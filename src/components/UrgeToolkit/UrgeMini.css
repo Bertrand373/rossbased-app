@@ -1,11 +1,11 @@
-/* components/UrgeToolkit/UrgeMini.css - Updated for darker theme */
+/* components/UrgeToolkit/UrgeMini.css */
 .urge-mini-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,13 +13,12 @@
 }
 
 .urge-mini-container {
-  background-color: var(--card-background);
+  background-color: white;
   border-radius: var(--radius-lg);
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  border: 1px solid var(--border);
 }
 
 .urge-mini-header {
@@ -27,18 +26,17 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-md);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--light-gray);
 }
 
 .urge-mini-header h3 {
   font-size: 1.125rem;
   margin: 0;
-  color: var(--text);
 }
 
 .close-btn {
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--gray);
   font-size: 1.25rem;
   padding: 0;
   display: flex;
@@ -48,7 +46,7 @@
 
 .urge-mini-tabs {
   display: flex;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--light-gray);
 }
 
 .mini-tab-btn {
@@ -61,13 +59,13 @@
   background: transparent;
   border: none;
   border-bottom: 3px solid transparent;
-  color: var(--text-secondary);
+  color: var(--gray);
   font-size: 0.875rem;
   transition: all 0.2s;
 }
 
 .mini-tab-btn.active {
-  color: var(--text-accent);
+  color: var(--primary);
   border-bottom-color: var(--primary);
 }
 
@@ -91,17 +89,15 @@
   width: 100%;
   text-align: center;
   padding: var(--spacing-md);
-  background-color: var(--medium-gray);
-  color: var(--text);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: white;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
 }
 
 .mini-time-left {
   font-size: 3rem;
   font-weight: 700;
   font-family: monospace;
-  color: var(--text-accent);
 }
 
 .mini-timer-label {
@@ -120,7 +116,7 @@
 .mini-timer-tip {
   text-align: center;
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--gray);
   margin-top: var(--spacing-sm);
 }
 
@@ -136,7 +132,7 @@
 .mini-suggestion-text {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-accent);
+  color: var(--primary);
   margin-bottom: var(--spacing-md);
 }
 
@@ -148,13 +144,12 @@
   width: 100%;
   margin-top: var(--spacing-md);
   padding-top: var(--spacing-md);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--light-gray);
 }
 
 .mini-effectiveness p {
   margin-bottom: var(--spacing-sm);
   font-size: 0.875rem;
-  color: var(--text);
 }
 
 .mini-feedback-buttons {
@@ -171,15 +166,16 @@
   padding: var(--spacing-sm);
   border-radius: var(--radius-md);
   font-size: 0.875rem;
-  background-color: var(--medium-gray);
 }
 
 .mini-feedback-btn.yes-btn {
+  background-color: rgba(34, 197, 94, 0.1);
   color: var(--success);
   border: 1px solid var(--success);
 }
 
 .mini-feedback-btn.no-btn {
+  background-color: rgba(239, 68, 68, 0.1);
   color: var(--danger);
   border: 1px solid var(--danger);
 }
@@ -196,9 +192,8 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-md);
-  background-color: var(--medium-gray);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
 }
 
 .mini-audio-info {
@@ -208,12 +203,11 @@
 
 .mini-audio-title {
   font-weight: 600;
-  color: var(--text);
 }
 
 .mini-audio-duration {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 .mini-audio-btn {
@@ -223,7 +217,7 @@
 .mini-audio-tip {
   text-align: center;
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 .mini-more-btn {

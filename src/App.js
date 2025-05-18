@@ -1,4 +1,4 @@
-// App.js - Updated with unified layout
+// App.js - Main application component
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -17,7 +17,7 @@ import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 
-// Custom hooks
+// Mock user data - In a real app, this would come from a backend
 import { useUserData } from './hooks/useUserData';
 
 function App() {
@@ -40,16 +40,7 @@ function App() {
   return (
     <Router>
       <div className="app-container">
-        <Toaster 
-          position="top-center" 
-          toastOptions={{
-            style: {
-              background: '#1a1a1a',
-              color: '#f9fafb',
-              border: '1px solid #2a2a2a'
-            },
-          }}
-        />
+        <Toaster position="top-center" />
         
         {showAuthModal && (
           <AuthModal 
@@ -58,75 +49,70 @@ function App() {
           />
         )}
         
-        {/* Combined top section for better cohesion */}
-        <div className="app-top-section">
-          <header className="app-header">
-            <h1>SR <span>Tracker</span></h1>
-            <div className="user-controls">
-              {isLoggedIn ? (
-                <div className="user-info">
-                  <span className="username">{userData.username}</span>
-                  <button className="logout-btn" onClick={logout}>Logout</button>
-                </div>
-              ) : (
-                <button className="login-btn" onClick={() => setShowAuthModal(true)}>Login</button>
-              )}
-            </div>
-          </header>
-          
-          {/* Integrated subscription banner */}
-          {!isPremium && <SubscriptionBanner />}
-          
-          {/* Navigation now part of the same visual element */}
-          {!isMobile ? (
-            <nav className="desktop-nav">
+        <header className="app-header">
+          <h1>SR Tracker</h1>
+          <div className="user-controls">
+            {isLoggedIn ? (
+              <div className="user-info">
+                <span className="username">{userData.username}</span>
+                <button className="logout-btn" onClick={logout}>Logout</button>
+              </div>
+            ) : (
+              <button className="login-btn" onClick={() => setShowAuthModal(true)}>Login</button>
+            )}
+          </div>
+        </header>
+        
+        {!isPremium && <SubscriptionBanner />}
+        
+        {!isMobile ? (
+          <nav className="desktop-nav">
+            <NavLink 
+              to="/" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('tracker')}>
+              Tracker
+            </NavLink>
+            <NavLink 
+              to="/calendar" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('calendar')}>
+              Calendar
+            </NavLink>
+            <NavLink 
+              to="/stats" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('stats')}>
+              Stats
+            </NavLink>
+            <NavLink 
+              to="/motivation" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('motivation')}>
+              Daily Motivation
+            </NavLink>
+            <NavLink 
+              to="/urge-toolkit" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('urge-toolkit')}>
+              Urge Toolkit
+            </NavLink>
+            {isPremium && (
               <NavLink 
-                to="/" 
+                to="/community" 
                 className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                onClick={() => setActiveTab('tracker')}>
-                Tracker
+                onClick={() => setActiveTab('community')}>
+                Community
               </NavLink>
-              <NavLink 
-                to="/calendar" 
-                className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                onClick={() => setActiveTab('calendar')}>
-                Calendar
-              </NavLink>
-              <NavLink 
-                to="/stats" 
-                className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                onClick={() => setActiveTab('stats')}>
-                Stats
-              </NavLink>
-              <NavLink 
-                to="/motivation" 
-                className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                onClick={() => setActiveTab('motivation')}>
-                Daily Motivation
-              </NavLink>
-              <NavLink 
-                to="/urge-toolkit" 
-                className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                onClick={() => setActiveTab('urge-toolkit')}>
-                Urge Toolkit
-              </NavLink>
-              {isPremium && (
-                <NavLink 
-                  to="/community" 
-                  className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                  onClick={() => setActiveTab('community')}>
-                  Community
-                </NavLink>
-              )}
-            </nav>
-          ) : (
-            <MobileNavigation 
-              activeTab={activeTab} 
-              setActiveTab={setActiveTab} 
-              isPremium={isPremium}
-            />
-          )}
-        </div>
+            )}
+          </nav>
+        ) : (
+          <MobileNavigation 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            isPremium={isPremium}
+          />
+        )}
         
         <main className="app-content">
           <Routes>
@@ -134,7 +120,7 @@ function App() {
             <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} />} />
             <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} />} />
             <Route path="/motivation" element={<DailyMotivation userData={userData} isPremium={isPremium} />} />
-            <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+            <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} />} />
             <Route path="/community" element={
               isPremium ? <Community userData={userData} /> : <SubscriptionBanner fullPage={true} />
             } />

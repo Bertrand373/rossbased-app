@@ -1,4 +1,4 @@
-// components/Subscription/SubscriptionBanner.js - Updated for unified layout
+// components/Subscription/SubscriptionBanner.js
 import React, { useState } from 'react';
 import './SubscriptionBanner.css';
 
@@ -16,12 +16,15 @@ const SubscriptionBanner = ({ fullPage = false }) => {
       {!fullPage ? (
         <div className="subscription-banner">
           <div className="subscription-banner-content">
+            <div className="banner-icon">
+              <FaCrown />
+            </div>
             <div className="banner-text">
-              <p><FaCrown style={{ color: '#ffdd00', marginRight: '8px' }} />Unlock all premium features for just $3.99/month</p>
+              <p>Unlock all premium features for just $3.99/month</p>
             </div>
             <div className="banner-actions">
               <button 
-                className="btn-light"
+                className="btn btn-light"
                 onClick={() => setShowModal(true)}
               >
                 Upgrade Now

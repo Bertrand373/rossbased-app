@@ -63,10 +63,6 @@
   background-color: var(--warning);
 }
 
-.legend-indicator.benefits {
-  background-color: #2563eb; /* Blue for tracked benefits */
-}
-
 .calendar-grid {
   border: 1px solid var(--light-gray);
   border-radius: var(--radius-md);
@@ -126,8 +122,8 @@
 
 .today .day-number {
   display: inline-block;
-  background-color: #ffffff; /* White circle */
-  color: #000000; /* Black text */
+  background-color: var(--primary);
+  color: white;
   width: 24px;
   height: 24px;
   border-radius: 50%;

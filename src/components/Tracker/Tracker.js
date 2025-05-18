@@ -1,3 +1,4 @@
+// components/Tracker/Tracker.js (continued)
 import React, { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -165,7 +166,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       {/* Main Tracker Content */}
       <div className="tracker-header">
-        <h2>Your Streak</h2>
+        <h2>Your Streak Tracker</h2>
         {userData.startDate && (
           <button 
             className="btn btn-outline edit-date-btn"
@@ -178,8 +179,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       <div className="streak-display">
         <div className="current-streak">
-          <div className="streak-count">Day {userData.currentStreak}</div>
-          <div className="streak-label">Current streak</div>
+          <div className="streak-count">{userData.currentStreak}</div>
+          <div className="streak-label">Current Streak</div>
         </div>
         
         <div className="streak-milestones">

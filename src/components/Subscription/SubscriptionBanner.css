@@ -1,25 +1,23 @@
-/* components/Subscription/SubscriptionBanner.css - Updated for unified layout */
-/* Banner Style - Updated for better integration */
+/* components/Subscription/SubscriptionBanner.css */
+/* Banner Style */
 .subscription-banner {
-  background-color: var(--card-background);
-  color: var(--text);
-  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(to right, var(--primary-light), var(--primary));
+  color: white;
+  padding: var(--spacing-sm);
   text-align: center;
-  border-bottom: 1px solid var(--border);
 }
 
 .subscription-banner-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
 .banner-icon {
   font-size: 1.25rem;
   margin-right: var(--spacing-md);
-  color: var(--text-accent);
 }
 
 .banner-text {
@@ -38,23 +36,23 @@
 }
 
 .btn-light {
-  background-color: var(--medium-gray);
-  color: var(--text);
+  background-color: white;
+  color: var(--primary);
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-full);
   font-weight: 600;
-  border: 1px solid var(--primary);
+  border: none;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .btn-light:hover {
-  border-color: var(--primary-light);
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .close-banner-btn {
   background: transparent;
-  color: var(--text-secondary);
+  color: white;
   border: none;
   font-size: 1rem;
   cursor: pointer;
@@ -85,18 +83,17 @@
 
 .crown-icon {
   font-size: 2.5rem;
-  color: var(--text-accent);
+  color: var(--primary);
   margin-bottom: var(--spacing-md);
 }
 
 .subscription-header h2 {
   font-size: 2rem;
   margin-bottom: var(--spacing-sm);
-  color: var(--text);
 }
 
 .subscription-header p {
-  color: var(--text-secondary);
+  color: var(--gray);
   font-size: 1.125rem;
 }
 
@@ -107,35 +104,32 @@
 }
 
 .feature-card {
-  background-color: var(--medium-gray);
+  background-color: white;
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   text-align: center;
-  border: 1px solid var(--border);
 }
 
 .feature-icon {
   font-size: 2rem;
-  color: var(--text-accent);
+  color: var(--primary);
   margin-bottom: var(--spacing-md);
 }
 
 .feature-card h3 {
   margin-bottom: var(--spacing-md);
-  color: var(--text);
 }
 
 .feature-card p {
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 .subscription-pricing {
-  background-color: var(--medium-gray);
+  background-color: white;
   border-radius: var(--radius-md);
   padding: var(--spacing-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
 }
 
 .pricing-header {
@@ -146,11 +140,10 @@
 .pricing-header h3 {
   font-size: 1.5rem;
   margin-bottom: var(--spacing-sm);
-  color: var(--text);
 }
 
 .pricing-header p {
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 .pricing-options {
@@ -163,17 +156,16 @@
 .pricing-card {
   flex: 1;
   max-width: 300px;
-  background-color: var(--card-background);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   text-align: center;
   position: relative;
-  border: 1px solid var(--border);
 }
 
 .pricing-card.best-value {
-  background-color: var(--card-background);
-  border: 1px solid var(--primary);
+  background-color: rgba(37, 99, 235, 0.05);
+  border: 2px solid var(--primary);
   transform: scale(1.05);
 }
 
@@ -182,30 +174,28 @@
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--medium-gray);
-  color: var(--text-accent);
+  background-color: var(--primary);
+  color: white;
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 600;
-  border: 1px solid var(--primary);
 }
 
 .pricing-title {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: var(--spacing-md);
-  color: var(--text);
 }
 
 .pricing-amount {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--text-accent);
+  color: var(--primary);
 }
 
 .pricing-period {
-  color: var(--text-secondary);
+  color: var(--gray);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -214,7 +204,6 @@
   margin-bottom: var(--spacing-lg);
   text-align: left;
   padding-left: var(--spacing-md);
-  color: var(--text);
 }
 
 .pricing-features li {
@@ -227,7 +216,7 @@
   content: "✓";
   position: absolute;
   left: 0;
-  color: var(--text-accent);
+  color: var(--primary);
   font-weight: bold;
 }
 
@@ -238,14 +227,12 @@
 .guarantee {
   text-align: center;
   font-style: italic;
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 /* Modal Style */
 .subscription-modal {
   max-width: 600px;
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
 }
 
 .modal-close {
@@ -255,14 +242,13 @@
   background: transparent;
   border: none;
   font-size: 1rem;
-  color: var(--text-secondary);
+  color: var(--gray);
   cursor: pointer;
 }
 
 .subscription-modal h3 {
   text-align: center;
   margin-bottom: var(--spacing-lg);
-  color: var(--text);
 }
 
 .subscription-options {
@@ -273,17 +259,16 @@
 
 .subscription-option {
   flex: 1;
-  border: 1px solid var(--border);
+  border: 1px solid var(--light-gray);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   text-align: center;
   position: relative;
-  background-color: var(--medium-gray);
 }
 
 .subscription-option.recommended {
   border-color: var(--primary);
-  background-color: var(--card-background);
+  background-color: rgba(37, 99, 235, 0.05);
 }
 
 .recommended-badge {
@@ -291,13 +276,12 @@
   top: -10px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--medium-gray);
-  color: var(--text-accent);
+  background-color: var(--primary);
+  color: white;
   padding: 2px 8px;
   border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 600;
-  border: 1px solid var(--primary);
 }
 
 .option-header {
@@ -306,18 +290,17 @@
 
 .option-header h4 {
   margin-bottom: var(--spacing-sm);
-  color: var(--text);
 }
 
 .option-price {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-accent);
+  color: var(--primary);
 }
 
 .option-period {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 .option-btn {
@@ -330,7 +313,6 @@
 
 .premium-features-list h4 {
   margin-bottom: var(--spacing-md);
-  color: var(--text);
 }
 
 .premium-features-list ul {
@@ -338,17 +320,12 @@
   grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-sm) var(--spacing-md);
   padding-left: var(--spacing-xl);
-  color: var(--text);
-}
-
-.premium-features-list ul li::before {
-  color: var(--text-accent);
 }
 
 .trial-note {
   text-align: center;
   font-style: italic;
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 /* Mobile responsiveness */

@@ -1,129 +1,299 @@
-import React, { useState, useEffect } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, subMonths, addMonths, parseISO, differenceInDays } from 'date-fns';
+// components/Calendar/Calendar.js
+import React, { useState } from 'react';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
+  isSameDay, subMonths, addMonths, parseISO, differenceInDays } from 'date-fns';
 import './Calendar.css';
 
-const Calendar = ({ userData, isPremium, updateUserData }) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+// Icons
+import { FaChevronLeft, FaChevronRight, FaCheckCircle, FaTimesCircle, FaMoon, FaInfoCircle } from 'react-icons/fa';
+
+const Calendar = ({ userData, isPremium }) => {
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [status, setStatus] = useState('');
+  const [dayInfoModal, setDayInfoModal] = useState(false);
 
-  const startMonth = startOfMonth(currentMonth);
-  const endMonth = endOfMonth(currentMonth);
-  const startDate = startOfWeek(startMonth);
-  const endDate = endOfWeek(endMonth);
+  // Next and previous month handlers
+  const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+  const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
 
-  const days = [];
-  let day = startDate;
-  while (day <= endDate) {
-    days.push(day);
-    day = addDays(day, 1);
-  }
-
-  const handleStatusChange = async (date, newStatus) => {
-    if (!updateUserData) {
-      console.error('updateUserData is not defined');
-      return;
+  // Helper function to determine day status based on streak history
+  const getDayStatus = (day) => {
+    // If before start date, return null
+    if (userData.startDate && day < userData.startDate) {
+      return null;
     }
-
-    const updatedStreakHistory = [...userData.streakHistory];
-    const updatedWetDreamDates = [...userData.wetDreamDates];
-    let updatedWetDreamCount = userData.wetDreamCount;
-    let updatedRelapseCount = userData.relapseCount;
-    let currentStreak = userData.currentStreak;
-
-    if (newStatus === 'Relapse') {
-      updatedRelapseCount += 1;
-      currentStreak = 0;
-      updatedStreakHistory.push({
-        id: updatedStreakHistory.length + 1,
-        start: userData.startDate,
-        end: date,
-        days: differenceInDays(date, userData.startDate),
-        reason: 'relapse'
-      });
-    } else if (newStatus === 'Wet Dream') {
-      updatedWetDreamDates.push(format(date, 'yyyy-MM-dd'));
-      updatedWetDreamCount += 1;
-    } else if (newStatus === 'Success') {
-      currentStreak += 1;
+    
+    // Initialize with success (streak maintained)
+    let status = 'success';
+    
+    // Check for wet dreams - mocked data for demonstration
+    const wetDreamDates = [5, 17].map(dayNum => 
+      new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNum)
+    );
+    
+    if (wetDreamDates.some(date => isSameDay(date, day))) {
+      status = 'wet-dream';
     }
-
-    try {
-      await updateUserData({
-        streakHistory: updatedStreakHistory,
-        wetDreamDates: updatedWetDreamDates,
-        wetDreamCount: updatedWetDreamCount,
-        relapseCount: updatedRelapseCount,
-        currentStreak
-      });
-      setStatus(newStatus);
-      setShowModal(false);
-    } catch (err) {
-      console.error('Error updating user data:', err);
+    
+    // Check for relapses - using streak history
+    const isRelapse = userData.streakHistory.some(streak => 
+      streak.end && isSameDay(streak.end, day) && streak.reason === 'relapse'
+    );
+    
+    if (isRelapse) {
+      status = 'relapse';
     }
+    
+    return status;
   };
 
-  const getDayStatus = (date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    if (userData.wetDreamDates.includes(dateStr)) return 'Wet Dream';
-    const relapse = userData.streakHistory.find(streak => streak.reason === 'relapse' && isSameDay(parseISO(streak.end), date));
-    if (relapse) return 'Relapse';
-    return 'Success';
-  };
-
-  const getDayBenefits = (date) => {
-    return userData.benefitTracking.find(item => isSameDay(parseISO(item.date), date));
-  };
-
-  const onDateClick = (day) => {
+  // Show day details
+  const showDayDetails = (day) => {
     setSelectedDate(day);
-    setStatus(getDayStatus(day));
-    setShowModal(true);
+    setDayInfoModal(true);
   };
 
-  const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
-  const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+  // Get day benefits data
+  const getDayBenefits = (day) => {
+    if (!userData.benefitTracking) return null;
+    return userData.benefitTracking.find(benefit => 
+      isSameDay(new Date(benefit.date), day)
+    );
+  };
+
+  // Render day cell with appropriate styling
+  const renderDayCell = (day, dayIndex) => {
+    const dayStatus = getDayStatus(day);
+    const isSelected = selectedDate && isSameDay(day, selectedDate);
+    const isToday = isSameDay(day, new Date());
+    const dayBenefits = getDayBenefits(day);
+    
+    // Classes for day cell
+    const dayClasses = [
+      'day-cell',
+      !isSameMonth(day, currentDate) ? 'other-month' : '',
+      isToday ? 'today' : '',
+      isSelected ? 'selected' : '',
+      dayStatus === 'success' ? 'success-day' : '',
+      dayStatus === 'relapse' ? 'relapse-day' : '',
+      dayStatus === 'wet-dream' ? 'wet-dream-day' : ''
+    ].filter(Boolean).join(' ');
+
+    return (
+      <div 
+        key={dayIndex} 
+        className={dayClasses}
+        onClick={() => showDayDetails(day)}
+      >
+        <div className="day-number">{format(day, 'd')}</div>
+        
+        {dayStatus && (
+          <div className="day-indicator">
+            {dayStatus === 'success' && <FaCheckCircle className="success-icon" />}
+            {dayStatus === 'relapse' && <FaTimesCircle className="relapse-icon" />}
+            {dayStatus === 'wet-dream' && <FaMoon className="wet-dream-icon" />}
+          </div>
+        )}
+        
+        {isPremium && dayBenefits && (
+          <div className="day-benefits-indicator">
+            <div className="benefit-dot" style={{ 
+              background: `rgba(37, 99, 235, ${dayBenefits.energy / 10})` 
+            }}></div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Build calendar days
+  const renderCalendarDays = () => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(monthStart);
+    const startDate = startOfWeek(monthStart);
+    const endDate = endOfWeek(monthEnd);
+    
+    const dateFormat = "EEEE";
+    const days = [];
+    const rows = [];
+    
+    // Create header row with day names
+    let daysHeader = [];
+    let day = startDate;
+    
+    for (let i = 0; i < 7; i++) {
+      daysHeader.push(
+        <div key={`header-${i}`} className="day-header">
+          {format(day, dateFormat).substring(0, 3)}
+        </div>
+      );
+      day = addDays(day, 1);
+    }
+    
+    rows.push(<div className="calendar-row header-row" key="header">{daysHeader}</div>);
+    
+    // Reset for actual day cells
+    day = startDate;
+    let formattedDate = "";
+    
+    // Create calendar rows
+    while (day <= endDate) {
+      const week = [];
+      
+      for (let i = 0; i < 7; i++) {
+        formattedDate = format(day, "d");
+        week.push(renderDayCell(day, i));
+        day = addDays(day, 1);
+      }
+      
+      rows.push(
+        <div className="calendar-row" key={`row-${format(day, 'yyyy-MM-dd')}`}>
+          {week}
+        </div>
+      );
+    }
+    
+    return rows;
+  };
 
   return (
     <div className="calendar-container">
-      <header className="calendar-header">
-        <button onClick={prevMonth}>&lt;</button>
-        <h2>{format(currentMonth, 'MMMM yyyy')}</h2>
-        <button onClick={nextMonth}>&gt;</button>
-      </header>
-      <div className="calendar-grid">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="calendar-day-header">{day}</div>
-        ))}
-        {days.map(day => {
-          const status = getDayStatus(day);
-          const benefits = getDayBenefits(day);
-          return (
-            <div
-              key={day}
-              className={`calendar-day ${!isSameMonth(day, startMonth) ? 'disabled' : ''} ${isSameDay(day, new Date()) ? 'today' : ''}`}
-              onClick={() => isSameMonth(day, startMonth) && onDateClick(day)}
-            >
-              <span>{format(day, 'd')}</span>
-              {benefits && <div className="benefit-dot" />}
-              {status === 'Relapse' && <div className="relapse-marker" />}
-              {status === 'Wet Dream' && <div className="wet-dream-marker" />}
-            </div>
-          );
-        })}
+      <div className="calendar-header">
+        <h2>Streak Calendar</h2>
+        <div className="month-navigation">
+          <button className="month-nav-btn" onClick={prevMonth}>
+            <FaChevronLeft />
+          </button>
+          <h3>{format(currentDate, 'MMMM yyyy')}</h3>
+          <button className="month-nav-btn" onClick={nextMonth}>
+            <FaChevronRight />
+          </button>
+        </div>
       </div>
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
+      
+      <div className="calendar-legend">
+        <div className="legend-item">
+          <div className="legend-indicator success"></div>
+          <span>Streak Day</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-indicator relapse"></div>
+          <span>Relapse</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-indicator wet-dream"></div>
+          <span>Wet Dream</span>
+        </div>
+      </div>
+      
+      <div className="calendar-grid">
+        {renderCalendarDays()}
+      </div>
+      
+      {dayInfoModal && selectedDate && (
+        <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
+          <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
             <h3>{format(selectedDate, 'MMMM d, yyyy')}</h3>
-            <select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option value="Success">Success</option>
-              <option value="Relapse">Relapse</option>
-              <option value="Wet Dream">Wet Dream</option>
-            </select>
-            <button onClick={() => handleStatusChange(selectedDate, status)}>Save</button>
-            <button onClick={() => setShowModal(false)}>Cancel</button>
+            
+            <div className="day-status-info">
+              {getDayStatus(selectedDate) === 'success' && (
+                <div className="status-badge success">
+                  <FaCheckCircle /> Streak Maintained
+                </div>
+              )}
+              
+              {getDayStatus(selectedDate) === 'relapse' && (
+                <div className="status-badge relapse">
+                  <FaTimesCircle /> Relapse Day
+                </div>
+              )}
+              
+              {getDayStatus(selectedDate) === 'wet-dream' && (
+                <div className="status-badge wet-dream">
+                  <FaMoon /> Wet Dream
+                </div>
+              )}
+            </div>
+            
+            {userData.startDate && selectedDate >= userData.startDate && (
+              <div className="day-streak-info">
+                Day {differenceInDays(selectedDate, userData.startDate) + 1} of current streak
+              </div>
+            )}
+            
+            {isPremium ? (
+              <>
+                <div className="day-benefits">
+                  <h4>Tracked Benefits</h4>
+                  
+                  {getDayBenefits(selectedDate) ? (
+                    <div className="benefits-details">
+                      <div className="benefit-item">
+                        <span>Energy:</span>
+                        <div className="benefit-meter">
+                          <div 
+                            className="benefit-level" 
+                            style={{ width: `${getDayBenefits(selectedDate).energy * 10}%` }}
+                          ></div>
+                        </div>
+                        <span>{getDayBenefits(selectedDate).energy}/10</span>
+                      </div>
+                      
+                      <div className="benefit-item">
+                        <span>Focus:</span>
+                        <div className="benefit-meter">
+                          <div 
+                            className="benefit-level" 
+                            style={{ width: `${getDayBenefits(selectedDate).focus * 10}%` }}
+                          ></div>
+                        </div>
+                        <span>{getDayBenefits(selectedDate).focus}/10</span>
+                      </div>
+                      
+                      <div className="benefit-item">
+                        <span>Confidence:</span>
+                        <div className="benefit-meter">
+                          <div 
+                            className="benefit-level" 
+                            style={{ width: `${getDayBenefits(selectedDate).confidence * 10}%` }}
+                          ></div>
+                        </div>
+                        <span>{getDayBenefits(selectedDate).confidence}/10</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="no-benefits">
+                      <FaInfoCircle />
+                      <span>No benefits tracked for this day</span>
+                    </div>
+                  )}
+                </div>
+                
+                {userData.notes && userData.notes[format(selectedDate, 'yyyy-MM-dd')] && (
+                  <div className="day-journal">
+                    <h4>Journal Entry</h4>
+                    <div className="journal-entry">
+                      {userData.notes[format(selectedDate, 'yyyy-MM-dd')]}
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="premium-teaser">
+                <h4>Premium Features</h4>
+                <p>Upgrade to premium to see detailed benefit tracking and journal entries for each day.</p>
+                <button className="btn btn-primary">Upgrade Now</button>
+              </div>
+            )}
+            
+            <div className="modal-actions">
+              <button 
+                className="btn btn-outline" 
+                onClick={() => setDayInfoModal(false)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -132,4 +302,3 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 };
 
 export default Calendar;
-

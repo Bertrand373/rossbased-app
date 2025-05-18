@@ -1,17 +1,15 @@
-/* components/Stats/Stats.css - Removing containers and expanding content */
+/* components/Stats/Stats.css */
 .stats-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
 }
 
-/* Streak Statistics - Removed container border */
+/* Streak Statistics */
 .streak-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-md);
-  /* Removed background-color, border and border-radius */
-  /* Removed padding to expand content width */
 }
 
 .stat-card {
@@ -20,12 +18,10 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-lg);
-  background-color: var(--medium-gray);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
-  border: 1px solid var(--border);
-  color: var(--text);
 }
 
 .stat-card:hover {
@@ -36,40 +32,51 @@
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1;
-  color: var(--text); /* White text */
 }
 
 .stat-card .stat-label {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--gray);
   margin-top: var(--spacing-sm);
 }
 
-/* Remove all colored styling from individual cards */
-.current-streak, 
-.longest-streak, 
-.total-wetdreams, 
+.current-streak {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: white;
+}
+
+.current-streak .stat-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.longest-streak {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+.longest-streak .stat-value {
+  color: var(--success);
+}
+
+.total-wetdreams {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.total-wetdreams .stat-value {
+  color: var(--warning);
+}
+
 .total-relapses {
-  background-color: var(--medium-gray);
-  border: 1px solid var(--border);
+  background-color: rgba(239, 68, 68, 0.1);
 }
 
-.current-streak .stat-value,
-.longest-streak .stat-value,
-.total-wetdreams .stat-value,
 .total-relapses .stat-value {
-  color: var(--text);
+  color: var(--danger);
 }
 
-/* Milestone Badges - Removed container */
-.milestone-section {
-  /* Removed background-color, border, border-radius and padding */
-}
-
+/* Milestone Badges */
 .milestone-section h3, .benefits-section h3 {
   margin-bottom: var(--spacing-md);
   font-size: 1.25rem;
-  color: var(--text);
 }
 
 .badges-grid {
@@ -83,18 +90,16 @@
   flex-direction: column;
   align-items: center;
   padding: var(--spacing-md);
-  background-color: var(--medium-gray);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   text-align: center;
-  border: 1px solid var(--border);
 }
 
 .badge-card.earned {
-  background-color: var(--medium-gray);
+  background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--primary);
 }
 
 .badge-card.earned:hover {
@@ -108,15 +113,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--card-background);
+  background-color: var(--light-gray);
   border-radius: 50%;
   margin-bottom: var(--spacing-sm);
 }
 
 .badge-card.earned .badge-icon {
-  background-color: var(--card-background);
-  border: 1px solid var(--primary);
-  color: var(--text-accent);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: white;
 }
 
 .badge-earned-icon, .badge-locked-icon {
@@ -124,25 +128,20 @@
 }
 
 .badge-locked-icon {
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 .badge-name {
   font-weight: 600;
   margin-bottom: var(--spacing-xs);
-  color: var(--text);
 }
 
 .badge-date {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
-/* Benefits Tracking - Removed container */
-.benefits-section {
-  /* Removed background-color, border, border-radius and padding */
-}
-
+/* Benefits Tracking */
 .benefits-controls {
   display: flex;
   justify-content: space-between;
@@ -155,31 +154,27 @@
 }
 
 .metric-btn, .time-btn {
-  background-color: var(--medium-gray);
+  background-color: var(--light-gray);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
-  color: var(--text);
-  border: 1px solid var(--border);
 }
 
 .metric-btn.active, .time-btn.active {
-  background-color: var(--medium-gray);
-  color: var(--text-accent);
-  border-color: var(--primary);
+  background-color: var(--primary);
+  color: white;
 }
 
 .chart-container {
   height: 300px;
   margin-bottom: var(--spacing-lg);
-  background-color: var(--medium-gray);
+  background-color: white;
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
 }
 
 .benefits-stats {
@@ -191,39 +186,36 @@
 .average-stat {
   flex: 1;
   padding: var(--spacing-md);
-  background-color: var(--medium-gray);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
 }
 
 .average-stat .stat-label {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--gray);
   margin-bottom: var(--spacing-sm);
 }
 
 .average-stat .stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--text);
+  color: var(--primary);
 }
 
 .streak-comparison {
   flex: 2;
   padding: var(--spacing-md);
-  background-color: var(--medium-gray);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
 }
 
 .streak-comparison h4 {
   margin-bottom: var(--spacing-md);
   font-size: 1rem;
-  color: var(--text);
 }
 
 .comparison-grid {
@@ -238,27 +230,25 @@
 
 .comparison-label {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--gray);
   margin-bottom: var(--spacing-xs);
 }
 
 .comparison-value {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text);
+  color: var(--primary);
 }
 
 .benefits-insights {
   padding: var(--spacing-md);
-  background-color: var(--medium-gray);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
 }
 
 .benefits-insights h4 {
   margin-bottom: var(--spacing-md);
   font-size: 1rem;
-  color: var(--text);
 }
 
 .insights-list {
@@ -272,20 +262,17 @@
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--card-background);
+  background-color: white;
   border-radius: var(--radius-md);
   transition: background-color 0.2s;
-  border: 1px solid var(--border);
-  color: var(--text);
 }
 
 .insight-item.highlighted {
-  background-color: var(--card-background);
-  border-color: var(--primary);
+  background-color: rgba(37, 99, 235, 0.1);
 }
 
 .insight-icon {
-  color: var(--text-accent);
+  color: var(--primary);
   font-size: 1.25rem;
   flex-shrink: 0;
 }
@@ -293,15 +280,13 @@
 /* Free Benefit Tracker */
 .free-benefit-tracker {
   padding: var(--spacing-lg);
-  background-color: var(--medium-gray);
+  background-color: white;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
 }
 
 .free-benefit-tracker h4 {
   margin-bottom: var(--spacing-md);
   font-size: 1rem;
-  color: var(--text);
 }
 
 .benefit-rating {
@@ -318,60 +303,49 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--gray);
   margin-top: var(--spacing-xs);
 }
 
 .limited-stats {
   margin-top: var(--spacing-lg);
   padding-top: var(--spacing-md);
-  border-top: 1px solid var(--border);
-  color: var(--text);
+  border-top: 1px solid var(--light-gray);
 }
 
 /* Badge Modal */
 .badge-modal {
   text-align: center;
   max-width: 450px;
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
 }
 
 .badge-trophy {
   width: 80px;
   height: 80px;
-  background-color: var(--medium-gray);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto var(--spacing-md);
-  color: var(--text-accent);
-  border: 2px solid var(--primary);
+  color: white;
 }
 
 .badge-trophy-icon {
   font-size: 3rem;
 }
 
-.badge-modal h3 {
-  color: var(--text);
-  margin-bottom: var(--spacing-sm);
-}
-
 .badge-earned-date {
   margin-bottom: var(--spacing-md);
-  color: var(--text-secondary);
+  color: var(--gray);
   font-size: 0.875rem;
 }
 
 .badge-description {
-  background-color: var(--medium-gray);
+  background-color: var(--light-gray);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
   margin-bottom: var(--spacing-lg);
-  border: 1px solid var(--border);
-  color: var(--text);
 }
 
 .badge-benefits {
@@ -381,7 +355,6 @@
 
 .badge-benefits h4 {
   margin-bottom: var(--spacing-md);
-  color: var(--text);
 }
 
 .badge-benefits ul {
@@ -393,7 +366,6 @@
   align-items: center;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-sm);
-  color: var(--text);
 }
 
 .check-icon {

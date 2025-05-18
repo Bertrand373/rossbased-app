@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css - Updated for darker theme (continued) */
+/* components/UrgeToolkit/UrgeToolkit.css */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -6,13 +6,13 @@
 }
 
 .toolkit-description {
-  color: var(--text-secondary);
+  color: var(--gray);
   margin-bottom: var(--spacing-md);
 }
 
 .toolkit-tabs {
   display: flex;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--light-gray);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -24,17 +24,17 @@
   background: transparent;
   border: none;
   border-bottom: 3px solid transparent;
-  color: var(--text-secondary);
+  color: var(--gray);
   font-weight: 500;
   transition: all 0.2s;
 }
 
 .tab-btn:hover {
-  color: var(--text);
+  color: var(--primary);
 }
 
 .tab-btn.active {
-  color: var(--text-accent);
+  color: var(--primary);
   border-bottom-color: var(--primary);
 }
 
@@ -54,18 +54,16 @@
   flex-direction: column;
   align-items: center;
   padding: var(--spacing-xl);
-  background-color: var(--medium-gray);
-  color: var(--text);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: white;
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
 }
 
 .time-left {
   font-size: 4rem;
   font-weight: 700;
   font-family: monospace;
-  color: var(--text-accent);
 }
 
 .timer-label {
@@ -75,10 +73,9 @@
 }
 
 .timer-instructions {
-  background-color: var(--card-background);
+  background-color: var(--light-gray);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
 }
 
 .timer-instructions ul {
@@ -92,7 +89,7 @@
 
 .timer-motivation {
   font-weight: 500;
-  color: var(--text-accent);
+  color: var(--primary);
   margin-top: var(--spacing-md);
 }
 
@@ -121,20 +118,19 @@
   justify-content: center;
   gap: var(--spacing-lg);
   padding: var(--spacing-xl);
-  background-color: var(--medium-gray);
+  background-color: var(--light-gray);
   border-radius: var(--radius-lg);
   text-align: center;
-  border: 1px solid var(--border);
 }
 
 .suggestion-text {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-accent);
+  color: var(--primary);
 }
 
 .empty-suggestion {
-  color: var(--text-secondary);
+  color: var(--gray);
   max-width: 400px;
 }
 
@@ -143,20 +139,18 @@
 }
 
 .redirect-info {
-  background-color: var(--card-background);
+  background-color: white;
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
 }
 
 .premium-feature {
   margin-top: var(--spacing-md);
   padding: var(--spacing-md);
-  background-color: var(--medium-gray);
+  background-color: rgba(37, 99, 235, 0.1);
   border-radius: var(--radius-md);
-  color: var(--text);
-  border: 1px solid var(--border);
+  color: var(--primary);
 }
 
 /* Audio Affirmations Tab */
@@ -177,15 +171,13 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-md);
-  background-color: var(--medium-gray);
+  background-color: white;
   border-radius: var(--radius-md);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
 }
 
 .audio-item.premium-locked {
-  background-color: var(--card-background);
-  opacity: 0.7;
+  background-color: var(--light-gray);
 }
 
 .audio-info {
@@ -198,17 +190,16 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  color: var(--text);
 }
 
 .lock-icon-small {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 .audio-duration {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--gray);
 }
 
 .audio-play-btn {
@@ -221,9 +212,8 @@
 
 .audio-info-section {
   padding: var(--spacing-lg);
-  background-color: var(--card-background);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
 }
 
 .premium-upgrade {
@@ -234,17 +224,15 @@
 .premium-upgrade p {
   margin-bottom: var(--spacing-md);
   font-style: italic;
-  color: var(--text-secondary);
 }
 
 /* Effectiveness Feedback */
 .effectiveness-feedback {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-md);
-  background-color: var(--card-background);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
   text-align: center;
-  border: 1px solid var(--border);
 }
 
 .feedback-buttons {
@@ -261,15 +249,16 @@
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-full);
   font-weight: 500;
-  background-color: var(--medium-gray);
 }
 
 .yes-btn {
+  background-color: rgba(34, 197, 94, 0.1);
   color: var(--success);
   border: 1px solid var(--success);
 }
 
 .no-btn {
+  background-color: rgba(239, 68, 68, 0.1);
   color: var(--danger);
   border: 1px solid var(--danger);
 }
@@ -278,16 +267,14 @@
 .usage-counter {
   margin-top: var(--spacing-md);
   padding: var(--spacing-md);
-  background-color: var(--card-background);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
   text-align: center;
-  border: 1px solid var(--border);
 }
 
 .usage-counter p {
   margin-bottom: var(--spacing-md);
   font-style: italic;
-  color: var(--text-secondary);
 }
 
 /* Mobile responsiveness */
@@ -332,7 +319,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
