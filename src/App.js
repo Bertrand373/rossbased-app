@@ -1,15 +1,14 @@
-// App.js - Replaced text logo with image
+// App.js - Updated with unified layout
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
-import logo from './assets/logo.png'; // Import logo image
 
 // Tabs
 import Tracker from './components/Tracker/Tracker';
 import Calendar from './components/Calendar/Calendar';
 import Stats from './components/Stats/Stats';
-// import DailyMotivation from './components/DailyMotivation/DailyMotivation';
+import DailyMotivation from './components/DailyMotivation/DailyMotivation';
 import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Community from './components/Community/Community';
 
@@ -59,9 +58,10 @@ function App() {
           />
         )}
         
+        {/* Combined top section for better cohesion */}
         <div className="app-top-section">
           <header className="app-header">
-            <img src={logo} alt="Titantrack Logo" className="app-logo" />
+            <h1>SR <span>Tracker</span></h1>
             <div className="user-controls">
               {isLoggedIn ? (
                 <div className="user-info">
@@ -74,8 +74,10 @@ function App() {
             </div>
           </header>
           
+          {/* Integrated subscription banner */}
           {!isPremium && <SubscriptionBanner />}
           
+          {/* Navigation now part of the same visual element */}
           {!isMobile ? (
             <nav className="desktop-nav">
               <NavLink 
@@ -95,6 +97,12 @@ function App() {
                 className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                 onClick={() => setActiveTab('stats')}>
                 Stats
+              </NavLink>
+              <NavLink 
+                to="/motivation" 
+                className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+                onClick={() => setActiveTab('motivation')}>
+                Daily Motivation
               </NavLink>
               <NavLink 
                 to="/urge-toolkit" 
@@ -125,6 +133,7 @@ function App() {
             <Route path="/" element={<Tracker userData={userData} updateUserData={updateUserData} isPremium={isPremium} />} />
             <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} />} />
             <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} />} />
+            <Route path="/motivation" element={<DailyMotivation userData={userData} isPremium={isPremium} />} />
             <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
             <Route path="/community" element={
               isPremium ? <Community userData={userData} /> : <SubscriptionBanner fullPage={true} />

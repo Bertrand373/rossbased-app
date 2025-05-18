@@ -1,22 +1,20 @@
 {
-  "name": "rossbased-app",
+  "name": "titantrack",
   "version": "1.0.0",
-  "description": "Semen Retention Tracker Web App for Rossbased",
+  "description": "Semen Retention Tracker Web App",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "server": "node server/index.js"
+    "eject": "react-scripts eject"
   },
   "keywords": [
     "react",
     "webapp",
-    "rossbased",
-    "semen-retention"
+    "titantrack"
   ],
-  "author": "Bertrand373",
+  "author": "Your Name",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.9.0",
@@ -27,19 +25,10 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^5.0.1",
-    "react-router-dom": "^6.30.0",
+    "react-router-dom": "^6.22.0",
     "react-scripts": "^5.0.1"
   },
-  "overrides": {
-    "svgo": "^2.8.0",
-    "nth-check": "^2.0.1",
-    "postcss": "^8.4.31",
-    "resolve-url-loader": "^5.0.0"
-  },
-  "homepage": "https://app.rossbased.com",
-  "engines": {
-    "node": ">=14.x"
-  },
+  "homepage": "https://titantrack.app",
   "browserslist": {
     "production": [
       ">0.2%",

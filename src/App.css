@@ -1,7 +1,7 @@
-/* Updated App.css - Added logo image styling */
+/* Updated App.css - Improved layout cohesion */
 :root {
   /* Dark theme variables */
-  --primary: #ffdd00;
+  --primary: #ffdd00; /* Accent color */
   --primary-light: #ffea66;
   --primary-dark: #e6c700;
   --accent: #ffdd00;
@@ -12,15 +12,15 @@
   --warning: #fbbf24;
   --gray: #9ca3af;
   --light-gray: #1f1f1f;
-  --medium-gray: #2a2a2a;
+  --medium-gray: #2a2a2a; /* Added for elements that need slight contrast */
   --dark-gray: #d1d5db;
-  --background: #0f0f0f;
+  --background: #0f0f0f; /* Dark background */
   --card-background: #1a1a1a;
-  --banner-background: #1a1a1a;
-  --banner-accent: #2a2a2a;
+  --banner-background: #1a1a1a; /* New - for previous yellow banners */
+  --banner-accent: #2a2a2a; /* New - for banner accents */
   --text: #f9fafb;
   --text-secondary: #d1d5db;
-  --text-accent: #ffdd00;
+  --text-accent: #ffdd00; /* For text that needs accent color */
   --border: #2a2a2a;
   --hover-overlay: rgba(255, 255, 255, 0.05);
   --card-background-rgb: 26, 26, 26;
@@ -52,16 +52,16 @@ body {
   line-height: 1.5;
 }
 
-/* App container */
+/* Updated app container to increase cohesion */
 .app-container {
-  max-width: 1000px;
+  max-width: 1000px; /* Reduced from 1200px */
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Top section */
+/* Unified header/nav container */
 .app-top-section {
   background-color: var(--card-background);
   border-radius: var(--radius-lg);
@@ -70,20 +70,23 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Header */
+/* Updated header with more subtle styling */
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-lg) var(--spacing-lg);
   border-bottom: 1px solid var(--border);
 }
 
-/* Logo image styling */
-.app-logo {
-  height: 40px; /* Adjust based on your image */
-  max-width: 150px; /* Prevent oversized images */
-  object-fit: contain; /* Maintain aspect ratio */
+.app-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.app-header h1 span {
+  color: var(--text-accent);
 }
 
 .user-controls {
@@ -116,22 +119,18 @@ button:active {
   transform: scale(0.98);
 }
 
-/* Yellow login/logout button */
 .login-btn, .logout-btn {
-  background-color: var(--primary, #ffdd00);
-  color: #000000;
-  border: 1px solid var(--primary-dark, #e6c700);
-  padding: var(--spacing-sm) var(--spacing-md);
-  font-size: 0.9rem;
+  background-color: var(--medium-gray);
+  color: var(--text);
+  border: 1px solid var(--primary);
 }
 
 .login-btn:hover, .logout-btn:hover {
-  background-color: #ffffff;
-  border-color: #ffffff;
-  color: #000000;
+  background-color: var(--medium-gray);
+  border-color: var(--primary-light);
 }
 
-/* Subscription banner */
+/* Updated banner styling with better integration */
 .subscription-banner {
   background-color: var(--card-background);
   color: var(--text);
@@ -139,12 +138,11 @@ button:active {
   border-bottom: 1px solid var(--border);
 }
 
-/* Desktop navigation - Centered menu items */
+/* Updated desktop navigation */
 .desktop-nav {
   display: flex;
-  justify-content: center;
   background-color: var(--card-background);
-  padding: var(--spacing-md) 0;
+  padding: 0 var(--spacing-lg);
 }
 
 .nav-link {
@@ -156,7 +154,7 @@ button:active {
 }
 
 .nav-link.active {
-  color: var(--text);
+  color: var(--text-accent);
 }
 
 .nav-link.active::after {
@@ -169,39 +167,7 @@ button:active {
   background-color: var(--primary);
 }
 
-/* Mobile navigation */
-.mobile-navigation {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: var(--card-background);
-  display: flex;
-  justify-content: space-around;
-  padding: var(--spacing-sm) 0;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-}
-
-.mobile-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: var(--text-secondary);
-  font-size: 0.7rem;
-}
-
-.mobile-nav-item.active {
-  color: var(--text-accent);
-}
-
-.mobile-nav-icon {
-  font-size: 1.5rem;
-  margin-bottom: var(--spacing-xs);
-}
-
-/* App content */
+/* Updated app content with connecting styling */
 .app-content {
   flex: 1;
   padding: var(--spacing-lg) var(--spacing-xl);
@@ -436,6 +402,93 @@ input:checked + .toggle-slider:before {
   .card-title {
     font-size: 1.1rem;
   }
+}
+
+/* Mobile navigation */
+.mobile-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--card-background);
+  display: flex;
+  justify-content: space-around;
+  padding: var(--spacing-sm) 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+}
+
+.mobile-nav-item.active {
+  color: var(--text-accent);
+}
+
+.mobile-nav-icon {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+.loading-spinner {
+  border: 4px solid var(--medium-gray);
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Premium lock overlay */
+.premium-lock {
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(26, 26, 26, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.lock-icon {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.premium-message {
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+  font-weight: 500;
+  color: var(--text);
 }
 
 /* Form layout */
