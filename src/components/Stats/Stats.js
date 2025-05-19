@@ -161,22 +161,22 @@ const Stats = ({ userData, isPremium }) => {
       {/* Streak Statistics */}
       <div className="streak-stats">
         <div className="stat-card current-streak">
-          <div className="stat-value">{userData.currentStreak}</div>
+          <div className="stat-value">{userData.currentStreak || 0}</div>
           <div className="stat-label">Current Streak</div>
         </div>
         
         <div className="stat-card longest-streak">
-          <div className="stat-value">{userData.longestStreak}</div>
+          <div className="stat-value">{userData.longestStreak || 0}</div>
           <div className="stat-label">Longest Streak</div>
         </div>
         
         <div className="stat-card total-wetdreams">
-          <div className="stat-value">{userData.wetDreamCount}</div>
+          <div className="stat-value">{userData.wetDreamCount || 0}</div>
           <div className="stat-label">Wet Dreams</div>
         </div>
         
         <div className="stat-card total-relapses">
-          <div className="stat-value">{userData.relapseCount}</div>
+          <div className="stat-value">{userData.relapseCount || 0}</div>
           <div className="stat-label">Relapses</div>
         </div>
       </div>
@@ -186,7 +186,7 @@ const Stats = ({ userData, isPremium }) => {
         <h3>Your Achievements</h3>
         
         <div className="badges-grid">
-          {userData.badges.map(badge => (
+          {userData.badges && userData.badges.map(badge => (
             <div 
               key={badge.id} 
               className={`badge-card ${badge.earned ? 'earned' : 'locked'}`}

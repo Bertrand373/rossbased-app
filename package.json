@@ -1,48 +1,35 @@
 {
   "name": "rossbased-app",
   "version": "1.0.0",
-  "description": "Semen Retention Tracker Web App for Rossbased",
-  "main": "index.js",
-  "scripts": {
-    "start": "node server/index.js",
-    "client": "react-scripts start",
-    "build": "react-scripts build && cd server && npm install",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "server": "node server/index.js"
-  },
-  "keywords": [
-    "react",
-    "webapp",
-    "rossbased",
-    "semen-retention"
-  ],
-  "author": "Bertrand373",
-  "license": "ISC",
+  "private": true,
   "dependencies": {
-    "axios": "^1.9.0",
-    "chart.js": "^4.4.1",
-    "cors": "^2.8.5",
-    "date-fns": "^3.6.0",
-    "express": "^4.21.0",
-    "mongoose": "^8.7.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.5.0",
+    "chart.js": "^4.4.0",
+    "date-fns": "^2.30.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
-    "react-icons": "^5.0.1",
-    "react-router-dom": "^6.30.0",
-    "react-scripts": "^5.0.1"
+    "react-icons": "^4.10.1",
+    "react-router-dom": "^6.15.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
   },
-  "overrides": {
-    "svgo": "^2.8.0",
-    "nth-check": "^2.0.1",
-    "postcss": "^8.4.31",
-    "resolve-url-loader": "^5.0.0"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build && cd server && npm install",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "server": "node server/app.js"
   },
-  "homepage": "https://app.rossbased.com",
-  "engines": {
-    "node": ">=14.x"
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [
