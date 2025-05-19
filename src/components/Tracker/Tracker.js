@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
+import DatePicker from 'react-datepicker'; // Import the DatePicker
+import 'react-datepicker/dist/react-datepicker.css'; // Import styles
 import './Tracker.css';
 
 // Icons
@@ -14,7 +16,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [showUrgeMini, setShowUrgeMini] = useState(false);
   const [showSetStartDate, setShowSetStartDate] = useState(!userData.startDate);
   const [startDate, setStartDate] = useState(
-    userData.startDate ? format(new Date(userData.startDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd')
+    userData.startDate ? new Date(userData.startDate) : new Date()
   );
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [currentNote, setCurrentNote] = useState('');
@@ -26,7 +28,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     console.log("userData updated:", userData);
     if (userData.startDate) {
       const startDateObj = new Date(userData.startDate);
-      setStartDate(format(startDateObj, 'yyyy-MM-dd'));
+      setStartDate(startDateObj);
       
       // Calculate current streak based on start date
       if (!isNaN(startDateObj.getTime())) {
@@ -46,7 +48,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     : 0;
 
   const handleStartDateSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    
     const newStartDate = new Date(startDate);
     
     // Make sure newStartDate is a valid date
@@ -127,7 +130,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       // Update local state
       setCurrentStreak(0);
-      setStartDate(format(now, 'yyyy-MM-dd'));
+      setStartDate(now);
       
       toast.error('Streak reset. Keep going - every day is a new opportunity!');
     }
@@ -182,14 +185,15 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <form onSubmit={handleStartDateSubmit}>
               <div className="form-group">
                 <label htmlFor="startDate">Start Date:</label>
-                <input
-                  type="date"
-                  id="startDate"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  max={format(new Date(), 'yyyy-MM-dd')}
-                  required
-                />
+                <div className="datepicker-container">
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    maxDate={new Date()}
+                    dateFormat="MMMM d, yyyy"
+                    className="modern-datepicker"
+                  />
+                </div>
               </div>
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">Set Start Date</button>

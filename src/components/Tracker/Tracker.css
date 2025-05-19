@@ -1,201 +1,54 @@
-/* components/Tracker/Tracker.css */
-.tracker-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
+/* Add these styles to components/Tracker/Tracker.css */
+
+/* DatePicker Styling */
+.datepicker-container {
+  width: 100%;
+  margin-bottom: var(--spacing-md);
 }
 
-.tracker-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.modern-datepicker {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--light-gray);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-family: inherit;
 }
 
-.streak-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  background-color: var(--light-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+/* Override react-datepicker styles to make it look better */
+.react-datepicker {
+  font-family: inherit;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--light-gray);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.current-streak {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: linear-gradient(to right, var(--primary), var(--primary-dark));
+.react-datepicker__header {
+  background-color: var(--primary);
+  border-bottom: none;
+  padding-top: 10px;
+}
+
+.react-datepicker__current-month, 
+.react-datepicker__day-name {
   color: white;
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.streak-count {
-  font-size: 4rem;
-  font-weight: 700;
-  line-height: 1;
+.react-datepicker__day--selected, 
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--primary);
+  border-radius: 50%;
 }
 
-.streak-label {
-  font-size: 1.25rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  margin-top: var(--spacing-sm);
-}
-
-.streak-milestones {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-md);
-}
-
-.streak-milestone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: white;
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.milestone-icon {
-  font-size: 1.5rem;
-  margin-bottom: var(--spacing-sm);
-  color: var(--primary);
-}
-
-.milestone-value {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.milestone-label {
-  font-size: 0.875rem;
-  color: var(--gray);
-}
-
-.tracker-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-md);
-}
-
-.journal-section {
+.react-datepicker__day:hover {
   background-color: var(--light-gray);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
+  border-radius: 50%;
 }
 
-.journal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-md);
+.react-datepicker__navigation {
+  top: 10px;
 }
 
-.journal-preview {
-  background-color: white;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.empty-journal {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  background-color: white;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.info-icon {
-  font-size: 1.5rem;
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
-.discord-integration {
-  background-color: var(--light-gray);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-}
-
-.discord-toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  margin: var(--spacing-md) 0;
-}
-
-.discord-username {
-  font-size: 0.875rem;
-  margin-top: var(--spacing-md);
-}
-
-.discord-note {
-  color: var(--gray);
-  font-style: italic;
-  margin-top: var(--spacing-xs);
-}
-
-/* Modal styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: white;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.modal-content h2 {
-  margin-bottom: var(--spacing-md);
-}
-
-.modal-content p {
-  margin-bottom: var(--spacing-md);
-  color: var(--gray);
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-md);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .streak-milestones {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .tracker-actions {
-    grid-template-columns: 1fr;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions button {
-    width: 100%;
-  }
+.react-datepicker__navigation-icon::before {
+  border-color: white;
 }
