@@ -41,12 +41,16 @@
 }
 
 .current-streak {
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
-  color: white;
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.3);
+}
+
+.current-streak .stat-value {
+  color: var(--primary);
 }
 
 .current-streak .stat-label {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text);
 }
 
 .longest-streak {
