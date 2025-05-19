@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 
+// Custom hook to manage user data
 export const useUserData = () => {
   const [userData, setUserData] = useState({
     username: '',
@@ -11,7 +11,12 @@ export const useUserData = () => {
     wetDreamCount: 0,
     relapseCount: 0,
     isPremium: false,
-    badges: [],
+    badges: [
+      { id: 1, name: '7-Day Warrior', earned: false, date: null },
+      { id: 2, name: '14-Day Monk', earned: false, date: null },
+      { id: 3, name: '30-Day Master', earned: false, date: null },
+      { id: 4, name: '90-Day King', earned: false, date: null }
+    ],
     benefitTracking: [],
     streakHistory: [],
     urgeToolUsage: [],
@@ -21,20 +26,91 @@ export const useUserData = () => {
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
-  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Important: Check the API_URL - this might be wrong in your current code
-  const API_URL = process.env.NODE_ENV === 'production'
-    ? '/api' // When in production, the API is at the same domain
-    : 'http://localhost:5001/api'; // For local development
+  // Mock login function (in a real app, this would make an API call)
+  const login = async (username, password = 'demo') => {
+    try {
+      setIsLoading(true);
+      console.log('Logging in with:', username);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Create mock data for the user
+      const mockUserData = {
+        username,
+        startDate: new Date(new Date().setDate(new Date().getDate() - 7)), // 7 days ago
+        currentStreak: 7,
+        longestStreak: 14,
+        wetDreamCount: 1,
+        relapseCount: 2,
+        isPremium: username === 'premium', // Make 'premium' user have premium features
+        badges: [
+          { id: 1, name: '7-Day Warrior', earned: true, date: new Date() },
+          { id: 2, name: '14-Day Monk', earned: false, date: null },
+          { id: 3, name: '30-Day Master', earned: false, date: null },
+          { id: 4, name: '90-Day King', earned: false, date: null }
+        ],
+        benefitTracking: [
+          { date: new Date(), energy: 8, focus: 7, confidence: 6 },
+          { date: new Date(new Date().setDate(new Date().getDate() - 1)), energy: 7, focus: 6, confidence: 5 },
+          { date: new Date(new Date().setDate(new Date().getDate() - 2)), energy: 6, focus: 5, confidence: 4 }
+        ],
+        streakHistory: [
+          { 
+            id: 1, 
+            start: new Date(new Date().setDate(new Date().getDate() - 20)), 
+            end: new Date(new Date().setDate(new Date().getDate() - 13)), 
+            days: 7,
+            reason: 'relapse'
+          },
+          { 
+            id: 2, 
+            start: new Date(new Date().setDate(new Date().getDate() - 7)), 
+            end: null, 
+            days: 7,
+            reason: null
+          }
+        ],
+        urgeToolUsage: [],
+        discordUsername: username + '_discord',
+        showOnLeaderboard: true,
+        notes: {
+          [new Date().toISOString().split('T')[0]]: "Feeling stronger each day. Noticed improved energy levels today."
+        }
+      };
+      
+      setUserData(mockUserData);
+      setIsLoggedIn(true);
+      setIsPremium(mockUserData.isPremium);
+      
+      // Save to localStorage to persist
+      localStorage.setItem('userData', JSON.stringify(mockUserData));
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      toast.success(`Welcome, ${username}!`);
+      setIsLoading(false);
+      
+      // Force redirect to tracker page by simulating a click on the tracker link
+      const trackerLink = document.querySelector('a[href="/"]');
+      if (trackerLink) {
+        trackerLink.click();
+      } else {
+        // Fallback navigation if link not found
+        window.location.href = '/';
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Login error:', err);
+      toast.error('Login failed. Please try again.');
+      setIsLoading(false);
+      return false;
+    }
+  };
 
-  // Helper function to clear user data
-  const clearUserData = () => {
-    // Clear localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    
-    // Reset state
+  const logout = () => {
     setUserData({
       username: '',
       startDate: null,
@@ -43,7 +119,12 @@ export const useUserData = () => {
       wetDreamCount: 0,
       relapseCount: 0,
       isPremium: false,
-      badges: [],
+      badges: [
+        { id: 1, name: '7-Day Warrior', earned: false, date: null },
+        { id: 2, name: '14-Day Monk', earned: false, date: null },
+        { id: 3, name: '30-Day Master', earned: false, date: null },
+        { id: 4, name: '90-Day King', earned: false, date: null }
+      ],
       benefitTracking: [],
       streakHistory: [],
       urgeToolUsage: [],
@@ -53,216 +134,91 @@ export const useUserData = () => {
     });
     setIsLoggedIn(false);
     setIsPremium(false);
-    setToken(null);
-  };
-
-  const login = async (username, password = 'demo') => {
-    try {
-      console.log('Attempting login for:', username);
-      const response = await axios.post(`${API_URL}/login`, { username, password });
-      console.log('Login response:', response.data);
-      
-      setToken(response.data.token);
-      
-      // Process the response data
-      const processedData = {
-        ...response.data,
-        startDate: response.data.startDate ? new Date(response.data.startDate) : null,
-        benefitTracking: response.data.benefitTracking ? response.data.benefitTracking.map(item => ({
-          ...item,
-          date: new Date(item.date)
-        })) : [],
-        streakHistory: response.data.streakHistory ? response.data.streakHistory.map(streak => ({
-          ...streak,
-          start: new Date(streak.start),
-          end: streak.end ? new Date(streak.end) : null
-        })) : [],
-        badges: response.data.badges ? response.data.badges.map(badge => ({
-          ...badge,
-          date: badge.date ? new Date(badge.date) : null
-        })) : [],
-        urgeToolUsage: response.data.urgeToolUsage ? response.data.urgeToolUsage.map(usage => ({
-          ...usage,
-          date: new Date(usage.date)
-        })) : []
-      };
-      
-      console.log('Processed user data:', processedData);
-      setUserData(processedData);
-      setIsLoggedIn(true);
-      setIsPremium(response.data.isPremium || false);
-      
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('username', username);
-      console.log('Login successful:', username);
-      
-      toast.success('Login successful!');
-    } catch (err) {
-      console.error('Login error:', err);
-      toast.error('Login failed. Please try again.');
-    }
-  };
-
-  const logout = () => {
-    clearUserData();
+    
+    // Clear localStorage
+    localStorage.removeItem('userData');
+    localStorage.removeItem('isLoggedIn');
+    
     toast.success('Logged out successfully');
   };
 
-  const updateUserData = async (newData) => {
+  const updateUserData = (newData) => {
     try {
-      console.log('Updating user data with:', newData);
+      const updatedData = { ...userData, ...newData };
+      setUserData(updatedData);
       
-      // Make sure we have a username and token
-      const username = userData.username || localStorage.getItem('username') || 'testuser';
-      const currentToken = token || localStorage.getItem('token');
-      
-      if (!currentToken) {
-        console.error('No token available for API request');
-        toast.error('Authentication error. Please log in again.');
-        clearUserData();
-        return;
+      // Update premium status if it changed
+      if (newData.isPremium !== undefined) {
+        setIsPremium(newData.isPremium);
       }
       
-      // Prepare data for sending to API
-      const dataToSend = {
-        ...newData,
-      };
+      // Save to localStorage
+      localStorage.setItem('userData', JSON.stringify(updatedData));
       
-      // Special handling for dates
-      if (newData.startDate instanceof Date) {
-        dataToSend.startDate = newData.startDate.toISOString();
-      }
-      
-      console.log('Sending data to API:', dataToSend);
-      console.log('PUT URL:', `${API_URL}/user/${username}`);
-      console.log('Using token:', currentToken.substring(0, 10) + '...');
-      
-      const response = await axios.put(
-        `${API_URL}/user/${username}`,
-        dataToSend,
-        { 
-          headers: { 
-            'Authorization': `Bearer ${currentToken}`,
-            'Content-Type': 'application/json'
-          } 
-        }
-      );
-      
-      console.log('Update response:', response.data);
-      
-      if (response.data) {
-        // Process the response data
-        const processedData = {
-          ...response.data,
-          startDate: response.data.startDate ? new Date(response.data.startDate) : null,
-          benefitTracking: response.data.benefitTracking ? response.data.benefitTracking.map(item => ({
-            ...item,
-            date: new Date(item.date)
-          })) : [],
-          streakHistory: response.data.streakHistory ? response.data.streakHistory.map(streak => ({
-            ...streak,
-            start: new Date(streak.start),
-            end: streak.end ? new Date(streak.end) : null
-          })) : [],
-          badges: response.data.badges ? response.data.badges.map(badge => ({
-            ...badge,
-            date: badge.date ? new Date(badge.date) : null
-          })) : [],
-          urgeToolUsage: response.data.urgeToolUsage ? response.data.urgeToolUsage.map(usage => ({
-            ...usage,
-            date: new Date(usage.date)
-          })) : []
-        };
-        
-        console.log('Updated user data:', processedData);
-        setUserData(processedData);
-        setIsPremium(response.data.isPremium || false);
-      }
+      return true;
     } catch (err) {
       console.error('Update user data error:', err);
-      
-      // Check for auth errors and handle them specially
-      if (err.response && err.response.status === 401) {
-        console.error('Authentication error. Token may be invalid.');
-        toast.error('Your session has expired. Please log in again.');
-        clearUserData();
-      } else {
-        console.error('Error details:', err.response?.data || err.message);
-        toast.error('Failed to update data. Please try again.');
-      }
+      toast.error('Failed to update data');
+      return false;
     }
   };
 
-  // Check for existing token on mount
+  // Load data from localStorage on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username');
+    const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
+    const storedUserData = localStorage.getItem('userData');
     
-    if (storedToken && storedUsername) {
-      console.log('Found stored token and username:', storedUsername);
-      console.log('Token:', storedToken.substring(0, 10) + '...');
-      
-      setToken(storedToken);
-      const fetchUser = async () => {
-        try {
-          console.log('Fetching user data for:', storedUsername);
-          const response = await axios.get(
-            `${API_URL}/user/${storedUsername}`,
-            { 
-              headers: { 
-                'Authorization': `Bearer ${storedToken}`,
-                'Content-Type': 'application/json'
-              } 
-            }
-          );
-          
-          console.log('Fetch user response:', response.data);
-          
-          if (response.data) {
-            // Process the response data
-            const processedData = {
-              ...response.data,
-              startDate: response.data.startDate ? new Date(response.data.startDate) : null,
-              benefitTracking: response.data.benefitTracking ? response.data.benefitTracking.map(item => ({
-                ...item,
-                date: new Date(item.date)
-              })) : [],
-              streakHistory: response.data.streakHistory ? response.data.streakHistory.map(streak => ({
-                ...streak,
-                start: new Date(streak.start),
-                end: streak.end ? new Date(streak.end) : null
-              })) : [],
-              badges: response.data.badges ? response.data.badges.map(badge => ({
-                ...badge,
-                date: badge.date ? new Date(badge.date) : null
-              })) : [],
-              urgeToolUsage: response.data.urgeToolUsage ? response.data.urgeToolUsage.map(usage => ({
-                ...usage,
-                date: new Date(usage.date)
-              })) : []
-            };
-            
-            console.log('Processed user data from fetch:', processedData);
-            setUserData(processedData);
-            setIsLoggedIn(true);
-            setIsPremium(response.data.isPremium || false);
-          }
-        } catch (err) {
-          console.error('Fetch user error:', err);
-          
-          // Handle authentication errors
-          if (err.response && err.response.status === 401) {
-            console.log('Token invalid or expired. Logging out.');
-            toast.error('Your session has expired. Please log in again.');
-          }
-          
-          // Always logout on error to force re-authentication
-          clearUserData();
+    if (storedIsLoggedIn === 'true' && storedUserData) {
+      try {
+        const parsedUserData = JSON.parse(storedUserData);
+        
+        // Convert string dates back to Date objects
+        if (parsedUserData.startDate) {
+          parsedUserData.startDate = new Date(parsedUserData.startDate);
         }
-      };
-      fetchUser();
+        
+        if (parsedUserData.badges) {
+          parsedUserData.badges = parsedUserData.badges.map(badge => ({
+            ...badge,
+            date: badge.date ? new Date(badge.date) : null
+          }));
+        }
+        
+        if (parsedUserData.benefitTracking) {
+          parsedUserData.benefitTracking = parsedUserData.benefitTracking.map(item => ({
+            ...item,
+            date: new Date(item.date)
+          }));
+        }
+        
+        if (parsedUserData.streakHistory) {
+          parsedUserData.streakHistory = parsedUserData.streakHistory.map(streak => ({
+            ...streak,
+            start: new Date(streak.start),
+            end: streak.end ? new Date(streak.end) : null
+          }));
+        }
+        
+        setUserData(parsedUserData);
+        setIsLoggedIn(true);
+        setIsPremium(parsedUserData.isPremium || false);
+      } catch (err) {
+        console.error('Error parsing stored user data:', err);
+        localStorage.removeItem('userData');
+        localStorage.removeItem('isLoggedIn');
+      }
     }
   }, []);
 
-  return { userData, isLoggedIn, isPremium, login, logout, updateUserData, clearUserData };
+  return { 
+    userData, 
+    isLoggedIn, 
+    isPremium, 
+    isLoading,
+    login, 
+    logout, 
+    updateUserData 
+  };
 };
+
+export default useUserData;

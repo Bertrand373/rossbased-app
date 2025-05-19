@@ -1,6 +1,6 @@
-// App.js - Updated with auth protection
+// App.js - Main application component
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
 
@@ -11,20 +11,20 @@ import Stats from './components/Stats/Stats';
 import DailyMotivation from './components/DailyMotivation/DailyMotivation';
 import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Community from './components/Community/Community';
-import Landing from './components/Landing/Landing';
 
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
+import LoadingSpinner from './components/shared/LoadingSpinner';
 
-// User data hook
+// Custom hook for user data
 import { useUserData } from './hooks/useUserData';
 
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
-  const { userData, isLoggedIn, isPremium, login, logout, updateUserData, clearUserData } = useUserData();
+  const { userData, isLoggedIn, isPremium, isLoading, login, logout, updateUserData } = useUserData();
 
   // Monitor screen size for responsive design
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -38,20 +38,12 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleResetApp = () => {
-    // Clear all local storage
-    localStorage.clear();
-    // Force page reload to reset the app state
-    window.location.reload();
-  };
-
-  // Auth protection component
-  const ProtectedRoute = ({ children }) => {
-    if (!isLoggedIn) {
-      return <Navigate to="/welcome" replace />;
+  // Handle login
+  const handleLogin = async (username, password) => {
+    const success = await login(username, password);
+    if (success) {
+      setShowAuthModal(false);
     }
-    
-    return children;
   };
 
   return (
@@ -62,492 +54,91 @@ function App() {
         {showAuthModal && (
           <AuthModal 
             onClose={() => setShowAuthModal(false)} 
-            onLogin={login}
+            onLogin={handleLogin}
           />
         )}
         
-        <Routes>
-          {/* Landing/Welcome Page */}
-          <Route path="/welcome" element={<Landing onLogin={login} />} />
-          
-          {/* Protected Routes */}
-          <Route path="/" element={
-            isLoggedIn ? (
-              <div className="main-app">
-                <header className="app-header">
-                  <h1>SR Tracker</h1>
-                  <div className="user-controls">
-                    {isLoggedIn ? (
-                      <div className="user-info">
-                        <span className="username">{userData.username}</span>
-                        <button className="logout-btn" onClick={logout}>Logout</button>
-                        <button 
-                          className="reset-btn" 
-                          onClick={handleResetApp}
-                          style={{ marginLeft: '8px', backgroundColor: '#ef4444' }}
-                        >
-                          Reset App
-                        </button>
-                      </div>
-                    ) : (
-                      <button className="login-btn" onClick={() => setShowAuthModal(true)}>Login</button>
-                    )}
-                  </div>
-                </header>
-                
-                {!isPremium && <SubscriptionBanner />}
-                
-                {!isMobile ? (
-                  <nav className="desktop-nav">
-                    <NavLink 
-                      to="/" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('tracker')}>
-                      Tracker
-                    </NavLink>
-                    <NavLink 
-                      to="/calendar" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('calendar')}>
-                      Calendar
-                    </NavLink>
-                    <NavLink 
-                      to="/stats" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('stats')}>
-                      Stats
-                    </NavLink>
-                    <NavLink 
-                      to="/motivation" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('motivation')}>
-                      Daily Motivation
-                    </NavLink>
-                    <NavLink 
-                      to="/urge-toolkit" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('urge-toolkit')}>
-                      Urge Toolkit
-                    </NavLink>
-                    {isPremium && (
-                      <NavLink 
-                        to="/community" 
-                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                        onClick={() => setActiveTab('community')}>
-                        Community
-                      </NavLink>
-                    )}
-                  </nav>
-                ) : (
-                  <MobileNavigation 
-                    activeTab={activeTab} 
-                    setActiveTab={setActiveTab} 
-                    isPremium={isPremium}
-                  />
-                )}
-                
-                <main className="app-content">
-                  <Tracker userData={userData} updateUserData={updateUserData} isPremium={isPremium} />
-                </main>
+        {isLoading && (
+          <LoadingSpinner message="Logging you in..." />
+        )}
+        
+        <header className="app-header">
+          <h1>SR Tracker</h1>
+          <div className="user-controls">
+            {isLoggedIn ? (
+              <div className="user-info">
+                <span className="username">{userData.username}</span>
+                <button className="logout-btn" onClick={logout}>Logout</button>
               </div>
             ) : (
-              <Navigate to="/welcome" replace />
-            )
-          } />
-          
-          <Route path="/calendar" element={
-            <ProtectedRoute>
-              <div className="main-app">
-                <header className="app-header">
-                  <h1>SR Tracker</h1>
-                  <div className="user-controls">
-                    <div className="user-info">
-                      <span className="username">{userData.username}</span>
-                      <button className="logout-btn" onClick={logout}>Logout</button>
-                      <button 
-                        className="reset-btn" 
-                        onClick={handleResetApp}
-                        style={{ marginLeft: '8px', backgroundColor: '#ef4444' }}
-                      >
-                        Reset App
-                      </button>
-                    </div>
-                  </div>
-                </header>
-                
-                {!isPremium && <SubscriptionBanner />}
-                
-                {!isMobile ? (
-                  <nav className="desktop-nav">
-                    <NavLink 
-                      to="/" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('tracker')}>
-                      Tracker
-                    </NavLink>
-                    <NavLink 
-                      to="/calendar" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('calendar')}>
-                      Calendar
-                    </NavLink>
-                    <NavLink 
-                      to="/stats" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('stats')}>
-                      Stats
-                    </NavLink>
-                    <NavLink 
-                      to="/motivation" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('motivation')}>
-                      Daily Motivation
-                    </NavLink>
-                    <NavLink 
-                      to="/urge-toolkit" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('urge-toolkit')}>
-                      Urge Toolkit
-                    </NavLink>
-                    {isPremium && (
-                      <NavLink 
-                        to="/community" 
-                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                        onClick={() => setActiveTab('community')}>
-                        Community
-                      </NavLink>
-                    )}
-                  </nav>
-                ) : (
-                  <MobileNavigation 
-                    activeTab={activeTab} 
-                    setActiveTab={setActiveTab} 
-                    isPremium={isPremium}
-                  />
-                )}
-                
-                <main className="app-content">
-                  <Calendar userData={userData} isPremium={isPremium} />
-                </main>
-              </div>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/stats" element={
-            <ProtectedRoute>
-              <div className="main-app">
-                <header className="app-header">
-                  <h1>SR Tracker</h1>
-                  <div className="user-controls">
-                    <div className="user-info">
-                      <span className="username">{userData.username}</span>
-                      <button className="logout-btn" onClick={logout}>Logout</button>
-                      <button 
-                        className="reset-btn" 
-                        onClick={handleResetApp}
-                        style={{ marginLeft: '8px', backgroundColor: '#ef4444' }}
-                      >
-                        Reset App
-                      </button>
-                    </div>
-                  </div>
-                </header>
-                
-                {!isPremium && <SubscriptionBanner />}
-                
-                {!isMobile ? (
-                  <nav className="desktop-nav">
-                    <NavLink 
-                      to="/" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('tracker')}>
-                      Tracker
-                    </NavLink>
-                    <NavLink 
-                      to="/calendar" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('calendar')}>
-                      Calendar
-                    </NavLink>
-                    <NavLink 
-                      to="/stats" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('stats')}>
-                      Stats
-                    </NavLink>
-                    <NavLink 
-                      to="/motivation" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('motivation')}>
-                      Daily Motivation
-                    </NavLink>
-                    <NavLink 
-                      to="/urge-toolkit" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('urge-toolkit')}>
-                      Urge Toolkit
-                    </NavLink>
-                    {isPremium && (
-                      <NavLink 
-                        to="/community" 
-                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                        onClick={() => setActiveTab('community')}>
-                        Community
-                      </NavLink>
-                    )}
-                  </nav>
-                ) : (
-                  <MobileNavigation 
-                    activeTab={activeTab} 
-                    setActiveTab={setActiveTab} 
-                    isPremium={isPremium}
-                  />
-                )}
-                
-                <main className="app-content">
-                  <Stats userData={userData} isPremium={isPremium} />
-                </main>
-              </div>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/motivation" element={
-            <ProtectedRoute>
-              <div className="main-app">
-                <header className="app-header">
-                  <h1>SR Tracker</h1>
-                  <div className="user-controls">
-                    <div className="user-info">
-                      <span className="username">{userData.username}</span>
-                      <button className="logout-btn" onClick={logout}>Logout</button>
-                      <button 
-                        className="reset-btn" 
-                        onClick={handleResetApp}
-                        style={{ marginLeft: '8px', backgroundColor: '#ef4444' }}
-                      >
-                        Reset App
-                      </button>
-                    </div>
-                  </div>
-                </header>
-                
-                {!isPremium && <SubscriptionBanner />}
-                
-                {!isMobile ? (
-                  <nav className="desktop-nav">
-                    <NavLink 
-                      to="/" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('tracker')}>
-                      Tracker
-                    </NavLink>
-                    <NavLink 
-                      to="/calendar" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('calendar')}>
-                      Calendar
-                    </NavLink>
-                    <NavLink 
-                      to="/stats" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('stats')}>
-                      Stats
-                    </NavLink>
-                    <NavLink 
-                      to="/motivation" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('motivation')}>
-                      Daily Motivation
-                    </NavLink>
-                    <NavLink 
-                      to="/urge-toolkit" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('urge-toolkit')}>
-                      Urge Toolkit
-                    </NavLink>
-                    {isPremium && (
-                      <NavLink 
-                        to="/community" 
-                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                        onClick={() => setActiveTab('community')}>
-                        Community
-                      </NavLink>
-                    )}
-                  </nav>
-                ) : (
-                  <MobileNavigation 
-                    activeTab={activeTab} 
-                    setActiveTab={setActiveTab} 
-                    isPremium={isPremium}
-                  />
-                )}
-                
-                <main className="app-content">
-                  <DailyMotivation userData={userData} isPremium={isPremium} />
-                </main>
-              </div>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/urge-toolkit" element={
-            <ProtectedRoute>
-              <div className="main-app">
-                <header className="app-header">
-                  <h1>SR Tracker</h1>
-                  <div className="user-controls">
-                    <div className="user-info">
-                      <span className="username">{userData.username}</span>
-                      <button className="logout-btn" onClick={logout}>Logout</button>
-                      <button 
-                        className="reset-btn" 
-                        onClick={handleResetApp}
-                        style={{ marginLeft: '8px', backgroundColor: '#ef4444' }}
-                      >
-                        Reset App
-                      </button>
-                    </div>
-                  </div>
-                </header>
-                
-                {!isPremium && <SubscriptionBanner />}
-                
-                {!isMobile ? (
-                  <nav className="desktop-nav">
-                    <NavLink 
-                      to="/" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('tracker')}>
-                      Tracker
-                    </NavLink>
-                    <NavLink 
-                      to="/calendar" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('calendar')}>
-                      Calendar
-                    </NavLink>
-                    <NavLink 
-                      to="/stats" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('stats')}>
-                      Stats
-                    </NavLink>
-                    <NavLink 
-                      to="/motivation" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('motivation')}>
-                      Daily Motivation
-                    </NavLink>
-                    <NavLink 
-                      to="/urge-toolkit" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('urge-toolkit')}>
-                      Urge Toolkit
-                    </NavLink>
-                    {isPremium && (
-                      <NavLink 
-                        to="/community" 
-                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                        onClick={() => setActiveTab('community')}>
-                        Community
-                      </NavLink>
-                    )}
-                  </nav>
-                ) : (
-                  <MobileNavigation 
-                    activeTab={activeTab} 
-                    setActiveTab={setActiveTab} 
-                    isPremium={isPremium}
-                  />
-                )}
-                
-                <main className="app-content">
-                  <UrgeToolkit userData={userData} updateUserData={updateUserData} isPremium={isPremium} />
-                </main>
-              </div>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/community" element={
-            <ProtectedRoute>
-              <div className="main-app">
-                <header className="app-header">
-                  <h1>SR Tracker</h1>
-                  <div className="user-controls">
-                    <div className="user-info">
-                      <span className="username">{userData.username}</span>
-                      <button className="logout-btn" onClick={logout}>Logout</button>
-                      <button 
-                        className="reset-btn" 
-                        onClick={handleResetApp}
-                        style={{ marginLeft: '8px', backgroundColor: '#ef4444' }}
-                      >
-                        Reset App
-                      </button>
-                    </div>
-                  </div>
-                </header>
-                
-                {!isPremium && <SubscriptionBanner />}
-                
-                {!isMobile ? (
-                  <nav className="desktop-nav">
-                    <NavLink 
-                      to="/" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('tracker')}>
-                      Tracker
-                    </NavLink>
-                    <NavLink 
-                      to="/calendar" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('calendar')}>
-                      Calendar
-                    </NavLink>
-                    <NavLink 
-                      to="/stats" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('stats')}>
-                      Stats
-                    </NavLink>
-                    <NavLink 
-                      to="/motivation" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('motivation')}>
-                      Daily Motivation
-                    </NavLink>
-                    <NavLink 
-                      to="/urge-toolkit" 
-                      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                      onClick={() => setActiveTab('urge-toolkit')}>
-                      Urge Toolkit
-                    </NavLink>
-                    {isPremium && (
-                      <NavLink 
-                        to="/community" 
-                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                        onClick={() => setActiveTab('community')}>
-                        Community
-                      </NavLink>
-                    )}
-                  </nav>
-                ) : (
-                  <MobileNavigation 
-                    activeTab={activeTab} 
-                    setActiveTab={setActiveTab} 
-                    isPremium={isPremium}
-                  />
-                )}
-                
-                <main className="app-content">
-                  {isPremium ? <Community userData={userData} /> : <SubscriptionBanner fullPage={true} />}
-                </main>
-              </div>
-            </ProtectedRoute>
-          } />
-          
-          {/* Default redirect to Welcome page */}
-          <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/welcome"} replace />} />
-        </Routes>
+              <button className="login-btn" onClick={() => setShowAuthModal(true)}>Login</button>
+            )}
+          </div>
+        </header>
+        
+        {!isPremium && <SubscriptionBanner />}
+        
+        {!isMobile ? (
+          <nav className="desktop-nav">
+            <NavLink 
+              to="/" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('tracker')}>
+              Tracker
+            </NavLink>
+            <NavLink 
+              to="/calendar" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('calendar')}>
+              Calendar
+            </NavLink>
+            <NavLink 
+              to="/stats" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('stats')}>
+              Stats
+            </NavLink>
+            <NavLink 
+              to="/motivation" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('motivation')}>
+              Daily Motivation
+            </NavLink>
+            <NavLink 
+              to="/urge-toolkit" 
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              onClick={() => setActiveTab('urge-toolkit')}>
+              Urge Toolkit
+            </NavLink>
+            {isPremium && (
+              <NavLink 
+                to="/community" 
+                className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+                onClick={() => setActiveTab('community')}>
+                Community
+              </NavLink>
+            )}
+          </nav>
+        ) : (
+          <MobileNavigation 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            isPremium={isPremium}
+          />
+        )}
+        
+        <main className="app-content">
+          <Routes>
+            <Route path="/" element={<Tracker userData={userData} updateUserData={updateUserData} isPremium={isPremium} />} />
+            <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} />} />
+            <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} />} />
+            <Route path="/motivation" element={<DailyMotivation userData={userData} isPremium={isPremium} />} />
+            <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+            <Route path="/community" element={
+              isPremium ? <Community userData={userData} /> : <SubscriptionBanner fullPage={true} />
+            } />
+          </Routes>
+        </main>
       </div>
     </Router>
   );

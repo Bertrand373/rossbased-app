@@ -3,9 +3,9 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: var(--background);
+  background-color: #0f0f0f;
   padding: var(--spacing-lg);
-  color: var(--text);
+  color: #ffffff;
 }
 
 .landing-content {
@@ -15,9 +15,15 @@
   text-align: center;
 }
 
+.landing-content h1 {
+  color: #ffdd00;
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+}
+
 .landing-subtitle {
   font-size: 1.25rem;
-  color: var(--gray);
+  color: #dddddd;
   margin-bottom: var(--spacing-xl);
 }
 
@@ -29,10 +35,11 @@
 }
 
 .feature-item {
-  background-color: var(--light-gray);
+  background-color: #222222;
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   text-align: center;
+  border: 1px solid #333333;
 }
 
 .feature-icon {
@@ -43,10 +50,11 @@
 .feature-item h3 {
   margin-bottom: var(--spacing-sm);
   font-size: 1.25rem;
+  color: #ffffff;
 }
 
 .feature-item p {
-  color: var(--gray);
+  color: #aaaaaa;
   font-size: 0.875rem;
 }
 
@@ -57,12 +65,59 @@
 .login-cta-btn {
   padding: var(--spacing-md) var(--spacing-xl);
   font-size: 1.125rem;
+  background-color: #ffdd00;
+  color: #0f0f0f;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.2);
 }
 
 .privacy-notice {
   font-size: 0.75rem;
-  color: var(--gray);
+  color: #777777;
   margin-top: var(--spacing-lg);
+}
+
+/* Loading Animation */
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.loading-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-circle {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #222222;
+  border-top: 4px solid #ffdd00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-lg);
+}
+
+.loading-animation p {
+  color: #dddddd;
+  font-size: 1.25rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Media queries for responsive design */
@@ -70,5 +125,9 @@
   .landing-features {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
+  }
+  
+  .landing-content h1 {
+    font-size: 2.5rem;
   }
 }

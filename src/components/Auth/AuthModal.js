@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './AuthModal.css';
 
 // Icons
-import { FaTimes, FaUser, FaLock, FaGoogle, FaDiscord } from 'react-icons/fa';
+import { FaTimes, FaUser, FaLock, FaGoogle, FaDiscord, FaEnvelope, FaSpinner } from 'react-icons/fa';
 
 const AuthModal = ({ onClose, onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,8 +13,9 @@ const AuthModal = ({ onClose, onLogin }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [discordUsername, setDiscordUsername] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Basic validation
@@ -28,10 +29,17 @@ const AuthModal = ({ onClose, onLogin }) => {
       return;
     }
     
-    // In a real app, this would authenticate with a backend
-    // For demo purposes, we'll just pass the username to the login function
-    onLogin(username, password);
-    onClose();
+    setIsLoading(true);
+    
+    try {
+      // In a real app, this would authenticate with a backend
+      // For demo purposes, we'll just pass the username to the login function
+      await onLogin(username, password);
+      // Modal will be closed by the parent component after successful login
+    } catch (error) {
+      setError('Login failed. Please try again.');
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -44,12 +52,12 @@ const AuthModal = ({ onClose, onLogin }) => {
         <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
         
         <div className="auth-social-buttons">
-          <button className="social-btn google-btn">
+          <button className="social-btn google-btn" disabled={isLoading}>
             <FaGoogle />
             <span>{isLogin ? 'Login with Google' : 'Sign up with Google'}</span>
           </button>
           
-          <button className="social-btn discord-btn">
+          <button className="social-btn discord-btn" disabled={isLoading}>
             <FaDiscord />
             <span>{isLogin ? 'Login with Discord' : 'Sign up with Discord'}</span>
           </button>
@@ -74,12 +82,14 @@ const AuthModal = ({ onClose, onLogin }) => {
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username"
               required
+              disabled={isLoading}
             />
           </div>
           
           {!isLogin && (
             <div className="form-group">
               <label htmlFor="email">
+                <FaEnvelope className="input-icon" />
                 <span>Email</span>
               </label>
               <input
@@ -89,6 +99,7 @@ const AuthModal = ({ onClose, onLogin }) => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
+                disabled={isLoading}
               />
             </div>
           )}
@@ -105,6 +116,7 @@ const AuthModal = ({ onClose, onLogin }) => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
+              disabled={isLoading}
             />
           </div>
           
@@ -122,6 +134,7 @@ const AuthModal = ({ onClose, onLogin }) => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your password"
                   required
+                  disabled={isLoading}
                 />
               </div>
               
@@ -136,13 +149,21 @@ const AuthModal = ({ onClose, onLogin }) => {
                   value={discordUsername}
                   onChange={(e) => setDiscordUsername(e.target.value)}
                   placeholder="For leaderboard integration"
+                  disabled={isLoading}
                 />
               </div>
             </>
           )}
           
-          <button type="submit" className="btn btn-primary auth-submit-btn">
-            {isLogin ? 'Login' : 'Create Account'}
+          <button type="submit" className="btn btn-primary auth-submit-btn" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <FaSpinner className="spinner" /> 
+                {isLogin ? 'Logging in...' : 'Creating Account...'}
+              </>
+            ) : (
+              isLogin ? 'Login' : 'Create Account'
+            )}
           </button>
         </form>
         
@@ -153,6 +174,7 @@ const AuthModal = ({ onClose, onLogin }) => {
               <button 
                 className="switch-btn"
                 onClick={() => setIsLogin(false)}
+                disabled={isLoading}
               >
                 Sign Up
               </button>
@@ -163,6 +185,7 @@ const AuthModal = ({ onClose, onLogin }) => {
               <button 
                 className="switch-btn"
                 onClick={() => setIsLogin(true)}
+                disabled={isLoading}
               >
                 Login
               </button>
@@ -172,7 +195,7 @@ const AuthModal = ({ onClose, onLogin }) => {
         
         {isLogin && (
           <div className="forgot-password">
-            <button className="forgot-btn">Forgot password?</button>
+            <button className="forgot-btn" disabled={isLoading}>Forgot password?</button>
           </div>
         )}
       </div>
