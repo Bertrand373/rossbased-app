@@ -7,7 +7,7 @@ import './UrgeMini.css';
 // Icons
 import { FaStopwatch, FaBolt, FaVolumeUp, FaCheck, FaTimes, FaTimes as FaClose } from 'react-icons/fa';
 
-const UrgeMini = ({ onClose, isPremium, updateUserData }) => {
+const UrgeMini = ({ onClose, isPremium, updateUserData, userData }) => {
   const [activeTab, setActiveTab] = useState('timer');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
