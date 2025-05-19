@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
-import DatePicker from 'react-datepicker'; // Import the DatePicker
-import 'react-datepicker/dist/react-datepicker.css'; // Import styles
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import './Tracker.css';
 
 // Icons
