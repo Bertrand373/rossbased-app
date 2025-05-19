@@ -16,7 +16,6 @@ import Community from './components/Community/Community';
 import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
-import LoadingSpinner from './components/shared/LoadingSpinner';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -59,7 +58,14 @@ function App() {
         )}
         
         {isLoading && (
-          <LoadingSpinner message="Logging you in..." />
+          <div className="loading-overlay">
+            <div className="loading-container">
+              <div className="loading-spinner">
+                <div className="spinner-inner"></div>
+              </div>
+              <p className="loading-message">Logging you in...</p>
+            </div>
+          </div>
         )}
         
         <header className="app-header">
