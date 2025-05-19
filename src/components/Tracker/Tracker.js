@@ -1,6 +1,6 @@
 // components/Tracker/Tracker.js
-import React, { useState } from 'react';
-import { format, differenceInDays } from 'date-fns';
+import React, { useState, useEffect } from 'react';
+import { format, differenceInDays, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Tracker.css';
 
@@ -14,15 +14,35 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [showUrgeMini, setShowUrgeMini] = useState(false);
   const [showSetStartDate, setShowSetStartDate] = useState(!userData.startDate);
   const [startDate, setStartDate] = useState(
-    userData.startDate ? format(userData.startDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd')
+    userData.startDate ? format(new Date(userData.startDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd')
   );
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [currentNote, setCurrentNote] = useState('');
+  const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   const today = new Date();
+
+  // Update UI when userData changes
+  useEffect(() => {
+    console.log("userData updated:", userData);
+    if (userData.startDate) {
+      const startDateObj = new Date(userData.startDate);
+      setStartDate(format(startDateObj, 'yyyy-MM-dd'));
+      
+      // Calculate current streak based on start date
+      if (!isNaN(startDateObj.getTime())) {
+        const calculatedStreak = differenceInDays(today, startDateObj) + 1;
+        setCurrentStreak(calculatedStreak > 0 ? calculatedStreak : 0);
+      }
+    }
+    
+    if (userData.currentStreak !== undefined) {
+      setCurrentStreak(userData.currentStreak);
+    }
+  }, [userData, today]);
 
   // Calculate days since start
   const daysSinceStart = userData.startDate 
-    ? differenceInDays(today, userData.startDate) + 1 
+    ? differenceInDays(today, new Date(userData.startDate)) + 1 
     : 0;
 
   const handleStartDateSubmit = (e) => {
@@ -36,14 +56,24 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
     
     // Calculate current streak based on the new start date
-    const currentStreak = differenceInDays(today, newStartDate) + 1;
+    const calculatedStreak = differenceInDays(today, newStartDate) + 1;
+    const newStreak = calculatedStreak > 0 ? calculatedStreak : 0;
+    
+    console.log("Setting start date:", {
+      startDate: newStartDate,
+      currentStreak: newStreak,
+      longestStreak: Math.max(userData.longestStreak || 0, newStreak)
+    });
     
     // Update user data with new start date and current streak
     updateUserData({
       startDate: newStartDate,
-      currentStreak: currentStreak,
-      longestStreak: Math.max(userData.longestStreak || 0, currentStreak)
+      currentStreak: newStreak,
+      longestStreak: Math.max(userData.longestStreak || 0, newStreak)
     });
+    
+    // Update local state
+    setCurrentStreak(newStreak);
     
     setShowSetStartDate(false);
     toast.success('Start date set successfully!');
@@ -56,7 +86,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       // Update streak history to mark current streak as ended
       const updatedHistory = [...(userData.streakHistory || [])];
-      const currentStreakIndex = updatedHistory.findIndex(streak => streak.end === null);
+      const currentStreakIndex = updatedHistory.findIndex(streak => 
+        streak.end === null || streak.end === undefined
+      );
       
       if (currentStreakIndex !== -1) {
         updatedHistory[currentStreakIndex] = {
@@ -78,6 +110,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       updatedHistory.push(newStreak);
       
+      console.log("Logging relapse:", {
+        startDate: now,
+        currentStreak: 0,
+        relapseCount: (userData.relapseCount || 0) + 1,
+        streakHistory: updatedHistory
+      });
+      
       // Update user data
       updateUserData({
         startDate: now,
@@ -86,12 +125,20 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         streakHistory: updatedHistory
       });
       
+      // Update local state
+      setCurrentStreak(0);
+      setStartDate(format(now, 'yyyy-MM-dd'));
+      
       toast.error('Streak reset. Keep going - every day is a new opportunity!');
     }
   };
 
   const handleWetDream = () => {
     if (window.confirm('Do you want to log a wet dream? This will not reset your streak.')) {
+      console.log("Logging wet dream:", {
+        wetDreamCount: (userData.wetDreamCount || 0) + 1
+      });
+      
       updateUserData({
         wetDreamCount: (userData.wetDreamCount || 0) + 1
       });
@@ -104,6 +151,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     const today = format(new Date(), 'yyyy-MM-dd');
     const updatedNotes = { ...userData.notes, [today]: currentNote };
     
+    console.log("Saving note:", {
+      notes: updatedNotes
+    });
+    
     updateUserData({ notes: updatedNotes });
     setShowNoteModal(false);
     toast.success('Journal entry saved!');
@@ -111,6 +162,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
+
+  console.log("Tracker rendering with:", {
+    currentStreak,
+    userDataStreak: userData.currentStreak,
+    startDate: userData.startDate,
+    daysSinceStart
+  });
 
   return (
     <div className="tracker-container">
@@ -190,7 +248,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       <div className="streak-display">
         <div className="current-streak">
-          <div className="streak-count">{userData.currentStreak || 0}</div>
+          <div className="streak-count">{currentStreak}</div>
           <div className="streak-label">Current Streak</div>
         </div>
         

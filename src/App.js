@@ -23,7 +23,7 @@ import { useUserData } from './hooks/useUserData';
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
-  const { userData, isLoggedIn, isPremium, login, logout, updateUserData } = useUserData();
+  const { userData, isLoggedIn, isPremium, login, logout, updateUserData, clearUserData } = useUserData();
 
   // Monitor screen size for responsive design
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -36,6 +36,13 @@ function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const handleResetApp = () => {
+    // Clear all local storage
+    localStorage.clear();
+    // Force page reload to reset the app state
+    window.location.reload();
+  };
 
   return (
     <Router>
@@ -56,6 +63,13 @@ function App() {
               <div className="user-info">
                 <span className="username">{userData.username}</span>
                 <button className="logout-btn" onClick={logout}>Logout</button>
+                <button 
+                  className="reset-btn" 
+                  onClick={handleResetApp}
+                  style={{ marginLeft: '8px', backgroundColor: '#ef4444' }}
+                >
+                  Reset App
+                </button>
               </div>
             ) : (
               <button className="login-btn" onClick={() => setShowAuthModal(true)}>Login</button>
@@ -120,7 +134,7 @@ function App() {
             <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} />} />
             <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} />} />
             <Route path="/motivation" element={<DailyMotivation userData={userData} isPremium={isPremium} />} />
-            <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} />} />
+            <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} updateUserData={updateUserData} isPremium={isPremium} />} />
             <Route path="/community" element={
               isPremium ? <Community userData={userData} /> : <SubscriptionBanner fullPage={true} />
             } />

@@ -54,20 +54,45 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`, req.body);
+  next();
+});
+
 // Middleware to verify JWT
 const authenticate = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    console.log('No token provided');
-    return res.status(401).json({ error: 'Unauthorized' });
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    console.log('No authorization header provided');
+    return res.status(401).json({ error: 'Unauthorized - No token provided' });
   }
+  
+  // Check if the authorization header is properly formatted
+  const tokenParts = authHeader.split(' ');
+  if (tokenParts.length !== 2 || tokenParts[0] !== 'Bearer') {
+    console.log('Authorization header malformed:', authHeader);
+    return res.status(401).json({ error: 'Unauthorized - Invalid token format' });
+  }
+  
+  const token = tokenParts[1];
+  
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'rossbased_secret_key');
+    // Use a consistent JWT_SECRET
+    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+    console.log('Verifying token with secret:', jwtSecret.substring(0, 3) + '...');
+    
+    const decoded = jwt.verify(token, jwtSecret);
+    console.log('Token verified successfully for user:', decoded.username);
     req.user = decoded;
     next();
   } catch (err) {
     console.error('JWT verification error:', err);
-    res.status(401).json({ error: 'Invalid token' });
+    // Return a more descriptive error message
+    return res.status(401).json({ 
+      error: 'Unauthorized - Token invalid',
+      details: err.message 
+    });
   }
 };
 
@@ -98,7 +123,13 @@ app.post('/api/login', async (req, res) => {
           { date: new Date(), energy: 8, focus: 7, confidence: 6 },
           { date: addDays(new Date(), -2), energy: 6, focus: 5, confidence: 7 }
         ],
-        streakHistory: [],
+        streakHistory: [{
+          id: 1,
+          start: new Date(),
+          end: null,
+          days: 0,
+          reason: null
+        }],
         urgeToolUsage: [],
         discordUsername: '',
         showOnLeaderboard: false,
@@ -109,11 +140,18 @@ app.post('/api/login', async (req, res) => {
     } else if (user.password !== password) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ username }, process.env.JWT_SECRET || 'rossbased_secret_key', { expiresIn: '1h' });
+    
+    // Use a consistent JWT_SECRET
+    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+    console.log('Generating token with secret:', jwtSecret.substring(0, 3) + '...');
+    
+    const token = jwt.sign({ username }, jwtSecret, { expiresIn: '7d' }); // Extended expiration to 7 days
+    console.log('Login successful, token generated for:', username);
+    
     res.json({ token, ...user.toObject() });
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
 
@@ -126,6 +164,7 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
       console.log('User not found:', req.params.username);
       return res.status(404).json({ error: 'User not found' });
     }
+    console.log('Returning user data for:', req.params.username);
     res.json(user);
   } catch (err) {
     console.error('Get user error:', err);
@@ -135,24 +174,42 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
 
 // Update user data - Using PUT method
 app.put('/api/user/:username', authenticate, async (req, res) => {
-  console.log('Received update user request for:', req.params.username, req.body);
+  console.log('Received update user request for:', req.params.username);
+  console.log('Update data:', req.body);
+  
   try {
     // Check if user exists first
     const existingUser = await User.findOne({ username: req.params.username });
     if (!existingUser) {
+      console.log('User not found:', req.params.username);
       return res.status(404).json({ error: 'User not found' });
     }
+    
+    // Process dates if needed
+    const updateData = { ...req.body };
     
     // Update the user
     const user = await User.findOneAndUpdate(
       { username: req.params.username },
-      { $set: req.body },
+      { $set: updateData },
       { new: true }
     );
     
+    console.log('User updated successfully:', req.params.username);
     res.json(user);
   } catch (err) {
     console.error('Update user error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Just for testing: Get all users
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.json(users);
+  } catch (err) {
+    console.error('Get users error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
