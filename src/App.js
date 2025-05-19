@@ -83,7 +83,8 @@ function App() {
               </div>
             </header>
             
-            {!isPremium && <SubscriptionBanner />}
+            {/* Banner hidden while all features are free */}
+            {/* {!isPremium && <SubscriptionBanner />} */}
             
             {!isMobile ? (
               <nav className="desktop-nav">
@@ -117,14 +118,12 @@ function App() {
                   onClick={() => setActiveTab('urge-toolkit')}>
                   Urge Toolkit
                 </NavLink>
-                {isPremium && (
-                  <NavLink 
-                    to="/community" 
-                    className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                    onClick={() => setActiveTab('community')}>
-                    Community
-                  </NavLink>
-                )}
+                <NavLink 
+                  to="/community" 
+                  className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+                  onClick={() => setActiveTab('community')}>
+                  Community
+                </NavLink>
               </nav>
             ) : (
               <MobileNavigation 
@@ -141,9 +140,7 @@ function App() {
                 <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} />} />
                 <Route path="/motivation" element={<DailyMotivation userData={userData} isPremium={isPremium} />} />
                 <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                <Route path="/community" element={
-                  isPremium ? <Community userData={userData} /> : <SubscriptionBanner fullPage={true} />
-                } />
+                <Route path="/community" element={<Community userData={userData} />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </main>

@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
+/**
+ * Premium Features Control
+ * 
+ * Currently all users have premium features enabled for testing purposes.
+ * To re-enable premium restrictions, search for "isPremium: true" below
+ * and change it back to "isPremium: username === 'premium'"
+ */
+
 // Custom hook to manage user data
 export const useUserData = () => {
   const [userData, setUserData] = useState({
@@ -45,7 +53,7 @@ export const useUserData = () => {
         longestStreak: 14,
         wetDreamCount: 1,
         relapseCount: 2,
-        isPremium: username === 'premium', // Make 'premium' user have premium features
+        isPremium: true, // Set to true for all users for now
         badges: [
           { id: 1, name: '7-Day Warrior', earned: true, date: new Date() },
           { id: 2, name: '14-Day Monk', earned: false, date: null },
@@ -91,15 +99,6 @@ export const useUserData = () => {
       
       toast.success(`Welcome, ${username}!`);
       setIsLoading(false);
-      
-      // Force redirect to tracker page by simulating a click on the tracker link
-      const trackerLink = document.querySelector('a[href="/"]');
-      if (trackerLink) {
-        trackerLink.click();
-      } else {
-        // Fallback navigation if link not found
-        window.location.href = '/';
-      }
       
       return true;
     } catch (err) {
