@@ -28,7 +28,8 @@ app.use((err, req, res, next) => {
 });
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/rossbased';
+mongoose.connect(mongoUri)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -43,7 +44,7 @@ const userSchema = new mongoose.Schema({
   relapseCount: Number,
   isPremium: Boolean,
   badges: [{ id: Number, name: String, earned: Boolean, date: Date }],
-  benefitTracking: [{ date: String, energy: Number, focus: Number, confidence: Number }],
+  benefitTracking: [{ date: Date, energy: Number, focus: Number, confidence: Number }],
   streakHistory: [{ id: Number, start: Date, end: Date, days: Number, reason: String }],
   urgeToolUsage: [{ date: Date, tool: String, effective: Boolean }],
   discordUsername: String,
@@ -61,7 +62,7 @@ const authenticate = (req, res, next) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'rossbased_secret_key');
     req.user = decoded;
     next();
   } catch (err) {
@@ -94,8 +95,8 @@ app.post('/api/login', async (req, res) => {
           { id: 4, name: '90-Day King', earned: false, date: null }
         ],
         benefitTracking: [
-          { date: format(new Date(), 'yyyy-MM-dd'), energy: 8, focus: 7, confidence: 6 },
-          { date: format(addDays(new Date(), -2), 'yyyy-MM-dd'), energy: 6, focus: 5, confidence: 7 }
+          { date: new Date(), energy: 8, focus: 7, confidence: 6 },
+          { date: addDays(new Date(), -2), energy: 6, focus: 5, confidence: 7 }
         ],
         streakHistory: [],
         urgeToolUsage: [],
@@ -105,9 +106,11 @@ app.post('/api/login', async (req, res) => {
       });
       await user.save();
       console.log('User created:', username);
+    } else if (user.password !== password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, user });
+    const token = jwt.sign({ username }, process.env.JWT_SECRET || 'rossbased_secret_key', { expiresIn: '1h' });
+    res.json({ token, ...user.toObject() });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -130,19 +133,23 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
   }
 });
 
-// Update user data
-app.post('/api/user/:username', authenticate, async (req, res) => {
+// Update user data - Using PUT method
+app.put('/api/user/:username', authenticate, async (req, res) => {
   console.log('Received update user request for:', req.params.username, req.body);
   try {
-    const user = await User.findOneAndUpdate(
-      { username: req.params.username },
-      req.body,
-      { new: true }
-    );
-    if (!user) {
-      console.log('User not found:', req.params.username);
+    // Check if user exists first
+    const existingUser = await User.findOne({ username: req.params.username });
+    if (!existingUser) {
       return res.status(404).json({ error: 'User not found' });
     }
+    
+    // Update the user
+    const user = await User.findOneAndUpdate(
+      { username: req.params.username },
+      { $set: req.body },
+      { new: true }
+    );
+    
     res.json(user);
   } catch (err) {
     console.error('Update user error:', err);

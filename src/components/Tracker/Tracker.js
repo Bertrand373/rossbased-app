@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js (continued)
+// components/Tracker/Tracker.js
 import React, { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -29,10 +29,20 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     e.preventDefault();
     const newStartDate = new Date(startDate);
     
-    // Update user data with new start date
+    // Make sure newStartDate is a valid date
+    if (isNaN(newStartDate.getTime())) {
+      toast.error('Please enter a valid date');
+      return;
+    }
+    
+    // Calculate current streak based on the new start date
+    const currentStreak = differenceInDays(today, newStartDate) + 1;
+    
+    // Update user data with new start date and current streak
     updateUserData({
       startDate: newStartDate,
-      currentStreak: differenceInDays(today, newStartDate) + 1
+      currentStreak: currentStreak,
+      longestStreak: Math.max(userData.longestStreak || 0, currentStreak)
     });
     
     setShowSetStartDate(false);
@@ -45,7 +55,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       const now = new Date();
       
       // Update streak history to mark current streak as ended
-      const updatedHistory = [...userData.streakHistory];
+      const updatedHistory = [...(userData.streakHistory || [])];
       const currentStreakIndex = updatedHistory.findIndex(streak => streak.end === null);
       
       if (currentStreakIndex !== -1) {
@@ -59,7 +69,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       // Add new streak starting today
       const newStreak = {
-        id: userData.streakHistory.length + 1,
+        id: (userData.streakHistory?.length || 0) + 1,
         start: now,
         end: null,
         days: 0,
@@ -72,7 +82,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       updateUserData({
         startDate: now,
         currentStreak: 0,
-        relapseCount: userData.relapseCount + 1,
+        relapseCount: (userData.relapseCount || 0) + 1,
         streakHistory: updatedHistory
       });
       
@@ -83,7 +93,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const handleWetDream = () => {
     if (window.confirm('Do you want to log a wet dream? This will not reset your streak.')) {
       updateUserData({
-        wetDreamCount: userData.wetDreamCount + 1
+        wetDreamCount: (userData.wetDreamCount || 0) + 1
       });
       
       toast.success('Wet dream logged. Your streak continues!');
@@ -161,6 +171,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           onClose={() => setShowUrgeMini(false)} 
           isPremium={isPremium}
           updateUserData={updateUserData}
+          userData={userData}
         />
       )}
       
@@ -179,26 +190,26 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       <div className="streak-display">
         <div className="current-streak">
-          <div className="streak-count">{userData.currentStreak}</div>
+          <div className="streak-count">{userData.currentStreak || 0}</div>
           <div className="streak-label">Current Streak</div>
         </div>
         
         <div className="streak-milestones">
           <div className="streak-milestone">
             <FaCrown className="milestone-icon" />
-            <div className="milestone-value">{userData.longestStreak}</div>
+            <div className="milestone-value">{userData.longestStreak || 0}</div>
             <div className="milestone-label">Longest</div>
           </div>
           
           <div className="streak-milestone">
             <FaCalendarCheck className="milestone-icon" />
-            <div className="milestone-value">{userData.wetDreamCount}</div>
+            <div className="milestone-value">{userData.wetDreamCount || 0}</div>
             <div className="milestone-label">Wet Dreams</div>
           </div>
           
           <div className="streak-milestone">
             <FaExclamationTriangle className="milestone-icon" />
-            <div className="milestone-value">{userData.relapseCount}</div>
+            <div className="milestone-value">{userData.relapseCount || 0}</div>
             <div className="milestone-label">Relapses</div>
           </div>
         </div>
@@ -244,7 +255,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           <label className="toggle-switch">
             <input 
               type="checkbox" 
-              checked={userData.showOnLeaderboard}
+              checked={userData.showOnLeaderboard || false}
               onChange={(e) => updateUserData({ showOnLeaderboard: e.target.checked })}
             />
             <span className="toggle-slider"></span>
