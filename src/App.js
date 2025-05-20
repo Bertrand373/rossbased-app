@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
+import trackerLogo from './assets/trackerapplogo.png';
 
 // Tabs
 import Tracker from './components/Tracker/Tracker';
@@ -10,7 +11,6 @@ import Calendar from './components/Calendar/Calendar';
 import Stats from './components/Stats/Stats';
 import DailyMotivation from './components/DailyMotivation/DailyMotivation';
 import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
-import Community from './components/Community/Community';
 import Landing from './components/Landing/Landing'; // Use your existing Landing component
 
 // Shared components
@@ -74,7 +74,9 @@ function App() {
           // Show main app UI if logged in
           <>
             <header className="app-header">
-              <h1>SR Tracker</h1>
+              <div className="logo-container">
+                <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
+              </div>
               <div className="user-controls">
                 <div className="user-info">
                   <span className="username">{userData.username}</span>
@@ -118,18 +120,12 @@ function App() {
                   onClick={() => setActiveTab('urge-toolkit')}>
                   Urge Toolkit
                 </NavLink>
-                <NavLink 
-                  to="/community" 
-                  className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-                  onClick={() => setActiveTab('community')}>
-                  Community
-                </NavLink>
               </nav>
             ) : (
               <MobileNavigation 
                 activeTab={activeTab} 
                 setActiveTab={setActiveTab} 
-                isPremium={isPremium}
+                isPremium={false}
               />
             )}
             
@@ -137,10 +133,9 @@ function App() {
               <Routes>
                 <Route path="/" element={<Tracker userData={userData} updateUserData={updateUserData} isPremium={isPremium} />} />
                 <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} />} />
-                <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} />} />
+                <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                 <Route path="/motivation" element={<DailyMotivation userData={userData} isPremium={isPremium} />} />
                 <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                <Route path="/community" element={<Community userData={userData} />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </main>

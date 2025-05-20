@@ -9,11 +9,10 @@ import {
   FaCalendarAlt,
   FaChartBar,
   FaQuoteRight,
-  FaShieldAlt,
-  FaUsers
+  FaShieldAlt
 } from 'react-icons/fa';
 
-const MobileNavigation = ({ activeTab, setActiveTab, isPremium }) => {
+const MobileNavigation = ({ activeTab, setActiveTab }) => {
   return (
     <div className="mobile-navigation">
       <NavLink 
@@ -70,19 +69,6 @@ const MobileNavigation = ({ activeTab, setActiveTab, isPremium }) => {
         <FaShieldAlt className="mobile-nav-icon" />
         <span>Urges</span>
       </NavLink>
-      
-      {isPremium && (
-        <NavLink 
-          to="/community" 
-          className={({ isActive }) => 
-            isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
-          }
-          onClick={() => setActiveTab('community')}
-        >
-          <FaUsers className="mobile-nav-icon" />
-          <span>Community</span>
-        </NavLink>
-      )}
     </div>
   );
 };

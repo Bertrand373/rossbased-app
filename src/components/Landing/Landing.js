@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import './Landing.css';
 import AuthModal from '../Auth/AuthModal';
+import trackerLogo from '../../assets/trackerapplogo.png';
 
 const Landing = ({ onLogin }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -31,6 +32,7 @@ const Landing = ({ onLogin }) => {
         </div>
       ) : (
         <div className="landing-content">
+          <img src={trackerLogo} alt="Tracker App Logo" className="landing-logo" style={{ height: '80px', marginBottom: '20px' }} />
           <h1>SR Tracker</h1>
           <p className="landing-subtitle">Track your streak, manage urges, and unlock your potential</p>
           
