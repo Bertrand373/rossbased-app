@@ -4,17 +4,19 @@ import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 // Import icons at the top
-import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle } from 'react-icons/fa';
+import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo } from 'react-icons/fa';
 import './Stats.css';
+import toast from 'react-hot-toast';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-const Stats = ({ userData, isPremium }) => {
+const Stats = ({ userData, isPremium, updateUserData }) => {
   const [selectedMetric, setSelectedMetric] = useState('energy');
   const [timeRange, setTimeRange] = useState('week');
   const [showBadgeModal, setShowBadgeModal] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   
   // Time range options for chart
   const timeRangeOptions = {
@@ -30,6 +32,43 @@ const Stats = ({ userData, isPremium }) => {
   const handleBadgeClick = (badge) => {
     setSelectedBadge(badge);
     setShowBadgeModal(true);
+  };
+
+  // Handle reset stats
+  const handleResetStats = () => {
+    setShowResetConfirm(true);
+  };
+
+  // Confirm reset stats
+  const confirmResetStats = () => {
+    // Reset all stats
+    const resetUserData = {
+      ...userData,
+      startDate: new Date(),
+      currentStreak: 0,
+      longestStreak: 0,
+      wetDreamCount: 0,
+      relapseCount: 0,
+      badges: [
+        { id: 1, name: '7-Day Warrior', earned: false, date: null },
+        { id: 2, name: '14-Day Monk', earned: false, date: null },
+        { id: 3, name: '30-Day Master', earned: false, date: null },
+        { id: 4, name: '90-Day King', earned: false, date: null }
+      ],
+      benefitTracking: [],
+      streakHistory: [{
+        id: 1,
+        start: new Date(),
+        end: null,
+        days: 0,
+        reason: null
+      }],
+      notes: {}
+    };
+    
+    updateUserData(resetUserData);
+    setShowResetConfirm(false);
+    toast.success('All stats have been reset');
   };
   
   // Filter benefit data based on selected time range
@@ -155,7 +194,24 @@ const Stats = ({ userData, isPremium }) => {
     <div className="stats-container">
       <div className="stats-header">
         <h2>Your Stats</h2>
+        <button className="reset-stats-btn" onClick={handleResetStats}>
+          <FaRedo /> Reset Stats
+        </button>
       </div>
+      
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Reset All Stats?</h3>
+            <p>This will reset all your stats, including streaks, badges, and tracking history. This action cannot be undone.</p>
+            <div className="form-actions">
+              <button className="btn btn-danger" onClick={confirmResetStats}>Reset Everything</button>
+              <button className="btn btn-outline" onClick={() => setShowResetConfirm(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Streak Statistics */}
       <div className="streak-stats">

@@ -50,7 +50,6 @@
   background-color: rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-lg);
   color: var(--text);
-  border: 1px solid rgba(255, 221, 0, 0.3);
 }
 
 .streak-count {
