@@ -76,6 +76,7 @@
   background-color: var(--light-gray);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
+  border: none;
 }
 
 .timer-instructions ul {
@@ -127,7 +128,7 @@
 .suggestion-text {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--primary);
+  color: white;
 }
 
 .empty-suggestion {
@@ -140,11 +141,11 @@
 }
 
 .redirect-info {
-  background-color: rgba(255, 221, 0, 0.1);
+  background-color: var(--light-gray);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
+  box-shadow: none;
+  border: none;
 }
 
 .premium-feature {
@@ -215,9 +216,10 @@
 
 .audio-info-section {
   padding: var(--spacing-lg);
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid var(--border);
+  background-color: var(--light-gray);
   border-radius: var(--radius-md);
+  border: none;
+  box-shadow: none;
 }
 
 .premium-upgrade {

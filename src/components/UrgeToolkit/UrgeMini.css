@@ -133,7 +133,7 @@
 .mini-suggestion-text {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--primary);
+  color: white;
   margin-bottom: var(--spacing-md);
 }
 

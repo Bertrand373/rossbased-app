@@ -18,7 +18,8 @@
 
 .filter-btn {
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--light-gray);
+  background-color: var(--primary);
+  color: black;
   border: none;
   border-radius: var(--radius-md);
   font-size: 0.875rem;
@@ -28,7 +29,7 @@
 }
 
 .filter-btn.active {
-  background-color: var(--primary);
+  background-color: white;
   color: black;
 }
 
@@ -187,7 +188,8 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--light-gray);
+  background-color: var(--primary);
+  color: black;
   border: none;
   border-radius: var(--radius-full);
   font-size: 0.875rem;
@@ -196,8 +198,7 @@
 }
 
 .post-action-btn:hover {
-  background-color: rgba(37, 99, 235, 0.1);
-  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.8);
 }
 
 .empty-feed {
