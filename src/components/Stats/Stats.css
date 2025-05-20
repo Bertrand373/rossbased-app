@@ -117,7 +117,7 @@
   flex-direction: column;
   align-items: center;
   padding: var(--spacing-md);
-  background-color: rgba(255, 221, 0, 0.1);
+  background-color: #0f0f0f;
   border: 1px solid rgba(255, 221, 0, 0.3);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -126,7 +126,8 @@
 }
 
 .badge-card.earned {
-  background-color: rgba(255, 221, 0, 0.2);
+  background-color: #0f0f0f;
+  border: 1px solid var(--primary);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -136,8 +137,8 @@
 }
 
 .badge-card.locked {
-  background-color: var(--light-gray);
-  border: none;
+  background-color: #0f0f0f;
+  border: 1px solid var(--light-gray);
 }
 
 .badge-icon {
@@ -192,18 +193,20 @@
 }
 
 .metric-btn, .time-btn {
-  background-color: var(--light-gray);
+  background-color: white;
+  color: black;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
+  border: none;
 }
 
 .metric-btn.active, .time-btn.active {
   background-color: var(--primary);
-  color: #000;
+  color: black;
 }
 
 .chart-container {
@@ -234,7 +237,7 @@
 
 .average-stat .stat-label {
   font-size: 0.875rem;
-  color: var(--gray);
+  color: white;
   margin-bottom: var(--spacing-sm);
 }
 
@@ -268,7 +271,7 @@
 
 .comparison-label {
   font-size: 0.75rem;
-  color: var(--gray);
+  color: white;
   margin-bottom: var(--spacing-xs);
 }
 

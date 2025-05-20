@@ -94,8 +94,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const datasets = [{
       label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
       data: filteredData.map(item => item[selectedMetric]),
-      borderColor: 'rgb(37, 99, 235)',
-      backgroundColor: 'rgba(37, 99, 235, 0.1)',
+      borderColor: 'rgb(255, 255, 255)',
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
       tension: 0.3,
       fill: true
     }];
@@ -112,7 +112,19 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         min: 0,
         max: 10,
         ticks: {
-          stepSize: 2
+          stepSize: 2,
+          color: 'rgba(255, 255, 255, 0.7)'
+        },
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)'
+        }
+      },
+      x: {
+        ticks: {
+          color: 'rgba(255, 255, 255, 0.7)'
+        },
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)'
         }
       }
     },
