@@ -50,11 +50,21 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const handleStartDateSubmit = (e) => {
     if (e) e.preventDefault();
     
+    // Make sure the selected date is valid
     const newStartDate = new Date(startDate);
     
     // Make sure newStartDate is a valid date
     if (isNaN(newStartDate.getTime())) {
       toast.error('Please enter a valid date');
+      return;
+    }
+    
+    // Check if newStartDate is in the future
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0); // Reset time portion for proper comparison
+    
+    if (newStartDate > currentDate) {
+      toast.error('Start date cannot be in the future');
       return;
     }
     
@@ -77,6 +87,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     
     // Update local state
     setCurrentStreak(newStreak);
+    setStartDate(newStartDate);
     
     setShowSetStartDate(false);
     toast.success('Start date set successfully!');
@@ -193,7 +204,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                   <DatePicker
                     selected={startDate}
                     onChange={handleDateChange}
-                    maxDate={new Date()}
+                    maxDate={new Date()} // Prevents selecting future dates
                     dateFormat="MMMM d, yyyy"
                     className="modern-datepicker"
                     required
@@ -202,7 +213,21 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               </div>
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">Set Start Date</button>
-                <button type="button" className="btn btn-outline" onClick={() => setShowSetStartDate(false)}>Cancel</button>
+                <button 
+                  type="button" 
+                  className="btn btn-outline" 
+                  onClick={() => {
+                    if (userData.startDate) {
+                      setShowSetStartDate(false);
+                    } else {
+                      // If no start date is set, use today's date
+                      setStartDate(new Date());
+                      handleStartDateSubmit();
+                    }
+                  }}
+                >
+                  {userData.startDate ? "Cancel" : "Use Today"}
+                </button>
               </div>
             </form>
           </div>
