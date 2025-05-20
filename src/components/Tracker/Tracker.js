@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './Tracker.css';
 
 // Icons
-import { FaCrown, FaCalendarCheck, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
+import { FaCrown, FaCalendarCheck, FaExclamationTriangle, FaInfoCircle, FaTimes } from 'react-icons/fa';
 
 // Urge Toolkit Mini-component
 import UrgeMini from '../UrgeToolkit/UrgeMini';
@@ -80,6 +80,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     
     setShowSetStartDate(false);
     toast.success('Start date set successfully!');
+  };
+
+  const handleDateChange = (date) => {
+    setStartDate(date);
   };
 
   const handleRelapse = () => {
@@ -188,15 +192,17 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <div className="datepicker-container">
                   <DatePicker
                     selected={startDate}
-                    onChange={(date) => setStartDate(date)}
+                    onChange={handleDateChange}
                     maxDate={new Date()}
                     dateFormat="MMMM d, yyyy"
                     className="modern-datepicker"
+                    required
                   />
                 </div>
               </div>
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">Set Start Date</button>
+                <button type="button" className="btn btn-outline" onClick={() => setShowSetStartDate(false)}>Cancel</button>
               </div>
             </form>
           </div>

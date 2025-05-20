@@ -29,7 +29,7 @@
 
 .filter-btn.active {
   background-color: var(--primary);
-  color: white;
+  color: black;
 }
 
 .community-main {
@@ -46,10 +46,11 @@
 }
 
 .post-creation {
-  background-color: white;
+  background-color: rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
 }
 
 .post-input-container {
@@ -77,7 +78,7 @@
   bottom: -5px;
   right: -5px;
   background-color: var(--primary);
-  color: white;
+  color: black;
   font-size: 0.625rem;
   font-weight: 600;
   padding: 2px 4px;
@@ -91,6 +92,8 @@
   padding: var(--spacing-md);
   resize: none;
   font-family: inherit;
+  background-color: var(--medium-gray);
+  color: var(--text);
 }
 
 .post-actions {
@@ -111,10 +114,11 @@
 }
 
 .post-card {
-  background-color: white;
+  background-color: rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
 }
 
 .post-card.milestone-post {
@@ -221,10 +225,11 @@
 }
 
 .active-challenge, .available-challenges, .leaderboard-preview {
-  background-color: white;
+  background-color: rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
 }
 
 .challenge-card {
@@ -247,7 +252,7 @@
 .challenge-duration {
   font-size: 0.75rem;
   color: var(--gray);
-  background-color: white;
+  background-color: var(--medium-gray);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
 }
@@ -265,7 +270,7 @@
 
 .progress-bar {
   height: 8px;
-  background-color: white;
+  background-color: var(--medium-gray);
   border-radius: var(--radius-full);
   overflow: hidden;
 }
@@ -378,6 +383,7 @@
 /* Challenge Modal */
 .challenge-modal {
   max-width: 500px;
+  background-color: var(--card-background);
 }
 
 .challenge-modal h3 {

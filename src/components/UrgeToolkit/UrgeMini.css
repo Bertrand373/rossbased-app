@@ -13,12 +13,13 @@
 }
 
 .urge-mini-container {
-  background-color: white;
+  background-color: var(--card-background);
   border-radius: var(--radius-lg);
   width: 90%;
   max-width: 400px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   overflow: hidden;
+  border: 1px solid var(--border);
 }
 
 .urge-mini-header {
@@ -58,7 +59,6 @@
   padding: var(--spacing-sm);
   background: transparent;
   border: none;
-  border-bottom: 3px solid transparent;
   color: var(--gray);
   font-size: 0.875rem;
   transition: all 0.2s;
@@ -66,7 +66,6 @@
 
 .mini-tab-btn.active {
   color: var(--primary);
-  border-bottom-color: var(--primary);
 }
 
 .mini-tab-icon {
@@ -89,7 +88,8 @@
   width: 100%;
   text-align: center;
   padding: var(--spacing-md);
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  background: rgba(255, 221, 0, 0.1);
+  border: 1px solid var(--border);
   color: white;
   border-radius: var(--radius-md);
 }
@@ -98,6 +98,7 @@
   font-size: 3rem;
   font-weight: 700;
   font-family: monospace;
+  color: var(--primary);
 }
 
 .mini-timer-label {
@@ -192,7 +193,8 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-md);
-  background-color: var(--light-gray);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
 }
 
