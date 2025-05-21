@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - Fixed Date Handling Section
+// components/Tracker/Tracker.js
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -49,9 +49,12 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     ? differenceInDays(today, new Date(userData.startDate)) + 1 
     : 0;
 
-  // Ensure date is properly formatted for the UI
-  const formatDateForDisplay = (date) => {
-    return format(date, 'MMMM d, yyyy');
+  const handleDateChange = (date) => {
+    console.log("Date selected:", date);
+    // Make sure we're using a fresh Date object
+    const newDate = new Date(date);
+    console.log("New date object created:", newDate);
+    setStartDate(newDate);
   };
 
   const handleStartDateSubmit = (e) => {
@@ -89,17 +92,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     
     // Update local state
     setCurrentStreak(newStreak);
-    // Important: Make sure we're setting the state with a new date object
     setStartDate(newStartDate);
     
     setShowSetStartDate(false);
     toast.success('Start date set successfully!');
-  };
-
-  const handleDateChange = (date) => {
-    console.log("Date selected:", date);
-    // Create a new Date object to ensure it's properly handled
-    setStartDate(new Date(date));
   };
 
   const handleRelapse = () => {
@@ -191,8 +187,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                     dateFormat="MMMM d, yyyy"
                     className="modern-datepicker"
                     required
-                    inline={false} // Force dropdown mode
-                    shouldCloseOnSelect={true} // Close picker on date selection
+                    popperPlacement="bottom"
+                    shouldCloseOnSelect={true}
                   />
                 </div>
               </div>
