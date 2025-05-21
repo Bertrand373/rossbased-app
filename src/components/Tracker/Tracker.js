@@ -1,5 +1,5 @@
 // components/Tracker/Tracker.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
 import DatePicker from 'react-datepicker';
@@ -50,18 +50,32 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     : 0;
 
   const handleDateChange = (date) => {
-    console.log("Date selected:", date);
-    // Make sure we're using a fresh Date object
-    const newDate = new Date(date);
-    console.log("New date object created:", newDate);
-    setStartDate(newDate);
+    // Explicitly create a new date object with the selected date
+    // Clone the date to ensure we're working with a fresh object
+    if (date) {
+      console.log("Date selected:", date);
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const day = date.getDate();
+      
+      // Create a brand new date object
+      const newDate = new Date(year, month, day);
+      console.log("New date object created:", newDate);
+      
+      // Force state update by creating a completely new date instance
+      setStartDate(newDate);
+    }
   };
 
   const handleStartDateSubmit = (e) => {
     if (e) e.preventDefault();
     
-    // Create a new date object to ensure it's properly handled
-    const newStartDate = new Date(startDate);
+    // Explicitly create a new date object with the year, month, and day
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth();
+    const day = startDate.getDate();
+    const newStartDate = new Date(year, month, day);
+    
     console.log("Submitting start date:", newStartDate);
     
     // Make sure newStartDate is a valid date
@@ -80,7 +94,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
     
     // Calculate current streak based on the new start date
-    const calculatedStreak = differenceInDays(today, newStartDate) + 1;
+    const calculatedStreak = differenceInDays(new Date(), newStartDate) + 1;
     const newStreak = calculatedStreak > 0 ? calculatedStreak : 0;
     
     // Update user data with new start date and current streak
@@ -92,7 +106,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     
     // Update local state
     setCurrentStreak(newStreak);
-    setStartDate(newStartDate);
     
     setShowSetStartDate(false);
     toast.success('Start date set successfully!');
@@ -186,9 +199,14 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                     maxDate={new Date()} // Prevents selecting future dates
                     dateFormat="MMMM d, yyyy"
                     className="modern-datepicker"
-                    required
-                    popperPlacement="bottom"
-                    shouldCloseOnSelect={true}
+                    onFocus={e => e.target.blur()} // Prevents keyboard on mobile
+                    customInput={
+                      <input
+                        type="text"
+                        className="modern-datepicker"
+                        readOnly
+                      />
+                    }
                   />
                 </div>
               </div>
@@ -203,7 +221,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                     } else {
                       // If no start date is set, use today's date
                       const today = new Date();
-                      setStartDate(today);
+                      const newToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                      setStartDate(newToday);
                       // Submit the form with today's date
                       setTimeout(() => handleStartDateSubmit(), 0);
                     }
