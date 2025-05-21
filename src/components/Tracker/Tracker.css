@@ -1,3 +1,181 @@
+/* components/Tracker/Tracker.css */
+.tracker-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.edit-date-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.streak-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background-color: rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.current-streak {
+  text-align: center;
+}
+
+.streak-count {
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.streak-label {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-top: var(--spacing-sm);
+}
+
+.streak-milestones {
+  display: flex;
+  gap: var(--spacing-xl);
+  width: 100%;
+  justify-content: center;
+}
+
+.streak-milestone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.milestone-icon {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-sm);
+  color: var(--primary);
+}
+
+.milestone-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.milestone-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.tracker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tracker-actions button {
+  flex: 1;
+  min-width: 120px;
+}
+
+.journal-section {
+  background-color: var(--light-gray);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border: none;
+}
+
+.journal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.journal-preview {
+  background-color: var(--card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.empty-journal {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  color: var(--text-secondary);
+  background-color: var(--card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+}
+
+.info-icon {
+  font-size: 1.25rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.discord-integration {
+  background-color: var(--light-gray);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  border: none;
+}
+
+.discord-integration h3 {
+  margin-bottom: var(--spacing-md);
+}
+
+.discord-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.discord-username {
+  background-color: var(--medium-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+}
+
+.discord-note {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+  font-style: italic;
+}
+
+.datepicker-container {
+  position: relative;
+}
+
+.modern-datepicker {
+  padding: var(--spacing-md);
+  border: 1px solid var(--light-gray);
+  border-radius: var(--radius-md);
+  background-color: var(--medium-gray);
+  color: var(--text);
+  width: 100%;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
 /* Override react-datepicker styles to make it look better in dark mode */
 .react-datepicker {
   font-family: inherit;
@@ -52,4 +230,32 @@
 .react-datepicker__day--disabled {
   color: var(--gray);
   opacity: 0.5;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .streak-milestones {
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    justify-content: space-evenly;
+  }
+  
+  .tracker-actions {
+    flex-direction: column;
+  }
+  
+  .journal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .journal-header button {
+    width: 100%;
+  }
+  
+  .discord-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js
+// components/Tracker/Tracker.js - Fixed Date Handling Section
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -15,17 +15,19 @@ import UrgeMini from '../UrgeToolkit/UrgeMini';
 const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [showUrgeMini, setShowUrgeMini] = useState(false);
   const [showSetStartDate, setShowSetStartDate] = useState(!userData.startDate);
+  
+  // Initialize with the current date if no start date exists
   const [startDate, setStartDate] = useState(
     userData.startDate ? new Date(userData.startDate) : new Date()
   );
+  
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [currentNote, setCurrentNote] = useState('');
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   const today = new Date();
-
+  
   // Update UI when userData changes
   useEffect(() => {
-    console.log("userData updated:", userData);
     if (userData.startDate) {
       const startDateObj = new Date(userData.startDate);
       setStartDate(startDateObj);
@@ -47,11 +49,17 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     ? differenceInDays(today, new Date(userData.startDate)) + 1 
     : 0;
 
+  // Ensure date is properly formatted for the UI
+  const formatDateForDisplay = (date) => {
+    return format(date, 'MMMM d, yyyy');
+  };
+
   const handleStartDateSubmit = (e) => {
     if (e) e.preventDefault();
     
-    // Make sure the selected date is valid
+    // Create a new date object to ensure it's properly handled
     const newStartDate = new Date(startDate);
+    console.log("Submitting start date:", newStartDate);
     
     // Make sure newStartDate is a valid date
     if (isNaN(newStartDate.getTime())) {
@@ -72,12 +80,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     const calculatedStreak = differenceInDays(today, newStartDate) + 1;
     const newStreak = calculatedStreak > 0 ? calculatedStreak : 0;
     
-    console.log("Setting start date:", {
-      startDate: newStartDate,
-      currentStreak: newStreak,
-      longestStreak: Math.max(userData.longestStreak || 0, newStreak)
-    });
-    
     // Update user data with new start date and current streak
     updateUserData({
       startDate: newStartDate,
@@ -87,6 +89,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     
     // Update local state
     setCurrentStreak(newStreak);
+    // Important: Make sure we're setting the state with a new date object
     setStartDate(newStartDate);
     
     setShowSetStartDate(false);
@@ -94,7 +97,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   };
 
   const handleDateChange = (date) => {
-    setStartDate(date);
+    console.log("Date selected:", date);
+    // Create a new Date object to ensure it's properly handled
+    setStartDate(new Date(date));
   };
 
   const handleRelapse = () => {
@@ -128,13 +133,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       updatedHistory.push(newStreak);
       
-      console.log("Logging relapse:", {
-        startDate: now,
-        currentStreak: 0,
-        relapseCount: (userData.relapseCount || 0) + 1,
-        streakHistory: updatedHistory
-      });
-      
       // Update user data
       updateUserData({
         startDate: now,
@@ -153,10 +151,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   const handleWetDream = () => {
     if (window.confirm('Do you want to log a wet dream? This will not reset your streak.')) {
-      console.log("Logging wet dream:", {
-        wetDreamCount: (userData.wetDreamCount || 0) + 1
-      });
-      
       updateUserData({
         wetDreamCount: (userData.wetDreamCount || 0) + 1
       });
@@ -169,10 +163,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     const today = format(new Date(), 'yyyy-MM-dd');
     const updatedNotes = { ...userData.notes, [today]: currentNote };
     
-    console.log("Saving note:", {
-      notes: updatedNotes
-    });
-    
     updateUserData({ notes: updatedNotes });
     setShowNoteModal(false);
     toast.success('Journal entry saved!');
@@ -180,13 +170,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
-
-  console.log("Tracker rendering with:", {
-    currentStreak,
-    userDataStreak: userData.currentStreak,
-    startDate: userData.startDate,
-    daysSinceStart
-  });
 
   return (
     <div className="tracker-container">
@@ -208,6 +191,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                     dateFormat="MMMM d, yyyy"
                     className="modern-datepicker"
                     required
+                    inline={false} // Force dropdown mode
+                    shouldCloseOnSelect={true} // Close picker on date selection
                   />
                 </div>
               </div>
@@ -221,8 +206,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                       setShowSetStartDate(false);
                     } else {
                       // If no start date is set, use today's date
-                      setStartDate(new Date());
-                      handleStartDateSubmit();
+                      const today = new Date();
+                      setStartDate(today);
+                      // Submit the form with today's date
+                      setTimeout(() => handleStartDateSubmit(), 0);
                     }
                   }}
                 >
