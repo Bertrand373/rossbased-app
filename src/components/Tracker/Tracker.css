@@ -178,45 +178,39 @@
   font-style: italic;
 }
 
-/* Date Picker Styles */
-.date-picker-container {
+/* Simple Date Picker Styles */
+.simple-date-picker {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
 }
 
-.date-select {
+.date-input-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.date-input-container label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.date-input-container input {
   padding: var(--spacing-md);
   background-color: var(--medium-gray);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   font-size: 1rem;
-  cursor: pointer;
+  text-align: center;
 }
 
-.month-select {
-  flex: 1.5;
-}
-
-.day-select {
-  flex: 0.8;
-}
-
-.year-select {
-  flex: 1;
-}
-
-/* Fix for Firefox */
-.date-select option {
-  background-color: var(--card-background);
-  color: var(--text);
-}
-
-/* Hover and focus states */
-.date-select:hover, .date-select:focus {
-  border-color: var(--primary);
-  outline: none;
+.date-helper-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
 }
 
 /* Mobile responsiveness */
@@ -246,7 +240,7 @@
     align-items: flex-start;
   }
   
-  .date-picker-container {
+  .simple-date-picker {
     flex-direction: column;
   }
 }

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import './Tracker.css';
 
 // Icons
-import { FaCrown, FaCalendarCheck, FaExclamationTriangle, FaInfoCircle, FaTimes } from 'react-icons/fa';
+import { FaCrown, FaCalendarCheck, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 
 // Urge Toolkit Mini-component
 import UrgeMini from '../UrgeToolkit/UrgeMini';
@@ -24,10 +24,12 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   const today = new Date();
 
-  // States for date picker
-  const [selectedMonth, setSelectedMonth] = useState(startDate.getMonth());
-  const [selectedDay, setSelectedDay] = useState(startDate.getDate());
-  const [selectedYear, setSelectedYear] = useState(startDate.getFullYear());
+  // States for simple date inputs
+  const [dateInputs, setDateInputs] = useState({
+    year: startDate.getFullYear(),
+    month: startDate.getMonth() + 1, // Convert 0-based to 1-based for user understanding
+    day: startDate.getDate()
+  });
   
   // Update UI when userData changes
   useEffect(() => {
@@ -35,10 +37,12 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       const startDateObj = new Date(userData.startDate);
       setStartDate(startDateObj);
       
-      // Update select states
-      setSelectedMonth(startDateObj.getMonth());
-      setSelectedDay(startDateObj.getDate());
-      setSelectedYear(startDateObj.getFullYear());
+      // Update date inputs
+      setDateInputs({
+        year: startDateObj.getFullYear(),
+        month: startDateObj.getMonth() + 1,
+        day: startDateObj.getDate()
+      });
       
       // Calculate current streak based on start date
       if (!isNaN(startDateObj.getTime())) {
@@ -52,63 +56,78 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [userData, today]);
 
-  // Update start date when any select changes
-  useEffect(() => {
-    try {
-      const newDate = new Date(selectedYear, selectedMonth, selectedDay);
-      if (!isNaN(newDate.getTime())) {
-        setStartDate(newDate);
-      }
-    } catch (error) {
-      console.error("Error updating date:", error);
-    }
-  }, [selectedMonth, selectedDay, selectedYear]);
-
   // Calculate days since start
   const daysSinceStart = userData.startDate 
     ? differenceInDays(today, new Date(userData.startDate)) + 1 
     : 0;
 
-  // Calculate days in month
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
+  // Handle date input changes
+  const handleDateInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Only accept numeric input
+    if (!/^\d*$/.test(value)) return;
+    
+    setDateInputs(prev => ({
+      ...prev,
+      [name]: value === '' ? '' : parseInt(value, 10)
+    }));
   };
 
-  // Generate array of years for select
-  const getYearOptions = () => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let i = currentYear - 10; i <= currentYear; i++) {
-      years.push(i);
+  // Create a valid date from inputs or return null if invalid
+  const getDateFromInputs = () => {
+    const { year, month, day } = dateInputs;
+    
+    // Basic validation
+    if (!year || !month || !day || 
+        year < 1900 || year > 2100 || 
+        month < 1 || month > 12 || 
+        day < 1 || day > 31) {
+      return null;
     }
-    return years;
+    
+    // JavaScript months are 0-based
+    const date = new Date(year, month - 1, day);
+    
+    // Check if the date is valid (e.g., not Feb 30)
+    if (date.getFullYear() !== year || 
+        date.getMonth() !== month - 1 || 
+        date.getDate() !== day) {
+      return null;
+    }
+    
+    return date;
   };
-
-  // Get month name for display
-  const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
 
   const handleStartDateSubmit = (e) => {
     if (e) e.preventDefault();
+    
+    const newDate = getDateFromInputs();
+    
+    if (!newDate) {
+      toast.error('Please enter a valid date');
+      return;
+    }
     
     // Check if date is in the future
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     
-    if (startDate > currentDate) {
+    if (newDate > currentDate) {
       toast.error('Start date cannot be in the future');
       return;
     }
     
+    // Set the new start date
+    setStartDate(newDate);
+    
     // Calculate current streak based on the new start date
-    const calculatedStreak = differenceInDays(today, startDate) + 1;
+    const calculatedStreak = differenceInDays(today, newDate) + 1;
     const newStreak = calculatedStreak > 0 ? calculatedStreak : 0;
     
     // Update user data with new start date and current streak
     updateUserData({
-      startDate: startDate,
+      startDate: newDate,
       currentStreak: newStreak,
       longestStreak: Math.max(userData.longestStreak || 0, newStreak)
     });
@@ -118,6 +137,18 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     
     setShowSetStartDate(false);
     toast.success('Start date set successfully!');
+  };
+
+  const handleUseToday = () => {
+    const today = new Date();
+    setDateInputs({
+      year: today.getFullYear(),
+      month: today.getMonth() + 1,
+      day: today.getDate()
+    });
+    
+    setStartDate(today);
+    setTimeout(() => handleStartDateSubmit(), 0);
   };
 
   const handleRelapse = () => {
@@ -162,9 +193,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       // Update local state
       setCurrentStreak(0);
       setStartDate(now);
-      setSelectedMonth(now.getMonth());
-      setSelectedDay(now.getDate());
-      setSelectedYear(now.getFullYear());
+      setDateInputs({
+        year: now.getFullYear(),
+        month: now.getMonth() + 1,
+        day: now.getDate()
+      });
       
       toast.error('Streak reset. Keep going - every day is a new opportunity!');
     }
@@ -192,34 +225,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
-  // Get maximum day based on selected month and year
-  const maxDay = getDaysInMonth(selectedYear, selectedMonth);
-  
-  // Ensure selected day is valid for the month
-  useEffect(() => {
-    if (selectedDay > maxDay) {
-      setSelectedDay(maxDay);
-    }
-  }, [selectedMonth, selectedYear, maxDay, selectedDay]);
-
-  // Handle month change properly
-  const handleMonthChange = (e) => {
-    const newMonth = parseInt(e.target.value, 10);
-    setSelectedMonth(newMonth);
-  };
-
-  // Handle day change properly
-  const handleDayChange = (e) => {
-    const newDay = parseInt(e.target.value, 10);
-    setSelectedDay(newDay);
-  };
-
-  // Handle year change properly
-  const handleYearChange = (e) => {
-    const newYear = parseInt(e.target.value, 10);
-    setSelectedYear(newYear);
-  };
-
   return (
     <div className="tracker-container">
       {/* Set Start Date Modal */}
@@ -230,46 +235,54 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <p>When did you begin your current streak?</p>
             
             <form onSubmit={handleStartDateSubmit}>
-              <div className="form-group">
-                <label htmlFor="startDate">Start Date:</label>
-                <div className="date-picker-container">
-                  {/* Month Selection */}
-                  <select 
-                    id="month-select"
-                    value={selectedMonth}
-                    onChange={handleMonthChange}
-                    className="date-select month-select"
-                  >
-                    {monthNames.map((month, index) => (
-                      <option key={month} value={index}>{month}</option>
-                    ))}
-                  </select>
+              <div className="form-group date-input-group">
+                <label>Start Date:</label>
+                <div className="simple-date-picker">
+                  <div className="date-input-container">
+                    <label htmlFor="month">Month (1-12)</label>
+                    <input
+                      type="text"
+                      id="month"
+                      name="month"
+                      value={dateInputs.month}
+                      onChange={handleDateInputChange}
+                      placeholder="MM"
+                      maxLength="2"
+                    />
+                  </div>
                   
-                  {/* Day Selection */}
-                  <select 
-                    id="day-select"
-                    value={selectedDay}
-                    onChange={handleDayChange}
-                    className="date-select day-select"
-                  >
-                    {Array.from({ length: maxDay }, (_, i) => i + 1).map(day => (
-                      <option key={day} value={day}>{day}</option>
-                    ))}
-                  </select>
+                  <div className="date-input-container">
+                    <label htmlFor="day">Day (1-31)</label>
+                    <input
+                      type="text"
+                      id="day"
+                      name="day"
+                      value={dateInputs.day}
+                      onChange={handleDateInputChange}
+                      placeholder="DD"
+                      maxLength="2"
+                    />
+                  </div>
                   
-                  {/* Year Selection */}
-                  <select 
-                    id="year-select"
-                    value={selectedYear}
-                    onChange={handleYearChange}
-                    className="date-select year-select"
-                  >
-                    {getYearOptions().map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
+                  <div className="date-input-container">
+                    <label htmlFor="year">Year</label>
+                    <input
+                      type="text"
+                      id="year"
+                      name="year"
+                      value={dateInputs.year}
+                      onChange={handleDateInputChange}
+                      placeholder="YYYY"
+                      maxLength="4"
+                    />
+                  </div>
+                </div>
+                
+                <div className="date-helper-text">
+                  Enter date in MM/DD/YYYY format, e.g., 5/21/2025
                 </div>
               </div>
+              
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">Set Start Date</button>
                 <button 
@@ -279,13 +292,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                     if (userData.startDate) {
                       setShowSetStartDate(false);
                     } else {
-                      // If no start date is set, use today's date
-                      const today = new Date();
-                      setSelectedDay(today.getDate());
-                      setSelectedMonth(today.getMonth());
-                      setSelectedYear(today.getFullYear());
-                      setStartDate(today);
-                      setTimeout(() => handleStartDateSubmit(), 0);
+                      handleUseToday();
                     }
                   }}
                 >
