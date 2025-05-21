@@ -1,9 +1,7 @@
 // components/Tracker/Tracker.js
-import React, { useState, useEffect, useRef } from 'react';
-import { format, differenceInDays, parseISO } from 'date-fns';
+import React, { useState, useEffect } from 'react';
+import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import './Tracker.css';
 
 // Icons
@@ -25,12 +23,22 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [currentNote, setCurrentNote] = useState('');
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   const today = new Date();
+
+  // States for simplified date picker
+  const [selectedMonth, setSelectedMonth] = useState(startDate.getMonth());
+  const [selectedDay, setSelectedDay] = useState(startDate.getDate());
+  const [selectedYear, setSelectedYear] = useState(startDate.getFullYear());
   
   // Update UI when userData changes
   useEffect(() => {
     if (userData.startDate) {
       const startDateObj = new Date(userData.startDate);
       setStartDate(startDateObj);
+      
+      // Update select states
+      setSelectedMonth(startDateObj.getMonth());
+      setSelectedDay(startDateObj.getDate());
+      setSelectedYear(startDateObj.getFullYear());
       
       // Calculate current streak based on start date
       if (!isNaN(startDateObj.getTime())) {
@@ -44,62 +52,51 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [userData, today]);
 
+  // Update start date when any select changes
+  useEffect(() => {
+    const newDate = new Date(selectedYear, selectedMonth, selectedDay);
+    setStartDate(newDate);
+  }, [selectedMonth, selectedDay, selectedYear]);
+
   // Calculate days since start
   const daysSinceStart = userData.startDate 
     ? differenceInDays(today, new Date(userData.startDate)) + 1 
     : 0;
 
-  const handleDateChange = (date) => {
-    // Explicitly create a new date object with the selected date
-    // Clone the date to ensure we're working with a fresh object
-    if (date) {
-      console.log("Date selected:", date);
-      const year = date.getFullYear();
-      const month = date.getMonth();
-      const day = date.getDate();
-      
-      // Create a brand new date object
-      const newDate = new Date(year, month, day);
-      console.log("New date object created:", newDate);
-      
-      // Force state update by creating a completely new date instance
-      setStartDate(newDate);
+  // Calculate days in month
+  const getDaysInMonth = (year, month) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  // Generate array of years for select
+  const getYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = currentYear - 10; i <= currentYear; i++) {
+      years.push(i);
     }
+    return years;
   };
 
   const handleStartDateSubmit = (e) => {
     if (e) e.preventDefault();
     
-    // Explicitly create a new date object with the year, month, and day
-    const year = startDate.getFullYear();
-    const month = startDate.getMonth();
-    const day = startDate.getDate();
-    const newStartDate = new Date(year, month, day);
-    
-    console.log("Submitting start date:", newStartDate);
-    
-    // Make sure newStartDate is a valid date
-    if (isNaN(newStartDate.getTime())) {
-      toast.error('Please enter a valid date');
-      return;
-    }
-    
-    // Check if newStartDate is in the future
+    // Check if date is in the future
     const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0); // Reset time portion for proper comparison
+    currentDate.setHours(0, 0, 0, 0);
     
-    if (newStartDate > currentDate) {
+    if (startDate > currentDate) {
       toast.error('Start date cannot be in the future');
       return;
     }
     
     // Calculate current streak based on the new start date
-    const calculatedStreak = differenceInDays(new Date(), newStartDate) + 1;
+    const calculatedStreak = differenceInDays(today, startDate) + 1;
     const newStreak = calculatedStreak > 0 ? calculatedStreak : 0;
     
     // Update user data with new start date and current streak
     updateUserData({
-      startDate: newStartDate,
+      startDate: startDate,
       currentStreak: newStreak,
       longestStreak: Math.max(userData.longestStreak || 0, newStreak)
     });
@@ -153,6 +150,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       // Update local state
       setCurrentStreak(0);
       setStartDate(now);
+      setSelectedMonth(now.getMonth());
+      setSelectedDay(now.getDate());
+      setSelectedYear(now.getFullYear());
       
       toast.error('Streak reset. Keep going - every day is a new opportunity!');
     }
@@ -180,6 +180,16 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
+  // Get maximum day based on selected month and year
+  const maxDay = getDaysInMonth(selectedYear, selectedMonth);
+  
+  // Ensure selected day is valid for the month
+  useEffect(() => {
+    if (selectedDay > maxDay) {
+      setSelectedDay(maxDay);
+    }
+  }, [selectedMonth, selectedYear, maxDay, selectedDay]);
+
   return (
     <div className="tracker-container">
       {/* Set Start Date Modal */}
@@ -192,22 +202,45 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <form onSubmit={handleStartDateSubmit}>
               <div className="form-group">
                 <label htmlFor="startDate">Start Date:</label>
-                <div className="datepicker-container">
-                  <DatePicker
-                    selected={startDate}
-                    onChange={handleDateChange}
-                    maxDate={new Date()} // Prevents selecting future dates
-                    dateFormat="MMMM d, yyyy"
-                    className="modern-datepicker"
-                    onFocus={e => e.target.blur()} // Prevents keyboard on mobile
-                    customInput={
-                      <input
-                        type="text"
-                        className="modern-datepicker"
-                        readOnly
-                      />
-                    }
-                  />
+                <div className="date-picker-container">
+                  <select 
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                    className="date-select month-select"
+                  >
+                    <option value={0}>January</option>
+                    <option value={1}>February</option>
+                    <option value={2}>March</option>
+                    <option value={3}>April</option>
+                    <option value={4}>May</option>
+                    <option value={5}>June</option>
+                    <option value={6}>July</option>
+                    <option value={7}>August</option>
+                    <option value={8}>September</option>
+                    <option value={9}>October</option>
+                    <option value={10}>November</option>
+                    <option value={11}>December</option>
+                  </select>
+                  
+                  <select 
+                    value={selectedDay}
+                    onChange={(e) => setSelectedDay(parseInt(e.target.value))}
+                    className="date-select day-select"
+                  >
+                    {[...Array(maxDay).keys()].map(i => (
+                      <option key={i+1} value={i+1}>{i+1}</option>
+                    ))}
+                  </select>
+                  
+                  <select 
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    className="date-select year-select"
+                  >
+                    {getYearOptions().map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className="form-actions">
@@ -221,9 +254,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                     } else {
                       // If no start date is set, use today's date
                       const today = new Date();
-                      const newToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                      setStartDate(newToday);
-                      // Submit the form with today's date
+                      setSelectedDay(today.getDate());
+                      setSelectedMonth(today.getMonth());
+                      setSelectedYear(today.getFullYear());
+                      setStartDate(today);
                       setTimeout(() => handleStartDateSubmit(), 0);
                     }
                   }}
