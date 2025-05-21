@@ -24,7 +24,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   const today = new Date();
 
-  // States for simplified date picker
+  // States for date picker
   const [selectedMonth, setSelectedMonth] = useState(startDate.getMonth());
   const [selectedDay, setSelectedDay] = useState(startDate.getDate());
   const [selectedYear, setSelectedYear] = useState(startDate.getFullYear());
@@ -54,8 +54,14 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   // Update start date when any select changes
   useEffect(() => {
-    const newDate = new Date(selectedYear, selectedMonth, selectedDay);
-    setStartDate(newDate);
+    try {
+      const newDate = new Date(selectedYear, selectedMonth, selectedDay);
+      if (!isNaN(newDate.getTime())) {
+        setStartDate(newDate);
+      }
+    } catch (error) {
+      console.error("Error updating date:", error);
+    }
   }, [selectedMonth, selectedDay, selectedYear]);
 
   // Calculate days since start
@@ -77,6 +83,12 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
     return years;
   };
+
+  // Get month name for display
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
   const handleStartDateSubmit = (e) => {
     if (e) e.preventDefault();
@@ -190,6 +202,24 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [selectedMonth, selectedYear, maxDay, selectedDay]);
 
+  // Handle month change properly
+  const handleMonthChange = (e) => {
+    const newMonth = parseInt(e.target.value, 10);
+    setSelectedMonth(newMonth);
+  };
+
+  // Handle day change properly
+  const handleDayChange = (e) => {
+    const newDay = parseInt(e.target.value, 10);
+    setSelectedDay(newDay);
+  };
+
+  // Handle year change properly
+  const handleYearChange = (e) => {
+    const newYear = parseInt(e.target.value, 10);
+    setSelectedYear(newYear);
+  };
+
   return (
     <div className="tracker-container">
       {/* Set Start Date Modal */}
@@ -203,38 +233,35 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               <div className="form-group">
                 <label htmlFor="startDate">Start Date:</label>
                 <div className="date-picker-container">
+                  {/* Month Selection */}
                   <select 
+                    id="month-select"
                     value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                    onChange={handleMonthChange}
                     className="date-select month-select"
                   >
-                    <option value={0}>January</option>
-                    <option value={1}>February</option>
-                    <option value={2}>March</option>
-                    <option value={3}>April</option>
-                    <option value={4}>May</option>
-                    <option value={5}>June</option>
-                    <option value={6}>July</option>
-                    <option value={7}>August</option>
-                    <option value={8}>September</option>
-                    <option value={9}>October</option>
-                    <option value={10}>November</option>
-                    <option value={11}>December</option>
-                  </select>
-                  
-                  <select 
-                    value={selectedDay}
-                    onChange={(e) => setSelectedDay(parseInt(e.target.value))}
-                    className="date-select day-select"
-                  >
-                    {[...Array(maxDay).keys()].map(i => (
-                      <option key={i+1} value={i+1}>{i+1}</option>
+                    {monthNames.map((month, index) => (
+                      <option key={month} value={index}>{month}</option>
                     ))}
                   </select>
                   
+                  {/* Day Selection */}
                   <select 
+                    id="day-select"
+                    value={selectedDay}
+                    onChange={handleDayChange}
+                    className="date-select day-select"
+                  >
+                    {Array.from({ length: maxDay }, (_, i) => i + 1).map(day => (
+                      <option key={day} value={day}>{day}</option>
+                    ))}
+                  </select>
+                  
+                  {/* Year Selection */}
+                  <select 
+                    id="year-select"
                     value={selectedYear}
-                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    onChange={handleYearChange}
                     className="date-select year-select"
                   >
                     {getYearOptions().map(year => (
