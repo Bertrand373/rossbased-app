@@ -24,12 +24,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   const today = new Date();
 
-  // States for simple date inputs
-  const [dateInputs, setDateInputs] = useState({
-    year: startDate.getFullYear(),
-    month: startDate.getMonth() + 1, // Convert 0-based to 1-based for user understanding
-    day: startDate.getDate()
-  });
+  // Simplified approach with raw text strings
+  const [monthInput, setMonthInput] = useState(startDate.getMonth() + 1 + '');
+  const [dayInput, setDayInput] = useState(startDate.getDate() + '');
+  const [yearInput, setYearInput] = useState(startDate.getFullYear() + '');
+  
+  // Debugging variables
+  const [debugText, setDebugText] = useState('No input yet');
   
   // Update UI when userData changes
   useEffect(() => {
@@ -37,12 +38,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       const startDateObj = new Date(userData.startDate);
       setStartDate(startDateObj);
       
-      // Update date inputs
-      setDateInputs({
-        year: startDateObj.getFullYear(),
-        month: startDateObj.getMonth() + 1,
-        day: startDateObj.getDate()
-      });
+      // Update date inputs as strings
+      setMonthInput((startDateObj.getMonth() + 1) + '');
+      setDayInput(startDateObj.getDate() + '');
+      setYearInput(startDateObj.getFullYear() + '');
       
       // Calculate current streak based on start date
       if (!isNaN(startDateObj.getTime())) {
@@ -61,28 +60,34 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     ? differenceInDays(today, new Date(userData.startDate)) + 1 
     : 0;
 
-  // Handle date input changes
-  const handleDateInputChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Only accept numeric input
-    if (!/^\d*$/.test(value)) return;
-    
-    setDateInputs(prev => ({
-      ...prev,
-      [name]: value === '' ? '' : parseInt(value, 10)
-    }));
+  // Handle date input changes with direct setters
+  const handleMonthChange = (e) => {
+    setDebugText(`Month input changed to: ${e.target.value}`);
+    setMonthInput(e.target.value);
+  };
+  
+  const handleDayChange = (e) => {
+    setDebugText(`Day input changed to: ${e.target.value}`);
+    setDayInput(e.target.value);
+  };
+  
+  const handleYearChange = (e) => {
+    setDebugText(`Year input changed to: ${e.target.value}`);
+    setYearInput(e.target.value);
   };
 
   // Create a valid date from inputs or return null if invalid
   const getDateFromInputs = () => {
-    const { year, month, day } = dateInputs;
+    // Parse inputs as integers
+    const month = parseInt(monthInput, 10);
+    const day = parseInt(dayInput, 10);
+    const year = parseInt(yearInput, 10);
     
     // Basic validation
-    if (!year || !month || !day || 
-        year < 1900 || year > 2100 || 
+    if (isNaN(month) || isNaN(day) || isNaN(year) ||
         month < 1 || month > 12 || 
-        day < 1 || day > 31) {
+        day < 1 || day > 31 || 
+        year < 1900 || year > 2100) {
       return null;
     }
     
@@ -141,11 +146,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   const handleUseToday = () => {
     const today = new Date();
-    setDateInputs({
-      year: today.getFullYear(),
-      month: today.getMonth() + 1,
-      day: today.getDate()
-    });
+    setMonthInput((today.getMonth() + 1) + '');
+    setDayInput(today.getDate() + '');
+    setYearInput(today.getFullYear() + '');
     
     setStartDate(today);
     setTimeout(() => handleStartDateSubmit(), 0);
@@ -193,11 +196,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       // Update local state
       setCurrentStreak(0);
       setStartDate(now);
-      setDateInputs({
-        year: now.getFullYear(),
-        month: now.getMonth() + 1,
-        day: now.getDate()
-      });
+      setMonthInput((now.getMonth() + 1) + '');
+      setDayInput(now.getDate() + '');
+      setYearInput(now.getFullYear() + '');
       
       toast.error('Streak reset. Keep going - every day is a new opportunity!');
     }
@@ -227,67 +228,61 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   return (
     <div className="tracker-container">
-      {/* Set Start Date Modal */}
+      {/* Set Start Date Modal - Extremely simplified */}
       {showSetStartDate && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Set Your Start Date</h2>
             <p>When did you begin your current streak?</p>
             
+            <div className="debug-info" style={{marginBottom: '10px', color: 'yellow'}}>
+              {debugText}
+            </div>
+            
             <form onSubmit={handleStartDateSubmit}>
-              <div className="form-group date-input-group">
-                <label>Start Date:</label>
-                <div className="simple-date-picker">
-                  <div className="date-input-container">
-                    <label htmlFor="month">Month (1-12)</label>
+              {/* Super simple form with minimum styling and complexity */}
+              <div style={{marginBottom: '20px'}}>
+                <div style={{display: 'flex', gap: '10px', marginBottom: '10px'}}>
+                  <div>
+                    <label htmlFor="month-input" style={{display: 'block', marginBottom: '5px'}}>Month:</label>
                     <input
                       type="text"
-                      id="month"
-                      name="month"
-                      value={dateInputs.month}
-                      onChange={handleDateInputChange}
-                      placeholder="MM"
-                      maxLength="2"
+                      id="month-input"
+                      value={monthInput}
+                      onChange={handleMonthChange}
+                      style={{width: '60px', padding: '8px'}}
                     />
                   </div>
                   
-                  <div className="date-input-container">
-                    <label htmlFor="day">Day (1-31)</label>
+                  <div>
+                    <label htmlFor="day-input" style={{display: 'block', marginBottom: '5px'}}>Day:</label>
                     <input
                       type="text"
-                      id="day"
-                      name="day"
-                      value={dateInputs.day}
-                      onChange={handleDateInputChange}
-                      placeholder="DD"
-                      maxLength="2"
+                      id="day-input"
+                      value={dayInput}
+                      onChange={handleDayChange}
+                      style={{width: '60px', padding: '8px'}}
                     />
                   </div>
                   
-                  <div className="date-input-container">
-                    <label htmlFor="year">Year</label>
+                  <div>
+                    <label htmlFor="year-input" style={{display: 'block', marginBottom: '5px'}}>Year:</label>
                     <input
                       type="text"
-                      id="year"
-                      name="year"
-                      value={dateInputs.year}
-                      onChange={handleDateInputChange}
-                      placeholder="YYYY"
-                      maxLength="4"
+                      id="year-input"
+                      value={yearInput}
+                      onChange={handleYearChange}
+                      style={{width: '80px', padding: '8px'}}
                     />
                   </div>
-                </div>
-                
-                <div className="date-helper-text">
-                  Enter date in MM/DD/YYYY format, e.g., 5/21/2025
                 </div>
               </div>
               
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">Set Start Date</button>
+              <div style={{display: 'flex', gap: '10px'}}>
+                <button type="submit" className="btn btn-primary">Set Date</button>
                 <button 
                   type="button" 
-                  className="btn btn-outline" 
+                  className="btn btn-outline"
                   onClick={() => {
                     if (userData.startDate) {
                       setShowSetStartDate(false);
