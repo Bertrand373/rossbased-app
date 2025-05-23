@@ -38,6 +38,30 @@
   color: var(--text);
 }
 
+/* Override any other button styling for action buttons */
+.tracker-header .action-btn,
+.journal-header .action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--text-secondary);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tracker-header .action-btn:hover,
+.journal-header .action-btn:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
+}
+
 /* Current Streak Section - styled like Daily Motivation quote card */
 .current-streak-container {
   display: flex;
@@ -70,7 +94,7 @@
   font-size: 4rem;
   font-weight: 700;
   line-height: 1;
-  color: var(--primary);
+  color: var(--text);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -415,6 +439,12 @@
   }
   
   .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .tracker-header .action-btn,
+  .journal-header .action-btn {
     flex: 1;
     justify-content: center;
   }
