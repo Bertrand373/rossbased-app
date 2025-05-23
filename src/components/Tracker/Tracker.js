@@ -325,7 +325,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
-  // Create HTML content for iframe - with better styling and UX
+  // Create HTML content for iframe - compact version
   const iframeHtml = `
     <!DOCTYPE html>
     <html>
@@ -335,41 +335,59 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           background-color: #2c2c2c; 
           color: white;
-          padding: 16px;
+          padding: 12px;
           margin: 0;
         }
         
         .form-container {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 12px;
+        }
+        
+        .current-date {
+          background-color: #1a2332;
+          padding: 8px 12px;
+          border-radius: 6px;
+          text-align: center;
+          font-size: 13px;
+          color: #ffffff;
+          border: 1px solid #334155;
+        }
+        
+        .current-date-label {
+          color: #94a3b8;
+          font-size: 11px;
+          margin-bottom: 2px;
         }
         
         .date-picker-row {
           display: flex;
-          gap: 12px;
+          gap: 8px;
           align-items: flex-end;
+          justify-content: center;
         }
         
         .input-group {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 4px;
         }
         
         .input-group label {
-          font-size: 13px;
+          font-size: 11px;
           color: #cccccc;
           font-weight: 500;
+          text-align: center;
         }
         
         input {
-          padding: 12px 8px;
+          padding: 8px 6px;
           background-color: #333333;
           border: 1px solid #444444;
-          border-radius: 8px;
+          border-radius: 6px;
           color: white;
-          font-size: 16px;
+          font-size: 14px;
           text-align: center;
           font-weight: 500;
           transition: border-color 0.2s, background-color 0.2s;
@@ -381,41 +399,41 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           background-color: #3a3a3a;
         }
         
-        .month-input { width: 50px; }
-        .day-input { width: 50px; }
-        .year-input { width: 80px; }
+        .month-input { width: 40px; }
+        .day-input { width: 40px; }
+        .year-input { width: 60px; }
         
         .date-separator {
-          font-size: 24px;
+          font-size: 18px;
           color: #666;
-          margin: 0 4px;
+          margin: 0 2px;
           align-self: flex-end;
-          padding-bottom: 12px;
+          padding-bottom: 8px;
         }
         
         .helper-text {
           background-color: #1a1a1a;
-          padding: 12px;
-          border-radius: 6px;
-          font-size: 13px;
+          padding: 8px;
+          border-radius: 4px;
+          font-size: 11px;
           color: #aaaaaa;
           text-align: center;
-          border-left: 3px solid #ffdd00;
+          border-left: 2px solid #ffdd00;
         }
         
         .actions-row {
           display: flex;
-          gap: 12px;
-          margin-top: 8px;
+          gap: 8px;
+          margin-top: 4px;
         }
         
         button {
-          padding: 12px 20px;
-          border-radius: 8px;
+          padding: 8px 14px;
+          border-radius: 6px;
           border: none;
           cursor: pointer;
           font-weight: 600;
-          font-size: 14px;
+          font-size: 12px;
           transition: all 0.2s;
         }
         
@@ -435,7 +453,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         
         .btn-outline {
           background-color: transparent;
-          border: 2px solid #ffdd00;
+          border: 1px solid #ffdd00;
           color: #ffdd00;
           flex: 1;
         }
@@ -443,30 +461,14 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         .btn-outline:hover {
           background-color: rgba(255, 221, 0, 0.1);
         }
-        
-        .current-date {
-          background-color: #1a2332;
-          padding: 12px;
-          border-radius: 6px;
-          text-align: center;
-          font-size: 14px;
-          color: #ffffff;
-          border: 1px solid #334155;
-        }
-        
-        .current-date-label {
-          color: #94a3b8;
-          font-size: 12px;
-          margin-bottom: 4px;
-        }
       </style>
     </head>
     <body>
       <form id="date-form">
         <div class="form-container">
           <div class="current-date">
-            <div class="current-date-label">Currently selected date:</div>
-            <div id="current-display">${format(startDate, 'MMMM d, yyyy')}</div>
+            <div class="current-date-label">Current:</div>
+            <div id="current-display">${format(startDate, 'MMM d, yyyy')}</div>
           </div>
           
           <div class="date-picker-row">
@@ -491,11 +493,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
           
           <div class="helper-text">
-            💡 Enter your date in MM/DD/YYYY format. The cursor will automatically move to the next field as you type.
+            Enter MM/DD/YYYY - cursor auto-advances
           </div>
           
           <div class="actions-row">
-            <button type="submit" id="submit-button" class="btn-primary">Set Start Date</button>
+            <button type="submit" id="submit-button" class="btn-primary">Set Date</button>
             <button type="button" id="cancel-button" class="btn-outline">${userData.startDate ? "Cancel" : "Use Today"}</button>
           </div>
         </div>
@@ -506,14 +508,14 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   return (
     <div className="tracker-container">
-      {/* Enhanced Date Picker Modal using iframe */}
+      {/* Compact Date Picker Modal using iframe */}
       {showSetStartDate && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Set Your Start Date</h2>
             <p>When did you begin your current streak?</p>
             
-            <div style={{ height: '280px', marginBottom: '10px' }}>
+            <div style={{ height: '180px', marginBottom: '10px' }}>
               <iframe
                 ref={iframeRef}
                 onLoad={handleIframeLoad}
