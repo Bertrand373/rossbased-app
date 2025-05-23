@@ -1,465 +1,466 @@
 /* components/Tracker/Tracker.css */
 .tracker-container {
- display: flex;
- flex-direction: column;
- gap: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
 .tracker-header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
 }
 
 .tracker-actions {
- display: flex;
- gap: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-md);
 }
 
 .action-btn {
- display: flex;
- align-items: center;
- gap: var(--spacing-sm);
- padding: var(--spacing-sm) var(--spacing-md);
- background-color: var(--medium-gray);
- border: 1px solid var(--border);
- border-radius: var(--radius-md);
- color: var(--text);
- font-size: 0.875rem;
- font-weight: 500;
- cursor: pointer;
- transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--text-secondary);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .action-btn:hover {
- background-color: var(--light-gray);
- border-color: var(--primary);
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 /* Current Streak Section - styled like Daily Motivation quote card */
 .current-streak-container {
- display: flex;
- flex-direction: column;
- gap: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
 .streak-date {
- font-size: 0.875rem;
- color: var(--text-secondary);
- text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
 }
 
 .streak-card {
- background-color: var(--medium-gray);
- border-radius: var(--radius-lg);
- padding: var(--spacing-xl);
- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
- text-align: center;
- position: relative;
- border: 1px solid var(--border);
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+  border: 1px solid var(--border);
 }
 
 .streak-content {
- padding: var(--spacing-lg) 0;
- margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg) 0;
+  margin-bottom: var(--spacing-lg);
 }
 
 .streak-number {
- font-size: 4rem;
- font-weight: 700;
- line-height: 1;
- color: var(--primary);
- margin-bottom: var(--spacing-sm);
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
 }
 
 .streak-label {
- font-size: 1.25rem;
- font-weight: 500;
- color: var(--text);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
 }
 
 .streak-milestones {
- display: flex;
- justify-content: center;
- gap: var(--spacing-xl);
- margin-bottom: var(--spacing-lg);
- padding: var(--spacing-md) 0;
- border-top: 1px solid var(--border);
- border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md) 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .milestone-item {
- display: flex;
- flex-direction: column;
- align-items: center;
- text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .milestone-icon {
- font-size: 1.2rem;
- color: var(--primary);
- margin-bottom: var(--spacing-sm);
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
 }
 
 .milestone-value {
- font-size: 1.25rem;
- font-weight: 600;
- color: var(--text);
- margin-bottom: var(--spacing-xs);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
 }
 
 .milestone-label {
- font-size: 0.875rem;
- color: var(--text-secondary);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
 .streak-actions {
- display: flex;
- justify-content: center;
- gap: var(--spacing-lg);
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
 }
 
 .streak-action-btn {
- display: flex;
- align-items: center;
- gap: var(--spacing-sm);
- padding: var(--spacing-sm) var(--spacing-md);
- border-radius: var(--radius-full);
- font-size: 0.875rem;
- font-weight: 500;
- cursor: pointer;
- transition: all 0.2s;
- border: 1px solid;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
 }
 
 .relapse-btn {
- background-color: rgba(239, 68, 68, 0.1);
- color: var(--danger);
- border-color: var(--danger);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 .relapse-btn:hover {
- background-color: rgba(239, 68, 68, 0.2);
+  background-color: rgba(239, 68, 68, 0.2);
 }
 
 .wetdream-btn {
- background-color: rgba(245, 158, 11, 0.1);
- color: var(--warning);
- border-color: var(--warning);
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border-color: var(--warning);
 }
 
 .wetdream-btn:hover {
- background-color: rgba(245, 158, 11, 0.2);
+  background-color: rgba(245, 158, 11, 0.2);
 }
 
 .urge-btn {
- background-color: rgba(37, 99, 235, 0.1);
- color: var(--primary);
- border-color: var(--primary);
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
 .urge-btn:hover {
- background-color: rgba(37, 99, 235, 0.2);
+  background-color: rgba(37, 99, 235, 0.2);
 }
 
 /* Journal Section - styled like Daily Motivation */
 .journal-section {
- background-color: var(--card-background);
- border-radius: var(--radius-md);
- padding: var(--spacing-lg);
- border: 1px solid var(--border);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
 }
 
 .journal-header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
 }
 
 .journal-header h3 {
- margin-bottom: 0;
- font-size: 1.125rem;
- color: var(--text);
+  margin-bottom: 0;
+  font-size: 1.125rem;
+  color: var(--text);
 }
 
 .journal-preview {
- background-color: var(--light-gray);
- padding: var(--spacing-md);
- border-radius: var(--radius-md);
- font-style: italic;
- margin-bottom: var(--spacing-md);
- border: 1px solid var(--border);
- color: var(--text);
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-style: italic;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+  color: var(--text);
 }
 
 .empty-journal {
- display: flex;
- align-items: center;
- gap: var(--spacing-md);
- background-color: var(--light-gray);
- padding: var(--spacing-md);
- border-radius: var(--radius-md);
- color: var(--text-secondary);
- margin-bottom: var(--spacing-md);
- border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
 }
 
 .info-icon {
- font-size: 1.25rem;
- color: var(--primary);
- flex-shrink: 0;
+  font-size: 1.25rem;
+  color: var(--primary);
+  flex-shrink: 0;
 }
 
 .journal-prompt {
- background-color: var(--medium-gray);
- padding: var(--spacing-md);
- border-radius: var(--radius-md);
- font-style: italic;
- margin-bottom: var(--spacing-md);
- border: 1px solid var(--border);
- color: var(--text);
+  background-color: var(--medium-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-style: italic;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+  color: var(--text);
 }
 
 .journal-btn {
- width: 100%;
+  width: 100%;
 }
 
 /* Discord Section - styled like Daily Motivation */
 .discord-section {
- background-color: var(--card-background);
- border-radius: var(--radius-md);
- padding: var(--spacing-lg);
- border: 1px solid var(--border);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
 }
 
 .discord-section h3 {
- margin-bottom: var(--spacing-md);
- font-size: 1.125rem;
- color: var(--text);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.125rem;
+  color: var(--text);
 }
 
 .discord-toggle-container {
- margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
 }
 
 .discord-toggle {
- display: flex;
- align-items: center;
- justify-content: space-between;
- padding: var(--spacing-md);
- background-color: var(--light-gray);
- border-radius: var(--radius-md);
- border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background-color: var(--light-gray);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
 .discord-toggle span {
- color: var(--text);
- font-weight: 500;
+  color: var(--text);
+  font-weight: 500;
 }
 
 .toggle-btn {
- background: transparent;
- border: none;
- font-size: 1.5rem;
- cursor: pointer;
- color: var(--text-secondary);
- transition: color 0.2s;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.2s;
 }
 
 .toggle-btn.active {
- color: var(--primary);
+  color: var(--primary);
 }
 
 .toggle-btn:hover {
- color: var(--primary);
+  color: var(--primary);
 }
 
 .discord-details {
- background-color: var(--light-gray);
- padding: var(--spacing-md);
- border-radius: var(--radius-md);
- border: 1px solid var(--border);
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
 .discord-username-display {
- display: flex;
- align-items: center;
- gap: var(--spacing-md);
- margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
 }
 
 .discord-icon {
- color: #5865F2;
- font-size: 1.25rem;
+  color: #5865F2;
+  font-size: 1.25rem;
 }
 
 .discord-username-display span {
- font-weight: 500;
- color: var(--text);
+  font-weight: 500;
+  color: var(--text);
 }
 
 .discord-note {
- font-size: 0.875rem;
- color: var(--text-secondary);
- font-style: italic;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
 }
 
 /* Button variations to match Daily Motivation */
 .btn {
- padding: var(--spacing-sm) var(--spacing-lg);
- border-radius: var(--radius-md);
- font-weight: 500;
- cursor: pointer;
- display: inline-block;
- text-align: center;
- transition: all 0.2s;
- border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.2s;
+  border: none;
 }
 
 .btn-primary {
- background-color: var(--primary);
- color: #000000;
- font-weight: 600;
+  background-color: var(--primary);
+  color: #000000;
+  font-weight: 600;
 }
 
 .btn-primary:hover {
- background-color: var(--primary-dark);
+  background-color: var(--primary-dark);
 }
 
 .btn-outline {
- background-color: transparent;
- border: 1px solid var(--primary);
- color: var(--primary);
+  background-color: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
 }
 
 .btn-outline:hover {
- background-color: rgba(255, 221, 0, 0.1);
+  background-color: rgba(255, 221, 0, 0.1);
 }
 
 /* Form styling */
 .form-group {
- margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
 }
 
 .form-group textarea {
- width: 100%;
- padding: var(--spacing-md);
- background-color: var(--medium-gray);
- border: 1px solid var(--border);
- border-radius: var(--radius-md);
- color: var(--text);
- font-family: inherit;
- resize: vertical;
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-family: inherit;
+  resize: vertical;
 }
 
 .form-group textarea:focus {
- outline: none;
- border-color: var(--primary);
+  outline: none;
+  border-color: var(--primary);
 }
 
 .form-actions {
- display: flex;
- justify-content: flex-end;
- gap: var(--spacing-md);
- margin-top: var(--spacing-lg);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
 }
 
 /* Modal styling */
 .modal-overlay {
- position: fixed;
- top: 0;
- left: 0;
- right: 0;
- bottom: 0;
- background-color: rgba(0, 0, 0, 0.7);
- display: flex;
- justify-content: center;
- align-items: center;
- z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
- background-color: var(--card-background);
- border-radius: var(--radius-lg);
- padding: var(--spacing-xl);
- width: 90%;
- max-width: 500px;
- box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
- color: var(--text);
- border: 1px solid var(--border);
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .modal-content h2 {
- margin-bottom: var(--spacing-md);
- color: var(--text);
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
 }
 
 .modal-content p {
- margin-bottom: var(--spacing-lg);
- color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
 }
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
- .tracker-header {
-   flex-direction: column;
-   align-items: flex-start;
-   gap: var(--spacing-md);
- }
- 
- .tracker-actions {
-   width: 100%;
- }
- 
- .action-btn {
-   flex: 1;
-   justify-content: center;
- }
- 
- .streak-number {
-   font-size: 3rem;
- }
- 
- .streak-milestones {
-   flex-wrap: wrap;
-   gap: var(--spacing-lg);
-   justify-content: space-evenly;
- }
- 
- .streak-actions {
-   flex-direction: column;
-   gap: var(--spacing-md);
- }
- 
- .streak-action-btn {
-   width: 100%;
-   justify-content: center;
- }
- 
- .journal-header {
-   flex-direction: column;
-   align-items: flex-start;
-   gap: var(--spacing-md);
- }
- 
- .journal-header .action-btn {
-   width: 100%;
-   justify-content: center;
- }
- 
- .discord-toggle {
-   flex-direction: column;
-   gap: var(--spacing-md);
-   text-align: center;
- }
- 
- .form-actions {
-   flex-direction: column;
- }
- 
- .form-actions button {
-   width: 100%;
- }
+  .tracker-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .tracker-actions {
+    width: 100%;
+  }
+  
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .streak-number {
+    font-size: 3rem;
+  }
+  
+  .streak-milestones {
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    justify-content: space-evenly;
+  }
+  
+  .streak-actions {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .streak-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .journal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .journal-header .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .discord-toggle {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
 }
