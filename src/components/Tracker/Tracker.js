@@ -338,7 +338,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
-  // Create HTML content for iframe - compact version
+  // Create HTML content for iframe - compact version with updated button styling
   const iframeHtml = `
     <!DOCTYPE html>
     <html>
@@ -441,38 +441,26 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         }
         
         button {
-          padding: 8px 14px;
-          border-radius: 6px;
-          border: none;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 16px;
+          background-color: rgba(128, 128, 128, 0.1);
+          border: 1px solid #aaaaaa;
+          border-radius: 9999px;
+          color: #aaaaaa;
+          font-size: 14px;
+          font-weight: 500;
           cursor: pointer;
-          font-weight: 600;
-          font-size: 12px;
           transition: all 0.2s;
+          flex: 1;
+          justify-content: center;
         }
         
         button:hover {
-          transform: translateY(-1px);
-        }
-        
-        .btn-primary {
-          background-color: #ffdd00;
-          color: black;
-          flex: 1;
-        }
-        
-        .btn-primary:hover {
-          background-color: #e6c700;
-        }
-        
-        .btn-outline {
-          background-color: transparent;
-          border: 1px solid #ffdd00;
-          color: #ffdd00;
-          flex: 1;
-        }
-        
-        .btn-outline:hover {
-          background-color: rgba(255, 221, 0, 0.1);
+          background-color: rgba(128, 128, 128, 0.2);
+          border-color: #ffffff;
+          color: #ffffff;
         }
       </style>
     </head>
@@ -510,8 +498,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
           
           <div class="actions-row">
-            <button type="submit" id="submit-button" class="btn-primary">Set Date</button>
-            <button type="button" id="cancel-button" class="btn-outline">${userData.startDate ? "Cancel" : "Use Today"}</button>
+            <button type="submit" id="submit-button">Set Date</button>
+            <button type="button" id="cancel-button">${userData.startDate ? "Cancel" : "Use Today"}</button>
           </div>
         </div>
       </form>
@@ -564,8 +552,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
             
             <div className="form-actions">
-              <button onClick={saveNote} className="btn btn-primary">Save Entry</button>
-              <button onClick={() => setShowNoteModal(false)} className="btn btn-outline">Cancel</button>
+              <button onClick={saveNote} className="action-btn">Save Entry</button>
+              <button onClick={() => setShowNoteModal(false)} className="action-btn">Cancel</button>
             </div>
           </div>
         </div>
@@ -685,16 +673,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         <div className="journal-prompt">
           <p>How are you feeling today? What benefits or challenges are you experiencing?</p>
         </div>
-        
-        <button 
-          className="btn btn-primary journal-btn"
-          onClick={() => {
-            setCurrentNote(todayNote || '');
-            setShowNoteModal(true);
-          }}
-        >
-          {todayNote ? 'Update Journal Entry' : 'Start Writing'}
-        </button>
       </div>
       
       {/* Discord Integration */}
