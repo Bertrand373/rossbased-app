@@ -1,5 +1,5 @@
 // components/Tracker/Tracker.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Tracker.css';
@@ -23,25 +23,138 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [currentNote, setCurrentNote] = useState('');
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   const today = new Date();
-
-  // Simplified approach with raw text strings
-  const [monthInput, setMonthInput] = useState(startDate.getMonth() + 1 + '');
-  const [dayInput, setDayInput] = useState(startDate.getDate() + '');
-  const [yearInput, setYearInput] = useState(startDate.getFullYear() + '');
   
-  // Debugging variables
-  const [debugText, setDebugText] = useState('No input yet');
+  // Reference to the frame
+  const iframeRef = useRef(null);
+
+  // Initialize the iframe content when it loads
+  const handleIframeLoad = () => {
+    try {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+      
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      
+      // Initialize date picker with current values
+      const monthInput = iframeDoc.getElementById('month-input');
+      const dayInput = iframeDoc.getElementById('day-input');
+      const yearInput = iframeDoc.getElementById('year-input');
+      
+      if (monthInput && dayInput && yearInput) {
+        monthInput.value = startDate.getMonth() + 1;
+        dayInput.value = startDate.getDate();
+        yearInput.value = startDate.getFullYear();
+      }
+      
+      // Setup the form submission
+      const form = iframeDoc.getElementById('date-form');
+      if (form) {
+        form.onsubmit = (e) => {
+          e.preventDefault();
+          handleIframeSubmit();
+        };
+      }
+      
+      // Setup button handlers
+      const submitButton = iframeDoc.getElementById('submit-button');
+      const cancelButton = iframeDoc.getElementById('cancel-button');
+      
+      if (submitButton) {
+        submitButton.onclick = () => handleIframeSubmit();
+      }
+      
+      if (cancelButton) {
+        cancelButton.onclick = () => {
+          if (userData.startDate) {
+            setShowSetStartDate(false);
+          } else {
+            // Use today's date
+            const today = new Date();
+            if (monthInput) monthInput.value = today.getMonth() + 1;
+            if (dayInput) dayInput.value = today.getDate();
+            if (yearInput) yearInput.value = today.getFullYear();
+            setTimeout(() => handleIframeSubmit(), 0);
+          }
+        };
+      }
+    } catch (error) {
+      console.error("Error setting up iframe:", error);
+    }
+  };
+  
+  // Handle form submission from iframe
+  const handleIframeSubmit = () => {
+    try {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+      
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      
+      // Get values from form
+      const month = parseInt(iframeDoc.getElementById('month-input').value, 10);
+      const day = parseInt(iframeDoc.getElementById('day-input').value, 10);
+      const year = parseInt(iframeDoc.getElementById('year-input').value, 10);
+      
+      // Basic validation
+      if (isNaN(month) || isNaN(day) || isNaN(year) ||
+          month < 1 || month > 12 || 
+          day < 1 || day > 31 || 
+          year < 1900 || year > 2100) {
+        toast.error('Please enter a valid date');
+        return;
+      }
+      
+      // Create date object (JS months are 0-based)
+      const newDate = new Date(year, month - 1, day);
+      
+      // Validate date
+      if (isNaN(newDate.getTime()) || 
+          newDate.getFullYear() !== year || 
+          newDate.getMonth() !== month - 1 || 
+          newDate.getDate() !== day) {
+        toast.error('Please enter a valid date');
+        return;
+      }
+      
+      // Check if date is in the future
+      const currentDate = new Date();
+      currentDate.setHours(0, 0, 0, 0);
+      
+      if (newDate > currentDate) {
+        toast.error('Start date cannot be in the future');
+        return;
+      }
+      
+      // Set the new start date
+      setStartDate(newDate);
+      
+      // Calculate current streak based on the new start date
+      const calculatedStreak = differenceInDays(today, newDate) + 1;
+      const newStreak = calculatedStreak > 0 ? calculatedStreak : 0;
+      
+      // Update user data with new start date and current streak
+      updateUserData({
+        startDate: newDate,
+        currentStreak: newStreak,
+        longestStreak: Math.max(userData.longestStreak || 0, newStreak)
+      });
+      
+      // Update local state
+      setCurrentStreak(newStreak);
+      
+      setShowSetStartDate(false);
+      toast.success('Start date set successfully!');
+    } catch (error) {
+      console.error("Error submitting date:", error);
+      toast.error('Error setting date. Please try again.');
+    }
+  };
   
   // Update UI when userData changes
   useEffect(() => {
     if (userData.startDate) {
       const startDateObj = new Date(userData.startDate);
       setStartDate(startDateObj);
-      
-      // Update date inputs as strings
-      setMonthInput((startDateObj.getMonth() + 1) + '');
-      setDayInput(startDateObj.getDate() + '');
-      setYearInput(startDateObj.getFullYear() + '');
       
       // Calculate current streak based on start date
       if (!isNaN(startDateObj.getTime())) {
@@ -59,100 +172,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const daysSinceStart = userData.startDate 
     ? differenceInDays(today, new Date(userData.startDate)) + 1 
     : 0;
-
-  // Handle date input changes with direct setters
-  const handleMonthChange = (e) => {
-    setDebugText(`Month input changed to: ${e.target.value}`);
-    setMonthInput(e.target.value);
-  };
-  
-  const handleDayChange = (e) => {
-    setDebugText(`Day input changed to: ${e.target.value}`);
-    setDayInput(e.target.value);
-  };
-  
-  const handleYearChange = (e) => {
-    setDebugText(`Year input changed to: ${e.target.value}`);
-    setYearInput(e.target.value);
-  };
-
-  // Create a valid date from inputs or return null if invalid
-  const getDateFromInputs = () => {
-    // Parse inputs as integers
-    const month = parseInt(monthInput, 10);
-    const day = parseInt(dayInput, 10);
-    const year = parseInt(yearInput, 10);
-    
-    // Basic validation
-    if (isNaN(month) || isNaN(day) || isNaN(year) ||
-        month < 1 || month > 12 || 
-        day < 1 || day > 31 || 
-        year < 1900 || year > 2100) {
-      return null;
-    }
-    
-    // JavaScript months are 0-based
-    const date = new Date(year, month - 1, day);
-    
-    // Check if the date is valid (e.g., not Feb 30)
-    if (date.getFullYear() !== year || 
-        date.getMonth() !== month - 1 || 
-        date.getDate() !== day) {
-      return null;
-    }
-    
-    return date;
-  };
-
-  const handleStartDateSubmit = (e) => {
-    if (e) e.preventDefault();
-    
-    const newDate = getDateFromInputs();
-    
-    if (!newDate) {
-      toast.error('Please enter a valid date');
-      return;
-    }
-    
-    // Check if date is in the future
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    
-    if (newDate > currentDate) {
-      toast.error('Start date cannot be in the future');
-      return;
-    }
-    
-    // Set the new start date
-    setStartDate(newDate);
-    
-    // Calculate current streak based on the new start date
-    const calculatedStreak = differenceInDays(today, newDate) + 1;
-    const newStreak = calculatedStreak > 0 ? calculatedStreak : 0;
-    
-    // Update user data with new start date and current streak
-    updateUserData({
-      startDate: newDate,
-      currentStreak: newStreak,
-      longestStreak: Math.max(userData.longestStreak || 0, newStreak)
-    });
-    
-    // Update local state
-    setCurrentStreak(newStreak);
-    
-    setShowSetStartDate(false);
-    toast.success('Start date set successfully!');
-  };
-
-  const handleUseToday = () => {
-    const today = new Date();
-    setMonthInput((today.getMonth() + 1) + '');
-    setDayInput(today.getDate() + '');
-    setYearInput(today.getFullYear() + '');
-    
-    setStartDate(today);
-    setTimeout(() => handleStartDateSubmit(), 0);
-  };
 
   const handleRelapse = () => {
     // Confirm relapse
@@ -196,9 +215,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       // Update local state
       setCurrentStreak(0);
       setStartDate(now);
-      setMonthInput((now.getMonth() + 1) + '');
-      setDayInput(now.getDate() + '');
-      setYearInput(now.getFullYear() + '');
       
       toast.error('Streak reset. Keep going - every day is a new opportunity!');
     }
@@ -226,75 +242,137 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
+  // Create HTML content for iframe
+  const iframeHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background-color: #2c2c2c; 
+          color: white;
+          padding: 0;
+          margin: 0;
+        }
+        
+        .form-container {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+        
+        .inputs-row {
+          display: flex;
+          gap: 10px;
+        }
+        
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+        
+        .input-group label {
+          font-size: 14px;
+          color: #cccccc;
+        }
+        
+        input {
+          padding: 8px;
+          background-color: #333333;
+          border: 1px solid #444444;
+          border-radius: 4px;
+          color: white;
+          width: 100%;
+          box-sizing: border-box;
+        }
+        
+        .actions-row {
+          display: flex;
+          gap: 10px;
+          margin-top: 10px;
+        }
+        
+        button {
+          padding: 8px 16px;
+          border-radius: 4px;
+          border: none;
+          cursor: pointer;
+        }
+        
+        .btn-primary {
+          background-color: #ffdd00;
+          color: black;
+        }
+        
+        .btn-outline {
+          background-color: transparent;
+          border: 1px solid #ffdd00;
+          color: #ffdd00;
+        }
+        
+        .helper-text {
+          font-size: 12px;
+          color: #aaaaaa;
+        }
+      </style>
+    </head>
+    <body>
+      <form id="date-form">
+        <div class="form-container">
+          <div class="inputs-row">
+            <div class="input-group">
+              <label for="month-input">Month:</label>
+              <input type="number" id="month-input" min="1" max="12" required>
+            </div>
+            
+            <div class="input-group">
+              <label for="day-input">Day:</label>
+              <input type="number" id="day-input" min="1" max="31" required>
+            </div>
+            
+            <div class="input-group">
+              <label for="year-input">Year:</label>
+              <input type="number" id="year-input" min="1900" max="2100" required>
+            </div>
+          </div>
+          
+          <div class="helper-text">Enter date as MM/DD/YYYY</div>
+          
+          <div class="actions-row">
+            <button type="submit" id="submit-button" class="btn-primary">Set Date</button>
+            <button type="button" id="cancel-button" class="btn-outline">${userData.startDate ? "Cancel" : "Use Today"}</button>
+          </div>
+        </div>
+      </form>
+    </body>
+    </html>
+  `;
+
   return (
     <div className="tracker-container">
-      {/* Set Start Date Modal - Extremely simplified */}
+      {/* Date Picker Modal using iframe */}
       {showSetStartDate && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Set Your Start Date</h2>
             <p>When did you begin your current streak?</p>
             
-            <div className="debug-info" style={{marginBottom: '10px', color: 'yellow'}}>
-              {debugText}
+            <div style={{ height: '210px', marginBottom: '10px' }}>
+              <iframe
+                ref={iframeRef}
+                onLoad={handleIframeLoad}
+                srcDoc={iframeHtml}
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  border: 'none', 
+                  overflow: 'hidden'
+                }}
+                title="Date Picker"
+              />
             </div>
-            
-            <form onSubmit={handleStartDateSubmit}>
-              {/* Super simple form with minimum styling and complexity */}
-              <div style={{marginBottom: '20px'}}>
-                <div style={{display: 'flex', gap: '10px', marginBottom: '10px'}}>
-                  <div>
-                    <label htmlFor="month-input" style={{display: 'block', marginBottom: '5px'}}>Month:</label>
-                    <input
-                      type="text"
-                      id="month-input"
-                      value={monthInput}
-                      onChange={handleMonthChange}
-                      style={{width: '60px', padding: '8px'}}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="day-input" style={{display: 'block', marginBottom: '5px'}}>Day:</label>
-                    <input
-                      type="text"
-                      id="day-input"
-                      value={dayInput}
-                      onChange={handleDayChange}
-                      style={{width: '60px', padding: '8px'}}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="year-input" style={{display: 'block', marginBottom: '5px'}}>Year:</label>
-                    <input
-                      type="text"
-                      id="year-input"
-                      value={yearInput}
-                      onChange={handleYearChange}
-                      style={{width: '80px', padding: '8px'}}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div style={{display: 'flex', gap: '10px'}}>
-                <button type="submit" className="btn btn-primary">Set Date</button>
-                <button 
-                  type="button" 
-                  className="btn btn-outline"
-                  onClick={() => {
-                    if (userData.startDate) {
-                      setShowSetStartDate(false);
-                    } else {
-                      handleUseToday();
-                    }
-                  }}
-                >
-                  {userData.startDate ? "Cancel" : "Use Today"}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
