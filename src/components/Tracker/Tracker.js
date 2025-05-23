@@ -5,7 +5,20 @@ import toast from 'react-hot-toast';
 import './Tracker.css';
 
 // Icons
-import { FaCrown, FaCalendarCheck, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
+import { 
+  FaCrown, 
+  FaCalendarCheck, 
+  FaExclamationTriangle, 
+  FaInfoCircle, 
+  FaEdit,
+  FaTimes,
+  FaMoon,
+  FaShieldAlt,
+  FaPen,
+  FaDiscord,
+  FaToggleOn,
+  FaToggleOff
+} from 'react-icons/fa';
 
 // Urge Toolkit Mini-component
 import UrgeMini from '../UrgeToolkit/UrgeMini';
@@ -568,71 +581,99 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         />
       )}
       
-      {/* Main Tracker Content */}
+      {/* Header Section */}
       <div className="tracker-header">
-        <h2>Your Streak Tracker</h2>
-        {userData.startDate && (
-          <button 
-            className="btn btn-outline edit-date-btn"
-            onClick={() => setShowSetStartDate(true)}
-          >
-            Edit Date
-          </button>
-        )}
+        <h2>Streak Tracker</h2>
+        <div className="tracker-actions">
+          {userData.startDate && (
+            <button 
+              className="action-btn"
+              onClick={() => setShowSetStartDate(true)}
+            >
+              <FaEdit />
+              <span>Edit Date</span>
+            </button>
+          )}
+        </div>
       </div>
       
-      <div className="streak-display">
-        <div className="current-streak">
-          <div className="streak-count">{currentStreak}</div>
-          <div className="streak-label">Current Streak</div>
-        </div>
+      {/* Current Streak Display */}
+      <div className="current-streak-container">
+        <div className="streak-date">Today, {format(new Date(), 'MMMM d, yyyy')}</div>
         
-        <div className="streak-milestones">
-          <div className="streak-milestone">
-            <FaCrown className="milestone-icon" />
-            <div className="milestone-value">{userData.longestStreak || 0}</div>
-            <div className="milestone-label">Longest</div>
+        <div className="streak-card">
+          <div className="streak-content">
+            <div className="streak-number">{currentStreak}</div>
+            <div className="streak-label">Current Streak</div>
           </div>
           
-          <div className="streak-milestone">
-            <FaCalendarCheck className="milestone-icon" />
-            <div className="milestone-value">{userData.wetDreamCount || 0}</div>
-            <div className="milestone-label">Wet Dreams</div>
+          <div className="streak-milestones">
+            <div className="milestone-item">
+              <FaCrown className="milestone-icon" />
+              <div className="milestone-value">{userData.longestStreak || 0}</div>
+              <div className="milestone-label">Longest</div>
+            </div>
+            
+            <div className="milestone-item">
+              <FaMoon className="milestone-icon" />
+              <div className="milestone-value">{userData.wetDreamCount || 0}</div>
+              <div className="milestone-label">Wet Dreams</div>
+            </div>
+            
+            <div className="milestone-item">
+              <FaExclamationTriangle className="milestone-icon" />
+              <div className="milestone-value">{userData.relapseCount || 0}</div>
+              <div className="milestone-label">Relapses</div>
+            </div>
           </div>
           
-          <div className="streak-milestone">
-            <FaExclamationTriangle className="milestone-icon" />
-            <div className="milestone-value">{userData.relapseCount || 0}</div>
-            <div className="milestone-label">Relapses</div>
+          <div className="streak-actions">
+            <button 
+              className="streak-action-btn relapse-btn"
+              onClick={handleRelapse}
+            >
+              <FaTimes />
+              <span>Log Relapse</span>
+            </button>
+            
+            <button 
+              className="streak-action-btn wetdream-btn"
+              onClick={handleWetDream}
+            >
+              <FaMoon />
+              <span>Log Wet Dream</span>
+            </button>
+            
+            <button 
+              className="streak-action-btn urge-btn"
+              onClick={() => setShowUrgeMini(true)}
+            >
+              <FaShieldAlt />
+              <span>Fighting Urges?</span>
+            </button>
           </div>
         </div>
       </div>
       
-      <div className="tracker-actions">
-        <button className="btn btn-danger" onClick={handleRelapse}>Log Relapse</button>
-        <button className="btn btn-warning" onClick={handleWetDream}>Log Wet Dream</button>
-        <button className="btn btn-primary" onClick={() => setShowUrgeMini(true)}>
-          Fighting Urges?
-        </button>
-      </div>
-      
+      {/* Journal Section */}
       <div className="journal-section">
         <div className="journal-header">
-          <h3>Daily Journal</h3>
+          <h3>Today's Journal</h3>
           <button 
-            className="btn btn-outline"
+            className="action-btn"
             onClick={() => {
               setCurrentNote(todayNote || '');
               setShowNoteModal(true);
             }}
           >
-            {todayNote ? 'Edit Entry' : 'Add Entry'}
+            <FaPen />
+            <span>{todayNote ? 'Edit Entry' : 'Add Entry'}</span>
           </button>
         </div>
         
         {todayNote ? (
           <div className="journal-preview">
-            <p>{todayNote.length > 150 ? `${todayNote.substring(0, 150)}...` : todayNote}</p>
+            <p>"{todayNote.length > 150 ? `${todayNote.substring(0, 150)}...` : todayNote}"</p>
           </div>
         ) : (
           <div className="empty-journal">
@@ -640,26 +681,50 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <p>No journal entry for today. Recording your thoughts can help track benefits and stay motivated.</p>
           </div>
         )}
+        
+        <div className="journal-prompt">
+          <p>How are you feeling today? What benefits or challenges are you experiencing?</p>
+        </div>
+        
+        <button 
+          className="btn btn-primary journal-btn"
+          onClick={() => {
+            setCurrentNote(todayNote || '');
+            setShowNoteModal(true);
+          }}
+        >
+          {todayNote ? 'Update Journal Entry' : 'Start Writing'}
+        </button>
       </div>
       
-      <div className="discord-integration">
+      {/* Discord Integration */}
+      <div className="discord-section">
         <h3>Discord Integration</h3>
-        <div className="discord-toggle">
-          <label className="toggle-switch">
-            <input 
-              type="checkbox" 
-              checked={userData.showOnLeaderboard || false}
-              onChange={(e) => updateUserData({ showOnLeaderboard: e.target.checked })}
-            />
-            <span className="toggle-slider"></span>
-          </label>
-          <span>Show my streak on Discord leaderboard</span>
+        
+        <div className="discord-toggle-container">
+          <div className="discord-toggle">
+            <span>Show my streak on Discord leaderboard</span>
+            <button 
+              className={`toggle-btn ${userData.showOnLeaderboard ? 'active' : ''}`}
+              onClick={() => updateUserData({ showOnLeaderboard: !userData.showOnLeaderboard })}
+            >
+              {userData.showOnLeaderboard ? <FaToggleOn /> : <FaToggleOff />}
+            </button>
+          </div>
         </div>
         
         {userData.showOnLeaderboard && (
-          <div className="discord-username">
-            <p>Your Discord username: {userData.discordUsername || 'Not set'}</p>
-            {!userData.discordUsername && <p className="discord-note">Set your Discord username in settings to appear on the leaderboard</p>}
+          <div className="discord-details">
+            <div className="discord-username-display">
+              <FaDiscord className="discord-icon" />
+              <span>Username: {userData.discordUsername || 'Not set'}</span>
+            </div>
+            
+            {!userData.discordUsername && (
+              <div className="discord-note">
+                <p>Set your Discord username in settings to appear on the leaderboard</p>
+              </div>
+            )}
           </div>
         )}
       </div>
