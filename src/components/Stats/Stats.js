@@ -343,6 +343,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 <div className="comparison-grid">
                   <div className="comparison-item">
                     <div className="comparison-label">1-7 Days</div>
+                    <div className="comparison-value">{streakComparison[selectedMetric].short}</div>
+                  </div>
+                  
+                  <div className="comparison-item">
+                    <div className="comparison-label">8-30 Days</div>
+                    <div className="comparison-value">{streakComparison[selectedMetric].medium}</div>
+                  </div>
+                  
+                  <div className="comparison-item">
+                    <div className="comparison-label">30+ Days</div>
                     <div className="comparison-value">{streakComparison[selectedMetric].long}</div>
                   </div>
                 </div>
@@ -353,14 +363,131 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <h4>Personalized Insights</h4>
               
               <div className="insights-list">
-      selectedMetric].short}</div>
+                {generateInsights().map(insight => (
+                  <div 
+                    key={insight.id} 
+                    className={`insight-item ${insight.metric === selectedMetric ? 'highlighted' : ''}`}
+                  >
+                    <FaRegLightbulb className="insight-icon" />
+                    <span>{insight.text}</span>
                   </div>
-                  
-                  <div className="comparison-item">
-                    <div className="comparison-label">8-30 Days</div>
-                    <div className="comparison-value">{streakComparison[selectedMetric].medium}</div>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="premium-lock">
+            <div className="free-benefit-tracker">
+              <h4>Track Your Energy Levels</h4>
+              
+              <div className="benefit-rating">
+                <span>How's your energy today?</span>
+                
+                <div className="rating-slider">
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="10" 
+                    defaultValue="7" 
+                    className="range-slider"
+                  />
+                  <div className="rating-labels">
+                    <span>Low</span>
+                    <span>High</span>
                   </div>
-                  
-                  <div className="comparison-item">
-                    <div className="comparison-label">30+ Days</div>
-                    <div className="comparison-value">{streakComparison[
+                </div>
+                
+                <button className="btn btn-primary">Save Rating</button>
+              </div>
+              
+              <div className="limited-stats">
+                <p>Last 7 days average: <strong>7.5/10</strong></p>
+              </div>
+            </div>
+            
+            <div className="premium-overlay">
+              <FaLock className="lock-icon" />
+              <div className="premium-message">
+                <h3>Unlock Full Benefit Tracking</h3>
+                <p>Premium members can track multiple benefits, view detailed graphs, and get personalized insights.</p>
+                <button className="btn btn-primary">Upgrade to Premium</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Badge Modal */}
+      {showBadgeModal && selectedBadge && (
+        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
+          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
+            <div className="badge-trophy">
+              <FaMedal className="badge-trophy-icon" />
+            </div>
+            
+            <h3>{selectedBadge.name}</h3>
+            
+            <div className="badge-earned-date">
+              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
+            </div>
+            
+            <div className="badge-description">
+              <p>
+                {
+                  selectedBadge.name === '7-Day Warrior' ? 
+                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
+                  selectedBadge.name === '14-Day Monk' ? 
+                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
+                  selectedBadge.name === '30-Day Master' ? 
+                    'A full month of retention! Your willpower is exceptional, and the benefits are becoming more pronounced.' :
+                  selectedBadge.name === '90-Day King' ? 
+                    'The ultimate achievement! 90 days of complete discipline. You\'ve mastered your impulses and transformed your life.' :
+                    'Congratulations on earning this achievement badge!'
+                }
+              </p>
+            </div>
+            
+            <div className="badge-benefits">
+              <h4>Unlock Benefits:</h4>
+              <ul>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>New affirmations in the Urge Toolkit</span>
+                </li>
+                {selectedBadge.name !== '7-Day Warrior' && (
+                  <li>
+                    <FaCheckCircle className="check-icon" />
+                    <span>Exclusive challenges in the Community tab</span>
+                  </li>
+                )}
+                {(selectedBadge.name === '30-Day Master' || selectedBadge.name === '90-Day King') && (
+                  <li>
+                    <FaCheckCircle className="check-icon" />
+                    <span>Special Discord role and recognition</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+            
+            <div className="modal-actions">
+              {isPremium ? (
+                <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
+                  Share Achievement
+                </button>
+              ) : (
+                <button className="btn btn-primary">
+                  Upgrade to Share
+                </button>
+              )}
+              <button className="btn btn-outline" onClick={() => setShowBadgeModal(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Stats;
