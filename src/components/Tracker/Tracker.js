@@ -77,6 +77,89 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           }
         };
       }
+
+      // Add input validation and auto-advance functionality
+      const setupInputBehavior = () => {
+        // Month input behavior
+        if (monthInput) {
+          monthInput.oninput = (e) => {
+            let value = e.target.value;
+            // Remove non-numeric characters
+            value = value.replace(/[^0-9]/g, '');
+            
+            // Limit to 2 digits
+            if (value.length > 2) {
+              value = value.slice(0, 2);
+            }
+            
+            // Auto-correct common mistakes
+            if (value.length === 1 && parseInt(value) > 1) {
+              value = '0' + value;
+            }
+            
+            // Validate range
+            if (parseInt(value) > 12) {
+              value = '12';
+            }
+            
+            e.target.value = value;
+            
+            // Auto-advance to day field
+            if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 12) {
+              dayInput.focus();
+            }
+          };
+        }
+
+        // Day input behavior
+        if (dayInput) {
+          dayInput.oninput = (e) => {
+            let value = e.target.value;
+            // Remove non-numeric characters
+            value = value.replace(/[^0-9]/g, '');
+            
+            // Limit to 2 digits
+            if (value.length > 2) {
+              value = value.slice(0, 2);
+            }
+            
+            // Auto-correct common mistakes
+            if (value.length === 1 && parseInt(value) > 3) {
+              value = '0' + value;
+            }
+            
+            // Validate range
+            if (parseInt(value) > 31) {
+              value = '31';
+            }
+            
+            e.target.value = value;
+            
+            // Auto-advance to year field
+            if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 31) {
+              yearInput.focus();
+            }
+          };
+        }
+
+        // Year input behavior
+        if (yearInput) {
+          yearInput.oninput = (e) => {
+            let value = e.target.value;
+            // Remove non-numeric characters
+            value = value.replace(/[^0-9]/g, '');
+            
+            // Limit to 4 digits
+            if (value.length > 4) {
+              value = value.slice(0, 4);
+            }
+            
+            e.target.value = value;
+          };
+        }
+      };
+
+      setupInputBehavior();
     } catch (error) {
       console.error("Error setting up iframe:", error);
     }
@@ -112,7 +195,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           newDate.getFullYear() !== year || 
           newDate.getMonth() !== month - 1 || 
           newDate.getDate() !== day) {
-        toast.error('Please enter a valid date');
+        toast.error('Please enter a valid date (e.g., February 30th does not exist)');
         return;
       }
       
@@ -242,7 +325,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
-  // Create HTML content for iframe
+  // Create HTML content for iframe - with better styling and UX
   const iframeHtml = `
     <!DOCTYPE html>
     <html>
@@ -252,96 +335,167 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           background-color: #2c2c2c; 
           color: white;
-          padding: 0;
+          padding: 16px;
           margin: 0;
         }
         
         .form-container {
           display: flex;
           flex-direction: column;
-          gap: 15px;
+          gap: 20px;
         }
         
-        .inputs-row {
+        .date-picker-row {
           display: flex;
-          gap: 10px;
+          gap: 12px;
+          align-items: flex-end;
         }
         
         .input-group {
           display: flex;
           flex-direction: column;
-          gap: 5px;
+          gap: 6px;
         }
         
         .input-group label {
-          font-size: 14px;
+          font-size: 13px;
           color: #cccccc;
+          font-weight: 500;
         }
         
         input {
-          padding: 8px;
+          padding: 12px 8px;
           background-color: #333333;
           border: 1px solid #444444;
-          border-radius: 4px;
+          border-radius: 8px;
           color: white;
-          width: 100%;
-          box-sizing: border-box;
+          font-size: 16px;
+          text-align: center;
+          font-weight: 500;
+          transition: border-color 0.2s, background-color 0.2s;
+        }
+        
+        input:focus {
+          outline: none;
+          border-color: #ffdd00;
+          background-color: #3a3a3a;
+        }
+        
+        .month-input { width: 50px; }
+        .day-input { width: 50px; }
+        .year-input { width: 80px; }
+        
+        .date-separator {
+          font-size: 24px;
+          color: #666;
+          margin: 0 4px;
+          align-self: flex-end;
+          padding-bottom: 12px;
+        }
+        
+        .helper-text {
+          background-color: #1a1a1a;
+          padding: 12px;
+          border-radius: 6px;
+          font-size: 13px;
+          color: #aaaaaa;
+          text-align: center;
+          border-left: 3px solid #ffdd00;
         }
         
         .actions-row {
           display: flex;
-          gap: 10px;
-          margin-top: 10px;
+          gap: 12px;
+          margin-top: 8px;
         }
         
         button {
-          padding: 8px 16px;
-          border-radius: 4px;
+          padding: 12px 20px;
+          border-radius: 8px;
           border: none;
           cursor: pointer;
+          font-weight: 600;
+          font-size: 14px;
+          transition: all 0.2s;
+        }
+        
+        button:hover {
+          transform: translateY(-1px);
         }
         
         .btn-primary {
           background-color: #ffdd00;
           color: black;
+          flex: 1;
+        }
+        
+        .btn-primary:hover {
+          background-color: #e6c700;
         }
         
         .btn-outline {
           background-color: transparent;
-          border: 1px solid #ffdd00;
+          border: 2px solid #ffdd00;
           color: #ffdd00;
+          flex: 1;
         }
         
-        .helper-text {
+        .btn-outline:hover {
+          background-color: rgba(255, 221, 0, 0.1);
+        }
+        
+        .current-date {
+          background-color: #1a2332;
+          padding: 12px;
+          border-radius: 6px;
+          text-align: center;
+          font-size: 14px;
+          color: #ffffff;
+          border: 1px solid #334155;
+        }
+        
+        .current-date-label {
+          color: #94a3b8;
           font-size: 12px;
-          color: #aaaaaa;
+          margin-bottom: 4px;
         }
       </style>
     </head>
     <body>
       <form id="date-form">
         <div class="form-container">
-          <div class="inputs-row">
+          <div class="current-date">
+            <div class="current-date-label">Currently selected date:</div>
+            <div id="current-display">${format(startDate, 'MMMM d, yyyy')}</div>
+          </div>
+          
+          <div class="date-picker-row">
             <div class="input-group">
-              <label for="month-input">Month:</label>
-              <input type="number" id="month-input" min="1" max="12" required>
+              <label for="month-input">Month</label>
+              <input type="text" id="month-input" class="month-input" placeholder="MM" maxlength="2">
             </div>
             
-            <div class="input-group">
-              <label for="day-input">Day:</label>
-              <input type="number" id="day-input" min="1" max="31" required>
-            </div>
+            <div class="date-separator">/</div>
             
             <div class="input-group">
-              <label for="year-input">Year:</label>
-              <input type="number" id="year-input" min="1900" max="2100" required>
+              <label for="day-input">Day</label>
+              <input type="text" id="day-input" class="day-input" placeholder="DD" maxlength="2">
+            </div>
+            
+            <div class="date-separator">/</div>
+            
+            <div class="input-group">
+              <label for="year-input">Year</label>
+              <input type="text" id="year-input" class="year-input" placeholder="YYYY" maxlength="4">
             </div>
           </div>
           
-          <div class="helper-text">Enter date as MM/DD/YYYY</div>
+          <div class="helper-text">
+            💡 Enter your date in MM/DD/YYYY format. The cursor will automatically move to the next field as you type.
+          </div>
           
           <div class="actions-row">
-            <button type="submit" id="submit-button" class="btn-primary">Set Date</button>
+            <button type="submit" id="submit-button" class="btn-primary">Set Start Date</button>
             <button type="button" id="cancel-button" class="btn-outline">${userData.startDate ? "Cancel" : "Use Today"}</button>
           </div>
         </div>
@@ -352,14 +506,14 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   return (
     <div className="tracker-container">
-      {/* Date Picker Modal using iframe */}
+      {/* Enhanced Date Picker Modal using iframe */}
       {showSetStartDate && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Set Your Start Date</h2>
             <p>When did you begin your current streak?</p>
             
-            <div style={{ height: '210px', marginBottom: '10px' }}>
+            <div style={{ height: '280px', marginBottom: '10px' }}>
               <iframe
                 ref={iframeRef}
                 onLoad={handleIframeLoad}
@@ -368,6 +522,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                   width: '100%', 
                   height: '100%', 
                   border: 'none', 
+                  borderRadius: '8px',
                   overflow: 'hidden'
                 }}
                 title="Date Picker"
