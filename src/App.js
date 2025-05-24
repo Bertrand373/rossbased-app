@@ -1,9 +1,12 @@
-// App.js - Main application component with proper navigation and Landing component
+// App.js - Main application component with sleeker header design
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
+
+// Icons for header
+import { FaCrown, FaTimes } from 'react-icons/fa';
 
 // Tabs
 import Tracker from './components/Tracker/Tracker';
@@ -76,11 +79,23 @@ function App() {
             <header className="app-header">
               <div className="logo-container">
                 <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
+                <h1 className="app-title">SR Tracker</h1>
               </div>
               <div className="user-controls">
+                <div className="streak-badge">
+                  <FaCrown className="streak-badge-icon" />
+                  <span>{userData.currentStreak || 0} day streak</span>
+                </div>
                 <div className="user-info">
-                  <span className="username">{userData.username}</span>
-                  <button className="logout-btn" onClick={logout}>Logout</button>
+                  <div className="user-profile">
+                    <div className="user-avatar">
+                      {userData.username ? userData.username.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <span className="username">{userData.username}</span>
+                  </div>
+                  <button className="logout-btn" onClick={logout} title="Logout">
+                    <FaTimes />
+                  </button>
                 </div>
               </div>
             </header>

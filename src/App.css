@@ -1,4 +1,4 @@
-/* App.css - Main application styles */
+/* App.css - Main application styles with sleeker header design */
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -37,34 +37,61 @@ body {
   flex-direction: column;
 }
 
+/* App Header Styles - Updated for sleeker design */
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-md) var(--spacing-lg);
-  background-color: var(--card-background);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid var(--border);
 }
 
 .logo-container {
   display: flex;
   align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 221, 0, 0.2);
 }
 
 .app-logo {
-  height: 26px;
+  height: 32px;
   width: auto;
 }
 
-.app-header h1 {
-  font-size: 1.5rem;
+.app-title {
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--primary);
+  margin: 0;
 }
 
 .user-controls {
   display: flex;
   align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.streak-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.3);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.streak-badge-icon {
+  font-size: 1rem;
+  color: var(--primary);
 }
 
 .user-info {
@@ -73,8 +100,86 @@ body {
   gap: var(--spacing-md);
 }
 
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
 .username {
   font-weight: 500;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--danger);
+  color: var(--danger);
+  transform: scale(1.05);
+}
+
+/* Mobile header adjustments */
+@media (max-width: 768px) {
+  .app-header {
+    padding: var(--spacing-md);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+  
+  .logo-container {
+    flex: 1;
+  }
+  
+  .app-title {
+    font-size: 1.125rem;
+  }
+  
+  .user-controls {
+    gap: var(--spacing-md);
+  }
+  
+  .streak-badge {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: center;
+  }
+  
+  .username {
+    display: none;
+  }
 }
 
 button {
@@ -471,10 +576,6 @@ input:checked + .toggle-slider:before {
 
 /* Mobile responsive styles */
 @media (max-width: 768px) {
-  .app-header {
-    padding: var(--spacing-md);
-  }
-  
   .app-content {
     margin: var(--spacing-sm);
     padding: var(--spacing-md);
