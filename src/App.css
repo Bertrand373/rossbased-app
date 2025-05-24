@@ -200,8 +200,10 @@ button:active {
 .desktop-nav {
   display: flex;
   background-color: var(--card-background);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   padding: 0 var(--spacing-lg);
+  margin: 0 var(--spacing-lg);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
 }
 
 .nav-link {
