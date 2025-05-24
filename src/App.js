@@ -96,7 +96,7 @@ function App() {
                         <span className="username">{userData.username}</span>
                       </div>
                       <button className="logout-btn" onClick={logout} title="Logout">
-                        <FaSignOutAlt />
+                        <span>Logout</span>
                       </button>
                     </div>
                   </div>
@@ -109,7 +109,7 @@ function App() {
                       <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
                     </div>
                     <button className="logout-btn" onClick={logout} title="Logout">
-                      <FaSignOutAlt />
+                      <span>Logout</span>
                     </button>
                   </div>
                   <div className="header-bottom-row">
