@@ -445,22 +445,34 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           align-items: center;
           gap: 8px;
           padding: 8px 16px;
-          background-color: rgba(128, 128, 128, 0.1);
-          border: 1px solid #444444;
-          border-radius: 9999px;
-          color: #aaaaaa;
-          font-size: 14px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s;
+          background-color: rgba(128, 128, 128, 0.1) !important;
+          border: 1px solid #444444 !important;
+          border-radius: 9999px !important;
+          color: #aaaaaa !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
+          cursor: pointer !important;
+          transition: all 0.2s !important;
           flex: 1;
           justify-content: center;
         }
         
         button:hover {
-          background-color: rgba(128, 128, 128, 0.2);
-          border-color: #ffffff;
-          color: #ffffff;
+          background-color: rgba(128, 128, 128, 0.2) !important;
+          border-color: #ffffff !important;
+          color: #ffffff !important;
+        }
+        
+        #submit-button:hover {
+          background-color: rgba(128, 128, 128, 0.2) !important;
+          border-color: #ffffff !important;
+          color: #ffffff !important;
+        }
+        
+        #cancel-button:hover {
+          background-color: rgba(128, 128, 128, 0.2) !important;
+          border-color: #ffffff !important;
+          color: #ffffff !important;
         }
       </style>
     </head>
