@@ -6,7 +6,7 @@ import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
 
 // Icons for header
-import { FaCrown, FaTimes } from 'react-icons/fa';
+import { FaCrown, FaSignOutAlt } from 'react-icons/fa';
 
 // Tabs
 import Tracker from './components/Tracker/Tracker';
@@ -77,27 +77,50 @@ function App() {
           // Show main app UI if logged in
           <>
             <header className="app-header">
-              <div className="logo-container">
-                <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
-                <h1 className="app-title">SR Tracker</h1>
-              </div>
-              <div className="user-controls">
-                <div className="streak-badge">
-                  <FaCrown className="streak-badge-icon" />
-                  <span>{userData.currentStreak || 0} day streak</span>
-                </div>
-                <div className="user-info">
-                  <div className="user-profile">
-                    <div className="user-avatar">
-                      {userData.username ? userData.username.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                    <span className="username">{userData.username}</span>
+              {!isMobile ? (
+                // Desktop Layout
+                <>
+                  <div className="logo-container">
+                    <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
                   </div>
-                  <button className="logout-btn" onClick={logout} title="Logout">
-                    <FaTimes />
-                  </button>
-                </div>
-              </div>
+                  <div className="user-controls">
+                    <div className="streak-badge">
+                      <FaCrown className="streak-badge-icon" />
+                      <span>{userData.currentStreak || 0} day streak</span>
+                    </div>
+                    <div className="user-info">
+                      <div className="user-profile">
+                        <div className="user-avatar">
+                          {userData.username ? userData.username.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                        <span className="username">{userData.username}</span>
+                      </div>
+                      <button className="logout-btn" onClick={logout} title="Logout">
+                        <FaSignOutAlt />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                // Mobile Layout - Two rows
+                <>
+                  <div className="header-top-row">
+                    <div className="logo-container">
+                      <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
+                    </div>
+                    <button className="logout-btn" onClick={logout} title="Logout">
+                      <FaSignOutAlt />
+                    </button>
+                  </div>
+                  <div className="header-bottom-row">
+                    <div className="streak-badge">
+                      <FaCrown className="streak-badge-icon" />
+                      <span>{userData.currentStreak || 0} day streak</span>
+                    </div>
+                    <span className="mobile-username">{userData.username}</span>
+                  </div>
+                </>
+              )}
             </header>
             
             {/* Banner hidden while all features are free */}
