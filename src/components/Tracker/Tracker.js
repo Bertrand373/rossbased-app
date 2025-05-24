@@ -732,7 +732,17 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               className={`toggle-btn ${userData.showOnLeaderboard ? 'active' : ''}`}
               onClick={() => updateUserData({ showOnLeaderboard: !userData.showOnLeaderboard })}
             >
-              {userData.showOnLeaderboard ? <FaToggleOn /> : <FaToggleOff />}
+              {userData.showOnLeaderboard ? (
+                <>
+                  <FaToggleOn />
+                  <span>Enabled</span>
+                </>
+              ) : (
+                <>
+                  <FaToggleOff />
+                  <span>Disabled</span>
+                </>
+              )}
             </button>
           </div>
         </div>
