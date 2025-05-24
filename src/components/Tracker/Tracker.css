@@ -23,7 +23,7 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--text-secondary);
+  border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
@@ -46,7 +46,7 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--text-secondary);
+  border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
@@ -362,7 +362,7 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--text-secondary);
+  border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
