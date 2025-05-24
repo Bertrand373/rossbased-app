@@ -728,22 +728,15 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         <div className="discord-toggle-container">
           <div className="discord-toggle">
             <span>Show my streak on Discord leaderboard</span>
-            <button 
-              className={`toggle-btn ${userData.showOnLeaderboard ? 'active' : ''}`}
+            <div 
+              className={`toggle-container ${userData.showOnLeaderboard ? 'active' : ''}`}
               onClick={() => updateUserData({ showOnLeaderboard: !userData.showOnLeaderboard })}
             >
-              {userData.showOnLeaderboard ? (
-                <>
-                  <FaToggleOn />
-                  <span>Enabled</span>
-                </>
-              ) : (
-                <>
-                  <FaToggleOff />
-                  <span>Disabled</span>
-                </>
-              )}
-            </button>
+              <div className={`custom-toggle-switch ${userData.showOnLeaderboard ? 'active' : ''}`}></div>
+              <span className="toggle-label">
+                {userData.showOnLeaderboard ? 'Enabled' : 'Disabled'}
+              </span>
+            </div>
           </div>
         </div>
         
