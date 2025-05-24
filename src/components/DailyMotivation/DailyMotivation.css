@@ -21,19 +21,20 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--medium-gray);
+  background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .action-btn:hover:not(:disabled) {
-  background-color: var(--medium-gray);
-  border-color: var(--primary);
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .action-btn.premium-locked {
@@ -179,6 +180,21 @@
   justify-content: center;
   gap: var(--spacing-sm);
   width: 100%;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.prompt-btn:hover:not(:disabled) {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 /* Premium Teaser */
@@ -232,17 +248,20 @@
 
 .back-btn {
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--medium-gray);
+  background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .back-btn:hover {
-  border-color: var(--primary);
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .archive-list {
@@ -293,6 +312,58 @@
 .archive-quote-actions {
   display: flex;
   gap: var(--spacing-md);
+}
+
+/* Form actions for modals */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.form-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.form-actions button:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.form-actions button.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #000;
+}
+
+.form-actions button.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.form-actions button.btn-outline {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.form-actions button.btn-outline:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 /* Submission Modal */
