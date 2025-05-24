@@ -446,7 +446,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           gap: 8px;
           padding: 8px 16px;
           background-color: rgba(128, 128, 128, 0.1);
-          border: 1px solid #aaaaaa;
+          border: 1px solid #444444;
           border-radius: 9999px;
           color: #aaaaaa;
           font-size: 14px;
