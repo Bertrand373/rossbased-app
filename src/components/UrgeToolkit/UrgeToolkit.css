@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css */
+/* components/UrgeToolkit/UrgeToolkit.css - Updated to match Daily Motivation styling */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -6,14 +6,14 @@
 }
 
 .toolkit-description {
-  color: var(--gray);
+  color: var(--text-secondary);
   margin-bottom: var(--spacing-md);
 }
 
 .toolkit-tabs {
   display: flex;
   margin-bottom: var(--spacing-lg);
-  border-bottom: 1px solid var(--light-gray);
+  border-bottom: 1px solid var(--border);
 }
 
 .tab-btn {
@@ -23,17 +23,19 @@
   padding: var(--spacing-md) var(--spacing-lg);
   background: transparent;
   border: none;
-  color: var(--gray);
+  color: var(--text-secondary);
   font-weight: 500;
   transition: all 0.2s;
+  cursor: pointer;
 }
 
 .tab-btn:hover {
-  color: var(--primary);
+  color: var(--text);
 }
 
 .tab-btn.active {
   color: var(--primary);
+  border-bottom: 2px solid var(--primary);
 }
 
 .tab-icon {
@@ -70,22 +72,25 @@
   font-size: 1.25rem;
   font-weight: 500;
   margin-top: var(--spacing-md);
+  color: var(--text);
 }
 
 .timer-instructions {
-  background-color: var(--light-gray);
+  background-color: var(--card-background);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
-  border: none;
+  border: 1px solid var(--border);
 }
 
 .timer-instructions ul {
   margin: var(--spacing-md) 0;
   padding-left: var(--spacing-xl);
+  color: var(--text);
 }
 
 .timer-instructions li {
   margin-bottom: var(--spacing-sm);
+  color: var(--text);
 }
 
 .timer-motivation {
@@ -102,6 +107,45 @@
 
 .timer-btn {
   min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timer-btn:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.timer-btn.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #000;
+}
+
+.timer-btn.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.timer-btn.btn-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.timer-btn.btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.2);
 }
 
 /* Redirect Energy Tab */
@@ -128,24 +172,53 @@
 .suggestion-text {
   font-size: 1.5rem;
   font-weight: 600;
-  color: white;
+  color: var(--text);
 }
 
 .empty-suggestion {
-  color: var(--gray);
+  color: var(--text-secondary);
   max-width: 400px;
 }
 
 .suggestion-btn {
   min-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.suggestion-btn:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.suggestion-btn.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #000;
+}
+
+.suggestion-btn.btn-primary:hover {
+  background-color: var(--primary-dark);
 }
 
 .redirect-info {
-  background-color: var(--light-gray);
+  background-color: var(--card-background);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
-  box-shadow: none;
-  border: none;
+  border: 1px solid var(--border);
+  color: var(--text);
 }
 
 .premium-feature {
@@ -154,6 +227,7 @@
   background-color: rgba(37, 99, 235, 0.1);
   border-radius: var(--radius-md);
   color: var(--primary);
+  border: 1px solid var(--border);
 }
 
 /* Audio Affirmations Tab */
@@ -181,7 +255,8 @@
 }
 
 .audio-item.premium-locked {
-  background-color: var(--light-gray);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
 }
 
 .audio-info {
@@ -194,20 +269,52 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  color: var(--text);
 }
 
 .lock-icon-small {
   font-size: 0.875rem;
-  color: var(--gray);
+  color: var(--text-secondary);
 }
 
 .audio-duration {
   font-size: 0.875rem;
-  color: var(--gray);
+  color: var(--text-secondary);
 }
 
 .audio-play-btn {
   min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.audio-play-btn:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.audio-play-btn.btn-outline {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.audio-play-btn.btn-outline:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .hidden-audio {
@@ -216,10 +323,10 @@
 
 .audio-info-section {
   padding: var(--spacing-lg);
-  background-color: var(--light-gray);
+  background-color: var(--card-background);
   border-radius: var(--radius-md);
-  border: none;
-  box-shadow: none;
+  border: 1px solid var(--border);
+  color: var(--text);
 }
 
 .premium-upgrade {
@@ -230,15 +337,22 @@
 .premium-upgrade p {
   margin-bottom: var(--spacing-md);
   font-style: italic;
+  color: var(--text-secondary);
 }
 
 /* Effectiveness Feedback */
 .effectiveness-feedback {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-md);
-  background-color: var(--light-gray);
+  background-color: var(--card-background);
   border-radius: var(--radius-md);
   text-align: center;
+  border: 1px solid var(--border);
+}
+
+.effectiveness-feedback p {
+  color: var(--text);
+  margin-bottom: var(--spacing-md);
 }
 
 .feedback-buttons {
@@ -255,6 +369,8 @@
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-full);
   font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .yes-btn {
@@ -263,24 +379,34 @@
   border: 1px solid var(--success);
 }
 
+.yes-btn:hover {
+  background-color: rgba(34, 197, 94, 0.2);
+}
+
 .no-btn {
   background-color: rgba(239, 68, 68, 0.1);
   color: var(--danger);
   border: 1px solid var(--danger);
 }
 
+.no-btn:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
 /* Usage Counter for Free Users */
 .usage-counter {
   margin-top: var(--spacing-md);
   padding: var(--spacing-md);
-  background-color: var(--light-gray);
+  background-color: var(--card-background);
   border-radius: var(--radius-md);
   text-align: center;
+  border: 1px solid var(--border);
 }
 
 .usage-counter p {
   margin-bottom: var(--spacing-md);
   font-style: italic;
+  color: var(--text-secondary);
 }
 
 /* Mobile responsiveness */
@@ -316,18 +442,4 @@
   .audio-play-btn {
     width: 100%;
   }
-}
-
-/* UrgeMini component */
-.urge-mini-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
 }
