@@ -338,7 +338,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
-  // Create HTML content for iframe - compact version with updated button styling
+  // Create HTML content for iframe with fixed button styling
   const iframeHtml = `
     <!DOCTYPE html>
     <html>
@@ -441,10 +441,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         }
         
         button {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 16px;
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px !important;
+          padding: 8px 16px !important;
           background-color: rgba(128, 128, 128, 0.1) !important;
           border: 1px solid #444444 !important;
           border-radius: 9999px !important;
@@ -453,8 +453,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           font-weight: 500 !important;
           cursor: pointer !important;
           transition: all 0.2s !important;
-          flex: 1;
-          justify-content: center;
+          flex: 1 !important;
+          justify-content: center !important;
         }
         
         button:hover {
@@ -463,10 +463,44 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           color: #ffffff !important;
         }
         
+        #submit-button {
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px !important;
+          padding: 8px 16px !important;
+          background-color: rgba(128, 128, 128, 0.1) !important;
+          border: 1px solid #444444 !important;
+          border-radius: 9999px !important;
+          color: #aaaaaa !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
+          cursor: pointer !important;
+          transition: all 0.2s !important;
+          flex: 1 !important;
+          justify-content: center !important;
+        }
+        
         #submit-button:hover {
           background-color: rgba(128, 128, 128, 0.2) !important;
           border-color: #ffffff !important;
           color: #ffffff !important;
+        }
+        
+        #cancel-button {
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px !important;
+          padding: 8px 16px !important;
+          background-color: rgba(128, 128, 128, 0.1) !important;
+          border: 1px solid #444444 !important;
+          border-radius: 9999px !important;
+          color: #aaaaaa !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
+          cursor: pointer !important;
+          transition: all 0.2s !important;
+          flex: 1 !important;
+          justify-content: center !important;
         }
         
         #cancel-button:hover {
