@@ -29,13 +29,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  background-color: rgba(128, 128, 128, 0.2);
-  border-color: var(--text);
-  color: var(--text);
+  transition: none;
 }
 
 /* Override any other button styling for action buttons */
@@ -52,14 +46,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.tracker-header .action-btn:hover,
-.journal-header .action-btn:hover {
-  background-color: rgba(128, 128, 128, 0.2);
-  border-color: var(--text);
-  color: var(--text);
+  transition: none;
 }
 
 /* Current Streak Section - styled like Daily Motivation quote card */
@@ -352,12 +339,13 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+  cursor: pointer;
 }
 
 .toggle-label {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  transition: color 0.2s;
+  transition: none;
 }
 
 .toggle-container.active .toggle-label {
@@ -436,13 +424,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.form-actions .action-btn:hover {
-  background-color: rgba(128, 128, 128, 0.2);
-  border-color: var(--text);
-  color: var(--text);
+  transition: none;
 }
 
 /* Modal styling */
