@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - FIXED: Complete file with syntax errors corrected
+// components/Stats/Stats.js - FIXED: Section renamed to "Benefit Insights"
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -684,7 +684,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             </div>
             
             <div className="benefits-insights-section">
-              <h4>Pattern Insights</h4>
+              <h4>Benefit Insights</h4>
               
               <div className="average-stat-integrated">
                 <div className="stat-label">Average {selectedMetric}</div>

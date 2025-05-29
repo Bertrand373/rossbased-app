@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - FIXED: CSS syntax error corrected */
+/* components/Stats/Stats.css - FIXED: Consistent card heights across all sections */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -51,6 +51,7 @@
   margin-top: 0;
 }
 
+/* UPDATED: Consistent card height - matches badge cards exactly */
 .stat-card {
   display: flex;
   flex-direction: column;
@@ -61,6 +62,9 @@
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   transition: none;
+  /* ADDED: Fixed height to match badge cards */
+  min-height: 140px;
+  height: 140px;
 }
 
 .stat-card .stat-value {
@@ -145,7 +149,9 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
+  /* REFERENCE HEIGHT: This is the base height that all other cards should match */
   min-height: 140px;
+  height: 140px;
   justify-content: center;
 }
 
@@ -370,7 +376,7 @@
   background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.4), transparent);
 }
 
-/* UPDATED: Benefit Insights Section with matching header size */
+/* UPDATED: Benefit Insights Section with matching header size and RENAMED */
 .benefits-insights-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -390,7 +396,7 @@
   font-weight: 600;
 }
 
-/* Average stat with gradient background matching badge cards */
+/* UPDATED: Average stat with consistent height matching badge cards */
 .average-stat-integrated {
   display: flex;
   justify-content: center;
@@ -404,6 +410,9 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
+  /* ADDED: Fixed height to match badge cards */
+  min-height: 140px;
+  height: 140px;
 }
 
 /* Subtle glow effect like badge cards */
@@ -449,6 +458,7 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* UPDATED: Comparison cards with consistent height matching badge cards */
 .comparison-card {
   display: flex;
   flex-direction: column;
@@ -460,6 +470,9 @@
   border: 1px solid var(--border);
   text-align: center;
   transition: none;
+  /* ADDED: Fixed height to match badge cards */
+  min-height: 140px;
+  height: 140px;
 }
 
 .comparison-value {
@@ -486,7 +499,7 @@
   font-weight: 600;
 }
 
-/* UPDATED: Enhanced insights list for all 6 metrics display */
+/* UPDATED: Enhanced insights list for all 6 metrics display with consistent height */
 .insights-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -494,6 +507,7 @@
   width: 100%;
 }
 
+/* UPDATED: Insight items with consistent height matching badge cards */
 .insight-item {
   display: flex;
   align-items: flex-start;
@@ -503,7 +517,11 @@
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   transition: all 0.2s ease;
-  min-height: 80px;
+  /* ADDED: Fixed height to match badge cards */
+  min-height: 140px;
+  height: 140px;
+  /* ADDED: Ensure content is properly aligned within the fixed height */
+  align-items: center;
 }
 
 .insight-item.highlighted {
@@ -902,12 +920,21 @@
     margin-top: 0;
   }
   
+  /* UPDATED: Mobile stat cards maintain same height as desktop */
+  .stat-card {
+    min-height: 120px;
+    height: 120px;
+    padding: var(--spacing-md);
+  }
+  
   .badges-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   
+  /* UPDATED: Mobile badge cards maintain same height as desktop */
   .badge-card {
     min-height: 120px;
+    height: 120px;
     padding: var(--spacing-md);
     justify-content: center;
   }
@@ -978,10 +1005,13 @@
     font-size: 1rem;
   }
   
+  /* UPDATED: Mobile average stat maintains consistent height */
   .average-stat-integrated {
     flex-direction: column;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
+    min-height: 120px;
+    height: 120px;
   }
   
   .average-stat-integrated .stat-label {
@@ -998,23 +1028,29 @@
     gap: var(--spacing-md);
   }
   
+  /* UPDATED: Mobile comparison cards maintain consistent height */
   .comparison-card {
     padding: var(--spacing-md);
+    min-height: 120px;
+    height: 120px;
   }
   
   .comparison-value {
     font-size: 1.75rem;
   }
   
-  /* UPDATED: Mobile insights list - single column for all 6 insights */
+  /* UPDATED: Mobile insights list - single column for all 6 insights with consistent height */
   .insights-list {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
   }
   
+  /* UPDATED: Mobile insight items maintain consistent height */
   .insight-item {
-    min-height: auto;
+    min-height: 120px;
+    height: 120px;
     padding: var(--spacing-md);
+    align-items: center;
   }
   
   .insight-item span {
