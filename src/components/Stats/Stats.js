@@ -695,22 +695,22 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <h4>Detailed Analysis</h4>
               
               <div className="streak-comparison">
-                <h5>{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Levels by Streak Length</h5>
+                <h5><span className="metric-highlight">{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
                 
                 <div className="comparison-grid">
                   <div className="comparison-card">
                     <div className="comparison-value">{streakComparison[selectedMetric].short}/10</div>
-                    <div className="comparison-label">1-7 Days</div>
+                    <div className="comparison-label">1-7 Day Streak</div>
                   </div>
                   
                   <div className="comparison-card">
                     <div className="comparison-value">{streakComparison[selectedMetric].medium}/10</div>
-                    <div className="comparison-label">8-30 Days</div>
+                    <div className="comparison-label">8-30 Day Streak</div>
                   </div>
                   
                   <div className="comparison-card">
                     <div className="comparison-value">{streakComparison[selectedMetric].long}/10</div>
-                    <div className="comparison-label">30+ Days</div>
+                    <div className="comparison-label">30+ Day Streak</div>
                   </div>
                 </div>
               </div>

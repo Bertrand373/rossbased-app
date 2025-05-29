@@ -373,6 +373,7 @@
   gap: var(--spacing-sm);
   font-weight: 600;
   color: var(--text);
+  justify-content: center; /* ADDED: Center the header */
 }
 
 .current-insight-header .insight-icon {
@@ -385,6 +386,7 @@
   font-size: 0.875rem;
   line-height: 1.4;
   font-weight: 500;
+  text-align: center; /* CHANGED: Center-aligned the insight text */
 }
 
 /* REDESIGNED: Detailed Analysis Section */
@@ -399,7 +401,7 @@
 }
 
 .detailed-analysis-section h4 {
-  margin: 0 0 var(--spacing-lg) 0;
+  margin: var(--spacing-lg) 0 var(--spacing-lg) 0; /* ADDED: More padding above header */
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
@@ -416,6 +418,12 @@
   color: var(--text);
   text-align: center;
   font-weight: 600;
+}
+
+/* ADDED: Yellow metric highlighting */
+.metric-highlight {
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .comparison-grid {
@@ -459,7 +467,7 @@
   margin-bottom: var(--spacing-lg);
   font-size: 1rem;
   color: var(--text);
-  text-align: center;
+  text-align: center; /* CHANGED: Centered the header */
   font-weight: 600;
 }
 
@@ -519,6 +527,7 @@
   font-size: 0.875rem;
   line-height: 1.4;
   font-weight: 500;
+  text-align: center; /* CHANGED: Center-aligned the insight text */
 }
 
 .insight-card.highlighted .insight-text {
@@ -661,12 +670,14 @@
   color: var(--text);
   margin-bottom: var(--spacing-sm);
   font-size: 0.875rem;
+  text-align: center; /* CHANGED: Center-aligned pattern text */
 }
 
 .pattern-actionable {
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-style: italic;
+  text-align: center; /* CHANGED: Center-aligned actionable text */
 }
 
 .no-patterns {
