@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f0f0f" />
+    <meta
+      name="description"
+      content="TitanTrack - Track your semen retention journey"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>TitanTrack</title>
+    <style>
+      /* Apply dark background immediately during loading */
+      html, body {
+        background-color: #0f0f0f;
+        color: #f9fafb;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+      }
+      
+      /* UPDATED: Custom helmet loader with natural helmet colors */
+      #initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #0f0f0f;
+        z-index: 9999;
+        gap: 24px;
+      }
+      
+      #initial-loader .helmet-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      #initial-loader .helmet-image {
+        width: 100px;
+        height: 100px;
+        animation: helmet-pulse 1.8s ease-in-out infinite;
+        /* CLEAN: No glow effects - just clean pulsing */
+      }
+      
+      #initial-loader .loader-message {
+        color: #ffffff;
+        font-size: 1.25rem;
+        font-weight: 500;
+        text-align: center;
+        margin: 0;
+      }
+      
+      /* CLEAN: Helmet pulse animation - no glow effects */
+      @keyframes helmet-pulse {
+        0%, 100% { 
+          opacity: 1; 
+          transform: scale(1);
+          /* CLEAN: No glow effects - just clean scaling and opacity */
+        }
+        50% { 
+          opacity: 0.7; 
+          transform: scale(0.94);
+          /* CLEAN: No glow effects - just clean scaling and opacity */
+        }
+      }
+      
+      /* Mobile responsiveness */
+      @media (max-width: 768px) {
+        #initial-loader .helmet-image {
+          width: 70px;
+          height: 70px;
+        }
+        
+        #initial-loader .loader-message {
+          font-size: 1.125rem;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        #initial-loader .helmet-image {
+          width: 60px;
+          height: 60px;
+        }
+        
+        #initial-loader .loader-message {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    
+    <!-- UPDATED: Initial helmet loader with natural helmet colors -->
+    <div id="initial-loader">
+      <div class="helmet-container">
+        <!-- Try to use the actual helmet image, fallback to SVG if not found -->
+        <img class="helmet-image" src="%PUBLIC_URL%/helmet.png" alt="Loading" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+        <svg class="helmet-image" style="display: none;" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Enhanced Spartan helmet SVG with natural gold/bronze colors -->
+          <defs>
+            <!-- FIXED: Gradient uses natural helmet gold/bronze tones -->
+            <linearGradient id="helmet-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#daa520;stop-opacity:1" />
+              <stop offset="50%" style="stop-color:#d4af37;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge> 
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Main helmet dome -->
+          <path d="M50 10 C25 10, 8 27, 8 50 C8 68, 15 78, 25 85 L75 85 C85 78, 92 68, 92 50 C92 27, 75 10, 50 10 Z" 
+                fill="url(#helmet-gradient)" stroke="#d4af37" stroke-width="1.5" filter="url(#glow)"/>
+          <!-- Helmet crest -->
+          <path d="M35 10 Q50 5, 65 10 Q60 15, 50 15 Q40 15, 35 10 Z" 
+                fill="#daa520" stroke="#d4af37" stroke-width="1"/>
+          <!-- Face guard horizontal bars -->
+          <rect x="20" y="40" width="60" height="3" rx="1.5" fill="#d4af37"/>
+          <rect x="22" y="50" width="56" height="3" rx="1.5" fill="#d4af37"/>
+          <rect x="24" y="60" width="52" height="3" rx="1.5" fill="#d4af37"/>
+          <!-- Cheek guards -->
+          <path d="M15 45 Q12 50, 15 65 Q20 70, 25 65 L25 45 Z" 
+                fill="url(#helmet-gradient)" stroke="#d4af37" stroke-width="1"/>
+          <path d="M85 45 Q88 50, 85 65 Q80 70, 75 65 L75 45 Z" 
+                fill="url(#helmet-gradient)" stroke="#d4af37" stroke-width="1"/>
+          <!-- Nose guard -->
+          <path d="M45 35 Q50 30, 55 35 Q50 45, 45 35 Z" 
+                fill="#d4af37" opacity="0.8"/>
+        </svg>
+      </div>
+      <p class="loader-message">Loading...</p>
+    </div>
+    
+    <div id="root"></div>
+    
+    <script>
+      // Remove the initial loader once the React app mounts
+      window.addEventListener('DOMContentLoaded', function() {
+        // Give React a moment to start up
+        setTimeout(function() {
+          var loader = document.getElementById('initial-loader');
+          var root = document.getElementById('root');
+          
+          // Check if React has started rendering content
+          function checkForReactContent() {
+            if (root && root.children.length > 0) {
+              // React has loaded, fade out the helmet loader
+              if (loader) {
+                loader.style.opacity = '0';
+                loader.style.transition = 'opacity 0.5s ease';
+                setTimeout(function() {
+                  if (loader && loader.parentNode) {
+                    loader.parentNode.removeChild(loader);
+                  }
+                }, 500);
+              }
+            } else {
+              // Keep checking every 100ms
+              setTimeout(checkForReactContent, 100);
+            }
+          }
+          
+          checkForReactContent();
+        }, 100);
+      });
+    </script>
+  </body>
+</html>

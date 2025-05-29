@@ -1,0 +1,1042 @@
+/* components/Stats/Stats.css - FIXED: Header spacing to exactly match calendar */
+.stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* FIXED: Stats header spacing to EXACTLY match calendar spacing */
+.stats-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  /* CHANGED: Match calendar's exact spacing - calendar has margin-bottom: var(--spacing-lg) on the header, 
+     then the calendar-main-section starts with padding: var(--spacing-xl) which creates the visual gap.
+     We need to replicate this same pattern. */
+  margin-bottom: var(--spacing-lg); /* CHANGED: From var(--spacing-xl) to var(--spacing-lg) to match calendar header */
+  margin-top: 0;
+  position: relative;
+}
+
+.stats-header-spacer {
+  /* Empty spacer for centering */
+}
+
+.stats-header h2 {
+  text-align: center;
+  flex: 1;
+  margin: 0;
+  justify-self: center;
+}
+
+.reset-stats-btn {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+}
+
+/* FIXED: Remove extra margin to match calendar's tighter spacing */
+.streak-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  /* REMOVED: No extra margin-top needed - header margin-bottom provides spacing */
+  margin-top: 0;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: none;
+}
+
+.stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+}
+
+.stat-card .stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+}
+
+.current-streak {
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+}
+
+.current-streak .stat-value {
+  color: var(--text);
+}
+
+.current-streak .stat-label {
+  color: var(--text-secondary);
+}
+
+.longest-streak {
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+}
+
+.longest-streak .stat-value {
+  color: var(--text);
+}
+
+.total-wetdreams {
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+}
+
+.total-wetdreams .stat-value {
+  color: var(--text);
+}
+
+.total-relapses {
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+}
+
+.total-relapses .stat-value {
+  color: var(--text);
+}
+
+/* Milestone Badges - Individual cards styled like legend items, keeping grid layout */
+.milestone-section h3, .benefits-section h3 {
+  margin-bottom: var(--spacing-md);
+  font-size: 1.25rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+/* Individual badge cards styled like calendar legend items */
+.badge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  /* Calendar legend styling applied to individual cards */
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  /* FIXED: Ensure minimum height for consistent badge sizing */
+  min-height: 140px;
+  justify-content: center;
+}
+
+/* Add subtle glow effect to each card */
+.badge-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
+}
+
+.badge-card:hover {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border-color: rgba(255, 221, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.badge-card.earned {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.08) 0%, rgba(255, 221, 0, 0.12) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+}
+
+.badge-card.earned:hover {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.12) 0%, rgba(255, 221, 0, 0.15) 100%);
+  border-color: rgba(255, 221, 0, 0.3);
+}
+
+.badge-card.locked {
+  background: linear-gradient(135deg, var(--medium-gray) 0%, var(--light-gray) 100%);
+  border: 1px solid var(--border);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.badge-card.locked:hover {
+  transform: none;
+  background: linear-gradient(135deg, var(--medium-gray) 0%, var(--light-gray) 100%);
+  border-color: var(--border);
+}
+
+.badge-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--medium-gray);
+  border-radius: 50%;
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--border);
+}
+
+.badge-card.earned .badge-icon {
+  background-color: var(--primary);
+  color: #000;
+  border: 1px solid var(--primary);
+}
+
+.badge-earned-icon, .badge-locked-icon {
+  font-size: 1.5rem;
+}
+
+.badge-locked-icon {
+  color: var(--text-secondary);
+}
+
+.badge-name {
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text);
+  /* FIXED: Ensure consistent text spacing */
+  line-height: 1.3;
+}
+
+.badge-card.earned .badge-name {
+  color: var(--primary);
+}
+
+.badge-date {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  /* FIXED: Ensure consistent height even when empty */
+  min-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* UPDATED: Benefits Visualization - Header moved inside controls container */
+.benefits-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: 0;
+  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* ADDED: More top padding for header */
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  position: relative;
+}
+
+/* ADDED: Header inside the benefits controls container */
+.benefits-controls-header {
+  margin-bottom: var(--spacing-md); /* ADDED: Space between header and controls */
+  font-size: 1.125rem; /* CHANGED: Match Pattern Insights header size */
+  color: var(--text);
+  text-align: center;
+  font-weight: 600;
+  margin-top: 0; /* ADDED: Remove any top margin */
+}
+
+/* Subtle connection line at bottom of controls */
+.benefits-controls::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.4), transparent);
+}
+
+/* 2 separate pill containers - much cleaner layout */
+.metric-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  max-width: 600px;
+  align-items: center;
+}
+
+.metric-pill-container {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  background-color: var(--card-background);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 480px;
+}
+
+/* Time range selector styled like calendar Month/Week toggle */
+.time-range-selector-container {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  justify-content: center;
+}
+
+.time-range-selector {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  background-color: var(--card-background);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  width: 100%;
+}
+
+.metric-btn, .time-btn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+  white-space: nowrap;
+}
+
+.metric-btn.active, .time-btn.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+/* Chart container with subtle connection from controls */
+.chart-container-connected {
+  height: 300px;
+  margin-bottom: var(--spacing-lg);
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border: 1px solid var(--border);
+  border-top: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Subtle connection indicator at top of chart */
+.chart-container-connected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.4), transparent);
+}
+
+/* UPDATED: Benefit Insights Section with matching header size */
+.benefits-insights-section {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.benefits-insights-section h4 {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 1.125rem; /* CHANGED: Match Pattern Insights and Benefit Visualizer header size */
+  color: var(--text);
+  text-align: center;
+  font-weight: 600; /* ADDED: Same weight as other headers */
+}
+
+/* Average stat with gradient background matching badge cards */
+.average-stat-integrated {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle glow effect like badge cards */
+.average-stat-integrated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
+}
+
+.average-stat-integrated .stat-label {
+  font-size: 1rem;
+  color: var(--text);
+  margin-right: var(--spacing-md);
+  font-weight: 600;
+}
+
+.average-stat-integrated .stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.streak-comparison {
+  margin-bottom: var(--spacing-md);
+}
+
+.streak-comparison h5 {
+  margin-bottom: var(--spacing-lg);
+  font-size: 1rem;
+  color: var(--text);
+  text-align: center;
+  font-weight: 600;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.comparison-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  transition: none;
+}
+
+.comparison-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.comparison-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+/* Personalized insights within the insights section */
+.analysis-insights h5 {
+  margin-bottom: var(--spacing-md);
+  font-size: 1rem;
+  color: var(--text);
+  text-align: center;
+  font-weight: 600;
+}
+
+.insights-list {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.insight-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  transition: none;
+  flex: 1;
+  min-width: 280px;
+  max-width: 320px;
+}
+
+.insight-item.highlighted {
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+}
+
+.insight-icon {
+  color: var(--primary);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.insight-item span {
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+/* Premium Lock */
+.premium-lock {
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 15, 15, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: var(--radius-md);
+}
+
+.lock-icon {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.premium-message {
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+}
+
+.premium-message h3 {
+  margin-bottom: var(--spacing-sm);
+  color: var(--text);
+}
+
+.premium-message p {
+  color: var(--text-secondary);
+}
+
+/* Free Benefit Tracker */
+.free-benefit-tracker {
+  padding: var(--spacing-lg);
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.free-benefit-tracker h4 {
+  margin-bottom: var(--spacing-md);
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.benefit-rating {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.benefit-rating span {
+  color: var(--text);
+}
+
+.rating-slider {
+  width: 100%;
+}
+
+.rating-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.limited-stats {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+.limited-stats p {
+  color: var(--text);
+}
+
+/* Pattern Analysis Section */
+.pattern-analysis-section {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  border-top: 3px solid rgba(255, 221, 0, 0.3);
+}
+
+.pattern-analysis-section h3 {
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.25rem;
+  color: var(--text);
+  text-align: center;
+  position: relative;
+}
+
+.pattern-analysis-section h3::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.pattern-insights {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.pattern-insight-item {
+  background-color: var(--card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.pattern-text {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.875rem;
+}
+
+.pattern-actionable {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.no-patterns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  background-color: var(--card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.no-patterns-icon {
+  color: var(--primary);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Badge Modal */
+.badge-modal {
+  text-align: center;
+  max-width: 450px;
+}
+
+.badge-trophy {
+  width: 80px;
+  height: 80px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--spacing-md);
+  color: #000;
+}
+
+.badge-trophy-icon {
+  font-size: 3rem;
+}
+
+.badge-earned-date {
+  margin-bottom: var(--spacing-md);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.badge-description {
+  background-color: rgba(255, 221, 0, 0.1);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.badge-description p {
+  color: var(--text);
+}
+
+.badge-benefits {
+  text-align: left;
+  margin-bottom: var(--spacing-lg);
+}
+
+.badge-benefits h4 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+}
+
+.badge-benefits ul {
+  list-style: none;
+}
+
+.badge-benefits li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.badge-benefits li span {
+  color: var(--text);
+}
+
+.check-icon {
+  color: var(--success);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.modal-content h3 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+}
+
+.modal-content p {
+  color: var(--text-secondary);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.form-actions .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+  border: 1px solid;
+}
+
+.form-actions .btn-danger {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.modal-actions .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+  border: 1px solid;
+}
+
+.modal-actions .btn-primary {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+.modal-actions .btn-outline {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  /* FIXED: Mobile header spacing to match desktop and calendar behavior */
+  .stats-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    position: static;
+    /* CHANGED: Match the pattern - header has margin-bottom: var(--spacing-lg), then content starts with margin-top */
+    margin-bottom: var(--spacing-lg); /* CONSISTENT: Same pattern as desktop but adjusted for mobile flow */
+    margin-top: 0;
+  }
+  
+  .stats-header h2 {
+    text-align: center;
+    flex: none;
+    order: 1;
+  }
+  
+  .reset-stats-btn {
+    position: static;
+    width: 100%;
+    justify-content: center;
+    order: 2;
+  }
+  
+  /* CONSISTENT: Mobile spacing pattern to match calendar */
+  .streak-stats {
+    grid-template-columns: repeat(2, 1fr);
+    /* FIXED: Remove extra mobile spacing to match calendar */
+    margin-top: 0;
+  }
+  
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* FIXED: Ensure consistent mobile badge heights */
+  .badge-card {
+    min-height: 120px; /* REDUCED: Smaller min-height for mobile */
+    padding: var(--spacing-md); /* REDUCED: Smaller padding for mobile */
+    justify-content: center;
+  }
+  
+  .badge-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--spacing-xs); /* REDUCED: Less margin on mobile */
+  }
+  
+  .badge-earned-icon, .badge-locked-icon {
+    font-size: 1.25rem;
+  }
+  
+  .badge-name {
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-xs); /* CONSISTENT: Same margin as icon */
+    line-height: 1.2; /* TIGHTER: Better mobile spacing */
+  }
+  
+  .badge-date {
+    font-size: 0.75rem;
+    min-height: 14px; /* REDUCED: Smaller for mobile */
+  }
+  
+  .benefits-controls {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md) var(--spacing-md); /* ADJUSTED: Mobile padding */
+  }
+  
+  .benefits-controls-header {
+    font-size: 1rem; /* CHANGED: Match mobile Pattern Insights size */
+  }
+  
+  .metric-selector {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .metric-pill-container {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .time-range-selector-container {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .time-range-selector {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .chart-container-connected {
+    padding: var(--spacing-md);
+  }
+  
+  .benefits-insights-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .benefits-insights-section h4 {
+    font-size: 1rem; /* CHANGED: Match mobile Pattern Insights size */
+  }
+  
+  .average-stat-integrated {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+  
+  .average-stat-integrated .stat-label {
+    margin-right: 0;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .average-stat-integrated .stat-value {
+    font-size: 2rem;
+  }
+  
+  .comparison-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .comparison-card {
+    padding: var(--spacing-md);
+  }
+  
+  .comparison-value {
+    font-size: 1.75rem;
+  }
+  
+  .insights-list {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .insight-item {
+    min-width: auto;
+    max-width: none;
+    width: 100%;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .modal-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .pattern-analysis-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .pattern-insight-item {
+    padding: var(--spacing-md);
+  }
+  
+  .pattern-text {
+    font-size: 0.8rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .pattern-actionable {
+    font-size: 0.8rem;
+  }
+  
+  .no-patterns {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  .no-patterns-icon {
+    font-size: 1.125rem;
+  }
+}

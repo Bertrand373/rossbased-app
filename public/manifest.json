@@ -1,0 +1,20 @@
+{
+  "short_name": "TitanTrack",
+  "name": "TitanTrack - Semen Retention Tracker",
+  "icons": [
+    {
+      "src": "helmet.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "helmet.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#0f0f0f"
+}

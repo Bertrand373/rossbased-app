@@ -1,0 +1,1542 @@
+/* components/Calendar/Calendar.css - FINAL: Pill triggers, clean navigation, perfect spacing */
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Enhanced header with reset button */
+.calendar-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  /* FIXED: Reduce spacing to match other tabs exactly */
+  margin-bottom: var(--spacing-lg);
+}
+
+.calendar-header-spacer {
+  /* Empty spacer for centering */
+}
+
+.calendar-header h2 {
+  color: var(--text);
+  margin: 0;
+  text-align: center;
+}
+
+.calendar-header-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-self: end;
+}
+
+.reset-calendar-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+}
+
+/* FIXED: Main calendar section spacing to perfectly match other tabs */
+.calendar-main-section {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  /* FIXED: Perfect spacing alignment with other tabs */
+  margin-top: var(--spacing-lg);
+}
+
+/* UPDATED: Calendar controls - moved toggle above navigation */
+.calendar-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* MOVED: View mode toggle now comes first */
+.view-mode-toggle {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  background-color: var(--card-background);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  order: 1;
+}
+
+.view-toggle-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+  white-space: nowrap;
+}
+
+.view-toggle-btn.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+/* Period navigation now comes second */
+.period-navigation {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  order: 2;
+}
+
+.period-navigation h3 {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  min-width: 220px;
+  text-align: center;
+}
+
+/* FIXED: Clean navigation buttons - no background boxes, just pure arrows */
+.period-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  /* FIXED: Completely transparent background */
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: none;
+  font-size: 1.25rem;
+  border-radius: var(--radius-full);
+}
+
+/* FIXED: Clean hover with no background changes */
+.period-nav-btn:hover {
+  color: var(--text);
+}
+
+/* REMOVED: All pseudo-element overrides - use real icons only */
+
+/* UPDATED: Subtle legend styling like average energy card in stats */
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border-radius: var(--radius-lg);
+  /* CHANGED: More subtle border like average energy card */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+
+/* CHANGED: More subtle glow effect */
+.calendar-legend::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  /* CHANGED: More subtle glow like average energy card */
+  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+  color: var(--text);
+  white-space: nowrap;
+  font-weight: 500;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.legend-item:hover {
+  background-color: rgba(255, 221, 0, 0.05);
+  border-color: rgba(255, 221, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.legend-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.legend-indicator.current-streak {
+  background: linear-gradient(135deg, var(--success) 0%, rgba(34, 197, 94, 0.8) 100%);
+}
+
+.legend-indicator.former-streak {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.6) 0%, rgba(34, 197, 94, 0.4) 100%);
+}
+
+.legend-indicator.relapse {
+  background: linear-gradient(135deg, var(--danger) 0%, rgba(239, 68, 68, 0.8) 100%);
+}
+
+.legend-indicator.wet-dream {
+  background: linear-gradient(135deg, var(--warning) 0%, rgba(245, 158, 11, 0.8) 100%);
+}
+
+/* UPDATED: Direct icon styling for legend (no trophy icon) */
+.legend-info-icon {
+  color: var(--primary);
+  font-size: 0.875rem;
+  filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
+}
+
+.calendar-instructions {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: var(--spacing-sm);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+/* Calendar display container */
+.calendar-display {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+/* Month view styling */
+.calendar-grid {
+  /* Existing month view styles */
+}
+
+.calendar-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.header-row {
+  background-color: var(--light-gray);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
+.day-header {
+  padding: var(--spacing-md);
+  text-align: center;
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.day-cell {
+  position: relative;
+  height: 80px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: var(--card-background);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--spacing-sm);
+}
+
+.day-cell:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.day-cell:last-child {
+  border-right: none;
+}
+
+.calendar-row:last-child .day-cell {
+  border-bottom: none;
+}
+
+.day-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.day-number {
+  font-weight: 500;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.other-month {
+  color: var(--text-secondary);
+  background-color: var(--light-gray);
+}
+
+.other-month .day-number {
+  color: var(--text-secondary);
+}
+
+.today .day-number {
+  display: inline-block;
+  background-color: var(--primary);
+  color: #000;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.selected {
+  border: 2px solid var(--primary) !important;
+}
+
+/* FIXED: Calendar day background colors - make them visible */
+.current-streak-day {
+  background-color: rgba(34, 197, 94, 0.2) !important;
+  border-left: 4px solid var(--success) !important;
+}
+
+.former-streak-day {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+  border-left: 4px solid rgba(34, 197, 94, 0.6) !important;
+}
+
+.relapse-day {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  border-left: 4px solid var(--danger) !important;
+}
+
+.wet-dream-day {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  border-left: 4px solid var(--warning) !important;
+}
+
+/* FIXED: Calendar day indicators - BIGGER ICONS for better visibility */
+.day-indicators {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 4px; /* INCREASED: More space between icons */
+  flex-wrap: wrap;
+  min-height: 20px; /* INCREASED: More height for bigger icons */
+}
+
+.day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
+  font-size: 0.875rem; /* INCREASED: Much bigger icons - was 0.6rem */
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-icon {
+  color: var(--success);
+}
+
+.relapse-icon {
+  color: var(--danger);
+}
+
+.wet-dream-icon {
+  color: var(--warning);
+}
+
+.tracking-icon {
+  color: var(--primary);
+}
+
+.badge-icon {
+  display: none; /* Keep trophy hidden */
+}
+
+.trigger-icon {
+  color: var(--text-secondary);
+  font-size: 0.75rem; /* INCREASED: Bigger trigger icons - was 0.55rem */
+}
+
+/* Week view styling */
+.week-view-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+.week-day-cell {
+  background-color: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-height: 120px;
+}
+
+.week-day-cell:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.week-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.week-day-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.week-day-number {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.week-day-number.today {
+  background-color: var(--primary);
+  color: #000;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.week-day-status {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.week-status-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.week-status-badge.current-streak {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.week-status-badge.former-streak {
+  background-color: rgba(34, 197, 94, 0.08);
+  color: rgba(34, 197, 94, 0.8);
+}
+
+.week-status-badge.relapse {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+.week-status-badge.wet-dream {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+}
+
+.week-badge-indicator {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.week-badge-icon {
+  color: var(--primary);
+  font-size: 0.875rem;
+}
+
+.badge-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--background);
+  color: var(--text);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  border: 1px solid var(--border);
+}
+
+.week-badge-indicator:hover .badge-tooltip {
+  opacity: 1;
+}
+
+.week-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.week-benefit-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.75rem;
+}
+
+.benefit-mini-label {
+  color: var(--text-secondary);
+  min-width: 32px;
+  font-size: 0.7rem;
+}
+
+.benefit-mini-slider {
+  flex: 1;
+  height: 4px;
+  background-color: rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  min-width: 30px;
+}
+
+.benefit-mini-fill {
+  height: 100%;
+  background-color: var(--primary);
+  border-radius: var(--radius-full);
+  transition: width 0.2s ease;
+}
+
+.benefit-mini-value {
+  color: var(--text);
+  font-weight: 500;
+  min-width: 28px;
+  font-size: 0.7rem;
+}
+
+.week-tracking-indicators {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-top: auto;
+}
+
+.week-journal-icon, .week-trigger-icon {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.week-journal-icon {
+  color: var(--primary);
+}
+
+/* UPDATED: Edit day modal with better back button placement */
+.edit-day-modal {
+  width: 90%;
+  max-width: 500px;
+}
+
+/* CHANGED: Simplified modal header - no back button at top */
+.modal-header-simple {
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.modal-header-simple h3 {
+  text-align: center;
+  margin: 0;
+  color: var(--text);
+  font-size: 1.25rem;
+}
+
+.edit-day-modal p {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.edit-day-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* UPDATED: Status buttons with calendar-matching colors */
+.edit-option-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.current-streak-btn {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.current-streak-btn:hover {
+  background-color: rgba(34, 197, 94, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.2);
+}
+
+.wet-dream-btn {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border-color: var(--warning);
+}
+
+.wet-dream-btn:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.2);
+}
+
+.relapse-btn {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.relapse-btn:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+}
+
+.clear-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.clear-btn:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(128, 128, 128, 0.1);
+}
+
+/* UPDATED: Trigger selection styling with PILL-SHAPED buttons */
+.trigger-selection {
+  background-color: var(--light-gray);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.trigger-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
+/* UPDATED: Pill-shaped trigger buttons */
+.trigger-option-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full); /* CHANGED: Full pill shape */
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  white-space: nowrap;
+  min-width: fit-content;
+  flex-shrink: 0;
+}
+
+.trigger-option-pill:hover:not(.selected) {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.trigger-option-pill.selected {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2);
+}
+
+.trigger-option-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.trigger-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+.trigger-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+  border: 1px solid;
+}
+
+.trigger-actions .btn-primary {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* UPDATED: Enhanced Day Info Modal with proper spacing */
+.day-info-modal {
+  width: 90%;
+  max-width: 600px;
+}
+
+.day-info-modal h3 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+  text-align: center;
+}
+
+/* FIXED: Day status info section with proper spacing between badges */
+.day-status-info {
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  max-width: fit-content;
+}
+
+.status-badge.current-streak {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.status-badge.former-streak {
+  background-color: rgba(34, 197, 94, 0.05);
+  color: rgba(34, 197, 94, 0.8);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-badge.relapse {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.status-badge.wet-dream {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border: 1px solid var(--warning);
+}
+
+.status-badge.badge-earned {
+  background-color: rgba(255, 221, 0, 0.1);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+/* UPDATED: Enhanced trigger info display */
+.trigger-info {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trigger-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.trigger-display-icon {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* UPDATED: Streak day context styling with subtle badge card styling */
+.day-streak-info {
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  /* CHANGED: More subtle border like average energy card */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* CHANGED: More subtle glow effect like average energy card */
+.day-streak-info::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
+}
+
+.streak-day-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+}
+
+.streak-context {
+  font-size: 0.875rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.day-tracking-info {
+  background-color: var(--card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-md);
+}
+
+.day-tracking-info h4 {
+  margin-bottom: var(--spacing-sm);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.day-tracking-info p {
+  margin: 0;
+  color: var(--success);
+  font-size: 0.875rem;
+}
+
+.day-benefits {
+  margin-top: var(--spacing-lg);
+}
+
+.day-benefits h4, .day-journal h4 {
+  margin-bottom: var(--spacing-md);
+  font-size: 1rem;
+  color: var(--text);
+}
+
+/* Enhanced yellow sliders for ALL 6 benefits */
+.benefits-details-enhanced {
+  background-color: var(--card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.benefit-slider-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.benefit-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.benefit-label {
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  text-align: left;
+}
+
+.benefit-value {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+/* Enhanced benefit meter - EXACTLY like the tracker sliders */
+.benefit-meter-enhanced {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 221, 0, 0.2);
+  outline: none;
+  overflow: hidden;
+}
+
+.benefit-level-enhanced {
+  height: 100%;
+  background: #ffdd00;
+  border-radius: var(--radius-full);
+  transition: width 0.2s ease;
+}
+
+/* OLD benefit styling - keep for backwards compatibility */
+.benefits-details {
+  background-color: var(--card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.benefit-item:last-child {
+  margin-bottom: 0;
+}
+
+.benefit-item span:first-child {
+  color: var(--text);
+  min-width: 80px;
+}
+
+.benefit-item span:last-child {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.benefit-meter {
+  flex: 1;
+  height: 8px;
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.benefit-level {
+  height: 100%;
+  background-color: var(--primary);
+  border-radius: var(--radius-full);
+}
+
+.no-benefits {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background-color: var(--card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.day-journal {
+  margin-top: var(--spacing-lg);
+}
+
+.journal-entry {
+  background-color: var(--card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-style: italic;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.premium-teaser {
+  margin-top: var(--spacing-lg);
+  background-color: var(--card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.premium-teaser h4 {
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.premium-teaser p {
+  margin-bottom: var(--spacing-md);
+  color: var(--text-secondary);
+}
+
+.premium-teaser button {
+  background-color: var(--primary);
+  color: #000;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.premium-teaser button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* UPDATED: Modal actions with FIXED back button styling for mobile */
+.modal-actions {
+  margin-top: var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+/* FIXED: Back button styled like cancel button - no animations */
+.back-to-info-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none; /* REMOVED: No animations */
+  border: 1px solid;
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.modal-actions button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none; /* REMOVED: No animations */
+  border: 1px solid;
+}
+
+.modal-actions .btn-primary {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.modal-actions .btn-outline {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.edit-day-btn {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Form actions for modals */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.form-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none; /* REMOVED: No animations */
+  border: 1px solid;
+}
+
+.form-actions .btn-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.form-actions .btn-outline {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .calendar-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+  
+  .calendar-header h2 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .calendar-header-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  .reset-calendar-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .calendar-main-section {
+    padding: var(--spacing-md);
+    /* FIXED: Maintain proper spacing on mobile */
+    margin-top: var(--spacing-md);
+  }
+  
+  .calendar-controls {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+  
+  .period-navigation {
+    gap: var(--spacing-md);
+  }
+  
+  .period-navigation h3 {
+    font-size: 1.125rem;
+    min-width: 160px;
+  }
+  
+  /* FIXED: Mobile navigation buttons - clean arrows only */
+  .period-nav-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    /* KEEP: Clean transparent background */
+    background: none;
+    border: none;
+  }
+  
+  .view-mode-toggle {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .view-toggle-btn {
+    flex: 1;
+    text-align: center;
+  }
+  
+  /* Mobile legend - stacked layout */
+  .calendar-legend {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    align-items: center;
+  }
+  
+  .legend-item {
+    font-size: 0.75rem;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .legend-indicator {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .legend-info-icon {
+    font-size: 0.75rem;
+  }
+  
+  .calendar-instructions {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs);
+  }
+  
+  /* Mobile day headers */
+  .day-header {
+    padding: var(--spacing-sm);
+    font-size: 0.75rem;
+    line-height: 1;
+  }
+  
+  .day-cell {
+    height: 60px;
+    padding: var(--spacing-xs);
+  }
+  
+  .day-number {
+    font-size: 0.75rem;
+  }
+  
+  .today .day-number {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 0.65rem;
+  }
+  
+  /* FIXED: Mobile indicators - properly sized and still BIGGER than before */
+  .day-indicators {
+    gap: 3px; /* INCREASED: More space on mobile */
+    min-height: 18px; /* INCREASED: More height on mobile */
+  }
+  
+  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
+    font-size: 0.75rem !important; /* INCREASED: Much bigger on mobile - was 0.5rem */
+  }
+  
+  .trigger-icon {
+    font-size: 0.65rem !important; /* INCREASED: Bigger trigger icons on mobile - was 0.45rem */
+  }
+  
+  /* Mobile week view */
+  .week-view-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .week-day-cell {
+    min-height: 100px;
+    padding: var(--spacing-sm);
+  }
+  
+  .week-day-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .week-benefits {
+    margin-top: var(--spacing-sm);
+  }
+  
+  .week-benefit-item {
+    margin-bottom: 2px;
+  }
+  
+  .benefit-mini-label {
+    min-width: 24px;
+    font-size: 0.65rem;
+  }
+  
+  .benefit-mini-slider {
+    min-width: 25px;
+    height: 3px;
+  }
+  
+  .benefit-mini-value {
+    min-width: 24px;
+    font-size: 0.65rem;
+  }
+  
+  /* Mobile modals */
+  .edit-day-modal, .day-info-modal {
+    max-width: 95%;
+    padding: var(--spacing-md);
+    margin: var(--spacing-md);
+  }
+  
+  /* FIXED: Mobile day status info - stacked properly on mobile */
+  .day-status-info {
+    gap: var(--spacing-sm);
+  }
+  
+  .status-badge {
+    font-size: 0.8rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .modal-header-simple h3 {
+    font-size: 1rem;
+  }
+  
+  .edit-day-options {
+    gap: var(--spacing-sm);
+  }
+  
+  .edit-option-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.8rem;
+  }
+  
+  /* Mobile pill-shaped triggers */
+  .trigger-options {
+    justify-content: center;
+    gap: var(--spacing-xs);
+  }
+  
+  .trigger-option-pill {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-width: auto;
+    flex: 0 1 auto;
+  }
+  
+  .trigger-option-icon {
+    font-size: 0.875rem;
+  }
+  
+  /* Mobile benefit sliders */
+  .benefits-details-enhanced {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .benefit-slider-item {
+    gap: var(--spacing-xs);
+  }
+  
+  .benefit-slider-header {
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .benefit-label {
+    font-size: 0.875rem;
+  }
+  
+  .benefit-value {
+    font-size: 0.8rem;
+  }
+  
+  .benefit-meter-enhanced {
+    height: 6px;
+  }
+  
+  /* Mobile streak context */
+  .streak-day-number {
+    font-size: 1.5rem;
+  }
+  
+  .streak-context {
+    font-size: 0.8rem;
+  }
+  
+  .benefit-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .benefit-item span:first-child {
+    width: 100%;
+  }
+  
+  /* FIXED: Mobile modal actions - side by side for back/cancel buttons like desktop */
+  .modal-actions {
+    flex-direction: row; /* CHANGED: Keep side by side on mobile */
+    width: 100%;
+    gap: var(--spacing-sm);
+    justify-content: space-between;
+  }
+  
+  .modal-actions button, .back-to-info-btn {
+    flex: 1; /* ADDED: Equal width buttons */
+    justify-content: center;
+  }
+  
+  .form-actions {
+    flex-direction: row; /* CHANGED: Keep side by side on mobile */
+    gap: var(--spacing-sm);
+  }
+  
+  .form-actions button {
+    flex: 1; /* ADDED: Equal width buttons */
+    justify-content: center;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .calendar-main-section {
+    padding: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  
+  .period-navigation h3 {
+    font-size: 1rem;
+    min-width: 140px;
+  }
+  
+  /* FIXED: Very small screen navigation - keep clean */
+  .period-nav-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+    background: none;
+    border: none;
+  }
+  
+  .calendar-legend {
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+  }
+  
+  .legend-item {
+    font-size: 0.7rem;
+  }
+  
+  .day-header {
+    padding: 4px 2px;
+    font-size: 0.65rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .day-cell {
+    height: 50px;
+    padding: 2px;
+  }
+  
+  .day-number {
+    font-size: 0.7rem;
+  }
+  
+  .today .day-number {
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    font-size: 0.6rem;
+  }
+  
+  /* FIXED: Very small screens - appropriately sized icons but STILL BIGGER */
+  .day-indicators {
+    gap: 2px;
+    min-height: 16px;
+  }
+  
+  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
+    font-size: 0.7rem !important; /* INCREASED: Still bigger than original - was 0.45rem */
+  }
+  
+  .trigger-icon {
+    font-size: 0.6rem !important; /* INCREASED: Still bigger than original - was 0.4rem */
+  }
+  
+  /* Very small screen pill triggers */
+  .trigger-options {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .trigger-option-pill {
+    width: 100%;
+    max-width: 200px;
+    justify-content: center;
+  }
+  
+  /* Very small screens - benefit sliders */
+  .benefits-details-enhanced {
+    padding: var(--spacing-sm);
+  }
+  
+  .benefit-label {
+    font-size: 0.8rem;
+  }
+  
+  .benefit-value {
+    font-size: 0.75rem;
+  }
+  
+  .benefit-meter-enhanced {
+    height: 5px;
+  }
+  
+  .streak-day-number {
+    font-size: 1.25rem;
+  }
+  
+  .streak-context {
+    font-size: 0.75rem;
+  }
+  
+  .modal-header-simple h3 {
+    font-size: 0.9rem;
+  }
+}

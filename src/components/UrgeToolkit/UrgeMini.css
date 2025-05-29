@@ -1,0 +1,228 @@
+/* components/UrgeToolkit/UrgeMini.css */
+.urge-mini-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.urge-mini-container {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.urge-mini-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.urge-mini-header h3 {
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.close-btn {
+  background: transparent;
+  color: var(--gray);
+  font-size: 1.25rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.urge-mini-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.mini-tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  background: transparent;
+  border: none;
+  color: var(--gray);
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.mini-tab-btn.active {
+  color: var(--primary);
+}
+
+.mini-tab-icon {
+  font-size: 1.25rem;
+}
+
+.urge-mini-content {
+  padding: var(--spacing-lg);
+}
+
+/* Timer Tab */
+.mini-timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.mini-timer-display {
+  width: 100%;
+  text-align: center;
+  padding: var(--spacing-md);
+  background: rgba(255, 221, 0, 0.1);
+  border: 1px solid var(--border);
+  color: white;
+  border-radius: var(--radius-md);
+}
+
+.mini-time-left {
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--primary);
+}
+
+.mini-timer-label {
+  font-size: 1rem;
+  margin-top: var(--spacing-sm);
+}
+
+.mini-timer-controls {
+  width: 100%;
+}
+
+.mini-timer-btn {
+  width: 100%;
+}
+
+.mini-timer-tip {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--gray);
+  margin-top: var(--spacing-sm);
+}
+
+/* Redirect Tab */
+.mini-redirect-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
+}
+
+.mini-suggestion-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: var(--spacing-md);
+}
+
+.mini-suggestion-btn {
+  width: 100%;
+}
+
+.mini-effectiveness {
+  width: 100%;
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--light-gray);
+}
+
+.mini-effectiveness p {
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.875rem;
+}
+
+.mini-feedback-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.mini-feedback-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+}
+
+.mini-feedback-btn.yes-btn {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.mini-feedback-btn.no-btn {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+/* Audio Tab */
+.mini-audio-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.mini-audio-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.mini-audio-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.mini-audio-title {
+  font-weight: 600;
+}
+
+.mini-audio-duration {
+  font-size: 0.75rem;
+  color: var(--gray);
+}
+
+.mini-audio-btn {
+  min-width: 80px;
+}
+
+.mini-audio-tip {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--gray);
+}
+
+.mini-more-btn {
+  width: 100%;
+  margin-top: var(--spacing-md);
+}

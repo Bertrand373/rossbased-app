@@ -1,0 +1,55 @@
+/* components/Navigation/MobileNavigation.css - Updated for better design consistency */
+.mobile-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  display: flex;
+  justify-content: space-around;
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  border-top: 1px solid var(--border);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-xs);
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+  min-width: 50px;
+}
+
+.mobile-nav-item.active {
+  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+}
+
+.mobile-nav-item:not(.active) {
+  border: 1px solid transparent;
+}
+
+.mobile-nav-icon {
+  font-size: 1.4rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.mobile-nav-item span {
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Add padding to the bottom of the app content to account for mobile navigation */
+@media (max-width: 768px) {
+  .app-content {
+    padding-bottom: 90px;
+  }
+}

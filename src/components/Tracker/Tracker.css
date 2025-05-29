@@ -1,0 +1,776 @@
+/* components/Tracker/Tracker.css - UPDATED: Yellow styling for benefits logged status */
+.tracker-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* FIXED: Properly centered header with spacers and aligned with other tabs */
+.tracker-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: var(--spacing-xl); /* CHANGED: Match calendar and stats exact spacing */
+  margin-top: 0; /* ADDED: Remove extra top margin to align with other tabs */
+}
+
+.tracker-header-spacer {
+  /* Empty spacer for centering */
+}
+
+.tracker-header h2 {
+  text-align: center;
+  margin: 0;
+}
+
+.tracker-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-self: end;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+}
+
+/* UPDATED: Current Streak Section - aligned with other tabs for seamless switching */
+.current-streak-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: 0; /* CHANGED: Remove extra top margin - spacing now comes from header margin-bottom */
+}
+
+/* UPDATED: Streak card with date moved inside and TWO dividers added */
+.streak-card {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* MOVED: Date now inside the streak card at the top */
+.streak-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+  order: 1;
+}
+
+.streak-content {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.streak-number {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  margin: 0;
+}
+
+.streak-label {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+/* EXISTING: First divider line between streak content and milestones */
+.streak-divider {
+  order: 3;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0;
+}
+
+.streak-milestones {
+  order: 4;
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  margin: 0;
+}
+
+.milestone-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.milestone-icon {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.milestone-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.milestone-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* ADDED: Second divider line between milestones and action buttons */
+.streak-actions-divider {
+  order: 5;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0;
+}
+
+.streak-actions {
+  order: 6; /* CHANGED: From order 5 to order 6 to accommodate new divider */
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin: 0;
+}
+
+.streak-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.relapse-btn {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.relapse-btn:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.wetdream-btn {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border-color: var(--warning);
+}
+
+.wetdream-btn:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+}
+
+.urge-btn {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.urge-btn:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+}
+
+/* ENHANCED: Benefit Logging Container - header moved inside */
+.benefit-logging-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* CHANGED: Remove gap since header is now inside the container */
+}
+
+/* ENHANCED: Benefits section with header inside the container */
+.benefit-logging-section {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  /* ENHANCED: Same yellow accent border as pattern insights */
+  border-top: 3px solid rgba(255, 221, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ENHANCED: Header inside container styled like pattern insights */
+.benefit-logging-section-header {
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.125rem;
+  color: var(--text);
+  text-align: center;
+  position: relative;
+  margin-top: 0; /* ADDED: Remove any top margin */
+}
+
+/* ENHANCED: Same glow line as pattern insights header */
+.benefit-logging-section-header::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+/* REMOVED: Old external header styling - no longer needed */
+.benefit-logging-header {
+  display: none; /* Hide the old external header */
+}
+
+/* FIXED: Benefit status section - at top of card container */
+.benefit-status-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* FIXED: Yellow styling for benefits logged status to match "Track your benefits..." */
+.benefits-logged {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary); /* CHANGED: Use same grayish color as "Track your benefits..." */
+  font-weight: 500;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+/* UPDATED: Consistent styling for not logged status */
+.benefits-not-logged {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.check-icon, .info-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* FIXED: Yellow check icon to match info icon styling */
+.check-icon {
+  color: var(--primary); /* CONSISTENT: Keep yellow like info icon */
+}
+
+.info-icon {
+  color: var(--primary);
+}
+
+.edit-benefits-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  margin-left: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: none;
+}
+
+/* Benefit sliders - now inside the card */
+.benefit-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.benefit-slider-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.benefit-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.benefit-label {
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  text-align: left;
+}
+
+.benefit-value {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+/* Fixed slider styling - solid yellow ball */
+.benefit-range-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 221, 0, 0.2);
+  outline: none;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.benefit-range-slider:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.benefit-range-slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.benefit-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffdd00;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.benefit-range-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffdd00;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.benefit-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+.save-benefits-btn {
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid #ffdd00;
+  border-radius: var(--radius-full);
+  color: #ffdd00;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+}
+
+/* UPDATED: Journal Section - Now separate and simplified */
+.journal-section {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+/* FIXED: Properly centered journal header with spacers */
+.journal-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.journal-header-spacer {
+  /* Empty spacer for centering */
+}
+
+.journal-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.journal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-self: end;
+}
+
+.journal-preview {
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-style: italic;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.empty-journal {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+}
+
+.journal-prompt {
+  background-color: var(--medium-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-style: italic;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* Discord Section - pill-style toggle like navigation */
+.discord-section {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.discord-section h3 {
+  margin-bottom: var(--spacing-md);
+  font-size: 1.125rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.discord-toggle-container {
+  margin-bottom: var(--spacing-md);
+}
+
+.discord-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background-color: var(--light-gray);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.discord-toggle span {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Custom Toggle Switch Design - pill-style like navigation */
+.custom-toggle-switch {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  background-color: var(--medium-gray);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.custom-toggle-switch.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+}
+
+.custom-toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-toggle-switch.active::before {
+  transform: translateX(28px);
+  background-color: var(--primary);
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+}
+
+.toggle-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.toggle-container.active .toggle-label {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.discord-details {
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.discord-username-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.discord-icon {
+  color: #5865F2;
+  font-size: 1.25rem;
+}
+
+.discord-username-display span {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.discord-note {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Form styling */
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+/* Make form action buttons use the same style as action buttons */
+.form-actions .action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+}
+
+/* Modal styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.modal-content h2 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+  text-align: center;
+}
+
+.modal-content p {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+/* Mobile responsiveness - UPDATED: Center headers on mobile */
+@media (max-width: 768px) {
+  .tracker-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg); /* CONSISTENT: Same as desktop to match other tabs */
+    margin-top: 0; /* CONSISTENT: Same as desktop to match other tabs */
+  }
+  
+  .tracker-header h2 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .tracker-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .journal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+  
+  .journal-header h3 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .journal-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  .journal-actions .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .streak-number {
+    font-size: 3rem;
+  }
+  
+  .streak-milestones {
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    justify-content: space-evenly;
+  }
+  
+  .streak-actions {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .streak-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .benefit-logging-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .benefit-sliders {
+    gap: var(--spacing-md);
+  }
+  
+  /* Mobile-specific styling for benefit status */
+  .benefit-status-section {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .benefits-logged, .benefits-not-logged {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .edit-benefits-btn {
+    margin-left: 0;
+    margin-top: var(--spacing-sm);
+  }
+  
+  .discord-toggle {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+  
+  .toggle-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
