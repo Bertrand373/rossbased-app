@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - FIXED: Proper reset button placement and 3-row pill layout */
+/* components/Stats/Stats.css - UPDATED: Enhanced insights list for all 6 metrics */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -40,6 +40,221 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
+  transition: none;
+  border: 1px solid;
+}
+
+.modal-actions .btn-primary {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+.modal-actions .btn-outline {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  /* FIXED: Mobile header - reset button becomes full width under title */
+  .stats-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    position: static;
+    margin-bottom: var(--spacing-lg);
+    margin-top: 0;
+  }
+  
+  .stats-header h2 {
+    text-align: center;
+    flex: none;
+    order: 1;
+    width: 100%;
+  }
+  
+  /* FIXED: Reset button - full width pill button under title */
+  .reset-stats-btn {
+    position: static;
+    width: 100%;
+    justify-content: center;
+    order: 2;
+    border-radius: var(--radius-full);
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+  
+  .streak-stats {
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 0;
+  }
+  
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .badge-card {
+    min-height: 120px;
+    padding: var(--spacing-md);
+    justify-content: center;
+  }
+  
+  .badge-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .badge-earned-icon, .badge-locked-icon {
+    font-size: 1.25rem;
+  }
+  
+  .badge-name {
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-xs);
+    line-height: 1.2;
+  }
+  
+  .badge-date {
+    font-size: 0.75rem;
+    min-height: 14px;
+  }
+  
+  .benefits-controls {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md) var(--spacing-md);
+  }
+  
+  .benefits-controls-header {
+    font-size: 1rem;
+  }
+  
+  .metric-selector {
+    max-width: none;
+    width: 100%;
+  }
+  
+  /* FIXED: Mobile 3-row layout - stack all pill containers */
+  .metric-pill-container-row1,
+  .metric-pill-container-row2 {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .time-range-selector-container {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .time-range-selector {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .chart-container-connected {
+    padding: var(--spacing-md);
+  }
+  
+  .benefits-insights-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .benefits-insights-section h4 {
+    font-size: 1rem;
+  }
+  
+  .average-stat-integrated {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+  
+  .average-stat-integrated .stat-label {
+    margin-right: 0;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .average-stat-integrated .stat-value {
+    font-size: 2rem;
+  }
+  
+  .comparison-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .comparison-card {
+    padding: var(--spacing-md);
+  }
+  
+  .comparison-value {
+    font-size: 1.75rem;
+  }
+  
+  /* UPDATED: Mobile insights list - single column for all 6 insights */
+  .insights-list {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .insight-item {
+    min-height: auto;
+    padding: var(--spacing-md);
+  }
+  
+  .insight-item span {
+    font-size: 0.8rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .modal-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .pattern-analysis-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .pattern-insight-item {
+    padding: var(--spacing-md);
+  }
+  
+  .pattern-text {
+    font-size: 0.8rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .pattern-actionable {
+    font-size: 0.8rem;
+  }
+  
+  .no-patterns {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  .no-patterns-icon {
+    font-size: 1.125rem;
+  }
+}
   transition: none;
 }
 
@@ -486,41 +701,55 @@
   font-weight: 600;
 }
 
+/* UPDATED: Enhanced insights list for all 6 metrics display */
 .insights-list {
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-lg);
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  width: 100%;
 }
 
 .insight-item {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md) var(--spacing-lg);
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
   background-color: var(--card-background);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  transition: none;
-  flex: 1;
-  min-width: 280px;
-  max-width: 320px;
+  transition: all 0.2s ease;
+  min-height: 80px;
 }
 
 .insight-item.highlighted {
   background-color: rgba(255, 221, 0, 0.1);
   border: 1px solid rgba(255, 221, 0, 0.2);
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.15);
 }
 
 .insight-icon {
   color: var(--primary);
   font-size: 1.25rem;
   flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.insight-item.highlighted .insight-icon {
+  color: var(--primary);
+  filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
 }
 
 .insight-item span {
   color: var(--text);
   font-size: 0.875rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.insight-item.highlighted span {
+  color: var(--text);
+  font-weight: 600;
 }
 
 /* Premium Lock */
@@ -837,214 +1066,3 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
-  border: 1px solid;
-}
-
-.modal-actions .btn-primary {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.modal-actions .btn-outline {
-  background-color: rgba(128, 128, 128, 0.1);
-  border-color: var(--border);
-  color: var(--text-secondary);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  /* FIXED: Mobile header - reset button becomes full width under title */
-  .stats-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
-    position: static;
-    margin-bottom: var(--spacing-lg);
-    margin-top: 0;
-  }
-  
-  .stats-header h2 {
-    text-align: center;
-    flex: none;
-    order: 1;
-    width: 100%;
-  }
-  
-  /* FIXED: Reset button - full width pill button under title */
-  .reset-stats-btn {
-    position: static;
-    width: 100%;
-    justify-content: center;
-    order: 2;
-    border-radius: var(--radius-full);
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
-  
-  .streak-stats {
-    grid-template-columns: repeat(2, 1fr);
-    margin-top: 0;
-  }
-  
-  .badges-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .badge-card {
-    min-height: 120px;
-    padding: var(--spacing-md);
-    justify-content: center;
-  }
-  
-  .badge-icon {
-    width: 40px;
-    height: 40px;
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .badge-earned-icon, .badge-locked-icon {
-    font-size: 1.25rem;
-  }
-  
-  .badge-name {
-    font-size: 0.875rem;
-    margin-bottom: var(--spacing-xs);
-    line-height: 1.2;
-  }
-  
-  .badge-date {
-    font-size: 0.75rem;
-    min-height: 14px;
-  }
-  
-  .benefits-controls {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    align-items: center;
-    padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md) var(--spacing-md);
-  }
-  
-  .benefits-controls-header {
-    font-size: 1rem;
-  }
-  
-  .metric-selector {
-    max-width: none;
-    width: 100%;
-  }
-  
-  /* FIXED: Mobile 3-row layout - stack all pill containers */
-  .metric-pill-container-row1,
-  .metric-pill-container-row2 {
-    max-width: none;
-    width: 100%;
-  }
-  
-  .time-range-selector-container {
-    max-width: none;
-    width: 100%;
-  }
-  
-  .time-range-selector {
-    max-width: none;
-    width: 100%;
-  }
-  
-  .chart-container-connected {
-    padding: var(--spacing-md);
-  }
-  
-  .benefits-insights-section {
-    padding: var(--spacing-lg);
-  }
-  
-  .benefits-insights-section h4 {
-    font-size: 1rem;
-  }
-  
-  .average-stat-integrated {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-  }
-  
-  .average-stat-integrated .stat-label {
-    margin-right: 0;
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .average-stat-integrated .stat-value {
-    font-size: 2rem;
-  }
-  
-  .comparison-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-  
-  .comparison-card {
-    padding: var(--spacing-md);
-  }
-  
-  .comparison-value {
-    font-size: 1.75rem;
-  }
-  
-  .insights-list {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .insight-item {
-    min-width: auto;
-    max-width: none;
-    width: 100%;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .modal-actions {
-    flex-direction: column;
-  }
-  
-  .modal-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .pattern-analysis-section {
-    padding: var(--spacing-lg);
-  }
-  
-  .pattern-insight-item {
-    padding: var(--spacing-md);
-  }
-  
-  .pattern-text {
-    font-size: 0.8rem;
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .pattern-actionable {
-    font-size: 0.8rem;
-  }
-  
-  .no-patterns {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    text-align: center;
-  }
-  
-  .no-patterns-icon {
-    font-size: 1.125rem;
-  }
-}

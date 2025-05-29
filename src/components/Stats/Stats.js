@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - FIXED: Complete file with syntax errors corrected
+// components/Stats/Stats.js - UPDATED: Show all 6 metric insights with highlighting
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -263,178 +263,200 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   const streakComparison = generateStreakComparison();
   
-  // FIXED: Generate proper insights based on selected metric and actual data
-  const generateInsights = () => {
+  // UPDATED: Generate insights for ALL 6 metrics, always return all of them
+  const generateAllInsights = () => {
     const filteredData = getFilteredBenefitData();
     
     if (filteredData.length < 3) {
       return [
         {
           id: 1,
-          text: `Track more days to see personalized ${selectedMetric} insights about your progress.`,
-          metric: selectedMetric
+          text: "Track more days to see personalized energy insights about your progress.",
+          metric: "energy"
+        },
+        {
+          id: 2,
+          text: "Focus patterns become clearer with more data points tracked.",
+          metric: "focus"
+        },
+        {
+          id: 3,
+          text: "Confidence trends emerge as you build a longer tracking history.",
+          metric: "confidence"
+        },
+        {
+          id: 4,
+          text: "Aura improvements are best analyzed over extended tracking periods.",
+          metric: "aura"
+        },
+        {
+          id: 5,
+          text: "Attraction benefits show patterns with consistent daily logging.",
+          metric: "attraction"
+        },
+        {
+          id: 6,
+          text: "Workout performance correlations become visible with more tracking.",
+          metric: "workout"
         }
       ];
     }
     
     const insights = [];
     const recentData = filteredData.slice(-7); // Last 7 days
-    const currentAvg = calculateAverage();
     
-    // Metric-specific insights based on selected metric
-    switch (selectedMetric) {
-      case 'energy':
-        const energyTrend = recentData.length > 1 ? 
-          (recentData[recentData.length - 1].energy || 5) - (recentData[0].energy || 5) : 0;
-        
-        if (energyTrend > 1.5) {
-          insights.push({
-            id: 1,
-            text: "Your energy levels have been trending strongly upward this week.",
-            metric: "energy"
-          });
-        } else if (energyTrend < -1.5) {
-          insights.push({
-            id: 1,
-            text: "Consider what might be affecting your energy levels recently.",
-            metric: "energy"
-          });
-        } else if (currentAvg > 7.5) {
-          insights.push({
-            id: 1,
-            text: "Your energy levels are consistently high - excellent progress!",
-            metric: "energy"
-          });
-        } else {
-          insights.push({
-            id: 1,
-            text: "Energy typically peaks around day 10-14 of retention cycles.",
-            metric: "energy"
-          });
-        }
-        break;
-        
-      case 'focus':
-        const focusAvg = recentData.reduce((sum, item) => sum + (item.focus || 5), 0) / recentData.length;
-        if (focusAvg > 7.5) {
-          insights.push({
-            id: 1,
-            text: "Your focus levels have been consistently high this week.",
-            metric: "focus"
-          });
-        } else if (focusAvg > 6) {
-          insights.push({
-            id: 1,
-            text: "Focus tends to improve steadily after day 5 of retention.",
-            metric: "focus"
-          });
-        } else {
-          insights.push({
-            id: 1,
-            text: "Mental clarity often increases with longer retention periods.",
-            metric: "focus"
-          });
-        }
-        break;
-        
-      case 'confidence':
-        const confidenceAvg = recentData.reduce((sum, item) => sum + (item.confidence || 5), 0) / recentData.length;
-        if (confidenceAvg > 7.5) {
-          insights.push({
-            id: 1,
-            text: "Confidence shows strong improvement during your current streak.",
-            metric: "confidence"
-          });
-        } else if (confidenceAvg > 6) {
-          insights.push({
-            id: 1,
-            text: "Self-confidence typically builds gradually with retention practice.",
-            metric: "confidence"
-          });
-        } else {
-          insights.push({
-            id: 1,
-            text: "Confidence benefits often become noticeable after 2-3 weeks.",
-            metric: "confidence"
-          });
-        }
-        break;
-        
-      case 'aura':
-        const auraAvg = recentData.reduce((sum, item) => sum + (item.aura || 5), 0) / recentData.length;
-        if (auraAvg > 7.5) {
-          insights.push({
-            id: 1,
-            text: "Your aura and presence have been particularly strong lately.",
-            metric: "aura"
-          });
-        } else if (auraAvg > 6) {
-          insights.push({
-            id: 1,
-            text: "Aura improvements often correlate with longer retention periods.",
-            metric: "aura"
-          });
-        } else {
-          insights.push({
-            id: 1,
-            text: "Many report enhanced presence and magnetism with consistent practice.",
-            metric: "aura"
-          });
-        }
-        break;
-        
-      case 'attraction':
-        const attractionAvg = recentData.reduce((sum, item) => sum + (item.attraction || 5), 0) / recentData.length;
-        if (attractionAvg > 7.5) {
-          insights.push({
-            id: 1,
-            text: "Your attraction and magnetism levels are notably high this period.",
-            metric: "attraction"
-          });
-        } else if (attractionAvg > 6) {
-          insights.push({
-            id: 1,
-            text: "Attraction benefits often intensify after the first few weeks.",
-            metric: "attraction"
-          });
-        } else {
-          insights.push({
-            id: 1,
-            text: "Enhanced attraction is commonly reported with longer streaks.",
-            metric: "attraction"
-          });
-        }
-        break;
-        
-      case 'workout':
-        const workoutAvg = recentData.reduce((sum, item) => sum + (item.workout || 5), 0) / recentData.length;
-        if (workoutAvg > 7.5) {
-          insights.push({
-            id: 1,
-            text: "Your workout performance has been exceptionally strong lately.",
-            metric: "workout"
-          });
-        } else if (workoutAvg > 6) {
-          insights.push({
-            id: 1,
-            text: "Physical performance often improves with retained energy.",
-            metric: "workout"
-          });
-        } else {
-          insights.push({
-            id: 1,
-            text: "Many experience enhanced strength and endurance with retention.",
-            metric: "workout"
-          });
-        }
-        break;
-        
-      default:
-        insights.push({
-          id: 1,
-          text: "Your benefit tracking shows steady progress on your journey.",
-          metric: selectedMetric
-        });
+    // Helper function to calculate average for any metric
+    const calculateMetricAverage = (metric) => {
+      const sum = filteredData.reduce((acc, item) => acc + (item[metric] || 0), 0);
+      return (sum / filteredData.length).toFixed(1);
+    };
+    
+    // Helper function to calculate recent average for any metric
+    const calculateRecentAverage = (metric) => {
+      if (recentData.length === 0) return 5;
+      const sum = recentData.reduce((acc, item) => acc + (item[metric] || 5), 0);
+      return sum / recentData.length;
+    };
+    
+    // ENERGY INSIGHTS
+    const energyTrend = recentData.length > 1 ? 
+      (recentData[recentData.length - 1].energy || 5) - (recentData[0].energy || 5) : 0;
+    const energyAvg = parseFloat(calculateMetricAverage('energy'));
+    
+    if (energyTrend > 1.5) {
+      insights.push({
+        id: 1,
+        text: "Your energy levels have been trending strongly upward this week.",
+        metric: "energy"
+      });
+    } else if (energyTrend < -1.5) {
+      insights.push({
+        id: 1,
+        text: "Consider what might be affecting your energy levels recently.",
+        metric: "energy"
+      });
+    } else if (energyAvg > 7.5) {
+      insights.push({
+        id: 1,
+        text: "Your energy levels are consistently high - excellent progress!",
+        metric: "energy"
+      });
+    } else {
+      insights.push({
+        id: 1,
+        text: "Energy typically peaks around day 10-14 of retention cycles.",
+        metric: "energy"
+      });
+    }
+    
+    // FOCUS INSIGHTS
+    const focusAvg = calculateRecentAverage('focus');
+    if (focusAvg > 7.5) {
+      insights.push({
+        id: 2,
+        text: "Your focus levels have been consistently high this week.",
+        metric: "focus"
+      });
+    } else if (focusAvg > 6) {
+      insights.push({
+        id: 2,
+        text: "Focus tends to improve steadily after day 5 of retention.",
+        metric: "focus"
+      });
+    } else {
+      insights.push({
+        id: 2,
+        text: "Mental clarity often increases with longer retention periods.",
+        metric: "focus"
+      });
+    }
+    
+    // CONFIDENCE INSIGHTS
+    const confidenceAvg = calculateRecentAverage('confidence');
+    if (confidenceAvg > 7.5) {
+      insights.push({
+        id: 3,
+        text: "Confidence shows strong improvement during your current streak.",
+        metric: "confidence"
+      });
+    } else if (confidenceAvg > 6) {
+      insights.push({
+        id: 3,
+        text: "Self-confidence typically builds gradually with retention practice.",
+        metric: "confidence"
+      });
+    } else {
+      insights.push({
+        id: 3,
+        text: "Confidence benefits often become noticeable after 2-3 weeks.",
+        metric: "confidence"
+      });
+    }
+    
+    // AURA INSIGHTS
+    const auraAvg = calculateRecentAverage('aura');
+    if (auraAvg > 7.5) {
+      insights.push({
+        id: 4,
+        text: "Your aura and presence have been particularly strong lately.",
+        metric: "aura"
+      });
+    } else if (auraAvg > 6) {
+      insights.push({
+        id: 4,
+        text: "Aura improvements often correlate with longer retention periods.",
+        metric: "aura"
+      });
+    } else {
+      insights.push({
+        id: 4,
+        text: "Many report enhanced presence and magnetism with consistent practice.",
+        metric: "aura"
+      });
+    }
+    
+    // ATTRACTION INSIGHTS
+    const attractionAvg = calculateRecentAverage('attraction');
+    if (attractionAvg > 7.5) {
+      insights.push({
+        id: 5,
+        text: "Your attraction and magnetism levels are notably high this period.",
+        metric: "attraction"
+      });
+    } else if (attractionAvg > 6) {
+      insights.push({
+        id: 5,
+        text: "Attraction benefits often intensify after the first few weeks.",
+        metric: "attraction"
+      });
+    } else {
+      insights.push({
+        id: 5,
+        text: "Enhanced attraction is commonly reported with longer streaks.",
+        metric: "attraction"
+      });
+    }
+    
+    // WORKOUT INSIGHTS
+    const workoutAvg = calculateRecentAverage('workout');
+    if (workoutAvg > 7.5) {
+      insights.push({
+        id: 6,
+        text: "Your workout performance has been exceptionally strong lately.",
+        metric: "workout"
+      });
+    } else if (workoutAvg > 6) {
+      insights.push({
+        id: 6,
+        text: "Physical performance often improves with retained energy.",
+        metric: "workout"
+      });
+    } else {
+      insights.push({
+        id: 6,
+        text: "Many experience enhanced strength and endurance with retention.",
+        metric: "workout"
+      });
     }
     
     return insights;
@@ -565,6 +587,88 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 {badge.earned ? (
                   <FaTrophy className="badge-earned-icon" />
                 ) : (
+            <div className="no-patterns">
+              <FaInfoCircle className="no-patterns-icon" />
+              <span>Track more streaks to discover your personal patterns and triggers.</span>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Badge Modal */}
+      {showBadgeModal && selectedBadge && (
+        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
+          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
+            <div className="badge-trophy">
+              <FaMedal className="badge-trophy-icon" />
+            </div>
+            
+            <h3>{selectedBadge.name}</h3>
+            
+            <div className="badge-earned-date">
+              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
+            </div>
+            
+            <div className="badge-description">
+              <p>
+                {
+                  selectedBadge.name === '7-Day Warrior' ? 
+                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
+                  selectedBadge.name === '14-Day Monk' ? 
+                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
+                  selectedBadge.name === '30-Day Master' ? 
+                    'A full month of retention! Your willpower is exceptional, and the benefits are becoming more pronounced.' :
+                  selectedBadge.name === '90-Day King' ? 
+                    'The ultimate achievement! 90 days of complete discipline. You\'ve mastered your impulses and transformed your life.' :
+                    'Congratulations on earning this achievement badge!'
+                }
+              </p>
+            </div>
+            
+            <div className="badge-benefits">
+              <h4>Unlock Benefits:</h4>
+              <ul>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>New affirmations in the Urge Toolkit</span>
+                </li>
+                {selectedBadge.name !== '7-Day Warrior' && (
+                  <li>
+                    <FaCheckCircle className="check-icon" />
+                    <span>Exclusive challenges in the Community tab</span>
+                  </li>
+                )}
+                {(selectedBadge.name === '30-Day Master' || selectedBadge.name === '90-Day King') && (
+                  <li>
+                    <FaCheckCircle className="check-icon" />
+                    <span>Special Discord role and recognition</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+            
+            <div className="modal-actions">
+              {isPremium ? (
+                <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
+                  Share Achievement
+                </button>
+              ) : (
+                <button className="btn btn-primary">
+                  Upgrade to Share
+                </button>
+              )}
+              <button className="btn btn-outline" onClick={() => setShowBadgeModal(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Stats;
                   <FaLock className="badge-locked-icon" />
                 )}
               </div>
@@ -694,7 +798,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 <h5>Personalized Analysis</h5>
                 
                 <div className="insights-list">
-                  {generateInsights().map(insight => (
+                  {generateAllInsights().map(insight => (
                     <div 
                       key={insight.id} 
                       className={`insight-item ${insight.metric === selectedMetric ? 'highlighted' : ''}`}
@@ -762,85 +866,3 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             ))
           ) : (
-            <div className="no-patterns">
-              <FaInfoCircle className="no-patterns-icon" />
-              <span>Track more streaks to discover your personal patterns and triggers.</span>
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Badge Modal */}
-      {showBadgeModal && selectedBadge && (
-        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
-          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
-            <div className="badge-trophy">
-              <FaMedal className="badge-trophy-icon" />
-            </div>
-            
-            <h3>{selectedBadge.name}</h3>
-            
-            <div className="badge-earned-date">
-              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
-            </div>
-            
-            <div className="badge-description">
-              <p>
-                {
-                  selectedBadge.name === '7-Day Warrior' ? 
-                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
-                  selectedBadge.name === '14-Day Monk' ? 
-                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
-                  selectedBadge.name === '30-Day Master' ? 
-                    'A full month of retention! Your willpower is exceptional, and the benefits are becoming more pronounced.' :
-                  selectedBadge.name === '90-Day King' ? 
-                    'The ultimate achievement! 90 days of complete discipline. You\'ve mastered your impulses and transformed your life.' :
-                    'Congratulations on earning this achievement badge!'
-                }
-              </p>
-            </div>
-            
-            <div className="badge-benefits">
-              <h4>Unlock Benefits:</h4>
-              <ul>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>New affirmations in the Urge Toolkit</span>
-                </li>
-                {selectedBadge.name !== '7-Day Warrior' && (
-                  <li>
-                    <FaCheckCircle className="check-icon" />
-                    <span>Exclusive challenges in the Community tab</span>
-                  </li>
-                )}
-                {(selectedBadge.name === '30-Day Master' || selectedBadge.name === '90-Day King') && (
-                  <li>
-                    <FaCheckCircle className="check-icon" />
-                    <span>Special Discord role and recognition</span>
-                  </li>
-                )}
-              </ul>
-            </div>
-            
-            <div className="modal-actions">
-              {isPremium ? (
-                <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
-                  Share Achievement
-                </button>
-              ) : (
-                <button className="btn btn-primary">
-                  Upgrade to Share
-                </button>
-              )}
-              <button className="btn btn-outline" onClick={() => setShowBadgeModal(false)}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Stats;
