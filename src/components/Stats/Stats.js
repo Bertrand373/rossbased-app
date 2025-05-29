@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Show all 6 metric insights with highlighting
+// components/Stats/Stats.js - FIXED: Complete file with syntax errors corrected
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -587,88 +587,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 {badge.earned ? (
                   <FaTrophy className="badge-earned-icon" />
                 ) : (
-            <div className="no-patterns">
-              <FaInfoCircle className="no-patterns-icon" />
-              <span>Track more streaks to discover your personal patterns and triggers.</span>
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Badge Modal */}
-      {showBadgeModal && selectedBadge && (
-        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
-          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
-            <div className="badge-trophy">
-              <FaMedal className="badge-trophy-icon" />
-            </div>
-            
-            <h3>{selectedBadge.name}</h3>
-            
-            <div className="badge-earned-date">
-              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
-            </div>
-            
-            <div className="badge-description">
-              <p>
-                {
-                  selectedBadge.name === '7-Day Warrior' ? 
-                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
-                  selectedBadge.name === '14-Day Monk' ? 
-                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
-                  selectedBadge.name === '30-Day Master' ? 
-                    'A full month of retention! Your willpower is exceptional, and the benefits are becoming more pronounced.' :
-                  selectedBadge.name === '90-Day King' ? 
-                    'The ultimate achievement! 90 days of complete discipline. You\'ve mastered your impulses and transformed your life.' :
-                    'Congratulations on earning this achievement badge!'
-                }
-              </p>
-            </div>
-            
-            <div className="badge-benefits">
-              <h4>Unlock Benefits:</h4>
-              <ul>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>New affirmations in the Urge Toolkit</span>
-                </li>
-                {selectedBadge.name !== '7-Day Warrior' && (
-                  <li>
-                    <FaCheckCircle className="check-icon" />
-                    <span>Exclusive challenges in the Community tab</span>
-                  </li>
-                )}
-                {(selectedBadge.name === '30-Day Master' || selectedBadge.name === '90-Day King') && (
-                  <li>
-                    <FaCheckCircle className="check-icon" />
-                    <span>Special Discord role and recognition</span>
-                  </li>
-                )}
-              </ul>
-            </div>
-            
-            <div className="modal-actions">
-              {isPremium ? (
-                <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
-                  Share Achievement
-                </button>
-              ) : (
-                <button className="btn btn-primary">
-                  Upgrade to Share
-                </button>
-              )}
-              <button className="btn btn-outline" onClick={() => setShowBadgeModal(false)}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Stats;
                   <FaLock className="badge-locked-icon" />
                 )}
               </div>
@@ -866,3 +784,85 @@ export default Stats;
               </div>
             ))
           ) : (
+            <div className="no-patterns">
+              <FaInfoCircle className="no-patterns-icon" />
+              <span>Track more streaks to discover your personal patterns and triggers.</span>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Badge Modal */}
+      {showBadgeModal && selectedBadge && (
+        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
+          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
+            <div className="badge-trophy">
+              <FaMedal className="badge-trophy-icon" />
+            </div>
+            
+            <h3>{selectedBadge.name}</h3>
+            
+            <div className="badge-earned-date">
+              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
+            </div>
+            
+            <div className="badge-description">
+              <p>
+                {
+                  selectedBadge.name === '7-Day Warrior' ? 
+                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
+                  selectedBadge.name === '14-Day Monk' ? 
+                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
+                  selectedBadge.name === '30-Day Master' ? 
+                    'A full month of retention! Your willpower is exceptional, and the benefits are becoming more pronounced.' :
+                  selectedBadge.name === '90-Day King' ? 
+                    'The ultimate achievement! 90 days of complete discipline. You\'ve mastered your impulses and transformed your life.' :
+                    'Congratulations on earning this achievement badge!'
+                }
+              </p>
+            </div>
+            
+            <div className="badge-benefits">
+              <h4>Unlock Benefits:</h4>
+              <ul>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>New affirmations in the Urge Toolkit</span>
+                </li>
+                {selectedBadge.name !== '7-Day Warrior' && (
+                  <li>
+                    <FaCheckCircle className="check-icon" />
+                    <span>Exclusive challenges in the Community tab</span>
+                  </li>
+                )}
+                {(selectedBadge.name === '30-Day Master' || selectedBadge.name === '90-Day King') && (
+                  <li>
+                    <FaCheckCircle className="check-icon" />
+                    <span>Special Discord role and recognition</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+            
+            <div className="modal-actions">
+              {isPremium ? (
+                <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
+                  Share Achievement
+                </button>
+              ) : (
+                <button className="btn btn-primary">
+                  Upgrade to Share
+                </button>
+              )}
+              <button className="btn btn-outline" onClick={() => setShowBadgeModal(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Stats;
