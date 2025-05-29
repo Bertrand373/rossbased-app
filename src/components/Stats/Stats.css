@@ -335,8 +335,9 @@
 
 .current-metric-average {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column; /* CHANGED: Always use column layout like mobile */
+  gap: var(--spacing-sm); /* CHANGED: Use mobile gap */
+  align-items: center; /* ADDED: Center content */
   padding: var(--spacing-lg);
   background-color: var(--card-background);
   border-radius: var(--radius-md);
@@ -375,11 +376,19 @@
   font-weight: 600;
   color: var(--text);
   justify-content: center; /* ADDED: Center the header */
+  position: relative; /* ADDED: For absolute positioning of icon */
 }
 
 .current-insight-header .insight-icon {
   color: var(--primary);
   font-size: 1.125rem;
+  position: absolute; /* CHANGED: Position absolutely */
+  left: -30px; /* ADDED: Position to the left of text */
+}
+
+/* ADDED: Ensure text centering is independent of icon */
+.current-insight-header span {
+  text-align: center;
 }
 
 .current-insight-text {
@@ -399,6 +408,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  /* ADDED: Same premium styling as Pattern Analysis */
+  border-top: 3px solid rgba(255, 221, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .detailed-analysis-section h4 {
@@ -407,6 +419,19 @@
   color: var(--text);
   text-align: center;
   font-weight: 600;
+  position: relative; /* ADDED: For the glow line */
+}
+
+/* ADDED: Yellow glow line like Pattern Analysis */
+.detailed-analysis-section h4::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
 .streak-comparison {
@@ -891,6 +916,7 @@
   .current-metric-average {
     min-height: 100px;
     justify-content: center; /* ENSURE: Centered on desktop */
+    /* REMOVED: flex-direction override - keep column layout */
   }
   
   .current-insight-card {
@@ -1002,6 +1028,7 @@
     gap: var(--spacing-sm);
     min-height: 100px;
     justify-content: center; /* ADDED: Center content on mobile too */
+    /* REMOVED: flex-direction override since desktop now uses column too */
   }
   
   .current-metric-value {
@@ -1095,8 +1122,13 @@
   }
 }
 
-/* VERY SMALL SCREENS: Further optimizations */
+/* ADDED: Hide icons on very small screens to prevent overflow */
 @media (max-width: 480px) {
+  .current-insight-header .insight-icon,
+  .insight-card-header .insight-icon {
+    display: none; /* Hide icons on very small screens */
+  }
+}
   .stats-container {
     gap: var(--spacing-md);
   }
