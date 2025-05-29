@@ -81,12 +81,20 @@
   margin-top: var(--spacing-sm);
 }
 
-/* Milestone Badges - consistent with stat cards */
+/* REDESIGNED: Section Headers with Consistent Spacing */
+.milestone-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
 .milestone-section h3 {
-  margin-bottom: var(--spacing-md);
+  margin: 0;
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
+  /* ADDED: Consistent spacing above and below like other tab headers */
+  padding: var(--spacing-lg) 0;
 }
 
 .badges-grid {
@@ -200,7 +208,7 @@
   justify-content: center;
 }
 
-/* REDESIGNED: Benefit Tracker Section */
+/* REDESIGNED: Benefit Tracker Section with Consistent Spacing */
 .benefit-tracker-section {
   display: flex;
   flex-direction: column;
@@ -208,10 +216,12 @@
 }
 
 .benefit-tracker-section h3 {
-  margin-bottom: var(--spacing-md);
+  margin: 0;
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
+  /* ADDED: Consistent spacing above and below like other sections */
+  padding: var(--spacing-lg) 0;
 }
 
 /* Controls with 3-row pill layout */
@@ -897,10 +907,12 @@
     justify-self: center;
   }
   
+  /* FIXED: Mobile reset button to match Reset Calendar styling exactly */
   .reset-stats-btn {
     width: 100%;
     justify-content: center;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md); /* CHANGED: Match reset calendar button */
+    font-size: 0.875rem; /* ENSURE: Same font size */
   }
   
   /* Mobile: 2x2 grid for stats and badges */
