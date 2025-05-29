@@ -365,6 +365,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  justify-content: center; /* ADDED: Vertically center all content */
 }
 
 .current-insight-header {
@@ -490,6 +491,7 @@
   transition: all 0.2s ease;
   /* CHANGED: Dynamic height for better content readability */
   min-height: 120px;
+  justify-content: center; /* ADDED: Vertically center all content */
 }
 
 .insight-card.highlighted {
@@ -505,6 +507,7 @@
   gap: var(--spacing-sm);
   font-weight: 600;
   color: var(--text);
+  justify-content: center; /* ADDED: Center the header content */
 }
 
 .insight-card-header .insight-icon {
@@ -887,10 +890,12 @@
   /* Desktop: Better spacing for sidebar cards */
   .current-metric-average {
     min-height: 100px;
+    justify-content: center; /* ENSURE: Centered on desktop */
   }
   
   .current-insight-card {
     min-height: 180px;
+    justify-content: center; /* ENSURE: Centered on desktop */
   }
 }
 
@@ -996,6 +1001,7 @@
     flex-direction: column;
     gap: var(--spacing-sm);
     min-height: 100px;
+    justify-content: center; /* ADDED: Center content on mobile too */
   }
   
   .current-metric-value {
@@ -1004,6 +1010,7 @@
   
   .current-insight-card {
     min-height: 100px;
+    justify-content: center; /* ENSURE: Centered on mobile */
   }
   
   /* Mobile: Detailed Analysis */
@@ -1037,6 +1044,7 @@
   .insight-card {
     min-height: 100px;
     padding: var(--spacing-md);
+    justify-content: center; /* ENSURE: Centered on mobile */
   }
   
   .insight-text {
@@ -1147,6 +1155,7 @@
   .current-insight-card {
     min-height: 90px;
     padding: var(--spacing-md);
+    justify-content: center; /* ENSURE: Centered on very small screens */
   }
   
   .detailed-analysis-section {
@@ -1166,6 +1175,7 @@
   .insight-card {
     min-height: 90px;
     padding: var(--spacing-sm);
+    justify-content: center; /* ENSURE: Centered on very small screens */
   }
   
   .insight-card-header {
