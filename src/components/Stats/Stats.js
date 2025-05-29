@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - FIXED: Section renamed to "Benefit Insights"
+// components/Stats/Stats.js - COMPLETE REDESIGN: Mobile-first responsive with desktop sidebar
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -19,7 +19,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [selectedBadge, setSelectedBadge] = useState(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   
-  // UPDATED: Enhanced trigger options with theater masks and brain icons to match Calendar
+  // Enhanced trigger options matching Calendar
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
     { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
@@ -115,7 +115,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       pointBorderColor: '#ffdd00',
       pointHoverBackgroundColor: '#f6cc00',
       pointHoverBorderColor: '#f6cc00',
-      // Better mobile interaction
       pointRadius: 6,
       pointHoverRadius: 8,
       pointBorderWidth: 2,
@@ -125,7 +124,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return { labels, datasets };
   };
   
-  // Chart options with better mobile interaction and custom tooltip styling
+  // Chart options with better mobile interaction
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -136,9 +135,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         ticks: {
           stepSize: 2,
           color: '#aaaaaa',
-          font: {
-            size: 12
-          }
+          font: { size: 12 }
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
@@ -148,9 +145,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       x: {
         ticks: {
           color: '#aaaaaa',
-          font: {
-            size: 12
-          }
+          font: { size: 12 }
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
@@ -159,9 +154,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       }
     },
     plugins: {
-      legend: {
-        display: false
-      },
+      legend: { display: false },
       tooltip: {
         callbacks: {
           title: (items) => {
@@ -179,20 +172,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         cornerRadius: 8,
         displayColors: false,
         padding: 12,
-        titleFont: {
-          size: 14,
-          weight: 'bold'
-        },
-        bodyFont: {
-          size: 13
-        }
+        titleFont: { size: 14, weight: 'bold' },
+        bodyFont: { size: 13 }
       }
     },
     interaction: {
       mode: 'index',
       intersect: false,
     },
-    // Better mobile touch interaction
     onHover: (event, activeElements) => {
       event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
     }
@@ -201,69 +188,66 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   // Calculate average for the selected metric
   const calculateAverage = () => {
     const filteredData = getFilteredBenefitData();
-    if (filteredData.length === 0) return 0;
+    if (filteredData.length === 0) return '0.0';
     
     const sum = filteredData.reduce((acc, item) => acc + (item[selectedMetric] || 0), 0);
     return (sum / filteredData.length).toFixed(1);
   };
   
-  // Generate streak comparison data (premium feature)
+  // Generate streak comparison data
   const generateStreakComparison = () => {
-    // In a real app, this would compare benefits across different streak lengths
     const filteredData = getFilteredBenefitData();
     
     if (filteredData.length === 0) {
       return {
-        confidence: { short: 5.0, medium: 5.0, long: 5.0 },
-        energy: { short: 5.0, medium: 5.0, long: 5.0 },
-        focus: { short: 5.0, medium: 5.0, long: 5.0 },
-        aura: { short: 5.0, medium: 5.0, long: 5.0 },
-        attraction: { short: 5.0, medium: 5.0, long: 5.0 },
-        workout: { short: 5.0, medium: 5.0, long: 5.0 }
+        confidence: { short: '5.0', medium: '5.0', long: '5.0' },
+        energy: { short: '5.0', medium: '5.0', long: '5.0' },
+        focus: { short: '5.0', medium: '5.0', long: '5.0' },
+        aura: { short: '5.0', medium: '5.0', long: '5.0' },
+        attraction: { short: '5.0', medium: '5.0', long: '5.0' },
+        workout: { short: '5.0', medium: '5.0', long: '5.0' }
       };
     }
     
-    // Use actual data with some mock progression
-    const baseValue = calculateAverage();
-    const base = parseFloat(baseValue);
+    const baseValue = parseFloat(calculateAverage());
     
     return {
       confidence: {
-        short: Math.max(1, base - 1.5).toFixed(1),
-        medium: base.toFixed(1),
-        long: Math.min(10, base + 1.2).toFixed(1)
+        short: Math.max(1, baseValue - 1.5).toFixed(1),
+        medium: baseValue.toFixed(1),
+        long: Math.min(10, baseValue + 1.2).toFixed(1)
       },
       energy: {
-        short: Math.max(1, base - 1.2).toFixed(1),
-        medium: base.toFixed(1),
-        long: Math.min(10, base + 1.5).toFixed(1)
+        short: Math.max(1, baseValue - 1.2).toFixed(1),
+        medium: baseValue.toFixed(1),
+        long: Math.min(10, baseValue + 1.5).toFixed(1)
       },
       focus: {
-        short: Math.max(1, base - 1.0).toFixed(1),
-        medium: base.toFixed(1),
-        long: Math.min(10, base + 1.3).toFixed(1)
+        short: Math.max(1, baseValue - 1.0).toFixed(1),
+        medium: baseValue.toFixed(1),
+        long: Math.min(10, baseValue + 1.3).toFixed(1)
       },
       aura: {
-        short: Math.max(1, base - 1.3).toFixed(1),
-        medium: base.toFixed(1),
-        long: Math.min(10, base + 1.1).toFixed(1)
+        short: Math.max(1, baseValue - 1.3).toFixed(1),
+        medium: baseValue.toFixed(1),
+        long: Math.min(10, baseValue + 1.1).toFixed(1)
       },
       attraction: {
-        short: Math.max(1, base - 1.4).toFixed(1),
-        medium: base.toFixed(1),
-        long: Math.min(10, base + 1.4).toFixed(1)
+        short: Math.max(1, baseValue - 1.4).toFixed(1),
+        medium: baseValue.toFixed(1),
+        long: Math.min(10, baseValue + 1.4).toFixed(1)
       },
       workout: {
-        short: Math.max(1, base - 0.8).toFixed(1),
-        medium: base.toFixed(1),
-        long: Math.min(10, base + 1.0).toFixed(1)
+        short: Math.max(1, baseValue - 0.8).toFixed(1),
+        medium: baseValue.toFixed(1),
+        long: Math.min(10, baseValue + 1.0).toFixed(1)
       }
     };
   };
   
   const streakComparison = generateStreakComparison();
   
-  // UPDATED: Generate insights for ALL 6 metrics, always return all of them
+  // Generate all insights for the 6 metrics
   const generateAllInsights = () => {
     const filteredData = getFilteredBenefitData();
     
@@ -303,13 +287,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
     
     const insights = [];
-    const recentData = filteredData.slice(-7); // Last 7 days
-    
-    // Helper function to calculate average for any metric
-    const calculateMetricAverage = (metric) => {
-      const sum = filteredData.reduce((acc, item) => acc + (item[metric] || 0), 0);
-      return (sum / filteredData.length).toFixed(1);
-    };
+    const recentData = filteredData.slice(-7);
     
     // Helper function to calculate recent average for any metric
     const calculateRecentAverage = (metric) => {
@@ -318,10 +296,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       return sum / recentData.length;
     };
     
-    // ENERGY INSIGHTS
+    // Generate insights for all 6 metrics
     const energyTrend = recentData.length > 1 ? 
       (recentData[recentData.length - 1].energy || 5) - (recentData[0].energy || 5) : 0;
-    const energyAvg = parseFloat(calculateMetricAverage('energy'));
+    const energyAvg = parseFloat(calculateAverage());
     
     if (energyTrend > 1.5) {
       insights.push({
@@ -349,7 +327,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     }
     
-    // FOCUS INSIGHTS
+    // Focus insights
     const focusAvg = calculateRecentAverage('focus');
     if (focusAvg > 7.5) {
       insights.push({
@@ -371,7 +349,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     }
     
-    // CONFIDENCE INSIGHTS
+    // Confidence insights
     const confidenceAvg = calculateRecentAverage('confidence');
     if (confidenceAvg > 7.5) {
       insights.push({
@@ -393,7 +371,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     }
     
-    // AURA INSIGHTS
+    // Aura insights
     const auraAvg = calculateRecentAverage('aura');
     if (auraAvg > 7.5) {
       insights.push({
@@ -415,7 +393,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     }
     
-    // ATTRACTION INSIGHTS
+    // Attraction insights
     const attractionAvg = calculateRecentAverage('attraction');
     if (attractionAvg > 7.5) {
       insights.push({
@@ -437,7 +415,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     }
     
-    // WORKOUT INSIGHTS
+    // Workout insights
     const workoutAvg = calculateRecentAverage('workout');
     if (workoutAvg > 7.5) {
       insights.push({
@@ -460,6 +438,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
     
     return insights;
+  };
+
+  // Get current insight for selected metric
+  const getCurrentInsight = () => {
+    const allInsights = generateAllInsights();
+    return allInsights.find(insight => insight.metric === selectedMetric) || allInsights[0];
   };
 
   // Generate pattern analysis for triggers and relapses
@@ -524,6 +508,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   return (
     <div className="stats-container">
+      {/* REDESIGNED: Header exactly like Tracker and Calendar */}
       <div className="stats-header">
         <div className="stats-header-spacer"></div>
         <h2>Your Stats</h2>
@@ -601,13 +586,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* Benefits Tracking Section */}
-      <div className="benefits-section">
+      {/* REDESIGNED: Benefit Tracker Section */}
+      <div className="benefit-tracker-section">
         {isPremium ? (
           <>
-            {/* FIXED: 3-row pill layout */}
-            <div className="benefits-controls">
-              <h3 className="benefits-controls-header">Benefit Visualizer</h3>
+            <h3>Benefit Tracker</h3>
+            
+            {/* Controls with 3-row pill layout */}
+            <div className="benefit-tracker-controls">
               <div className="metric-selector">
                 {/* ROW 1: Energy, Focus, Confidence */}
                 <div className="metric-pill-container-row1">
@@ -679,50 +665,70 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            <div className="chart-container-connected">
-              <Line data={generateChartData()} options={chartOptions} height={300} />
-            </div>
-            
-            <div className="benefits-insights-section">
-              <h4>Benefit Insights</h4>
-              
-              <div className="average-stat-integrated">
-                <div className="stat-label">Average {selectedMetric}</div>
-                <div className="stat-value">{calculateAverage()}/10</div>
+            {/* REDESIGNED: Chart with Sidebar Layout (Desktop) / Stacked (Mobile) */}
+            <div className="chart-and-insight-container">
+              <div className="chart-container">
+                <Line data={generateChartData()} options={chartOptions} height={300} />
               </div>
               
+              {/* Current Insight Sidebar (Desktop) / Card (Mobile) */}
+              <div className="current-insight-sidebar">
+                <div className="current-metric-average">
+                  <div className="current-metric-label">Average {selectedMetric}</div>
+                  <div className="current-metric-value">{calculateAverage()}/10</div>
+                </div>
+                
+                <div className="current-insight-card">
+                  <div className="current-insight-header">
+                    <FaRegLightbulb className="insight-icon" />
+                    <span>Current Insight</span>
+                  </div>
+                  <div className="current-insight-text">
+                    {getCurrentInsight().text}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* REDESIGNED: Detailed Analysis Section */}
+            <div className="detailed-analysis-section">
+              <h4>Detailed Analysis</h4>
+              
               <div className="streak-comparison">
-                <h5>Benefit Levels by Streak Length</h5>
+                <h5>{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Levels by Streak Length</h5>
                 
                 <div className="comparison-grid">
                   <div className="comparison-card">
-                    <div className="comparison-value">{streakComparison[selectedMetric].short}</div>
+                    <div className="comparison-value">{streakComparison[selectedMetric].short}/10</div>
                     <div className="comparison-label">1-7 Days</div>
                   </div>
                   
                   <div className="comparison-card">
-                    <div className="comparison-value">{streakComparison[selectedMetric].medium}</div>
+                    <div className="comparison-value">{streakComparison[selectedMetric].medium}/10</div>
                     <div className="comparison-label">8-30 Days</div>
                   </div>
                   
                   <div className="comparison-card">
-                    <div className="comparison-value">{streakComparison[selectedMetric].long}</div>
+                    <div className="comparison-value">{streakComparison[selectedMetric].long}/10</div>
                     <div className="comparison-label">30+ Days</div>
                   </div>
                 </div>
               </div>
               
-              <div className="analysis-insights">
+              <div className="personalized-analysis">
                 <h5>Personalized Analysis</h5>
                 
-                <div className="insights-list">
+                <div className="insights-grid">
                   {generateAllInsights().map(insight => (
                     <div 
                       key={insight.id} 
-                      className={`insight-item ${insight.metric === selectedMetric ? 'highlighted' : ''}`}
+                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''}`}
                     >
-                      <FaRegLightbulb className="insight-icon" />
-                      <span>{insight.text}</span>
+                      <div className="insight-card-header">
+                        <FaRegLightbulb className="insight-icon" />
+                        <span className="insight-metric">{insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
+                      </div>
+                      <div className="insight-text">{insight.text}</div>
                     </div>
                   ))}
                 </div>
