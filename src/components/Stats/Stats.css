@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - COMPLETE REDESIGN: Mobile-first responsive with desktop sidebar */
+/* components/Stats/Stats.css - UPDATED: Added Wisdom Toggle Styling */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -44,6 +44,47 @@
   font-weight: 500;
   cursor: pointer;
   transition: none;
+}
+
+/* NEW: Wisdom Toggle Button Styling */
+.wisdom-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xs);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.wisdom-toggle-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.3);
+}
+
+.wisdom-eye {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.wisdom-eye.active {
+  color: var(--primary);
+  filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.5));
+}
+
+.wisdom-toggle-btn:hover .wisdom-eye {
+  color: var(--primary);
+}
+
+/* Section Wisdom Toggle - for headers */
+.section-wisdom-toggle {
+  margin-left: var(--spacing-sm);
 }
 
 /* Streak Statistics - maintain consistent card heights */
@@ -369,7 +410,7 @@
   justify-content: center; /* ADDED: Vertically center all content */
 }
 
-/* FIXED: Lightbulb icon positioning - near the centered text instead of left edge */
+/* UPDATED: Insight header with wisdom toggle button */
 .current-insight-header {
   display: flex;
   align-items: center;
@@ -377,20 +418,14 @@
   font-weight: 600;
   color: var(--text);
   justify-content: center; /* ADDED: Center the entire header */
-  position: relative; /* REMOVED: No longer needed for absolute positioning */
+  position: relative;
 }
 
 .current-insight-header .insight-icon {
   color: var(--primary);
   font-size: 1.125rem;
-  /* FIXED: Remove absolute positioning - let it flow naturally next to text */
   position: static;
   left: auto;
-}
-
-/* REMOVED: Special span centering since icon is now inline */
-.current-insight-header span {
-  /* Text flows naturally next to icon */
 }
 
 .current-insight-text {
@@ -415,13 +450,22 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* NEW: Detailed analysis header with wisdom toggle */
+.detailed-analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
 .detailed-analysis-section h4 {
-  margin-bottom: var(--spacing-lg); /* FIXED: Match Pattern Insights exactly */
+  margin: 0;
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
   font-weight: 600;
-  position: relative; /* ADDED: For the glow line */
+  position: relative;
 }
 
 /* ADDED: Yellow glow line like Pattern Analysis */
@@ -661,8 +705,17 @@
   border-top: 3px solid rgba(255, 221, 0, 0.3);
 }
 
-.pattern-analysis-section h3 {
+/* NEW: Pattern analysis header with wisdom toggle */
+.pattern-analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-lg);
+}
+
+.pattern-analysis-section h3 {
+  margin: 0;
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
