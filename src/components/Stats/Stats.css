@@ -405,16 +405,21 @@
   justify-content: center; /* ADDED: Vertically center all content */
 }
 
-/* UPDATED: Insight header with wisdom toggle button - FIXED: Relative positioning for absolute child */
+/* UPDATED: Insight header with wisdom toggle button - FIXED: Perfect centering */
 .current-insight-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  justify-content: center;
   font-weight: 600;
   color: var(--text);
-  justify-content: center;
   position: relative; /* NEEDED: For absolute positioning of eye button */
-  padding-right: 36px; /* ADDED: Space for the eye button so text stays centered */
+  width: 100%; /* ADDED: Full width for proper centering */
+}
+
+.current-insight-header span {
+  position: absolute; /* ADDED: Absolute positioning for perfect centering */
+  left: 50%; /* ADDED: Center horizontally */
+  transform: translateX(-50%); /* ADDED: Perfect center alignment */
 }
 
 .current-insight-header .insight-icon {
@@ -444,14 +449,14 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* NEW: Detailed analysis header with wisdom toggle - FIXED: Relative positioning */
+/* NEW: Detailed analysis header with wisdom toggle - FIXED: Perfect centering */
 .detailed-analysis-header {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative; /* ADDED: For absolute positioning of eye button */
   margin-bottom: var(--spacing-lg);
-  padding-right: 36px; /* ADDED: Space for the eye button so text stays centered */
+  width: 100%; /* ADDED: Full width for proper centering */
 }
 
 .detailed-analysis-section h4 {
@@ -460,7 +465,9 @@
   color: var(--text);
   text-align: center;
   font-weight: 600;
-  position: relative;
+  position: absolute; /* ADDED: Absolute positioning for perfect centering */
+  left: 50%; /* ADDED: Center horizontally */
+  transform: translateX(-50%); /* ADDED: Perfect center alignment */
 }
 
 /* ADDED: Yellow glow line like Pattern Analysis */
@@ -700,14 +707,14 @@
   border-top: 3px solid rgba(255, 221, 0, 0.3);
 }
 
-/* NEW: Pattern analysis header with wisdom toggle - FIXED: Relative positioning */
+/* NEW: Pattern analysis header with wisdom toggle - FIXED: Perfect centering */
 .pattern-analysis-header {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative; /* ADDED: For absolute positioning of eye button */
   margin-bottom: var(--spacing-lg);
-  padding-right: 36px; /* ADDED: Space for the eye button so text stays centered */
+  width: 100%; /* ADDED: Full width for proper centering */
 }
 
 .pattern-analysis-section h3 {
@@ -715,7 +722,9 @@
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
-  position: relative;
+  position: absolute; /* ADDED: Absolute positioning for perfect centering */
+  left: 50%; /* ADDED: Center horizontally */
+  transform: translateX(-50%); /* ADDED: Perfect center alignment */
 }
 
 .pattern-analysis-section h3::after {
