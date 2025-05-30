@@ -46,7 +46,7 @@
   transition: none;
 }
 
-/* NEW: Wisdom Toggle Button Styling */
+/* NEW: Wisdom Toggle Button Styling - FIXED: No hover animations, proper positioning */
 .wisdom-toggle-btn {
   display: flex;
   align-items: center;
@@ -56,35 +56,30 @@
   border: 1px solid var(--border);
   border-radius: 50%;
   cursor: pointer;
-  transition: all 0.2s ease;
-  width: 32px;
-  height: 32px;
+  transition: none; /* REMOVED: No hover animations to fix mobile sticky hover */
+  width: 28px; /* REDUCED: Smaller for better proportion */
+  height: 28px;
   flex-shrink: 0;
-}
-
-.wisdom-toggle-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.3);
+  position: absolute; /* ADDED: Absolute positioning to prevent header movement */
+  right: 0; /* ADDED: Position to the right */
+  top: 50%; /* ADDED: Center vertically */
+  transform: translateY(-50%); /* ADDED: Perfect vertical centering */
 }
 
 .wisdom-eye {
-  font-size: 1rem;
+  font-size: 0.875rem; /* REDUCED: Smaller icon */
   color: var(--text-secondary);
-  transition: all 0.2s ease;
+  transition: none; /* REMOVED: No transitions for mobile compatibility */
 }
 
 .wisdom-eye.active {
   color: var(--primary);
-  filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.5));
+  /* REMOVED: Drop shadow to keep it simple and avoid rendering issues */
 }
 
-.wisdom-toggle-btn:hover .wisdom-eye {
-  color: var(--primary);
-}
-
-/* Section Wisdom Toggle - for headers */
+/* Section Wisdom Toggle - for headers - FIXED: Absolute positioning */
 .section-wisdom-toggle {
-  margin-left: var(--spacing-sm);
+  /* REMOVED: margin-left since we're using absolute positioning */
 }
 
 /* Streak Statistics - maintain consistent card heights */
@@ -410,22 +405,21 @@
   justify-content: center; /* ADDED: Vertically center all content */
 }
 
-/* UPDATED: Insight header with wisdom toggle button */
+/* UPDATED: Insight header with wisdom toggle button - FIXED: Relative positioning for absolute child */
 .current-insight-header {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   font-weight: 600;
   color: var(--text);
-  justify-content: center; /* ADDED: Center the entire header */
-  position: relative;
+  justify-content: center;
+  position: relative; /* NEEDED: For absolute positioning of eye button */
+  padding-right: 36px; /* ADDED: Space for the eye button so text stays centered */
 }
 
 .current-insight-header .insight-icon {
-  color: var(--primary);
-  font-size: 1.125rem;
-  position: static;
-  left: auto;
+  /* REMOVED: Light bulb icon as requested */
+  display: none;
 }
 
 .current-insight-text {
@@ -450,13 +444,14 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* NEW: Detailed analysis header with wisdom toggle */
+/* NEW: Detailed analysis header with wisdom toggle - FIXED: Relative positioning */
 .detailed-analysis-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
+  position: relative; /* ADDED: For absolute positioning of eye button */
   margin-bottom: var(--spacing-lg);
+  padding-right: 36px; /* ADDED: Space for the eye button so text stays centered */
 }
 
 .detailed-analysis-section h4 {
@@ -705,13 +700,14 @@
   border-top: 3px solid rgba(255, 221, 0, 0.3);
 }
 
-/* NEW: Pattern analysis header with wisdom toggle */
+/* NEW: Pattern analysis header with wisdom toggle - FIXED: Relative positioning */
 .pattern-analysis-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
+  position: relative; /* ADDED: For absolute positioning of eye button */
   margin-bottom: var(--spacing-lg);
+  padding-right: 36px; /* ADDED: Space for the eye button so text stays centered */
 }
 
 .pattern-analysis-section h3 {
