@@ -1094,12 +1094,4 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats;id: insights.length + 1,
-          practical: `Your cycle averages ${avgLength} days - you're still in the initial adaptation phase where willpower is weakest.`,
-          esoteric: `Your cycle averages ${avgLength} days - you're in the physical purification phase.`,
-          actionable: wisdomMode ?
-            "Focus on grounding practices: cold showers, exercise, and avoiding stimulating content during this foundational period." :
-            "Focus on building basic habits: avoid triggers, stay busy, and use accountability during this challenging period."
-        });
-      } else if (avgLength < 14) {
-        insights.push({
+export default Stats;
