@@ -124,23 +124,27 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return { labels, datasets };
   };
   
-  // FIXED: Chart options with Y-axis extended to 10.5 to prevent dot clipping
+  // FIXED: Chart options - extend grid lines beyond 10 but keep clean 0-10 labels
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
       y: {
         min: 0,
-        max: 10.5, // PERFECT: Extended just to 10.5 - gives dots breathing room without extra grid lines
+        max: 10.5, // EXTENDED: Gives grid lines breathing room beyond 10
         ticks: {
           stepSize: 2,
           color: '#aaaaaa',
-          font: { size: 12 }
-          // REMOVED: No callback needed since 10.5 won't show as a tick anyway
+          font: { size: 12 },
+          // ADDED: Only show clean 0-10 labels, hide anything above 10
+          callback: function(value) {
+            return value <= 10 ? value : '';
+          }
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
-          drawBorder: false
+          drawBorder: false, // REMOVED: No top/bottom border lines
+          lineWidth: 1
         }
       },
       x: {
