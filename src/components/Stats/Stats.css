@@ -416,7 +416,7 @@
 }
 
 .detailed-analysis-section h4 {
-  margin: var(--spacing-xl) 0 var(--spacing-lg) 0; /* FIXED: Match Pattern Insights top spacing */
+  margin: var(--spacing-lg) 0 var(--spacing-lg) 0; /* FIXED: Match Pattern Insights spacing exactly */
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
@@ -492,7 +492,7 @@
 
 /* Personalized Analysis */
 .personalized-analysis h5 {
-  margin: var(--spacing-xl) 0 var(--spacing-lg) 0; /* FIXED: Centered in gap - more space above, normal below */
+  margin: var(--spacing-md) 0 var(--spacing-md) 0; /* FIXED: Smaller margins to center in gap */
   font-size: 1rem;
   color: var(--text);
   text-align: center; /* CHANGED: Centered the header */
