@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - COMPLETE REDESIGN: Mobile-first responsive with desktop sidebar
+// components/Stats/Stats.js - FIXED: Extended Y-axis to prevent dot clipping
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -124,18 +124,22 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return { labels, datasets };
   };
   
-  // Chart options with better mobile interaction
+  // FIXED: Chart options with extended Y-axis to prevent dot clipping
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
       y: {
         min: 0,
-        max: 10,
+        max: 11, // CHANGED: Extended from 10 to 11 to give dots breathing room
         ticks: {
           stepSize: 2,
           color: '#aaaaaa',
-          font: { size: 12 }
+          font: { size: 12 },
+          // ADDED: Custom callback to only show ticks 0, 2, 4, 6, 8, 10 (hide 11)
+          callback: function(value) {
+            return value <= 10 ? value : '';
+          }
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
@@ -774,101 +778,3 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
           </div>
-        )}
-      </div>
-      
-      {/* Pattern Analysis Section */}
-      <div className="pattern-analysis-section">
-        <h3>Pattern Insights</h3>
-        
-        <div className="pattern-insights">
-          {generatePatternInsights().length > 0 ? (
-            generatePatternInsights().map(insight => (
-              <div key={insight.id} className="pattern-insight-item">
-                <div className="pattern-text">{insight.pattern}</div>
-                <div className="pattern-actionable">{insight.actionable}</div>
-              </div>
-            ))
-          ) : (
-            <div className="no-patterns">
-              <FaInfoCircle className="no-patterns-icon" />
-              <span>Track more streaks to discover your personal patterns and triggers.</span>
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Badge Modal */}
-      {showBadgeModal && selectedBadge && (
-        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
-          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
-            <div className="badge-trophy">
-              <FaMedal className="badge-trophy-icon" />
-            </div>
-            
-            <h3>{selectedBadge.name}</h3>
-            
-            <div className="badge-earned-date">
-              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
-            </div>
-            
-            <div className="badge-description">
-              <p>
-                {
-                  selectedBadge.name === '7-Day Warrior' ? 
-                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
-                  selectedBadge.name === '14-Day Monk' ? 
-                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
-                  selectedBadge.name === '30-Day Master' ? 
-                    'A full month of retention! Your willpower is exceptional, and the benefits are becoming more pronounced.' :
-                  selectedBadge.name === '90-Day King' ? 
-                    'The ultimate achievement! 90 days of complete discipline. You\'ve mastered your impulses and transformed your life.' :
-                    'Congratulations on earning this achievement badge!'
-                }
-              </p>
-            </div>
-            
-            <div className="badge-benefits">
-              <h4>Unlock Benefits:</h4>
-              <ul>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>New affirmations in the Urge Toolkit</span>
-                </li>
-                {selectedBadge.name !== '7-Day Warrior' && (
-                  <li>
-                    <FaCheckCircle className="check-icon" />
-                    <span>Exclusive challenges in the Community tab</span>
-                  </li>
-                )}
-                {(selectedBadge.name === '30-Day Master' || selectedBadge.name === '90-Day King') && (
-                  <li>
-                    <FaCheckCircle className="check-icon" />
-                    <span>Special Discord role and recognition</span>
-                  </li>
-                )}
-              </ul>
-            </div>
-            
-            <div className="modal-actions">
-              {isPremium ? (
-                <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
-                  Share Achievement
-                </button>
-              ) : (
-                <button className="btn btn-primary">
-                  Upgrade to Share
-                </button>
-              )}
-              <button className="btn btn-outline" onClick={() => setShowBadgeModal(false)}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Stats;
