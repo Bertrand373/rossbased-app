@@ -700,17 +700,17 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 <div className="comparison-grid">
                   <div className="comparison-card">
                     <div className="comparison-value">{streakComparison[selectedMetric].short}/10</div>
-                    <div className="comparison-label">1-7 Day Streak</div>
+                    <div className="comparison-label">{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 1-7 day streaks</div>
                   </div>
                   
                   <div className="comparison-card">
                     <div className="comparison-value">{streakComparison[selectedMetric].medium}/10</div>
-                    <div className="comparison-label">8-30 Day Streak</div>
+                    <div className="comparison-label">{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 8-30 day streaks</div>
                   </div>
                   
                   <div className="comparison-card">
                     <div className="comparison-value">{streakComparison[selectedMetric].long}/10</div>
-                    <div className="comparison-label">30+ Day Streak</div>
+                    <div className="comparison-label">{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 30+ day streaks</div>
                   </div>
                 </div>
               </div>
