@@ -1,5 +1,5 @@
-// components/Stats/Stats.js - UPDATED: Wisdom Toggle with Eye Icon for Practical vs Esoteric Insights
-import React, { useState } from 'react';
+// components/Stats/Stats.js - UPDATED: Smart Floating Toggle that shows only when relevant
+import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
@@ -22,6 +22,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   // NEW: Wisdom toggle states
   const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
   
+  // NEW: Smart floating toggle visibility
+  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
+  
+  // NEW: Refs for scroll detection
+  const insightsStartRef = useRef(null); // Current insight section start
+  const patternSectionRef = useRef(null); // Pattern analysis section
+  
   // Enhanced trigger options matching Calendar
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
@@ -33,6 +40,48 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     { id: 'home_alone', label: 'Being Home Alone', icon: FaHome },
     { id: 'explicit_content', label: 'Explicit Content', icon: FaTheaterMasks }
   ];
+  
+  // NEW: Smart scroll detection for floating toggle
+  useEffect(() => {
+    const handleScroll = () => {
+      // Only show toggle if premium (since free users don't see insights)
+      if (!isPremium) {
+        setShowFloatingToggle(false);
+        return;
+      }
+      
+      const insightsStart = insightsStartRef.current;
+      const patternSection = patternSectionRef.current;
+      
+      if (!insightsStart || !patternSection) return;
+      
+      // Get scroll position and element positions
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      
+      // Get positions relative to document
+      const insightsStartTop = insightsStart.getBoundingClientRect().top + scrollTop;
+      const patternSectionBottom = patternSection.getBoundingClientRect().bottom + scrollTop;
+      
+      // Show toggle when:
+      // 1. User has scrolled to the insights section start
+      // 2. User hasn't scrolled past the pattern analysis section
+      const shouldShow = 
+        scrollTop + windowHeight >= insightsStartTop && // Reached insights area
+        scrollTop < patternSectionBottom - windowHeight; // Haven't passed pattern section
+      
+      setShowFloatingToggle(shouldShow);
+    };
+    
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll);
+    
+    // Check initial position
+    handleScroll();
+    
+    // Cleanup
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isPremium]); // Re-run when premium status changes
   
   // Time range options for chart
   const timeRangeOptions = {
@@ -604,15 +653,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         insights.push({
           id: insights.length + 1,
           practical: `Your cycle averages ${avgLength} days - you're still in the initial adaptation phase where willpower is weakest.`,
-          esoteric: `Your cycle averages ${avgLength} days - you're in the physical purification phase.`,
-          actionable: wisdomMode ?
-            "Focus on grounding practices: cold showers, exercise, and avoiding stimulating content during this foundational period." :
-            "Focus on building basic habits: avoid triggers, stay busy, and use accountability during this challenging period."
-        });
-      } else if (avgLength < 14) {
-        insights.push({
-          id: insights.length + 1,
-          practical: `Your ${avgLength}-day cycles suggest you've mastered initial urges but struggle with medium-term discipline.`,
           esoteric: `Your ${avgLength}-day cycles suggest you're transcending the physical but not yet stabilized in the emotional realm.`,
           actionable: wisdomMode ?
             "Days 7-14 test emotional equilibrium. Practice emotional alchemy: transform frustration into determination." :
@@ -677,14 +717,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   return (
     <div className="stats-container">
-      {/* Floating Wisdom Toggle - Global control for all insights */}
-      <button 
-        className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
-        onClick={() => setWisdomMode(!wisdomMode)}
-        title={wisdomMode ? "Switch to Practical Insights" : "Switch to Esoteric Insights"}
-      >
-        <FaEye className={`floating-wisdom-eye ${wisdomMode ? 'active' : ''}`} />
-      </button>
+      {/* Smart Floating Wisdom Toggle - Only shows when insights are visible */}
+      {showFloatingToggle && (
+        <button 
+          className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
+          onClick={() => setWisdomMode(!wisdomMode)}
+          title={wisdomMode ? "Switch to Practical Insights" : "Switch to Esoteric Insights"}
+        >
+          <FaEye className={`floating-wisdom-eye ${wisdomMode ? 'active' : ''}`} />
+        </button>
+      )}
 
       {/* REDESIGNED: Header exactly like Tracker and Calendar */}
       <div className="stats-header">
@@ -849,8 +891,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 <Line data={generateChartData()} options={chartOptions} height={300} />
               </div>
               
-              {/* Current Insight Sidebar (Desktop) / Card (Mobile) */}
-              <div className="current-insight-sidebar">
+              {/* Current Insight Sidebar (Desktop) / Card (Mobile) - REF MARKER for scroll detection */}
+              <div className="current-insight-sidebar" ref={insightsStartRef}>
                 <div className="current-metric-average">
                   <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric}</div>
                   <div className="current-metric-value">{calculateAverage()}/10</div>
@@ -955,8 +997,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         )}
       </div>
       
-      {/* UPDATED: Pattern Analysis Section with Wisdom Toggle */}
-      <div className="pattern-analysis-section">
+      {/* UPDATED: Pattern Analysis Section with Wisdom Toggle - REF MARKER for scroll detection */}
+      <div className="pattern-analysis-section" ref={patternSectionRef}>
         <h3>Pattern Insights</h3>
         
         <div className="pattern-insights">
@@ -1052,4 +1094,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats;
+export default Stats; cycle averages ${avgLength} days - you're in the physical purification phase.`,
+          actionable: wisdomMode ?
+            "Focus on grounding practices: cold showers, exercise, and avoiding stimulating content during this foundational period." :
+            "Focus on building basic habits: avoid triggers, stay busy, and use accountability during this challenging period."
+        });
+      } else if (avgLength < 14) {
+        insights.push({
+          id: insights.length + 1,
+          practical: `Your ${avgLength}-day cycles suggest you've mastered initial urges but struggle with medium-term discipline.`,
+          esoteric: `Your
