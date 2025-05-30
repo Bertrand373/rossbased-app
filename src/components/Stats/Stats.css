@@ -46,41 +46,55 @@
   transition: none;
 }
 
-/* NEW: Wisdom Toggle Button Styling - FIXED: No hover animations, proper positioning */
-.wisdom-toggle-btn {
+/* FLOATING WISDOM TOGGLE - Clean implementation without affecting layouts */
+.floating-wisdom-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background-color: var(--card-background);
+  border: 2px solid var(--border);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xs);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: 50%;
   cursor: pointer;
-  transition: none; /* REMOVED: No hover animations to fix mobile sticky hover */
-  width: 28px; /* REDUCED: Smaller for better proportion */
-  height: 28px;
-  flex-shrink: 0;
-  position: absolute; /* ADDED: Absolute positioning to prevent header movement */
-  right: 0; /* ADDED: Position to the right */
-  top: 50%; /* ADDED: Center vertically */
-  transform: translateY(-50%); /* ADDED: Perfect vertical centering */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  transition: none;
 }
 
-.wisdom-eye {
-  font-size: 0.875rem; /* REDUCED: Smaller icon */
+.floating-wisdom-toggle.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: var(--primary);
+}
+
+.floating-wisdom-eye {
+  font-size: 1.25rem;
   color: var(--text-secondary);
-  transition: none; /* REMOVED: No transitions for mobile compatibility */
+  transition: none;
 }
 
-.wisdom-eye.active {
+.floating-wisdom-eye.active {
   color: var(--primary);
-  /* REMOVED: Drop shadow to keep it simple and avoid rendering issues */
 }
 
-/* Section Wisdom Toggle - for headers - FIXED: Absolute positioning */
-.section-wisdom-toggle {
-  /* REMOVED: margin-left since we're using absolute positioning */
+/* Mobile: Position above mobile navigation */
+@media (max-width: 768px) {
+  .floating-wisdom-toggle {
+    bottom: 100px; /* Above mobile navigation */
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .floating-wisdom-eye {
+    font-size: 1.125rem;
+  }
 }
+
+/* REVERTED: All section headers back to original styling */
 
 /* Streak Statistics - maintain consistent card heights */
 .streak-stats {
@@ -405,26 +419,39 @@
   justify-content: center; /* ADDED: Vertically center all content */
 }
 
-/* UPDATED: Insight header with wisdom toggle button - FIXED: Perfect centering */
+/* REVERTED: Current Insight header back to original */
+.current-insight-card {
+  padding: var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  justify-content: center;
+}
+
 .current-insight-header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: var(--spacing-sm);
   font-weight: 600;
   color: var(--text);
-  position: relative; /* NEEDED: For absolute positioning of eye button */
-  width: 100%; /* ADDED: Full width for proper centering */
-}
-
-.current-insight-header span {
-  position: absolute; /* ADDED: Absolute positioning for perfect centering */
-  left: 50%; /* ADDED: Center horizontally */
-  transform: translateX(-50%); /* ADDED: Perfect center alignment */
+  justify-content: center;
 }
 
 .current-insight-header .insight-icon {
-  /* REMOVED: Light bulb icon as requested */
-  display: none;
+  color: var(--primary);
+  font-size: 1.125rem;
+}
+
+.current-insight-text {
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-weight: 500;
+  text-align: center;
 }
 
 .current-insight-text {
@@ -435,7 +462,7 @@
   text-align: center; /* CHANGED: Center-aligned the insight text */
 }
 
-/* REDESIGNED: Detailed Analysis Section */
+/* REVERTED: Detailed Analysis section back to original */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -444,19 +471,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  /* ADDED: Same premium styling as Pattern Analysis */
   border-top: 3px solid rgba(255, 221, 0, 0.3);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* NEW: Detailed analysis header with wisdom toggle - FIXED: Perfect centering */
-.detailed-analysis-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative; /* ADDED: For absolute positioning of eye button */
-  margin-bottom: var(--spacing-lg);
-  width: 100%; /* ADDED: Full width for proper centering */
 }
 
 .detailed-analysis-section h4 {
@@ -465,12 +481,10 @@
   color: var(--text);
   text-align: center;
   font-weight: 600;
-  position: absolute; /* ADDED: Absolute positioning for perfect centering */
-  left: 50%; /* ADDED: Center horizontally */
-  transform: translateX(-50%); /* ADDED: Perfect center alignment */
+  position: relative;
+  margin-bottom: var(--spacing-lg);
 }
 
-/* ADDED: Yellow glow line like Pattern Analysis */
 .detailed-analysis-section h4::after {
   content: '';
   position: absolute;
@@ -697,7 +711,7 @@
   color: var(--text);
 }
 
-/* Pattern Analysis Section */
+/* REVERTED: Pattern Analysis section back to original */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -707,24 +721,13 @@
   border-top: 3px solid rgba(255, 221, 0, 0.3);
 }
 
-/* NEW: Pattern analysis header with wisdom toggle - FIXED: Perfect centering */
-.pattern-analysis-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative; /* ADDED: For absolute positioning of eye button */
-  margin-bottom: var(--spacing-lg);
-  width: 100%; /* ADDED: Full width for proper centering */
-}
-
 .pattern-analysis-section h3 {
   margin: 0;
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
-  position: absolute; /* ADDED: Absolute positioning for perfect centering */
-  left: 50%; /* ADDED: Center horizontally */
-  transform: translateX(-50%); /* ADDED: Perfect center alignment */
+  position: relative;
+  margin-bottom: var(--spacing-lg);
 }
 
 .pattern-analysis-section h3::after {

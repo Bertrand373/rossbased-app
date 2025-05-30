@@ -677,6 +677,15 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   return (
     <div className="stats-container">
+      {/* Floating Wisdom Toggle - Global control for all insights */}
+      <button 
+        className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
+        onClick={() => setWisdomMode(!wisdomMode)}
+        title={wisdomMode ? "Switch to Practical Insights" : "Switch to Esoteric Insights"}
+      >
+        <FaEye className={`floating-wisdom-eye ${wisdomMode ? 'active' : ''}`} />
+      </button>
+
       {/* REDESIGNED: Header exactly like Tracker and Calendar */}
       <div className="stats-header">
         <div className="stats-header-spacer"></div>
@@ -849,14 +858,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 
                 <div className="current-insight-card">
                   <div className="current-insight-header">
+                    <FaRegLightbulb className="insight-icon" />
                     <span>Current Insight</span>
-                    <button 
-                      className="wisdom-toggle-btn"
-                      onClick={() => setWisdomMode(!wisdomMode)}
-                      title={wisdomMode ? "Switch to Practical Insights" : "Switch to Esoteric Insights"}
-                    >
-                      <FaEye className={`wisdom-eye ${wisdomMode ? 'active' : ''}`} />
-                    </button>
                   </div>
                   <div className="current-insight-text">
                     {getCurrentInsight()}
@@ -867,16 +870,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             
             {/* REDESIGNED: Detailed Analysis Section */}
             <div className="detailed-analysis-section">
-              <div className="detailed-analysis-header">
-                <h4>Detailed Analysis</h4>
-                <button 
-                  className="wisdom-toggle-btn section-wisdom-toggle"
-                  onClick={() => setWisdomMode(!wisdomMode)}
-                  title={wisdomMode ? "Switch to Practical Insights" : "Switch to Esoteric Insights"}
-                >
-                  <FaEye className={`wisdom-eye ${wisdomMode ? 'active' : ''}`} />
-                </button>
-              </div>
+              <h4>Detailed Analysis</h4>
               
               <div className="streak-comparison">
                 <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
@@ -963,16 +957,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       
       {/* UPDATED: Pattern Analysis Section with Wisdom Toggle */}
       <div className="pattern-analysis-section">
-        <div className="pattern-analysis-header">
-          <h3>Pattern Insights</h3>
-          <button 
-            className="wisdom-toggle-btn section-wisdom-toggle"
-            onClick={() => setWisdomMode(!wisdomMode)}
-            title={wisdomMode ? "Switch to Practical Insights" : "Switch to Esoteric Insights"}
-          >
-            <FaEye className={`wisdom-eye ${wisdomMode ? 'active' : ''}`} />
-          </button>
-        </div>
+        <h3>Pattern Insights</h3>
         
         <div className="pattern-insights">
           {generatePatternInsights().length > 0 ? (
