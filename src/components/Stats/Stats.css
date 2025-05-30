@@ -369,26 +369,28 @@
   justify-content: center; /* ADDED: Vertically center all content */
 }
 
+/* FIXED: Lightbulb icon positioning - near the centered text instead of left edge */
 .current-insight-header {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   font-weight: 600;
   color: var(--text);
-  justify-content: center; /* ADDED: Center the header */
-  position: relative; /* ADDED: For absolute positioning of icon */
+  justify-content: center; /* ADDED: Center the entire header */
+  position: relative; /* REMOVED: No longer needed for absolute positioning */
 }
 
 .current-insight-header .insight-icon {
   color: var(--primary);
   font-size: 1.125rem;
-  position: absolute; /* CHANGED: Position absolutely */
-  left: -30px; /* ADDED: Position to the left of text */
+  /* FIXED: Remove absolute positioning - let it flow naturally next to text */
+  position: static;
+  left: auto;
 }
 
-/* ADDED: Ensure text centering is independent of icon */
+/* REMOVED: Special span centering since icon is now inline */
 .current-insight-header span {
-  text-align: center;
+  /* Text flows naturally next to icon */
 }
 
 .current-insight-text {
