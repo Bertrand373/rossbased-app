@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Yellow styling for benefits logged status */
+/* components/Tracker/Tracker.css - UPDATED: Grey relapse button styling */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -169,14 +169,18 @@
   border: 1px solid;
 }
 
-.relapse-btn {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: var(--danger);
-  border-color: var(--danger);
+/* NEW: Grey relapse button - styled exactly like action-btn but with hover animations */
+.relapse-btn-grey {
+  background-color: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--border);
 }
 
-.relapse-btn:hover {
-  background-color: rgba(239, 68, 68, 0.2);
+.relapse-btn-grey:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text);
+  color: var(--text);
+  transform: scale(1.05);
 }
 
 .wetdream-btn {

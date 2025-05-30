@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - FIXED: Syntax errors corrected
+// components/Tracker/Tracker.js - UPDATED: Sleep Quality replaces Attraction + Grey Relapse Button
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -37,13 +37,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [currentNote, setCurrentNote] = useState('');
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   
-  // Benefit tracking states
+  // UPDATED: Benefit tracking states - Sleep Quality replaces Attraction
   const [todayBenefits, setTodayBenefits] = useState({ 
     energy: 5, 
     focus: 5, 
     confidence: 5, 
     aura: 5, 
-    attraction: 5, 
+    sleep: 5,  // CHANGED: sleep replaces attraction
     workout: 5 
   });
   const [benefitsLogged, setBenefitsLogged] = useState(false);
@@ -66,7 +66,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         focus: existingBenefits.focus,
         confidence: existingBenefits.confidence,
         aura: existingBenefits.aura || 5,
-        attraction: existingBenefits.attraction || 5,
+        sleep: existingBenefits.sleep || existingBenefits.attraction || 5, // MIGRATION: Handle old attraction data
         workout: existingBenefits.workout || existingBenefits.gymPerformance || 5
       });
       setBenefitsLogged(true);
@@ -388,7 +388,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       focus: todayBenefits.focus,
       confidence: todayBenefits.confidence,
       aura: todayBenefits.aura,
-      attraction: todayBenefits.attraction,
+      sleep: todayBenefits.sleep, // CHANGED: sleep replaces attraction
       workout: todayBenefits.workout
     });
     
@@ -697,7 +697,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           
           <div className="streak-actions">
             <button 
-              className="streak-action-btn relapse-btn"
+              className="streak-action-btn relapse-btn-grey"
               onClick={handleRelapse}
             >
               <FaTimes />
@@ -723,7 +723,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* UPDATED: Benefit Logging Section with header inside container */}
+      {/* UPDATED: Benefit Logging Section with Sleep Quality */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -817,15 +817,15 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             <div className="benefit-slider-item">
               <div className="benefit-slider-header">
-                <span className="benefit-label">Attraction</span>
-                <span className="benefit-value">{todayBenefits.attraction}/10</span>
+                <span className="benefit-label">Sleep Quality</span>
+                <span className="benefit-value">{todayBenefits.sleep}/10</span>
               </div>
               <input
                 type="range"
                 min="1"
                 max="10"
-                value={todayBenefits.attraction}
-                onChange={(e) => handleBenefitChange('attraction', parseInt(e.target.value))}
+                value={todayBenefits.sleep}
+                onChange={(e) => handleBenefitChange('sleep', parseInt(e.target.value))}
                 className="benefit-range-slider"
                 disabled={benefitsLogged}
               />

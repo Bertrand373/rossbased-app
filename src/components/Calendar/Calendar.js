@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - COMPLETELY FIXED: All syntax errors resolved
+// components/Calendar/Calendar.js - UPDATED: Sleep Quality support for day info modal
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -330,12 +330,22 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     setPendingStatusUpdate(null);
   };
 
-  // Get day benefits data
+  // UPDATED: Get day benefits data - handle sleep quality migration
   const getDayBenefits = (day) => {
     if (!userData.benefitTracking) return null;
-    return userData.benefitTracking.find(benefit => 
+    const benefits = userData.benefitTracking.find(benefit => 
       isSameDay(new Date(benefit.date), day)
     );
+    
+    // MIGRATION: Handle old attraction data -> sleep data
+    if (benefits && !benefits.sleep && benefits.attraction) {
+      return {
+        ...benefits,
+        sleep: benefits.attraction // Migrate attraction to sleep
+      };
+    }
+    
+    return benefits;
   };
 
   // Helper function to render trigger icon
@@ -403,7 +413,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     );
   };
 
-  // Week view rendering
+  // UPDATED: Week view rendering with sleep quality support
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
     const days = [];
@@ -457,14 +467,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 <span className="benefit-mini-value">{dayBenefits.focus}/10</span>
               </div>
               <div className="week-benefit-item">
-                <span className="benefit-mini-label">Confidence</span>
+                <span className="benefit-mini-label">Sleep</span>
                 <div className="benefit-mini-slider">
                   <div 
                     className="benefit-mini-fill" 
-                    style={{ width: `${dayBenefits.confidence * 10}%` }}
+                    style={{ width: `${(dayBenefits.sleep || dayBenefits.confidence) * 10}%` }}
                   ></div>
                 </div>
-                <span className="benefit-mini-value">{dayBenefits.confidence}/10</span>
+                <span className="benefit-mini-value">{dayBenefits.sleep || dayBenefits.confidence}/10</span>
               </div>
             </div>
           )}
@@ -752,7 +762,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
       
-      {/* Day Info Modal without badge references */}
+      {/* UPDATED: Day Info Modal with Sleep Quality support */}
       {dayInfoModal && selectedDate && (
         <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
           <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
@@ -873,16 +883,17 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                         </div>
                       )}
                       
-                      {getDayBenefits(selectedDate).attraction && (
+                      {/* UPDATED: Sleep Quality support with migration from attraction */}
+                      {(getDayBenefits(selectedDate).sleep || getDayBenefits(selectedDate).attraction) && (
                         <div className="benefit-slider-item">
                           <div className="benefit-slider-header">
-                            <span className="benefit-label">Attraction</span>
-                            <span className="benefit-value">{getDayBenefits(selectedDate).attraction}/10</span>
+                            <span className="benefit-label">Sleep Quality</span>
+                            <span className="benefit-value">{getDayBenefits(selectedDate).sleep || getDayBenefits(selectedDate).attraction}/10</span>
                           </div>
                           <div className="benefit-meter-enhanced">
                             <div 
                               className="benefit-level-enhanced" 
-                              style={{ width: `${getDayBenefits(selectedDate).attraction * 10}%` }}
+                              style={{ width: `${(getDayBenefits(selectedDate).sleep || getDayBenefits(selectedDate).attraction) * 10}%` }}
                             ></div>
                           </div>
                         </div>

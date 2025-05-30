@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - FIXED: Corrected syntax error around line 780
+// components/Stats/Stats.js - UPDATED: Sleep Quality + Esoteric Wisdom Pattern Analysis
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -96,7 +96,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       .sort((a, b) => new Date(a.date) - new Date(b.date));
   };
   
-  // Generate chart data
+  // Generate chart data - UPDATED: Handle sleep metric
   const generateChartData = () => {
     const filteredData = getFilteredBenefitData();
     
@@ -106,7 +106,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     const datasets = [{
       label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
-      data: filteredData.map(item => item[selectedMetric] || 5),
+      data: filteredData.map(item => {
+        // MIGRATION: Handle old attraction data -> sleep data
+        if (selectedMetric === 'sleep') {
+          return item[selectedMetric] || item.attraction || 5;
+        }
+        return item[selectedMetric] || 5;
+      }),
       borderColor: '#ffdd00',
       backgroundColor: 'rgba(255, 221, 0, 0.1)',
       tension: 0.3,
@@ -185,16 +191,22 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
   
-  // Calculate average for the selected metric
+  // Calculate average for the selected metric - UPDATED: Handle sleep
   const calculateAverage = () => {
     const filteredData = getFilteredBenefitData();
     if (filteredData.length === 0) return '0.0';
     
-    const sum = filteredData.reduce((acc, item) => acc + (item[selectedMetric] || 0), 0);
+    const sum = filteredData.reduce((acc, item) => {
+      // MIGRATION: Handle old attraction data -> sleep data
+      if (selectedMetric === 'sleep') {
+        return acc + (item[selectedMetric] || item.attraction || 0);
+      }
+      return acc + (item[selectedMetric] || 0);
+    }, 0);
     return (sum / filteredData.length).toFixed(1);
   };
   
-  // Generate streak comparison data
+  // Generate streak comparison data - UPDATED: Include sleep
   const generateStreakComparison = () => {
     const filteredData = getFilteredBenefitData();
     
@@ -204,7 +216,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         energy: { short: '5.0', medium: '5.0', long: '5.0' },
         focus: { short: '5.0', medium: '5.0', long: '5.0' },
         aura: { short: '5.0', medium: '5.0', long: '5.0' },
-        attraction: { short: '5.0', medium: '5.0', long: '5.0' },
+        sleep: { short: '5.0', medium: '5.0', long: '5.0' },
         workout: { short: '5.0', medium: '5.0', long: '5.0' }
       };
     }
@@ -232,8 +244,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         medium: baseValue.toFixed(1),
         long: Math.min(10, baseValue + 1.1).toFixed(1)
       },
-      attraction: {
-        short: Math.max(1, baseValue - 1.4).toFixed(1),
+      sleep: {
+        short: Math.max(1, baseValue - 1.1).toFixed(1),
         medium: baseValue.toFixed(1),
         long: Math.min(10, baseValue + 1.4).toFixed(1)
       },
@@ -247,7 +259,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   const streakComparison = generateStreakComparison();
   
-  // Generate all insights for the 6 metrics
+  // UPDATED: Generate insights with esoteric wisdom for all 6 metrics including sleep
   const generateAllInsights = () => {
     const filteredData = getFilteredBenefitData();
     
@@ -255,32 +267,32 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       return [
         {
           id: 1,
-          text: "Track more days to see personalized energy insights about your progress.",
+          text: "Track more days to see personalized energy insights about your progress and vital force patterns.",
           metric: "energy"
         },
         {
           id: 2,
-          text: "Focus patterns become clearer with more data points tracked.",
+          text: "Focus patterns become clearer with more data - mental clarity follows the natural rhythms of retention.",
           metric: "focus"
         },
         {
           id: 3,
-          text: "Confidence trends emerge as you build a longer tracking history.",
+          text: "Confidence trends emerge as you build tracking history - inner strength manifests through discipline.",
           metric: "confidence"
         },
         {
           id: 4,
-          text: "Aura improvements are best analyzed over extended tracking periods.",
+          text: "Aura improvements are best analyzed over extended periods - your energetic presence grows with practice.",
           metric: "aura"
         },
         {
           id: 5,
-          text: "Attraction benefits show patterns with consistent daily logging.",
-          metric: "attraction"
+          text: "Sleep quality patterns show the connection between retention and dream states over time.",
+          metric: "sleep"
         },
         {
           id: 6,
-          text: "Workout performance correlations become visible with more tracking.",
+          text: "Workout performance correlations become visible with more tracking - retained energy enhances physical power.",
           metric: "workout"
         }
       ];
@@ -292,11 +304,17 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     // Helper function to calculate recent average for any metric
     const calculateRecentAverage = (metric) => {
       if (recentData.length === 0) return 5;
-      const sum = recentData.reduce((acc, item) => acc + (item[metric] || 5), 0);
+      const sum = recentData.reduce((acc, item) => {
+        // MIGRATION: Handle old attraction data -> sleep data
+        if (metric === 'sleep') {
+          return acc + (item[metric] || item.attraction || 5);
+        }
+        return acc + (item[metric] || 5);
+      }, 0);
       return sum / recentData.length;
     };
     
-    // Generate insights for all 6 metrics
+    // UPDATED: Energy insights with esoteric wisdom
     const energyTrend = recentData.length > 1 ? 
       (recentData[recentData.length - 1].energy || 5) - (recentData[0].energy || 5) : 0;
     const energyAvg = parseFloat(calculateAverage());
@@ -304,135 +322,135 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     if (energyTrend > 1.5) {
       insights.push({
         id: 1,
-        text: "Your energy levels have been trending strongly upward this week.",
+        text: "Your vital force is ascending - the retained life essence is strengthening your energetic field significantly.",
         metric: "energy"
       });
     } else if (energyTrend < -1.5) {
       insights.push({
         id: 1,
-        text: "Consider what might be affecting your energy levels recently.",
+        text: "Consider what's depleting your life force - stress, poor sleep, or scattered attention can drain vital energy.",
         metric: "energy"
       });
     } else if (energyAvg > 7.5) {
       insights.push({
         id: 1,
-        text: "Your energy levels are consistently high - excellent progress!",
+        text: "Your energy centers are aligned - you've entered the realm where physical vitality meets spiritual power.",
         metric: "energy"
       });
     } else {
       insights.push({
         id: 1,
-        text: "Energy typically peaks around day 10-14 of retention cycles.",
+        text: "Ancient wisdom teaches that energy peaks around day 10-14 as the body completes its first transmutation cycle.",
         metric: "energy"
       });
     }
     
-    // Focus insights
+    // Focus insights with mental alchemy concepts
     const focusAvg = calculateRecentAverage('focus');
     if (focusAvg > 7.5) {
       insights.push({
         id: 2,
-        text: "Your focus levels have been consistently high this week.",
+        text: "Your mind has achieved the clarity spoken of in hermetic traditions - focused attention becomes a magical tool.",
         metric: "focus"
       });
     } else if (focusAvg > 6) {
       insights.push({
         id: 2,
-        text: "Focus tends to improve steadily after day 5 of retention.",
+        text: "Mental alchemy is occurring - the fog of desire is lifting, revealing the crystal clarity beneath.",
         metric: "focus"
       });
     } else {
       insights.push({
         id: 2,
-        text: "Mental clarity often increases with longer retention periods.",
+        text: "The ancients knew that mental clarity follows the withdrawal of vital essence from lower chakras to higher ones.",
         metric: "focus"
       });
     }
     
-    // Confidence insights
+    // Confidence insights with inner authority concepts
     const confidenceAvg = calculateRecentAverage('confidence');
     if (confidenceAvg > 7.5) {
       insights.push({
         id: 3,
-        text: "Confidence shows strong improvement during your current streak.",
+        text: "You're developing true inner authority - confidence born from self-mastery, not ego or external validation.",
         metric: "confidence"
       });
     } else if (confidenceAvg > 6) {
       insights.push({
         id: 3,
-        text: "Self-confidence typically builds gradually with retention practice.",
+        text: "Each day of retention builds the foundation of unshakeable self-trust - the cornerstone of personal power.",
         metric: "confidence"
       });
     } else {
       insights.push({
         id: 3,
-        text: "Confidence benefits often become noticeable after 2-3 weeks.",
+        text: "Real confidence emerges after 2-3 weeks as you prove to yourself that you can master your strongest impulses.",
         metric: "confidence"
       });
     }
     
-    // Aura insights
+    // Aura insights with energetic presence concepts
     const auraAvg = calculateRecentAverage('aura');
     if (auraAvg > 7.5) {
       insights.push({
         id: 4,
-        text: "Your aura and presence have been particularly strong lately.",
+        text: "Your energetic field is becoming magnetic - others unconsciously sense the power you're cultivating within.",
         metric: "aura"
       });
     } else if (auraAvg > 6) {
       insights.push({
         id: 4,
-        text: "Aura improvements often correlate with longer retention periods.",
+        text: "The retained life force is beginning to radiate outward, creating the luminous presence mystics speak of.",
         metric: "aura"
       });
     } else {
       insights.push({
         id: 4,
-        text: "Many report enhanced presence and magnetism with consistent practice.",
+        text: "Esoteric teachings say that after 30 days, the subtle body begins to glow with accumulated spiritual energy.",
         metric: "aura"
       });
     }
     
-    // Attraction insights
-    const attractionAvg = calculateRecentAverage('attraction');
-    if (attractionAvg > 7.5) {
+    // NEW: Sleep insights with dream consciousness and lunar cycles
+    const sleepAvg = calculateRecentAverage('sleep');
+    if (sleepAvg > 7.5) {
       insights.push({
         id: 5,
-        text: "Your attraction and magnetism levels are notably high this period.",
-        metric: "attraction"
+        text: "Deep, restorative sleep indicates your nervous system is harmonizing - the body's natural wisdom is healing.",
+        metric: "sleep"
       });
-    } else if (attractionAvg > 6) {
+    } else if (sleepAvg > 6) {
       insights.push({
         id: 5,
-        text: "Attraction benefits often intensify after the first few weeks.",
-        metric: "attraction"
+        text: "Quality sleep improves with retention as sexual energy transforms into higher spiritual forces during rest.",
+        metric: "sleep"
       });
     } else {
       insights.push({
         id: 5,
-        text: "Enhanced attraction is commonly reported with longer streaks.",
-        metric: "attraction"
+        text: "Poor sleep often indicates energy is still chaotic - consider meditation before bed to calm the vital currents.",
+        metric: "sleep"
       });
     }
     
-    // Workout insights
+    // Workout insights with physical transmutation
     const workoutAvg = calculateRecentAverage('workout');
     if (workoutAvg > 7.5) {
       insights.push({
         id: 6,
-        text: "Your workout performance has been exceptionally strong lately.",
+        text: "Your physical vessel is becoming a temple - retained life force is amplifying your strength and endurance.",
         metric: "workout"
       });
     } else if (workoutAvg > 6) {
       insights.push({
         id: 6,
-        text: "Physical performance often improves with retained energy.",
+        text: "The body becomes more resilient as sexual energy transmutes into raw physical power and stamina.",
         metric: "workout"
       });
     } else {
       insights.push({
         id: 6,
-        text: "Many experience enhanced strength and endurance with retention.",
+        text: "Ancient warriors knew that conserved sexual energy provides extraordinary physical capabilities when channeled properly.",
         metric: "workout"
       });
     }
@@ -446,10 +464,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return allInsights.find(insight => insight.metric === selectedMetric) || allInsights[0];
   };
 
-  // Generate pattern analysis for triggers and relapses
+  // UPDATED: Enhanced esoteric pattern analysis for triggers and cycles
   const generatePatternInsights = () => {
     if (!userData.streakHistory || userData.streakHistory.length < 2) {
-      return [];
+      return [{
+        id: 1,
+        pattern: "Your journey is just beginning - patterns will emerge as you accumulate more experience.",
+        actionable: "The path of self-mastery reveals its secrets only to those who persist through multiple cycles."
+      }];
     }
 
     const insights = [];
@@ -460,12 +482,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     if (relapsedStreaks.length === 0) {
       return [{
         id: 1,
-        pattern: "No relapse patterns identified yet.",
-        actionable: "Continue tracking to identify potential triggers over time."
+        pattern: "You're maintaining strong discipline - the forces of temptation have not yet revealed their patterns.",
+        actionable: "Continue tracking to identify subtle energy fluctuations that may precede challenging moments."
       }];
     }
 
-    // Analyze most common trigger
+    // Analyze most common trigger with esoteric interpretation
     const triggerCounts = {};
     relapsedStreaks.forEach(streak => {
       if (streak.trigger) {
@@ -479,30 +501,95 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
     if (triggerCounts[mostCommonTrigger] > 1) {
       const triggerLabel = triggerOptions.find(t => t.id === mostCommonTrigger)?.label || mostCommonTrigger;
+      
+      // ESOTERIC TRIGGER INTERPRETATIONS
+      let esotericInsight = "";
+      switch(mostCommonTrigger) {
+        case 'lustful_thoughts':
+          esotericInsight = "The mind is your battleground - these thoughts are the ego's last defense against transcendence.";
+          break;
+        case 'stress':
+          esotericInsight = "Stress scatters your life force - when the nervous system is agitated, lower impulses resurface.";
+          break;
+        case 'boredom':
+          esotericInsight = "Boredom signals unused creative energy - this force seeks expression and will find destructive outlets if ignored.";
+          break;
+        case 'social_media':
+          esotericInsight = "Digital stimulation fragments your attention - scattered focus weakens your energetic boundaries.";
+          break;
+        case 'loneliness':
+          esotericInsight = "Loneliness is the soul seeking connection - but true fulfillment comes from inner unity, not external validation.";
+          break;
+        case 'explicit_content':
+          esotericInsight = "Visual triggers activate ancient programming - the eyes are gateways that can either elevate or deplete your essence.";
+          break;
+        default:
+          esotericInsight = "This trigger represents unresolved energy seeking expression through familiar patterns.";
+      }
+      
       insights.push({
         id: insights.length + 1,
-        pattern: `"${triggerLabel}" appears to be your most common trigger (${triggerCounts[mostCommonTrigger]} times).`,
-        actionable: `Consider developing specific strategies to handle ${triggerLabel.toLowerCase()} situations.`
+        pattern: `"${triggerLabel}" appears ${triggerCounts[mostCommonTrigger]} times in your pattern. ${esotericInsight}`,
+        actionable: `Develop specific rituals to transmute this energy: breathing exercises, cold exposure, or physical movement when ${triggerLabel.toLowerCase()} arises.`
       });
     }
 
-    // Analyze streak length patterns
+    // Analyze streak length patterns with esoteric cycle understanding
     const streakLengths = relapsedStreaks.map(streak => streak.days).filter(days => days > 0);
     if (streakLengths.length > 1) {
       const avgLength = Math.round(streakLengths.reduce((sum, len) => sum + len, 0) / streakLengths.length);
-      if (avgLength < 14) {
+      
+      if (avgLength < 7) {
         insights.push({
           id: insights.length + 1,
-          pattern: `Your streaks typically end around day ${avgLength}.`,
-          actionable: "Focus extra attention on days 10-15 when urges may be strongest."
+          pattern: `Your cycle averages ${avgLength} days - you're in the physical purification phase.`,
+          actionable: "Focus on grounding practices: cold showers, exercise, and avoiding stimulating content during this foundational period."
+        });
+      } else if (avgLength < 14) {
+        insights.push({
+          id: insights.length + 1,
+          pattern: `Your ${avgLength}-day cycles suggest you're transcending the physical but not yet stabilized in the emotional realm.`,
+          actionable: "Days 7-14 test emotional equilibrium. Practice emotional alchemy: transform frustration into determination."
+        });
+      } else if (avgLength < 30) {
+        insights.push({
+          id: insights.length + 1,
+          pattern: `Your ${avgLength}-day pattern indicates strong mental discipline but challenges with long-term transmutation.`,
+          actionable: "You've mastered the lower centers. Now focus on channeling energy into creative and spiritual pursuits."
+        });
+      } else {
+        insights.push({
+          id: insights.length + 1,
+          pattern: `Your ${avgLength}-day cycles show advanced self-mastery - you're operating at the level of spiritual adepts.`,
+          actionable: "Your challenge now is maintaining this state while serving others and expressing your highest creative potential."
+        });
+      }
+    }
+
+    // Add lunar/cosmic cycle insights if data supports it
+    const currentStreak = userData.currentStreak || 0;
+    if (currentStreak > 0) {
+      if (currentStreak % 7 === 0) {
+        insights.push({
+          id: insights.length + 1,
+          pattern: `You've completed ${currentStreak / 7} full weekly cycles - each 7-day period represents one complete energy transformation.`,
+          actionable: "Weekly cycles mirror the cosmic rhythm. Use Sundays for reflection and intention-setting for the next cycle."
+        });
+      }
+      
+      if (currentStreak >= 28) {
+        insights.push({
+          id: insights.length + 1,
+          pattern: "You've completed a full lunar cycle of retention - your energy now follows celestial rhythms rather than earthly impulses.",
+          actionable: "Track your energy with moon phases. New moons are ideal for setting intentions, full moons for releasing lower desires."
         });
       }
     }
 
     return insights.length > 0 ? insights : [{
       id: 1,
-      pattern: "Building your pattern database with each tracked experience.",
-      actionable: "Continue logging triggers to identify personalized insights."
+      pattern: "The universe is revealing your unique energetic patterns through each experience.",
+      actionable: "Continue the sacred work of self-observation - every cycle teaches you something new about your inner nature."
     }];
   };
   
@@ -586,13 +673,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* REDESIGNED: Benefit Tracker Section */}
+      {/* REDESIGNED: Benefit Tracker Section with Sleep Quality */}
       <div className="benefit-tracker-section">
         {isPremium ? (
           <>
             <h3>Benefit Tracker</h3>
             
-            {/* Controls with 3-row pill layout */}
+            {/* Controls with 3-row pill layout - UPDATED: Sleep Quality replaces Attraction */}
             <div className="benefit-tracker-controls">
               <div className="metric-selector">
                 {/* ROW 1: Energy, Focus, Confidence */}
@@ -617,7 +704,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   </button>
                 </div>
                 
-                {/* ROW 2: Aura, Attraction, Workout */}
+                {/* ROW 2: Aura, Sleep Quality, Workout */}
                 <div className="metric-pill-container-row2">
                   <button 
                     className={`metric-btn ${selectedMetric === 'aura' ? 'active' : ''}`}
@@ -626,10 +713,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                     Aura
                   </button>
                   <button 
-                    className={`metric-btn ${selectedMetric === 'attraction' ? 'active' : ''}`}
-                    onClick={() => setSelectedMetric('attraction')}
+                    className={`metric-btn ${selectedMetric === 'sleep' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('sleep')}
                   >
-                    Attraction
+                    Sleep Quality
                   </button>
                   <button 
                     className={`metric-btn ${selectedMetric === 'workout' ? 'active' : ''}`}
@@ -674,14 +761,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {/* Current Insight Sidebar (Desktop) / Card (Mobile) */}
               <div className="current-insight-sidebar">
                 <div className="current-metric-average">
-                  <div className="current-metric-label">Average {selectedMetric}</div>
+                  <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric}</div>
                   <div className="current-metric-value">{calculateAverage()}/10</div>
                 </div>
                 
                 <div className="current-insight-card">
                   <div className="current-insight-header">
                     <FaRegLightbulb className="insight-icon" />
-                    <span>Current Insight</span>
+                    <span>Esoteric Insight</span>
                   </div>
                   <div className="current-insight-text">
                     {getCurrentInsight().text}
@@ -695,22 +782,22 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <h4>Detailed Analysis</h4>
               
               <div className="streak-comparison">
-                <h5><span className="metric-highlight">{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
+                <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
                 
                 <div className="comparison-grid">
                   <div className="comparison-card">
                     <div className="comparison-value">{streakComparison[selectedMetric].short}/10</div>
-                    <div className="comparison-label">{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 1-7 day streaks</div>
+                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 1-7 day streaks</div>
                   </div>
                   
                   <div className="comparison-card">
                     <div className="comparison-value">{streakComparison[selectedMetric].medium}/10</div>
-                    <div className="comparison-label">{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 8-30 day streaks</div>
+                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 8-30 day streaks</div>
                   </div>
                   
                   <div className="comparison-card">
                     <div className="comparison-value">{streakComparison[selectedMetric].long}/10</div>
-                    <div className="comparison-label">{selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 30+ day streaks</div>
+                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 30+ day streaks</div>
                   </div>
                 </div>
               </div>
@@ -726,7 +813,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                     >
                       <div className="insight-card-header">
                         <FaRegLightbulb className="insight-icon" />
-                        <span className="insight-metric">{insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
+                        <span className="insight-metric">{insight.metric === 'sleep' ? 'Sleep Quality' : insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
                       </div>
                       <div className="insight-text">{insight.text}</div>
                     </div>
@@ -777,9 +864,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         )}
       </div>
       
-      {/* Pattern Analysis Section */}
+      {/* UPDATED: Pattern Analysis Section with Esoteric Wisdom */}
       <div className="pattern-analysis-section">
-        <h3>Pattern Insights</h3>
+        <h3>Esoteric Pattern Insights</h3>
         
         <div className="pattern-insights">
           {generatePatternInsights().length > 0 ? (
@@ -792,7 +879,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           ) : (
             <div className="no-patterns">
               <FaInfoCircle className="no-patterns-icon" />
-              <span>Track more streaks to discover your personal patterns and triggers.</span>
+              <span>Track more cycles to discover the deeper rhythms and cosmic patterns governing your journey.</span>
             </div>
           )}
         </div>
