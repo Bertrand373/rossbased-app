@@ -124,22 +124,19 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return { labels, datasets };
   };
   
-  // FIXED: Chart options with extended Y-axis to prevent dot clipping
+  // FIXED: Chart options with Y-axis extended to 10.5 to prevent dot clipping
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
       y: {
         min: 0,
-        max: 11, // CHANGED: Extended from 10 to 11 to give dots breathing room
+        max: 10.5, // PERFECT: Extended just to 10.5 - gives dots breathing room without extra grid lines
         ticks: {
           stepSize: 2,
           color: '#aaaaaa',
-          font: { size: 12 },
-          // ADDED: Custom callback to only show ticks 0, 2, 4, 6, 8, 10 (hide 11)
-          callback: function(value) {
-            return value <= 10 ? value : '';
-          }
+          font: { size: 12 }
+          // REMOVED: No callback needed since 10.5 won't show as a tick anyway
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
