@@ -652,7 +652,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       if (avgLength < 7) {
         insights.push({
           id: insights.length + 1,
-          practical: `Your cycle averages ${avgLength} days - you're still in the initial adaptation phase where willpower is weakest.`,
+          practical: `Your ${avgLength}-day cycles suggest you've mastered initial urges but struggle with medium-term discipline.`,
           esoteric: `Your ${avgLength}-day cycles suggest you're transcending the physical but not yet stabilized in the emotional realm.`,
           actionable: wisdomMode ?
             "Days 7-14 test emotional equilibrium. Practice emotional alchemy: transform frustration into determination." :
@@ -1094,13 +1094,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats; cycle averages ${avgLength} days - you're in the physical purification phase.`,
+export default Stats;id: insights.length + 1,
+          practical: `Your cycle averages ${avgLength} days - you're still in the initial adaptation phase where willpower is weakest.`,
+          esoteric: `Your cycle averages ${avgLength} days - you're in the physical purification phase.`,
           actionable: wisdomMode ?
             "Focus on grounding practices: cold showers, exercise, and avoiding stimulating content during this foundational period." :
             "Focus on building basic habits: avoid triggers, stay busy, and use accountability during this challenging period."
         });
       } else if (avgLength < 14) {
         insights.push({
-          id: insights.length + 1,
-          practical: `Your ${avgLength}-day cycles suggest you've mastered initial urges but struggle with medium-term discipline.`,
-          esoteric: `Your
