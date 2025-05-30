@@ -124,7 +124,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return { labels, datasets };
   };
   
-  // FIXED: Chart options - extend chart area for dots with grace margin
+  // Chart options - reverted to original clean version
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -132,20 +132,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       y: {
         min: 0,
         max: 10,
-        grace: '5%', // ADDED: This extends the chart area by 5% beyond max value
         ticks: {
           stepSize: 2,
           color: '#aaaaaa',
-          font: { size: 12 },
-          // Only show ticks up to 10
-          callback: function(value) {
-            return Number.isInteger(value) && value >= 0 && value <= 10 && value % 2 === 0 ? value : '';
-          }
+          font: { size: 12 }
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
-          drawBorder: false,
-          lineWidth: 1
+          drawBorder: false
         }
       },
       x: {
