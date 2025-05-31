@@ -65,10 +65,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       
       // Show toggle when:
       // 1. User has scrolled to the insights section start
-      // 2. User hasn't scrolled past the pattern analysis section
+      // 2. User hasn't scrolled completely past the pattern analysis section
       const shouldShow = 
         scrollTop + windowHeight >= insightsStartTop && // Reached insights area
-        scrollTop < patternSectionBottom - windowHeight; // Haven't passed pattern section
+        scrollTop <= patternSectionBottom; // Haven't scrolled completely past pattern section
       
       setShowFloatingToggle(shouldShow);
     };
