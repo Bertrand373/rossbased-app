@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Consistent button styling matching Calendar modal */
+/* components/Tracker/Tracker.css - FIXED: All hover effects removed */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -10,8 +10,8 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  margin-bottom: var(--spacing-xl); /* CHANGED: Match calendar and stats exact spacing */
-  margin-top: 0; /* ADDED: Remove extra top margin to align with other tabs */
+  margin-bottom: var(--spacing-xl);
+  margin-top: 0;
 }
 
 .tracker-header-spacer {
@@ -29,7 +29,7 @@
   justify-self: end;
 }
 
-/* UPDATED: Edit Date button styled like Calendar Cancel button - no animations */
+/* FIXED: Edit Date button styled like Calendar Cancel button - NO HOVER EFFECTS */
 .action-btn {
   display: flex;
   align-items: center;
@@ -42,26 +42,31 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none; /* REMOVED: No animations like Calendar Cancel */
+  transition: none;
 }
 
-/* FIXED: Explicitly remove hover effects from action buttons */
-.action-btn:hover {
-  background-color: rgba(128, 128, 128, 0.1); /* SAME: No change on hover */
-  border-color: var(--border); /* SAME: No change on hover */
-  color: var(--text-secondary); /* SAME: No change on hover */
-  transform: none; /* ENSURE: No transform on hover */
+/* NUCLEAR OPTION: Force remove ALL hover effects with maximum specificity */
+.action-btn:hover,
+.tracker-actions .action-btn:hover,
+.journal-actions .action-btn:hover,
+button.action-btn:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
-/* UPDATED: Current Streak Section - aligned with other tabs for seamless switching */
+/* UPDATED: Current Streak Section */
 .current-streak-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  margin-top: 0; /* CHANGED: Remove extra top margin - spacing now comes from header margin-bottom */
+  margin-top: 0;
 }
 
-/* UPDATED: Streak card with date moved inside and TWO dividers added */
 .streak-card {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -74,7 +79,6 @@
   gap: var(--spacing-lg);
 }
 
-/* MOVED: Date now inside the streak card at the top */
 .streak-date {
   font-size: 0.875rem;
   color: var(--text-secondary);
@@ -106,7 +110,6 @@
   margin: 0;
 }
 
-/* EXISTING: First divider line between streak content and milestones */
 .streak-divider {
   order: 3;
   width: 100%;
@@ -148,7 +151,6 @@
   color: var(--text-secondary);
 }
 
-/* ADDED: Second divider line between milestones and action buttons */
 .streak-actions-divider {
   order: 5;
   width: 100%;
@@ -158,14 +160,13 @@
 }
 
 .streak-actions {
-  order: 6; /* CHANGED: From order 5 to order 6 to accommodate new divider */
+  order: 6;
   display: flex;
   justify-content: center;
   gap: var(--spacing-lg);
   margin: 0;
 }
 
-/* UPDATED: Consistent styling for ALL streak action buttons */
 .streak-action-btn {
   display: flex;
   align-items: center;
@@ -179,18 +180,17 @@
   border: 1px solid;
 }
 
-/* UPDATED: Relapse button - grey theme matching the pattern of other buttons */
 .relapse-btn-grey {
-  background-color: rgba(128, 128, 128, 0.1); /* GREY: Light grey background */
-  color: var(--text-secondary); /* GREY: Grey text color (same in hover and non-hover) */
-  border-color: var(--text-secondary); /* GREY: Grey border matching text color */
+  background-color: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
 }
 
 .relapse-btn-grey:hover {
-  background-color: rgba(128, 128, 128, 0.2); /* GREY: Darker grey background on hover */
-  border-color: var(--text-secondary); /* GREY: Same grey border color */
-  color: var(--text-secondary); /* GREY: Same grey text color */
-  transform: scale(1.05); /* CONSISTENT: Same hover animation as other buttons */
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+  transform: scale(1.05);
 }
 
 .wetdream-btn {
@@ -219,38 +219,33 @@
   transform: scale(1.05);
 }
 
-/* ENHANCED: Benefit Logging Container - header moved inside */
 .benefit-logging-container {
   display: flex;
   flex-direction: column;
-  gap: 0; /* CHANGED: Remove gap since header is now inside the container */
+  gap: 0;
 }
 
-/* ENHANCED: Benefits section with header inside the container */
 .benefit-logging-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
-  /* ENHANCED: Same yellow accent border as pattern insights */
   border-top: 3px solid rgba(255, 221, 0, 0.3);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* ENHANCED: Header inside container styled like pattern insights */
 .benefit-logging-section-header {
   margin-bottom: var(--spacing-lg);
   font-size: 1.125rem;
   color: var(--text);
   text-align: center;
   position: relative;
-  margin-top: 0; /* ADDED: Remove any top margin */
+  margin-top: 0;
 }
 
-/* ENHANCED: Same glow line as pattern insights header */
 .benefit-logging-section-header::after {
   content: '';
   position: absolute;
@@ -262,31 +257,27 @@
   background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
-/* REMOVED: Old external header styling - no longer needed */
 .benefit-logging-header {
-  display: none; /* Hide the old external header */
+  display: none;
 }
 
-/* FIXED: Benefit status section - at top of card container */
 .benefit-status-section {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* FIXED: Yellow styling for benefits logged status to match "Track your benefits..." */
 .benefits-logged {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  color: var(--text-secondary); /* CHANGED: Use same grayish color as "Track your benefits..." */
+  color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.875rem;
   flex-wrap: wrap;
 }
 
-/* UPDATED: Consistent styling for not logged status */
 .benefits-not-logged {
   display: flex;
   align-items: center;
@@ -304,16 +295,15 @@
   flex-shrink: 0;
 }
 
-/* FIXED: Yellow check icon to match info icon styling */
 .check-icon {
-  color: var(--primary); /* CONSISTENT: Keep yellow like info icon */
+  color: var(--primary);
 }
 
 .info-icon {
   color: var(--primary);
 }
 
-/* UPDATED: Edit Benefits button styled like Calendar Cancel button - no animations */
+/* FIXED: Edit Benefits button - NO HOVER EFFECTS */
 .edit-benefits-btn {
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
@@ -323,18 +313,16 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: 0.75rem;
   cursor: pointer;
-  transition: none; /* REMOVED: No animations like Calendar Cancel */
+  transition: none;
 }
 
-/* FIXED: Explicitly remove hover effects from edit benefits button */
 .edit-benefits-btn:hover {
-  background-color: rgba(128, 128, 128, 0.1); /* SAME: No change on hover */
-  border-color: var(--border); /* SAME: No change on hover */
-  color: var(--text-secondary); /* SAME: No change on hover */
-  transform: none; /* ENSURE: No transform on hover */
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
 }
 
-/* Benefit sliders - now inside the card */
 .benefit-sliders {
   display: flex;
   flex-direction: column;
@@ -366,7 +354,6 @@
   font-size: 0.875rem;
 }
 
-/* Fixed slider styling - solid yellow ball */
 .benefit-range-slider {
   -webkit-appearance: none;
   width: 100%;
@@ -414,7 +401,7 @@
   margin-top: var(--spacing-lg);
 }
 
-/* UPDATED: Save Benefits button styled like Calendar "Edit Day Status" button - no animations */
+/* FIXED: Save Benefits button - NO HOVER EFFECTS */
 .save-benefits-btn {
   background-color: rgba(255, 221, 0, 0.1);
   border: 1px solid rgba(255, 221, 0, 0.2);
@@ -424,18 +411,16 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none; /* REMOVED: No animations like Calendar Edit Day Status */
+  transition: none;
 }
 
-/* FIXED: Explicitly remove hover effects from save benefits button */
 .save-benefits-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1); /* SAME: No change on hover */
-  border-color: rgba(255, 221, 0, 0.2); /* SAME: No change on hover */
-  color: var(--primary); /* SAME: No change on hover */
-  transform: none; /* ENSURE: No transform on hover */
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: none !important;
 }
 
-/* UPDATED: Journal Section - Now separate and simplified */
 .journal-section {
   background-color: var(--card-background);
   border-radius: var(--radius-md);
@@ -443,7 +428,6 @@
   border: 1px solid var(--border);
 }
 
-/* FIXED: Properly centered journal header with spacers */
 .journal-header {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -500,7 +484,6 @@
   color: var(--text);
 }
 
-/* Discord Section - pill-style toggle like navigation */
 .discord-section {
   background-color: var(--card-background);
   border-radius: var(--radius-md);
@@ -534,7 +517,6 @@
   font-weight: 500;
 }
 
-/* Custom Toggle Switch Design - pill-style like navigation */
 .custom-toggle-switch {
   position: relative;
   width: 56px;
@@ -618,7 +600,6 @@
   font-style: italic;
 }
 
-/* Form styling */
 .form-group {
   margin-bottom: var(--spacing-md);
 }
@@ -639,7 +620,7 @@
   border-color: var(--primary);
 }
 
-/* UPDATED: Form actions with consistent button styling matching Calendar modal */
+/* FIXED: Form actions with NO HOVER EFFECTS */
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -647,7 +628,6 @@
   margin-top: var(--spacing-lg);
 }
 
-/* UPDATED: Form action buttons styled like Calendar modal buttons */
 .form-actions .action-btn {
   display: flex;
   align-items: center;
@@ -657,41 +637,36 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none; /* REMOVED: No animations like Calendar */
+  transition: none;
   border: 1px solid;
 }
 
-/* CANCEL/CLOSE buttons styled like Calendar Cancel button */
 .form-actions .action-btn:not(.primary-action) {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
   color: var(--text-secondary);
 }
 
-/* FIXED: Explicitly remove hover effects from cancel buttons */
 .form-actions .action-btn:not(.primary-action):hover {
-  background-color: rgba(128, 128, 128, 0.1); /* SAME: No change on hover */
-  border-color: var(--border); /* SAME: No change on hover */
-  color: var(--text-secondary); /* SAME: No change on hover */
-  transform: none; /* ENSURE: No transform on hover */
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
 }
 
-/* ACTION buttons (Save Entry, Set Date) styled like Calendar Edit Day Status button */
 .form-actions .action-btn.primary-action {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
 }
 
-/* FIXED: Explicitly remove hover effects from primary action buttons */
 .form-actions .action-btn.primary-action:hover {
-  background-color: rgba(255, 221, 0, 0.1); /* SAME: No change on hover */
-  border-color: rgba(255, 221, 0, 0.2); /* SAME: No change on hover */
-  color: var(--primary); /* SAME: No change on hover */
-  transform: none; /* ENSURE: No transform on hover */
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: none !important;
 }
 
-/* Modal styling */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -727,15 +702,15 @@
   color: var(--text-secondary);
 }
 
-/* Mobile responsiveness - UPDATED: Center headers on mobile */
+/* Mobile responsiveness */
 @media (max-width: 768px) {
   .tracker-header {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg); /* CONSISTENT: Same as desktop to match other tabs */
-    margin-top: 0; /* CONSISTENT: Same as desktop to match other tabs */
+    margin-bottom: var(--spacing-lg);
+    margin-top: 0;
   }
   
   .tracker-header h2 {
@@ -805,7 +780,6 @@
     gap: var(--spacing-md);
   }
   
-  /* Mobile-specific styling for benefit status */
   .benefit-status-section {
     margin-bottom: var(--spacing-md);
   }
