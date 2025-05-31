@@ -45,6 +45,14 @@
   transition: none; /* REMOVED: No animations like Calendar Cancel */
 }
 
+/* FIXED: Explicitly remove hover effects from action buttons */
+.action-btn:hover {
+  background-color: rgba(128, 128, 128, 0.1); /* SAME: No change on hover */
+  border-color: var(--border); /* SAME: No change on hover */
+  color: var(--text-secondary); /* SAME: No change on hover */
+  transform: none; /* ENSURE: No transform on hover */
+}
+
 /* UPDATED: Current Streak Section - aligned with other tabs for seamless switching */
 .current-streak-container {
   display: flex;
@@ -318,6 +326,14 @@
   transition: none; /* REMOVED: No animations like Calendar Cancel */
 }
 
+/* FIXED: Explicitly remove hover effects from edit benefits button */
+.edit-benefits-btn:hover {
+  background-color: rgba(128, 128, 128, 0.1); /* SAME: No change on hover */
+  border-color: var(--border); /* SAME: No change on hover */
+  color: var(--text-secondary); /* SAME: No change on hover */
+  transform: none; /* ENSURE: No transform on hover */
+}
+
 /* Benefit sliders - now inside the card */
 .benefit-sliders {
   display: flex;
@@ -409,6 +425,14 @@
   font-weight: 500;
   cursor: pointer;
   transition: none; /* REMOVED: No animations like Calendar Edit Day Status */
+}
+
+/* FIXED: Explicitly remove hover effects from save benefits button */
+.save-benefits-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1); /* SAME: No change on hover */
+  border-color: rgba(255, 221, 0, 0.2); /* SAME: No change on hover */
+  color: var(--primary); /* SAME: No change on hover */
+  transform: none; /* ENSURE: No transform on hover */
 }
 
 /* UPDATED: Journal Section - Now separate and simplified */
@@ -644,11 +668,27 @@
   color: var(--text-secondary);
 }
 
+/* FIXED: Explicitly remove hover effects from cancel buttons */
+.form-actions .action-btn:not(.primary-action):hover {
+  background-color: rgba(128, 128, 128, 0.1); /* SAME: No change on hover */
+  border-color: var(--border); /* SAME: No change on hover */
+  color: var(--text-secondary); /* SAME: No change on hover */
+  transform: none; /* ENSURE: No transform on hover */
+}
+
 /* ACTION buttons (Save Entry, Set Date) styled like Calendar Edit Day Status button */
 .form-actions .action-btn.primary-action {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
+}
+
+/* FIXED: Explicitly remove hover effects from primary action buttons */
+.form-actions .action-btn.primary-action:hover {
+  background-color: rgba(255, 221, 0, 0.1); /* SAME: No change on hover */
+  border-color: rgba(255, 221, 0, 0.2); /* SAME: No change on hover */
+  color: var(--primary); /* SAME: No change on hover */
+  transform: none; /* ENSURE: No transform on hover */
 }
 
 /* Modal styling */
