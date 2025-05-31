@@ -1,4 +1,4 @@
-// App.js - Updated with Emotional Timeline replacing Daily Motivation
+// App.js - Fixed with proper updateUserData prop for Calendar component
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -12,7 +12,7 @@ import { FaPowerOff, FaUser } from 'react-icons/fa';
 import Tracker from './components/Tracker/Tracker';
 import Calendar from './components/Calendar/Calendar';
 import Stats from './components/Stats/Stats';
-import EmotionalTimeline from './components/EmotionalTimeline/EmotionalTimeline'; // CHANGED: Replaced DailyMotivation
+import EmotionalTimeline from './components/EmotionalTimeline/EmotionalTimeline';
 import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Landing from './components/Landing/Landing';
 
@@ -140,3 +140,115 @@ function App() {
         {isLoggedIn ? (
           // Show main app UI if logged in
           <>
+            <header className="app-header">
+              {!isMobile ? (
+                // Desktop Layout - Logo, Navigation, Logout all in one row
+                <>
+                  <div className="logo-container">
+                    <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
+                  </div>
+                  
+                  <nav className="header-nav">
+                    <div className="nav-container">
+                      <NavLink 
+                        to="/" 
+                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+                        onClick={() => setActiveTab('tracker')}>
+                        Tracker
+                      </NavLink>
+                      <NavLink 
+                        to="/calendar" 
+                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+                        onClick={() => setActiveTab('calendar')}>
+                        Calendar
+                      </NavLink>
+                      <NavLink 
+                        to="/stats" 
+                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+                        onClick={() => setActiveTab('stats')}>
+                        Stats
+                      </NavLink>
+                      <NavLink 
+                        to="/timeline" 
+                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+                        onClick={() => setActiveTab('timeline')}>
+                        Timeline
+                      </NavLink>
+                      <NavLink 
+                        to="/urge-toolkit" 
+                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+                        onClick={() => setActiveTab('urge-toolkit')}>
+                        Urge Toolkit
+                      </NavLink>
+                    </div>
+                  </nav>
+                  
+                  <div className="user-controls">
+                    <button className="profile-btn" onClick={() => {/* TODO: Open profile settings */}} title="Profile Settings">
+                      <FaUser />
+                      <span>Profile</span>
+                    </button>
+                    <button className="logout-btn" onClick={logout} title="Logout">
+                      <FaPowerOff />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                // Mobile Layout - Two rows
+                <>
+                  <div className="header-top-row">
+                    <div className="logo-container">
+                      <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
+                    </div>
+                    <div className="mobile-user-controls">
+                      <button className="profile-btn" onClick={() => {/* TODO: Open profile settings */}} title="Profile Settings">
+                        <FaUser />
+                      </button>
+                      <button className="logout-btn" onClick={logout} title="Logout">
+                        <FaPowerOff />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="header-bottom-row">
+                    <span className="mobile-username">{userData.username}</span>
+                  </div>
+                </>
+              )}
+            </header>
+            
+            {/* Banner hidden while all features are free */}
+            {/* {!isPremium && <SubscriptionBanner />} */}
+            
+            {/* Mobile Navigation */}
+            {isMobile && (
+              <MobileNavigation 
+                activeTab={activeTab} 
+                setActiveTab={setActiveTab} 
+                isPremium={false}
+              />
+            )}
+            
+            <main className="app-content">
+              <Routes>
+                <Route path="/" element={<Tracker userData={userData} updateUserData={updateUserData} isPremium={isPremium} />} />
+                <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+                <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+                <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+                <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </main>
+          </>
+        ) : (
+          // Show landing page if not logged in
+          <Routes>
+            <Route path="*" element={<Landing onLogin={handleLogin} />} />
+          </Routes>
+        )}
+      </div>
+    </Router>
+  );
+}
+
+export default App;
