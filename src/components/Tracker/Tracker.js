@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - FIXED: Syntax error corrected
+// components/Tracker/Tracker.js - UPDATED: Consistent button classes matching Calendar modal
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -73,95 +73,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [userData.benefitTracking]);
 
-  // Setup input validation and auto-advance functionality
-  const setupInputBehavior = () => {
-    const iframe = iframeRef.current;
-    if (!iframe) return;
-    
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    const monthInput = iframeDoc.getElementById('month-input');
-    const dayInput = iframeDoc.getElementById('day-input');
-    const yearInput = iframeDoc.getElementById('year-input');
-    
-    // Month input behavior
-    if (monthInput) {
-      monthInput.oninput = (e) => {
-        let value = e.target.value;
-        // Remove non-numeric characters
-        value = value.replace(/[^0-9]/g, '');
-        
-        // Limit to 2 digits
-        if (value.length > 2) {
-          value = value.slice(0, 2);
-        }
-        
-        // Auto-correct common mistakes
-        if (value.length === 1 && parseInt(value) > 1) {
-          value = '0' + value;
-        }
-        
-        // Validate range
-        if (parseInt(value) > 12) {
-          value = '12';
-        }
-        
-        e.target.value = value;
-        
-        // Auto-advance to day field
-        if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 12) {
-          dayInput.focus();
-        }
-      };
-    }
-
-    // Day input behavior
-    if (dayInput) {
-      dayInput.oninput = (e) => {
-        let value = e.target.value;
-        // Remove non-numeric characters
-        value = value.replace(/[^0-9]/g, '');
-        
-        // Limit to 2 digits
-        if (value.length > 2) {
-          value = value.slice(0, 2);
-        }
-        
-        // Auto-correct common mistakes
-        if (value.length === 1 && parseInt(value) > 3) {
-          value = '0' + value;
-        }
-        
-        // Validate range
-        if (parseInt(value) > 31) {
-          value = '31';
-        }
-        
-        e.target.value = value;
-        
-        // Auto-advance to year field
-        if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 31) {
-          yearInput.focus();
-        }
-      };
-    }
-
-    // Year input behavior
-    if (yearInput) {
-      yearInput.oninput = (e) => {
-        let value = e.target.value;
-        // Remove non-numeric characters
-        value = value.replace(/[^0-9]/g, '');
-        
-        // Limit to 4 digits
-        if (value.length > 4) {
-          value = value.slice(0, 4);
-        }
-        
-        e.target.value = value;
-      };
-    }
-  };
-
   // Initialize the iframe content when it loads
   const handleIframeLoad = () => {
     try {
@@ -216,6 +127,87 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       setupInputBehavior();
     } catch (error) {
       console.error("Error setting up iframe:", error);
+    }
+  };
+
+  // Setup input behavior for iframe
+  const setupInputBehavior = () => {
+    try {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+      
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      const monthInput = iframeDoc.getElementById('month-input');
+      const dayInput = iframeDoc.getElementById('day-input');
+      const yearInput = iframeDoc.getElementById('year-input');
+
+      // Month input behavior
+      if (monthInput) {
+        monthInput.oninput = (e) => {
+          let value = e.target.value;
+          value = value.replace(/[^0-9]/g, '');
+          
+          if (value.length > 2) {
+            value = value.slice(0, 2);
+          }
+          
+          if (value.length === 1 && parseInt(value) > 1) {
+            value = '0' + value;
+          }
+          
+          if (parseInt(value) > 12) {
+            value = '12';
+          }
+          
+          e.target.value = value;
+          
+          if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 12) {
+            dayInput.focus();
+          }
+        };
+      }
+
+      // Day input behavior
+      if (dayInput) {
+        dayInput.oninput = (e) => {
+          let value = e.target.value;
+          value = value.replace(/[^0-9]/g, '');
+          
+          if (value.length > 2) {
+            value = value.slice(0, 2);
+          }
+          
+          if (value.length === 1 && parseInt(value) > 3) {
+            value = '0' + value;
+          }
+          
+          if (parseInt(value) > 31) {
+            value = '31';
+          }
+          
+          e.target.value = value;
+          
+          if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 31) {
+            yearInput.focus();
+          }
+        };
+      }
+
+      // Year input behavior
+      if (yearInput) {
+        yearInput.oninput = (e) => {
+          let value = e.target.value;
+          value = value.replace(/[^0-9]/g, '');
+          
+          if (value.length > 4) {
+            value = value.slice(0, 4);
+          }
+          
+          e.target.value = value;
+        };
+      }
+    } catch (error) {
+      console.error("Error setting up input behavior:", error);
     }
   };
   
@@ -522,7 +514,25 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           margin-top: 4px;
         }
         
-        button {
+        /* UPDATED: Buttons styled to match Calendar modal patterns */
+        .primary-action {
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px !important;
+          padding: 8px 16px !important;
+          background-color: rgba(255, 221, 0, 0.1) !important;
+          border: 1px solid rgba(255, 221, 0, 0.2) !important;
+          border-radius: 9999px !important;
+          color: #ffdd00 !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
+          cursor: pointer !important;
+          transition: none !important;
+          flex: 1 !important;
+          justify-content: center !important;
+        }
+        
+        .secondary-action {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
@@ -534,15 +544,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           font-size: 14px !important;
           font-weight: 500 !important;
           cursor: pointer !important;
-          transition: all 0.2s !important;
+          transition: none !important;
           flex: 1 !important;
           justify-content: center !important;
-        }
-        
-        button:hover {
-          background-color: rgba(128, 128, 128, 0.2) !important;
-          border-color: #ffffff !important;
-          color: #ffffff !important;
         }
       </style>
     </head>
@@ -580,8 +584,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
           
           <div class="actions-row">
-            <button type="submit" id="submit-button">Set Date</button>
-            <button type="button" id="cancel-button">${userData.startDate ? "Cancel" : "Use Today"}</button>
+            <button type="submit" id="submit-button" class="primary-action">Set Date</button>
+            <button type="button" id="cancel-button" class="secondary-action">${userData.startDate ? "Cancel" : "Use Today"}</button>
           </div>
         </div>
       </form>
@@ -633,9 +637,16 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               ></textarea>
             </div>
             
+            {/* UPDATED: Form actions with consistent button classes */}
             <div className="form-actions">
-              <button onClick={saveNote} className="action-btn">Save Entry</button>
-              <button onClick={() => setShowNoteModal(false)} className="action-btn">Cancel</button>
+              <button onClick={saveNote} className="action-btn primary-action">
+                <FaCheckCircle />
+                Save Entry
+              </button>
+              <button onClick={() => setShowNoteModal(false)} className="action-btn">
+                <FaTimes />
+                Cancel
+              </button>
             </div>
           </div>
         </div>

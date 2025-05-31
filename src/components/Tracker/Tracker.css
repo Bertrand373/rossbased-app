@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Consistent button styling for all 3 main actions */
+/* components/Tracker/Tracker.css - UPDATED: Consistent button styling matching Calendar modal */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -29,6 +29,7 @@
   justify-self: end;
 }
 
+/* UPDATED: Edit Date button styled like Calendar Cancel button - no animations */
 .action-btn {
   display: flex;
   align-items: center;
@@ -41,7 +42,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: none; /* REMOVED: No animations like Calendar Cancel */
 }
 
 /* UPDATED: Current Streak Section - aligned with other tabs for seamless switching */
@@ -304,6 +305,7 @@
   color: var(--primary);
 }
 
+/* UPDATED: Edit Benefits button styled like Calendar Cancel button - no animations */
 .edit-benefits-btn {
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
@@ -313,7 +315,7 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: 0.75rem;
   cursor: pointer;
-  transition: none;
+  transition: none; /* REMOVED: No animations like Calendar Cancel */
 }
 
 /* Benefit sliders - now inside the card */
@@ -396,16 +398,17 @@
   margin-top: var(--spacing-lg);
 }
 
+/* UPDATED: Save Benefits button styled like Calendar "Edit Day Status" button - no animations */
 .save-benefits-btn {
   background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid #ffdd00;
+  border: 1px solid rgba(255, 221, 0, 0.2);
   border-radius: var(--radius-full);
-  color: #ffdd00;
+  color: var(--primary);
   padding: var(--spacing-sm) var(--spacing-lg);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: none; /* REMOVED: No animations like Calendar Edit Day Status */
 }
 
 /* UPDATED: Journal Section - Now separate and simplified */
@@ -612,6 +615,7 @@
   border-color: var(--primary);
 }
 
+/* UPDATED: Form actions with consistent button styling matching Calendar modal */
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -619,20 +623,32 @@
   margin-top: var(--spacing-lg);
 }
 
-/* Make form action buttons use the same style as action buttons */
+/* UPDATED: Form action buttons styled like Calendar modal buttons */
 .form-actions .action-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: none; /* REMOVED: No animations like Calendar */
+  border: 1px solid;
+}
+
+/* CANCEL/CLOSE buttons styled like Calendar Cancel button */
+.form-actions .action-btn:not(.primary-action) {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+/* ACTION buttons (Save Entry, Set Date) styled like Calendar Edit Day Status button */
+.form-actions .action-btn.primary-action {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
 }
 
 /* Modal styling */
