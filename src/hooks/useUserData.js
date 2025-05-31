@@ -26,6 +26,7 @@ export const useUserData = () => {
       { id: 4, name: '90-Day King', earned: false, date: null }
     ],
     benefitTracking: [],
+    emotionalTracking: [], // ADDED: New emotional tracking array
     streakHistory: [],
     urgeToolUsage: [],
     discordUsername: '',
@@ -67,7 +68,7 @@ export const useUserData = () => {
             focus: 7, 
             confidence: 6, 
             aura: 7, 
-            attraction: 6, 
+            sleep: 6, // CHANGED: sleep replaces attraction
             workout: 8 
           },
           { 
@@ -76,7 +77,7 @@ export const useUserData = () => {
             focus: 6, 
             confidence: 5, 
             aura: 6, 
-            attraction: 5, 
+            sleep: 5, // CHANGED: sleep replaces attraction
             workout: 7 
           },
           { 
@@ -85,8 +86,38 @@ export const useUserData = () => {
             focus: 5, 
             confidence: 4, 
             aura: 5, 
-            attraction: 4, 
+            sleep: 4, // CHANGED: sleep replaces attraction
             workout: 6 
+          }
+        ],
+        // ADDED: Mock emotional tracking data
+        emotionalTracking: [
+          {
+            date: new Date(),
+            day: 7,
+            phase: 1,
+            anxiety: 4,
+            moodStability: 7,
+            mentalClarity: 8,
+            emotionalProcessing: 6
+          },
+          {
+            date: new Date(new Date().setDate(new Date().getDate() - 1)),
+            day: 6,
+            phase: 1,
+            anxiety: 5,
+            moodStability: 6,
+            mentalClarity: 7,
+            emotionalProcessing: 5
+          },
+          {
+            date: new Date(new Date().setDate(new Date().getDate() - 2)),
+            day: 5,
+            phase: 1,
+            anxiety: 6,
+            moodStability: 5,
+            mentalClarity: 6,
+            emotionalProcessing: 4
           }
         ],
         streakHistory: [
@@ -109,7 +140,7 @@ export const useUserData = () => {
         discordUsername: username + '_discord',
         showOnLeaderboard: true,
         notes: {
-          [new Date().toISOString().split('T')[0]]: "Feeling stronger each day. Noticed improved energy levels today."
+          [new Date().toISOString().split('T')[0]]: "Feeling stronger each day. Noticed improved energy levels today. The timeline is helping me understand that this anxiety I'm feeling is normal for day 7."
         }
       };
       
@@ -151,6 +182,7 @@ export const useUserData = () => {
         { id: 4, name: '90-Day King', earned: false, date: null }
       ],
       benefitTracking: [],
+      emotionalTracking: [], // ADDED: Reset emotional tracking
       streakHistory: [],
       urgeToolUsage: [],
       discordUsername: '',
@@ -215,9 +247,20 @@ export const useUserData = () => {
             date: new Date(item.date),
             // Add default values for new benefits if they don't exist
             aura: item.aura || 5,
-            attraction: item.attraction || 5,
+            sleep: item.sleep || item.attraction || 5, // MIGRATION: Handle old attraction data
             workout: item.workout || item.gymPerformance || 5
           }));
+        }
+        
+        // ADDED: Handle emotional tracking data conversion
+        if (parsedUserData.emotionalTracking) {
+          parsedUserData.emotionalTracking = parsedUserData.emotionalTracking.map(item => ({
+            ...item,
+            date: new Date(item.date)
+          }));
+        } else {
+          // Initialize emotional tracking if it doesn't exist
+          parsedUserData.emotionalTracking = [];
         }
         
         if (parsedUserData.streakHistory) {

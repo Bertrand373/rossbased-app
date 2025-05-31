@@ -1,4 +1,4 @@
-// components/Navigation/MobileNavigation.js
+// components/Navigation/MobileNavigation.js - Updated with Timeline
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './MobileNavigation.css';
@@ -8,7 +8,7 @@ import {
   FaHome,
   FaCalendarAlt,
   FaChartBar,
-  FaQuoteRight,
+  FaMapSigns, // CHANGED: Timeline icon instead of quote
   FaShieldAlt
 } from 'react-icons/fa';
 
@@ -49,14 +49,14 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
       </NavLink>
       
       <NavLink 
-        to="/motivation" 
+        to="/timeline" 
         className={({ isActive }) => 
           isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
         }
-        onClick={() => setActiveTab('motivation')}
+        onClick={() => setActiveTab('timeline')}
       >
-        <FaQuoteRight className="mobile-nav-icon" />
-        <span>Quote</span>
+        <FaMapSigns className="mobile-nav-icon" />
+        <span>Timeline</span>
       </NavLink>
       
       <NavLink 
