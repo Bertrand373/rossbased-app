@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Sleep Quality replaces Attraction + Grey Relapse Button
+// components/Tracker/Tracker.js - UPDATED: Warning Triangle icon for relapse button
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -8,7 +8,7 @@ import './Tracker.css';
 import { 
   FaCrown, 
   FaCalendarCheck, 
-  FaExclamationTriangle, 
+  FaExclamationTriangle, // UPDATED: Now using this for relapse button
   FaInfoCircle, 
   FaEdit,
   FaTimes,
@@ -114,50 +114,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           if (userData.startDate) {
             setShowSetStartDate(false);
           } else {
-            // Use today's date
-            const today = new Date();
-            if (monthInput) monthInput.value = today.getMonth() + 1;
-            if (dayInput) dayInput.value = today.getDate();
-            if (yearInput) yearInput.value = today.getFullYear();
-            setTimeout(() => handleIframeSubmit(), 0);
-          }
-        };
-      }
-
-      // Add input validation and auto-advance functionality
-      const setupInputBehavior = () => {
-        // Month input behavior
-        if (monthInput) {
-          monthInput.oninput = (e) => {
-            let value = e.target.value;
-            // Remove non-numeric characters
-            value = value.replace(/[^0-9]/g, '');
-            
-            // Limit to 2 digits
-            if (value.length > 2) {
-              value = value.slice(0, 2);
-            }
-            
-            // Auto-correct common mistakes
-            if (value.length === 1 && parseInt(value) > 1) {
-              value = '0' + value;
-            }
-            
-            // Validate range
-            if (parseInt(value) > 12) {
-              value = '12';
-            }
-            
-            e.target.value = value;
-            
-            // Auto-advance to day field
-            if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 12) {
-              dayInput.focus();
-            }
-          };
-        }
-
-        // Day input behavior
+            // Day input behavior
         if (dayInput) {
           dayInput.oninput = (e) => {
             let value = e.target.value;
@@ -700,7 +657,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               className="streak-action-btn relapse-btn-grey"
               onClick={handleRelapse}
             >
-              <FaTimes />
+              <FaExclamationTriangle />
               <span>Log Relapse</span>
             </button>
             
@@ -936,4 +893,47 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   );
 };
 
-export default Tracker;
+export default Tracker; Use today's date
+            const today = new Date();
+            if (monthInput) monthInput.value = today.getMonth() + 1;
+            if (dayInput) dayInput.value = today.getDate();
+            if (yearInput) yearInput.value = today.getFullYear();
+            setTimeout(() => handleIframeSubmit(), 0);
+          }
+        };
+      }
+
+      // Add input validation and auto-advance functionality
+      const setupInputBehavior = () => {
+        // Month input behavior
+        if (monthInput) {
+          monthInput.oninput = (e) => {
+            let value = e.target.value;
+            // Remove non-numeric characters
+            value = value.replace(/[^0-9]/g, '');
+            
+            // Limit to 2 digits
+            if (value.length > 2) {
+              value = value.slice(0, 2);
+            }
+            
+            // Auto-correct common mistakes
+            if (value.length === 1 && parseInt(value) > 1) {
+              value = '0' + value;
+            }
+            
+            // Validate range
+            if (parseInt(value) > 12) {
+              value = '12';
+            }
+            
+            e.target.value = value;
+            
+            // Auto-advance to day field
+            if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 12) {
+              dayInput.focus();
+            }
+          };
+        }
+
+        //

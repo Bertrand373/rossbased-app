@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Grey relapse button styling */
+/* components/Tracker/Tracker.css - UPDATED: Consistent button styling for all 3 main actions */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -156,6 +156,7 @@
   margin: 0;
 }
 
+/* UPDATED: Consistent styling for ALL streak action buttons */
 .streak-action-btn {
   display: flex;
   align-items: center;
@@ -169,18 +170,18 @@
   border: 1px solid;
 }
 
-/* NEW: Grey relapse button - styled exactly like action-btn but with hover animations */
+/* UPDATED: Relapse button - now matches the visual style of other buttons with grey theme */
 .relapse-btn-grey {
-  background-color: rgba(128, 128, 128, 0.1);
-  color: var(--text-secondary);
-  border-color: var(--border);
+  background-color: rgba(239, 68, 68, 0.1); /* CHANGED: Red-tinted background to match danger theme */
+  color: var(--danger); /* CHANGED: Red text color to match danger theme */
+  border-color: var(--danger); /* CHANGED: Red border to match danger theme */
 }
 
 .relapse-btn-grey:hover {
-  background-color: rgba(128, 128, 128, 0.2);
-  border-color: var(--text);
-  color: var(--text);
-  transform: scale(1.05);
+  background-color: rgba(239, 68, 68, 0.2); /* CHANGED: Darker red background on hover */
+  border-color: var(--danger);
+  color: var(--danger);
+  transform: scale(1.05); /* CONSISTENT: Same hover animation as other buttons */
 }
 
 .wetdream-btn {
@@ -191,6 +192,9 @@
 
 .wetdream-btn:hover {
   background-color: rgba(245, 158, 11, 0.2);
+  border-color: var(--warning);
+  color: var(--warning);
+  transform: scale(1.05);
 }
 
 .urge-btn {
@@ -201,6 +205,9 @@
 
 .urge-btn:hover {
   background-color: rgba(37, 99, 235, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.05);
 }
 
 /* ENHANCED: Benefit Logging Container - header moved inside */
