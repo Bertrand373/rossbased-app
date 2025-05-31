@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Warning Triangle icon for relapse button
+// components/Tracker/Tracker.js - FIXED: Syntax error corrected
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -73,6 +73,95 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [userData.benefitTracking]);
 
+  // Setup input validation and auto-advance functionality
+  const setupInputBehavior = () => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+    
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    const monthInput = iframeDoc.getElementById('month-input');
+    const dayInput = iframeDoc.getElementById('day-input');
+    const yearInput = iframeDoc.getElementById('year-input');
+    
+    // Month input behavior
+    if (monthInput) {
+      monthInput.oninput = (e) => {
+        let value = e.target.value;
+        // Remove non-numeric characters
+        value = value.replace(/[^0-9]/g, '');
+        
+        // Limit to 2 digits
+        if (value.length > 2) {
+          value = value.slice(0, 2);
+        }
+        
+        // Auto-correct common mistakes
+        if (value.length === 1 && parseInt(value) > 1) {
+          value = '0' + value;
+        }
+        
+        // Validate range
+        if (parseInt(value) > 12) {
+          value = '12';
+        }
+        
+        e.target.value = value;
+        
+        // Auto-advance to day field
+        if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 12) {
+          dayInput.focus();
+        }
+      };
+    }
+
+    // Day input behavior
+    if (dayInput) {
+      dayInput.oninput = (e) => {
+        let value = e.target.value;
+        // Remove non-numeric characters
+        value = value.replace(/[^0-9]/g, '');
+        
+        // Limit to 2 digits
+        if (value.length > 2) {
+          value = value.slice(0, 2);
+        }
+        
+        // Auto-correct common mistakes
+        if (value.length === 1 && parseInt(value) > 3) {
+          value = '0' + value;
+        }
+        
+        // Validate range
+        if (parseInt(value) > 31) {
+          value = '31';
+        }
+        
+        e.target.value = value;
+        
+        // Auto-advance to year field
+        if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 31) {
+          yearInput.focus();
+        }
+      };
+    }
+
+    // Year input behavior
+    if (yearInput) {
+      yearInput.oninput = (e) => {
+        let value = e.target.value;
+        // Remove non-numeric characters
+        value = value.replace(/[^0-9]/g, '');
+        
+        // Limit to 4 digits
+        if (value.length > 4) {
+          value = value.slice(0, 4);
+        }
+        
+        e.target.value = value;
+      };
+    }
+  };
+
   // Initialize the iframe content when it loads
   const handleIframeLoad = () => {
     try {
@@ -114,53 +203,15 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           if (userData.startDate) {
             setShowSetStartDate(false);
           } else {
-            // Day input behavior
-        if (dayInput) {
-          dayInput.oninput = (e) => {
-            let value = e.target.value;
-            // Remove non-numeric characters
-            value = value.replace(/[^0-9]/g, '');
-            
-            // Limit to 2 digits
-            if (value.length > 2) {
-              value = value.slice(0, 2);
-            }
-            
-            // Auto-correct common mistakes
-            if (value.length === 1 && parseInt(value) > 3) {
-              value = '0' + value;
-            }
-            
-            // Validate range
-            if (parseInt(value) > 31) {
-              value = '31';
-            }
-            
-            e.target.value = value;
-            
-            // Auto-advance to year field
-            if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 31) {
-              yearInput.focus();
-            }
-          };
-        }
-
-        // Year input behavior
-        if (yearInput) {
-          yearInput.oninput = (e) => {
-            let value = e.target.value;
-            // Remove non-numeric characters
-            value = value.replace(/[^0-9]/g, '');
-            
-            // Limit to 4 digits
-            if (value.length > 4) {
-              value = value.slice(0, 4);
-            }
-            
-            e.target.value = value;
-          };
+            // Use today's date
+            const today = new Date();
+            if (monthInput) monthInput.value = today.getMonth() + 1;
+            if (dayInput) dayInput.value = today.getDate();
+            if (yearInput) yearInput.value = today.getFullYear();
+            setTimeout(() => handleIframeSubmit(), 0);
+          }
         };
-      };
+      }
 
       setupInputBehavior();
     } catch (error) {
@@ -893,47 +944,4 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   );
 };
 
-export default Tracker; Use today's date
-            const today = new Date();
-            if (monthInput) monthInput.value = today.getMonth() + 1;
-            if (dayInput) dayInput.value = today.getDate();
-            if (yearInput) yearInput.value = today.getFullYear();
-            setTimeout(() => handleIframeSubmit(), 0);
-          }
-        };
-      }
-
-      // Add input validation and auto-advance functionality
-      const setupInputBehavior = () => {
-        // Month input behavior
-        if (monthInput) {
-          monthInput.oninput = (e) => {
-            let value = e.target.value;
-            // Remove non-numeric characters
-            value = value.replace(/[^0-9]/g, '');
-            
-            // Limit to 2 digits
-            if (value.length > 2) {
-              value = value.slice(0, 2);
-            }
-            
-            // Auto-correct common mistakes
-            if (value.length === 1 && parseInt(value) > 1) {
-              value = '0' + value;
-            }
-            
-            // Validate range
-            if (parseInt(value) > 12) {
-              value = '12';
-            }
-            
-            e.target.value = value;
-            
-            // Auto-advance to day field
-            if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= 12) {
-              dayInput.focus();
-            }
-          };
-        }
-
-        //
+export default Tracker;
