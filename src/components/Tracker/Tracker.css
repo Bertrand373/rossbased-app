@@ -170,17 +170,17 @@
   border: 1px solid;
 }
 
-/* UPDATED: Relapse button - now matches the visual style of other buttons with grey theme */
+/* UPDATED: Relapse button - grey theme matching the pattern of other buttons */
 .relapse-btn-grey {
-  background-color: rgba(239, 68, 68, 0.1); /* CHANGED: Red-tinted background to match danger theme */
-  color: var(--danger); /* CHANGED: Red text color to match danger theme */
-  border-color: var(--danger); /* CHANGED: Red border to match danger theme */
+  background-color: rgba(128, 128, 128, 0.1); /* GREY: Light grey background */
+  color: var(--text-secondary); /* GREY: Grey text color (same in hover and non-hover) */
+  border-color: var(--text-secondary); /* GREY: Grey border matching text color */
 }
 
 .relapse-btn-grey:hover {
-  background-color: rgba(239, 68, 68, 0.2); /* CHANGED: Darker red background on hover */
-  border-color: var(--danger);
-  color: var(--danger);
+  background-color: rgba(128, 128, 128, 0.2); /* GREY: Darker grey background on hover */
+  border-color: var(--text-secondary); /* GREY: Same grey border color */
+  color: var(--text-secondary); /* GREY: Same grey text color */
   transform: scale(1.05); /* CONSISTENT: Same hover animation as other buttons */
 }
 
