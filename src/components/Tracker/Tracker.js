@@ -159,7 +159,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             e.target.value = value;
           };
-        }
+        };
       };
 
       setupInputBehavior();
