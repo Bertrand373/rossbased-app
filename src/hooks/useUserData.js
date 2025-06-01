@@ -29,6 +29,7 @@ export const useUserData = () => {
     emotionalTracking: [], // ADDED: New emotional tracking array
     streakHistory: [],
     urgeToolUsage: [],
+    urgeLog: [], // ADDED: New urge log for emergency toolkit
     discordUsername: '',
     showOnLeaderboard: false,
     notes: {}
@@ -137,6 +138,25 @@ export const useUserData = () => {
           }
         ],
         urgeToolUsage: [],
+        // ADDED: Mock urge log data for emergency toolkit
+        urgeLog: [
+          {
+            date: new Date(new Date().setDate(new Date().getDate() - 2)),
+            intensity: 6,
+            trigger: 'stress',
+            protocol: 'breathing',
+            phase: 'Foundation Phase',
+            day: 5
+          },
+          {
+            date: new Date(new Date().setDate(new Date().getDate() - 1)),
+            intensity: 4,
+            trigger: 'boredom',
+            protocol: 'mental',
+            phase: 'Foundation Phase',
+            day: 6
+          }
+        ],
         discordUsername: username + '_discord',
         showOnLeaderboard: true,
         notes: {
@@ -185,6 +205,7 @@ export const useUserData = () => {
       emotionalTracking: [], // ADDED: Reset emotional tracking
       streakHistory: [],
       urgeToolUsage: [],
+      urgeLog: [], // ADDED: Reset urge log
       discordUsername: '',
       showOnLeaderboard: false,
       notes: {}
@@ -261,6 +282,17 @@ export const useUserData = () => {
         } else {
           // Initialize emotional tracking if it doesn't exist
           parsedUserData.emotionalTracking = [];
+        }
+        
+        // ADDED: Handle urge log data conversion
+        if (parsedUserData.urgeLog) {
+          parsedUserData.urgeLog = parsedUserData.urgeLog.map(item => ({
+            ...item,
+            date: new Date(item.date)
+          }));
+        } else {
+          // Initialize urge log if it doesn't exist
+          parsedUserData.urgeLog = [];
         }
         
         if (parsedUserData.streakHistory) {

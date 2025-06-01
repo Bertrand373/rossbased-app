@@ -1,4 +1,4 @@
-// App.js - Fixed with proper updateUserData prop for Calendar component
+// App.js - Fixed with proper updateUserData prop for UrgeToolkit component
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
