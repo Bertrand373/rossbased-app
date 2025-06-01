@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css - COMPLETE EMERGENCY TOOLKIT STYLING */
+/* components/UrgeToolkit/UrgeToolkit.css - FIXED: Mobile phase indicator styling */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -30,22 +30,32 @@
   justify-self: end;
 }
 
+/* FIXED: Phase indicator with better mobile styling */
 .phase-indicator {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 140px;
 }
 
 .phase-name {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--primary);
+  text-align: right;
+  line-height: 1.2;
 }
 
 .phase-day {
   font-size: 0.75rem;
   color: var(--text-secondary);
+  text-align: right;
+  line-height: 1.2;
 }
 
 /* Crisis Mode Alert */
@@ -944,7 +954,7 @@
   opacity: 0.8;
 }
 
-/* Mobile Responsiveness */
+/* FIXED: Mobile Responsiveness - Better phase indicator styling */
 @media (max-width: 768px) {
   .toolkit-header {
     display: flex;
@@ -967,14 +977,42 @@
     justify-content: center;
   }
   
+  /* FIXED: Mobile phase indicator - centered and better styled */
   .phase-indicator {
     align-items: center;
     text-align: center;
+    background-color: rgba(255, 221, 0, 0.1);
+    border-color: rgba(255, 221, 0, 0.2);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    min-width: auto;
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .phase-name {
+    font-size: 1rem;
+    text-align: center;
+    line-height: 1.3;
+  }
+  
+  .phase-day {
+    font-size: 0.875rem;
+    text-align: center;
+    opacity: 0.8;
   }
   
   .intensity-scale {
+    display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(2, 1fr);
+    gap: var(--spacing-xs);
+  }
+  
+  .intensity-btn {
+    font-size: 0.875rem;
+    min-height: 40px;
+    aspect-ratio: auto;
   }
   
   .protocols-grid {
@@ -1010,17 +1048,34 @@
     width: 100%;
     justify-content: center;
   }
+  
+  .breathing-btn, .energy-btn {
+    min-width: auto;
+    width: 100%;
+  }
 }
 
 /* Very Small Screens */
 @media (max-width: 480px) {
+  .phase-indicator {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  
+  .phase-name {
+    font-size: 0.875rem;
+  }
+  
+  .phase-day {
+    font-size: 0.75rem;
+  }
+  
   .intensity-scale {
     grid-template-columns: repeat(5, 1fr);
     gap: 4px;
   }
   
   .intensity-btn {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     min-height: 36px;
   }
   
@@ -1041,5 +1096,14 @@
   
   .crisis-icon {
     font-size: 1.5rem;
+  }
+  
+  .tool-name {
+    font-size: 0.75rem;
+  }
+  
+  .tool-activate-btn {
+    font-size: 0.7rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
 }

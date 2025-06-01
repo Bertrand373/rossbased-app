@@ -1,13 +1,14 @@
-// components/UrgeToolkit/UrgeToolkit.js - COMPLETE REBUILD: Emergency Crisis Management System
+// components/UrgeToolkit/UrgeToolkit.js - FIXED: Emergency Crisis Management System
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import './UrgeToolkit.css';
 
-// Icons - FIXED: All required imports included
+// Icons - All required imports
 import { FaShieldAlt, FaExclamationTriangle, FaThermometerHalf, FaBolt, 
   FaBrain, FaHeart, FaEye, FaCompress, FaExpand, FaPlay, FaPause, 
-  FaStop, FaRedo, FaCheckCircle, FaTimes, FaInfoCircle, FaStopwatch } from 'react-icons/fa';
+  FaStop, FaRedo, FaCheckCircle, FaTimes, FaInfoCircle, FaStopwatch,
+  FaLeaf, FaLightbulb, FaTrophy } from 'react-icons/fa';
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   // Emergency States
@@ -37,42 +38,58 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   const currentDay = userData.startDate ? 
     differenceInDays(new Date(), new Date(userData.startDate)) + 1 : 0;
 
-  // Enhanced trigger options
+  // FIXED: Enhanced trigger options with proper error handling
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain, intensity: 'high' },
     { id: 'explicit_content', label: 'Explicit Content', icon: FaEye, intensity: 'extreme' },
     { id: 'stress', label: 'Stress/Anxiety', icon: FaExclamationTriangle, intensity: 'medium' },
-    { id: 'boredom', label: 'Boredom/Idle Time', icon: FaCompress, intensity: 'medium' },
+    { id: 'boredom', label: 'Boredom/Idle Time', icon: FaStopwatch, intensity: 'medium' },
     { id: 'loneliness', label: 'Loneliness', icon: FaHeart, intensity: 'high' },
     { id: 'social_media', label: 'Social Media', icon: FaBolt, intensity: 'medium' },
     { id: 'physical_arousal', label: 'Physical Arousal', icon: FaThermometerHalf, intensity: 'extreme' }
   ];
 
-  // Get phase-specific protocol based on streak day
+  // FIXED: Get phase-specific protocol matching Timeline exactly
   const getPhaseProtocol = () => {
     if (currentDay <= 14) {
       return {
-        name: "Foundation Phase",
+        name: "Initial Adaptation", // FIXED: Matches Timeline exactly
         focus: "Breaking habits, physical control",
-        tools: ['breathing', 'cold', 'physical', 'mental']
+        tools: ['breathing', 'cold', 'physical', 'mental'],
+        icon: FaLeaf,
+        color: "#22c55e"
       };
     } else if (currentDay <= 45) {
       return {
-        name: "Emotional Phase", 
+        name: "Emotional Purging", // FIXED: Matches Timeline exactly
         focus: "Managing emotional volatility",
-        tools: ['breathing', 'energy', 'emotional', 'grounding']
+        tools: ['breathing', 'energy', 'emotional', 'grounding'],
+        icon: FaHeart,
+        color: "#f59e0b"
       };
     } else if (currentDay <= 90) {
       return {
-        name: "Mental Expansion",
+        name: "Mental Expansion", // FIXED: Matches Timeline exactly
         focus: "Transmuting energy to creativity",
-        tools: ['energy', 'transmutation', 'creativity', 'advanced']
+        tools: ['energy', 'transmutation', 'creativity', 'advanced'],
+        icon: FaBrain,
+        color: "#3b82f6"
+      };
+    } else if (currentDay <= 180) {
+      return {
+        name: "Spiritual Integration", // FIXED: Matches Timeline exactly
+        focus: "Advanced energy management", 
+        tools: ['advanced', 'transmutation', 'spiritual', 'mastery'],
+        icon: FaLightbulb,
+        color: "#8b5cf6"
       };
     } else {
       return {
-        name: "Mastery Phase",
-        focus: "Advanced energy management", 
-        tools: ['advanced', 'transmutation', 'spiritual', 'mastery']
+        name: "Mastery & Service", // FIXED: Matches Timeline exactly
+        focus: "Complete mastery and teaching others",
+        tools: ['advanced', 'transmutation', 'spiritual', 'mastery'],
+        icon: FaTrophy,
+        color: "#ffdd00"
       };
     }
   };
@@ -89,103 +106,138 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   // EMERGENCY PHYSIOLOGICAL RESET - Wim Hof Protocol
   const startWimHofBreathing = () => {
-    setBreathingActive(true);
-    setBreathingPhase('inhale');
-    setBreathingCount(0);
-    setBreathingCycle(1);
-    setBreathingTimer(0);
-    
-    breathingIntervalRef.current = setInterval(() => {
-      setBreathingTimer(prev => {
-        const newTime = prev + 1;
-        
-        // Phase transitions for Wim Hof method
-        if (breathingPhase === 'inhale' && newTime >= 2) {
-          setBreathingPhase('exhale');
-          setBreathingCount(prev => prev + 1);
-          return 0;
-        } else if (breathingPhase === 'exhale' && newTime >= 1) {
-          if (breathingCount >= 30) {
-            setBreathingPhase('hold');
+    try {
+      setBreathingActive(true);
+      setBreathingPhase('inhale');
+      setBreathingCount(0);
+      setBreathingCycle(1);
+      setBreathingTimer(0);
+      
+      toast.success('Starting emergency breathing protocol...');
+      
+      breathingIntervalRef.current = setInterval(() => {
+        setBreathingTimer(prev => {
+          const newTime = prev + 1;
+          
+          // Phase transitions for Wim Hof method
+          if (breathingPhase === 'inhale' && newTime >= 2) {
+            setBreathingPhase('exhale');
+            setBreathingCount(prev => prev + 1);
             return 0;
-          } else {
-            setBreathingPhase('inhale');
+          } else if (breathingPhase === 'exhale' && newTime >= 1) {
+            if (breathingCount >= 30) {
+              setBreathingPhase('hold');
+              return 0;
+            } else {
+              setBreathingPhase('inhale');
+              return 0;
+            }
+          } else if (breathingPhase === 'hold' && newTime >= 90) {
+            setBreathingPhase('complete');
+            setBreathingCycle(prev => prev + 1);
+            toast.success('Breathing cycle complete! Urge should be significantly reduced.');
             return 0;
           }
-        } else if (breathingPhase === 'hold' && newTime >= 90) {
-          setBreathingPhase('complete');
-          setBreathingCycle(prev => prev + 1);
-          toast.success('Breathing cycle complete! Urge should be significantly reduced.');
-          return 0;
-        }
-        
-        return newTime;
-      });
-    }, 1000);
+          
+          return newTime;
+        });
+      }, 1000);
+    } catch (error) {
+      console.error('Error starting breathing protocol:', error);
+      toast.error('Error starting breathing protocol');
+    }
   };
 
   const stopBreathing = () => {
-    setBreathingActive(false);
-    setBreathingPhase('ready');
-    if (breathingIntervalRef.current) {
-      clearInterval(breathingIntervalRef.current);
+    try {
+      setBreathingActive(false);
+      setBreathingPhase('ready');
+      if (breathingIntervalRef.current) {
+        clearInterval(breathingIntervalRef.current);
+      }
+      toast.success('Breathing protocol stopped');
+    } catch (error) {
+      console.error('Error stopping breathing:', error);
     }
   };
 
   // ENERGY CIRCULATION - Microcosmic Orbit
   const startEnergyCirculation = () => {
-    setEnergyActive(true);
-    setEnergyPosition('base');
-    setEnergyDirection('up');
-    
-    const positions = ['base', 'sacral', 'solar', 'heart', 'throat', 'third-eye', 'crown'];
-    let currentIndex = 0;
-    
-    energyIntervalRef.current = setInterval(() => {
-      if (energyDirection === 'up') {
-        currentIndex++;
-        if (currentIndex >= positions.length) {
-          setEnergyDirection('down');
-          currentIndex = positions.length - 2;
+    try {
+      setEnergyActive(true);
+      setEnergyPosition('base');
+      setEnergyDirection('up');
+      
+      toast.success('Starting energy circulation...');
+      
+      const positions = ['base', 'sacral', 'solar', 'heart', 'throat', 'third-eye', 'crown'];
+      let currentIndex = 0;
+      
+      energyIntervalRef.current = setInterval(() => {
+        if (energyDirection === 'up') {
+          currentIndex++;
+          if (currentIndex >= positions.length) {
+            setEnergyDirection('down');
+            currentIndex = positions.length - 2;
+          }
+        } else {
+          currentIndex--;
+          if (currentIndex < 0) {
+            setEnergyDirection('up');
+            currentIndex = 1;
+            toast.success('Energy circulation complete! One full orbit.');
+          }
         }
-      } else {
-        currentIndex--;
-        if (currentIndex < 0) {
-          setEnergyDirection('up');
-          currentIndex = 1;
-          toast.success('Energy circulation complete! One full orbit.');
-        }
-      }
-      setEnergyPosition(positions[currentIndex]);
-    }, 3000); // 3 seconds per position
+        setEnergyPosition(positions[currentIndex]);
+      }, 3000); // 3 seconds per position
+    } catch (error) {
+      console.error('Error starting energy circulation:', error);
+      toast.error('Error starting energy circulation');
+    }
   };
 
   const stopEnergyCirculation = () => {
-    setEnergyActive(false);
-    setEnergyPosition('base');
-    if (energyIntervalRef.current) {
-      clearInterval(energyIntervalRef.current);
+    try {
+      setEnergyActive(false);
+      setEnergyPosition('base');
+      if (energyIntervalRef.current) {
+        clearInterval(energyIntervalRef.current);
+      }
+      toast.success('Energy circulation stopped');
+    } catch (error) {
+      console.error('Error stopping energy circulation:', error);
     }
   };
 
-  // URGE INTENSITY ASSESSMENT
+  // FIXED: URGE INTENSITY ASSESSMENT with proper error handling
   const handleUrgeIntensity = (intensity) => {
-    setUrgeIntensity(intensity);
-    
-    if (intensity >= 8) {
-      setIsInCrisis(true);
-      toast.error('CRISIS MODE ACTIVATED - Using emergency protocols');
-    } else if (intensity >= 5) {
-      toast.warning('High intensity detected - Escalating intervention');
-    }
-    
-    // Auto-select appropriate protocol based on intensity
-    if (intensity >= 8) {
-      setActiveProtocol('crisis');
-    } else if (intensity >= 5) {
-      setActiveProtocol('breathing');
-    } else {
-      setActiveProtocol('mental');
+    try {
+      console.log('Setting urge intensity to:', intensity);
+      setUrgeIntensity(intensity);
+      
+      if (intensity >= 8) {
+        setIsInCrisis(true);
+        toast.error('CRISIS MODE ACTIVATED - Using emergency protocols');
+      } else if (intensity >= 5) {
+        toast.warning('High intensity detected - Escalating intervention');
+        setIsInCrisis(false);
+      } else {
+        setIsInCrisis(false);
+      }
+      
+      // Auto-select appropriate protocol based on intensity
+      if (intensity >= 8) {
+        setActiveProtocol('breathing'); // Always start with breathing for crisis
+      } else if (intensity >= 5) {
+        setActiveProtocol('breathing');
+      } else {
+        setActiveProtocol('mental');
+      }
+      
+      console.log('Urge intensity set successfully:', intensity);
+    } catch (error) {
+      console.error('Error handling urge intensity:', error);
+      toast.error('Error setting intensity level');
     }
   };
 
@@ -234,72 +286,118 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         "Pressure point: press firmly between thumb and index finger",
         "Stand straight, shoulders back"
       ]
+    },
+    mental: {
+      name: "Mental Redirection",
+      duration: "1-2 minutes",
+      description: "Cognitive techniques to break thought patterns",
+      steps: [
+        "Count backwards from 100 by 7s",
+        "Name 5 things you can see, 4 you can hear, 3 you can touch",
+        "Recite your goals and reasons for retention",
+        "Visualize your future self thanking you"
+      ]
     }
   };
 
-  // Handle trigger selection and logging
+  // FIXED: Handle trigger selection and logging with error handling
   const handleTriggerSelection = () => {
-    if (selectedTrigger) {
-      // Log the urge with trigger for analytics
-      const urgeLog = {
-        date: new Date(),
-        intensity: urgeIntensity,
-        trigger: selectedTrigger,
-        protocol: activeProtocol,
-        phase: currentPhase.name,
-        day: currentDay
-      };
-      
-      const updatedUrgeLog = [...(userData.urgeLog || []), urgeLog];
-      updateUserData({ urgeLog: updatedUrgeLog });
-      
-      toast.success('Urge logged - this helps identify patterns');
+    try {
+      if (selectedTrigger && updateUserData) {
+        // Log the urge with trigger for analytics
+        const urgeLog = {
+          date: new Date(),
+          intensity: urgeIntensity,
+          trigger: selectedTrigger,
+          protocol: activeProtocol,
+          phase: currentPhase.name,
+          day: currentDay
+        };
+        
+        const updatedUrgeLog = [...(userData.urgeLog || []), urgeLog];
+        updateUserData({ urgeLog: updatedUrgeLog });
+        
+        toast.success('Urge logged - this helps identify patterns');
+      }
+      setShowTriggerSelection(false);
+    } catch (error) {
+      console.error('Error logging trigger:', error);
+      toast.error('Error logging trigger data');
     }
-    setShowTriggerSelection(false);
   };
 
-  // Get streak-phase specific tools
+  // FIXED: Get streak-phase specific tools with proper phase names
   const getPhaseSpecificTools = () => {
     const tools = [];
     
-    if (currentDay <= 14) {
+    try {
+      if (currentDay <= 14) { // Initial Adaptation
+        tools.push(
+          { id: 'habit-breaker', name: 'Habit Circuit Breaker', icon: FaBolt, action: () => toast.success('Habit breaker activated - Do 20 push-ups now!') },
+          { id: 'cold-protocol', name: 'Emergency Cold Protocol', icon: FaThermometerHalf, action: () => toast.success('Cold protocol - Apply cold water to face and wrists for 30 seconds') },
+          { id: 'physical-reset', name: 'Physical Position Reset', icon: FaCompress, action: () => toast.success('Physical reset - Stand up, shoulders back, take 10 deep breaths') }
+        );
+      } else if (currentDay <= 45) { // Emotional Purging
+        tools.push(
+          { id: 'emotional-stabilizer', name: 'Emotional Stabilizer', icon: FaHeart, action: () => toast.success('Emotional stabilizer - Accept the feelings, let them flow through you') },
+          { id: 'energy-transmute', name: 'Energy Transmutation', icon: FaBolt, action: () => toast.success('Energy transmutation - Channel this energy into creative work') },
+          { id: 'grounding', name: 'Grounding Technique', icon: FaCompress, action: () => toast.success('Grounding - Feel your feet on the ground, breathe into your belly') }
+        );
+      } else if (currentDay <= 90) { // Mental Expansion
+        tools.push(
+          { id: 'creative-redirect', name: 'Creative Redirection', icon: FaBrain, action: () => toast.success('Creative redirect - Channel this mental energy into problem-solving') },
+          { id: 'advanced-circulation', name: 'Advanced Energy Work', icon: FaBolt, action: () => toast.success('Advanced energy - Visualize energy rising up your spine to your crown') },
+          { id: 'transmutation-master', name: 'Transmutation Mastery', icon: FaEye, action: () => toast.success('Transmutation mastery - Transform desire into spiritual power') }
+        );
+      } else if (currentDay <= 180) { // Spiritual Integration
+        tools.push(
+          { id: 'spiritual-tools', name: 'Spiritual Integration', icon: FaLightbulb, action: () => toast.success('Spiritual integration - See this as a test of your evolved consciousness') },
+          { id: 'service-redirect', name: 'Service Redirection', icon: FaHeart, action: () => toast.success('Service redirect - How can you use this energy to help others?') },
+          { id: 'wisdom-embodiment', name: 'Wisdom Embodiment', icon: FaEye, action: () => toast.success('Wisdom embodiment - You are beyond these base impulses') }
+        );
+      } else { // Mastery & Service
+        tools.push(
+          { id: 'master-level', name: 'Master Level Techniques', icon: FaTrophy, action: () => toast.success('Master techniques - You have transcended the need for these tools') },
+          { id: 'teaching-moment', name: 'Teaching Opportunity', icon: FaBrain, action: () => toast.success('Teaching moment - Use this experience to guide others') },
+          { id: 'cosmic-perspective', name: 'Cosmic Perspective', icon: FaLightbulb, action: () => toast.success('Cosmic perspective - You are a beacon of transmuted energy') }
+        );
+      }
+    } catch (error) {
+      console.error('Error getting phase tools:', error);
+      // Fallback tools
       tools.push(
-        { id: 'habit-breaker', name: 'Habit Circuit Breaker', icon: FaBolt },
-        { id: 'cold-protocol', name: 'Emergency Cold Protocol', icon: FaThermometerHalf },
-        { id: 'physical-reset', name: 'Physical Position Reset', icon: FaCompress }
-      );
-    } else if (currentDay <= 45) {
-      tools.push(
-        { id: 'emotional-stabilizer', name: 'Emotional Stabilizer', icon: FaHeart },
-        { id: 'energy-transmute', name: 'Energy Transmutation', icon: FaBolt },
-        { id: 'grounding', name: 'Grounding Technique', icon: FaCompress }
-      );
-    } else if (currentDay <= 90) {
-      tools.push(
-        { id: 'creative-redirect', name: 'Creative Redirection', icon: FaBrain },
-        { id: 'advanced-circulation', name: 'Advanced Energy Work', icon: FaBolt },
-        { id: 'transmutation-master', name: 'Transmutation Mastery', icon: FaEye }
-      );
-    } else {
-      tools.push(
-        { id: 'master-level', name: 'Master Level Techniques', icon: FaShieldAlt },
-        { id: 'energy-mastery', name: 'Energy Mastery', icon: FaBolt },
-        { id: 'spiritual-tools', name: 'Spiritual Tools', icon: FaEye }
+        { id: 'basic-breathing', name: 'Basic Breathing', icon: FaBolt, action: () => toast.success('Take 10 deep breaths') }
       );
     }
     
     return tools;
   };
 
+  // FIXED: Handle tool activation with error handling
+  const handleToolActivation = (tool) => {
+    try {
+      if (tool.action) {
+        tool.action();
+      } else {
+        toast.success(`${tool.name} activated`);
+      }
+    } catch (error) {
+      console.error('Error activating tool:', error);
+      toast.error('Error activating tool');
+    }
+  };
+
   return (
     <div className="urge-toolkit-container">
-      {/* Header matching other tabs */}
+      {/* FIXED: Header matching other tabs with proper phase display */}
       <div className="toolkit-header">
         <div className="toolkit-header-spacer"></div>
         <h2>Emergency Toolkit</h2>
         <div className="toolkit-header-actions">
           <div className="phase-indicator">
-            <span className="phase-name">{currentPhase.name}</span>
+            <span className="phase-name" style={{ color: currentPhase.color }}>
+              {currentPhase.name}
+            </span>
             <span className="phase-day">Day {currentDay}</span>
           </div>
         </div>
@@ -318,7 +416,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
 
-      {/* Urge Intensity Assessment */}
+      {/* FIXED: Urge Intensity Assessment with proper error handling */}
       <div className="intensity-assessment-section">
         <h3>Current Urge Intensity</h3>
         <p className="assessment-description">Rate the intensity of what you're experiencing right now</p>
@@ -329,6 +427,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               key={level}
               className={`intensity-btn ${urgeIntensity === level ? 'active' : ''} ${level >= 8 ? 'crisis-level' : level >= 5 ? 'high-level' : 'normal-level'}`}
               onClick={() => handleUrgeIntensity(level)}
+              type="button"
             >
               {level}
             </button>
@@ -413,12 +512,12 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               
               <div className="breathing-controls">
                 {!breathingActive ? (
-                  <button className="btn btn-primary breathing-btn" onClick={startWimHofBreathing}>
+                  <button className="btn btn-primary breathing-btn" onClick={startWimHofBreathing} type="button">
                     <FaPlay />
                     Start Emergency Breathing
                   </button>
                 ) : (
-                  <button className="btn btn-danger breathing-btn" onClick={stopBreathing}>
+                  <button className="btn btn-danger breathing-btn" onClick={stopBreathing} type="button">
                     <FaStop />
                     Stop Protocol
                   </button>
@@ -450,12 +549,12 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               
               <div className="energy-controls">
                 {!energyActive ? (
-                  <button className="btn btn-primary energy-btn" onClick={startEnergyCirculation}>
+                  <button className="btn btn-primary energy-btn" onClick={startEnergyCirculation} type="button">
                     <FaBolt />
                     Start Energy Circulation
                   </button>
                 ) : (
-                  <button className="btn btn-danger energy-btn" onClick={stopEnergyCirculation}>
+                  <button className="btn btn-danger energy-btn" onClick={stopEnergyCirculation} type="button">
                     <FaStop />
                     Stop Circulation
                   </button>
@@ -464,7 +563,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
           )}
 
-          {(activeProtocol === 'cold' || activeProtocol === 'physical') && (
+          {(activeProtocol === 'cold' || activeProtocol === 'physical' || activeProtocol === 'mental') && (
             <div className="manual-protocol-interface">
               <div className="protocol-steps">
                 <h4>Follow these steps:</h4>
@@ -486,7 +585,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
 
-      {/* Phase-Specific Tools */}
+      {/* FIXED: Phase-Specific Tools with matching Timeline names */}
       <div className="phase-tools-section">
         <h3>{currentPhase.name} Tools</h3>
         <p className="phase-description">{currentPhase.focus}</p>
@@ -498,7 +597,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 <tool.icon />
               </div>
               <div className="tool-name">{tool.name}</div>
-              <button className="tool-activate-btn">
+              <button 
+                className="tool-activate-btn"
+                onClick={() => handleToolActivation(tool)}
+                type="button"
+              >
                 Activate
               </button>
             </div>
@@ -518,6 +621,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 key={trigger.id}
                 className={`trigger-option ${selectedTrigger === trigger.id ? 'selected' : ''} ${trigger.intensity}`}
                 onClick={() => setSelectedTrigger(trigger.id)}
+                type="button"
               >
                 <trigger.icon className="trigger-icon" />
                 <span>{trigger.label}</span>
@@ -530,6 +634,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               <button 
                 className="btn btn-primary"
                 onClick={handleTriggerSelection}
+                type="button"
               >
                 <FaCheckCircle />
                 Log This Trigger
@@ -593,15 +698,15 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
           <div className="session-feedback">
             <p>How effective was this session?</p>
             <div className="effectiveness-buttons">
-              <button className="effectiveness-btn high">
+              <button className="effectiveness-btn high" type="button">
                 <FaCheckCircle />
                 Very Effective
               </button>
-              <button className="effectiveness-btn medium">
+              <button className="effectiveness-btn medium" type="button">
                 <FaInfoCircle />
                 Somewhat Effective
               </button>
-              <button className="effectiveness-btn low">
+              <button className="effectiveness-btn low" type="button">
                 <FaTimes />
                 Not Effective
               </button>
