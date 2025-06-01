@@ -364,7 +364,7 @@ button.action-btn:hover {
 .benefit-range-slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 8px;
+  height: 24px; /* RESTORED: Thick track to match thumb size */
   border-radius: var(--radius-full);
   background: rgba(255, 221, 0, 0.2);
   outline: none;
