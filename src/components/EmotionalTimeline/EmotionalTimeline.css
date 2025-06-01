@@ -1,3 +1,10 @@
+/* components/EmotionalTimeline/EmotionalTimeline.css - FIXED: Progress bar colors working properly */
+.emotional-timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
 /* ULTRA FIX: Using CSS custom properties for progress bar colors */
 .progress-fill {
   height: 100%;
@@ -12,11 +19,6 @@
 .progress-fill-colored {
   background-color: var(--phase-color) !important;
   background: var(--phase-color) !important;
-} components/EmotionalTimeline/EmotionalTimeline.css - FIXED: Progress bar colors working properly */
-.emotional-timeline-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
 }
 
 /* Header matching Stats header exactly */
@@ -156,8 +158,6 @@
   border: 1px solid var(--border);
   position: relative;
 }
-
-
 
 .progress-text {
   font-size: 0.875rem;
