@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - FIXED: Progress bar colors working properly */
+/* components/EmotionalTimeline/EmotionalTimeline.css - FIXED: Perfect slider label spacing */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -460,12 +460,15 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* CRITICAL FIX: Perfect slider label spacing - matching Tracker fix */
 .slider-labels {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
   color: var(--text-secondary);
   margin-top: var(--spacing-xs);
+  /* CRITICAL FIX: Perfect alignment with slider track */
+  padding: 0 12px; /* Half of slider thumb width (24px / 2) for perfect alignment */
 }
 
 .emotion-actions {

@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Timeline-style benefit section */
+/* components/Tracker/Tracker.css - UPDATED: Timeline-style benefit section with perfect label spacing */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -219,7 +219,7 @@ button.action-btn:hover {
   transform: scale(1.05);
 }
 
-/* UPDATED: Benefit section styled exactly like Timeline emotional check-in */
+/* COMPLETELY REDESIGNED: Benefit section styled exactly like Timeline emotional check-in */
 .benefit-logging-container {
   display: flex;
   flex-direction: column;
@@ -238,14 +238,15 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Larger section header matching Timeline */
+/* COMPLETELY REDESIGNED: Timeline-style section header with underline */
 .benefit-logging-section-header {
   margin-bottom: var(--spacing-lg);
-  font-size: 1.125rem; /* LARGER: Matching Timeline */
+  font-size: 1.125rem;
   color: var(--text);
   text-align: center;
   position: relative;
   margin-top: 0;
+  font-weight: 600;
 }
 
 .benefit-logging-section-header::after {
@@ -325,17 +326,17 @@ button.action-btn:hover {
   transform: none !important;
 }
 
-/* UPDATED: Benefit sliders styled exactly like Timeline emotional sliders */
+/* COMPLETELY REDESIGNED: Benefit sliders styled exactly like Timeline emotional sliders */
 .benefit-sliders {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg); /* INCREASED: Matching Timeline spacing */
+  gap: var(--spacing-lg);
 }
 
 .benefit-slider-item {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md); /* INCREASED: Matching Timeline spacing */
+  gap: var(--spacing-md);
 }
 
 .benefit-slider-header {
@@ -344,13 +345,13 @@ button.action-btn:hover {
   justify-content: space-between;
 }
 
-/* UPDATED: Larger benefit labels matching Timeline */
+/* COMPLETELY REDESIGNED: Benefit labels matching Timeline exactly */
 .benefit-label {
   font-weight: 500;
   color: var(--text);
   flex: 1;
   text-align: left;
-  font-size: 1rem; /* LARGER: Matching Timeline emotion labels */
+  font-size: 1rem;
 }
 
 .benefit-value {
@@ -400,13 +401,15 @@ button.action-btn:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* ADDED: Slider guide labels exactly like Timeline */
+/* COMPLETELY REDESIGNED: Slider labels with perfect equidistant spacing */
 .slider-labels {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
   color: var(--text-secondary);
   margin-top: var(--spacing-xs);
+  /* CRITICAL FIX: Perfect alignment with slider track */
+  padding: 0 12px; /* Half of slider thumb width (24px / 2) for perfect alignment */
 }
 
 .benefit-actions {
