@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Using CSS custom properties for progress bar
+// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Corrected phase progress calculations
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -277,7 +277,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
 
   const currentPhase = getCurrentPhase();
 
-  // ROBUST: Calculate progress percentage within current phase
+  // CORRECTED: Calculate progress percentage within current phase
   const getPhaseProgress = (phase) => {
     if (!phase || currentDay <= 0) return 0;
     
@@ -289,15 +289,15 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
       return Math.min(100, (milestone / 10) * 100);
     }
     
-    // ROBUST: Calculate how far through the current phase
-    const daysIntoPhase = currentDay - phase.startDay; // 0-based: days completed in this phase
+    // CORRECTED: Calculate how far through the current phase
+    const daysCompletedInPhase = currentDay - phase.startDay; // How many days completed (0-based from phase start)
     const totalDaysInPhase = phase.endDay - phase.startDay + 1; // Total days this phase spans
-    const progress = (daysIntoPhase / totalDaysInPhase) * 100;
+    const progress = (daysCompletedInPhase / totalDaysInPhase) * 100;
     
     return Math.min(100, Math.max(0, progress));
   };
 
-  // ROBUST: Get clear progress text showing phase completion
+  // FIXED: Get mathematically correct progress text
   const getPhaseProgressText = (phase) => {
     if (!phase || currentDay <= 0) return "";
     
@@ -309,12 +309,18 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
       return `Mastery Milestone ${milestoneNumber}, Day ${daysInCurrentMilestone}`;
     }
     
-    // CLEAR: Emphasize this is phase progress, not total journey
-    const daysIntoPhase = currentDay - phase.startDay; // Days completed in this phase
-    const totalDaysInPhase = phase.endDay - phase.startDay + 1; // Total phase length
-    const daysRemaining = phase.endDay - currentDay;
+    // CORRECTED CALCULATION:
+    // If current day = 16 and phase starts at day 15:
+    // Days completed in phase = 16 - 15 = 1 (you've completed 1 day)
+    // But for display, we want to show "Day 2 of phase" (because you're on day 2)
+    // So we add 1 to show current day within phase
     
-    return `${daysIntoPhase} of ${totalDaysInPhase} days through this phase (${daysRemaining} remaining)`;
+    const daysCompletedInPhase = currentDay - phase.startDay; // 0-based completed days
+    const currentDayInPhase = daysCompletedInPhase + 1; // 1-based current day in phase
+    const totalDaysInPhase = phase.endDay - phase.startDay + 1; // Total phase length
+    const daysRemainingInPhase = phase.endDay - currentDay; // Days left after today
+    
+    return `Day ${currentDayInPhase} of ${totalDaysInPhase} in this phase (${daysRemainingInPhase} remaining)`;
   };
 
   // Check if emotions are already logged for today
