@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - FIXED: Perfect slider label spacing */
+/* components/EmotionalTimeline/EmotionalTimeline.css - FINAL FIX: Slider labels positioned directly under sliders */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -397,13 +397,14 @@
 .emotion-slider-item {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm); /* FIXED: Reduced from var(--spacing-md) to bring labels closer */
+  gap: var(--spacing-sm);
 }
 
 .emotion-slider-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: var(--spacing-xs); /* ADDED: Small gap before slider */
 }
 
 .emotion-label {
@@ -428,6 +429,8 @@
   outline: none;
   opacity: 0.8;
   transition: opacity 0.2s;
+  margin: 0 !important; /* FORCE: Remove any default margins */
+  padding: 0 !important; /* FORCE: Remove any default padding */
 }
 
 .emotion-range-slider:hover:not(:disabled) {
@@ -448,6 +451,7 @@
   background: #ffdd00;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 0 !important; /* FORCE: No margins on thumb */
 }
 
 .emotion-range-slider::-moz-range-thumb {
@@ -458,17 +462,35 @@
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 0 !important; /* FORCE: No margins on thumb */
 }
 
-/* CRITICAL FIX: Perfect slider label spacing - closer to slider track */
+/* NUCLEAR FIX: Slider labels positioned DIRECTLY under sliders with NO gap */
 .slider-labels {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
   color: var(--text-secondary);
-  margin-top: 2px; /* FIXED: Much closer to slider - was var(--spacing-xs) which is 4px */
-  /* CRITICAL FIX: Perfect alignment with slider track */
-  padding: 0 12px; /* Half of slider thumb width (24px / 2) for perfect alignment */
+  margin-top: 0px !important; /* NUCLEAR: Absolutely no margin */
+  margin-bottom: 0px !important; /* NUCLEAR: Absolutely no margin */
+  padding-top: 0px !important; /* NUCLEAR: Absolutely no padding */
+  padding-bottom: 0px !important; /* NUCLEAR: Absolutely no padding */
+  line-height: 1 !important; /* NUCLEAR: Minimal line height */
+  /* NUCLEAR: Force labels to be as close as possible */
+  transform: translateY(-4px) !important; /* NUCLEAR: Pull labels up towards slider */
+  /* Perfect alignment with slider track */
+  padding-left: 12px !important; /* Half of slider thumb width for alignment */
+  padding-right: 12px !important; /* Half of slider thumb width for alignment */
+}
+
+/* NUCLEAR: Override any inherited spacing */
+.emotion-slider-item .slider-labels,
+.benefit-slider-item .slider-labels {
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  transform: translateY(-4px) !important; /* Pull up towards slider */
+  line-height: 1 !important;
 }
 
 .emotion-actions {
