@@ -15,7 +15,12 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   const [urgeIntensity, setUrgeIntensity] = useState(0);
   const [activeProtocol, setActiveProtocol] = useState(null);
   const [selectedTrigger, setSelectedTrigger] = useState('');
-  const [sessionStartTime] = useState(new Date());
+  
+  // FIXED: Proper session timing
+  const [sessionStartTime, setSessionStartTime] = useState(null);
+  const [protocolStartTime, setProtocolStartTime] = useState(null);
+  const [totalActiveTime, setTotalActiveTime] = useState(0);
+  const [isTimerActive, setIsTimerActive] = useState(false);
   
   // Breathing Protocol States
   const [breathingActive, setBreathingActive] = useState(false);
@@ -91,6 +96,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     try {
       setUrgeIntensity(intensity);
       
+      // FIXED: Start session timing when user actually begins
+      if (!sessionStartTime) {
+        setSessionStartTime(new Date());
+      }
+      
       // Auto-suggest protocol based on intensity
       if (intensity >= 7) {
         setActiveProtocol('breathing');
@@ -112,6 +122,23 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
+  // FIXED: Start/stop active timing
+  const startActiveTimer = () => {
+    if (!isTimerActive) {
+      setProtocolStartTime(new Date());
+      setIsTimerActive(true);
+    }
+  };
+
+  const stopActiveTimer = () => {
+    if (isTimerActive && protocolStartTime) {
+      const timeSpent = (new Date() - protocolStartTime) / 1000; // seconds
+      setTotalActiveTime(prev => prev + timeSpent);
+      setIsTimerActive(false);
+      setProtocolStartTime(null);
+    }
+  };
+
   // Breathing protocol implementation
   const startBreathing = () => {
     try {
@@ -119,6 +146,9 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
       setBreathingPhase('inhale');
       setBreathingCount(0);
       setBreathingTimer(0);
+      
+      // FIXED: Start active timer when protocol actually begins
+      startActiveTimer();
       
       toast.success('Starting breathing protocol...');
       
@@ -133,6 +163,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             setBreathingCount(prev => prev + 1);
             if (breathingCount >= 10) {
               setBreathingPhase('complete');
+              stopActiveTimer(); // FIXED: Stop timer when protocol ends
               toast.success('Breathing complete! How do you feel?');
               setTimeout(() => setCurrentStep('summary'), 1000);
               return 0;
@@ -158,6 +189,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
       if (breathingIntervalRef.current) {
         clearInterval(breathingIntervalRef.current);
       }
+      stopActiveTimer(); // FIXED: Stop timer when user stops early
       setCurrentStep('summary');
     } catch (error) {
       console.error('Error stopping breathing:', error);
@@ -218,12 +250,16 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   // Reset to start new session
   const resetSession = () => {
+    // FIXED: Reset all timing states
+    stopActiveTimer(); // Stop any active timer
     setCurrentStep('assessment');
     setUrgeIntensity(0);
     setActiveProtocol(null);
     setSelectedTrigger('');
     setBreathingActive(false);
     setBreathingPhase('ready');
+    setSessionStartTime(null);
+    setTotalActiveTime(0);
   };
 
   return (
@@ -349,7 +385,10 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               </div>
               <button 
                 className="primary-btn" 
-                onClick={() => setCurrentStep('tools')}
+                onClick={() => {
+                  startActiveTimer(); // Start timing when user begins manual protocol
+                  setCurrentStep('tools');
+                }}
                 type="button"
               >
                 <FaCheckCircle />
@@ -372,7 +411,10 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               </div>
               <button 
                 className="primary-btn" 
-                onClick={() => setCurrentStep('tools')}
+                onClick={() => {
+                  startActiveTimer(); // Start timing when user begins manual protocol  
+                  setCurrentStep('tools');
+                }}
                 type="button"
               >
                 <FaCheckCircle />
@@ -409,7 +451,10 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
           <div className="tools-actions">
             <button 
               className="primary-btn" 
-              onClick={() => setCurrentStep('summary')}
+              onClick={() => {
+                stopActiveTimer(); // Stop timing when moving to summary
+                setCurrentStep('summary');
+              }}
               type="button"
             >
               Continue to Summary
@@ -454,7 +499,15 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
             <div className="stat-item">
               <span className="stat-label">Session Duration:</span>
-              <span className="stat-value">{Math.round((new Date() - sessionStartTime) / 60000)} minutes</span>
+              <span className="stat-value">
+                {sessionStartTime ? Math.round((new Date() - sessionStartTime) / 60000) : 0} minutes
+              </span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Active Protocol Time:</span>
+              <span className="stat-value">
+                {Math.round(totalActiveTime / 60)} minutes {Math.round(totalActiveTime % 60)} seconds
+              </span>
             </div>
           </div>
 
