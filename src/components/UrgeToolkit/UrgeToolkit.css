@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css - CLEAN REDESIGN: Branded & Intuitive */
+/* components/UrgeToolkit/UrgeToolkit.css - FIXED: Phase indicator with proper colors */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -30,7 +30,7 @@
   justify-self: end;
 }
 
-/* Clean phase indicator */
+/* FIXED: Phase indicator with dynamic colors */
 .phase-indicator {
   display: flex;
   flex-direction: column;
@@ -41,12 +41,18 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   min-width: 140px;
+  /* ADDED: Support for CSS custom properties */
+  border-left: 3px solid var(--phase-color, var(--primary));
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.02) 0%, 
+    color-mix(in srgb, var(--phase-color, var(--primary)) 8%, transparent) 100%
+  );
 }
 
 .phase-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--text);
+  color: var(--phase-color, var(--text));
   text-align: right;
   line-height: 1.2;
 }
@@ -558,11 +564,16 @@
     justify-content: center;
   }
   
+  /* FIXED: Mobile phase indicator with colors */
   .phase-indicator {
     align-items: center;
     text-align: center;
-    background-color: rgba(255, 221, 0, 0.1);
-    border-color: rgba(255, 221, 0, 0.2);
+    background: linear-gradient(135deg, 
+      color-mix(in srgb, var(--phase-color, var(--primary)) 10%, var(--card-background)) 0%, 
+      var(--card-background) 100%
+    );
+    border-left: 3px solid var(--phase-color, var(--primary));
+    border-color: var(--phase-color, var(--primary));
     padding: var(--spacing-md);
     border-radius: var(--radius-lg);
     min-width: auto;
@@ -573,7 +584,7 @@
   .phase-name {
     font-size: 1rem;
     text-align: center;
-    color: var(--primary);
+    color: var(--phase-color, var(--primary));
   }
   
   .phase-day {

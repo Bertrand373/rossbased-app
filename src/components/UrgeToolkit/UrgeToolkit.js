@@ -1,4 +1,4 @@
-// components/UrgeToolkit/UrgeToolkit.js - CLEAN REDESIGN: Improved UX & Branding
+// components/UrgeToolkit/UrgeToolkit.js - FIXED: Day counter and breathing timer
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -22,18 +22,17 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   const [totalActiveTime, setTotalActiveTime] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
   
-  // Breathing Protocol States
+  // FIXED: Breathing Protocol States
   const [breathingActive, setBreathingActive] = useState(false);
-  const [breathingPhase, setBreathingPhase] = useState('ready');
+  const [breathingPhase, setBreathingPhase] = useState('ready'); // ready, inhale, exhale, complete
   const [breathingCount, setBreathingCount] = useState(0);
   const [breathingTimer, setBreathingTimer] = useState(0);
   
   // Timer ref
   const breathingIntervalRef = useRef(null);
   
-  // Calculate current streak day
-  const currentDay = userData.startDate ? 
-    differenceInDays(new Date(), new Date(userData.startDate)) + 1 : 0;
+  // FIXED: Use current streak instead of calculated difference
+  const currentDay = userData.currentStreak || 0;
 
   // Get current phase info (matching Timeline exactly)
   const getCurrentPhase = () => {
@@ -139,7 +138,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  // Breathing protocol implementation
+  // FIXED: Breathing protocol implementation with proper phase transitions
   const startBreathing = () => {
     try {
       setBreathingActive(true);
@@ -156,21 +155,34 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         setBreathingTimer(prev => {
           const newTime = prev + 1;
           
-          if (breathingPhase === 'inhale' && newTime >= 4) {
-            setBreathingPhase('exhale');
-            return 0;
-          } else if (breathingPhase === 'exhale' && newTime >= 4) {
-            setBreathingCount(prev => prev + 1);
-            if (breathingCount >= 10) {
-              setBreathingPhase('complete');
-              stopActiveTimer(); // FIXED: Stop timer when protocol ends
-              toast.success('Breathing complete! How do you feel?');
-              setTimeout(() => setCurrentStep('summary'), 1000);
-              return 0;
-            } else {
-              setBreathingPhase('inhale');
-              return 0;
+          // FIXED: Proper phase transitions with global state updates
+          if (newTime >= 4) {
+            setBreathingTimer(0); // Reset timer for next phase
+            
+            if (breathingPhase === 'inhale') {
+              setBreathingPhase('exhale');
+            } else if (breathingPhase === 'exhale') {
+              setBreathingCount(prevCount => {
+                const newCount = prevCount + 1;
+                if (newCount >= 10) {
+                  // Complete the breathing exercise
+                  setBreathingPhase('complete');
+                  setBreathingActive(false);
+                  if (breathingIntervalRef.current) {
+                    clearInterval(breathingIntervalRef.current);
+                  }
+                  stopActiveTimer();
+                  toast.success('Breathing complete! How do you feel?');
+                  setTimeout(() => setCurrentStep('summary'), 1000);
+                  return newCount;
+                } else {
+                  // Start next cycle
+                  setBreathingPhase('inhale');
+                  return newCount;
+                }
+              });
             }
+            return 0; // Reset timer
           }
           
           return newTime;
@@ -260,6 +272,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     setBreathingPhase('ready');
     setSessionStartTime(null);
     setTotalActiveTime(0);
+    setBreathingCount(0);
+    setBreathingTimer(0);
+    if (breathingIntervalRef.current) {
+      clearInterval(breathingIntervalRef.current);
+    }
   };
 
   return (
@@ -269,7 +286,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         <div className="toolkit-header-spacer"></div>
         <h2>Emergency Toolkit</h2>
         <div className="toolkit-header-actions">
-          <div className="phase-indicator">
+          <div className="phase-indicator" style={{ '--phase-color': currentPhase.color }}>
             <span className="phase-name">{currentPhase.name}</span>
             <span className="phase-day">Day {currentDay}</span>
           </div>
@@ -328,23 +345,25 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             ))}
           </div>
 
-          {/* Active Protocol Interface */}
+          {/* FIXED: Active Protocol Interface with proper breathing states */}
           {activeProtocol === 'breathing' && (
             <div className="breathing-interface">
               <div className="breathing-display">
                 <div className="breathing-circle">
-                  <div className={`breathing-indicator ${breathingPhase}`}>
-                    {breathingPhase === 'ready' && <FaPlay />}
-                    {breathingPhase === 'inhale' && <FaExpand />}
-                    {breathingPhase === 'exhale' && <FaCompress />}
-                    {breathingPhase === 'complete' && <FaCheckCircle />}
+                  <div className={`breathing-animation ${breathingPhase === 'inhale' ? 'inhale-animation' : breathingPhase === 'exhale' ? 'exhale-animation' : ''}`}>
+                    <div className={`breathing-indicator ${breathingPhase}`}>
+                      {breathingPhase === 'ready' && <FaPlay />}
+                      {breathingPhase === 'inhale' && <FaExpand />}
+                      {breathingPhase === 'exhale' && <FaCompress />}
+                      {breathingPhase === 'complete' && <FaCheckCircle />}
+                    </div>
                   </div>
                 </div>
                 
                 <div className="breathing-status">
                   {breathingPhase === 'ready' && <span>Ready to begin</span>}
-                  {breathingPhase === 'inhale' && <span>Breathe IN slowly ({breathingTimer}s)</span>}
-                  {breathingPhase === 'exhale' && <span>Breathe OUT slowly ({breathingTimer}s)</span>}
+                  {breathingPhase === 'inhale' && <span>Breathe IN slowly ({4 - breathingTimer}s remaining)</span>}
+                  {breathingPhase === 'exhale' && <span>Breathe OUT slowly ({4 - breathingTimer}s remaining)</span>}
                   {breathingPhase === 'complete' && <span>Well done!</span>}
                 </div>
                 

@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Corrected phase progress calculations
+// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Day counter matches current streak
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -25,9 +25,8 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   });
   const [emotionsLogged, setEmotionsLogged] = useState(false);
 
-  // Calculate current day and phase
-  const currentDay = userData.startDate ? 
-    differenceInDays(new Date(), new Date(userData.startDate)) + 1 : 0;
+  // FIXED: Use current streak instead of calculated day difference
+  const currentDay = userData.currentStreak || 0;
 
   // FIXED: Enhanced phase definitions with correct icon colors
   const emotionalPhases = [
@@ -260,7 +259,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     }
   ];
 
-  // FIXED: Get current phase based on streak day with proper logic
+  // FIXED: Get current phase based on current streak (not calculated days)
   const getCurrentPhase = () => {
     if (currentDay <= 0) return null;
     
