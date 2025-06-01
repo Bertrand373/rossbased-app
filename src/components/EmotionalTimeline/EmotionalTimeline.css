@@ -397,7 +397,7 @@
 .emotion-slider-item {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm); /* FIXED: Reduced from var(--spacing-md) to bring labels closer */
 }
 
 .emotion-slider-header {

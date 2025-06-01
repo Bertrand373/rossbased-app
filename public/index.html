@@ -3,19 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <!-- ULTRA ENHANCED: Multiple layers of zoom prevention -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no" />
+    <!-- ENHANCED: Strong zoom prevention without breaking loader -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#0f0f0f" />
     <meta
       name="description"
       content="TitanTrack - Track your semen retention journey"
     />
-    <!-- ENHANCED: iOS-specific meta tags with stronger zoom prevention -->
+    <!-- ENHANCED: iOS-specific meta tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="TitanTrack" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <!-- ADDED: Additional zoom prevention meta tags -->
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
     
@@ -32,63 +31,29 @@
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
           'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
           sans-serif;
-        /* ULTRA ENHANCED: Maximum zoom prevention at CSS level */
+        /* ENHANCED: Zoom prevention */
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
         -webkit-touch-callout: none;
         -webkit-tap-highlight-color: transparent;
-        /* CRITICAL: Prevent all zoom and gesture behaviors */
         touch-action: manipulation;
-        -ms-touch-action: manipulation;
         -webkit-text-size-adjust: 100%;
         -ms-text-size-adjust: 100%;
-        /* ADDED: Prevent zoom via transform */
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-        /* ADDED: Force fixed positioning context */
-        position: relative;
-        overflow-x: hidden;
-        /* CRITICAL: Disable all zoom behaviors */
-        zoom: 1;
-        -moz-transform: scale(1);
-        -webkit-transform: scale(1);
-        transform: scale(1);
       }
       
-      /* ULTRA ENHANCED: Force zoom level and prevent scaling on all elements */
-      *, *::before, *::after {
-        -webkit-text-size-adjust: 100%;
-        -ms-text-size-adjust: 100%;
-        touch-action: manipulation;
-        -ms-touch-action: manipulation;
-        /* ADDED: Disable zoom on all elements */
-        zoom: 1;
-        -webkit-transform: scale(1);
-        -moz-transform: scale(1);
-        transform: scale(1);
-      }
-      
-      /* ENHANCED: Allow text selection only in input fields and textareas */
+      /* Allow text selection only in input fields and textareas */
       input, textarea, [contenteditable] {
         -webkit-user-select: text;
         -moz-user-select: text;
         -ms-user-select: text;
         user-select: text;
-        /* CRITICAL: Prevent zoom in input fields */
-        font-size: 16px !important;
-        -webkit-text-size-adjust: 100%;
-      }
-      
-      /* ADDED: Prevent zoom on form controls specifically */
-      input, textarea, select, button {
-        touch-action: manipulation;
-        -webkit-text-size-adjust: 100%;
+        /* Prevent zoom in input fields */
         font-size: 16px !important;
       }
       
-      /* UPDATED: Custom helmet loader with natural helmet colors */
+      /* RESTORED: Working helmet loader */
       #initial-loader {
         position: fixed;
         top: 0;
@@ -102,11 +67,6 @@
         background-color: #0f0f0f;
         z-index: 9999;
         gap: 24px;
-        /* ADDED: Prevent zoom on loader */
-        touch-action: none;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        user-select: none;
       }
       
       #initial-loader .helmet-container {
@@ -119,7 +79,6 @@
         width: 100px;
         height: 100px;
         animation: helmet-pulse 1.8s ease-in-out infinite;
-        /* CLEAN: No glow effects - just clean pulsing */
       }
       
       #initial-loader .loader-message {
@@ -130,17 +89,15 @@
         margin: 0;
       }
       
-      /* CLEAN: Helmet pulse animation - no glow effects */
+      /* CLEAN: Helmet pulse animation */
       @keyframes helmet-pulse {
         0%, 100% { 
           opacity: 1; 
           transform: scale(1);
-          /* CLEAN: No glow effects - just clean scaling and opacity */
         }
         50% { 
           opacity: 0.7; 
           transform: scale(0.94);
-          /* CLEAN: No glow effects - just clean scaling and opacity */
         }
       }
       
@@ -171,15 +128,12 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
-    <!-- UPDATED: Initial helmet loader with natural helmet colors -->
+    <!-- RESTORED: Working helmet loader -->
     <div id="initial-loader">
       <div class="helmet-container">
-        <!-- Try to use the actual helmet image, fallback to SVG if not found -->
         <img class="helmet-image" src="%PUBLIC_URL%/helmet.png" alt="Loading" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
         <svg class="helmet-image" style="display: none;" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <!-- Enhanced Spartan helmet SVG with natural gold/bronze colors -->
           <defs>
-            <!-- FIXED: Gradient uses natural helmet gold/bronze tones -->
             <linearGradient id="helmet-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" style="stop-color:#daa520;stop-opacity:1" />
               <stop offset="50%" style="stop-color:#d4af37;stop-opacity:1" />
@@ -193,22 +147,17 @@
               </feMerge>
             </filter>
           </defs>
-          <!-- Main helmet dome -->
           <path d="M50 10 C25 10, 8 27, 8 50 C8 68, 15 78, 25 85 L75 85 C85 78, 92 68, 92 50 C92 27, 75 10, 50 10 Z" 
                 fill="url(#helmet-gradient)" stroke="#d4af37" stroke-width="1.5" filter="url(#glow)"/>
-          <!-- Helmet crest -->
           <path d="M35 10 Q50 5, 65 10 Q60 15, 50 15 Q40 15, 35 10 Z" 
                 fill="#daa520" stroke="#d4af37" stroke-width="1"/>
-          <!-- Face guard horizontal bars -->
           <rect x="20" y="40" width="60" height="3" rx="1.5" fill="#d4af37"/>
           <rect x="22" y="50" width="56" height="3" rx="1.5" fill="#d4af37"/>
           <rect x="24" y="60" width="52" height="3" rx="1.5" fill="#d4af37"/>
-          <!-- Cheek guards -->
           <path d="M15 45 Q12 50, 15 65 Q20 70, 25 65 L25 45 Z" 
                 fill="url(#helmet-gradient)" stroke="#d4af37" stroke-width="1"/>
           <path d="M85 45 Q88 50, 85 65 Q80 70, 75 65 L75 45 Z" 
                 fill="url(#helmet-gradient)" stroke="#d4af37" stroke-width="1"/>
-          <!-- Nose guard -->
           <path d="M45 35 Q50 30, 55 35 Q50 45, 45 35 Z" 
                 fill="#d4af37" opacity="0.8"/>
         </svg>
@@ -219,142 +168,75 @@
     <div id="root"></div>
     
     <script>
-      // ULTRA ENHANCED: Multiple layers of JavaScript zoom prevention
+      // ENHANCED: Effective zoom prevention without breaking functionality
       
-      // Prevent all gesture events
+      // Prevent gesture events
       document.addEventListener('gesturestart', function (e) {
         e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-      }, { passive: false, capture: true });
+      }, { passive: false });
       
       document.addEventListener('gesturechange', function (e) {
         e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-      }, { passive: false, capture: true });
+      }, { passive: false });
       
-      document.addEventListener('gestureend', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-      }, { passive: false, capture: true });
-      
-      // ENHANCED: Aggressive double-tap zoom prevention
+      // Enhanced double-tap zoom prevention
       let lastTouchEnd = 0;
-      let touchCount = 0;
-      
-      document.addEventListener('touchstart', function(event) {
-        if (event.touches.length > 1) {
-          event.preventDefault();
-          event.stopPropagation();
-          return false;
-        }
-        touchCount++;
-      }, { passive: false, capture: true });
       
       document.addEventListener('touchend', function (event) {
         const now = (new Date()).getTime();
-        
-        // Prevent double-tap zoom
         if (now - lastTouchEnd <= 300) {
           event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
-          return false;
         }
-        
-        // Reset touch count
-        if (event.touches.length === 0) {
-          touchCount = 0;
-        }
-        
         lastTouchEnd = now;
-      }, { passive: false, capture: true });
+      }, { passive: false });
       
-      // ADDED: Prevent pinch-to-zoom with touch events
+      // Prevent pinch-to-zoom
       document.addEventListener('touchmove', function(event) {
         if (event.touches.length > 1) {
           event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
-          return false;
         }
-      }, { passive: false, capture: true });
+      }, { passive: false });
       
-      // ADDED: Prevent mouse wheel zoom
+      // Prevent mouse wheel zoom
       document.addEventListener('wheel', function(event) {
         if (event.ctrlKey || event.metaKey) {
           event.preventDefault();
-          event.stopPropagation();
-          return false;
         }
-      }, { passive: false, capture: true });
+      }, { passive: false });
       
-      // ADDED: Prevent keyboard zoom shortcuts
+      // Prevent keyboard zoom shortcuts
       document.addEventListener('keydown', function(event) {
-        // Prevent Ctrl/Cmd + Plus/Minus/0 (zoom shortcuts)
         if ((event.ctrlKey || event.metaKey) && 
             (event.key === '+' || event.key === '-' || event.key === '0' || 
              event.key === '=' || event.keyCode === 61 || event.keyCode === 173 || 
              event.keyCode === 48)) {
           event.preventDefault();
-          event.stopPropagation();
-          return false;
         }
-      }, { passive: false, capture: true });
+      }, { passive: false });
       
-      // ULTRA ENHANCED: Force zoom level monitoring and reset
-      function forceZoomReset() {
+      // SIMPLIFIED: Zoom reset without breaking loader
+      function resetZoom() {
         try {
-          // Force viewport reset
           const viewport = document.querySelector('meta[name="viewport"]');
           if (viewport) {
-            viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no');
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
           }
-          
-          // Force body zoom reset
-          document.body.style.zoom = '1';
-          document.body.style.transform = 'scale(1)';
-          document.body.style.webkitTransform = 'scale(1)';
-          document.body.style.mozTransform = 'scale(1)';
-          
-          // Force html zoom reset
-          document.documentElement.style.zoom = '1';
-          document.documentElement.style.transform = 'scale(1)';
-          document.documentElement.style.webkitTransform = 'scale(1)';
-          document.documentElement.style.mozTransform = 'scale(1)';
-          
         } catch (error) {
-          // Silently handle any errors
+          // Silent fail
         }
       }
       
-      // Monitor and reset zoom continuously
-      setInterval(forceZoomReset, 100);
+      // Monitor zoom occasionally (not aggressively)
+      setInterval(resetZoom, 1000);
       
-      // Force reset on various events
-      window.addEventListener('resize', forceZoomReset, { passive: true });
-      window.addEventListener('orientationchange', forceZoomReset, { passive: true });
-      document.addEventListener('visibilitychange', forceZoomReset, { passive: true });
-      
-      // Initial force reset
-      forceZoomReset();
-      
-      // Remove the initial loader once the React app mounts
+      // RESTORED: Working loader removal logic
       window.addEventListener('DOMContentLoaded', function() {
-        // Give React a moment to start up
         setTimeout(function() {
           var loader = document.getElementById('initial-loader');
           var root = document.getElementById('root');
           
-          // Check if React has started rendering content
           function checkForReactContent() {
             if (root && root.children.length > 0) {
-              // React has loaded, fade out the helmet loader
               if (loader) {
                 loader.style.opacity = '0';
                 loader.style.transition = 'opacity 0.5s ease';
@@ -365,7 +247,6 @@
                 }, 500);
               }
             } else {
-              // Keep checking every 100ms
               setTimeout(checkForReactContent, 100);
             }
           }

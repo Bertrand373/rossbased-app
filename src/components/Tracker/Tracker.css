@@ -336,7 +336,7 @@ button.action-btn:hover {
 .benefit-slider-item {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm); /* FIXED: Reduced from var(--spacing-md) to bring labels closer */
 }
 
 .benefit-slider-header {
