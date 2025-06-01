@@ -4,10 +4,10 @@ import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import './UrgeToolkit.css';
 
-// Icons
+// Icons - FIXED: All required imports included
 import { FaShieldAlt, FaExclamationTriangle, FaThermometerHalf, FaBolt, 
   FaBrain, FaHeart, FaEye, FaCompress, FaExpand, FaPlay, FaPause, 
-  FaStop, FaRedo, FaCheckCircle, FaTimes, FaInfoCircle } from 'react-icons/fa';
+  FaStop, FaRedo, FaCheckCircle, FaTimes, FaInfoCircle, FaStopwatch } from 'react-icons/fa';
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   // Emergency States
