@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Progress bar calculation and color
+// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Using CSS custom properties for progress bar
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -432,7 +432,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
 
-      {/* FIXED: Current Phase Display with proper icon colors and progress */}
+      {/* ULTRA FIX: Current Phase Display with CSS custom properties */}
       {currentPhase && currentDay > 0 && (
         <div className="current-phase-container">
           <div className="phase-card current">
@@ -452,14 +452,18 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
               {wisdomMode ? currentPhase.esotericDescription : currentPhase.description}
             </div>
 
-            {/* FIXED: Progress bar with correct calculation and color */}
+            {/* ULTRA FIX: Progress bar using CSS custom properties */}
             <div className="phase-progress">
-              <div className="progress-bar">
+              <div 
+                className="progress-bar"
+                style={{
+                  '--phase-color': currentPhase.color
+                }}
+              >
                 <div 
-                  className="progress-fill"
+                  className="progress-fill progress-fill-colored"
                   style={{ 
-                    width: `${getPhaseProgress(currentPhase)}%`,
-                    backgroundColor: currentPhase.color
+                    width: `${getPhaseProgress(currentPhase)}%`
                   }}
                 ></div>
               </div>

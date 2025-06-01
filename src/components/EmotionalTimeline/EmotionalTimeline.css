@@ -1,4 +1,18 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - FIXED: Progress bar colors working properly */
+/* ULTRA FIX: Using CSS custom properties for progress bar colors */
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  /* Default background - will be overridden by CSS custom property */
+  background-color: #666666;
+}
+
+/* ULTRA OVERRIDE: Use CSS custom property for dynamic coloring */
+.progress-fill-colored {
+  background-color: var(--phase-color) !important;
+  background: var(--phase-color) !important;
+} components/EmotionalTimeline/EmotionalTimeline.css - FIXED: Progress bar colors working properly */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -143,14 +157,7 @@
   position: relative;
 }
 
-/* CRITICAL FIX: Removed hardcoded background color to allow inline styles to work */
-.progress-fill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  transition: width 0.6s ease; /* FIXED: Smoother animation */
-  /* REMOVED: background color here - now set via inline style in component */
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); /* ADDED: Subtle glow effect */
-}
+
 
 .progress-text {
   font-size: 0.875rem;
