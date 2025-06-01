@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Proper icon colors and progress bar
+// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Progress bar calculation and color
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -277,24 +277,44 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
 
   const currentPhase = getCurrentPhase();
 
-  // FIXED: Calculate progress percentage within current phase
+  // ROBUST: Calculate progress percentage within current phase
   const getPhaseProgress = (phase) => {
     if (!phase || currentDay <= 0) return 0;
     
-    // Special handling for the infinite phase (181+)
+    // Special handling for the infinite mastery phase (181+)
     if (phase.endDay === 999) {
-      // For the mastery phase, show progress based on milestones
-      const daysInPhase = currentDay - phase.startDay + 1;
-      const milestone = Math.min(daysInPhase / 30, 10); // Cap at 10 months for visual purposes
+      // For the mastery phase, show progress based on 30-day milestones
+      const daysIntoMastery = currentDay - phase.startDay;
+      const milestone = Math.min(daysIntoMastery / 30, 10); // Cap at 10 milestones for visual
       return Math.min(100, (milestone / 10) * 100);
     }
     
-    // Normal phase progress calculation
-    const daysInPhase = currentDay - phase.startDay + 1;
-    const totalDaysInPhase = phase.endDay - phase.startDay + 1;
-    const progress = (daysInPhase / totalDaysInPhase) * 100;
+    // ROBUST: Calculate how far through the current phase
+    const daysIntoPhase = currentDay - phase.startDay; // 0-based: days completed in this phase
+    const totalDaysInPhase = phase.endDay - phase.startDay + 1; // Total days this phase spans
+    const progress = (daysIntoPhase / totalDaysInPhase) * 100;
     
     return Math.min(100, Math.max(0, progress));
+  };
+
+  // ROBUST: Get clear progress text showing phase completion
+  const getPhaseProgressText = (phase) => {
+    if (!phase || currentDay <= 0) return "";
+    
+    // Special handling for the infinite mastery phase (181+)
+    if (phase.endDay === 999) {
+      const daysIntoMastery = currentDay - phase.startDay;
+      const milestoneNumber = Math.floor(daysIntoMastery / 30) + 1;
+      const daysInCurrentMilestone = (daysIntoMastery % 30) + 1;
+      return `Mastery Milestone ${milestoneNumber}, Day ${daysInCurrentMilestone}`;
+    }
+    
+    // CLEAR: Emphasize this is phase progress, not total journey
+    const daysIntoPhase = currentDay - phase.startDay; // Days completed in this phase
+    const totalDaysInPhase = phase.endDay - phase.startDay + 1; // Total phase length
+    const daysRemaining = phase.endDay - currentDay;
+    
+    return `${daysIntoPhase} of ${totalDaysInPhase} days through this phase (${daysRemaining} remaining)`;
   };
 
   // Check if emotions are already logged for today
@@ -432,6 +452,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
               {wisdomMode ? currentPhase.esotericDescription : currentPhase.description}
             </div>
 
+            {/* FIXED: Progress bar with correct calculation and color */}
             <div className="phase-progress">
               <div className="progress-bar">
                 <div 
@@ -443,10 +464,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                 ></div>
               </div>
               <div className="progress-text">
-                {currentPhase.endDay === 999 ? 
-                  `Day ${currentDay - currentPhase.startDay + 1} of mastery` :
-                  `Day ${currentDay - currentPhase.startDay + 1} of ${currentPhase.endDay - currentPhase.startDay + 1}`
-                }
+                {getPhaseProgressText(currentPhase)}
               </div>
             </div>
 
