@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js
+// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Proper icon colors and progress bar
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -29,7 +29,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   const currentDay = userData.startDate ? 
     differenceInDays(new Date(), new Date(userData.startDate)) + 1 : 0;
 
-  // Enhanced phase definitions with both practical and esoteric insights
+  // FIXED: Enhanced phase definitions with correct icon colors
   const emotionalPhases = [
     {
       id: 1,
@@ -38,7 +38,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
       startDay: 1,
       endDay: 14,
       icon: FaLeaf,
-      color: "#22c55e",
+      color: "#22c55e", // Green
       description: "Your body begins adapting to retention while initial urges peak",
       esotericDescription: "The vital force begins redirecting from lower centers to higher consciousness",
       commonExperiences: [
@@ -77,7 +77,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
       startDay: 15,
       endDay: 45,
       icon: FaHeart,
-      color: "#f59e0b",
+      color: "#f59e0b", // Orange/Yellow
       description: "Suppressed emotions surface for healing - this is the most challenging phase",
       esotericDescription: "The heart chakra opens, releasing stored emotional trauma for spiritual purification",
       commonExperiences: [
@@ -124,7 +124,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
       startDay: 46,
       endDay: 90,
       icon: FaBrain,
-      color: "#3b82f6",
+      color: "#3b82f6", // Blue
       description: "Cognitive abilities enhance as emotional turbulence stabilizes",
       esotericDescription: "The third eye awakens as mental faculties expand beyond ordinary consciousness",
       commonExperiences: [
@@ -171,7 +171,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
       startDay: 91,
       endDay: 180,
       icon: FaLightbulb,
-      color: "#8b5cf6",
+      color: "#8b5cf6", // Purple
       description: "Profound inner transformation as benefits become deeply integrated",
       esotericDescription: "Soul integration as the divine masculine energy fully awakens within",
       commonExperiences: [
@@ -218,7 +218,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
       startDay: 181,
       endDay: 999,
       icon: FaTrophy,
-      color: "#ffdd00",
+      color: "#ffdd00", // Gold/Yellow
       description: "Complete integration - you've transcended the need for external validation",
       esotericDescription: "Bodhisattva consciousness - enlightened being choosing to serve others",
       commonExperiences: [
@@ -260,15 +260,42 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     }
   ];
 
-  // Get current phase based on streak day
+  // FIXED: Get current phase based on streak day with proper logic
   const getCurrentPhase = () => {
     if (currentDay <= 0) return null;
-    return emotionalPhases.find(phase => 
-      currentDay >= phase.startDay && currentDay <= phase.endDay
-    ) || emotionalPhases[emotionalPhases.length - 1]; // Default to last phase for 181+
+    
+    // Find the phase that contains the current day
+    for (const phase of emotionalPhases) {
+      if (currentDay >= phase.startDay && (phase.endDay === 999 || currentDay <= phase.endDay)) {
+        return phase;
+      }
+    }
+    
+    // Fallback to first phase if something goes wrong
+    return emotionalPhases[0];
   };
 
   const currentPhase = getCurrentPhase();
+
+  // FIXED: Calculate progress percentage within current phase
+  const getPhaseProgress = (phase) => {
+    if (!phase || currentDay <= 0) return 0;
+    
+    // Special handling for the infinite phase (181+)
+    if (phase.endDay === 999) {
+      // For the mastery phase, show progress based on milestones
+      const daysInPhase = currentDay - phase.startDay + 1;
+      const milestone = Math.min(daysInPhase / 30, 10); // Cap at 10 months for visual purposes
+      return Math.min(100, (milestone / 10) * 100);
+    }
+    
+    // Normal phase progress calculation
+    const daysInPhase = currentDay - phase.startDay + 1;
+    const totalDaysInPhase = phase.endDay - phase.startDay + 1;
+    const progress = (daysInPhase / totalDaysInPhase) * 100;
+    
+    return Math.min(100, Math.max(0, progress));
+  };
 
   // Check if emotions are already logged for today
   useEffect(() => {
@@ -385,7 +412,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
 
-      {/* Current Phase Display */}
+      {/* FIXED: Current Phase Display with proper icon colors and progress */}
       {currentPhase && currentDay > 0 && (
         <div className="current-phase-container">
           <div className="phase-card current">
@@ -410,7 +437,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                 <div 
                   className="progress-fill"
                   style={{ 
-                    width: `${Math.min(100, ((currentDay - currentPhase.startDay) / (currentPhase.endDay - currentPhase.startDay)) * 100)}%`,
+                    width: `${getPhaseProgress(currentPhase)}%`,
                     backgroundColor: currentPhase.color
                   }}
                 ></div>
@@ -434,12 +461,12 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
 
-      {/* Timeline Overview */}
+      {/* FIXED: Timeline Overview with proper phase status and colors */}
       <div className="timeline-overview">
         <h3>Complete Journey Map</h3>
         <div className="phases-timeline">
           {emotionalPhases.map((phase, index) => {
-            const isCompleted = currentDay > phase.endDay;
+            const isCompleted = currentDay > phase.endDay && phase.endDay !== 999;
             const isCurrent = currentPhase?.id === phase.id;
             const isUpcoming = currentDay < phase.startDay;
             
@@ -459,6 +486,11 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                 {isCompleted && (
                   <div className="timeline-phase-check">
                     <FaCheckCircle style={{ color: phase.color }} />
+                  </div>
+                )}
+                {isCurrent && (
+                  <div className="timeline-phase-current" style={{ color: phase.color }}>
+                    Current
                   </div>
                 )}
               </div>

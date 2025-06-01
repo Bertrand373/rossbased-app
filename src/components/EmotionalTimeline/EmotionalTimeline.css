@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - Styled like Stats tab */
+/* components/EmotionalTimeline/EmotionalTimeline.css - FIXED: Proper phase colors and progress bar */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -89,11 +89,13 @@
   gap: var(--spacing-lg);
 }
 
+/* FIXED: Phase icon with proper color inheritance */
 .phase-icon {
   font-size: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Color is set via inline style in the component */
 }
 
 .phase-info {
@@ -123,6 +125,7 @@
   text-align: center;
 }
 
+/* FIXED: Progress bar with proper background and color inheritance */
 .phase-progress {
   order: 4;
   display: flex;
@@ -132,23 +135,27 @@
 
 .progress-bar {
   width: 100%;
-  height: 8px;
-  background-color: var(--medium-gray);
+  height: 12px; /* INCREASED: Slightly thicker for better visibility */
+  background-color: rgba(255, 255, 255, 0.1); /* FIXED: Subtle background */
   border-radius: var(--radius-full);
   overflow: hidden;
   border: 1px solid var(--border);
+  position: relative;
 }
 
 .progress-fill {
   height: 100%;
   border-radius: var(--radius-full);
-  transition: width 0.3s ease;
+  transition: width 0.6s ease; /* FIXED: Smoother animation */
+  /* Background color is set via inline style in the component */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); /* ADDED: Subtle glow effect */
 }
 
 .progress-text {
   font-size: 0.875rem;
   color: var(--text-secondary);
   text-align: center;
+  font-weight: 500;
 }
 
 .phase-detail-btn {
@@ -191,6 +198,7 @@
   gap: var(--spacing-md);
 }
 
+/* FIXED: Timeline phases with proper color inheritance */
 .timeline-phase {
   display: flex;
   align-items: center;
@@ -223,6 +231,7 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
+/* FIXED: Phase status styling with proper colors */
 .timeline-phase.completed {
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%);
   border: 1px solid rgba(34, 197, 94, 0.2);
@@ -243,6 +252,7 @@
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
 }
 
+/* FIXED: Timeline phase icon with color inheritance */
 .timeline-phase-icon {
   font-size: 1.5rem;
   display: flex;
@@ -253,6 +263,7 @@
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+  /* Color is set via inline style in the component */
 }
 
 .timeline-phase-info {
@@ -276,6 +287,17 @@
 .timeline-phase-check {
   font-size: 1.25rem;
   flex-shrink: 0;
+}
+
+/* ADDED: Current phase indicator */
+.timeline-phase-current {
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
+  /* Color is set via inline style in the component */
 }
 
 /* Emotional Check-in Section - styled like Stats benefit tracker */
@@ -636,11 +658,13 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* FIXED: Phase modal icon with color inheritance */
 .phase-modal-icon {
   font-size: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Color is set via inline style in the component */
 }
 
 .phase-modal-info h3 {
