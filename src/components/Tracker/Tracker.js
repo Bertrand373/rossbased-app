@@ -781,6 +781,86 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 min="1"
                 max="10"
                 value={todayBenefits.energy}
+                onChange={(e) => handleBenefitChange('energy', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Low</span>
+                <span>High</span>
+              </div>
+            </div>
+            
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Focus</span>
+                <span className="benefit-value">{todayBenefits.focus}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.focus}
+                onChange={(e) => handleBenefitChange('focus', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Scattered</span>
+                <span>Laser Focus</span>
+              </div>
+            </div>
+            
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Confidence</span>
+                <span className="benefit-value">{todayBenefits.confidence}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.confidence}
+                onChange={(e) => handleBenefitChange('confidence', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Insecure</span>
+                <span>Very Confident</span>
+              </div>
+            </div>
+            
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Aura</span>
+                <span className="benefit-value">{todayBenefits.aura}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.aura}
+                onChange={(e) => handleBenefitChange('aura', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Invisible</span>
+                <span>Magnetic</span>
+              </div>
+            </div>
+            
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Sleep Quality</span>
+                <span className="benefit-value">{todayBenefits.sleep}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.sleep}
                 onChange={(e) => handleBenefitChange('sleep', parseInt(e.target.value))}
                 className="benefit-range-slider"
                 disabled={benefitsLogged}
@@ -900,84 +980,4 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   );
 };
 
-export default Tracker;efitChange('energy', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Low</span>
-                <span>High</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Focus</span>
-                <span className="benefit-value">{todayBenefits.focus}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.focus}
-                onChange={(e) => handleBenefitChange('focus', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Scattered</span>
-                <span>Laser Focus</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Confidence</span>
-                <span className="benefit-value">{todayBenefits.confidence}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.confidence}
-                onChange={(e) => handleBenefitChange('confidence', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Insecure</span>
-                <span>Very Confident</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Aura</span>
-                <span className="benefit-value">{todayBenefits.aura}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.aura}
-                onChange={(e) => handleBenefitChange('aura', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Invisible</span>
-                <span>Magnetic</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Sleep Quality</span>
-                <span className="benefit-value">{todayBenefits.sleep}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.sleep}
-                onChange={(e) => handleBen
+export default Tracker;
