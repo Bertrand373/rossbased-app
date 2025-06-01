@@ -460,13 +460,13 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* CRITICAL FIX: Perfect slider label spacing - matching Tracker fix */
+/* CRITICAL FIX: Perfect slider label spacing - closer to slider track */
 .slider-labels {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
   color: var(--text-secondary);
-  margin-top: var(--spacing-xs);
+  margin-top: 2px; /* FIXED: Much closer to slider - was var(--spacing-xs) which is 4px */
   /* CRITICAL FIX: Perfect alignment with slider track */
   padding: 0 12px; /* Half of slider thumb width (24px / 2) for perfect alignment */
 }
