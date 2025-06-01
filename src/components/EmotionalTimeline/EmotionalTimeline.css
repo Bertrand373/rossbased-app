@@ -445,8 +445,8 @@
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 20px; /* REFINED: Smaller than track for inset appearance */
+  height: 20px; /* REFINED: Smaller than track for inset appearance */
   border-radius: 50%;
   background: #ffdd00;
   cursor: pointer;
@@ -455,8 +455,8 @@
 }
 
 .emotion-range-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 20px; /* REFINED: Smaller than track for inset appearance */
+  height: 20px; /* REFINED: Smaller than track for inset appearance */
   border-radius: 50%;
   background: #ffdd00;
   cursor: pointer;
