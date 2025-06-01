@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Consistent button classes matching Calendar modal
+// components/Tracker/Tracker.js - UPDATED: Timeline-style benefit sliders with guide text
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -82,61 +82,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
       
       // Initialize date picker with current values
-      const monthInput = iframeDoc.getElementById('month-input');
-      const dayInput = iframeDoc.getElementById('day-input');
-      const yearInput = iframeDoc.getElementById('year-input');
-      
-      if (monthInput && dayInput && yearInput) {
-        monthInput.value = startDate.getMonth() + 1;
-        dayInput.value = startDate.getDate();
-        yearInput.value = startDate.getFullYear();
-      }
-      
-      // Setup the form submission
-      const form = iframeDoc.getElementById('date-form');
-      if (form) {
-        form.onsubmit = (e) => {
-          e.preventDefault();
-          handleIframeSubmit();
-        };
-      }
-      
-      // Setup button handlers
-      const submitButton = iframeDoc.getElementById('submit-button');
-      const cancelButton = iframeDoc.getElementById('cancel-button');
-      
-      if (submitButton) {
-        submitButton.onclick = () => handleIframeSubmit();
-      }
-      
-      if (cancelButton) {
-        cancelButton.onclick = () => {
-          if (userData.startDate) {
-            setShowSetStartDate(false);
-          } else {
-            // Use today's date
-            const today = new Date();
-            if (monthInput) monthInput.value = today.getMonth() + 1;
-            if (dayInput) dayInput.value = today.getDate();
-            if (yearInput) yearInput.value = today.getFullYear();
-            setTimeout(() => handleIframeSubmit(), 0);
-          }
-        };
-      }
-
-      setupInputBehavior();
-    } catch (error) {
-      console.error("Error setting up iframe:", error);
-    }
-  };
-
-  // Setup input behavior for iframe
-  const setupInputBehavior = () => {
-    try {
-      const iframe = iframeRef.current;
-      if (!iframe) return;
-      
-      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
       const monthInput = iframeDoc.getElementById('month-input');
       const dayInput = iframeDoc.getElementById('day-input');
       const yearInput = iframeDoc.getElementById('year-input');
@@ -742,7 +687,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* UPDATED: Benefit Logging Section with Sleep Quality */}
+      {/* UPDATED: Benefit Logging Section styled like Timeline emotional check-in */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -769,6 +714,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
+          {/* UPDATED: Benefit sliders with Timeline-style guide labels */}
           <div className="benefit-sliders">
             <div className="benefit-slider-item">
               <div className="benefit-slider-header">
@@ -784,6 +730,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 className="benefit-range-slider"
                 disabled={benefitsLogged}
               />
+              <div className="slider-labels">
+                <span>Low</span>
+                <span>High</span>
+              </div>
             </div>
             
             <div className="benefit-slider-item">
@@ -800,6 +750,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 className="benefit-range-slider"
                 disabled={benefitsLogged}
               />
+              <div className="slider-labels">
+                <span>Scattered</span>
+                <span>Laser Focus</span>
+              </div>
             </div>
             
             <div className="benefit-slider-item">
@@ -816,6 +770,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 className="benefit-range-slider"
                 disabled={benefitsLogged}
               />
+              <div className="slider-labels">
+                <span>Insecure</span>
+                <span>Very Confident</span>
+              </div>
             </div>
             
             <div className="benefit-slider-item">
@@ -832,6 +790,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 className="benefit-range-slider"
                 disabled={benefitsLogged}
               />
+              <div className="slider-labels">
+                <span>Invisible</span>
+                <span>Magnetic</span>
+              </div>
             </div>
             
             <div className="benefit-slider-item">
@@ -848,6 +810,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 className="benefit-range-slider"
                 disabled={benefitsLogged}
               />
+              <div className="slider-labels">
+                <span>Poor</span>
+                <span>Excellent</span>
+              </div>
             </div>
             
             <div className="benefit-slider-item">
@@ -864,6 +830,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 className="benefit-range-slider"
                 disabled={benefitsLogged}
               />
+              <div className="slider-labels">
+                <span>Weak</span>
+                <span>Strong</span>
+              </div>
             </div>
           </div>
           
@@ -955,4 +925,59 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   );
 };
 
-export default Tracker;
+export default Tracker;d('day-input');
+      const yearInput = iframeDoc.getElementById('year-input');
+      
+      if (monthInput && dayInput && yearInput) {
+        monthInput.value = startDate.getMonth() + 1;
+        dayInput.value = startDate.getDate();
+        yearInput.value = startDate.getFullYear();
+      }
+      
+      // Setup the form submission
+      const form = iframeDoc.getElementById('date-form');
+      if (form) {
+        form.onsubmit = (e) => {
+          e.preventDefault();
+          handleIframeSubmit();
+        };
+      }
+      
+      // Setup button handlers
+      const submitButton = iframeDoc.getElementById('submit-button');
+      const cancelButton = iframeDoc.getElementById('cancel-button');
+      
+      if (submitButton) {
+        submitButton.onclick = () => handleIframeSubmit();
+      }
+      
+      if (cancelButton) {
+        cancelButton.onclick = () => {
+          if (userData.startDate) {
+            setShowSetStartDate(false);
+          } else {
+            // Use today's date
+            const today = new Date();
+            if (monthInput) monthInput.value = today.getMonth() + 1;
+            if (dayInput) dayInput.value = today.getDate();
+            if (yearInput) yearInput.value = today.getFullYear();
+            setTimeout(() => handleIframeSubmit(), 0);
+          }
+        };
+      }
+
+      setupInputBehavior();
+    } catch (error) {
+      console.error("Error setting up iframe:", error);
+    }
+  };
+
+  // Setup input behavior for iframe
+  const setupInputBehavior = () => {
+    try {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+      
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      const monthInput = iframeDoc.getElementById('month-input');
+      const dayInput = iframeDoc.getElementByI

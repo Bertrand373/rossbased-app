@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - FIXED: All hover effects removed */
+/* components/Tracker/Tracker.css - UPDATED: Timeline-style benefit section */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -219,6 +219,7 @@ button.action-btn:hover {
   transform: scale(1.05);
 }
 
+/* UPDATED: Benefit section styled exactly like Timeline emotional check-in */
 .benefit-logging-container {
   display: flex;
   flex-direction: column;
@@ -237,9 +238,10 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
 }
 
+/* UPDATED: Larger section header matching Timeline */
 .benefit-logging-section-header {
   margin-bottom: var(--spacing-lg);
-  font-size: 1.125rem;
+  font-size: 1.125rem; /* LARGER: Matching Timeline */
   color: var(--text);
   text-align: center;
   position: relative;
@@ -323,16 +325,17 @@ button.action-btn:hover {
   transform: none !important;
 }
 
+/* UPDATED: Benefit sliders styled exactly like Timeline emotional sliders */
 .benefit-sliders {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-lg); /* INCREASED: Matching Timeline spacing */
 }
 
 .benefit-slider-item {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-md); /* INCREASED: Matching Timeline spacing */
 }
 
 .benefit-slider-header {
@@ -341,11 +344,13 @@ button.action-btn:hover {
   justify-content: space-between;
 }
 
+/* UPDATED: Larger benefit labels matching Timeline */
 .benefit-label {
   font-weight: 500;
   color: var(--text);
   flex: 1;
   text-align: left;
+  font-size: 1rem; /* LARGER: Matching Timeline emotion labels */
 }
 
 .benefit-value {
@@ -393,6 +398,15 @@ button.action-btn:hover {
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ADDED: Slider guide labels exactly like Timeline */
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
 }
 
 .benefit-actions {
