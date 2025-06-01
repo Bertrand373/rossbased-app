@@ -1,4 +1,4 @@
-// components/UrgeToolkit/UrgeToolkit.js - FIXED: Day counter and breathing timer
+// components/UrgeToolkit/UrgeToolkit.js - FIXED: Breathing animation, text alternation, and removed UrgeMini
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -6,7 +6,7 @@ import './UrgeToolkit.css';
 
 // Icons - Simplified set
 import { FaShieldAlt, FaExclamationTriangle, FaBolt, FaBrain, FaHeart, 
-  FaCompress, FaExpand, FaPlay, FaPause, FaStop, FaCheckCircle, 
+  FaPlay, FaPause, FaStop, FaCheckCircle, 
   FaTimes, FaInfoCircle, FaStopwatch, FaLeaf, FaLightbulb, FaTrophy } from 'react-icons/fa';
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
@@ -56,7 +56,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     { id: 'thoughts', label: 'Lustful Thoughts', icon: FaBrain },
     { id: 'content', label: 'Explicit Content', icon: FaExclamationTriangle },
     { id: 'stress', label: 'Stress/Anxiety', icon: FaStopwatch },
-    { id: 'boredom', label: 'Boredom', icon: FaCompress },
+    { id: 'boredom', label: 'Boredom', icon: FaInfoCircle },
     { id: 'loneliness', label: 'Loneliness', icon: FaHeart },
     { id: 'other', label: 'Other Trigger', icon: FaBolt }
   ];
@@ -138,51 +138,51 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  // FIXED: Breathing protocol implementation with proper phase transitions
+  // FIXED: Breathing protocol with proper phase transitions and text alternation
   const startBreathing = () => {
     try {
       setBreathingActive(true);
       setBreathingPhase('inhale');
       setBreathingCount(0);
-      setBreathingTimer(0);
+      setBreathingTimer(4); // Start at 4 and count down
       
-      // FIXED: Start active timer when protocol actually begins
       startActiveTimer();
-      
       toast.success('Starting breathing protocol...');
       
       breathingIntervalRef.current = setInterval(() => {
         setBreathingTimer(prev => {
-          const newTime = prev + 1;
+          const newTime = prev - 1; // Count down from 4 to 0
           
-          // FIXED: Proper phase transitions with global state updates
-          if (newTime >= 4) {
-            setBreathingTimer(0); // Reset timer for next phase
-            
-            if (breathingPhase === 'inhale') {
-              setBreathingPhase('exhale');
-            } else if (breathingPhase === 'exhale') {
-              setBreathingCount(prevCount => {
-                const newCount = prevCount + 1;
-                if (newCount >= 10) {
-                  // Complete the breathing exercise
-                  setBreathingPhase('complete');
-                  setBreathingActive(false);
-                  if (breathingIntervalRef.current) {
-                    clearInterval(breathingIntervalRef.current);
+          // When timer reaches 0, switch phases
+          if (newTime <= 0) {
+            setBreathingPhase(currentPhase => {
+              if (currentPhase === 'inhale') {
+                return 'exhale';
+              } else if (currentPhase === 'exhale') {
+                // Complete one full cycle
+                setBreathingCount(prevCount => {
+                  const newCount = prevCount + 1;
+                  if (newCount >= 10) {
+                    // Complete the breathing exercise
+                    setBreathingPhase('complete');
+                    setBreathingActive(false);
+                    if (breathingIntervalRef.current) {
+                      clearInterval(breathingIntervalRef.current);
+                    }
+                    stopActiveTimer();
+                    toast.success('Breathing complete! How do you feel?');
+                    setTimeout(() => setCurrentStep('summary'), 1000);
+                    return newCount;
+                  } else {
+                    // Start next cycle with inhale
+                    return newCount;
                   }
-                  stopActiveTimer();
-                  toast.success('Breathing complete! How do you feel?');
-                  setTimeout(() => setCurrentStep('summary'), 1000);
-                  return newCount;
-                } else {
-                  // Start next cycle
-                  setBreathingPhase('inhale');
-                  return newCount;
-                }
-              });
-            }
-            return 0; // Reset timer
+                });
+                return 'inhale';
+              }
+              return currentPhase;
+            });
+            return 4; // Reset timer to 4 for next phase
           }
           
           return newTime;
@@ -201,7 +201,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
       if (breathingIntervalRef.current) {
         clearInterval(breathingIntervalRef.current);
       }
-      stopActiveTimer(); // FIXED: Stop timer when user stops early
+      stopActiveTimer();
       setCurrentStep('summary');
     } catch (error) {
       console.error('Error stopping breathing:', error);
@@ -262,8 +262,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   // Reset to start new session
   const resetSession = () => {
-    // FIXED: Reset all timing states
-    stopActiveTimer(); // Stop any active timer
+    stopActiveTimer();
     setCurrentStep('assessment');
     setUrgeIntensity(0);
     setActiveProtocol(null);
@@ -281,14 +280,19 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="urge-toolkit-container">
-      {/* Clean Header */}
+      {/* UPDATED: Header with phase indicator including icon */}
       <div className="toolkit-header">
         <div className="toolkit-header-spacer"></div>
         <h2>Emergency Toolkit</h2>
         <div className="toolkit-header-actions">
           <div className="phase-indicator" style={{ '--phase-color': currentPhase.color }}>
-            <span className="phase-name">{currentPhase.name}</span>
-            <span className="phase-day">Day {currentDay}</span>
+            <div className="phase-indicator-content">
+              <currentPhase.icon className="phase-indicator-icon" />
+              <div className="phase-indicator-text">
+                <span className="phase-name">{currentPhase.name}</span>
+                <span className="phase-day">Day {currentDay}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -345,25 +349,20 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             ))}
           </div>
 
-          {/* FIXED: Active Protocol Interface with proper breathing states */}
+          {/* FIXED: Breathing Interface - Clean circle without icons, proper text alternation */}
           {activeProtocol === 'breathing' && (
             <div className="breathing-interface">
               <div className="breathing-display">
                 <div className="breathing-circle">
                   <div className={`breathing-animation ${breathingPhase === 'inhale' ? 'inhale-animation' : breathingPhase === 'exhale' ? 'exhale-animation' : ''}`}>
-                    <div className={`breathing-indicator ${breathingPhase}`}>
-                      {breathingPhase === 'ready' && <FaPlay />}
-                      {breathingPhase === 'inhale' && <FaExpand />}
-                      {breathingPhase === 'exhale' && <FaCompress />}
-                      {breathingPhase === 'complete' && <FaCheckCircle />}
-                    </div>
+                    {/* REMOVED: All icons - just the pulsing circle */}
                   </div>
                 </div>
                 
                 <div className="breathing-status">
                   {breathingPhase === 'ready' && <span>Ready to begin</span>}
-                  {breathingPhase === 'inhale' && <span>Breathe IN slowly ({4 - breathingTimer}s remaining)</span>}
-                  {breathingPhase === 'exhale' && <span>Breathe OUT slowly ({4 - breathingTimer}s remaining)</span>}
+                  {breathingPhase === 'inhale' && <span>Breathe IN slowly ({breathingTimer}s remaining)</span>}
+                  {breathingPhase === 'exhale' && <span>Breathe OUT slowly ({breathingTimer}s remaining)</span>}
                   {breathingPhase === 'complete' && <span>Well done!</span>}
                 </div>
                 
@@ -405,7 +404,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               <button 
                 className="primary-btn" 
                 onClick={() => {
-                  startActiveTimer(); // Start timing when user begins manual protocol
+                  startActiveTimer();
                   setCurrentStep('tools');
                 }}
                 type="button"
@@ -431,7 +430,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               <button 
                 className="primary-btn" 
                 onClick={() => {
-                  startActiveTimer(); // Start timing when user begins manual protocol  
+                  startActiveTimer();
                   setCurrentStep('tools');
                 }}
                 type="button"
@@ -471,7 +470,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             <button 
               className="primary-btn" 
               onClick={() => {
-                stopActiveTimer(); // Stop timing when moving to summary
+                stopActiveTimer();
                 setCurrentStep('summary');
               }}
               type="button"

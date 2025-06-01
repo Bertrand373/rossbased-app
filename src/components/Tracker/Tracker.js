@@ -1,6 +1,7 @@
-// components/Tracker/Tracker.js - UPDATED: Timeline-style benefit sliders with guide text
+// components/Tracker/Tracker.js - REMOVED: UrgeMini component, redirect to urge tab instead
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import './Tracker.css';
 
@@ -8,7 +9,7 @@ import './Tracker.css';
 import { 
   FaCrown, 
   FaCalendarCheck, 
-  FaExclamationTriangle, // UPDATED: Now using this for relapse button
+  FaExclamationTriangle,
   FaInfoCircle, 
   FaEdit,
   FaTimes,
@@ -21,11 +22,8 @@ import {
   FaCheckCircle,
 } from 'react-icons/fa';
 
-// Urge Toolkit Mini-component
-import UrgeMini from '../UrgeToolkit/UrgeMini';
-
 const Tracker = ({ userData, updateUserData, isPremium }) => {
-  const [showUrgeMini, setShowUrgeMini] = useState(false);
+  const navigate = useNavigate();
   const [showSetStartDate, setShowSetStartDate] = useState(!userData.startDate);
   
   // Initialize with the current date if no start date exists
@@ -359,6 +357,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   };
 
+  // UPDATED: Handle urge redirection to urge tab instead of mini toolkit
+  const handleUrges = () => {
+    navigate('/urge-toolkit');
+  };
+
   // Handle benefit logging
   const handleBenefitChange = (type, value) => {
     setTodayBenefits(prev => ({
@@ -652,16 +655,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* Urge Mini Toolkit */}
-      {showUrgeMini && (
-        <UrgeMini 
-          onClose={() => setShowUrgeMini(false)} 
-          isPremium={isPremium}
-          updateUserData={updateUserData}
-          userData={userData}
-        />
-      )}
-      
       {/* Header Section */}
       <div className="tracker-header">
         <div className="tracker-header-spacer"></div>
@@ -731,9 +724,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               <span>Log Wet Dream</span>
             </button>
             
+            {/* UPDATED: Fighting Urges button now redirects to urge tab */}
             <button 
               className="streak-action-btn urge-btn"
-              onClick={() => setShowUrgeMini(true)}
+              onClick={handleUrges}
             >
               <FaShieldAlt />
               <span>Fighting Urges?</span>

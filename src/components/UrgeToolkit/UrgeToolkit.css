@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css - FIXED: Phase indicator with proper colors */
+/* components/UrgeToolkit/UrgeToolkit.css - FIXED: Phase indicator with icon and clean breathing animation */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -30,37 +30,52 @@
   justify-self: end;
 }
 
-/* FIXED: Phase indicator with dynamic colors */
+/* UPDATED: Phase indicator with icon instead of left border */
 .phase-indicator {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  min-width: 140px;
-  /* ADDED: Support for CSS custom properties */
-  border-left: 3px solid var(--phase-color, var(--primary));
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
   background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.02) 0%, 
-    color-mix(in srgb, var(--phase-color, var(--primary)) 8%, transparent) 100%
+    color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
+    var(--card-background) 100%
   );
+  border: 1px solid color-mix(in srgb, var(--phase-color, var(--primary)) 20%, var(--border));
+  border-radius: var(--radius-lg);
+  min-width: 180px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.phase-indicator-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.phase-indicator-icon {
+  font-size: 1.5rem;
+  color: var(--phase-color, var(--primary));
+  flex-shrink: 0;
+}
+
+.phase-indicator-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
 }
 
 .phase-name {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--phase-color, var(--text));
-  text-align: right;
   line-height: 1.2;
 }
 
 .phase-day {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  text-align: right;
   line-height: 1.2;
 }
 
@@ -204,7 +219,7 @@
   font-style: italic;
 }
 
-/* Breathing Interface - FIXED: Proper circle breathing animation */
+/* FIXED: Breathing Interface - Clean circle without icons, just pulsing */
 .breathing-interface {
   display: flex;
   flex-direction: column;
@@ -236,25 +251,15 @@
   overflow: hidden;
 }
 
-.breathing-indicator {
-  font-size: 2.5rem;
-  color: var(--text-secondary);
-  transition: all 0.5s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* FIXED: Proper breathing animation - smooth circle expansion/contraction */
+/* FIXED: Clean breathing animation - just the pulsing circle, no icons */
 .breathing-animation {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.3) 0%, rgba(255, 221, 0, 0.1) 100%);
   border: 2px solid var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* REMOVED: All display flex and icon styling - just the circle */
+  transition: all 0.5s ease;
 }
 
 .inhale-animation {
@@ -285,18 +290,6 @@
     transform: scale(1);
     opacity: 0.6;
   }
-}
-
-.breathing-indicator.inhale {
-  color: var(--primary);
-}
-
-.breathing-indicator.exhale {
-  color: var(--primary);
-}
-
-.breathing-indicator.complete {
-  color: var(--primary);
 }
 
 .breathing-status {
@@ -394,7 +387,7 @@
   transform: translateY(-1px);
 }
 
-/* FIXED: Trigger Selection - Pill-shaped, consistent colors, readable text */
+/* Trigger Selection - Pill-shaped, consistent colors, readable text */
 .trigger-selection {
   margin-bottom: var(--spacing-xl);
 }
@@ -422,11 +415,11 @@
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: var(--card-background);
   border: 1px solid var(--border);
-  border-radius: var(--radius-full); /* FIXED: Pill-shaped */
+  border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.875rem;
-  color: var(--text); /* FIXED: Readable text color */
+  color: var(--text);
   font-weight: 500;
   white-space: nowrap;
   min-width: fit-content;
@@ -442,7 +435,7 @@
 .trigger-option.selected {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: var(--primary);
-  color: var(--primary); /* FIXED: Consistent yellow when selected */
+  color: var(--primary);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2);
 }
@@ -450,7 +443,7 @@
 .trigger-option svg {
   font-size: 1rem;
   flex-shrink: 0;
-  color: inherit; /* FIXED: Icon inherits text color */
+  color: inherit;
 }
 
 /* Session Stats - Clean summary */
@@ -564,33 +557,30 @@
     justify-content: center;
   }
   
-  /* FIXED: Mobile phase indicator with colors */
+  /* UPDATED: Mobile phase indicator with icon */
   .phase-indicator {
-    align-items: center;
-    text-align: center;
-    background: linear-gradient(135deg, 
-      color-mix(in srgb, var(--phase-color, var(--primary)) 10%, var(--card-background)) 0%, 
-      var(--card-background) 100%
-    );
-    border-left: 3px solid var(--phase-color, var(--primary));
-    border-color: var(--phase-color, var(--primary));
-    padding: var(--spacing-md);
-    border-radius: var(--radius-lg);
-    min-width: auto;
     width: 100%;
     max-width: 280px;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .phase-indicator-content {
+    justify-content: center;
+  }
+  
+  .phase-indicator-icon {
+    font-size: 1.25rem;
   }
   
   .phase-name {
-    font-size: 1rem;
-    text-align: center;
-    color: var(--phase-color, var(--primary));
+    font-size: 0.875rem;
+    text-align: left;
   }
   
   .phase-day {
-    font-size: 0.875rem;
-    text-align: center;
-    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-align: left;
   }
   
   .assessment-section,
@@ -619,10 +609,6 @@
     height: 140px;
   }
   
-  .breathing-indicator {
-    font-size: 2rem;
-  }
-  
   .breathing-animation {
     width: 50px;
     height: 50px;
@@ -632,7 +618,6 @@
     grid-template-columns: 1fr;
   }
   
-  /* FIXED: Mobile trigger options - maintain pill shape and proper spacing */
   .trigger-options {
     flex-direction: column;
     align-items: center;
@@ -665,12 +650,16 @@
     padding: var(--spacing-sm) var(--spacing-md);
   }
   
+  .phase-indicator-icon {
+    font-size: 1.125rem;
+  }
+  
   .phase-name {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
   }
   
   .phase-day {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
   
   .assessment-section,
@@ -694,10 +683,6 @@
     height: 120px;
   }
   
-  .breathing-indicator {
-    font-size: 1.5rem;
-  }
-  
   .breathing-animation {
     width: 40px;
     height: 40px;
@@ -715,7 +700,6 @@
     padding: var(--spacing-md);
   }
   
-  /* FIXED: Very small screen trigger options */
   .trigger-option {
     max-width: 100%;
     font-size: 0.8rem;
