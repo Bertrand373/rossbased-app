@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - FINAL FIX: Slider labels positioned directly under sliders */
+/* components/EmotionalTimeline/EmotionalTimeline.css - PREMIUM: Enhanced slider styling */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -398,99 +398,252 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  position: relative;
 }
 
 .emotion-slider-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-xs); /* ADDED: Small gap before slider */
+  margin-bottom: var(--spacing-xs);
 }
 
+/* PREMIUM: Enhanced emotion labels with subtle color coding */
 .emotion-label {
-  font-weight: 500;
+  font-weight: 600; /* ENHANCED: Bolder weight for premium feel */
   color: var(--text);
   flex: 1;
   text-align: left;
+  font-size: 1rem;
+  letter-spacing: 0.025em; /* PREMIUM: Subtle letter spacing */
 }
 
+/* PREMIUM: Contextual color coding for different emotions */
+.emotion-slider-item:nth-child(1) .emotion-label {
+  /* Anxiety - subtle warm tone */
+  color: rgba(239, 154, 154, 0.9);
+}
+
+.emotion-slider-item:nth-child(2) .emotion-label {
+  /* Mood Stability - balanced tone */
+  color: rgba(129, 230, 217, 0.9);
+}
+
+.emotion-slider-item:nth-child(3) .emotion-label {
+  /* Mental Clarity - cool focused tone */
+  color: rgba(147, 197, 253, 0.9);
+}
+
+.emotion-slider-item:nth-child(4) .emotion-label {
+  /* Emotional Processing - warm processing tone */
+  color: rgba(196, 181, 253, 0.9);
+}
+
+/* PREMIUM: Enhanced value display */
 .emotion-value {
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
+  font-weight: 700; /* ENHANCED: Bolder for premium feel */
+  color: var(--primary);
+  font-size: 0.9375rem; /* REFINED: Slightly larger */
+  background-color: rgba(255, 221, 0, 0.1);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  min-width: 48px;
+  text-align: center;
+  border: 1px solid rgba(255, 221, 0, 0.2);
 }
 
+/* PREMIUM: Enhanced emotion slider with gradient track and improved thumb */
 .emotion-range-slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 24px; /* RESTORED: Thick track to match thumb size */
+  height: 28px; /* PREMIUM: Slightly thicker for better presence */
   border-radius: var(--radius-full);
-  background: rgba(255, 221, 0, 0.2);
+  /* PREMIUM: Gradient background instead of flat color */
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.2) 0%, 
+    rgba(255, 221, 0, 0.15) 50%, 
+    rgba(255, 221, 0, 0.25) 100%
+  );
   outline: none;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-  margin: 0 !important; /* FORCE: Remove any default margins */
-  padding: 0 !important; /* FORCE: Remove any default padding */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* PREMIUM: Smooth cubic-bezier transition */
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  /* PREMIUM: Subtle inner shadow for depth */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* PREMIUM: Enhanced hover state */
 .emotion-range-slider:hover:not(:disabled) {
-  opacity: 1;
+  /* PREMIUM: Brighter gradient on hover */
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.25) 0%, 
+    rgba(255, 221, 0, 0.2) 50%, 
+    rgba(255, 221, 0, 0.3) 100%
+  );
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(255, 221, 0, 0.1);
+}
+
+/* PREMIUM: Focus state with subtle glow */
+.emotion-range-slider:focus:not(:disabled) {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(255, 221, 0, 0.2);
 }
 
 .emotion-range-slider:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  background: rgba(128, 128, 128, 0.1);
 }
 
+/* PREMIUM: Enhanced WebKit thumb with subtle glow and smooth animations */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px; /* REFINED: Smaller than track for inset appearance */
-  height: 20px; /* REFINED: Smaller than track for inset appearance */
+  width: 24px; /* PREMIUM: Slightly larger for better interaction */
+  height: 24px;
   border-radius: 50%;
-  background: #ffdd00;
+  background: linear-gradient(135deg, #ffdd00 0%, #f6cc00 100%); /* PREMIUM: Gradient thumb */
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin: 0 !important; /* FORCE: No margins on thumb */
+  /* PREMIUM: Enhanced shadow with subtle glow */
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    0 0 0 2px rgba(255, 255, 255, 0.1),
+    0 0 16px rgba(255, 221, 0, 0.3);
+  margin: 0 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* PREMIUM: Smooth animation */
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
+/* PREMIUM: Thumb hover with scale and enhanced glow */
+.emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
+  transform: scale(1.1); /* PREMIUM: Subtle scale on hover */
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 0 0 3px rgba(255, 255, 255, 0.15),
+    0 0 20px rgba(255, 221, 0, 0.4);
+  background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
+}
+
+/* PREMIUM: Active/dragging state */
+.emotion-range-slider:active::-webkit-slider-thumb {
+  transform: scale(1.05);
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    0 0 0 4px rgba(255, 221, 0, 0.3),
+    0 0 24px rgba(255, 221, 0, 0.5);
+}
+
+/* PREMIUM: Enhanced Firefox thumb */
 .emotion-range-slider::-moz-range-thumb {
-  width: 20px; /* REFINED: Smaller than track for inset appearance */
-  height: 20px; /* REFINED: Smaller than track for inset appearance */
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: #ffdd00;
+  background: linear-gradient(135deg, #ffdd00 0%, #f6cc00 100%);
   cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin: 0 !important; /* FORCE: No margins on thumb */
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    0 0 16px rgba(255, 221, 0, 0.3);
+  margin: 0 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* NUCLEAR FIX: Slider labels positioned DIRECTLY under sliders with NO gap */
+/* PREMIUM: Firefox thumb hover */
+.emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
+  transform: scale(1.1);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 221, 0, 0.4);
+  background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
+}
+
+/* PREMIUM: Contextual track colors for different emotions */
+.emotion-slider-item:nth-child(1) .emotion-range-slider {
+  /* Anxiety - warm gradient */
+  background: linear-gradient(to right, 
+    rgba(239, 68, 68, 0.15) 0%, 
+    rgba(245, 158, 11, 0.15) 50%, 
+    rgba(34, 197, 94, 0.2) 100%
+  );
+}
+
+.emotion-slider-item:nth-child(2) .emotion-range-slider {
+  /* Mood Stability - balanced gradient */
+  background: linear-gradient(to right, 
+    rgba(239, 68, 68, 0.15) 0%, 
+    rgba(255, 221, 0, 0.15) 50%, 
+    rgba(34, 197, 94, 0.2) 100%
+  );
+}
+
+.emotion-slider-item:nth-child(3) .emotion-range-slider {
+  /* Mental Clarity - cool focused gradient */
+  background: linear-gradient(to right, 
+    rgba(148, 163, 184, 0.2) 0%, 
+    rgba(59, 130, 246, 0.15) 50%, 
+    rgba(34, 197, 94, 0.2) 100%
+  );
+}
+
+.emotion-slider-item:nth-child(4) .emotion-range-slider {
+  /* Emotional Processing - processing gradient */
+  background: linear-gradient(to right, 
+    rgba(156, 163, 175, 0.2) 0%, 
+    rgba(139, 92, 246, 0.15) 50%, 
+    rgba(34, 197, 94, 0.2) 100%
+  );
+}
+
+/* PREMIUM: Enhanced slider labels with better typography */
 .slider-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* PREMIUM: Slightly larger for readability */
   color: var(--text-secondary);
-  margin-top: 0px !important; /* NUCLEAR: Absolutely no margin */
-  margin-bottom: 0px !important; /* NUCLEAR: Absolutely no margin */
-  padding-top: 0px !important; /* NUCLEAR: Absolutely no padding */
-  padding-bottom: 0px !important; /* NUCLEAR: Absolutely no padding */
-  line-height: 1 !important; /* NUCLEAR: Minimal line height */
-  /* NUCLEAR: Force labels to be as close as possible */
-  transform: translateY(-4px) !important; /* NUCLEAR: Pull labels up towards slider */
-  /* Perfect alignment with slider track */
-  padding-left: 12px !important; /* Half of slider thumb width for alignment */
-  padding-right: 12px !important; /* Half of slider thumb width for alignment */
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  line-height: 1 !important;
+  transform: translateY(-2px) !important; /* PREMIUM: Closer to slider */
+  padding-left: 14px !important; /* PREMIUM: Better alignment with larger thumb */
+  padding-right: 14px !important;
+  font-weight: 500; /* PREMIUM: Medium weight for better readability */
+  letter-spacing: 0.025em; /* PREMIUM: Subtle letter spacing */
 }
 
-/* NUCLEAR: Override any inherited spacing */
-.emotion-slider-item .slider-labels,
-.benefit-slider-item .slider-labels {
-  margin: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  transform: translateY(-4px) !important; /* Pull up towards slider */
-  line-height: 1 !important;
+/* PREMIUM: Contextual label colors */
+.emotion-slider-item:nth-child(1) .slider-labels span:first-child {
+  color: rgba(34, 197, 94, 0.8); /* Calm - green */
+}
+
+.emotion-slider-item:nth-child(1) .slider-labels span:last-child {
+  color: rgba(239, 68, 68, 0.8); /* High Anxiety - red */
+}
+
+.emotion-slider-item:nth-child(2) .slider-labels span:first-child {
+  color: rgba(239, 68, 68, 0.8); /* Mood Swings - red */
+}
+
+.emotion-slider-item:nth-child(2) .slider-labels span:last-child {
+  color: rgba(34, 197, 94, 0.8); /* Very Stable - green */
+}
+
+.emotion-slider-item:nth-child(3) .slider-labels span:first-child {
+  color: rgba(148, 163, 184, 0.8); /* Foggy - gray */
+}
+
+.emotion-slider-item:nth-child(3) .slider-labels span:last-child {
+  color: rgba(59, 130, 246, 0.8); /* Crystal Clear - blue */
+}
+
+.emotion-slider-item:nth-child(4) .slider-labels span:first-child {
+  color: rgba(156, 163, 175, 0.8); /* Suppressed - gray */
+}
+
+.emotion-slider-item:nth-child(4) .slider-labels span:last-child {
+  color: rgba(139, 92, 246, 0.8); /* Flowing - purple */
 }
 
 .emotion-actions {
@@ -499,16 +652,26 @@
   margin-top: var(--spacing-lg);
 }
 
+/* PREMIUM: Enhanced save button */
 .save-emotions-btn {
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.15) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.25);
   border-radius: var(--radius-full);
   color: var(--primary);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: 0.875rem;
-  font-weight: 500;
+  padding: var(--spacing-md) var(--spacing-xl); /* PREMIUM: More generous padding */
+  font-size: 0.9375rem; /* PREMIUM: Slightly larger */
+  font-weight: 600; /* PREMIUM: Bolder weight */
   cursor: pointer;
-  transition: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.1);
+  letter-spacing: 0.025em;
+}
+
+.save-emotions-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.15) 0%, rgba(255, 221, 0, 0.2) 100%);
+  border-color: rgba(255, 221, 0, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.2);
 }
 
 /* Journal Section - styled like Tracker journal */
@@ -957,6 +1120,27 @@
   .edit-emotions-btn {
     margin-left: 0;
     margin-top: var(--spacing-sm);
+  }
+  
+  /* PREMIUM: Mobile slider adjustments */
+  .emotion-range-slider {
+    height: 32px; /* PREMIUM: Slightly larger on mobile for better touch */
+  }
+  
+  .emotion-range-slider::-webkit-slider-thumb {
+    width: 28px; /* PREMIUM: Larger thumb on mobile */
+    height: 28px;
+  }
+  
+  .emotion-range-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .slider-labels {
+    padding-left: 16px !important; /* PREMIUM: Adjust for larger mobile thumb */
+    padding-right: 16px !important;
+    font-size: 0.75rem;
   }
   
   .journal-header {
