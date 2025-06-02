@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - PREMIUM: Enhanced slider styling */
+/* components/Tracker/Tracker.css - UNIFIED: Consistent slider colors matching app theme */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -326,7 +326,7 @@ button.action-btn:hover {
   transform: none !important;
 }
 
-/* PREMIUM: Enhanced benefit sliders with contextual styling */
+/* UNIFIED: All benefit sliders use consistent app theme colors */
 .benefit-sliders {
   display: flex;
   flex-direction: column;
@@ -347,52 +347,21 @@ button.action-btn:hover {
   margin-bottom: var(--spacing-xs);
 }
 
-/* PREMIUM: Enhanced benefit labels with subtle color coding */
+/* UNIFIED: All benefit labels use consistent white color */
 .benefit-label {
-  font-weight: 600; /* ENHANCED: Bolder weight for premium feel */
-  color: var(--text);
+  font-weight: 600;
+  color: var(--text); /* UNIFIED: Consistent white text */
   flex: 1;
   text-align: left;
   font-size: 1rem;
-  letter-spacing: 0.025em; /* PREMIUM: Subtle letter spacing */
+  letter-spacing: 0.025em;
 }
 
-/* PREMIUM: Contextual color coding for different benefits */
-.benefit-slider-item:nth-child(1) .benefit-label {
-  /* Energy - vibrant orange */
-  color: rgba(251, 146, 60, 0.9);
-}
-
-.benefit-slider-item:nth-child(2) .benefit-label {
-  /* Focus - sharp blue */
-  color: rgba(59, 130, 246, 0.9);
-}
-
-.benefit-slider-item:nth-child(3) .benefit-label {
-  /* Confidence - strong purple */
-  color: rgba(139, 92, 246, 0.9);
-}
-
-.benefit-slider-item:nth-child(4) .benefit-label {
-  /* Aura - mystical cyan */
-  color: rgba(34, 211, 238, 0.9);
-}
-
-.benefit-slider-item:nth-child(5) .benefit-label {
-  /* Sleep Quality - calming indigo */
-  color: rgba(99, 102, 241, 0.9);
-}
-
-.benefit-slider-item:nth-child(6) .benefit-label {
-  /* Workout - energetic green */
-  color: rgba(34, 197, 94, 0.9);
-}
-
-/* PREMIUM: Enhanced value display */
+/* UNIFIED: Enhanced value display with consistent styling */
 .benefit-value {
-  font-weight: 700; /* ENHANCED: Bolder for premium feel */
+  font-weight: 700;
   color: var(--primary);
-  font-size: 0.9375rem; /* REFINED: Slightly larger */
+  font-size: 0.9375rem;
   background-color: rgba(255, 221, 0, 0.1);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
@@ -401,31 +370,29 @@ button.action-btn:hover {
   border: 1px solid rgba(255, 221, 0, 0.2);
 }
 
-/* PREMIUM: Enhanced benefit slider with gradient track and improved thumb */
+/* UNIFIED: All benefit sliders use consistent theme colors */
 .benefit-range-slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 28px; /* PREMIUM: Slightly thicker for better presence */
+  height: 28px;
   border-radius: var(--radius-full);
-  /* PREMIUM: Gradient background instead of flat color */
+  /* UNIFIED: Consistent gradient background for all sliders */
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.2) 0%, 
     rgba(255, 221, 0, 0.15) 50%, 
     rgba(255, 221, 0, 0.25) 100%
   );
   outline: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* PREMIUM: Smooth cubic-bezier transition */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
-  /* PREMIUM: Subtle inner shadow for depth */
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* PREMIUM: Enhanced hover state */
+/* UNIFIED: Consistent hover state for all sliders */
 .benefit-range-slider:hover:not(:disabled) {
-  /* PREMIUM: Brighter gradient on hover */
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.25) 0%, 
     rgba(255, 221, 0, 0.2) 50%, 
@@ -434,7 +401,7 @@ button.action-btn:hover {
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(255, 221, 0, 0.1);
 }
 
-/* PREMIUM: Focus state with subtle glow */
+/* UNIFIED: Consistent focus state */
 .benefit-range-slider:focus:not(:disabled) {
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(255, 221, 0, 0.2);
 }
@@ -445,28 +412,27 @@ button.action-btn:hover {
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* PREMIUM: Enhanced WebKit thumb with subtle glow and smooth animations */
+/* UNIFIED: Enhanced WebKit thumb with consistent styling */
 .benefit-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px; /* PREMIUM: Slightly larger for better interaction */
+  width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ffdd00 0%, #f6cc00 100%); /* PREMIUM: Gradient thumb */
+  background: linear-gradient(135deg, #ffdd00 0%, #f6cc00 100%);
   cursor: pointer;
-  /* PREMIUM: Enhanced shadow with subtle glow */
   box-shadow: 
     0 2px 8px rgba(0, 0, 0, 0.25),
     0 0 0 2px rgba(255, 255, 255, 0.1),
     0 0 16px rgba(255, 221, 0, 0.3);
   margin: 0 !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* PREMIUM: Smooth animation */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-/* PREMIUM: Thumb hover with scale and enhanced glow */
+/* UNIFIED: Consistent thumb hover */
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.1); /* PREMIUM: Subtle scale on hover */
+  transform: scale(1.1);
   box-shadow: 
     0 4px 12px rgba(0, 0, 0, 0.3),
     0 0 0 3px rgba(255, 255, 255, 0.15),
@@ -474,7 +440,7 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
 }
 
-/* PREMIUM: Active/dragging state */
+/* UNIFIED: Consistent active state */
 .benefit-range-slider:active::-webkit-slider-thumb {
   transform: scale(1.05);
   box-shadow: 
@@ -483,7 +449,7 @@ button.action-btn:hover {
     0 0 24px rgba(255, 221, 0, 0.5);
 }
 
-/* PREMIUM: Enhanced Firefox thumb */
+/* UNIFIED: Enhanced Firefox thumb */
 .benefit-range-slider::-moz-range-thumb {
   width: 24px;
   height: 24px;
@@ -498,7 +464,7 @@ button.action-btn:hover {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* PREMIUM: Firefox thumb hover */
+/* UNIFIED: Firefox thumb hover */
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
   transform: scale(1.1);
   box-shadow: 
@@ -507,126 +473,41 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
 }
 
-/* PREMIUM: Contextual track colors for different benefits */
-.benefit-slider-item:nth-child(1) .benefit-range-slider {
-  /* Energy - warm energetic gradient */
-  background: linear-gradient(to right, 
-    rgba(239, 68, 68, 0.15) 0%, 
-    rgba(251, 146, 60, 0.15) 50%, 
-    rgba(34, 197, 94, 0.2) 100%
-  );
-}
-
-.benefit-slider-item:nth-child(2) .benefit-range-slider {
-  /* Focus - cool concentration gradient */
-  background: linear-gradient(to right, 
-    rgba(148, 163, 184, 0.2) 0%, 
-    rgba(59, 130, 246, 0.15) 50%, 
-    rgba(34, 197, 94, 0.2) 100%
-  );
-}
-
-.benefit-slider-item:nth-child(3) .benefit-range-slider {
-  /* Confidence - strong purple gradient */
-  background: linear-gradient(to right, 
-    rgba(156, 163, 175, 0.2) 0%, 
-    rgba(139, 92, 246, 0.15) 50%, 
-    rgba(34, 197, 94, 0.2) 100%
-  );
-}
-
-.benefit-slider-item:nth-child(4) .benefit-range-slider {
-  /* Aura - mystical cyan gradient */
-  background: linear-gradient(to right, 
-    rgba(148, 163, 184, 0.2) 0%, 
-    rgba(34, 211, 238, 0.15) 50%, 
-    rgba(34, 197, 94, 0.2) 100%
-  );
-}
-
-.benefit-slider-item:nth-child(5) .benefit-range-slider {
-  /* Sleep Quality - calming indigo gradient */
-  background: linear-gradient(to right, 
-    rgba(239, 68, 68, 0.15) 0%, 
-    rgba(99, 102, 241, 0.15) 50%, 
-    rgba(34, 197, 94, 0.2) 100%
-  );
-}
-
-.benefit-slider-item:nth-child(6) .benefit-range-slider {
-  /* Workout - energetic green gradient */
-  background: linear-gradient(to right, 
-    rgba(156, 163, 175, 0.2) 0%, 
-    rgba(34, 197, 94, 0.15) 50%, 
-    rgba(34, 197, 94, 0.25) 100%
-  );
-}
-
-/* PREMIUM: Enhanced slider labels with better typography and contextual colors */
+/* UNIFIED: All slider labels use consistent colors */
 .slider-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8125rem; /* PREMIUM: Slightly larger for readability */
-  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  color: var(--text-secondary); /* UNIFIED: Consistent text color */
   margin-top: 0px !important;
   margin-bottom: 0px !important;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   line-height: 1 !important;
-  transform: translateY(-2px) !important; /* PREMIUM: Closer to slider */
-  padding-left: 14px !important; /* PREMIUM: Better alignment with larger thumb */
+  transform: translateY(-2px) !important;
+  padding-left: 14px !important;
   padding-right: 14px !important;
-  font-weight: 500; /* PREMIUM: Medium weight for better readability */
-  letter-spacing: 0.025em; /* PREMIUM: Subtle letter spacing */
+  font-weight: 500;
+  letter-spacing: 0.025em;
 }
 
-/* PREMIUM: Contextual label colors for benefits */
-.benefit-slider-item:nth-child(1) .slider-labels span:first-child {
-  color: rgba(239, 68, 68, 0.8); /* Low - red */
-}
-
-.benefit-slider-item:nth-child(1) .slider-labels span:last-child {
-  color: rgba(34, 197, 94, 0.8); /* High - green */
-}
-
-.benefit-slider-item:nth-child(2) .slider-labels span:first-child {
-  color: rgba(148, 163, 184, 0.8); /* Scattered - gray */
-}
-
-.benefit-slider-item:nth-child(2) .slider-labels span:last-child {
-  color: rgba(59, 130, 246, 0.8); /* Laser Focus - blue */
-}
-
-.benefit-slider-item:nth-child(3) .slider-labels span:first-child {
-  color: rgba(239, 68, 68, 0.8); /* Insecure - red */
-}
-
-.benefit-slider-item:nth-child(3) .slider-labels span:last-child {
-  color: rgba(139, 92, 246, 0.8); /* Very Confident - purple */
-}
-
-.benefit-slider-item:nth-child(4) .slider-labels span:first-child {
-  color: rgba(148, 163, 184, 0.8); /* Invisible - gray */
-}
-
-.benefit-slider-item:nth-child(4) .slider-labels span:last-child {
-  color: rgba(34, 211, 238, 0.8); /* Magnetic - cyan */
-}
-
-.benefit-slider-item:nth-child(5) .slider-labels span:first-child {
-  color: rgba(239, 68, 68, 0.8); /* Poor - red */
-}
-
-.benefit-slider-item:nth-child(5) .slider-labels span:last-child {
-  color: rgba(99, 102, 241, 0.8); /* Excellent - indigo */
-}
-
+/* UNIFIED: Consistent label colors - subtle contextual colors that fit the theme */
+.benefit-slider-item:nth-child(1) .slider-labels span:first-child,
+.benefit-slider-item:nth-child(2) .slider-labels span:first-child,
+.benefit-slider-item:nth-child(3) .slider-labels span:first-child,
+.benefit-slider-item:nth-child(4) .slider-labels span:first-child,
+.benefit-slider-item:nth-child(5) .slider-labels span:first-child,
 .benefit-slider-item:nth-child(6) .slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8); /* Weak - gray */
+  color: rgba(156, 163, 175, 0.8); /* UNIFIED: Consistent gray for "low" states */
 }
 
+.benefit-slider-item:nth-child(1) .slider-labels span:last-child,
+.benefit-slider-item:nth-child(2) .slider-labels span:last-child,
+.benefit-slider-item:nth-child(3) .slider-labels span:last-child,
+.benefit-slider-item:nth-child(4) .slider-labels span:last-child,
+.benefit-slider-item:nth-child(5) .slider-labels span:last-child,
 .benefit-slider-item:nth-child(6) .slider-labels span:last-child {
-  color: rgba(34, 197, 94, 0.8); /* Strong - green */
+  color: rgba(255, 221, 0, 0.8); /* UNIFIED: Consistent yellow for "high" states */
 }
 
 .benefit-actions {
@@ -641,9 +522,9 @@ button.action-btn:hover {
   border: 1px solid rgba(255, 221, 0, 0.25);
   border-radius: var(--radius-full);
   color: var(--primary);
-  padding: var(--spacing-md) var(--spacing-xl); /* PREMIUM: More generous padding */
-  font-size: 0.9375rem; /* PREMIUM: Slightly larger */
-  font-weight: 600; /* PREMIUM: Bolder weight */
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 0.9375rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(255, 221, 0, 0.1);
@@ -1031,13 +912,13 @@ button.action-btn:hover {
     margin-top: var(--spacing-sm);
   }
   
-  /* PREMIUM: Mobile slider adjustments */
+  /* UNIFIED: Mobile slider adjustments */
   .benefit-range-slider {
-    height: 32px; /* PREMIUM: Slightly larger on mobile for better touch */
+    height: 32px;
   }
   
   .benefit-range-slider::-webkit-slider-thumb {
-    width: 28px; /* PREMIUM: Larger thumb on mobile */
+    width: 28px;
     height: 28px;
   }
   
@@ -1047,7 +928,7 @@ button.action-btn:hover {
   }
   
   .slider-labels {
-    padding-left: 16px !important; /* PREMIUM: Adjust for larger mobile thumb */
+    padding-left: 16px !important;
     padding-right: 16px !important;
     font-size: 0.75rem;
   }
