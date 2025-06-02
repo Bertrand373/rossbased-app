@@ -1,6 +1,6 @@
-// App.js - Fixed with proper updateUserData prop for UrgeToolkit component
+// App.js - Updated with Profile Component and improved profile button functionality
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
@@ -14,6 +14,7 @@ import Calendar from './components/Calendar/Calendar';
 import Stats from './components/Stats/Stats';
 import EmotionalTimeline from './components/EmotionalTimeline/EmotionalTimeline';
 import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
+import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
 // Shared components
@@ -24,6 +25,37 @@ import SpartanLoader from './components/Shared/SpartanLoader';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
+
+// Profile Button Component - handles navigation to profile
+const ProfileButton = () => {
+  const navigate = useNavigate();
+  
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+  
+  return (
+    <button className="profile-btn" onClick={handleProfileClick} title="Profile Settings">
+      <FaUser />
+      <span>Profile</span>
+    </button>
+  );
+};
+
+// Mobile Profile Button Component
+const MobileProfileButton = () => {
+  const navigate = useNavigate();
+  
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+  
+  return (
+    <button className="profile-btn" onClick={handleProfileClick} title="Profile Settings">
+      <FaUser />
+    </button>
+  );
+};
 
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -142,7 +174,7 @@ function App() {
           <>
             <header className="app-header">
               {!isMobile ? (
-                // Desktop Layout - Logo, Navigation, Logout all in one row
+                // Desktop Layout - Logo, Navigation, User Controls
                 <>
                   <div className="logo-container">
                     <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
@@ -184,10 +216,7 @@ function App() {
                   </nav>
                   
                   <div className="user-controls">
-                    <button className="profile-btn" onClick={() => {/* TODO: Open profile settings */}} title="Profile Settings">
-                      <FaUser />
-                      <span>Profile</span>
-                    </button>
+                    <ProfileButton />
                     <button className="logout-btn" onClick={logout} title="Logout">
                       <FaPowerOff />
                       <span>Logout</span>
@@ -202,9 +231,7 @@ function App() {
                       <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
                     </div>
                     <div className="mobile-user-controls">
-                      <button className="profile-btn" onClick={() => {/* TODO: Open profile settings */}} title="Profile Settings">
-                        <FaUser />
-                      </button>
+                      <MobileProfileButton />
                       <button className="logout-btn" onClick={logout} title="Logout">
                         <FaPowerOff />
                       </button>
@@ -236,6 +263,7 @@ function App() {
                 <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                 <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                 <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+                <Route path="/profile" element={<Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </main>
