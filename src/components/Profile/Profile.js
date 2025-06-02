@@ -1,4 +1,4 @@
-// components/Profile/Profile.js - Complete Profile Component with Settings and Feedback
+// components/Profile/Profile.js - Simplified Profile Component - Removed journey stats and unnecessary features
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -6,10 +6,9 @@ import './Profile.css';
 
 // Icons
 import { FaUser, FaEdit, FaCrown, FaDiscord, FaCog, FaCommentAlt, FaBug, 
-  FaLightbulb, FaStar, FaPaperPlane, FaTimes, FaCheckCircle, FaEye, 
-  FaEyeSlash, FaTrash, FaDownload, FaSignOutAlt, FaCreditCard, 
-  FaBell, FaMoon, FaSun, FaGlobe, FaLock, FaTrophy, FaCalendarAlt,
-  FaChartLine, FaShieldAlt } from 'react-icons/fa';
+  FaLightbulb, FaStar, FaPaperPlane, FaTimes, FaCheckCircle, 
+  FaTrash, FaDownload, FaSignOutAlt, FaCreditCard, 
+  FaBell, FaGlobe, FaLock } from 'react-icons/fa';
 
 const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('account');
@@ -28,12 +27,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
   const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false); // Default true
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
-  
-  // App Settings States
-  const [darkMode, setDarkMode] = useState(userData.darkMode !== false); // Default true (dark)
   const [notifications, setNotifications] = useState(userData.notifications !== false); // Default true
+  
+  // App Settings States - SIMPLIFIED: Only language
   const [language, setLanguage] = useState(userData.language || 'en');
-  const [wisdomMode, setWisdomMode] = useState(userData.wisdomMode || false);
   
   // Feedback States
   const [feedbackType, setFeedbackType] = useState('general');
@@ -56,15 +53,11 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'critical', label: 'Critical/Urgent', color: '#dc2626' }
   ];
 
-  // Calculate user stats for display
+  // Calculate basic user info for display - SIMPLIFIED
   const userStats = {
     memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown',
     currentStreak: userData.currentStreak || 0,
-    longestStreak: userData.longestStreak || 0,
-    totalBenefitsLogged: userData.benefitTracking?.length || 0,
-    totalJournalEntries: userData.notes ? Object.keys(userData.notes).length : 0,
-    badgesEarned: userData.badges?.filter(badge => badge.earned).length || 0,
-    totalBadges: userData.badges?.length || 4
+    longestStreak: userData.longestStreak || 0
   };
 
   // Handle profile updates
@@ -77,10 +70,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       dataSharing,
       analyticsOptIn,
       marketingEmails,
-      darkMode,
       notifications,
-      language,
-      wisdomMode
+      language
     };
     
     updateUserData(updates);
@@ -207,7 +198,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       </div>
 
-      {/* Profile Overview Card */}
+      {/* SIMPLIFIED: Profile Overview Card - Removed detailed stats */}
       <div className="profile-overview-card">
         <div className="profile-avatar-section">
           <div className="profile-avatar">
@@ -226,6 +217,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         </div>
         
+        {/* SIMPLIFIED: Only show basic streak info */}
         <div className="profile-quick-stats">
           <div className="quick-stat-item">
             <div className="quick-stat-value">{userStats.currentStreak}</div>
@@ -234,10 +226,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           <div className="quick-stat-item">
             <div className="quick-stat-value">{userStats.longestStreak}</div>
             <div className="quick-stat-label">Longest Streak</div>
-          </div>
-          <div className="quick-stat-item">
-            <div className="quick-stat-value">{userStats.badgesEarned}/{userStats.totalBadges}</div>
-            <div className="quick-stat-label">Badges Earned</div>
           </div>
         </div>
       </div>
@@ -283,7 +271,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
       {/* Tab Content */}
       <div className="profile-tab-content">
-        {/* Account Tab */}
+        {/* Account Tab - SIMPLIFIED: Removed journey statistics */}
         {activeTab === 'account' && (
           <div className="account-section">
             <div className="section-header">
@@ -359,45 +347,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 </div>
               )}
             </div>
-
-            {/* Account Stats */}
-            <div className="account-stats">
-              <h4>Your Journey Statistics</h4>
-              <div className="stats-grid">
-                <div className="stat-card">
-                  <div className="stat-icon"><FaCalendarAlt /></div>
-                  <div className="stat-info">
-                    <div className="stat-value">{userStats.currentStreak} days</div>
-                    <div className="stat-label">Current Streak</div>
-                  </div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-icon"><FaTrophy /></div>
-                  <div className="stat-info">
-                    <div className="stat-value">{userStats.longestStreak} days</div>
-                    <div className="stat-label">Longest Streak</div>
-                  </div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-icon"><FaChartLine /></div>
-                  <div className="stat-info">
-                    <div className="stat-value">{userStats.totalBenefitsLogged}</div>
-                    <div className="stat-label">Benefits Logged</div>
-                  </div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-icon"><FaEdit /></div>
-                  <div className="stat-info">
-                    <div className="stat-value">{userStats.totalJournalEntries}</div>
-                    <div className="stat-label">Journal Entries</div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
-        {/* Subscription Tab */}
+        {/* Subscription Tab - UNCHANGED */}
         {activeTab === 'subscription' && (
           <div className="subscription-section">
             <div className="current-plan-card">
@@ -445,14 +398,14 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <h4>Premium Benefits</h4>
                 <div className="benefits-grid">
                   <div className="benefit-item">
-                    <FaChartLine className="benefit-icon" />
+                    <div className="benefit-icon">📊</div>
                     <div className="benefit-text">
                       <div className="benefit-title">Advanced Analytics</div>
                       <div className="benefit-description">Detailed insights and progress tracking</div>
                     </div>
                   </div>
                   <div className="benefit-item">
-                    <FaShieldAlt className="benefit-icon" />
+                    <div className="benefit-icon">🛡️</div>
                     <div className="benefit-text">
                       <div className="benefit-title">Full Urge Toolkit</div>
                       <div className="benefit-description">Access all emergency management tools</div>
@@ -466,7 +419,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                     </div>
                   </div>
                   <div className="benefit-item">
-                    <FaStar className="benefit-icon" />
+                    <div className="benefit-icon">⭐</div>
                     <div className="benefit-text">
                       <div className="benefit-title">Priority Support</div>
                       <div className="benefit-description">Get help faster when you need it</div>
@@ -478,7 +431,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Privacy Tab */}
+        {/* Privacy Tab - UNCHANGED */}
         {activeTab === 'privacy' && (
           <div className="privacy-section">
             <h3>Privacy Settings</h3>
@@ -554,46 +507,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Settings Tab */}
+        {/* Settings Tab - SIMPLIFIED: Only language */}
         {activeTab === 'settings' && (
           <div className="settings-section">
             <h3>App Settings</h3>
             
             <div className="settings-groups">
-              <div className="settings-group">
-                <h4>Appearance</h4>
-                
-                <div className="toggle-setting">
-                  <div className="toggle-info">
-                    <span className="toggle-label">Dark Mode</span>
-                    <span className="toggle-description">Use dark theme (recommended)</span>
-                  </div>
-                  <div 
-                    className={`toggle-switch ${darkMode ? 'active' : ''}`}
-                    onClick={() => setDarkMode(!darkMode)}
-                  >
-                    <div className="toggle-slider">
-                      {darkMode ? <FaMoon /> : <FaSun />}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="toggle-setting">
-                  <div className="toggle-info">
-                    <span className="toggle-label">Wisdom Mode Default</span>
-                    <span className="toggle-description">Start with esoteric insights in Stats and Timeline</span>
-                  </div>
-                  <div 
-                    className={`toggle-switch ${wisdomMode ? 'active' : ''}`}
-                    onClick={() => setWisdomMode(!wisdomMode)}
-                  >
-                    <div className="toggle-slider">
-                      <FaEye />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <div className="settings-group">
                 <h4>Language & Region</h4>
                 
@@ -622,7 +541,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Data Tab */}
+        {/* Data Tab - UNCHANGED */}
         {activeTab === 'data' && (
           <div className="data-section">
             <h3>Data Management</h3>
@@ -661,7 +580,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         )}
       </div>
 
-      {/* Feedback Modal */}
+      {/* Feedback Modal - UNCHANGED */}
       {showFeedbackModal && (
         <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
           <div className="modal-content feedback-modal" onClick={e => e.stopPropagation()}>
@@ -752,7 +671,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       )}
 
-      {/* Export Confirmation Modal */}
+      {/* Export Confirmation Modal - UNCHANGED */}
       {showExportModal && (
         <div className="modal-overlay" onClick={() => setShowExportModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -779,7 +698,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       )}
 
-      {/* Delete Account Confirmation Modal */}
+      {/* Delete Account Confirmation Modal - UNCHANGED */}
       {showDeleteConfirm && (
         <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>

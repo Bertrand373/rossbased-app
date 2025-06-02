@@ -1,4 +1,4 @@
-/* components/Profile/Profile.css - Complete Profile Component Styling */
+/* components/Profile/Profile.css - Simplified Profile Styling */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -51,7 +51,7 @@
   box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2);
 }
 
-/* Profile Overview Card */
+/* SIMPLIFIED: Profile Overview Card - Removed detailed stats section */
 .profile-overview-card {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -131,6 +131,7 @@
   color: var(--text-secondary);
 }
 
+/* SIMPLIFIED: Only show basic streak stats - removed detailed journey stats */
 .profile-quick-stats {
   display: flex;
   gap: var(--spacing-xl);
@@ -377,68 +378,6 @@
   color: var(--text);
   font-size: 0.875rem;
   margin-bottom: var(--spacing-sm);
-}
-
-/* Account Stats */
-.account-stats {
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border);
-}
-
-.account-stats h4 {
-  margin: 0 0 var(--spacing-lg) 0;
-  font-size: 1rem;
-  color: var(--text);
-  text-align: center;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
-}
-
-.stat-card {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.stat-icon {
-  width: 40px;
-  height: 40px;
-  background-color: rgba(255, 221, 0, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary);
-  font-size: 1.125rem;
-  flex-shrink: 0;
-}
-
-.stat-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.stat-value {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1;
-}
-
-.stat-label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
 }
 
 /* Subscription Section */
@@ -1020,10 +959,6 @@
     justify-content: center;
   }
   
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
   .benefits-grid {
     grid-template-columns: 1fr;
   }
@@ -1116,18 +1051,6 @@
     padding: var(--spacing-md);
   }
   
-  .stat-card {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-sm);
-  }
-  
-  .stat-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
-  }
-  
   .benefit-item {
     flex-direction: column;
     text-align: center;
@@ -1147,4 +1070,3 @@
     max-width: 100%;
   }
 }
-  
