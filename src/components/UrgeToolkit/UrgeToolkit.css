@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css - FIXED: Phase indicator with icon and clean breathing animation */
+/* components/UrgeToolkit/UrgeToolkit.css - FIXED: Clean centered phase indicator */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -30,53 +30,65 @@
   justify-self: end;
 }
 
-/* UPDATED: Phase indicator with icon instead of left border */
+/* FIXED: Clean centered phase indicator with proper spacing */
 .phase-indicator {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-xl);
   background: linear-gradient(135deg, 
     color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
     var(--card-background) 100%
   );
   border: 1px solid color-mix(in srgb, var(--phase-color, var(--primary)) 20%, var(--border));
   border-radius: var(--radius-lg);
-  min-width: 180px;
+  min-width: 200px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 .phase-indicator-content {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  justify-content: center;
+  gap: var(--spacing-md);
   width: 100%;
 }
 
+/* FIXED: Properly sized and colored icon */
 .phase-indicator-icon {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   color: var(--phase-color, var(--primary));
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* FIXED: Centered text with proper alignment */
 .phase-indicator-text {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  align-items: center;
+  text-align: center;
   flex: 1;
 }
 
 .phase-name {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--phase-color, var(--text));
   line-height: 1.2;
+  margin: 0;
 }
 
 .phase-day {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.2;
+  margin: 0;
 }
 
 /* Section Container - Consistent styling */
@@ -557,30 +569,32 @@
     justify-content: center;
   }
   
-  /* UPDATED: Mobile phase indicator with icon */
+  /* FIXED: Mobile phase indicator - clean centered layout */
   .phase-indicator {
     width: 100%;
-    max-width: 280px;
+    max-width: 320px;
+    padding: var(--spacing-md) var(--spacing-lg);
     justify-content: center;
     text-align: center;
   }
   
   .phase-indicator-content {
     justify-content: center;
+    gap: var(--spacing-md);
   }
   
   .phase-indicator-icon {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
   
   .phase-name {
-    font-size: 0.875rem;
-    text-align: left;
+    font-size: 0.9375rem;
+    text-align: center;
   }
   
   .phase-day {
-    font-size: 0.75rem;
-    text-align: left;
+    font-size: 0.8125rem;
+    text-align: center;
   }
   
   .assessment-section,
@@ -646,20 +660,26 @@
 
 /* Very Small Screens */
 @media (max-width: 480px) {
+  /* FIXED: Very small screen phase indicator */
   .phase-indicator {
     padding: var(--spacing-sm) var(--spacing-md);
+    max-width: 100%;
+  }
+  
+  .phase-indicator-content {
+    gap: var(--spacing-sm);
   }
   
   .phase-indicator-icon {
-    font-size: 1.125rem;
+    font-size: 1.375rem;
   }
   
   .phase-name {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
   }
   
   .phase-day {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
   
   .assessment-section,
