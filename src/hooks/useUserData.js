@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 export const useUserData = () => {
   const [userData, setUserData] = useState({
     username: '',
+    email: '', // ADDED: Profile field
     startDate: null,
     currentStreak: 0,
     longestStreak: 0,
@@ -32,7 +33,15 @@ export const useUserData = () => {
     urgeLog: [], // ADDED: New urge log for emergency toolkit
     discordUsername: '',
     showOnLeaderboard: false,
-    notes: {}
+    notes: {},
+    // ADDED: Profile-specific fields
+    dataSharing: false, // Privacy setting
+    analyticsOptIn: true, // Privacy setting - default true
+    marketingEmails: false, // Privacy setting
+    darkMode: true, // App setting - default true (dark theme)
+    notifications: true, // App setting - default true
+    language: 'en', // App setting - default English
+    wisdomMode: false // App setting - default practical mode
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
@@ -50,6 +59,7 @@ export const useUserData = () => {
       // Create mock data for the user
       const mockUserData = {
         username,
+        email: `${username}@example.com`, // ADDED: Mock email based on username
         startDate: new Date(new Date().setDate(new Date().getDate() - 7)), // 7 days ago
         currentStreak: 7,
         longestStreak: 14,
@@ -161,7 +171,15 @@ export const useUserData = () => {
         showOnLeaderboard: true,
         notes: {
           [new Date().toISOString().split('T')[0]]: "Feeling stronger each day. Noticed improved energy levels today. The timeline is helping me understand that this anxiety I'm feeling is normal for day 7."
-        }
+        },
+        // ADDED: Profile-specific fields with realistic defaults
+        dataSharing: false,
+        analyticsOptIn: true,
+        marketingEmails: false,
+        darkMode: true,
+        notifications: true,
+        language: 'en',
+        wisdomMode: false
       };
       
       setUserData(mockUserData);
@@ -189,6 +207,7 @@ export const useUserData = () => {
   const logout = () => {
     setUserData({
       username: '',
+      email: '', // ADDED: Reset email
       startDate: null,
       currentStreak: 0,
       longestStreak: 0,
@@ -208,7 +227,15 @@ export const useUserData = () => {
       urgeLog: [], // ADDED: Reset urge log
       discordUsername: '',
       showOnLeaderboard: false,
-      notes: {}
+      notes: {},
+      // ADDED: Reset profile fields to defaults
+      dataSharing: false,
+      analyticsOptIn: true,
+      marketingEmails: false,
+      darkMode: true,
+      notifications: true,
+      language: 'en',
+      wisdomMode: false
     });
     setIsLoggedIn(false);
     setIsPremium(false);
@@ -302,6 +329,16 @@ export const useUserData = () => {
             end: streak.end ? new Date(streak.end) : null
           }));
         }
+        
+        // ADDED: Set default values for profile fields if they don't exist
+        parsedUserData.email = parsedUserData.email || '';
+        parsedUserData.dataSharing = parsedUserData.dataSharing || false;
+        parsedUserData.analyticsOptIn = parsedUserData.analyticsOptIn !== false; // Default true
+        parsedUserData.marketingEmails = parsedUserData.marketingEmails || false;
+        parsedUserData.darkMode = parsedUserData.darkMode !== false; // Default true
+        parsedUserData.notifications = parsedUserData.notifications !== false; // Default true
+        parsedUserData.language = parsedUserData.language || 'en';
+        parsedUserData.wisdomMode = parsedUserData.wisdomMode || false;
         
         setUserData(parsedUserData);
         setIsLoggedIn(true);
