@@ -1,11 +1,11 @@
-// components/Tracker/Tracker.js - REMOVED: UrgeMini component, redirect to urge tab instead
+// components/Tracker/Tracker.js - UPDATED: Added consistent icons to modal buttons
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import './Tracker.css';
 
-// Icons
+// Icons - UPDATED: Added missing icons for modal buttons
 import { 
   FaCrown, 
   FaCalendarCheck, 
@@ -20,6 +20,8 @@ import {
   FaToggleOn,
   FaToggleOff,
   FaCheckCircle,
+  FaCalendarAlt, // ADDED: For Set Date button
+  FaSave // ADDED: For Save Entry button
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
@@ -415,7 +417,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
-  // Create HTML content for iframe with fixed button styling
+  // UPDATED: Create HTML content for iframe with enhanced button styling and icons
   const iframeHtml = `
     <!DOCTYPE html>
     <html>
@@ -517,24 +519,38 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           margin-top: 4px;
         }
         
-        /* UPDATED: Buttons styled to match Calendar modal patterns */
+        /* UPDATED: Enhanced primary button with icon-like styling matching edit profile */
         .primary-action {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
           padding: 8px 16px !important;
-          background-color: rgba(255, 221, 0, 0.1) !important;
-          border: 1px solid rgba(255, 221, 0, 0.2) !important;
+          background-color: rgba(128, 128, 128, 0.1) !important;
+          border: 1px solid #444444 !important;
           border-radius: 9999px !important;
-          color: #ffdd00 !important;
+          color: #aaaaaa !important;
           font-size: 14px !important;
           font-weight: 500 !important;
           cursor: pointer !important;
-          transition: none !important;
+          transition: all 0.2s !important;
           flex: 1 !important;
           justify-content: center !important;
         }
         
+        .primary-action:hover {
+          background-color: rgba(255, 221, 0, 0.1) !important;
+          border-color: rgba(255, 221, 0, 0.2) !important;
+          color: #ffdd00 !important;
+        }
+        
+        /* UPDATED: Calendar icon for Set Date button */
+        .primary-action::before {
+          content: "📅" !important;
+          font-size: 12px !important;
+          margin-right: 4px !important;
+        }
+        
+        /* UPDATED: Cancel button remains static - no hover effects */
         .secondary-action {
           display: flex !important;
           align-items: center !important;
@@ -624,7 +640,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* Journal Note Modal */}
+      {/* UPDATED: Journal Note Modal with enhanced Save Entry button */}
       {showNoteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -640,10 +656,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               ></textarea>
             </div>
             
-            {/* UPDATED: Form actions with consistent button classes */}
+            {/* UPDATED: Form actions with consistent button styling and icons */}
             <div className="form-actions">
               <button onClick={saveNote} className="action-btn primary-action">
-                <FaCheckCircle />
+                <FaSave />
                 Save Entry
               </button>
               <button onClick={() => setShowNoteModal(false)} className="action-btn">

@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - REFINED: Professional slider styling with subtle accents */
+/* components/Tracker/Tracker.css - UPDATED: Consistent modal button styling */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -745,7 +745,7 @@ button.action-btn:hover {
   border-color: var(--primary);
 }
 
-/* FIXED: Form actions with NO HOVER EFFECTS */
+/* UPDATED: Modal buttons with consistent styling matching edit profile button */
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -762,33 +762,35 @@ button.action-btn:hover {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: all 0.2s;
   border: 1px solid;
 }
 
+/* UPDATED: Primary action buttons with edit profile button styling */
+.form-actions .action-btn.primary-action {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.form-actions .action-btn.primary-action:hover {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+/* UPDATED: Cancel buttons - no hover effects, stay static */
 .form-actions .action-btn:not(.primary-action) {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
   color: var(--text-secondary);
+  transition: none;
 }
 
 .form-actions .action-btn:not(.primary-action):hover {
   background-color: rgba(128, 128, 128, 0.1) !important;
   border-color: var(--border) !important;
   color: var(--text-secondary) !important;
-  transform: none !important;
-}
-
-.form-actions .action-btn.primary-action {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.form-actions .action-btn.primary-action:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
   transform: none !important;
 }
 
