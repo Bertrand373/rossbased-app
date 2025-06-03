@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - ULTRA FIXED: Professional slider styling matching Tracker exactly */
+/* components/EmotionalTimeline/EmotionalTimeline.css - ULTRA FIXED: Slider headers and values match Tracker exactly */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -409,27 +409,27 @@
   margin-bottom: var(--spacing-xs);
 }
 
-/* ULTRA FIXED: All emotion labels use consistent white color */
+/* 🎯 TRACKER MATCH: Emotion labels EXACTLY match Tracker benefit labels */
 .emotion-label {
   font-weight: 600;
-  color: var(--text); /* UNIFIED: Consistent white text */
+  color: var(--text);
   flex: 1;
   text-align: left;
-  font-size: 1rem;
+  font-size: 1rem !important; /* FIXED: Match Tracker exactly - was bigger */
   letter-spacing: 0.025em;
 }
 
-/* ULTRA FIXED: Enhanced value display - WHITE TEXT like Tracker master template */
+/* 🎯 TRACKER MATCH: Enhanced value display - EXACT copy from Tracker */
 .emotion-value {
   font-weight: 700;
-  color: var(--primary); /* MATCH TRACKER: Primary color like Tracker */
-  font-size: 0.9375rem;
-  background-color: rgba(255, 221, 0, 0.08); /* MATCH TRACKER: Same opacity as refined Tracker */
+  color: var(--primary);
+  font-size: 0.9375rem !important; /* FIXED: Match Tracker exactly - was bigger */
+  background-color: rgba(255, 221, 0, 0.08);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
   min-width: 48px;
   text-align: center;
-  border: 1px solid rgba(255, 221, 0, 0.15); /* MATCH TRACKER: Same border as refined Tracker */
+  border: 1px solid rgba(255, 221, 0, 0.15);
 }
 
 /* 🎯 TRACKER MATCH: Professional slider styling - EXACT COPY from Tracker */
@@ -1062,6 +1062,15 @@
   .edit-emotions-btn {
     margin-left: 0;
     margin-top: var(--spacing-sm);
+  }
+  
+  /* 🎯 TRACKER MATCH: Mobile emotion labels and values EXACTLY match Tracker mobile sizing */
+  .emotion-label {
+    font-size: 0.875rem !important; /* FIXED: Match Tracker mobile size exactly */
+  }
+  
+  .emotion-value {
+    font-size: 0.8rem !important; /* FIXED: Match Tracker mobile size exactly */
   }
   
   /* TRACKER MATCH: Mobile slider adjustments with professional styling - EXACT COPY */
