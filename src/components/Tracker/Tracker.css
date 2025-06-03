@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - ULTRA FIXED: Perfect slider label spacing matching Timeline exactly */
+/* components/Tracker/Tracker.css - REFINED: Professional slider styling with subtle accents */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -326,7 +326,7 @@ button.action-btn:hover {
   transform: none !important;
 }
 
-/* ULTRA FIXED: All benefit sliders use EXACT Timeline styling and spacing */
+/* REFINED: Professional slider styling - dialed back 20% from "gamey" look */
 .benefit-sliders {
   display: flex;
   flex-direction: column;
@@ -347,64 +347,64 @@ button.action-btn:hover {
   margin-bottom: var(--spacing-xs);
 }
 
-/* ULTRA FIXED: All benefit labels use consistent white color */
+/* Benefit labels - consistent styling */
 .benefit-label {
   font-weight: 600;
-  color: var(--text); /* UNIFIED: Consistent white text */
+  color: var(--text);
   flex: 1;
   text-align: left;
   font-size: 1rem;
   letter-spacing: 0.025em;
 }
 
-/* ULTRA FIXED: Enhanced value display with consistent styling */
+/* Enhanced value display with consistent styling */
 .benefit-value {
   font-weight: 700;
   color: var(--primary);
   font-size: 0.9375rem;
-  background-color: rgba(255, 221, 0, 0.1);
+  background-color: rgba(255, 221, 0, 0.08); /* REFINED: Reduced opacity from 0.1 to 0.08 */
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
   min-width: 48px;
   text-align: center;
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  border: 1px solid rgba(255, 221, 0, 0.15); /* REFINED: Reduced opacity from 0.2 to 0.15 */
 }
 
-/* ULTRA FIXED: All benefit sliders use consistent theme colors */
+/* REFINED: Professional slider track - subtler gradient */
 .benefit-range-slider {
   -webkit-appearance: none;
   width: 100%;
   height: 28px;
   border-radius: var(--radius-full);
-  /* UNIFIED: Consistent gradient background for all sliders */
+  /* REFINED: Much subtler gradient - reduced from gamey to professional */
   background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.2) 0%, 
-    rgba(255, 221, 0, 0.15) 50%, 
-    rgba(255, 221, 0, 0.25) 100%
+    rgba(128, 128, 128, 0.15) 0%, 
+    rgba(255, 221, 0, 0.08) 50%, 
+    rgba(255, 221, 0, 0.12) 100%
   );
   outline: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease; /* REFINED: Reduced from 0.3s cubic-bezier to simple 0.2s ease */
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); /* REFINED: Reduced shadow intensity */
+  border: 1px solid rgba(255, 255, 255, 0.03); /* REFINED: Subtler border */
   margin-bottom: 0px !important;
 }
 
-/* ULTRA FIXED: Consistent hover state for all sliders */
+/* REFINED: Subtler hover state */
 .benefit-range-slider:hover:not(:disabled) {
   background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.25) 0%, 
-    rgba(255, 221, 0, 0.2) 50%, 
-    rgba(255, 221, 0, 0.3) 100%
+    rgba(128, 128, 128, 0.18) 0%, 
+    rgba(255, 221, 0, 0.1) 50%, 
+    rgba(255, 221, 0, 0.15) 100%
   );
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(255, 221, 0, 0.1);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08); /* REFINED: Single shadow layer */
 }
 
-/* ULTRA FIXED: Consistent focus state */
+/* REFINED: Professional focus state */
 .benefit-range-slider:focus:not(:disabled) {
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(255, 221, 0, 0.2);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15); /* REFINED: Reduced glow */
 }
 
 .benefit-range-slider:disabled {
@@ -413,111 +413,81 @@ button.action-btn:hover {
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* ULTRA FIXED: Enhanced WebKit thumb with consistent styling */
+/* REFINED: Professional WebKit thumb - subtler styling */
 .benefit-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ffdd00 0%, #f6cc00 100%);
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%); /* REFINED: More muted yellow */
   cursor: pointer;
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.25),
-    0 0 0 2px rgba(255, 255, 255, 0.1),
-    0 0 16px rgba(255, 221, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* REFINED: Single shadow, reduced intensity */
   margin: 0 !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.15s ease; /* REFINED: Faster, simpler transition */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* REFINED: Subtler border */
 }
 
-/* ULTRA FIXED: Consistent thumb hover */
+/* REFINED: Subtler thumb hover */
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.1);
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    0 0 0 3px rgba(255, 255, 255, 0.15),
-    0 0 20px rgba(255, 221, 0, 0.4);
-  background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
+  transform: scale(1.05); /* REFINED: Reduced from 1.1 to 1.05 */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* REFINED: Single shadow layer */
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%); /* REFINED: Subtler highlight */
 }
 
-/* ULTRA FIXED: Consistent active state */
+/* REFINED: Professional active state */
 .benefit-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.05);
-  box-shadow: 
-    0 2px 6px rgba(0, 0, 0, 0.4),
-    0 0 0 4px rgba(255, 221, 0, 0.3),
-    0 0 24px rgba(255, 221, 0, 0.5);
+  transform: scale(1.02); /* REFINED: Minimal scaling */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25); /* REFINED: Simple shadow */
 }
 
-/* ULTRA FIXED: Enhanced Firefox thumb */
+/* REFINED: Professional Firefox thumb */
 .benefit-range-slider::-moz-range-thumb {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ffdd00 0%, #f6cc00 100%);
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%); /* REFINED: Consistent muted yellow */
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.25),
-    0 0 16px rgba(255, 221, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1); /* REFINED: Subtler border */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* REFINED: Single shadow */
   margin: 0 !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s ease; /* REFINED: Consistent transition */
 }
 
-/* ULTRA FIXED: Firefox thumb hover */
+/* REFINED: Firefox thumb hover */
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.1);
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(255, 221, 0, 0.4);
-  background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
+  transform: scale(1.05); /* REFINED: Consistent subtle scaling */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* REFINED: Single shadow */
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%); /* REFINED: Consistent highlight */
 }
 
-/* ⭐ ULTRA MEGA FINAL FIX: Slider labels now use NUCLEAR-LEVEL overrides to match Timeline EXACTLY ⭐ */
-
-/* Step 1: Create an incredibly specific selector that targets ONLY benefit sliders in Tracker */
+/* Professional slider labels with perfect spacing */
 .benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
 .benefit-sliders .benefit-slider-item .slider-labels,
 .tracker-container .benefit-sliders .slider-labels,
 .tracker-container .benefit-logging-section .slider-labels,
 .benefit-logging-container .benefit-sliders .slider-labels {
-  /* NUCLEAR OVERRIDE: Copy Timeline spacing EXACTLY with maximum specificity */
   display: flex !important;
   justify-content: space-between !important;
   font-size: 0.8125rem !important;
   color: var(--text-secondary) !important;
-  
-  /* THE MONEY SHOT: Perfect Timeline spacing with nuclear overrides */
   margin-top: 8px !important;
   margin-bottom: 0px !important;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   line-height: 1 !important;
-  transform: none !important; /* Remove the -2px transform that was causing issues */
+  transform: none !important;
   padding-left: 14px !important;
   padding-right: 14px !important;
   font-weight: 500 !important;
   letter-spacing: 0.025em !important;
-  
-  /* Extra insurance overrides */
   position: relative !important;
   z-index: 1 !important;
   width: 100% !important;
   box-sizing: border-box !important;
 }
 
-/* Step 2: Override any competing margin/padding rules with even more specificity */
-.tracker-container .benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
-.tracker-container .benefit-sliders .benefit-slider-item .slider-labels {
-  margin-top: 8px !important;
-  margin-bottom: 0px !important;
-  transform: none !important;
-  margin-left: 0px !important;
-  margin-right: 0px !important;
-}
-
-/* Step 3: Apply the same color scheme as Timeline with maximum specificity */
+/* Consistent label colors */
 .benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
 .benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
 .benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
@@ -530,7 +500,7 @@ button.action-btn:hover {
 .tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
 .tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
 .tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8) !important; /* UNIFIED: Consistent gray for "low" states */
+  color: rgba(156, 163, 175, 0.8) !important;
 }
 
 .benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
@@ -545,7 +515,7 @@ button.action-btn:hover {
 .tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
 .tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
 .tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.8) !important; /* UNIFIED: Consistent yellow for "high" states */
+  color: rgba(255, 221, 0, 0.7) !important; /* REFINED: Reduced from 0.8 to 0.7 for subtlety */
 }
 
 .benefit-actions {
@@ -554,26 +524,26 @@ button.action-btn:hover {
   margin-top: var(--spacing-lg);
 }
 
-/* PREMIUM: Enhanced save button */
+/* REFINED: Professional save button */
 .save-benefits-btn {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.15) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.25);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.08) 0%, rgba(255, 221, 0, 0.12) 100%); /* REFINED: Reduced opacity */
+  border: 1px solid rgba(255, 221, 0, 0.2); /* REFINED: Reduced from 0.25 to 0.2 */
   border-radius: var(--radius-full);
   color: var(--primary);
   padding: var(--spacing-md) var(--spacing-xl);
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.1);
+  transition: all 0.2s ease; /* REFINED: Simplified transition */
+  box-shadow: 0 2px 6px rgba(255, 221, 0, 0.08); /* REFINED: Single subtle shadow */
   letter-spacing: 0.025em;
 }
 
 .save-benefits-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.15) 0%, rgba(255, 221, 0, 0.2) 100%);
-  border-color: rgba(255, 221, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.12) 0%, rgba(255, 221, 0, 0.16) 100%); /* REFINED: Subtle hover */
+  border-color: rgba(255, 221, 0, 0.25);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(255, 221, 0, 0.15); /* REFINED: Single shadow layer */
 }
 
 .journal-section {
@@ -950,7 +920,7 @@ button.action-btn:hover {
     margin-top: var(--spacing-sm);
   }
   
-  /* ULTRA FIXED: Mobile slider adjustments with PERFECT spacing */
+  /* REFINED: Mobile slider adjustments with professional styling */
   .benefit-range-slider {
     height: 32px;
   }
@@ -965,13 +935,12 @@ button.action-btn:hover {
     height: 28px;
   }
   
-  /* ULTRA MEGA MOBILE FIX: Perfect mobile spacing with nuclear overrides */
+  /* Mobile slider labels with perfect spacing */
   .benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
   .benefit-sliders .benefit-slider-item .slider-labels,
   .tracker-container .benefit-sliders .slider-labels,
   .tracker-container .benefit-logging-section .slider-labels,
   .benefit-logging-container .benefit-sliders .slider-labels {
-    /* MOBILE NUCLEAR OVERRIDE: Slightly larger spacing for mobile */
     margin-top: 10px !important;
     margin-bottom: 0px !important;
     padding-top: 0px !important;
