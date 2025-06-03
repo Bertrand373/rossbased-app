@@ -1,4 +1,4 @@
-// components/Shared/DatePicker.js - React date picker with iframe validation logic
+// components/Shared/DatePicker.js - IMPROVED: Better styling and consistent with other modals
 import React, { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { FaCheckCircle, FaTimes } from 'react-icons/fa';
@@ -146,8 +146,8 @@ const DatePicker = ({ currentDate, onSubmit, onCancel, hasExistingDate = false }
   return (
     <div className="date-picker-container">
       <div className="current-date-display">
-        <div className="current-date-label">Current:</div>
-        <div className="current-date-value">{format(currentDate, 'MMM d, yyyy')}</div>
+        <div className="current-date-label">Currently Set:</div>
+        <div className="current-date-value">{format(currentDate, 'MMMM d, yyyy')}</div>
       </div>
       
       <form onSubmit={handleSubmit} className="date-picker-form">
@@ -200,7 +200,7 @@ const DatePicker = ({ currentDate, onSubmit, onCancel, hasExistingDate = false }
         </div>
         
         <div className="helper-text">
-          Enter MM/DD/YYYY - cursor auto-advances
+          💡 Enter MM/DD/YYYY format - cursor will automatically advance between fields
         </div>
         
         <div className="date-picker-actions">

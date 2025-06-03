@@ -1,73 +1,79 @@
-/* components/Shared/DatePicker.css - EXACT styling from iframe converted to CSS */
+/* components/Shared/DatePicker.css - IMPROVED: Better styling, consistent with other modals */
 
 .date-picker-container {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  padding: var(--spacing-sm);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  gap: var(--spacing-lg);
+  padding: 0; /* REMOVED: No padding around container */
+  background-color: transparent; /* REMOVED: No background */
+  border: none; /* REMOVED: No border */
+  border-radius: 0; /* REMOVED: No border radius */
 }
 
 .current-date-display {
-  background-color: #1a2332;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-sm);
+  background-color: var(--medium-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
   text-align: center;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--text);
-  border: 1px solid #334155;
+  border: 1px solid var(--border);
 }
 
 .current-date-label {
-  color: #94a3b8;
-  font-size: 0.6875rem;
-  margin-bottom: 2px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  margin-bottom: var(--spacing-xs);
   font-weight: 500;
 }
 
 .current-date-value {
   color: var(--text);
   font-weight: 600;
+  font-size: 1rem;
 }
 
 .date-picker-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
+/* IMPROVED: Better spacing and layout for date inputs */
 .date-inputs-row {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md); /* INCREASED: More reasonable spacing */
   align-items: flex-end;
   justify-content: center;
+  padding: var(--spacing-md) 0; /* ADDED: Vertical padding for better spacing */
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
+  align-items: center; /* ADDED: Center the inputs */
 }
 
 .input-group label {
-  font-size: 0.6875rem;
-  color: var(--text-accent);
-  font-weight: 500;
+  font-size: 0.875rem; /* INCREASED: Larger labels */
+  color: var(--text);
+  font-weight: 600;
   text-align: center;
 }
 
+/* IMPROVED: Better input styling matching other form elements */
 .date-inputs-row input {
-  padding: var(--spacing-sm) var(--spacing-xs);
+  padding: var(--spacing-md); /* INCREASED: More padding like other inputs */
   background-color: var(--medium-gray);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   color: var(--text);
-  font-size: 0.875rem;
+  font-size: 1rem; /* INCREASED: Larger font size */
   text-align: center;
-  font-weight: 500;
+  font-weight: 600;
   transition: border-color 0.2s, background-color 0.2s;
+  min-height: 44px; /* ADDED: Minimum height for better touch targets */
 }
 
 .date-inputs-row input:focus {
@@ -81,76 +87,80 @@
   font-weight: 400;
 }
 
+/* IMPROVED: Better input widths */
 .month-input { 
-  width: 40px; 
+  width: 64px; /* INCREASED: From 40px to 64px */
 }
 
 .day-input { 
-  width: 40px; 
+  width: 64px; /* INCREASED: From 40px to 64px */
 }
 
 .year-input { 
-  width: 60px; 
+  width: 80px; /* INCREASED: From 60px to 80px */
 }
 
 .date-separator {
-  font-size: 1.125rem;
+  font-size: 1.5rem; /* INCREASED: Bigger separator */
   color: var(--text-secondary);
-  margin: 0 2px;
+  margin: 0 var(--spacing-xs); /* INCREASED: More margin */
   align-self: flex-end;
-  padding-bottom: var(--spacing-sm);
-  font-weight: 500;
+  padding-bottom: var(--spacing-md); /* INCREASED: Match input padding */
+  font-weight: 600;
 }
 
 .helper-text {
-  background-color: #1a1a1a;
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  font-size: 0.6875rem;
+  background-color: var(--card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem; /* INCREASED: Larger text */
   color: var(--text-secondary);
   text-align: center;
-  border-left: 2px solid var(--primary);
+  border-left: 3px solid var(--primary);
   font-weight: 500;
+  border: 1px solid var(--border);
 }
 
+/* IMPROVED: Button styling matching journal modal buttons exactly */
 .date-picker-actions {
   display: flex;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-xs);
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
 }
 
-/* FIXED: Primary action button - matching Calendar edit day modal exactly */
+/* FIXED: Primary action button - matching Add Entry button exactly */
 .date-picker-container .primary-action {
   display: flex !important;
   align-items: center !important;
   gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: var(--primary) !important;
-  border: 1px solid var(--primary) !important;
+  padding: var(--spacing-md) var(--spacing-lg) !important; /* INCREASED: Match journal modal */
+  background-color: rgba(255, 221, 0, 0.1) !important; /* CHANGED: Match journal modal style */
+  border: 1px solid rgba(255, 221, 0, 0.2) !important; /* CHANGED: Match journal modal style */
   border-radius: var(--radius-full) !important;
-  color: #000000 !important;
+  color: var(--primary) !important; /* CHANGED: Primary color text */
   font-size: 0.875rem !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important; /* CHANGED: Match journal modal weight */
   cursor: pointer !important;
   transition: all 0.2s !important;
   flex: 1 !important;
   justify-content: center !important;
+  min-height: 44px !important; /* ADDED: Minimum height for better touch */
 }
 
 .date-picker-container .primary-action:hover {
-  background-color: var(--primary-dark) !important;
-  border-color: var(--primary-dark) !important;
-  color: #000000 !important;
+  background-color: rgba(255, 221, 0, 0.2) !important; /* CHANGED: Match journal modal hover */
+  border-color: rgba(255, 221, 0, 0.3) !important;
+  color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.3) !important;
+  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
-/* FIXED: Cancel button - matching Calendar edit day modal exactly */
+/* FIXED: Cancel button - matching journal modal cancel button exactly */
 .date-picker-container .cancel-action {
   display: flex !important;
   align-items: center !important;
   gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
+  padding: var(--spacing-md) var(--spacing-lg) !important; /* INCREASED: Match journal modal */
   background-color: rgba(128, 128, 128, 0.1) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-full) !important;
@@ -161,6 +171,7 @@
   transition: none !important;
   flex: 1 !important;
   justify-content: center !important;
+  min-height: 44px !important; /* ADDED: Minimum height for better touch */
 }
 
 /* FIXED: Cancel button stays static - no hover effects */
@@ -172,73 +183,92 @@
   box-shadow: none !important;
 }
 
-/* Mobile responsiveness */
+/* IMPROVED: Mobile responsiveness with better spacing */
 @media (max-width: 768px) {
   .date-picker-container {
-    gap: var(--spacing-sm);
-    padding: var(--spacing-xs);
+    gap: var(--spacing-md); /* REDUCED: Less gap on mobile */
   }
   
   .date-inputs-row {
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm); /* REDUCED: Tighter spacing on mobile */
+    padding: var(--spacing-sm) 0;
   }
   
+  /* IMPROVED: Better mobile input sizes */
   .month-input,
   .day-input {
-    width: 36px;
+    width: 56px; /* INCREASED: From 36px to 56px for better touch targets */
   }
   
   .year-input {
-    width: 56px;
+    width: 72px; /* INCREASED: From 56px to 72px */
   }
   
   .date-inputs-row input {
-    padding: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md); /* INCREASED: Better mobile padding */
+    font-size: 1rem; /* MAINTAINED: Good size for mobile */
+    min-height: 48px; /* INCREASED: Better touch target on mobile */
+  }
+  
+  .input-group label {
     font-size: 0.8125rem;
   }
   
+  .date-separator {
+    font-size: 1.25rem;
+    margin: 0 var(--spacing-xs);
+    padding-bottom: var(--spacing-sm);
+  }
+  
   .helper-text {
-    font-size: 0.625rem;
-    padding: var(--spacing-xs);
+    font-size: 0.8125rem;
+    padding: var(--spacing-sm) var(--spacing-md);
   }
   
   .current-date-display {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: 0.75rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.8125rem;
   }
   
   .current-date-label {
-    font-size: 0.625rem;
+    font-size: 0.75rem;
+  }
+  
+  .current-date-value {
+    font-size: 0.9375rem;
   }
   
   .date-picker-actions {
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
   }
   
+  /* IMPROVED: Mobile buttons with better sizing */
   .date-picker-container .primary-action,
   .date-picker-container .cancel-action {
-    padding: var(--spacing-xs) var(--spacing-sm) !important;
-    font-size: 0.8125rem !important;
+    padding: var(--spacing-md) var(--spacing-lg) !important; /* MAINTAINED: Good mobile padding */
+    font-size: 0.875rem !important;
+    min-height: 48px !important; /* MAINTAINED: Good mobile touch target */
   }
 }
 
-/* Very small screens */
+/* Very small screens - more compact */
 @media (max-width: 480px) {
   .date-inputs-row {
-    justify-content: space-between;
+    gap: var(--spacing-xs);
+    justify-content: space-evenly; /* CHANGED: Better distribution */
   }
   
   .month-input,
   .day-input {
-    width: 32px;
-  }
-  
-  .year-input {
     width: 52px;
   }
   
+  .year-input {
+    width: 68px;
+  }
+  
   .date-separator {
-    font-size: 1rem;
-    margin: 0 1px;
+    font-size: 1.125rem;
+    margin: 0 2px;
   }
 }
