@@ -1,4 +1,4 @@
-/* components/Profile/Profile.css - FIXED: Improved mobile layout and removed redundant elements */
+/* components/Profile/Profile.css - FIXED: Scoped selectors to prevent affecting other components */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -130,8 +130,6 @@
   font-size: 0.875rem;
   color: var(--text-secondary);
 }
-
-/* REMOVED: Quick stats section completely - no more redundant streak data */
 
 /* Tab Navigation */
 .profile-tabs {
@@ -589,7 +587,8 @@
   border-top: 1px solid var(--border);
 }
 
-.logout-btn {
+/* FIXED: Profile-specific logout button (different from header logout) */
+.profile-container .logout-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -604,14 +603,14 @@
   transition: all 0.2s;
 }
 
-.logout-btn:hover {
+.profile-container .logout-btn:hover {
   background-color: rgba(239, 68, 68, 0.1);
   border-color: var(--danger);
   color: var(--danger);
 }
 
-/* Action Buttons */
-.action-btn {
+/* FIXED: Profile-specific action buttons - scoped to profile container */
+.profile-container .action-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -626,7 +625,7 @@
   transition: all 0.2s;
 }
 
-.action-btn:hover {
+.profile-container .action-btn:hover {
   background-color: rgba(255, 221, 0, 0.2);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2);
@@ -653,7 +652,8 @@
   box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
 }
 
-.cancel-btn {
+/* FIXED: Profile-specific cancel button - scoped to profile container */
+.profile-container .cancel-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -668,7 +668,7 @@
   transition: all 0.2s;
 }
 
-.cancel-btn:hover {
+.profile-container .cancel-btn:hover {
   background-color: rgba(128, 128, 128, 0.2);
   color: var(--text);
 }
@@ -924,8 +924,6 @@
   .profile-member-since {
     text-align: center; /* ADDED: Ensure all text is centered */
   }
-  
-  /* REMOVED: Quick stats section completely - no mobile adjustments needed */
   
   .profile-tabs {
     overflow-x: auto;
