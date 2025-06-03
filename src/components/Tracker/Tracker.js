@@ -517,7 +517,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           margin-top: 4px;
         }
         
-        /* UPDATED: Enhanced primary button with checkmark icon matching edit profile */
         .primary-action {
           display: flex !important;
           align-items: center !important;
@@ -541,13 +540,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           color: #ffdd00 !important;
         }
         
-        /* UPDATED: Button icons for consistency - larger icons */
         .button-icon {
           font-size: 14px !important;
           margin-right: 6px !important;
         }
         
-        /* UPDATED: Cancel button with X icon */
         .secondary-action {
           display: flex !important;
           align-items: center !important;
@@ -723,7 +720,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
           </div>
           
-          {/* ADDED: Second divider between milestones and action buttons */}
           <div className="streak-actions-divider"></div>
           
           <div className="streak-actions">
@@ -743,7 +739,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               <span>Log Wet Dream</span>
             </button>
             
-            {/* UPDATED: Fighting Urges button now redirects to urge tab */}
             <button 
               className="streak-action-btn urge-btn"
               onClick={handleUrges}
@@ -784,6 +779,66 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           
           {/* UPDATED: Benefit sliders with Timeline-style guide labels */}
           <div className="benefit-sliders">
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Energy</span>
+                <span className="benefit-value">{todayBenefits.energy}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.energy}
+                onChange={(e) => handleBenefitChange('energy', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Low</span>
+                <span>High</span>
+              </div>
+            </div>
+            
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Focus</span>
+                <span className="benefit-value">{todayBenefits.focus}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.focus}
+                onChange={(e) => handleBenefitChange('focus', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Scattered</span>
+                <span>Laser Focus</span>
+              </div>
+            </div>
+            
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Confidence</span>
+                <span className="benefit-value">{todayBenefits.confidence}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.confidence}
+                onChange={(e) => handleBenefitChange('confidence', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Insecure</span>
+                <span>Very Confident</span>
+              </div>
+            </div>
+            
             <div className="benefit-slider-item">
               <div className="benefit-slider-header">
                 <span className="benefit-label">Aura</span>
@@ -933,64 +988,4 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   );
 };
 
-export default Tracker;-slider-header">
-                <span className="benefit-label">Energy</span>
-                <span className="benefit-value">{todayBenefits.energy}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.energy}
-                onChange={(e) => handleBenefitChange('energy', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Low</span>
-                <span>High</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Focus</span>
-                <span className="benefit-value">{todayBenefits.focus}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.focus}
-                onChange={(e) => handleBenefitChange('focus', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Scattered</span>
-                <span>Laser Focus</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Confidence</span>
-                <span className="benefit-value">{todayBenefits.confidence}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.confidence}
-                onChange={(e) => handleBenefitChange('confidence', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Insecure</span>
-                <span>Very Confident</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit
+export default Tracker;
