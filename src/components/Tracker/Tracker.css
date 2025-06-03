@@ -762,11 +762,11 @@ button.action-btn:hover {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
   border: 1px solid;
+  transition: all 0.2s;
 }
 
-/* UPDATED: Primary action buttons with edit profile button styling */
+/* FIXED: Primary action buttons (Set Date & Save Entry) with consistent edit profile styling */
 .form-actions .action-btn.primary-action {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
@@ -779,7 +779,7 @@ button.action-btn:hover {
   color: var(--primary);
 }
 
-/* UPDATED: Cancel buttons - no hover effects, stay static */
+/* FIXED: Cancel buttons - no hover effects, stay static */
 .form-actions .action-btn:not(.primary-action) {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);

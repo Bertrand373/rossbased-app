@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import './Tracker.css';
 
-// Icons - UPDATED: Added missing icons for modal buttons
+// Icons - UPDATED: Simplified to use checkmark for both primary buttons
 import { 
   FaCrown, 
   FaCalendarCheck, 
@@ -19,9 +19,7 @@ import {
   FaDiscord,
   FaToggleOn,
   FaToggleOff,
-  FaCheckCircle,
-  FaCalendarAlt, // ADDED: For Set Date button
-  FaSave // ADDED: For Save Entry button
+  FaCheckCircle
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
@@ -519,7 +517,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           margin-top: 4px;
         }
         
-        /* UPDATED: Enhanced primary button with icon-like styling matching edit profile */
+        /* UPDATED: Enhanced primary button with checkmark icon matching edit profile */
         .primary-action {
           display: flex !important;
           align-items: center !important;
@@ -543,9 +541,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           color: #ffdd00 !important;
         }
         
-        /* UPDATED: Calendar icon for Set Date button */
+        /* UPDATED: Checkmark icon for Set Date button */
         .primary-action::before {
-          content: "📅" !important;
+          content: "✓" !important;
           font-size: 12px !important;
           margin-right: 4px !important;
         }
@@ -659,7 +657,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             {/* UPDATED: Form actions with consistent button styling and icons */}
             <div className="form-actions">
               <button onClick={saveNote} className="action-btn primary-action">
-                <FaSave />
+                <FaCheckCircle />
                 Save Entry
               </button>
               <button onClick={() => setShowNoteModal(false)} className="action-btn">
