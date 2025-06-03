@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - FIXED: Save Entry button styling to be grey with yellow hover
+// components/Tracker/Tracker.js - FIXED: Save Entry button styling to match Set Date button hover
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -659,9 +659,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               ></textarea>
             </div>
             
-            {/* FIXED: Save Entry button now uses no class for grey default with yellow hover */}
+            {/* FIXED: Save Entry button now uses primary-action class for grey default with yellow hover */}
             <div className="form-actions">
-              <button onClick={saveNote} className="action-btn">
+              <button onClick={saveNote} className="action-btn primary-action">
                 <FaCheckCircle />
                 Save Entry
               </button>
@@ -784,66 +784,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           
           {/* UPDATED: Benefit sliders with Timeline-style guide labels */}
           <div className="benefit-sliders">
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Energy</span>
-                <span className="benefit-value">{todayBenefits.energy}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.energy}
-                onChange={(e) => handleBenefitChange('energy', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Low</span>
-                <span>High</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Focus</span>
-                <span className="benefit-value">{todayBenefits.focus}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.focus}
-                onChange={(e) => handleBenefitChange('focus', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Scattered</span>
-                <span>Laser Focus</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Confidence</span>
-                <span className="benefit-value">{todayBenefits.confidence}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.confidence}
-                onChange={(e) => handleBenefitChange('confidence', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Insecure</span>
-                <span>Very Confident</span>
-              </div>
-            </div>
-            
             <div className="benefit-slider-item">
               <div className="benefit-slider-header">
                 <span className="benefit-label">Aura</span>
@@ -993,4 +933,64 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   );
 };
 
-export default Tracker;
+export default Tracker;-slider-header">
+                <span className="benefit-label">Energy</span>
+                <span className="benefit-value">{todayBenefits.energy}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.energy}
+                onChange={(e) => handleBenefitChange('energy', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Low</span>
+                <span>High</span>
+              </div>
+            </div>
+            
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Focus</span>
+                <span className="benefit-value">{todayBenefits.focus}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.focus}
+                onChange={(e) => handleBenefitChange('focus', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Scattered</span>
+                <span>Laser Focus</span>
+              </div>
+            </div>
+            
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Confidence</span>
+                <span className="benefit-value">{todayBenefits.confidence}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.confidence}
+                onChange={(e) => handleBenefitChange('confidence', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Insecure</span>
+                <span>Very Confident</span>
+              </div>
+            </div>
+            
+            <div className="benefit-slider-item">
+              <div className="benefit
