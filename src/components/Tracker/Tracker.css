@@ -389,6 +389,7 @@ button.action-btn:hover {
   position: relative;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 0px !important;
 }
 
 /* UNIFIED: Consistent hover state for all sliders */
@@ -474,11 +475,14 @@ button.action-btn:hover {
 }
 
 /* FIXED: All slider labels now use PERFECT SPACING to match Timeline exactly */
-.slider-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
+.slider-labels,
+.benefit-slider-item .slider-labels,
+.benefit-sliders .slider-labels,
+.benefit-logging-section .slider-labels {
+  display: flex !important;
+  justify-content: space-between !important;
+  font-size: 0.8125rem !important;
+  color: var(--text-secondary) !important;
   /* FIXED: Exact same spacing as Timeline - PERFECT MATCH */
   margin-top: 0px !important;
   margin-bottom: 0px !important;
@@ -488,8 +492,8 @@ button.action-btn:hover {
   transform: translateY(-2px) !important;
   padding-left: 14px !important;
   padding-right: 14px !important;
-  font-weight: 500;
-  letter-spacing: 0.025em;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em !important;
 }
 
 /* UNIFIED: Consistent label colors - subtle contextual colors that fit the theme */
@@ -929,12 +933,25 @@ button.action-btn:hover {
   }
   
   /* FIXED: Perfect mobile spacing to match Timeline exactly */
-  .slider-labels {
+  .slider-labels,
+  .benefit-slider-item .slider-labels,
+  .benefit-sliders .slider-labels,
+  .benefit-logging-section .slider-labels {
     padding-left: 16px !important;
     padding-right: 16px !important;
-    font-size: 0.75rem;
-    /* FIXED: Same transform as Timeline for perfect mobile spacing */
+    font-size: 0.75rem !important;
+    /* CRITICAL: Same transform as Timeline for perfect mobile spacing */
     transform: translateY(-2px) !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    line-height: 1 !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.025em !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    color: var(--text-secondary) !important;
   }
   
   .discord-toggle {
