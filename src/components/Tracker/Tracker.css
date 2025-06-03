@@ -771,6 +771,7 @@ button.action-btn:hover {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
   color: var(--text-secondary);
+  transition: all 0.2s;
 }
 
 .form-actions .action-btn.primary-action:hover {

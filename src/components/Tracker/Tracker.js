@@ -541,14 +541,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           color: #ffdd00 !important;
         }
         
-        /* UPDATED: Checkmark icon for Set Date button */
-        .primary-action::before {
-          content: "✓" !important;
+        /* UPDATED: Button icons for consistency */
+        .button-icon {
           font-size: 12px !important;
           margin-right: 4px !important;
         }
         
-        /* UPDATED: Cancel button remains static - no hover effects */
+        /* UPDATED: Cancel button with X icon */
         .secondary-action {
           display: flex !important;
           align-items: center !important;
@@ -601,8 +600,14 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
           
           <div class="actions-row">
-            <button type="submit" id="submit-button" class="primary-action">Set Date</button>
-            <button type="button" id="cancel-button" class="secondary-action">${userData.startDate ? "Cancel" : "Use Today"}</button>
+            <button type="submit" id="submit-button" class="primary-action">
+              <span class="button-icon">✓</span>
+              Set Date
+            </button>
+            <button type="button" id="cancel-button" class="secondary-action">
+              <span class="button-icon">✕</span>
+              ${userData.startDate ? "Cancel" : "Use Today"}
+            </button>
           </div>
         </div>
       </form>
