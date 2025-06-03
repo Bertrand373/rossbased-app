@@ -541,10 +541,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           color: #ffdd00 !important;
         }
         
-        /* UPDATED: Button icons for consistency */
+        /* UPDATED: Button icons for consistency - larger icons */
         .button-icon {
-          font-size: 12px !important;
-          margin-right: 4px !important;
+          font-size: 14px !important;
+          margin-right: 6px !important;
         }
         
         /* UPDATED: Cancel button with X icon */
@@ -665,7 +665,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <FaCheckCircle />
                 Save Entry
               </button>
-              <button onClick={() => setShowNoteModal(false)} className="action-btn">
+              <button onClick={() => setShowNoteModal(false)} className="action-btn cancel-action">
                 <FaTimes />
                 Cancel
               </button>

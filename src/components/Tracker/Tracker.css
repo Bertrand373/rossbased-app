@@ -763,10 +763,9 @@ button.action-btn:hover {
   font-weight: 500;
   cursor: pointer;
   border: 1px solid;
-  transition: all 0.2s;
 }
 
-/* FIXED: Primary action buttons (Set Date & Save Entry) with consistent edit profile styling */
+/* FIXED: Primary action buttons (Set Date & Save Entry) - grey static, yellow hover */
 .form-actions .action-btn.primary-action {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
@@ -780,15 +779,30 @@ button.action-btn:hover {
   color: var(--primary);
 }
 
-/* FIXED: Cancel buttons - no hover effects, stay static */
-.form-actions .action-btn:not(.primary-action) {
+/* FIXED: Cancel buttons with cancel-action class - no hover effects, stay static */
+.form-actions .action-btn.cancel-action {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
   color: var(--text-secondary);
   transition: none;
 }
 
-.form-actions .action-btn:not(.primary-action):hover {
+.form-actions .action-btn.cancel-action:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+}
+
+/* LEGACY: Keep old selector for any buttons without specific classes */
+.form-actions .action-btn:not(.primary-action):not(.cancel-action) {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.form-actions .action-btn:not(.primary-action):not(.cancel-action):hover {
   background-color: rgba(128, 128, 128, 0.1) !important;
   border-color: var(--border) !important;
   color: var(--text-secondary) !important;
