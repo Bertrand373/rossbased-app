@@ -1,4 +1,4 @@
-// components/Profile/Profile.js - Simplified Profile Component - Removed journey stats and unnecessary features
+// components/Profile/Profile.js - FIXED: Removed redundant streak data and improved mobile layout
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -53,11 +53,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'critical', label: 'Critical/Urgent', color: '#dc2626' }
   ];
 
-  // Calculate basic user info for display - SIMPLIFIED
+  // Calculate basic user info for display - REMOVED: streak data
   const userStats = {
-    memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown',
-    currentStreak: userData.currentStreak || 0,
-    longestStreak: userData.longestStreak || 0
+    memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown'
   };
 
   // Handle profile updates
@@ -198,7 +196,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       </div>
 
-      {/* SIMPLIFIED: Profile Overview Card - Removed detailed stats */}
+      {/* FIXED: Profile Overview Card - Removed streak stats completely */}
       <div className="profile-overview-card">
         <div className="profile-avatar-section">
           <div className="profile-avatar">
@@ -217,17 +215,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         </div>
         
-        {/* SIMPLIFIED: Only show basic streak info */}
-        <div className="profile-quick-stats">
-          <div className="quick-stat-item">
-            <div className="quick-stat-value">{userStats.currentStreak}</div>
-            <div className="quick-stat-label">Current Streak</div>
-          </div>
-          <div className="quick-stat-item">
-            <div className="quick-stat-value">{userStats.longestStreak}</div>
-            <div className="quick-stat-label">Longest Streak</div>
-          </div>
-        </div>
+        {/* REMOVED: Quick stats section completely - no more redundant streak data */}
       </div>
 
       {/* Tab Navigation */}
@@ -271,7 +259,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
       {/* Tab Content */}
       <div className="profile-tab-content">
-        {/* Account Tab - SIMPLIFIED: Removed journey statistics */}
+        {/* Account Tab */}
         {activeTab === 'account' && (
           <div className="account-section">
             <div className="section-header">
@@ -350,7 +338,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Subscription Tab - UNCHANGED */}
+        {/* Subscription Tab */}
         {activeTab === 'subscription' && (
           <div className="subscription-section">
             <div className="current-plan-card">
@@ -431,7 +419,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Privacy Tab - UNCHANGED */}
+        {/* Privacy Tab */}
         {activeTab === 'privacy' && (
           <div className="privacy-section">
             <h3>Privacy Settings</h3>
@@ -507,14 +495,14 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Settings Tab - SIMPLIFIED: Only language */}
+        {/* FIXED: Settings Tab - Changed "Language & Region" to just "Language" */}
         {activeTab === 'settings' && (
           <div className="settings-section">
             <h3>App Settings</h3>
             
             <div className="settings-groups">
               <div className="settings-group">
-                <h4>Language & Region</h4>
+                <h4>Language</h4>
                 
                 <div className="select-setting">
                   <label>Language</label>
@@ -541,7 +529,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Data Tab - UNCHANGED */}
+        {/* Data Tab */}
         {activeTab === 'data' && (
           <div className="data-section">
             <h3>Data Management</h3>
@@ -580,7 +568,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         )}
       </div>
 
-      {/* Feedback Modal - UNCHANGED */}
+      {/* Feedback Modal */}
       {showFeedbackModal && (
         <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
           <div className="modal-content feedback-modal" onClick={e => e.stopPropagation()}>
@@ -671,7 +659,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       )}
 
-      {/* Export Confirmation Modal - UNCHANGED */}
+      {/* Export Confirmation Modal */}
       {showExportModal && (
         <div className="modal-overlay" onClick={() => setShowExportModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -698,7 +686,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       )}
 
-      {/* Delete Account Confirmation Modal - UNCHANGED */}
+      {/* Delete Account Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>

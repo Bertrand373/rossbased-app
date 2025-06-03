@@ -1,4 +1,4 @@
-/* components/Profile/Profile.css - Simplified Profile Styling */
+/* components/Profile/Profile.css - FIXED: Improved mobile layout and removed redundant elements */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -51,7 +51,7 @@
   box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2);
 }
 
-/* SIMPLIFIED: Profile Overview Card - Removed detailed stats section */
+/* SIMPLIFIED: Profile Overview Card - Removed quick stats completely */
 .profile-overview-card {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -60,7 +60,7 @@
   border: 1px solid var(--border);
   border-top: 3px solid rgba(255, 221, 0, 0.3);
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* CHANGED: Center the content */
   align-items: center;
   gap: var(--spacing-xl);
 }
@@ -131,28 +131,7 @@
   color: var(--text-secondary);
 }
 
-/* SIMPLIFIED: Only show basic streak stats - removed detailed journey stats */
-.profile-quick-stats {
-  display: flex;
-  gap: var(--spacing-xl);
-}
-
-.quick-stat-item {
-  text-align: center;
-}
-
-.quick-stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1;
-}
-
-.quick-stat-label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: var(--spacing-xs);
-}
+/* REMOVED: Quick stats section completely - no more redundant streak data */
 
 /* Tab Navigation */
 .profile-tabs {
@@ -891,7 +870,7 @@
   color: var(--text);
 }
 
-/* Mobile Responsiveness */
+/* IMPROVED: Mobile Responsiveness with better centering */
 @media (max-width: 768px) {
   .profile-header {
     display: flex;
@@ -918,21 +897,35 @@
     justify-content: center;
   }
   
+  /* IMPROVED: Better mobile layout - completely centered */
   .profile-overview-card {
     flex-direction: column;
     gap: var(--spacing-lg);
     text-align: center;
+    align-items: center; /* ADDED: Center everything */
+    justify-content: center; /* ADDED: Center everything */
   }
   
   .profile-avatar-section {
     flex-direction: column;
     gap: var(--spacing-md);
+    align-items: center; /* ADDED: Center the avatar section */
+    text-align: center; /* ADDED: Center text */
   }
   
-  .profile-quick-stats {
-    justify-content: space-around;
-    gap: var(--spacing-md);
+  /* ADDED: Make sure all profile info is centered on mobile */
+  .profile-basic-info {
+    align-items: center; /* ADDED: Center all profile info */
+    text-align: center; /* ADDED: Center text */
   }
+  
+  .profile-username,
+  .profile-plan,
+  .profile-member-since {
+    text-align: center; /* ADDED: Ensure all text is centered */
+  }
+  
+  /* REMOVED: Quick stats section completely - no mobile adjustments needed */
   
   .profile-tabs {
     overflow-x: auto;
@@ -1005,14 +998,6 @@
     gap: var(--spacing-md);
     text-align: center;
   }
-  
-  .quick-stat-value {
-    font-size: 1.25rem;
-  }
-  
-  .quick-stat-label {
-    font-size: 0.7rem;
-  }
 }
 
 /* Very Small Screens */
@@ -1035,16 +1020,6 @@
   
   .profile-username {
     font-size: 1.25rem;
-  }
-  
-  .profile-quick-stats {
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-  }
-  
-  .quick-stat-item {
-    flex: 1;
-    min-width: 80px;
   }
   
   .profile-tab-content {
