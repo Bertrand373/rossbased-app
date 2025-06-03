@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Added consistent icons to modal buttons
+// components/Tracker/Tracker.js - FIXED: Save Entry button styling to be grey with yellow hover
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -643,7 +643,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* UPDATED: Journal Note Modal with enhanced Save Entry button */}
+      {/* FIXED: Journal Note Modal with corrected Save Entry button styling */}
       {showNoteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -659,7 +659,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               ></textarea>
             </div>
             
-            {/* UPDATED: Form actions with consistent button styling and icons */}
+            {/* FIXED: Save Entry button now has grey default with yellow hover */}
             <div className="form-actions">
               <button onClick={saveNote} className="action-btn primary-action">
                 <FaCheckCircle />
