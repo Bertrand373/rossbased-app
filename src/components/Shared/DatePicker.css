@@ -128,39 +128,40 @@
   margin-top: var(--spacing-md);
 }
 
-/* FIXED: Primary action button - matching Add Entry button exactly */
+/* FIXED: Primary action button - matching Add Entry button exactly with NO HOVER */
 .date-picker-container .primary-action {
   display: flex !important;
   align-items: center !important;
   gap: var(--spacing-sm) !important;
-  padding: var(--spacing-md) var(--spacing-lg) !important; /* INCREASED: Match journal modal */
-  background-color: rgba(255, 221, 0, 0.1) !important; /* CHANGED: Match journal modal style */
-  border: 1px solid rgba(255, 221, 0, 0.2) !important; /* CHANGED: Match journal modal style */
+  padding: var(--spacing-sm) var(--spacing-md) !important; /* FIXED: Match journal modal exact padding */
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border: 1px solid rgba(255, 221, 0, 0.2) !important;
   border-radius: var(--radius-full) !important;
-  color: var(--primary) !important; /* CHANGED: Primary color text */
+  color: var(--primary) !important;
   font-size: 0.875rem !important;
-  font-weight: 500 !important; /* CHANGED: Match journal modal weight */
+  font-weight: 500 !important;
   cursor: pointer !important;
-  transition: all 0.2s !important;
+  transition: none !important; /* REMOVED: All transitions */
   flex: 1 !important;
   justify-content: center !important;
-  min-height: 44px !important; /* ADDED: Minimum height for better touch */
+  min-height: auto !important; /* REMOVED: Fixed height to match journal modal */
 }
 
+/* REMOVED: All hover effects for primary button */
 .date-picker-container .primary-action:hover {
-  background-color: rgba(255, 221, 0, 0.2) !important; /* CHANGED: Match journal modal hover */
-  border-color: rgba(255, 221, 0, 0.3) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
+  background-color: rgba(255, 221, 0, 0.1) !important; /* STATIC: No change on hover */
+  border-color: rgba(255, 221, 0, 0.2) !important; /* STATIC: No change on hover */
+  color: var(--primary) !important; /* STATIC: No change on hover */
+  transform: none !important; /* STATIC: No animations */
+  box-shadow: none !important; /* STATIC: No shadows */
 }
 
-/* FIXED: Cancel button - matching journal modal cancel button exactly */
+/* FIXED: Cancel button - matching journal modal cancel button exactly with NO HOVER */
 .date-picker-container .cancel-action {
   display: flex !important;
   align-items: center !important;
   gap: var(--spacing-sm) !important;
-  padding: var(--spacing-md) var(--spacing-lg) !important; /* INCREASED: Match journal modal */
+  padding: var(--spacing-sm) var(--spacing-md) !important; /* FIXED: Match journal modal exact padding */
   background-color: rgba(128, 128, 128, 0.1) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-full) !important;
@@ -171,10 +172,10 @@
   transition: none !important;
   flex: 1 !important;
   justify-content: center !important;
-  min-height: 44px !important; /* ADDED: Minimum height for better touch */
+  min-height: auto !important; /* REMOVED: Fixed height to match journal modal */
 }
 
-/* FIXED: Cancel button stays static - no hover effects */
+/* REMOVED: All hover effects for cancel button - completely static */
 .date-picker-container .cancel-action:hover {
   background-color: rgba(128, 128, 128, 0.1) !important;
   border-color: var(--border) !important;
@@ -242,12 +243,12 @@
     gap: var(--spacing-sm);
   }
   
-  /* IMPROVED: Mobile buttons with better sizing */
+  /* FIXED: Mobile buttons with exact journal modal sizing */
   .date-picker-container .primary-action,
   .date-picker-container .cancel-action {
-    padding: var(--spacing-md) var(--spacing-lg) !important; /* MAINTAINED: Good mobile padding */
+    padding: var(--spacing-sm) var(--spacing-md) !important; /* FIXED: Match journal modal exactly */
     font-size: 0.875rem !important;
-    min-height: 48px !important; /* MAINTAINED: Good mobile touch target */
+    min-height: auto !important; /* REMOVED: Fixed height to match journal modal */
   }
 }
 
