@@ -1,0 +1,244 @@
+/* components/Shared/DatePicker.css - EXACT styling from iframe converted to CSS */
+
+.date-picker-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.current-date-display {
+  background-color: #1a2332;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--text);
+  border: 1px solid #334155;
+}
+
+.current-date-label {
+  color: #94a3b8;
+  font-size: 0.6875rem;
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.current-date-value {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.date-picker-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.date-inputs-row {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.input-group label {
+  font-size: 0.6875rem;
+  color: var(--text-accent);
+  font-weight: 500;
+  text-align: center;
+}
+
+.date-inputs-row input {
+  padding: var(--spacing-sm) var(--spacing-xs);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.875rem;
+  text-align: center;
+  font-weight: 500;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.date-inputs-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.date-inputs-row input::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.month-input { 
+  width: 40px; 
+}
+
+.day-input { 
+  width: 40px; 
+}
+
+.year-input { 
+  width: 60px; 
+}
+
+.date-separator {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin: 0 2px;
+  align-self: flex-end;
+  padding-bottom: var(--spacing-sm);
+  font-weight: 500;
+}
+
+.helper-text {
+  background-color: #1a1a1a;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  border-left: 2px solid var(--primary);
+  font-weight: 500;
+}
+
+.date-picker-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
+
+/* FIXED: Primary action button - matching Calendar edit day modal exactly */
+.date-picker-container .primary-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: var(--primary) !important;
+  border: 1px solid var(--primary) !important;
+  border-radius: var(--radius-full) !important;
+  color: #000000 !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  flex: 1 !important;
+  justify-content: center !important;
+}
+
+.date-picker-container .primary-action:hover {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  color: #000000 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.3) !important;
+}
+
+/* FIXED: Cancel button - matching Calendar edit day modal exactly */
+.date-picker-container .cancel-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  flex: 1 !important;
+  justify-content: center !important;
+}
+
+/* FIXED: Cancel button stays static - no hover effects */
+.date-picker-container .cancel-action:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .date-picker-container {
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs);
+  }
+  
+  .date-inputs-row {
+    gap: var(--spacing-xs);
+  }
+  
+  .month-input,
+  .day-input {
+    width: 36px;
+  }
+  
+  .year-input {
+    width: 56px;
+  }
+  
+  .date-inputs-row input {
+    padding: var(--spacing-xs);
+    font-size: 0.8125rem;
+  }
+  
+  .helper-text {
+    font-size: 0.625rem;
+    padding: var(--spacing-xs);
+  }
+  
+  .current-date-display {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.75rem;
+  }
+  
+  .current-date-label {
+    font-size: 0.625rem;
+  }
+  
+  .date-picker-actions {
+    gap: var(--spacing-xs);
+  }
+  
+  .date-picker-container .primary-action,
+  .date-picker-container .cancel-action {
+    padding: var(--spacing-xs) var(--spacing-sm) !important;
+    font-size: 0.8125rem !important;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .date-inputs-row {
+    justify-content: space-between;
+  }
+  
+  .month-input,
+  .day-input {
+    width: 32px;
+  }
+  
+  .year-input {
+    width: 52px;
+  }
+  
+  .date-separator {
+    font-size: 1rem;
+    margin: 0 1px;
+  }
+}
