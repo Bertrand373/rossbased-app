@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UNIFIED: Consistent slider colors matching app theme */
+/* components/Tracker/Tracker.css - FIXED: Slider label spacing to match Timeline perfectly */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -473,12 +473,13 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
 }
 
-/* UNIFIED: All slider labels use consistent colors */
+/* FIXED: All slider labels now use PERFECT SPACING to match Timeline exactly */
 .slider-labels {
   display: flex;
   justify-content: space-between;
   font-size: 0.8125rem;
-  color: var(--text-secondary); /* UNIFIED: Consistent text color */
+  color: var(--text-secondary);
+  /* FIXED: Exact same spacing as Timeline - PERFECT MATCH */
   margin-top: 0px !important;
   margin-bottom: 0px !important;
   padding-top: 0px !important;
@@ -912,7 +913,7 @@ button.action-btn:hover {
     margin-top: var(--spacing-sm);
   }
   
-  /* UNIFIED: Mobile slider adjustments */
+  /* FIXED: Mobile slider adjustments with PERFECT Timeline spacing */
   .benefit-range-slider {
     height: 32px;
   }
@@ -927,10 +928,13 @@ button.action-btn:hover {
     height: 28px;
   }
   
+  /* FIXED: Perfect mobile spacing to match Timeline exactly */
   .slider-labels {
     padding-left: 16px !important;
     padding-right: 16px !important;
     font-size: 0.75rem;
+    /* FIXED: Same transform as Timeline for perfect mobile spacing */
+    transform: translateY(-2px) !important;
   }
   
   .discord-toggle {
