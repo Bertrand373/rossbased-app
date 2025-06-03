@@ -659,9 +659,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               ></textarea>
             </div>
             
-            {/* FIXED: Save Entry button now has grey default with yellow hover */}
+            {/* FIXED: Save Entry button now uses no class for grey default with yellow hover */}
             <div className="form-actions">
-              <button onClick={saveNote} className="action-btn primary-action">
+              <button onClick={saveNote} className="action-btn">
                 <FaCheckCircle />
                 Save Entry
               </button>
