@@ -422,7 +422,7 @@
 /* 🎯 TRACKER MATCH: Enhanced value display - EXACT copy from Tracker */
 .emotion-value {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--text) !important; /* FIXED: White text like Tracker - was yellow */
   font-size: 0.9375rem !important; /* FIXED: Match Tracker exactly - was bigger */
   background-color: rgba(255, 221, 0, 0.08);
   padding: var(--spacing-xs) var(--spacing-sm);
