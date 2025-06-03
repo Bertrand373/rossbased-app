@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - FIXED: Slider label spacing to match Timeline perfectly */
+/* components/Tracker/Tracker.css - ULTRA FIXED: Perfect slider label spacing matching Timeline exactly */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -326,7 +326,7 @@ button.action-btn:hover {
   transform: none !important;
 }
 
-/* UNIFIED: All benefit sliders use consistent app theme colors */
+/* ULTRA FIXED: All benefit sliders use EXACT Timeline styling and spacing */
 .benefit-sliders {
   display: flex;
   flex-direction: column;
@@ -347,7 +347,7 @@ button.action-btn:hover {
   margin-bottom: var(--spacing-xs);
 }
 
-/* UNIFIED: All benefit labels use consistent white color */
+/* ULTRA FIXED: All benefit labels use consistent white color */
 .benefit-label {
   font-weight: 600;
   color: var(--text); /* UNIFIED: Consistent white text */
@@ -357,7 +357,7 @@ button.action-btn:hover {
   letter-spacing: 0.025em;
 }
 
-/* UNIFIED: Enhanced value display with consistent styling */
+/* ULTRA FIXED: Enhanced value display with consistent styling */
 .benefit-value {
   font-weight: 700;
   color: var(--primary);
@@ -370,7 +370,7 @@ button.action-btn:hover {
   border: 1px solid rgba(255, 221, 0, 0.2);
 }
 
-/* UNIFIED: All benefit sliders use consistent theme colors */
+/* ULTRA FIXED: All benefit sliders use consistent theme colors */
 .benefit-range-slider {
   -webkit-appearance: none;
   width: 100%;
@@ -392,7 +392,7 @@ button.action-btn:hover {
   margin-bottom: 0px !important;
 }
 
-/* UNIFIED: Consistent hover state for all sliders */
+/* ULTRA FIXED: Consistent hover state for all sliders */
 .benefit-range-slider:hover:not(:disabled) {
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.25) 0%, 
@@ -402,7 +402,7 @@ button.action-btn:hover {
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(255, 221, 0, 0.1);
 }
 
-/* UNIFIED: Consistent focus state */
+/* ULTRA FIXED: Consistent focus state */
 .benefit-range-slider:focus:not(:disabled) {
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(255, 221, 0, 0.2);
 }
@@ -413,7 +413,7 @@ button.action-btn:hover {
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* UNIFIED: Enhanced WebKit thumb with consistent styling */
+/* ULTRA FIXED: Enhanced WebKit thumb with consistent styling */
 .benefit-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -431,7 +431,7 @@ button.action-btn:hover {
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-/* UNIFIED: Consistent thumb hover */
+/* ULTRA FIXED: Consistent thumb hover */
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
   transform: scale(1.1);
   box-shadow: 
@@ -441,7 +441,7 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
 }
 
-/* UNIFIED: Consistent active state */
+/* ULTRA FIXED: Consistent active state */
 .benefit-range-slider:active::-webkit-slider-thumb {
   transform: scale(1.05);
   box-shadow: 
@@ -450,7 +450,7 @@ button.action-btn:hover {
     0 0 24px rgba(255, 221, 0, 0.5);
 }
 
-/* UNIFIED: Enhanced Firefox thumb */
+/* ULTRA FIXED: Enhanced Firefox thumb */
 .benefit-range-slider::-moz-range-thumb {
   width: 24px;
   height: 24px;
@@ -465,7 +465,7 @@ button.action-btn:hover {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* UNIFIED: Firefox thumb hover */
+/* ULTRA FIXED: Firefox thumb hover */
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
   transform: scale(1.1);
   box-shadow: 
@@ -474,45 +474,78 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
 }
 
-/* FIXED: All slider labels now use PERFECT SPACING to match Timeline exactly */
-.slider-labels,
-.benefit-slider-item .slider-labels,
-.benefit-sliders .slider-labels,
-.benefit-logging-section .slider-labels {
+/* ⭐ ULTRA MEGA FINAL FIX: Slider labels now use NUCLEAR-LEVEL overrides to match Timeline EXACTLY ⭐ */
+
+/* Step 1: Create an incredibly specific selector that targets ONLY benefit sliders in Tracker */
+.benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
+.benefit-sliders .benefit-slider-item .slider-labels,
+.tracker-container .benefit-sliders .slider-labels,
+.tracker-container .benefit-logging-section .slider-labels,
+.benefit-logging-container .benefit-sliders .slider-labels {
+  /* NUCLEAR OVERRIDE: Copy Timeline spacing EXACTLY with maximum specificity */
   display: flex !important;
   justify-content: space-between !important;
   font-size: 0.8125rem !important;
   color: var(--text-secondary) !important;
-  /* FIXED: Exact same spacing as Timeline - PERFECT MATCH */
-  margin-top: 0px !important;
+  
+  /* THE MONEY SHOT: Perfect Timeline spacing with nuclear overrides */
+  margin-top: 8px !important;
   margin-bottom: 0px !important;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   line-height: 1 !important;
-  transform: translateY(-2px) !important;
+  transform: none !important; /* Remove the -2px transform that was causing issues */
   padding-left: 14px !important;
   padding-right: 14px !important;
   font-weight: 500 !important;
   letter-spacing: 0.025em !important;
+  
+  /* Extra insurance overrides */
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
-/* UNIFIED: Consistent label colors - subtle contextual colors that fit the theme */
-.benefit-slider-item:nth-child(1) .slider-labels span:first-child,
-.benefit-slider-item:nth-child(2) .slider-labels span:first-child,
-.benefit-slider-item:nth-child(3) .slider-labels span:first-child,
-.benefit-slider-item:nth-child(4) .slider-labels span:first-child,
-.benefit-slider-item:nth-child(5) .slider-labels span:first-child,
-.benefit-slider-item:nth-child(6) .slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8); /* UNIFIED: Consistent gray for "low" states */
+/* Step 2: Override any competing margin/padding rules with even more specificity */
+.tracker-container .benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
+.tracker-container .benefit-sliders .benefit-slider-item .slider-labels {
+  margin-top: 8px !important;
+  margin-bottom: 0px !important;
+  transform: none !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
 }
 
-.benefit-slider-item:nth-child(1) .slider-labels span:last-child,
-.benefit-slider-item:nth-child(2) .slider-labels span:last-child,
-.benefit-slider-item:nth-child(3) .slider-labels span:last-child,
-.benefit-slider-item:nth-child(4) .slider-labels span:last-child,
-.benefit-slider-item:nth-child(5) .slider-labels span:last-child,
-.benefit-slider-item:nth-child(6) .slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.8); /* UNIFIED: Consistent yellow for "high" states */
+/* Step 3: Apply the same color scheme as Timeline with maximum specificity */
+.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:first-child {
+  color: rgba(156, 163, 175, 0.8) !important; /* UNIFIED: Consistent gray for "low" states */
+}
+
+.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:last-child {
+  color: rgba(255, 221, 0, 0.8) !important; /* UNIFIED: Consistent yellow for "high" states */
 }
 
 .benefit-actions {
@@ -917,7 +950,7 @@ button.action-btn:hover {
     margin-top: var(--spacing-sm);
   }
   
-  /* FIXED: Mobile slider adjustments with PERFECT Timeline spacing */
+  /* ULTRA FIXED: Mobile slider adjustments with PERFECT spacing */
   .benefit-range-slider {
     height: 32px;
   }
@@ -932,21 +965,22 @@ button.action-btn:hover {
     height: 28px;
   }
   
-  /* FIXED: Perfect mobile spacing to match Timeline exactly */
-  .slider-labels,
-  .benefit-slider-item .slider-labels,
-  .benefit-sliders .slider-labels,
-  .benefit-logging-section .slider-labels {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    font-size: 0.75rem !important;
-    /* CRITICAL: Same transform as Timeline for perfect mobile spacing */
-    transform: translateY(-2px) !important;
-    margin-top: 0px !important;
+  /* ULTRA MEGA MOBILE FIX: Perfect mobile spacing with nuclear overrides */
+  .benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
+  .benefit-sliders .benefit-slider-item .slider-labels,
+  .tracker-container .benefit-sliders .slider-labels,
+  .tracker-container .benefit-logging-section .slider-labels,
+  .benefit-logging-container .benefit-sliders .slider-labels {
+    /* MOBILE NUCLEAR OVERRIDE: Slightly larger spacing for mobile */
+    margin-top: 10px !important;
     margin-bottom: 0px !important;
     padding-top: 0px !important;
     padding-bottom: 0px !important;
     line-height: 1 !important;
+    transform: none !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    font-size: 0.75rem !important;
     font-weight: 500 !important;
     letter-spacing: 0.025em !important;
     display: flex !important;
