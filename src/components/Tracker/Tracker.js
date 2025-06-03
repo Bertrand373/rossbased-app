@@ -1,11 +1,11 @@
-// components/Tracker/Tracker.js - FIXED: Save Entry button styling to match Set Date button hover
+// components/Tracker/Tracker.js - FIXED: Matching modal button icons with Calendar edit day modal
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import './Tracker.css';
 
-// Icons - UPDATED: Simplified to use checkmark for both primary buttons
+// Icons - UPDATED: Using FaCheckCircle and FaTimes to match Calendar modal buttons
 import { 
   FaCrown, 
   FaCalendarCheck, 
@@ -415,7 +415,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
-  // UPDATED: Create HTML content for iframe with enhanced button styling and icons
+  // UPDATED: Create HTML content for iframe with matching checkmark and X icons
   const iframeHtml = `
     <!DOCTYPE html>
     <html>
@@ -517,17 +517,18 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           margin-top: 4px;
         }
         
+        /* UPDATED: Primary action - yellow button with checkmark icon matching Calendar */
         .primary-action {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
           padding: 8px 16px !important;
-          background-color: rgba(128, 128, 128, 0.1) !important;
-          border: 1px solid #444444 !important;
+          background-color: #ffdd00 !important;
+          border: 1px solid #ffdd00 !important;
           border-radius: 9999px !important;
-          color: #aaaaaa !important;
+          color: #000000 !important;
           font-size: 14px !important;
-          font-weight: 500 !important;
+          font-weight: 600 !important;
           cursor: pointer !important;
           transition: all 0.2s !important;
           flex: 1 !important;
@@ -535,16 +536,14 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         }
         
         .primary-action:hover {
-          background-color: rgba(255, 221, 0, 0.1) !important;
-          border-color: rgba(255, 221, 0, 0.2) !important;
-          color: #ffdd00 !important;
+          background-color: #d9bc00 !important;
+          border-color: #d9bc00 !important;
+          color: #000000 !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 4px 8px rgba(255, 221, 0, 0.3) !important;
         }
         
-        .button-icon {
-          font-size: 14px !important;
-          margin-right: 6px !important;
-        }
-        
+        /* UPDATED: Cancel button - static grey with X icon matching Calendar */
         .secondary-action {
           display: flex !important;
           align-items: center !important;
@@ -560,6 +559,22 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           transition: none !important;
           flex: 1 !important;
           justify-content: center !important;
+        }
+        
+        /* UPDATED: Button icons - using matching checkmark and X symbols */
+        .button-icon {
+          font-size: 14px !important;
+          margin-right: 4px !important;
+        }
+        
+        .checkmark-icon {
+          color: #000000 !important;
+          font-weight: bold !important;
+        }
+        
+        .x-icon {
+          color: #aaaaaa !important;
+          font-weight: bold !important;
         }
       </style>
     </head>
@@ -598,11 +613,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           
           <div class="actions-row">
             <button type="submit" id="submit-button" class="primary-action">
-              <span class="button-icon">✓</span>
+              <span class="button-icon checkmark-icon">✓</span>
               Set Date
             </button>
             <button type="button" id="cancel-button" class="secondary-action">
-              <span class="button-icon">✕</span>
+              <span class="button-icon x-icon">✕</span>
               ${userData.startDate ? "Cancel" : "Use Today"}
             </button>
           </div>
@@ -640,7 +655,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* FIXED: Journal Note Modal with corrected Save Entry button styling */}
+      {/* UPDATED: Journal Note Modal with matching icons and button styling */}
       {showNoteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -656,7 +671,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               ></textarea>
             </div>
             
-            {/* FIXED: Save Entry button now uses primary-action class for grey default with yellow hover */}
+            {/* UPDATED: Buttons now match Calendar edit day modal styling with proper icons */}
             <div className="form-actions">
               <button onClick={saveNote} className="action-btn primary-action">
                 <FaCheckCircle />
