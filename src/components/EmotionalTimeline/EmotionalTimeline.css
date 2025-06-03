@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - ULTRA FIXED: Perfect label spacing matching Tracker exactly */
+/* components/EmotionalTimeline/EmotionalTimeline.css - ULTRA FIXED: Professional slider styling matching Tracker exactly */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -422,50 +422,51 @@
 /* ULTRA FIXED: Enhanced value display - WHITE TEXT like Tracker master template */
 .emotion-value {
   font-weight: 700;
-  color: var(--text); /* MASTER: White text like Tracker template */
+  color: var(--primary); /* MATCH TRACKER: Primary color like Tracker */
   font-size: 0.9375rem;
-  background-color: rgba(255, 221, 0, 0.1);
+  background-color: rgba(255, 221, 0, 0.08); /* MATCH TRACKER: Same opacity as refined Tracker */
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
   min-width: 48px;
   text-align: center;
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  border: 1px solid rgba(255, 221, 0, 0.15); /* MATCH TRACKER: Same border as refined Tracker */
 }
 
-/* ULTRA FIXED: All emotion sliders use consistent theme colors */
+/* 🎯 TRACKER MATCH: Professional slider styling - EXACT COPY from Tracker */
 .emotion-range-slider {
   -webkit-appearance: none;
   width: 100%;
   height: 28px;
   border-radius: var(--radius-full);
-  /* UNIFIED: Consistent gradient background for all sliders */
+  /* TRACKER MATCH: EXACT same refined gradient background */
   background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.2) 0%, 
-    rgba(255, 221, 0, 0.15) 50%, 
-    rgba(255, 221, 0, 0.25) 100%
+    rgba(128, 128, 128, 0.15) 0%, 
+    rgba(255, 221, 0, 0.08) 50%, 
+    rgba(255, 221, 0, 0.12) 100%
   );
   outline: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease; /* TRACKER MATCH: Same transition */
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); /* TRACKER MATCH: Same shadow */
+  border: 1px solid rgba(255, 255, 255, 0.03); /* TRACKER MATCH: Same border */
+  margin-bottom: 0px !important;
 }
 
-/* ULTRA FIXED: Consistent hover state for all sliders */
+/* TRACKER MATCH: Subtler hover state - EXACT COPY */
 .emotion-range-slider:hover:not(:disabled) {
   background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.25) 0%, 
-    rgba(255, 221, 0, 0.2) 50%, 
-    rgba(255, 221, 0, 0.3) 100%
+    rgba(128, 128, 128, 0.18) 0%, 
+    rgba(255, 221, 0, 0.1) 50%, 
+    rgba(255, 221, 0, 0.15) 100%
   );
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(255, 221, 0, 0.1);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
 }
 
-/* ULTRA FIXED: Consistent focus state */
+/* TRACKER MATCH: Professional focus state - EXACT COPY */
 .emotion-range-slider:focus:not(:disabled) {
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(255, 221, 0, 0.2);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
 }
 
 .emotion-range-slider:disabled {
@@ -474,75 +475,62 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* ULTRA FIXED: Enhanced WebKit thumb with consistent styling */
+/* TRACKER MATCH: Professional WebKit thumb - EXACT COPY */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ffdd00 0%, #f6cc00 100%);
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%); /* TRACKER MATCH: Same muted yellow */
   cursor: pointer;
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.25),
-    0 0 0 2px rgba(255, 255, 255, 0.1),
-    0 0 16px rgba(255, 221, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* TRACKER MATCH: Same shadow */
   margin: 0 !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.15s ease; /* TRACKER MATCH: Same transition */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* TRACKER MATCH: Same border */
 }
 
-/* ULTRA FIXED: Consistent thumb hover */
+/* TRACKER MATCH: Subtler thumb hover - EXACT COPY */
 .emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.1);
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    0 0 0 3px rgba(255, 255, 255, 0.15),
-    0 0 20px rgba(255, 221, 0, 0.4);
-  background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
+  transform: scale(1.05); /* TRACKER MATCH: Same scaling */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* TRACKER MATCH: Same shadow */
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%); /* TRACKER MATCH: Same highlight */
 }
 
-/* ULTRA FIXED: Consistent active state */
+/* TRACKER MATCH: Professional active state - EXACT COPY */
 .emotion-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.05);
-  box-shadow: 
-    0 2px 6px rgba(0, 0, 0, 0.4),
-    0 0 0 4px rgba(255, 221, 0, 0.3),
-    0 0 24px rgba(255, 221, 0, 0.5);
+  transform: scale(1.02); /* TRACKER MATCH: Same scaling */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25); /* TRACKER MATCH: Same shadow */
 }
 
-/* ULTRA FIXED: Enhanced Firefox thumb */
+/* TRACKER MATCH: Professional Firefox thumb - EXACT COPY */
 .emotion-range-slider::-moz-range-thumb {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ffdd00 0%, #f6cc00 100%);
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%); /* TRACKER MATCH: Same muted yellow */
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.25),
-    0 0 16px rgba(255, 221, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1); /* TRACKER MATCH: Same border */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* TRACKER MATCH: Same shadow */
   margin: 0 !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s ease; /* TRACKER MATCH: Same transition */
 }
 
-/* ULTRA FIXED: Firefox thumb hover */
+/* TRACKER MATCH: Firefox thumb hover - EXACT COPY */
 .emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.1);
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(255, 221, 0, 0.4);
-  background: linear-gradient(135deg, #ffe135 0%, #ffdd00 100%);
+  transform: scale(1.05); /* TRACKER MATCH: Same scaling */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* TRACKER MATCH: Same shadow */
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%); /* TRACKER MATCH: Same highlight */
 }
 
-/* ⭐ NUCLEAR MEGA FIX: Timeline slider labels now EXACTLY match Tracker spacing ⭐ */
+/* ⭐ TRACKER MATCH: Timeline slider labels now EXACTLY match Tracker spacing ⭐ */
 
 /* Step 1: Target emotional timeline sliders with maximum specificity */
 .emotional-timeline-container .emotional-checkin-section .emotion-sliders .emotion-slider-item .slider-labels,
 .emotion-sliders .emotion-slider-item .slider-labels,
 .emotional-checkin-section .emotion-sliders .slider-labels,
 .emotional-timeline-container .emotion-sliders .slider-labels {
-  /* NUCLEAR OVERRIDE: Copy Tracker spacing EXACTLY with maximum specificity */
+  /* TRACKER MATCH: Copy Tracker spacing EXACTLY with maximum specificity */
   display: flex !important;
   justify-content: space-between !important;
   font-size: 0.8125rem !important;
@@ -586,7 +574,7 @@
 .emotional-timeline-container .emotion-slider-item:nth-child(2) .slider-labels span:first-child,
 .emotional-timeline-container .emotion-slider-item:nth-child(3) .slider-labels span:first-child,
 .emotional-timeline-container .emotion-slider-item:nth-child(4) .slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8) !important; /* UNIFIED: Consistent gray for "negative" states */
+  color: rgba(156, 163, 175, 0.8) !important; /* TRACKER MATCH: Same gray for "negative" states */
 }
 
 .emotional-checkin-section .emotion-slider-item:nth-child(1) .slider-labels span:last-child,
@@ -597,7 +585,7 @@
 .emotional-timeline-container .emotion-slider-item:nth-child(2) .slider-labels span:last-child,
 .emotional-timeline-container .emotion-slider-item:nth-child(3) .slider-labels span:last-child,
 .emotional-timeline-container .emotion-slider-item:nth-child(4) .slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.8) !important; /* UNIFIED: Consistent yellow for "positive" states */
+  color: rgba(255, 221, 0, 0.7) !important; /* TRACKER MATCH: Same refined yellow for "positive" states */
 }
 
 .emotion-actions {
@@ -606,26 +594,26 @@
   margin-top: var(--spacing-lg);
 }
 
-/* PREMIUM: Enhanced save button */
+/* TRACKER MATCH: Professional save button - EXACT COPY from refined Tracker */
 .save-emotions-btn {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.15) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.25);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.08) 0%, rgba(255, 221, 0, 0.12) 100%); /* TRACKER MATCH: Same opacity */
+  border: 1px solid rgba(255, 221, 0, 0.2); /* TRACKER MATCH: Same border */
   border-radius: var(--radius-full);
   color: var(--primary);
   padding: var(--spacing-md) var(--spacing-xl);
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.1);
+  transition: all 0.2s ease; /* TRACKER MATCH: Same transition */
+  box-shadow: 0 2px 6px rgba(255, 221, 0, 0.08); /* TRACKER MATCH: Same shadow */
   letter-spacing: 0.025em;
 }
 
 .save-emotions-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.15) 0%, rgba(255, 221, 0, 0.2) 100%);
-  border-color: rgba(255, 221, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.12) 0%, rgba(255, 221, 0, 0.16) 100%); /* TRACKER MATCH: Same hover */
+  border-color: rgba(255, 221, 0, 0.25);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(255, 221, 0, 0.15); /* TRACKER MATCH: Same hover shadow */
 }
 
 /* Journal Section - styled like Tracker journal */
@@ -1076,7 +1064,7 @@
     margin-top: var(--spacing-sm);
   }
   
-  /* ULTRA FIXED: Mobile slider adjustments with PERFECT spacing */
+  /* TRACKER MATCH: Mobile slider adjustments with professional styling - EXACT COPY */
   .emotion-range-slider {
     height: 32px;
   }
@@ -1091,12 +1079,12 @@
     height: 28px;
   }
   
-  /* ULTRA MEGA MOBILE FIX: Perfect mobile spacing with nuclear overrides */
+  /* TRACKER MATCH: Mobile slider labels with perfect spacing - EXACT COPY */
   .emotional-timeline-container .emotional-checkin-section .emotion-sliders .emotion-slider-item .slider-labels,
   .emotion-sliders .emotion-slider-item .slider-labels,
   .emotional-checkin-section .emotion-sliders .slider-labels,
   .emotional-timeline-container .emotion-sliders .slider-labels {
-    /* MOBILE NUCLEAR OVERRIDE: Slightly larger spacing for mobile to match Tracker */
+    /* TRACKER MATCH: Mobile spacing */
     margin-top: 10px !important;
     margin-bottom: 0px !important;
     padding-top: 0px !important;
