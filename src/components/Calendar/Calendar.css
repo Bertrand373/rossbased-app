@@ -128,7 +128,10 @@
   color: var(--text-secondary);
   cursor: pointer;
   transition: none; /* NO ANIMATIONS: Keep it static */
-  font-size: 1rem; /* READABLE: Good size for arrows */
+  font-size: 1.25rem; /* INCREASED: Make Unicode arrows bigger and more prominent */
+  font-weight: 600; /* BOLD: Make arrows more visible */
+  line-height: 1; /* CENTERED: Remove line-height spacing */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; /* SYSTEM: Use system font for better Unicode rendering */
 }
 
 /* FIXED: Static hover - no animations or color changes */
@@ -1192,16 +1195,19 @@
     min-width: 160px;
   }
   
-  /* FIXED: Mobile navigation buttons - now properly visible with grey static styling */
+  /* FIXED: Mobile navigation buttons - now properly visible with better Unicode styling */
   .period-nav-btn {
     width: 36px;
     height: 36px;
-    font-size: 0.875rem;
+    font-size: 1.125rem; /* INCREASED: Bigger arrows on mobile */
+    font-weight: 600; /* BOLD: More prominent */
+    line-height: 1; /* CENTERED: Perfect centering */
     /* KEEP: Grey static button styling for mobile */
     background-color: rgba(128, 128, 128, 0.1);
     border: 1px solid var(--border);
     border-radius: 50%;
     color: var(--text-secondary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   }
   
   /* KEEP: Static hover on mobile */
@@ -1454,16 +1460,19 @@
     min-width: 140px;
   }
   
-  /* FIXED: Very small screen navigation - keep grey static styling */
+  /* FIXED: Very small screen navigation - better Unicode styling */
   .period-nav-btn {
     width: 32px;
     height: 32px;
-    font-size: 0.75rem;
+    font-size: 1rem; /* INCREASED: Bigger arrows on very small screens */
+    font-weight: 600; /* BOLD: More prominent */
+    line-height: 1; /* CENTERED: Perfect centering */
     /* KEEP: Grey static button styling */
     background-color: rgba(128, 128, 128, 0.1);
     border: 1px solid var(--border);
     border-radius: 50%;
     color: var(--text-secondary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   }
   
   /* KEEP: Static hover on very small screens */
