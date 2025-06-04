@@ -568,29 +568,33 @@
     justify-content: center;
   }
   
-  /* REVERTED: Mobile phase indicator with original styling but fixed spacing */
+  /* FIXED: Mobile phase indicator with icon on left, text centered independently */
   .phase-indicator {
     width: 100%;
     max-width: 320px;
     padding: var(--spacing-md) var(--spacing-lg);
-    justify-content: center;
+    justify-content: flex-start; /* CHANGED: Start from left instead of center */
     text-align: center;
   }
   
-  /* FIXED: Mobile content maintains the even spacing */
+  /* FIXED: Mobile content - icon on left, text gets remaining space */
   .phase-indicator-content {
-    justify-content: center;
-    gap: var(--spacing-md); /* FIXED: Even spacing maintained */
+    justify-content: flex-start; /* CHANGED: Start from left */
+    gap: var(--spacing-md);
+    width: 100%;
   }
   
   .phase-indicator-icon {
     font-size: 1.5rem;
+    flex-shrink: 0; /* ADDED: Prevent icon from shrinking */
   }
   
-  /* REVERTED: Mobile text back to center alignment */
+  /* FIXED: Mobile text takes remaining space and centers itself */
   .phase-indicator-text {
     align-items: center;
     text-align: center;
+    flex: 1; /* ADDED: Take all remaining space */
+    margin-right: var(--spacing-md); /* ADDED: Offset for visual balance */
   }
   
   .phase-name {
@@ -666,18 +670,28 @@
 
 /* Very Small Screens */
 @media (max-width: 480px) {
-  /* REVERTED: Very small screen with original styling but fixed spacing */
+  /* FIXED: Very small screen with same mobile layout logic */
   .phase-indicator {
     padding: var(--spacing-sm) var(--spacing-md);
     max-width: 100%;
+    justify-content: flex-start; /* CHANGED: Start from left */
   }
   
   .phase-indicator-content {
-    gap: var(--spacing-sm); /* FIXED: Smaller but still even spacing */
+    gap: var(--spacing-sm);
+    justify-content: flex-start; /* CHANGED: Start from left */
+    width: 100%;
   }
   
   .phase-indicator-icon {
     font-size: 1.375rem;
+    flex-shrink: 0; /* ADDED: Prevent shrinking */
+  }
+  
+  /* FIXED: Text takes remaining space and centers itself */
+  .phase-indicator-text {
+    flex: 1; /* ADDED: Take remaining space */
+    margin-right: var(--spacing-sm); /* ADDED: Smaller offset for very small screens */
   }
   
   .phase-name {
