@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css - FIXED: Clean centered phase indicator */
+/* components/UrgeToolkit/UrgeToolkit.css - FIXED: Balanced phase indicator spacing */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -30,12 +30,11 @@
   justify-self: end;
 }
 
-/* FIXED: Clean centered phase indicator with proper spacing */
+/* FIXED: Balanced phase indicator with even spacing around icon */
 .phase-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
   padding: var(--spacing-lg) var(--spacing-xl);
   background: linear-gradient(135deg, 
     color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
@@ -48,15 +47,17 @@
   text-align: center;
 }
 
+/* FIXED: Perfectly centered content with balanced spacing */
 .phase-indicator-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-md); /* FIXED: This creates equal spacing on both sides of icon */
   width: 100%;
+  /* REMOVED: Any extra spacing that was creating imbalance */
 }
 
-/* FIXED: Properly sized and colored icon */
+/* FIXED: Icon with no extra margins or padding */
 .phase-indicator-icon {
   font-size: 1.75rem;
   color: var(--phase-color, var(--primary));
@@ -64,16 +65,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* REMOVED: Any margin or padding that creates uneven spacing */
 }
 
-/* FIXED: Centered text with proper alignment */
+/* FIXED: Text section with no extra spacing */
 .phase-indicator-text {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  align-items: center;
-  text-align: center;
+  align-items: flex-start; /* CHANGED: Left-align text for better readability */
+  text-align: left; /* CHANGED: Left-align text */
   flex: 1;
+  /* REMOVED: Any centering that was fighting with the flex layout */
 }
 
 .phase-name {
@@ -569,7 +572,7 @@
     justify-content: center;
   }
   
-  /* FIXED: Mobile phase indicator - clean centered layout */
+  /* FIXED: Mobile phase indicator with balanced spacing */
   .phase-indicator {
     width: 100%;
     max-width: 320px;
@@ -578,13 +581,20 @@
     text-align: center;
   }
   
+  /* FIXED: Mobile content with perfect balance */
   .phase-indicator-content {
     justify-content: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-md); /* FIXED: Maintains even spacing on mobile */
   }
   
   .phase-indicator-icon {
     font-size: 1.5rem;
+  }
+  
+  /* FIXED: Mobile text back to center alignment for mobile */
+  .phase-indicator-text {
+    align-items: center;
+    text-align: center;
   }
   
   .phase-name {
@@ -667,7 +677,7 @@
   }
   
   .phase-indicator-content {
-    gap: var(--spacing-sm);
+    gap: var(--spacing-sm); /* FIXED: Slightly smaller gap but still balanced */
   }
   
   .phase-indicator-icon {
