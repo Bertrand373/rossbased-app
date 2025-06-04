@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Sleep Quality support for day info modal
+// components/Calendar/Calendar.js - FIXED: Simple text arrows for reliable mobile display
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import './Calendar.css';
 
 // Icons
-import { FaChevronLeft, FaChevronRight, FaCheckCircle, FaTimesCircle, FaMoon, 
+import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaRedo, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye } from 'react-icons/fa';
 
@@ -593,12 +593,13 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </div>
           
           <div className="period-navigation">
+            {/* FIXED: Use simple text arrows instead of React icons for reliable mobile display */}
             <button className="period-nav-btn" onClick={prevPeriod}>
-              <FaChevronLeft />
+              ‹
             </button>
             <h3>{getPeriodHeaderText()}</h3>
             <button className="period-nav-btn" onClick={nextPeriod}>
-              <FaChevronRight />
+              ›
             </button>
           </div>
         </div>
