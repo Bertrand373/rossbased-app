@@ -563,4 +563,410 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       
       {/* Reset Confirmation Modal */}
       {showResetConfirm && (
-        <div className="modal
+        <div className="modal-overlay" onClick={() => setShowResetConfirm(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h3>Reset Calendar Data</h3>
+            <p>This will clear your streak history, benefit tracking, and journal entries. Your overall stats (longest streak, total relapses) will be preserved.</p>
+            <p><strong>This action cannot be undone.</strong></p>
+            <div className="form-actions">
+              <button 
+                className="btn-danger" 
+                onClick={confirmResetCalendar}
+              >
+                Reset Calendar
+              </button>
+              <button 
+                className="btn-outline" 
+                onClick={() => setShowResetConfirm(false)}
+              >
+                <FaTimes />
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="calendar-main-section">
+        {/* Calendar Controls */}
+        <div className="calendar-controls">
+          {/* View Mode Toggle */}
+          <div className="view-mode-toggle">
+            <button 
+              className={`view-toggle-btn ${viewMode === 'month' ? 'active' : ''}`}
+              onClick={() => setViewMode('month')}
+            >
+              Month
+            </button>
+            <button 
+              className={`view-toggle-btn ${viewMode === 'week' ? 'active' : ''}`}
+              onClick={() => setViewMode('week')}
+            >
+              Week
+            </button>
+          </div>
+
+          {/* Period Navigation */}
+          <div className="period-navigation">
+            <button className="period-nav-btn" onClick={prevPeriod}>
+              ←
+            </button>
+            <h3>{getPeriodHeaderText()}</h3>
+            <button className="period-nav-btn" onClick={nextPeriod}>
+              →
+            </button>
+          </div>
+        </div>
+
+        {/* Calendar Legend */}
+        <div className="calendar-legend">
+          <div className="legend-item">
+            <div className="legend-indicator current-streak"></div>
+            <span>Current Streak</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-indicator former-streak"></div>
+            <span>Former Streak</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-indicator relapse"></div>
+            <span>Relapse</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-indicator wet-dream"></div>
+            <span>Wet Dream</span>
+          </div>
+          <div className="legend-item">
+            <FaInfoCircle className="legend-info-icon" />
+            <span>Has Data</span>
+          </div>
+        </div>
+
+        {/* Calendar Display */}
+        <div className="calendar-display">
+          {viewMode === 'month' ? (
+            <div className="calendar-grid">
+              {renderCalendarDays()}
+            </div>
+          ) : (
+            renderWeekView()
+          )}
+        </div>
+
+        <div className="calendar-instructions">
+          Click on any day to view details and edit status
+        </div>
+      </div>
+
+      {/* Day Info Modal */}
+      {dayInfoModal && selectedDate && (
+        <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
+          <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
+            <h3>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
+            
+            {/* Day Status */}
+            <div className="day-status-info">
+              {(() => {
+                const dayStatus = getDayStatus(selectedDate);
+                if (dayStatus) {
+                  return (
+                    <div className={`status-badge ${dayStatus.type}`}>
+                      {dayStatus.type === 'current-streak' && (
+                        <>
+                          <FaCheckCircle />
+                          <span>Current Streak Day</span>
+                        </>
+                      )}
+                      {dayStatus.type === 'former-streak' && (
+                        <>
+                          <FaCheckCircle />
+                          <span>Former Streak Day</span>
+                        </>
+                      )}
+                      {dayStatus.type === 'relapse' && (
+                        <>
+                          <FaTimesCircle />
+                          <span>Relapse Day</span>
+                        </>
+                      )}
+                      {dayStatus.type === 'wet-dream' && (
+                        <>
+                          <FaMoon />
+                          <span>Wet Dream</span>
+                        </>
+                      )}
+                    </div>
+                  );
+                }
+                return (
+                  <div className="status-badge">
+                    <span>No specific status</span>
+                  </div>
+                );
+              })()}
+
+              {/* Trigger Info */}
+              {(() => {
+                const dayStatus = getDayStatus(selectedDate);
+                if (dayStatus?.trigger) {
+                  const trigger = triggerOptions.find(t => t.id === dayStatus.trigger);
+                  return (
+                    <div className="trigger-info">
+                      <div className="trigger-display">
+                        <div className="trigger-display-icon">
+                          {renderTriggerIcon(dayStatus.trigger)}
+                        </div>
+                        <span>Trigger: {trigger?.label || 'Unknown'}</span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+
+            {/* Journey Day Counter */}
+            {isDayPartOfJourney(selectedDate) && (
+              <div className="day-streak-info">
+                <div className="streak-day-number">
+                  {(() => {
+                    if (userData.startDate) {
+                      const streakStart = new Date(userData.startDate);
+                      const dayNumber = differenceInDays(selectedDate, streakStart) + 1;
+                      return dayNumber > 0 ? dayNumber : 0;
+                    }
+                    return 0;
+                  })()}
+                </div>
+                <div className="streak-context">Day of your retention journey</div>
+              </div>
+            )}
+
+            {/* Tracking Info */}
+            {(() => {
+              const dayTracking = getDayTracking(selectedDate);
+              if (dayTracking.hasBenefits || dayTracking.hasJournal) {
+                return (
+                  <div className="day-tracking-info">
+                    <h4>Logged Data</h4>
+                    {dayTracking.hasBenefits && <p>✓ Benefits tracked for this day</p>}
+                    {dayTracking.hasJournal && <p>✓ Journal entry recorded</p>}
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
+            {/* Benefits Details */}
+            {(() => {
+              const dayBenefits = getDayBenefits(selectedDate);
+              if (dayBenefits) {
+                return (
+                  <div className="day-benefits">
+                    <h4>Benefits Tracked</h4>
+                    <div className="benefits-details-enhanced">
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Energy</span>
+                          <span className="benefit-value">{dayBenefits.energy}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div 
+                            className="benefit-level-enhanced" 
+                            style={{ width: `${dayBenefits.energy * 10}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Focus</span>
+                          <span className="benefit-value">{dayBenefits.focus}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div 
+                            className="benefit-level-enhanced" 
+                            style={{ width: `${dayBenefits.focus * 10}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Confidence</span>
+                          <span className="benefit-value">{dayBenefits.confidence}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div 
+                            className="benefit-level-enhanced" 
+                            style={{ width: `${dayBenefits.confidence * 10}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Aura</span>
+                          <span className="benefit-value">{dayBenefits.aura || 5}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div 
+                            className="benefit-level-enhanced" 
+                            style={{ width: `${(dayBenefits.aura || 5) * 10}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Sleep Quality</span>
+                          <span className="benefit-value">{dayBenefits.sleep || dayBenefits.attraction || 5}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div 
+                            className="benefit-level-enhanced" 
+                            style={{ width: `${(dayBenefits.sleep || dayBenefits.attraction || 5) * 10}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Workout</span>
+                          <span className="benefit-value">{dayBenefits.workout || dayBenefits.gymPerformance || 5}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div 
+                            className="benefit-level-enhanced" 
+                            style={{ width: `${(dayBenefits.workout || dayBenefits.gymPerformance || 5) * 10}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
+            {/* Journal Entry */}
+            {(() => {
+              const dayStr = format(selectedDate, 'yyyy-MM-dd');
+              const dayNote = userData.notes && userData.notes[dayStr];
+              if (dayNote) {
+                return (
+                  <div className="day-journal">
+                    <h4>Journal Entry</h4>
+                    <div className="journal-entry">
+                      {dayNote}
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
+            <div className="modal-actions">
+              <button className="btn-primary edit-day-btn" onClick={showEditFromInfo}>
+                <FaEdit />
+                Edit Day
+              </button>
+              <button className="btn-outline" onClick={() => setDayInfoModal(false)}>
+                <FaTimes />
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Day Modal */}
+      {editDayModal && editingDate && (
+        <div className="modal-overlay" onClick={() => setEditDayModal(false)}>
+          <div className="modal-content edit-day-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header-simple">
+              <h3>Edit {format(editingDate, 'MMM d, yyyy')}</h3>
+            </div>
+            
+            <p>What happened on this day?</p>
+
+            {!showTriggerSelection ? (
+              <div className="edit-day-options">
+                <button 
+                  className="edit-option-btn current-streak-btn"
+                  onClick={() => handleStatusClick('current-streak')}
+                >
+                  <FaCheckCircle />
+                  <span>Mark as Streak Day</span>
+                </button>
+                
+                <button 
+                  className="edit-option-btn wet-dream-btn"
+                  onClick={() => handleStatusClick('wet-dream')}
+                >
+                  <FaMoon />
+                  <span>Mark as Wet Dream</span>
+                </button>
+                
+                <button 
+                  className="edit-option-btn relapse-btn"
+                  onClick={() => handleStatusClick('relapse')}
+                >
+                  <FaTimesCircle />
+                  <span>Mark as Relapse</span>
+                </button>
+                
+                <button 
+                  className="edit-option-btn clear-btn"
+                  onClick={() => handleStatusClick('clear')}
+                >
+                  <FaTimes />
+                  <span>Clear Status</span>
+                </button>
+              </div>
+            ) : (
+              <div className="trigger-selection">
+                <h4>What triggered this relapse?</h4>
+                <div className="trigger-options">
+                  {triggerOptions.map(trigger => (
+                    <button
+                      key={trigger.id}
+                      className={`trigger-option-pill ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                      onClick={() => setSelectedTrigger(trigger.id)}
+                    >
+                      <trigger.icon className="trigger-option-icon" />
+                      <span>{trigger.label}</span>
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="trigger-actions">
+                  <button 
+                    className="btn btn-primary"
+                    onClick={handleTriggerSelection}
+                    disabled={!selectedTrigger}
+                  >
+                    Confirm Relapse
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="modal-actions">
+              <button className="back-to-info-btn" onClick={backToDayInfo}>
+                <FaArrowLeft />
+                Back to Info
+              </button>
+              <button className="btn-outline" onClick={() => setEditDayModal(false)}>
+                <FaTimes />
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Calendar;
