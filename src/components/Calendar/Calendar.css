@@ -1055,32 +1055,32 @@
   /* REMOVED: justify-content: space-between - now uses equal flex */
 }
 
-/* ULTRA FIXED: Back button styled exactly like DatePicker cancel button */
+/* ULTRA FIXED: Back button styled exactly like cancel button - NO hover effects */
 .back-to-info-btn {
   display: flex !important;
   align-items: center !important;
   gap: var(--spacing-sm) !important;
   padding: var(--spacing-sm) var(--spacing-md) !important; /* MATCHED: DatePicker padding exactly */
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border: 1px solid var(--border) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important; /* MATCHED: Cancel button styling */
+  border: 1px solid var(--border) !important; /* MATCHED: Cancel button styling */
   border-radius: var(--radius-full) !important;
-  color: var(--text-secondary) !important;
+  color: var(--text-secondary) !important; /* MATCHED: Cancel button styling */
   font-size: 0.875rem !important;
   font-weight: 500 !important;
   cursor: pointer !important;
-  transition: none !important; /* MATCHED: No transitions like DatePicker */
+  transition: none !important; /* REMOVED: No transitions like cancel button */
   flex: 1 !important; /* ADDED: Equal width */
   justify-content: center !important; /* ADDED: Center content */
   min-height: auto !important; /* MATCHED: Auto height like DatePicker */
 }
 
-/* REMOVED: All hover effects for back button - completely static like DatePicker */
+/* REMOVED: All hover effects for back button - completely static like cancel button */
 .back-to-info-btn:hover {
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-  transform: none !important;
-  box-shadow: none !important;
+  background-color: rgba(128, 128, 128, 0.1) !important; /* STATIC: No change */
+  border-color: var(--border) !important; /* STATIC: No change */
+  color: var(--text-secondary) !important; /* STATIC: No change */
+  transform: none !important; /* STATIC: No animations */
+  box-shadow: none !important; /* STATIC: No shadows */
 }
 
 /* ULTRA FIXED: All modal action buttons styled like DatePicker */
@@ -1121,13 +1121,13 @@
   color: var(--text-secondary) !important;
 }
 
-/* REMOVED: All hover effects for outline buttons - static like DatePicker */
+/* REMOVED: All hover effects for outline buttons - static like cancel buttons */
 .modal-actions .btn-outline:hover {
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-  transform: none !important;
-  box-shadow: none !important;
+  background-color: rgba(128, 128, 128, 0.1) !important; /* STATIC: Same as cancel button */
+  border-color: var(--border) !important; /* STATIC: Same as cancel button */
+  color: var(--text-secondary) !important; /* STATIC: Same as cancel button */
+  transform: none !important; /* STATIC: No animations */
+  box-shadow: none !important; /* STATIC: No shadows */
 }
 
 .edit-day-btn {
@@ -1454,30 +1454,35 @@
     width: 100%;
   }
   
-  /* ULTRA FIXED: Mobile modal actions - side by side matching DatePicker exactly */
+  /* UPDATED: Mobile modal actions - stacked vertically for calendar modals */
   .modal-actions {
-    flex-direction: row !important; /* KEEP: Side by side on mobile like DatePicker */
+    flex-direction: column !important; /* CHANGED: Stack vertically on mobile */
     width: 100%;
     gap: var(--spacing-sm);
-    justify-content: center; /* CENTERED: Center the equal-width buttons */
+    align-items: center;
   }
   
   .modal-actions button, .back-to-info-btn {
-    flex: 1 !important; /* EQUAL: Equal width buttons */
+    width: 100% !important; /* FULL: Full width buttons */
+    max-width: 280px !important; /* LIMIT: Max width for better UX */
     justify-content: center !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important; /* MATCHED: DatePicker mobile padding */
+    padding: var(--spacing-md) var(--spacing-lg) !important; /* INCREASED: More padding for touch targets */
     font-size: 0.875rem !important;
-    min-height: auto !important; /* MATCHED: Auto height like DatePicker */
+    min-height: 48px !important; /* INCREASED: Better touch targets */
   }
   
   .form-actions {
-    flex-direction: row !important; /* KEEP: Side by side on mobile like DatePicker */
+    flex-direction: column !important; /* CHANGED: Stack vertically on mobile */
     gap: var(--spacing-sm);
+    align-items: center;
   }
   
   .form-actions button {
-    flex: 1 !important; /* EQUAL: Equal width buttons */
+    width: 100% !important; /* FULL: Full width buttons */
+    max-width: 280px !important; /* LIMIT: Max width for better UX */
     justify-content: center !important;
+    padding: var(--spacing-md) var(--spacing-lg) !important; /* INCREASED: More padding for touch targets */
+    min-height: 48px !important; /* INCREASED: Better touch targets */
   }
 }
 
