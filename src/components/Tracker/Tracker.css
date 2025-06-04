@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Journal modal buttons now match DatePicker layout */
+/* components/Tracker/Tracker.css - FIXED: Complete CSS with proper syntax */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -362,12 +362,12 @@ button.action-btn:hover {
   font-weight: 700;
   color: var(--primary);
   font-size: 0.9375rem;
-  background-color: rgba(255, 221, 0, 0.08); /* REFINED: Reduced opacity from 0.1 to 0.08 */
+  background-color: rgba(255, 221, 0, 0.08);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
   min-width: 48px;
   text-align: center;
-  border: 1px solid rgba(255, 221, 0, 0.15); /* REFINED: Reduced opacity from 0.2 to 0.15 */
+  border: 1px solid rgba(255, 221, 0, 0.15);
 }
 
 /* REFINED: Professional slider track - subtler gradient */
@@ -376,19 +376,18 @@ button.action-btn:hover {
   width: 100%;
   height: 28px;
   border-radius: var(--radius-full);
-  /* REFINED: Much subtler gradient - reduced from gamey to professional */
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.15) 0%, 
     rgba(255, 221, 0, 0.08) 50%, 
     rgba(255, 221, 0, 0.12) 100%
   );
   outline: none;
-  transition: all 0.2s ease; /* REFINED: Reduced from 0.3s cubic-bezier to simple 0.2s ease */
+  transition: all 0.2s ease;
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); /* REFINED: Reduced shadow intensity */
-  border: 1px solid rgba(255, 255, 255, 0.03); /* REFINED: Subtler border */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.03);
   margin-bottom: 0px !important;
 }
 
@@ -399,12 +398,12 @@ button.action-btn:hover {
     rgba(255, 221, 0, 0.1) 50%, 
     rgba(255, 221, 0, 0.15) 100%
   );
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08); /* REFINED: Single shadow layer */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
 }
 
 /* REFINED: Professional focus state */
 .benefit-range-slider:focus:not(:disabled) {
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15); /* REFINED: Reduced glow */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
 }
 
 .benefit-range-slider:disabled {
@@ -420,25 +419,25 @@ button.action-btn:hover {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%); /* REFINED: More muted yellow */
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* REFINED: Single shadow, reduced intensity */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
-  transition: all 0.15s ease; /* REFINED: Faster, simpler transition */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* REFINED: Subtler border */
+  transition: all 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* REFINED: Subtler thumb hover */
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.05); /* REFINED: Reduced from 1.1 to 1.05 */
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* REFINED: Single shadow layer */
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%); /* REFINED: Subtler highlight */
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
 /* REFINED: Professional active state */
 .benefit-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.02); /* REFINED: Minimal scaling */
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25); /* REFINED: Simple shadow */
+  transform: scale(1.02);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
 /* REFINED: Professional Firefox thumb */
@@ -446,19 +445,19 @@ button.action-btn:hover {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%); /* REFINED: Consistent muted yellow */
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1); /* REFINED: Subtler border */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* REFINED: Single shadow */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
-  transition: all 0.15s ease; /* REFINED: Consistent transition */
+  transition: all 0.15s ease;
 }
 
 /* REFINED: Firefox thumb hover */
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.05); /* REFINED: Consistent subtle scaling */
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* REFINED: Single shadow */
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%); /* REFINED: Consistent highlight */
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
 /* Professional slider labels with perfect spacing */
@@ -515,7 +514,7 @@ button.action-btn:hover {
 .tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
 .tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
 .tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.7) !important; /* REFINED: Reduced from 0.8 to 0.7 for subtlety */
+  color: rgba(255, 221, 0, 0.7) !important;
 }
 
 .benefit-actions {
@@ -526,24 +525,24 @@ button.action-btn:hover {
 
 /* REFINED: Professional save button */
 .save-benefits-btn {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.08) 0%, rgba(255, 221, 0, 0.12) 100%); /* REFINED: Reduced opacity */
-  border: 1px solid rgba(255, 221, 0, 0.2); /* REFINED: Reduced from 0.25 to 0.2 */
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.08) 0%, rgba(255, 221, 0, 0.12) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
   border-radius: var(--radius-full);
   color: var(--primary);
   padding: var(--spacing-md) var(--spacing-xl);
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease; /* REFINED: Simplified transition */
-  box-shadow: 0 2px 6px rgba(255, 221, 0, 0.08); /* REFINED: Single subtle shadow */
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(255, 221, 0, 0.08);
   letter-spacing: 0.025em;
 }
 
 .save-benefits-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.12) 0%, rgba(255, 221, 0, 0.16) 100%); /* REFINED: Subtle hover */
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.12) 0%, rgba(255, 221, 0, 0.16) 100%);
   border-color: rgba(255, 221, 0, 0.25);
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(255, 221, 0, 0.15); /* REFINED: Single shadow layer */
+  box-shadow: 0 4px 10px rgba(255, 221, 0, 0.15);
 }
 
 .journal-section {
@@ -776,3 +775,299 @@ button.action-btn:hover {
 .form-actions .action-btn.primary-action:hover {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+/* FIXED: Cancel buttons with cancel-action class - no hover effects, stay static */
+.form-actions .action-btn.cancel-action {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.form-actions .action-btn.cancel-action:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+}
+
+/* LEGACY: Keep old selector for any buttons without specific classes */
+.form-actions .action-btn:not(.primary-action):not(.cancel-action) {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.form-actions .action-btn:not(.primary-action):not(.cancel-action):hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+}
+
+/* ADDED: Journal modal specific button styling - matches DatePicker exactly */
+.journal-modal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+/* FIXED: Journal primary action button - matching DatePicker primary button exactly */
+.journal-primary-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border: 1px solid rgba(255, 221, 0, 0.2) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  min-height: auto !important;
+}
+
+/* REMOVED: All hover effects for journal primary button */
+.journal-primary-action:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* FIXED: Journal cancel button - matching DatePicker cancel button exactly */
+.journal-cancel-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  min-height: auto !important;
+}
+
+/* REMOVED: All hover effects for journal cancel button */
+.journal-cancel-action:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.modal-content h2 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+  text-align: center;
+}
+
+.modal-content p {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .tracker-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    margin-top: 0;
+  }
+  
+  .tracker-header h2 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .tracker-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .journal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+  
+  .journal-header h3 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .journal-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  .journal-actions .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .streak-number {
+    font-size: 3rem;
+  }
+  
+  .streak-milestones {
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    justify-content: space-evenly;
+  }
+  
+  .streak-actions {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .streak-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .benefit-logging-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .benefit-sliders {
+    gap: var(--spacing-md);
+  }
+  
+  .benefit-status-section {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .benefits-logged, .benefits-not-logged {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .edit-benefits-btn {
+    margin-left: 0;
+    margin-top: var(--spacing-sm);
+  }
+  
+  /* REFINED: Mobile slider adjustments with professional styling */
+  .benefit-range-slider {
+    height: 32px;
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  /* Mobile slider labels with perfect spacing */
+  .benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
+  .benefit-sliders .benefit-slider-item .slider-labels,
+  .tracker-container .benefit-sliders .slider-labels,
+  .tracker-container .benefit-logging-section .slider-labels,
+  .benefit-logging-container .benefit-sliders .slider-labels {
+    margin-top: 10px !important;
+    margin-bottom: 0px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    line-height: 1 !important;
+    transform: none !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.025em !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    color: var(--text-secondary) !important;
+  }
+  
+  .discord-toggle {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+  
+  .toggle-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* ADDED: Mobile styling for journal modal buttons - keep side-by-side like DatePicker */
+  .journal-modal-actions {
+    flex-direction: row; /* KEEP: Side-by-side on mobile like DatePicker */
+    gap: var(--spacing-sm);
+  }
+  
+  .journal-primary-action,
+  .journal-cancel-action {
+    flex: 1 !important; /* EQUAL: Equal width buttons */
+    justify-content: center !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    min-height: auto !important;
+  }
+}
