@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Using React DatePicker instead of iframe
+// components/Tracker/Tracker.js - FIXED: Journal modal buttons now match DatePicker side-by-side layout
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -258,7 +258,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* UPDATED: Journal Note Modal with matching icons and button styling */}
+      {/* FIXED: Journal Note Modal with side-by-side buttons matching DatePicker */}
       {showNoteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -274,13 +274,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               ></textarea>
             </div>
             
-            {/* UPDATED: Buttons now match Calendar edit day modal styling with proper icons */}
-            <div className="form-actions">
-              <button onClick={saveNote} className="action-btn primary-action">
+            {/* FIXED: Side-by-side button layout matching DatePicker exactly */}
+            <div className="journal-modal-actions">
+              <button onClick={saveNote} className="journal-primary-action">
                 <FaCheckCircle />
                 Save Entry
               </button>
-              <button onClick={() => setShowNoteModal(false)} className="action-btn cancel-action">
+              <button onClick={() => setShowNoteModal(false)} className="journal-cancel-action">
                 <FaTimes />
                 Cancel
               </button>
