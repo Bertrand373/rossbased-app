@@ -1,4 +1,4 @@
-/* components/Calendar/Calendar.css - FIXED: Navigation buttons now visible and styled properly */
+/* components/Calendar/Calendar.css - FIXED: Journey counter styling and modal buttons to match DatePicker */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -834,43 +834,31 @@
   color: var(--text-secondary);
 }
 
-/* UPDATED: Streak day context styling with subtle badge card styling */
+/* ULTRA FIXED: Journey counter card styled EXACTLY like DatePicker "Currently Set" card */
 .day-streak-info {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  /* CHANGED: More subtle border like average energy card */
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--spacing-lg);
+  background-color: var(--medium-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  position: relative;
-  overflow: hidden;
+  font-size: 0.875rem;
+  color: var(--text);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-lg);
 }
 
-/* CHANGED: More subtle glow effect like average energy card */
-.day-streak-info::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
-}
-
+/* ULTRA FIXED: All text white like DatePicker */
 .streak-day-number {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--text) !important; /* FIXED: White text instead of yellow */
   line-height: 1;
   margin-bottom: var(--spacing-xs);
 }
 
 .streak-context {
   font-size: 0.875rem;
-  color: var(--text);
-  font-weight: 500;
+  color: var(--text) !important; /* FIXED: White text instead of mixed colors */
+  font-weight: 500; /* MATCHED: Same weight as DatePicker */
 }
 
 .day-tracking-info {
@@ -1059,60 +1047,102 @@
   background-color: var(--primary-dark);
 }
 
-/* UPDATED: Modal actions with FIXED back button styling for mobile */
+/* ULTRA FIXED: Modal actions with side-by-side buttons matching DatePicker EXACTLY */
 .modal-actions {
   margin-top: var(--spacing-lg);
   display: flex;
-  justify-content: space-between;
   gap: var(--spacing-md);
+  /* REMOVED: justify-content: space-between - now uses equal flex */
 }
 
-/* FIXED: Back button styled like cancel button - no animations */
+/* ULTRA FIXED: Back button styled exactly like DatePicker cancel button */
 .back-to-info-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: none; /* REMOVED: No animations */
-  border: 1px solid;
-  background-color: rgba(128, 128, 128, 0.1);
-  border-color: var(--border);
-  color: var(--text-secondary);
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important; /* MATCHED: DatePicker padding exactly */
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important; /* MATCHED: No transitions like DatePicker */
+  flex: 1 !important; /* ADDED: Equal width */
+  justify-content: center !important; /* ADDED: Center content */
+  min-height: auto !important; /* MATCHED: Auto height like DatePicker */
 }
 
+/* REMOVED: All hover effects for back button - completely static like DatePicker */
+.back-to-info-btn:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ULTRA FIXED: All modal action buttons styled like DatePicker */
 .modal-actions button {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: none; /* REMOVED: No animations */
-  border: 1px solid;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important; /* MATCHED: DatePicker padding exactly */
+  border-radius: var(--radius-full) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important; /* MATCHED: No transitions like DatePicker */
+  border: 1px solid !important;
+  flex: 1 !important; /* ADDED: Equal width */
+  justify-content: center !important; /* ADDED: Center content */
+  min-height: auto !important; /* MATCHED: Auto height like DatePicker */
 }
 
 .modal-actions .btn-primary {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: var(--primary);
-  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+/* REMOVED: All hover effects for primary buttons - static like DatePicker */
+.modal-actions .btn-primary:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .modal-actions .btn-outline {
-  background-color: rgba(128, 128, 128, 0.1);
-  border-color: var(--border);
-  color: var(--text-secondary);
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* REMOVED: All hover effects for outline buttons - static like DatePicker */
+.modal-actions .btn-outline:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .edit-day-btn {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: var(--primary);
-  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+/* REMOVED: Edit day button hover effects - static like DatePicker */
+.edit-day-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Form actions for modals */
@@ -1424,27 +1454,30 @@
     width: 100%;
   }
   
-  /* FIXED: Mobile modal actions - side by side for back/cancel buttons like desktop */
+  /* ULTRA FIXED: Mobile modal actions - side by side matching DatePicker exactly */
   .modal-actions {
-    flex-direction: row; /* CHANGED: Keep side by side on mobile */
+    flex-direction: row !important; /* KEEP: Side by side on mobile like DatePicker */
     width: 100%;
     gap: var(--spacing-sm);
-    justify-content: space-between;
+    justify-content: center; /* CENTERED: Center the equal-width buttons */
   }
   
   .modal-actions button, .back-to-info-btn {
-    flex: 1; /* ADDED: Equal width buttons */
-    justify-content: center;
+    flex: 1 !important; /* EQUAL: Equal width buttons */
+    justify-content: center !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important; /* MATCHED: DatePicker mobile padding */
+    font-size: 0.875rem !important;
+    min-height: auto !important; /* MATCHED: Auto height like DatePicker */
   }
   
   .form-actions {
-    flex-direction: row; /* CHANGED: Keep side by side on mobile */
+    flex-direction: row !important; /* KEEP: Side by side on mobile like DatePicker */
     gap: var(--spacing-sm);
   }
   
   .form-actions button {
-    flex: 1; /* ADDED: Equal width buttons */
-    justify-content: center;
+    flex: 1 !important; /* EQUAL: Equal width buttons */
+    justify-content: center !important;
   }
 }
 
