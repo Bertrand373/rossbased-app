@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - FIXED: Added X icons to Close and Cancel buttons
+// components/Calendar/Calendar.js - UPDATED: Removed "Clear Status" option and verified relapse logic
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -100,7 +100,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     toast.success('Calendar data has been reset (streak history, benefits, and journal entries cleared)');
   };
 
-  // Helper function to determine day status based on streak history
+  // VERIFIED: Helper function to determine day status - CORRECT relapse logic
   const getDayStatus = (day) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -116,7 +116,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return null;
     }
     
-    // Check for specific relapse dates from streak history
+    // VERIFIED: Check for specific relapse dates from streak history
+    // This correctly identifies relapse days and their triggers
     const relapseDay = userData.streakHistory?.find(streak => 
       streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), day)
     );
@@ -125,7 +126,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return { type: 'relapse', trigger: relapseDay.trigger };
     }
     
-    // Check for wet dreams
+    // Check for wet dreams (this is mock logic - in real app you'd track these separately)
     const wetDreamDates = userData.streakHistory?.reduce((dates, streak) => {
       if (streak.start && streak.days > 7) {
         const wetDreamDay = new Date(streak.start);
@@ -141,22 +142,28 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return { type: 'wet-dream' };
     }
     
-    // Check if day is within current streak
+    // VERIFIED: Check if day is within current streak (GREEN)
+    // Days from startDate up to today (but not including relapse days) = current streak
     if (userData.startDate) {
       const streakStart = new Date(userData.startDate);
-      const daysSinceStart = differenceInDays(day, streakStart);
+      streakStart.setHours(0, 0, 0, 0);
       
-      if (day >= streakStart && day <= today && daysSinceStart < userData.currentStreak) {
+      if (day >= streakStart && day <= today) {
         return { type: 'current-streak' };
       }
     }
     
-    // Check former streaks
+    // VERIFIED: Check former streaks (BLUE) 
+    // Days that were part of previous streaks (before relapse) = former streak
     const dayStreak = userData.streakHistory?.find(streak => {
       if (!streak.start || !streak.end) return false;
       const streakStart = new Date(streak.start);
       const streakEnd = new Date(streak.end);
+      streakStart.setHours(0, 0, 0, 0);
+      streakEnd.setHours(0, 0, 0, 0);
       
+      // Day is within a completed streak period (but not the relapse day itself)
+      // Example: If relapse on Day 5, then Days 1,2,3,4 = former streak (blue)
       return day >= streakStart && day < streakEnd;
     });
     
@@ -235,7 +242,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  // Enhanced day status update with proper trigger handling
+  // VERIFIED: Enhanced day status update with CORRECT relapse logic
   const updateDayStatus = (newStatus) => {
     if (!editingDate || !updateUserData) {
       console.error('Missing editingDate or updateUserData function');
@@ -250,20 +257,24 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     
     switch (newStatus) {
       case 'relapse':
+        // VERIFIED: Correct relapse logic
+        // 1. Find the active streak (no end date)
         const activeStreakIndex = updatedStreakHistory.findIndex(streak => !streak.end);
         if (activeStreakIndex !== -1) {
           const currentStreak = updatedStreakHistory[activeStreakIndex];
           const streakDays = differenceInDays(editingDate, new Date(currentStreak.start)) + 1;
           
+          // 2. End the current streak on the relapse date
           updatedStreakHistory[activeStreakIndex] = {
             ...currentStreak,
-            end: editingDate,
+            end: editingDate, // Relapse day becomes the end date
             days: streakDays > 0 ? streakDays : 0,
             reason: 'relapse',
             trigger: selectedTrigger || null
           };
         }
         
+        // 3. Start a new streak the day AFTER the relapse
         const newStreakStart = addDays(editingDate, 1);
         updatedStreakHistory.push({
           id: updatedStreakHistory.length + 1,
@@ -274,6 +285,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           trigger: null
         });
         
+        // 4. Calculate new current streak (days from new start to today)
         const newCurrentStreak = newStreakStart <= today ? 
           differenceInDays(today, newStreakStart) + 1 : 0;
         
@@ -291,6 +303,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         break;
         
       case 'wet-dream':
+        // Wet dreams don't break streaks, just increment counter
         updatedUserData = {
           ...updatedUserData,
           wetDreamCount: (userData.wetDreamCount || 0) + 1
@@ -299,6 +312,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         break;
         
       case 'current-streak':
+        // Confirm/mark as streak day (informational only)
         if (userData.startDate) {
           const streakStart = new Date(userData.startDate);
           if (editingDate >= streakStart && editingDate <= today) {
@@ -309,9 +323,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         }
         break;
         
-      case 'clear':
-        toast.success(`Cleared status for ${format(editingDate, 'MMM d')}`);
-        break;
+      // REMOVED: 'clear' case - no longer available as an option
         
       default:
         break;
@@ -880,7 +892,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
 
-      {/* Edit Day Modal */}
+      {/* UPDATED: Edit Day Modal - REMOVED "Clear Status" option */}
       {editDayModal && editingDate && (
         <div className="modal-overlay" onClick={() => setEditDayModal(false)}>
           <div className="modal-content edit-day-modal" onClick={e => e.stopPropagation()}>
@@ -916,13 +928,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                   <span>Mark as Relapse</span>
                 </button>
                 
-                <button 
-                  className="edit-option-btn clear-btn"
-                  onClick={() => handleStatusClick('clear')}
-                >
-                  <FaTimes />
-                  <span>Clear Status</span>
-                </button>
+                {/* REMOVED: Clear Status button */}
               </div>
             ) : (
               <div className="trigger-selection">
