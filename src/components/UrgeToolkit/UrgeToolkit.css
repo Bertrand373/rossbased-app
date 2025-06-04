@@ -30,66 +30,49 @@
   justify-self: end;
 }
 
-/* REDESIGNED: Professional card-style phase indicator with icon circle */
+/* FIXED: Original design with balanced spacing around icon */
 .phase-indicator {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding: var(--spacing-lg);
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  justify-content: center;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: linear-gradient(135deg, 
+    color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
+    var(--card-background) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--phase-color, var(--primary)) 20%, var(--border));
   border-radius: var(--radius-lg);
-  min-width: 240px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  position: relative;
-  overflow: hidden;
-  border-top: 3px solid var(--phase-color, var(--primary));
+  min-width: 200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-/* Subtle glow effect */
-.phase-indicator::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--phase-color, var(--primary)), transparent);
-  opacity: 0.6;
-}
-
-/* REDESIGNED: Content with proper spacing */
+/* FIXED: Balanced content with even spacing on both sides of icon */
 .phase-indicator-content {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg); /* FIXED: Generous spacing between icon circle and text */
+  justify-content: center;
+  gap: var(--spacing-lg); /* FIXED: This creates proper even spacing */
   width: 100%;
 }
 
-/* REDESIGNED: Icon in a colored circle for better visual hierarchy */
+/* REVERTED: Original icon styling */
 .phase-indicator-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--phase-color, var(--primary)) 0%, color-mix(in srgb, var(--phase-color, var(--primary)) 80%, black) 100%);
+  font-size: 1.75rem;
+  color: var(--phase-color, var(--primary));
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  color: #000000;
-  flex-shrink: 0;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-/* REDESIGNED: Text section with better typography */
+/* REVERTED: Original text styling but centered */
 .phase-indicator-text {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  align-items: flex-start;
-  text-align: left;
-  flex: 1;
+  align-items: center;
+  text-align: center;
 }
 
 .phase-name {
@@ -585,23 +568,29 @@
     justify-content: center;
   }
   
-  /* FIXED: Mobile phase indicator with card design */
+  /* REVERTED: Mobile phase indicator with original styling but fixed spacing */
   .phase-indicator {
     width: 100%;
-    max-width: 340px;
+    max-width: 320px;
     padding: var(--spacing-md) var(--spacing-lg);
-    justify-content: flex-start;
+    justify-content: center;
+    text-align: center;
   }
   
-  /* FIXED: Mobile content maintains proper spacing */
+  /* FIXED: Mobile content maintains the even spacing */
   .phase-indicator-content {
-    gap: var(--spacing-md); /* FIXED: Consistent spacing on mobile */
+    justify-content: center;
+    gap: var(--spacing-md); /* FIXED: Even spacing maintained */
   }
   
   .phase-indicator-icon {
-    width: 48px;
-    height: 48px;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+  }
+  
+  /* REVERTED: Mobile text back to center alignment */
+  .phase-indicator-text {
+    align-items: center;
+    text-align: center;
   }
   
   .phase-name {
@@ -677,20 +666,18 @@
 
 /* Very Small Screens */
 @media (max-width: 480px) {
-  /* FIXED: Very small screen phase indicator */
+  /* REVERTED: Very small screen with original styling but fixed spacing */
   .phase-indicator {
     padding: var(--spacing-sm) var(--spacing-md);
     max-width: 100%;
   }
   
   .phase-indicator-content {
-    gap: var(--spacing-sm); /* FIXED: Smaller but consistent gap */
+    gap: var(--spacing-sm); /* FIXED: Smaller but still even spacing */
   }
   
   .phase-indicator-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
+    font-size: 1.375rem;
   }
   
   .phase-name {
