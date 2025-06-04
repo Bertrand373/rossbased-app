@@ -1,4 +1,4 @@
-/* components/Calendar/Calendar.css - FINAL: Pill triggers, clean navigation, perfect spacing */
+/* components/Calendar/Calendar.css - FIXED: Navigation buttons now visible and styled properly */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -114,29 +114,30 @@
   text-align: center;
 }
 
-/* FIXED: Clean navigation buttons - no background boxes, just pure arrows */
+/* FIXED: Navigation buttons styled like grey static buttons throughout the app */
 .period-nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  /* FIXED: Completely transparent background */
-  background: none;
-  border: none;
+  /* FIXED: Grey static button styling like all other static buttons */
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: 50%; /* CIRCLE: Make it circular */
   color: var(--text-secondary);
   cursor: pointer;
-  transition: none;
-  font-size: 1.25rem;
-  border-radius: var(--radius-full);
+  transition: none; /* NO ANIMATIONS: Keep it static */
+  font-size: 1rem; /* READABLE: Good size for arrows */
 }
 
-/* FIXED: Clean hover with no background changes */
+/* FIXED: Static hover - no animations or color changes */
 .period-nav-btn:hover {
-  color: var(--text);
+  background-color: rgba(128, 128, 128, 0.1); /* STATIC: No change */
+  border-color: var(--border); /* STATIC: No change */
+  color: var(--text-secondary); /* STATIC: No change */
+  transform: none; /* NO ANIMATIONS */
 }
-
-/* REMOVED: All pseudo-element overrides - use real icons only */
 
 /* UPDATED: Subtle legend styling like average energy card in stats */
 .calendar-legend {
@@ -1191,14 +1192,24 @@
     min-width: 160px;
   }
   
-  /* FIXED: Mobile navigation buttons - clean arrows only */
+  /* FIXED: Mobile navigation buttons - now properly visible with grey static styling */
   .period-nav-btn {
     width: 36px;
     height: 36px;
-    font-size: 1rem;
-    /* KEEP: Clean transparent background */
-    background: none;
-    border: none;
+    font-size: 0.875rem;
+    /* KEEP: Grey static button styling for mobile */
+    background-color: rgba(128, 128, 128, 0.1);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--text-secondary);
+  }
+  
+  /* KEEP: Static hover on mobile */
+  .period-nav-btn:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+    border-color: var(--border);
+    color: var(--text-secondary);
+    transform: none;
   }
   
   .view-mode-toggle {
@@ -1443,13 +1454,24 @@
     min-width: 140px;
   }
   
-  /* FIXED: Very small screen navigation - keep clean */
+  /* FIXED: Very small screen navigation - keep grey static styling */
   .period-nav-btn {
     width: 32px;
     height: 32px;
-    font-size: 0.875rem;
-    background: none;
-    border: none;
+    font-size: 0.75rem;
+    /* KEEP: Grey static button styling */
+    background-color: rgba(128, 128, 128, 0.1);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--text-secondary);
+  }
+  
+  /* KEEP: Static hover on very small screens */
+  .period-nav-btn:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+    border-color: var(--border);
+    color: var(--text-secondary);
+    transform: none;
   }
   
   .calendar-legend {
