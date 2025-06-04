@@ -568,14 +568,14 @@
     justify-content: center;
   }
   
-  /* FIXED: Mobile phase indicator - icon far left, text perfectly centered in card */
+  /* FIXED: Mobile phase indicator with better vertical spacing */
   .phase-indicator {
     width: 100%;
     max-width: 320px;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-lg); /* INCREASED: More vertical padding */
     justify-content: flex-start;
     text-align: center;
-    position: relative; /* ADDED: For absolute positioning of text */
+    position: relative;
   }
   
   /* FIXED: Mobile content - icon on far left */
@@ -591,26 +591,29 @@
     /* Icon stays at far left */
   }
   
-  /* FIXED: Mobile text perfectly centered in entire card */
+  /* FIXED: Mobile text with more breathing room from card borders */
   .phase-indicator-text {
-    position: absolute; /* ADDED: Absolute positioning */
-    left: 50%; /* ADDED: Center horizontally */
-    top: 50%; /* ADDED: Center vertically */
-    transform: translate(-50%, -50%); /* ADDED: Perfect centering */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     align-items: center;
     text-align: center;
-    width: auto; /* CHANGED: Let text size itself */
-    margin-right: 0; /* REMOVED: No margin needed */
+    width: auto;
+    margin-right: 0;
+    padding: var(--spacing-md) 0; /* ADDED: Vertical padding to push text away from borders */
   }
   
   .phase-name {
     font-size: 0.9375rem;
     text-align: center;
+    margin-bottom: var(--spacing-xs); /* ADDED: Space between header and counter */
   }
   
   .phase-day {
     font-size: 0.8125rem;
     text-align: center;
+    margin-top: var(--spacing-xs); /* ADDED: Space between counter and header */
   }
   
   .assessment-section,
@@ -676,12 +679,12 @@
 
 /* Very Small Screens */
 @media (max-width: 480px) {
-  /* FIXED: Very small screen with same perfect centering */
+  /* FIXED: Very small screen with better vertical spacing */
   .phase-indicator {
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-md); /* INCREASED: More vertical padding */
     max-width: 100%;
     justify-content: flex-start;
-    position: relative; /* ADDED: For absolute positioning */
+    position: relative;
   }
   
   .phase-indicator-content {
@@ -696,14 +699,15 @@
     /* Icon stays at far left */
   }
   
-  /* FIXED: Text perfectly centered in entire card */
+  /* FIXED: Very small screen text with breathing room from borders */
   .phase-indicator-text {
-    position: absolute; /* ADDED: Absolute positioning */
-    left: 50%; /* ADDED: Center horizontally */
-    top: 50%; /* ADDED: Center vertically */
-    transform: translate(-50%, -50%); /* ADDED: Perfect centering */
-    width: auto; /* CHANGED: Let text size itself */
-    margin-right: 0; /* REMOVED: No margin needed */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    margin-right: 0;
+    padding: var(--spacing-sm) 0; /* ADDED: Smaller padding for very small screens */
   }
   
   .phase-name {
