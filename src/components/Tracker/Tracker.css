@@ -124,6 +124,7 @@ button.action-btn:hover {
   justify-content: center;
   gap: var(--spacing-xl);
   margin: 0;
+  flex-wrap: wrap;
 }
 
 .milestone-item {
@@ -466,7 +467,7 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
-/* ✨ PREMIUM LOCK OVERLAY - Beautiful fade-to-transparent effect ✨ */
+/* ✨ PREMIUM LOCK OVERLAY - Beautiful fade-to-transparent effect with rounded corners ✨ */
 .premium-lock-overlay {
   position: absolute;
   top: 0;
@@ -1086,8 +1087,9 @@ button.action-btn:hover {
   
   .streak-milestones {
     flex-wrap: wrap;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
     justify-content: space-evenly;
+    margin: 0;
   }
   
   .streak-actions {
@@ -1230,6 +1232,8 @@ button.action-btn:hover {
   
   .milestone-item {
     min-width: 80px;
+    flex: 1;
+    max-width: 120px;
   }
   
   /* Very small screen premium lock adjustments */
