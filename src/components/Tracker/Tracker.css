@@ -55,7 +55,496 @@ button.action-btn:hover {
   color: var(--text-secondary) !important;
   transform: none !important;
   opacity: 1 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-toggle-switch.active::before {
+  transform: translateX(28px);
+  background-color: var(--primary);
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+}
+
+.toggle-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.toggle-container.active .toggle-label {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.discord-details {
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.discord-username-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.discord-icon {
+  color: #5865F2;
+  font-size: 1.25rem;
+}
+
+.discord-username-display span {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.discord-note {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* UPDATED: Modal buttons with consistent styling matching edit profile button */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.form-actions .action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid;
+}
+
+/* FIXED: Primary action buttons (Set Date & Save Entry) - grey static, yellow hover */
+.form-actions .action-btn.primary-action {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.form-actions .action-btn.primary-action:hover {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+/* FIXED: Cancel buttons with cancel-action class - no hover effects, stay static */
+.form-actions .action-btn.cancel-action {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.form-actions .action-btn.cancel-action:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+}
+
+/* LEGACY: Keep old selector for any buttons without specific classes */
+.form-actions .action-btn:not(.primary-action):not(.cancel-action) {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.form-actions .action-btn:not(.primary-action):not(.cancel-action):hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+}
+
+/* ADDED: Journal modal specific button styling - matches DatePicker exactly */
+.journal-modal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+/* FIXED: Journal primary action button - matching DatePicker primary button exactly */
+.journal-primary-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border: 1px solid rgba(255, 221, 0, 0.2) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  min-height: auto !important;
+}
+
+/* REMOVED: All hover effects for journal primary button */
+.journal-primary-action:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: none !important;
   box-shadow: none !important;
+}
+
+/* FIXED: Journal cancel button - matching DatePicker cancel button exactly */
+.journal-cancel-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  min-height: auto !important;
+}
+
+/* REMOVED: All hover effects for journal cancel button */
+.journal-cancel-action:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.modal-content h2 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+  text-align: center;
+}
+
+.modal-content p {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .tracker-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    margin-top: 0;
+  }
+  
+  .tracker-header h2 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .tracker-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .journal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+  
+  .journal-header h3 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .journal-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  .journal-actions .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .streak-number {
+    font-size: 3rem;
+  }
+  
+  .streak-milestones {
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    justify-content: space-evenly;
+    margin: 0;
+  }
+  
+  .streak-actions {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .streak-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .benefit-logging-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .premium-benefits-container {
+    gap: var(--spacing-md);
+  }
+  
+  .benefit-status-section {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .benefits-logged, .benefits-not-logged {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .edit-benefits-btn {
+    margin-left: 0;
+    margin-top: var(--spacing-sm);
+  }
+  
+  /* REFINED: Mobile slider adjustments with professional styling */
+  .benefit-range-slider {
+    height: 32px;
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  /* Mobile slider labels with perfect spacing */
+  .benefit-logging-section .premium-benefits-container .slider-labels,
+  .premium-benefits-container .benefit-slider-item .slider-labels,
+  .tracker-container .premium-benefits-container .slider-labels,
+  .tracker-container .benefit-logging-section .slider-labels,
+  .benefit-logging-container .premium-benefits-container .slider-labels {
+    margin-top: 10px !important;
+    margin-bottom: 0px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    line-height: 1 !important;
+    transform: none !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.025em !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    color: var(--text-secondary) !important;
+  }
+  
+  /* Mobile single premium lock adjustments */
+  .single-lock-icon {
+    font-size: 1.75rem;
+  }
+  
+  .single-lock-text {
+    font-size: 0.9rem;
+  }
+  
+  .single-lock-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  /* Mobile upgrade button adjustments */
+  .single-lock-upgrade-btn {
+    font-size: 0.8rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: auto;
+  }
+  
+  /* Mobile benefit actions */
+  .benefit-actions-row {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: center;
+  }
+  
+  .save-benefits-btn.partial,
+  .upgrade-benefits-btn {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .discord-toggle {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+  
+  .toggle-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* ADDED: Mobile styling for journal modal buttons - keep side-by-side like DatePicker */
+  .journal-modal-actions {
+    flex-direction: row;
+    gap: var(--spacing-sm);
+  }
+  
+  .journal-primary-action,
+  .journal-cancel-action {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    min-height: auto !important;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .benefit-logging-section {
+    padding: var(--spacing-md);
+  }
+  
+  .streak-number {
+    font-size: 2.5rem;
+  }
+  
+  .milestone-item {
+    min-width: 80px;
+    flex: 1;
+    max-width: 120px;
+  }
+  
+  /* Very small screen single premium lock adjustments */
+  .single-lock-icon {
+    font-size: 1.5rem;
+  }
+  
+  .single-lock-text {
+    font-size: 0.875rem;
+  }
+  
+  .single-lock-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  /* Very small screen upgrade button adjustments */
+  .single-lock-upgrade-btn {
+    font-size: 0.75rem;
+    min-width: auto;
+  }
+  
+  .benefit-actions-row {
+    gap: var(--spacing-xs);
+  }
+  
+  .benefit-slider-header {
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  
+  .benefit-label {
+    font-size: 0.875rem;
+  }
+  
+  .benefit-value {
+    font-size: 0.8rem;
+  }
+} none !important;
   outline: none !important;
 }
 
@@ -495,21 +984,19 @@ button.action-btn:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  /* KEPT: Professional radial gradient for smooth fade */
   background: radial-gradient(
     ellipse at center,
-    rgba(51, 51, 51, 0.92) 0%,     /* High opacity at center */
-    rgba(51, 51, 51, 0.88) 20%,    /* Still very opaque */
-    rgba(51, 51, 51, 0.75) 40%,    /* Medium-high opacity */
-    rgba(51, 51, 51, 0.5) 60%,     /* Medium opacity */
-    rgba(51, 51, 51, 0.25) 80%,    /* Lower opacity */
-    rgba(51, 51, 51, 0.1) 95%,     /* Very transparent */
-    rgba(51, 51, 51, 0) 100%       /* Completely transparent at edges */
+    rgba(51, 51, 51, 0.92) 0%,
+    rgba(51, 51, 51, 0.88) 20%,
+    rgba(51, 51, 51, 0.75) 40%,
+    rgba(51, 51, 51, 0.5) 60%,
+    rgba(51, 51, 51, 0.25) 80%,
+    rgba(51, 51, 51, 0.1) 95%,
+    rgba(51, 51, 51, 0) 100%
   );
   display: flex;
   align-items: center;
   justify-content: center;
-  /* KEPT: Professional backdrop blur for premium feel */
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
@@ -522,32 +1009,28 @@ button.action-btn:hover {
   text-align: center;
   padding: var(--spacing-lg);
   pointer-events: all;
-  /* REMOVED: Glow effects, but kept clean structure */
 }
 
 .single-lock-icon {
   font-size: 2rem;
-  color: var(--text-secondary); /* SUBTLE: Grey instead of flashy yellow */
+  color: var(--text-secondary);
   margin-bottom: var(--spacing-sm);
-  /* REMOVED: Pulsing animations for subtlety */
 }
 
 .single-lock-text {
   font-size: 1rem;
-  font-weight: 600; /* TONED DOWN: From 700 to 600 */
-  color: var(--text); /* SUBTLE: White instead of yellow */
-  letter-spacing: 0.5px; /* REDUCED: From 1px to 0.5px */
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.5px;
   margin-bottom: var(--spacing-xs);
-  /* REMOVED: Text shadows and uppercase for clean look */
 }
 
 .single-lock-subtitle {
   font-size: 0.875rem;
-  font-weight: 400; /* LIGHTER: From 500 to 400 */
+  font-weight: 400;
   color: var(--text-secondary);
-  letter-spacing: 0.25px; /* MINIMAL: Very subtle spacing */
+  letter-spacing: 0.25px;
   margin-bottom: var(--spacing-md);
-  /* REMOVED: Text shadows for clean typography */
 }
 
 /* 🎯 MAIN MENU PILL STYLING: Upgrade button matches your navigation exactly */
@@ -556,29 +1039,27 @@ button.action-btn:hover {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md); /* MATCHING: Same as nav pills */
-  background-color: rgba(255, 221, 0, 0.1); /* MATCHING: Same as active nav state */
-  border: 1px solid rgba(255, 221, 0, 0.2); /* MATCHING: Same border as nav pills */
-  border-radius: var(--radius-full); /* MATCHING: Same border radius as nav pills */
-  color: var(--primary); /* MATCHING: Same text color as nav pills */
-  font-size: 0.875rem; /* MATCHING: Same font size as nav pills */
-  font-weight: 500; /* MATCHING: Same font weight as nav pills */
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: none; /* MATCHING: No transitions like nav pills */
-  letter-spacing: normal; /* REMOVED: Fancy letter spacing */
-  text-transform: none; /* REMOVED: Uppercase */
-  min-width: auto; /* REMOVED: Fixed width */
+  transition: none;
+  letter-spacing: normal;
+  text-transform: none;
+  min-width: auto;
   pointer-events: all;
-  /* REMOVED: All shadows, gradients, and fancy effects */
 }
 
 /* CLEAN HOVER: Simple state change like nav pills */
 .single-lock-upgrade-btn:hover {
-  background-color: rgba(255, 221, 0, 0.15); /* SUBTLE: Just slightly more opacity */
-  border-color: rgba(255, 221, 0, 0.25); /* SUBTLE: Slightly stronger border */
-  color: var(--primary); /* CONSISTENT: Same color */
-  transform: none; /* REMOVED: No animations */
-  /* REMOVED: All shadows and fancy effects */
+  background-color: rgba(255, 221, 0, 0.15);
+  border-color: rgba(255, 221, 0, 0.25);
+  color: var(--primary);
+  transform: none;
 }
 
 /* Professional slider labels with perfect spacing */
@@ -787,3 +1268,49 @@ button.action-btn:hover {
 }
 
 .discord-toggle-container {
+  margin-bottom: var(--spacing-md);
+}
+
+.discord-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background-color: var(--light-gray);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.discord-toggle span {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.custom-toggle-switch {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  background-color: var(--medium-gray);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.custom-toggle-switch.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+}
+
+.custom-toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow:
