@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Single premium lock overlay design */
+/* components/Tracker/Tracker.css - UPDATED: Enhanced single premium lock overlay with upgrade button */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -476,7 +476,7 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
-/* 🎯 NEW: SINGLE PREMIUM LOCK OVERLAY - Elegant and prominent */
+/* 🎯 ENHANCED: SINGLE PREMIUM LOCK OVERLAY - Elegant and prominent with upgrade button */
 .single-premium-lock-overlay {
   position: absolute;
   top: 0;
@@ -518,11 +518,12 @@ button.action-btn:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md); /* INCREASED: More space for button */
   text-align: center;
   /* Enhanced glow effect around the entire lock section */
   filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6));
   padding: var(--spacing-lg);
+  pointer-events: all; /* ADDED: Allow button clicks */
 }
 
 .single-lock-icon {
@@ -549,8 +550,39 @@ button.action-btn:hover {
   font-weight: 500;
   color: var(--text);
   letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-md); /* ADDED: Space before button */
   /* Subtle text shadow for better readability */
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* NEW: Upgrade button in the lock overlay */
+.single-lock-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.2) 0%, rgba(255, 221, 0, 0.3) 100%);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-full);
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  min-width: 160px;
+  pointer-events: all; /* ENSURE: Button is clickable */
+}
+
+.single-lock-upgrade-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.3) 0%, rgba(255, 221, 0, 0.4) 100%);
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 221, 0, 0.4);
+  color: #000000; /* ENHANCED: Dark text on hover for better contrast */
 }
 
 /* Enhanced pulsing animation for the single lock icon */
@@ -1198,6 +1230,13 @@ button.action-btn:hover {
     font-size: 0.8rem;
   }
   
+  /* Mobile upgrade button adjustments */
+  .single-lock-upgrade-btn {
+    font-size: 0.8rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 140px;
+  }
+  
   /* Mobile benefit actions */
   .benefit-actions-row {
     flex-direction: column;
@@ -1274,6 +1313,12 @@ button.action-btn:hover {
   
   .single-lock-subtitle {
     font-size: 0.75rem;
+  }
+  
+  /* Very small screen upgrade button adjustments */
+  .single-lock-upgrade-btn {
+    font-size: 0.75rem;
+    min-width: 120px;
   }
   
   .single-lock-fade-gradient {
