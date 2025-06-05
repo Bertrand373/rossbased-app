@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - ADDED: Premium lock overlay for benefit sliders
+// components/Tracker/Tracker.js - UPDATED: Single premium lock overlay covering all 5 sliders
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -375,7 +375,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* UPDATED: Benefit Logging Section with Premium Lock Overlay */}
+      {/* UPDATED: Benefit Logging Section with Single Premium Lock Overlay */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -402,9 +402,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* UPDATED: Benefit sliders with Premium Lock Overlay */}
-          <div className="benefit-sliders">
-            {/* Energy Slider - FREE for all users */}
+          {/* UPDATED: Premium Benefits Container with Single Lock Overlay */}
+          <div className="premium-benefits-container">
+            {/* Energy Slider - FREE for all users (outside premium container) */}
             <div className="benefit-slider-item">
               <div className="benefit-slider-header">
                 <span className="benefit-label">Energy</span>
@@ -425,46 +425,50 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               </div>
             </div>
             
-            {/* PREMIUM LOCKED SLIDERS */}
-            {[
-              { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
-              { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
-              { key: 'aura', label: 'Aura', value: todayBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
-              { key: 'sleep', label: 'Sleep Quality', value: todayBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
-              { key: 'workout', label: 'Workout', value: todayBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
-            ].map((slider) => (
-              <div key={slider.key} className={`benefit-slider-item ${!isPremium ? 'premium-locked' : ''}`}>
-                <div className="benefit-slider-header">
-                  <span className="benefit-label">{slider.label}</span>
-                  <span className="benefit-value">{slider.value}/10</span>
+            {/* PREMIUM BENEFITS SECTION - All 5 sliders with single overlay */}
+            <div className={`premium-benefits-section ${!isPremium ? 'premium-locked' : ''}`}>
+              {/* PREMIUM LOCKED SLIDERS */}
+              {[
+                { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
+                { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
+                { key: 'aura', label: 'Aura', value: todayBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
+                { key: 'sleep', label: 'Sleep Quality', value: todayBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
+                { key: 'workout', label: 'Workout', value: todayBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
+              ].map((slider) => (
+                <div key={slider.key} className="benefit-slider-item">
+                  <div className="benefit-slider-header">
+                    <span className="benefit-label">{slider.label}</span>
+                    <span className="benefit-value">{slider.value}/10</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={slider.value}
+                    onChange={(e) => isPremium && handleBenefitChange(slider.key, parseInt(e.target.value))}
+                    className="benefit-range-slider"
+                    disabled={benefitsLogged || !isPremium}
+                  />
+                  <div className="slider-labels">
+                    <span>{slider.lowLabel}</span>
+                    <span>{slider.highLabel}</span>
+                  </div>
                 </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={slider.value}
-                  onChange={(e) => isPremium && handleBenefitChange(slider.key, parseInt(e.target.value))}
-                  className="benefit-range-slider"
-                  disabled={benefitsLogged || !isPremium}
-                />
-                <div className="slider-labels">
-                  <span>{slider.lowLabel}</span>
-                  <span>{slider.highLabel}</span>
-                </div>
-                
-                {/* PREMIUM LOCK OVERLAY */}
-                {!isPremium && (
-                  <div className="premium-lock-overlay">
-                    <div className="lock-fade-gradient">
-                      <div className="lock-center">
-                        <FaLock className="lock-icon" />
-                        <span className="lock-text">Premium</span>
-                      </div>
+              ))}
+              
+              {/* SINGLE PREMIUM LOCK OVERLAY covering all 5 sliders */}
+              {!isPremium && (
+                <div className="single-premium-lock-overlay">
+                  <div className="single-lock-fade-gradient">
+                    <div className="single-lock-center">
+                      <FaLock className="single-lock-icon" />
+                      <span className="single-lock-text">Premium</span>
+                      <span className="single-lock-subtitle">Unlock Full Benefits Tracking</span>
                     </div>
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              )}
+            </div>
           </div>
           
           {/* Save/Upgrade buttons */}

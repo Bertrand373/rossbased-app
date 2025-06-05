@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - ADDED: Premium lock overlay with fade effect */
+/* components/Tracker/Tracker.css - UPDATED: Single premium lock overlay design */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -327,24 +327,33 @@ button.action-btn:hover {
   transform: none !important;
 }
 
-/* REFINED: Professional slider styling - dialed back 20% from "gamey" look */
-.benefit-sliders {
+/* NEW: Premium Benefits Container Structure */
+.premium-benefits-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
+/* NEW: Premium Benefits Section with Single Lock Overlay */
+.premium-benefits-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.premium-benefits-section.premium-locked {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+/* REFINED: Professional slider styling - dialed back 20% from "gamey" look */
 .benefit-slider-item {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
   position: relative;
-}
-
-/* ADDED: Premium locked slider styling */
-.benefit-slider-item.premium-locked {
-  position: relative;
-  overflow: hidden;
 }
 
 .benefit-slider-header {
@@ -467,8 +476,8 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
-/* ✨ PREMIUM LOCK OVERLAY - Beautiful fade-to-transparent effect with rounded corners ✨ */
-.premium-lock-overlay {
+/* 🎯 NEW: SINGLE PREMIUM LOCK OVERLAY - Elegant and prominent */
+.single-premium-lock-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -480,74 +489,88 @@ button.action-btn:hover {
   overflow: hidden;
 }
 
-.lock-fade-gradient {
+.single-lock-fade-gradient {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  /* Beautiful radial gradient using medium gray that fades from opaque center to transparent edges */
+  /* Beautiful radial gradient that fades more gradually for better premium feel */
   background: radial-gradient(
     ellipse at center,
-    rgba(51, 51, 51, 0.95) 0%,     /* Almost opaque medium gray center */
-    rgba(51, 51, 51, 0.85) 25%,    /* Still quite opaque */
-    rgba(51, 51, 51, 0.6) 50%,     /* Medium opacity */
-    rgba(51, 51, 51, 0.3) 75%,     /* Getting transparent */
-    rgba(51, 51, 51, 0.1) 90%,     /* Very transparent */
+    rgba(51, 51, 51, 0.92) 0%,     /* High opacity at center */
+    rgba(51, 51, 51, 0.88) 20%,    /* Still very opaque */
+    rgba(51, 51, 51, 0.75) 40%,    /* Medium-high opacity */
+    rgba(51, 51, 51, 0.5) 60%,     /* Medium opacity */
+    rgba(51, 51, 51, 0.25) 80%,    /* Lower opacity */
+    rgba(51, 51, 51, 0.1) 95%,     /* Very transparent */
     rgba(51, 51, 51, 0) 100%       /* Completely transparent at edges */
   );
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Subtle backdrop blur for premium feel */
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
+  /* Enhanced backdrop blur for premium feel */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
-.lock-center {
+.single-lock-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xs);
-  /* Subtle glow effect around the lock */
-  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+  gap: var(--spacing-sm);
+  text-align: center;
+  /* Enhanced glow effect around the entire lock section */
+  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6));
+  padding: var(--spacing-lg);
 }
 
-.lock-icon {
-  font-size: 1.5rem;
+.single-lock-icon {
+  font-size: 2.5rem;
   color: var(--primary);
-  /* Gentle pulsing animation */
-  animation: lock-pulse 2s ease-in-out infinite;
+  margin-bottom: var(--spacing-sm);
+  /* Enhanced pulsing animation */
+  animation: single-lock-pulse 2.5s ease-in-out infinite;
 }
 
-.lock-text {
-  font-size: 0.75rem;
-  font-weight: 600;
+.single-lock-text {
+  font-size: 1.125rem;
+  font-weight: 700;
   color: var(--primary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-xs);
   /* Subtle text shadow for better readability */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
-/* Gentle pulsing animation for the lock icon */
-@keyframes lock-pulse {
+.single-lock-subtitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  /* Subtle text shadow for better readability */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* Enhanced pulsing animation for the single lock icon */
+@keyframes single-lock-pulse {
   0%, 100% {
     opacity: 1;
     transform: scale(1);
   }
   50% {
-    opacity: 0.7;
-    transform: scale(0.95);
+    opacity: 0.8;
+    transform: scale(0.98);
   }
 }
 
 /* Professional slider labels with perfect spacing */
-.benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
-.benefit-sliders .benefit-slider-item .slider-labels,
-.tracker-container .benefit-sliders .slider-labels,
+.benefit-logging-section .premium-benefits-container .slider-labels,
+.premium-benefits-container .benefit-slider-item .slider-labels,
+.tracker-container .premium-benefits-container .slider-labels,
 .tracker-container .benefit-logging-section .slider-labels,
-.benefit-logging-container .benefit-sliders .slider-labels {
+.benefit-logging-container .premium-benefits-container .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
   font-size: 0.8125rem !important;
@@ -1106,7 +1129,7 @@ button.action-btn:hover {
     padding: var(--spacing-lg);
   }
   
-  .benefit-sliders {
+  .premium-benefits-container {
     gap: var(--spacing-md);
   }
   
@@ -1141,11 +1164,11 @@ button.action-btn:hover {
   }
   
   /* Mobile slider labels with perfect spacing */
-  .benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
-  .benefit-sliders .benefit-slider-item .slider-labels,
-  .tracker-container .benefit-sliders .slider-labels,
+  .benefit-logging-section .premium-benefits-container .slider-labels,
+  .premium-benefits-container .benefit-slider-item .slider-labels,
+  .tracker-container .premium-benefits-container .slider-labels,
   .tracker-container .benefit-logging-section .slider-labels,
-  .benefit-logging-container .benefit-sliders .slider-labels {
+  .benefit-logging-container .premium-benefits-container .slider-labels {
     margin-top: 10px !important;
     margin-bottom: 0px !important;
     padding-top: 0px !important;
@@ -1162,13 +1185,17 @@ button.action-btn:hover {
     color: var(--text-secondary) !important;
   }
   
-  /* Mobile premium lock overlay adjustments */
-  .lock-icon {
-    font-size: 1.25rem;
+  /* Mobile single premium lock adjustments */
+  .single-lock-icon {
+    font-size: 2rem;
   }
   
-  .lock-text {
-    font-size: 0.7rem;
+  .single-lock-text {
+    font-size: 1rem;
+  }
+  
+  .single-lock-subtitle {
+    font-size: 0.8rem;
   }
   
   /* Mobile benefit actions */
@@ -1236,23 +1263,28 @@ button.action-btn:hover {
     max-width: 120px;
   }
   
-  /* Very small screen premium lock adjustments */
-  .lock-icon {
-    font-size: 1rem;
+  /* Very small screen single premium lock adjustments */
+  .single-lock-icon {
+    font-size: 1.75rem;
   }
   
-  .lock-text {
-    font-size: 0.65rem;
+  .single-lock-text {
+    font-size: 0.9rem;
   }
   
-  .lock-fade-gradient {
-    /* Slightly smaller gradient on very small screens using medium gray */
+  .single-lock-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .single-lock-fade-gradient {
+    /* Slightly more opaque gradient on very small screens for better visibility */
     background: radial-gradient(
       ellipse at center,
-      rgba(51, 51, 51, 0.9) 0%,
-      rgba(51, 51, 51, 0.8) 30%,
-      rgba(51, 51, 51, 0.5) 60%,
-      rgba(51, 51, 51, 0.2) 80%,
+      rgba(51, 51, 51, 0.95) 0%,
+      rgba(51, 51, 51, 0.9) 25%,
+      rgba(51, 51, 51, 0.8) 50%,
+      rgba(51, 51, 51, 0.6) 75%,
+      rgba(51, 51, 51, 0.3) 90%,
       rgba(51, 51, 51, 0) 100%
     );
   }
