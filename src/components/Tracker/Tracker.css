@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - FIXED: Complete CSS with proper syntax */
+/* components/Tracker/Tracker.css - ADDED: Premium lock overlay with fade effect */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -340,6 +340,12 @@ button.action-btn:hover {
   position: relative;
 }
 
+/* ADDED: Premium locked slider styling */
+.benefit-slider-item.premium-locked {
+  position: relative;
+  overflow: hidden;
+}
+
 .benefit-slider-header {
   display: flex;
   align-items: center;
@@ -460,6 +466,81 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
+/* ✨ PREMIUM LOCK OVERLAY - Beautiful fade-to-transparent effect ✨ */
+.premium-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  pointer-events: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.lock-fade-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Beautiful radial gradient that fades from opaque center to transparent edges */
+  background: radial-gradient(
+    ellipse at center,
+    rgba(15, 15, 15, 0.95) 0%,     /* Almost opaque dark center */
+    rgba(15, 15, 15, 0.85) 25%,    /* Still quite opaque */
+    rgba(15, 15, 15, 0.6) 50%,     /* Medium opacity */
+    rgba(15, 15, 15, 0.3) 75%,     /* Getting transparent */
+    rgba(15, 15, 15, 0.1) 90%,     /* Very transparent */
+    rgba(15, 15, 15, 0) 100%       /* Completely transparent at edges */
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Subtle backdrop blur for premium feel */
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+.lock-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  /* Subtle glow effect around the lock */
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+.lock-icon {
+  font-size: 1.5rem;
+  color: var(--primary);
+  /* Gentle pulsing animation */
+  animation: lock-pulse 2s ease-in-out infinite;
+}
+
+.lock-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  /* Subtle text shadow for better readability */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Gentle pulsing animation for the lock icon */
+@keyframes lock-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+}
+
 /* Professional slider labels with perfect spacing */
 .benefit-logging-section .benefit-sliders .benefit-slider-item .slider-labels,
 .benefit-sliders .benefit-slider-item .slider-labels,
@@ -523,6 +604,15 @@ button.action-btn:hover {
   margin-top: var(--spacing-lg);
 }
 
+/* ADDED: Benefit actions row for free users */
+.benefit-actions-row {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
 /* REFINED: Professional save button */
 .save-benefits-btn {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.08) 0%, rgba(255, 221, 0, 0.12) 100%);
@@ -543,6 +633,40 @@ button.action-btn:hover {
   border-color: rgba(255, 221, 0, 0.25);
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(255, 221, 0, 0.15);
+}
+
+/* ADDED: Partial save button for free users */
+.save-benefits-btn.partial {
+  flex: 1;
+  max-width: 200px;
+}
+
+/* ADDED: Upgrade button styling */
+.upgrade-benefits-btn {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--radius-full);
+  color: #f59e0b;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.1);
+  letter-spacing: 0.025em;
+  flex: 1;
+  max-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.upgrade-benefits-btn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border-color: rgba(251, 191, 36, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.2);
 }
 
 .journal-section {
@@ -1036,6 +1160,28 @@ button.action-btn:hover {
     color: var(--text-secondary) !important;
   }
   
+  /* Mobile premium lock overlay adjustments */
+  .lock-icon {
+    font-size: 1.25rem;
+  }
+  
+  .lock-text {
+    font-size: 0.7rem;
+  }
+  
+  /* Mobile benefit actions */
+  .benefit-actions-row {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: center;
+  }
+  
+  .save-benefits-btn.partial,
+  .upgrade-benefits-btn {
+    max-width: 100%;
+    width: 100%;
+  }
+  
   .discord-toggle {
     flex-direction: column;
     gap: var(--spacing-md);
@@ -1069,5 +1215,58 @@ button.action-btn:hover {
     padding: var(--spacing-sm) var(--spacing-md) !important;
     font-size: 0.875rem !important;
     min-height: auto !important;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .benefit-logging-section {
+    padding: var(--spacing-md);
+  }
+  
+  .streak-number {
+    font-size: 2.5rem;
+  }
+  
+  .milestone-item {
+    min-width: 80px;
+  }
+  
+  /* Very small screen premium lock adjustments */
+  .lock-icon {
+    font-size: 1rem;
+  }
+  
+  .lock-text {
+    font-size: 0.65rem;
+  }
+  
+  .lock-fade-gradient {
+    /* Slightly smaller gradient on very small screens */
+    background: radial-gradient(
+      ellipse at center,
+      rgba(15, 15, 15, 0.9) 0%,
+      rgba(15, 15, 15, 0.8) 30%,
+      rgba(15, 15, 15, 0.5) 60%,
+      rgba(15, 15, 15, 0.2) 80%,
+      rgba(15, 15, 15, 0) 100%
+    );
+  }
+  
+  .benefit-actions-row {
+    gap: var(--spacing-xs);
+  }
+  
+  .benefit-slider-header {
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  
+  .benefit-label {
+    font-size: 0.875rem;
+  }
+  
+  .benefit-value {
+    font-size: 0.8rem;
   }
 }

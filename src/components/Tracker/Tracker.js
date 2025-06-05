@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - FIXED: Journal modal buttons now match DatePicker side-by-side layout
+// components/Tracker/Tracker.js - ADDED: Premium lock overlay for benefit sliders
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +22,9 @@ import {
   FaDiscord,
   FaToggleOn,
   FaToggleOff,
-  FaCheckCircle
+  FaCheckCircle,
+  FaLock,
+  FaStar
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
@@ -239,6 +241,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
+  // ADDED: Premium upgrade handler
+  const handleUpgradeClick = () => {
+    toast.success('Premium upgrade coming soon! 🚀');
+  };
+
   return (
     <div className="tracker-container">
       {/* UPDATED: React DatePicker Modal (replacing iframe) */}
@@ -368,7 +375,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* UPDATED: Benefit Logging Section styled like Timeline emotional check-in */}
+      {/* UPDATED: Benefit Logging Section with Premium Lock Overlay */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -395,8 +402,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* UPDATED: Benefit sliders with Timeline-style guide labels */}
+          {/* UPDATED: Benefit sliders with Premium Lock Overlay */}
           <div className="benefit-sliders">
+            {/* Energy Slider - FREE for all users */}
             <div className="benefit-slider-item">
               <div className="benefit-slider-header">
                 <span className="benefit-label">Energy</span>
@@ -417,117 +425,77 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               </div>
             </div>
             
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Focus</span>
-                <span className="benefit-value">{todayBenefits.focus}/10</span>
+            {/* PREMIUM LOCKED SLIDERS */}
+            {[
+              { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
+              { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
+              { key: 'aura', label: 'Aura', value: todayBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
+              { key: 'sleep', label: 'Sleep Quality', value: todayBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
+              { key: 'workout', label: 'Workout', value: todayBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
+            ].map((slider) => (
+              <div key={slider.key} className={`benefit-slider-item ${!isPremium ? 'premium-locked' : ''}`}>
+                <div className="benefit-slider-header">
+                  <span className="benefit-label">{slider.label}</span>
+                  <span className="benefit-value">{slider.value}/10</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={slider.value}
+                  onChange={(e) => isPremium && handleBenefitChange(slider.key, parseInt(e.target.value))}
+                  className="benefit-range-slider"
+                  disabled={benefitsLogged || !isPremium}
+                />
+                <div className="slider-labels">
+                  <span>{slider.lowLabel}</span>
+                  <span>{slider.highLabel}</span>
+                </div>
+                
+                {/* PREMIUM LOCK OVERLAY */}
+                {!isPremium && (
+                  <div className="premium-lock-overlay">
+                    <div className="lock-fade-gradient">
+                      <div className="lock-center">
+                        <FaLock className="lock-icon" />
+                        <span className="lock-text">Premium</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.focus}
-                onChange={(e) => handleBenefitChange('focus', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Scattered</span>
-                <span>Laser Focus</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Confidence</span>
-                <span className="benefit-value">{todayBenefits.confidence}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.confidence}
-                onChange={(e) => handleBenefitChange('confidence', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Insecure</span>
-                <span>Very Confident</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Aura</span>
-                <span className="benefit-value">{todayBenefits.aura}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.aura}
-                onChange={(e) => handleBenefitChange('aura', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Invisible</span>
-                <span>Magnetic</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Sleep Quality</span>
-                <span className="benefit-value">{todayBenefits.sleep}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.sleep}
-                onChange={(e) => handleBenefitChange('sleep', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Poor</span>
-                <span>Excellent</span>
-              </div>
-            </div>
-            
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Workout</span>
-                <span className="benefit-value">{todayBenefits.workout}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.workout}
-                onChange={(e) => handleBenefitChange('workout', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Weak</span>
-                <span>Strong</span>
-              </div>
-            </div>
+            ))}
           </div>
           
-          {/* Save button only shows when not logged */}
+          {/* Save/Upgrade buttons */}
           {!benefitsLogged && (
             <div className="benefit-actions">
-              <button 
-                className="action-btn save-benefits-btn"
-                onClick={saveBenefits}
-              >
-                <FaCheckCircle />
-                <span>Save Today's Benefits</span>
-              </button>
+              {isPremium ? (
+                <button 
+                  className="action-btn save-benefits-btn"
+                  onClick={saveBenefits}
+                >
+                  <FaCheckCircle />
+                  <span>Save Today's Benefits</span>
+                </button>
+              ) : (
+                <div className="benefit-actions-row">
+                  <button 
+                    className="action-btn save-benefits-btn partial"
+                    onClick={saveBenefits}
+                  >
+                    <FaCheckCircle />
+                    <span>Save Energy Level</span>
+                  </button>
+                  <button 
+                    className="action-btn upgrade-benefits-btn"
+                    onClick={handleUpgradeClick}
+                  >
+                    <FaStar />
+                    <span>Unlock All Benefits</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
