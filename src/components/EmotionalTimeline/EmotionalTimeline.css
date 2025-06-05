@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - ULTRA FIXED: Slider headers and values match Tracker exactly */
+/* components/EmotionalTimeline/EmotionalTimeline.css - ULTRA FIXED: Slider headers and values match Tracker exactly + Mastery Levels */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -306,6 +306,173 @@
   background-color: rgba(255, 221, 0, 0.2);
   border-radius: var(--radius-full);
   /* Color is set via inline style in the component */
+}
+
+/* ADDED: Mastery Levels Section */
+.mastery-levels-section {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.mastery-levels-section h3 {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 1.25rem;
+  color: var(--text);
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+
+.mastery-levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.mastery-level-card {
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mastery-level-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
+}
+
+.mastery-level-card:hover {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border-color: rgba(255, 221, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.mastery-level-card.completed {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.mastery-level-card.current {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.12) 0%, rgba(255, 221, 0, 0.15) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.3);
+  transform: scale(1.02);
+}
+
+.mastery-level-card.upcoming {
+  opacity: 0.6;
+}
+
+.mastery-level-card.upcoming:hover {
+  transform: none;
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+}
+
+.mastery-level-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.mastery-level-number {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.2) 0%, rgba(255, 221, 0, 0.1) 100%);
+  border: 2px solid rgba(255, 221, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.mastery-level-card.completed .mastery-level-number {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.mastery-level-card.current .mastery-level-number {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.3) 0%, rgba(255, 221, 0, 0.2) 100%);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 12px rgba(255, 221, 0, 0.4);
+}
+
+.mastery-level-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.mastery-level-range {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.mastery-level-duration {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: var(--spacing-md);
+}
+
+.mastery-level-progress {
+  margin-top: var(--spacing-md);
+}
+
+.mastery-progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.mastery-progress-fill {
+  height: 100%;
+  background-color: var(--primary);
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
+}
+
+.mastery-level-check {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  font-size: 1.25rem;
+  color: var(--success);
+}
+
+.mastery-level-current {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.2);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 221, 0, 0.3);
 }
 
 /* Emotional Check-in Section - styled like Stats benefit tracker */
@@ -1045,6 +1212,47 @@
     font-size: 1rem;
   }
   
+  /* Mobile mastery levels */
+  .mastery-levels-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .mastery-level-card {
+    padding: var(--spacing-md);
+  }
+  
+  .mastery-level-card.current {
+    transform: scale(1);
+  }
+  
+  .mastery-level-header {
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .mastery-level-number {
+    width: 40px;
+    height: 40px;
+    font-size: 0.75rem;
+  }
+  
+  .mastery-level-name {
+    font-size: 1rem;
+  }
+  
+  .mastery-level-range {
+    font-size: 0.8rem;
+  }
+  
+  .mastery-level-duration {
+    font-size: 0.7rem;
+  }
+  
+  .mastery-level-current {
+    font-size: 0.7rem;
+    padding: 2px var(--spacing-xs);
+  }
+  
   .emotional-checkin-section {
     padding: var(--spacing-lg);
   }
@@ -1158,5 +1366,38 @@
   .form-actions .action-btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .mastery-levels-section h3 {
+    font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
+  }
+  
+  .mastery-level-card {
+    padding: var(--spacing-sm);
+  }
+  
+  .mastery-level-header {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-xs);
+  }
+  
+  .mastery-level-number {
+    width: 36px;
+    height: 36px;
+    font-size: 0.7rem;
+  }
+  
+  .mastery-level-name {
+    font-size: 0.9rem;
+  }
+  
+  .mastery-level-check, .mastery-level-current {
+    position: static;
+    margin-top: var(--spacing-sm);
+    align-self: center;
   }
 }

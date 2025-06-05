@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Day counter matches current streak
+// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Mastery Levels System instead of confusing milestones
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -27,6 +27,30 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
 
   // FIXED: Use current streak instead of calculated day difference
   const currentDay = userData.currentStreak || 0;
+
+  // UPDATED: Mastery Levels System - replaces confusing milestones
+  const masteryLevels = [
+    { id: 1, name: "Master", dayRange: "181-365", startDay: 181, endDay: 365, duration: "6 months" },
+    { id: 2, name: "Sage", dayRange: "366-730", startDay: 366, endDay: 730, duration: "1 year" },
+    { id: 3, name: "Enlightened", dayRange: "731-1095", startDay: 731, endDay: 1095, duration: "1 year" },
+    { id: 4, name: "Transcendent", dayRange: "1096-1460", startDay: 1096, endDay: 1460, duration: "1 year" },
+    { id: 5, name: "Ascended Master", dayRange: "1461-1825", startDay: 1461, endDay: 1825, duration: "1 year" },
+    { id: 6, name: "Divine Avatar", dayRange: "1826+", startDay: 1826, endDay: 999999, duration: "Eternal" }
+  ];
+
+  // UPDATED: Get current mastery level for advanced practitioners
+  const getCurrentMasteryLevel = () => {
+    if (currentDay < 181) return null;
+    
+    for (const level of masteryLevels) {
+      if (currentDay >= level.startDay && currentDay <= level.endDay) {
+        return level;
+      }
+    }
+    
+    // Fallback to highest level for extremely long streaks
+    return masteryLevels[masteryLevels.length - 1];
+  };
 
   // FIXED: Enhanced phase definitions with correct icon colors
   const emotionalPhases = [
@@ -215,7 +239,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
       name: "Mastery & Service",
       dayRange: "181+",
       startDay: 181,
-      endDay: 999,
+      endDay: 999999, // UPDATED: Very high number for mastery system
       icon: FaTrophy,
       color: "#ffdd00", // Gold/Yellow
       description: "Complete integration - you've transcended the need for external validation",
@@ -265,7 +289,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     
     // Find the phase that contains the current day
     for (const phase of emotionalPhases) {
-      if (currentDay >= phase.startDay && (phase.endDay === 999 || currentDay <= phase.endDay)) {
+      if (currentDay >= phase.startDay && (phase.endDay === 999999 || currentDay <= phase.endDay)) {
         return phase;
       }
     }
@@ -276,16 +300,22 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
 
   const currentPhase = getCurrentPhase();
 
-  // CORRECTED: Calculate progress percentage within current phase
+  // UPDATED: Calculate progress percentage with mastery level support
   const getPhaseProgress = (phase) => {
     if (!phase || currentDay <= 0) return 0;
     
-    // Special handling for the infinite mastery phase (181+)
-    if (phase.endDay === 999) {
-      // For the mastery phase, show progress based on 30-day milestones
-      const daysIntoMastery = currentDay - phase.startDay;
-      const milestone = Math.min(daysIntoMastery / 30, 10); // Cap at 10 milestones for visual
-      return Math.min(100, (milestone / 10) * 100);
+    // UPDATED: Special handling for mastery phase (181+)
+    if (phase.startDay === 181) {
+      const masteryLevel = getCurrentMasteryLevel();
+      if (!masteryLevel) return 0;
+      
+      // Calculate progress within current mastery level
+      const daysIntoLevel = currentDay - masteryLevel.startDay;
+      const totalDaysInLevel = masteryLevel.endDay === 999999 ? 
+        365 : (masteryLevel.endDay - masteryLevel.startDay + 1); // 1 year for most levels
+      
+      const progress = (daysIntoLevel / totalDaysInLevel) * 100;
+      return Math.min(100, Math.max(0, progress));
     }
     
     // CORRECTED: Calculate how far through the current phase
@@ -296,24 +326,29 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     return Math.min(100, Math.max(0, progress));
   };
 
-  // FIXED: Get mathematically correct progress text
+  // UPDATED: Get progress text with mastery level support
   const getPhaseProgressText = (phase) => {
     if (!phase || currentDay <= 0) return "";
     
-    // Special handling for the infinite mastery phase (181+)
-    if (phase.endDay === 999) {
-      const daysIntoMastery = currentDay - phase.startDay;
-      const milestoneNumber = Math.floor(daysIntoMastery / 30) + 1;
-      const daysInCurrentMilestone = (daysIntoMastery % 30) + 1;
-      return `Mastery Milestone ${milestoneNumber}, Day ${daysInCurrentMilestone}`;
+    // UPDATED: Special handling for mastery phase - show level progression
+    if (phase.startDay === 181) {
+      const masteryLevel = getCurrentMasteryLevel();
+      if (!masteryLevel) return "";
+      
+      const daysIntoLevel = currentDay - masteryLevel.startDay;
+      const currentDayInLevel = daysIntoLevel + 1; // 1-based current day in level
+      
+      if (masteryLevel.endDay === 999999) {
+        // Divine Avatar level - eternal
+        return `Level ${masteryLevel.id} ${masteryLevel.name} - Day ${currentDayInLevel} (Eternal Journey)`;
+      } else {
+        const totalDaysInLevel = masteryLevel.endDay - masteryLevel.startDay + 1;
+        const daysRemainingInLevel = masteryLevel.endDay - currentDay;
+        return `Level ${masteryLevel.id} ${masteryLevel.name} - Day ${currentDayInLevel} of ${totalDaysInLevel} (${daysRemainingInLevel} days to next level)`;
+      }
     }
     
-    // CORRECTED CALCULATION:
-    // If current day = 16 and phase starts at day 15:
-    // Days completed in phase = 16 - 15 = 1 (you've completed 1 day)
-    // But for display, we want to show "Day 2 of phase" (because you're on day 2)
-    // So we add 1 to show current day within phase
-    
+    // CORRECTED CALCULATION for regular phases:
     const daysCompletedInPhase = currentDay - phase.startDay; // 0-based completed days
     const currentDayInPhase = daysCompletedInPhase + 1; // 1-based current day in phase
     const totalDaysInPhase = phase.endDay - phase.startDay + 1; // Total phase length
@@ -488,12 +523,12 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
 
-      {/* FIXED: Timeline Overview with proper phase status and colors */}
+      {/* UPDATED: Timeline Overview with mastery levels section */}
       <div className="timeline-overview">
         <h3>Complete Journey Map</h3>
         <div className="phases-timeline">
           {emotionalPhases.map((phase, index) => {
-            const isCompleted = currentDay > phase.endDay && phase.endDay !== 999;
+            const isCompleted = currentDay > phase.endDay && phase.endDay !== 999999;
             const isCurrent = currentPhase?.id === phase.id;
             const isUpcoming = currentDay < phase.startDay;
             
@@ -524,6 +559,56 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
             );
           })}
         </div>
+
+        {/* ADDED: Mastery Levels Display for advanced practitioners */}
+        {currentDay >= 181 && (
+          <div className="mastery-levels-section">
+            <h3>Mastery Levels (Days 181+)</h3>
+            <div className="mastery-levels-grid">
+              {masteryLevels.map((level, index) => {
+                const isCompleted = currentDay > level.endDay && level.endDay !== 999999;
+                const isCurrent = getCurrentMasteryLevel()?.id === level.id;
+                const isUpcoming = currentDay < level.startDay;
+                
+                return (
+                  <div 
+                    key={level.id}
+                    className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                  >
+                    <div className="mastery-level-header">
+                      <div className="mastery-level-number">Level {level.id}</div>
+                      <div className="mastery-level-name">{level.name}</div>
+                    </div>
+                    <div className="mastery-level-range">Days {level.dayRange}</div>
+                    <div className="mastery-level-duration">{level.duration}</div>
+                    
+                    {isCurrent && (
+                      <div className="mastery-level-progress">
+                        <div className="mastery-progress-bar">
+                          <div 
+                            className="mastery-progress-fill"
+                            style={{ width: `${getPhaseProgress(currentPhase)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {isCompleted && (
+                      <div className="mastery-level-check">
+                        <FaCheckCircle />
+                      </div>
+                    )}
+                    {isCurrent && (
+                      <div className="mastery-level-current">
+                        Current Level
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Daily Emotional Check-in */}
