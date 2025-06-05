@@ -486,15 +486,15 @@ button.action-btn:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  /* Beautiful radial gradient that fades from opaque center to transparent edges */
+  /* Beautiful radial gradient using medium gray that fades from opaque center to transparent edges */
   background: radial-gradient(
     ellipse at center,
-    rgba(15, 15, 15, 0.95) 0%,     /* Almost opaque dark center */
-    rgba(15, 15, 15, 0.85) 25%,    /* Still quite opaque */
-    rgba(15, 15, 15, 0.6) 50%,     /* Medium opacity */
-    rgba(15, 15, 15, 0.3) 75%,     /* Getting transparent */
-    rgba(15, 15, 15, 0.1) 90%,     /* Very transparent */
-    rgba(15, 15, 15, 0) 100%       /* Completely transparent at edges */
+    rgba(51, 51, 51, 0.95) 0%,     /* Almost opaque medium gray center */
+    rgba(51, 51, 51, 0.85) 25%,    /* Still quite opaque */
+    rgba(51, 51, 51, 0.6) 50%,     /* Medium opacity */
+    rgba(51, 51, 51, 0.3) 75%,     /* Getting transparent */
+    rgba(51, 51, 51, 0.1) 90%,     /* Very transparent */
+    rgba(51, 51, 51, 0) 100%       /* Completely transparent at edges */
   );
   display: flex;
   align-items: center;
@@ -1246,14 +1246,14 @@ button.action-btn:hover {
   }
   
   .lock-fade-gradient {
-    /* Slightly smaller gradient on very small screens */
+    /* Slightly smaller gradient on very small screens using medium gray */
     background: radial-gradient(
       ellipse at center,
-      rgba(15, 15, 15, 0.9) 0%,
-      rgba(15, 15, 15, 0.8) 30%,
-      rgba(15, 15, 15, 0.5) 60%,
-      rgba(15, 15, 15, 0.2) 80%,
-      rgba(15, 15, 15, 0) 100%
+      rgba(51, 51, 51, 0.9) 0%,
+      rgba(51, 51, 51, 0.8) 30%,
+      rgba(51, 51, 51, 0.5) 60%,
+      rgba(51, 51, 51, 0.2) 80%,
+      rgba(51, 51, 51, 0) 100%
     );
   }
   
