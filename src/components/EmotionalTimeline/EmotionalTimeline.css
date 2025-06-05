@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - ULTRA FIXED: Slider headers and values match Tracker exactly + Mastery Levels */
+/* components/EmotionalTimeline/EmotionalTimeline.css - UPDATED: Added premium lock overlays matching Tracker design */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -66,6 +66,19 @@
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
+}
+
+.wisdom-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ADDED: Timeline content container for main premium lock */
+.timeline-content-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
 /* Current Phase Card - styled like Stats streak cards */
@@ -185,6 +198,11 @@
   max-width: 200px;
 }
 
+.phase-detail-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Timeline Overview - styled like Stats milestone section */
 .timeline-overview {
   display: flex;
@@ -206,7 +224,7 @@
   gap: var(--spacing-md);
 }
 
-/* FIXED: Timeline phases with proper color inheritance */
+/* FIXED: Timeline phases with proper color inheritance and lock states */
 .timeline-phase {
   display: flex;
   align-items: center;
@@ -237,6 +255,16 @@
   border-color: rgba(255, 221, 0, 0.1);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-phase.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.timeline-phase.locked:hover {
+  transform: none;
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
 }
 
 /* FIXED: Phase status styling with proper colors */
@@ -308,6 +336,13 @@
   /* Color is set via inline style in the component */
 }
 
+/* ADDED: Lock indicator for non-premium users */
+.timeline-phase-lock {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
 /* ADDED: Mastery Levels Section */
 .mastery-levels-section {
   margin-top: var(--spacing-xl);
@@ -374,6 +409,16 @@
 }
 
 .mastery-level-card.upcoming:hover {
+  transform: none;
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+}
+
+.mastery-level-card.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mastery-level-card.locked:hover {
   transform: none;
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
 }
@@ -475,6 +520,14 @@
   border: 1px solid rgba(255, 221, 0, 0.3);
 }
 
+.mastery-level-lock {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+}
+
 /* Emotional Check-in Section - styled like Stats benefit tracker */
 .emotional-checkin-section {
   background-color: var(--medium-gray);
@@ -553,6 +606,20 @@
   font-size: 0.75rem;
   cursor: pointer;
   transition: none;
+}
+
+/* ADDED: Emotion sliders container for premium lock */
+.emotion-sliders-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.emotion-sliders-container.premium-locked {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
 }
 
 /* ULTRA FIXED: All emotional sliders use EXACT Tracker benefit spacing */
@@ -755,6 +822,205 @@
   color: rgba(255, 221, 0, 0.7) !important; /* TRACKER MATCH: Same refined yellow for "positive" states */
 }
 
+/* ADDED: Timeline-specific premium lock overlay for emotion sliders */
+.timeline-premium-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  pointer-events: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.timeline-lock-fade-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Beautiful radial gradient that fades more gradually for better premium feel */
+  background: radial-gradient(
+    ellipse at center,
+    rgba(51, 51, 51, 0.92) 0%,     /* High opacity at center */
+    rgba(51, 51, 51, 0.88) 20%,    /* Still very opaque */
+    rgba(51, 51, 51, 0.75) 40%,    /* Medium-high opacity */
+    rgba(51, 51, 51, 0.5) 60%,     /* Medium opacity */
+    rgba(51, 51, 51, 0.25) 80%,    /* Lower opacity */
+    rgba(51, 51, 51, 0.1) 95%,     /* Very transparent */
+    rgba(51, 51, 51, 0) 100%       /* Completely transparent at edges */
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Enhanced backdrop blur for premium feel */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.timeline-lock-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-align: center;
+  /* Enhanced glow effect around the entire lock section */
+  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6));
+  padding: var(--spacing-lg);
+}
+
+.timeline-lock-icon {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+  /* Enhanced pulsing animation */
+  animation: timeline-lock-pulse 2.5s ease-in-out infinite;
+}
+
+.timeline-lock-text {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-xs);
+  /* Subtle text shadow for better readability */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.timeline-lock-subtitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  /* Subtle text shadow for better readability */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* Enhanced pulsing animation for the timeline lock icon */
+@keyframes timeline-lock-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+/* ADDED: Main timeline premium lock overlay */
+.main-timeline-premium-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  pointer-events: all;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.main-timeline-lock-fade-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Stronger gradient for main lock overlay */
+  background: radial-gradient(
+    ellipse at center,
+    rgba(51, 51, 51, 0.95) 0%,     
+    rgba(51, 51, 51, 0.92) 20%,    
+    rgba(51, 51, 51, 0.85) 40%,    
+    rgba(51, 51, 51, 0.7) 60%,     
+    rgba(51, 51, 51, 0.4) 80%,    
+    rgba(51, 51, 51, 0.15) 95%,     
+    rgba(51, 51, 51, 0) 100%       
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.main-timeline-lock-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  text-align: center;
+  filter: drop-shadow(0 0 16px rgba(255, 221, 0, 0.8));
+  padding: var(--spacing-xl);
+}
+
+.main-timeline-lock-icon {
+  font-size: 4rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+  animation: main-timeline-lock-pulse 2s ease-in-out infinite;
+}
+
+.main-timeline-lock-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: var(--spacing-sm);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+}
+
+.main-timeline-lock-subtitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-lg);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.main-timeline-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.3) 100%);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-full);
+  color: var(--primary);
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(255, 221, 0, 0.3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.main-timeline-upgrade-btn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.4) 100%);
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 221, 0, 0.4);
+}
+
+@keyframes main-timeline-lock-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(0.95);
+  }
+}
+
 .emotion-actions {
   display: flex;
   justify-content: center;
@@ -781,6 +1047,32 @@
   border-color: rgba(255, 221, 0, 0.25);
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(255, 221, 0, 0.15); /* TRACKER MATCH: Same hover shadow */
+}
+
+/* ADDED: Upgrade button for emotion tracking */
+.upgrade-emotions-btn {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--radius-full);
+  color: #f59e0b;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.1);
+  letter-spacing: 0.025em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.upgrade-emotions-btn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border-color: rgba(251, 191, 36, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.2);
 }
 
 /* Journal Section - styled like Tracker journal */
@@ -830,6 +1122,11 @@
   transition: none;
 }
 
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .journal-prompt {
   display: flex;
   align-items: center;
@@ -873,6 +1170,49 @@
   color: var(--text-secondary);
   margin-bottom: var(--spacing-md);
   border: 1px solid var(--border);
+}
+
+/* ADDED: Journal premium teaser */
+.journal-premium-teaser {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  background-color: var(--light-gray);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.journal-premium-teaser .lock-icon {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.upgrade-journal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--radius-full);
+  color: #f59e0b;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upgrade-journal-btn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border-color: rgba(251, 191, 36, 0.4);
+  transform: translateY(-1px);
 }
 
 /* Phase Insight Section - styled like Stats insight cards */
@@ -937,6 +1277,47 @@
   line-height: 1.4;
   font-weight: 500;
   text-align: center;
+}
+
+/* ADDED: Insight premium teaser */
+.insight-premium-teaser {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.insight-premium-teaser .lock-icon {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.upgrade-insight-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--radius-full);
+  color: #f59e0b;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upgrade-insight-btn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border-color: rgba(251, 191, 36, 0.4);
+  transform: translateY(-1px);
 }
 
 /* Phase Detail Modal */
@@ -1253,6 +1634,25 @@
     padding: 2px var(--spacing-xs);
   }
   
+  /* Mobile main timeline lock adjustments */
+  .main-timeline-lock-icon {
+    font-size: 3rem;
+  }
+  
+  .main-timeline-lock-text {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+  
+  .main-timeline-lock-subtitle {
+    font-size: 1rem;
+  }
+  
+  .main-timeline-upgrade-btn {
+    font-size: 1rem;
+    padding: var(--spacing-sm) var(--spacing-lg);
+  }
+  
   .emotional-checkin-section {
     padding: var(--spacing-lg);
   }
@@ -1316,6 +1716,19 @@
     display: flex !important;
     justify-content: space-between !important;
     color: var(--text-secondary) !important;
+  }
+  
+  /* Mobile timeline lock adjustments */
+  .timeline-lock-icon {
+    font-size: 1.75rem;
+  }
+  
+  .timeline-lock-text {
+    font-size: 0.9rem;
+  }
+  
+  .timeline-lock-subtitle {
+    font-size: 0.8rem;
   }
   
   .journal-header {
@@ -1395,9 +1808,40 @@
     font-size: 0.9rem;
   }
   
-  .mastery-level-check, .mastery-level-current {
+  .mastery-level-check, .mastery-level-current, .mastery-level-lock {
     position: static;
     margin-top: var(--spacing-sm);
     align-self: center;
+  }
+  
+  /* Very small screen main timeline lock adjustments */
+  .main-timeline-lock-icon {
+    font-size: 2.5rem;
+  }
+  
+  .main-timeline-lock-text {
+    font-size: 1.25rem;
+  }
+  
+  .main-timeline-lock-subtitle {
+    font-size: 0.875rem;
+  }
+  
+  .main-timeline-upgrade-btn {
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  
+  /* Very small screen timeline lock adjustments */
+  .timeline-lock-icon {
+    font-size: 1.5rem;
+  }
+  
+  .timeline-lock-text {
+    font-size: 0.8rem;
+  }
+  
+  .timeline-lock-subtitle {
+    font-size: 0.75rem;
   }
 }
