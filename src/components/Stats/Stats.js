@@ -1,13 +1,16 @@
-// components/Stats/Stats.js - UPDATED: Smart Floating Toggle that shows only when relevant
+// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 // Import icons at the top
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
+
+// Import helmet image to match Timeline design
+import helmetImage from '../../assets/helmet.png';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
@@ -41,10 +44,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     { id: 'explicit_content', label: 'Explicit Content', icon: FaTheaterMasks }
   ];
   
-  // NEW: Smart scroll detection for floating toggle
+  // NEW: Smart scroll detection for floating toggle - ONLY for premium users
   useEffect(() => {
     const handleScroll = () => {
-      // Only show toggle if premium (since free users don't see insights)
+      // Only show toggle if premium (since free users don't see premium insights)
       if (!isPremium) {
         setShowFloatingToggle(false);
         return;
@@ -99,12 +102,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowBadgeModal(true);
   };
 
-  // Handle reset stats
+  // Handle reset stats - AVAILABLE TO ALL USERS
   const handleResetStats = () => {
     setShowResetConfirm(true);
   };
 
-  // Confirm reset stats
+  // Confirm reset stats - AVAILABLE TO ALL USERS
   const confirmResetStats = () => {
     // Reset all stats
     const resetUserData = {
@@ -134,6 +137,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     updateUserData(resetUserData);
     setShowResetConfirm(false);
     toast.success('All stats have been reset');
+  };
+
+  // ADDED: Premium upgrade handler
+  const handleUpgradeClick = () => {
+    toast.success('Premium upgrade coming soon! 🚀');
   };
   
   // Filter benefit data based on selected time range
@@ -717,8 +725,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   return (
     <div className="stats-container">
-      {/* Smart Floating Wisdom Toggle - Only shows when insights are visible */}
-      {showFloatingToggle && (
+      {/* Smart Floating Wisdom Toggle - Only shows for premium users when insights are visible */}
+      {showFloatingToggle && isPremium && (
         <button 
           className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
           onClick={() => setWisdomMode(!wisdomMode)}
@@ -728,7 +736,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </button>
       )}
 
-      {/* REDESIGNED: Header exactly like Tracker and Calendar */}
+      {/* Header exactly like Tracker and Calendar */}
       <div className="stats-header">
         <div className="stats-header-spacer"></div>
         <h2>Your Stats</h2>
@@ -740,7 +748,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* Reset Confirmation Modal */}
+      {/* Reset Confirmation Modal - AVAILABLE TO ALL USERS */}
       {showResetConfirm && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -754,7 +762,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
       
-      {/* Streak Statistics */}
+      {/* Streak Statistics - ALWAYS VISIBLE */}
       <div className="streak-stats">
         <div className="stat-card current-streak">
           <div className="stat-value">{userData.currentStreak || 0}</div>
@@ -777,7 +785,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* Milestone Badges */}
+      {/* Milestone Badges - ALWAYS VISIBLE */}
       <div className="milestone-section">
         <h3>Your Achievements</h3>
         
@@ -806,92 +814,146 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* REDESIGNED: Benefit Tracker Section with Sleep Quality */}
+      {/* PROGRESSIVE PREMIUM: Benefit Tracker Section */}
       <div className="benefit-tracker-section">
-        {isPremium ? (
-          <>
-            <h3>Benefit Tracker</h3>
+        <h3>Benefit Tracker</h3>
+        
+        {/* Controls - ALWAYS VISIBLE (so users can see different averages) */}
+        <div className="benefit-tracker-controls">
+          <div className="metric-selector">
+            {/* ROW 1: Energy, Focus, Confidence */}
+            <div className="metric-pill-container-row1">
+              <button 
+                className={`metric-btn ${selectedMetric === 'energy' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('energy')}
+              >
+                Energy
+              </button>
+              <button 
+                className={`metric-btn ${selectedMetric === 'focus' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('focus')}
+              >
+                Focus
+              </button>
+              <button 
+                className={`metric-btn ${selectedMetric === 'confidence' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('confidence')}
+              >
+                Confidence
+              </button>
+            </div>
             
-            {/* Controls with 3-row pill layout - UPDATED: Sleep Quality replaces Attraction */}
-            <div className="benefit-tracker-controls">
-              <div className="metric-selector">
-                {/* ROW 1: Energy, Focus, Confidence */}
-                <div className="metric-pill-container-row1">
-                  <button 
-                    className={`metric-btn ${selectedMetric === 'energy' ? 'active' : ''}`}
-                    onClick={() => setSelectedMetric('energy')}
-                  >
-                    Energy
-                  </button>
-                  <button 
-                    className={`metric-btn ${selectedMetric === 'focus' ? 'active' : ''}`}
-                    onClick={() => setSelectedMetric('focus')}
-                  >
-                    Focus
-                  </button>
-                  <button 
-                    className={`metric-btn ${selectedMetric === 'confidence' ? 'active' : ''}`}
-                    onClick={() => setSelectedMetric('confidence')}
-                  >
-                    Confidence
-                  </button>
-                </div>
-                
-                {/* ROW 2: Aura, Sleep Quality, Workout */}
-                <div className="metric-pill-container-row2">
-                  <button 
-                    className={`metric-btn ${selectedMetric === 'aura' ? 'active' : ''}`}
-                    onClick={() => setSelectedMetric('aura')}
-                  >
-                    Aura
-                  </button>
-                  <button 
-                    className={`metric-btn ${selectedMetric === 'sleep' ? 'active' : ''}`}
-                    onClick={() => setSelectedMetric('sleep')}
-                  >
-                    Sleep Quality
-                  </button>
-                  <button 
-                    className={`metric-btn ${selectedMetric === 'workout' ? 'active' : ''}`}
-                    onClick={() => setSelectedMetric('workout')}
-                  >
-                    Workout
-                  </button>
-                </div>
+            {/* ROW 2: Aura, Sleep Quality, Workout */}
+            <div className="metric-pill-container-row2">
+              <button 
+                className={`metric-btn ${selectedMetric === 'aura' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('aura')}
+              >
+                Aura
+              </button>
+              <button 
+                className={`metric-btn ${selectedMetric === 'sleep' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('sleep')}
+              >
+                Sleep Quality
+              </button>
+              <button 
+                className={`metric-btn ${selectedMetric === 'workout' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('workout')}
+              >
+                Workout
+              </button>
+            </div>
+          </div>
+          
+          {/* ROW 3: Time range selector - ALWAYS VISIBLE */}
+          <div className="time-range-selector-container">
+            <div className="time-range-selector">
+              <button 
+                className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
+                onClick={() => setTimeRange('week')}
+              >
+                Week
+              </button>
+              <button 
+                className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
+                onClick={() => setTimeRange('month')}
+              >
+                Month
+              </button>
+              <button 
+                className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
+                onClick={() => setTimeRange('quarter')}
+              >
+                3 Months
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* FREE USER CONTENT: Average + One Insight */}
+        {!isPremium && (
+          <div className="free-benefit-preview">
+            {/* Average Display */}
+            <div className="free-average-display">
+              <div className="current-metric-average">
+                <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric}</div>
+                <div className="current-metric-value">{calculateAverage()}/10</div>
               </div>
-              
-              {/* ROW 3: Time range selector */}
-              <div className="time-range-selector-container">
-                <div className="time-range-selector">
-                  <button 
-                    className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
-                    onClick={() => setTimeRange('week')}
-                  >
-                    Week
-                  </button>
-                  <button 
-                    className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
-                    onClick={() => setTimeRange('month')}
-                  >
-                    Month
-                  </button>
-                  <button 
-                    className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
-                    onClick={() => setTimeRange('quarter')}
-                  >
-                    3 Months
-                  </button>
+            </div>
+            
+            {/* Single Insight Preview */}
+            <div className="free-insight-preview">
+              <div className="current-insight-card">
+                <div className="current-insight-header">
+                  <FaRegLightbulb className="insight-icon" />
+                  <span>Sample Insight</span>
+                </div>
+                <div className="current-insight-text">
+                  {getCurrentInsight()}
                 </div>
               </div>
             </div>
             
-            {/* REDESIGNED: Chart with Sidebar Layout (Desktop) / Stacked (Mobile) */}
+            {/* Upgrade CTA */}
+            <div className="benefit-upgrade-cta">
+              <div className="upgrade-helmet-section">
+                <img 
+                  src={helmetImage} 
+                  alt="Premium" 
+                  className="upgrade-helmet-icon"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'block';
+                  }}
+                />
+                <FaLock 
+                  className="upgrade-helmet-fallback" 
+                  style={{ display: 'none' }}
+                />
+              </div>
+              <div className="upgrade-text-section">
+                <h4>Unlock Full Benefit Tracking</h4>
+                <p>See your progress chart, detailed comparisons, all 6 benefit insights, and pattern analysis</p>
+                <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
+                  <FaStar />
+                  Upgrade to Premium
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* PREMIUM CONTENT: Full Chart and Analysis */}
+        {isPremium && (
+          <>
+            {/* Chart with Sidebar Layout (Desktop) / Stacked (Mobile) */}
             <div className="chart-and-insight-container">
               <div className="chart-container">
                 <Line data={generateChartData()} options={chartOptions} height={300} />
               </div>
               
-              {/* Current Insight Sidebar (Desktop) / Card (Mobile) - REF MARKER for scroll detection */}
+              {/* Current Insight Sidebar - REF MARKER for scroll detection */}
               <div className="current-insight-sidebar" ref={insightsStartRef}>
                 <div className="current-metric-average">
                   <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric}</div>
@@ -910,7 +972,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* REDESIGNED: Detailed Analysis Section */}
+            {/* Detailed Analysis Section */}
             <div className="detailed-analysis-section">
               <h4>Detailed Analysis</h4>
               
@@ -954,71 +1016,32 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 </div>
               </div>
             </div>
-          </>
-        ) : (
-          <div className="premium-lock">
-            <div className="free-benefit-tracker">
-              <h4>Track Your Energy Levels</h4>
-              
-              <div className="benefit-rating">
-                <span>How's your energy today?</span>
-                
-                <div className="rating-slider">
-                  <input 
-                    type="range" 
-                    min="1" 
-                    max="10" 
-                    defaultValue="7" 
-                    className="range-slider"
-                  />
-                  <div className="rating-labels">
-                    <span>Low</span>
-                    <span>High</span>
-                  </div>
-                </div>
-                
-                <button className="btn btn-primary">Save Rating</button>
-              </div>
-              
-              <div className="limited-stats">
-                <p>Last 7 days average: <strong>7.5/10</strong></p>
-              </div>
-            </div>
             
-            <div className="premium-overlay">
-              <FaLock className="lock-icon" />
-              <div className="premium-message">
-                <h3>Unlock Full Benefit Tracking</h3>
-                <p>Premium members can track multiple benefits, view detailed graphs, and get personalized insights.</p>
-                <button className="btn btn-primary">Upgrade to Premium</button>
+            {/* Pattern Analysis Section - REF MARKER for scroll detection */}
+            <div className="pattern-analysis-section" ref={patternSectionRef}>
+              <h3>Pattern Insights</h3>
+              
+              <div className="pattern-insights">
+                {generatePatternInsights().length > 0 ? (
+                  generatePatternInsights().map(insight => (
+                    <div key={insight.id} className="pattern-insight-item">
+                      <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
+                      <div className="pattern-actionable">{insight.actionable}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-patterns">
+                    <FaInfoCircle className="no-patterns-icon" />
+                    <span>{wisdomMode ? 
+                      "Track more cycles to discover the deeper rhythms and cosmic patterns governing your journey." :
+                      "Track more cycles to identify behavioral patterns and optimize your approach."
+                    }</span>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          </>
         )}
-      </div>
-      
-      {/* UPDATED: Pattern Analysis Section with Wisdom Toggle - REF MARKER for scroll detection */}
-      <div className="pattern-analysis-section" ref={patternSectionRef}>
-        <h3>Pattern Insights</h3>
-        
-        <div className="pattern-insights">
-          {generatePatternInsights().length > 0 ? (
-            generatePatternInsights().map(insight => (
-              <div key={insight.id} className="pattern-insight-item">
-                <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
-                <div className="pattern-actionable">{insight.actionable}</div>
-              </div>
-            ))
-          ) : (
-            <div className="no-patterns">
-              <FaInfoCircle className="no-patterns-icon" />
-              <span>{wisdomMode ? 
-                "Track more cycles to discover the deeper rhythms and cosmic patterns governing your journey." :
-                "Track more cycles to identify behavioral patterns and optimize your approach."
-              }</span>
-            </div>
-          )}
-        </div>
       </div>
       
       {/* Badge Modal */}

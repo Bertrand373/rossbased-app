@@ -1,8 +1,23 @@
-/* components/Stats/Stats.css - UPDATED: Added Wisdom Toggle Styling */
+/* components/Stats/Stats.css - UPDATED: Added progressive premium lock styles */
 .stats-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+}
+
+/* Using CSS custom properties for progress bar colors */
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  background-color: #666666;
+}
+
+/* Use CSS custom property for dynamic coloring */
+.progress-fill-colored {
+  background-color: var(--phase-color) !important;
+  background: var(--phase-color) !important;
 }
 
 /* REDESIGNED: Header exactly matching Tracker and Calendar */
@@ -93,8 +108,6 @@
     font-size: 1.125rem;
   }
 }
-
-/* REVERTED: All section headers back to original styling */
 
 /* Streak Statistics - maintain consistent card heights */
 .streak-stats {
@@ -307,7 +320,7 @@
   max-width: 480px;
 }
 
-/* ROW 2: Aura, Attraction, Workout */
+/* ROW 2: Aura, Sleep Quality, Workout */
 .metric-pill-container-row2 {
   display: flex;
   gap: var(--spacing-xs);
@@ -356,6 +369,150 @@
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
 }
+
+/* ===== ADDED: FREE USER BENEFIT PREVIEW SECTION - PROGRESSIVE PREMIUM LOCK ===== */
+
+.free-benefit-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* FREE: Average Display - Same styling as premium sidebar */
+.free-average-display {
+  display: flex;
+  justify-content: center;
+}
+
+.free-average-display .current-metric-average {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: center;
+  padding: var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  min-height: 80px;
+  justify-content: center;
+  max-width: 300px;
+  width: 100%;
+}
+
+/* FREE: Single Insight Preview */
+.free-insight-preview {
+  display: flex;
+  justify-content: center;
+}
+
+.free-insight-preview .current-insight-card {
+  padding: var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  justify-content: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* NEW: Benefit Upgrade CTA - Matching Timeline early teaser design */
+.benefit-upgrade-cta {
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-top: 3px solid rgba(255, 221, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  text-align: left;
+}
+
+/* NEW: Benefit upgrade helmet - EXACT copy of Timeline early teaser helmet sizing */
+.upgrade-helmet-icon {
+  width: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
+  height: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
+  flex-shrink: 0;
+  animation: benefit-helmet-pulse 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+.upgrade-helmet-fallback {
+  font-size: 3.2rem; /* MATCH: Same as Timeline early-teaser-helmet-fallback */
+  color: var(--primary);
+  flex-shrink: 0;
+  animation: benefit-helmet-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes benefit-helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.upgrade-text-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.upgrade-text-section h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.upgrade-text-section p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* NEW: Benefit upgrade button - EXACT copy of Timeline early-teaser-upgrade-btn */
+.benefit-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl); /* MATCH: Same as Timeline */
+  background-color: var(--primary); /* MATCH: Same as Timeline */
+  border: none; /* MATCH: Same as Timeline */
+  border-radius: var(--radius-full);
+  color: #000000; /* MATCH: Same as Timeline */
+  font-size: 1.125rem; /* MATCH: Same as Timeline */
+  font-weight: 600; /* MATCH: Same as Timeline */
+  cursor: pointer;
+  transition: all 0.2s ease; /* MATCH: Same as Timeline */
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  min-width: 200px; /* MATCH: Same as Timeline */
+  min-height: 48px; /* MATCH: Same as Timeline */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Timeline */
+  align-self: flex-start;
+}
+
+.benefit-upgrade-btn:hover {
+  background-color: var(--primary-dark); /* MATCH: Same as Timeline */
+  transform: translateY(-2px); /* MATCH: Same as Timeline */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Timeline */
+  color: #000000; /* MATCH: Same as Timeline */
+}
+
+/* ===== END: FREE USER BENEFIT PREVIEW SECTION ===== */
 
 /* REDESIGNED: Chart and Insight Container - Mobile-first with Desktop Sidebar */
 .chart-and-insight-container {
@@ -419,19 +576,6 @@
   justify-content: center; /* ADDED: Vertically center all content */
 }
 
-/* REVERTED: Current Insight header back to original */
-.current-insight-card {
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  justify-content: center;
-}
-
 .current-insight-header {
   display: flex;
   align-items: center;
@@ -452,14 +596,6 @@
   line-height: 1.4;
   font-weight: 500;
   text-align: center;
-}
-
-.current-insight-text {
-  color: var(--text);
-  font-size: 0.875rem;
-  line-height: 1.4;
-  font-weight: 500;
-  text-align: center; /* CHANGED: Center-aligned the insight text */
 }
 
 /* REVERTED: Detailed Analysis section back to original */
@@ -1080,6 +1216,52 @@
     max-width: none;
     width: 100%;
   }
+
+  /* MOBILE RESPONSIVENESS for Progressive Premium */
+  /* Mobile benefit upgrade CTA adjustments */
+  .benefit-upgrade-cta {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-lg);
+  }
+
+  .upgrade-helmet-icon {
+    width: 70px; /* MATCH: Mobile scaling like Timeline */
+    height: 70px;
+  }
+
+  .upgrade-helmet-fallback {
+    font-size: 2.8rem; /* MATCH: Mobile scaling like Timeline */
+  }
+
+  .upgrade-text-section h4 {
+    font-size: 1.25rem;
+  }
+
+  .upgrade-text-section p {
+    font-size: 0.875rem;
+  }
+
+  .benefit-upgrade-btn {
+    font-size: 1rem; /* MATCH: Mobile size like Timeline */
+    padding: var(--spacing-md) var(--spacing-lg);
+    min-width: 180px; /* MATCH: Mobile width like Timeline */
+    min-height: 48px; /* MATCH: Mobile height like Timeline */
+    align-self: center;
+  }
+  
+  /* Mobile free benefit preview adjustments */
+  .free-average-display .current-metric-average {
+    max-width: 100%;
+    min-height: 100px;
+    padding: var(--spacing-md);
+  }
+  
+  .free-insight-preview .current-insight-card {
+    max-width: 100%;
+    min-height: 100px;
+    padding: var(--spacing-md);
+  }
   
   /* Mobile: Chart and insights remain stacked */
   .chart-container {
@@ -1188,6 +1370,35 @@
 
 /* VERY SMALL SCREENS: Further optimizations */
 @media (max-width: 480px) {
+  /* Very small screen benefit upgrade adjustments */
+  .upgrade-helmet-icon {
+    width: 60px; /* MATCH: Very small screen scaling like Timeline */
+    height: 60px;
+  }
+
+  .upgrade-helmet-fallback {
+    font-size: 2.4rem; /* MATCH: Very small screen scaling like Timeline */
+  }
+
+  .upgrade-text-section h4 {
+    font-size: 1.125rem;
+  }
+
+  .upgrade-text-section p {
+    font-size: 0.8rem;
+  }
+
+  .benefit-upgrade-btn {
+    font-size: 0.875rem; /* MATCH: Very small screen size like Timeline */
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 160px; /* MATCH: Very small screen width like Timeline */
+    min-height: 44px; /* MATCH: Very small screen height like Timeline */
+  }
+  
+  .benefit-upgrade-cta {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
   /* Hide icons on very small screens to prevent overflow */
   .current-insight-header .insight-icon,
   .insight-card-header .insight-icon {
