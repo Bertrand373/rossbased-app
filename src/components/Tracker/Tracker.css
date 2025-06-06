@@ -567,34 +567,35 @@ button.action-btn:hover {
   text-shadow: 0 0 6px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-/* NEW: Upgrade button in the helmet overlay */
+/* NEW: Upgrade button in the helmet overlay - LANDING PAGE LOGIN BUTTON STYLE */
 .single-lock-upgrade-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.2) 0%, rgba(255, 221, 0, 0.3) 100%);
-  border: 2px solid var(--primary);
+  padding: var(--spacing-md) var(--spacing-xl); /* LARGER: More substantial padding like login button */
+  background-color: var(--primary); /* BOLD: Solid yellow background like login button */
+  border: none; /* CLEAN: No border like login button */
   border-radius: var(--radius-full);
-  color: var(--primary);
-  font-size: 0.875rem;
-  font-weight: 700;
+  color: #000000; /* DARK: Black text on yellow background like login button */
+  font-size: 1.125rem; /* LARGER: Bigger text like login button */
+  font-weight: 600; /* BOLD: Strong weight like login button */
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+  transition: all 0.2s ease; /* SMOOTH: Animation like login button */
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  min-width: 160px;
+  min-width: 200px; /* WIDER: More substantial button */
+  min-height: 48px; /* TALLER: Better touch target */
   pointer-events: all; /* ENSURE: Button is clickable */
+  /* PREMIUM: Strong shadow like login button */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
 }
 
 .single-lock-upgrade-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.3) 0%, rgba(255, 221, 0, 0.4) 100%);
-  border-color: var(--primary-light);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 221, 0, 0.4);
-  color: #000000; /* ENHANCED: Dark text on hover for better contrast */
+  background-color: var(--primary-dark); /* DARKER: On hover like login button */
+  transform: translateY(-2px); /* LIFT: Hover animation like login button */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* ENHANCED: Stronger glow on hover like login button */
+  color: #000000; /* MAINTAIN: Dark text for contrast */
 }
 
 /* Enhanced pulsing animation for the helmet icon */
@@ -1243,11 +1244,12 @@ button.action-btn:hover {
     font-size: 0.8rem;
   }
   
-  /* Mobile upgrade button adjustments */
+  /* Mobile upgrade button adjustments - LANDING PAGE STYLE */
   .single-lock-upgrade-btn {
-    font-size: 0.8rem;
-    padding: var(--spacing-sm) var(--spacing-md);
-    min-width: 140px;
+    font-size: 1rem; /* LARGER: Bigger text on mobile like login button */
+    padding: var(--spacing-md) var(--spacing-lg); /* SUBSTANTIAL: Good padding on mobile */
+    min-width: 180px; /* WIDER: More prominent on mobile */
+    min-height: 48px; /* GOOD: Touch target height */
   }
   
   /* Mobile benefit actions */
@@ -1329,10 +1331,12 @@ button.action-btn:hover {
     font-size: 0.75rem;
   }
   
-  /* Very small screen upgrade button adjustments */
+  /* Very small screen upgrade button adjustments - LANDING PAGE STYLE */
   .single-lock-upgrade-btn {
-    font-size: 0.75rem;
-    min-width: 120px;
+    font-size: 0.875rem; /* READABLE: Good size on small screens */
+    padding: var(--spacing-sm) var(--spacing-md); /* COMPACT: But still substantial */
+    min-width: 160px; /* APPROPRIATE: Good width for small screens */
+    min-height: 44px; /* GOOD: Touch target */
   }
   
   .single-lock-fade-gradient {
