@@ -1,21 +1,20 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - UPDATED: Added premium lock overlays matching Tracker design */
+/* components/EmotionalTimeline/EmotionalTimeline.css - FIXED: Early premium lock with Tracker helmet styling */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* ULTRA FIX: Using CSS custom properties for progress bar colors */
+/* Using CSS custom properties for progress bar colors */
 .progress-fill {
   height: 100%;
   border-radius: var(--radius-full);
   transition: width 0.6s ease;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-  /* Default background - will be overridden by CSS custom property */
   background-color: #666666;
 }
 
-/* ULTRA OVERRIDE: Use CSS custom property for dynamic coloring */
+/* Use CSS custom property for dynamic coloring */
 .progress-fill-colored {
   background-color: var(--phase-color) !important;
   background: var(--phase-color) !important;
@@ -73,7 +72,7 @@
   cursor: not-allowed;
 }
 
-/* ADDED: Timeline content container for main premium lock */
+/* Timeline content container for premium locks */
 .timeline-content-container {
   position: relative;
   display: flex;
@@ -118,13 +117,12 @@
   gap: var(--spacing-lg);
 }
 
-/* FIXED: Phase icon with proper color inheritance */
+/* Phase icon with proper color inheritance */
 .phase-icon {
   font-size: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Color is set via inline style in the component */
 }
 
 .phase-info {
@@ -154,7 +152,7 @@
   text-align: center;
 }
 
-/* FIXED: Progress bar with proper background and NO hardcoded color */
+/* Progress bar with proper background */
 .phase-progress {
   order: 4;
   display: flex;
@@ -164,8 +162,8 @@
 
 .progress-bar {
   width: 100%;
-  height: 12px; /* INCREASED: Slightly thicker for better visibility */
-  background-color: rgba(255, 255, 255, 0.1); /* FIXED: Subtle background */
+  height: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-full);
   overflow: hidden;
   border: 1px solid var(--border);
@@ -203,6 +201,115 @@
   cursor: not-allowed;
 }
 
+/* NEW: Early Premium Teaser Section - Shown immediately after current phase */
+.early-premium-teaser {
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-top: 3px solid rgba(255, 221, 0, 0.3);
+}
+
+.early-teaser-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  text-align: left;
+}
+
+/* NEW: Early teaser helmet - EXACT copy of Tracker single-lock-icon sizing */
+.early-teaser-helmet {
+  width: 80px; /* MATCH: Same as Tracker single-lock-icon */
+  height: 80px; /* MATCH: Same as Tracker single-lock-icon */
+  flex-shrink: 0;
+  animation: early-helmet-pulse 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+.early-teaser-helmet-fallback {
+  font-size: 3.2rem; /* MATCH: Same as Tracker single-lock-icon-fallback */
+  color: var(--primary);
+  flex-shrink: 0;
+  animation: early-helmet-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes early-helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.early-teaser-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.early-teaser-text h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.early-teaser-text p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* NEW: Early teaser upgrade button - EXACT copy of Tracker single-lock-upgrade-btn */
+.early-teaser-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl); /* MATCH: Same as Tracker */
+  background-color: var(--primary); /* MATCH: Same as Tracker */
+  border: none; /* MATCH: Same as Tracker */
+  border-radius: var(--radius-full);
+  color: #000000; /* MATCH: Same as Tracker */
+  font-size: 1.125rem; /* MATCH: Same as Tracker */
+  font-weight: 600; /* MATCH: Same as Tracker */
+  cursor: pointer;
+  transition: all 0.2s ease; /* MATCH: Same as Tracker */
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  min-width: 200px; /* MATCH: Same as Tracker */
+  min-height: 48px; /* MATCH: Same as Tracker */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Tracker */
+  align-self: flex-start;
+}
+
+.early-teaser-upgrade-btn:hover {
+  background-color: var(--primary-dark); /* MATCH: Same as Tracker */
+  transform: translateY(-2px); /* MATCH: Same as Tracker */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Tracker */
+  color: #000000; /* MATCH: Same as Tracker */
+}
+
+/* Premium Features Section - Container for all premium content */
+.premium-features-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.premium-features-section.locked-features {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
 /* Timeline Overview - styled like Stats milestone section */
 .timeline-overview {
   display: flex;
@@ -224,7 +331,7 @@
   gap: var(--spacing-md);
 }
 
-/* FIXED: Timeline phases with proper color inheritance and lock states */
+/* Timeline phases with proper color inheritance and lock states */
 .timeline-phase {
   display: flex;
   align-items: center;
@@ -233,7 +340,6 @@
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-lg);
-  cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
@@ -257,17 +363,7 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
-.timeline-phase.locked {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.timeline-phase.locked:hover {
-  transform: none;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-}
-
-/* FIXED: Phase status styling with proper colors */
+/* Phase status styling with proper colors */
 .timeline-phase.completed {
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%);
   border: 1px solid rgba(34, 197, 94, 0.2);
@@ -288,7 +384,7 @@
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
 }
 
-/* FIXED: Timeline phase icon with color inheritance */
+/* Timeline phase icon with color inheritance */
 .timeline-phase-icon {
   font-size: 1.5rem;
   display: flex;
@@ -299,7 +395,6 @@
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
-  /* Color is set via inline style in the component */
 }
 
 .timeline-phase-info {
@@ -325,7 +420,7 @@
   flex-shrink: 0;
 }
 
-/* ADDED: Current phase indicator */
+/* Current phase indicator */
 .timeline-phase-current {
   font-size: 0.875rem;
   font-weight: 600;
@@ -333,17 +428,16 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   background-color: rgba(255, 221, 0, 0.2);
   border-radius: var(--radius-full);
-  /* Color is set via inline style in the component */
 }
 
-/* ADDED: Lock indicator for non-premium users */
+/* Lock indicator for non-premium users */
 .timeline-phase-lock {
   font-size: 1.125rem;
   color: var(--text-secondary);
   flex-shrink: 0;
 }
 
-/* ADDED: Mastery Levels Section */
+/* Mastery Levels Section */
 .mastery-levels-section {
   margin-top: var(--spacing-xl);
   padding-top: var(--spacing-xl);
@@ -409,16 +503,6 @@
 }
 
 .mastery-level-card.upcoming:hover {
-  transform: none;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-}
-
-.mastery-level-card.locked {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.mastery-level-card.locked:hover {
   transform: none;
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
 }
@@ -608,21 +692,7 @@
   transition: none;
 }
 
-/* ADDED: Emotion sliders container for premium lock */
-.emotion-sliders-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.emotion-sliders-container.premium-locked {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-md);
-}
-
-/* ULTRA FIXED: All emotional sliders use EXACT Tracker benefit spacing */
+/* TRACKER MATCH: All emotional sliders use EXACT Tracker benefit spacing and styling */
 .emotion-sliders {
   display: flex;
   flex-direction: column;
@@ -643,21 +713,21 @@
   margin-bottom: var(--spacing-xs);
 }
 
-/* 🎯 TRACKER MATCH: Emotion labels EXACTLY match Tracker benefit labels */
+/* TRACKER MATCH: Emotion labels EXACTLY match Tracker benefit labels */
 .emotion-label {
   font-weight: 600;
   color: var(--text);
   flex: 1;
   text-align: left;
-  font-size: 1rem !important; /* FIXED: Match Tracker exactly - was bigger */
+  font-size: 1rem !important;
   letter-spacing: 0.025em;
 }
 
-/* 🎯 TRACKER MATCH: Enhanced value display - EXACT copy from Tracker */
+/* TRACKER MATCH: Enhanced value display - EXACT copy from Tracker */
 .emotion-value {
   font-weight: 700;
-  color: var(--text) !important; /* FIXED: White text like Tracker - was yellow */
-  font-size: 0.9375rem !important; /* FIXED: Match Tracker exactly - was bigger */
+  color: var(--text) !important; /* FIXED: White text like Tracker */
+  font-size: 0.9375rem !important;
   background-color: rgba(255, 221, 0, 0.08);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
@@ -666,25 +736,24 @@
   border: 1px solid rgba(255, 221, 0, 0.15);
 }
 
-/* 🎯 TRACKER MATCH: Professional slider styling - EXACT COPY from Tracker */
+/* TRACKER MATCH: Professional slider styling - EXACT COPY from Tracker */
 .emotion-range-slider {
   -webkit-appearance: none;
   width: 100%;
   height: 28px;
   border-radius: var(--radius-full);
-  /* TRACKER MATCH: EXACT same refined gradient background */
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.15) 0%, 
     rgba(255, 221, 0, 0.08) 50%, 
     rgba(255, 221, 0, 0.12) 100%
   );
   outline: none;
-  transition: all 0.2s ease; /* TRACKER MATCH: Same transition */
+  transition: all 0.2s ease;
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); /* TRACKER MATCH: Same shadow */
-  border: 1px solid rgba(255, 255, 255, 0.03); /* TRACKER MATCH: Same border */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.03);
   margin-bottom: 0px !important;
 }
 
@@ -716,25 +785,25 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%); /* TRACKER MATCH: Same muted yellow */
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* TRACKER MATCH: Same shadow */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
-  transition: all 0.15s ease; /* TRACKER MATCH: Same transition */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* TRACKER MATCH: Same border */
+  transition: all 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* TRACKER MATCH: Subtler thumb hover - EXACT COPY */
 .emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.05); /* TRACKER MATCH: Same scaling */
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* TRACKER MATCH: Same shadow */
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%); /* TRACKER MATCH: Same highlight */
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
 /* TRACKER MATCH: Professional active state - EXACT COPY */
 .emotion-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.02); /* TRACKER MATCH: Same scaling */
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25); /* TRACKER MATCH: Same shadow */
+  transform: scale(1.02);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
 /* TRACKER MATCH: Professional Firefox thumb - EXACT COPY */
@@ -742,64 +811,47 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%); /* TRACKER MATCH: Same muted yellow */
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1); /* TRACKER MATCH: Same border */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* TRACKER MATCH: Same shadow */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
-  transition: all 0.15s ease; /* TRACKER MATCH: Same transition */
+  transition: all 0.15s ease;
 }
 
 /* TRACKER MATCH: Firefox thumb hover - EXACT COPY */
 .emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.05); /* TRACKER MATCH: Same scaling */
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* TRACKER MATCH: Same shadow */
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%); /* TRACKER MATCH: Same highlight */
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
-/* ⭐ TRACKER MATCH: Timeline slider labels now EXACTLY match Tracker spacing ⭐ */
-
-/* Step 1: Target emotional timeline sliders with maximum specificity */
+/* TRACKER MATCH: Timeline slider labels now EXACTLY match Tracker spacing */
 .emotional-timeline-container .emotional-checkin-section .emotion-sliders .emotion-slider-item .slider-labels,
 .emotion-sliders .emotion-slider-item .slider-labels,
 .emotional-checkin-section .emotion-sliders .slider-labels,
 .emotional-timeline-container .emotion-sliders .slider-labels {
-  /* TRACKER MATCH: Copy Tracker spacing EXACTLY with maximum specificity */
   display: flex !important;
   justify-content: space-between !important;
   font-size: 0.8125rem !important;
   color: var(--text-secondary) !important;
-  
-  /* THE MONEY SHOT: Perfect Tracker spacing with nuclear overrides */
   margin-top: 8px !important;
   margin-bottom: 0px !important;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   line-height: 1 !important;
-  transform: none !important; /* Remove any transforms that cause issues */
+  transform: none !important;
   padding-left: 14px !important;
   padding-right: 14px !important;
   font-weight: 500 !important;
   letter-spacing: 0.025em !important;
-  
-  /* Extra insurance overrides */
   position: relative !important;
   z-index: 1 !important;
   width: 100% !important;
   box-sizing: border-box !important;
 }
 
-/* Step 2: Override any competing margin/padding rules with even more specificity */
-.emotional-timeline-container .emotional-checkin-section .emotion-sliders .emotion-slider-item .slider-labels,
-.emotional-timeline-container .emotion-sliders .emotion-slider-item .slider-labels {
-  margin-top: 8px !important;
-  margin-bottom: 0px !important;
-  transform: none !important;
-  margin-left: 0px !important;
-  margin-right: 0px !important;
-}
-
-/* Step 3: Apply the same color scheme as Tracker with maximum specificity */
+/* TRACKER MATCH: Color scheme for slider labels */
 .emotional-checkin-section .emotion-slider-item:nth-child(1) .slider-labels span:first-child,
 .emotional-checkin-section .emotion-slider-item:nth-child(2) .slider-labels span:first-child,
 .emotional-checkin-section .emotion-slider-item:nth-child(3) .slider-labels span:first-child,
@@ -808,7 +860,7 @@
 .emotional-timeline-container .emotion-slider-item:nth-child(2) .slider-labels span:first-child,
 .emotional-timeline-container .emotion-slider-item:nth-child(3) .slider-labels span:first-child,
 .emotional-timeline-container .emotion-slider-item:nth-child(4) .slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8) !important; /* TRACKER MATCH: Same gray for "negative" states */
+  color: rgba(156, 163, 175, 0.8) !important;
 }
 
 .emotional-checkin-section .emotion-slider-item:nth-child(1) .slider-labels span:last-child,
@@ -819,206 +871,7 @@
 .emotional-timeline-container .emotion-slider-item:nth-child(2) .slider-labels span:last-child,
 .emotional-timeline-container .emotion-slider-item:nth-child(3) .slider-labels span:last-child,
 .emotional-timeline-container .emotion-slider-item:nth-child(4) .slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.7) !important; /* TRACKER MATCH: Same refined yellow for "positive" states */
-}
-
-/* ADDED: Timeline-specific premium lock overlay for emotion sliders */
-.timeline-premium-lock-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  pointer-events: none;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.timeline-lock-fade-gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  /* Beautiful radial gradient that fades more gradually for better premium feel */
-  background: radial-gradient(
-    ellipse at center,
-    rgba(51, 51, 51, 0.92) 0%,     /* High opacity at center */
-    rgba(51, 51, 51, 0.88) 20%,    /* Still very opaque */
-    rgba(51, 51, 51, 0.75) 40%,    /* Medium-high opacity */
-    rgba(51, 51, 51, 0.5) 60%,     /* Medium opacity */
-    rgba(51, 51, 51, 0.25) 80%,    /* Lower opacity */
-    rgba(51, 51, 51, 0.1) 95%,     /* Very transparent */
-    rgba(51, 51, 51, 0) 100%       /* Completely transparent at edges */
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Enhanced backdrop blur for premium feel */
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-
-.timeline-lock-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-  text-align: center;
-  /* Enhanced glow effect around the entire lock section */
-  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6));
-  padding: var(--spacing-lg);
-}
-
-.timeline-lock-icon {
-  font-size: 2rem;
-  color: var(--primary);
-  margin-bottom: var(--spacing-sm);
-  /* Enhanced pulsing animation */
-  animation: timeline-lock-pulse 2.5s ease-in-out infinite;
-}
-
-.timeline-lock-text {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: var(--spacing-xs);
-  /* Subtle text shadow for better readability */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-.timeline-lock-subtitle {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: 0.5px;
-  /* Subtle text shadow for better readability */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-}
-
-/* Enhanced pulsing animation for the timeline lock icon */
-@keyframes timeline-lock-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.98);
-  }
-}
-
-/* ADDED: Main timeline premium lock overlay */
-.main-timeline-premium-lock-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  pointer-events: all;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.main-timeline-lock-fade-gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  /* Stronger gradient for main lock overlay */
-  background: radial-gradient(
-    ellipse at center,
-    rgba(51, 51, 51, 0.95) 0%,     
-    rgba(51, 51, 51, 0.92) 20%,    
-    rgba(51, 51, 51, 0.85) 40%,    
-    rgba(51, 51, 51, 0.7) 60%,     
-    rgba(51, 51, 51, 0.4) 80%,    
-    rgba(51, 51, 51, 0.15) 95%,     
-    rgba(51, 51, 51, 0) 100%       
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-}
-
-.main-timeline-lock-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-lg);
-  text-align: center;
-  filter: drop-shadow(0 0 16px rgba(255, 221, 0, 0.8));
-  padding: var(--spacing-xl);
-}
-
-.main-timeline-lock-icon {
-  font-size: 4rem;
-  color: var(--primary);
-  margin-bottom: var(--spacing-md);
-  animation: main-timeline-lock-pulse 2s ease-in-out infinite;
-}
-
-.main-timeline-lock-text {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: var(--spacing-sm);
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
-}
-
-.main-timeline-lock-subtitle {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: 1px;
-  margin-bottom: var(--spacing-lg);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-}
-
-.main-timeline-upgrade-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.3) 100%);
-  border: 2px solid var(--primary);
-  border-radius: var(--radius-full);
-  color: var(--primary);
-  font-size: 1.125rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(255, 221, 0, 0.3);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.main-timeline-upgrade-btn:hover {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.4) 100%);
-  border-color: var(--primary-light);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 221, 0, 0.4);
-}
-
-@keyframes main-timeline-lock-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(0.95);
-  }
+  color: rgba(255, 221, 0, 0.7) !important;
 }
 
 .emotion-actions {
@@ -1027,29 +880,29 @@
   margin-top: var(--spacing-lg);
 }
 
-/* TRACKER MATCH: Professional save button - EXACT COPY from refined Tracker */
+/* TRACKER MATCH: Professional save button - EXACT COPY from Tracker */
 .save-emotions-btn {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.08) 0%, rgba(255, 221, 0, 0.12) 100%); /* TRACKER MATCH: Same opacity */
-  border: 1px solid rgba(255, 221, 0, 0.2); /* TRACKER MATCH: Same border */
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.08) 0%, rgba(255, 221, 0, 0.12) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
   border-radius: var(--radius-full);
   color: var(--primary);
   padding: var(--spacing-md) var(--spacing-xl);
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease; /* TRACKER MATCH: Same transition */
-  box-shadow: 0 2px 6px rgba(255, 221, 0, 0.08); /* TRACKER MATCH: Same shadow */
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(255, 221, 0, 0.08);
   letter-spacing: 0.025em;
 }
 
 .save-emotions-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.12) 0%, rgba(255, 221, 0, 0.16) 100%); /* TRACKER MATCH: Same hover */
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.12) 0%, rgba(255, 221, 0, 0.16) 100%);
   border-color: rgba(255, 221, 0, 0.25);
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(255, 221, 0, 0.15); /* TRACKER MATCH: Same hover shadow */
+  box-shadow: 0 4px 10px rgba(255, 221, 0, 0.15);
 }
 
-/* ADDED: Upgrade button for emotion tracking */
+/* Upgrade button for emotion tracking */
 .upgrade-emotions-btn {
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
   border: 1px solid rgba(251, 191, 36, 0.3);
@@ -1172,7 +1025,7 @@
   border: 1px solid var(--border);
 }
 
-/* ADDED: Journal premium teaser */
+/* Journal premium teaser */
 .journal-premium-teaser {
   display: flex;
   flex-direction: column;
@@ -1191,28 +1044,6 @@
   font-size: 2rem;
   color: var(--primary);
   margin-bottom: var(--spacing-sm);
-}
-
-.upgrade-journal-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  border-radius: var(--radius-full);
-  color: #f59e0b;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.upgrade-journal-btn:hover {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.2) 100%);
-  border-color: rgba(251, 191, 36, 0.4);
-  transform: translateY(-1px);
 }
 
 /* Phase Insight Section - styled like Stats insight cards */
@@ -1279,7 +1110,7 @@
   text-align: center;
 }
 
-/* ADDED: Insight premium teaser */
+/* Insight premium teaser */
 .insight-premium-teaser {
   display: flex;
   flex-direction: column;
@@ -1298,26 +1129,138 @@
   margin-bottom: var(--spacing-sm);
 }
 
-.upgrade-insight-btn {
+/* NEW: Main Premium Helmet Overlay - EXACT copy of Tracker styling */
+.main-premium-helmet-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  pointer-events: all;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.main-helmet-fade-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* TRACKER MATCH: Beautiful radial gradient that fades more gradually for better premium feel */
+  background: radial-gradient(
+    ellipse at center,
+    rgba(51, 51, 51, 0.92) 0%,     /* High opacity at center */
+    rgba(51, 51, 51, 0.88) 20%,    /* Still very opaque */
+    rgba(51, 51, 51, 0.75) 40%,    /* Medium-high opacity */
+    rgba(51, 51, 51, 0.5) 60%,     /* Medium opacity */
+    rgba(51, 51, 51, 0.25) 80%,    /* Lower opacity */
+    rgba(51, 51, 51, 0.1) 95%,     /* Very transparent */
+    rgba(51, 51, 51, 0) 100%       /* Completely transparent at edges */
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* TRACKER MATCH: Enhanced backdrop blur for premium feel */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.main-helmet-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
+  /* TRACKER MATCH: Enhanced glow effect around the entire lock section */
+  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6));
+  padding: var(--spacing-lg);
+  pointer-events: all;
+}
+
+/* NEW: Main helmet image - EXACT copy of Tracker single-lock-icon sizing */
+.main-helmet-icon {
+  width: 80px; /* MATCH: Same as Tracker single-lock-icon */
+  height: 80px; /* MATCH: Same as Tracker single-lock-icon */
+  margin-bottom: var(--spacing-xs);
+  /* TRACKER MATCH: Enhanced pulsing animation */
+  animation: main-helmet-pulse 2.5s ease-in-out infinite;
+  /* TRACKER MATCH: Enhanced glow effect for the helmet */
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+/* NEW: Fallback for when helmet image fails to load - EXACT copy of Tracker sizing */
+.main-helmet-icon-fallback {
+  font-size: 3.2rem; /* MATCH: Same as Tracker single-lock-icon-fallback */
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+  /* TRACKER MATCH: Enhanced pulsing animation */
+  animation: main-helmet-pulse 2.5s ease-in-out infinite;
+}
+
+.main-helmet-text {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-xs);
+  /* TRACKER MATCH: Subtle but readable glow behind text */
+  text-shadow: 0 0 8px rgba(255, 221, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.main-helmet-subtitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-md);
+  /* TRACKER MATCH: Subtle glow for readability without being too flashy */
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* NEW: Main upgrade button - EXACT copy of Tracker single-lock-upgrade-btn */
+.main-helmet-upgrade-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  padding: var(--spacing-md) var(--spacing-xl); /* MATCH: Same as Tracker */
+  background-color: var(--primary); /* MATCH: Same as Tracker */
+  border: none; /* MATCH: Same as Tracker */
   border-radius: var(--radius-full);
-  color: #f59e0b;
-  font-size: 0.875rem;
-  font-weight: 600;
+  color: #000000; /* MATCH: Same as Tracker */
+  font-size: 1.125rem; /* MATCH: Same as Tracker */
+  font-weight: 600; /* MATCH: Same as Tracker */
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease; /* MATCH: Same as Tracker */
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  min-width: 200px; /* MATCH: Same as Tracker */
+  min-height: 48px; /* MATCH: Same as Tracker */
+  pointer-events: all;
+  /* MATCH: Strong shadow like Tracker */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
 }
 
-.upgrade-insight-btn:hover {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.2) 100%);
-  border-color: rgba(251, 191, 36, 0.4);
-  transform: translateY(-1px);
+.main-helmet-upgrade-btn:hover {
+  background-color: var(--primary-dark); /* MATCH: Same as Tracker */
+  transform: translateY(-2px); /* MATCH: Same as Tracker */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Tracker */
+  color: #000000; /* MATCH: Same as Tracker */
+}
+
+/* TRACKER MATCH: Enhanced pulsing animation for the helmet icon */
+@keyframes main-helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
 }
 
 /* Phase Detail Modal */
@@ -1344,13 +1287,12 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* FIXED: Phase modal icon with color inheritance */
+/* Phase modal icon with color inheritance */
 .phase-modal-icon {
   font-size: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Color is set via inline style in the component */
 }
 
 .phase-modal-info h3 {
@@ -1565,6 +1507,38 @@
     width: 100%;
     justify-content: center;
   }
+
+  /* Mobile early premium teaser adjustments */
+  .early-teaser-content {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-lg);
+  }
+
+  .early-teaser-helmet {
+    width: 70px; /* MATCH: Mobile scaling like Tracker */
+    height: 70px;
+  }
+
+  .early-teaser-helmet-fallback {
+    font-size: 2.8rem; /* MATCH: Mobile scaling like Tracker */
+  }
+
+  .early-teaser-text h3 {
+    font-size: 1.25rem;
+  }
+
+  .early-teaser-text p {
+    font-size: 0.875rem;
+  }
+
+  .early-teaser-upgrade-btn {
+    font-size: 1rem; /* MATCH: Mobile size like Tracker */
+    padding: var(--spacing-md) var(--spacing-lg);
+    min-width: 180px; /* MATCH: Mobile width like Tracker */
+    min-height: 48px; /* MATCH: Mobile height like Tracker */
+    align-self: center;
+  }
   
   .phase-icon-section {
     flex-direction: column;
@@ -1634,23 +1608,29 @@
     padding: 2px var(--spacing-xs);
   }
   
-  /* Mobile main timeline lock adjustments */
-  .main-timeline-lock-icon {
-    font-size: 3rem;
+  /* Mobile main timeline helmet adjustments - MATCH Tracker sizing */
+  .main-helmet-icon {
+    width: 70px; /* MATCH: Same as Tracker mobile */
+    height: 70px;
   }
   
-  .main-timeline-lock-text {
-    font-size: 1.5rem;
-    letter-spacing: 1px;
+  .main-helmet-icon-fallback {
+    font-size: 2.8rem; /* MATCH: Same as Tracker mobile */
   }
   
-  .main-timeline-lock-subtitle {
+  .main-helmet-text {
     font-size: 1rem;
   }
   
-  .main-timeline-upgrade-btn {
-    font-size: 1rem;
-    padding: var(--spacing-sm) var(--spacing-lg);
+  .main-helmet-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .main-helmet-upgrade-btn {
+    font-size: 1rem; /* MATCH: Same as Tracker mobile */
+    padding: var(--spacing-md) var(--spacing-lg);
+    min-width: 180px; /* MATCH: Same as Tracker mobile */
+    min-height: 48px; /* MATCH: Same as Tracker mobile */
   }
   
   .emotional-checkin-section {
@@ -1672,13 +1652,13 @@
     margin-top: var(--spacing-sm);
   }
   
-  /* 🎯 TRACKER MATCH: Mobile emotion labels and values EXACTLY match Tracker mobile sizing */
+  /* TRACKER MATCH: Mobile emotion labels and values EXACTLY match Tracker mobile sizing */
   .emotion-label {
-    font-size: 0.875rem !important; /* FIXED: Match Tracker mobile size exactly */
+    font-size: 0.875rem !important;
   }
   
   .emotion-value {
-    font-size: 0.8rem !important; /* FIXED: Match Tracker mobile size exactly */
+    font-size: 0.8rem !important;
   }
   
   /* TRACKER MATCH: Mobile slider adjustments with professional styling - EXACT COPY */
@@ -1701,7 +1681,6 @@
   .emotion-sliders .emotion-slider-item .slider-labels,
   .emotional-checkin-section .emotion-sliders .slider-labels,
   .emotional-timeline-container .emotion-sliders .slider-labels {
-    /* TRACKER MATCH: Mobile spacing */
     margin-top: 10px !important;
     margin-bottom: 0px !important;
     padding-top: 0px !important;
@@ -1716,19 +1695,6 @@
     display: flex !important;
     justify-content: space-between !important;
     color: var(--text-secondary) !important;
-  }
-  
-  /* Mobile timeline lock adjustments */
-  .timeline-lock-icon {
-    font-size: 1.75rem;
-  }
-  
-  .timeline-lock-text {
-    font-size: 0.9rem;
-  }
-  
-  .timeline-lock-subtitle {
-    font-size: 0.8rem;
   }
   
   .journal-header {
@@ -1813,35 +1779,54 @@
     margin-top: var(--spacing-sm);
     align-self: center;
   }
-  
-  /* Very small screen main timeline lock adjustments */
-  .main-timeline-lock-icon {
-    font-size: 2.5rem;
+
+  /* Very small screen early premium teaser adjustments */
+  .early-teaser-helmet {
+    width: 60px; /* MATCH: Very small screen scaling like Tracker */
+    height: 60px;
   }
-  
-  .main-timeline-lock-text {
-    font-size: 1.25rem;
+
+  .early-teaser-helmet-fallback {
+    font-size: 2.4rem; /* MATCH: Very small screen scaling like Tracker */
   }
-  
-  .main-timeline-lock-subtitle {
-    font-size: 0.875rem;
+
+  .early-teaser-text h3 {
+    font-size: 1.125rem;
   }
-  
-  .main-timeline-upgrade-btn {
-    font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-  
-  /* Very small screen timeline lock adjustments */
-  .timeline-lock-icon {
-    font-size: 1.5rem;
-  }
-  
-  .timeline-lock-text {
+
+  .early-teaser-text p {
     font-size: 0.8rem;
   }
+
+  .early-teaser-upgrade-btn {
+    font-size: 0.875rem; /* MATCH: Very small screen size like Tracker */
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 160px; /* MATCH: Very small screen width like Tracker */
+    min-height: 44px; /* MATCH: Very small screen height like Tracker */
+  }
   
-  .timeline-lock-subtitle {
+  /* Very small screen main timeline helmet adjustments - MATCH Tracker sizing */
+  .main-helmet-icon {
+    width: 60px; /* MATCH: Same as Tracker very small screen */
+    height: 60px;
+  }
+  
+  .main-helmet-icon-fallback {
+    font-size: 2.4rem; /* MATCH: Same as Tracker very small screen */
+  }
+  
+  .main-helmet-text {
+    font-size: 0.9rem;
+  }
+  
+  .main-helmet-subtitle {
     font-size: 0.75rem;
+  }
+  
+  .main-helmet-upgrade-btn {
+    font-size: 0.875rem; /* MATCH: Same as Tracker very small screen */
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 160px; /* MATCH: Same as Tracker very small screen */
+    min-height: 44px; /* MATCH: Same as Tracker very small screen */
   }
 }
