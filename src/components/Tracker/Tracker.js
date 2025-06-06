@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - FIXED: Complete file with no syntax errors
+// components/Tracker/Tracker.js - UPDATED: Uses helmet image for premium overlay
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +26,9 @@ import {
   FaLock,
   FaStar
 } from 'react-icons/fa';
+
+// Import helmet image
+import helmetImage from '../../assets/helmet.png';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
   const navigate = useNavigate();
@@ -375,7 +378,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* UPDATED: Benefit Logging Section with Single Premium Lock Overlay */}
+      {/* UPDATED: Benefit Logging Section with Single Premium Helmet Overlay */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -402,7 +405,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* UPDATED: Premium Benefits Container with Single Lock Overlay */}
+          {/* UPDATED: Premium Benefits Container with Single Helmet Overlay */}
           <div className="premium-benefits-container">
             {/* Energy Slider - FREE for all users (outside premium container) */}
             <div className="benefit-slider-item">
@@ -425,7 +428,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               </div>
             </div>
             
-            {/* PREMIUM BENEFITS SECTION - All 5 sliders with single overlay */}
+            {/* PREMIUM BENEFITS SECTION - All 5 sliders with single helmet overlay */}
             <div className={`premium-benefits-section ${!isPremium ? 'premium-locked' : ''}`}>
               {/* PREMIUM LOCKED SLIDERS */}
               {[
@@ -456,12 +459,25 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 </div>
               ))}
               
-              {/* ENHANCED: SINGLE PREMIUM LOCK OVERLAY covering all 5 sliders with upgrade button */}
+              {/* ENHANCED: SINGLE PREMIUM HELMET OVERLAY covering all 5 sliders with upgrade button */}
               {!isPremium && (
                 <div className="single-premium-lock-overlay">
                   <div className="single-lock-fade-gradient">
                     <div className="single-lock-center">
-                      <FaLock className="single-lock-icon" />
+                      <img 
+                        src={helmetImage} 
+                        alt="Premium" 
+                        className="single-lock-icon"
+                        onError={(e) => {
+                          // Fallback to lock icon if helmet image fails to load
+                          e.target.style.display = 'none';
+                          e.target.nextElementSibling.style.display = 'block';
+                        }}
+                      />
+                      <FaLock 
+                        className="single-lock-icon-fallback" 
+                        style={{ display: 'none' }}
+                      />
                       <span className="single-lock-text">Premium</span>
                       <span className="single-lock-subtitle">Unlock Full Benefits Tracking</span>
                       <button className="single-lock-upgrade-btn" onClick={handleUpgradeClick}>

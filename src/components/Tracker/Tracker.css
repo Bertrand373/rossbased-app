@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Enhanced single premium lock overlay with upgrade button */
+/* components/Tracker/Tracker.css - UPDATED: Enhanced single premium overlay with HELMET instead of lock */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -334,7 +334,7 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
 }
 
-/* NEW: Premium Benefits Section with Single Lock Overlay */
+/* NEW: Premium Benefits Section with Single Helmet Overlay */
 .premium-benefits-section {
   position: relative;
   display: flex;
@@ -476,7 +476,7 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
-/* 🎯 ENHANCED: SINGLE PREMIUM LOCK OVERLAY - Elegant and prominent with upgrade button */
+/* 🎯 ENHANCED: SINGLE PREMIUM HELMET OVERLAY - Elegant and prominent with upgrade button */
 .single-premium-lock-overlay {
   position: absolute;
   top: 0;
@@ -526,12 +526,24 @@ button.action-btn:hover {
   pointer-events: all; /* ADDED: Allow button clicks */
 }
 
+/* NEW: Helmet Image instead of Lock Icon */
 .single-lock-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--spacing-sm);
+  /* Enhanced pulsing animation */
+  animation: single-helmet-pulse 2.5s ease-in-out infinite;
+  /* Enhanced glow effect for the helmet */
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+/* NEW: Fallback for when helmet image fails to load */
+.single-lock-icon-fallback {
   font-size: 2.5rem;
   color: var(--primary);
   margin-bottom: var(--spacing-sm);
   /* Enhanced pulsing animation */
-  animation: single-lock-pulse 2.5s ease-in-out infinite;
+  animation: single-helmet-pulse 2.5s ease-in-out infinite;
 }
 
 .single-lock-text {
@@ -555,7 +567,7 @@ button.action-btn:hover {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-/* NEW: Upgrade button in the lock overlay */
+/* NEW: Upgrade button in the helmet overlay */
 .single-lock-upgrade-btn {
   display: flex;
   align-items: center;
@@ -585,8 +597,8 @@ button.action-btn:hover {
   color: #000000; /* ENHANCED: Dark text on hover for better contrast */
 }
 
-/* Enhanced pulsing animation for the single lock icon */
-@keyframes single-lock-pulse {
+/* Enhanced pulsing animation for the helmet icon */
+@keyframes single-helmet-pulse {
   0%, 100% {
     opacity: 1;
     transform: scale(1);
@@ -1217,9 +1229,10 @@ button.action-btn:hover {
     color: var(--text-secondary) !important;
   }
   
-  /* Mobile single premium lock adjustments */
+  /* Mobile single premium helmet adjustments */
   .single-lock-icon {
-    font-size: 2rem;
+    width: 56px;
+    height: 56px;
   }
   
   .single-lock-text {
@@ -1302,9 +1315,10 @@ button.action-btn:hover {
     max-width: 120px;
   }
   
-  /* Very small screen single premium lock adjustments */
+  /* Very small screen single premium helmet adjustments */
   .single-lock-icon {
-    font-size: 1.75rem;
+    width: 48px;
+    height: 48px;
   }
   
   .single-lock-text {
