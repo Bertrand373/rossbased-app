@@ -1,4 +1,6 @@
-// components/UrgeToolkit/UrgeToolkit.js - FIXED: Breathing animation, text alternation, and removed UrgeMini
+// Updated UrgeToolkit.js with COMPLETE premium lock - no free access
+
+// components/UrgeToolkit/UrgeToolkit.js - COMPLETE premium lock matching Timeline
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -10,19 +12,19 @@ import { FaShieldAlt, FaExclamationTriangle, FaBolt, FaBrain, FaHeart,
   FaTimes, FaInfoCircle, FaStopwatch, FaLeaf, FaLightbulb, FaTrophy } from 'react-icons/fa';
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
-  // Core States - Simplified
+  // Core States for premium users only
   const [currentStep, setCurrentStep] = useState('assessment'); // assessment, protocol, tools, summary
   const [urgeIntensity, setUrgeIntensity] = useState(0);
   const [activeProtocol, setActiveProtocol] = useState(null);
   const [selectedTrigger, setSelectedTrigger] = useState('');
   
-  // FIXED: Proper session timing
+  // Session timing states
   const [sessionStartTime, setSessionStartTime] = useState(null);
   const [protocolStartTime, setProtocolStartTime] = useState(null);
   const [totalActiveTime, setTotalActiveTime] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
   
-  // FIXED: Breathing Protocol States
+  // Breathing Protocol States
   const [breathingActive, setBreathingActive] = useState(false);
   const [breathingPhase, setBreathingPhase] = useState('ready'); // ready, inhale, exhale, complete
   const [breathingCount, setBreathingCount] = useState(0);
@@ -31,196 +33,100 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   // Timer ref
   const breathingIntervalRef = useRef(null);
   
-  // FIXED: Use current streak instead of calculated difference
-  const currentDay = userData.currentStreak || 0;
+  // Get current streak and phase info
+  const currentDay = userData.currentStreak || 1;
+  const getPhaseInfo = (day) => {
+    if (day <= 7) return { name: 'Detox', icon: FaShieldAlt, color: '#ef4444' };
+    if (day <= 30) return { name: 'Withdrawal', icon: FaExclamationTriangle, color: '#f59e0b' };
+    if (day <= 90) return { name: 'Recovery', icon: FaBolt, color: '#10b981' };
+    if (day <= 365) return { name: 'Growth', icon: FaBrain, color: '#3b82f6' };
+    return { name: 'Mastery', icon: FaTrophy, color: '#8b5cf6' };
+  };
+  
+  const currentPhase = getPhaseInfo(currentDay);
 
-  // Get current phase info (matching Timeline exactly)
-  const getCurrentPhase = () => {
-    if (currentDay <= 14) {
-      return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
-    } else if (currentDay <= 45) {
-      return { name: "Emotional Purging", icon: FaHeart, color: "#f59e0b" };
-    } else if (currentDay <= 90) {
-      return { name: "Mental Expansion", icon: FaBrain, color: "#3b82f6" };
-    } else if (currentDay <= 180) {
-      return { name: "Spiritual Integration", icon: FaLightbulb, color: "#8b5cf6" };
-    } else {
-      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
-    }
+  // Premium upgrade handler
+  const handleUpgradeClick = () => {
+    toast.success('Premium upgrade coming soon! 🚀');
   };
 
-  const currentPhase = getCurrentPhase();
-
-  // Simplified trigger options
-  const triggerOptions = [
-    { id: 'thoughts', label: 'Lustful Thoughts', icon: FaBrain },
-    { id: 'content', label: 'Explicit Content', icon: FaExclamationTriangle },
-    { id: 'stress', label: 'Stress/Anxiety', icon: FaStopwatch },
-    { id: 'boredom', label: 'Boredom', icon: FaInfoCircle },
-    { id: 'loneliness', label: 'Loneliness', icon: FaHeart },
-    { id: 'other', label: 'Other Trigger', icon: FaBolt }
-  ];
-
-  // Clean protocol definitions
+  // PREMIUM ONLY: Full protocol system
   const protocols = {
-    breathing: {
-      name: "Emergency Breathing",
-      duration: "2-3 minutes",
-      description: "Physiological reset using controlled breathing",
-      bestFor: "High intensity urges, anxiety, physical arousal"
-    },
     mental: {
-      name: "Mental Redirection",
-      duration: "1-2 minutes", 
-      description: "Cognitive techniques to break thought patterns",
-      bestFor: "Intrusive thoughts, mental loops, mild urges"
+      name: 'Mental Redirection',
+      description: 'Cognitive techniques to redirect thoughts',
+      duration: '5-10 minutes',
+      icon: FaBrain,
+      color: '#3b82f6',
+      steps: [
+        'Acknowledge the urge without judgment',
+        'Practice the 5-4-3-2-1 grounding technique',
+        'Engage in complex mental math or puzzles',
+        'Visualize your future self thanking you',
+        'Write down 3 reasons for your commitment'
+      ]
     },
     physical: {
-      name: "Physical Reset",
-      duration: "2-5 minutes",
-      description: "Body-based techniques to redirect energy",
-      bestFor: "Restlessness, physical tension, moderate urges"
+      name: 'Physical Release',
+      description: 'Channel energy through movement',
+      duration: '10-15 minutes',
+      icon: FaBolt,
+      color: '#10b981',
+      steps: [
+        'Do 20 push-ups or jumping jacks',
+        'Take a cold shower for 2-3 minutes',
+        'Go for a brisk 10-minute walk',
+        'Practice deep breathing exercises',
+        'Stretch or do yoga poses'
+      ]
+    },
+    emergency: {
+      name: 'Emergency Protocol',
+      description: 'For intense urges requiring immediate action',
+      duration: '15-20 minutes',
+      icon: FaExclamationTriangle,
+      color: '#ef4444',
+      steps: [
+        'Remove yourself from triggering environment',
+        'Call a trusted friend or mentor',
+        'Practice intense breathing: 4-7-8 technique',
+        'Do physical exercise until exhausted',
+        'Write about your feelings and goals'
+      ]
     }
   };
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
-    };
-  }, []);
-
-  // Handle intensity selection with automatic progression
-  const handleUrgeIntensity = (intensity) => {
-    try {
-      setUrgeIntensity(intensity);
-      
-      // FIXED: Start session timing when user actually begins
-      if (!sessionStartTime) {
-        setSessionStartTime(new Date());
-      }
-      
-      // Auto-suggest protocol based on intensity
-      if (intensity >= 7) {
-        setActiveProtocol('breathing');
-        toast.success('High intensity detected - Emergency breathing recommended');
-      } else if (intensity >= 4) {
-        setActiveProtocol('physical');
-        toast.success('Moderate intensity - Physical reset recommended');
-      } else {
-        setActiveProtocol('mental');
-        toast.success('Low intensity - Mental redirection should help');
-      }
-      
-      // Auto-progress to protocol selection
-      setTimeout(() => setCurrentStep('protocol'), 500);
-      
-    } catch (error) {
-      console.error('Error handling intensity:', error);
-      toast.error('Error setting intensity level');
-    }
+  // PREMIUM ONLY: Get protocol based on intensity
+  const getRecommendedProtocol = () => {
+    if (urgeIntensity <= 3) return 'mental';
+    if (urgeIntensity <= 7) return 'physical';
+    return 'emergency';
   };
 
-  // FIXED: Start/stop active timing
-  const startActiveTimer = () => {
-    if (!isTimerActive) {
-      setProtocolStartTime(new Date());
-      setIsTimerActive(true);
-    }
-  };
-
-  const stopActiveTimer = () => {
-    if (isTimerActive && protocolStartTime) {
-      const timeSpent = (new Date() - protocolStartTime) / 1000; // seconds
-      setTotalActiveTime(prev => prev + timeSpent);
-      setIsTimerActive(false);
-      setProtocolStartTime(null);
-    }
-  };
-
-  // FIXED: Breathing protocol with proper phase transitions and text alternation
-  const startBreathing = () => {
-    try {
-      setBreathingActive(true);
-      setBreathingPhase('inhale');
-      setBreathingCount(0);
-      setBreathingTimer(4); // Start at 4 and count down
-      
-      startActiveTimer();
-      toast.success('Starting breathing protocol...');
-      
-      breathingIntervalRef.current = setInterval(() => {
-        setBreathingTimer(prev => {
-          const newTime = prev - 1; // Count down from 4 to 0
-          
-          // When timer reaches 0, switch phases
-          if (newTime <= 0) {
-            setBreathingPhase(currentPhase => {
-              if (currentPhase === 'inhale') {
-                return 'exhale';
-              } else if (currentPhase === 'exhale') {
-                // Complete one full cycle
-                setBreathingCount(prevCount => {
-                  const newCount = prevCount + 1;
-                  if (newCount >= 10) {
-                    // Complete the breathing exercise
-                    setBreathingPhase('complete');
-                    setBreathingActive(false);
-                    if (breathingIntervalRef.current) {
-                      clearInterval(breathingIntervalRef.current);
-                    }
-                    stopActiveTimer();
-                    toast.success('Breathing complete! How do you feel?');
-                    setTimeout(() => setCurrentStep('summary'), 1000);
-                    return newCount;
-                  } else {
-                    // Start next cycle with inhale
-                    return newCount;
-                  }
-                });
-                return 'inhale';
-              }
-              return currentPhase;
-            });
-            return 4; // Reset timer to 4 for next phase
-          }
-          
-          return newTime;
-        });
-      }, 1000);
-    } catch (error) {
-      console.error('Error starting breathing:', error);
-      toast.error('Error starting breathing protocol');
-    }
-  };
-
-  const stopBreathing = () => {
-    try {
-      setBreathingActive(false);
-      setBreathingPhase('ready');
-      if (breathingIntervalRef.current) {
-        clearInterval(breathingIntervalRef.current);
-      }
-      stopActiveTimer();
-      setCurrentStep('summary');
-    } catch (error) {
-      console.error('Error stopping breathing:', error);
-    }
-  };
-
-  // Get phase-appropriate tools
-  const getPhaseTools = () => {
-    const tools = [];
+  // PREMIUM ONLY: Handle intensity selection
+  const handleUrgeIntensity = (level) => {
+    setUrgeIntensity(level);
+    setCurrentStep('protocol');
+    setSessionStartTime(new Date());
     
-    if (currentDay <= 14) {
+    const protocol = getRecommendedProtocol();
+    setActiveProtocol(protocol);
+  };
+
+  // PREMIUM ONLY: Advanced tools based on recovery phase
+  const getPhaseTools = () => {
+    let tools = [];
+    
+    if (currentDay <= 7) {
       tools.push(
-        { id: 'cold-shower', name: 'Cold Shower Protocol', action: () => toast.success('Take a 2-minute cold shower - this will reset your nervous system') },
-        { id: 'exercise', name: 'Physical Exercise', action: () => toast.success('Do 20 push-ups or run for 5 minutes to redirect energy') },
-        { id: 'environment', name: 'Change Environment', action: () => toast.success('Leave your current location - go outside or to a public space') }
+        { id: 'cold_shower', name: 'Cold Shower', action: () => toast.success('Take a 2-3 minute cold shower to reset your system') },
+        { id: 'pushups', name: 'Push-ups', action: () => toast.success('Do 20-30 push-ups to redirect physical energy') },
+        { id: 'call_friend', name: 'Call Support', action: () => toast.success('Call someone in your support network right now') }
       );
-    } else if (currentDay <= 45) {
+    } else if (currentDay <= 30) {
       tools.push(
-        { id: 'journaling', name: 'Emotional Processing', action: () => toast.success('Write down what you\'re feeling - emotions need to be acknowledged and released') },
+        { id: 'breathing', name: 'Box Breathing', action: () => setBreathingActive(true) },
+        { id: 'walk', name: 'Emergency Walk', action: () => toast.success('Take a 10-minute walk outside immediately') },
         { id: 'meditation', name: 'Mindfulness Practice', action: () => toast.success('Sit quietly for 5 minutes and observe your emotions without judgment') },
         { id: 'support', name: 'Reach Out for Support', action: () => toast.success('Call a friend or mentor - you don\'t have to handle this alone') }
       );
@@ -241,7 +147,18 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     return tools;
   };
 
-  // Handle trigger logging
+  // PREMIUM ONLY: Trigger options
+  const triggerOptions = [
+    { id: 'boredom', label: 'Boredom', icon: FaInfoCircle },
+    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
+    { id: 'loneliness', label: 'Loneliness', icon: FaHeart },
+    { id: 'social_media', label: 'Social Media', icon: FaBolt },
+    { id: 'late_night', label: 'Late Night', icon: FaInfoCircle },
+    { id: 'home_alone', label: 'Being Home Alone', icon: FaShieldAlt },
+    { id: 'explicit_content', label: 'Explicit Content', icon: FaExclamationTriangle }
+  ];
+
+  // PREMIUM ONLY: Handle trigger logging
   const logTrigger = () => {
     if (selectedTrigger && updateUserData) {
       const urgeLog = {
@@ -260,9 +177,8 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  // Reset to start new session
+  // PREMIUM ONLY: Reset session
   const resetSession = () => {
-    stopActiveTimer();
     setCurrentStep('assessment');
     setUrgeIntensity(0);
     setActiveProtocol(null);
@@ -278,9 +194,206 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
+  // If not premium, show only the locked content
+  if (!isPremium) {
+    return (
+      <div className="urge-toolkit-container">
+        {/* Header with phase indicator */}
+        <div className="toolkit-header">
+          <div className="toolkit-header-spacer"></div>
+          <h2>Emergency Toolkit</h2>
+          <div className="toolkit-header-actions">
+            <div className="phase-indicator" style={{ '--phase-color': currentPhase.color }}>
+              <div className="phase-indicator-content">
+                <currentPhase.icon className="phase-indicator-icon" />
+                <div className="phase-indicator-text">
+                  <span className="phase-name">{currentPhase.name}</span>
+                  <span className="phase-day">Day {currentDay}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* PREMIUM LOCKED CONTENT - Complete Emergency Toolkit */}
+        <div className="premium-toolkit-container">
+          <div className="premium-toolkit-section toolkit-locked-features">
+            {/* Intensity Assessment Preview */}
+            <div className="locked-assessment-section">
+              <div className="section-header">
+                <h3>Urge Intensity Assessment</h3>
+                <p>Smart assessment system that adapts protocols to your specific situation</p>
+              </div>
+              
+              <div className="locked-intensity-preview">
+                <div className="intensity-scale-locked">
+                  {[1,2,3,4,5,6,7,8,9,10].map(level => (
+                    <div key={level} className="intensity-btn-locked">
+                      {level}
+                    </div>
+                  ))}
+                </div>
+                <div className="intensity-labels-locked">
+                  <span>Mild thoughts</span>
+                  <span>Overwhelming</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Advanced Protocols Preview */}
+            <div className="locked-protocol-section">
+              <div className="section-header">
+                <h3>Phase-Specific Emergency Protocols</h3>
+                <p>Scientifically-backed techniques customized for your recovery phase</p>
+              </div>
+              
+              <div className="locked-protocol-grid">
+                <div className="locked-protocol-card">
+                  <FaBrain className="locked-protocol-icon" />
+                  <h4>Mental Redirection</h4>
+                  <p>Cognitive techniques and grounding exercises for thought management</p>
+                  <span className="protocol-duration">5-10 minutes</span>
+                </div>
+                <div className="locked-protocol-card">
+                  <FaBolt className="locked-protocol-icon" />
+                  <h4>Physical Release</h4>
+                  <p>Movement-based strategies to channel energy productively</p>
+                  <span className="protocol-duration">10-15 minutes</span>
+                </div>
+                <div className="locked-protocol-card">
+                  <FaExclamationTriangle className="locked-protocol-icon" />
+                  <h4>Emergency Protocol</h4>
+                  <p>Intensive interventions for high-intensity urges</p>
+                  <span className="protocol-duration">15-20 minutes</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Emergency Tools Preview */}
+            <div className="locked-tools-section">
+              <div className="section-header">
+                <h3>Emergency Intervention Tools</h3>
+                <p>20+ specialized techniques that adapt to your recovery phase</p>
+              </div>
+              
+              <div className="locked-tools-grid">
+                <div className="locked-tool-card">
+                  <FaStopwatch />
+                  <span>Guided Breathing Timer</span>
+                </div>
+                <div className="locked-tool-card">
+                  <FaHeart />
+                  <span>4-7-8 Breathing</span>
+                </div>
+                <div className="locked-tool-card">
+                  <FaLeaf />
+                  <span>Mindfulness Scripts</span>
+                </div>
+                <div className="locked-tool-card">
+                  <FaBolt />
+                  <span>Energy Redirection</span>
+                </div>
+                <div className="locked-tool-card">
+                  <FaBrain />
+                  <span>Cognitive Reframing</span>
+                </div>
+                <div className="locked-tool-card">
+                  <FaShieldAlt />
+                  <span>Emergency Contacts</span>
+                </div>
+                <div className="locked-tool-card">
+                  <FaLightbulb />
+                  <span>Visualization Guides</span>
+                </div>
+                <div className="locked-tool-card">
+                  <FaTrophy />
+                  <span>Motivation Boosters</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Trigger Analysis Preview */}
+            <div className="locked-analysis-section">
+              <div className="section-header">
+                <h3>Trigger Pattern Analysis</h3>
+                <p>Track and analyze your urge patterns to build stronger defenses</p>
+              </div>
+              
+              <div className="locked-trigger-preview">
+                <div className="trigger-options-locked">
+                  {triggerOptions.slice(0, 6).map(trigger => (
+                    <div key={trigger.id} className="trigger-option-locked">
+                      <trigger.icon />
+                      <span>{trigger.label}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="analysis-features">
+                  <div className="analysis-feature">
+                    <FaLightbulb />
+                    <span>Pattern Recognition</span>
+                  </div>
+                  <div className="analysis-feature">
+                    <FaBrain />
+                    <span>Personalized Insights</span>
+                  </div>
+                  <div className="analysis-feature">
+                    <FaTrophy />
+                    <span>Success Tracking</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Helmet Overlay - EXACT copy from Timeline */}
+            <div className="main-helmet-overlay">
+              <div className="main-helmet-content">
+                <div className="main-helmet-icon">
+                  <svg width="120" height="120" viewBox="0 0 120 120" className="main-helmet-svg">
+                    <defs>
+                      <linearGradient id="helmetGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.9"/>
+                        <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.7"/>
+                      </linearGradient>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge> 
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
+                    <circle cx="60" cy="45" r="35" fill="url(#helmetGradient)" filter="url(#glow)"/>
+                    <rect x="45" y="65" width="30" height="20" rx="3" fill="url(#helmetGradient)" filter="url(#glow)"/>
+                    <circle cx="50" cy="40" r="3" fill="var(--card-background)" opacity="0.9"/>
+                    <circle cx="70" cy="40" r="3" fill="var(--card-background)" opacity="0.9"/>
+                    <path d="M52 50 Q60 55 68 50" stroke="var(--card-background)" strokeWidth="2" fill="none" opacity="0.9"/>
+                  </svg>
+                  <div className="main-helmet-fallback">🛡️</div>
+                </div>
+                <div className="main-helmet-text">Emergency Toolkit Premium</div>
+                <div className="main-helmet-subtitle">
+                  Complete emergency intervention system with personalized protocols
+                </div>
+                <button 
+                  className="main-helmet-upgrade-btn"
+                  onClick={handleUpgradeClick}
+                >
+                  <FaTrophy />
+                  Upgrade Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // PREMIUM USERS: Full Emergency Toolkit functionality
   return (
     <div className="urge-toolkit-container">
-      {/* UPDATED: Header with phase indicator including icon */}
+      {/* Header with phase indicator */}
       <div className="toolkit-header">
         <div className="toolkit-header-spacer"></div>
         <h2>Emergency Toolkit</h2>
@@ -341,116 +454,60 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 className={`protocol-card ${activeProtocol === key ? 'active' : ''}`}
                 onClick={() => setActiveProtocol(key)}
               >
-                <div className="protocol-name">{protocol.name}</div>
-                <div className="protocol-duration">{protocol.duration}</div>
-                <div className="protocol-description">{protocol.description}</div>
-                <div className="protocol-best-for">Best for: {protocol.bestFor}</div>
+                <protocol.icon 
+                  className="protocol-icon" 
+                  style={{ color: protocol.color }}
+                />
+                <div className="protocol-info">
+                  <h4>{protocol.name}</h4>
+                  <p>{protocol.description}</p>
+                  <span className="protocol-duration">Duration: {protocol.duration}</span>
+                </div>
               </div>
             ))}
           </div>
 
-          {/* FIXED: Breathing Interface - Clean circle without icons, proper text alternation */}
-          {activeProtocol === 'breathing' && (
-            <div className="breathing-interface">
-              <div className="breathing-display">
-                <div className="breathing-circle">
-                  <div className={`breathing-animation ${breathingPhase === 'inhale' ? 'inhale-animation' : breathingPhase === 'exhale' ? 'exhale-animation' : ''}`}>
-                    {/* REMOVED: All icons - just the pulsing circle */}
-                  </div>
-                </div>
-                
-                <div className="breathing-status">
-                  {breathingPhase === 'ready' && <span>Ready to begin</span>}
-                  {breathingPhase === 'inhale' && <span>Breathe IN slowly ({breathingTimer}s remaining)</span>}
-                  {breathingPhase === 'exhale' && <span>Breathe OUT slowly ({breathingTimer}s remaining)</span>}
-                  {breathingPhase === 'complete' && <span>Well done!</span>}
-                </div>
-                
-                {breathingActive && (
-                  <div className="breathing-progress">
-                    Cycle {breathingCount + 1}/10
-                  </div>
-                )}
+          {/* Active Protocol Steps */}
+          {activeProtocol && (
+            <div className="active-protocol">
+              <div className="protocol-steps">
+                <h4>Protocol Steps:</h4>
+                <ol>
+                  {protocols[activeProtocol].steps.map((step, index) => (
+                    <li key={index}>{step}</li>
+                  ))}
+                </ol>
               </div>
               
-              <div className="breathing-controls">
-                {!breathingActive ? (
-                  <button className="primary-btn" onClick={startBreathing} type="button">
-                    <FaPlay />
-                    Start Breathing Protocol
-                  </button>
-                ) : (
-                  <button className="secondary-btn" onClick={stopBreathing} type="button">
-                    <FaStop />
-                    Complete Session
-                  </button>
-                )}
+              <div className="protocol-actions">
+                <button 
+                  className="primary-btn"
+                  onClick={() => setCurrentStep('tools')}
+                >
+                  <FaCheckCircle />
+                  Continue to Tools
+                </button>
+                <button 
+                  className="secondary-btn"
+                  onClick={resetSession}
+                >
+                  <FaTimes />
+                  Start Over
+                </button>
               </div>
-            </div>
-          )}
-
-          {activeProtocol === 'mental' && (
-            <div className="mental-protocol">
-              <div className="protocol-steps">
-                <h4>Mental Redirection Steps:</h4>
-                <ol>
-                  <li>Name 5 things you can see around you</li>
-                  <li>Name 4 things you can hear</li>
-                  <li>Name 3 things you can touch</li>
-                  <li>Take 10 deep breaths</li>
-                  <li>Recite your reasons for retention</li>
-                </ol>
-              </div>
-              <button 
-                className="primary-btn" 
-                onClick={() => {
-                  startActiveTimer();
-                  setCurrentStep('tools');
-                }}
-                type="button"
-              >
-                <FaCheckCircle />
-                I've Completed This
-              </button>
-            </div>
-          )}
-
-          {activeProtocol === 'physical' && (
-            <div className="physical-protocol">
-              <div className="protocol-steps">
-                <h4>Physical Reset Steps:</h4>
-                <ol>
-                  <li>Do 20 jumping jacks or push-ups</li>
-                  <li>Splash cold water on your face</li>
-                  <li>Change your physical position/location</li>
-                  <li>Stand straight, shoulders back</li>
-                  <li>Take 5 deep breaths</li>
-                </ol>
-              </div>
-              <button 
-                className="primary-btn" 
-                onClick={() => {
-                  startActiveTimer();
-                  setCurrentStep('tools');
-                }}
-                type="button"
-              >
-                <FaCheckCircle />
-                I've Completed This
-              </button>
             </div>
           )}
         </div>
       )}
 
-      {/* Step 3: Phase-Specific Tools */}
+      {/* Step 3: Emergency Tools */}
       {currentStep === 'tools' && (
         <div className="tools-section">
           <div className="section-header">
-            <h3>{currentPhase.name} Tools</h3>
-            <p>Additional techniques for your current phase</p>
+            <h3>Emergency Tools</h3>
+            <p>Additional techniques for your {currentPhase.name} phase (Day {currentDay})</p>
           </div>
-          
+
           <div className="phase-tools">
             {getPhaseTools().map(tool => (
               <div key={tool.id} className="tool-card">
@@ -458,24 +515,47 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 <button 
                   className="tool-btn"
                   onClick={tool.action}
-                  type="button"
                 >
-                  Use This Tool
+                  Use Tool
                 </button>
               </div>
             ))}
           </div>
 
+          {/* Trigger Selection */}
+          <div className="trigger-selection">
+            <h4>What triggered this urge?</h4>
+            <div className="trigger-options">
+              {triggerOptions.map(trigger => (
+                <div 
+                  key={trigger.id}
+                  className={`trigger-option ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedTrigger(trigger.id)}
+                >
+                  <trigger.icon />
+                  <span>{trigger.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="tools-actions">
             <button 
-              className="primary-btn" 
+              className="primary-btn"
               onClick={() => {
-                stopActiveTimer();
+                logTrigger();
                 setCurrentStep('summary');
               }}
-              type="button"
             >
-              Continue to Summary
+              <FaCheckCircle />
+              Complete Session
+            </button>
+            <button 
+              className="secondary-btn"
+              onClick={resetSession}
+            >
+              <FaTimes />
+              Start Over
             </button>
           </div>
         </div>
@@ -486,67 +566,33 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         <div className="summary-section">
           <div className="section-header">
             <h3>Session Complete</h3>
-            <p>Help us understand what triggered this urge</p>
-          </div>
-
-          <div className="trigger-selection">
-            <h4>What triggered this urge?</h4>
-            <div className="trigger-options">
-              {triggerOptions.map(trigger => (
-                <button
-                  key={trigger.id}
-                  className={`trigger-option ${selectedTrigger === trigger.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedTrigger(trigger.id)}
-                  type="button"
-                >
-                  <trigger.icon />
-                  <span>{trigger.label}</span>
-                </button>
-              ))}
-            </div>
+            <p>Great job working through this urge!</p>
           </div>
 
           <div className="session-stats">
             <div className="stat-item">
-              <span className="stat-label">Intensity Level:</span>
+              <span className="stat-label">Intensity Level</span>
               <span className="stat-value">{urgeIntensity}/10</span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">Protocol Used:</span>
+              <span className="stat-label">Protocol Used</span>
               <span className="stat-value">{protocols[activeProtocol]?.name}</span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">Session Duration:</span>
+              <span className="stat-label">Trigger</span>
               <span className="stat-value">
-                {sessionStartTime ? Math.round((new Date() - sessionStartTime) / 60000) : 0} minutes
-              </span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Active Protocol Time:</span>
-              <span className="stat-value">
-                {Math.round(totalActiveTime / 60)} minutes {Math.round(totalActiveTime % 60)} seconds
+                {triggerOptions.find(t => t.id === selectedTrigger)?.label || 'Not specified'}
               </span>
             </div>
           </div>
 
           <div className="summary-actions">
             <button 
-              className="primary-btn" 
-              onClick={() => {
-                logTrigger();
-                resetSession();
-              }}
-              type="button"
+              className="primary-btn"
+              onClick={resetSession}
             >
               <FaCheckCircle />
-              Complete Session
-            </button>
-            <button 
-              className="secondary-btn" 
-              onClick={resetSession}
-              type="button"
-            >
-              Start New Session
+              New Session
             </button>
           </div>
         </div>
