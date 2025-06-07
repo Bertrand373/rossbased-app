@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Added progressive premium lock styles */
+/* components/Stats/Stats.css - FIXED: Complete file with proper CSS block closure */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -931,3 +931,108 @@
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   border: 1px solid var(--border);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .stats-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    margin-top: 0;
+  }
+  
+  .stats-header h2 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .stats-header-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+    justify-content: center;
+  }
+  
+  .reset-stats-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .streak-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .benefit-metrics-pills {
+    max-width: 100%;
+  }
+  
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .insights-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .benefit-upgrade-cta {
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    text-align: center;
+  }
+  
+  .upgrade-text-section h4 {
+    font-size: 1.25rem;
+  }
+  
+  .upgrade-text-section p {
+    font-size: 0.875rem;
+  }
+  
+  .benefit-upgrade-btn {
+    align-self: center;
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .streak-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .badges-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card,
+  .badge-card,
+  .comparison-card {
+    min-height: 120px;
+    height: 120px;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 2rem;
+  }
+  
+  .comparison-value {
+    font-size: 1.5rem;
+  }
+  
+  .upgrade-helmet-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .upgrade-helmet-fallback {
+    font-size: 2.5rem;
+  }
+}
