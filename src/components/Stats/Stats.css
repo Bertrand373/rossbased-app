@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - FIXED: Complete file with proper CSS block closure */
+/* components/Stats/Stats.css - FIXED: Mobile layout for stats and badges */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -109,7 +109,7 @@
   }
 }
 
-/* Streak Statistics - maintain consistent card heights */
+/* Streak Statistics - FIXED: Mobile layout shows 2x2 grid consistently */
 .streak-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -142,6 +142,7 @@
   font-size: 0.875rem;
   color: var(--text-secondary);
   margin-top: var(--spacing-sm);
+  text-align: center;
 }
 
 /* REDESIGNED: Section Headers with Consistent Spacing */
@@ -160,6 +161,7 @@
   padding: var(--spacing-lg) 0;
 }
 
+/* Achievement Badges - FIXED: Mobile layout shows 2x2 grid consistently */
 .badges-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -219,324 +221,101 @@
   cursor: not-allowed;
 }
 
-.badge-card.locked:hover {
-  transform: none;
-  background: linear-gradient(135deg, var(--medium-gray) 0%, var(--light-gray) 100%);
-  border-color: var(--border);
-}
-
 .badge-icon {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--medium-gray);
-  border-radius: 50%;
+  font-size: 2rem;
   margin-bottom: var(--spacing-sm);
-  border: 1px solid var(--border);
+  color: var(--primary);
 }
 
-.badge-card.earned .badge-icon {
-  background-color: var(--primary);
-  color: #000;
-  border: 1px solid var(--primary);
-}
-
-.badge-earned-icon, .badge-locked-icon {
-  font-size: 1.5rem;
-}
-
-.badge-locked-icon {
+.badge-card.locked .badge-icon {
   color: var(--text-secondary);
 }
 
 .badge-name {
+  font-size: 0.875rem;
   font-weight: 600;
-  margin-bottom: var(--spacing-xs);
   color: var(--text);
-  line-height: 1.3;
-}
-
-.badge-card.earned .badge-name {
-  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
 }
 
 .badge-date {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  min-height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* REDESIGNED: Benefit Tracker Section with Consistent Spacing */
-.benefit-tracker-section {
+/* Premium Benefits Section */
+.benefits-section {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-.benefit-tracker-section h3 {
+.benefits-header {
+  text-align: center;
+}
+
+.benefits-header h3 {
   margin: 0;
   font-size: 1.25rem;
   color: var(--text);
-  text-align: center;
-  /* ADDED: Consistent spacing above and below like other sections */
   padding: var(--spacing-lg) 0;
 }
 
-/* REDESIGNED: Clean 2-row pill layout matching Profile tabs */
-.benefit-tracker-controls {
+/* Benefits Controls */
+.benefits-controls {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  gap: var(--spacing-md);
 }
 
-/* ROW 1: All 6 benefit metrics in one container */
-.benefit-metrics-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.benefit-metrics-pills {
-  display: flex;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs);
-  background-color: var(--card-background);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  width: 100%;
-  max-width: 800px; /* Desktop: Accommodate all 6 items */
-}
-
-.benefit-metrics-pills::-webkit-scrollbar {
-  display: none;
-}
-
-.metric-pill {
-  display: flex;
-  align-items: center;
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: transparent;
-  border: 1px solid transparent;
-  color: var(--text-secondary);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: none;
-  white-space: nowrap;
-  min-width: fit-content;
-  flex-shrink: 0;
-}
-
-.metric-pill.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-/* ROW 2: Time range selector */
+.metric-selector-container,
 .time-range-container {
-  width: 100%;
   display: flex;
   justify-content: center;
 }
 
+.benefit-metrics-pills,
 .time-range-pills {
   display: flex;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs);
-  background-color: var(--card-background);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  width: 100%;
-  max-width: 300px;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  max-width: 100%;
 }
 
+.metric-pill,
 .time-pill {
-  flex: 1;
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: transparent;
-  border: 1px solid transparent;
-  color: var(--text-secondary);
+  border: 1px solid var(--border);
   border-radius: var(--radius-full);
+  background-color: var(--card-background);
+  color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
-.time-pill.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-/* ===== ADDED: FREE USER BENEFIT PREVIEW SECTION - PROGRESSIVE PREMIUM LOCK ===== */
-
-.free-benefit-preview {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-}
-
-/* FREE: Average Display - Same styling as premium sidebar */
-.free-average-display {
-  display: flex;
-  justify-content: center;
-}
-
-.free-average-display .current-metric-average {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  align-items: center;
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  min-height: 80px;
-  justify-content: center;
-  max-width: 300px;
-  width: 100%;
-}
-
-/* FREE: Single Insight Preview */
-.free-insight-preview {
-  display: flex;
-  justify-content: center;
-}
-
-.free-insight-preview .current-insight-card {
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  justify-content: center;
-  max-width: 600px;
-  width: 100%;
-}
-
-/* NEW: Benefit Upgrade CTA - Matching Timeline early teaser design */
-.benefit-upgrade-cta {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xl);
-  text-align: left;
-}
-
-/* NEW: Benefit upgrade helmet - EXACT copy of Timeline early teaser helmet sizing */
-.upgrade-helmet-icon {
-  width: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
-  height: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
-  flex-shrink: 0;
-  animation: benefit-helmet-pulse 2.5s ease-in-out infinite;
-  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
-}
-
-.upgrade-helmet-fallback {
-  font-size: 3.2rem; /* MATCH: Same as Timeline early-teaser-helmet-fallback */
-  color: var(--primary);
-  flex-shrink: 0;
-  animation: benefit-helmet-pulse 2.5s ease-in-out infinite;
-}
-
-@keyframes benefit-helmet-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.98);
-  }
-}
-
-.upgrade-text-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.upgrade-text-section h4 {
-  font-size: 1.5rem;
-  font-weight: 600;
+.metric-pill:hover,
+.time-pill:hover {
+  border-color: var(--primary);
   color: var(--text);
-  margin: 0;
 }
 
-.upgrade-text-section p {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  margin: 0;
-  line-height: 1.5;
+.metric-pill.active,
+.time-pill.active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #000000;
+  font-weight: 600;
 }
 
-/* NEW: Benefit upgrade button - EXACT copy of Timeline early-teaser-upgrade-btn */
-.benefit-upgrade-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl); /* MATCH: Same as Timeline */
-  background-color: var(--primary); /* MATCH: Same as Timeline */
-  border: none; /* MATCH: Same as Timeline */
-  border-radius: var(--radius-full);
-  color: #000000; /* MATCH: Same as Timeline */
-  font-size: 1.125rem; /* MATCH: Same as Timeline */
-  font-weight: 600; /* MATCH: Same as Timeline */
-  cursor: pointer;
-  transition: all 0.2s ease; /* MATCH: Same as Timeline */
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  min-width: 200px; /* MATCH: Same as Timeline */
-  min-height: 48px; /* MATCH: Same as Timeline */
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Timeline */
-  align-self: flex-start;
-}
-
-.benefit-upgrade-btn:hover {
-  background-color: var(--primary-dark); /* MATCH: Same as Timeline */
-  transform: translateY(-2px); /* MATCH: Same as Timeline */
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Timeline */
-  color: #000000; /* MATCH: Same as Timeline */
-}
-
-/* ===== END: FREE USER BENEFIT PREVIEW SECTION ===== */
-
-/* REDESIGNED: Chart and Insight Container - Mobile-first with Desktop Sidebar */
+/* Chart and Insight Container */
 .chart-and-insight-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: var(--spacing-lg);
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border);
 }
 
 .chart-container {
@@ -547,7 +326,7 @@
   border: 1px solid var(--border);
 }
 
-/* Current Insight Sidebar (Mobile: Card, Desktop: Sidebar) */
+/* Current Insight Sidebar */
 .current-insight-sidebar {
   display: flex;
   flex-direction: column;
@@ -556,9 +335,9 @@
 
 .current-metric-average {
   display: flex;
-  flex-direction: column; /* CHANGED: Always use column layout like mobile */
-  gap: var(--spacing-sm); /* CHANGED: Use mobile gap */
-  align-items: center; /* ADDED: Center content */
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: center;
   padding: var(--spacing-lg);
   background-color: var(--card-background);
   border-radius: var(--radius-md);
@@ -570,6 +349,13 @@
   font-size: 1rem;
   color: var(--text);
   font-weight: 600;
+  text-align: center;
+}
+
+.metric-highlight {
+  color: var(--primary);
+  font-weight: 700;
+  text-transform: capitalize;
 }
 
 .current-metric-value {
@@ -587,7 +373,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  justify-content: center; /* ADDED: Vertically center all content */
+  justify-content: center;
 }
 
 .current-insight-header {
@@ -612,7 +398,7 @@
   text-align: center;
 }
 
-/* REVERTED: Detailed Analysis section back to original */
+/* Detailed Analysis Section */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -646,22 +432,11 @@
   background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
-.streak-comparison {
-  margin-bottom: var(--spacing-md); /* REDUCED: Less space after comparison cards */
-}
-
 .streak-comparison h5 {
-  margin-bottom: var(--spacing-lg);
+  margin: 0 0 var(--spacing-lg) 0;
   font-size: 1rem;
   color: var(--text);
   text-align: center;
-  font-weight: 600;
-}
-
-/* ADDED: Yellow metric highlighting */
-.metric-highlight {
-  color: var(--primary);
-  font-weight: 700;
 }
 
 .comparison-grid {
@@ -679,208 +454,47 @@
   background-color: var(--card-background);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  text-align: center;
-  transition: none;
-  min-height: 140px;
-  height: 140px;
+  min-height: 100px;
 }
 
 .comparison-value {
   font-size: 2rem;
   font-weight: 700;
+  color: var(--primary);
   line-height: 1;
-  color: var(--text);
-  margin-bottom: var(--spacing-sm);
 }
 
 .comparison-label {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  line-height: 1.3;
-  font-weight: 500;
-}
-
-/* Personalized Analysis */
-.personalized-analysis h5 {
-  margin-bottom: var(--spacing-md); /* REDUCED: Less space after header */
-  font-size: 1rem;
-  color: var(--text);
-  text-align: center; /* CHANGED: Centered the header */
-  font-weight: 600;
-}
-
-/* REDESIGNED: Insights Grid - Dynamic Heights for Better Content */
-.insights-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
-  width: 100%;
-}
-
-.insight-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  transition: all 0.2s ease;
-  /* CHANGED: Dynamic height for better content readability */
-  min-height: 120px;
-  justify-content: center; /* ADDED: Vertically center all content */
-}
-
-.insight-card.highlighted {
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.15);
-}
-
-.insight-card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-weight: 600;
-  color: var(--text);
-  justify-content: center; /* ADDED: Center the header content */
-}
-
-.insight-card-header .insight-icon {
-  color: var(--primary);
-  font-size: 1.125rem;
-  flex-shrink: 0;
-}
-
-.insight-card.highlighted .insight-card-header .insight-icon {
-  filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
-}
-
-.insight-metric {
-  font-size: 0.875rem;
-  color: var(--text);
-}
-
-.insight-text {
-  color: var(--text);
-  font-size: 0.875rem;
-  line-height: 1.4;
-  font-weight: 500;
-  text-align: center; /* CHANGED: Center-aligned the insight text */
-}
-
-.insight-card.highlighted .insight-text {
-  font-weight: 600;
-}
-
-/* Premium Lock */
-.premium-lock {
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(15, 15, 15, 0.9);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-  border-radius: var(--radius-md);
-}
-
-.lock-icon {
-  font-size: 2rem;
-  color: var(--primary);
-  margin-bottom: var(--spacing-md);
-}
-
-.premium-message {
+  margin-top: var(--spacing-sm);
   text-align: center;
-  margin-bottom: var(--spacing-md);
-  color: var(--text);
 }
 
-.premium-message h3 {
-  margin-bottom: var(--spacing-sm);
-  color: var(--text);
-}
-
-.premium-message p {
-  color: var(--text-secondary);
-}
-
-.free-benefit-tracker {
-  padding: var(--spacing-lg);
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.free-benefit-tracker h4 {
-  margin-bottom: var(--spacing-md);
-  font-size: 1rem;
-  color: var(--text);
-}
-
-.benefit-rating {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.benefit-rating span {
-  color: var(--text);
-}
-
-.rating-slider {
-  width: 100%;
-}
-
-.rating-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: var(--spacing-xs);
-}
-
-.limited-stats {
-  margin-top: var(--spacing-lg);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--border);
-}
-
-.limited-stats p {
-  color: var(--text);
-}
-
-/* REVERTED: Pattern Analysis section back to original */
+/* Pattern Analysis Section */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
   border-top: 3px solid rgba(255, 221, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.pattern-analysis-section h3 {
+.pattern-analysis-section h4 {
   margin: 0;
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
+  font-weight: 600;
   position: relative;
   margin-bottom: var(--spacing-lg);
 }
 
-.pattern-analysis-section h3::after {
+.pattern-analysis-section h4::after {
   content: '';
   position: absolute;
   bottom: -8px;
@@ -891,7 +505,7 @@
   background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
-.pattern-insights {
+.pattern-insights-grid {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
@@ -911,29 +525,175 @@
   color: var(--text);
   margin-bottom: var(--spacing-sm);
   font-size: 0.875rem;
-  text-align: center; /* CHANGED: Center-aligned pattern text */
+  text-align: center;
 }
 
 .pattern-actionable {
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-style: italic;
-  text-align: center; /* CHANGED: Center-aligned actionable text */
+  text-align: center;
 }
 
-.no-patterns {
+/* Non-Premium Upgrade Section */
+.benefit-upgrade-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.benefit-upgrade-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  justify-content: space-between;
+}
+
+.upgrade-text-section {
+  flex: 1;
+}
+
+.upgrade-text-section h4 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 1.5rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.upgrade-text-section p {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.upgrade-visual-section {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
+}
+
+.upgrade-helmet-icon {
+  width: 80px;
+  height: 80px;
+  background-color: rgba(255, 221, 0, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  border: 2px solid rgba(255, 221, 0, 0.2);
+}
+
+.benefit-upgrade-btn {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: var(--primary);
+  color: #000000;
+  border: none;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: center;
+  min-width: 200px;
+}
+
+.benefit-upgrade-btn:hover {
+  background-color: #e6c500;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
   background-color: var(--card-background);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  color: var(--text);
   border: 1px solid var(--border);
 }
 
-/* Mobile responsiveness */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--spacing-md);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--text);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-body {
+  text-align: center;
+}
+
+.badge-detail-icon {
+  font-size: 3rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+.modal-body ul {
+  text-align: left;
+  margin: var(--spacing-md) 0;
+  color: var(--text-secondary);
+}
+
+.modal-body li {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Mobile responsiveness - FIXED: Proper 2x2 grid layout */
 @media (max-width: 768px) {
   .stats-header {
     display: flex;
@@ -961,10 +721,12 @@
     justify-content: center;
   }
   
+  /* FIXED: Stats cards show 2x2 grid on mobile */
   .streak-stats {
     grid-template-columns: repeat(2, 1fr);
   }
   
+  /* FIXED: Achievement badges show 2x2 grid on mobile */
   .badges-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -977,7 +739,7 @@
     grid-template-columns: 1fr;
   }
   
-  .insights-grid {
+  .chart-and-insight-container {
     grid-template-columns: 1fr;
   }
   
@@ -1002,25 +764,45 @@
   }
 }
 
-/* Very small screens */
+/* Very small screens - Keep 2x2 grid but smaller cards */
 @media (max-width: 480px) {
+  /* Stats cards remain 2x2 but get smaller */
   .streak-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
   }
   
+  /* Achievement badges remain 2x2 but get smaller */
   .badges-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
   }
   
   .stat-card,
-  .badge-card,
-  .comparison-card {
+  .badge-card {
     min-height: 120px;
     height: 120px;
+    padding: var(--spacing-md);
   }
   
   .stat-card .stat-value {
     font-size: 2rem;
+  }
+  
+  .stat-card .stat-label {
+    font-size: 0.75rem;
+  }
+  
+  .badge-icon {
+    font-size: 1.5rem;
+  }
+  
+  .badge-name {
+    font-size: 0.75rem;
+  }
+  
+  .badge-date {
+    font-size: 0.675rem;
   }
   
   .comparison-value {
@@ -1030,9 +812,6 @@
   .upgrade-helmet-icon {
     width: 60px;
     height: 60px;
-  }
-  
-  .upgrade-helmet-fallback {
     font-size: 2.5rem;
   }
 }
