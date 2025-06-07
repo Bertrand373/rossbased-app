@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern
+// components/Stats/Stats.js - COMPLETE FILE - Progressive premium lock matching Timeline pattern
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -666,4 +666,486 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             "Days 7-14 test emotional equilibrium. Practice emotional alchemy: transform frustration into determination." :
             "Days 7-14 are often challenging due to increased energy. Channel this into productive activities and maintain routines."
         });
+      } else if (avgLength < 21) {
+        insights.push({
+          id: insights.length + 1,
+          practical: `Your ${avgLength}-day cycles suggest you handle initial challenges but struggle with deeper habit patterns.`,
+          esoteric: `Your ${avgLength}-day cycles suggest you're mastering the emotional realm but haven't yet stabilized in the mental plane.`,
+          actionable: wisdomMode ?
+            "Days 14-30 test mental fortitude. Practice mental alchemy: transform doubt into unwavering resolve." :
+            "Days 14-30 require mental discipline. Focus on long-term goals and avoid situations that weaken resolve."
+        });
+      } else {
+        insights.push({
+          id: insights.length + 1,
+          practical: `Your ${avgLength}-day cycles show strong discipline - focus on identifying what causes eventual breakdown.`,
+          esoteric: `Your ${avgLength}-day cycles show mastery over lower impulses - examine what causes spiritual regression.`,
+          actionable: wisdomMode ?
+            "After 30+ days, examine subtle pride or spiritual bypassing that may be creating energetic imbalances." :
+            "After 30+ days, examine overconfidence or external stressors that may be weakening your foundation."
+        });
       }
+    }
+
+    return insights.length > 0 ? insights : [{
+      id: 1,
+      practical: "Continue tracking to identify patterns in your journey.",
+      esoteric: "Continue tracking to identify patterns in your spiritual development.",
+      actionable: wisdomMode ?
+        "The path reveals itself to those who persist with awareness and dedication." :
+        "Keep recording your experiences to understand your personal triggers and cycles."
+    }];
+  };
+
+  return (
+    <div className="stats-container">
+      {/* UPDATED: Header matching Tracker and Calendar with Reset button */}
+      <div className="stats-header">
+        <div className="stats-header-spacer"></div>
+        <h2>Your Stats</h2>
+        <div className="stats-header-actions">
+          <button 
+            className="reset-stats-btn"
+            onClick={handleResetStats}
+            title="Reset All Stats"
+          >
+            <FaRedo />
+            <span>Reset Stats</span>
+          </button>
+        </div>
+      </div>
+      
+      {/* Streak Statistics */}
+      <div className="streak-stats">
+        <div className="stat-card current-streak">
+          <div className="stat-value">{userData.currentStreak || 0}</div>
+          <div className="stat-label">Current Streak</div>
+        </div>
+        
+        <div className="stat-card longest-streak">
+          <div className="stat-value">{userData.longestStreak || 0}</div>
+          <div className="stat-label">Longest Streak</div>
+        </div>
+        
+        <div className="stat-card total-wetdreams">
+          <div className="stat-value">{userData.wetDreamCount || 0}</div>
+          <div className="stat-label">Wet Dreams</div>
+        </div>
+        
+        <div className="stat-card total-relapses">
+          <div className="stat-value">{userData.relapseCount || 0}</div>
+          <div className="stat-label">Relapses</div>
+        </div>
+      </div>
+      
+      {/* Milestone Badges */}
+      <div className="milestone-section">
+        <h3>Your Achievements</h3>
+        
+        <div className="badges-grid">
+          {userData.badges && userData.badges.map(badge => (
+            <div 
+              key={badge.id} 
+              className={`badge-card ${badge.earned ? 'earned' : 'locked'}`}
+              onClick={() => badge.earned && handleBadgeClick(badge)}
+            >
+              <div className="badge-icon">
+                {badge.earned ? (
+                  <FaTrophy className="badge-earned-icon" />
+                ) : (
+                  <FaLock className="badge-locked-icon" />
+                )}
+              </div>
+              <div className="badge-name">{badge.name}</div>
+              {badge.earned && (
+                <div className="badge-date">
+                  Earned {badge.date ? format(new Date(badge.date), 'MMM d') : ''}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      {/* Benefits Tracking Section */}
+      <div className="benefit-tracker-section">
+        <h3>Benefit Tracker</h3>
+        
+        {isPremium ? (
+          <>
+            {/* REDESIGNED: 2-row pill layout */}
+            <div className="benefit-tracker-controls">
+              {/* ROW 1: All 6 benefit metrics */}
+              <div className="benefit-metrics-container">
+                <div className="benefit-metrics-pills">
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'energy' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('energy')}
+                  >
+                    Energy
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'focus' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('focus')}
+                  >
+                    Focus
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'confidence' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('confidence')}
+                  >
+                    Confidence
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'aura' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('aura')}
+                  >
+                    Aura
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'sleep' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('sleep')}
+                  >
+                    Sleep
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'workout' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('workout')}
+                  >
+                    Workout
+                  </button>
+                </div>
+              </div>
+              
+              {/* ROW 2: Time range selector */}
+              <div className="time-range-container">
+                <div className="time-range-pills">
+                  <button 
+                    className={`time-pill ${timeRange === 'week' ? 'active' : ''}`}
+                    onClick={() => setTimeRange('week')}
+                  >
+                    Week
+                  </button>
+                  <button 
+                    className={`time-pill ${timeRange === 'month' ? 'active' : ''}`}
+                    onClick={() => setTimeRange('month')}
+                  >
+                    Month
+                  </button>
+                  <button 
+                    className={`time-pill ${timeRange === 'quarter' ? 'active' : ''}`}
+                    onClick={() => setTimeRange('quarter')}
+                  >
+                    3 Months
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* REDESIGNED: Chart and Current Insight */}
+            <div className="chart-and-insight-container" ref={insightsStartRef}>
+              <div className="chart-container">
+                <Line data={generateChartData()} options={chartOptions} height={300} />
+              </div>
+              
+              {/* Current Insight Sidebar */}
+              <div className="current-insight-sidebar">
+                <div className="current-metric-average">
+                  <div className="current-metric-label">Average <span className="metric-highlight">{selectedMetric}</span></div>
+                  <div className="current-metric-value">{calculateAverage()}/10</div>
+                </div>
+                
+                <div className="current-insight-card">
+                  <div className="current-insight-header">
+                    <FaRegLightbulb className="insight-icon" />
+                    <span>Current Insight</span>
+                  </div>
+                  <div className="current-insight-text">
+                    {getCurrentInsight()}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* REVERTED: Detailed Analysis Section */}
+            <div className="detailed-analysis-section">
+              <h4>Detailed Analysis</h4>
+              
+              <div className="streak-comparison">
+                <h5>Streak Length Comparison for <span className="metric-highlight">{selectedMetric}</span></h5>
+                
+                <div className="comparison-grid">
+                  <div className="comparison-card">
+                    <div className="comparison-value">{streakComparison[selectedMetric].short}</div>
+                    <div className="comparison-label">1-7 Days</div>
+                  </div>
+                  
+                  <div className="comparison-card">
+                    <div className="comparison-value">{streakComparison[selectedMetric].medium}</div>
+                    <div className="comparison-label">8-30 Days</div>
+                  </div>
+                  
+                  <div className="comparison-card">
+                    <div className="comparison-value">{streakComparison[selectedMetric].long}</div>
+                    <div className="comparison-label">30+ Days</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="personalized-analysis">
+                <h5>Personalized Insights</h5>
+                
+                <div className="insights-grid">
+                  {generateAllInsights().map(insight => (
+                    <div 
+                      key={insight.id} 
+                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''}`}
+                    >
+                      <div className="insight-card-header">
+                        <FaRegLightbulb className="insight-icon" />
+                        <span className="insight-metric">{insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
+                      </div>
+                      <div className="insight-text">
+                        {wisdomMode ? insight.esoteric : insight.practical}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* REVERTED: Pattern Analysis Section */}
+            <div className="pattern-analysis-section" ref={patternSectionRef}>
+              <h3>Pattern Analysis</h3>
+              
+              <div className="pattern-insights">
+                {generatePatternInsights().map(pattern => (
+                  <div key={pattern.id} className="pattern-insight-item">
+                    <div className="pattern-text">
+                      {wisdomMode ? pattern.esoteric : pattern.practical}
+                    </div>
+                    <div className="pattern-actionable">
+                      {pattern.actionable}
+                    </div>
+                  </div>
+                ))}
+                
+                {generatePatternInsights().length === 0 && (
+                  <div className="no-patterns">
+                    <FaInfoCircle />
+                    <span>Continue tracking to identify patterns in your journey</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* NEW: Floating Wisdom Toggle - Only visible when scrolled to insights */}
+            {showFloatingToggle && (
+              <div 
+                className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
+                onClick={() => setWisdomMode(!wisdomMode)}
+                title={wisdomMode ? "Switch to Practical View" : "Switch to Esoteric View"}
+              >
+                <FaEye className={`floating-wisdom-eye ${wisdomMode ? 'active' : ''}`} />
+              </div>
+            )}
+          </>
+        ) : (
+          /* FREE USER: Progressive premium lock with early teaser */
+          <div className="free-benefit-preview">
+            {/* FREE: Benefit metrics selector (same as premium) */}
+            <div className="benefit-tracker-controls">
+              <div className="benefit-metrics-container">
+                <div className="benefit-metrics-pills">
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'energy' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('energy')}
+                  >
+                    Energy
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'focus' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('focus')}
+                  >
+                    Focus
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'confidence' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('confidence')}
+                  >
+                    Confidence
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'aura' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('aura')}
+                  >
+                    Aura
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'sleep' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('sleep')}
+                  >
+                    Sleep
+                  </button>
+                  <button 
+                    className={`metric-pill ${selectedMetric === 'workout' ? 'active' : ''}`}
+                    onClick={() => setSelectedMetric('workout')}
+                  >
+                    Workout
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* FREE: Average display */}
+            <div className="free-average-display">
+              <div className="current-metric-average">
+                <div className="current-metric-label">Average <span className="metric-highlight">{selectedMetric}</span></div>
+                <div className="current-metric-value">{calculateAverage()}/10</div>
+              </div>
+            </div>
+            
+            {/* FREE: Single insight preview */}
+            <div className="free-insight-preview">
+              <div className="current-insight-card">
+                <div className="current-insight-header">
+                  <FaRegLightbulb className="insight-icon" />
+                  <span>Sample Insight</span>
+                </div>
+                <div className="current-insight-text">
+                  {getCurrentInsight()}
+                </div>
+              </div>
+            </div>
+            
+            {/* NEW: Benefit Upgrade CTA - Matching Timeline design */}
+            <div className="benefit-upgrade-cta">
+              <img 
+                src={helmetImage} 
+                alt="Upgrade" 
+                className="upgrade-helmet-icon"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextElementSibling.style.display = 'flex';
+                }}
+              />
+              <div className="upgrade-helmet-fallback" style={{ display: 'none' }}>
+                ⚔️
+              </div>
+              
+              <div className="upgrade-text-section">
+                <h4>Unlock Full Benefit Analytics</h4>
+                <p>Get detailed charts, streak comparisons, personalized insights, and pattern analysis to optimize your journey.</p>
+                <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
+                  <FaStar />
+                  Upgrade Now
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Badge Modal */}
+      {showBadgeModal && selectedBadge && (
+        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
+          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
+            <div className="badge-trophy">
+              <FaMedal className="badge-trophy-icon" />
+            </div>
+            
+            <h3>{selectedBadge.name}</h3>
+            
+            <div className="badge-earned-date">
+              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
+            </div>
+            
+            <div className="badge-description">
+              <p>
+                {
+                  selectedBadge.name === '7-Day Warrior' ? 
+                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
+                  selectedBadge.name === '14-Day Monk' ? 
+                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
+                  selectedBadge.name === '30-Day Master' ? 
+                    'A full month of retention! Your willpower is exceptional, and the benefits are becoming more pronounced.' :
+                  selectedBadge.name === '90-Day King' ? 
+                    'The ultimate achievement! 90 days of complete discipline. You\'ve mastered your impulses and transformed your life.' :
+                    'Congratulations on earning this achievement badge!'
+                }
+              </p>
+            </div>
+            
+            <div className="badge-benefits">
+              <h4>Unlock Benefits:</h4>
+              <ul>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>New affirmations in the Urge Toolkit</span>
+                </li>
+                {selectedBadge.name !== '7-Day Warrior' && (
+                  <li>
+                    <FaCheckCircle className="check-icon" />
+                    <span>Exclusive challenges in the Community tab</span>
+                  </li>
+                )}
+                {(selectedBadge.name === '30-Day Master' || selectedBadge.name === '90-Day King') && (
+                  <li>
+                    <FaCheckCircle className="check-icon" />
+                    <span>Special Discord role and recognition</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+            
+            <div className="modal-actions">
+              {isPremium ? (
+                <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
+                  Share Achievement
+                </button>
+              ) : (
+                <button className="btn btn-primary">
+                  Upgrade to Share
+                </button>
+              )}
+              <button className="btn btn-outline" onClick={() => setShowBadgeModal(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && (
+        <div className="modal-overlay" onClick={() => setShowResetConfirm(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h3>Reset All Stats</h3>
+            <p>Are you sure you want to reset all your statistics?</p>
+            <p><strong>This action cannot be undone.</strong> All data including:</p>
+            <ul>
+              <li>Current and longest streaks</li>
+              <li>Wet dream and relapse counts</li>
+              <li>All earned badges</li>
+              <li>Benefit tracking data</li>
+              <li>Streak history</li>
+            </ul>
+            <p>will be permanently deleted.</p>
+            
+            <div className="modal-actions">
+              <button className="btn btn-danger" onClick={confirmResetStats}>
+                <FaRedo />
+                Yes, Reset Everything
+              </button>
+              <button className="btn btn-outline" onClick={() => setShowResetConfirm(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Stats;
