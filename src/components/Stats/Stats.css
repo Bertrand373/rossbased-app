@@ -271,7 +271,7 @@
   justify-content: center;
 }
 
-/* REDESIGNED: Benefit Tracker Section with Consistent Spacing */
+/* UPDATED: Benefit Tracker Section - Single Row Design */
 .benefit-tracker-section {
   display: flex;
   flex-direction: column;
@@ -283,11 +283,10 @@
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
-  /* ADDED: Consistent spacing above and below like other sections */
   padding: var(--spacing-lg) 0;
 }
 
-/* Controls with 3-row pill layout */
+/* Controls with SINGLE-row pill layout */
 .benefit-tracker-controls {
   display: flex;
   flex-direction: column;
@@ -304,12 +303,12 @@
   flex-direction: column;
   gap: var(--spacing-md);
   width: 100%;
-  max-width: 600px;
+  max-width: 800px; /* INCREASED: To accommodate 6 items in one row */
   align-items: center;
 }
 
-/* ROW 1: Energy, Focus, Confidence */
-.metric-pill-container-row1 {
+/* SINGLE ROW: All 6 benefit items in one container */
+.metric-pill-container {
   display: flex;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs);
@@ -317,22 +316,10 @@
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   width: 100%;
-  max-width: 480px;
+  justify-content: center; /* DESKTOP: Center the pills */
 }
 
-/* ROW 2: Aura, Sleep Quality, Workout */
-.metric-pill-container-row2 {
-  display: flex;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs);
-  background-color: var(--card-background);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  width: 100%;
-  max-width: 480px;
-}
-
-/* ROW 3: Time range selector */
+/* Time range selector - UNCHANGED */
 .time-range-selector-container {
   width: 100%;
   max-width: 360px;
@@ -360,8 +347,12 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: all 0.2s;
   white-space: nowrap;
+}
+
+.metric-btn:hover, .time-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .metric-btn.active, .time-btn.active {
@@ -1206,10 +1197,23 @@
     width: 100%;
   }
   
-  .metric-pill-container-row1,
-  .metric-pill-container-row2 {
-    max-width: none;
-    width: 100%;
+  /* MOBILE: Horizontal scroll behavior for metric pills */
+  .metric-pill-container {
+    justify-content: flex-start; /* MOBILE: Align left for scrolling */
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: var(--spacing-md); /* MOBILE: Extra padding for scroll comfort */
+  }
+  
+  .metric-pill-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .metric-btn {
+    white-space: nowrap;
+    min-width: fit-content;
+    flex-shrink: 0; /* MOBILE: Prevent pills from shrinking */
   }
   
   .time-range-selector-container {
