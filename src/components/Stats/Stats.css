@@ -541,9 +541,7 @@
   .insight-text {
     font-size: 0.75rem;
   }
-}
-  font-weight: 500;
-  cursor: pointer;
+} pointer;
   transition: none;
 }
 
@@ -1400,3 +1398,5 @@
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-full);
   font-size: 0.875rem;
+  font-weight: 500;
+  cursor:
