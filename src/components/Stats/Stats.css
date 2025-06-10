@@ -59,7 +59,6 @@
   font-weight: 500;
   cursor: pointer;
   transition: none;
-  border: 1px solid;
 }
 
 .form-actions .btn-danger {
@@ -111,485 +110,40 @@
   
   .chart-container {
     flex: 2;
-    min-width: 0; /* Allow flex shrinking */
+    min-width: 0;
   }
   
   .current-insight-sidebar {
     flex: 1;
-    min-width: 280px; /* Minimum sidebar width */
-    max-width: 320px; /* Maximum sidebar width */
+    min-width: 280px;
   }
   
-  /* Desktop: Better spacing for sidebar cards */
-  .current-metric-average {
-    min-height: 100px;
-    justify-content: center; /* ENSURE: Centered on desktop */
-    /* REMOVED: flex-direction override - keep column layout */
-  }
-  
-  .current-insight-card {
-    min-height: 180px;
-    justify-content: center; /* ENSURE: Centered on desktop */
-  }
-}
-
-/* MOBILE RESPONSIVE: Stack Layout and Optimizations */
-@media (max-width: 768px) {
-  /* Mobile header - reset button below title */
-  .stats-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-    margin-top: 0;
-  }
-  
-  .stats-header h2 {
-    text-align: center;
-    order: 1;
-    width: 100%;
-  }
-  
-  .stats-header-actions {
-    width: 100%;
-    order: 2;
-    justify-self: center;
-  }
-  
-  /* FIXED: Mobile reset button to match Reset Calendar styling exactly */
-  .reset-stats-btn {
-    width: 100%;
-    justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-md); /* CHANGED: Match reset calendar button */
-    font-size: 0.875rem; /* ENSURE: Same font size */
-  }
-  
-  /* Mobile: 2x2 grid for stats and badges */
-  .streak-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .stat-card {
-    min-height: 120px;
-    height: 120px;
-    padding: var(--spacing-md);
-  }
-  
-  .stat-card .stat-value {
-    font-size: 2rem;
-  }
-  
-  .badges-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .badge-card {
-    min-height: 120px;
-    height: 120px;
-    padding: var(--spacing-md);
-  }
-  
-  .badge-icon {
-    width: 40px;
-    height: 40px;
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .badge-earned-icon, .badge-locked-icon {
-    font-size: 1.25rem;
-  }
-  
-  .badge-name {
-    font-size: 0.875rem;
-    line-height: 1.2;
-  }
-  
-  /* Mobile: Benefit tracker controls */
-  .benefit-tracker-controls {
-    padding: var(--spacing-lg) var(--spacing-md);
-  }
-  
-  .metric-selector {
-    max-width: none;
-    width: 100%;
-  }
-  
-  /* MOBILE: Horizontal scroll behavior for metric pills */
+  /* Desktop: Benefit tracker controls - make pills scrollable horizontally */
   .metric-pill-container {
-    justify-content: flex-start; /* MOBILE: Align left for scrolling */
+    justify-content: flex-start;
     overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-right: var(--spacing-md); /* MOBILE: Extra padding for scroll comfort */
   }
   
   .metric-pill-container::-webkit-scrollbar {
     display: none;
   }
   
-  .metric-btn {
-    white-space: nowrap;
-    min-width: fit-content;
-    flex-shrink: 0; /* MOBILE: Prevent pills from shrinking */
+  .metric-selector {
+    flex-shrink: 0;
   }
   
-  .time-range-selector-container {
-    max-width: none;
-    width: 100%;
-  }
-
-  /* MOBILE RESPONSIVENESS for Progressive Premium */
-  /* Mobile benefit upgrade CTA adjustments */
-  .benefit-upgrade-cta {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-lg);
-  }
-
-  .upgrade-helmet-icon {
-    width: 70px; /* MATCH: Mobile scaling like Timeline */
-    height: 70px;
-  }
-
-  .upgrade-helmet-fallback {
-    font-size: 2.8rem; /* MATCH: Mobile scaling like Timeline */
-  }
-
-  .upgrade-text-section h4 {
-    font-size: 1.25rem;
-  }
-
-  .upgrade-text-section p {
-    font-size: 0.875rem;
-  }
-
-  .benefit-upgrade-btn {
-    font-size: 1rem; /* MATCH: Mobile size like Timeline */
-    padding: var(--spacing-md) var(--spacing-lg);
-    min-width: 180px; /* MATCH: Mobile width like Timeline */
-    min-height: 48px; /* MATCH: Mobile height like Timeline */
-    align-self: center;
-  }
-  
-  /* Mobile free benefit preview adjustments */
-  .free-average-display .current-metric-average {
-    max-width: 100%;
-    min-height: 100px;
-    padding: var(--spacing-md);
-  }
-  
-  .free-insight-preview .current-insight-card {
-    max-width: 100%;
-    min-height: 100px;
-    padding: var(--spacing-md);
-  }
-  
-  /* MOBILE LAYOUT REORGANIZATION: Separate chart from average/insight container */
-  .chart-and-insight-container {
-    flex-direction: column;
-    gap: 0; /* Remove gap between chart and insights */
-  }
-  
-  /* MOBILE: Chart gets its own separate section */
-  .chart-container {
-    padding: var(--spacing-md);
-    background-color: var(--medium-gray);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    margin-bottom: var(--spacing-lg); /* Add space between chart and insights */
-  }
-  
-  /* MOBILE: Current insights section - separate container below chart */
-  .current-insight-sidebar {
-    background-color: var(--medium-gray);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    border: 1px solid var(--border);
-    gap: var(--spacing-lg); /* Increased gap between average and insight */
-  }
-  
-  .current-metric-average {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    min-height: 100px;
-    justify-content: center;
-  }
-  
-  .current-metric-value {
-    font-size: 1.75rem; /* MATCH: Make same size as comparison-value */
-  }
-  
-  .current-insight-card {
-    min-height: 100px;
-    justify-content: center;
-  }
-  
-  /* Mobile: Detailed Analysis */
-  .detailed-analysis-section {
-    padding: var(--spacing-lg);
-  }
-  
-  .detailed-analysis-section h4 {
-    font-size: 1.125rem;
-    margin-bottom: var(--spacing-lg);
-  }
-  
-  .comparison-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .comparison-card {
-    min-height: 100px;
-    height: 100px;
-    padding: var(--spacing-md);
-  }
-  
-  .comparison-value {
-    font-size: 1.75rem; /* MATCH: Same size as current-metric-value */
-  }
-  
-  /* Mobile: Insights grid - single column */
+  /* Desktop: Insights grid - always 2 columns */
   .insights-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  .insight-card {
-    min-height: 100px;
-    padding: var(--spacing-md);
-    justify-content: center;
-  }
-  
-  .insight-text {
-    font-size: 0.8rem;
-  }
-  
-  /* Mobile: Pattern analysis */
-  .pattern-analysis-section {
-    padding: var(--spacing-lg);
-  }
-  
-  .pattern-insight-item {
-    padding: var(--spacing-md);
-  }
-  
-  .pattern-text {
-    font-size: 0.8rem;
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .pattern-actionable {
-    font-size: 0.8rem;
-  }
-  
-  .no-patterns {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    text-align: center;
-  }
-  
-  /* Mobile: Modal actions */
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .modal-actions {
-    flex-direction: column;
-  }
-  
-  .modal-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* VERY SMALL SCREENS: Further optimizations */
-@media (max-width: 480px) {
-  /* Very small screen benefit upgrade adjustments */
-  .upgrade-helmet-icon {
-    width: 60px; /* MATCH: Very small screen scaling like Timeline */
-    height: 60px;
-  }
-
-  .upgrade-helmet-fallback {
-    font-size: 2.4rem; /* MATCH: Very small screen scaling like Timeline */
-  }
-
-  .upgrade-text-section h4 {
-    font-size: 1.125rem;
-  }
-
-  .upgrade-text-section p {
-    font-size: 0.8rem;
-  }
-
-  .benefit-upgrade-btn {
-    font-size: 0.875rem; /* MATCH: Very small screen size like Timeline */
-    padding: var(--spacing-sm) var(--spacing-md);
-    min-width: 160px; /* MATCH: Very small screen width like Timeline */
-    min-height: 44px; /* MATCH: Very small screen height like Timeline */
-  }
-  
-  .benefit-upgrade-cta {
-    padding: var(--spacing-lg) var(--spacing-md);
-  }
-
-  /* Hide icons on very small screens to prevent overflow */
-  .current-insight-header .insight-icon,
-  .insight-card-header .insight-icon {
-    display: none;
-  }
-  
-  .stats-container {
-    gap: var(--spacing-md);
-  }
-  
-  .stat-card {
-    min-height: 100px;
-    height: 100px;
-    padding: var(--spacing-sm);
-  }
-  
-  .stat-card .stat-value {
-    font-size: 1.75rem;
-  }
-  
-  .stat-card .stat-label {
-    font-size: 0.8rem;
-  }
-  
-  .badge-card {
-    min-height: 100px;
-    height: 100px;
-    padding: var(--spacing-sm);
-  }
-  
-  .badge-icon {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .badge-earned-icon, .badge-locked-icon {
-    font-size: 1.125rem;
-  }
-  
-  .badge-name {
-    font-size: 0.8rem;
-  }
-  
-  .benefit-tracker-controls {
-    padding: var(--spacing-md) var(--spacing-sm);
-  }
-  
-  .chart-container {
-    padding: var(--spacing-sm);
-    height: 250px;
-  }
-  
-  .current-metric-average {
-    min-height: 80px;
-    padding: var(--spacing-md);
-  }
-  
-  .current-metric-value {
-    font-size: 1.5rem; /* Slightly smaller on very small screens */
-  }
-  
-  .current-insight-card {
-    min-height: 90px;
-    padding: var(--spacing-md);
-    justify-content: center;
-  }
-  
-  .detailed-analysis-section {
-    padding: var(--spacing-md);
-  }
-  
-  .comparison-card {
-    min-height: 90px;
-    height: 90px;
-    padding: var(--spacing-sm);
-  }
-  
-  .comparison-value {
-    font-size: 1.5rem; /* MATCH: Same as current-metric-value on very small screens */
-  }
-  
-  .insight-card {
-    min-height: 90px;
-    padding: var(--spacing-sm);
-    justify-content: center;
-  }
-  
-  .insight-card-header {
-    gap: var(--spacing-xs);
-  }
-  
-  .insight-card-header .insight-icon {
-    font-size: 1rem;
-  }
-  
-  .insight-metric {
-    font-size: 0.8rem;
-  }
-  
-  .insight-text {
-    font-size: 0.75rem;
-  }
-} pointer;
-  transition: none;
-}
-
-/* FLOATING WISDOM TOGGLE - Clean implementation without affecting layouts */
-.floating-wisdom-toggle {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  background-color: var(--card-background);
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  z-index: 999;
-  transition: none;
-}
-
-.floating-wisdom-toggle.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: var(--primary);
-}
-
-.floating-wisdom-eye {
-  font-size: 1.25rem;
-  color: var(--text-secondary);
-  transition: none;
-}
-
-.floating-wisdom-eye.active {
-  color: var(--primary);
-}
-
-/* Mobile: Position above mobile navigation */
-@media (max-width: 768px) {
-  .floating-wisdom-toggle {
-    bottom: 100px; /* Above mobile navigation */
-    right: 16px;
-    width: 48px;
-    height: 48px;
-  }
-  
-  .floating-wisdom-eye {
-    font-size: 1.125rem;
+  /* Desktop: Comparison cards - always 3 columns */
+  .comparison-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -831,137 +385,114 @@
   margin-bottom: var(--spacing-xl);
 }
 
-/* FREE: Average Display - Same styling as premium sidebar */
-.free-average-display {
-  display: flex;
-  justify-content: center;
-}
-
-.free-average-display .current-metric-average {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  align-items: center;
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  min-height: 80px;
-  justify-content: center;
-  max-width: 300px;
-  width: 100%;
-}
-
-/* FREE: Single Insight Preview */
-.free-insight-preview {
-  display: flex;
-  justify-content: center;
-}
-
-.free-insight-preview .current-insight-card {
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  justify-content: center;
-  max-width: 600px;
-  width: 100%;
-}
-
-/* NEW: Benefit Upgrade CTA - Matching Timeline early teaser design */
+/* FREE: Average Display - Same styling as premium but limited */
 .benefit-upgrade-cta {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  background: linear-gradient(135deg, 
+    rgba(255, 221, 0, 0.05) 0%, 
+    rgba(255, 221, 0, 0.02) 50%,
+    rgba(255, 221, 0, 0.05) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.15);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xl);
-  text-align: left;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-/* NEW: Benefit upgrade helmet - EXACT copy of Timeline early teaser helmet sizing */
+.benefit-upgrade-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.upgrade-visual-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
 .upgrade-helmet-icon {
-  width: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
-  height: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
-  flex-shrink: 0;
-  animation: benefit-helmet-pulse 2.5s ease-in-out infinite;
-  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--primary) 0%, #f0cc00 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(255, 221, 0, 0.3);
+  position: relative;
 }
 
 .upgrade-helmet-fallback {
-  font-size: 3.2rem; /* MATCH: Same as Timeline early-teaser-helmet-fallback */
-  color: var(--primary);
-  flex-shrink: 0;
-  animation: benefit-helmet-pulse 2.5s ease-in-out infinite;
+  font-size: 2.5rem;
+  color: #000000;
+  font-weight: 700;
 }
 
-@keyframes benefit-helmet-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.98);
-  }
+.upgrade-helmet-icon::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.2), rgba(255, 221, 0, 0.05));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
 }
 
 .upgrade-text-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+  max-width: 400px;
 }
 
 .upgrade-text-section h4 {
-  font-size: 1.5rem;
-  font-weight: 600;
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.25rem;
   color: var(--text);
-  margin: 0;
+  font-weight: 600;
 }
 
 .upgrade-text-section p {
-  font-size: 1rem;
-  color: var(--text-secondary);
   margin: 0;
-  line-height: 1.5;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
-/* NEW: Benefit upgrade button - EXACT copy of Timeline early-teaser-upgrade-btn */
 .benefit-upgrade-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl); /* MATCH: Same as Timeline */
-  background-color: var(--primary); /* MATCH: Same as Timeline */
-  border: none; /* MATCH: Same as Timeline */
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: var(--primary);
+  border: none;
   border-radius: var(--radius-full);
-  color: #000000; /* MATCH: Same as Timeline */
-  font-size: 1.125rem; /* MATCH: Same as Timeline */
-  font-weight: 600; /* MATCH: Same as Timeline */
+  color: #000000;
+  font-size: 1.125rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease; /* MATCH: Same as Timeline */
+  transition: all 0.2s ease;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  min-width: 200px; /* MATCH: Same as Timeline */
-  min-height: 48px; /* MATCH: Same as Timeline */
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Timeline */
+  min-width: 200px;
+  min-height: 48px;
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
   align-self: flex-start;
 }
 
 .benefit-upgrade-btn:hover {
-  background-color: var(--primary-dark); /* MATCH: Same as Timeline */
-  transform: translateY(-2px); /* MATCH: Same as Timeline */
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Timeline */
-  color: #000000; /* MATCH: Same as Timeline */
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+  color: #000000;
 }
 
 /* ===== END: FREE USER BENEFIT PREVIEW SECTION ===== */
@@ -994,9 +525,9 @@
 
 .current-metric-average {
   display: flex;
-  flex-direction: column; /* CHANGED: Always use column layout like mobile */
-  gap: var(--spacing-sm); /* CHANGED: Use mobile gap */
-  align-items: center; /* ADDED: Center content */
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: center;
   padding: var(--spacing-lg);
   background-color: var(--card-background);
   border-radius: var(--radius-md);
@@ -1025,7 +556,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  justify-content: center; /* ADDED: Vertically center all content */
+  justify-content: center;
 }
 
 .current-insight-header {
@@ -1085,7 +616,7 @@
 }
 
 .streak-comparison {
-  margin-bottom: var(--spacing-md); /* REDUCED: Less space after comparison cards */
+  margin-bottom: var(--spacing-md);
 }
 
 .streak-comparison h5 {
@@ -1140,10 +671,10 @@
 
 /* Personalized Analysis */
 .personalized-analysis h5 {
-  margin-bottom: var(--spacing-md); /* REDUCED: Less space after header */
+  margin-bottom: var(--spacing-md);
   font-size: 1rem;
   color: var(--text);
-  text-align: center; /* CHANGED: Centered the header */
+  text-align: center;
   font-weight: 600;
 }
 
@@ -1164,9 +695,8 @@
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   transition: all 0.2s ease;
-  /* CHANGED: Dynamic height for better content readability */
   min-height: 120px;
-  justify-content: center; /* ADDED: Vertically center all content */
+  justify-content: center;
 }
 
 .insight-card.highlighted {
@@ -1182,7 +712,7 @@
   gap: var(--spacing-sm);
   font-weight: 600;
   color: var(--text);
-  justify-content: center; /* ADDED: Center the header content */
+  justify-content: center;
 }
 
 .insight-card-header .insight-icon {
@@ -1205,7 +735,7 @@
   font-size: 0.875rem;
   line-height: 1.4;
   font-weight: 500;
-  text-align: center; /* CHANGED: Center-aligned the insight text */
+  text-align: center;
 }
 
 .insight-card:not(.highlighted) .insight-icon {
@@ -1223,7 +753,7 @@
   margin-bottom: var(--spacing-md);
   font-size: 1rem;
   color: var(--text);
-  text-align: center; /* CHANGED: Centered the header */
+  text-align: center;
   font-weight: 600;
 }
 
@@ -1238,7 +768,7 @@
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  text-align: center; /* CHANGED: Center-aligned all pattern content */
+  text-align: center;
   transition: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -1248,14 +778,14 @@
   color: var(--text);
   margin-bottom: var(--spacing-sm);
   font-size: 0.875rem;
-  text-align: center; /* CHANGED: Center-aligned pattern text */
+  text-align: center;
 }
 
 .pattern-actionable {
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-style: italic;
-  text-align: center; /* CHANGED: Center-aligned actionable text */
+  text-align: center;
 }
 
 .no-patterns {
@@ -1399,4 +929,311 @@
   border-radius: var(--radius-full);
   font-size: 0.875rem;
   font-weight: 500;
-  cursor:
+  cursor: pointer;
+  transition: none;
+  border: 1px solid;
+}
+
+/* MOBILE RESPONSIVE: Stacked layout and single columns */
+@media (max-width: 768px) {
+  /* Mobile: Chart and Insight Container - Keep stacked */
+  .chart-and-insight-container {
+    padding: var(--spacing-md);
+  }
+  
+  .chart-container {
+    height: 250px;
+    padding: var(--spacing-md);
+  }
+  
+  .current-metric-average {
+    min-height: 80px;
+  }
+  
+  .current-metric-value {
+    font-size: 1.75rem;
+  }
+  
+  .current-insight-card {
+    min-height: 100px;
+  }
+  
+  /* Mobile: Streak stats grid - 2x2 */
+  .streak-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Mobile: Badges grid - 2x2 */
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .badge-card {
+    min-height: 120px;
+    height: 120px;
+  }
+  
+  .detailed-analysis-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .detailed-analysis-section h4 {
+    font-size: 1.125rem;
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .comparison-card {
+    min-height: 100px;
+    height: 100px;
+    padding: var(--spacing-md);
+  }
+  
+  .comparison-value {
+    font-size: 1.75rem;
+  }
+  
+  /* Mobile: Insights grid - single column */
+  .insights-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .insight-card {
+    min-height: 100px;
+    padding: var(--spacing-md);
+    justify-content: center;
+  }
+  
+  .insight-text {
+    font-size: 0.8rem;
+  }
+  
+  /* Mobile: Pattern analysis */
+  .pattern-analysis-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .pattern-insight-item {
+    padding: var(--spacing-md);
+  }
+  
+  .pattern-text {
+    font-size: 0.8rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .pattern-actionable {
+    font-size: 0.8rem;
+  }
+  
+  .no-patterns {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  /* Mobile: Modal actions */
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .modal-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* VERY SMALL SCREENS: Further optimizations */
+@media (max-width: 480px) {
+  /* Very small screen benefit upgrade adjustments */
+  .upgrade-helmet-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .upgrade-helmet-fallback {
+    font-size: 2.4rem;
+  }
+
+  .upgrade-text-section h4 {
+    font-size: 1.125rem;
+  }
+
+  .upgrade-text-section p {
+    font-size: 0.8rem;
+  }
+
+  .benefit-upgrade-btn {
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 160px;
+    min-height: 44px;
+  }
+  
+  .benefit-upgrade-cta {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  /* Hide icons on very small screens to prevent overflow */
+  .current-insight-header .insight-icon,
+  .insight-card-header .insight-icon {
+    display: none;
+  }
+  
+  .stats-container {
+    gap: var(--spacing-md);
+  }
+  
+  .stat-card {
+    min-height: 100px;
+    height: 100px;
+    padding: var(--spacing-sm);
+  }
+  
+  .stat-card .stat-value {
+    font-size: 1.75rem;
+  }
+  
+  .stat-card .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .badge-card {
+    min-height: 100px;
+    height: 100px;
+    padding: var(--spacing-sm);
+  }
+  
+  .badge-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .badge-earned-icon, .badge-locked-icon {
+    font-size: 1.125rem;
+  }
+  
+  .badge-name {
+    font-size: 0.8rem;
+  }
+  
+  .benefit-tracker-controls {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+  
+  .chart-container {
+    padding: var(--spacing-sm);
+    height: 250px;
+  }
+  
+  .current-metric-average {
+    min-height: 80px;
+    padding: var(--spacing-md);
+  }
+  
+  .current-metric-value {
+    font-size: 1.5rem;
+  }
+  
+  .current-insight-card {
+    min-height: 90px;
+    padding: var(--spacing-md);
+    justify-content: center;
+  }
+  
+  .detailed-analysis-section {
+    padding: var(--spacing-md);
+  }
+  
+  .comparison-card {
+    min-height: 90px;
+    height: 90px;
+    padding: var(--spacing-sm);
+  }
+  
+  .comparison-value {
+    font-size: 1.5rem;
+  }
+  
+  .insight-card {
+    min-height: 90px;
+    padding: var(--spacing-sm);
+    justify-content: center;
+  }
+  
+  .insight-card-header {
+    gap: var(--spacing-xs);
+  }
+  
+  .insight-card-header .insight-icon {
+    font-size: 1rem;
+  }
+  
+  .insight-metric {
+    font-size: 0.8rem;
+  }
+  
+  .insight-text {
+    font-size: 0.75rem;
+  }
+}
+
+/* FLOATING WISDOM TOGGLE - Clean implementation without affecting layouts */
+.floating-wisdom-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background-color: var(--card-background);
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  transition: none;
+}
+
+.floating-wisdom-toggle.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: var(--primary);
+}
+
+.floating-wisdom-eye {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.floating-wisdom-eye.active {
+  color: var(--primary);
+}
+
+/* Mobile: Position above mobile navigation */
+@media (max-width: 768px) {
+  .floating-wisdom-toggle {
+    bottom: 100px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .floating-wisdom-eye {
+    font-size: 1.125rem;
+  }
+}
