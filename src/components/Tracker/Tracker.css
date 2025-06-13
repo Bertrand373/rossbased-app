@@ -792,11 +792,11 @@
   .tracker-actions {
     width: 100%;
     order: 2;
-    justify-self: center;
+    justify-content: center;
   }
   
   .action-btn {
-    flex: 1;
+    width: 100%;
     justify-content: center;
   }
   
@@ -1033,7 +1033,9 @@
   .benefit-value {
     font-size: 0.8rem;
   }
-}/* components/Tracker/Tracker.css - UPDATED: Clean subscription banner replacing helmet overlay */
+}
+
+/* components/Tracker/Tracker.css - UPDATED: Clean subscription banner replacing helmet overlay */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -1273,5 +1275,3 @@ button.action-btn:hover {
   flex-direction: column;
   gap: var(--spacing-lg);
 }
-
-/* COMPLETELY REDESIGNED: Timeline-style section header with under */
