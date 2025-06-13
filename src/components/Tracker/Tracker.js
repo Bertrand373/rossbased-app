@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Hard premium cutoff with clean subscription banner
+// components/Tracker/Tracker.js - UPDATED: Uses helmet image for premium overlay
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -213,34 +213,23 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       benefit => format(new Date(benefit.date), 'yyyy-MM-dd') !== todayStr
     );
     
-    // Add new entry - for free users, only save energy
-    const newEntry = {
+    // Add new entry
+    updatedBenefitTracking.push({
       date: today,
-      energy: todayBenefits.energy
-    };
-    
-    // For premium users, save all benefits
-    if (isPremium) {
-      newEntry.focus = todayBenefits.focus;
-      newEntry.confidence = todayBenefits.confidence;
-      newEntry.aura = todayBenefits.aura;
-      newEntry.sleep = todayBenefits.sleep;
-      newEntry.workout = todayBenefits.workout;
-    }
-    
-    updatedBenefitTracking.push(newEntry);
+      energy: todayBenefits.energy,
+      focus: todayBenefits.focus,
+      confidence: todayBenefits.confidence,
+      aura: todayBenefits.aura,
+      sleep: todayBenefits.sleep, // CHANGED: sleep replaces attraction
+      workout: todayBenefits.workout
+    });
     
     // Sort by date
     updatedBenefitTracking.sort((a, b) => new Date(a.date) - new Date(b.date));
     
     updateUserData({ benefitTracking: updatedBenefitTracking });
     setBenefitsLogged(true);
-    
-    if (isPremium) {
-      toast.success('All benefits logged for today!');
-    } else {
-      toast.success('Energy level saved!');
-    }
+    toast.success('Benefits logged for today!');
   };
 
   const saveNote = () => {
@@ -389,7 +378,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* UPDATED: Benefit Logging Section with Hard Premium Cutoff */}
+      {/* UPDATED: Benefit Logging Section with Single Premium Helmet Overlay */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -416,8 +405,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* FREE USER: Energy Slider Only */}
-          <div className="free-benefit-container">
+          {/* UPDATED: Premium Benefits Container with Single Helmet Overlay */}
+          <div className="premium-benefits-container">
+            {/* Energy Slider - FREE for all users (outside premium container) */}
             <div className="benefit-slider-item">
               <div className="benefit-slider-header">
                 <span className="benefit-label">Energy</span>
@@ -437,39 +427,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <span>High</span>
               </div>
             </div>
-          </div>
-
-          {/* PREMIUM CUTOFF: Free users see subscription banner, Premium users see all sliders */}
-          {!isPremium ? (
-            // PREMIUM UPGRADE BANNER - Clean subscription prompt
-            <div className="benefit-upgrade-banner">
-              <div className="benefit-upgrade-content">
-                <img 
-                  src={helmetImage} 
-                  alt="Premium Benefits" 
-                  className="benefit-upgrade-helmet"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'block';
-                  }}
-                />
-                <FaLock 
-                  className="benefit-upgrade-helmet-fallback" 
-                  style={{ display: 'none' }}
-                />
-                <div className="benefit-upgrade-text">
-                  <h3>Unlock Complete Benefits Tracking</h3>
-                  <p>Track Focus, Confidence, Aura, Sleep Quality & Workout levels with detailed analytics</p>
-                  <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
-                    <FaStar />
-                    Upgrade to Premium
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            // PREMIUM BENEFITS SECTION - All premium sliders
-            <div className="premium-benefits-container">
+            
+            {/* PREMIUM BENEFITS SECTION - All 5 sliders with single helmet overlay */}
+            <div className={`premium-benefits-section ${!isPremium ? 'premium-locked' : ''}`}>
+              {/* PREMIUM LOCKED SLIDERS */}
               {[
                 { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
                 { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
@@ -487,9 +448,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                     min="1"
                     max="10"
                     value={slider.value}
-                    onChange={(e) => handleBenefitChange(slider.key, parseInt(e.target.value))}
+                    onChange={(e) => isPremium && handleBenefitChange(slider.key, parseInt(e.target.value))}
                     className="benefit-range-slider"
-                    disabled={benefitsLogged}
+                    disabled={benefitsLogged || !isPremium}
                   />
                   <div className="slider-labels">
                     <span>{slider.lowLabel}</span>
@@ -497,10 +458,40 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                   </div>
                 </div>
               ))}
+              
+              {/* ENHANCED: SINGLE PREMIUM HELMET OVERLAY covering all 5 sliders with upgrade button */}
+              {!isPremium && (
+                <div className="single-premium-lock-overlay">
+                  <div className="single-lock-fade-gradient">
+                    <div className="single-lock-center">
+                      <img 
+                        src={helmetImage} 
+                        alt="Premium" 
+                        className="single-lock-icon"
+                        onError={(e) => {
+                          // Fallback to lock icon if helmet image fails to load
+                          e.target.style.display = 'none';
+                          e.target.nextElementSibling.style.display = 'block';
+                        }}
+                      />
+                      <FaLock 
+                        className="single-lock-icon-fallback" 
+                        style={{ display: 'none' }}
+                      />
+                      <span className="single-lock-text">Premium</span>
+                      <span className="single-lock-subtitle">Unlock Full Benefits Tracking</span>
+                      <button className="single-lock-upgrade-btn" onClick={handleUpgradeClick}>
+                        <FaStar />
+                        Upgrade Now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
           
-          {/* Save buttons */}
+          {/* Save/Upgrade buttons */}
           {!benefitsLogged && (
             <div className="benefit-actions">
               {isPremium ? (
@@ -509,16 +500,25 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                   onClick={saveBenefits}
                 >
                   <FaCheckCircle />
-                  <span>Save All Benefits</span>
+                  <span>Save Today's Benefits</span>
                 </button>
               ) : (
-                <button 
-                  className="action-btn save-benefits-btn"
-                  onClick={saveBenefits}
-                >
-                  <FaCheckCircle />
-                  <span>Save Energy Level</span>
-                </button>
+                <div className="benefit-actions-row">
+                  <button 
+                    className="action-btn save-benefits-btn partial"
+                    onClick={saveBenefits}
+                  >
+                    <FaCheckCircle />
+                    <span>Save Energy Level</span>
+                  </button>
+                  <button 
+                    className="action-btn upgrade-benefits-btn"
+                    onClick={handleUpgradeClick}
+                  >
+                    <FaStar />
+                    <span>Unlock All Benefits</span>
+                  </button>
+                </div>
               )}
             </div>
           )}
