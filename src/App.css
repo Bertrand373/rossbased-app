@@ -110,10 +110,14 @@ body {
   font-weight: 500;
   font-size: 0.875rem;
   border-radius: var(--radius-full);
-  transition: none;
+  transition: all 0.2s;
   background-color: transparent;
   border: 1px solid transparent;
   white-space: nowrap;
+}
+
+.header-nav .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .header-nav .nav-link.active {
