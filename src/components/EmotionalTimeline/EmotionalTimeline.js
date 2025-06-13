@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Early premium lock with Tracker helmet styling
+// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Hard premium cutoff after upgrade banner
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -500,7 +500,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
 
-      {/* UPDATED: Timeline Content Container with EARLIER Premium Lock */}
+      {/* UPDATED: Timeline Content Container with Hard Premium Cutoff */}
       <div className="timeline-content-container">
         {/* Current Phase Display - ALWAYS VISIBLE */}
         {currentPhase && currentDay > 0 && (
@@ -554,8 +554,9 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
           </div>
         )}
 
-        {/* NEW: Early Premium Teaser Section - Shows Immediately After Current Phase */}
-        {!isPremium && (
+        {/* PREMIUM CUTOFF: Free users see nothing beyond this point */}
+        {!isPremium ? (
+          // HARD STOP: Only show the premium upgrade for free users
           <div className="early-premium-teaser">
             <div className="early-teaser-content">
               <img 
@@ -581,290 +582,261 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
           </div>
-        )}
-
-        {/* PREMIUM FEATURES SECTION - Single container with helmet overlay for non-premium */}
-        <div className={`premium-features-section ${!isPremium ? 'locked-features' : ''}`}>
-          {/* Timeline Overview */}
-          <div className="timeline-overview">
-            <h3>Complete Journey Map</h3>
-            <div className="phases-timeline">
-              {emotionalPhases.map((phase, index) => {
-                const isCompleted = currentDay > phase.endDay && phase.endDay !== 999999;
-                const isCurrent = currentPhase?.id === phase.id;
-                const isUpcoming = currentDay < phase.startDay;
-                
-                return (
-                  <div 
-                    key={phase.id} 
-                    className={`timeline-phase ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                    onClick={() => isPremium && showPhaseDetails(phase)}
-                    style={{ cursor: isPremium ? 'pointer' : 'default' }}
-                  >
-                    <div className="timeline-phase-icon" style={{ color: phase.color }}>
-                      <phase.icon />
-                    </div>
-                    <div className="timeline-phase-info">
-                      <div className="timeline-phase-name">{phase.name}</div>
-                      <div className="timeline-phase-range">Days {phase.dayRange}</div>
-                    </div>
-                    {isPremium ? (
-                      <>
-                        {isCompleted && (
-                          <div className="timeline-phase-check">
-                            <FaCheckCircle style={{ color: phase.color }} />
-                          </div>
-                        )}
-                        {isCurrent && (
-                          <div className="timeline-phase-current" style={{ color: phase.color }}>
-                            Current
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="timeline-phase-lock">
-                        <FaLock />
+        ) : (
+          // PREMIUM FEATURES SECTION - Only visible to premium users
+          <div className="premium-features-section">
+            {/* Timeline Overview */}
+            <div className="timeline-overview">
+              <h3>Complete Journey Map</h3>
+              <div className="phases-timeline">
+                {emotionalPhases.map((phase, index) => {
+                  const isCompleted = currentDay > phase.endDay && phase.endDay !== 999999;
+                  const isCurrent = currentPhase?.id === phase.id;
+                  const isUpcoming = currentDay < phase.startDay;
+                  
+                  return (
+                    <div 
+                      key={phase.id} 
+                      className={`timeline-phase ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                      onClick={() => isPremium && showPhaseDetails(phase)}
+                      style={{ cursor: isPremium ? 'pointer' : 'default' }}
+                    >
+                      <div className="timeline-phase-icon" style={{ color: phase.color }}>
+                        <phase.icon />
                       </div>
-                    )}
+                      <div className="timeline-phase-info">
+                        <div className="timeline-phase-name">{phase.name}</div>
+                        <div className="timeline-phase-range">Days {phase.dayRange}</div>
+                      </div>
+                      {isPremium ? (
+                        <>
+                          {isCompleted && (
+                            <div className="timeline-phase-check">
+                              <FaCheckCircle style={{ color: phase.color }} />
+                            </div>
+                          )}
+                          {isCurrent && (
+                            <div className="timeline-phase-current" style={{ color: phase.color }}>
+                              Current
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="timeline-phase-lock">
+                          <FaLock />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Mastery Levels Display for advanced practitioners */}
+              {currentDay >= 181 && (
+                <div className="mastery-levels-section">
+                  <h3>Mastery Levels (Days 181+)</h3>
+                  <div className="mastery-levels-grid">
+                    {masteryLevels.map((level, index) => {
+                      const isCompleted = currentDay > level.endDay && level.endDay !== 999999;
+                      const isCurrent = getCurrentMasteryLevel()?.id === level.id;
+                      const isUpcoming = currentDay < level.startDay;
+                      
+                      return (
+                        <div 
+                          key={level.id}
+                          className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                        >
+                          <div className="mastery-level-header">
+                            <div className="mastery-level-number">Level {level.id}</div>
+                            <div className="mastery-level-name">{level.name}</div>
+                          </div>
+                          <div className="mastery-level-range">Days {level.dayRange}</div>
+                          <div className="mastery-level-duration">{level.duration}</div>
+                          
+                          {isPremium && isCurrent && (
+                            <div className="mastery-level-progress">
+                              <div className="mastery-progress-bar">
+                                <div 
+                                  className="mastery-progress-fill"
+                                  style={{ width: `${getPhaseProgress(currentPhase)}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {isPremium ? (
+                            <>
+                              {isCompleted && (
+                                <div className="mastery-level-check">
+                                  <FaCheckCircle />
+                                </div>
+                              )}
+                              {isCurrent && (
+                                <div className="mastery-level-current">
+                                  Current Level
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="mastery-level-lock">
+                              <FaLock />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                </div>
+              )}
             </div>
 
-            {/* Mastery Levels Display for advanced practitioners */}
-            {currentDay >= 181 && (
-              <div className="mastery-levels-section">
-                <h3>Mastery Levels (Days 181+)</h3>
-                <div className="mastery-levels-grid">
-                  {masteryLevels.map((level, index) => {
-                    const isCompleted = currentDay > level.endDay && level.endDay !== 999999;
-                    const isCurrent = getCurrentMasteryLevel()?.id === level.id;
-                    const isUpcoming = currentDay < level.startDay;
-                    
-                    return (
-                      <div 
-                        key={level.id}
-                        className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+            {/* Daily Emotional Check-in */}
+            <div className="emotional-checkin-section">
+              <h3>Daily Emotional Check-in</h3>
+              
+              <div className="emotion-status-section">
+                {emotionsLogged ? (
+                  <div className="emotions-logged">
+                    <FaCheckCircle className="check-icon" />
+                    <span>Emotional check-in completed for today!</span>
+                    {isPremium && (
+                      <button 
+                        className="action-btn edit-emotions-btn"
+                        onClick={enableEmotionEditing}
                       >
-                        <div className="mastery-level-header">
-                          <div className="mastery-level-number">Level {level.id}</div>
-                          <div className="mastery-level-name">{level.name}</div>
-                        </div>
-                        <div className="mastery-level-range">Days {level.dayRange}</div>
-                        <div className="mastery-level-duration">{level.duration}</div>
-                        
-                        {isPremium && isCurrent && (
-                          <div className="mastery-level-progress">
-                            <div className="mastery-progress-bar">
-                              <div 
-                                className="mastery-progress-fill"
-                                style={{ width: `${getPhaseProgress(currentPhase)}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {isPremium ? (
-                          <>
-                            {isCompleted && (
-                              <div className="mastery-level-check">
-                                <FaCheckCircle />
-                              </div>
-                            )}
-                            {isCurrent && (
-                              <div className="mastery-level-current">
-                                Current Level
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div className="mastery-level-lock">
-                            <FaLock />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                        <FaPen />
+                        <span>Edit</span>
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="emotions-not-logged">
+                    <FaInfoCircle className="info-icon" />
+                    <span>Track your emotional state to better understand your phase progression</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Daily Emotional Check-in */}
-          <div className="emotional-checkin-section">
-            <h3>Daily Emotional Check-in</h3>
-            
-            <div className="emotion-status-section">
-              {emotionsLogged ? (
-                <div className="emotions-logged">
-                  <FaCheckCircle className="check-icon" />
-                  <span>Emotional check-in completed for today!</span>
-                  {isPremium && (
+              {/* Emotion sliders */}
+              <div className="emotion-sliders">
+                {[
+                  { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
+                  { key: 'moodStability', label: 'Mood Stability', value: todayEmotions.moodStability, lowLabel: 'Mood Swings', highLabel: 'Very Stable' },
+                  { key: 'mentalClarity', label: 'Mental Clarity', value: todayEmotions.mentalClarity, lowLabel: 'Foggy', highLabel: 'Crystal Clear' },
+                  { key: 'emotionalProcessing', label: 'Emotional Processing', value: todayEmotions.emotionalProcessing, lowLabel: 'Suppressed', highLabel: 'Flowing' }
+                ].map((emotion) => (
+                  <div key={emotion.key} className="emotion-slider-item">
+                    <div className="emotion-slider-header">
+                      <span className="emotion-label">{emotion.label}</span>
+                      <span className="emotion-value">{emotion.value}/10</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={emotion.value}
+                      onChange={(e) => isPremium && handleEmotionChange(emotion.key, parseInt(e.target.value))}
+                      className="emotion-range-slider"
+                      disabled={emotionsLogged || !isPremium}
+                    />
+                    <div className="slider-labels">
+                      <span>{emotion.lowLabel}</span>
+                      <span>{emotion.highLabel}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {!emotionsLogged && (
+                <div className="emotion-actions">
+                  {isPremium ? (
                     <button 
-                      className="action-btn edit-emotions-btn"
-                      onClick={enableEmotionEditing}
+                      className="action-btn save-emotions-btn"
+                      onClick={saveEmotions}
                     >
-                      <FaPen />
-                      <span>Edit</span>
+                      <FaCheckCircle />
+                      <span>Save Emotional Check-in</span>
+                    </button>
+                  ) : (
+                    <button 
+                      className="action-btn upgrade-emotions-btn"
+                      onClick={handleUpgradeClick}
+                    >
+                      <FaStar />
+                      <span>Unlock Emotional Tracking</span>
                     </button>
                   )}
                 </div>
-              ) : (
-                <div className="emotions-not-logged">
-                  <FaInfoCircle className="info-icon" />
-                  <span>Track your emotional state to better understand your phase progression</span>
-                </div>
               )}
             </div>
 
-            {/* Emotion sliders */}
-            <div className="emotion-sliders">
-              {[
-                { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
-                { key: 'moodStability', label: 'Mood Stability', value: todayEmotions.moodStability, lowLabel: 'Mood Swings', highLabel: 'Very Stable' },
-                { key: 'mentalClarity', label: 'Mental Clarity', value: todayEmotions.mentalClarity, lowLabel: 'Foggy', highLabel: 'Crystal Clear' },
-                { key: 'emotionalProcessing', label: 'Emotional Processing', value: todayEmotions.emotionalProcessing, lowLabel: 'Suppressed', highLabel: 'Flowing' }
-              ].map((emotion) => (
-                <div key={emotion.key} className="emotion-slider-item">
-                  <div className="emotion-slider-header">
-                    <span className="emotion-label">{emotion.label}</span>
-                    <span className="emotion-value">{emotion.value}/10</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={emotion.value}
-                    onChange={(e) => isPremium && handleEmotionChange(emotion.key, parseInt(e.target.value))}
-                    className="emotion-range-slider"
-                    disabled={emotionsLogged || !isPremium}
-                  />
-                  <div className="slider-labels">
-                    <span>{emotion.lowLabel}</span>
-                    <span>{emotion.highLabel}</span>
-                  </div>
+            {/* Journal Section */}
+            <div className="timeline-journal-section">
+              <div className="journal-header">
+                <div className="journal-header-spacer"></div>
+                <h3>Phase-Specific Journal</h3>
+                <div className="journal-actions">
+                  <button 
+                    className="action-btn"
+                    onClick={handleJournalPrompt}
+                    disabled={!isPremium}
+                  >
+                    <FaPen />
+                    <span>{isPremium ? (todayNote ? 'Edit Entry' : 'Add Entry') : 'Premium Feature'}</span>
+                  </button>
                 </div>
-              ))}
-            </div>
-
-            {!emotionsLogged && (
-              <div className="emotion-actions">
-                {isPremium ? (
-                  <button 
-                    className="action-btn save-emotions-btn"
-                    onClick={saveEmotions}
-                  >
-                    <FaCheckCircle />
-                    <span>Save Emotional Check-in</span>
-                  </button>
-                ) : (
-                  <button 
-                    className="action-btn upgrade-emotions-btn"
-                    onClick={handleUpgradeClick}
-                  >
-                    <FaStar />
-                    <span>Unlock Emotional Tracking</span>
-                  </button>
-                )}
               </div>
-            )}
-          </div>
 
-          {/* Journal Section */}
-          <div className="timeline-journal-section">
-            <div className="journal-header">
-              <div className="journal-header-spacer"></div>
-              <h3>Phase-Specific Journal</h3>
-              <div className="journal-actions">
-                <button 
-                  className="action-btn"
-                  onClick={handleJournalPrompt}
-                  disabled={!isPremium}
-                >
-                  <FaPen />
-                  <span>{isPremium ? (todayNote ? 'Edit Entry' : 'Add Entry') : 'Premium Feature'}</span>
-                </button>
+              <div className="journal-prompt">
+                <FaRegLightbulb className="prompt-icon" />
+                <p>{getPhaseJournalPrompt()}</p>
               </div>
-            </div>
 
-            <div className="journal-prompt">
-              <FaRegLightbulb className="prompt-icon" />
-              <p>{getPhaseJournalPrompt()}</p>
-            </div>
-
-            {isPremium ? (
-              <>
-                {todayNote ? (
-                  <div className="journal-preview">
-                    <p>"{todayNote.length > 150 ? `${todayNote.substring(0, 150)}...` : todayNote}"</p>
-                  </div>
-                ) : (
-                  <div className="empty-journal">
-                    <FaInfoCircle className="info-icon" />
-                    <p>No journal entry for today. Recording your emotional journey helps track progress through phases.</p>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="journal-premium-teaser">
-                <FaLock className="lock-icon" />
-                <p>Unlock phase-specific journal prompts and track your emotional journey through each phase with Premium.</p>
-              </div>
-            )}
-          </div>
-
-          {/* Current Phase Insight */}
-          {currentPhase && (
-            <div className="phase-insight-section">
-              <h3>Understanding Your Current Phase</h3>
               {isPremium ? (
-                <div className="insight-card">
-                  <div className="insight-header">
-                    <FaRegLightbulb className="insight-icon" />
-                    <span>{wisdomMode ? 'Spiritual Insight' : 'Practical Insight'}</span>
-                  </div>
-                  <div className="insight-text">
-                    {wisdomMode ? currentPhase.insights.esoteric : currentPhase.insights.practical}
-                  </div>
-                </div>
+                <>
+                  {todayNote ? (
+                    <div className="journal-preview">
+                      <p>"{todayNote.length > 150 ? `${todayNote.substring(0, 150)}...` : todayNote}"</p>
+                    </div>
+                  ) : (
+                    <div className="empty-journal">
+                      <FaInfoCircle className="info-icon" />
+                      <p>No journal entry for today. Recording your emotional journey helps track progress through phases.</p>
+                    </div>
+                  )}
+                </>
               ) : (
-                <div className="insight-premium-teaser">
+                <div className="journal-premium-teaser">
                   <FaLock className="lock-icon" />
-                  <p>Get deep insights into your current phase with practical and spiritual perspectives.</p>
+                  <p>Unlock phase-specific journal prompts and track your emotional journey through each phase with Premium.</p>
                 </div>
               )}
             </div>
-          )}
 
-          {/* MAIN PREMIUM HELMET OVERLAY - Covers All Premium Features */}
-          {!isPremium && (
-            <div className="main-premium-helmet-overlay">
-              <div className="main-helmet-fade-gradient">
-                <div className="main-helmet-center">
-                  <img 
-                    src={helmetImage} 
-                    alt="Premium" 
-                    className="main-helmet-icon"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'block';
-                    }}
-                  />
-                  <FaLock 
-                    className="main-helmet-icon-fallback" 
-                    style={{ display: 'none' }}
-                  />
-                  <span className="main-helmet-text">Premium</span>
-                  <span className="main-helmet-subtitle">Unlock Full Emotional Timeline</span>
-                  <button className="main-helmet-upgrade-btn" onClick={handleUpgradeClick}>
-                    <FaStar />
-                    Upgrade Now
-                  </button>
-                </div>
+            {/* Current Phase Insight */}
+            {currentPhase && (
+              <div className="phase-insight-section">
+                <h3>Understanding Your Current Phase</h3>
+                {isPremium ? (
+                  <div className="insight-card">
+                    <div className="insight-header">
+                      <FaRegLightbulb className="insight-icon" />
+                      <span>{wisdomMode ? 'Spiritual Insight' : 'Practical Insight'}</span>
+                    </div>
+                    <div className="insight-text">
+                      {wisdomMode ? currentPhase.insights.esoteric : currentPhase.insights.practical}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="insight-premium-teaser">
+                    <FaLock className="lock-icon" />
+                    <p>Get deep insights into your current phase with practical and spiritual perspectives.</p>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Phase Detail Modal */}
