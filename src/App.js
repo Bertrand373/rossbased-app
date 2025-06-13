@@ -1,6 +1,6 @@
 // App.js - Updated with Profile Component and improved profile button functionality
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
@@ -29,13 +29,20 @@ import { useUserData } from './hooks/useUserData';
 // Profile Button Component - handles navigation to profile
 const ProfileButton = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   
   const handleProfileClick = () => {
     navigate('/profile');
   };
   
+  const isActive = location.pathname === '/profile';
+  
   return (
-    <button className="profile-btn" onClick={handleProfileClick} title="Profile Settings">
+    <button 
+      className={`profile-btn ${isActive ? 'active' : ''}`} 
+      onClick={handleProfileClick} 
+      title="Profile Settings"
+    >
       <FaUser />
       <span>Profile</span>
     </button>
@@ -45,13 +52,20 @@ const ProfileButton = () => {
 // Mobile Profile Button Component
 const MobileProfileButton = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   
   const handleProfileClick = () => {
     navigate('/profile');
   };
   
+  const isActive = location.pathname === '/profile';
+  
   return (
-    <button className="profile-btn" onClick={handleProfileClick} title="Profile Settings">
+    <button 
+      className={`profile-btn ${isActive ? 'active' : ''}`} 
+      onClick={handleProfileClick} 
+      title="Profile Settings"
+    >
       <FaUser />
     </button>
   );
