@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Uses helmet image for premium overlay
+// components/Tracker/Tracker.js - UPDATED: Uses helmet image for premium upgrade banner
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -142,7 +142,257 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       if (currentStreakIndex !== -1) {
         updatedHistory[currentStreakIndex] = {
-          ...updatedHistory[currentStreakIndex],
+          <div className="streak-actions-divider"></div>
+          
+          <div className="streak-actions">
+            <button 
+              className="streak-action-btn relapse-btn-grey"
+              onClick={handleRelapse}
+            >
+              <FaExclamationTriangle />
+              <span>Log Relapse</span>
+            </button>
+            
+            <button 
+              className="streak-action-btn wetdream-btn"
+              onClick={handleWetDream}
+            >
+              <FaMoon />
+              <span>Log Wet Dream</span>
+            </button>
+            
+            <button 
+              className="streak-action-btn urge-btn"
+              onClick={handleUrges}
+            >
+              <FaShieldAlt />
+              <span>Fighting Urges?</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* RESTRUCTURED: Benefit Logging Section with Upgrade Banner Pattern */}
+      <div className="benefit-logging-container">
+        <div className="benefit-logging-section">
+          <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
+          
+          {/* Benefits logged status */}
+          <div className="benefit-status-section">
+            {benefitsLogged ? (
+              <div className="benefits-logged">
+                <FaCheckCircle className="check-icon" />
+                <span>Benefits logged for today!</span>
+                <button 
+                  className="action-btn edit-benefits-btn"
+                  onClick={enableBenefitEditing}
+                >
+                  <FaPen />
+                  <span>Edit</span>
+                </button>
+              </div>
+            ) : (
+              <div className="benefits-not-logged">
+                <FaInfoCircle className="info-icon" />
+                <span>Track your benefits for today - the more you log, the more powerful your analytics become</span>
+              </div>
+            )}
+          </div>
+          
+          {/* RESTRUCTURED: Free + Premium Benefits with upgrade banner pattern */}
+          <div className="free-benefit-container">
+            {/* Energy Slider - FREE for all users */}
+            <div className="benefit-slider-item">
+              <div className="benefit-slider-header">
+                <span className="benefit-label">Energy</span>
+                <span className="benefit-value">{todayBenefits.energy}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayBenefits.energy}
+                onChange={(e) => handleBenefitChange('energy', parseInt(e.target.value))}
+                className="benefit-range-slider"
+                disabled={benefitsLogged}
+              />
+              <div className="slider-labels">
+                <span>Low</span>
+                <span>High</span>
+              </div>
+            </div>
+          </div>
+
+          {/* UPGRADE BANNER - Shown to non-premium users */}
+          {!isPremium && (
+            <div className="benefit-upgrade-banner">
+              <div className="benefit-upgrade-content">
+                <img 
+                  src={helmetImage} 
+                  alt="Premium Benefits" 
+                  className="benefit-upgrade-helmet"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'block';
+                  }}
+                />
+                <div className="benefit-upgrade-helmet-fallback" style={{display: 'none'}}>⚡</div>
+                
+                <div className="benefit-upgrade-text">
+                  <h3>Unlock All Benefits</h3>
+                  <p>Track Focus, Confidence, Aura, Sleep Quality, and Workout performance with detailed analytics and insights.</p>
+                  
+                  <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
+                    <FaStar />
+                    Upgrade to Premium
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PREMIUM BENEFITS CONTAINER - Only shown to premium users */}
+          {isPremium && (
+            <div className="premium-benefits-container">
+              {/* ALL 5 PREMIUM SLIDERS - No overlay needed since already premium */}
+              {[
+                { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
+                { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
+                { key: 'aura', label: 'Aura', value: todayBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
+                { key: 'sleep', label: 'Sleep Quality', value: todayBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
+                { key: 'workout', label: 'Workout', value: todayBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
+              ].map((slider) => (
+                <div key={slider.key} className="benefit-slider-item">
+                  <div className="benefit-slider-header">
+                    <span className="benefit-label">{slider.label}</span>
+                    <span className="benefit-value">{slider.value}/10</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={slider.value}
+                    onChange={(e) => handleBenefitChange(slider.key, parseInt(e.target.value))}
+                    className="benefit-range-slider"
+                    disabled={benefitsLogged}
+                  />
+                  <div className="slider-labels">
+                    <span>{slider.lowLabel}</span>
+                    <span>{slider.highLabel}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Save/Upgrade buttons */}
+          {!benefitsLogged && (
+            <div className="benefit-actions">
+              {isPremium ? (
+                <button 
+                  className="action-btn save-benefits-btn"
+                  onClick={saveBenefits}
+                >
+                  <FaCheckCircle />
+                  <span>Save Today's Benefits</span>
+                </button>
+              ) : (
+                <div className="benefit-actions-row">
+                  <button 
+                    className="action-btn save-benefits-btn partial"
+                    onClick={saveBenefits}
+                  >
+                    <FaCheckCircle />
+                    <span>Save Energy Level</span>
+                  </button>
+                  <button 
+                    className="action-btn upgrade-benefits-btn"
+                    onClick={handleUpgradeClick}
+                  >
+                    <FaStar />
+                    <span>Unlock All Benefits</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Today's Journal Section - SEPARATE SECTION */}
+      <div className="journal-section">
+        <div className="journal-header">
+          <div className="journal-header-spacer"></div>
+          <h3>Today's Journal</h3>
+          <div className="journal-actions">
+            <button 
+              className="action-btn"
+              onClick={() => {
+                setCurrentNote(todayNote || '');
+                setShowNoteModal(true);
+              }}
+            >
+              <FaPen />
+              <span>{todayNote ? 'Edit Entry' : 'Add Entry'}</span>
+            </button>
+          </div>
+        </div>
+        
+        {todayNote ? (
+          <div className="journal-preview">
+            <p>"{todayNote.length > 150 ? `${todayNote.substring(0, 150)}...` : todayNote}"</p>
+          </div>
+        ) : (
+          <div className="empty-journal">
+            <FaInfoCircle className="info-icon" />
+            <p>No journal entry for today. Recording your thoughts can help track benefits and stay motivated.</p>
+          </div>
+        )}
+        
+        <div className="journal-prompt">
+          <p>How are you feeling today? What benefits or challenges are you experiencing?</p>
+        </div>
+      </div>
+      
+      {/* Discord Integration */}
+      <div className="discord-section">
+        <h3>Discord Integration</h3>
+        
+        <div className="discord-toggle-container">
+          <div className="discord-toggle">
+            <span>Show my streak on Discord leaderboard</span>
+            <div 
+              className={`toggle-container ${userData.showOnLeaderboard ? 'active' : ''}`}
+              onClick={() => updateUserData({ showOnLeaderboard: !userData.showOnLeaderboard })}
+            >
+              <div className={`custom-toggle-switch ${userData.showOnLeaderboard ? 'active' : ''}`}></div>
+              <span className="toggle-label">
+                {userData.showOnLeaderboard ? 'Enabled' : 'Disabled'}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        {userData.showOnLeaderboard && (
+          <div className="discord-details">
+            <div className="discord-username-display">
+              <FaDiscord className="discord-icon" />
+              <span>Username: {userData.discordUsername || 'Not set'}</span>
+            </div>
+            
+            {!userData.discordUsername && (
+              <div className="discord-note">
+                <p>Set your Discord username in settings to appear on the leaderboard</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Tracker;...updatedHistory[currentStreakIndex],
           end: now,
           days: daysSinceStart,
           reason: 'relapse'
@@ -347,255 +597,3 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               <div className="milestone-label">Relapses</div>
             </div>
           </div>
-          
-          <div className="streak-actions-divider"></div>
-          
-          <div className="streak-actions">
-            <button 
-              className="streak-action-btn relapse-btn-grey"
-              onClick={handleRelapse}
-            >
-              <FaExclamationTriangle />
-              <span>Log Relapse</span>
-            </button>
-            
-            <button 
-              className="streak-action-btn wetdream-btn"
-              onClick={handleWetDream}
-            >
-              <FaMoon />
-              <span>Log Wet Dream</span>
-            </button>
-            
-            <button 
-              className="streak-action-btn urge-btn"
-              onClick={handleUrges}
-            >
-              <FaShieldAlt />
-              <span>Fighting Urges?</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      {/* UPDATED: Benefit Logging Section with Single Premium Helmet Overlay */}
-      <div className="benefit-logging-container">
-        <div className="benefit-logging-section">
-          <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
-          
-          {/* Benefits logged status */}
-          <div className="benefit-status-section">
-            {benefitsLogged ? (
-              <div className="benefits-logged">
-                <FaCheckCircle className="check-icon" />
-                <span>Benefits logged for today!</span>
-                <button 
-                  className="action-btn edit-benefits-btn"
-                  onClick={enableBenefitEditing}
-                >
-                  <FaPen />
-                  <span>Edit</span>
-                </button>
-              </div>
-            ) : (
-              <div className="benefits-not-logged">
-                <FaInfoCircle className="info-icon" />
-                <span>Track your benefits for today - the more you log, the more powerful your analytics become</span>
-              </div>
-            )}
-          </div>
-          
-          {/* UPDATED: Premium Benefits Container with Single Helmet Overlay */}
-          <div className="premium-benefits-container">
-            {/* Energy Slider - FREE for all users (outside premium container) */}
-            <div className="benefit-slider-item">
-              <div className="benefit-slider-header">
-                <span className="benefit-label">Energy</span>
-                <span className="benefit-value">{todayBenefits.energy}/10</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={todayBenefits.energy}
-                onChange={(e) => handleBenefitChange('energy', parseInt(e.target.value))}
-                className="benefit-range-slider"
-                disabled={benefitsLogged}
-              />
-              <div className="slider-labels">
-                <span>Low</span>
-                <span>High</span>
-              </div>
-            </div>
-            
-            {/* PREMIUM BENEFITS SECTION - All 5 sliders with single helmet overlay */}
-            <div className={`premium-benefits-section ${!isPremium ? 'premium-locked' : ''}`}>
-              {/* PREMIUM LOCKED SLIDERS */}
-              {[
-                { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
-                { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
-                { key: 'aura', label: 'Aura', value: todayBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
-                { key: 'sleep', label: 'Sleep Quality', value: todayBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
-                { key: 'workout', label: 'Workout', value: todayBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
-              ].map((slider) => (
-                <div key={slider.key} className="benefit-slider-item">
-                  <div className="benefit-slider-header">
-                    <span className="benefit-label">{slider.label}</span>
-                    <span className="benefit-value">{slider.value}/10</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={slider.value}
-                    onChange={(e) => isPremium && handleBenefitChange(slider.key, parseInt(e.target.value))}
-                    className="benefit-range-slider"
-                    disabled={benefitsLogged || !isPremium}
-                  />
-                  <div className="slider-labels">
-                    <span>{slider.lowLabel}</span>
-                    <span>{slider.highLabel}</span>
-                  </div>
-                </div>
-              ))}
-              
-              {/* ENHANCED: SINGLE PREMIUM HELMET OVERLAY covering all 5 sliders with upgrade button */}
-              {!isPremium && (
-                <div className="single-premium-lock-overlay">
-                  <div className="single-lock-fade-gradient">
-                    <div className="single-lock-center">
-                      <img 
-                        src={helmetImage} 
-                        alt="Premium" 
-                        className="single-lock-icon"
-                        onError={(e) => {
-                          // Fallback to lock icon if helmet image fails to load
-                          e.target.style.display = 'none';
-                          e.target.nextElementSibling.style.display = 'block';
-                        }}
-                      />
-                      <FaLock 
-                        className="single-lock-icon-fallback" 
-                        style={{ display: 'none' }}
-                      />
-                      <span className="single-lock-text">Premium</span>
-                      <span className="single-lock-subtitle">Unlock Full Benefits Tracking</span>
-                      <button className="single-lock-upgrade-btn" onClick={handleUpgradeClick}>
-                        <FaStar />
-                        Upgrade Now
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Save/Upgrade buttons */}
-          {!benefitsLogged && (
-            <div className="benefit-actions">
-              {isPremium ? (
-                <button 
-                  className="action-btn save-benefits-btn"
-                  onClick={saveBenefits}
-                >
-                  <FaCheckCircle />
-                  <span>Save Today's Benefits</span>
-                </button>
-              ) : (
-                <div className="benefit-actions-row">
-                  <button 
-                    className="action-btn save-benefits-btn partial"
-                    onClick={saveBenefits}
-                  >
-                    <FaCheckCircle />
-                    <span>Save Energy Level</span>
-                  </button>
-                  <button 
-                    className="action-btn upgrade-benefits-btn"
-                    onClick={handleUpgradeClick}
-                  >
-                    <FaStar />
-                    <span>Unlock All Benefits</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Today's Journal Section - SEPARATE SECTION */}
-      <div className="journal-section">
-        <div className="journal-header">
-          <div className="journal-header-spacer"></div>
-          <h3>Today's Journal</h3>
-          <div className="journal-actions">
-            <button 
-              className="action-btn"
-              onClick={() => {
-                setCurrentNote(todayNote || '');
-                setShowNoteModal(true);
-              }}
-            >
-              <FaPen />
-              <span>{todayNote ? 'Edit Entry' : 'Add Entry'}</span>
-            </button>
-          </div>
-        </div>
-        
-        {todayNote ? (
-          <div className="journal-preview">
-            <p>"{todayNote.length > 150 ? `${todayNote.substring(0, 150)}...` : todayNote}"</p>
-          </div>
-        ) : (
-          <div className="empty-journal">
-            <FaInfoCircle className="info-icon" />
-            <p>No journal entry for today. Recording your thoughts can help track benefits and stay motivated.</p>
-          </div>
-        )}
-        
-        <div className="journal-prompt">
-          <p>How are you feeling today? What benefits or challenges are you experiencing?</p>
-        </div>
-      </div>
-      
-      {/* Discord Integration */}
-      <div className="discord-section">
-        <h3>Discord Integration</h3>
-        
-        <div className="discord-toggle-container">
-          <div className="discord-toggle">
-            <span>Show my streak on Discord leaderboard</span>
-            <div 
-              className={`toggle-container ${userData.showOnLeaderboard ? 'active' : ''}`}
-              onClick={() => updateUserData({ showOnLeaderboard: !userData.showOnLeaderboard })}
-            >
-              <div className={`custom-toggle-switch ${userData.showOnLeaderboard ? 'active' : ''}`}></div>
-              <span className="toggle-label">
-                {userData.showOnLeaderboard ? 'Enabled' : 'Disabled'}
-              </span>
-            </div>
-          </div>
-        </div>
-        
-        {userData.showOnLeaderboard && (
-          <div className="discord-details">
-            <div className="discord-username-display">
-              <FaDiscord className="discord-icon" />
-              <span>Username: {userData.discordUsername || 'Not set'}</span>
-            </div>
-            
-            {!userData.discordUsername && (
-              <div className="discord-note">
-                <p>Set your Discord username in settings to appear on the leaderboard</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default Tracker;

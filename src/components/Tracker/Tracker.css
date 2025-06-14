@@ -327,25 +327,113 @@ button.action-btn:hover {
   transform: none !important;
 }
 
-/* NEW: Premium Benefits Container Structure */
+/* NEW: Free Benefit Container - Energy slider for all users */
+.free-benefit-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* NEW: Benefit Upgrade Banner - Clean subscription prompt like EmotionalTimeline */
+.benefit-upgrade-banner {
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-top: 3px solid rgba(255, 221, 0, 0.3);
+}
+
+.benefit-upgrade-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  text-align: left;
+}
+
+/* NEW: Benefit upgrade helmet - EXACT copy of EmotionalTimeline early teaser helmet sizing */
+.benefit-upgrade-helmet {
+  width: 80px; /* MATCH: Same as EmotionalTimeline early-teaser-helmet */
+  height: 80px; /* MATCH: Same as EmotionalTimeline early-teaser-helmet */
+  flex-shrink: 0;
+  animation: benefit-upgrade-helmet-pulse 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+.benefit-upgrade-helmet-fallback {
+  font-size: 3.2rem; /* MATCH: Same as EmotionalTimeline early-teaser-helmet-fallback */
+  color: var(--primary);
+  flex-shrink: 0;
+  animation: benefit-upgrade-helmet-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes benefit-upgrade-helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.benefit-upgrade-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.benefit-upgrade-text h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.benefit-upgrade-text p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* NEW: Benefit upgrade button - EXACT copy of EmotionalTimeline early-teaser-upgrade-btn */
+.benefit-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl); /* MATCH: Same as EmotionalTimeline */
+  background-color: var(--primary); /* MATCH: Same as EmotionalTimeline */
+  border: none; /* MATCH: Same as EmotionalTimeline */
+  border-radius: var(--radius-full);
+  color: #000000; /* MATCH: Same as EmotionalTimeline */
+  font-size: 1.125rem; /* MATCH: Same as EmotionalTimeline */
+  font-weight: 600; /* MATCH: Same as EmotionalTimeline */
+  cursor: pointer;
+  transition: all 0.2s ease; /* MATCH: Same as EmotionalTimeline */
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  min-width: 200px; /* MATCH: Same as EmotionalTimeline */
+  min-height: 48px; /* MATCH: Same as EmotionalTimeline */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as EmotionalTimeline */
+  align-self: flex-start;
+}
+
+.benefit-upgrade-btn:hover {
+  background-color: var(--primary-dark); /* MATCH: Same as EmotionalTimeline */
+  transform: translateY(-2px); /* MATCH: Same as EmotionalTimeline */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as EmotionalTimeline */
+  color: #000000; /* MATCH: Same as EmotionalTimeline */
+}
+
+/* Premium Benefits Container - Only for premium users */
 .premium-benefits-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-}
-
-/* NEW: Premium Benefits Section with Single Helmet Overlay */
-.premium-benefits-section {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.premium-benefits-section.premium-locked {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-md);
 }
 
 /* REFINED: Professional slider styling - dialed back 20% from "gamey" look */
@@ -476,197 +564,6 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
-/* 🎯 ENHANCED: SINGLE PREMIUM HELMET OVERLAY - Elegant and prominent with upgrade button */
-.single-premium-lock-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  pointer-events: none;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.single-lock-fade-gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  /* Beautiful radial gradient that fades more gradually for better premium feel */
-  background: radial-gradient(
-    ellipse at center,
-    rgba(51, 51, 51, 0.92) 0%,     /* High opacity at center */
-    rgba(51, 51, 51, 0.88) 20%,    /* Still very opaque */
-    rgba(51, 51, 51, 0.75) 40%,    /* Medium-high opacity */
-    rgba(51, 51, 51, 0.5) 60%,     /* Medium opacity */
-    rgba(51, 51, 51, 0.25) 80%,    /* Lower opacity */
-    rgba(51, 51, 51, 0.1) 95%,     /* Very transparent */
-    rgba(51, 51, 51, 0) 100%       /* Completely transparent at edges */
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Enhanced backdrop blur for premium feel */
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-
-.single-lock-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-md); /* INCREASED: More space for button */
-  text-align: center;
-  /* Enhanced glow effect around the entire lock section */
-  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6));
-  padding: var(--spacing-lg);
-  pointer-events: all; /* ADDED: Allow button clicks */
-}
-
-/* NEW: Helmet Image instead of Lock Icon - BIGGER SIZE */
-.single-lock-icon {
-  width: 80px; /* INCREASED: From 64px to 80px */
-  height: 80px; /* INCREASED: From 64px to 80px */
-  margin-bottom: var(--spacing-xs); /* REDUCED: From var(--spacing-sm) to var(--spacing-xs) for tighter spacing */
-  /* Enhanced pulsing animation */
-  animation: single-helmet-pulse 2.5s ease-in-out infinite;
-  /* Enhanced glow effect for the helmet */
-  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
-}
-
-/* NEW: Fallback for when helmet image fails to load - BIGGER SIZE */
-.single-lock-icon-fallback {
-  font-size: 3.2rem; /* INCREASED: From 2.5rem to 3.2rem to match helmet size */
-  color: var(--primary);
-  margin-bottom: var(--spacing-xs); /* REDUCED: From var(--spacing-sm) to var(--spacing-xs) for tighter spacing */
-  /* Enhanced pulsing animation */
-  animation: single-helmet-pulse 2.5s ease-in-out infinite;
-}
-
-.single-lock-text {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: var(--spacing-xs); /* KEPT: Tight spacing between Premium and subtitle */
-  /* REFINED: Subtle but readable glow behind text */
-  text-shadow: 0 0 8px rgba(255, 221, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-.single-lock-subtitle {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: 0.5px;
-  margin-bottom: var(--spacing-md); /* KEPT: Space before button */
-  /* REFINED: Subtle glow for readability without being too flashy */
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.6);
-}
-
-/* NEW: Upgrade button in the helmet overlay - LANDING PAGE LOGIN BUTTON STYLE */
-.single-lock-upgrade-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl); /* LARGER: More substantial padding like login button */
-  background-color: var(--primary); /* BOLD: Solid yellow background like login button */
-  border: none; /* CLEAN: No border like login button */
-  border-radius: var(--radius-full);
-  color: #000000; /* DARK: Black text on yellow background like login button */
-  font-size: 1.125rem; /* LARGER: Bigger text like login button */
-  font-weight: 600; /* BOLD: Strong weight like login button */
-  cursor: pointer;
-  transition: all 0.2s ease; /* SMOOTH: Animation like login button */
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  min-width: 200px; /* WIDER: More substantial button */
-  min-height: 48px; /* TALLER: Better touch target */
-  pointer-events: all; /* ENSURE: Button is clickable */
-  /* PREMIUM: Strong shadow like login button */
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
-}
-
-.single-lock-upgrade-btn:hover {
-  background-color: var(--primary-dark); /* DARKER: On hover like login button */
-  transform: translateY(-2px); /* LIFT: Hover animation like login button */
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* ENHANCED: Stronger glow on hover like login button */
-  color: #000000; /* MAINTAIN: Dark text for contrast */
-}
-
-/* Enhanced pulsing animation for the helmet icon */
-@keyframes single-helmet-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.98);
-  }
-}
-
-/* Professional slider labels with perfect spacing */
-.benefit-logging-section .premium-benefits-container .slider-labels,
-.premium-benefits-container .benefit-slider-item .slider-labels,
-.tracker-container .premium-benefits-container .slider-labels,
-.tracker-container .benefit-logging-section .slider-labels,
-.benefit-logging-container .premium-benefits-container .slider-labels {
-  display: flex !important;
-  justify-content: space-between !important;
-  font-size: 0.8125rem !important;
-  color: var(--text-secondary) !important;
-  margin-top: 8px !important;
-  margin-bottom: 0px !important;
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  line-height: 1 !important;
-  transform: none !important;
-  padding-left: 14px !important;
-  padding-right: 14px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.025em !important;
-  position: relative !important;
-  z-index: 1 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-/* Consistent label colors */
-.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8) !important;
-}
-
-.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.7) !important;
-}
-
 .benefit-actions {
   display: flex;
   justify-content: center;
@@ -736,6 +633,67 @@ button.action-btn:hover {
   border-color: rgba(251, 191, 36, 0.4);
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(251, 191, 36, 0.2);
+}
+
+/* Professional slider labels with perfect spacing */
+.benefit-logging-section .free-benefit-container .slider-labels,
+.benefit-logging-section .premium-benefits-container .slider-labels,
+.free-benefit-container .benefit-slider-item .slider-labels,
+.premium-benefits-container .benefit-slider-item .slider-labels,
+.tracker-container .free-benefit-container .slider-labels,
+.tracker-container .premium-benefits-container .slider-labels,
+.tracker-container .benefit-logging-section .slider-labels,
+.benefit-logging-container .free-benefit-container .slider-labels,
+.benefit-logging-container .premium-benefits-container .slider-labels {
+  display: flex !important;
+  justify-content: space-between !important;
+  font-size: 0.8125rem !important;
+  color: var(--text-secondary) !important;
+  margin-top: 8px !important;
+  margin-bottom: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  line-height: 1 !important;
+  transform: none !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em !important;
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Consistent label colors */
+.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:first-child {
+  color: rgba(156, 163, 175, 0.8) !important;
+}
+
+.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:last-child {
+  color: rgba(255, 221, 0, 0.7) !important;
 }
 
 .journal-section {
@@ -1174,7 +1132,7 @@ button.action-btn:hover {
     padding: var(--spacing-lg);
   }
   
-  .premium-benefits-container {
+  .free-benefit-container, .premium-benefits-container {
     gap: var(--spacing-md);
   }
   
@@ -1191,6 +1149,38 @@ button.action-btn:hover {
   .edit-benefits-btn {
     margin-left: 0;
     margin-top: var(--spacing-sm);
+  }
+
+  /* Mobile benefit upgrade banner adjustments */
+  .benefit-upgrade-content {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-lg);
+  }
+
+  .benefit-upgrade-helmet {
+    width: 70px; /* MATCH: Mobile scaling like EmotionalTimeline */
+    height: 70px;
+  }
+
+  .benefit-upgrade-helmet-fallback {
+    font-size: 2.8rem; /* MATCH: Mobile scaling like EmotionalTimeline */
+  }
+
+  .benefit-upgrade-text h3 {
+    font-size: 1.25rem;
+  }
+
+  .benefit-upgrade-text p {
+    font-size: 0.875rem;
+  }
+
+  .benefit-upgrade-btn {
+    font-size: 1rem; /* MATCH: Mobile size like EmotionalTimeline */
+    padding: var(--spacing-md) var(--spacing-lg);
+    min-width: 180px; /* MATCH: Mobile width like EmotionalTimeline */
+    min-height: 48px; /* MATCH: Mobile height like EmotionalTimeline */
+    align-self: center;
   }
   
   /* REFINED: Mobile slider adjustments with professional styling */
@@ -1209,10 +1199,14 @@ button.action-btn:hover {
   }
   
   /* Mobile slider labels with perfect spacing */
+  .benefit-logging-section .free-benefit-container .slider-labels,
   .benefit-logging-section .premium-benefits-container .slider-labels,
+  .free-benefit-container .benefit-slider-item .slider-labels,
   .premium-benefits-container .benefit-slider-item .slider-labels,
+  .tracker-container .free-benefit-container .slider-labels,
   .tracker-container .premium-benefits-container .slider-labels,
   .tracker-container .benefit-logging-section .slider-labels,
+  .benefit-logging-container .free-benefit-container .slider-labels,
   .benefit-logging-container .premium-benefits-container .slider-labels {
     margin-top: 10px !important;
     margin-bottom: 0px !important;
@@ -1230,29 +1224,6 @@ button.action-btn:hover {
     color: var(--text-secondary) !important;
   }
   
-  /* Mobile single premium helmet adjustments - BIGGER SIZES */
-  .single-lock-icon {
-    width: 70px; /* INCREASED: From 56px to 70px */
-    height: 70px; /* INCREASED: From 56px to 70px */
-  }
-  
-  .single-lock-text {
-    font-size: 1rem;
-  }
-  
-  .single-lock-subtitle {
-    font-size: 0.8rem;
-  }
-  
-  /* Mobile upgrade button adjustments - LANDING PAGE STYLE */
-  .single-lock-upgrade-btn {
-    font-size: 1rem; /* LARGER: Bigger text on mobile like login button */
-    padding: var(--spacing-md) var(--spacing-lg); /* SUBSTANTIAL: Good padding on mobile */
-    min-width: 180px; /* WIDER: More prominent on mobile */
-    min-height: 48px; /* GOOD: Touch target height */
-  }
-  
-  /* Mobile benefit actions */
   .benefit-actions-row {
     flex-direction: column;
     gap: var(--spacing-sm);
@@ -1316,40 +1287,30 @@ button.action-btn:hover {
     flex: 1;
     max-width: 120px;
   }
-  
-  /* Very small screen single premium helmet adjustments - BIGGER SIZES */
-  .single-lock-icon {
-    width: 60px; /* INCREASED: From 48px to 60px */
-    height: 60px; /* INCREASED: From 48px to 60px */
+
+  /* Very small screen benefit upgrade banner adjustments */
+  .benefit-upgrade-helmet {
+    width: 60px; /* MATCH: Very small screen scaling like EmotionalTimeline */
+    height: 60px;
   }
-  
-  .single-lock-text {
-    font-size: 0.9rem;
+
+  .benefit-upgrade-helmet-fallback {
+    font-size: 2.4rem; /* MATCH: Very small screen scaling like EmotionalTimeline */
   }
-  
-  .single-lock-subtitle {
-    font-size: 0.75rem;
+
+  .benefit-upgrade-text h3 {
+    font-size: 1.125rem;
   }
-  
-  /* Very small screen upgrade button adjustments - LANDING PAGE STYLE */
-  .single-lock-upgrade-btn {
-    font-size: 0.875rem; /* READABLE: Good size on small screens */
-    padding: var(--spacing-sm) var(--spacing-md); /* COMPACT: But still substantial */
-    min-width: 160px; /* APPROPRIATE: Good width for small screens */
-    min-height: 44px; /* GOOD: Touch target */
+
+  .benefit-upgrade-text p {
+    font-size: 0.8rem;
   }
-  
-  .single-lock-fade-gradient {
-    /* Slightly more opaque gradient on very small screens for better visibility */
-    background: radial-gradient(
-      ellipse at center,
-      rgba(51, 51, 51, 0.95) 0%,
-      rgba(51, 51, 51, 0.9) 25%,
-      rgba(51, 51, 51, 0.8) 50%,
-      rgba(51, 51, 51, 0.6) 75%,
-      rgba(51, 51, 51, 0.3) 90%,
-      rgba(51, 51, 51, 0) 100%
-    );
+
+  .benefit-upgrade-btn {
+    font-size: 0.875rem; /* MATCH: Very small screen size like EmotionalTimeline */
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 160px; /* MATCH: Very small screen width like EmotionalTimeline */
+    min-height: 44px; /* MATCH: Very small screen height like EmotionalTimeline */
   }
   
   .benefit-actions-row {
