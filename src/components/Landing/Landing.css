@@ -121,7 +121,7 @@
   align-items: center;
   height: 100vh;
   width: 100%;
-  background-color: var(--background);
+  background-color: var(--card-background);
 }
 
 /* Mobile responsiveness - CRITICAL for no-scroll experience */
