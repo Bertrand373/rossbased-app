@@ -1112,9 +1112,9 @@ button.action-btn:hover {
   }
   
   .streak-milestones {
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-    justify-content: space-evenly;
+    flex-wrap: nowrap; /* FIXED: Keep all 3 items in one row */
+    gap: var(--spacing-sm); /* REDUCED: Smaller gap to fit better */
+    justify-content: space-between; /* CHANGED: Distribute evenly */
     margin: 0;
   }
   
@@ -1283,9 +1283,17 @@ button.action-btn:hover {
   }
   
   .milestone-item {
-    min-width: 80px;
+    min-width: 70px; /* REDUCED: Smaller minimum width for tight spacing */
     flex: 1;
-    max-width: 120px;
+    max-width: 90px; /* REDUCED: Smaller max width to fit 3 in one row */
+  }
+
+  .milestone-value {
+    font-size: 1rem; /* REDUCED: Smaller font size for very small screens */
+  }
+
+  .milestone-label {
+    font-size: 0.75rem; /* REDUCED: Smaller label font size */
   }
 
   /* Very small screen benefit upgrade banner adjustments */

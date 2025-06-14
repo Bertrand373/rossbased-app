@@ -142,6 +142,212 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       if (currentStreakIndex !== -1) {
         updatedHistory[currentStreakIndex] = {
+          ...updatedHistory[currentStreakIndex],
+          end: now,
+          days: daysSinceStart,
+          reason: 'relapse'
+        };
+      }
+      
+      // Add new streak starting today
+      const newStreak = {
+        id: (userData.streakHistory?.length || 0) + 1,
+        start: now,
+        end: null,
+        days: 0,
+        reason: null
+      };
+      
+      updatedHistory.push(newStreak);
+      
+      // Update user data
+      updateUserData({
+        startDate: now,
+        currentStreak: 0,
+        relapseCount: (userData.relapseCount || 0) + 1,
+        streakHistory: updatedHistory
+      });
+      
+      // Update local state
+      setCurrentStreak(0);
+      setStartDate(now);
+      
+      toast.error('Streak reset. Keep going - every day is a new opportunity!');
+    }
+  };
+
+  const handleWetDream = () => {
+    if (window.confirm('Do you want to log a wet dream? This will not reset your streak.')) {
+      updateUserData({
+        wetDreamCount: (userData.wetDreamCount || 0) + 1
+      });
+      
+      toast.success('Wet dream logged. Your streak continues!');
+    }
+  };
+
+  // UPDATED: Handle urge redirection to urge tab instead of mini toolkit
+  const handleUrges = () => {
+    navigate('/urge-toolkit');
+  };
+
+  // Handle benefit logging
+  const handleBenefitChange = (type, value) => {
+    setTodayBenefits(prev => ({
+      ...prev,
+      [type]: value
+    }));
+  };
+
+  // Enable editing of benefits
+  const enableBenefitEditing = () => {
+    setBenefitsLogged(false);
+  };
+
+  const saveBenefits = () => {
+    const today = new Date();
+    const todayStr = format(today, 'yyyy-MM-dd');
+    
+    // Remove existing entry for today if it exists
+    const updatedBenefitTracking = (userData.benefitTracking || []).filter(
+      benefit => format(new Date(benefit.date), 'yyyy-MM-dd') !== todayStr
+    );
+    
+    // Add new entry
+    updatedBenefitTracking.push({
+      date: today,
+      energy: todayBenefits.energy,
+      focus: todayBenefits.focus,
+      confidence: todayBenefits.confidence,
+      aura: todayBenefits.aura,
+      sleep: todayBenefits.sleep, // CHANGED: sleep replaces attraction
+      workout: todayBenefits.workout
+    });
+    
+    // Sort by date
+    updatedBenefitTracking.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    updateUserData({ benefitTracking: updatedBenefitTracking });
+    setBenefitsLogged(true);
+    toast.success('Benefits logged for today!');
+  };
+
+  const saveNote = () => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const updatedNotes = { ...userData.notes, [today]: currentNote };
+    
+    updateUserData({ notes: updatedNotes });
+    setShowNoteModal(false);
+    toast.success('Journal entry saved!');
+  };
+
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const todayNote = userData.notes && userData.notes[todayStr];
+
+  // ADDED: Premium upgrade handler
+  const handleUpgradeClick = () => {
+    toast.success('Premium upgrade coming soon! 🚀');
+  };
+
+  return (
+    <div className="tracker-container">
+      {/* UPDATED: React DatePicker Modal (replacing iframe) */}
+      {showSetStartDate && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Set Your Start Date</h2>
+            <p>When did you begin your current streak?</p>
+            
+            <DatePicker
+              currentDate={startDate}
+              onSubmit={handleDateSubmit}
+              onCancel={handleDateCancel}
+              hasExistingDate={!!userData.startDate}
+            />
+          </div>
+        </div>
+      )}
+      
+      {/* FIXED: Journal Note Modal with side-by-side buttons matching DatePicker */}
+      {showNoteModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Journal Entry</h2>
+            <p>Record your thoughts, feelings, and insights for today:</p>
+            
+            <div className="form-group">
+              <textarea
+                value={currentNote}
+                onChange={(e) => setCurrentNote(e.target.value)}
+                rows="6"
+                placeholder="How are you feeling today? What benefits or challenges are you experiencing?"
+              ></textarea>
+            </div>
+            
+            {/* FIXED: Side-by-side button layout matching DatePicker exactly */}
+            <div className="journal-modal-actions">
+              <button onClick={saveNote} className="journal-primary-action">
+                <FaCheckCircle />
+                Save Entry
+              </button>
+              <button onClick={() => setShowNoteModal(false)} className="journal-cancel-action">
+                <FaTimes />
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Header Section */}
+      <div className="tracker-header">
+        <div className="tracker-header-spacer"></div>
+        <h2>Streak Tracker</h2>
+        <div className="tracker-actions">
+          {userData.startDate && (
+            <button 
+              className="action-btn"
+              onClick={() => setShowSetStartDate(true)}
+            >
+              <FaEdit />
+              <span>Edit Date</span>
+            </button>
+          )}
+        </div>
+      </div>
+      
+      {/* Current Streak Display */}
+      <div className="current-streak-container">
+        <div className="streak-card">
+          <div className="streak-date">Today, {format(new Date(), 'MMMM d, yyyy')}</div>
+          
+          <div className="streak-content">
+            <div className="streak-number">{currentStreak}</div>
+            <div className="streak-label">Current Streak</div>
+          </div>
+          
+          <div className="streak-divider"></div>
+          
+          <div className="streak-milestones">
+            <div className="milestone-item">
+              <FaCrown className="milestone-icon" />
+              <div className="milestone-value">{userData.longestStreak || 0}</div>
+              <div className="milestone-label">Longest</div>
+            </div>
+            
+            <div className="milestone-item">
+              <FaMoon className="milestone-icon" />
+              <div className="milestone-value">{userData.wetDreamCount || 0}</div>
+              <div className="milestone-label">Wet Dreams</div>
+            </div>
+            
+            <div className="milestone-item">
+              <FaExclamationTriangle className="milestone-icon" />
+              <div className="milestone-value">{userData.relapseCount || 0}</div>
+              <div className="milestone-label">Relapses</div>
+            </div>
+          </div>
+          
           <div className="streak-actions-divider"></div>
           
           <div className="streak-actions">
@@ -392,208 +598,4 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   );
 };
 
-export default Tracker;...updatedHistory[currentStreakIndex],
-          end: now,
-          days: daysSinceStart,
-          reason: 'relapse'
-        };
-      }
-      
-      // Add new streak starting today
-      const newStreak = {
-        id: (userData.streakHistory?.length || 0) + 1,
-        start: now,
-        end: null,
-        days: 0,
-        reason: null
-      };
-      
-      updatedHistory.push(newStreak);
-      
-      // Update user data
-      updateUserData({
-        startDate: now,
-        currentStreak: 0,
-        relapseCount: (userData.relapseCount || 0) + 1,
-        streakHistory: updatedHistory
-      });
-      
-      // Update local state
-      setCurrentStreak(0);
-      setStartDate(now);
-      
-      toast.error('Streak reset. Keep going - every day is a new opportunity!');
-    }
-  };
-
-  const handleWetDream = () => {
-    if (window.confirm('Do you want to log a wet dream? This will not reset your streak.')) {
-      updateUserData({
-        wetDreamCount: (userData.wetDreamCount || 0) + 1
-      });
-      
-      toast.success('Wet dream logged. Your streak continues!');
-    }
-  };
-
-  // UPDATED: Handle urge redirection to urge tab instead of mini toolkit
-  const handleUrges = () => {
-    navigate('/urge-toolkit');
-  };
-
-  // Handle benefit logging
-  const handleBenefitChange = (type, value) => {
-    setTodayBenefits(prev => ({
-      ...prev,
-      [type]: value
-    }));
-  };
-
-  // Enable editing of benefits
-  const enableBenefitEditing = () => {
-    setBenefitsLogged(false);
-  };
-
-  const saveBenefits = () => {
-    const today = new Date();
-    const todayStr = format(today, 'yyyy-MM-dd');
-    
-    // Remove existing entry for today if it exists
-    const updatedBenefitTracking = (userData.benefitTracking || []).filter(
-      benefit => format(new Date(benefit.date), 'yyyy-MM-dd') !== todayStr
-    );
-    
-    // Add new entry
-    updatedBenefitTracking.push({
-      date: today,
-      energy: todayBenefits.energy,
-      focus: todayBenefits.focus,
-      confidence: todayBenefits.confidence,
-      aura: todayBenefits.aura,
-      sleep: todayBenefits.sleep, // CHANGED: sleep replaces attraction
-      workout: todayBenefits.workout
-    });
-    
-    // Sort by date
-    updatedBenefitTracking.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    updateUserData({ benefitTracking: updatedBenefitTracking });
-    setBenefitsLogged(true);
-    toast.success('Benefits logged for today!');
-  };
-
-  const saveNote = () => {
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const updatedNotes = { ...userData.notes, [today]: currentNote };
-    
-    updateUserData({ notes: updatedNotes });
-    setShowNoteModal(false);
-    toast.success('Journal entry saved!');
-  };
-
-  const todayStr = format(new Date(), 'yyyy-MM-dd');
-  const todayNote = userData.notes && userData.notes[todayStr];
-
-  // ADDED: Premium upgrade handler
-  const handleUpgradeClick = () => {
-    toast.success('Premium upgrade coming soon! 🚀');
-  };
-
-  return (
-    <div className="tracker-container">
-      {/* UPDATED: React DatePicker Modal (replacing iframe) */}
-      {showSetStartDate && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Set Your Start Date</h2>
-            <p>When did you begin your current streak?</p>
-            
-            <DatePicker
-              currentDate={startDate}
-              onSubmit={handleDateSubmit}
-              onCancel={handleDateCancel}
-              hasExistingDate={!!userData.startDate}
-            />
-          </div>
-        </div>
-      )}
-      
-      {/* FIXED: Journal Note Modal with side-by-side buttons matching DatePicker */}
-      {showNoteModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Journal Entry</h2>
-            <p>Record your thoughts, feelings, and insights for today:</p>
-            
-            <div className="form-group">
-              <textarea
-                value={currentNote}
-                onChange={(e) => setCurrentNote(e.target.value)}
-                rows="6"
-                placeholder="How are you feeling today? What benefits or challenges are you experiencing?"
-              ></textarea>
-            </div>
-            
-            {/* FIXED: Side-by-side button layout matching DatePicker exactly */}
-            <div className="journal-modal-actions">
-              <button onClick={saveNote} className="journal-primary-action">
-                <FaCheckCircle />
-                Save Entry
-              </button>
-              <button onClick={() => setShowNoteModal(false)} className="journal-cancel-action">
-                <FaTimes />
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Header Section */}
-      <div className="tracker-header">
-        <div className="tracker-header-spacer"></div>
-        <h2>Streak Tracker</h2>
-        <div className="tracker-actions">
-          {userData.startDate && (
-            <button 
-              className="action-btn"
-              onClick={() => setShowSetStartDate(true)}
-            >
-              <FaEdit />
-              <span>Edit Date</span>
-            </button>
-          )}
-        </div>
-      </div>
-      
-      {/* Current Streak Display */}
-      <div className="current-streak-container">
-        <div className="streak-card">
-          <div className="streak-date">Today, {format(new Date(), 'MMMM d, yyyy')}</div>
-          
-          <div className="streak-content">
-            <div className="streak-number">{currentStreak}</div>
-            <div className="streak-label">Current Streak</div>
-          </div>
-          
-          <div className="streak-divider"></div>
-          
-          <div className="streak-milestones">
-            <div className="milestone-item">
-              <FaCrown className="milestone-icon" />
-              <div className="milestone-value">{userData.longestStreak || 0}</div>
-              <div className="milestone-label">Longest</div>
-            </div>
-            
-            <div className="milestone-item">
-              <FaMoon className="milestone-icon" />
-              <div className="milestone-value">{userData.wetDreamCount || 0}</div>
-              <div className="milestone-label">Wet Dreams</div>
-            </div>
-            
-            <div className="milestone-item">
-              <FaExclamationTriangle className="milestone-icon" />
-              <div className="milestone-value">{userData.relapseCount || 0}</div>
-              <div className="milestone-label">Relapses</div>
-            </div>
-          </div>
+export default Tracker;
