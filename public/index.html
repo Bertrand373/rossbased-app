@@ -57,7 +57,7 @@
         font-size: 16px !important;
       }
       
-      /* FIXED: Matching React SpartanLoader exactly */
+      /* ANIMATED LOADER: Pulsing helmet with perfect sizing match */
       #initial-loader {
         max-width: 1200px;
         margin: 24px auto;
@@ -71,7 +71,7 @@
         justify-content: center;
         align-items: center;
         z-index: 9999;
-        gap: 24px; /* Changed from 16px to 24px to match var(--spacing-lg) */
+        gap: 24px; /* This matches var(--spacing-lg) from SpartanLoader */
       }
       
       #initial-loader .helmet-container {
@@ -80,21 +80,15 @@
         justify-content: center;
       }
       
+      /* ANIMATED: Exact 100px helmet with pulsing to match landing page SpartanLoader */
       #initial-loader .helmet-image {
         width: 100px;
         height: 100px;
+        /* MATCH: Same pulsing animation as SpartanLoader default */
         animation: helmet-pulse 1.8s ease-in-out infinite;
       }
       
-      #initial-loader .loader-message {
-        color: #f9fafb; /* Changed to match var(--text) */
-        font-size: 1.25rem;
-        font-weight: 500;
-        text-align: center;
-        margin: 0;
-      }
-      
-      /* FIXED: Matching SpartanLoader pulse animation exactly */
+      /* MATCH: Same pulse animation as SpartanLoader CSS */
       @keyframes helmet-pulse {
         0%, 100% { 
           opacity: 1; 
@@ -106,32 +100,48 @@
         }
       }
       
-      /* Mobile responsiveness - MATCHING SpartanLoader exactly */
+      /* STATIC: Exact text sizing to match landing page SpartanLoader */
+      #initial-loader .loader-message {
+        color: #f9fafb;
+        font-size: 1.25rem; /* This matches SpartanLoader default desktop size */
+        font-weight: 500;
+        text-align: center;
+        margin: 0;
+        /* NO ANIMATION - completely static */
+      }
+      
+      /* Mobile responsiveness - EXACT match with SpartanLoader mobile breakpoints */
       @media (max-width: 768px) {
         #initial-loader {
           margin: 8px;
           min-height: calc(100vh - 16px);
-          gap: 16px; /* Changed to match var(--spacing-md) on mobile */
+          gap: 16px; /* This matches var(--spacing-md) from SpartanLoader mobile */
         }
         
+        /* ANIMATED: 70px on mobile with pulsing to match SpartanLoader */
         #initial-loader .helmet-image {
-          width: 70px; /* This matches SpartanLoader mobile max-width */
+          width: 70px;
           height: 70px;
+          animation: helmet-pulse 1.8s ease-in-out infinite;
         }
         
+        /* STATIC: Mobile text size to match SpartanLoader mobile */
         #initial-loader .loader-message {
-          font-size: 1.125rem; /* This matches SpartanLoader mobile */
+          font-size: 1.125rem;
         }
       }
       
       @media (max-width: 480px) {
+        /* STATIC: Very small screens to match SpartanLoader */
+        /* ANIMATED: Very small screens with pulsing to match SpartanLoader */
         #initial-loader .helmet-image {
-          width: 60px; /* This matches SpartanLoader very small screens */
+          width: 60px;
           height: 60px;
+          animation: helmet-pulse 1.8s ease-in-out infinite;
         }
         
         #initial-loader .loader-message {
-          font-size: 1rem; /* This matches SpartanLoader very small screens */
+          font-size: 1rem;
         }
       }
     </style>
@@ -139,7 +149,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
-    <!-- FIXED: Message now matches React loader exactly -->
+    <!-- ANIMATED LOADER: Pulsing helmet, matches landing page SpartanLoader exactly -->
     <div id="initial-loader">
       <div class="helmet-container">
         <img class="helmet-image" src="%PUBLIC_URL%/helmet.png" alt="Loading" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
@@ -211,31 +221,26 @@
       // Monitor zoom occasionally (not aggressively)
       setInterval(resetZoom, 1000);
       
-      /* IMPROVED: Faster loader removal with smoother transition */
+      /* IMMEDIATE LOADER REMOVAL: Remove as soon as React content appears */
       window.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-          var loader = document.getElementById('initial-loader');
-          var root = document.getElementById('root');
-          
-          function checkForReactContent() {
-            if (root && root.children.length > 0) {
-              if (loader) {
-                // Faster, smoother transition
-                loader.style.opacity = '0';
-                loader.style.transition = 'opacity 0.3s ease-out';
-                setTimeout(function() {
-                  if (loader && loader.parentNode) {
-                    loader.parentNode.removeChild(loader);
-                  }
-                }, 300); // Reduced from 500ms
+        var loader = document.getElementById('initial-loader');
+        var root = document.getElementById('root');
+        
+        function checkForReactContent() {
+          if (root && root.children.length > 0) {
+            if (loader) {
+              // IMMEDIATE removal - no fade, no delay
+              if (loader.parentNode) {
+                loader.parentNode.removeChild(loader);
               }
-            } else {
-              setTimeout(checkForReactContent, 50); // Check more frequently
             }
+          } else {
+            setTimeout(checkForReactContent, 10); // Check very frequently
           }
-          
-          checkForReactContent();
-        }, 50); // Start checking sooner
+        }
+        
+        // Start checking immediately
+        checkForReactContent();
       });
     </script>
   </body>

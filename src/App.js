@@ -74,7 +74,7 @@ const MobileProfileButton = () => {
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
-  // REMOVED: isInitialLoading state - this was causing the black flash
+  // REMOVED: isInitialLoading state - HTML loader handles initial loading now
   const { userData, isLoggedIn, isPremium, isLoading, login, logout, updateUserData } = useUserData();
 
   // Monitor screen size for responsive design
@@ -89,9 +89,6 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // REMOVED: Initial app loading timer - HTML loader in index.html handles this now
-  // This was the source of the black flash between loaders
-
   // Handle login
   const handleLogin = async (username, password) => {
     const success = await login(username, password);
@@ -101,15 +98,15 @@ function App() {
     return success;
   };
 
-  // FIXED: Only show SpartanLoader for actual data loading (login/logout), not initial page load
+  // CONSISTENT: Login loader matches HTML loader and landing page exactly
   if (isLoading) {
     return (
       <div className="spartan-loading-screen">
         <SpartanLoader 
           size={100}
-          message="Logging you in..."
+          message="Loading your Dashboard..."
           showMessage={true}
-          animationType="warrior"
+          animationType="default"
         />
       </div>
     );
