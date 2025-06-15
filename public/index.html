@@ -57,7 +57,7 @@
         font-size: 16px !important;
       }
       
-      /* FIXED: Contained helmet loader matching app design */
+      /* FIXED: Matching React SpartanLoader exactly */
       #initial-loader {
         max-width: 1200px;
         margin: 24px auto;
@@ -71,7 +71,7 @@
         justify-content: center;
         align-items: center;
         z-index: 9999;
-        gap: 16px;
+        gap: 24px; /* Changed from 16px to 24px to match var(--spacing-lg) */
       }
       
       #initial-loader .helmet-container {
@@ -87,14 +87,14 @@
       }
       
       #initial-loader .loader-message {
-        color: #ffffff;
+        color: #f9fafb; /* Changed to match var(--text) */
         font-size: 1.25rem;
         font-weight: 500;
         text-align: center;
         margin: 0;
       }
       
-      /* CLEAN: Helmet pulse animation */
+      /* FIXED: Matching SpartanLoader pulse animation exactly */
       @keyframes helmet-pulse {
         0%, 100% { 
           opacity: 1; 
@@ -106,31 +106,32 @@
         }
       }
       
-      /* Mobile responsiveness */
+      /* Mobile responsiveness - MATCHING SpartanLoader exactly */
       @media (max-width: 768px) {
         #initial-loader {
           margin: 8px;
           min-height: calc(100vh - 16px);
+          gap: 16px; /* Changed to match var(--spacing-md) on mobile */
         }
         
         #initial-loader .helmet-image {
-          width: 70px;
+          width: 70px; /* This matches SpartanLoader mobile max-width */
           height: 70px;
         }
         
         #initial-loader .loader-message {
-          font-size: 1.125rem;
+          font-size: 1.125rem; /* This matches SpartanLoader mobile */
         }
       }
       
       @media (max-width: 480px) {
         #initial-loader .helmet-image {
-          width: 60px;
+          width: 60px; /* This matches SpartanLoader very small screens */
           height: 60px;
         }
         
         #initial-loader .loader-message {
-          font-size: 1rem;
+          font-size: 1rem; /* This matches SpartanLoader very small screens */
         }
       }
     </style>
@@ -138,7 +139,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
-    <!-- FIXED: Contained helmet loader matching app container design -->
+    <!-- FIXED: Message now matches React loader exactly -->
     <div id="initial-loader">
       <div class="helmet-container">
         <img class="helmet-image" src="%PUBLIC_URL%/helmet.png" alt="Loading" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
@@ -166,7 +167,7 @@
           <path d="M45 55 Q50 60, 55 55" stroke="#8b4513" stroke-width="2" fill="none"/>
         </svg>
       </div>
-      <p class="loader-message">Starting TitanTrack...</p>
+      <p class="loader-message">Loading your Dashboard...</p>
     </div>
     
     <div id="root"></div>
@@ -210,7 +211,7 @@
       // Monitor zoom occasionally (not aggressively)
       setInterval(resetZoom, 1000);
       
-      // RESTORED: Working loader removal logic
+      /* IMPROVED: Faster loader removal with smoother transition */
       window.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() {
           var loader = document.getElementById('initial-loader');
@@ -219,21 +220,22 @@
           function checkForReactContent() {
             if (root && root.children.length > 0) {
               if (loader) {
+                // Faster, smoother transition
                 loader.style.opacity = '0';
-                loader.style.transition = 'opacity 0.5s ease';
+                loader.style.transition = 'opacity 0.3s ease-out';
                 setTimeout(function() {
                   if (loader && loader.parentNode) {
                     loader.parentNode.removeChild(loader);
                   }
-                }, 500);
+                }, 300); // Reduced from 500ms
               }
             } else {
-              setTimeout(checkForReactContent, 100);
+              setTimeout(checkForReactContent, 50); // Check more frequently
             }
           }
           
           checkForReactContent();
-        }, 100);
+        }, 50); // Start checking sooner
       });
     </script>
   </body>
