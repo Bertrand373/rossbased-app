@@ -1,4 +1,4 @@
-/* App.css - Main application styles with updated header navigation and loader container */
+/* App.css - Main application styles with updated header navigation */
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -37,15 +37,14 @@ body {
   flex-direction: column;
 }
 
-/* UPDATED: Contained Loading Screen - Respects app container bounds */
+/* FIXED: Spartan Loading Screen - Full screen overlay */
 .spartan-loading-screen {
-  max-width: 1200px;
-  margin: var(--spacing-lg) auto;
-  min-height: calc(100vh - 48px);
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--card-background);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -271,12 +270,6 @@ body {
   /* Hide header navigation on mobile */
   .header-nav {
     display: none;
-  }
-  
-  /* Mobile loading screen adjustments */
-  .spartan-loading-screen {
-    margin: var(--spacing-sm);
-    min-height: calc(100vh - 32px);
   }
 }
 

@@ -74,7 +74,7 @@ const MobileProfileButton = () => {
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
-  // REMOVED: isInitialLoading state - HTML loader handles initial loading now
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const { userData, isLoggedIn, isPremium, isLoading, login, logout, updateUserData } = useUserData();
 
   // Monitor screen size for responsive design
@@ -89,6 +89,16 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Handle initial app loading (for page refreshes)
+  useEffect(() => {
+    // Simulate checking authentication state
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 1500); // Show helmet for 1.5 seconds on page load/refresh
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // Handle login
   const handleLogin = async (username, password) => {
     const success = await login(username, password);
@@ -98,15 +108,15 @@ function App() {
     return success;
   };
 
-  // CONSISTENT: Login loader matches HTML loader and landing page exactly
-  if (isLoading) {
+  // FIXED: Show SpartanLoader when loading OR when initially loading the app
+  if (isLoading || isInitialLoading) {
     return (
       <div className="spartan-loading-screen">
         <SpartanLoader 
           size={100}
-          message="Loading your Dashboard..."
+          message={isLoading ? "Logging you in..." : "Loading your dashboard..."}
           showMessage={true}
-          animationType="default"
+          animationType="warrior"
         />
       </div>
     );

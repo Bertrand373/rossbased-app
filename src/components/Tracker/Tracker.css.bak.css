@@ -1,0 +1,1371 @@
+/* components/Tracker/Tracker.css - UPDATED: Enhanced single premium overlay with HELMET instead of lock */
+.tracker-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* FIXED: Properly centered header with spacers and aligned with other tabs */
+.tracker-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 0;
+}
+
+.tracker-header-spacer {
+  /* Empty spacer for centering */
+}
+
+.tracker-header h2 {
+  text-align: center;
+  margin: 0;
+}
+
+.tracker-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-self: end;
+}
+
+/* FIXED: Edit Date button styled like Calendar Cancel button - NO HOVER EFFECTS */
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+}
+
+/* NUCLEAR OPTION: Force remove ALL hover effects with maximum specificity */
+.action-btn:hover,
+.tracker-actions .action-btn:hover,
+.journal-actions .action-btn:hover,
+button.action-btn:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* UPDATED: Current Streak Section */
+.current-streak-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: 0;
+}
+
+.streak-card {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.streak-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+  order: 1;
+}
+
+.streak-content {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.streak-number {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  margin: 0;
+}
+
+.streak-label {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+.streak-divider {
+  order: 3;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0;
+}
+
+.streak-milestones {
+  order: 4;
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.milestone-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.milestone-icon {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.milestone-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.milestone-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.streak-actions-divider {
+  order: 5;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0;
+}
+
+.streak-actions {
+  order: 6;
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin: 0;
+}
+
+.streak-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.relapse-btn-grey {
+  background-color: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+.relapse-btn-grey:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+  transform: scale(1.05);
+}
+
+.wetdream-btn {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border-color: var(--warning);
+}
+
+.wetdream-btn:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+  border-color: var(--warning);
+  color: var(--warning);
+  transform: scale(1.05);
+}
+
+.urge-btn {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.urge-btn:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+/* COMPLETELY REDESIGNED: Benefit section styled exactly like Timeline emotional check-in */
+.benefit-logging-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.benefit-logging-section {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  border-top: 3px solid rgba(255, 221, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* COMPLETELY REDESIGNED: Timeline-style section header with underline */
+.benefit-logging-section-header {
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.125rem;
+  color: var(--text);
+  text-align: center;
+  position: relative;
+  margin-top: 0;
+  font-weight: 600;
+}
+
+.benefit-logging-section-header::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.benefit-logging-header {
+  display: none;
+}
+
+.benefit-status-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.benefits-logged {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.benefits-not-logged {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.check-icon, .info-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.check-icon {
+  color: var(--primary);
+}
+
+.info-icon {
+  color: var(--primary);
+}
+
+/* FIXED: Edit Benefits button - NO HOVER EFFECTS */
+.edit-benefits-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  margin-left: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: none;
+}
+
+.edit-benefits-btn:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+}
+
+/* NEW: Premium Benefits Container Structure */
+.premium-benefits-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* NEW: Premium Benefits Section with Single Helmet Overlay */
+.premium-benefits-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.premium-benefits-section.premium-locked {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+/* REFINED: Professional slider styling - dialed back 20% from "gamey" look */
+.benefit-slider-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  position: relative;
+}
+
+.benefit-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Benefit labels - consistent styling */
+.benefit-label {
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  text-align: left;
+  font-size: 1rem;
+  letter-spacing: 0.025em;
+}
+
+/* Enhanced value display with consistent styling */
+.benefit-value {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.9375rem;
+  background-color: rgba(255, 221, 0, 0.08);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  min-width: 48px;
+  text-align: center;
+  border: 1px solid rgba(255, 221, 0, 0.15);
+}
+
+/* REFINED: Professional slider track - subtler gradient */
+.benefit-range-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.15) 0%, 
+    rgba(255, 221, 0, 0.08) 50%, 
+    rgba(255, 221, 0, 0.12) 100%
+  );
+  outline: none;
+  transition: all 0.2s ease;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  margin-bottom: 0px !important;
+}
+
+/* REFINED: Subtler hover state */
+.benefit-range-slider:hover:not(:disabled) {
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.18) 0%, 
+    rgba(255, 221, 0, 0.1) 50%, 
+    rgba(255, 221, 0, 0.15) 100%
+  );
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
+}
+
+/* REFINED: Professional focus state */
+.benefit-range-slider:focus:not(:disabled) {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
+}
+
+.benefit-range-slider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(128, 128, 128, 0.1);
+}
+
+/* REFINED: Professional WebKit thumb - subtler styling */
+.benefit-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  margin: 0 !important;
+  transition: all 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* REFINED: Subtler thumb hover */
+.benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+}
+
+/* REFINED: Professional active state */
+.benefit-range-slider:active::-webkit-slider-thumb {
+  transform: scale(1.02);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* REFINED: Professional Firefox thumb */
+.benefit-range-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  margin: 0 !important;
+  transition: all 0.15s ease;
+}
+
+/* REFINED: Firefox thumb hover */
+.benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+}
+
+/* 🎯 ENHANCED: SINGLE PREMIUM HELMET OVERLAY - Elegant and prominent with upgrade button */
+.single-premium-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  pointer-events: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.single-lock-fade-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Beautiful radial gradient that fades more gradually for better premium feel */
+  background: radial-gradient(
+    ellipse at center,
+    rgba(51, 51, 51, 0.92) 0%,     /* High opacity at center */
+    rgba(51, 51, 51, 0.88) 20%,    /* Still very opaque */
+    rgba(51, 51, 51, 0.75) 40%,    /* Medium-high opacity */
+    rgba(51, 51, 51, 0.5) 60%,     /* Medium opacity */
+    rgba(51, 51, 51, 0.25) 80%,    /* Lower opacity */
+    rgba(51, 51, 51, 0.1) 95%,     /* Very transparent */
+    rgba(51, 51, 51, 0) 100%       /* Completely transparent at edges */
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Enhanced backdrop blur for premium feel */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.single-lock-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md); /* INCREASED: More space for button */
+  text-align: center;
+  /* Enhanced glow effect around the entire lock section */
+  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6));
+  padding: var(--spacing-lg);
+  pointer-events: all; /* ADDED: Allow button clicks */
+}
+
+/* NEW: Helmet Image instead of Lock Icon - BIGGER SIZE */
+.single-lock-icon {
+  width: 80px; /* INCREASED: From 64px to 80px */
+  height: 80px; /* INCREASED: From 64px to 80px */
+  margin-bottom: var(--spacing-xs); /* REDUCED: From var(--spacing-sm) to var(--spacing-xs) for tighter spacing */
+  /* Enhanced pulsing animation */
+  animation: single-helmet-pulse 2.5s ease-in-out infinite;
+  /* Enhanced glow effect for the helmet */
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+/* NEW: Fallback for when helmet image fails to load - BIGGER SIZE */
+.single-lock-icon-fallback {
+  font-size: 3.2rem; /* INCREASED: From 2.5rem to 3.2rem to match helmet size */
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs); /* REDUCED: From var(--spacing-sm) to var(--spacing-xs) for tighter spacing */
+  /* Enhanced pulsing animation */
+  animation: single-helmet-pulse 2.5s ease-in-out infinite;
+}
+
+.single-lock-text {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-xs); /* KEPT: Tight spacing between Premium and subtitle */
+  /* REFINED: Subtle but readable glow behind text */
+  text-shadow: 0 0 8px rgba(255, 221, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.single-lock-subtitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-md); /* KEPT: Space before button */
+  /* REFINED: Subtle glow for readability without being too flashy */
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* NEW: Upgrade button in the helmet overlay - LANDING PAGE LOGIN BUTTON STYLE */
+.single-lock-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl); /* LARGER: More substantial padding like login button */
+  background-color: var(--primary); /* BOLD: Solid yellow background like login button */
+  border: none; /* CLEAN: No border like login button */
+  border-radius: var(--radius-full);
+  color: #000000; /* DARK: Black text on yellow background like login button */
+  font-size: 1.125rem; /* LARGER: Bigger text like login button */
+  font-weight: 600; /* BOLD: Strong weight like login button */
+  cursor: pointer;
+  transition: all 0.2s ease; /* SMOOTH: Animation like login button */
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  min-width: 200px; /* WIDER: More substantial button */
+  min-height: 48px; /* TALLER: Better touch target */
+  pointer-events: all; /* ENSURE: Button is clickable */
+  /* PREMIUM: Strong shadow like login button */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+}
+
+.single-lock-upgrade-btn:hover {
+  background-color: var(--primary-dark); /* DARKER: On hover like login button */
+  transform: translateY(-2px); /* LIFT: Hover animation like login button */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* ENHANCED: Stronger glow on hover like login button */
+  color: #000000; /* MAINTAIN: Dark text for contrast */
+}
+
+/* Enhanced pulsing animation for the helmet icon */
+@keyframes single-helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+/* Professional slider labels with perfect spacing */
+.benefit-logging-section .premium-benefits-container .slider-labels,
+.premium-benefits-container .benefit-slider-item .slider-labels,
+.tracker-container .premium-benefits-container .slider-labels,
+.tracker-container .benefit-logging-section .slider-labels,
+.benefit-logging-container .premium-benefits-container .slider-labels {
+  display: flex !important;
+  justify-content: space-between !important;
+  font-size: 0.8125rem !important;
+  color: var(--text-secondary) !important;
+  margin-top: 8px !important;
+  margin-bottom: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  line-height: 1 !important;
+  transform: none !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em !important;
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Consistent label colors */
+.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
+.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
+.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:first-child {
+  color: rgba(156, 163, 175, 0.8) !important;
+}
+
+.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
+.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
+.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:last-child {
+  color: rgba(255, 221, 0, 0.7) !important;
+}
+
+.benefit-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+/* ADDED: Benefit actions row for free users */
+.benefit-actions-row {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* REFINED: Professional save button */
+.save-benefits-btn {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.08) 0%, rgba(255, 221, 0, 0.12) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
+  color: var(--primary);
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(255, 221, 0, 0.08);
+  letter-spacing: 0.025em;
+}
+
+.save-benefits-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.12) 0%, rgba(255, 221, 0, 0.16) 100%);
+  border-color: rgba(255, 221, 0, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(255, 221, 0, 0.15);
+}
+
+/* ADDED: Partial save button for free users */
+.save-benefits-btn.partial {
+  flex: 1;
+  max-width: 200px;
+}
+
+/* ADDED: Upgrade button styling */
+.upgrade-benefits-btn {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--radius-full);
+  color: #f59e0b;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.1);
+  letter-spacing: 0.025em;
+  flex: 1;
+  max-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.upgrade-benefits-btn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border-color: rgba(251, 191, 36, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.2);
+}
+
+.journal-section {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.journal-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.journal-header-spacer {
+  /* Empty spacer for centering */
+}
+
+.journal-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.journal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-self: end;
+}
+
+.journal-preview {
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-style: italic;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.empty-journal {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+}
+
+.journal-prompt {
+  background-color: var(--medium-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-style: italic;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.discord-section {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.discord-section h3 {
+  margin-bottom: var(--spacing-md);
+  font-size: 1.125rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.discord-toggle-container {
+  margin-bottom: var(--spacing-md);
+}
+
+.discord-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background-color: var(--light-gray);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.discord-toggle span {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.custom-toggle-switch {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  background-color: var(--medium-gray);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.custom-toggle-switch.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+}
+
+.custom-toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-toggle-switch.active::before {
+  transform: translateX(28px);
+  background-color: var(--primary);
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+}
+
+.toggle-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.toggle-container.active .toggle-label {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.discord-details {
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.discord-username-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.discord-icon {
+  color: #5865F2;
+  font-size: 1.25rem;
+}
+
+.discord-username-display span {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.discord-note {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* UPDATED: Modal buttons with consistent styling matching edit profile button */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.form-actions .action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid;
+}
+
+/* FIXED: Primary action buttons (Set Date & Save Entry) - grey static, yellow hover */
+.form-actions .action-btn.primary-action {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.form-actions .action-btn.primary-action:hover {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+/* FIXED: Cancel buttons with cancel-action class - no hover effects, stay static */
+.form-actions .action-btn.cancel-action {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.form-actions .action-btn.cancel-action:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+}
+
+/* LEGACY: Keep old selector for any buttons without specific classes */
+.form-actions .action-btn:not(.primary-action):not(.cancel-action) {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  transition: none;
+}
+
+.form-actions .action-btn:not(.primary-action):not(.cancel-action):hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+}
+
+/* ADDED: Journal modal specific button styling - matches DatePicker exactly */
+.journal-modal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+/* FIXED: Journal primary action button - matching DatePicker primary button exactly */
+.journal-primary-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border: 1px solid rgba(255, 221, 0, 0.2) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  min-height: auto !important;
+}
+
+/* REMOVED: All hover effects for journal primary button */
+.journal-primary-action:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* FIXED: Journal cancel button - matching DatePicker cancel button exactly */
+.journal-cancel-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  min-height: auto !important;
+}
+
+/* REMOVED: All hover effects for journal cancel button */
+.journal-cancel-action:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.modal-content h2 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+  text-align: center;
+}
+
+.modal-content p {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .tracker-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    margin-top: 0;
+  }
+  
+  .tracker-header h2 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .tracker-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .journal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+  
+  .journal-header h3 {
+    text-align: center;
+    order: 1;
+  }
+  
+  .journal-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  .journal-actions .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .streak-number {
+    font-size: 3rem;
+  }
+  
+  .streak-milestones {
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    justify-content: space-evenly;
+    margin: 0;
+  }
+  
+  .streak-actions {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .streak-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .benefit-logging-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .premium-benefits-container {
+    gap: var(--spacing-md);
+  }
+  
+  .benefit-status-section {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .benefits-logged, .benefits-not-logged {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .edit-benefits-btn {
+    margin-left: 0;
+    margin-top: var(--spacing-sm);
+  }
+  
+  /* REFINED: Mobile slider adjustments with professional styling */
+  .benefit-range-slider {
+    height: 32px;
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  /* Mobile slider labels with perfect spacing */
+  .benefit-logging-section .premium-benefits-container .slider-labels,
+  .premium-benefits-container .benefit-slider-item .slider-labels,
+  .tracker-container .premium-benefits-container .slider-labels,
+  .tracker-container .benefit-logging-section .slider-labels,
+  .benefit-logging-container .premium-benefits-container .slider-labels {
+    margin-top: 10px !important;
+    margin-bottom: 0px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    line-height: 1 !important;
+    transform: none !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.025em !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    color: var(--text-secondary) !important;
+  }
+  
+  /* Mobile single premium helmet adjustments - BIGGER SIZES */
+  .single-lock-icon {
+    width: 70px; /* INCREASED: From 56px to 70px */
+    height: 70px; /* INCREASED: From 56px to 70px */
+  }
+  
+  .single-lock-text {
+    font-size: 1rem;
+  }
+  
+  .single-lock-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  /* Mobile upgrade button adjustments - LANDING PAGE STYLE */
+  .single-lock-upgrade-btn {
+    font-size: 1rem; /* LARGER: Bigger text on mobile like login button */
+    padding: var(--spacing-md) var(--spacing-lg); /* SUBSTANTIAL: Good padding on mobile */
+    min-width: 180px; /* WIDER: More prominent on mobile */
+    min-height: 48px; /* GOOD: Touch target height */
+  }
+  
+  /* Mobile benefit actions */
+  .benefit-actions-row {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: center;
+  }
+  
+  .save-benefits-btn.partial,
+  .upgrade-benefits-btn {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .discord-toggle {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+  
+  .toggle-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* ADDED: Mobile styling for journal modal buttons - keep side-by-side like DatePicker */
+  .journal-modal-actions {
+    flex-direction: row; /* KEEP: Side-by-side on mobile like DatePicker */
+    gap: var(--spacing-sm);
+  }
+  
+  .journal-primary-action,
+  .journal-cancel-action {
+    flex: 1 !important; /* EQUAL: Equal width buttons */
+    justify-content: center !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    min-height: auto !important;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .benefit-logging-section {
+    padding: var(--spacing-md);
+  }
+  
+  .streak-number {
+    font-size: 2.5rem;
+  }
+  
+  .milestone-item {
+    min-width: 80px;
+    flex: 1;
+    max-width: 120px;
+  }
+  
+  /* Very small screen single premium helmet adjustments - BIGGER SIZES */
+  .single-lock-icon {
+    width: 60px; /* INCREASED: From 48px to 60px */
+    height: 60px; /* INCREASED: From 48px to 60px */
+  }
+  
+  .single-lock-text {
+    font-size: 0.9rem;
+  }
+  
+  .single-lock-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  /* Very small screen upgrade button adjustments - LANDING PAGE STYLE */
+  .single-lock-upgrade-btn {
+    font-size: 0.875rem; /* READABLE: Good size on small screens */
+    padding: var(--spacing-sm) var(--spacing-md); /* COMPACT: But still substantial */
+    min-width: 160px; /* APPROPRIATE: Good width for small screens */
+    min-height: 44px; /* GOOD: Touch target */
+  }
+  
+  .single-lock-fade-gradient {
+    /* Slightly more opaque gradient on very small screens for better visibility */
+    background: radial-gradient(
+      ellipse at center,
+      rgba(51, 51, 51, 0.95) 0%,
+      rgba(51, 51, 51, 0.9) 25%,
+      rgba(51, 51, 51, 0.8) 50%,
+      rgba(51, 51, 51, 0.6) 75%,
+      rgba(51, 51, 51, 0.3) 90%,
+      rgba(51, 51, 51, 0) 100%
+    );
+  }
+  
+  .benefit-actions-row {
+    gap: var(--spacing-xs);
+  }
+  
+  .benefit-slider-header {
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  
+  .benefit-label {
+    font-size: 0.875rem;
+  }
+  
+  .benefit-value {
+    font-size: 0.8rem;
+  }
+}
