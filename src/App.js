@@ -74,7 +74,7 @@ const MobileProfileButton = () => {
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  // REMOVED: isInitialLoading state - this was causing the black flash
   const { userData, isLoggedIn, isPremium, isLoading, login, logout, updateUserData } = useUserData();
 
   // Monitor screen size for responsive design
@@ -89,15 +89,8 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Handle initial app loading (for page refreshes)
-  useEffect(() => {
-    // Simulate checking authentication state
-    const timer = setTimeout(() => {
-      setIsInitialLoading(false);
-    }, 1500); // Show helmet for 1.5 seconds on page load/refresh
-
-    return () => clearTimeout(timer);
-  }, []);
+  // REMOVED: Initial app loading timer - HTML loader in index.html handles this now
+  // This was the source of the black flash between loaders
 
   // Handle login
   const handleLogin = async (username, password) => {
@@ -108,13 +101,13 @@ function App() {
     return success;
   };
 
-  // FIXED: Show SpartanLoader when loading OR when initially loading the app
-  if (isLoading || isInitialLoading) {
+  // FIXED: Only show SpartanLoader for actual data loading (login/logout), not initial page load
+  if (isLoading) {
     return (
       <div className="spartan-loading-screen">
         <SpartanLoader 
           size={100}
-          message={isLoading ? "Logging you in..." : "Loading your dashboard..."}
+          message="Logging you in..."
           showMessage={true}
           animationType="warrior"
         />
