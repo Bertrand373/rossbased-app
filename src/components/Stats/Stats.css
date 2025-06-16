@@ -368,37 +368,6 @@
   color: var(--primary);
 }
 
-/* ENHANCED: Metric-specific button styling for better category recognition */
-.metric-btn.energy.active {
-  background: linear-gradient(135deg, rgba(255, 99, 71, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border-color: rgba(255, 99, 71, 0.3);
-}
-
-.metric-btn.focus.active {
-  background: linear-gradient(135deg, rgba(138, 43, 226, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border-color: rgba(138, 43, 226, 0.3);
-}
-
-.metric-btn.confidence.active {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border-color: rgba(255, 215, 0, 0.3);
-}
-
-.metric-btn.aura.active {
-  background: linear-gradient(135deg, rgba(75, 0, 130, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border-color: rgba(75, 0, 130, 0.3);
-}
-
-.metric-btn.sleep.active {
-  background: linear-gradient(135deg, rgba(25, 25, 112, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border-color: rgba(25, 25, 112, 0.3);
-}
-
-.metric-btn.workout.active {
-  background: linear-gradient(135deg, rgba(220, 20, 60, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border-color: rgba(220, 20, 60, 0.3);
-}
-
 /* ===== ADDED: FREE USER BENEFIT PREVIEW SECTION - PROGRESSIVE PREMIUM LOCK ===== */
 
 .free-benefit-preview {
