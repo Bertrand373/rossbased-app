@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css - FIXED: Balanced phase indicator spacing */
+/* components/UrgeToolkit/UrgeToolkit.css - ENHANCED: Advanced breathing modes, experience levels, new animations */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -230,7 +230,7 @@
   font-style: italic;
 }
 
-/* FIXED: Breathing Interface - Clean circle without icons, just pulsing */
+/* ENHANCED: Breathing Interface with Advanced Mode Selector */
 .breathing-interface {
   display: flex;
   flex-direction: column;
@@ -240,6 +240,41 @@
   background-color: var(--card-background);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
+}
+
+/* NEW: Breathing Mode Selector */
+.breathing-mode-selector {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-xs);
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+  color: var(--text);
+}
+
+.mode-btn.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .breathing-display {
@@ -262,14 +297,13 @@
   overflow: hidden;
 }
 
-/* FIXED: Clean breathing animation - just the pulsing circle, no icons */
+/* ENHANCED: Multiple breathing animation types */
 .breathing-animation {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.3) 0%, rgba(255, 221, 0, 0.1) 100%);
   border: 2px solid var(--primary);
-  /* REMOVED: All display flex and icon styling - just the circle */
   transition: all 0.5s ease;
 }
 
@@ -279,6 +313,16 @@
 
 .exhale-animation {
   animation: breathe-out 4s ease-in-out infinite;
+}
+
+/* NEW: Advanced breathing animations */
+.rapid-animation {
+  animation: rapid-breathe 0.5s ease-in-out infinite;
+}
+
+.hold-animation {
+  animation: energy-hold 2s ease-in-out infinite;
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.6) 0%, rgba(255, 221, 0, 0.3) 100%);
 }
 
 @keyframes breathe-in {
@@ -303,6 +347,32 @@
   }
 }
 
+/* NEW: Rapid breathing animation for Bhastrika */
+@keyframes rapid-breathe {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+/* NEW: Energy hold animation */
+@keyframes energy-hold {
+  0%, 100% { 
+    transform: scale(1.5);
+    opacity: 0.8;
+    box-shadow: 0 0 20px rgba(255, 221, 0, 0.4);
+  }
+  50% { 
+    transform: scale(1.7);
+    opacity: 1;
+    box-shadow: 0 0 30px rgba(255, 221, 0, 0.6);
+  }
+}
+
 .breathing-status {
   text-align: center;
   font-size: 1.125rem;
@@ -324,7 +394,8 @@
 
 /* Protocol Steps - Clean instructions */
 .mental-protocol,
-.physical-protocol {
+.physical-protocol,
+.energy-protocol {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -645,6 +716,19 @@
   .breathing-animation {
     width: 50px;
     height: 50px;
+  }
+  
+  /* NEW: Mobile breathing mode selector */
+  .breathing-mode-selector {
+    flex-direction: column;
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .mode-btn {
+    width: 100%;
+    justify-content: center;
+    padding: var(--spacing-md);
   }
   
   .phase-tools {
