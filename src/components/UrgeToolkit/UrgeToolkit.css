@@ -676,13 +676,13 @@
   .phase-name {
     font-size: 0.9375rem;
     text-align: center;
-    margin-bottom: var(--spacing-xs); /* ADDED: Space between header and counter */
+    margin-bottom: 2px; /* FIXED: Closer spacing between text elements */
   }
   
   .phase-day {
     font-size: 0.8125rem;
     text-align: center;
-    margin-top: var(--spacing-xs); /* ADDED: Space between counter and header */
+    margin-top: 2px; /* FIXED: Closer spacing between text elements */
   }
   
   .assessment-section,
@@ -714,6 +714,10 @@
   .breathing-animation {
     width: 50px;
     height: 50px;
+  }
+  
+  .breathing-interface {
+    padding: var(--spacing-lg);
   }
   
   /* NEW: Mobile breathing mode selector */
@@ -824,10 +828,6 @@
   .breathing-animation {
     width: 40px;
     height: 40px;
-  }
-  
-  .breathing-interface {
-    padding: var(--spacing-lg);
   }
   
   .protocol-card {
