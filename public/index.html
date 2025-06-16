@@ -57,7 +57,7 @@
         font-size: 16px !important;
       }
       
-      /* ANIMATED LOADER: Pulsing helmet with perfect sizing match */
+      /* ANIMATED LOADER: Pulsing helmet with smaller sizing */
       #initial-loader {
         max-width: 1200px;
         margin: 24px auto;
@@ -80,10 +80,10 @@
         justify-content: center;
       }
       
-      /* ANIMATED: Exact 100px helmet with pulsing to match landing page SpartanLoader */
+      /* UPDATED: Smaller 60px helmet for desktop (was 100px) */
       #initial-loader .helmet-image {
-        width: 100px;
-        height: 100px;
+        width: 60px;
+        height: 60px;
         /* MATCH: Same pulsing animation as SpartanLoader default */
         animation: helmet-pulse 1.8s ease-in-out infinite;
       }
@@ -118,10 +118,10 @@
           gap: 16px; /* This matches var(--spacing-md) from SpartanLoader mobile */
         }
         
-        /* ANIMATED: 70px on mobile with pulsing to match SpartanLoader */
+        /* UPDATED: Smaller 45px on mobile (was 70px) */
         #initial-loader .helmet-image {
-          width: 70px;
-          height: 70px;
+          width: 45px;
+          height: 45px;
           animation: helmet-pulse 1.8s ease-in-out infinite;
         }
         
@@ -132,11 +132,10 @@
       }
       
       @media (max-width: 480px) {
-        /* STATIC: Very small screens to match SpartanLoader */
-        /* ANIMATED: Very small screens with pulsing to match SpartanLoader */
+        /* UPDATED: Smaller 40px for very small screens (was 60px) */
         #initial-loader .helmet-image {
-          width: 60px;
-          height: 60px;
+          width: 40px;
+          height: 40px;
           animation: helmet-pulse 1.8s ease-in-out infinite;
         }
         

@@ -4,7 +4,7 @@ import './SpartanLoader.css';
 import helmetImage from '../../assets/helmet.png';
 
 const SpartanLoader = ({ 
-  size = 80, 
+  size = 50, // UPDATED: Changed from 80 to 50 for smaller default size
   message = "Loading...", 
   showMessage = true,
   animationType = "default" // default, intense, breathing, warrior
