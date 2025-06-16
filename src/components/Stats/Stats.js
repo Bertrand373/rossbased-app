@@ -960,37 +960,37 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             {/* SINGLE ROW: All 6 benefit items in one container */}
             <div className="metric-pill-container">
               <button 
-                className={`metric-btn ${selectedMetric === 'energy' ? 'active' : ''}`}
+                className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('energy')}
               >
                 Energy
               </button>
               <button 
-                className={`metric-btn ${selectedMetric === 'focus' ? 'active' : ''}`}
+                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('focus')}
               >
                 Focus
               </button>
               <button 
-                className={`metric-btn ${selectedMetric === 'confidence' ? 'active' : ''}`}
+                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('confidence')}
               >
                 Confidence
               </button>
               <button 
-                className={`metric-btn ${selectedMetric === 'aura' ? 'active' : ''}`}
+                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('aura')}
               >
                 Aura
               </button>
               <button 
-                className={`metric-btn ${selectedMetric === 'sleep' ? 'active' : ''}`}
+                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('sleep')}
               >
                 Sleep Quality
               </button>
               <button 
-                className={`metric-btn ${selectedMetric === 'workout' ? 'active' : ''}`}
+                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('workout')}
               >
                 Workout
@@ -1142,11 +1142,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   {generateAllInsights().map(insight => (
                     <div 
                       key={insight.id} 
-                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''}`}
+                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''} ${insight.isPhaseSpecific ? 'phase-specific' : ''} ${insight.isChallenge ? 'challenge-warning' : ''}`}
                     >
                       <div className="insight-card-header">
                         <FaRegLightbulb className="insight-icon" />
-                        <span className="insight-metric">{insight.metric === 'sleep' ? 'Sleep Quality' : insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
+                        <span className="insight-metric">{insight.metric === 'sleep' ? 'Sleep Quality' : insight.metric === 'challenge' ? 'Current Phase' : insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
                       </div>
                       <div className="insight-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
                     </div>
@@ -1162,7 +1162,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <div className="pattern-insights">
                 {generatePatternInsights().length > 0 ? (
                   generatePatternInsights().map(insight => (
-                    <div key={insight.id} className="pattern-insight-item">
+                    <div key={insight.id} className={`pattern-insight-item ${insight.isTimeline ? 'timeline' : ''} ${insight.isWarning ? 'warning' : ''}`}>
                       <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
                       <div className="pattern-actionable">{insight.actionable}</div>
                     </div>
