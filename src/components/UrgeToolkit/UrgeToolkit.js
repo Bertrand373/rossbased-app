@@ -240,20 +240,18 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
       // Start the timer
       breathingIntervalRef.current = setInterval(() => {
         setBreathingTimer(prev => {
-          const newTime = prev - 1;
-          
-          if (newTime <= 0) {
-            // Handle phase transitions based on current mode
-            if (advancedBreathing && experienceLevel !== 'beginner') {
-              handleAdvancedBreathing();
-            } else {
-              handleStandardBreathing();
-            }
-            // Return value will be set by the handlers above
-            return newTime; // This will be updated by the handlers
+          if (prev <= 1) {
+            // Timer is about to hit 0, trigger phase change
+            setTimeout(() => {
+              if (advancedBreathing && experienceLevel !== 'beginner') {
+                handleAdvancedBreathing();
+              } else {
+                handleStandardBreathing();
+              }
+            }, 0);
+            return 0;
           }
-          
-          return newTime;
+          return prev - 1;
         });
       }, 1000);
       
@@ -264,48 +262,54 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   };
 
   const handleAdvancedBreathing = () => {
-    if (breathingPhase === 'bhastrika') {
-      setBreathingPhase('hold');
-      setBreathingTimer(15); // 15 seconds to hold
-    } else if (breathingPhase === 'hold') {
-      setBreathingPhase('exhale');
-      setBreathingTimer(15); // 15 seconds to exhale
-    } else if (breathingPhase === 'exhale') {
-      // Complete one cycle
-      setBreathingCount(prev => {
-        const newCount = prev + 1;
-        if (newCount >= 3) {
-          completeBreathingSession('Advanced breathing complete! Energy redirected upward.');
-          return newCount;
-        } else {
-          // Start next cycle
-          setBreathingPhase('bhastrika');
-          setBreathingTimer(30); // 30 rapid breaths
-          return newCount;
-        }
-      });
-    }
+    setBreathingPhase(currentPhase => {
+      if (currentPhase === 'bhastrika') {
+        setBreathingTimer(15); // 15 seconds to hold
+        return 'hold';
+      } else if (currentPhase === 'hold') {
+        setBreathingTimer(15); // 15 seconds to exhale
+        return 'exhale';
+      } else if (currentPhase === 'exhale') {
+        // Complete one cycle
+        setBreathingCount(prev => {
+          const newCount = prev + 1;
+          if (newCount >= 3) {
+            completeBreathingSession('Advanced breathing complete! Energy redirected upward.');
+            return newCount;
+          } else {
+            // Start next cycle
+            setBreathingTimer(30); // 30 rapid breaths
+            return newCount;
+          }
+        });
+        return 'bhastrika';
+      }
+      return currentPhase;
+    });
   };
 
   const handleStandardBreathing = () => {
-    if (breathingPhase === 'inhale') {
-      setBreathingPhase('exhale');
-      setBreathingTimer(4); // 4 seconds to exhale
-    } else if (breathingPhase === 'exhale') {
-      // Complete one cycle
-      setBreathingCount(prev => {
-        const newCount = prev + 1;
-        if (newCount >= 10) {
-          completeBreathingSession('Breathing complete! How do you feel?');
-          return newCount;
-        } else {
-          // Start next cycle
-          setBreathingPhase('inhale');
-          setBreathingTimer(4); // 4 seconds to inhale
-          return newCount;
-        }
-      });
-    }
+    setBreathingPhase(currentPhase => {
+      if (currentPhase === 'inhale') {
+        setBreathingTimer(4); // 4 seconds to exhale
+        return 'exhale';
+      } else if (currentPhase === 'exhale') {
+        // Complete one cycle
+        setBreathingCount(prev => {
+          const newCount = prev + 1;
+          if (newCount >= 10) {
+            completeBreathingSession('Breathing complete! How do you feel?');
+            return newCount;
+          } else {
+            // Start next cycle
+            setBreathingTimer(4); // 4 seconds to inhale
+            return newCount;
+          }
+        });
+        return 'inhale';
+      }
+      return currentPhase;
+    });
   };
 
   const stopBreathing = () => {
