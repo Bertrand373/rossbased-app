@@ -231,65 +231,10 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         setBreathingTimer(prev => {
           const newTime = prev - 1;
           
-          if (advancedBreathing && experienceLevel !== 'beginner') {
-            // Advanced Bhastrika logic
-            if (breathingPhase === 'bhastrika' && newTime <= 0) {
-              setBreathingPhase('hold');
-              return 30; // Hold for 30 seconds
-            } 
-            if (breathingPhase === 'hold' && newTime <= 0) {
-              setBreathingPhase('exhale');
-              return 15; // Slow exhale for 15 seconds
-            } 
-            if (breathingPhase === 'exhale' && newTime <= 0) {
-              setBreathingCount(prevCount => {
-                const newCount = prevCount + 1;
-                if (newCount >= 3) { // 3 complete cycles
-                  setBreathingPhase('complete');
-                  setBreathingActive(false);
-                  if (breathingIntervalRef.current) {
-                    clearInterval(breathingIntervalRef.current);
-                  }
-                  stopActiveTimer();
-                  toast.success('Advanced breathing complete! Energy redirected upward.');
-                  setTimeout(() => setCurrentStep('summary'), 1000);
-                  return newCount;
-                } else {
-                  setBreathingPhase('bhastrika');
-                  return newCount;
-                }
-              });
-              return 30; // Reset for next cycle
-            }
-          } else {
-            // Standard breathing logic
-            if (newTime <= 0) {
-              setBreathingPhase(currentPhase => {
-                if (currentPhase === 'inhale') {
-                  return 'exhale';
-                } else if (currentPhase === 'exhale') {
-                  setBreathingCount(prevCount => {
-                    const newCount = prevCount + 1;
-                    if (newCount >= 10) {
-                      setBreathingPhase('complete');
-                      setBreathingActive(false);
-                      if (breathingIntervalRef.current) {
-                        clearInterval(breathingIntervalRef.current);
-                      }
-                      stopActiveTimer();
-                      toast.success('Breathing complete! How do you feel?');
-                      setTimeout(() => setCurrentStep('summary'), 1000);
-                      return newCount;
-                    } else {
-                      return newCount;
-                    }
-                  });
-                  return 'inhale';
-                }
-                return currentPhase;
-              });
-              return 4;
-            }
+          // Handle timer reaching zero
+          if (newTime <= 0) {
+            handleBreathingPhaseChange();
+            return getNextTimerValue();
           }
           
           return newTime;
@@ -299,6 +244,69 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
       console.error('Error starting breathing:', error);
       toast.error('Error starting breathing protocol');
     }
+  };
+
+  // Helper function to handle phase changes
+  const handleBreathingPhaseChange = () => {
+    if (advancedBreathing && experienceLevel !== 'beginner') {
+      // Advanced breathing phase changes
+      if (breathingPhase === 'bhastrika') {
+        setBreathingPhase('hold');
+      } else if (breathingPhase === 'hold') {
+        setBreathingPhase('exhale');
+      } else if (breathingPhase === 'exhale') {
+        setBreathingCount(prevCount => {
+          const newCount = prevCount + 1;
+          if (newCount >= 3) {
+            completeBreathingSession('Advanced breathing complete! Energy redirected upward.');
+            return newCount;
+          } else {
+            setBreathingPhase('bhastrika');
+            return newCount;
+          }
+        });
+      }
+    } else {
+      // Standard breathing phase changes
+      if (breathingPhase === 'inhale') {
+        setBreathingPhase('exhale');
+      } else if (breathingPhase === 'exhale') {
+        setBreathingCount(prevCount => {
+          const newCount = prevCount + 1;
+          if (newCount >= 10) {
+            completeBreathingSession('Breathing complete! How do you feel?');
+            return newCount;
+          } else {
+            setBreathingPhase('inhale');
+            return newCount;
+          }
+        });
+      }
+    }
+  };
+
+  // Helper function to get next timer value
+  const getNextTimerValue = () => {
+    if (advancedBreathing && experienceLevel !== 'beginner') {
+      if (breathingPhase === 'bhastrika') return 30; // Hold phase
+      if (breathingPhase === 'hold') return 15; // Exhale phase
+      if (breathingPhase === 'exhale') return 30; // Next bhastrika cycle
+    } else {
+      return 4; // Standard breathing rhythm
+    }
+    return 4;
+  };
+
+  // Helper function to complete breathing session
+  const completeBreathingSession = (message) => {
+    setBreathingPhase('complete');
+    setBreathingActive(false);
+    if (breathingIntervalRef.current) {
+      clearInterval(breathingIntervalRef.current);
+    }
+    stopActiveTimer();
+    toast.success(message);
+    setTimeout(() => setCurrentStep('summary'), 1000);
   };
 
   const stopBreathing = () => {
