@@ -57,7 +57,7 @@
         font-size: 16px !important;
       }
       
-      /* ANIMATED LOADER: Pulsing helmet with perfect sizing match */
+      /* UPDATED: Modest helmet loader with refined sizing */
       #initial-loader {
         max-width: 1200px;
         margin: 24px auto;
@@ -80,10 +80,10 @@
         justify-content: center;
       }
       
-      /* ANIMATED: Exact 100px helmet with pulsing to match landing page SpartanLoader */
+      /* UPDATED: Modest 80px helmet with pulsing - refined and professional */
       #initial-loader .helmet-image {
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
         /* MATCH: Same pulsing animation as SpartanLoader default */
         animation: helmet-pulse 1.8s ease-in-out infinite;
       }
@@ -110,7 +110,7 @@
         /* NO ANIMATION - completely static */
       }
       
-      /* Mobile responsiveness - EXACT match with SpartanLoader mobile breakpoints */
+      /* Mobile responsiveness - UPDATED: Modest sizing to match SpartanLoader */
       @media (max-width: 768px) {
         #initial-loader {
           margin: 8px;
@@ -118,10 +118,10 @@
           gap: 16px; /* This matches var(--spacing-md) from SpartanLoader mobile */
         }
         
-        /* ANIMATED: 70px on mobile with pulsing to match SpartanLoader */
+        /* UPDATED: Modest 60px on mobile with pulsing to match SpartanLoader */
         #initial-loader .helmet-image {
-          width: 70px;
-          height: 70px;
+          width: 60px;
+          height: 60px;
           animation: helmet-pulse 1.8s ease-in-out infinite;
         }
         
@@ -132,11 +132,10 @@
       }
       
       @media (max-width: 480px) {
-        /* STATIC: Very small screens to match SpartanLoader */
-        /* ANIMATED: Very small screens with pulsing to match SpartanLoader */
+        /* UPDATED: Very modest 50px on very small screens with pulsing to match SpartanLoader */
         #initial-loader .helmet-image {
-          width: 60px;
-          height: 60px;
+          width: 50px;
+          height: 50px;
           animation: helmet-pulse 1.8s ease-in-out infinite;
         }
         
@@ -149,7 +148,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
-    <!-- ANIMATED LOADER: Pulsing helmet, matches landing page SpartanLoader exactly -->
+    <!-- UPDATED: Modest helmet loader, matches refined SpartanLoader sizing exactly -->
     <div id="initial-loader">
       <div class="helmet-container">
         <img class="helmet-image" src="%PUBLIC_URL%/helmet.png" alt="Loading" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />

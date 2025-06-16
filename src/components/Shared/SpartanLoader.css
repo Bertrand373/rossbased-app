@@ -99,15 +99,15 @@
   }
 }
 
-/* Mobile Responsiveness */
+/* UPDATED: Mobile Responsiveness - Modest sizing */
 @media (max-width: 768px) {
   .spartan-loader-message {
     font-size: 1.125rem;
   }
   
   .spartan-helmet-image {
-    max-width: 70px;
-    max-height: 70px;
+    max-width: 60px;
+    max-height: 60px;
   }
   
   .spartan-loader-container {
@@ -115,11 +115,11 @@
   }
 }
 
-/* Very small screens */
+/* UPDATED: Very small screens - Even more modest */
 @media (max-width: 480px) {
   .spartan-helmet-image {
-    max-width: 60px;
-    max-height: 60px;
+    max-width: 50px;
+    max-height: 50px;
   }
   
   .spartan-loader-message {
@@ -129,6 +129,11 @@
 
 /* EXPLANATION OF CHANGES:
  * 
+ * MODEST SIZING UPDATE:
+ * - Desktop: 80px (passed via size prop, down from 100px)
+ * - Mobile (768px): 60px (down from 70px) 
+ * - Small screens (480px): 50px (down from 60px)
+ * 
  * REMOVED ALL GLOW EFFECTS:
  * - No more filter: drop-shadow() properties
  * - No more brightness() adjustments
@@ -136,4 +141,5 @@
  * 
  * The helmet now pulses naturally without any glowing effects,
  * showing just the helmet's original colors and a subtle scaling animation.
+ * Creates a refined, professional loading experience.
  */
