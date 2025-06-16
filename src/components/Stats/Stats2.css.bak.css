@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Added progressive premium lock styles + Timeline-based enhancements */
+/* components/Stats/Stats.css - UPDATED: Added progressive premium lock styles */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -61,45 +61,38 @@
   transition: none;
 }
 
-/* ENHANCED: Floating wisdom toggle with better visibility and animations */
+/* FLOATING WISDOM TOGGLE - Clean implementation without affecting layouts */
 .floating-wisdom-toggle {
   position: fixed;
   bottom: 24px;
   right: 24px;
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  background-color: var(--card-background);
   border: 2px solid var(--border);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   z-index: 999;
-  transition: all 0.3s ease;
-}
-
-.floating-wisdom-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  transition: none;
 }
 
 .floating-wisdom-toggle.active {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.2) 100%);
+  background-color: rgba(255, 221, 0, 0.1);
   border-color: var(--primary);
-  box-shadow: 0 4px 16px rgba(255, 221, 0, 0.3);
 }
 
 .floating-wisdom-eye {
   font-size: 1.25rem;
   color: var(--text-secondary);
-  transition: all 0.3s ease;
+  transition: none;
 }
 
 .floating-wisdom-eye.active {
   color: var(--primary);
-  filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.5));
 }
 
 /* Mobile: Position above mobile navigation */
@@ -418,7 +411,7 @@
   width: 100%;
 }
 
-/* ENHANCED: Benefit Upgrade CTA - Matching Timeline early teaser design exactly */
+/* NEW: Benefit Upgrade CTA - Matching Timeline early teaser design */
 .benefit-upgrade-cta {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid var(--border);
@@ -430,14 +423,9 @@
   align-items: center;
   gap: var(--spacing-xl);
   text-align: left;
-  margin-top: var(--spacing-lg);
 }
 
-.upgrade-helmet-section {
-  flex-shrink: 0;
-}
-
-/* ENHANCED: Benefit upgrade helmet - EXACT copy of Timeline early teaser helmet sizing */
+/* NEW: Benefit upgrade helmet - EXACT copy of Timeline early teaser helmet sizing */
 .upgrade-helmet-icon {
   width: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
   height: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
@@ -485,7 +473,7 @@
   line-height: 1.5;
 }
 
-/* ENHANCED: Benefit upgrade button - EXACT copy of Timeline early-teaser-upgrade-btn */
+/* NEW: Benefit upgrade button - EXACT copy of Timeline early-teaser-upgrade-btn */
 .benefit-upgrade-btn {
   display: flex;
   align-items: center;
@@ -511,7 +499,7 @@
 .benefit-upgrade-btn:hover {
   background-color: var(--primary-dark); /* MATCH: Same as Timeline */
   transform: translateY(-2px); /* MATCH: Same as Timeline */
-  box-shadow: 0 6px 16px rgba(255, 221, 0, 0.4); /* MATCH: Enhanced shadow on hover */
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Timeline */
   color: #000000; /* MATCH: Same as Timeline */
 }
 
@@ -601,7 +589,7 @@
   text-align: center;
 }
 
-/* ENHANCED: Detailed Analysis section with phase indicator styling */
+/* REVERTED: Detailed Analysis section back to original */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -622,10 +610,6 @@
   font-weight: 600;
   position: relative;
   margin-bottom: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xs);
 }
 
 .detailed-analysis-section h4::after {
@@ -657,13 +641,6 @@
   font-weight: 700;
 }
 
-/* ENHANCED: Phase-specific highlighting */
-.phase-highlight {
-  color: var(--primary);
-  font-weight: 700;
-  text-shadow: 0 0 4px rgba(255, 221, 0, 0.3);
-}
-
 .comparison-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -683,24 +660,6 @@
   transition: none;
   min-height: 140px;
   height: 140px;
-}
-
-/* ENHANCED: Phase-aware comparison cards */
-.comparison-card.phase-aware {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-}
-
-.comparison-card.phase-aware::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
 .comparison-value {
@@ -727,7 +686,7 @@
   font-weight: 600;
 }
 
-/* ENHANCED: Insights Grid with phase-specific styling */
+/* REDESIGNED: Insights Grid - Dynamic Heights for Better Content */
 .insights-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -754,36 +713,6 @@
   border: 1px solid rgba(255, 221, 0, 0.2);
   transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(255, 221, 0, 0.15);
-}
-
-/* ENHANCED: Phase-specific insight card styling */
-.insight-card.phase-specific {
-  border-left: 3px solid var(--primary);
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
-}
-
-.insight-card.challenge-warning {
-  border-left: 3px solid var(--danger);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--card-background) 100%);
-}
-
-.insight-card.timeline-based {
-  border-left: 3px solid var(--success);
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
-}
-
-/* Phase-specific animations */
-@keyframes phase-glow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(255, 221, 0, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(255, 221, 0, 0.4);
-  }
-}
-
-.insight-card.highlighted.phase-specific {
-  animation: phase-glow 2s ease-in-out infinite;
 }
 
 .insight-card-header {
@@ -909,7 +838,7 @@
   color: var(--text);
 }
 
-/* ENHANCED: Pattern Analysis section with timeline-based styling */
+/* REVERTED: Pattern Analysis section back to original */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -924,13 +853,8 @@
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
-  font-weight: 600;
   position: relative;
   margin-bottom: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xs);
 }
 
 .pattern-analysis-section h3::after {
@@ -957,64 +881,6 @@
   border: 1px solid var(--border);
   transition: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* ENHANCED: Pattern-specific styling */
-.pattern-insight-item.timeline {
-  border-left: 4px solid var(--primary);
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--card-background) 100%);
-}
-
-.pattern-insight-item.warning {
-  border-left: 4px solid var(--danger);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--card-background) 100%);
-}
-
-.pattern-insight-item.recovery {
-  border-left: 4px solid var(--success);
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
-}
-
-/* Timeline pattern styling */
-.timeline-pattern {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--card-background) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  margin: var(--spacing-md) 0;
-}
-
-.timeline-pattern .pattern-text {
-  color: var(--primary);
-  font-weight: 600;
-}
-
-/* Challenge warning styling */
-.challenge-warning {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, var(--card-background) 100%);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  margin: var(--spacing-md) 0;
-}
-
-.challenge-warning .pattern-text {
-  color: var(--danger);
-  font-weight: 600;
-}
-
-/* Recovery pattern styling */
-.recovery-pattern {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
-  border: 1px solid rgba(34, 197, 94, 0.1);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  margin: var(--spacing-md) 0;
-}
-
-.recovery-pattern .pattern-text {
-  color: var(--success);
-  font-weight: 600;
 }
 
 .pattern-text {
@@ -1465,11 +1331,6 @@
   /* Mobile: Pattern analysis */
   .pattern-analysis-section {
     padding: var(--spacing-lg);
-  }
-  
-  .pattern-analysis-section h3 {
-    font-size: 1.125rem;
-    margin-bottom: var(--spacing-lg); /* ADDED: Ensure mobile matches desktop spacing */
   }
   
   .pattern-insight-item {
