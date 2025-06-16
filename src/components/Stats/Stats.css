@@ -927,10 +927,6 @@
   font-weight: 600;
   position: relative;
   margin-bottom: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xs);
 }
 
 .pattern-analysis-section h3::after {
