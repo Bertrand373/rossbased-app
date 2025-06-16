@@ -605,7 +605,7 @@
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* REDUCED: Top padding to match pattern analysis */
+  padding: var(--spacing-xl);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -621,7 +621,7 @@
   text-align: center;
   font-weight: 600;
   position: relative;
-  margin-bottom: 0; /* REMOVED: Extra margin - let flex gap handle spacing */
+  margin-bottom: var(--spacing-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -631,7 +631,7 @@
 .detailed-analysis-section h4::after {
   content: '';
   position: absolute;
-  bottom: -4px; /* TIGHTER: Closer to header text to match pattern section */
+  bottom: -8px;
   left: 50%;
   transform: translateX(-50%);
   width: 40px;
@@ -913,7 +913,7 @@
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* REDUCED: Top padding to match detailed analysis visual positioning */
+  padding: var(--spacing-xl);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -929,7 +929,7 @@
   text-align: center;
   font-weight: 600;
   position: relative;
-  margin-bottom: 0; /* REMOVED: Extra margin - let flex gap handle spacing */
+  margin-bottom: var(--spacing-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -939,7 +939,7 @@
 .pattern-analysis-section h3::after {
   content: '';
   position: absolute;
-  bottom: -4px; /* TIGHTER: Closer to header text */
+  bottom: -8px;
   left: 50%;
   transform: translateX(-50%);
   width: 40px;
@@ -1428,12 +1428,12 @@
   
   /* Mobile: Detailed Analysis */
   .detailed-analysis-section {
-    padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* REDUCED: Top padding on mobile too */
+    padding: var(--spacing-lg);
   }
   
   .detailed-analysis-section h4 {
     font-size: 1.125rem;
-    margin-bottom: 0; /* REMOVED: Extra margin - let flex gap handle spacing */
+    margin-bottom: var(--spacing-lg); /* ADDED: Ensure mobile matches desktop spacing */
   }
   
   .comparison-grid {
@@ -1467,12 +1467,12 @@
   
   /* Mobile: Pattern analysis - FIXED: Ensure same header spacing as detailed analysis */
   .pattern-analysis-section {
-    padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* REDUCED: Top padding on mobile too */
+    padding: var(--spacing-lg);
   }
   
   .pattern-analysis-section h3 {
     font-size: 1.125rem;
-    margin-bottom: 0; /* REMOVED: Extra margin - let flex gap handle spacing */
+    margin-bottom: var(--spacing-lg); /* FIXED: Ensure mobile matches desktop spacing */
   }
   
   .pattern-insight-item {
