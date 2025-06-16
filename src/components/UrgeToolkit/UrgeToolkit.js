@@ -7,8 +7,10 @@ import './UrgeToolkit.css';
 // Icons - Simplified set
 import { FaShieldAlt, FaExclamationTriangle, FaBolt, FaBrain, FaHeart, 
   FaPlay, FaPause, FaStop, FaCheckCircle, 
-  FaTimes, FaInfoCircle, FaStopwatch, FaLeaf, FaLightbulb, FaTrophy,
-  FaFire, FaWind, FaUsers, FaBatteryEmpty } from 'react-icons/fa';
+  FaTimes, FaInfoCircle, FaStopwatch, FaLeaf, FaLightbulb, FaTrophy } from 'react-icons/fa';
+
+// Additional icons for enhanced features
+import { FaFire, FaWind, FaUsers, FaBatteryEmpty } from 'react-icons/fa';
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   // Core States - Simplified
@@ -163,7 +165,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         setAdvancedBreathing(experienceLevel !== 'beginner');
         toast.success(`Emergency ${experienceLevel !== 'beginner' ? 'advanced ' : ''}breathing recommended`);
       } else if (intensity >= 6) {
-        if (experienceLevel !== 'beginner' && (triggerOptions.find(t => t.id === 'energy-overflow'))) {
+        if (experienceLevel !== 'beginner') {
           setActiveProtocol('energy');
           toast.success('Energy circulation recommended for overflow');
         } else {
@@ -233,12 +235,10 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             // Advanced Bhastrika logic
             if (breathingPhase === 'bhastrika' && newTime <= 0) {
               setBreathingPhase('hold');
-              setBreathingTimer(30); // Hold for 30 seconds
-              return 30;
+              return 30; // Hold for 30 seconds
             } else if (breathingPhase === 'hold' && newTime <= 0) {
               setBreathingPhase('exhale');
-              setBreathingTimer(15); // Slow exhale for 15 seconds
-              return 15;
+              return 15; // Slow exhale for 15 seconds
             } else if (breathingPhase === 'exhale' && newTime <= 0) {
               setBreathingCount(prevCount => {
                 const newCount = prevCount + 1;
