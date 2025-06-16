@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <!-- UPDATED: Changed favicon from heart to helmet with cache busting -->
-    <link rel="icon" href="%PUBLIC_URL%/helmet.png?v=3" />
-    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/helmet.png?v=3" />
-    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/helmet.png?v=3" />
+    <!-- FIXED: Proper favicon setup with correctly sized icons -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png" />
     <!-- ENHANCED: Strong zoom prevention without breaking loader -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#0f0f0f" />
@@ -21,9 +21,8 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
     
-    <!-- UPDATED: Apple touch icon also uses helmet with cache busting -->
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/helmet.png?v=3" />
-    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/helmet.png?v=3" />
+    <!-- FIXED: Apple touch icon uses proper sized icon -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>TitanTrack</title>
     <style>
@@ -58,20 +57,21 @@
         font-size: 16px !important;
       }
       
-      /* RESTORED: Working helmet loader with tighter spacing */
+      /* ANIMATED LOADER: Pulsing helmet with perfect sizing match */
       #initial-loader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        max-width: 1200px;
+        margin: 24px auto;
+        min-height: calc(100vh - 48px);
+        background: linear-gradient(135deg, #2c2c2c 0%, #333333 100%);
+        border: 1px solid #444444;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background-color: #0f0f0f;
         z-index: 9999;
-        gap: 16px;
+        gap: 24px; /* This matches var(--spacing-lg) from SpartanLoader */
       }
       
       #initial-loader .helmet-container {
@@ -80,21 +80,15 @@
         justify-content: center;
       }
       
+      /* ANIMATED: Exact 100px helmet with pulsing to match landing page SpartanLoader */
       #initial-loader .helmet-image {
         width: 100px;
         height: 100px;
+        /* MATCH: Same pulsing animation as SpartanLoader default */
         animation: helmet-pulse 1.8s ease-in-out infinite;
       }
       
-      #initial-loader .loader-message {
-        color: #ffffff;
-        font-size: 1.25rem;
-        font-weight: 500;
-        text-align: center;
-        margin: 0;
-      }
-      
-      /* CLEAN: Helmet pulse animation */
+      /* MATCH: Same pulse animation as SpartanLoader CSS */
       @keyframes helmet-pulse {
         0%, 100% { 
           opacity: 1; 
@@ -106,22 +100,44 @@
         }
       }
       
-      /* Mobile responsiveness */
+      /* STATIC: Exact text sizing to match landing page SpartanLoader */
+      #initial-loader .loader-message {
+        color: #f9fafb;
+        font-size: 1.25rem; /* This matches SpartanLoader default desktop size */
+        font-weight: 500;
+        text-align: center;
+        margin: 0;
+        /* NO ANIMATION - completely static */
+      }
+      
+      /* Mobile responsiveness - EXACT match with SpartanLoader mobile breakpoints */
       @media (max-width: 768px) {
+        #initial-loader {
+          margin: 8px;
+          min-height: calc(100vh - 16px);
+          gap: 16px; /* This matches var(--spacing-md) from SpartanLoader mobile */
+        }
+        
+        /* ANIMATED: 70px on mobile with pulsing to match SpartanLoader */
         #initial-loader .helmet-image {
           width: 70px;
           height: 70px;
+          animation: helmet-pulse 1.8s ease-in-out infinite;
         }
         
+        /* STATIC: Mobile text size to match SpartanLoader mobile */
         #initial-loader .loader-message {
           font-size: 1.125rem;
         }
       }
       
       @media (max-width: 480px) {
+        /* STATIC: Very small screens to match SpartanLoader */
+        /* ANIMATED: Very small screens with pulsing to match SpartanLoader */
         #initial-loader .helmet-image {
           width: 60px;
           height: 60px;
+          animation: helmet-pulse 1.8s ease-in-out infinite;
         }
         
         #initial-loader .loader-message {
@@ -133,7 +149,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
-    <!-- RESTORED: Working helmet loader -->
+    <!-- ANIMATED LOADER: Pulsing helmet, matches landing page SpartanLoader exactly -->
     <div id="initial-loader">
       <div class="helmet-container">
         <img class="helmet-image" src="%PUBLIC_URL%/helmet.png" alt="Loading" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
@@ -156,57 +172,28 @@
                 fill="url(#helmet-gradient)" stroke="#d4af37" stroke-width="1.5" filter="url(#glow)"/>
           <path d="M35 10 Q50 5, 65 10 Q60 15, 50 15 Q40 15, 35 10 Z" 
                 fill="#daa520" stroke="#d4af37" stroke-width="1"/>
-          <rect x="20" y="40" width="60" height="3" rx="1.5" fill="#d4af37"/>
-          <rect x="22" y="50" width="56" height="3" rx="1.5" fill="#d4af37"/>
-          <rect x="24" y="60" width="52" height="3" rx="1.5" fill="#d4af37"/>
-          <path d="M15 45 Q12 50, 15 65 Q20 70, 25 65 L25 45 Z" 
-                fill="url(#helmet-gradient)" stroke="#d4af37" stroke-width="1"/>
-          <path d="M85 45 Q88 50, 85 65 Q80 70, 75 65 L75 45 Z" 
-                fill="url(#helmet-gradient)" stroke="#d4af37" stroke-width="1"/>
-          <path d="M45 35 Q50 30, 55 35 Q50 45, 45 35 Z" 
-                fill="#d4af37" opacity="0.8"/>
+          <circle cx="42" cy="45" r="3" fill="#8b4513"/>
+          <circle cx="58" cy="45" r="3" fill="#8b4513"/>
+          <path d="M45 55 Q50 60, 55 55" stroke="#8b4513" stroke-width="2" fill="none"/>
         </svg>
       </div>
-      <p class="loader-message">Loading...</p>
+      <p class="loader-message">Loading your Dashboard...</p>
     </div>
     
     <div id="root"></div>
     
     <script>
-      // ENHANCED: Effective zoom prevention without breaking functionality
-      
-      // Prevent gesture events
-      document.addEventListener('gesturestart', function (e) {
-        e.preventDefault();
+      // ENHANCED: Prevent zoom via touch gestures
+      document.addEventListener('gesturestart', function(event) {
+        event.preventDefault();
       }, { passive: false });
       
-      document.addEventListener('gesturechange', function (e) {
-        e.preventDefault();
+      document.addEventListener('gesturechange', function(event) {
+        event.preventDefault();
       }, { passive: false });
       
-      // Enhanced double-tap zoom prevention
-      let lastTouchEnd = 0;
-      
-      document.addEventListener('touchend', function (event) {
-        const now = (new Date()).getTime();
-        if (now - lastTouchEnd <= 300) {
-          event.preventDefault();
-        }
-        lastTouchEnd = now;
-      }, { passive: false });
-      
-      // Prevent pinch-to-zoom
-      document.addEventListener('touchmove', function(event) {
-        if (event.touches.length > 1) {
-          event.preventDefault();
-        }
-      }, { passive: false });
-      
-      // Prevent mouse wheel zoom
-      document.addEventListener('wheel', function(event) {
-        if (event.ctrlKey || event.metaKey) {
-          event.preventDefault();
-        }
+      document.addEventListener('gestureend', function(event) {
+        event.preventDefault();
       }, { passive: false });
       
       // Prevent keyboard zoom shortcuts
@@ -234,30 +221,26 @@
       // Monitor zoom occasionally (not aggressively)
       setInterval(resetZoom, 1000);
       
-      // RESTORED: Working loader removal logic
+      /* IMMEDIATE LOADER REMOVAL: Remove as soon as React content appears */
       window.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-          var loader = document.getElementById('initial-loader');
-          var root = document.getElementById('root');
-          
-          function checkForReactContent() {
-            if (root && root.children.length > 0) {
-              if (loader) {
-                loader.style.opacity = '0';
-                loader.style.transition = 'opacity 0.5s ease';
-                setTimeout(function() {
-                  if (loader && loader.parentNode) {
-                    loader.parentNode.removeChild(loader);
-                  }
-                }, 500);
+        var loader = document.getElementById('initial-loader');
+        var root = document.getElementById('root');
+        
+        function checkForReactContent() {
+          if (root && root.children.length > 0) {
+            if (loader) {
+              // IMMEDIATE removal - no fade, no delay
+              if (loader.parentNode) {
+                loader.parentNode.removeChild(loader);
               }
-            } else {
-              setTimeout(checkForReactContent, 100);
             }
+          } else {
+            setTimeout(checkForReactContent, 10); // Check very frequently
           }
-          
-          checkForReactContent();
-        }, 100);
+        }
+        
+        // Start checking immediately
+        checkForReactContent();
       });
     </script>
   </body>

@@ -1,4 +1,4 @@
-// components/Landing/Landing.js - Updated with SpartanLoader and modest sizing
+// components/Landing/Landing.js - Updated with SpartanLoader and fixed loading flow
 import React, { useState } from 'react';
 import { FaChartLine, FaShieldAlt, FaChartBar } from 'react-icons/fa';
 import './Landing.css';
@@ -26,7 +26,7 @@ const Landing = ({ onLogin }) => {
       {isLoading ? (
         <div className="loading-screen">
           <SpartanLoader 
-            size={80}
+            size={100}
             message="Preparing your dashboard..."
             showMessage={true}
             animationType="warrior"
