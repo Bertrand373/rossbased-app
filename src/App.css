@@ -50,8 +50,6 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-left: var(--spacing-lg);
-  margin-right: var(--spacing-lg);
 }
 
 /* ADDED: Additional Toast Overrides in App.css as backup */
