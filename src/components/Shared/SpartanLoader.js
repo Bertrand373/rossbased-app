@@ -1,4 +1,4 @@
-// src/components/Shared/SpartanLoader.js - FIXED to be truly responsive
+// src/components/Shared/SpartanLoader.js - FIXED to be truly responsive - simpler approach
 import React from 'react';
 import './SpartanLoader.css';
 import helmetImage from '../../assets/helmet.png';
@@ -31,9 +31,6 @@ const SpartanLoader = ({
           src={helmetImage}
           alt="Loading" 
           className={getAnimationClass()}
-          style={{ 
-            '--desktop-size': `${size}px`
-          }}
         />
       </div>
       {showMessage && (
