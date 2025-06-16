@@ -236,10 +236,12 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             if (breathingPhase === 'bhastrika' && newTime <= 0) {
               setBreathingPhase('hold');
               return 30; // Hold for 30 seconds
-            } else if (breathingPhase === 'hold' && newTime <= 0) {
+            } 
+            if (breathingPhase === 'hold' && newTime <= 0) {
               setBreathingPhase('exhale');
               return 15; // Slow exhale for 15 seconds
-            } else if (breathingPhase === 'exhale' && newTime <= 0) {
+            } 
+            if (breathingPhase === 'exhale' && newTime <= 0) {
               setBreathingCount(prevCount => {
                 const newCount = prevCount + 1;
                 if (newCount >= 3) { // 3 complete cycles
