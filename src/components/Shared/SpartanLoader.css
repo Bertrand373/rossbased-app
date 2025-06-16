@@ -15,8 +15,8 @@
 
 .spartan-helmet-image {
   display: block;
-  max-width: 100%;
-  height: auto;
+  width: var(--desktop-size, 80px);
+  height: var(--desktop-size, 80px);
   animation: spartan-pulse 1.8s ease-in-out infinite;
   /* REMOVED: No glow effects - clean pulsing only */
 }
@@ -99,15 +99,15 @@
   }
 }
 
-/* UPDATED: Mobile Responsiveness - Modest sizing */
+/* UPDATED: Mobile Responsiveness - Modest sizing that overrides desktop */
 @media (max-width: 768px) {
   .spartan-loader-message {
     font-size: 1.125rem;
   }
   
   .spartan-helmet-image {
-    max-width: 60px;
-    max-height: 60px;
+    width: 60px !important;
+    height: 60px !important;
   }
   
   .spartan-loader-container {
@@ -115,11 +115,11 @@
   }
 }
 
-/* UPDATED: Very small screens - Even more modest */
+/* UPDATED: Very small screens - Even more modest with override */
 @media (max-width: 480px) {
   .spartan-helmet-image {
-    max-width: 50px;
-    max-height: 50px;
+    width: 50px !important;
+    height: 50px !important;
   }
   
   .spartan-loader-message {
