@@ -909,7 +909,7 @@
   color: var(--text);
 }
 
-/* ENHANCED: Pattern Analysis section with timeline-based styling - FIXED: Match detailed analysis header positioning exactly */
+/* FIXED: Pattern Analysis section header to match Detailed Analysis exactly */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -930,10 +930,6 @@
   font-weight: 600;
   position: relative;
   margin-bottom: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xs);
 }
 
 .pattern-analysis-section h3::after {
@@ -1472,7 +1468,7 @@
   
   .pattern-analysis-section h3 {
     font-size: 1.125rem;
-    margin-bottom: var(--spacing-lg); /* FIXED: Ensure mobile matches desktop spacing */
+    margin-bottom: var(--spacing-lg);
   }
   
   .pattern-insight-item {
