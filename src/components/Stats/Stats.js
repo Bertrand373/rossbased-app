@@ -133,6 +133,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const handleUpgradeClick = () => {
     toast.success('Premium upgrade coming soon! 🚀');
   };
+
+  // ADDED: Helper function to get current phase
+  const getCurrentPhase = (streak) => {
+    if (streak <= 7) return 'Foundation Phase';
+    if (streak <= 30) return 'Adjustment Phase';
+    if (streak <= 90) return 'Momentum Phase';
+    if (streak <= 180) return 'Transformation Phase';
+    if (streak <= 365) return 'Integration Phase';
+    return 'Mastery Phase';
+  };
   
   // Filter benefit data based on selected time range
   const getFilteredBenefitData = () => {
@@ -1102,17 +1112,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Detailed Analysis Section */}
+            {/* Detailed Analysis Section - FIXED HEADER STRUCTURE */}
             <div className="detailed-analysis-section">
-              <h4>Detailed Analysis - Day {userData.currentStreak || 0} ({(() => {
-                const streak = userData.currentStreak || 0;
-                if (streak <= 7) return 'Foundation Phase';
-                if (streak <= 30) return 'Adjustment Phase';
-                if (streak <= 90) return 'Momentum Phase';
-                if (streak <= 180) return 'Transformation Phase';
-                if (streak <= 365) return 'Integration Phase';
-                return 'Mastery Phase';
-              })()})</h4>
+              <h4>Detailed Analysis - Day {userData.currentStreak || 0} ({getCurrentPhase(userData.currentStreak || 0)})</h4>
               
               <div className="streak-comparison">
                 <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
