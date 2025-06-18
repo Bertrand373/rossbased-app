@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Added progressive premium lock styles + Timeline-based enhancements + FIXED Pattern Analysis Header Positioning */
+/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + FIXED Pattern Analysis Header Positioning */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -622,10 +622,6 @@
   font-weight: 600;
   position: relative;
   margin-bottom: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xs);
 }
 
 .detailed-analysis-section h4::after {
