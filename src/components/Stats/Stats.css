@@ -1252,7 +1252,7 @@
   }
 }
 
-/* MOBILE RESPONSIVE: Stack Layout and Optimizations */
+/* MOBILE RESPONSIVE: Stack Layout and Optimizations - FIXED HEADER ALIGNMENT */
 @media (max-width: 768px) {
   /* Mobile header - reset button below title */
   .stats-header {
@@ -1426,20 +1426,34 @@
     justify-content: center; /* ENSURE: Centered on mobile */
   }
   
-  /* Mobile: Detailed Analysis */
+  /* Mobile: Detailed Analysis - FIXED to match desktop exactly */
   .detailed-analysis-section {
     padding: var(--spacing-lg);
   }
   
   .detailed-analysis-section h4 {
-    font-size: 1.125rem !important;
-    margin-bottom: var(--spacing-lg) !important;
     margin: 0 !important;
+    font-size: 1.125rem !important; /* Mobile font size */
     color: var(--text) !important;
     text-align: center !important;
     font-weight: 600 !important;
     position: relative !important;
+    margin-bottom: var(--spacing-lg) !important;
     display: block !important;
+    flex-direction: initial !important;
+    align-items: initial !important;
+    gap: initial !important;
+  }
+  
+  .detailed-analysis-section h4::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
   }
   
   .comparison-grid {
@@ -1471,20 +1485,34 @@
     font-size: 0.8rem;
   }
   
-  /* Mobile: Pattern analysis - FIXED: Ensure same header spacing as detailed analysis */
+  /* Mobile: Pattern analysis - FIXED to match detailed analysis exactly */
   .pattern-analysis-section {
     padding: var(--spacing-lg);
   }
   
   .pattern-analysis-section h3 {
-    font-size: 1.125rem !important;
-    margin-bottom: var(--spacing-lg) !important;
     margin: 0 !important;
+    font-size: 1.125rem !important; /* Mobile font size - same as detailed-analysis h4 */
     color: var(--text) !important;
     text-align: center !important;
     font-weight: 600 !important;
     position: relative !important;
+    margin-bottom: var(--spacing-lg) !important;
     display: block !important;
+    flex-direction: initial !important;
+    align-items: initial !important;
+    gap: initial !important;
+  }
+  
+  .pattern-analysis-section h3::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
   }
   
   .pattern-insight-item {
