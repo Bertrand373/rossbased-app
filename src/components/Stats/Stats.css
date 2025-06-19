@@ -909,7 +909,7 @@
   color: var(--text);
 }
 
-/* FIXED: Pattern Analysis section header to match Detailed Analysis exactly */
+/* FIXED: Pattern Analysis section header to match Understanding Your Current Phase exactly */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -923,17 +923,12 @@
 }
 
 .pattern-analysis-section h3 {
-  margin: 0 !important;
-  font-size: 1.25rem !important;
-  color: var(--text) !important;
-  text-align: center !important;
-  font-weight: 600 !important;
-  position: relative !important;
-  margin-bottom: var(--spacing-lg) !important;
-  display: block !important;
-  flex-direction: initial !important;
-  align-items: initial !important;
-  gap: initial !important;
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text);
+  text-align: center;
+  position: relative;
+  margin-bottom: var(--spacing-lg);
 }
 
 .pattern-analysis-section h3::after {
@@ -1491,17 +1486,12 @@
   }
   
   .pattern-analysis-section h3 {
-    margin: 0 !important;
-    font-size: 1.125rem !important; /* Mobile font size - same as detailed-analysis h4 */
-    color: var(--text) !important;
-    text-align: center !important;
-    font-weight: 600 !important;
-    position: relative !important;
-    margin-bottom: var(--spacing-lg) !important;
-    display: block !important;
-    flex-direction: initial !important;
-    align-items: initial !important;
-    gap: initial !important;
+    margin: 0;
+    font-size: 1.125rem; /* Mobile font size - same as detailed-analysis h4 */
+    color: var(--text);
+    text-align: center;
+    position: relative;
+    margin-bottom: var(--spacing-lg);
   }
   
   .pattern-analysis-section h3::after {
