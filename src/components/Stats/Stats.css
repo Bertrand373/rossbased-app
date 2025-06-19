@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + FIXED Pattern Analysis Header Positioning */
+/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + FIXED Pattern Analysis Header with Left Accent */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -909,7 +909,7 @@
   color: var(--text);
 }
 
-/* FIXED: Pattern Analysis section header to match Understanding Your Current Phase exactly */
+/* UPDATED: Pattern Analysis section with left accent and Option 1 header */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -918,28 +918,32 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
+  /* MOVED: Border accent from top to left */
+  border-left: 4px solid var(--primary);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.pattern-analysis-section h3 {
+/* NEW: Option 1 - Icon + Title Inline header */
+.pattern-analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md) 0;
+}
+
+.pattern-analysis-header .header-icon {
+  color: var(--primary);
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.pattern-analysis-header h3 {
   margin: 0;
   font-size: 1.25rem;
   color: var(--text);
-  text-align: center;
-  position: relative;
-  margin-bottom: var(--spacing-lg);
-}
-
-.pattern-analysis-section h3::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  font-weight: 600;
 }
 
 .pattern-insights {
@@ -1480,29 +1484,17 @@
     font-size: 0.8rem;
   }
   
-  /* Mobile: Pattern analysis - FIXED to match detailed analysis exactly */
+  /* Mobile: Pattern analysis with new header design */
   .pattern-analysis-section {
     padding: var(--spacing-lg);
   }
   
-  .pattern-analysis-section h3 {
-    margin: 0;
-    font-size: 1.125rem; /* Mobile font size - same as detailed-analysis h4 */
-    color: var(--text);
-    text-align: center;
-    position: relative;
-    margin-bottom: var(--spacing-lg);
+  .pattern-analysis-header h3 {
+    font-size: 1.125rem; /* Mobile font size */
   }
   
-  .pattern-analysis-section h3::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  .pattern-analysis-header .header-icon {
+    font-size: 1.25rem; /* Slightly smaller on mobile */
   }
   
   .pattern-insight-item {
