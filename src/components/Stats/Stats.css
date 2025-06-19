@@ -930,7 +930,6 @@
   justify-content: center;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
-  padding: var(--spacing-md) 0;
 }
 
 .pattern-analysis-header .header-icon {
