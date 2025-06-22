@@ -5,7 +5,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 // Import icons at the top
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch, FaCompass } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 
@@ -1112,9 +1112,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Benefit Insights Section - FIXED HEADER STRUCTURE */}
+            {/* Benefit Insights Section - UPDATED: Header with icon */}
             <div className="detailed-analysis-section">
-              <h4>Benefit Insights - Day {userData.currentStreak || 0} ({getCurrentPhase(userData.currentStreak || 0)})</h4>
+              <div className="detailed-analysis-header">
+                <FaSearch className="header-icon" />
+                <h4>Benefit Insights - Day {userData.currentStreak || 0} ({getCurrentPhase(userData.currentStreak || 0)})</h4>
+              </div>
               
               <div className="streak-comparison">
                 <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
@@ -1157,10 +1160,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Journey Guidance Section - UPDATED: New header structure */}
+            {/* Journey Guidance Section - UPDATED: Compass icon */}
             <div className="pattern-analysis-section" ref={patternSectionRef}>
               <div className="pattern-analysis-header">
-                <FaSearch className="header-icon" />
+                <FaCompass className="header-icon" />
                 <h3>Journey Guidance</h3>
               </div>
               
