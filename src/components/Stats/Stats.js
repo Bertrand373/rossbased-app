@@ -1112,9 +1112,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Detailed Analysis Section - FIXED HEADER STRUCTURE */}
+            {/* Benefit Insights Section - FIXED HEADER STRUCTURE */}
             <div className="detailed-analysis-section">
-              <h4>Detailed Analysis - Day {userData.currentStreak || 0} ({getCurrentPhase(userData.currentStreak || 0)})</h4>
+              <h4>Benefit Insights - Day {userData.currentStreak || 0} ({getCurrentPhase(userData.currentStreak || 0)})</h4>
               
               <div className="streak-comparison">
                 <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
@@ -1157,11 +1157,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Pattern Analysis Section - UPDATED: New header structure */}
+            {/* Journey Guidance Section - UPDATED: New header structure */}
             <div className="pattern-analysis-section" ref={patternSectionRef}>
               <div className="pattern-analysis-header">
                 <FaSearch className="header-icon" />
-                <h3>Pattern Analysis</h3>
+                <h3>Journey Guidance</h3>
               </div>
               
               <div className="pattern-insights">
