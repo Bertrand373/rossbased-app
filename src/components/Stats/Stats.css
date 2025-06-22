@@ -909,11 +909,11 @@
   color: var(--text);
 }
 
-/* UPDATED: Journey Guidance section with left accent and Option 1 header */
+/* UPDATED: Journey Guidance section with left accent and FIXED header spacing */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* FIXED: Reduced top padding */
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -923,13 +923,13 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* NEW: Option 1 - Icon + Title Inline header */
+/* FIXED: Option 1 - Icon + Title Inline header with NO margin-bottom */
 .pattern-analysis-header {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 0; /* FIXED: Remove margin-bottom to prevent double spacing with flex gap */
 }
 
 .pattern-analysis-header .header-icon {
@@ -1483,9 +1483,13 @@
     font-size: 0.8rem;
   }
   
-  /* Mobile: Journey guidance with new header design */
+  /* Mobile: Journey guidance with FIXED header spacing */
   .pattern-analysis-section {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* FIXED: Reduced top padding on mobile */
+  }
+  
+  .pattern-analysis-header {
+    margin-bottom: 0; /* FIXED: Ensure no margin on mobile too */
   }
   
   .pattern-analysis-header h3 {
