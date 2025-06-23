@@ -1,4 +1,35 @@
-// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
+// UPDATED: Get phase-specific challenge insight - matches Emotional Timeline
+  const getChallengeInsight = (phase, streak) => {
+    const challengeInsights = {
+      initial: {
+        practical: `Day ${streak}: You're in the Initial Adaptation phase. Strong urges and restlessness are completely normal - your body is learning to retain energy.`,
+        esoteric: `Day ${streak}: You're beginning the hero's journey. The resistance you feel is the old self protecting its familiar patterns.`,
+        actionable: "Focus on building unbreakable daily habits. Use cold showers and intense exercise to channel excess energy."
+      },
+      purging: {
+        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
+        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
+        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
+      },
+      expansion: {
+        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
+        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
+        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
+      },
+      integration: {
+        practical: `Day ${streak}: Spiritual Integration phase brings profound inner transformation. You're gaining abilities that feel almost supernatural.`,
+        esoteric: `Day ${streak}: Major consciousness expansion occurring. You're embodying the divine masculine archetype.`,
+        actionable: "Accept increased responsibility gracefully. Share your wisdom while remaining humble about your development."
+      },
+      mastery: {
+        practical: `Day ${streak}: Mastery & Service phase brings responsibility for guiding others and contributing to human evolution.`,
+        esoteric: `Day ${streak}: Individual development now serves cosmic evolution. Your consciousness affects the collective field.`,
+        actionable: "Focus on legacy creation and mentoring others. Your mastery should serve the awakening of all humanity."
+      }
+    };
+    
+    return challengeInsights[phase];
+  }// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -134,14 +165,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     toast.success('Premium upgrade coming soon! 🚀');
   };
 
-  // ADDED: Helper function to get current phase
+  // UPDATED: Helper function to get current phase - now matches Emotional Timeline exactly
   const getCurrentPhase = (streak) => {
-    if (streak <= 7) return 'Foundation Phase';
-    if (streak <= 30) return 'Adjustment Phase';
-    if (streak <= 90) return 'Momentum Phase';
-    if (streak <= 180) return 'Transformation Phase';
-    if (streak <= 365) return 'Integration Phase';
-    return 'Mastery Phase';
+    if (streak <= 14) return 'Initial Adaptation';
+    if (streak <= 45) return 'Emotional Purging';
+    if (streak <= 90) return 'Mental Expansion';
+    if (streak <= 180) return 'Spiritual Integration';
+    return 'Mastery & Service';
   };
   
   // Filter benefit data based on selected time range
@@ -333,199 +363,169 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   const streakComparison = generateStreakComparison();
   
-  // Get metric-specific benefits based on timeline phase
+  // UPDATED: Get metric-specific benefits based on timeline phase - matches Emotional Timeline
   const getMetricBenefits = (metric, phase, streak) => {
     const metricData = {
       energy: {
-        foundation: {
+        initial: {
           practical: "Energy fluctuations are normal as your body adjusts to conserving vital force. Expect periods of high energy alternating with fatigue.",
           esoteric: "Your life force is beginning to accumulate instead of being scattered. The body temple is learning to contain divine energy.",
           actionable: "Establish consistent morning exercise and avoid energy-draining activities during this critical foundation period."
         },
-        adjustment: {
+        purging: {
           practical: "Noticeable strength gains and vitality increases. Your physical power and endurance are improving significantly.",
           esoteric: "Raw sexual energy (Jing) is being refined into life energy (Qi). Your vital force is stabilizing at higher frequencies.",
           actionable: "Channel this increased energy into productive activities - exercise, creative projects, and skill development."
         },
-        momentum: {
+        expansion: {
           practical: "Sustained high energy throughout the day. Your body composition improves naturally without extra effort.",
           esoteric: "You're entering the alchemical refinement stage. Sexual energy transforms into pure vitality and creative power.",
           actionable: "Use this momentum phase to tackle your biggest goals and challenges while maintaining spiritual practices."
         },
-        transformation: {
+        integration: {
           practical: "Your presence amplifies - others can feel your energy from across a room. Consistent, reliable energy levels.",
           esoteric: "Energy transmutation is nearly complete. You're operating on refined life force rather than base sexual energy.",
           actionable: "Focus on service and helping others while maintaining the practices that brought you to this level."
         },
-        integration: {
+        mastery: {
           practical: "Energy consistency is natural and effortless. You rarely get sick and recover quickly when you do.",
           esoteric: "Vital force flows freely through all energy centers. You've achieved energetic harmony and balance.",
           actionable: "Share your knowledge and help others achieve similar energy mastery through teaching and mentoring."
-        },
-        mastery: {
-          practical: "Optimal function in all body systems. Biomarkers suggest extended lifespan and peak performance.",
-          esoteric: "You've achieved the transmutation of Jing to Qi to Shen. Sexual energy has become spiritual energy.",
-          actionable: "Use your mastery to contribute to human consciousness evolution and planetary healing."
         }
       },
       focus: {
-        foundation: {
+        initial: {
           practical: "Brief periods of unusual mental sharpness alternating with mind racing. Concentration gradually improving.",
           esoteric: "Mental fog from energy dissipation is clearing. Your mind's natural clarity is beginning to emerge.",
           actionable: "Start with short meditation sessions (15 minutes) and gradually build concentration muscle."
         },
-        adjustment: {
+        purging: {
           practical: "Improved memory and faster decision-making. Information absorption and retention significantly enhanced.",
           esoteric: "Brain tissue becomes more densely connected as vital nutrients are redirected from reproduction to cognition.",
           actionable: "Take on learning challenges - new languages, skills, or complex subjects while your brain is optimizing."
         },
-        momentum: {
+        expansion: {
           practical: "Mental clarity reaches new levels. Pattern recognition and strategic thinking abilities expand dramatically.",
           esoteric: "The mind purifies as sexual energy transforms. Fog lifts and thoughts become crystal clear.",
           actionable: "Apply enhanced focus to your most important goals. This is the time for major intellectual achievements."
         },
-        transformation: {
+        integration: {
           practical: "Memory becomes exceptional with photographic tendencies. Ability to master new skills rapidly develops.",
           esoteric: "Mental body (Manomaya Kosha) expands and clarifies. Consciousness operates at higher dimensional levels.",
           actionable: "Share your enhanced mental capabilities through teaching, writing, or innovative problem-solving."
         },
-        integration: {
+        mastery: {
           practical: "Knowledge synthesis across disciplines becomes natural. Complex concepts understood intuitively.",
           esoteric: "Mind achieves unity consciousness. Individual thinking merges with universal intelligence.",
           actionable: "Use integrated awareness to bridge different fields of knowledge and create innovative solutions."
-        },
-        mastery: {
-          practical: "Universal understanding and prophetic insight. Ability to see probable futures and outcomes.",
-          esoteric: "Individual mind dissolves into cosmic consciousness. Thinking becomes a function of universal awareness.",
-          actionable: "Guide humanity's intellectual evolution and contribute to collective wisdom expansion."
         }
       },
       confidence: {
-        foundation: {
+        initial: {
           practical: "Growing sense of possibility and self-confidence from taking control of this fundamental area of life.",
           esoteric: "Personal power begins awakening as you reclaim dominion over your most basic drives and impulses.",
           actionable: "Practice saying no to small requests to build boundary-setting strength for bigger challenges ahead."
         },
-        adjustment: {
+        purging: {
           practical: "Growing belief in your capabilities. Natural inclination to take charge in group situations emerges.",
           esoteric: "Solar plexus chakra (Manipura) activates as personal power stabilizes. Inner fire begins burning steady.",
           actionable: "Take on leadership opportunities at work or in community to develop and exercise your growing confidence."
         },
-        momentum: {
+        expansion: {
           practical: "Natural confidence without arrogance. Others seeking your opinions and treating you with more respect.",
           esoteric: "Personal power matures into authentic authority. You embody strength without aggression or dominance.",
           actionable: "Use growing influence responsibly. Focus on empowering others rather than seeking personal advantage."
         },
-        transformation: {
+        integration: {
           practical: "Others automatically looking to you for direction. Natural charisma and leadership abilities manifest.",
           esoteric: "Divine masculine energy fully activated. You embody the archetype of the wise king or spiritual warrior.",
           actionable: "Accept leadership responsibilities but remain humble. Power should serve others, not personal ego."
         },
-        integration: {
+        mastery: {
           practical: "Unshakeable inner confidence independent of external circumstances. Natural authority recognized by others.",
           esoteric: "Self-confidence transcends into cosmic confidence. You know your place in the universal order.",
           actionable: "Mentor others in developing authentic confidence and personal power through your example and teaching."
-        },
-        mastery: {
-          practical: "Perfect self-assurance without ego. Others naturally defer to your wisdom and judgment.",
-          esoteric: "Personal will aligns completely with divine will. Individual confidence becomes universal confidence.",
-          actionable: "Use absolute confidence to serve the highest good and guide others toward their own divine authority."
         }
       },
       aura: {
-        foundation: {
+        initial: {
           practical: "Others beginning to notice something different about you, though they can't quite explain what it is.",
           esoteric: "Your electromagnetic field strengthens as vital energy accumulates. Auric field begins expanding beyond normal limits.",
           actionable: "Pay attention to how others respond to your presence. Practice maintaining positive, powerful energy."
         },
-        adjustment: {
+        purging: {
           practical: "Magnetism increasing - people drawn to be near you without knowing why. Quality of interactions improves.",
           esoteric: "Aura expands from normal 3-6 feet to 10-15 feet. Others unconsciously sense your elevated energy signature.",
           actionable: "Use your growing magnetism responsibly. Attract people for mutual benefit, not personal manipulation."
         },
-        momentum: {
+        expansion: {
           practical: "Attracting higher-quality people into your life. Network and relationship quality significantly improves.",
           esoteric: "Auric field becomes powerful enough to influence others' emotional and mental states. Energy signature purifies.",
           actionable: "Consciously radiate positive energy. Your presence should uplift and inspire everyone you encounter."
         },
-        transformation: {
+        integration: {
           practical: "People change behavior in your presence. Natural authority and influence expand significantly.",
           esoteric: "Aura extends 50+ feet from body. Energy field carries information that transforms others at distance.",
           actionable: "Accept responsibility for your energetic impact on others. Your presence should serve their highest good."
         },
-        integration: {
+        mastery: {
           practical: "Consistent powerful presence that affects positive change in every environment you enter.",
           esoteric: "Auric field stabilizes at master level. Energy signature becomes a beacon of light for others.",
           actionable: "Use your energetic influence to create positive change in communities, organizations, and relationships."
-        },
-        mastery: {
-          practical: "Aura can fill entire buildings. People transform permanently after meeting you.",
-          esoteric: "Individual aura merges with cosmic energy field. You become a conduit for universal love and wisdom.",
-          actionable: "Channel cosmic energy for planetary healing and consciousness evolution. Your presence serves global awakening."
         }
       },
       sleep: {
-        foundation: {
+        initial: {
           practical: "Sleep patterns may be disrupted as body adjusts. You might sleep more or less than usual initially.",
           esoteric: "Body's natural circadian rhythms reset as energy patterns shift from reproduction to regeneration.",
           actionable: "Maintain consistent sleep schedule. Create sacred sleep environment free from electromagnetic interference."
         },
-        adjustment: {
+        purging: {
           practical: "Sleep optimization begins - needing less sleep but feeling more rested. Dreams become more vivid.",
           esoteric: "Energy body (Pranamaya Kosha) purifies during sleep. Astral consciousness becomes more active and aware.",
           actionable: "Pay attention to your dreams - they're processing old patterns and revealing guidance for your journey."
         },
-        momentum: {
+        expansion: {
           practical: "Deep, restorative sleep with consistent energy upon waking. Sleep efficiency reaches optimal levels.",
           esoteric: "Sleep becomes a time of spiritual regeneration. Consciousness travels to higher realms during rest.",
           actionable: "Use pre-sleep meditation to program positive dreams and insights. Morning journaling captures wisdom received."
         },
-        transformation: {
+        integration: {
           practical: "Requiring minimal sleep while feeling completely refreshed. Recovery and healing accelerated during rest.",
           esoteric: "Physical sleep merges with spiritual contemplation. Rest becomes active communion with higher consciousness.",
           actionable: "Dedicate first moments upon waking to gratitude and intention-setting for the day ahead."
         },
-        integration: {
+        mastery: {
           practical: "Perfect sleep efficiency - exactly the right amount of rest for optimal function with natural wake timing.",
           esoteric: "Sleep-wake cycle aligns with cosmic rhythms. Body follows natural law rather than artificial schedules.",
           actionable: "Share sleep optimization knowledge with others struggling with rest and recovery issues."
-        },
-        mastery: {
-          practical: "Sleep becomes optional - can function optimally on very little rest when necessary for service.",
-          esoteric: "Consciousness remains partially awake during sleep. You become guardian of your own dream realm.",
-          actionable: "Use mastery of sleep to serve others through healing work, emergency assistance, and spiritual guidance."
         }
       },
       workout: {
-        foundation: {
+        initial: {
           practical: "Physical restlessness increases - body needs more movement to circulate accumulating energy.",
           esoteric: "Life force seeks upward movement through physical expression. Body becomes vessel for dynamic energy.",
           actionable: "Establish vigorous daily exercise routine. Use physical movement to transmute sexual energy upward."
         },
-        adjustment: {
+        purging: {
           practical: "Noticeable strength gains and physical improvements. Coordination and athleticism naturally enhance.",
           esoteric: "Muscle tissue becomes more efficient as vital nutrients redirect from reproduction to physical development.",
           actionable: "Challenge yourself with progressive physical goals. Your enhanced capabilities can handle increased demands."
         },
-        momentum: {
+        expansion: {
           practical: "Natural muscle gain and fat loss without extra effort. Athletic performance reaches new personal bests.",
           esoteric: "Physical body becomes refined vessel for spiritual energy. Strength serves higher consciousness rather than ego.",
           actionable: "Use physical prowess to inspire and help others. Your body becomes example of what's possible."
         },
-        transformation: {
+        integration: {
           practical: "Movement becomes graceful and powerful. Others notice significant improvements in your physical presence.",
           esoteric: "Body achieves harmony between strength and flexibility, power and grace. Physical form reflects spiritual development.",
           actionable: "Train others in physical development. Share knowledge of how retention enhances athletic performance."
         },
-        integration: {
+        mastery: {
           practical: "Peak physical condition maintained effortlessly. Body operates at optimal efficiency in all activities.",
           esoteric: "Physical form becomes temple for divine consciousness. Every movement expresses spiritual principle.",
           actionable: "Use physical mastery to demonstrate integration of body, mind, and spirit in all activities."
-        },
-        mastery: {
-          practical: "Extraordinary physical capabilities that seem supernatural to others. Healing others through touch or presence.",
-          esoteric: "Body becomes vehicle for cosmic energy. Physical form serves universal consciousness rather than personal desires.",
-          actionable: "Channel physical mastery for healing, protection, and service to those in need of strength and vitality."
         }
       }
     };
@@ -533,26 +533,23 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return metricData[metric][phase];
   };
   
-  // Get challenge-specific guidance based on phase
+  // UPDATED: Get challenge-specific guidance based on phase - matches Emotional Timeline
   const getChallengeGuidance = (phase, streak) => {
     const challengeData = {
-      foundation: {
-        actionable: "Expect resistance and doubt. Commit to 30 days minimum. Remove all triggers from environment."
+      initial: {
+        actionable: "Expect resistance and strong urges. Focus on building unbreakable daily habits. Remove all triggers from environment."
       },
-      adjustment: {
-        actionable: "Flatlines are normal integration periods. Maintain practices even when motivation dips. Trust the process."
+      purging: {
+        actionable: "Flatlines and mood swings are normal. Accept emotions without resistance. Maintain practices even when motivation dips."
       },
-      momentum: {
-        actionable: "Guard against ego inflation. Use increased energy for service to others, not personal glorification."
-      },
-      transformation: {
-        actionable: "Handle increased responsibility wisely. Some relationships may not survive your transformation - this is normal."
+      expansion: {
+        actionable: "Guard against ego inflation. Use increased mental abilities for meaningful goals and helping others."
       },
       integration: {
-        actionable: "Find community with others at your level. Avoid trying to save everyone - let them have their own journey."
+        actionable: "Handle increased responsibility wisely. Some relationships may change as you transform - this is normal."
       },
       mastery: {
-        actionable: "Focus on legacy creation and consciousness evolution. Your development serves all humanity now."
+        actionable: "Focus on legacy creation and service to others. Your development now serves humanity's evolution."
       }
     };
     
@@ -616,13 +613,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     // Define all 6 enhanced benefit categories
     const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
     
-    // Timeline-based phase detection
+    // UPDATED: Timeline-based phase detection - matches Emotional Timeline exactly
     const getPhase = (streak) => {
-      if (streak <= 7) return 'foundation';
-      if (streak <= 30) return 'adjustment'; 
-      if (streak <= 90) return 'momentum';
-      if (streak <= 180) return 'transformation';
-      if (streak <= 365) return 'integration';
+      if (streak <= 14) return 'initial';
+      if (streak <= 45) return 'purging'; 
+      if (streak <= 90) return 'expansion';
+      if (streak <= 180) return 'integration';
       return 'mastery';
     };
     
@@ -672,7 +668,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return wisdomMode ? currentInsight.esoteric : currentInsight.practical;
   };
 
-  // ENHANCED: Generate pattern insights with challenge-specific guidance
+  // UPDATED: Generate pattern insights with Emotional Timeline phases
   const generatePatternInsights = () => {
     const filteredData = getFilteredBenefitData();
     const currentStreak = userData.currentStreak || 0;
@@ -680,59 +676,51 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     // Get current phase for context
     const getPhase = (streak) => {
-      if (streak <= 7) return 'foundation';
-      if (streak <= 30) return 'adjustment'; 
-      if (streak <= 90) return 'momentum';
-      if (streak <= 180) return 'transformation';
-      if (streak <= 365) return 'integration';
+      if (streak <= 14) return 'initial';
+      if (streak <= 45) return 'purging'; 
+      if (streak <= 90) return 'expansion';
+      if (streak <= 180) return 'integration';
       return 'mastery';
     };
     
     const currentPhase = getPhase(currentStreak);
     
-    // Timeline-based challenge patterns from the guide
+    // UPDATED: Timeline-based challenge patterns matching Emotional Timeline
     const timelinePatterns = {
-      foundation: {
-        practical: "Days 1-7: Foundation Phase. The resistance and urges you're experiencing are completely normal - your ego is fighting change.",
-        esoteric: "Days 1-7: You're beginning the hero's journey. The inner conflict represents old patterns dying and new consciousness being born.",
+      initial: {
+        practical: "Days 1-14: Initial Adaptation phase. Strong urges and energy fluctuations are completely normal - your body is learning to retain vital force.",
+        esoteric: "Days 1-14: You're beginning the hero's journey. The inner conflict represents old patterns dying and new consciousness being born.",
         actionable: wisdomMode ?
           "Embrace this sacred initiation. Every urge resisted builds spiritual strength for the challenges ahead." :
-          "Focus on building unbreakable daily habits. Remove all triggers from your environment immediately."
+          "Focus on building unbreakable daily habits. Use cold showers and exercise to channel excess energy."
       },
-      adjustment: {
-        practical: "Days 8-30: Adjustment Phase. Flatlines and mood swings indicate your brain is rewiring neural pathways - this is progress.",
-        esoteric: "Days 8-30: Your energy body is adapting to higher frequencies. Emotional volatility shows old patterns being purged.",
+      purging: {
+        practical: "Days 15-45: Emotional Purging phase. Mood swings and flatlines indicate your psyche is healing itself - this is the most challenging phase.",
+        esoteric: "Days 15-45: Your energy body is adapting to higher frequencies. Emotional volatility shows old patterns being purged.",
         actionable: wisdomMode ?
-          "Trust the purification process. Meditation and nature connection help stabilize during this transformation." :
-          "Maintain practices even when motivation dips. This phase determines your long-term success."
+          "Trust the purification process. Journal extensively and accept emotions without resistance." :
+          "This emotional turbulence is temporary but necessary. Maintain practices even when motivation dips."
       },
-      momentum: {
-        practical: "Days 31-90: Momentum Phase. Real transformation is manifesting. Guard against ego inflation as abilities develop.",
-        esoteric: "Days 31-90: Sexual energy is transmuting into life force. You're entering the alchemical refinement stage.",
+      expansion: {
+        practical: "Days 46-90: Mental Expansion phase. Enhanced cognitive abilities and creativity emerge as emotional turbulence stabilizes.",
+        esoteric: "Days 46-90: Sexual energy is transmuting into mental power. You're entering the alchemical refinement stage.",
         actionable: wisdomMode ?
-          "Channel growing power into service. Spiritual pride is the greatest danger during this powerful phase." :
-          "Use increased energy for meaningful goals. Help others while staying humble about your progress."
-      },
-      transformation: {
-        practical: "Days 91-180: Transformation Phase. Others notice dramatic changes in your presence and capabilities.",
-        esoteric: "Days 91-180: Major consciousness expansion occurring. You're developing abilities that seem supernatural to others.",
-        actionable: wisdomMode ?
-          "Accept your growing influence responsibly. Some relationships may not survive your transformation." :
-          "Handle increased social attention wisely. Set clear boundaries to protect your energy."
+          "Channel growing mental power into service. Apply enhanced abilities to help others and create meaningful work." :
+          "Use increased focus for important goals. This is the time for major intellectual and creative achievements."
       },
       integration: {
-        practical: "Days 181-365: Integration Phase. Stabilizing new identity and capabilities. Loneliness is common at this level.",
-        esoteric: "Days 181-365: Individual development now serves cosmic evolution. You're becoming a beacon for others.",
+        practical: "Days 91-180: Spiritual Integration phase. Profound inner transformation as benefits become deeply integrated.",
+        esoteric: "Days 91-180: Major consciousness expansion occurring. You're embodying the divine masculine archetype.",
         actionable: wisdomMode ?
-          "Seek community with other advanced practitioners. Your solitude is sacred preparation for greater service." :
-          "Find ways to contribute meaningfully. Your development should benefit others, not just yourself."
+          "Accept your growing influence responsibly. You're becoming a beacon of light for others on the path." :
+          "Handle increased social attention wisely. Share your wisdom while remaining humble about your development."
       },
       mastery: {
-        practical: "365+ Days: Mastery Phase. Operating at peak human potential. Your responsibility extends to guiding others.",
-        esoteric: "365+ Days: Individual consciousness merges with universal consciousness. You serve the evolution of all humanity.",
+        practical: "180+ Days: Mastery & Service phase. Complete integration - you've transcended the need for external validation.",
+        esoteric: "180+ Days: Individual consciousness merges with universal consciousness. You serve the evolution of all humanity.",
         actionable: wisdomMode ?
           "Share your wisdom through teaching and example. Your mastery serves the awakening of collective consciousness." :
-          "Create systems and institutions that help others achieve similar mastery. Focus on lasting positive impact."
+          "Focus on legacy creation and mentoring others. Your development should create lasting positive impact."
       }
     };
     
