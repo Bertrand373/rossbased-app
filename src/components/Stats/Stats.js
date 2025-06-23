@@ -1,80 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Fixed Pattern Analysis Header
-import React, { useState, useEffect, useRef } from 'react';
-import { format, subDays } from 'date-fns';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-// Import icons at the top
-import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch, FaCompass } from 'react-icons/fa';
-import './Stats.css';
-import toast from 'react-hot-toast';
-
-// Import helmet image to match Timeline design
-import helmetImage from '../../assets/helmet.png';
-
-// Register ChartJS components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
-
-const Stats = ({ userData, isPremium, updateUserData }) => {
-  const [selectedMetric, setSelectedMetric] = useState('energy');
-  const [timeRange, setTimeRange] = useState('week');
-  const [showBadgeModal, setShowBadgeModal] = useState(false);
-  const [selectedBadge, setSelectedBadge] = useState(null);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  
-  // NEW: Wisdom toggle states
-  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
-  
-  // NEW: Smart floating toggle visibility
-  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
-  
-  // NEW: Refs for scroll detection
-  const insightsStartRef = useRef(null); // Current insight section start
-  const patternSectionRef = useRef(null); // Pattern analysis section
-  
-  // Enhanced trigger options matching Calendar
-  const triggerOptions = [
-    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
-    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
-    { id: 'boredom', label: 'Boredom', icon: FaClock },
-    { id: 'social_media', label: 'Social Media', icon: FaLaptop },
-    { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
-    { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
-    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
-  ];
-
-  // NEW: Smart floating toggle scroll detection
-  useEffect(() => {
-    if (!isPremium) return; // Only show for premium users
-    
-    const handleScroll = () => {
-      if (!insightsStartRef.current || !patternSectionRef.current) return;
-      
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const windowHeight = window.innerHeight;
-      
-      const insightsStartTop = insightsStartRef.current.offsetTop;
-      const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
-      
-      // Show toggle when:
-      // 1. User has scrolled to the insights section start
-      // 2. User hasn't scrolled completely past the pattern analysis section
-      const shouldShow = 
-        scrollTop + windowHeight >= insightsStartTop && // Reached insights area
-        scrollTop <= patternSectionBottom; // Haven't scrolled completely past pattern section
-      
-      setShowFloatingToggle(shouldShow);
-    };
-    
-    // Add scroll listener
-    window.addEventListener('scroll', handleScroll);
-    
-    // Check initial position
-    handleScroll();
-    
-    // Cleanup
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isPremium]); // Re-run when premium status changes
+}, [isPremium]); // Re-run when premium status changes
   
   // Time range options for chart
   const timeRangeOptions = {
@@ -730,20 +654,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         practical: `Days 1-7: Foundation Phase. The resistance and urges you're experiencing are completely normal - your ego is fighting change.`,
         esoteric: `Days 1-7: You're beginning the hero's journey. The inner conflict represents old patterns dying and new consciousness being born.`,
         actionable: wisdomMode ?
-          "Embrace this sacred initiation. Every urge resisted builds spiritual strength for the challenges ahead." :
-          "Focus on building unbreakable daily habits. Remove all triggers from your environment immediately."
-      },
-      adjustment: {
-        practical: `Days 8-30: Adjustment Phase. Flatlines and mood swings indicate your brain is rewiring neural pathways - this is progress.`,
-        esoteric: `Days 8-30: Your energy body is adapting to higher frequencies. Emotional volatility shows old patterns being purged.`,
-        actionable: wisdomMode ?
-          "Trust the purification process. Meditation and nature connection help stabilize during this transformation." :
-          "Maintain practices even when motivation dips. This phase determines your long-term success."
-      },
-      momentum: {
-        practical: `Days 31-90: Momentum Phase. Real transformation is manifesting. Guard against ego inflation as abilities develop.`,
-        esoteric: `Days 31-90: Sexual energy is transmuting into life force. You're entering the alchemical refinement stage.`,
-        actionable: wisdomMode ?
           "Channel growing power into service. Spiritual pride is the greatest danger during this powerful phase." :
           "Use increased energy for meaningful goals. Help others while staying humble about your progress."
       },
@@ -1112,11 +1022,23 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Benefit Insights Section - UPDATED: Header with icon */}
+            {/* Benefit Insights Section - REDESIGNED: Clean header with visual phase indicator */}
             <div className="detailed-analysis-section">
               <div className="detailed-analysis-header">
-                <FaSearch className="header-icon" />
-                <h4>Benefit Insights - Day {userData.currentStreak || 0} ({getCurrentPhase(userData.currentStreak || 0)})</h4>
+                <div className="detailed-analysis-title">
+                  <FaSearch className="header-icon" />
+                  <h4>Benefit Insights</h4>
+                </div>
+                
+                <div className="benefit-phase-indicator">
+                  <div className="benefit-phase-content">
+                    <FaStar className="benefit-phase-icon" />
+                    <div className="benefit-phase-text">
+                      <div className="benefit-phase-name">{getCurrentPhase(userData.currentStreak || 0)}</div>
+                      <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
               
               <div className="streak-comparison">
@@ -1254,4 +1176,93 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats;
+export default Stats; ?
+          "Embrace this sacred initiation. Every urge resisted builds spiritual strength for the challenges ahead." :
+          "Focus on building unbreakable daily habits. Remove all triggers from your environment immediately."
+      },
+      adjustment: {
+        practical: `Days 8-30: Adjustment Phase. Flatlines and mood swings indicate your brain is rewiring neural pathways - this is progress.`,
+        esoteric: `Days 8-30: Your energy body is adapting to higher frequencies. Emotional volatility shows old patterns being purged.`,
+        actionable: wisdomMode ?
+          "Trust the purification process. Meditation and nature connection help stabilize during this transformation." :
+          "Maintain practices even when motivation dips. This phase determines your long-term success."
+      },
+      momentum: {
+        practical: `Days 31-90: Momentum Phase. Real transformation is manifesting. Guard against ego inflation as abilities develop.`,
+        esoteric: `Days 31-90: Sexual energy is transmuting into life force. You're entering the alchemical refinement stage.`,
+        actionable: wisdomMode// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
+import React, { useState, useEffect, useRef } from 'react';
+import { format, subDays } from 'date-fns';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+// Import icons at the top
+import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch, FaCompass } from 'react-icons/fa';
+import './Stats.css';
+import toast from 'react-hot-toast';
+
+// Import helmet image to match Timeline design
+import helmetImage from '../../assets/helmet.png';
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+const Stats = ({ userData, isPremium, updateUserData }) => {
+  const [selectedMetric, setSelectedMetric] = useState('energy');
+  const [timeRange, setTimeRange] = useState('week');
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  
+  // NEW: Wisdom toggle states
+  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
+  
+  // NEW: Smart floating toggle visibility
+  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
+  
+  // NEW: Refs for scroll detection
+  const insightsStartRef = useRef(null); // Current insight section start
+  const patternSectionRef = useRef(null); // Pattern analysis section
+  
+  // Enhanced trigger options matching Calendar
+  const triggerOptions = [
+    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
+    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
+    { id: 'boredom', label: 'Boredom', icon: FaClock },
+    { id: 'social_media', label: 'Social Media', icon: FaLaptop },
+    { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
+    { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
+    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
+  ];
+
+  // NEW: Smart floating toggle scroll detection
+  useEffect(() => {
+    if (!isPremium) return; // Only show for premium users
+    
+    const handleScroll = () => {
+      if (!insightsStartRef.current || !patternSectionRef.current) return;
+      
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      
+      const insightsStartTop = insightsStartRef.current.offsetTop;
+      const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
+      
+      // Show toggle when:
+      // 1. User has scrolled to the insights section start
+      // 2. User hasn't scrolled completely past the pattern analysis section
+      const shouldShow = 
+        scrollTop + windowHeight >= insightsStartTop && // Reached insights area
+        scrollTop <= patternSectionBottom; // Haven't scrolled completely past pattern section
+      
+      setShowFloatingToggle(shouldShow);
+    };
+    
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll);
+    
+    // Check initial position
+    handleScroll();
+    
+    // Cleanup
+    return () => window.removeEventListener('scroll', handleScroll);

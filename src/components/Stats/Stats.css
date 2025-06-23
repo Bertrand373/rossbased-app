@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + FIXED Pattern Analysis Header with Left Accent */
+/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + REDESIGNED Benefit Insights Header */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -601,7 +601,7 @@
   text-align: center;
 }
 
-/* ENHANCED: Benefit Insights section with header styling matching Journey Guidance */
+/* REDESIGNED: Benefit insights header with visual phase indicator */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -614,27 +614,87 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* NEW: Benefit insights header matching pattern analysis header */
 .detailed-analysis-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: 0;
+}
+
+.detailed-analysis-title {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-  margin-bottom: 0;
 }
 
-.detailed-analysis-header .header-icon {
+.detailed-analysis-title .header-icon {
   color: var(--primary);
   font-size: 1.5rem;
   flex-shrink: 0;
 }
 
-.detailed-analysis-header h4 {
+.detailed-analysis-title h4 {
   margin: 0 !important;
   font-size: 1.25rem !important;
   color: var(--text) !important;
   font-weight: 600 !important;
   text-align: center !important;
+}
+
+/* NEW: Phase indicator for benefit insights - compact visual design */
+.benefit-phase-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(135deg, 
+    color-mix(in srgb, var(--primary) 8%, var(--card-background)) 0%, 
+    var(--card-background) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+  border-radius: var(--radius-full);
+  min-width: 200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.benefit-phase-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.benefit-phase-icon {
+  font-size: 1.25rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.benefit-phase-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  align-items: center;
+  text-align: center;
+}
+
+.benefit-phase-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.benefit-phase-day {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+  margin: 0;
 }
 
 .streak-comparison {
@@ -1422,17 +1482,41 @@
     justify-content: center; /* ENSURE: Centered on mobile */
   }
   
-  /* Mobile: Benefit Insights - UPDATED to match new header structure */
+  /* Mobile: Benefit Insights - UPDATED for new header structure */
   .detailed-analysis-section {
     padding: var(--spacing-lg);
   }
   
-  .detailed-analysis-header h4 {
+  .detailed-analysis-title h4 {
     font-size: 1.125rem !important; /* Mobile font size */
   }
   
-  .detailed-analysis-header .header-icon {
+  .detailed-analysis-title .header-icon {
     font-size: 1.25rem; /* Slightly smaller on mobile */
+  }
+  
+  /* Mobile: Compact phase indicator */
+  .benefit-phase-indicator {
+    width: 100%;
+    max-width: 280px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: auto;
+  }
+  
+  .benefit-phase-content {
+    gap: var(--spacing-sm);
+  }
+  
+  .benefit-phase-icon {
+    font-size: 1.125rem;
+  }
+  
+  .benefit-phase-name {
+    font-size: 0.8125rem;
+  }
+  
+  .benefit-phase-day {
+    font-size: 0.7rem;
   }
   
   .comparison-grid {
