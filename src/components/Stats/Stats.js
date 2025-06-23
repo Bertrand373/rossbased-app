@@ -1,33 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
-import React, { useState, useEffect, useRef } from 'react';
-import { format, subDays } from 'date-fns';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch, FaCompass } from 'react-icons/fa';
-import './Stats.css';
-import toast from 'react-hot-toast';
-import helmetImage from '../../assets/helmet.png';
-
-// Register ChartJS components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
-
-const Stats = ({ userData, isPremium, updateUserData }) => {
-  const [selectedMetric, setSelectedMetric] = useState('energy');
-  const [timeRange, setTimeRange] = useState('week');
-  const [showBadgeModal, setShowBadgeModal] = useState(false);
-  const [selectedBadge, setSelectedBadge] = useState(null);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  
-  // NEW: Wisdom toggle states
-  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
-  
-  // NEW: Smart floating toggle visibility
-  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
-  
-  // NEW: Refs for scroll detection
-  const insightsStartRef = useRef(null); // Current insight section start
-  const patternSectionRef = useRef(null); // Pattern analysis section
+const patternSectionRef = useRef(null); // Pattern analysis section
   
   // Enhanced trigger options matching Calendar
   const triggerOptions = [
@@ -131,13 +102,29 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     toast.success('Premium upgrade coming soon! 🚀');
   };
 
-  // UPDATED: Helper function to get current phase - now matches Emotional Timeline exactly
+  // UPDATED: Helper function to get current phase data - matches Emotional Timeline exactly  
+  const getCurrentPhaseData = (streak) => {
+    if (streak <= 14) {
+      return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
+    } else if (streak <= 45) {
+      return { name: "Emotional Purging", icon: FaHeart, color: "#f59e0b" };
+    } else if (streak <= 90) {
+      return { name: "Mental Expansion", icon: FaBrain, color: "#3b82f6" };
+    } else if (streak <= 180) {
+      return { name: "Spiritual Integration", icon: FaLightbulb, color: "#8b5cf6" };
+    } else {
+      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
+    }
+  };
+
+  // LEGACY: Keep old function for backward compatibility
   const getCurrentPhase = (streak) => {
-    if (streak <= 14) return 'Initial Adaptation';
-    if (streak <= 45) return 'Emotional Purging';
-    if (streak <= 90) return 'Mental Expansion';
-    if (streak <= 180) return 'Spiritual Integration';
-    return 'Mastery & Service';
+    if (streak <= 7) return 'Foundation Phase';
+    if (streak <= 30) return 'Adjustment Phase';
+    if (streak <= 90) return 'Momentum Phase';
+    if (streak <= 180) return 'Transformation Phase';
+    if (streak <= 365) return 'Integration Phase';
+    return 'Mastery Phase';
   };
   
   // Filter benefit data based on selected time range
@@ -1035,11 +1022,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   <h4>Benefit Insights</h4>
                 </div>
                 
-                <div className="benefit-phase-indicator">
+                <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
                   <div className="benefit-phase-content">
-                    <FaStar className="benefit-phase-icon" />
+                    {React.createElement(getCurrentPhaseData(userData.currentStreak || 0).icon, { className: "benefit-phase-icon" })}
                     <div className="benefit-phase-text">
-                      <div className="benefit-phase-name">{getCurrentPhase(userData.currentStreak || 0)}</div>
+                      <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
                       <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
                     </div>
                   </div>
@@ -1181,4 +1168,32 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats;
+export default Stats;// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
+import React, { useState, useEffect, useRef } from 'react';
+import { format, subDays } from 'date-fns';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch, FaCompass, FaLeaf, FaLightbulb } from 'react-icons/fa';
+import './Stats.css';
+import toast from 'react-hot-toast';
+import helmetImage from '../../assets/helmet.png';
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+const Stats = ({ userData, isPremium, updateUserData }) => {
+  const [selectedMetric, setSelectedMetric] = useState('energy');
+  const [timeRange, setTimeRange] = useState('week');
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  
+  // NEW: Wisdom toggle states
+  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
+  
+  // NEW: Smart floating toggle visibility
+  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
+  
+  // NEW: Refs for scroll detection
+  const insightsStartRef = useRef(null); // Current insight section start
