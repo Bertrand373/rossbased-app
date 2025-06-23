@@ -34,13 +34,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-// Import icons at the top
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
   FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch, FaCompass } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
-
-// Import helmet image to match Timeline design
 import helmetImage from '../../assets/helmet.png';
 
 // Register ChartJS components
