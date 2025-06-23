@@ -1,4 +1,80 @@
-}, [isPremium]); // Re-run when premium status changes
+// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
+import React, { useState, useEffect, useRef } from 'react';
+import { format, subDays } from 'date-fns';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+// Import icons at the top
+import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch, FaCompass } from 'react-icons/fa';
+import './Stats.css';
+import toast from 'react-hot-toast';
+
+// Import helmet image to match Timeline design
+import helmetImage from '../../assets/helmet.png';
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+const Stats = ({ userData, isPremium, updateUserData }) => {
+  const [selectedMetric, setSelectedMetric] = useState('energy');
+  const [timeRange, setTimeRange] = useState('week');
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  
+  // NEW: Wisdom toggle states
+  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
+  
+  // NEW: Smart floating toggle visibility
+  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
+  
+  // NEW: Refs for scroll detection
+  const insightsStartRef = useRef(null); // Current insight section start
+  const patternSectionRef = useRef(null); // Pattern analysis section
+  
+  // Enhanced trigger options matching Calendar
+  const triggerOptions = [
+    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
+    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
+    { id: 'boredom', label: 'Boredom', icon: FaClock },
+    { id: 'social_media', label: 'Social Media', icon: FaLaptop },
+    { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
+    { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
+    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
+  ];
+
+  // NEW: Smart floating toggle scroll detection
+  useEffect(() => {
+    if (!isPremium) return; // Only show for premium users
+    
+    const handleScroll = () => {
+      if (!insightsStartRef.current || !patternSectionRef.current) return;
+      
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      
+      const insightsStartTop = insightsStartRef.current.offsetTop;
+      const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
+      
+      // Show toggle when:
+      // 1. User has scrolled to the insights section start
+      // 2. User hasn't scrolled completely past the pattern analysis section
+      const shouldShow = 
+        scrollTop + windowHeight >= insightsStartTop && // Reached insights area
+        scrollTop <= patternSectionBottom; // Haven't scrolled completely past pattern section
+      
+      setShowFloatingToggle(shouldShow);
+    };
+    
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll);
+    
+    // Check initial position
+    handleScroll();
+    
+    // Cleanup
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isPremium]); // Re-run when premium status changes
   
   // Time range options for chart
   const timeRangeOptions = {
@@ -256,98 +332,6 @@
   };
   
   const streakComparison = generateStreakComparison();
-  
-  // ENHANCED: Timeline-based insights for all 6 metrics with challenge-specific guidance
-  const generateAllInsights = () => {
-    const filteredData = getFilteredBenefitData();
-    const currentStreak = userData.currentStreak || 0;
-    const insights = [];
-    
-    // Define all 6 enhanced benefit categories
-    const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
-    
-    // Timeline-based phase detection
-    const getPhase = (streak) => {
-      if (streak <= 7) return 'foundation';
-      if (streak <= 30) return 'adjustment'; 
-      if (streak <= 90) return 'momentum';
-      if (streak <= 180) return 'transformation';
-      if (streak <= 365) return 'integration';
-      return 'mastery';
-    };
-    
-    const currentPhase = getPhase(currentStreak);
-    
-    // Phase descriptions from the guide
-    const phaseDescriptions = {
-      foundation: {
-        name: "Foundation Phase",
-        description: "Building the base for transformation",
-        challenges: ["Urge management", "Habit breaking", "Initial doubt"]
-      },
-      adjustment: {
-        name: "Adjustment Phase", 
-        description: "Body and mind adapting to new energy patterns",
-        challenges: ["Flatline periods", "Social pressure", "Perfectionism"]
-      },
-      momentum: {
-        name: "Momentum Phase",
-        description: "Real transformation beginning to manifest",
-        challenges: ["Ego inflation", "Increased temptation", "Isolation tendency"]
-      },
-      transformation: {
-        name: "Transformation Phase",
-        description: "Deep changes in appearance, presence, and abilities",
-        challenges: ["Responsibility increase", "Relationship turbulence", "Power temptation"]
-      },
-      integration: {
-        name: "Integration Phase",
-        description: "Stabilizing new identity and capabilities",
-        challenges: ["Loneliness", "Overwhelming opportunities", "Savior complex"]
-      },
-      mastery: {
-        name: "Mastery Phase",
-        description: "Operating at peak human potential",
-        challenges: ["Legacy responsibility", "Spiritual leadership", "Cosmic awareness"]
-      }
-    };
-    
-    // Generate insights for ALL 6 metrics based on timeline and phase
-    allMetrics.forEach((metric, index) => {
-      const avgValue = parseFloat(calculateAverage());
-      const isSelectedMetric = metric === selectedMetric;
-      
-      // Get metric-specific benefits from the guide
-      const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
-      const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
-      
-      insights.push({
-        id: index + 1,
-        practical: metricBenefits.practical,
-        esoteric: metricBenefits.esoteric,
-        actionable: isSelectedMetric ? challengeGuidance.actionable : metricBenefits.actionable,
-        metric: metric,
-        phase: currentPhase,
-        isPhaseSpecific: true
-      });
-    });
-    
-    // Add phase-specific challenge insight if user needs guidance
-    if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
-      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
-      insights.push({
-        id: insights.length + 1,
-        practical: challengeInsight.practical,
-        esoteric: challengeInsight.esoteric,
-        actionable: challengeInsight.actionable,
-        metric: 'challenge',
-        phase: currentPhase,
-        isChallenge: true
-      });
-    }
-    
-    return insights;
-  };
   
   // Get metric-specific benefits based on timeline phase
   const getMetricBenefits = (metric, phase, streak) => {
@@ -623,6 +607,64 @@
     return challengeInsights[phase];
   };
 
+  // ENHANCED: Timeline-based insights for all 6 metrics with challenge-specific guidance
+  const generateAllInsights = () => {
+    const filteredData = getFilteredBenefitData();
+    const currentStreak = userData.currentStreak || 0;
+    const insights = [];
+    
+    // Define all 6 enhanced benefit categories
+    const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    
+    // Timeline-based phase detection
+    const getPhase = (streak) => {
+      if (streak <= 7) return 'foundation';
+      if (streak <= 30) return 'adjustment'; 
+      if (streak <= 90) return 'momentum';
+      if (streak <= 180) return 'transformation';
+      if (streak <= 365) return 'integration';
+      return 'mastery';
+    };
+    
+    const currentPhase = getPhase(currentStreak);
+    
+    // Generate insights for ALL 6 metrics based on timeline and phase
+    allMetrics.forEach((metric, index) => {
+      const avgValue = parseFloat(calculateAverage());
+      const isSelectedMetric = metric === selectedMetric;
+      
+      // Get metric-specific benefits from the guide
+      const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
+      const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
+      
+      insights.push({
+        id: index + 1,
+        practical: metricBenefits.practical,
+        esoteric: metricBenefits.esoteric,
+        actionable: isSelectedMetric ? challengeGuidance.actionable : metricBenefits.actionable,
+        metric: metric,
+        phase: currentPhase,
+        isPhaseSpecific: true
+      });
+    });
+    
+    // Add phase-specific challenge insight if user needs guidance
+    if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
+      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
+      insights.push({
+        id: insights.length + 1,
+        practical: challengeInsight.practical,
+        esoteric: challengeInsight.esoteric,
+        actionable: challengeInsight.actionable,
+        metric: 'challenge',
+        phase: currentPhase,
+        isChallenge: true
+      });
+    }
+    
+    return insights;
+  };
+
   // Generate current insight for sidebar
   const getCurrentInsight = () => {
     const insights = generateAllInsights();
@@ -651,29 +693,43 @@
     // Timeline-based challenge patterns from the guide
     const timelinePatterns = {
       foundation: {
-        practical: `Days 1-7: Foundation Phase. The resistance and urges you're experiencing are completely normal - your ego is fighting change.`,
-        esoteric: `Days 1-7: You're beginning the hero's journey. The inner conflict represents old patterns dying and new consciousness being born.`,
+        practical: "Days 1-7: Foundation Phase. The resistance and urges you're experiencing are completely normal - your ego is fighting change.",
+        esoteric: "Days 1-7: You're beginning the hero's journey. The inner conflict represents old patterns dying and new consciousness being born.",
+        actionable: wisdomMode ?
+          "Embrace this sacred initiation. Every urge resisted builds spiritual strength for the challenges ahead." :
+          "Focus on building unbreakable daily habits. Remove all triggers from your environment immediately."
+      },
+      adjustment: {
+        practical: "Days 8-30: Adjustment Phase. Flatlines and mood swings indicate your brain is rewiring neural pathways - this is progress.",
+        esoteric: "Days 8-30: Your energy body is adapting to higher frequencies. Emotional volatility shows old patterns being purged.",
+        actionable: wisdomMode ?
+          "Trust the purification process. Meditation and nature connection help stabilize during this transformation." :
+          "Maintain practices even when motivation dips. This phase determines your long-term success."
+      },
+      momentum: {
+        practical: "Days 31-90: Momentum Phase. Real transformation is manifesting. Guard against ego inflation as abilities develop.",
+        esoteric: "Days 31-90: Sexual energy is transmuting into life force. You're entering the alchemical refinement stage.",
         actionable: wisdomMode ?
           "Channel growing power into service. Spiritual pride is the greatest danger during this powerful phase." :
           "Use increased energy for meaningful goals. Help others while staying humble about your progress."
       },
       transformation: {
-        practical: `Days 91-180: Transformation Phase. Others notice dramatic changes in your presence and capabilities.`,
-        esoteric: `Days 91-180: Major consciousness expansion occurring. You're developing abilities that seem supernatural to others.`,
+        practical: "Days 91-180: Transformation Phase. Others notice dramatic changes in your presence and capabilities.",
+        esoteric: "Days 91-180: Major consciousness expansion occurring. You're developing abilities that seem supernatural to others.",
         actionable: wisdomMode ?
           "Accept your growing influence responsibly. Some relationships may not survive your transformation." :
           "Handle increased social attention wisely. Set clear boundaries to protect your energy."
       },
       integration: {
-        practical: `Days 181-365: Integration Phase. Stabilizing new identity and capabilities. Loneliness is common at this level.`,
-        esoteric: `Days 181-365: Individual development now serves cosmic evolution. You're becoming a beacon for others.`,
+        practical: "Days 181-365: Integration Phase. Stabilizing new identity and capabilities. Loneliness is common at this level.",
+        esoteric: "Days 181-365: Individual development now serves cosmic evolution. You're becoming a beacon for others.",
         actionable: wisdomMode ?
           "Seek community with other advanced practitioners. Your solitude is sacred preparation for greater service." :
           "Find ways to contribute meaningfully. Your development should benefit others, not just yourself."
       },
       mastery: {
-        practical: `365+ Days: Mastery Phase. Operating at peak human potential. Your responsibility extends to guiding others.`,
-        esoteric: `365+ Days: Individual consciousness merges with universal consciousness. You serve the evolution of all humanity.`,
+        practical: "365+ Days: Mastery Phase. Operating at peak human potential. Your responsibility extends to guiding others.",
+        esoteric: "365+ Days: Individual consciousness merges with universal consciousness. You serve the evolution of all humanity.",
         actionable: wisdomMode ?
           "Share your wisdom through teaching and example. Your mastery serves the awakening of collective consciousness." :
           "Create systems and institutions that help others achieve similar mastery. Focus on lasting positive impact."
@@ -1176,93 +1232,4 @@
   );
 };
 
-export default Stats; ?
-          "Embrace this sacred initiation. Every urge resisted builds spiritual strength for the challenges ahead." :
-          "Focus on building unbreakable daily habits. Remove all triggers from your environment immediately."
-      },
-      adjustment: {
-        practical: `Days 8-30: Adjustment Phase. Flatlines and mood swings indicate your brain is rewiring neural pathways - this is progress.`,
-        esoteric: `Days 8-30: Your energy body is adapting to higher frequencies. Emotional volatility shows old patterns being purged.`,
-        actionable: wisdomMode ?
-          "Trust the purification process. Meditation and nature connection help stabilize during this transformation." :
-          "Maintain practices even when motivation dips. This phase determines your long-term success."
-      },
-      momentum: {
-        practical: `Days 31-90: Momentum Phase. Real transformation is manifesting. Guard against ego inflation as abilities develop.`,
-        esoteric: `Days 31-90: Sexual energy is transmuting into life force. You're entering the alchemical refinement stage.`,
-        actionable: wisdomMode// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
-import React, { useState, useEffect, useRef } from 'react';
-import { format, subDays } from 'date-fns';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-// Import icons at the top
-import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch, FaCompass } from 'react-icons/fa';
-import './Stats.css';
-import toast from 'react-hot-toast';
-
-// Import helmet image to match Timeline design
-import helmetImage from '../../assets/helmet.png';
-
-// Register ChartJS components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
-
-const Stats = ({ userData, isPremium, updateUserData }) => {
-  const [selectedMetric, setSelectedMetric] = useState('energy');
-  const [timeRange, setTimeRange] = useState('week');
-  const [showBadgeModal, setShowBadgeModal] = useState(false);
-  const [selectedBadge, setSelectedBadge] = useState(null);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  
-  // NEW: Wisdom toggle states
-  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
-  
-  // NEW: Smart floating toggle visibility
-  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
-  
-  // NEW: Refs for scroll detection
-  const insightsStartRef = useRef(null); // Current insight section start
-  const patternSectionRef = useRef(null); // Pattern analysis section
-  
-  // Enhanced trigger options matching Calendar
-  const triggerOptions = [
-    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
-    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
-    { id: 'boredom', label: 'Boredom', icon: FaClock },
-    { id: 'social_media', label: 'Social Media', icon: FaLaptop },
-    { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
-    { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
-    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
-  ];
-
-  // NEW: Smart floating toggle scroll detection
-  useEffect(() => {
-    if (!isPremium) return; // Only show for premium users
-    
-    const handleScroll = () => {
-      if (!insightsStartRef.current || !patternSectionRef.current) return;
-      
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const windowHeight = window.innerHeight;
-      
-      const insightsStartTop = insightsStartRef.current.offsetTop;
-      const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
-      
-      // Show toggle when:
-      // 1. User has scrolled to the insights section start
-      // 2. User hasn't scrolled completely past the pattern analysis section
-      const shouldShow = 
-        scrollTop + windowHeight >= insightsStartTop && // Reached insights area
-        scrollTop <= patternSectionBottom; // Haven't scrolled completely past pattern section
-      
-      setShowFloatingToggle(shouldShow);
-    };
-    
-    // Add scroll listener
-    window.addEventListener('scroll', handleScroll);
-    
-    // Check initial position
-    handleScroll();
-    
-    // Cleanup
-    return () => window.removeEventListener('scroll', handleScroll);
+export default Stats;
