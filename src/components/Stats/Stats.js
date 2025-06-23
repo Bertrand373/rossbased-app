@@ -1,35 +1,4 @@
-// UPDATED: Get phase-specific challenge insight - matches Emotional Timeline
-  const getChallengeInsight = (phase, streak) => {
-    const challengeInsights = {
-      initial: {
-        practical: `Day ${streak}: You're in the Initial Adaptation phase. Strong urges and restlessness are completely normal - your body is learning to retain energy.`,
-        esoteric: `Day ${streak}: You're beginning the hero's journey. The resistance you feel is the old self protecting its familiar patterns.`,
-        actionable: "Focus on building unbreakable daily habits. Use cold showers and intense exercise to channel excess energy."
-      },
-      purging: {
-        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
-        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
-        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
-      },
-      expansion: {
-        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
-        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
-        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
-      },
-      integration: {
-        practical: `Day ${streak}: Spiritual Integration phase brings profound inner transformation. You're gaining abilities that feel almost supernatural.`,
-        esoteric: `Day ${streak}: Major consciousness expansion occurring. You're embodying the divine masculine archetype.`,
-        actionable: "Accept increased responsibility gracefully. Share your wisdom while remaining humble about your development."
-      },
-      mastery: {
-        practical: `Day ${streak}: Mastery & Service phase brings responsibility for guiding others and contributing to human evolution.`,
-        esoteric: `Day ${streak}: Individual development now serves cosmic evolution. Your consciousness affects the collective field.`,
-        actionable: "Focus on legacy creation and mentoring others. Your mastery should serve the awakening of all humanity."
-      }
-    };
-    
-    return challengeInsights[phase];
-  }// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
+// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -563,38 +532,33 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return isInDifficultPeriod || hasLimitedData || isNewUser;
   };
   
-  // Get phase-specific challenge insight
+  // UPDATED: Get phase-specific challenge insight - matches Emotional Timeline
   const getChallengeInsight = (phase, streak) => {
     const challengeInsights = {
-      foundation: {
-        practical: `Day ${streak}: You're in the Foundation Phase. Initial resistance and doubt are completely normal - your ego is fighting against change.`,
+      initial: {
+        practical: `Day ${streak}: You're in the Initial Adaptation phase. Strong urges and restlessness are completely normal - your body is learning to retain energy.`,
         esoteric: `Day ${streak}: You're beginning the hero's journey. The resistance you feel is the old self protecting its familiar patterns.`,
-        actionable: "Focus on building unbreakable daily habits. Success in this phase determines everything that follows."
+        actionable: "Focus on building unbreakable daily habits. Use cold showers and intense exercise to channel excess energy."
       },
-      adjustment: {
-        practical: `Day ${streak}: Adjustment Phase challenges include flatlines and social pressure. These are signs of your brain rewiring, not failure.`,
-        esoteric: `Day ${streak}: You're in the purification stage. Emotional and physical fluctuations indicate deep healing occurring.`,
-        actionable: "Increase meditation time during flatlines. Reduce external stimulation and trust your body's wisdom."
+      purging: {
+        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
+        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
+        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
       },
-      momentum: {
-        practical: `Day ${streak}: Momentum Phase brings ego inflation risks. Others may feel threatened by your rapid improvement.`,
-        esoteric: `Day ${streak}: You're entering alchemical transformation. Guard against spiritual pride as your abilities develop.`,
-        actionable: "Stay humble and focus on service. Use your growing influence to lift others up, not to dominate."
-      },
-      transformation: {
-        practical: `Day ${streak}: Transformation Phase intensifies everything. You're gaining abilities that feel almost supernatural.`,
-        esoteric: `Day ${streak}: Major energy transmutation occurring. Your consciousness is expanding beyond normal human limits.`,
-        actionable: "Accept increased responsibility gracefully. Some people will leave your life - this creates space for higher connections."
+      expansion: {
+        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
+        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
+        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
       },
       integration: {
-        practical: `Day ${streak}: Integration Phase can feel lonely as fewer people relate to your level of development.`,
-        esoteric: `Day ${streak}: You're stabilizing at master level consciousness. Solitude becomes sacred rather than lonely.`,
-        actionable: "Seek community with other advanced practitioners. Focus on creating lasting positive impact."
+        practical: `Day ${streak}: Spiritual Integration phase brings profound inner transformation. You're gaining abilities that feel almost supernatural.`,
+        esoteric: `Day ${streak}: Major consciousness expansion occurring. You're embodying the divine masculine archetype.`,
+        actionable: "Accept increased responsibility gracefully. Share your wisdom while remaining humble about your development."
       },
       mastery: {
-        practical: `Day ${streak}: Mastery Phase brings responsibility for guiding others and contributing to human evolution.`,
-        esoteric: `Day ${streak}: Individual development serves cosmic evolution. Your consciousness affects the collective field.`,
-        actionable: "Share your knowledge through teaching, writing, or creating systems that help others achieve similar mastery."
+        practical: `Day ${streak}: Mastery & Service phase brings responsibility for guiding others and contributing to human evolution.`,
+        esoteric: `Day ${streak}: Individual development now serves cosmic evolution. Your consciousness affects the collective field.`,
+        actionable: "Focus on legacy creation and mentoring others. Your mastery should serve the awakening of all humanity."
       }
     };
     
