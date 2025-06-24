@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + REDESIGNED Benefit Insights Header */
+/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + FIXED Benefit Insights Header Spacing */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -601,7 +601,7 @@
   text-align: center;
 }
 
-/* REDESIGNED: Benefit insights header with visual phase indicator - SIMPLIFIED TO MATCH JOURNEY GUIDANCE */
+/* FIXED: Benefit insights header - EXACT spacing match with Journey Guidance */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -610,34 +610,28 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  /* REMOVED: Yellow top border as requested */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* FIXED: Simplified header structure to match pattern-analysis-header EXACTLY */
 .detailed-analysis-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-lg);
-  margin-bottom: 0;
-}
-
-.detailed-analysis-title {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-  margin-bottom: 0; /* MATCHED: Same as pattern-analysis-header */
+  margin-bottom: 0;
 }
 
-.detailed-analysis-title h4 {
+.detailed-analysis-header h4 {
   margin: 0;
   font-size: 1.25rem;
   color: var(--text);
   font-weight: 600;
 }
 
-/* NEW: Phase indicator for benefit insights - EXACT copy of UrgeToolkit phase indicator styling */
+/* REMOVED: detailed-analysis-title wrapper - no longer needed */
+
+/* REPOSITIONED: Phase indicator moved outside header to avoid spacing conflicts */
 .benefit-phase-indicator {
   display: flex;
   align-items: center;
@@ -652,6 +646,8 @@
   min-width: 200px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  /* ADDED: Margin to separate from content while maintaining flex gap consistency */
+  margin-bottom: var(--spacing-md);
 }
 
 .benefit-phase-content {
@@ -969,26 +965,25 @@
   color: var(--text);
 }
 
-/* UPDATED: Journey Guidance section - REMOVED left yellow border - SIMPLIFIED HEADER */
+/* FIXED: Journey Guidance section - REFERENCE spacing that works correctly */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* FIXED: Reduced top padding */
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  /* REMOVED: Left yellow border as requested */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Simple header matching detailed-analysis-header - NO ICON */
+/* FIXED: Simple header matching benefit insights header structure */
 .pattern-analysis-header {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-  margin-bottom: 0; /* FIXED: Remove margin-bottom to prevent double spacing with flex gap */
+  margin-bottom: 0;
 }
 
 .pattern-analysis-header h3 {
@@ -1477,12 +1472,16 @@
     justify-content: center; /* ENSURE: Centered on mobile */
   }
   
-  /* Mobile: Benefit Insights - UPDATED for new header structure */
+  /* FIXED: Mobile Benefit insights - EXACT same padding structure as Journey guidance */
   .detailed-analysis-section {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
   }
   
-  .detailed-analysis-title h4 {
+  .detailed-analysis-header {
+    margin-bottom: 0;
+  }
+  
+  .detailed-analysis-header h4 {
     font-size: 1.125rem; /* Mobile font size */
   }
   
@@ -1560,13 +1559,13 @@
     font-size: 0.8rem;
   }
   
-  /* Mobile: Journey guidance with FIXED header spacing */
+  /* FIXED: Mobile Journey guidance - EXACT same padding structure as Benefit insights */
   .pattern-analysis-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* FIXED: Reduced top padding on mobile */
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
   }
   
   .pattern-analysis-header {
-    margin-bottom: 0; /* FIXED: Ensure no margin on mobile too */
+    margin-bottom: 0;
   }
   
   .pattern-analysis-header h3 {
