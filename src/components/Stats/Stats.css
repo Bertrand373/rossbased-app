@@ -601,7 +601,7 @@
   text-align: center;
 }
 
-/* REDESIGNED: Benefit insights header with visual phase indicator */
+/* REDESIGNED: Benefit insights header with visual phase indicator - SIMPLIFIED TO MATCH JOURNEY GUIDANCE */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -627,20 +627,14 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-}
-
-.detailed-analysis-title .header-icon {
-  color: var(--primary);
-  font-size: 1.5rem;
-  flex-shrink: 0;
+  margin-bottom: 0; /* MATCHED: Same as pattern-analysis-header */
 }
 
 .detailed-analysis-title h4 {
-  margin: 0 !important;
-  font-size: 1.25rem !important;
-  color: var(--text) !important;
-  font-weight: 600 !important;
-  text-align: center !important;
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text);
+  font-weight: 600;
 }
 
 /* NEW: Phase indicator for benefit insights - EXACT copy of UrgeToolkit phase indicator styling */
@@ -975,7 +969,7 @@
   color: var(--text);
 }
 
-/* UPDATED: Journey Guidance section - REMOVED left yellow border */
+/* UPDATED: Journey Guidance section - REMOVED left yellow border - SIMPLIFIED HEADER */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -988,19 +982,13 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Icon + Title Inline header matching detailed-analysis-header */
+/* UPDATED: Simple header matching detailed-analysis-header - NO ICON */
 .pattern-analysis-header {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
   margin-bottom: 0; /* FIXED: Remove margin-bottom to prevent double spacing with flex gap */
-}
-
-.pattern-analysis-header .header-icon {
-  color: var(--primary);
-  font-size: 1.5rem;
-  flex-shrink: 0;
 }
 
 .pattern-analysis-header h3 {
@@ -1495,11 +1483,7 @@
   }
   
   .detailed-analysis-title h4 {
-    font-size: 1.125rem !important; /* Mobile font size */
-  }
-  
-  .detailed-analysis-title .header-icon {
-    font-size: 1.25rem; /* Slightly smaller on mobile */
+    font-size: 1.125rem; /* Mobile font size */
   }
   
   /* Mobile: Compact phase indicator - EXACT copy of UrgeToolkit mobile styling */
@@ -1587,10 +1571,6 @@
   
   .pattern-analysis-header h3 {
     font-size: 1.125rem; /* Mobile font size */
-  }
-  
-  .pattern-analysis-header .header-icon {
-    font-size: 1.25rem; /* Slightly smaller on mobile */
   }
   
   .pattern-insight-item {

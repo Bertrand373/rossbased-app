@@ -4,7 +4,7 @@ import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaSearch, FaCompass, FaLeaf, FaLightbulb } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -1043,11 +1043,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Benefit Insights Section - REDESIGNED: Clean header with visual phase indicator */}
+            {/* Benefit Insights Section - REDESIGNED: Clean header with visual phase indicator - NO ICON */}
             <div className="detailed-analysis-section">
               <div className="detailed-analysis-header">
                 <div className="detailed-analysis-title">
-                  <FaSearch className="header-icon" />
                   <h4>Benefit Insights</h4>
                 </div>
                 
@@ -1103,10 +1102,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Journey Guidance Section - UPDATED: Compass icon */}
+            {/* Journey Guidance Section - NO ICON */}
             <div className="pattern-analysis-section" ref={patternSectionRef}>
               <div className="pattern-analysis-header">
-                <FaCompass className="header-icon" />
                 <h3>Journey Guidance</h3>
               </div>
               
@@ -1197,4 +1195,39 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats;
+export default Stats; // components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
+import React, { useState, useEffect, useRef } from 'react';
+import { format, subDays } from 'date-fns';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaCompass, FaLeaf, FaLightbulb } from 'react-icons/fa';
+import './Stats.css';
+import toast from 'react-hot-toast';
+import helmetImage from '../../assets/helmet.png';
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+const Stats = ({ userData, isPremium, updateUserData }) => {
+  const [selectedMetric, setSelectedMetric] = useState('energy');
+  const [timeRange, setTimeRange] = useState('week');
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  
+  // NEW: Wisdom toggle states
+  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
+  
+  // NEW: Smart floating toggle visibility
+  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
+  
+  // NEW: Refs for scroll detection
+  const insightsStartRef = useRef(null); // Current insight section start
+  const patternSectionRef = useRef(null); // Pattern analysis section
+  
+  // Enhanced trigger options matching Calendar
+  const triggerOptions = [
+    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
+    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
+    { id: 'boredom', label: 'Boredom', icon: F
