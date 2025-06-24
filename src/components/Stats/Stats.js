@@ -4,7 +4,7 @@ import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -1052,7 +1052,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 
                 <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
                   <div className="benefit-phase-content">
-                    {React.createElement(getCurrentPhaseData(userData.currentStreak || 0).icon, { className: "benefit-phase-icon" })}
+                    {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
                     <div className="benefit-phase-text">
                       <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
                       <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
