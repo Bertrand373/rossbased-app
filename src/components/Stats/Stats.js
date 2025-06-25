@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
+// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header with Phase Indicator
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -1043,7 +1043,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* UPDATED: Benefit Insights Section - Grid header with right-indented phase indicator */}
+            {/* UPDATED: Benefit Insights Section - Grid header with right-positioned phase indicator */}
             <div className="detailed-analysis-section">
               <div className="detailed-analysis-header">
                 <div className="detailed-analysis-header-spacer"></div>
@@ -1195,4 +1195,22 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats;
+export default Stats;// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header with Phase Indicator
+import React, { useState, useEffect, useRef } from 'react';
+import { format, subDays } from 'date-fns';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
+import './Stats.css';
+import toast from 'react-hot-toast';
+import helmetImage from '../../assets/helmet.png';
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+const Stats = ({ userData, isPremium, updateUserData }) => {
+  const [selectedMetric, setSelectedMetric] = useState('energy');
+  const [timeRange, setTimeRange] = useState('week');
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null
