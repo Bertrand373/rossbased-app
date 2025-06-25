@@ -613,20 +613,18 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Header layout - desktop inline, mobile stacked */
+/* UPDATED: Header layout - simplified to match pattern-analysis-header */
 .detailed-analysis-header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: var(--spacing-md);
   margin-bottom: 0;
 }
 
-/* Title section */
+/* Title section - simplified */
 .detailed-analysis-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0;
+  margin: 0;
 }
 
 .detailed-analysis-title h4 {
@@ -651,34 +649,6 @@
   min-width: 180px; /* SMALLER: Reduced width for inline positioning */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
-  align-self: flex-end; /* POSITIONED: Align to the right */
-}
-
-/* DESKTOP: Inline layout for header and phase indicator */
-@media (min-width: 769px) {
-  .detailed-analysis-header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-lg);
-    position: relative;
-  }
-  
-  .detailed-analysis-title {
-    flex: 1;
-    justify-content: center;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  
-  .benefit-phase-indicator {
-    align-self: center;
-    flex-shrink: 0;
-    margin-left: auto;
-  }
 }
 
 .benefit-phase-content {
@@ -1513,16 +1483,16 @@
     font-size: 1.125rem; /* Mobile font size */
   }
   
-  /* Mobile: Benefit insights header - stack vertically and center phase indicator */
+  /* Mobile: Benefit insights header - simplified to match Journey Guidance */
   .detailed-analysis-header {
+    display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-lg); /* INCREASED: Match the gap used in desktop for phase indicator */
   }
   
-  .detailed-analysis-title {
-    width: 100%;
-    justify-content: center;
+  .detailed-analysis-title h4 {
+    font-size: 1.125rem; /* Mobile font size */
   }
   
   /* Mobile: Compact phase indicator - SMALLER and centered */
