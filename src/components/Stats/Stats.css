@@ -601,7 +601,7 @@
   text-align: center;
 }
 
-/* REDESIGNED: Benefit insights header with visual phase indicator - SIMPLIFIED TO MATCH JOURNEY GUIDANCE */
+/* UPDATED: Benefit insights header - REPOSITIONED phase indicator */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -610,24 +610,23 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  /* REMOVED: Yellow top border as requested */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* UPDATED: Header layout to position phase indicator underneath on the right */
 .detailed-analysis-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   margin-bottom: 0;
 }
 
+/* Title section */
 .detailed-analysis-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
-  margin-bottom: 0; /* MATCHED: Same as pattern-analysis-header */
+  margin-bottom: 0;
 }
 
 .detailed-analysis-title h4 {
@@ -637,33 +636,34 @@
   font-weight: 600;
 }
 
-/* NEW: Phase indicator for benefit insights - EXACT copy of UrgeToolkit phase indicator styling */
+/* Phase indicator positioned underneath the title, aligned to the right */
 .benefit-phase-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-lg); /* SMALLER: Reduced padding for inline positioning */
   background: linear-gradient(135deg, 
     color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
     var(--card-background) 100%
   );
   border: 1px solid color-mix(in srgb, var(--phase-color, var(--primary)) 20%, var(--border));
   border-radius: var(--radius-lg);
-  min-width: 200px;
+  min-width: 180px; /* SMALLER: Reduced width for inline positioning */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  align-self: flex-end; /* POSITIONED: Align to the right */
 }
 
 .benefit-phase-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md); /* SMALLER: Reduced gap */
   width: 100%;
 }
 
 .benefit-phase-icon {
-  font-size: 1.75rem;
+  font-size: 1.5rem; /* SMALLER: Reduced icon size */
   color: var(--phase-color, var(--primary));
   flex-shrink: 0;
   display: flex;
@@ -680,7 +680,7 @@
 }
 
 .benefit-phase-name {
-  font-size: 1rem;
+  font-size: 0.875rem; /* SMALLER: Reduced font size */
   font-weight: 600;
   color: var(--phase-color, var(--text));
   line-height: 1.2;
@@ -688,7 +688,7 @@
 }
 
 .benefit-phase-day {
-  font-size: 0.875rem;
+  font-size: 0.75rem; /* SMALLER: Reduced font size */
   color: var(--text-secondary);
   line-height: 1.2;
   margin: 0;
@@ -1486,14 +1486,27 @@
     font-size: 1.125rem; /* Mobile font size */
   }
   
-  /* Mobile: Compact phase indicator - EXACT copy of UrgeToolkit mobile styling */
+  /* Mobile: Benefit insights header - stack vertically and center phase indicator */
+  .detailed-analysis-header {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .detailed-analysis-title {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Mobile: Compact phase indicator - SMALLER and centered */
   .benefit-phase-indicator {
     width: 100%;
-    max-width: 320px;
-    padding: var(--spacing-lg) var(--spacing-lg);
+    max-width: 280px; /* SMALLER: Reduced width for mobile */
+    padding: var(--spacing-sm) var(--spacing-md); /* SMALLER: Reduced padding */
     justify-content: flex-start;
     text-align: center;
     position: relative;
+    align-self: center; /* CENTERED: Override desktop right alignment */
   }
   
   .benefit-phase-content {
@@ -1503,7 +1516,7 @@
   }
   
   .benefit-phase-icon {
-    font-size: 1.5rem;
+    font-size: 1.25rem; /* SMALLER: Reduced icon size for mobile */
     flex-shrink: 0;
   }
   
@@ -1516,17 +1529,17 @@
     text-align: center;
     width: auto;
     margin-right: 0;
-    padding: var(--spacing-md) 0;
+    padding: var(--spacing-sm) 0;
   }
   
   .benefit-phase-name {
-    font-size: 0.9375rem;
+    font-size: 0.8125rem; /* SMALLER: Reduced font size for mobile */
     text-align: center;
     margin-bottom: 2px;
   }
   
   .benefit-phase-day {
-    font-size: 0.8125rem;
+    font-size: 0.6875rem; /* SMALLER: Reduced font size for mobile */
     text-align: center;
     margin-top: 2px;
   }
@@ -1643,41 +1656,22 @@
     padding: var(--spacing-lg) var(--spacing-md);
   }
 
-  /* Very small screen benefit phase indicator - EXACT copy of UrgeToolkit very small styling */
+  /* Very small screen benefit phase indicator - EVEN SMALLER */
   .benefit-phase-indicator {
-    padding: var(--spacing-md) var(--spacing-md);
-    max-width: 100%;
-    justify-content: flex-start;
-    position: relative;
-  }
-  
-  .benefit-phase-content {
-    gap: 0;
-    justify-content: flex-start;
-    width: 100%;
+    padding: var(--spacing-xs) var(--spacing-sm); /* SMALLER: Even less padding */
+    max-width: 240px; /* SMALLER: Reduced width for very small screens */
   }
   
   .benefit-phase-icon {
-    font-size: 1.375rem;
-    flex-shrink: 0;
-  }
-  
-  .benefit-phase-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: auto;
-    margin-right: 0;
-    padding: var(--spacing-sm) 0;
+    font-size: 1.125rem; /* SMALLER: Even smaller icon */
   }
   
   .benefit-phase-name {
-    font-size: 0.875rem;
+    font-size: 0.75rem; /* SMALLER: Even smaller text */
   }
   
   .benefit-phase-day {
-    font-size: 0.75rem;
+    font-size: 0.625rem; /* SMALLER: Even smaller text */
   }
 
   /* Hide icons on very small screens to prevent overflow */
