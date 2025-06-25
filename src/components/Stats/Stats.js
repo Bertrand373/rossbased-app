@@ -542,49 +542,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       }
     };
     
-    return challengeData[phase];
-  };
-  
-  // Determine if user needs challenge-specific guidance
-  const shouldShowChallengeGuidance = (streak, dataLength) => {
-    // Show during known difficult periods or if user seems to be struggling
-    const isInDifficultPeriod = (streak >= 14 && streak <= 45) || (streak >= 60 && streak <= 120);
-    const hasLimitedData = dataLength < 7;
-    const isNewUser = streak <= 7;
-    
-    return isInDifficultPeriod || hasLimitedData || isNewUser;
-  };
-  
-  // UPDATED: Get phase-specific challenge insight - matches Emotional Timeline
-  const getChallengeInsight = (phase, streak) => {
-    const challengeInsights = {
-      initial: {
-        practical: `Day ${streak}: You're in the Initial Adaptation phase. Strong urges and restlessness are completely normal - your body is learning to retain energy.`,
-        esoteric: `Day ${streak}: You're beginning the hero's journey. The resistance you feel is the old self protecting its familiar patterns.`,
-        actionable: "Focus on building unbreakable daily habits. Use cold showers and intense exercise to channel excess energy."
-      },
-      purging: {
-        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
-        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
-        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
-      },
-      expansion: {
-        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
-        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
-        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
-      },
-      integration: {
-        practical: `Day ${streak}: Spiritual Integration phase brings profound inner transformation. You're gaining abilities that feel almost supernatural.`,
-        esoteric: `Day ${streak}: Major consciousness expansion occurring. You're embodying the divine masculine archetype.`,
-        actionable: "Accept increased responsibility gracefully. Share your wisdom while remaining humble about your development."
-      },
-      mastery: {
-        practical: `Day ${streak}: Mastery & Service phase brings responsibility for guiding others and contributing to human evolution.`,
-        esoteric: `Day ${streak}: Individual development now serves cosmic evolution. Your consciousness affects the collective field.`,
-        actionable: "Focus on legacy creation and mentoring others. Your mastery should serve the awakening of all humanity."
-      }
-    };
-    
     return challengeInsights[phase];
   };
 
@@ -1195,22 +1152,47 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats;// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header with Phase Indicator
-import React, { useState, useEffect, useRef } from 'react';
-import { format, subDays } from 'date-fns';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
-import './Stats.css';
-import toast from 'react-hot-toast';
-import helmetImage from '../../assets/helmet.png';
-
-// Register ChartJS components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
-
-const Stats = ({ userData, isPremium, updateUserData }) => {
-  const [selectedMetric, setSelectedMetric] = useState('energy');
-  const [timeRange, setTimeRange] = useState('week');
-  const [showBadgeModal, setShowBadgeModal] = useState(false);
-  const [selectedBadge, setSelectedBadge] = useState(null
+export default Stats;Data[phase];
+  };
+  
+  // Determine if user needs challenge-specific guidance
+  const shouldShowChallengeGuidance = (streak, dataLength) => {
+    // Show during known difficult periods or if user seems to be struggling
+    const isInDifficultPeriod = (streak >= 14 && streak <= 45) || (streak >= 60 && streak <= 120);
+    const hasLimitedData = dataLength < 7;
+    const isNewUser = streak <= 7;
+    
+    return isInDifficultPeriod || hasLimitedData || isNewUser;
+  };
+  
+  // UPDATED: Get phase-specific challenge insight - matches Emotional Timeline
+  const getChallengeInsight = (phase, streak) => {
+    const challengeInsights = {
+      initial: {
+        practical: `Day ${streak}: You're in the Initial Adaptation phase. Strong urges and restlessness are completely normal - your body is learning to retain energy.`,
+        esoteric: `Day ${streak}: You're beginning the hero's journey. The resistance you feel is the old self protecting its familiar patterns.`,
+        actionable: "Focus on building unbreakable daily habits. Use cold showers and intense exercise to channel excess energy."
+      },
+      purging: {
+        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
+        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
+        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
+      },
+      expansion: {
+        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
+        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
+        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
+      },
+      integration: {
+        practical: `Day ${streak}: Spiritual Integration phase brings profound inner transformation. You're gaining abilities that feel almost supernatural.`,
+        esoteric: `Day ${streak}: Major consciousness expansion occurring. You're embodying the divine masculine archetype.`,
+        actionable: "Accept increased responsibility gracefully. Share your wisdom while remaining humble about your development."
+      },
+      mastery: {
+        practical: `Day ${streak}: Mastery & Service phase brings responsibility for guiding others and contributing to human evolution.`,
+        esoteric: `Day ${streak}: Individual development now serves cosmic evolution. Your consciousness affects the collective field.`,
+        actionable: "Focus on legacy creation and mentoring others. Your mastery should serve the awakening of all humanity."
+      }
+    };
+    
+    return challenge
