@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + FIXED Benefit Insights Header Spacing */
+/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + REDESIGNED Benefit Insights Header */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -601,7 +601,7 @@
   text-align: center;
 }
 
-/* UPDATED: Benefit insights header - INLINE phase indicator using grid layout */
+/* UPDATED: Benefit insights header - REPOSITIONED phase indicator */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -613,21 +613,19 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Header layout to inline phase indicator with the header title */
+/* UPDATED: Header layout to position phase indicator underneath on the right */
 .detailed-analysis-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
   margin-bottom: 0;
-  padding: var(--spacing-lg) 0;
 }
 
 /* Title section */
 .detailed-analysis-title {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   margin-bottom: 0;
 }
 
@@ -638,21 +636,22 @@
   font-weight: 600;
 }
 
-/* Phase indicator positioned inline on the right */
+/* Phase indicator positioned underneath the title, aligned to the right */
 .benefit-phase-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg); /* SMALLER: Reduced padding for inline positioning */
   background: linear-gradient(135deg, 
     color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
     var(--card-background) 100%
   );
   border: 1px solid color-mix(in srgb, var(--phase-color, var(--primary)) 20%, var(--border));
   border-radius: var(--radius-lg);
-  min-width: 180px;
+  min-width: 180px; /* SMALLER: Reduced width for inline positioning */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  align-self: flex-end; /* POSITIONED: Align to the right */
 }
 
 .benefit-phase-content {
@@ -970,26 +969,26 @@
   color: var(--text);
 }
 
-/* UPDATED: Journey Guidance section - MATCHING header spacing */
+/* UPDATED: Journey Guidance section - REMOVED left yellow border - SIMPLIFIED HEADER */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* FIXED: Reduced top padding */
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  /* REMOVED: Left yellow border as requested */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Header matching detailed-analysis-header spacing */
+/* UPDATED: Simple header matching detailed-analysis-header - NO ICON */
 .pattern-analysis-header {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: var(--spacing-md);
-  margin-bottom: 0;
-  padding: var(--spacing-lg) 0;
+  margin-bottom: 0; /* FIXED: Remove margin-bottom to prevent double spacing with flex gap */
 }
 
 .pattern-analysis-header h3 {
@@ -1478,35 +1477,36 @@
     justify-content: center; /* ENSURE: Centered on mobile */
   }
   
-  /* Mobile: Benefit Insights - UPDATED for new inline header structure */
+  /* Mobile: Benefit Insights - UPDATED for new header structure */
   .detailed-analysis-section {
     padding: var(--spacing-lg);
   }
   
-  /* Mobile: Benefit insights header - stack vertically */
+  .detailed-analysis-title h4 {
+    font-size: 1.125rem; /* Mobile font size */
+  }
+  
+  /* Mobile: Benefit insights header - stack vertically and center phase indicator */
   .detailed-analysis-header {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md) 0;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
   }
   
   .detailed-analysis-title {
-    justify-content: center;
     width: 100%;
+    justify-content: center;
   }
   
-  .detailed-analysis-title h4 {
-    font-size: 1.125rem;
-    text-align: center;
-  }
-  
-  /* Mobile: Phase indicator - centered and compact */
+  /* Mobile: Compact phase indicator - SMALLER and centered */
   .benefit-phase-indicator {
     width: 100%;
-    max-width: 280px;
-    padding: var(--spacing-sm) var(--spacing-md);
-    justify-content: center;
-    margin: 0 auto;
+    max-width: 280px; /* SMALLER: Reduced width for mobile */
+    padding: var(--spacing-sm) var(--spacing-md); /* SMALLER: Reduced padding */
+    justify-content: flex-start;
+    text-align: center;
+    position: relative;
+    align-self: center; /* CENTERED: Override desktop right alignment */
   }
   
   .benefit-phase-content {
@@ -1575,17 +1575,15 @@
   
   /* Mobile: Journey guidance with FIXED header spacing */
   .pattern-analysis-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* FIXED: Reduced top padding on mobile */
   }
   
   .pattern-analysis-header {
-    justify-content: center;
-    padding: var(--spacing-md) 0;
+    margin-bottom: 0; /* FIXED: Ensure no margin on mobile too */
   }
   
   .pattern-analysis-header h3 {
-    font-size: 1.125rem;
-    text-align: center;
+    font-size: 1.125rem; /* Mobile font size */
   }
   
   .pattern-insight-item {
