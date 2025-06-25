@@ -632,6 +632,7 @@
   font-size: 1.25rem;
   color: var(--text);
   font-weight: 600;
+  padding: var(--spacing-lg) 0; /* ADDED: Match the padding of Journey Guidance h3 */
 }
 
 /* Phase indicator positioned underneath the title, aligned to the right */
@@ -692,6 +693,7 @@
 }
 
 .streak-comparison {
+  margin-top: var(--spacing-lg); /* ADDED: Match the gap between header and content like Journey Guidance */
   margin-bottom: var(--spacing-md); /* REDUCED: Less space after comparison cards */
 }
 
@@ -993,6 +995,7 @@
   font-size: 1.25rem;
   color: var(--text);
   font-weight: 600;
+  padding: var(--spacing-lg) 0; /* ADDED: Explicit padding for consistency */
 }
 
 .pattern-insights {
