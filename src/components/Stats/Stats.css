@@ -601,7 +601,7 @@
   text-align: center;
 }
 
-/* UPDATED: Benefit insights header - REPOSITIONED phase indicator */
+/* UPDATED: Benefit insights header - DESKTOP INLINE, MOBILE STACKED */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -613,7 +613,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Header layout to position phase indicator underneath on the right */
+/* UPDATED: Header layout - desktop inline, mobile stacked */
 .detailed-analysis-header {
   display: flex;
   flex-direction: column;
@@ -652,6 +652,26 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   align-self: flex-end; /* POSITIONED: Align to the right */
+}
+
+/* DESKTOP: Inline layout for header and phase indicator */
+@media (min-width: 769px) {
+  .detailed-analysis-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+  }
+  
+  .detailed-analysis-title {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .benefit-phase-indicator {
+    align-self: center;
+    flex-shrink: 0;
+  }
 }
 
 .benefit-phase-content {
