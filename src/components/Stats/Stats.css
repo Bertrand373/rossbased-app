@@ -605,7 +605,7 @@
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* MATCHED: Same padding as pattern-analysis-section */
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* FIXED: Reduced top padding to match pattern-analysis-section */
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -1529,7 +1529,7 @@
   .benefit-phase-indicator {
     width: 100%;
     max-width: 280px; /* SMALLER: Reduced width for mobile */
-    padding: var(--spacing-md) var(--spacing-md); /* INCREASED: More vertical padding for proper text spacing */
+    padding: var(--spacing-lg) var(--spacing-lg); /* INCREASED: Match UrgeToolkit mobile padding for proper text spacing */
     justify-content: flex-start;
     text-align: center;
     position: relative;
@@ -1556,19 +1556,19 @@
     text-align: center;
     width: auto;
     margin-right: 0;
-    padding: var(--spacing-sm) 0;
+    padding: var(--spacing-md) 0; /* INCREASED: Add vertical padding to push text away from borders */
   }
   
   .benefit-phase-name {
     font-size: 0.8125rem; /* SMALLER: Reduced font size for mobile */
     text-align: center;
-    margin-bottom: 2px;
+    margin-bottom: var(--spacing-xs); /* INCREASED: More space between name and day */
   }
   
   .benefit-phase-day {
     font-size: 0.6875rem; /* SMALLER: Reduced font size for mobile */
     text-align: center;
-    margin-top: 2px;
+    margin-top: var(--spacing-xs); /* INCREASED: More space between day and name */
   }
   
   .comparison-grid {
@@ -1685,7 +1685,7 @@
 
   /* Very small screen benefit phase indicator - EVEN SMALLER */
   .benefit-phase-indicator {
-    padding: var(--spacing-xs) var(--spacing-sm); /* SMALLER: Even less padding */
+    padding: var(--spacing-md) var(--spacing-md); /* INCREASED: Better padding for very small screens */
     max-width: 240px; /* SMALLER: Reduced width for very small screens */
   }
   
