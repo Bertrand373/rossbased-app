@@ -352,7 +352,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return wisdomMode ? currentInsight.esoteric : currentInsight.practical;
   };
   
-  // Get metric-specific benefits based on timeline phase - matches Emotional Timeline
+  // UPDATED: Get metric-specific benefits based on timeline phase - matches Emotional Timeline
   const getMetricBenefits = (metric, phase, streak) => {
     const metricData = {
       energy: {
@@ -522,7 +522,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return metricData[metric][phase];
   };
   
-  // Get challenge-specific guidance based on phase - matches Emotional Timeline
+  // UPDATED: Get challenge-specific guidance based on phase - matches Emotional Timeline
   const getChallengeGuidance = (phase, streak) => {
     const challengeData = {
       initial: {
@@ -555,7 +555,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return isInDifficultPeriod || hasLimitedData || isNewUser;
   };
   
-  // Get phase-specific challenge insight - matches Emotional Timeline
+  // UPDATED: Get phase-specific challenge insight - matches Emotional Timeline
   const getChallengeInsight = (phase, streak) => {
     const challengeInsights = {
       initial: {
@@ -588,7 +588,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return challengeInsights[phase];
   };
 
-  // Timeline-based insights for all 6 metrics with challenge-specific guidance
+  // ENHANCED: Timeline-based insights for all 6 metrics with challenge-specific guidance
   const generateAllInsights = () => {
     const filteredData = getFilteredBenefitData();
     const currentStreak = userData.currentStreak || 0;
@@ -597,7 +597,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     // Define all 6 enhanced benefit categories
     const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
     
-    // Timeline-based phase detection - matches Emotional Timeline exactly
+    // UPDATED: Timeline-based phase detection - matches Emotional Timeline exactly
     const getPhase = (streak) => {
       if (streak <= 14) return 'initial';
       if (streak <= 45) return 'purging'; 
@@ -630,6 +630,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     // Add phase-specific challenge insight if user needs guidance
     if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
+      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
       insights.push({
         id: insights.length + 1,
         practical: challengeInsight.practical,
@@ -644,7 +645,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return insights;
   };
 
-  // Generate pattern insights with Emotional Timeline phases
+  // UPDATED: Generate pattern insights with Emotional Timeline phases
   const generatePatternInsights = () => {
     const filteredData = getFilteredBenefitData();
     const currentStreak = userData.currentStreak || 0;
@@ -661,7 +662,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     const currentPhase = getPhase(currentStreak);
     
-    // Timeline-based challenge patterns matching Emotional Timeline
+    // UPDATED: Timeline-based challenge patterns matching Emotional Timeline
     const timelinePatterns = {
       initial: {
         practical: "Days 1-14: Initial Adaptation phase. Strong urges and energy fluctuations are completely normal - your body is learning to retain vital force.",
@@ -1042,7 +1043,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* UPDATED: Benefit Insights Section - Grid header with right-positioned phase indicator */}
+            {/* UPDATED: Benefit Insights Section - Grid header with right-indented phase indicator */}
             <div className="detailed-analysis-section">
               <div className="detailed-analysis-header">
                 <div className="detailed-analysis-header-spacer"></div>

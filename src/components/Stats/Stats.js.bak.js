@@ -1,15 +1,12 @@
-// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern
+// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-// Import icons at the top
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaEye, FaStar } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
-
-// Import helmet image to match Timeline design
 import helmetImage from '../../assets/helmet.png';
 
 // Register ChartJS components
@@ -40,31 +37,21 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     { id: 'social_media', label: 'Social Media', icon: FaLaptop },
     { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
     { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
-    { id: 'home_alone', label: 'Being Home Alone', icon: FaHome },
-    { id: 'explicit_content', label: 'Explicit Content', icon: FaTheaterMasks }
+    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
   ];
-  
-  // NEW: Smart scroll detection for floating toggle - ONLY for premium users
+
+  // NEW: Smart floating toggle scroll detection
   useEffect(() => {
+    if (!isPremium) return; // Only show for premium users
+    
     const handleScroll = () => {
-      // Only show toggle if premium (since free users don't see premium insights)
-      if (!isPremium) {
-        setShowFloatingToggle(false);
-        return;
-      }
+      if (!insightsStartRef.current || !patternSectionRef.current) return;
       
-      const insightsStart = insightsStartRef.current;
-      const patternSection = patternSectionRef.current;
-      
-      if (!insightsStart || !patternSection) return;
-      
-      // Get scroll position and element positions
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const windowHeight = window.innerHeight;
       
-      // Get positions relative to document
-      const insightsStartTop = insightsStart.getBoundingClientRect().top + scrollTop;
-      const patternSectionBottom = patternSection.getBoundingClientRect().bottom + scrollTop;
+      const insightsStartTop = insightsStartRef.current.offsetTop;
+      const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
       
       // Show toggle when:
       // 1. User has scrolled to the insights section start
@@ -142,6 +129,31 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   // ADDED: Premium upgrade handler
   const handleUpgradeClick = () => {
     toast.success('Premium upgrade coming soon! 🚀');
+  };
+
+  // UPDATED: Helper function to get current phase data - matches Emotional Timeline exactly  
+  const getCurrentPhaseData = (streak) => {
+    if (streak <= 14) {
+      return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
+    } else if (streak <= 45) {
+      return { name: "Emotional Purging", icon: FaHeart, color: "#f59e0b" };
+    } else if (streak <= 90) {
+      return { name: "Mental Expansion", icon: FaBrain, color: "#3b82f6" };
+    } else if (streak <= 180) {
+      return { name: "Spiritual Integration", icon: FaLightbulb, color: "#8b5cf6" };
+    } else {
+      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
+    }
+  };
+
+  // LEGACY: Keep old function for backward compatibility
+  const getCurrentPhase = (streak) => {
+    if (streak <= 7) return 'Foundation Phase';
+    if (streak <= 30) return 'Adjustment Phase';
+    if (streak <= 90) return 'Momentum Phase';
+    if (streak <= 180) return 'Transformation Phase';
+    if (streak <= 365) return 'Integration Phase';
+    return 'Mastery Phase';
   };
   
   // Filter benefit data based on selected time range
@@ -266,7 +278,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return (sum / filteredData.length).toFixed(1);
   };
   
-  // Generate streak comparison data - UPDATED: Include sleep
+  // ENHANCED: Generate streak comparison data with expanded benefit categories
   const generateStreakComparison = () => {
     const filteredData = getFilteredBenefitData();
     
@@ -283,444 +295,509 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     const baseValue = parseFloat(calculateAverage());
     
-    return {
+    // Enhanced progression patterns based on the guide's timeline
+    const progressionMultipliers = {
       confidence: {
-        short: Math.max(1, baseValue - 1.5).toFixed(1),
-        medium: baseValue.toFixed(1),
-        long: Math.min(10, baseValue + 1.2).toFixed(1)
+        short: -1.5,  // Foundation phase - some confidence building
+        medium: 0.0,  // Adjustment phase - baseline confidence
+        long: +2.0    // Momentum+ phases - significant confidence boost
       },
       energy: {
-        short: Math.max(1, baseValue - 1.2).toFixed(1),
-        medium: baseValue.toFixed(1),
-        long: Math.min(10, baseValue + 1.5).toFixed(1)
+        short: -1.2,  // Initial adjustment period
+        medium: 0.0,  // Stabilization period
+        long: +2.5    // Major energy transformation
       },
       focus: {
-        short: Math.max(1, baseValue - 1.0).toFixed(1),
-        medium: baseValue.toFixed(1),
-        long: Math.min(10, baseValue + 1.3).toFixed(1)
+        short: -1.0,  // Some clarity improvements early
+        medium: 0.0,  // Baseline during adjustment
+        long: +2.3    // Significant mental enhancement
       },
       aura: {
-        short: Math.max(1, baseValue - 1.3).toFixed(1),
-        medium: baseValue.toFixed(1),
-        long: Math.min(10, baseValue + 1.1).toFixed(1)
+        short: -0.8,  // Subtle presence changes
+        medium: 0.0,  // Baseline magnetism
+        long: +2.8    // Powerful presence development
       },
       sleep: {
-        short: Math.max(1, baseValue - 1.1).toFixed(1),
-        medium: baseValue.toFixed(1),
-        long: Math.min(10, baseValue + 1.4).toFixed(1)
+        short: -1.1,  // Sleep pattern adjustment
+        medium: 0.0,  // Stabilized sleep
+        long: +2.2    // Optimized sleep quality
       },
       workout: {
-        short: Math.max(1, baseValue - 0.8).toFixed(1),
-        medium: baseValue.toFixed(1),
-        long: Math.min(10, baseValue + 1.0).toFixed(1)
+        short: -0.6,  // Some physical improvements
+        medium: 0.0,  // Baseline fitness
+        long: +2.0    // Significant physical enhancement
       }
     };
+    
+    const result = {};
+    
+    Object.keys(progressionMultipliers).forEach(metric => {
+      const multipliers = progressionMultipliers[metric];
+      result[metric] = {
+        short: Math.max(1, Math.min(10, baseValue + multipliers.short)).toFixed(1),
+        medium: baseValue.toFixed(1),
+        long: Math.max(1, Math.min(10, baseValue + multipliers.long)).toFixed(1)
+      };
+    });
+    
+    return result;
   };
   
   const streakComparison = generateStreakComparison();
   
-  // UPDATED: Generate dual insights - both practical and esoteric for all 6 metrics
-  const generateAllInsights = () => {
-    const filteredData = getFilteredBenefitData();
-    
-    if (filteredData.length < 3) {
-      return [
-        {
-          id: 1,
-          practical: "Track more days to see personalized energy patterns and improvement trends in your data.",
-          esoteric: "Track more days to see personalized energy insights about your progress and vital force patterns.",
-          metric: "energy"
+  // Generate current insight for sidebar
+  const getCurrentInsight = () => {
+    const insights = generateAllInsights();
+    const currentInsight = insights.find(insight => insight.metric === selectedMetric) || insights[0];
+    return wisdomMode ? currentInsight.esoteric : currentInsight.practical;
+  };
+  
+  // UPDATED: Get metric-specific benefits based on timeline phase - matches Emotional Timeline
+  const getMetricBenefits = (metric, phase, streak) => {
+    const metricData = {
+      energy: {
+        initial: {
+          practical: "Energy fluctuations are normal as your body adjusts to conserving vital force. Expect periods of high energy alternating with fatigue.",
+          esoteric: "Your life force is beginning to accumulate instead of being scattered. The body temple is learning to contain divine energy.",
+          actionable: "Establish consistent morning exercise and avoid energy-draining activities during this critical foundation period."
         },
-        {
-          id: 2,
-          practical: "Focus patterns become clearer with more data - mental clarity typically improves after day 7.",
-          esoteric: "Focus patterns become clearer with more data - mental clarity follows the natural rhythms of retention.",
-          metric: "focus"
+        purging: {
+          practical: "Noticeable strength gains and vitality increases. Your physical power and endurance are improving significantly.",
+          esoteric: "Raw sexual energy (Jing) is being refined into life energy (Qi). Your vital force is stabilizing at higher frequencies.",
+          actionable: "Channel this increased energy into productive activities - exercise, creative projects, and skill development."
         },
-        {
-          id: 3,
-          practical: "Confidence trends emerge as you build tracking history - self-control builds self-trust over time.",
-          esoteric: "Confidence trends emerge as you build tracking history - inner strength manifests through discipline.",
-          metric: "confidence"
+        expansion: {
+          practical: "Sustained high energy throughout the day. Your body composition improves naturally without extra effort.",
+          esoteric: "You're entering the alchemical refinement stage. Sexual energy transforms into pure vitality and creative power.",
+          actionable: "Use this momentum phase to tackle your biggest goals and challenges while maintaining spiritual practices."
         },
-        {
-          id: 4,
-          practical: "Aura improvements are best analyzed over extended periods - social presence often increases with longer streaks.",
-          esoteric: "Aura improvements are best analyzed over extended periods - your energetic presence grows with practice.",
-          metric: "aura"
+        integration: {
+          practical: "Your presence amplifies - others can feel your energy from across a room. Consistent, reliable energy levels.",
+          esoteric: "Energy transmutation is nearly complete. You're operating on refined life force rather than base sexual energy.",
+          actionable: "Focus on service and helping others while maintaining the practices that brought you to this level."
         },
-        {
-          id: 5,
-          practical: "Sleep quality patterns show correlation with retention - testosterone optimization often improves rest.",
-          esoteric: "Sleep quality patterns show the connection between retention and dream states over time.",
-          metric: "sleep"
-        },
-        {
-          id: 6,
-          practical: "Workout performance correlations become visible with more tracking - energy conservation can boost physical performance.",
-          esoteric: "Workout performance correlations become visible with more tracking - retained energy enhances physical power.",
-          metric: "workout"
+        mastery: {
+          practical: "Energy consistency is natural and effortless. You rarely get sick and recover quickly when you do.",
+          esoteric: "Vital force flows freely through all energy centers. You've achieved energetic harmony and balance.",
+          actionable: "Share your knowledge and help others achieve similar energy mastery through teaching and mentoring."
         }
-      ];
-    }
-    
-    const insights = [];
-    const recentData = filteredData.slice(-7);
-    
-    // Helper function to calculate recent average for any metric
-    const calculateRecentAverage = (metric) => {
-      if (recentData.length === 0) return 5;
-      const sum = recentData.reduce((acc, item) => {
-        // MIGRATION: Handle old attraction data -> sleep data
-        if (metric === 'sleep') {
-          return acc + (item[metric] || item.attraction || 5);
+      },
+      focus: {
+        initial: {
+          practical: "Brief periods of unusual mental sharpness alternating with mind racing. Concentration gradually improving.",
+          esoteric: "Mental fog from energy dissipation is clearing. Your mind's natural clarity is beginning to emerge.",
+          actionable: "Start with short meditation sessions (15 minutes) and gradually build concentration muscle."
+        },
+        purging: {
+          practical: "Improved memory and faster decision-making. Information absorption and retention significantly enhanced.",
+          esoteric: "Brain tissue becomes more densely connected as vital nutrients are redirected from reproduction to cognition.",
+          actionable: "Take on learning challenges - new languages, skills, or complex subjects while your brain is optimizing."
+        },
+        expansion: {
+          practical: "Mental clarity reaches new levels. Pattern recognition and strategic thinking abilities expand dramatically.",
+          esoteric: "The mind purifies as sexual energy transforms. Fog lifts and thoughts become crystal clear.",
+          actionable: "Apply enhanced focus to your most important goals. This is the time for major intellectual achievements."
+        },
+        integration: {
+          practical: "Memory becomes exceptional with photographic tendencies. Ability to master new skills rapidly develops.",
+          esoteric: "Mental body (Manomaya Kosha) expands and clarifies. Consciousness operates at higher dimensional levels.",
+          actionable: "Share your enhanced mental capabilities through teaching, writing, or innovative problem-solving."
+        },
+        mastery: {
+          practical: "Knowledge synthesis across disciplines becomes natural. Complex concepts understood intuitively.",
+          esoteric: "Mind achieves unity consciousness. Individual thinking merges with universal intelligence.",
+          actionable: "Use integrated awareness to bridge different fields of knowledge and create innovative solutions."
         }
-        return acc + (item[metric] || 5);
-      }, 0);
-      return sum / recentData.length;
+      },
+      confidence: {
+        initial: {
+          practical: "Growing sense of possibility and self-confidence from taking control of this fundamental area of life.",
+          esoteric: "Personal power begins awakening as you reclaim dominion over your most basic drives and impulses.",
+          actionable: "Practice saying no to small requests to build boundary-setting strength for bigger challenges ahead."
+        },
+        purging: {
+          practical: "Growing belief in your capabilities. Natural inclination to take charge in group situations emerges.",
+          esoteric: "Solar plexus chakra (Manipura) activates as personal power stabilizes. Inner fire begins burning steady.",
+          actionable: "Take on leadership opportunities at work or in community to develop and exercise your growing confidence."
+        },
+        expansion: {
+          practical: "Natural confidence without arrogance. Others seeking your opinions and treating you with more respect.",
+          esoteric: "Personal power matures into authentic authority. You embody strength without aggression or dominance.",
+          actionable: "Use growing influence responsibly. Focus on empowering others rather than seeking personal advantage."
+        },
+        integration: {
+          practical: "Others automatically looking to you for direction. Natural charisma and leadership abilities manifest.",
+          esoteric: "Divine masculine energy fully activated. You embody the archetype of the wise king or spiritual warrior.",
+          actionable: "Accept leadership responsibilities but remain humble. Power should serve others, not personal ego."
+        },
+        mastery: {
+          practical: "Unshakeable inner confidence independent of external circumstances. Natural authority recognized by others.",
+          esoteric: "Self-confidence transcends into cosmic confidence. You know your place in the universal order.",
+          actionable: "Mentor others in developing authentic confidence and personal power through your example and teaching."
+        }
+      },
+      aura: {
+        initial: {
+          practical: "Others beginning to notice something different about you, though they can't quite explain what it is.",
+          esoteric: "Your electromagnetic field strengthens as vital energy accumulates. Auric field begins expanding beyond normal limits.",
+          actionable: "Pay attention to how others respond to your presence. Practice maintaining positive, powerful energy."
+        },
+        purging: {
+          practical: "Magnetism increasing - people drawn to be near you without knowing why. Quality of interactions improves.",
+          esoteric: "Aura expands from normal 3-6 feet to 10-15 feet. Others unconsciously sense your elevated energy signature.",
+          actionable: "Use your growing magnetism responsibly. Attract people for mutual benefit, not personal manipulation."
+        },
+        expansion: {
+          practical: "Attracting higher-quality people into your life. Network and relationship quality significantly improves.",
+          esoteric: "Auric field becomes powerful enough to influence others' emotional and mental states. Energy signature purifies.",
+          actionable: "Consciously radiate positive energy. Your presence should uplift and inspire everyone you encounter."
+        },
+        integration: {
+          practical: "People change behavior in your presence. Natural authority and influence expand significantly.",
+          esoteric: "Aura extends 50+ feet from body. Energy field carries information that transforms others at distance.",
+          actionable: "Accept responsibility for your energetic impact on others. Your presence should serve their highest good."
+        },
+        mastery: {
+          practical: "Consistent powerful presence that affects positive change in every environment you enter.",
+          esoteric: "Auric field stabilizes at master level. Energy signature becomes a beacon of light for others.",
+          actionable: "Use your energetic influence to create positive change in communities, organizations, and relationships."
+        }
+      },
+      sleep: {
+        initial: {
+          practical: "Sleep patterns may be disrupted as body adjusts. You might sleep more or less than usual initially.",
+          esoteric: "Body's natural circadian rhythms reset as energy patterns shift from reproduction to regeneration.",
+          actionable: "Maintain consistent sleep schedule. Create sacred sleep environment free from electromagnetic interference."
+        },
+        purging: {
+          practical: "Sleep optimization begins - needing less sleep but feeling more rested. Dreams become more vivid.",
+          esoteric: "Energy body (Pranamaya Kosha) purifies during sleep. Astral consciousness becomes more active and aware.",
+          actionable: "Pay attention to your dreams - they're processing old patterns and revealing guidance for your journey."
+        },
+        expansion: {
+          practical: "Deep, restorative sleep with consistent energy upon waking. Sleep efficiency reaches optimal levels.",
+          esoteric: "Sleep becomes a time of spiritual regeneration. Consciousness travels to higher realms during rest.",
+          actionable: "Use pre-sleep meditation to program positive dreams and insights. Morning journaling captures wisdom received."
+        },
+        integration: {
+          practical: "Requiring minimal sleep while feeling completely refreshed. Recovery and healing accelerated during rest.",
+          esoteric: "Physical sleep merges with spiritual contemplation. Rest becomes active communion with higher consciousness.",
+          actionable: "Dedicate first moments upon waking to gratitude and intention-setting for the day ahead."
+        },
+        mastery: {
+          practical: "Perfect sleep efficiency - exactly the right amount of rest for optimal function with natural wake timing.",
+          esoteric: "Sleep-wake cycle aligns with cosmic rhythms. Body follows natural law rather than artificial schedules.",
+          actionable: "Share sleep optimization knowledge with others struggling with rest and recovery issues."
+        }
+      },
+      workout: {
+        initial: {
+          practical: "Physical restlessness increases - body needs more movement to circulate accumulating energy.",
+          esoteric: "Life force seeks upward movement through physical expression. Body becomes vessel for dynamic energy.",
+          actionable: "Establish vigorous daily exercise routine. Use physical movement to transmute sexual energy upward."
+        },
+        purging: {
+          practical: "Noticeable strength gains and physical improvements. Coordination and athleticism naturally enhance.",
+          esoteric: "Muscle tissue becomes more efficient as vital nutrients redirect from reproduction to physical development.",
+          actionable: "Challenge yourself with progressive physical goals. Your enhanced capabilities can handle increased demands."
+        },
+        expansion: {
+          practical: "Natural muscle gain and fat loss without extra effort. Athletic performance reaches new personal bests.",
+          esoteric: "Physical body becomes refined vessel for spiritual energy. Strength serves higher consciousness rather than ego.",
+          actionable: "Use physical prowess to inspire and help others. Your body becomes example of what's possible."
+        },
+        integration: {
+          practical: "Movement becomes graceful and powerful. Others notice significant improvements in your physical presence.",
+          esoteric: "Body achieves harmony between strength and flexibility, power and grace. Physical form reflects spiritual development.",
+          actionable: "Train others in physical development. Share knowledge of how retention enhances athletic performance."
+        },
+        mastery: {
+          practical: "Peak physical condition maintained effortlessly. Body operates at optimal efficiency in all activities.",
+          esoteric: "Physical form becomes temple for divine consciousness. Every movement expresses spiritual principle.",
+          actionable: "Use physical mastery to demonstrate integration of body, mind, and spirit in all activities."
+        }
+      }
     };
     
-    // UPDATED: Energy insights with both practical and esoteric versions
-    const energyTrend = recentData.length > 1 ? 
-      (recentData[recentData.length - 1].energy || 5) - (recentData[0].energy || 5) : 0;
-    const energyAvg = parseFloat(calculateAverage());
+    return metricData[metric][phase];
+  };
+  
+  // UPDATED: Get challenge-specific guidance based on phase - matches Emotional Timeline
+  const getChallengeGuidance = (phase, streak) => {
+    const challengeData = {
+      initial: {
+        actionable: "Expect resistance and strong urges. Focus on building unbreakable daily habits. Remove all triggers from environment."
+      },
+      purging: {
+        actionable: "Flatlines and mood swings are normal. Accept emotions without resistance. Maintain practices even when motivation dips."
+      },
+      expansion: {
+        actionable: "Guard against ego inflation. Use increased mental abilities for meaningful goals and helping others."
+      },
+      integration: {
+        actionable: "Handle increased responsibility wisely. Some relationships may change as you transform - this is normal."
+      },
+      mastery: {
+        actionable: "Focus on legacy creation and service to others. Your development now serves humanity's evolution."
+      }
+    };
     
-    if (energyTrend > 1.5) {
-      insights.push({
-        id: 1,
-        practical: "Your energy levels are rising consistently - this upward trend suggests your body is adapting well to retention.",
-        esoteric: "Your vital force is ascending - the retained life essence is strengthening your energetic field significantly.",
-        metric: "energy"
-      });
-    } else if (energyTrend < -1.5) {
-      insights.push({
-        id: 1,
-        practical: "Energy levels are declining - consider factors like sleep quality, stress levels, or diet that might be affecting you.",
-        esoteric: "Consider what's depleting your life force - stress, poor sleep, or scattered attention can drain vital energy.",
-        metric: "energy"
-      });
-    } else if (energyAvg > 7.5) {
-      insights.push({
-        id: 1,
-        practical: "Your energy levels are consistently high - you've likely reached the optimal adaptation phase of retention.",
-        esoteric: "Your energy centers are aligned - you've entered the realm where physical vitality meets spiritual power.",
-        metric: "energy"
-      });
-    } else {
-      insights.push({
-        id: 1,
-        practical: "Energy typically peaks around day 10-14 as testosterone levels stabilize and the body completes adaptation.",
-        esoteric: "Ancient wisdom teaches that energy peaks around day 10-14 as the body completes its first transmutation cycle.",
-        metric: "energy"
-      });
-    }
+    return challengeData[phase];
+  };
+  
+  // Determine if user needs challenge-specific guidance
+  const shouldShowChallengeGuidance = (streak, dataLength) => {
+    // Show during known difficult periods or if user seems to be struggling
+    const isInDifficultPeriod = (streak >= 14 && streak <= 45) || (streak >= 60 && streak <= 120);
+    const hasLimitedData = dataLength < 7;
+    const isNewUser = streak <= 7;
     
-    // Focus insights with practical vs mental alchemy concepts
-    const focusAvg = calculateRecentAverage('focus');
-    if (focusAvg > 7.5) {
-      insights.push({
-        id: 2,
-        practical: "Your focus is excellent - retention has likely optimized your dopamine sensitivity and attention span.",
-        esoteric: "Your mind has achieved the clarity spoken of in hermetic traditions - focused attention becomes a magical tool.",
-        metric: "focus"
-      });
-    } else if (focusAvg > 6) {
-      insights.push({
-        id: 2,
-        practical: "Focus is improving - reduced dopamine seeking behavior from retention often enhances concentration.",
-        esoteric: "Mental alchemy is occurring - the fog of desire is lifting, revealing the crystal clarity beneath.",
-        metric: "focus"
-      });
-    } else {
-      insights.push({
-        id: 2,
-        practical: "Focus typically improves after 2-3 weeks as your brain's reward system rebalances from reduced stimulation.",
-        esoteric: "The ancients knew that mental clarity follows the withdrawal of vital essence from lower chakras to higher ones.",
-        metric: "focus"
-      });
-    }
+    return isInDifficultPeriod || hasLimitedData || isNewUser;
+  };
+  
+  // UPDATED: Get phase-specific challenge insight - matches Emotional Timeline
+  const getChallengeInsight = (phase, streak) => {
+    const challengeInsights = {
+      initial: {
+        practical: `Day ${streak}: You're in the Initial Adaptation phase. Strong urges and restlessness are completely normal - your body is learning to retain energy.`,
+        esoteric: `Day ${streak}: You're beginning the hero's journey. The resistance you feel is the old self protecting its familiar patterns.`,
+        actionable: "Focus on building unbreakable daily habits. Use cold showers and intense exercise to channel excess energy."
+      },
+      purging: {
+        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
+        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
+        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
+      },
+      expansion: {
+        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
+        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
+        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
+      },
+      integration: {
+        practical: `Day ${streak}: Spiritual Integration phase brings profound inner transformation. You're gaining abilities that feel almost supernatural.`,
+        esoteric: `Day ${streak}: Major consciousness expansion occurring. You're embodying the divine masculine archetype.`,
+        actionable: "Accept increased responsibility gracefully. Share your wisdom while remaining humble about your development."
+      },
+      mastery: {
+        practical: `Day ${streak}: Mastery & Service phase brings responsibility for guiding others and contributing to human evolution.`,
+        esoteric: `Day ${streak}: Individual development now serves cosmic evolution. Your consciousness affects the collective field.`,
+        actionable: "Focus on legacy creation and mentoring others. Your mastery should serve the awakening of all humanity."
+      }
+    };
     
-    // Confidence insights with practical vs inner authority concepts
-    const confidenceAvg = calculateRecentAverage('confidence');
-    if (confidenceAvg > 7.5) {
-      insights.push({
-        id: 3,
-        practical: "Your confidence is strong - successfully maintaining discipline in this area builds genuine self-trust.",
-        esoteric: "You're developing true inner authority - confidence born from self-mastery, not ego or external validation.",
-        metric: "confidence"
-      });
-    } else if (confidenceAvg > 6) {
-      insights.push({
-        id: 3,
-        practical: "Confidence is building steadily - each day of self-control reinforces your belief in your own willpower.",
-        esoteric: "Each day of retention builds the foundation of unshakeable self-trust - the cornerstone of personal power.",
-        metric: "confidence"
-      });
-    } else {
-      insights.push({
-        id: 3,
-        practical: "Confidence often emerges after 2-3 weeks as you prove to yourself you can control strong impulses.",
-        esoteric: "Real confidence emerges after 2-3 weeks as you prove to yourself that you can master your strongest impulses.",
-        metric: "confidence"
-      });
-    }
+    return challengeInsights[phase];
+  };
+
+  // ENHANCED: Timeline-based insights for all 6 metrics with challenge-specific guidance
+  const generateAllInsights = () => {
+    const filteredData = getFilteredBenefitData();
+    const currentStreak = userData.currentStreak || 0;
+    const insights = [];
     
-    // Aura insights with practical vs energetic presence concepts
-    const auraAvg = calculateRecentAverage('aura');
-    if (auraAvg > 7.5) {
-      insights.push({
-        id: 4,
-        practical: "Your social presence is strong - others often respond positively to the confidence retention builds.",
-        esoteric: "Your energetic field is becoming magnetic - others unconsciously sense the power you're cultivating within.",
-        metric: "aura"
-      });
-    } else if (auraAvg > 6) {
-      insights.push({
-        id: 4,
-        practical: "Your presence is improving - retention often enhances charisma and social confidence over time.",
-        esoteric: "The retained life force is beginning to radiate outward, creating the luminous presence mystics speak of.",
-        metric: "aura"
-      });
-    } else {
-      insights.push({
-        id: 4,
-        practical: "Social presence typically improves after 30 days as increased confidence becomes noticeable to others.",
-        esoteric: "Esoteric teachings say that after 30 days, the subtle body begins to glow with accumulated spiritual energy.",
-        metric: "aura"
-      });
-    }
+    // Define all 6 enhanced benefit categories
+    const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
     
-    // Sleep insights with practical vs dream consciousness
-    const sleepAvg = calculateRecentAverage('sleep');
-    if (sleepAvg > 7.5) {
-      insights.push({
-        id: 5,
-        practical: "Your sleep quality is excellent - retention often improves sleep through better hormone regulation.",
-        esoteric: "Deep, restorative sleep indicates your nervous system is harmonizing - the body's natural wisdom is healing.",
-        metric: "sleep"
-      });
-    } else if (sleepAvg > 6) {
-      insights.push({
-        id: 5,
-        practical: "Sleep quality is improving - retention can enhance deep sleep phases and recovery cycles.",
-        esoteric: "Quality sleep improves with retention as sexual energy transforms into higher spiritual forces during rest.",
-        metric: "sleep"
-      });
-    } else {
-      insights.push({
-        id: 5,
-        practical: "Poor sleep may indicate stress or adjustment - consider meditation or relaxation before bed.",
-        esoteric: "Poor sleep often indicates energy is still chaotic - consider meditation before bed to calm the vital currents.",
-        metric: "sleep"
-      });
-    }
+    // UPDATED: Timeline-based phase detection - matches Emotional Timeline exactly
+    const getPhase = (streak) => {
+      if (streak <= 14) return 'initial';
+      if (streak <= 45) return 'purging'; 
+      if (streak <= 90) return 'expansion';
+      if (streak <= 180) return 'integration';
+      return 'mastery';
+    };
     
-    // Workout insights with practical vs physical transmutation
-    const workoutAvg = calculateRecentAverage('workout');
-    if (workoutAvg > 7.5) {
+    const currentPhase = getPhase(currentStreak);
+    
+    // Generate insights for ALL 6 metrics based on timeline and phase
+    allMetrics.forEach((metric, index) => {
+      const avgValue = parseFloat(calculateAverage());
+      const isSelectedMetric = metric === selectedMetric;
+      
+      // Get metric-specific benefits from the guide
+      const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
+      const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
+      
       insights.push({
-        id: 6,
-        practical: "Your workout performance is excellent - retention often increases energy available for physical training.",
-        esoteric: "Your physical vessel is becoming a temple - retained life force is amplifying your strength and endurance.",
-        metric: "workout"
+        id: index + 1,
+        practical: metricBenefits.practical,
+        esoteric: metricBenefits.esoteric,
+        actionable: isSelectedMetric ? challengeGuidance.actionable : metricBenefits.actionable,
+        metric: metric,
+        phase: currentPhase,
+        isPhaseSpecific: true
       });
-    } else if (workoutAvg > 6) {
+    });
+    
+    // Add phase-specific challenge insight if user needs guidance
+    if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
+      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
       insights.push({
-        id: 6,
-        practical: "Physical performance is improving - conserved energy can translate into better gym sessions.",
-        esoteric: "The body becomes more resilient as sexual energy transmutes into raw physical power and stamina.",
-        metric: "workout"
-      });
-    } else {
-      insights.push({
-        id: 6,
-        practical: "Physical performance often improves with retention - conserved energy can boost workout intensity.",
-        esoteric: "Ancient warriors knew that conserved sexual energy provides extraordinary physical capabilities when channeled properly.",
-        metric: "workout"
+        id: insights.length + 1,
+        practical: challengeInsight.practical,
+        esoteric: challengeInsight.esoteric,
+        actionable: challengeInsight.actionable,
+        metric: 'challenge',
+        phase: currentPhase,
+        isChallenge: true
       });
     }
     
     return insights;
   };
 
-  // Get current insight for selected metric
-  const getCurrentInsight = () => {
-    const allInsights = generateAllInsights();
-    const insight = allInsights.find(insight => insight.metric === selectedMetric) || allInsights[0];
-    return wisdomMode ? insight.esoteric : insight.practical;
-  };
-
-  // UPDATED: Enhanced pattern analysis with both practical and esoteric versions
+  // UPDATED: Generate pattern insights with Emotional Timeline phases
   const generatePatternInsights = () => {
-    if (!userData.streakHistory || userData.streakHistory.length < 2) {
-      return [{
-        id: 1,
-        practical: "Your journey is just beginning - patterns will emerge as you track more cycles and relapses.",
-        esoteric: "Your journey is just beginning - patterns will emerge as you accumulate more experience.",
-        actionable: wisdomMode ? 
-          "The path of self-mastery reveals its secrets only to those who persist through multiple cycles." :
-          "Continue tracking to identify trends in your behavior and triggers over time."
-      }];
-    }
-
-    const insights = [];
-    const relapsedStreaks = userData.streakHistory.filter(streak => 
-      streak.reason === 'relapse' && streak.trigger
-    );
-
-    if (relapsedStreaks.length === 0) {
-      return [{
-        id: 1,
-        practical: "You're maintaining strong discipline - continue tracking to identify potential weak points before they become issues.",
-        esoteric: "You're maintaining strong discipline - the forces of temptation have not yet revealed their patterns.",
+    const filteredData = getFilteredBenefitData();
+    const currentStreak = userData.currentStreak || 0;
+    const patterns = [];
+    
+    // Get current phase for context
+    const getPhase = (streak) => {
+      if (streak <= 14) return 'initial';
+      if (streak <= 45) return 'purging'; 
+      if (streak <= 90) return 'expansion';
+      if (streak <= 180) return 'integration';
+      return 'mastery';
+    };
+    
+    const currentPhase = getPhase(currentStreak);
+    
+    // UPDATED: Timeline-based challenge patterns matching Emotional Timeline
+    const timelinePatterns = {
+      initial: {
+        practical: "Days 1-14: Initial Adaptation phase. Strong urges and energy fluctuations are completely normal - your body is learning to retain vital force.",
+        esoteric: "Days 1-14: You're beginning the hero's journey. The inner conflict represents old patterns dying and new consciousness being born.",
         actionable: wisdomMode ?
-          "Continue tracking to identify subtle energy fluctuations that may precede challenging moments." :
-          "Keep monitoring your mood, stress levels, and environmental factors that might affect your discipline."
-      }];
-    }
-
-    // Analyze most common trigger with practical vs esoteric interpretation
-    const triggerCounts = {};
-    relapsedStreaks.forEach(streak => {
-      if (streak.trigger) {
-        triggerCounts[streak.trigger] = (triggerCounts[streak.trigger] || 0) + 1;
+          "Embrace this sacred initiation. Every urge resisted builds spiritual strength for the challenges ahead." :
+          "Focus on building unbreakable daily habits. Use cold showers and exercise to channel excess energy."
+      },
+      purging: {
+        practical: "Days 15-45: Emotional Purging phase. Mood swings and flatlines indicate your psyche is healing itself - this is the most challenging phase.",
+        esoteric: "Days 15-45: Your energy body is adapting to higher frequencies. Emotional volatility shows old patterns being purged.",
+        actionable: wisdomMode ?
+          "Trust the purification process. Journal extensively and accept emotions without resistance." :
+          "This emotional turbulence is temporary but necessary. Maintain practices even when motivation dips."
+      },
+      expansion: {
+        practical: "Days 46-90: Mental Expansion phase. Enhanced cognitive abilities and creativity emerge as emotional turbulence stabilizes.",
+        esoteric: "Days 46-90: Sexual energy is transmuting into mental power. You're entering the alchemical refinement stage.",
+        actionable: wisdomMode ?
+          "Channel growing mental power into service. Apply enhanced abilities to help others and create meaningful work." :
+          "Use increased focus for important goals. This is the time for major intellectual and creative achievements."
+      },
+      integration: {
+        practical: "Days 91-180: Spiritual Integration phase. Profound inner transformation as benefits become deeply integrated.",
+        esoteric: "Days 91-180: Major consciousness expansion occurring. You're embodying the divine masculine archetype.",
+        actionable: wisdomMode ?
+          "Accept your growing influence responsibly. You're becoming a beacon of light for others on the path." :
+          "Handle increased social attention wisely. Share your wisdom while remaining humble about your development."
+      },
+      mastery: {
+        practical: "180+ Days: Mastery & Service phase. Complete integration - you've transcended the need for external validation.",
+        esoteric: "180+ Days: Individual consciousness merges with universal consciousness. You serve the evolution of all humanity.",
+        actionable: wisdomMode ?
+          "Share your wisdom through teaching and example. Your mastery serves the awakening of collective consciousness." :
+          "Focus on legacy creation and mentoring others. Your development should create lasting positive impact."
       }
-    });
-
-    const mostCommonTrigger = Object.keys(triggerCounts).reduce((a, b) => 
-      triggerCounts[a] > triggerCounts[b] ? a : b
-    );
-
-    if (triggerCounts[mostCommonTrigger] > 1) {
-      const triggerLabel = triggerOptions.find(t => t.id === mostCommonTrigger)?.label || mostCommonTrigger;
-      
-      // DUAL INSIGHTS: Practical and Esoteric
-      let practicalInsight = "";
-      let esotericInsight = "";
-      let practicalAction = "";
-      let esotericAction = "";
-      
-      switch(mostCommonTrigger) {
-        case 'lustful_thoughts':
-          practicalInsight = "Lustful thoughts are your main trigger - this indicates you may need better mental discipline techniques.";
-          esotericInsight = "The mind is your battleground - these thoughts are the ego's last defense against transcendence.";
-          practicalAction = "Practice thought-stopping techniques, meditation, or redirect attention immediately when these thoughts arise.";
-          esotericAction = "Develop specific rituals to transmute this energy: breathing exercises, cold exposure, or physical movement when lustful thoughts arise.";
-          break;
-        case 'stress':
-          practicalInsight = "Stress is your main trigger - high cortisol may be weakening your willpower and decision-making.";
-          esotericInsight = "Stress scatters your life force - when the nervous system is agitated, lower impulses resurface.";
-          practicalAction = "Develop healthy stress management: exercise, deep breathing, or talking to someone when stressed.";
-          esotericAction = "Develop specific rituals to transmute this energy: breathing exercises, cold exposure, or physical movement when stress arises.";
-          break;
-        case 'boredom':
-          practicalInsight = "Boredom is your main trigger - idle time may be leading to seeking stimulation through familiar patterns.";
-          esotericInsight = "Boredom signals unused creative energy - this force seeks expression and will find destructive outlets if ignored.";
-          practicalAction = "Plan productive activities for idle time: hobbies, exercise, learning, or social activities.";
-          esotericAction = "Develop specific rituals to transmute this energy: breathing exercises, cold exposure, or physical movement when boredom arises.";
-          break;
-        case 'social_media':
-          practicalInsight = "Social media is your main trigger - digital dopamine hits may be weakening your impulse control.";
-          esotericInsight = "Digital stimulation fragments your attention - scattered focus weakens your energetic boundaries.";
-          practicalAction = "Limit social media use, use app timers, or avoid platforms that contain triggering content.";
-          esotericAction = "Develop specific rituals to transmute this energy: breathing exercises, cold exposure, or physical movement when social media urges arise.";
-          break;
-        case 'loneliness':
-          practicalInsight = "Loneliness is your main trigger - isolation may be leading to seeking connection through familiar patterns.";
-          esotericInsight = "Loneliness is the soul seeking connection - but true fulfillment comes from inner unity, not external validation.";
-          practicalAction = "Build social connections, join groups, call friends, or engage in community activities when feeling lonely.";
-          esotericAction = "Develop specific rituals to transmute this energy: breathing exercises, cold exposure, or physical movement when loneliness arises.";
-          break;
-        case 'explicit_content':
-          practicalInsight = "Explicit content is your main trigger - visual stimulation is directly activating old neural pathways.";
-          esotericInsight = "Visual triggers activate ancient programming - the eyes are gateways that can either elevate or deplete your essence.";
-          practicalAction = "Use content blockers, avoid triggering websites, or change your digital environment to reduce exposure.";
-          esotericAction = "Develop specific rituals to transmute this energy: breathing exercises, cold exposure, or physical movement when explicit content appears.";
-          break;
-        default:
-          practicalInsight = "This trigger appears multiple times in your pattern - it represents a consistent weak point in your discipline.";
-          esotericInsight = "This trigger represents unresolved energy seeking expression through familiar patterns.";
-          practicalAction = "Develop specific strategies to handle this trigger when it arises.";
-          esotericAction = "Develop specific rituals to transmute this energy when this trigger arises.";
-      }
-      
-      insights.push({
-        id: insights.length + 1,
-        practical: `"${triggerLabel}" appears ${triggerCounts[mostCommonTrigger]} times in your pattern. ${practicalInsight}`,
-        esoteric: `"${triggerLabel}" appears ${triggerCounts[mostCommonTrigger]} times in your pattern. ${esotericInsight}`,
-        actionable: wisdomMode ? esotericAction : practicalAction
+    };
+    
+    // Always show timeline-based pattern for current phase
+    const currentPattern = timelinePatterns[currentPhase];
+    if (currentPattern) {
+      patterns.push({
+        id: 1,
+        practical: currentPattern.practical,
+        esoteric: currentPattern.esoteric,
+        actionable: currentPattern.actionable,
+        isTimeline: true
       });
     }
-
-    // Analyze streak length patterns with practical vs esoteric cycle understanding
-    const streakLengths = relapsedStreaks.map(streak => streak.days).filter(days => days > 0);
-    if (streakLengths.length > 1) {
-      const avgLength = Math.round(streakLengths.reduce((sum, len) => sum + len, 0) / streakLengths.length);
+    
+    // Add specific challenge warnings based on timeline
+    const getChallengeWarnings = () => {
+      if (currentStreak >= 14 && currentStreak <= 21) {
+        return {
+          practical: "Week 3 Challenge: Many experience the strongest urges around day 14-21. This is your brain's final attempt to return to old patterns.",
+          esoteric: "Week 3 Initiation: You're facing the guardian at the threshold. This test determines if you're ready for deeper transformation.",
+          actionable: wisdomMode ?
+            "See this challenge as sacred initiation. Every moment you resist builds spiritual strength for the journey ahead." :
+            "Increase meditation time and remove yourself from triggering situations. This is the make-or-break moment."
+        };
+      }
       
-      if (avgLength < 7) {
-        insights.push({
-          id: insights.length + 1,
-          practical: `Your ${avgLength}-day cycles suggest you've mastered initial urges but struggle with medium-term discipline.`,
-          esoteric: `Your ${avgLength}-day cycles suggest you're transcending the physical but not yet stabilized in the emotional realm.`,
+      if (currentStreak >= 30 && currentStreak <= 45) {
+        return {
+          practical: "Flatline Warning: Days 30-45 often bring emotional numbness and low motivation. This is brain integration, not failure.",
+          esoteric: "Sacred Void: You're in the dissolution phase where old identity dies before new consciousness is born.",
           actionable: wisdomMode ?
-            "Days 7-14 test emotional equilibrium. Practice emotional alchemy: transform frustration into determination." :
-            "Days 7-14 are often challenging due to increased energy. Channel this into productive activities and maintain routines."
+            "Embrace the emptiness as sacred preparation. The void creates space for higher consciousness to enter." :
+            "Trust the process and maintain practices even when you feel nothing. This phase passes and leads to breakthroughs."
+        };
+      }
+      
+      if (currentStreak >= 60 && currentStreak <= 90) {
+        return {
+          practical: "Social Pressure Peak: Others may become more hostile or try to sabotage your progress as your energy threatens established hierarchies.",
+          esoteric: "Energy Disruption: Your rising consciousness disrupts lower vibrational patterns around you, causing resistance from others.",
+          actionable: wisdomMode ?
+            "Send love to those who resist your growth. Their hostility reflects their own inner suffering and limitation." :
+            "Protect your energy while maintaining compassion. Set firm boundaries with those who try to drain or sabotage you."
+        };
+      }
+      
+      return null;
+    };
+    
+    const challengeWarning = getChallengeWarnings();
+    if (challengeWarning) {
+      patterns.push({
+        id: 2,
+        practical: challengeWarning.practical,
+        esoteric: challengeWarning.esoteric,
+        actionable: challengeWarning.actionable,
+        isWarning: true
+      });
+    }
+    
+    // Add relapse analysis if user has history
+    if (userData.longestStreak && userData.longestStreak > currentStreak && currentStreak > 0) {
+      patterns.push({
+        id: patterns.length + 1,
+        practical: `Recovery Pattern: You've previously achieved ${userData.longestStreak} days. Your current ${currentStreak}-day streak shows you're rebuilding that momentum.`,
+        esoteric: `Spiral Evolution: Your previous ${userData.longestStreak}-day journey created lasting changes in your consciousness. This current cycle builds upon that foundation.`,
+        actionable: wisdomMode ?
+          "Each attempt deepens your spiritual capacity. You're not starting over - you're spiraling upward to higher levels." :
+          "Each attempt strengthens your resolve. Apply lessons learned from your previous success to go even further this time."
+      });
+    }
+    
+    // Add benefit tracking patterns if sufficient data
+    if (filteredData.length >= 7) {
+      const recentAvg = filteredData.slice(-7).reduce((sum, day) => sum + (day[selectedMetric] || 0), 0) / 7;
+      const overallAvg = parseFloat(calculateAverage());
+      
+      if (recentAvg > overallAvg + 0.5) {
+        patterns.push({
+          id: patterns.length + 1,
+          practical: `Improvement Trend: Your recent ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} levels are trending upward, showing real progress.`,
+          esoteric: `Energy Elevation: Your ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} energy is ascending to higher frequencies as your practice deepens.`,
+          actionable: wisdomMode ?
+            "Continue the practices that create this upward spiral. Your consciousness is expanding through dedicated effort." :
+            "Identify what specific factors are driving this improvement and maintain those positive patterns consistently."
         });
-      } else if (avgLength < 30) {
-        insights.push({
-          id: insights.length + 1,
-          practical: `Your ${avgLength}-day pattern indicates strong willpower but challenges with long-term lifestyle integration.`,
-          esoteric: `Your ${avgLength}-day pattern indicates strong mental discipline but challenges with long-term transmutation.`,
+      } else if (recentAvg < overallAvg - 0.5) {
+        patterns.push({
+          id: patterns.length + 1,
+          practical: `Attention Needed: Your recent ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} levels have dipped. This often happens before major breakthroughs.`,
+          esoteric: `Pre-Breakthrough Dip: Temporary ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} decreases often precede quantum leaps in consciousness.`,
           actionable: wisdomMode ?
-            "You've mastered the lower centers. Now focus on channeling energy into creative and spiritual pursuits." :
-            "You've built strong habits. Now focus on long-term goals and using this energy for personal growth."
-        });
-      } else {
-        insights.push({
-          id: insights.length + 1,
-          practical: `Your ${avgLength}-day cycles show excellent self-control - you're operating at an advanced level of discipline.`,
-          esoteric: `Your ${avgLength}-day cycles show advanced self-mastery - you're operating at the level of spiritual adepts.`,
-          actionable: wisdomMode ?
-            "Your challenge now is maintaining this state while serving others and expressing your highest creative potential." :
-            "Your challenge now is maintaining consistency while helping others and pursuing your highest goals."
+            "Trust the process - this dip often indicates deep transformation occurring beneath the surface." :
+            "Review your recent habits and stress levels. Make adjustments to support your wellbeing during this phase."
         });
       }
     }
-
-    // Add practical vs cosmic cycle insights if data supports it
-    const currentStreak = userData.currentStreak || 0;
-    if (currentStreak > 0) {
-      if (currentStreak % 7 === 0) {
-        insights.push({
-          id: insights.length + 1,
-          practical: `You've completed ${currentStreak / 7} full weekly cycles - weekly patterns help maintain consistent progress.`,
-          esoteric: `You've completed ${currentStreak / 7} full weekly cycles - each 7-day period represents one complete energy transformation.`,
-          actionable: wisdomMode ?
-            "Weekly cycles mirror the cosmic rhythm. Use Sundays for reflection and intention-setting for the next cycle." :
-            "Use weekly milestones for reflection and goal-setting to maintain motivation and track progress."
-        });
-      }
-      
-      if (currentStreak >= 28) {
-        insights.push({
-          id: insights.length + 1,
-          practical: "You've completed a full monthly cycle of retention - you're in the advanced consistency phase.",
-          esoteric: "You've completed a full lunar cycle of retention - your energy now follows celestial rhythms rather than earthly impulses.",
-          actionable: wisdomMode ?
-            "Track your energy with moon phases. New moons are ideal for setting intentions, full moons for releasing lower desires." :
-            "Maintain your proven strategies while exploring how this energy can fuel your biggest life goals."
-        });
-      }
-    }
-
-    return insights.length > 0 ? insights : [{
-      id: 1,
-      practical: "Continue tracking to discover patterns in your behavior and decision-making processes.",
-      esoteric: "The universe is revealing your unique energetic patterns through each experience.",
-      actionable: wisdomMode ?
-        "Continue the sacred work of self-observation - every cycle teaches you something new about your inner nature." :
-        "Keep detailed notes about your mood, environment, and circumstances to identify helpful patterns."
-    }];
+    
+    return patterns;
   };
   
   return (
@@ -821,44 +898,40 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         {/* Controls - ALWAYS VISIBLE (so users can see different averages) */}
         <div className="benefit-tracker-controls">
           <div className="metric-selector">
-            {/* ROW 1: Energy, Focus, Confidence */}
-            <div className="metric-pill-container-row1">
+            {/* SINGLE ROW: All 6 benefit items in one container */}
+            <div className="metric-pill-container">
               <button 
-                className={`metric-btn ${selectedMetric === 'energy' ? 'active' : ''}`}
+                className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('energy')}
               >
                 Energy
               </button>
               <button 
-                className={`metric-btn ${selectedMetric === 'focus' ? 'active' : ''}`}
+                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('focus')}
               >
                 Focus
               </button>
               <button 
-                className={`metric-btn ${selectedMetric === 'confidence' ? 'active' : ''}`}
+                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('confidence')}
               >
                 Confidence
               </button>
-            </div>
-            
-            {/* ROW 2: Aura, Sleep Quality, Workout */}
-            <div className="metric-pill-container-row2">
               <button 
-                className={`metric-btn ${selectedMetric === 'aura' ? 'active' : ''}`}
+                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('aura')}
               >
                 Aura
               </button>
               <button 
-                className={`metric-btn ${selectedMetric === 'sleep' ? 'active' : ''}`}
+                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('sleep')}
               >
                 Sleep Quality
               </button>
               <button 
-                className={`metric-btn ${selectedMetric === 'workout' ? 'active' : ''}`}
+                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
                 onClick={() => setSelectedMetric('workout')}
               >
                 Workout
@@ -866,7 +939,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          {/* ROW 3: Time range selector - ALWAYS VISIBLE */}
+          {/* Time range selector - UNCHANGED */}
           <div className="time-range-selector-container">
             <div className="time-range-selector">
               <button 
@@ -897,7 +970,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             {/* Average Display */}
             <div className="free-average-display">
               <div className="current-metric-average">
-                <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric}</div>
+                <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
                 <div className="current-metric-value">{calculateAverage()}/10</div>
               </div>
             </div>
@@ -915,26 +988,25 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Upgrade CTA */}
+            {/* PREMIUM UPGRADE CTA */}
             <div className="benefit-upgrade-cta">
               <div className="upgrade-helmet-section">
                 <img 
                   src={helmetImage} 
-                  alt="Premium" 
+                  alt="Premium Benefits" 
                   className="upgrade-helmet-icon"
                   onError={(e) => {
                     e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'block';
+                    e.target.nextSibling.style.display = 'block';
                   }}
                 />
-                <FaLock 
-                  className="upgrade-helmet-fallback" 
-                  style={{ display: 'none' }}
-                />
+                <div className="upgrade-helmet-fallback" style={{display: 'none'}}>⚡</div>
               </div>
+              
               <div className="upgrade-text-section">
-                <h4>Unlock Full Benefit Tracking</h4>
-                <p>See your progress chart, detailed comparisons, all 6 benefit insights, and pattern analysis</p>
+                <h4>Unlock Full Benefit Analysis</h4>
+                <p>Get detailed charts, advanced insights, pattern analysis, and personalized recommendations to optimize your journey.</p>
+                
                 <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
                   <FaStar />
                   Upgrade to Premium
@@ -944,19 +1016,18 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           </div>
         )}
         
-        {/* PREMIUM CONTENT: Full Chart and Analysis */}
+        {/* PREMIUM USER CONTENT: Full Analysis */}
         {isPremium && (
           <>
-            {/* Chart with Sidebar Layout (Desktop) / Stacked (Mobile) */}
-            <div className="chart-and-insight-container">
+            {/* Chart and Current Insight Container - REF MARKER for scroll detection */}
+            <div className="chart-and-insight-container" ref={insightsStartRef}>
               <div className="chart-container">
                 <Line data={generateChartData()} options={chartOptions} height={300} />
               </div>
               
-              {/* Current Insight Sidebar - REF MARKER for scroll detection */}
-              <div className="current-insight-sidebar" ref={insightsStartRef}>
+              <div className="current-insight-sidebar">
                 <div className="current-metric-average">
-                  <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric}</div>
+                  <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
                   <div className="current-metric-value">{calculateAverage()}/10</div>
                 </div>
                 
@@ -972,9 +1043,23 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Detailed Analysis Section */}
+            {/* UPDATED: Benefit Insights Section - Grid header with right-indented phase indicator */}
             <div className="detailed-analysis-section">
-              <h4>Detailed Analysis</h4>
+              <div className="detailed-analysis-header">
+                <div className="detailed-analysis-header-spacer"></div>
+                <h4>Benefit Insights</h4>
+                <div className="detailed-analysis-header-actions">
+                  <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
+                    <div className="benefit-phase-content">
+                      {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
+                      <div className="benefit-phase-text">
+                        <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
+                        <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               <div className="streak-comparison">
                 <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
@@ -1004,11 +1089,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   {generateAllInsights().map(insight => (
                     <div 
                       key={insight.id} 
-                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''}`}
+                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''} ${insight.isPhaseSpecific ? 'phase-specific' : ''} ${insight.isChallenge ? 'challenge-warning' : ''}`}
                     >
                       <div className="insight-card-header">
                         <FaRegLightbulb className="insight-icon" />
-                        <span className="insight-metric">{insight.metric === 'sleep' ? 'Sleep Quality' : insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
+                        <span className="insight-metric">{insight.metric === 'sleep' ? 'Sleep Quality' : insight.metric === 'challenge' ? 'Current Phase' : insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
                       </div>
                       <div className="insight-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
                     </div>
@@ -1017,14 +1102,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Pattern Analysis Section - REF MARKER for scroll detection */}
+            {/* Journey Guidance Section - NO ICON */}
             <div className="pattern-analysis-section" ref={patternSectionRef}>
-              <h3>Pattern Insights</h3>
+              <div className="pattern-analysis-header">
+                <h3>Journey Guidance</h3>
+              </div>
               
               <div className="pattern-insights">
                 {generatePatternInsights().length > 0 ? (
                   generatePatternInsights().map(insight => (
-                    <div key={insight.id} className="pattern-insight-item">
+                    <div key={insight.id} className={`pattern-insight-item ${insight.isTimeline ? 'timeline' : ''} ${insight.isWarning ? 'warning' : ''}`}>
                       <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
                       <div className="pattern-actionable">{insight.actionable}</div>
                     </div>
@@ -1066,48 +1153,39 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   selectedBadge.name === '14-Day Monk' ? 
                     'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
                   selectedBadge.name === '30-Day Master' ? 
-                    'A full month of retention! Your willpower is exceptional, and the benefits are becoming more pronounced.' :
+                    'A full month of commitment! You\'ve achieved true mastery over impulse and developed lasting self-control.' :
                   selectedBadge.name === '90-Day King' ? 
-                    'The ultimate achievement! 90 days of complete discipline. You\'ve mastered your impulses and transformed your life.' :
-                    'Congratulations on earning this achievement badge!'
+                    'Incredible achievement! 90 days represents complete transformation. You\'ve reached the pinnacle of self-mastery.' :
+                    'Congratulations on earning this achievement!'
                 }
               </p>
             </div>
             
             <div className="badge-benefits">
-              <h4>Unlock Benefits:</h4>
+              <h4>Benefits Unlocked:</h4>
               <ul>
                 <li>
                   <FaCheckCircle className="check-icon" />
-                  <span>New affirmations in the Urge Toolkit</span>
+                  <span>Increased mental clarity</span>
                 </li>
-                {selectedBadge.name !== '7-Day Warrior' && (
-                  <li>
-                    <FaCheckCircle className="check-icon" />
-                    <span>Exclusive challenges in the Community tab</span>
-                  </li>
-                )}
-                {(selectedBadge.name === '30-Day Master' || selectedBadge.name === '90-Day King') && (
-                  <li>
-                    <FaCheckCircle className="check-icon" />
-                    <span>Special Discord role and recognition</span>
-                  </li>
-                )}
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Enhanced self-discipline</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Greater emotional stability</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Improved energy levels</span>
+                </li>
               </ul>
             </div>
             
             <div className="modal-actions">
-              {isPremium ? (
-                <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
-                  Share Achievement
-                </button>
-              ) : (
-                <button className="btn btn-primary">
-                  Upgrade to Share
-                </button>
-              )}
-              <button className="btn btn-outline" onClick={() => setShowBadgeModal(false)}>
-                Close
+              <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
+                Continue Journey
               </button>
             </div>
           </div>
