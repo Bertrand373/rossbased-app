@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Emotional Timeline pattern + Redesigned Benefit Insights Header
+// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';

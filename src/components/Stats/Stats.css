@@ -761,10 +761,10 @@
 }
 
 .comparison-value {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 700;
   line-height: 1;
-  color: var(--primary);
+  color: var(--text);
   margin-bottom: var(--spacing-sm);
 }
 
