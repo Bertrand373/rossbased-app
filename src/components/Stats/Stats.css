@@ -611,20 +611,23 @@
   flex-direction: column;
   gap: var(--spacing-lg);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative; /* ADDED: For absolute positioning of phase indicator on desktop */
 }
 
 /* UPDATED: Header layout - simplified to match pattern-analysis-header */
 .detailed-analysis-header {
   display: flex;
+  flex-direction: column; /* CHANGED: Stack vertically */
   align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   margin-bottom: 0;
 }
 
 /* Title section - simplified */
 .detailed-analysis-title {
   margin: 0;
+  width: 100%; /* ADDED: Full width for true centering */
+  text-align: center; /* ADDED: Center the text */
 }
 
 .detailed-analysis-title h4 {
@@ -1301,6 +1304,26 @@
     min-height: 180px;
     justify-content: center; /* ENSURE: Centered on desktop */
   }
+  
+  /* DESKTOP: Benefit Insights header with right-aligned phase indicator */
+  .detailed-analysis-header {
+    flex-direction: row; /* DESKTOP: Side by side layout */
+    position: relative; /* For absolute positioning context */
+    padding-bottom: var(--spacing-lg); /* Add space for absolutely positioned indicator */
+  }
+  
+  .detailed-analysis-title {
+    flex: 1;
+    text-align: center;
+  }
+  
+  /* DESKTOP: Position phase indicator absolutely at the right */
+  .benefit-phase-indicator {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 }
 
 /* MOBILE RESPONSIVE: Stack Layout and Optimizations - FIXED HEADER ALIGNMENT */
@@ -1492,10 +1515,13 @@
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-lg); /* INCREASED: Match the gap used in desktop for phase indicator */
+    position: static; /* MOBILE: Reset position */
+    padding-bottom: 0; /* MOBILE: Remove extra padding */
   }
   
-  .detailed-analysis-title h4 {
-    font-size: 1.125rem; /* Mobile font size */
+  .detailed-analysis-title {
+    text-align: center; /* MOBILE: Ensure centered */
+    flex: none; /* MOBILE: Reset flex */
   }
   
   /* Mobile: Compact phase indicator - SMALLER and centered */
@@ -1507,6 +1533,9 @@
     text-align: center;
     position: relative;
     align-self: center; /* CENTERED: Override desktop right alignment */
+    transform: none; /* MOBILE: Reset transform */
+    top: auto; /* MOBILE: Reset position */
+    right: auto; /* MOBILE: Reset position */
   }
   
   .benefit-phase-content {
