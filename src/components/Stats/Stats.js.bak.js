@@ -1043,19 +1043,18 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* UPDATED: Benefit Insights Section - Grid header with right-indented phase indicator */}
+            {/* UPDATED: Benefit Insights Section - Phase indicator positioned underneath header on the right */}
             <div className="detailed-analysis-section">
               <div className="detailed-analysis-header">
-                <div className="detailed-analysis-header-spacer"></div>
-                <h4>Benefit Insights</h4>
-                <div className="detailed-analysis-header-actions">
-                  <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
-                    <div className="benefit-phase-content">
-                      {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
-                      <div className="benefit-phase-text">
-                        <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
-                        <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
-                      </div>
+                <div className="detailed-analysis-title">
+                  <h4>Benefit Insights</h4>
+                </div>
+                <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
+                  <div className="benefit-phase-content">
+                    {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
+                    <div className="benefit-phase-text">
+                      <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
+                      <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
                     </div>
                   </div>
                 </div>
