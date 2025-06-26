@@ -777,7 +777,7 @@
 
 /* Personalized Analysis */
 .personalized-analysis h5 {
-  margin-bottom: var(--spacing-md); /* REDUCED: Less space after header */
+  margin-bottom: var(--spacing-lg); /* CHANGED: Match the spacing of streak comparison header */
   font-size: 1rem;
   color: var(--text);
   text-align: center; /* CHANGED: Centered the header */
