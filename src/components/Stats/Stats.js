@@ -284,12 +284,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     if (filteredData.length === 0) {
       return {
-        confidence: { short: '5.0', medium: '5.0', long: '5.0' },
-        energy: { short: '5.0', medium: '5.0', long: '5.0' },
-        focus: { short: '5.0', medium: '5.0', long: '5.0' },
-        aura: { short: '5.0', medium: '5.0', long: '5.0' },
-        sleep: { short: '5.0', medium: '5.0', long: '5.0' },
-        workout: { short: '5.0', medium: '5.0', long: '5.0' }
+        confidence: { short: '5', medium: '5', long: '5' },
+        energy: { short: '5', medium: '5', long: '5' },
+        focus: { short: '5', medium: '5', long: '5' },
+        aura: { short: '5', medium: '5', long: '5' },
+        sleep: { short: '5', medium: '5', long: '5' },
+        workout: { short: '5', medium: '5', long: '5' }
       };
     }
     
@@ -333,10 +333,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     Object.keys(progressionMultipliers).forEach(metric => {
       const multipliers = progressionMultipliers[metric];
+      const shortValue = Math.max(1, Math.min(10, baseValue + multipliers.short));
+      const mediumValue = baseValue;
+      const longValue = Math.max(1, Math.min(10, baseValue + multipliers.long));
+      
       result[metric] = {
-        short: Math.max(1, Math.min(10, baseValue + multipliers.short)).toFixed(1),
-        medium: baseValue.toFixed(1),
-        long: Math.max(1, Math.min(10, baseValue + multipliers.long)).toFixed(1)
+        short: shortValue % 1 === 0 ? shortValue.toFixed(0) : shortValue.toFixed(1),
+        medium: mediumValue % 1 === 0 ? mediumValue.toFixed(0) : mediumValue.toFixed(1),
+        long: longValue % 1 === 0 ? longValue.toFixed(0) : longValue.toFixed(1)
       };
     });
     
@@ -606,59 +610,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       return 'mastery';
     };
     
-    const currentPhase = getPhase(currentStreak);
-    
-    // Generate insights for ALL 6 metrics based on timeline and phase
-    allMetrics.forEach((metric, index) => {
-      const avgValue = parseFloat(calculateAverage());
-      const isSelectedMetric = metric === selectedMetric;
-      
-      // Get metric-specific benefits from the guide
-      const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
-      const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
-      
-      insights.push({
-        id: index + 1,
-        practical: metricBenefits.practical,
-        esoteric: metricBenefits.esoteric,
-        actionable: isSelectedMetric ? challengeGuidance.actionable : metricBenefits.actionable,
-        metric: metric,
-        phase: currentPhase,
-        isPhaseSpecific: true
-      });
-    });
-    
-    // Add phase-specific challenge insight if user needs guidance
-    if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
-      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
-      insights.push({
-        id: insights.length + 1,
-        practical: challengeInsight.practical,
-        esoteric: challengeInsight.esoteric,
-        actionable: challengeInsight.actionable,
-        metric: 'challenge',
-        phase: currentPhase,
-        isChallenge: true
-      });
-    }
-    
-    return insights;
-  };
-
-  // UPDATED: Generate pattern insights with Emotional Timeline phases
-  const generatePatternInsights = () => {
-    const filteredData = getFilteredBenefitData();
-    const currentStreak = userData.currentStreak || 0;
-    const patterns = [];
-    
-    // Get current phase for context
-    const getPhase = (streak) => {
-      if (streak <= 14) return 'initial';
-      if (streak <= 45) return 'purging'; 
-      if (streak <= 90) return 'expansion';
-      if (streak <= 180) return 'integration';
-      return 'mastery';
-    };
     
     const currentPhase = getPhase(currentStreak);
     
@@ -1195,3 +1146,55 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 };
 
 export default Stats;
+    
+    // Generate insights for ALL 6 metrics based on timeline and phase
+    allMetrics.forEach((metric, index) => {
+      const avgValue = parseFloat(calculateAverage());
+      const isSelectedMetric = metric === selectedMetric;
+      
+      // Get metric-specific benefits from the guide
+      const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
+      const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
+      
+      insights.push({
+        id: index + 1,
+        practical: metricBenefits.practical,
+        esoteric: metricBenefits.esoteric,
+        actionable: isSelectedMetric ? challengeGuidance.actionable : metricBenefits.actionable,
+        metric: metric,
+        phase: currentPhase,
+        isPhaseSpecific: true
+      });
+    });
+    
+    // Add phase-specific challenge insight if user needs guidance
+    if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
+      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
+      insights.push({
+        id: insights.length + 1,
+        practical: challengeInsight.practical,
+        esoteric: challengeInsight.esoteric,
+        actionable: challengeInsight.actionable,
+        metric: 'challenge',
+        phase: currentPhase,
+        isChallenge: true
+      });
+    }
+    
+    return insights;
+  };
+
+  // UPDATED: Generate pattern insights with Emotional Timeline phases
+  const generatePatternInsights = () => {
+    const filteredData = getFilteredBenefitData();
+    const currentStreak = userData.currentStreak || 0;
+    const patterns = [];
+    
+    // Get current phase for context
+    const getPhase = (streak) => {
+      if (streak <= 14) return 'initial';
+      if (streak <= 45) return 'purging'; 
+      if (streak <= 90) return 'expansion';
+      if (streak <= 180) return 'integration';
+      return 'mastery';
+    };
