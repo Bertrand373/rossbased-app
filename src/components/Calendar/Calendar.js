@@ -717,16 +717,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                           <span className="benefit-value">{dayBenefits.energy || 0}/10</span>
                         </div>
                         <div className="benefit-meter-enhanced">
-                          <div className="benefit-level-enhanced" style={{width: `${(dayBenefits.energy || 0) * 10}%`}}></div>
-                        </div>
-                      </div>
-                      
-                      <div className="benefit-slider-item">
-                        <div className="benefit-slider-header">
-                          <span className="benefit-label">Focus</span>
-                          <span className="benefit-value">{dayBenefits.focus || 0}/10</span>
-                        </div>
-                        <div className="benefit-meter-enhanced">
                           <div className="benefit-level-enhanced" style={{width: `${(dayBenefits.focus || 0) * 10}%`}}></div>
                         </div>
                       </div>
@@ -771,10 +761,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                         </div>
                       </div>
                     </div>
-                  );
-                }
-                return null;
-              })()}
+                  </div>
+                );
+              }
+              return null;
+            })()}
 
             {(() => {
               const dayStr = format(selectedDate, 'yyyy-MM-dd');
@@ -886,4 +877,13 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Calendar;
+export default Calendar;<div className="benefit-level-enhanced" style={{width: `${(dayBenefits.energy || 0) * 10}%`}}></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Focus</span>
+                          <span className="benefit-value">{dayBenefits.focus || 0}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
