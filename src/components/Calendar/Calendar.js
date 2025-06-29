@@ -366,4 +366,524 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             <div className="day-status-indicator">
               {(dayStatus.type === 'current-streak' || dayStatus.type === 'former-streak') && 
                 <FaCheckCircle className="success-icon" />}
-              {dayStatus.type === 'relapse' && <FaTimesCircle className="relapse-
+              {dayStatus.type === 'relapse' && <FaTimesCircle className="relapse-icon" />}
+              {dayStatus.type === 'wet-dream' && <FaMoon className="wet-dream-icon" />}
+            </div>
+          )}
+          
+          {dayTracking.hasBenefits && (
+            <div className="day-tracking-indicator">
+              <FaInfoCircle className="tracking-icon" />
+            </div>
+          )}
+          
+          {dayTracking.hasJournal && (
+            <div className="day-tracking-indicator">
+              <FaEdit className="tracking-icon" />
+            </div>
+          )}
+          
+          {/* REMOVED: Badge indicator - trophy icons no longer displayed */}
+          
+          {dayStatus && dayStatus.trigger && (
+            <div className="day-trigger-indicator">
+              {renderTriggerIcon(dayStatus.trigger)}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Render month view calendar
+  const renderMonthView = () => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const startDate = startOfWeek(monthStart);
+    const endDate = endOfWeek(monthEnd);
+
+    const rows = [];
+    let days = [];
+    let day = startDate;
+    let formattedDate = '';
+
+    while (day <= endDate) {
+      for (let i = 0; i < 7; i++) {
+        formattedDate = format(day, 'd');
+        const cloneDay = day;
+        days.push(renderDayCell(cloneDay, `${formattedDate}-${i}`));
+        day = addDays(day, 1);
+      }
+      rows.push(
+        <div className="calendar-row" key={day}>
+          {days}
+        </div>
+      );
+      days = [];
+    }
+
+    return (
+      <div className="calendar-display">
+        <div className="calendar-grid">
+          <div className="calendar-row header-row">
+            <div className="day-header">Sun</div>
+            <div className="day-header">Mon</div>
+            <div className="day-header">Tue</div>
+            <div className="day-header">Wed</div>
+            <div className="day-header">Thu</div>
+            <div className="day-header">Fri</div>
+            <div className="day-header">Sat</div>
+          </div>
+          {rows}
+        </div>
+      </div>
+    );
+  };
+
+  // Render week view calendar
+  const renderWeekView = () => {
+    const { weekStart, weekEnd } = getWeekRange(currentDate);
+    const days = [];
+    let day = weekStart;
+
+    while (day <= weekEnd) {
+      const dayStatus = getDayStatus(day);
+      const dayTracking = getDayTracking(day);
+      const isToday = isSameDay(day, new Date());
+      const dayBenefits = getDayBenefits(day);
+
+      days.push(
+        <div key={format(day, 'yyyy-MM-dd')} className={`week-day-cell ${dayStatus?.type || ''}`} onClick={() => showDayDetails(day)}>
+          <div className="week-day-header">
+            <div className="week-day-name">{format(day, 'EEE')}</div>
+            <div className={`week-day-number ${isToday ? 'today' : ''}`}>
+              {format(day, 'd')}
+            </div>
+          </div>
+          
+          <div className="week-day-status">
+            {dayStatus && (
+              <div className={`week-status-badge ${dayStatus.type}`}>
+                {dayStatus.type === 'current-streak' && <FaCheckCircle />}
+                {dayStatus.type === 'former-streak' && <FaCheckCircle />}
+                {dayStatus.type === 'relapse' && <FaTimesCircle />}
+                {dayStatus.type === 'wet-dream' && <FaMoon />}
+                <span>{dayStatus.type.replace('-', ' ')}</span>
+              </div>
+            )}
+          </div>
+
+          {dayBenefits && (
+            <div className="week-benefits">
+              <div className="week-benefit-item">
+                <span className="benefit-mini-label">Enrg</span>
+                <div className="benefit-mini-slider">
+                  <div className="benefit-mini-fill" style={{width: `${(dayBenefits.energy || 0) * 10}%`}}></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.energy || 0}</span>
+              </div>
+              <div className="week-benefit-item">
+                <span className="benefit-mini-label">Focus</span>
+                <div className="benefit-mini-slider">
+                  <div className="benefit-mini-fill" style={{width: `${(dayBenefits.focus || 0) * 10}%`}}></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.focus || 0}</span>
+              </div>
+              <div className="week-benefit-item">
+                <span className="benefit-mini-label">Conf</span>
+                <div className="benefit-mini-slider">
+                  <div className="benefit-mini-fill" style={{width: `${(dayBenefits.confidence || 0) * 10}%`}}></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.confidence || 0}</span>
+              </div>
+            </div>
+          )}
+
+          <div className="week-tracking-indicators">
+            {dayTracking.hasJournal && <FaEdit className="week-journal-icon" />}
+            {dayStatus && dayStatus.trigger && renderTriggerIcon(dayStatus.trigger)}
+          </div>
+        </div>
+      );
+      
+      day = addDays(day, 1);
+    }
+
+    return (
+      <div className="calendar-display">
+        <div className="week-view-grid">
+          {days}
+        </div>
+      </div>
+    );
+  };
+
+  // Get period title based on view mode
+  const getPeriodTitle = () => {
+    if (viewMode === 'month') {
+      return format(currentDate, 'MMMM yyyy');
+    } else {
+      const { weekStart, weekEnd } = getWeekRange(currentDate);
+      if (isSameMonth(weekStart, weekEnd)) {
+        return `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'd, yyyy')}`;
+      } else {
+        return `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d, yyyy')}`;
+      }
+    }
+  };
+
+  // Calculate journey day for streak days
+  const getJourneyDay = (day) => {
+    if (!isDayPartOfJourney(day)) return null;
+    
+    const dayStatus = getDayStatus(day);
+    
+    if (dayStatus.type === 'current-streak') {
+      // Current streak: days from start date
+      const streakStart = new Date(userData.startDate);
+      streakStart.setHours(0, 0, 0, 0);
+      return differenceInDays(day, streakStart) + 1;
+    } else if (dayStatus.type === 'former-streak') {
+      // Former streak: find which streak this day belongs to
+      const dayStreak = userData.streakHistory?.find(streak => {
+        if (!streak.start || !streak.end) return false;
+        const streakStart = new Date(streak.start);
+        const streakEnd = new Date(streak.end);
+        streakStart.setHours(0, 0, 0, 0);
+        streakEnd.setHours(0, 0, 0, 0);
+        return day >= streakStart && day < streakEnd;
+      });
+      
+      if (dayStreak) {
+        const streakStart = new Date(dayStreak.start);
+        streakStart.setHours(0, 0, 0, 0);
+        return differenceInDays(day, streakStart) + 1;
+      }
+    }
+    
+    return null;
+  };
+
+  return (
+    <div className="calendar-container">
+      {/* Header exactly like Tracker and Calendar */}
+      <div className="calendar-header">
+        <div className="calendar-header-spacer"></div>
+        <h2>Your Calendar</h2>
+        <div className="calendar-header-actions">
+          {/* REMOVED: Reset calendar button - functionality moved to Stats */}
+        </div>
+      </div>
+
+      {/* Main calendar section */}
+      <div className="calendar-main-section">
+        {/* UPDATED: Calendar controls - moved toggle above navigation */}
+        <div className="calendar-controls">
+          {/* MOVED: View mode toggle now comes first */}
+          <div className="view-mode-toggle">
+            <button 
+              className={`view-toggle-btn ${viewMode === 'month' ? 'active' : ''}`}
+              onClick={() => setViewMode('month')}
+            >
+              Month
+            </button>
+            <button 
+              className={`view-toggle-btn ${viewMode === 'week' ? 'active' : ''}`}
+              onClick={() => setViewMode('week')}
+            >
+              Week
+            </button>
+          </div>
+
+          {/* Period navigation now comes second */}
+          <div className="period-navigation">
+            <button className="period-nav-btn" onClick={prevPeriod}>
+              ‹
+            </button>
+            <h3>{getPeriodTitle()}</h3>
+            <button className="period-nav-btn" onClick={nextPeriod}>
+              ›
+            </button>
+          </div>
+        </div>
+
+        {/* UPDATED: Calendar legend with BLUE former streak indicator */}
+        <div className="calendar-legend">
+          <div className="legend-item">
+            <div className="legend-indicator current-streak"></div>
+            <span>Current Streak</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-indicator former-streak"></div>
+            <span>Former Streak</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-indicator relapse"></div>
+            <span>Relapse</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-indicator wet-dream"></div>
+            <span>Wet Dream</span>
+          </div>
+          <div className="legend-item">
+            <FaInfoCircle className="legend-info-icon" />
+            <span>Benefits Tracked</span>
+          </div>
+          <div className="legend-item">
+            <FaEdit className="legend-info-icon" />
+            <span>Journal Entry</span>
+          </div>
+        </div>
+
+        <div className="calendar-instructions">
+          Click on any day to view details or edit your journey
+        </div>
+
+        {/* Calendar display */}
+        {viewMode === 'month' ? renderMonthView() : renderWeekView()}
+      </div>
+
+      {/* Day Info Modal */}
+      {dayInfoModal && selectedDate && (
+        <div className="modal-overlay">
+          <div className="modal-content day-info-modal">
+            <h3>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
+            
+            {/* Show journey day counter if this day is part of streak */}
+            {isDayPartOfJourney(selectedDate) && (
+              <div className="day-streak-info">
+                <div className="streak-day-number">{getJourneyDay(selectedDate)}</div>
+                <div className="streak-context">
+                  Day {getJourneyDay(selectedDate)} of your journey
+                </div>
+              </div>
+            )}
+            
+            <div className="day-status-info">
+              {(() => {
+                const dayStatus = getDayStatus(selectedDate);
+                if (dayStatus) {
+                  return (
+                    <div className={`status-badge ${dayStatus.type}`}>
+                      {dayStatus.type === 'current-streak' && <><FaCheckCircle /> Current Streak Day</>}
+                      {dayStatus.type === 'former-streak' && <><FaCheckCircle /> Former Streak Day</>}
+                      {dayStatus.type === 'relapse' && <><FaTimesCircle /> Relapse</>}
+                      {dayStatus.type === 'wet-dream' && <><FaMoon /> Wet Dream</>}
+                    </div>
+                  );
+                }
+                return <span>No streak data for this day</span>;
+              })()}
+              
+              {(() => {
+                const dayStatus = getDayStatus(selectedDate);
+                if (dayStatus && dayStatus.trigger) {
+                  return (
+                    <div className="trigger-info">
+                      <div className="trigger-display">
+                        {renderTriggerIcon(dayStatus.trigger)}
+                        <span>Trigger: {triggerOptions.find(t => t.id === dayStatus.trigger)?.label}</span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+
+            {(() => {
+              const dayTracking = getDayTracking(selectedDate);
+              if (dayTracking.hasBenefits) {
+                return (
+                  <div className="day-tracking-info">
+                    <h4>Benefits Tracked</h4>
+                    <p>✓ You tracked benefits for this day</p>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
+            {(() => {
+              const dayBenefits = getDayBenefits(selectedDate);
+              if (dayBenefits) {
+                return (
+                  <div className="day-benefits">
+                    <h4>Benefit Levels</h4>
+                    <div className="benefits-details-enhanced">
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Energy</span>
+                          <span className="benefit-value">{dayBenefits.energy || 0}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div className="benefit-level-enhanced" style={{width: `${(dayBenefits.energy || 0) * 10}%`}}></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Focus</span>
+                          <span className="benefit-value">{dayBenefits.focus || 0}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div className="benefit-level-enhanced" style={{width: `${(dayBenefits.focus || 0) * 10}%`}}></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Confidence</span>
+                          <span className="benefit-value">{dayBenefits.confidence || 0}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div className="benefit-level-enhanced" style={{width: `${(dayBenefits.confidence || 0) * 10}%`}}></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Aura</span>
+                          <span className="benefit-value">{dayBenefits.aura || 0}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div className="benefit-level-enhanced" style={{width: `${(dayBenefits.aura || 0) * 10}%`}}></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Sleep Quality</span>
+                          <span className="benefit-value">{dayBenefits.sleep || dayBenefits.attraction || 0}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div className="benefit-level-enhanced" style={{width: `${(dayBenefits.sleep || dayBenefits.attraction || 0) * 10}%`}}></div>
+                        </div>
+                      </div>
+                      
+                      <div className="benefit-slider-item">
+                        <div className="benefit-slider-header">
+                          <span className="benefit-label">Workout</span>
+                          <span className="benefit-value">{dayBenefits.workout || 0}/10</span>
+                        </div>
+                        <div className="benefit-meter-enhanced">
+                          <div className="benefit-level-enhanced" style={{width: `${(dayBenefits.workout || 0) * 10}%`}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
+            {(() => {
+              const dayStr = format(selectedDate, 'yyyy-MM-dd');
+              const journalEntry = userData.notes && userData.notes[dayStr];
+              if (journalEntry) {
+                return (
+                  <div className="day-journal">
+                    <h4>Journal Entry</h4>
+                    <div className="journal-entry">{journalEntry}</div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
+            <div className="modal-actions">
+              <button className="btn btn-primary edit-day-btn" onClick={showEditFromInfo}>
+                <FaEdit />
+                Edit Day
+              </button>
+              <button className="btn btn-outline" onClick={() => setDayInfoModal(false)}>
+                <FaTimes />
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Day Modal */}
+      {editDayModal && editingDate && (
+        <div className="modal-overlay">
+          <div className="modal-content edit-day-modal">
+            <div className="modal-header-simple">
+              <h3>Edit {format(editingDate, 'MMMM d, yyyy')}</h3>
+            </div>
+            <p>Choose the status for this day:</p>
+
+            {!showTriggerSelection ? (
+              <div className="edit-day-options">
+                <button 
+                  className="edit-option-btn current-streak-btn"
+                  onClick={() => handleStatusClick('current-streak')}
+                >
+                  <FaCheckCircle />
+                  <span>Mark as Streak Day</span>
+                </button>
+                
+                <button 
+                  className="edit-option-btn wet-dream-btn"
+                  onClick={() => handleStatusClick('wet-dream')}
+                >
+                  <FaMoon />
+                  <span>Mark as Wet Dream</span>
+                </button>
+                
+                <button 
+                  className="edit-option-btn relapse-btn"
+                  onClick={() => handleStatusClick('relapse')}
+                >
+                  <FaTimesCircle />
+                  <span>Mark as Relapse</span>
+                </button>
+                
+                {/* REMOVED: Clear Status button */}
+              </div>
+            ) : (
+              <div className="trigger-selection">
+                <h4>What triggered this relapse?</h4>
+                <div className="trigger-options">
+                  {triggerOptions.map(trigger => (
+                    <button
+                      key={trigger.id}
+                      className={`trigger-option-pill ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                      onClick={() => setSelectedTrigger(trigger.id)}
+                    >
+                      <trigger.icon className="trigger-option-icon" />
+                      <span>{trigger.label}</span>
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="trigger-actions">
+                  <button 
+                    className="btn btn-primary"
+                    onClick={handleTriggerSelection}
+                    disabled={!selectedTrigger}
+                  >
+                    Confirm Relapse
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="modal-actions">
+              <button className="back-to-info-btn" onClick={backToDayInfo}>
+                <FaArrowLeft />
+                Back to Info
+              </button>
+              <button className="btn-outline" onClick={() => setEditDayModal(false)}>
+                <FaTimes />
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Calendar;
