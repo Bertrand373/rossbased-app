@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
+// components/Stats/Stats.js - UPDATED: Smart Reset Dialog with three levels of reset
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -17,7 +17,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [timeRange, setTimeRange] = useState('week');
   const [showBadgeModal, setShowBadgeModal] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState(null);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  
+  // NEW: Smart reset states
+  const [resetOptions, setResetOptions] = useState({
+    currentStreakOnly: false,
+    allProgress: false,
+    everything: false
+  });
   
   // NEW: Wisdom toggle states
   const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
@@ -89,41 +96,128 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowBadgeModal(true);
   };
 
-  // Handle reset stats - AVAILABLE TO ALL USERS
-  const handleResetStats = () => {
-    setShowResetConfirm(true);
+  // NEW: Handle reset option toggle
+  const handleResetOptionToggle = (option) => {
+    const newOptions = { ...resetOptions };
+    
+    if (option === 'everything') {
+      // Everything toggles all options
+      const newValue = !resetOptions.everything;
+      newOptions.currentStreakOnly = newValue;
+      newOptions.allProgress = newValue;
+      newOptions.everything = newValue;
+    } else if (option === 'allProgress') {
+      // All progress also toggles current streak
+      const newValue = !resetOptions.allProgress;
+      newOptions.allProgress = newValue;
+      newOptions.currentStreakOnly = newValue;
+      // If turning on allProgress, turn off everything
+      if (newValue && resetOptions.everything) {
+        newOptions.everything = false;
+      }
+    } else if (option === 'currentStreakOnly') {
+      // Current streak only
+      newOptions.currentStreakOnly = !resetOptions.currentStreakOnly;
+      // If turning off current streak, also turn off higher levels
+      if (!newOptions.currentStreakOnly) {
+        newOptions.allProgress = false;
+        newOptions.everything = false;
+      }
+    }
+    
+    setResetOptions(newOptions);
   };
 
-  // Confirm reset stats - AVAILABLE TO ALL USERS
-  const confirmResetStats = () => {
-    // Reset all stats
-    const resetUserData = {
-      ...userData,
-      startDate: new Date(),
-      currentStreak: 0,
-      longestStreak: 0,
-      wetDreamCount: 0,
-      relapseCount: 0,
-      badges: [
-        { id: 1, name: '7-Day Warrior', earned: false, date: null },
-        { id: 2, name: '14-Day Monk', earned: false, date: null },
-        { id: 3, name: '30-Day Master', earned: false, date: null },
-        { id: 4, name: '90-Day King', earned: false, date: null }
-      ],
-      benefitTracking: [],
-      streakHistory: [{
-        id: 1,
-        start: new Date(),
-        end: null,
-        days: 0,
-        reason: null
-      }],
-      notes: {}
-    };
+  // NEW: Smart reset handler
+  const handleSmartReset = () => {
+    if (!resetOptions.currentStreakOnly && !resetOptions.allProgress && !resetOptions.everything) {
+      toast.error('Please select at least one reset option');
+      return;
+    }
+    
+    let resetUserData = { ...userData };
+    const today = new Date();
+    
+    if (resetOptions.everything) {
+      // NUCLEAR RESET - Everything goes
+      resetUserData = {
+        ...userData,
+        startDate: today,
+        currentStreak: 0,
+        longestStreak: 0,
+        wetDreamCount: 0,
+        relapseCount: 0,
+        badges: [
+          { id: 1, name: '7-Day Warrior', earned: false, date: null },
+          { id: 2, name: '14-Day Monk', earned: false, date: null },
+          { id: 3, name: '30-Day Master', earned: false, date: null },
+          { id: 4, name: '90-Day King', earned: false, date: null }
+        ],
+        benefitTracking: [],
+        streakHistory: [{
+          id: 1,
+          start: today,
+          end: null,
+          days: 0,
+          reason: null
+        }],
+        notes: {}
+      };
+      toast.success('All data has been completely reset');
+    } else if (resetOptions.allProgress) {
+      // RESET ALL PROGRESS - Keep only longest streak record
+      resetUserData = {
+        ...userData,
+        startDate: today,
+        currentStreak: 0,
+        // Keep longest streak as a record
+        wetDreamCount: 0,
+        relapseCount: 0,
+        badges: [
+          { id: 1, name: '7-Day Warrior', earned: false, date: null },
+          { id: 2, name: '14-Day Monk', earned: false, date: null },
+          { id: 3, name: '30-Day Master', earned: false, date: null },
+          { id: 4, name: '90-Day King', earned: false, date: null }
+        ],
+        benefitTracking: [],
+        streakHistory: [{
+          id: 1,
+          start: today,
+          end: null,
+          days: 0,
+          reason: null
+        }],
+        notes: {}
+      };
+      toast.success('Progress reset. Your longest streak record has been preserved');
+    } else if (resetOptions.currentStreakOnly) {
+      // RESET CURRENT STREAK ONLY - Keep all history and achievements
+      resetUserData = {
+        ...userData,
+        startDate: today,
+        currentStreak: 0,
+        // Preserve all other data
+        streakHistory: [
+          ...userData.streakHistory.filter(streak => streak.end), // Keep all ended streaks
+          {
+            id: userData.streakHistory.length + 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: null
+          }
+        ]
+      };
+      toast.success('Current streak reset. All history and achievements preserved');
+    }
     
     updateUserData(resetUserData);
-    setShowResetConfirm(false);
-    toast.success('All stats have been reset');
+    setShowResetModal(false);
+    setResetOptions({
+      currentStreakOnly: false,
+      allProgress: false,
+      everything: false
+    });
   };
 
   // ADDED: Premium upgrade handler
@@ -822,22 +916,118 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         <div className="stats-header-spacer"></div>
         <h2>Your Stats</h2>
         <div className="stats-header-actions">
-          <button className="reset-stats-btn" onClick={handleResetStats}>
+          <button className="reset-stats-btn" onClick={() => setShowResetModal(true)}>
             <FaRedo />
-            <span>Reset Stats</span>
+            <span>Reset Progress</span>
           </button>
         </div>
       </div>
       
-      {/* Reset Confirmation Modal - AVAILABLE TO ALL USERS */}
-      {showResetConfirm && (
+      {/* NEW: Smart Reset Modal */}
+      {showResetModal && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Reset All Stats?</h3>
-            <p>This will permanently delete all your progress data including streaks, benefits, journal entries, and badges. This action cannot be undone.</p>
+          <div className="modal-content smart-reset-modal">
+            <h3>Reset Progress</h3>
+            <p className="reset-intro">Choose what you want to reset. Each option will preserve different aspects of your journey.</p>
+            
+            <div className="reset-options">
+              <div 
+                className={`reset-option ${resetOptions.currentStreakOnly ? 'selected' : ''}`}
+                onClick={() => handleResetOptionToggle('currentStreakOnly')}
+              >
+                <div className="reset-option-checkbox">
+                  {resetOptions.currentStreakOnly && <FaCheckCircle />}
+                </div>
+                <div className="reset-option-content">
+                  <h4>Current streak only</h4>
+                  <p>Resets your current streak to 0 and starts fresh from today</p>
+                  <div className="reset-preserves">
+                    <span className="preserve-label">Preserves:</span>
+                    <ul>
+                      <li>All streak history</li>
+                      <li>Total relapse/wet dream counts</li>
+                      <li>All achievements and badges</li>
+                      <li>Benefit tracking data</li>
+                      <li>Journal entries</li>
+                      <li>Longest streak record</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div 
+                className={`reset-option ${resetOptions.allProgress ? 'selected' : ''}`}
+                onClick={() => handleResetOptionToggle('allProgress')}
+              >
+                <div className="reset-option-checkbox">
+                  {resetOptions.allProgress && <FaCheckCircle />}
+                </div>
+                <div className="reset-option-content">
+                  <h4>All progress</h4>
+                  <p>Clears all tracking data but keeps your longest streak as a record</p>
+                  <div className="reset-preserves">
+                    <span className="preserve-label">Preserves:</span>
+                    <ul>
+                      <li>Longest streak record only</li>
+                    </ul>
+                  </div>
+                  <div className="reset-deletes">
+                    <span className="delete-label">Deletes:</span>
+                    <ul>
+                      <li>Current streak</li>
+                      <li>All streak history</li>
+                      <li>Total counts</li>
+                      <li>All badges</li>
+                      <li>Benefit tracking</li>
+                      <li>Journal entries</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div 
+                className={`reset-option ${resetOptions.everything ? 'selected' : ''} nuclear`}
+                onClick={() => handleResetOptionToggle('everything')}
+              >
+                <div className="reset-option-checkbox">
+                  {resetOptions.everything && <FaCheckCircle />}
+                </div>
+                <div className="reset-option-content">
+                  <h4>Everything</h4>
+                  <p>Complete reset - starts fresh as if using the app for the first time</p>
+                  <div className="reset-deletes">
+                    <span className="delete-label">Deletes:</span>
+                    <ul>
+                      <li>All data including longest streak record</li>
+                      <li>Complete history and all achievements</li>
+                      <li>Returns to Day 0 with no records</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             <div className="form-actions">
-              <button className="btn btn-danger" onClick={confirmResetStats}>Reset Everything</button>
-              <button className="btn btn-outline" onClick={() => setShowResetConfirm(false)}>Cancel</button>
+              <button 
+                className="btn btn-danger" 
+                onClick={handleSmartReset}
+                disabled={!resetOptions.currentStreakOnly && !resetOptions.allProgress && !resetOptions.everything}
+              >
+                Confirm Reset
+              </button>
+              <button 
+                className="btn btn-outline" 
+                onClick={() => {
+                  setShowResetModal(false);
+                  setResetOptions({
+                    currentStreakOnly: false,
+                    allProgress: false,
+                    everything: false
+                  });
+                }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
