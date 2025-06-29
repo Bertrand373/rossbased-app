@@ -4,7 +4,7 @@ import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb, FaTimesCircle } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -928,84 +928,137 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         <div className="modal-overlay">
           <div className="modal-content smart-reset-modal">
             <h3>Reset Progress</h3>
-            <p className="reset-intro">Choose what you want to reset. Each option will preserve different aspects of your journey.</p>
+            <p className="reset-intro">Select one or more reset options:</p>
             
             <div className="reset-options">
               <div 
-                className={`reset-option ${resetOptions.currentStreakOnly ? 'selected' : ''}`}
+                className={`reset-option-card ${resetOptions.currentStreakOnly ? 'selected' : ''}`}
                 onClick={() => handleResetOptionToggle('currentStreakOnly')}
               >
-                <div className="reset-option-checkbox">
-                  {resetOptions.currentStreakOnly && <FaCheckCircle />}
+                <div className="reset-option-header">
+                  <div className="reset-option-checkbox">
+                    <div className="checkbox-outline">
+                      {resetOptions.currentStreakOnly && <FaCheckCircle className="checkbox-check" />}
+                    </div>
+                  </div>
+                  <div className="reset-option-title">
+                    <h4>Reset Current Streak</h4>
+                    <p className="reset-option-subtitle">Start fresh while keeping your history</p>
+                  </div>
                 </div>
-                <div className="reset-option-content">
-                  <h4>Current streak only</h4>
-                  <p>Resets your current streak to 0 and starts fresh from today</p>
-                  <div className="reset-preserves">
-                    <span className="preserve-label">Preserves:</span>
-                    <ul>
-                      <li>All streak history</li>
-                      <li>Total relapse/wet dream counts</li>
-                      <li>All achievements and badges</li>
-                      <li>Benefit tracking data</li>
-                      <li>Journal entries</li>
-                      <li>Longest streak record</li>
-                    </ul>
+                
+                <div className="reset-option-details">
+                  <div className="reset-impact-grid">
+                    <div className="reset-impact keeps">
+                      <div className="impact-label">
+                        <FaCheckCircle className="impact-icon" />
+                        <span>Keeps</span>
+                      </div>
+                      <ul className="impact-list">
+                        <li>All achievements</li>
+                        <li>Streak history</li>
+                        <li>Total counts</li>
+                        <li>Journal entries</li>
+                      </ul>
+                    </div>
+                    <div className="reset-impact loses">
+                      <div className="impact-label">
+                        <FaTimesCircle className="impact-icon" />
+                        <span>Resets</span>
+                      </div>
+                      <ul className="impact-list">
+                        <li>Current streak to 0</li>
+                        <li>Start date to today</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
               
               <div 
-                className={`reset-option ${resetOptions.allProgress ? 'selected' : ''}`}
+                className={`reset-option-card ${resetOptions.allProgress ? 'selected' : ''}`}
                 onClick={() => handleResetOptionToggle('allProgress')}
               >
-                <div className="reset-option-checkbox">
-                  {resetOptions.allProgress && <FaCheckCircle />}
-                </div>
-                <div className="reset-option-content">
-                  <h4>All progress</h4>
-                  <p>Clears all tracking data but keeps your longest streak as a record</p>
-                  <div className="reset-preserves">
-                    <span className="preserve-label">Preserves:</span>
-                    <ul>
-                      <li>Longest streak record only</li>
-                    </ul>
+                <div className="reset-option-header">
+                  <div className="reset-option-checkbox">
+                    <div className="checkbox-outline">
+                      {resetOptions.allProgress && <FaCheckCircle className="checkbox-check" />}
+                    </div>
                   </div>
-                  <div className="reset-deletes">
-                    <span className="delete-label">Deletes:</span>
-                    <ul>
-                      <li>Current streak</li>
-                      <li>All streak history</li>
-                      <li>Total counts</li>
-                      <li>All badges</li>
-                      <li>Benefit tracking</li>
-                      <li>Journal entries</li>
-                    </ul>
+                  <div className="reset-option-title">
+                    <h4>Reset All Progress</h4>
+                    <p className="reset-option-subtitle">Clear tracking but honor your best streak</p>
+                  </div>
+                </div>
+                
+                <div className="reset-option-details">
+                  <div className="reset-impact-grid">
+                    <div className="reset-impact keeps">
+                      <div className="impact-label">
+                        <FaCheckCircle className="impact-icon" />
+                        <span>Keeps</span>
+                      </div>
+                      <ul className="impact-list">
+                        <li>Longest streak record</li>
+                      </ul>
+                    </div>
+                    <div className="reset-impact loses">
+                      <div className="impact-label">
+                        <FaTimesCircle className="impact-icon" />
+                        <span>Clears</span>
+                      </div>
+                      <ul className="impact-list">
+                        <li>All badges</li>
+                        <li>Benefit tracking</li>
+                        <li>Journal entries</li>
+                        <li>Streak history</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
               
               <div 
-                className={`reset-option ${resetOptions.everything ? 'selected' : ''} nuclear`}
+                className={`reset-option-card nuclear ${resetOptions.everything ? 'selected' : ''}`}
                 onClick={() => handleResetOptionToggle('everything')}
               >
-                <div className="reset-option-checkbox">
-                  {resetOptions.everything && <FaCheckCircle />}
+                <div className="reset-option-header">
+                  <div className="reset-option-checkbox">
+                    <div className="checkbox-outline">
+                      {resetOptions.everything && <FaCheckCircle className="checkbox-check" />}
+                    </div>
+                  </div>
+                  <div className="reset-option-title">
+                    <h4>Nuclear Reset</h4>
+                    <p className="reset-option-subtitle">Complete fresh start - no traces remain</p>
+                  </div>
                 </div>
-                <div className="reset-option-content">
-                  <h4>Everything</h4>
-                  <p>Complete reset - starts fresh as if using the app for the first time</p>
-                  <div className="reset-deletes">
-                    <span className="delete-label">Deletes:</span>
-                    <ul>
-                      <li>All data including longest streak record</li>
-                      <li>Complete history and all achievements</li>
-                      <li>Returns to Day 0 with no records</li>
-                    </ul>
+                
+                <div className="reset-option-details">
+                  <div className="reset-warning">
+                    <FaExclamationTriangle className="warning-icon" />
+                    <span>This cannot be undone! All data will be permanently deleted.</span>
                   </div>
                 </div>
               </div>
             </div>
+            
+            {/* Summary of what will happen */}
+            {(resetOptions.currentStreakOnly || resetOptions.allProgress || resetOptions.everything) && (
+              <div className="reset-summary">
+                <div className="summary-label">You're about to:</div>
+                <ul className="summary-list">
+                  {resetOptions.everything ? (
+                    <li className="summary-nuclear">Delete everything and start completely fresh</li>
+                  ) : (
+                    <>
+                      {resetOptions.currentStreakOnly && <li>Reset your current streak to Day 0</li>}
+                      {resetOptions.allProgress && <li>Clear all progress except longest streak record</li>}
+                    </>
+                  )}
+                </ul>
+              </div>
+            )}
             
             <div className="form-actions">
               <button 
@@ -1013,7 +1066,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 onClick={handleSmartReset}
                 disabled={!resetOptions.currentStreakOnly && !resetOptions.allProgress && !resetOptions.everything}
               >
-                Confirm Reset
+                {resetOptions.everything ? 'Delete Everything' : 'Confirm Reset'}
               </button>
               <button 
                 className="btn btn-outline" 

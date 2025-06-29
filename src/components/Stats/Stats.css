@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + REDESIGNED Benefit Insights Header */
+/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + REDESIGNED Benefit Insights Header + Smart Reset Modal */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -60,6 +60,258 @@
   cursor: pointer;
   transition: none;
 }
+
+/* ===== SMART RESET MODAL STYLES ===== */
+.smart-reset-modal {
+  max-width: 600px;
+}
+
+.reset-intro {
+  color: #999;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.reset-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.reset-option-card {
+  background: #2a2a2a;
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-option-card:hover {
+  border-color: #555;
+  background: #2f2f2f;
+}
+
+.reset-option-card.selected {
+  border-color: #ffdd00;
+  background: #2f2a20;
+}
+
+.reset-option-card.nuclear.selected {
+  border-color: #ff4444;
+  background: #3a2020;
+}
+
+.reset-option-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.reset-option-checkbox {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkbox-outline {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #666;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.reset-option-card.selected .checkbox-outline {
+  border-color: #ffdd00;
+  background: #ffdd00;
+}
+
+.reset-option-card.nuclear.selected .checkbox-outline {
+  border-color: #ff4444;
+  background: #ff4444;
+}
+
+.checkbox-check {
+  color: #1a1a1a;
+  font-size: 16px;
+}
+
+.reset-option-title h4 {
+  margin: 0 0 4px 0;
+  color: #fff;
+  font-size: 18px;
+}
+
+.reset-option-subtitle {
+  margin: 0;
+  color: #999;
+  font-size: 14px;
+}
+
+.reset-option-details {
+  margin-left: 40px;
+}
+
+.reset-impact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.reset-impact {
+  padding: 12px;
+  border-radius: 8px;
+  background: #1f1f1f;
+}
+
+.reset-impact.keeps {
+  border: 1px solid #2a4a2a;
+}
+
+.reset-impact.loses {
+  border: 1px solid #4a2a2a;
+}
+
+.impact-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.impact-label .impact-icon {
+  font-size: 14px;
+}
+
+.reset-impact.keeps .impact-label {
+  color: #22c55e;
+}
+
+.reset-impact.loses .impact-label {
+  color: #ef4444;
+}
+
+.impact-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: #999;
+}
+
+.impact-list li {
+  margin-bottom: 4px;
+}
+
+.reset-warning {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #3a2020;
+  border: 1px solid #ff4444;
+  border-radius: 8px;
+  color: #ff9999;
+  font-size: 14px;
+}
+
+.warning-icon {
+  color: #ff4444;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.reset-summary {
+  background: #2a2a2a;
+  border: 1px solid #ffdd00;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.summary-label {
+  font-weight: 600;
+  color: #ffdd00;
+  margin-bottom: 8px;
+}
+
+.summary-list {
+  margin: 0;
+  padding-left: 20px;
+  color: #ccc;
+}
+
+.summary-list li {
+  margin-bottom: 4px;
+}
+
+.summary-nuclear {
+  color: #ff6666;
+  font-weight: 600;
+}
+
+/* Mobile adjustments for reset modal */
+@media (max-width: 768px) {
+  .smart-reset-modal {
+    max-width: 95%;
+  }
+  
+  .reset-option-card {
+    padding: 16px;
+  }
+  
+  .reset-option-title h4 {
+    font-size: 16px;
+  }
+  
+  .reset-option-subtitle {
+    font-size: 13px;
+  }
+  
+  .reset-impact-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .impact-list {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reset-option-header {
+    gap: 12px;
+  }
+  
+  .checkbox-outline {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .checkbox-check {
+    font-size: 14px;
+  }
+  
+  .reset-option-details {
+    margin-left: 32px;
+  }
+  
+  .reset-warning {
+    font-size: 13px;
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .warning-icon {
+    font-size: 18px;
+  }
+}
+/* ===== END SMART RESET MODAL STYLES ===== */
 
 /* ENHANCED: Floating wisdom toggle with better visibility and animations */
 .floating-wisdom-toggle {
@@ -1627,182 +1879,3 @@
   .pattern-actionable {
     font-size: 0.8rem;
   }
-  
-  .no-patterns {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    text-align: center;
-  }
-  
-  /* Mobile: Modal actions */
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .modal-actions {
-    flex-direction: column;
-  }
-  
-  .modal-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* VERY SMALL SCREENS: Further optimizations */
-@media (max-width: 480px) {
-  /* Very small screen benefit upgrade adjustments */
-  .upgrade-helmet-icon {
-    width: 60px; /* MATCH: Very small screen scaling like Timeline */
-    height: 60px;
-  }
-
-  .upgrade-helmet-fallback {
-    font-size: 2.4rem; /* MATCH: Very small screen scaling like Timeline */
-  }
-
-  .upgrade-text-section h4 {
-    font-size: 1.125rem;
-  }
-
-  .upgrade-text-section p {
-    font-size: 0.8rem;
-  }
-
-  .benefit-upgrade-btn {
-    font-size: 0.875rem; /* MATCH: Very small screen size like Timeline */
-    padding: var(--spacing-sm) var(--spacing-md);
-    min-width: 160px; /* MATCH: Very small screen width like Timeline */
-    min-height: 44px; /* MATCH: Very small screen height like Timeline */
-  }
-  
-  .benefit-upgrade-cta {
-    padding: var(--spacing-lg) var(--spacing-md);
-  }
-
-  /* Very small screen benefit phase indicator - EVEN SMALLER */
-  .benefit-phase-indicator {
-    padding: var(--spacing-md) var(--spacing-md); /* INCREASED: Better padding for very small screens */
-    max-width: 240px; /* SMALLER: Reduced width for very small screens */
-  }
-  
-  .benefit-phase-icon {
-    font-size: 1.125rem; /* SMALLER: Even smaller icon */
-  }
-  
-  .benefit-phase-name {
-    font-size: 0.75rem; /* SMALLER: Even smaller text */
-  }
-  
-  .benefit-phase-day {
-    font-size: 0.625rem; /* SMALLER: Even smaller text */
-  }
-
-  /* Hide icons on very small screens to prevent overflow */
-  .current-insight-header .insight-icon,
-  .insight-card-header .insight-icon {
-    display: none;
-  }
-  
-  .stats-container {
-    gap: var(--spacing-md);
-  }
-  
-  .stat-card {
-    min-height: 100px;
-    height: 100px;
-    padding: var(--spacing-sm);
-  }
-  
-  .stat-card .stat-value {
-    font-size: 1.75rem;
-  }
-  
-  .stat-card .stat-label {
-    font-size: 0.8rem;
-  }
-  
-  .badge-card {
-    min-height: 100px;
-    height: 100px;
-    padding: var(--spacing-sm);
-  }
-  
-  .badge-icon {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .badge-earned-icon, .badge-locked-icon {
-    font-size: 1.125rem;
-  }
-  
-  .badge-name {
-    font-size: 0.8rem;
-  }
-  
-  .benefit-tracker-controls {
-    padding: var(--spacing-md) var(--spacing-sm);
-  }
-  
-  .chart-container {
-    padding: var(--spacing-sm);
-    height: 250px;
-  }
-  
-  .current-metric-average {
-    min-height: 80px;
-    padding: var(--spacing-md);
-  }
-  
-  .current-metric-value {
-    font-size: 1.25rem;
-  }
-  
-  .current-insight-card {
-    min-height: 90px;
-    padding: var(--spacing-md);
-    justify-content: center;
-  }
-  
-  .detailed-analysis-section {
-    padding: var(--spacing-md);
-  }
-  
-  .comparison-card {
-    min-height: 90px;
-    height: 90px;
-    padding: var(--spacing-sm);
-  }
-  
-  .comparison-value {
-    font-size: 1.25rem;
-  }
-  
-  .insight-card {
-    min-height: 90px;
-    padding: var(--spacing-sm);
-    justify-content: center;
-  }
-  
-  .insight-card-header {
-    gap: var(--spacing-xs);
-  }
-  
-  .insight-card-header .insight-icon {
-    font-size: 1rem;
-  }
-  
-  .insight-metric {
-    font-size: 0.8rem;
-  }
-  
-  .insight-text {
-    font-size: 0.75rem;
-  }
-}
