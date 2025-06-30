@@ -169,12 +169,12 @@
 /* UPDATED: Responsive Badge Grid - Auto-fit layout for 6 badges */
 .badges-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--spacing-md);
   justify-items: center;
 }
 
-/* Desktop: Ensure 3 columns max on desktop for 6 badges */
+/* Desktop: Ensure proper layout for 6 badges */
 @media (min-width: 1200px) {
   .badges-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -183,15 +183,22 @@
   }
 }
 
-/* Tablet: 3 columns */
+/* Large tablet: 3 columns */
 @media (min-width: 769px) and (max-width: 1199px) {
   .badges-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
+/* Small tablet: 2 columns */
+@media (min-width: 481px) and (max-width: 768px) {
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* Mobile: 2 columns */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .badges-grid {
     grid-template-columns: repeat(2, 1fr);
   }

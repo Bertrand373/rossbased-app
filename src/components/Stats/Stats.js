@@ -32,7 +32,45 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const insightsStartRef = useRef(null); // Current insight section start
   const patternSectionRef = useRef(null); // Pattern analysis section
   
-  // Enhanced trigger options matching Calendar
+  // ADDED: Function to ensure user has all 6 badges (for existing users)
+  const ensureAllBadges = () => {
+    if (!userData.badges) return;
+    
+    const expectedBadges = [
+      { id: 1, name: '7-Day Warrior' },
+      { id: 2, name: '14-Day Monk' },
+      { id: 3, name: '30-Day Master' },
+      { id: 4, name: '90-Day King' },
+      { id: 5, name: '180-Day Master' },
+      { id: 6, name: '365-Day Sage' }
+    ];
+    
+    const currentBadges = userData.badges || [];
+    const missingBadges = expectedBadges.filter(expected => 
+      !currentBadges.find(current => current.name === expected.name)
+    );
+    
+    if (missingBadges.length > 0) {
+      const newBadges = missingBadges.map(badge => ({
+        id: badge.id,
+        name: badge.name,
+        earned: false,
+        date: null
+      }));
+      
+      const updatedUserData = {
+        ...userData,
+        badges: [...currentBadges, ...newBadges].sort((a, b) => a.id - b.id)
+      };
+      
+      updateUserData(updatedUserData);
+    }
+  };
+
+  // ADDED: Ensure all badges exist when component mounts
+  useEffect(() => {
+    ensureAllBadges();
+  }, [userData.badges]); // Only run when badges change
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
     { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
@@ -97,20 +135,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowSmartResetDialog(true);
   };
 
-  // UPDATED: Helper function to get badge requirements
+  // UPDATED: Helper function to get badge requirements - ADDED new badges
   const getBadgeRequirement = (badgeName) => {
     switch (badgeName) {
       case '7-Day Warrior': return 7;
       case '14-Day Monk': return 14;
-      case '30-Day Gladiator': return 30;
+      case '30-Day Master': return 30;  // KEPT: Original name
       case '90-Day King': return 90;
-      case '180-Day Master': return 180;
-      case '365-Day Sage': return 365;
+      case '180-Day Master': return 180;  // ADDED: New badge
+      case '365-Day Sage': return 365;   // ADDED: New badge
       default: return 0;
     }
   };
 
-  // UPDATED: Enhanced badge data with phase-specific benefits
+  // UPDATED: Enhanced badge data with phase-specific benefits - ADDED new badges
   const getBadgeData = (badgeName) => {
     const badgeData = {
       '7-Day Warrior': {
@@ -131,8 +169,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           'Mental clarity improving'
         ]
       },
-      '30-Day Gladiator': {
-        description: "Fought through the emotional purging arena!",
+      '30-Day Master': {  // KEPT: Original name and description
+        description: "You've achieved true mastery over impulse and developed lasting self-control.",
         benefits: [
           'Emotional healing initiated',
           'Processing past trauma',
@@ -149,7 +187,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           'Natural confidence emerged'
         ]
       },
-      '180-Day Master': {
+      '180-Day Master': {  // ADDED: New badge
         description: "True mastery unlocked - serve humanity's evolution",
         benefits: [
           'Complete mastery achieved',
@@ -158,7 +196,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           'Transcended personal limitations'
         ]
       },
-      '365-Day Sage': {
+      '365-Day Sage': {  // ADDED: New badge
         description: "Spiritual integration achieved - ultimate wisdom attained",
         benefits: [
           'Stable identity transformation',
@@ -191,14 +229,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     let resetUserData = { ...userData };
     const today = new Date();
 
-    // UPDATED: 6-badge system for all reset levels (removed 181-Day Master)
+    // UPDATED: 6-badge system - ADDED new badges to existing 4
     const defaultBadges = [
       { id: 1, name: '7-Day Warrior', earned: false, date: null },
       { id: 2, name: '14-Day Monk', earned: false, date: null },
-      { id: 3, name: '30-Day Gladiator', earned: false, date: null },
+      { id: 3, name: '30-Day Master', earned: false, date: null },  // KEPT: Original name
       { id: 4, name: '90-Day King', earned: false, date: null },
-      { id: 5, name: '180-Day Master', earned: false, date: null },
-      { id: 6, name: '365-Day Sage', earned: false, date: null }
+      { id: 5, name: '180-Day Master', earned: false, date: null },  // ADDED: New badge
+      { id: 6, name: '365-Day Sage', earned: false, date: null }     // ADDED: New badge
     ];
 
     switch (resetLevel) {
