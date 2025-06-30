@@ -1218,14 +1218,17 @@
     font-size: 2rem;
   }
   
+  /* Mobile: Override desktop badge layout */
   .badges-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
   }
   
   .badge-card {
-    min-height: 120px;
-    height: 120px;
+    min-height: 120px !important;
+    height: 120px !important;
     padding: var(--spacing-md);
+    /* Reset grid positioning for mobile */
+    grid-column: auto !important;
   }
   
   .badge-icon {
