@@ -1,10 +1,10 @@
-// components/Stats/Stats.js - UPDATED: Smart Reset Dialog with three levels of reset
+// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb, FaTimesCircle } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -17,14 +17,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [timeRange, setTimeRange] = useState('week');
   const [showBadgeModal, setShowBadgeModal] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState(null);
-  const [showResetModal, setShowResetModal] = useState(false);
-  
-  // NEW: Smart reset states
-  const [resetOptions, setResetOptions] = useState({
-    currentStreakOnly: false,
-    allProgress: false,
-    everything: false
-  });
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   
   // NEW: Wisdom toggle states
   const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
@@ -96,128 +89,41 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowBadgeModal(true);
   };
 
-  // NEW: Handle reset option toggle
-  const handleResetOptionToggle = (option) => {
-    const newOptions = { ...resetOptions };
-    
-    if (option === 'everything') {
-      // Everything toggles all options
-      const newValue = !resetOptions.everything;
-      newOptions.currentStreakOnly = newValue;
-      newOptions.allProgress = newValue;
-      newOptions.everything = newValue;
-    } else if (option === 'allProgress') {
-      // All progress also toggles current streak
-      const newValue = !resetOptions.allProgress;
-      newOptions.allProgress = newValue;
-      newOptions.currentStreakOnly = newValue;
-      // If turning on allProgress, turn off everything
-      if (newValue && resetOptions.everything) {
-        newOptions.everything = false;
-      }
-    } else if (option === 'currentStreakOnly') {
-      // Current streak only
-      newOptions.currentStreakOnly = !resetOptions.currentStreakOnly;
-      // If turning off current streak, also turn off higher levels
-      if (!newOptions.currentStreakOnly) {
-        newOptions.allProgress = false;
-        newOptions.everything = false;
-      }
-    }
-    
-    setResetOptions(newOptions);
+  // Handle reset stats - AVAILABLE TO ALL USERS
+  const handleResetStats = () => {
+    setShowResetConfirm(true);
   };
 
-  // NEW: Smart reset handler
-  const handleSmartReset = () => {
-    if (!resetOptions.currentStreakOnly && !resetOptions.allProgress && !resetOptions.everything) {
-      toast.error('Please select at least one reset option');
-      return;
-    }
-    
-    let resetUserData = { ...userData };
-    const today = new Date();
-    
-    if (resetOptions.everything) {
-      // NUCLEAR RESET - Everything goes
-      resetUserData = {
-        ...userData,
-        startDate: today,
-        currentStreak: 0,
-        longestStreak: 0,
-        wetDreamCount: 0,
-        relapseCount: 0,
-        badges: [
-          { id: 1, name: '7-Day Warrior', earned: false, date: null },
-          { id: 2, name: '14-Day Monk', earned: false, date: null },
-          { id: 3, name: '30-Day Master', earned: false, date: null },
-          { id: 4, name: '90-Day King', earned: false, date: null }
-        ],
-        benefitTracking: [],
-        streakHistory: [{
-          id: 1,
-          start: today,
-          end: null,
-          days: 0,
-          reason: null
-        }],
-        notes: {}
-      };
-      toast.success('All data has been completely reset');
-    } else if (resetOptions.allProgress) {
-      // RESET ALL PROGRESS - Keep only longest streak record
-      resetUserData = {
-        ...userData,
-        startDate: today,
-        currentStreak: 0,
-        // Keep longest streak as a record
-        wetDreamCount: 0,
-        relapseCount: 0,
-        badges: [
-          { id: 1, name: '7-Day Warrior', earned: false, date: null },
-          { id: 2, name: '14-Day Monk', earned: false, date: null },
-          { id: 3, name: '30-Day Master', earned: false, date: null },
-          { id: 4, name: '90-Day King', earned: false, date: null }
-        ],
-        benefitTracking: [],
-        streakHistory: [{
-          id: 1,
-          start: today,
-          end: null,
-          days: 0,
-          reason: null
-        }],
-        notes: {}
-      };
-      toast.success('Progress reset. Your longest streak record has been preserved');
-    } else if (resetOptions.currentStreakOnly) {
-      // RESET CURRENT STREAK ONLY - Keep all history and achievements
-      resetUserData = {
-        ...userData,
-        startDate: today,
-        currentStreak: 0,
-        // Preserve all other data
-        streakHistory: [
-          ...userData.streakHistory.filter(streak => streak.end), // Keep all ended streaks
-          {
-            id: userData.streakHistory.length + 1,
-            start: today,
-            end: null,
-            days: 0,
-            reason: null
-          }
-        ]
-      };
-      toast.success('Current streak reset. All history and achievements preserved');
-    }
+  // Confirm reset stats - AVAILABLE TO ALL USERS
+  const confirmResetStats = () => {
+    // Reset all stats
+    const resetUserData = {
+      ...userData,
+      startDate: new Date(),
+      currentStreak: 0,
+      longestStreak: 0,
+      wetDreamCount: 0,
+      relapseCount: 0,
+      badges: [
+        { id: 1, name: '7-Day Warrior', earned: false, date: null },
+        { id: 2, name: '14-Day Monk', earned: false, date: null },
+        { id: 3, name: '30-Day Master', earned: false, date: null },
+        { id: 4, name: '90-Day King', earned: false, date: null }
+      ],
+      benefitTracking: [],
+      streakHistory: [{
+        id: 1,
+        start: new Date(),
+        end: null,
+        days: 0,
+        reason: null
+      }],
+      notes: {}
+    };
     
     updateUserData(resetUserData);
-    setShowResetModal(false);
-    setResetOptions({
-      currentStreakOnly: false,
-      allProgress: false,
-      everything: false
-    });
+    setShowResetConfirm(false);
+    toast.success('All stats have been reset');
   };
 
   // ADDED: Premium upgrade handler
@@ -916,171 +822,22 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         <div className="stats-header-spacer"></div>
         <h2>Your Stats</h2>
         <div className="stats-header-actions">
-          <button className="reset-stats-btn" onClick={() => setShowResetModal(true)}>
+          <button className="reset-stats-btn" onClick={handleResetStats}>
             <FaRedo />
-            <span>Reset Progress</span>
+            <span>Reset Stats</span>
           </button>
         </div>
       </div>
       
-      {/* NEW: Smart Reset Modal */}
-      {showResetModal && (
+      {/* Reset Confirmation Modal - AVAILABLE TO ALL USERS */}
+      {showResetConfirm && (
         <div className="modal-overlay">
-          <div className="modal-content smart-reset-modal">
-            <h3>Reset Progress</h3>
-            <p className="reset-intro">Select one or more reset options:</p>
-            
-            <div className="reset-options">
-              <div 
-                className={`reset-option-card ${resetOptions.currentStreakOnly ? 'selected' : ''}`}
-                onClick={() => handleResetOptionToggle('currentStreakOnly')}
-              >
-                <div className="reset-option-header">
-                  <div className="reset-option-checkbox">
-                    <div className="checkbox-outline">
-                      {resetOptions.currentStreakOnly && <FaCheckCircle className="checkbox-check" />}
-                    </div>
-                  </div>
-                  <div className="reset-option-title">
-                    <h4>Reset Current Streak</h4>
-                    <p className="reset-option-subtitle">Start fresh while keeping your history</p>
-                  </div>
-                </div>
-                
-                <div className="reset-option-details">
-                  <div className="reset-impact-grid">
-                    <div className="reset-impact keeps">
-                      <div className="impact-label">
-                        <FaCheckCircle className="impact-icon" />
-                        <span>Keeps</span>
-                      </div>
-                      <ul className="impact-list">
-                        <li>All achievements</li>
-                        <li>Streak history</li>
-                        <li>Total counts</li>
-                        <li>Journal entries</li>
-                      </ul>
-                    </div>
-                    <div className="reset-impact loses">
-                      <div className="impact-label">
-                        <FaTimesCircle className="impact-icon" />
-                        <span>Resets</span>
-                      </div>
-                      <ul className="impact-list">
-                        <li>Current streak to 0</li>
-                        <li>Start date to today</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div 
-                className={`reset-option-card ${resetOptions.allProgress ? 'selected' : ''}`}
-                onClick={() => handleResetOptionToggle('allProgress')}
-              >
-                <div className="reset-option-header">
-                  <div className="reset-option-checkbox">
-                    <div className="checkbox-outline">
-                      {resetOptions.allProgress && <FaCheckCircle className="checkbox-check" />}
-                    </div>
-                  </div>
-                  <div className="reset-option-title">
-                    <h4>Reset All Progress</h4>
-                    <p className="reset-option-subtitle">Clear tracking but honor your best streak</p>
-                  </div>
-                </div>
-                
-                <div className="reset-option-details">
-                  <div className="reset-impact-grid">
-                    <div className="reset-impact keeps">
-                      <div className="impact-label">
-                        <FaCheckCircle className="impact-icon" />
-                        <span>Keeps</span>
-                      </div>
-                      <ul className="impact-list">
-                        <li>Longest streak record</li>
-                      </ul>
-                    </div>
-                    <div className="reset-impact loses">
-                      <div className="impact-label">
-                        <FaTimesCircle className="impact-icon" />
-                        <span>Clears</span>
-                      </div>
-                      <ul className="impact-list">
-                        <li>All badges</li>
-                        <li>Benefit tracking</li>
-                        <li>Journal entries</li>
-                        <li>Streak history</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div 
-                className={`reset-option-card nuclear ${resetOptions.everything ? 'selected' : ''}`}
-                onClick={() => handleResetOptionToggle('everything')}
-              >
-                <div className="reset-option-header">
-                  <div className="reset-option-checkbox">
-                    <div className="checkbox-outline">
-                      {resetOptions.everything && <FaCheckCircle className="checkbox-check" />}
-                    </div>
-                  </div>
-                  <div className="reset-option-title">
-                    <h4>Nuclear Reset</h4>
-                    <p className="reset-option-subtitle">Complete fresh start - no traces remain</p>
-                  </div>
-                </div>
-                
-                <div className="reset-option-details">
-                  <div className="reset-warning">
-                    <FaExclamationTriangle className="warning-icon" />
-                    <span>This cannot be undone! All data will be permanently deleted.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Summary of what will happen */}
-            {(resetOptions.currentStreakOnly || resetOptions.allProgress || resetOptions.everything) && (
-              <div className="reset-summary">
-                <div className="summary-label">You're about to:</div>
-                <ul className="summary-list">
-                  {resetOptions.everything ? (
-                    <li className="summary-nuclear">Delete everything and start completely fresh</li>
-                  ) : (
-                    <>
-                      {resetOptions.currentStreakOnly && <li>Reset your current streak to Day 0</li>}
-                      {resetOptions.allProgress && <li>Clear all progress except longest streak record</li>}
-                    </>
-                  )}
-                </ul>
-              </div>
-            )}
-            
+          <div className="modal-content">
+            <h3>Reset All Stats?</h3>
+            <p>This will permanently delete all your progress data including streaks, benefits, journal entries, and badges. This action cannot be undone.</p>
             <div className="form-actions">
-              <button 
-                className="btn btn-danger" 
-                onClick={handleSmartReset}
-                disabled={!resetOptions.currentStreakOnly && !resetOptions.allProgress && !resetOptions.everything}
-              >
-                {resetOptions.everything ? 'Delete Everything' : 'Confirm Reset'}
-              </button>
-              <button 
-                className="btn btn-outline" 
-                onClick={() => {
-                  setShowResetModal(false);
-                  setResetOptions({
-                    currentStreakOnly: false,
-                    allProgress: false,
-                    everything: false
-                  });
-                }}
-              >
-                Cancel
-              </button>
+              <button className="btn btn-danger" onClick={confirmResetStats}>Reset Everything</button>
+              <button className="btn btn-outline" onClick={() => setShowResetConfirm(false)}>Cancel</button>
             </div>
           </div>
         </div>
