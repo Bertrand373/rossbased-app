@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Progressive premium lock matching Timeline pattern + Redesigned Benefit Insights Header
+// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration - COMPLETE FILE
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -8,6 +8,7 @@ import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInf
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
+import SmartResetDialog from './SmartResetDialog';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
@@ -17,7 +18,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [timeRange, setTimeRange] = useState('week');
   const [showBadgeModal, setShowBadgeModal] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState(null);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  
+  // UPDATED: Replace old reset modal with smart reset dialog
+  const [showSmartResetDialog, setShowSmartResetDialog] = useState(false);
   
   // NEW: Wisdom toggle states
   const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
@@ -89,41 +92,113 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowBadgeModal(true);
   };
 
-  // Handle reset stats - AVAILABLE TO ALL USERS
+  // UPDATED: Handle smart reset - opens smart dialog instead of simple confirmation
   const handleResetStats = () => {
-    setShowResetConfirm(true);
+    setShowSmartResetDialog(true);
   };
 
-  // Confirm reset stats - AVAILABLE TO ALL USERS
-  const confirmResetStats = () => {
-    // Reset all stats
-    const resetUserData = {
-      ...userData,
-      startDate: new Date(),
-      currentStreak: 0,
-      longestStreak: 0,
-      wetDreamCount: 0,
-      relapseCount: 0,
-      badges: [
-        { id: 1, name: '7-Day Warrior', earned: false, date: null },
-        { id: 2, name: '14-Day Monk', earned: false, date: null },
-        { id: 3, name: '30-Day Master', earned: false, date: null },
-        { id: 4, name: '90-Day King', earned: false, date: null }
-      ],
-      benefitTracking: [],
-      streakHistory: [{
-        id: 1,
-        start: new Date(),
-        end: null,
-        days: 0,
-        reason: null
-      }],
-      notes: {}
-    };
+  // NEW: Enhanced reset function with different levels
+  const confirmResetStats = (resetLevel) => {
+    if (!updateUserData) {
+      console.error('updateUserData function is not available');
+      toast.error('Unable to reset data - please refresh the page');
+      return;
+    }
+
+    let resetUserData = { ...userData };
+    const today = new Date();
+
+    switch (resetLevel) {
+      case 'currentStreak':
+        // Reset only current streak, keep all history
+        resetUserData = {
+          ...userData,
+          currentStreak: 0,
+          startDate: today,
+          // Add new streak to history
+          streakHistory: [
+            ...(userData.streakHistory || []),
+            {
+              id: (userData.streakHistory?.length || 0) + 1,
+              start: today,
+              end: null,
+              days: 0,
+              reason: 'manual_reset'
+            }
+          ]
+        };
+        toast.success('Current streak reset to 0. All history and achievements preserved.');
+        break;
+
+      case 'allProgress':
+        // Reset most data but keep longest streak record
+        resetUserData = {
+          ...userData,
+          startDate: today,
+          currentStreak: 0,
+          relapseCount: 0,
+          wetDreamCount: 0,
+          // Keep only longest streak record
+          longestStreak: userData.longestStreak || 0,
+          // Reset everything else
+          streakHistory: [{
+            id: 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: 'major_reset'
+          }],
+          benefitTracking: [],
+          notes: {},
+          // Reset badges but keep longest streak milestone if earned
+          badges: userData.badges?.map(badge => ({
+            ...badge,
+            earned: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.earned : false,
+            date: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.date : null
+          })) || [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null }
+          ]
+        };
+        toast.success(`All progress reset. Longest streak record (${userData.longestStreak || 0} days) preserved.`);
+        break;
+
+      case 'everything':
+        // Complete nuclear reset - everything gone
+        resetUserData = {
+          startDate: today,
+          currentStreak: 0,
+          longestStreak: 0,
+          wetDreamCount: 0,
+          relapseCount: 0,
+          badges: [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null }
+          ],
+          benefitTracking: [],
+          streakHistory: [{
+            id: 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: 'complete_reset'
+          }],
+          notes: {}
+        };
+        toast.success('Complete reset successful. All data has been cleared.');
+        break;
+
+      default:
+        toast.error('Invalid reset option selected');
+        return;
+    }
     
     updateUserData(resetUserData);
-    setShowResetConfirm(false);
-    toast.success('All stats have been reset');
+    setShowSmartResetDialog(false);
   };
 
   // ADDED: Premium upgrade handler
@@ -817,31 +892,25 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </button>
       )}
 
-      {/* Header exactly like Tracker and Calendar */}
+      {/* UPDATED: Header with new Reset Progress button */}
       <div className="stats-header">
         <div className="stats-header-spacer"></div>
         <h2>Your Stats</h2>
         <div className="stats-header-actions">
           <button className="reset-stats-btn" onClick={handleResetStats}>
             <FaRedo />
-            <span>Reset Stats</span>
+            <span>Reset Progress</span>
           </button>
         </div>
       </div>
       
-      {/* Reset Confirmation Modal - AVAILABLE TO ALL USERS */}
-      {showResetConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Reset All Stats?</h3>
-            <p>This will permanently delete all your progress data including streaks, benefits, journal entries, and badges. This action cannot be undone.</p>
-            <div className="form-actions">
-              <button className="btn btn-danger" onClick={confirmResetStats}>Reset Everything</button>
-              <button className="btn btn-outline" onClick={() => setShowResetConfirm(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* UPDATED: Smart Reset Dialog replaces old confirmation modal */}
+      <SmartResetDialog
+        isOpen={showSmartResetDialog}
+        onClose={() => setShowSmartResetDialog(false)}
+        onConfirm={confirmResetStats}
+        userData={userData}
+      />
       
       {/* Streak Statistics - ALWAYS VISIBLE */}
       <div className="streak-stats">
