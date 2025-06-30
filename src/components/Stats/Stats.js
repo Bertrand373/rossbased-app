@@ -104,9 +104,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       case '14-Day Monk': return 14;
       case '30-Day Gladiator': return 30;
       case '90-Day King': return 90;
-      case '180-Day Sage': return 180;
-      case '181-Day Master': return 181;
-      case '365-Day Ascended': return 365;
+      case '180-Day Master': return 180;
+      case '365-Day Sage': return 365;
       default: return 0;
     }
   };
@@ -150,16 +149,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           'Natural confidence emerged'
         ]
       },
-      '180-Day Sage': {
-        description: "Spiritual integration achieved",
-        benefits: [
-          'Inner transformation complete',
-          'Divine masculine activated',
-          'Leadership naturally emerging',
-          'Wisdom-based decision making'
-        ]
-      },
-      '181-Day Master': {
+      '180-Day Master': {
         description: "True mastery unlocked - serve humanity's evolution",
         benefits: [
           'Complete mastery achieved',
@@ -168,8 +158,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           'Transcended personal limitations'
         ]
       },
-      '365-Day Ascended': {
-        description: "Stable emergence achieved - ultimate emotional mastery",
+      '365-Day Sage': {
+        description: "Spiritual integration achieved - ultimate wisdom attained",
         benefits: [
           'Stable identity transformation',
           'Complete emotional mastery',
@@ -201,15 +191,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     let resetUserData = { ...userData };
     const today = new Date();
 
-    // UPDATED: 7-badge system for all reset levels
+    // UPDATED: 6-badge system for all reset levels (removed 181-Day Master)
     const defaultBadges = [
       { id: 1, name: '7-Day Warrior', earned: false, date: null },
       { id: 2, name: '14-Day Monk', earned: false, date: null },
       { id: 3, name: '30-Day Gladiator', earned: false, date: null },
       { id: 4, name: '90-Day King', earned: false, date: null },
-      { id: 5, name: '180-Day Sage', earned: false, date: null },
-      { id: 6, name: '181-Day Master', earned: false, date: null },
-      { id: 7, name: '365-Day Ascended', earned: false, date: null }
+      { id: 5, name: '180-Day Master', earned: false, date: null },
+      { id: 6, name: '365-Day Sage', earned: false, date: null }
     ];
 
     switch (resetLevel) {
@@ -257,9 +246,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           // UPDATED: Reset badges but keep major milestone if earned
           badges: defaultBadges.map(badge => ({
             ...badge,
-            earned: (badge.name === '180-Day Sage' || badge.name === '181-Day Master' || badge.name === '365-Day Ascended') && 
+            earned: (badge.name === '180-Day Master' || badge.name === '365-Day Sage') && 
                     (userData.longestStreak || 0) >= getBadgeRequirement(badge.name) ? true : false,
-            date: (badge.name === '180-Day Sage' || badge.name === '181-Day Master' || badge.name === '365-Day Ascended') && 
+            date: (badge.name === '180-Day Master' || badge.name === '365-Day Sage') && 
                   (userData.longestStreak || 0) >= getBadgeRequirement(badge.name) ? userData.badges?.find(b => b.name === badge.name)?.date : null
           }))
         };
@@ -315,7 +304,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     } else if (streak <= 364) {
       return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
     } else {
-      return { name: "Ascended Master", icon: FaStar, color: "#ff6b9d" };
+      return { name: "Ascended Sage", icon: FaStar, color: "#ff6b9d" };
     }
   };
 
