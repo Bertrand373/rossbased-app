@@ -217,9 +217,6 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
           // Step 2: Confirmation
           <>
             <div className="confirmation-header">
-              <div className="warning-icon-container">
-                <FaExclamationTriangle className="warning-main-icon" />
-              </div>
               <h3>{confirmationDetails.title}</h3>
               <p className="confirmation-warning">{confirmationDetails.warning}</p>
             </div>
@@ -264,7 +261,7 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
             <div className="confirmation-actions">
               <button className="btn-confirm-reset" onClick={handleFinalConfirm}>
                 <FaRedo />
-                Yes, Reset {getSelectedResetLevel() === 'everything' ? 'Everything' : 'Progress'}
+                Yes, Reset
               </button>
               <button className="btn-back" onClick={() => setShowConfirmation(false)}>
                 <FaTimes />

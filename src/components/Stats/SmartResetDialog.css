@@ -180,7 +180,7 @@
   flex-shrink: 0;
 }
 
-/* Action Buttons - UPDATED: Match Tracker modal buttons exactly */
+/* Action Buttons - UPDATED: Continue button yellow like Set Date */
 .smart-reset-actions {
   display: flex;
   gap: var(--spacing-md);
@@ -248,29 +248,14 @@
   transform: none !important;
   box-shadow: none !important;
 }
+  transform: none !important;
+  box-shadow: none !important;
+}
 
-/* Confirmation Screen */
+/* Confirmation Header - UPDATED: Removed icon container */
 .confirmation-header {
   text-align: center;
   margin-bottom: var(--spacing-xl);
-}
-
-.warning-icon-container {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto var(--spacing-md);
-  border: 2px solid rgba(239, 68, 68, 0.3);
-}
-
-.warning-main-icon {
-  font-size: 1.5rem;
-  color: var(--danger);
-  filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.3));
 }
 
 .confirmation-header h3 {
