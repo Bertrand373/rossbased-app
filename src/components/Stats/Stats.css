@@ -173,6 +173,20 @@
   gap: var(--spacing-md);
 }
 
+/* ADDED: Second row for additional badges (180-Day Emperor, 365-Day Sage) */
+.badges-grid .badge-card:nth-child(5),
+.badges-grid .badge-card:nth-child(6) {
+  grid-column: span 2; /* Each takes 2 columns to center them */
+}
+
+.badges-grid .badge-card:nth-child(5) {
+  justify-self: end; /* 180-Day Emperor aligned to right of left half */
+}
+
+.badges-grid .badge-card:nth-child(6) {
+  justify-self: start; /* 365-Day Sage aligned to left of right half */
+}
+
 .badge-card {
   display: flex;
   flex-direction: column;
@@ -1375,6 +1389,20 @@
   
   .badges-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* MOBILE: Reset badge positioning for mobile 2-column layout */
+  .badges-grid .badge-card:nth-child(5),
+  .badges-grid .badge-card:nth-child(6) {
+    grid-column: span 1; /* Reset to single column on mobile */
+  }
+
+  .badges-grid .badge-card:nth-child(5) {
+    justify-self: stretch; /* Reset alignment */
+  }
+
+  .badges-grid .badge-card:nth-child(6) {
+    justify-self: stretch; /* Reset alignment */
   }
   
   .badge-card {

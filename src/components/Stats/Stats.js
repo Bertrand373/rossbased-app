@@ -1,307 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration + 30-Day Gladiator + Unique Badge Benefits - COMPLETE FILE
-import React, { useState, useEffect, useRef } from 'react';
-import { format, subDays } from 'date-fns';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb, 
-  FaShieldAlt, FaDumbbell, FaFire } from 'react-icons/fa';
-import './Stats.css';
-import toast from 'react-hot-toast';
-import helmetImage from '../../assets/helmet.png';
-import SmartResetDialog from './SmartResetDialog';
-
-// Register ChartJS components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
-
-const Stats = ({ userData, isPremium, updateUserData }) => {
-  const [selectedMetric, setSelectedMetric] = useState('energy');
-  const [timeRange, setTimeRange] = useState('week');
-  const [showBadgeModal, setShowBadgeModal] = useState(false);
-  const [selectedBadge, setSelectedBadge] = useState(null);
-  
-  // UPDATED: Replace old reset modal with smart reset dialog
-  const [showSmartResetDialog, setShowSmartResetDialog] = useState(false);
-  
-  // NEW: Wisdom toggle states
-  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
-  
-  // NEW: Smart floating toggle visibility
-  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
-  
-  // NEW: Refs for scroll detection
-  const insightsStartRef = useRef(null); // Current insight section start
-  const patternSectionRef = useRef(null); // Pattern analysis section
-  
-  // Enhanced trigger options matching Calendar
-  const triggerOptions = [
-    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
-    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
-    { id: 'boredom', label: 'Boredom', icon: FaClock },
-    { id: 'social_media', label: 'Social Media', icon: FaLaptop },
-    { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
-    { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
-    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
-  ];
-
-  // NEW: Smart floating toggle scroll detection
-  useEffect(() => {
-    if (!isPremium) return; // Only show for premium users
-    
-    const handleScroll = () => {
-      if (!insightsStartRef.current || !patternSectionRef.current) return;
-      
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const windowHeight = window.innerHeight;
-      
-      const insightsStartTop = insightsStartRef.current.offsetTop;
-      const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
-      
-      // Show toggle when:
-      // 1. User has scrolled to the insights section start
-      // 2. User hasn't scrolled completely past the pattern analysis section
-      const shouldShow = 
-        scrollTop + windowHeight >= insightsStartTop && // Reached insights area
-        scrollTop <= patternSectionBottom; // Haven't scrolled completely past pattern section
-      
-      setShowFloatingToggle(shouldShow);
-    };
-    
-    // Add scroll listener
-    window.addEventListener('scroll', handleScroll);
-    
-    // Check initial position
-    handleScroll();
-    
-    // Cleanup
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isPremium]); // Re-run when premium status changes
-  
-  // Time range options for chart
-  const timeRangeOptions = {
-    week: 7,
-    month: 30,
-    quarter: 90
-  };
-  
-  // Format date for displaying
-  const formatDate = (date) => format(new Date(date), 'MMM d, yyyy');
-  
-  // Handle badge click
-  const handleBadgeClick = (badge) => {
-    setSelectedBadge(badge);
-    setShowBadgeModal(true);
-  };
-
-  // UPDATED: Handle smart reset - opens smart dialog instead of simple confirmation
-  const handleResetStats = () => {
-    setShowSmartResetDialog(true);
-  };
-
-  // NEW: Enhanced reset function with different levels
-  const confirmResetStats = (resetLevel) => {
-    if (!updateUserData) {
-      console.error('updateUserData function is not available');
-      toast.error('Unable to reset data - please refresh the page');
-      return;
-    }
-
-    let resetUserData = { ...userData };
-    const today = new Date();
-
-    switch (resetLevel) {
-      case 'currentStreak':
-        // Reset only current streak, keep all history
-        resetUserData = {
-          ...userData,
-          currentStreak: 0,
-          startDate: today,
-          // Add new streak to history
-          streakHistory: [
-            ...(userData.streakHistory || []),
-            {
-              id: (userData.streakHistory?.length || 0) + 1,
-              start: today,
-              end: null,
-              days: 0,
-              reason: 'manual_reset'
-            }
-          ]
-        };
-        toast.success('Current streak reset to 0. All history and achievements preserved.');
-        break;
-
-      case 'allProgress':
-        // Reset most data but keep longest streak record
-        resetUserData = {
-          ...userData,
-          startDate: today,
-          currentStreak: 0,
-          relapseCount: 0,
-          wetDreamCount: 0,
-          // Keep only longest streak record
-          longestStreak: userData.longestStreak || 0,
-          // Reset everything else
-          streakHistory: [{
-            id: 1,
-            start: today,
-            end: null,
-            days: 0,
-            reason: 'major_reset'
-          }],
-          benefitTracking: [],
-          notes: {},
-          // Reset badges but keep longest streak milestone if earned
-          badges: userData.badges?.map(badge => ({
-            ...badge,
-            earned: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.earned : false,
-            date: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.date : null
-          })) || [
-            { id: 1, name: '7-Day Warrior', earned: false, date: null },
-            { id: 2, name: '14-Day Monk', earned: false, date: null },
-            { id: 3, name: '30-Day Gladiator', earned: false, date: null },
-            { id: 4, name: '90-Day King', earned: false, date: null }
-          ]
-        };
-        toast.success(`All progress reset. Longest streak record (${userData.longestStreak || 0} days) preserved.`);
-        break;
-
-      case 'everything':
-        // Complete nuclear reset - everything gone
-        resetUserData = {
-          startDate: today,
-          currentStreak: 0,
-          longestStreak: 0,
-          wetDreamCount: 0,
-          relapseCount: 0,
-          badges: [
-            { id: 1, name: '7-Day Warrior', earned: false, date: null },
-            { id: 2, name: '14-Day Monk', earned: false, date: null },
-            { id: 3, name: '30-Day Gladiator', earned: false, date: null },
-            { id: 4, name: '90-Day King', earned: false, date: null }
-          ],
-          benefitTracking: [],
-          streakHistory: [{
-            id: 1,
-            start: today,
-            end: null,
-            days: 0,
-            reason: 'complete_reset'
-          }],
-          notes: {}
-        };
-        toast.success('Complete reset successful. All data has been cleared.');
-        break;
-
-      default:
-        toast.error('Invalid reset option selected');
-        return;
-    }
-    
-    updateUserData(resetUserData);
-    setShowSmartResetDialog(false);
-  };
-
-  // ADDED: Premium upgrade handler
-  const handleUpgradeClick = () => {
-    toast.success('Premium upgrade coming soon! 🚀');
-  };
-
-  // UPDATED: Helper function to get current phase data - matches Emotional Timeline exactly  
-  const getCurrentPhaseData = (streak) => {
-    if (streak <= 14) {
-      return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
-    } else if (streak <= 45) {
-      return { name: "Emotional Purging", icon: FaHeart, color: "#f59e0b" };
-    } else if (streak <= 90) {
-      return { name: "Mental Expansion", icon: FaBrain, color: "#3b82f6" };
-    } else if (streak <= 180) {
-      return { name: "Spiritual Integration", icon: FaLightbulb, color: "#8b5cf6" };
-    } else {
-      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
-    }
-  };
-
-  // LEGACY: Keep old function for backward compatibility
-  const getCurrentPhase = (streak) => {
-    if (streak <= 7) return 'Foundation Phase';
-    if (streak <= 30) return 'Adjustment Phase';
-    if (streak <= 90) return 'Momentum Phase';
-    if (streak <= 180) return 'Transformation Phase';
-    if (streak <= 365) return 'Integration Phase';
-    return 'Mastery Phase';
-  };
-  
-  // Filter benefit data based on selected time range
-  const getFilteredBenefitData = () => {
-    if (!userData.benefitTracking) return [];
-    
-    const days = timeRangeOptions[timeRange];
-    const cutoffDate = subDays(new Date(), days);
-    
-    return userData.benefitTracking
-      .filter(item => new Date(item.date) >= cutoffDate)
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
-  };
-  
-  // Generate chart data - UPDATED: Handle sleep metric
-  const generateChartData = () => {
-    const filteredData = getFilteredBenefitData();
-    
-    const labels = filteredData.map(item => 
-      format(new Date(item.date), 'MMM d')
-    );
-    
-    const datasets = [{
-      label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
-      data: filteredData.map(item => {
-        // MIGRATION: Handle old attraction data -> sleep data
-        if (selectedMetric === 'sleep') {
-          return item[selectedMetric] || item.attraction || 5;
-        }
-        return item[selectedMetric] || 5;
-      }),
-      borderColor: '#ffdd00',
-      backgroundColor: 'rgba(255, 221, 0, 0.1)',
-      tension: 0.3,
-      fill: true,
-      pointBackgroundColor: '#ffdd00',
-      pointBorderColor: '#ffdd00',
-      pointHoverBackgroundColor: '#f6cc00',
-      pointHoverBorderColor: '#f6cc00',
-      pointRadius: 6,
-      pointHoverRadius: 8,
-      pointBorderWidth: 2,
-      pointHoverBorderWidth: 3
-    }];
-    
-    return { labels, datasets };
-  };
-  
-  // Chart options - reverted to original clean version
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        min: 0,
-        max: 10,
-        ticks: {
-          stepSize: 2,
-          color: '#aaaaaa',
-          font: { size: 12 }
-        },
-      purging: {
-        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
-        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
-        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
-      },
-      expansion: {
-        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
-        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
-        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
-      },
-      integration: {
+integration: {
         practical: `Day ${streak}: Spiritual Integration phase brings profound inner transformation. You're gaining abilities that feel almost supernatural.`,
         esoteric: `Day ${streak}: Major consciousness expansion occurring. You're embodying the divine masculine archetype.`,
         actionable: "Accept increased responsibility gracefully. Share your wisdom while remaining humble about your development."
@@ -575,6 +272,28 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           ]
         };
       
+      case '180-Day Emperor':
+        return {
+          description: "You've reached the pinnacle of the Spiritual Integration phase! At 180 days, you've achieved profound inner transformation with abilities that feel almost supernatural.",
+          benefits: [
+            { icon: FaTrophy, text: "Memory becomes exceptional with photographic tendencies" },
+            { icon: FaLightbulb, text: "Natural authority and influence expand significantly" },
+            { icon: FaHeart, text: "People change behavior in your presence" },
+            { icon: FaStar, text: "Aura extends 50+ feet - energy field transforms others" }
+          ]
+        };
+      
+      case '365-Day Sage':
+        return {
+          description: "One full year of mastery! You've entered the true Mastery & Service phase where your individual development now serves the evolution of all humanity.",
+          benefits: [
+            { icon: FaLightbulb, text: "Knowledge synthesis across disciplines becomes natural" },
+            { icon: FaTrophy, text: "Unshakeable inner confidence independent of circumstances" },
+            { icon: FaHeart, text: "Consistent powerful presence that creates positive change" },
+            { icon: FaStar, text: "Energy signature becomes a beacon of light for others" }
+          ]
+        };
+      
       default:
         return {
           description: "Congratulations on earning this achievement!",
@@ -644,7 +363,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* Milestone Badges - ALWAYS VISIBLE */}
+      {/* Milestone Badges - ALWAYS VISIBLE - NOW WITH 6 BADGES */}
       <div className="milestone-section">
         <h3>Your Achievements</h3>
         
@@ -954,7 +673,303 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats;
+export default Stats;// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration + 30-Day Gladiator + Unique Badge Benefits + 180/365 Day Badges - COMPLETE FILE
+import React, { useState, useEffect, useRef } from 'react';
+import { format, subDays } from 'date-fns';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb, 
+  FaShieldAlt, FaDumbbell, FaFire } from 'react-icons/fa';
+import './Stats.css';
+import toast from 'react-hot-toast';
+import helmetImage from '../../assets/helmet.png';
+import SmartResetDialog from './SmartResetDialog';
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+const Stats = ({ userData, isPremium, updateUserData }) => {
+  const [selectedMetric, setSelectedMetric] = useState('energy');
+  const [timeRange, setTimeRange] = useState('week');
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  
+  // UPDATED: Replace old reset modal with smart reset dialog
+  const [showSmartResetDialog, setShowSmartResetDialog] = useState(false);
+  
+  // NEW: Wisdom toggle states
+  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
+  
+  // NEW: Smart floating toggle visibility
+  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
+  
+  // NEW: Refs for scroll detection
+  const insightsStartRef = useRef(null); // Current insight section start
+  const patternSectionRef = useRef(null); // Pattern analysis section
+  
+  // Enhanced trigger options matching Calendar
+  const triggerOptions = [
+    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
+    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
+    { id: 'boredom', label: 'Boredom', icon: FaClock },
+    { id: 'social_media', label: 'Social Media', icon: FaLaptop },
+    { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
+    { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
+    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
+  ];
+
+  // NEW: Smart floating toggle scroll detection
+  useEffect(() => {
+    if (!isPremium) return; // Only show for premium users
+    
+    const handleScroll = () => {
+      if (!insightsStartRef.current || !patternSectionRef.current) return;
+      
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      
+      const insightsStartTop = insightsStartRef.current.offsetTop;
+      const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
+      
+      // Show toggle when:
+      // 1. User has scrolled to the insights section start
+      // 2. User hasn't scrolled completely past the pattern analysis section
+      const shouldShow = 
+        scrollTop + windowHeight >= insightsStartTop && // Reached insights area
+        scrollTop <= patternSectionBottom; // Haven't scrolled completely past pattern section
+      
+      setShowFloatingToggle(shouldShow);
+    };
+    
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll);
+    
+    // Check initial position
+    handleScroll();
+    
+    // Cleanup
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isPremium]); // Re-run when premium status changes
+  
+  // Time range options for chart
+  const timeRangeOptions = {
+    week: 7,
+    month: 30,
+    quarter: 90
+  };
+  
+  // Format date for displaying
+  const formatDate = (date) => format(new Date(date), 'MMM d, yyyy');
+  
+  // Handle badge click
+  const handleBadgeClick = (badge) => {
+    setSelectedBadge(badge);
+    setShowBadgeModal(true);
+  };
+
+  // UPDATED: Handle smart reset - opens smart dialog instead of simple confirmation
+  const handleResetStats = () => {
+    setShowSmartResetDialog(true);
+  };
+
+  // NEW: Enhanced reset function with different levels
+  const confirmResetStats = (resetLevel) => {
+    if (!updateUserData) {
+      console.error('updateUserData function is not available');
+      toast.error('Unable to reset data - please refresh the page');
+      return;
+    }
+
+    let resetUserData = { ...userData };
+    const today = new Date();
+
+    switch (resetLevel) {
+      case 'currentStreak':
+        // Reset only current streak, keep all history
+        resetUserData = {
+          ...userData,
+          currentStreak: 0,
+          startDate: today,
+          // Add new streak to history
+          streakHistory: [
+            ...(userData.streakHistory || []),
+            {
+              id: (userData.streakHistory?.length || 0) + 1,
+              start: today,
+              end: null,
+              days: 0,
+              reason: 'manual_reset'
+            }
+          ]
+        };
+        toast.success('Current streak reset to 0. All history and achievements preserved.');
+        break;
+
+      case 'allProgress':
+        // Reset most data but keep longest streak record
+        resetUserData = {
+          ...userData,
+          startDate: today,
+          currentStreak: 0,
+          relapseCount: 0,
+          wetDreamCount: 0,
+          // Keep only longest streak record
+          longestStreak: userData.longestStreak || 0,
+          // Reset everything else
+          streakHistory: [{
+            id: 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: 'major_reset'
+          }],
+          benefitTracking: [],
+          notes: {},
+          // Reset badges but keep longest streak milestone if earned
+          badges: userData.badges?.map(badge => ({
+            ...badge,
+            earned: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.earned : false,
+            date: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.date : null
+          })) || [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Gladiator', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null },
+            { id: 5, name: '180-Day Emperor', earned: false, date: null },
+            { id: 6, name: '365-Day Sage', earned: false, date: null }
+          ]
+        };
+        toast.success(`All progress reset. Longest streak record (${userData.longestStreak || 0} days) preserved.`);
+        break;
+
+      case 'everything':
+        // Complete nuclear reset - everything gone
+        resetUserData = {
+          startDate: today,
+          currentStreak: 0,
+          longestStreak: 0,
+          wetDreamCount: 0,
+          relapseCount: 0,
+          badges: [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Gladiator', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null },
+            { id: 5, name: '180-Day Emperor', earned: false, date: null },
+            { id: 6, name: '365-Day Sage', earned: false, date: null }
+          ],
+          benefitTracking: [],
+          streakHistory: [{
+            id: 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: 'complete_reset'
+          }],
+          notes: {}
+        };
+        toast.success('Complete reset successful. All data has been cleared.');
+        break;
+
+      default:
+        toast.error('Invalid reset option selected');
+        return;
+    }
+    
+    updateUserData(resetUserData);
+    setShowSmartResetDialog(false);
+  };
+
+  // ADDED: Premium upgrade handler
+  const handleUpgradeClick = () => {
+    toast.success('Premium upgrade coming soon! 🚀');
+  };
+
+  // UPDATED: Helper function to get current phase data - matches Emotional Timeline exactly  
+  const getCurrentPhaseData = (streak) => {
+    if (streak <= 14) {
+      return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
+    } else if (streak <= 45) {
+      return { name: "Emotional Purging", icon: FaHeart, color: "#f59e0b" };
+    } else if (streak <= 90) {
+      return { name: "Mental Expansion", icon: FaBrain, color: "#3b82f6" };
+    } else if (streak <= 180) {
+      return { name: "Spiritual Integration", icon: FaLightbulb, color: "#8b5cf6" };
+    } else {
+      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
+    }
+  };
+
+  // LEGACY: Keep old function for backward compatibility
+  const getCurrentPhase = (streak) => {
+    if (streak <= 7) return 'Foundation Phase';
+    if (streak <= 30) return 'Adjustment Phase';
+    if (streak <= 90) return 'Momentum Phase';
+    if (streak <= 180) return 'Transformation Phase';
+    if (streak <= 365) return 'Integration Phase';
+    return 'Mastery Phase';
+  };
+  
+  // Filter benefit data based on selected time range
+  const getFilteredBenefitData = () => {
+    if (!userData.benefitTracking) return [];
+    
+    const days = timeRangeOptions[timeRange];
+    const cutoffDate = subDays(new Date(), days);
+    
+    return userData.benefitTracking
+      .filter(item => new Date(item.date) >= cutoffDate)
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+  };
+  
+  // Generate chart data - UPDATED: Handle sleep metric
+  const generateChartData = () => {
+    const filteredData = getFilteredBenefitData();
+    
+    const labels = filteredData.map(item => 
+      format(new Date(item.date), 'MMM d')
+    );
+    
+    const datasets = [{
+      label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
+      data: filteredData.map(item => {
+        // MIGRATION: Handle old attraction data -> sleep data
+        if (selectedMetric === 'sleep') {
+          return item[selectedMetric] || item.attraction || 5;
+        }
+        return item[selectedMetric] || 5;
+      }),
+      borderColor: '#ffdd00',
+      backgroundColor: 'rgba(255, 221, 0, 0.1)',
+      tension: 0.3,
+      fill: true,
+      pointBackgroundColor: '#ffdd00',
+      pointBorderColor: '#ffdd00',
+      pointHoverBackgroundColor: '#f6cc00',
+      pointHoverBorderColor: '#f6cc00',
+      pointRadius: 6,
+      pointHoverRadius: 8,
+      pointBorderWidth: 2,
+      pointHoverBorderWidth: 3
+    }];
+    
+    return { labels, datasets };
+  };
+  
+  // Chart options - reverted to original clean version
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        min: 0,
+        max: 10,
+        ticks: {
+          stepSize: 2,
+          color: '#aaaaaa',
+          font: { size: 12 }
+        },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
           drawBorder: false
@@ -1307,3 +1322,14 @@ export default Stats;
         esoteric: `Day ${streak}: You're beginning the hero's journey. The resistance you feel is the old self protecting its familiar patterns.`,
         actionable: "Focus on building unbreakable daily habits. Use cold showers and intense exercise to channel excess energy."
       },
+      purging: {
+        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
+        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
+        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
+      },
+      expansion: {
+        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
+        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
+        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
+      },
+      integration:
