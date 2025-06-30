@@ -218,11 +218,11 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
-  min-height: 140px;
-  height: 140px;
   justify-content: center;
   width: 100%;
-  max-width: 220px;
+  /* Default mobile sizing */
+  min-height: 120px;
+  height: 120px;
 }
 
 .badge-card::before {
