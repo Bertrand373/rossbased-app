@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Enhanced 7-Badge Achievement System - COMPLETE FILE
+// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration - COMPLETE FILE
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -32,45 +32,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const insightsStartRef = useRef(null); // Current insight section start
   const patternSectionRef = useRef(null); // Pattern analysis section
   
-  // ADDED: Function to ensure user has all 6 badges (for existing users)
-  const ensureAllBadges = () => {
-    if (!userData.badges) return;
-    
-    const expectedBadges = [
-      { id: 1, name: '7-Day Warrior' },
-      { id: 2, name: '14-Day Monk' },
-      { id: 3, name: '30-Day Master' },
-      { id: 4, name: '90-Day King' },
-      { id: 5, name: '180-Day Master' },
-      { id: 6, name: '365-Day Sage' }
-    ];
-    
-    const currentBadges = userData.badges || [];
-    const missingBadges = expectedBadges.filter(expected => 
-      !currentBadges.find(current => current.name === expected.name)
-    );
-    
-    if (missingBadges.length > 0) {
-      const newBadges = missingBadges.map(badge => ({
-        id: badge.id,
-        name: badge.name,
-        earned: false,
-        date: null
-      }));
-      
-      const updatedUserData = {
-        ...userData,
-        badges: [...currentBadges, ...newBadges].sort((a, b) => a.id - b.id)
-      };
-      
-      updateUserData(updatedUserData);
-    }
-  };
-
-  // ADDED: Ensure all badges exist when component mounts
-  useEffect(() => {
-    ensureAllBadges();
-  }, [userData.badges]); // Only run when badges change
+  // Enhanced trigger options matching Calendar
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
     { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
@@ -135,90 +97,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowSmartResetDialog(true);
   };
 
-  // UPDATED: Helper function to get badge requirements - ADDED new badges
-  const getBadgeRequirement = (badgeName) => {
-    switch (badgeName) {
-      case '7-Day Warrior': return 7;
-      case '14-Day Monk': return 14;
-      case '30-Day Master': return 30;  // KEPT: Original name
-      case '90-Day King': return 90;
-      case '180-Day Master': return 180;  // ADDED: New badge
-      case '365-Day Sage': return 365;   // ADDED: New badge
-      default: return 0;
-    }
-  };
-
-  // UPDATED: Enhanced badge data with phase-specific benefits - ADDED new badges
-  const getBadgeData = (badgeName) => {
-    const badgeData = {
-      '7-Day Warrior': {
-        description: "You've begun the hero's journey!",
-        benefits: [
-          'Initial energy surge noticed',
-          'Breaking addictive patterns',
-          'Clarity moments emerging',
-          'Growing confidence foundation'
-        ]
-      },
-      '14-Day Monk': {
-        description: "Survived the guardian at the threshold",
-        benefits: [
-          'Neural rewiring strengthens',
-          'Survived peak urges',
-          'Energy stabilizing',
-          'Mental clarity improving'
-        ]
-      },
-      '30-Day Master': {  // KEPT: Original name and description
-        description: "You've achieved true mastery over impulse and developed lasting self-control.",
-        benefits: [
-          'Emotional healing initiated',
-          'Processing past trauma',
-          'Mood stabilizing',
-          'Physical strength gains'
-        ]
-      },
-      '90-Day King': {
-        description: "Mental expansion complete - entered the realm of kings",
-        benefits: [
-          'Enhanced cognitive abilities',
-          'Energy transmutation mastered',
-          'Strategic thinking developed',
-          'Natural confidence emerged'
-        ]
-      },
-      '180-Day Master': {  // ADDED: New badge
-        description: "True mastery unlocked - serve humanity's evolution",
-        benefits: [
-          'Complete mastery achieved',
-          'Serving universal evolution',
-          'Natural teacher emerged',
-          'Transcended personal limitations'
-        ]
-      },
-      '365-Day Sage': {  // ADDED: New badge
-        description: "Spiritual integration achieved - ultimate wisdom attained",
-        benefits: [
-          'Stable identity transformation',
-          'Complete emotional mastery',
-          'Unshakeable inner peace',
-          'Living example for others'
-        ]
-      }
-    };
-
-    return badgeData[badgeName] || {
-      description: 'Congratulations on earning this achievement!',
-      benefits: [
-        'Increased mental clarity',
-        'Enhanced self-discipline',
-        'Greater emotional stability',
-        'Improved energy levels'
-      ]
-    };
-  };
-
-  // UPDATED: Enhanced reset function with 7-badge system
+  // NEW: Enhanced reset function with different levels
   const confirmResetStats = (resetLevel) => {
     if (!updateUserData) {
       console.error('updateUserData function is not available');
@@ -228,16 +107,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
     let resetUserData = { ...userData };
     const today = new Date();
-
-    // UPDATED: 6-badge system - ADDED new badges to existing 4
-    const defaultBadges = [
-      { id: 1, name: '7-Day Warrior', earned: false, date: null },
-      { id: 2, name: '14-Day Monk', earned: false, date: null },
-      { id: 3, name: '30-Day Master', earned: false, date: null },  // KEPT: Original name
-      { id: 4, name: '90-Day King', earned: false, date: null },
-      { id: 5, name: '180-Day Master', earned: false, date: null },  // ADDED: New badge
-      { id: 6, name: '365-Day Sage', earned: false, date: null }     // ADDED: New badge
-    ];
 
     switch (resetLevel) {
       case 'currentStreak':
@@ -281,14 +150,17 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           }],
           benefitTracking: [],
           notes: {},
-          // UPDATED: Reset badges but keep major milestone if earned
-          badges: defaultBadges.map(badge => ({
+          // Reset badges but keep longest streak milestone if earned
+          badges: userData.badges?.map(badge => ({
             ...badge,
-            earned: (badge.name === '180-Day Master' || badge.name === '365-Day Sage') && 
-                    (userData.longestStreak || 0) >= getBadgeRequirement(badge.name) ? true : false,
-            date: (badge.name === '180-Day Master' || badge.name === '365-Day Sage') && 
-                  (userData.longestStreak || 0) >= getBadgeRequirement(badge.name) ? userData.badges?.find(b => b.name === badge.name)?.date : null
-          }))
+            earned: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.earned : false,
+            date: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.date : null
+          })) || [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null }
+          ]
         };
         toast.success(`All progress reset. Longest streak record (${userData.longestStreak || 0} days) preserved.`);
         break;
@@ -301,7 +173,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           longestStreak: 0,
           wetDreamCount: 0,
           relapseCount: 0,
-          badges: defaultBadges,
+          badges: [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null }
+          ],
           benefitTracking: [],
           streakHistory: [{
             id: 1,
@@ -329,7 +206,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     toast.success('Premium upgrade coming soon! 🚀');
   };
 
-  // UPDATED: Helper function to get current phase data - includes new Ascended Master phase
+  // UPDATED: Helper function to get current phase data - matches Emotional Timeline exactly  
   const getCurrentPhaseData = (streak) => {
     if (streak <= 14) {
       return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
@@ -339,10 +216,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       return { name: "Mental Expansion", icon: FaBrain, color: "#3b82f6" };
     } else if (streak <= 180) {
       return { name: "Spiritual Integration", icon: FaLightbulb, color: "#8b5cf6" };
-    } else if (streak <= 364) {
-      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
     } else {
-      return { name: "Ascended Sage", icon: FaStar, color: "#ff6b9d" };
+      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
     }
   };
 
@@ -1060,7 +935,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* UPDATED: Milestone Badges - 7-Badge System with Responsive Grid */}
+      {/* Milestone Badges - ALWAYS VISIBLE */}
       <div className="milestone-section">
         <h3>Your Achievements</h3>
         
@@ -1328,7 +1203,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         )}
       </div>
       
-      {/* UPDATED: Badge Modal with Enhanced Phase-Specific Benefits */}
+      {/* Badge Modal */}
       {showBadgeModal && selectedBadge && (
         <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
           <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
@@ -1343,24 +1218,45 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             </div>
             
             <div className="badge-description">
-              <p>{getBadgeData(selectedBadge.name).description}</p>
+              <p>
+                {
+                  selectedBadge.name === '7-Day Warrior' ? 
+                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
+                  selectedBadge.name === '14-Day Monk' ? 
+                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
+                  selectedBadge.name === '30-Day Master' ? 
+                    'A full month of commitment! You\'ve achieved true mastery over impulse and developed lasting self-control.' :
+                  selectedBadge.name === '90-Day King' ? 
+                    'Incredible achievement! 90 days represents complete transformation. You\'ve reached the pinnacle of self-mastery.' :
+                    'Congratulations on earning this achievement!'
+                }
+              </p>
             </div>
             
             <div className="badge-benefits">
               <h4>Benefits Unlocked:</h4>
               <ul>
-                {getBadgeData(selectedBadge.name).benefits.map((benefit, index) => (
-                  <li key={index}>
-                    <FaCheckCircle className="check-icon" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Increased mental clarity</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Enhanced self-discipline</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Greater emotional stability</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Improved energy levels</span>
+                </li>
               </ul>
             </div>
             
             <div className="modal-actions">
-              <button className="btn btn-primary primary-action" onClick={() => setShowBadgeModal(false)}>
-                <FaCheckCircle />
+              <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
                 Continue Journey
               </button>
             </div>
