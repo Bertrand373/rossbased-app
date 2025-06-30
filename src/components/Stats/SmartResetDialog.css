@@ -248,9 +248,6 @@
   transform: none !important;
   box-shadow: none !important;
 }
-  transform: none !important;
-  box-shadow: none !important;
-}
 
 /* Confirmation Header - UPDATED: Removed icon container */
 .confirmation-header {
@@ -468,7 +465,7 @@
   /* UPDATED: Keep side-by-side layout on mobile like Tracker modals */
   .smart-reset-actions,
   .confirmation-actions {
-    flex-direction: row !important; /* KEEP: Side-by-side on mobile like Tracker */
+    flex-direction: row !important;
     gap: var(--spacing-sm);
   }
 
