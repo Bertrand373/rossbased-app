@@ -129,9 +129,6 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
           // Step 1: Option Selection
           <>
             <div className="smart-reset-header">
-              <div className="reset-icon-container">
-                <FaRedo className="reset-main-icon" />
-              </div>
               <h3>Reset Progress</h3>
               <p>Choose what you'd like to reset. Each option is designed for different situations.</p>
             </div>

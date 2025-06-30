@@ -6,28 +6,10 @@
   width: 95%;
 }
 
-/* Header Section */
+/* Header Section - UPDATED: Removed icon container */
 .smart-reset-header {
   text-align: center;
   margin-bottom: var(--spacing-xl);
-}
-
-.reset-icon-container {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.2) 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto var(--spacing-md);
-  border: 2px solid rgba(255, 221, 0, 0.3);
-}
-
-.reset-main-icon {
-  font-size: 1.5rem;
-  color: var(--primary);
-  filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
 }
 
 .smart-reset-header h3 {
@@ -198,7 +180,7 @@
   flex-shrink: 0;
 }
 
-/* Action Buttons */
+/* Action Buttons - UPDATED: Match Tracker modal buttons exactly */
 .smart-reset-actions {
   display: flex;
   gap: var(--spacing-md);
@@ -207,49 +189,64 @@
 
 .btn-proceed {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.3);
-  border-radius: var(--radius-full);
-  color: var(--primary);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border: 1px solid rgba(255, 221, 0, 0.2) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  min-height: auto !important;
 }
 
 .btn-proceed:enabled:hover {
-  background-color: rgba(255, 221, 0, 0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .btn-proceed:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .btn-cancel {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: none;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  min-height: auto !important;
+}
+
+.btn-cancel:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Confirmation Screen */
@@ -393,7 +390,7 @@
   text-align: center;
 }
 
-/* Confirmation Actions */
+/* Confirmation Actions - UPDATED: Match Tracker modal buttons exactly */
 .confirmation-actions {
   display: flex;
   gap: var(--spacing-md);
@@ -401,45 +398,57 @@
 
 .btn-confirm-reset {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid var(--danger);
-  border-radius: var(--radius-full);
-  color: var(--danger);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid var(--danger) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--danger) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  min-height: auto !important;
 }
 
 .btn-confirm-reset:hover {
-  background-color: rgba(239, 68, 68, 0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .btn-back {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: none;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  min-height: auto !important;
 }
 
-/* Mobile Responsiveness */
+.btn-back:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Mobile Responsiveness - UPDATED: Keep side-by-side layout like Tracker */
 @media (max-width: 768px) {
   .smart-reset-modal {
     max-width: 95%;
@@ -471,17 +480,22 @@
     gap: var(--spacing-md);
   }
 
+  /* UPDATED: Keep side-by-side layout on mobile like Tracker modals */
   .smart-reset-actions,
   .confirmation-actions {
-    flex-direction: column;
+    flex-direction: row !important; /* KEEP: Side-by-side on mobile like Tracker */
+    gap: var(--spacing-sm);
   }
 
   .btn-proceed,
   .btn-cancel,
   .btn-confirm-reset,
   .btn-back {
-    width: 100%;
-    justify-content: center;
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    min-height: auto !important;
   }
 }
 
@@ -505,5 +519,17 @@
 
   .final-warning span {
     font-size: 0.8rem;
+  }
+
+  /* UPDATED: Keep equal width buttons on very small screens */
+  .btn-proceed,
+  .btn-cancel,
+  .btn-confirm-reset,
+  .btn-back {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    min-height: auto !important;
   }
 }
