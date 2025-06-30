@@ -269,10 +269,10 @@
   font-weight: 500;
 }
 
-/* Confirmation Details */
+/* Confirmation Details - UPDATED: Stack vertically on desktop */
 .confirmation-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
 }
@@ -458,7 +458,7 @@
   }
 
   .confirmation-details {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: var(--spacing-md);
   }
 
