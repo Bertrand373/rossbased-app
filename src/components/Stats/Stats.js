@@ -1,10 +1,11 @@
-// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration - COMPLETE FILE
+// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration + 30-Day Gladiator + Unique Badge Benefits - COMPLETE FILE
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb, 
+  FaShieldAlt, FaDumbbell, FaFire } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -158,7 +159,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           })) || [
             { id: 1, name: '7-Day Warrior', earned: false, date: null },
             { id: 2, name: '14-Day Monk', earned: false, date: null },
-            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 3, name: '30-Day Gladiator', earned: false, date: null },
             { id: 4, name: '90-Day King', earned: false, date: null }
           ]
         };
@@ -176,7 +177,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           badges: [
             { id: 1, name: '7-Day Warrior', earned: false, date: null },
             { id: 2, name: '14-Day Monk', earned: false, date: null },
-            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 3, name: '30-Day Gladiator', earned: false, date: null },
             { id: 4, name: '90-Day King', earned: false, date: null }
           ],
           benefitTracking: [],
@@ -290,6 +291,670 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           color: '#aaaaaa',
           font: { size: 12 }
         },
+      purging: {
+        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
+        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
+        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
+      },
+      expansion: {
+        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
+        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
+        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
+      },
+      integration: {
+        practical: `Day ${streak}: Spiritual Integration phase brings profound inner transformation. You're gaining abilities that feel almost supernatural.`,
+        esoteric: `Day ${streak}: Major consciousness expansion occurring. You're embodying the divine masculine archetype.`,
+        actionable: "Accept increased responsibility gracefully. Share your wisdom while remaining humble about your development."
+      },
+      mastery: {
+        practical: `Day ${streak}: Mastery & Service phase brings responsibility for guiding others and contributing to human evolution.`,
+        esoteric: `Day ${streak}: Individual development now serves cosmic evolution. Your consciousness affects the collective field.`,
+        actionable: "Focus on legacy creation and mentoring others. Your mastery should serve the awakening of all humanity."
+      }
+    };
+    
+    return challengeInsights[phase];
+  };
+
+  // ENHANCED: Timeline-based insights for all 6 metrics with challenge-specific guidance
+  const generateAllInsights = () => {
+    const filteredData = getFilteredBenefitData();
+    const currentStreak = userData.currentStreak || 0;
+    const insights = [];
+    
+    // Define all 6 enhanced benefit categories
+    const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    
+    // UPDATED: Timeline-based phase detection - matches Emotional Timeline exactly
+    const getPhase = (streak) => {
+      if (streak <= 14) return 'initial';
+      if (streak <= 45) return 'purging'; 
+      if (streak <= 90) return 'expansion';
+      if (streak <= 180) return 'integration';
+      return 'mastery';
+    };
+    
+    const currentPhase = getPhase(currentStreak);
+    
+    // Generate insights for ALL 6 metrics based on timeline and phase
+    allMetrics.forEach((metric, index) => {
+      const avgValue = parseFloat(calculateAverage());
+      const isSelectedMetric = metric === selectedMetric;
+      
+      // Get metric-specific benefits from the guide
+      const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
+      const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
+      
+      insights.push({
+        id: index + 1,
+        practical: metricBenefits.practical,
+        esoteric: metricBenefits.esoteric,
+        actionable: isSelectedMetric ? challengeGuidance.actionable : metricBenefits.actionable,
+        metric: metric,
+        phase: currentPhase,
+        isPhaseSpecific: true
+      });
+    });
+    
+    // Add phase-specific challenge insight if user needs guidance
+    if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
+      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
+      insights.push({
+        id: insights.length + 1,
+        practical: challengeInsight.practical,
+        esoteric: challengeInsight.esoteric,
+        actionable: challengeInsight.actionable,
+        metric: 'challenge',
+        phase: currentPhase,
+        isChallenge: true
+      });
+    }
+    
+    return insights;
+  };
+
+  // UPDATED: Generate pattern insights with Emotional Timeline phases
+  const generatePatternInsights = () => {
+    const filteredData = getFilteredBenefitData();
+    const currentStreak = userData.currentStreak || 0;
+    const patterns = [];
+    
+    // Get current phase for context
+    const getPhase = (streak) => {
+      if (streak <= 14) return 'initial';
+      if (streak <= 45) return 'purging'; 
+      if (streak <= 90) return 'expansion';
+      if (streak <= 180) return 'integration';
+      return 'mastery';
+    };
+    
+    const currentPhase = getPhase(currentStreak);
+    
+    // UPDATED: Timeline-based challenge patterns matching Emotional Timeline
+    const timelinePatterns = {
+      initial: {
+        practical: "Days 1-14: Initial Adaptation phase. Strong urges and energy fluctuations are completely normal - your body is learning to retain vital force.",
+        esoteric: "Days 1-14: You're beginning the hero's journey. The inner conflict represents old patterns dying and new consciousness being born.",
+        actionable: wisdomMode ?
+          "Embrace this sacred initiation. Every urge resisted builds spiritual strength for the challenges ahead." :
+          "Focus on building unbreakable daily habits. Use cold showers and exercise to channel excess energy."
+      },
+      purging: {
+        practical: "Days 15-45: Emotional Purging phase. Mood swings and flatlines indicate your psyche is healing itself - this is the most challenging phase.",
+        esoteric: "Days 15-45: Your energy body is adapting to higher frequencies. Emotional volatility shows old patterns being purged.",
+        actionable: wisdomMode ?
+          "Trust the purification process. Journal extensively and accept emotions without resistance." :
+          "This emotional turbulence is temporary but necessary. Maintain practices even when motivation dips."
+      },
+      expansion: {
+        practical: "Days 46-90: Mental Expansion phase. Enhanced cognitive abilities and creativity emerge as emotional turbulence stabilizes.",
+        esoteric: "Days 46-90: Sexual energy is transmuting into mental power. You're entering the alchemical refinement stage.",
+        actionable: wisdomMode ?
+          "Channel growing mental power into service. Apply enhanced abilities to help others and create meaningful work." :
+          "Use increased focus for important goals. This is the time for major intellectual and creative achievements."
+      },
+      integration: {
+        practical: "Days 91-180: Spiritual Integration phase. Profound inner transformation as benefits become deeply integrated.",
+        esoteric: "Days 91-180: Major consciousness expansion occurring. You're embodying the divine masculine archetype.",
+        actionable: wisdomMode ?
+          "Accept your growing influence responsibly. You're becoming a beacon of light for others on the path." :
+          "Handle increased social attention wisely. Share your wisdom while remaining humble about your development."
+      },
+      mastery: {
+        practical: "180+ Days: Mastery & Service phase. Complete integration - you've transcended the need for external validation.",
+        esoteric: "180+ Days: Individual consciousness merges with universal consciousness. You serve the evolution of all humanity.",
+        actionable: wisdomMode ?
+          "Share your wisdom through teaching and example. Your mastery serves the awakening of collective consciousness." :
+          "Focus on legacy creation and mentoring others. Your development should create lasting positive impact."
+      }
+    };
+    
+    // Always show timeline-based pattern for current phase
+    const currentPattern = timelinePatterns[currentPhase];
+    if (currentPattern) {
+      patterns.push({
+        id: 1,
+        practical: currentPattern.practical,
+        esoteric: currentPattern.esoteric,
+        actionable: currentPattern.actionable,
+        isTimeline: true
+      });
+    }
+    
+    // Add specific challenge warnings based on timeline
+    const getChallengeWarnings = () => {
+      if (currentStreak >= 14 && currentStreak <= 21) {
+        return {
+          practical: "Week 3 Challenge: Many experience the strongest urges around day 14-21. This is your brain's final attempt to return to old patterns.",
+          esoteric: "Week 3 Initiation: You're facing the guardian at the threshold. This test determines if you're ready for deeper transformation.",
+          actionable: wisdomMode ?
+            "See this challenge as sacred initiation. Every moment you resist builds spiritual strength for the journey ahead." :
+            "Increase meditation time and remove yourself from triggering situations. This is the make-or-break moment."
+        };
+      }
+      
+      if (currentStreak >= 30 && currentStreak <= 45) {
+        return {
+          practical: "Flatline Warning: Days 30-45 often bring emotional numbness and low motivation. This is brain integration, not failure.",
+          esoteric: "Sacred Void: You're in the dissolution phase where old identity dies before new consciousness is born.",
+          actionable: wisdomMode ?
+            "Embrace the emptiness as sacred preparation. The void creates space for higher consciousness to enter." :
+            "Trust the process and maintain practices even when you feel nothing. This phase passes and leads to breakthroughs."
+        };
+      }
+      
+      if (currentStreak >= 60 && currentStreak <= 90) {
+        return {
+          practical: "Social Pressure Peak: Others may become more hostile or try to sabotage your progress as your energy threatens established hierarchies.",
+          esoteric: "Energy Disruption: Your rising consciousness disrupts lower vibrational patterns around you, causing resistance from others.",
+          actionable: wisdomMode ?
+            "Send love to those who resist your growth. Their hostility reflects their own inner suffering and limitation." :
+            "Protect your energy while maintaining compassion. Set firm boundaries with those who try to drain or sabotage you."
+        };
+      }
+      
+      return null;
+    };
+    
+    const challengeWarning = getChallengeWarnings();
+    if (challengeWarning) {
+      patterns.push({
+        id: 2,
+        practical: challengeWarning.practical,
+        esoteric: challengeWarning.esoteric,
+        actionable: challengeWarning.actionable,
+        isWarning: true
+      });
+    }
+    
+    // Add relapse analysis if user has history
+    if (userData.longestStreak && userData.longestStreak > currentStreak && currentStreak > 0) {
+      patterns.push({
+        id: patterns.length + 1,
+        practical: `Recovery Pattern: You've previously achieved ${userData.longestStreak} days. Your current ${currentStreak}-day streak shows you're rebuilding that momentum.`,
+        esoteric: `Spiral Evolution: Your previous ${userData.longestStreak}-day journey created lasting changes in your consciousness. This current cycle builds upon that foundation.`,
+        actionable: wisdomMode ?
+          "Each attempt deepens your spiritual capacity. You're not starting over - you're spiraling upward to higher levels." :
+          "Each attempt strengthens your resolve. Apply lessons learned from your previous success to go even further this time."
+      });
+    }
+    
+    // Add benefit tracking patterns if sufficient data
+    if (filteredData.length >= 7) {
+      const recentAvg = filteredData.slice(-7).reduce((sum, day) => sum + (day[selectedMetric] || 0), 0) / 7;
+      const overallAvg = parseFloat(calculateAverage());
+      
+      if (recentAvg > overallAvg + 0.5) {
+        patterns.push({
+          id: patterns.length + 1,
+          practical: `Improvement Trend: Your recent ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} levels are trending upward, showing real progress.`,
+          esoteric: `Energy Elevation: Your ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} energy is ascending to higher frequencies as your practice deepens.`,
+          actionable: wisdomMode ?
+            "Continue the practices that create this upward spiral. Your consciousness is expanding through dedicated effort." :
+            "Identify what specific factors are driving this improvement and maintain those positive patterns consistently."
+        });
+      } else if (recentAvg < overallAvg - 0.5) {
+        patterns.push({
+          id: patterns.length + 1,
+          practical: `Attention Needed: Your recent ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} levels have dipped. This often happens before major breakthroughs.`,
+          esoteric: `Pre-Breakthrough Dip: Temporary ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} decreases often precede quantum leaps in consciousness.`,
+          actionable: wisdomMode ?
+            "Trust the process - this dip often indicates deep transformation occurring beneath the surface." :
+            "Review your recent habits and stress levels. Make adjustments to support your wellbeing during this phase."
+        });
+      }
+    }
+    
+    return patterns;
+  };
+
+  // UPDATED: Get unique badge descriptions and benefits based on the semen retention guide
+  const getBadgeInfo = (badgeName) => {
+    switch (badgeName) {
+      case '7-Day Warrior':
+        return {
+          description: "You've completed the Foundation Phase! Your body has begun adapting to energy retention and you've established the crucial daily habits that will carry you forward.",
+          benefits: [
+            { icon: FaShieldAlt, text: "Foundation established - new neural pathways forming" },
+            { icon: FaFire, text: "Energy fluctuations stabilizing" },
+            { icon: FaBrain, text: "Brief moments of unusual mental clarity" },
+            { icon: FaHeart, text: "Growing sense of possibility and self-confidence" }
+          ]
+        };
+      
+      case '14-Day Monk':
+        return {
+          description: "Two weeks of dedication! You're in the Adjustment Phase where initial benefits become noticeable. Your body is redirecting vital nutrients from reproduction to brain development.",
+          benefits: [
+            { icon: FaBrain, text: "Memory enhancement and faster decision-making" },
+            { icon: FaDumbbell, text: "Noticeable strength gains and better posture" },
+            { icon: FaEye, text: "Eyes becoming brighter and more alert" },
+            { icon: FaHeart, text: "Natural magnetism - others notice something different" }
+          ]
+        };
+      
+      case '30-Day Gladiator':
+        return {
+          description: "A full month of discipline! You've entered the Momentum Phase where major transformations begin. Your body composition naturally improves and sustained high energy emerges.",
+          benefits: [
+            { icon: FaDumbbell, text: "Natural muscle gain and fat loss without extra effort" },
+            { icon: FaFire, text: "Sustained high energy throughout the day" },
+            { icon: FaBrain, text: "Interest in philosophy and deeper subjects awakens" },
+            { icon: FaTrophy, text: "Attracting higher-quality people into your life" }
+          ]
+        };
+      
+      case '90-Day King':
+        return {
+          description: "Royal achievement! You've reached the Transformation Phase where profound changes manifest. At 90+ days, your brain has completed major restructuring and you've developed almost supernatural abilities.",
+          benefits: [
+            { icon: FaTrophy, text: "Face becomes more symmetric, features more defined" },
+            { icon: FaLightbulb, text: "Wisdom development and intuitive decision-making" },
+            { icon: FaHeart, text: "Natural charisma and leadership abilities emerge" },
+            { icon: FaStar, text: "Others automatically look to you for direction" }
+          ]
+        };
+      
+      default:
+        return {
+          description: "Congratulations on earning this achievement!",
+          benefits: [
+            { icon: FaCheckCircle, text: "Increased mental clarity" },
+            { icon: FaCheckCircle, text: "Enhanced self-discipline" },
+            { icon: FaCheckCircle, text: "Greater emotional stability" },
+            { icon: FaCheckCircle, text: "Improved energy levels" }
+          ]
+        };
+    }
+  };
+  
+  return (
+    <div className="stats-container">
+      {/* Smart Floating Wisdom Toggle - Only shows for premium users when insights are visible */}
+      {showFloatingToggle && isPremium && (
+        <button 
+          className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
+          onClick={() => setWisdomMode(!wisdomMode)}
+          title={wisdomMode ? "Switch to Practical Insights" : "Switch to Esoteric Insights"}
+        >
+          <FaEye className={`floating-wisdom-eye ${wisdomMode ? 'active' : ''}`} />
+        </button>
+      )}
+
+      {/* UPDATED: Header with new Reset Progress button */}
+      <div className="stats-header">
+        <div className="stats-header-spacer"></div>
+        <h2>Your Stats</h2>
+        <div className="stats-header-actions">
+          <button className="reset-stats-btn" onClick={handleResetStats}>
+            <FaRedo />
+            <span>Reset Progress</span>
+          </button>
+        </div>
+      </div>
+      
+      {/* UPDATED: Smart Reset Dialog replaces old confirmation modal */}
+      <SmartResetDialog
+        isOpen={showSmartResetDialog}
+        onClose={() => setShowSmartResetDialog(false)}
+        onConfirm={confirmResetStats}
+        userData={userData}
+      />
+      
+      {/* Streak Statistics - ALWAYS VISIBLE */}
+      <div className="streak-stats">
+        <div className="stat-card current-streak">
+          <div className="stat-value">{userData.currentStreak || 0}</div>
+          <div className="stat-label">Current Streak</div>
+        </div>
+        
+        <div className="stat-card longest-streak">
+          <div className="stat-value">{userData.longestStreak || 0}</div>
+          <div className="stat-label">Longest Streak</div>
+        </div>
+        
+        <div className="stat-card total-wetdreams">
+          <div className="stat-value">{userData.wetDreamCount || 0}</div>
+          <div className="stat-label">Wet Dreams</div>
+        </div>
+        
+        <div className="stat-card total-relapses">
+          <div className="stat-value">{userData.relapseCount || 0}</div>
+          <div className="stat-label">Relapses</div>
+        </div>
+      </div>
+      
+      {/* Milestone Badges - ALWAYS VISIBLE */}
+      <div className="milestone-section">
+        <h3>Your Achievements</h3>
+        
+        <div className="badges-grid">
+          {userData.badges && userData.badges.map(badge => (
+            <div 
+              key={badge.id} 
+              className={`badge-card ${badge.earned ? 'earned' : 'locked'}`}
+              onClick={() => badge.earned && handleBadgeClick(badge)}
+            >
+              <div className="badge-icon">
+                {badge.earned ? (
+                  <FaTrophy className="badge-earned-icon" />
+                ) : (
+                  <FaLock className="badge-locked-icon" />
+                )}
+              </div>
+              <div className="badge-name">{badge.name}</div>
+              {badge.earned && (
+                <div className="badge-date">
+                  Earned {badge.date ? format(new Date(badge.date), 'MMM d') : ''}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      {/* PROGRESSIVE PREMIUM: Benefit Tracker Section */}
+      <div className="benefit-tracker-section">
+        <h3>Benefit Tracker</h3>
+        
+        {/* Controls - ALWAYS VISIBLE (so users can see different averages) */}
+        <div className="benefit-tracker-controls">
+          <div className="metric-selector">
+            {/* SINGLE ROW: All 6 benefit items in one container */}
+            <div className="metric-pill-container">
+              <button 
+                className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('energy')}
+              >
+                Energy
+              </button>
+              <button 
+                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('focus')}
+              >
+                Focus
+              </button>
+              <button 
+                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('confidence')}
+              >
+                Confidence
+              </button>
+              <button 
+                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('aura')}
+              >
+                Aura
+              </button>
+              <button 
+                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('sleep')}
+              >
+                Sleep Quality
+              </button>
+              <button 
+                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
+                onClick={() => setSelectedMetric('workout')}
+              >
+                Workout
+              </button>
+            </div>
+          </div>
+          
+          {/* Time range selector - UNCHANGED */}
+          <div className="time-range-selector-container">
+            <div className="time-range-selector">
+              <button 
+                className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
+                onClick={() => setTimeRange('week')}
+              >
+                Week
+              </button>
+              <button 
+                className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
+                onClick={() => setTimeRange('month')}
+              >
+                Month
+              </button>
+              <button 
+                className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
+                onClick={() => setTimeRange('quarter')}
+              >
+                3 Months
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* FREE USER CONTENT: Average + One Insight */}
+        {!isPremium && (
+          <div className="free-benefit-preview">
+            {/* Average Display */}
+            <div className="free-average-display">
+              <div className="current-metric-average">
+                <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
+                <div className="current-metric-value">{calculateAverage()}/10</div>
+              </div>
+            </div>
+            
+            {/* Single Insight Preview */}
+            <div className="free-insight-preview">
+              <div className="current-insight-card">
+                <div className="current-insight-header">
+                  <FaRegLightbulb className="insight-icon" />
+                  <span>Sample Insight</span>
+                </div>
+                <div className="current-insight-text">
+                  {getCurrentInsight()}
+                </div>
+              </div>
+            </div>
+            
+            {/* PREMIUM UPGRADE CTA */}
+            <div className="benefit-upgrade-cta">
+              <div className="upgrade-helmet-section">
+                <img 
+                  src={helmetImage} 
+                  alt="Premium Benefits" 
+                  className="upgrade-helmet-icon"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+                <div className="upgrade-helmet-fallback" style={{display: 'none'}}>⚡</div>
+              </div>
+              
+              <div className="upgrade-text-section">
+                <h4>Unlock Full Benefit Analysis</h4>
+                <p>Get detailed charts, advanced insights, pattern analysis, and personalized recommendations to optimize your journey.</p>
+                
+                <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
+                  <FaStar />
+                  Upgrade to Premium
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* PREMIUM USER CONTENT: Full Analysis */}
+        {isPremium && (
+          <>
+            {/* Chart and Current Insight Container - REF MARKER for scroll detection */}
+            <div className="chart-and-insight-container" ref={insightsStartRef}>
+              <div className="chart-container">
+                <Line data={generateChartData()} options={chartOptions} height={300} />
+              </div>
+              
+              <div className="current-insight-sidebar">
+                <div className="current-metric-average">
+                  <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
+                  <div className="current-metric-value">{calculateAverage()}/10</div>
+                </div>
+                
+                <div className="current-insight-card">
+                  <div className="current-insight-header">
+                    <FaRegLightbulb className="insight-icon" />
+                    <span>Current Insight</span>
+                  </div>
+                  <div className="current-insight-text">
+                    {getCurrentInsight()}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* UPDATED: Benefit Insights Section - Phase indicator positioned underneath header on the right */}
+            <div className="detailed-analysis-section">
+              <div className="detailed-analysis-header">
+                <div className="detailed-analysis-title">
+                  <h4>Benefit Insights</h4>
+                </div>
+                <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
+                  <div className="benefit-phase-content">
+                    {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
+                    <div className="benefit-phase-text">
+                      <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
+                      <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="streak-comparison">
+                <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
+                
+                <div className="comparison-grid">
+                  <div className="comparison-card">
+                    <div className="comparison-value">{streakComparison[selectedMetric].short}/10</div>
+                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 1-7 day streaks</div>
+                  </div>
+                  
+                  <div className="comparison-card">
+                    <div className="comparison-value">{streakComparison[selectedMetric].medium}/10</div>
+                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 8-30 day streaks</div>
+                  </div>
+                  
+                  <div className="comparison-card">
+                    <div className="comparison-value">{streakComparison[selectedMetric].long}/10</div>
+                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 30+ day streaks</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="personalized-analysis">
+                <h5>Personalized Analysis</h5>
+                
+                <div className="insights-grid">
+                  {generateAllInsights().map(insight => (
+                    <div 
+                      key={insight.id} 
+                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''} ${insight.isPhaseSpecific ? 'phase-specific' : ''} ${insight.isChallenge ? 'challenge-warning' : ''}`}
+                    >
+                      <div className="insight-card-header">
+                        <FaRegLightbulb className="insight-icon" />
+                        <span className="insight-metric">{insight.metric === 'sleep' ? 'Sleep Quality' : insight.metric === 'challenge' ? 'Current Phase' : insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
+                      </div>
+                      <div className="insight-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Journey Guidance Section - NO ICON */}
+            <div className="pattern-analysis-section" ref={patternSectionRef}>
+              <div className="pattern-analysis-header">
+                <h3>Journey Guidance</h3>
+              </div>
+              
+              <div className="pattern-insights">
+                {generatePatternInsights().length > 0 ? (
+                  generatePatternInsights().map(insight => (
+                    <div key={insight.id} className={`pattern-insight-item ${insight.isTimeline ? 'timeline' : ''} ${insight.isWarning ? 'warning' : ''}`}>
+                      <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
+                      <div className="pattern-actionable">{insight.actionable}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-patterns">
+                    <FaInfoCircle className="no-patterns-icon" />
+                    <span>{wisdomMode ? 
+                      "Track more cycles to discover the deeper rhythms and cosmic patterns governing your journey." :
+                      "Track more cycles to identify behavioral patterns and optimize your approach."
+                    }</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+      
+      {/* UPDATED: Badge Modal with unique descriptions and benefits */}
+      {showBadgeModal && selectedBadge && (
+        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
+          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
+            <div className="badge-trophy">
+              <FaMedal className="badge-trophy-icon" />
+            </div>
+            
+            <h3>{selectedBadge.name}</h3>
+            
+            <div className="badge-earned-date">
+              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
+            </div>
+            
+            <div className="badge-description">
+              <p>{getBadgeInfo(selectedBadge.name).description}</p>
+            </div>
+            
+            <div className="badge-benefits">
+              <h4>Benefits Unlocked:</h4>
+              <ul>
+                {getBadgeInfo(selectedBadge.name).benefits.map((benefit, index) => (
+                  <li key={index}>
+                    <benefit.icon className="check-icon" />
+                    <span>{benefit.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="modal-actions">
+              <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
+                Continue Journey
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Stats;
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
           drawBorder: false
@@ -642,629 +1307,3 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         esoteric: `Day ${streak}: You're beginning the hero's journey. The resistance you feel is the old self protecting its familiar patterns.`,
         actionable: "Focus on building unbreakable daily habits. Use cold showers and intense exercise to channel excess energy."
       },
-      purging: {
-        practical: `Day ${streak}: Emotional Purging phase brings mood swings and flatlines. These are signs of your psyche healing itself.`,
-        esoteric: `Day ${streak}: You're in the purification stage. Emotional volatility indicates old patterns being purged from your system.`,
-        actionable: "Journal extensively and accept emotions without resistance. This emotional turbulence is part of healing."
-      },
-      expansion: {
-        practical: `Day ${streak}: Mental Expansion phase brings enhanced cognitive abilities. Your brain is operating at higher efficiency.`,
-        esoteric: `Day ${streak}: You're entering the alchemical refinement stage. Mental faculties expand as consciousness evolves.`,
-        actionable: "Apply enhanced focus to important goals. This is the time for major intellectual and creative achievements."
-      },
-      integration: {
-        practical: `Day ${streak}: Spiritual Integration phase brings profound inner transformation. You're gaining abilities that feel almost supernatural.`,
-        esoteric: `Day ${streak}: Major consciousness expansion occurring. You're embodying the divine masculine archetype.`,
-        actionable: "Accept increased responsibility gracefully. Share your wisdom while remaining humble about your development."
-      },
-      mastery: {
-        practical: `Day ${streak}: Mastery & Service phase brings responsibility for guiding others and contributing to human evolution.`,
-        esoteric: `Day ${streak}: Individual development now serves cosmic evolution. Your consciousness affects the collective field.`,
-        actionable: "Focus on legacy creation and mentoring others. Your mastery should serve the awakening of all humanity."
-      }
-    };
-    
-    return challengeInsights[phase];
-  };
-
-  // ENHANCED: Timeline-based insights for all 6 metrics with challenge-specific guidance
-  const generateAllInsights = () => {
-    const filteredData = getFilteredBenefitData();
-    const currentStreak = userData.currentStreak || 0;
-    const insights = [];
-    
-    // Define all 6 enhanced benefit categories
-    const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
-    
-    // UPDATED: Timeline-based phase detection - matches Emotional Timeline exactly
-    const getPhase = (streak) => {
-      if (streak <= 14) return 'initial';
-      if (streak <= 45) return 'purging'; 
-      if (streak <= 90) return 'expansion';
-      if (streak <= 180) return 'integration';
-      return 'mastery';
-    };
-    
-    const currentPhase = getPhase(currentStreak);
-    
-    // Generate insights for ALL 6 metrics based on timeline and phase
-    allMetrics.forEach((metric, index) => {
-      const avgValue = parseFloat(calculateAverage());
-      const isSelectedMetric = metric === selectedMetric;
-      
-      // Get metric-specific benefits from the guide
-      const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
-      const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
-      
-      insights.push({
-        id: index + 1,
-        practical: metricBenefits.practical,
-        esoteric: metricBenefits.esoteric,
-        actionable: isSelectedMetric ? challengeGuidance.actionable : metricBenefits.actionable,
-        metric: metric,
-        phase: currentPhase,
-        isPhaseSpecific: true
-      });
-    });
-    
-    // Add phase-specific challenge insight if user needs guidance
-    if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
-      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
-      insights.push({
-        id: insights.length + 1,
-        practical: challengeInsight.practical,
-        esoteric: challengeInsight.esoteric,
-        actionable: challengeInsight.actionable,
-        metric: 'challenge',
-        phase: currentPhase,
-        isChallenge: true
-      });
-    }
-    
-    return insights;
-  };
-
-  // UPDATED: Generate pattern insights with Emotional Timeline phases
-  const generatePatternInsights = () => {
-    const filteredData = getFilteredBenefitData();
-    const currentStreak = userData.currentStreak || 0;
-    const patterns = [];
-    
-    // Get current phase for context
-    const getPhase = (streak) => {
-      if (streak <= 14) return 'initial';
-      if (streak <= 45) return 'purging'; 
-      if (streak <= 90) return 'expansion';
-      if (streak <= 180) return 'integration';
-      return 'mastery';
-    };
-    
-    const currentPhase = getPhase(currentStreak);
-    
-    // UPDATED: Timeline-based challenge patterns matching Emotional Timeline
-    const timelinePatterns = {
-      initial: {
-        practical: "Days 1-14: Initial Adaptation phase. Strong urges and energy fluctuations are completely normal - your body is learning to retain vital force.",
-        esoteric: "Days 1-14: You're beginning the hero's journey. The inner conflict represents old patterns dying and new consciousness being born.",
-        actionable: wisdomMode ?
-          "Embrace this sacred initiation. Every urge resisted builds spiritual strength for the challenges ahead." :
-          "Focus on building unbreakable daily habits. Use cold showers and exercise to channel excess energy."
-      },
-      purging: {
-        practical: "Days 15-45: Emotional Purging phase. Mood swings and flatlines indicate your psyche is healing itself - this is the most challenging phase.",
-        esoteric: "Days 15-45: Your energy body is adapting to higher frequencies. Emotional volatility shows old patterns being purged.",
-        actionable: wisdomMode ?
-          "Trust the purification process. Journal extensively and accept emotions without resistance." :
-          "This emotional turbulence is temporary but necessary. Maintain practices even when motivation dips."
-      },
-      expansion: {
-        practical: "Days 46-90: Mental Expansion phase. Enhanced cognitive abilities and creativity emerge as emotional turbulence stabilizes.",
-        esoteric: "Days 46-90: Sexual energy is transmuting into mental power. You're entering the alchemical refinement stage.",
-        actionable: wisdomMode ?
-          "Channel growing mental power into service. Apply enhanced abilities to help others and create meaningful work." :
-          "Use increased focus for important goals. This is the time for major intellectual and creative achievements."
-      },
-      integration: {
-        practical: "Days 91-180: Spiritual Integration phase. Profound inner transformation as benefits become deeply integrated.",
-        esoteric: "Days 91-180: Major consciousness expansion occurring. You're embodying the divine masculine archetype.",
-        actionable: wisdomMode ?
-          "Accept your growing influence responsibly. You're becoming a beacon of light for others on the path." :
-          "Handle increased social attention wisely. Share your wisdom while remaining humble about your development."
-      },
-      mastery: {
-        practical: "180+ Days: Mastery & Service phase. Complete integration - you've transcended the need for external validation.",
-        esoteric: "180+ Days: Individual consciousness merges with universal consciousness. You serve the evolution of all humanity.",
-        actionable: wisdomMode ?
-          "Share your wisdom through teaching and example. Your mastery serves the awakening of collective consciousness." :
-          "Focus on legacy creation and mentoring others. Your development should create lasting positive impact."
-      }
-    };
-    
-    // Always show timeline-based pattern for current phase
-    const currentPattern = timelinePatterns[currentPhase];
-    if (currentPattern) {
-      patterns.push({
-        id: 1,
-        practical: currentPattern.practical,
-        esoteric: currentPattern.esoteric,
-        actionable: currentPattern.actionable,
-        isTimeline: true
-      });
-    }
-    
-    // Add specific challenge warnings based on timeline
-    const getChallengeWarnings = () => {
-      if (currentStreak >= 14 && currentStreak <= 21) {
-        return {
-          practical: "Week 3 Challenge: Many experience the strongest urges around day 14-21. This is your brain's final attempt to return to old patterns.",
-          esoteric: "Week 3 Initiation: You're facing the guardian at the threshold. This test determines if you're ready for deeper transformation.",
-          actionable: wisdomMode ?
-            "See this challenge as sacred initiation. Every moment you resist builds spiritual strength for the journey ahead." :
-            "Increase meditation time and remove yourself from triggering situations. This is the make-or-break moment."
-        };
-      }
-      
-      if (currentStreak >= 30 && currentStreak <= 45) {
-        return {
-          practical: "Flatline Warning: Days 30-45 often bring emotional numbness and low motivation. This is brain integration, not failure.",
-          esoteric: "Sacred Void: You're in the dissolution phase where old identity dies before new consciousness is born.",
-          actionable: wisdomMode ?
-            "Embrace the emptiness as sacred preparation. The void creates space for higher consciousness to enter." :
-            "Trust the process and maintain practices even when you feel nothing. This phase passes and leads to breakthroughs."
-        };
-      }
-      
-      if (currentStreak >= 60 && currentStreak <= 90) {
-        return {
-          practical: "Social Pressure Peak: Others may become more hostile or try to sabotage your progress as your energy threatens established hierarchies.",
-          esoteric: "Energy Disruption: Your rising consciousness disrupts lower vibrational patterns around you, causing resistance from others.",
-          actionable: wisdomMode ?
-            "Send love to those who resist your growth. Their hostility reflects their own inner suffering and limitation." :
-            "Protect your energy while maintaining compassion. Set firm boundaries with those who try to drain or sabotage you."
-        };
-      }
-      
-      return null;
-    };
-    
-    const challengeWarning = getChallengeWarnings();
-    if (challengeWarning) {
-      patterns.push({
-        id: 2,
-        practical: challengeWarning.practical,
-        esoteric: challengeWarning.esoteric,
-        actionable: challengeWarning.actionable,
-        isWarning: true
-      });
-    }
-    
-    // Add relapse analysis if user has history
-    if (userData.longestStreak && userData.longestStreak > currentStreak && currentStreak > 0) {
-      patterns.push({
-        id: patterns.length + 1,
-        practical: `Recovery Pattern: You've previously achieved ${userData.longestStreak} days. Your current ${currentStreak}-day streak shows you're rebuilding that momentum.`,
-        esoteric: `Spiral Evolution: Your previous ${userData.longestStreak}-day journey created lasting changes in your consciousness. This current cycle builds upon that foundation.`,
-        actionable: wisdomMode ?
-          "Each attempt deepens your spiritual capacity. You're not starting over - you're spiraling upward to higher levels." :
-          "Each attempt strengthens your resolve. Apply lessons learned from your previous success to go even further this time."
-      });
-    }
-    
-    // Add benefit tracking patterns if sufficient data
-    if (filteredData.length >= 7) {
-      const recentAvg = filteredData.slice(-7).reduce((sum, day) => sum + (day[selectedMetric] || 0), 0) / 7;
-      const overallAvg = parseFloat(calculateAverage());
-      
-      if (recentAvg > overallAvg + 0.5) {
-        patterns.push({
-          id: patterns.length + 1,
-          practical: `Improvement Trend: Your recent ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} levels are trending upward, showing real progress.`,
-          esoteric: `Energy Elevation: Your ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} energy is ascending to higher frequencies as your practice deepens.`,
-          actionable: wisdomMode ?
-            "Continue the practices that create this upward spiral. Your consciousness is expanding through dedicated effort." :
-            "Identify what specific factors are driving this improvement and maintain those positive patterns consistently."
-        });
-      } else if (recentAvg < overallAvg - 0.5) {
-        patterns.push({
-          id: patterns.length + 1,
-          practical: `Attention Needed: Your recent ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} levels have dipped. This often happens before major breakthroughs.`,
-          esoteric: `Pre-Breakthrough Dip: Temporary ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} decreases often precede quantum leaps in consciousness.`,
-          actionable: wisdomMode ?
-            "Trust the process - this dip often indicates deep transformation occurring beneath the surface." :
-            "Review your recent habits and stress levels. Make adjustments to support your wellbeing during this phase."
-        });
-      }
-    }
-    
-    return patterns;
-  };
-  
-  return (
-    <div className="stats-container">
-      {/* Smart Floating Wisdom Toggle - Only shows for premium users when insights are visible */}
-      {showFloatingToggle && isPremium && (
-        <button 
-          className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
-          onClick={() => setWisdomMode(!wisdomMode)}
-          title={wisdomMode ? "Switch to Practical Insights" : "Switch to Esoteric Insights"}
-        >
-          <FaEye className={`floating-wisdom-eye ${wisdomMode ? 'active' : ''}`} />
-        </button>
-      )}
-
-      {/* UPDATED: Header with new Reset Progress button */}
-      <div className="stats-header">
-        <div className="stats-header-spacer"></div>
-        <h2>Your Stats</h2>
-        <div className="stats-header-actions">
-          <button className="reset-stats-btn" onClick={handleResetStats}>
-            <FaRedo />
-            <span>Reset Progress</span>
-          </button>
-        </div>
-      </div>
-      
-      {/* UPDATED: Smart Reset Dialog replaces old confirmation modal */}
-      <SmartResetDialog
-        isOpen={showSmartResetDialog}
-        onClose={() => setShowSmartResetDialog(false)}
-        onConfirm={confirmResetStats}
-        userData={userData}
-      />
-      
-      {/* Streak Statistics - ALWAYS VISIBLE */}
-      <div className="streak-stats">
-        <div className="stat-card current-streak">
-          <div className="stat-value">{userData.currentStreak || 0}</div>
-          <div className="stat-label">Current Streak</div>
-        </div>
-        
-        <div className="stat-card longest-streak">
-          <div className="stat-value">{userData.longestStreak || 0}</div>
-          <div className="stat-label">Longest Streak</div>
-        </div>
-        
-        <div className="stat-card total-wetdreams">
-          <div className="stat-value">{userData.wetDreamCount || 0}</div>
-          <div className="stat-label">Wet Dreams</div>
-        </div>
-        
-        <div className="stat-card total-relapses">
-          <div className="stat-value">{userData.relapseCount || 0}</div>
-          <div className="stat-label">Relapses</div>
-        </div>
-      </div>
-      
-      {/* Milestone Badges - ALWAYS VISIBLE */}
-      <div className="milestone-section">
-        <h3>Your Achievements</h3>
-        
-        <div className="badges-grid">
-          {userData.badges && userData.badges.map(badge => (
-            <div 
-              key={badge.id} 
-              className={`badge-card ${badge.earned ? 'earned' : 'locked'}`}
-              onClick={() => badge.earned && handleBadgeClick(badge)}
-            >
-              <div className="badge-icon">
-                {badge.earned ? (
-                  <FaTrophy className="badge-earned-icon" />
-                ) : (
-                  <FaLock className="badge-locked-icon" />
-                )}
-              </div>
-              <div className="badge-name">{badge.name}</div>
-              {badge.earned && (
-                <div className="badge-date">
-                  Earned {badge.date ? format(new Date(badge.date), 'MMM d') : ''}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* PROGRESSIVE PREMIUM: Benefit Tracker Section */}
-      <div className="benefit-tracker-section">
-        <h3>Benefit Tracker</h3>
-        
-        {/* Controls - ALWAYS VISIBLE (so users can see different averages) */}
-        <div className="benefit-tracker-controls">
-          <div className="metric-selector">
-            {/* SINGLE ROW: All 6 benefit items in one container */}
-            <div className="metric-pill-container">
-              <button 
-                className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('energy')}
-              >
-                Energy
-              </button>
-              <button 
-                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('focus')}
-              >
-                Focus
-              </button>
-              <button 
-                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('confidence')}
-              >
-                Confidence
-              </button>
-              <button 
-                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('aura')}
-              >
-                Aura
-              </button>
-              <button 
-                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('sleep')}
-              >
-                Sleep Quality
-              </button>
-              <button 
-                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('workout')}
-              >
-                Workout
-              </button>
-            </div>
-          </div>
-          
-          {/* Time range selector - UNCHANGED */}
-          <div className="time-range-selector-container">
-            <div className="time-range-selector">
-              <button 
-                className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
-                onClick={() => setTimeRange('week')}
-              >
-                Week
-              </button>
-              <button 
-                className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
-                onClick={() => setTimeRange('month')}
-              >
-                Month
-              </button>
-              <button 
-                className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
-                onClick={() => setTimeRange('quarter')}
-              >
-                3 Months
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        {/* FREE USER CONTENT: Average + One Insight */}
-        {!isPremium && (
-          <div className="free-benefit-preview">
-            {/* Average Display */}
-            <div className="free-average-display">
-              <div className="current-metric-average">
-                <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
-                <div className="current-metric-value">{calculateAverage()}/10</div>
-              </div>
-            </div>
-            
-            {/* Single Insight Preview */}
-            <div className="free-insight-preview">
-              <div className="current-insight-card">
-                <div className="current-insight-header">
-                  <FaRegLightbulb className="insight-icon" />
-                  <span>Sample Insight</span>
-                </div>
-                <div className="current-insight-text">
-                  {getCurrentInsight()}
-                </div>
-              </div>
-            </div>
-            
-            {/* PREMIUM UPGRADE CTA */}
-            <div className="benefit-upgrade-cta">
-              <div className="upgrade-helmet-section">
-                <img 
-                  src={helmetImage} 
-                  alt="Premium Benefits" 
-                  className="upgrade-helmet-icon"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'block';
-                  }}
-                />
-                <div className="upgrade-helmet-fallback" style={{display: 'none'}}>⚡</div>
-              </div>
-              
-              <div className="upgrade-text-section">
-                <h4>Unlock Full Benefit Analysis</h4>
-                <p>Get detailed charts, advanced insights, pattern analysis, and personalized recommendations to optimize your journey.</p>
-                
-                <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
-                  <FaStar />
-                  Upgrade to Premium
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* PREMIUM USER CONTENT: Full Analysis */}
-        {isPremium && (
-          <>
-            {/* Chart and Current Insight Container - REF MARKER for scroll detection */}
-            <div className="chart-and-insight-container" ref={insightsStartRef}>
-              <div className="chart-container">
-                <Line data={generateChartData()} options={chartOptions} height={300} />
-              </div>
-              
-              <div className="current-insight-sidebar">
-                <div className="current-metric-average">
-                  <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
-                  <div className="current-metric-value">{calculateAverage()}/10</div>
-                </div>
-                
-                <div className="current-insight-card">
-                  <div className="current-insight-header">
-                    <FaRegLightbulb className="insight-icon" />
-                    <span>Current Insight</span>
-                  </div>
-                  <div className="current-insight-text">
-                    {getCurrentInsight()}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* UPDATED: Benefit Insights Section - Phase indicator positioned underneath header on the right */}
-            <div className="detailed-analysis-section">
-              <div className="detailed-analysis-header">
-                <div className="detailed-analysis-title">
-                  <h4>Benefit Insights</h4>
-                </div>
-                <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
-                  <div className="benefit-phase-content">
-                    {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
-                    <div className="benefit-phase-text">
-                      <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
-                      <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="streak-comparison">
-                <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
-                
-                <div className="comparison-grid">
-                  <div className="comparison-card">
-                    <div className="comparison-value">{streakComparison[selectedMetric].short}/10</div>
-                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 1-7 day streaks</div>
-                  </div>
-                  
-                  <div className="comparison-card">
-                    <div className="comparison-value">{streakComparison[selectedMetric].medium}/10</div>
-                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 8-30 day streaks</div>
-                  </div>
-                  
-                  <div className="comparison-card">
-                    <div className="comparison-value">{streakComparison[selectedMetric].long}/10</div>
-                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 30+ day streaks</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="personalized-analysis">
-                <h5>Personalized Analysis</h5>
-                
-                <div className="insights-grid">
-                  {generateAllInsights().map(insight => (
-                    <div 
-                      key={insight.id} 
-                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''} ${insight.isPhaseSpecific ? 'phase-specific' : ''} ${insight.isChallenge ? 'challenge-warning' : ''}`}
-                    >
-                      <div className="insight-card-header">
-                        <FaRegLightbulb className="insight-icon" />
-                        <span className="insight-metric">{insight.metric === 'sleep' ? 'Sleep Quality' : insight.metric === 'challenge' ? 'Current Phase' : insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
-                      </div>
-                      <div className="insight-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            {/* Journey Guidance Section - NO ICON */}
-            <div className="pattern-analysis-section" ref={patternSectionRef}>
-              <div className="pattern-analysis-header">
-                <h3>Journey Guidance</h3>
-              </div>
-              
-              <div className="pattern-insights">
-                {generatePatternInsights().length > 0 ? (
-                  generatePatternInsights().map(insight => (
-                    <div key={insight.id} className={`pattern-insight-item ${insight.isTimeline ? 'timeline' : ''} ${insight.isWarning ? 'warning' : ''}`}>
-                      <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
-                      <div className="pattern-actionable">{insight.actionable}</div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="no-patterns">
-                    <FaInfoCircle className="no-patterns-icon" />
-                    <span>{wisdomMode ? 
-                      "Track more cycles to discover the deeper rhythms and cosmic patterns governing your journey." :
-                      "Track more cycles to identify behavioral patterns and optimize your approach."
-                    }</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-      
-      {/* Badge Modal */}
-      {showBadgeModal && selectedBadge && (
-        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
-          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
-            <div className="badge-trophy">
-              <FaMedal className="badge-trophy-icon" />
-            </div>
-            
-            <h3>{selectedBadge.name}</h3>
-            
-            <div className="badge-earned-date">
-              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
-            </div>
-            
-            <div className="badge-description">
-              <p>
-                {
-                  selectedBadge.name === '7-Day Warrior' ? 
-                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
-                  selectedBadge.name === '14-Day Monk' ? 
-                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
-                  selectedBadge.name === '30-Day Master' ? 
-                    'A full month of commitment! You\'ve achieved true mastery over impulse and developed lasting self-control.' :
-                  selectedBadge.name === '90-Day King' ? 
-                    'Incredible achievement! 90 days represents complete transformation. You\'ve reached the pinnacle of self-mastery.' :
-                    'Congratulations on earning this achievement!'
-                }
-              </p>
-            </div>
-            
-            <div className="badge-benefits">
-              <h4>Benefits Unlocked:</h4>
-              <ul>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>Increased mental clarity</span>
-                </li>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>Enhanced self-discipline</span>
-                </li>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>Greater emotional stability</span>
-                </li>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>Improved energy levels</span>
-                </li>
-              </ul>
-            </div>
-            
-            <div className="modal-actions">
-              <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
-                Continue Journey
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Stats;
