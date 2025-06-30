@@ -806,63 +806,6 @@
   justify-content: center; /* ADDED: Vertically center all content */
 }
 
-.insight-card.highlighted {
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.15);
-}
-
-/* ENHANCED: Phase-specific insight card styling - ONLY highlighted cards get left border */
-.insight-card.phase-specific {
-  /* REMOVED: Default yellow left border - only highlighted cards get it */
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
-}
-
-.insight-card.highlighted.phase-specific {
-  border-left: 3px solid var(--primary); /* KEPT: Only highlighted cards get yellow left border */
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
-}
-
-.insight-card.challenge-warning {
-  border-left: 3px solid var(--danger);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--card-background) 100%);
-}
-
-.insight-card.timeline-based {
-  border-left: 3px solid var(--success);
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
-}
-
-/* Phase-specific animations */
-@keyframes phase-glow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(255, 221, 0, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(255, 221, 0, 0.4);
-  }
-}
-
-.insight-card.highlighted.phase-specific {
-  animation: phase-glow 2s ease-in-out infinite;
-}
-
-.insight-card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-weight: 600;
-  color: var(--text);
-  justify-content: center; /* ADDED: Center the header content */
-}
-
-.insight-card-header .insight-icon {
-  color: var(--primary);
-  font-size: 1.125rem;
-  flex-shrink: 0;
-}
-
 .insight-card.highlighted .insight-card-header .insight-icon {
   filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
 }
@@ -1564,13 +1507,13 @@
   .benefit-phase-name {
     font-size: 0.8125rem; /* SMALLER: Reduced font size for mobile */
     text-align: center;
-    margin-bottom: var(--spacing-xs); /* INCREASED: More space between name and day */
+    margin-bottom: 1px; /* REDUCED: Closer spacing between name and day */
   }
   
   .benefit-phase-day {
     font-size: 0.6875rem; /* SMALLER: Reduced font size for mobile */
     text-align: center;
-    margin-top: var(--spacing-xs); /* INCREASED: More space between day and name */
+    margin-top: 1px; /* REDUCED: Closer spacing between day and name */
   }
   
   .comparison-grid {
@@ -1697,10 +1640,12 @@
   
   .benefit-phase-name {
     font-size: 0.75rem; /* SMALLER: Even smaller text */
+    margin-bottom: 1px; /* REDUCED: Closer spacing */
   }
   
   .benefit-phase-day {
     font-size: 0.625rem; /* SMALLER: Even smaller text */
+    margin-top: 1px; /* REDUCED: Closer spacing */
   }
 
   /* Hide icons on very small screens to prevent overflow */
@@ -1805,4 +1750,61 @@
   .insight-text {
     font-size: 0.75rem;
   }
+}highlighted {
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.15);
 }
+
+/* ENHANCED: Phase-specific insight card styling - ONLY highlighted cards get left border */
+.insight-card.phase-specific {
+  /* REMOVED: Default yellow left border - only highlighted cards get it */
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
+}
+
+.insight-card.highlighted.phase-specific {
+  border-left: 3px solid var(--primary); /* KEPT: Only highlighted cards get yellow left border */
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
+}
+
+.insight-card.challenge-warning {
+  border-left: 3px solid var(--danger);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--card-background) 100%);
+}
+
+.insight-card.timeline-based {
+  border-left: 3px solid var(--success);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
+}
+
+/* Phase-specific animations */
+@keyframes phase-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 221, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 221, 0, 0.4);
+  }
+}
+
+.insight-card.highlighted.phase-specific {
+  animation: phase-glow 2s ease-in-out infinite;
+}
+
+.insight-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text);
+  justify-content: center; /* ADDED: Center the header content */
+}
+
+.insight-card-header .insight-icon {
+  color: var(--primary);
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.insight-card.
