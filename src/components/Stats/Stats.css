@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + REDESIGNED Benefit Insights Header */
+/* components/Stats/Stats.css - UPDATED: Enhanced 7-Badge System + Responsive Grid + Modal Button Styling */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -167,10 +167,35 @@
   padding: var(--spacing-lg) 0;
 }
 
+/* UPDATED: Responsive Badge Grid - Auto-fit layout for 7 badges */
 .badges-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-md);
+  justify-items: center;
+}
+
+/* Desktop: Ensure 4 columns max on desktop */
+@media (min-width: 1200px) {
+  .badges-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+}
+
+/* Tablet: 3 columns */
+@media (min-width: 769px) and (max-width: 1199px) {
+  .badges-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile: 2 columns */
+@media (max-width: 768px) {
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .badge-card {
@@ -190,6 +215,8 @@
   min-height: 140px;
   height: 140px;
   justify-content: center;
+  width: 100%;
+  max-width: 220px;
 }
 
 .badge-card::before {
@@ -263,6 +290,7 @@
   margin-bottom: var(--spacing-xs);
   color: var(--text);
   line-height: 1.3;
+  font-size: 0.875rem;
 }
 
 .badge-card.earned .badge-name {
@@ -1109,7 +1137,7 @@
   flex-shrink: 0;
 }
 
-/* Badge Modal */
+/* UPDATED: Badge Modal with Enhanced Button Styling */
 .badge-modal {
   text-align: center;
   max-width: 450px;
@@ -1161,6 +1189,8 @@
 
 .badge-benefits ul {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .badge-benefits li {
@@ -1241,9 +1271,10 @@
   color: var(--primary);
 }
 
+/* UPDATED: Enhanced Badge Modal Actions - Matching Tracker Primary Action Pattern */
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: var(--spacing-md);
   margin-top: var(--spacing-lg);
 }
@@ -1258,11 +1289,18 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
   border: 1px solid;
+  transition: all 0.2s;
 }
 
-.modal-actions .btn-primary {
+/* UPDATED: Primary action button - Grey static, yellow hover like Tracker */
+.modal-actions .btn-primary.primary-action {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.modal-actions .btn-primary.primary-action:hover {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
@@ -1369,10 +1407,93 @@
     padding: var(--spacing-md);
   }
   
-  .stat-card .stat-value {
+  .stat-card .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .badge-card {
+    min-height: 100px;
+    height: 100px;
+    padding: var(--spacing-sm);
+  }
+  
+  .badge-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .badge-earned-icon, .badge-locked-icon {
+    font-size: 1.125rem;
+  }
+  
+  .badge-name {
+    font-size: 0.8rem;
+  }
+  
+  .benefit-tracker-controls {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+  
+  .chart-container {
+    padding: var(--spacing-sm);
+    height: 250px;
+  }
+  
+  .current-metric-average {
+    min-height: 80px;
+    padding: var(--spacing-md);
+  }
+  
+  .current-metric-value {
+    font-size: 1.25rem;
+  }
+  
+  .current-insight-card {
+    min-height: 90px;
+    padding: var(--spacing-md);
+    justify-content: center;
+  }
+  
+  .detailed-analysis-section {
+    padding: var(--spacing-md);
+  }
+  
+  .comparison-card {
+    min-height: 90px;
+    height: 90px;
+    padding: var(--spacing-sm);
+  }
+  
+  .comparison-value {
+    font-size: 1.25rem;
+  }
+  
+  .insight-card {
+    min-height: 90px;
+    padding: var(--spacing-sm);
+    justify-content: center;
+  }
+  
+  .insight-card-header {
+    gap: var(--spacing-xs);
+  }
+  
+  .insight-card-header .insight-icon {
+    font-size: 1rem;
+  }
+  
+  .insight-metric {
+    font-size: 0.8rem;
+  }
+  
+  .insight-text {
+    font-size: 0.75rem;
+  }
+}stat-value {
     font-size: 2rem;
   }
   
+  /* Mobile: 2 columns for badges */
   .badges-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1725,86 +1846,4 @@
     font-size: 1.75rem;
   }
   
-  .stat-card .stat-label {
-    font-size: 0.8rem;
-  }
-  
-  .badge-card {
-    min-height: 100px;
-    height: 100px;
-    padding: var(--spacing-sm);
-  }
-  
-  .badge-icon {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .badge-earned-icon, .badge-locked-icon {
-    font-size: 1.125rem;
-  }
-  
-  .badge-name {
-    font-size: 0.8rem;
-  }
-  
-  .benefit-tracker-controls {
-    padding: var(--spacing-md) var(--spacing-sm);
-  }
-  
-  .chart-container {
-    padding: var(--spacing-sm);
-    height: 250px;
-  }
-  
-  .current-metric-average {
-    min-height: 80px;
-    padding: var(--spacing-md);
-  }
-  
-  .current-metric-value {
-    font-size: 1.25rem;
-  }
-  
-  .current-insight-card {
-    min-height: 90px;
-    padding: var(--spacing-md);
-    justify-content: center;
-  }
-  
-  .detailed-analysis-section {
-    padding: var(--spacing-md);
-  }
-  
-  .comparison-card {
-    min-height: 90px;
-    height: 90px;
-    padding: var(--spacing-sm);
-  }
-  
-  .comparison-value {
-    font-size: 1.25rem;
-  }
-  
-  .insight-card {
-    min-height: 90px;
-    padding: var(--spacing-sm);
-    justify-content: center;
-  }
-  
-  .insight-card-header {
-    gap: var(--spacing-xs);
-  }
-  
-  .insight-card-header .insight-icon {
-    font-size: 1rem;
-  }
-  
-  .insight-metric {
-    font-size: 0.8rem;
-  }
-  
-  .insight-text {
-    font-size: 0.75rem;
-  }
-}
+  .stat-card .
