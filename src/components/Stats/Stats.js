@@ -628,6 +628,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     }
     
+    return insights;
+  };
+
   const generatePatternInsights = () => {
     const filteredData = getFilteredBenefitData();
     const currentStreak = userData.currentStreak || 0;
