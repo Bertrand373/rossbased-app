@@ -785,10 +785,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         return {
           description: "You've completed the Foundation Phase! Your body has begun adapting to energy retention and you've established the crucial daily habits that will carry you forward.",
           benefits: [
-            { icon: FaShieldAlt, text: "Foundation established - new neural pathways forming" },
-            { icon: FaFire, text: "Energy fluctuations stabilizing" },
-            { icon: FaBrain, text: "Brief moments of unusual mental clarity" },
-            { icon: FaHeart, text: "Growing sense of possibility and self-confidence" }
+            { icon: FaCheckCircle, text: "Foundation established - new neural pathways forming" },
+            { icon: FaCheckCircle, text: "Energy fluctuations stabilizing" },
+            { icon: FaCheckCircle, text: "Brief moments of unusual mental clarity" },
+            { icon: FaCheckCircle, text: "Growing sense of possibility and self-confidence" }
           ]
         };
       
@@ -796,10 +796,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         return {
           description: "Two weeks of dedication! You're in the Adjustment Phase where initial benefits become noticeable. Your body is redirecting vital nutrients from reproduction to brain development.",
           benefits: [
-            { icon: FaBrain, text: "Memory enhancement and faster decision-making" },
-            { icon: FaDumbbell, text: "Noticeable strength gains and better posture" },
-            { icon: FaEye, text: "Eyes becoming brighter and more alert" },
-            { icon: FaHeart, text: "Natural magnetism - others notice something different" }
+            { icon: FaCheckCircle, text: "Memory enhancement and faster decision-making" },
+            { icon: FaCheckCircle, text: "Noticeable strength gains and better posture" },
+            { icon: FaCheckCircle, text: "Eyes becoming brighter and more alert" },
+            { icon: FaCheckCircle, text: "Natural magnetism - others notice something different" }
           ]
         };
       
@@ -807,10 +807,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         return {
           description: "A full month of discipline! You've entered the Momentum Phase where major transformations begin. Your body composition naturally improves and sustained high energy emerges.",
           benefits: [
-            { icon: FaDumbbell, text: "Natural muscle gain and fat loss without extra effort" },
-            { icon: FaFire, text: "Sustained high energy throughout the day" },
-            { icon: FaBrain, text: "Interest in philosophy and deeper subjects awakens" },
-            { icon: FaTrophy, text: "Attracting higher-quality people into your life" }
+            { icon: FaCheckCircle, text: "Natural muscle gain and fat loss without extra effort" },
+            { icon: FaCheckCircle, text: "Sustained high energy throughout the day" },
+            { icon: FaCheckCircle, text: "Interest in philosophy and deeper subjects awakens" },
+            { icon: FaCheckCircle, text: "Attracting higher-quality people into your life" }
           ]
         };
       
@@ -818,10 +818,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         return {
           description: "Royal achievement! You've reached the Transformation Phase where profound changes manifest. At 90+ days, your brain has completed major restructuring and you've developed almost supernatural abilities.",
           benefits: [
-            { icon: FaTrophy, text: "Face becomes more symmetric, features more defined" },
-            { icon: FaLightbulb, text: "Wisdom development and intuitive decision-making" },
-            { icon: FaHeart, text: "Natural charisma and leadership abilities emerge" },
-            { icon: FaStar, text: "Others automatically look to you for direction" }
+            { icon: FaCheckCircle, text: "Face becomes more symmetric, features more defined" },
+            { icon: FaCheckCircle, text: "Wisdom development and intuitive decision-making" },
+            { icon: FaCheckCircle, text: "Natural charisma and leadership abilities emerge" },
+            { icon: FaCheckCircle, text: "Others automatically look to you for direction" }
           ]
         };
       
@@ -829,10 +829,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         return {
           description: "You've reached the pinnacle of the Spiritual Integration phase! At 180 days, you've achieved profound inner transformation with abilities that feel almost supernatural.",
           benefits: [
-            { icon: FaTrophy, text: "Memory becomes exceptional with photographic tendencies" },
-            { icon: FaLightbulb, text: "Natural authority and influence expand significantly" },
-            { icon: FaHeart, text: "People change behavior in your presence" },
-            { icon: FaStar, text: "Aura extends 50+ feet - energy field transforms others" }
+            { icon: FaCheckCircle, text: "Memory becomes exceptional with photographic tendencies" },
+            { icon: FaCheckCircle, text: "Natural authority and influence expand significantly" },
+            { icon: FaCheckCircle, text: "People change behavior in your presence" },
+            { icon: FaCheckCircle, text: "Aura extends 50+ feet - energy field transforms others" }
           ]
         };
       
@@ -840,10 +840,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         return {
           description: "One full year of mastery! You've entered the true Mastery & Service phase where your individual development now serves the evolution of all humanity.",
           benefits: [
-            { icon: FaLightbulb, text: "Knowledge synthesis across disciplines becomes natural" },
-            { icon: FaTrophy, text: "Unshakeable inner confidence independent of circumstances" },
-            { icon: FaHeart, text: "Consistent powerful presence that creates positive change" },
-            { icon: FaStar, text: "Energy signature becomes a beacon of light for others" }
+            { icon: FaCheckCircle, text: "Knowledge synthesis across disciplines becomes natural" },
+            { icon: FaCheckCircle, text: "Unshakeable inner confidence independent of circumstances" },
+            { icon: FaCheckCircle, text: "Consistent powerful presence that creates positive change" },
+            { icon: FaCheckCircle, text: "Energy signature becomes a beacon of light for others" }
           ]
         };
       
