@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration + 30-Day Gladiator + Unique Badge Benefits + 180/365 Day Badges - COMPLETE FILE
+// components/Stats/Stats.js - FIXED: Badge unlocking logic + Enhanced 30-Day Gladiator content + Complete file
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -34,6 +34,66 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
     { id: 'home_environment', label: 'Home Environment', icon: FaHome }
   ];
+
+  // FIXED: Badge unlocking logic - automatically unlock badges when user reaches milestones
+  useEffect(() => {
+    if (!userData || !updateUserData) return;
+    
+    const currentStreak = userData.currentStreak || 0;
+    const currentBadges = userData.badges || [];
+    let hasChanges = false;
+    const today = new Date();
+    
+    // Check each badge and unlock if criteria met
+    const updatedBadges = currentBadges.map(badge => {
+      // Skip if already earned
+      if (badge.earned) return badge;
+      
+      let shouldEarn = false;
+      
+      switch (badge.name) {
+        case '7-Day Warrior':
+          shouldEarn = currentStreak >= 7;
+          break;
+        case '14-Day Monk':
+          shouldEarn = currentStreak >= 14;
+          break;
+        case '30-Day Gladiator':
+          shouldEarn = currentStreak >= 30;
+          break;
+        case '90-Day King':
+          shouldEarn = currentStreak >= 90;
+          break;
+        case '180-Day Emperor':
+          shouldEarn = currentStreak >= 180;
+          break;
+        case '365-Day Sage':
+          shouldEarn = currentStreak >= 365;
+          break;
+        default:
+          break;
+      }
+      
+      if (shouldEarn) {
+        hasChanges = true;
+        return {
+          ...badge,
+          earned: true,
+          date: today
+        };
+      }
+      
+      return badge;
+    });
+    
+    // Update user data if any badges were unlocked
+    if (hasChanges) {
+      updateUserData({
+        ...userData,
+        badges: updatedBadges
+      });
+    }
+  }, [userData?.currentStreak, updateUserData]);
 
   useEffect(() => {
     if (!isPremium) return;
@@ -779,6 +839,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return patterns;
   };
 
+  // ENHANCED: Complete badge information with accurate content from semen retention guide
   const getBadgeInfo = (badgeName) => {
     switch (badgeName) {
       case '7-Day Warrior':
