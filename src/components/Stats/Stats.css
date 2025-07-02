@@ -1564,13 +1564,13 @@
   .benefit-phase-name {
     font-size: 0.8125rem; /* SMALLER: Reduced font size for mobile */
     text-align: center;
-    margin-bottom: 1px; /* REDUCED: Closer spacing between name and day */
+    margin-bottom: var(--spacing-xs); /* INCREASED: More space between name and day */
   }
   
   .benefit-phase-day {
     font-size: 0.6875rem; /* SMALLER: Reduced font size for mobile */
     text-align: center;
-    margin-top: 1px; /* REDUCED: Closer spacing between day and name */
+    margin-top: var(--spacing-xs); /* INCREASED: More space between day and name */
   }
   
   .comparison-grid {
@@ -1697,12 +1697,10 @@
   
   .benefit-phase-name {
     font-size: 0.75rem; /* SMALLER: Even smaller text */
-    margin-bottom: 1px; /* REDUCED: Closer spacing */
   }
   
   .benefit-phase-day {
     font-size: 0.625rem; /* SMALLER: Even smaller text */
-    margin-top: 1px; /* REDUCED: Closer spacing */
   }
 
   /* Hide icons on very small screens to prevent overflow */
