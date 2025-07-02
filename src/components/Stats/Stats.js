@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - FIXED: Badge unlocking logic + Enhanced 30-Day Gladiator content + Complete file
+// components/Stats/Stats.js - FIXED: Badge unlocking logic + Consistent naming + 180-Day Emperor fixed
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -44,6 +44,42 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     let hasChanges = false;
     const today = new Date();
     
+    // FIXED: Ensure badges array has correct names and all 6 badges
+    if (currentBadges.length !== 6) {
+      const standardBadges = [
+        { id: 1, name: '7-Day Warrior', earned: false, date: null },
+        { id: 2, name: '14-Day Monk', earned: false, date: null },
+        { id: 3, name: '30-Day Gladiator', earned: false, date: null },
+        { id: 4, name: '90-Day King', earned: false, date: null },
+        { id: 5, name: '180-Day Emperor', earned: false, date: null },
+        { id: 6, name: '365-Day Sage', earned: false, date: null }
+      ];
+      
+      // Preserve any existing earned status
+      const updatedStandardBadges = standardBadges.map(standardBadge => {
+        const existingBadge = currentBadges.find(badge => 
+          badge.name === standardBadge.name || 
+          (badge.name === '30-Day Master' && standardBadge.name === '30-Day Gladiator') // Handle old naming
+        );
+        
+        if (existingBadge && existingBadge.earned) {
+          return {
+            ...standardBadge,
+            earned: true,
+            date: existingBadge.date
+          };
+        }
+        
+        return standardBadge;
+      });
+      
+      updateUserData({
+        ...userData,
+        badges: updatedStandardBadges
+      });
+      return; // Let the effect run again with the corrected badges
+    }
+    
     // Check each badge and unlock if criteria met
     const updatedBadges = currentBadges.map(badge => {
       // Skip if already earned
@@ -51,6 +87,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       
       let shouldEarn = false;
       
+      // FIXED: Consistent badge name checking
       switch (badge.name) {
         case '7-Day Warrior':
           shouldEarn = currentStreak >= 7;
@@ -59,6 +96,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           shouldEarn = currentStreak >= 14;
           break;
         case '30-Day Gladiator':
+        case '30-Day Master': // Handle legacy naming
           shouldEarn = currentStreak >= 30;
           break;
         case '90-Day King':
@@ -76,8 +114,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       
       if (shouldEarn) {
         hasChanges = true;
+        // FIXED: Ensure correct naming for legacy badges
         return {
           ...badge,
+          name: badge.name === '30-Day Master' ? '30-Day Gladiator' : badge.name,
           earned: true,
           date: today
         };
@@ -93,7 +133,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         badges: updatedBadges
       });
     }
-  }, [userData?.currentStreak, updateUserData]);
+  }, [userData?.currentStreak, userData?.badges?.length, updateUserData]);
 
   useEffect(() => {
     if (!isPremium) return;
@@ -140,6 +180,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     let resetUserData = { ...userData };
     const today = new Date();
 
+    // FIXED: Consistent badge names in reset logic
+    const getStandardBadges = () => [
+      { id: 1, name: '7-Day Warrior', earned: false, date: null },
+      { id: 2, name: '14-Day Monk', earned: false, date: null },
+      { id: 3, name: '30-Day Gladiator', earned: false, date: null },
+      { id: 4, name: '90-Day King', earned: false, date: null },
+      { id: 5, name: '180-Day Emperor', earned: false, date: null },
+      { id: 6, name: '365-Day Sage', earned: false, date: null }
+    ];
+
     switch (resetLevel) {
       case 'currentStreak':
         resetUserData = {
@@ -179,16 +229,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           notes: {},
           badges: userData.badges?.map(badge => ({
             ...badge,
+            name: badge.name === '30-Day Master' ? '30-Day Gladiator' : badge.name, // Fix naming
             earned: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.earned : false,
             date: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.date : null
-          })) || [
-            { id: 1, name: '7-Day Warrior', earned: false, date: null },
-            { id: 2, name: '14-Day Monk', earned: false, date: null },
-            { id: 3, name: '30-Day Gladiator', earned: false, date: null },
-            { id: 4, name: '90-Day King', earned: false, date: null },
-            { id: 5, name: '180-Day Emperor', earned: false, date: null },
-            { id: 6, name: '365-Day Sage', earned: false, date: null }
-          ]
+          })) || getStandardBadges()
         };
         toast.success(`All progress reset. Longest streak record (${userData.longestStreak || 0} days) preserved.`);
         break;
@@ -200,14 +244,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           longestStreak: 0,
           wetDreamCount: 0,
           relapseCount: 0,
-          badges: [
-            { id: 1, name: '7-Day Warrior', earned: false, date: null },
-            { id: 2, name: '14-Day Monk', earned: false, date: null },
-            { id: 3, name: '30-Day Gladiator', earned: false, date: null },
-            { id: 4, name: '90-Day King', earned: false, date: null },
-            { id: 5, name: '180-Day Emperor', earned: false, date: null },
-            { id: 6, name: '365-Day Sage', earned: false, date: null }
-          ],
+          badges: getStandardBadges(),
           benefitTracking: [],
           streakHistory: [{
             id: 1,
@@ -865,6 +902,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         };
       
       case '30-Day Gladiator':
+      case '30-Day Master': // Handle legacy naming
         return {
           description: "A full month of discipline! You've entered the Momentum Phase where major transformations begin. Your body composition naturally improves and sustained high energy emerges.",
           benefits: [
@@ -1268,5 +1306,3 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     </div>
   );
 };
-
-export default Stats;
