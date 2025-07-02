@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - COMPLETE FILE with 6-Badge System
+// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration - COMPLETE FILE
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -421,35 +421,63 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   // Get current phase data for benefit insights
   const currentPhaseData = getCurrentPhaseData(userData.currentStreak || 0);
   
-  // Calculate benefit averages
-  const calculateBenefitAverages = () => {
+  // Calculate average for single metric preview
+  const calculateAverage = () => {
     const filteredData = getFilteredBenefitData();
-    if (filteredData.length === 0) return { energy: 0, focus: 0, confidence: 0, aura: 0, sleep: 0, workout: 0 };
+    if (filteredData.length === 0) return 0;
     
-    const totals = filteredData.reduce((acc, item) => {
-      acc.energy += item.energy || 0;
-      acc.focus += item.focus || 0;
-      acc.confidence += item.confidence || 0;
-      acc.aura += item.aura || 0;
-      acc.sleep += item.sleep || item.attraction || 0; // Handle migration
-      acc.workout += item.workout || item.gymPerformance || 0; // Handle migration
-      return acc;
-    }, { energy: 0, focus: 0, confidence: 0, aura: 0, sleep: 0, workout: 0 });
+    const total = filteredData.reduce((sum, item) => {
+      // MIGRATION: Handle old attraction data -> sleep data
+      if (selectedMetric === 'sleep') {
+        return sum + (item[selectedMetric] || item.attraction || 5);
+      }
+      return sum + (item[selectedMetric] || 5);
+    }, 0);
     
-    const count = filteredData.length;
-    return {
-      energy: Math.round((totals.energy / count) * 10) / 10,
-      focus: Math.round((totals.focus / count) * 10) / 10,
-      confidence: Math.round((totals.confidence / count) * 10) / 10,
-      aura: Math.round((totals.aura / count) * 10) / 10,
-      sleep: Math.round((totals.sleep / count) * 10) / 10,
-      workout: Math.round((totals.workout / count) * 10) / 10
-    };
+    return Math.round((total / filteredData.length) * 10) / 10;
+  };
+
+  // Current insight for free users
+  const getCurrentInsight = () => {
+    const average = calculateAverage();
+    const currentStreak = userData.currentStreak || 0;
+    
+    if (currentStreak <= 7) {
+      return "You're in the foundation phase. Focus on building daily habits and staying consistent.";
+    } else if (currentStreak <= 30) {
+      return "Great progress! You're developing stronger self-control and mental clarity.";
+    } else if (currentStreak <= 90) {
+      return "Excellent milestone! You're experiencing significant mental and physical improvements.";
+    } else {
+      return "Outstanding achievement! You've reached advanced levels of self-mastery and control.";
+    }
   };
 
   // ENHANCED: Generate insights with phase-specific wisdom
   const generateInsights = () => {
-    const averages = calculateBenefitAverages();
+    const filteredData = getFilteredBenefitData();
+    const averages = {};
+    
+    // Calculate averages for all metrics
+    ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].forEach(metric => {
+      if (filteredData.length === 0) {
+        averages[metric] = 0;
+        return;
+      }
+      
+      const total = filteredData.reduce((sum, item) => {
+        if (metric === 'sleep') {
+          return sum + (item[metric] || item.attraction || 5);
+        }
+        if (metric === 'workout') {
+          return sum + (item[metric] || item.gymPerformance || 5);
+        }
+        return sum + (item[metric] || 5);
+      }, 0);
+      
+      averages[metric] = Math.round((total / filteredData.length) * 10) / 10;
+    });
+    
     const currentStreak = userData.currentStreak || 0;
     const longestStreak = userData.longestStreak || 0;
     const relapseCount = userData.relapseCount || 0;
@@ -756,7 +784,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             <div className="free-average-display">
               <div className="current-metric-average">
                 <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
-                <div className="current-metric-value">{calculateBenefitAverages()[selectedMetric] || 0}/10</div>
+                <div className="current-metric-value">{calculateAverage()}/10</div>
               </div>
             </div>
             
@@ -768,7 +796,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   <span>Sample Insight</span>
                 </div>
                 <div className="current-insight-text">
-                  Track your benefits daily to unlock personalized insights and recommendations.
+                  {getCurrentInsight()}
                 </div>
               </div>
             </div>
@@ -813,7 +841,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <div className="current-insight-sidebar">
                 <div className="current-metric-average">
                   <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
-                  <div className="current-metric-value">{calculateBenefitAverages()[selectedMetric] || 0}/10</div>
+                  <div className="current-metric-value">{calculateAverage()}/10</div>
                 </div>
                 
                 <div className="current-insight-card">
@@ -822,139 +850,120 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                     <span>Current Insight</span>
                   </div>
                   <div className="current-insight-text">
-                    {generateInsights()[0]?.practical || "Keep tracking your benefits to unlock insights!"}
+                    {generateInsights()[0]?.practical || getCurrentInsight()}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Full Benefit Averages Grid - PREMIUM ONLY */}
-            <div className="benefit-averages">
-              <div className="averages-header">
-                <h4>Your Averages ({timeRange === 'week' ? '7' : timeRange === 'month' ? '30' : '90'} Days)</h4>
+            {/* REDESIGNED: Benefit Insights Header with Current Phase */}
+            <div className="benefit-insights-section">
+              {/* REDESIGNED: Header with phase indicator */}
+              <div className="benefit-insights-header">
+                <div className="insights-header-main">
+                  <h3>Journey Guidance</h3>
+                </div>
+                
+                {/* REDESIGNED: Inline phase indicator */}
+                <div className="benefit-phase-indicator" style={{'--phase-color': currentPhaseData.color}}>
+                  <div className="benefit-phase-content">
+                    <div className="benefit-phase-icon">
+                      <currentPhaseData.icon />
+                    </div>
+                    <div className="benefit-phase-text">
+                      <div className="benefit-phase-name">{currentPhaseData.name}</div>
+                      <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="averages-grid">
-                {Object.entries(calculateBenefitAverages()).map(([metric, average]) => (
-                  <div key={metric} className={`average-item ${selectedMetric === metric ? 'highlighted' : ''}`}>
-                    <div className="average-value">{average}</div>
-                    <div className="average-label">{metric.charAt(0).toUpperCase() + metric.slice(1)}</div>
+
+              {/* Insights Grid */}
+              <div className="insights-grid">
+                {generateInsights().map(insight => (
+                  <div 
+                    key={insight.id} 
+                    className={`insight-card ${insight.isPhaseSpecific ? 'phase-specific highlighted' : ''} ${insight.isWarning ? 'challenge-warning' : ''} ${insight.isTimeline ? 'timeline-based' : ''}`}
+                  >
+                    <div className="insight-card-header">
+                      <div className="insight-icon">
+                        {insight.isPhaseSpecific ? <currentPhaseData.icon /> : 
+                         insight.isWarning ? <FaExclamationTriangle /> : 
+                         insight.isTimeline ? <FaClock /> : <FaRegLightbulb />}
+                      </div>
+                      <div className="insight-type">
+                        {insight.isPhaseSpecific ? 'Current Phase' : 
+                         insight.isWarning ? 'Challenge Alert' : 
+                         insight.isTimeline ? 'Pattern Analysis' : 'Insight'}
+                      </div>
+                    </div>
+                    <div className="insight-text">
+                      {wisdomMode ? insight.esoteric : insight.practical}
+                    </div>
+                    <div className="insight-actionable">
+                      <strong>Action:</strong> {insight.actionable}
+                    </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Streak Comparison */}
+            <div className="streak-comparison">
+              <h5>Streak Comparison</h5>
+              <div className="comparison-grid">
+                <div className="comparison-card phase-aware">
+                  <div className="comparison-value">
+                    <span className="metric-highlight">{userData.currentStreak || 0}</span>
+                  </div>
+                  <div className="comparison-label">Current Streak</div>
+                </div>
+                
+                <div className="comparison-card phase-aware">
+                  <div className="comparison-value">
+                    <span className="metric-highlight">{userData.longestStreak || 0}</span>
+                  </div>
+                  <div className="comparison-label">Personal Best</div>
+                </div>
+                
+                <div className="comparison-card phase-aware">
+                  <div className="comparison-value">
+                    <span className="phase-highlight">{getCurrentPhase(userData.currentStreak || 0)}</span>
+                  </div>
+                  <div className="comparison-label">Current Phase</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Pattern Analysis */}
+            <div className="pattern-analysis-section" ref={patternSectionRef}>
+              <div className="pattern-analysis-header">
+                <h5>Pattern Analysis</h5>
+              </div>
+              <div className="pattern-analysis-content">
+                {generatePatternInsights().length > 0 ? (
+                  generatePatternInsights().map(insight => (
+                    <div key={insight.id} className={`pattern-insight-item ${insight.isTimeline ? 'timeline' : ''} ${insight.isWarning ? 'warning' : ''}`}>
+                      <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
+                      <div className="pattern-actionable">{insight.actionable}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-patterns">
+                    <FaInfoCircle className="no-patterns-icon" />
+                    <span>{wisdomMode ? 
+                      "Track more cycles to discover the deeper rhythms and cosmic patterns governing your journey." :
+                      "Track more cycles to identify behavioral patterns and optimize your approach."
+                    }</span>
+                  </div>
+                )}
               </div>
             </div>
           </>
         )}
       </div>
-
-      {/* PROGRESSIVE PREMIUM: Benefit Insights Section */}
-      {isPremium && (
-        <>
-          <div className="benefit-insights-section" ref={insightsStartRef}>
-            {/* REDESIGNED: Header with phase indicator */}
-            <div className="benefit-insights-header">
-              <div className="insights-header-main">
-                <h3>Journey Guidance</h3>
-              </div>
-              
-              {/* REDESIGNED: Inline phase indicator */}
-              <div className="benefit-phase-indicator" style={{'--phase-color': currentPhaseData.color}}>
-                <div className="benefit-phase-content">
-                  <div className="benefit-phase-icon">
-                    <currentPhaseData.icon />
-                  </div>
-                  <div className="benefit-phase-text">
-                    <div className="benefit-phase-name">{currentPhaseData.name}</div>
-                    <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Insights Grid */}
-            <div className="insights-grid">
-              {generateInsights().map(insight => (
-                <div 
-                  key={insight.id} 
-                  className={`insight-card ${insight.isPhaseSpecific ? 'phase-specific highlighted' : ''} ${insight.isWarning ? 'challenge-warning' : ''} ${insight.isTimeline ? 'timeline-based' : ''}`}
-                >
-                  <div className="insight-card-header">
-                    <div className="insight-icon">
-                      {insight.isPhaseSpecific ? <currentPhaseData.icon /> : 
-                       insight.isWarning ? <FaExclamationTriangle /> : 
-                       insight.isTimeline ? <FaClock /> : <FaRegLightbulb />}
-                    </div>
-                    <div className="insight-type">
-                      {insight.isPhaseSpecific ? 'Current Phase' : 
-                       insight.isWarning ? 'Challenge Alert' : 
-                       insight.isTimeline ? 'Pattern Analysis' : 'Insight'}
-                    </div>
-                  </div>
-                  <div className="insight-text">
-                    {wisdomMode ? insight.esoteric : insight.practical}
-                  </div>
-                  <div className="insight-actionable">
-                    <strong>Action:</strong> {insight.actionable}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Streak Comparison */}
-          <div className="streak-comparison">
-            <h5>Streak Comparison</h5>
-            <div className="comparison-grid">
-              <div className="comparison-card phase-aware">
-                <div className="comparison-value">
-                  <span className="metric-highlight">{userData.currentStreak || 0}</span>
-                </div>
-                <div className="comparison-label">Current Streak</div>
-              </div>
-              
-              <div className="comparison-card phase-aware">
-                <div className="comparison-value">
-                  <span className="metric-highlight">{userData.longestStreak || 0}</span>
-                </div>
-                <div className="comparison-label">Personal Best</div>
-              </div>
-              
-              <div className="comparison-card phase-aware">
-                <div className="comparison-value">
-                  <span className="phase-highlight">{getCurrentPhase(userData.currentStreak || 0)}</span>
-                </div>
-                <div className="comparison-label">Current Phase</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Pattern Analysis */}
-          <div className="pattern-analysis-section" ref={patternSectionRef}>
-            <div className="pattern-analysis-header">
-              <h5>Pattern Analysis</h5>
-            </div>
-            <div className="pattern-analysis-content">
-              {generatePatternInsights().length > 0 ? (
-                generatePatternInsights().map(insight => (
-                  <div key={insight.id} className={`pattern-insight-item ${insight.isTimeline ? 'timeline' : ''} ${insight.isWarning ? 'warning' : ''}`}>
-                    <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
-                    <div className="pattern-actionable">{insight.actionable}</div>
-                  </div>
-                ))
-              ) : (
-                <div className="no-patterns">
-                  <FaInfoCircle className="no-patterns-icon" />
-                  <span>{wisdomMode ? 
-                    "Track more cycles to discover the deeper rhythms and cosmic patterns governing your journey." :
-                    "Track more cycles to identify behavioral patterns and optimize your approach."
-                  }</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </>
-      )}
       
-      {/* Badge Modal */}
+      {/* Badge Modal - UPDATED with 180-Day Master and 365-Day Sage descriptions */}
       {showBadgeModal && selectedBadge && (
         <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
           <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
