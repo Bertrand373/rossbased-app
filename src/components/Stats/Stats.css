@@ -1,485 +1,4 @@
-/* MOBILE RESPONSIVE: Stack Layout and Optimizations - FIXED HEADER ALIGNMENT */
-@media (max-width: 768px) {
-  /* Mobile header - reset button below title */
-  .stats-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-    margin-top: 0;
-  }
-  
-  .stats-header h2 {
-    text-align: center;
-    order: 1;
-    width: 100%;
-  }
-  
-  .stats-header-actions {
-    width: 100%;
-    order: 2;
-    justify-self: center;
-  }
-  
-  /* FIXED: Mobile reset button to match Reset Calendar styling exactly */
-  .reset-stats-btn {
-    width: 100%;
-    justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-md); /* CHANGED: Match reset calendar button */
-    font-size: 0.875rem; /* ENSURE: Same font size */
-  }
-  
-  /* Mobile: 2x2 grid for stats and badges */
-  .streak-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .stat-card {
-    min-height: 120px;
-    height: 120px;
-    padding: var(--spacing-md);
-  }
-  
-  .stat-card .stat-value {
-    font-size: 2rem;
-  }
-  
-  .badges-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .badge-card {
-    min-height: 120px;
-    height: 120px;
-    padding: var(--spacing-md);
-  }
-  
-  .badge-icon {
-    width: 40px;
-    height: 40px;
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .badge-earned-icon, .badge-locked-icon {
-    font-size: 1.25rem;
-  }
-  
-  .badge-name {
-    font-size: 0.875rem;
-    line-height: 1.2;
-  }
-  
-  /* Mobile: Benefit tracker controls */
-  .benefit-tracker-controls {
-    padding: var(--spacing-lg) var(--spacing-md);
-  }
-  
-  .metric-selector {
-    max-width: none;
-    width: 100%;
-  }
-  
-  /* MOBILE: Horizontal scroll behavior for metric pills */
-  .metric-pill-container {
-    justify-content: flex-start; /* MOBILE: Align left for scrolling */
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-right: var(--spacing-md); /* MOBILE: Extra padding for scroll comfort */
-  }
-  
-  .metric-pill-container::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .metric-btn {
-    white-space: nowrap;
-    min-width: fit-content;
-    flex-shrink: 0; /* MOBILE: Prevent pills from shrinking */
-  }
-  
-  .time-range-selector-container {
-    max-width: none;
-    width: 100%;
-  }
-
-  /* MOBILE RESPONSIVENESS for Progressive Premium */
-  /* Mobile benefit upgrade CTA adjustments */
-  .benefit-upgrade-cta {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-lg);
-  }
-
-  .upgrade-helmet-icon {
-    width: 70px; /* MATCH: Mobile scaling like Timeline */
-    height: 70px;
-  }
-
-  .upgrade-helmet-fallback {
-    font-size: 2.8rem; /* MATCH: Mobile scaling like Timeline */
-  }
-
-  .upgrade-text-section h4 {
-    font-size: 1.25rem;
-  }
-
-  .upgrade-text-section p {
-    font-size: 0.875rem;
-  }
-
-  .benefit-upgrade-btn {
-    font-size: 1rem; /* MATCH: Mobile size like Timeline */
-    padding: var(--spacing-md) var(--spacing-lg);
-    min-width: 180px; /* MATCH: Mobile width like Timeline */
-    min-height: 48px; /* MATCH: Mobile height like Timeline */
-    align-self: center;
-  }
-  
-  /* Mobile free benefit preview adjustments */
-  .free-average-display .current-metric-average {
-    max-width: 100%;
-    min-height: 100px;
-    padding: var(--spacing-md);
-  }
-  
-  .free-insight-preview .current-insight-card {
-    max-width: 100%;
-    min-height: 100px;
-    padding: var(--spacing-md);
-  }
-  
-  /* Mobile: Chart and insights remain stacked */
-  .chart-container {
-    padding: var(--spacing-md);
-  }
-  
-  .current-metric-average {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    min-height: 100px;
-    justify-content: center; /* ADDED: Center content on mobile too */
-    /* REMOVED: flex-direction override since desktop now uses column too */
-  }
-  
-  .current-metric-value {
-    font-size: 1.5rem;
-  }
-  
-  .current-insight-card {
-    min-height: 100px;
-    justify-content: center; /* ENSURE: Centered on mobile */
-  }
-  
-  /* Mobile: Benefit Insights - UPDATED for new header structure */
-  .detailed-analysis-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* MATCHED: Same padding as pattern-analysis-section */
-  }
-  
-  .detailed-analysis-title h4 {
-    font-size: 1.125rem; /* Mobile font size */
-  }
-  
-  /* Mobile: Benefit insights header - simplified to match Journey Guidance */
-  .detailed-analysis-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-lg); /* INCREASED: Match the gap used in desktop for phase indicator */
-    position: static; /* MOBILE: Reset position */
-    padding-bottom: 0; /* MOBILE: Remove extra padding */
-  }
-  
-  .detailed-analysis-title {
-    text-align: center; /* MOBILE: Ensure centered */
-    flex: none; /* MOBILE: Reset flex */
-  }
-  
-  /* Mobile: Compact phase indicator - SMALLER and centered */
-  .benefit-phase-indicator {
-    width: 100%;
-    max-width: 280px; /* SMALLER: Reduced width for mobile */
-    padding: var(--spacing-lg) var(--spacing-lg); /* INCREASED: Match UrgeToolkit mobile padding for proper text spacing */
-    justify-content: flex-start;
-    text-align: center;
-    position: relative;
-    align-self: center; /* CENTERED: Override desktop right alignment */
-    transform: none; /* MOBILE: Reset transform */
-    top: auto; /* MOBILE: Reset position */
-    right: auto; /* MOBILE: Reset position */
-  }
-  
-  .benefit-phase-content {
-    justify-content: flex-start;
-    gap: 0;
-    width: 100%;
-  }
-  
-  .benefit-phase-icon {
-    font-size: 1.25rem; /* SMALLER: Reduced icon size for mobile */
-    flex-shrink: 0;
-  }
-  
-  .benefit-phase-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    align-items: center;
-    text-align: center;
-    width: auto;
-    margin-right: 0;
-    padding: var(--spacing-md) 0; /* INCREASED: Add vertical padding to push text away from borders */
-  }
-  
-  .benefit-phase-name {
-    font-size: 0.8125rem; /* SMALLER: Reduced font size for mobile */
-    text-align: center;
-    margin-bottom: 1px; /* REDUCED: Closer spacing between name and day */
-  }
-  
-  .benefit-phase-day {
-    font-size: 0.6875rem; /* SMALLER: Reduced font size for mobile */
-    text-align: center;
-    margin-top: 1px; /* REDUCED: Closer spacing between day and name */
-  }
-  
-  .comparison-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .comparison-card {
-    min-height: 100px;
-    height: 100px;
-    padding: var(--spacing-md);
-  }
-  
-  .comparison-value {
-    font-size: 1.5rem;
-  }
-  
-  /* Mobile: Insights grid - single column */
-  .insights-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .insight-card {
-    min-height: 100px;
-    padding: var(--spacing-md);
-    justify-content: center; /* ENSURE: Centered on mobile */
-  }
-  
-  .insight-text {
-    font-size: 0.75rem;
-  }
-}size: 0.8rem;
-  }
-  
-  /* Mobile: Journey guidance with FIXED header spacing */
-  .pattern-analysis-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* FIXED: Reduced top padding on mobile */
-  }
-  
-  .pattern-analysis-header {
-    margin-bottom: 0; /* FIXED: Ensure no margin on mobile too */
-  }
-  
-  .pattern-analysis-header h3 {
-    font-size: 1.125rem; /* Mobile font size */
-  }
-  
-  .pattern-insight-item {
-    padding: var(--spacing-md);
-  }
-  
-  .pattern-text {
-    font-size: 0.8rem;
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .pattern-actionable {
-    font-size: 0.8rem;
-  }
-  
-  .no-patterns {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    text-align: center;
-  }
-  
-  /* Mobile: Modal actions */
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .modal-actions {
-    flex-direction: column;
-  }
-  
-  .modal-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* VERY SMALL SCREENS: Further optimizations */
-@media (max-width: 480px) {
-  /* Very small screen benefit upgrade adjustments */
-  .upgrade-helmet-icon {
-    width: 60px; /* MATCH: Very small screen scaling like Timeline */
-    height: 60px;
-  }
-
-  .upgrade-helmet-fallback {
-    font-size: 2.4rem; /* MATCH: Very small screen scaling like Timeline */
-  }
-
-  .upgrade-text-section h4 {
-    font-size: 1.125rem;
-  }
-
-  .upgrade-text-section p {
-    font-size: 0.8rem;
-  }
-
-  .benefit-upgrade-btn {
-    font-size: 0.875rem; /* MATCH: Very small screen size like Timeline */
-    padding: var(--spacing-sm) var(--spacing-md);
-    min-width: 160px; /* MATCH: Very small screen width like Timeline */
-    min-height: 44px; /* MATCH: Very small screen height like Timeline */
-  }
-  
-  .benefit-upgrade-cta {
-    padding: var(--spacing-lg) var(--spacing-md);
-  }
-
-  /* Very small screen benefit phase indicator - EVEN SMALLER */
-  .benefit-phase-indicator {
-    padding: var(--spacing-md) var(--spacing-md); /* INCREASED: Better padding for very small screens */
-    max-width: 240px; /* SMALLER: Reduced width for very small screens */
-  }
-  
-  .benefit-phase-icon {
-    font-size: 1.125rem; /* SMALLER: Even smaller icon */
-  }
-  
-  .benefit-phase-name {
-    font-size: 0.75rem; /* SMALLER: Even smaller text */
-    margin-bottom: 1px; /* REDUCED: Closer spacing */
-  }
-  
-  .benefit-phase-day {
-    font-size: 0.625rem; /* SMALLER: Even smaller text */
-    margin-top: 1px; /* REDUCED: Closer spacing */
-  }
-
-  /* Hide icons on very small screens to prevent overflow */
-  .current-insight-header .insight-icon,
-  .insight-card-header .insight-icon {
-    display: none;
-  }
-  
-  .stats-container {
-    gap: var(--spacing-md);
-  }
-  
-  .stat-card {
-    min-height: 100px;
-    height: 100px;
-    padding: var(--spacing-sm);
-  }
-  
-  .stat-card .stat-value {
-    font-size: 1.75rem;
-  }
-  
-  .stat-card .stat-label {
-    font-size: 0.8rem;
-  }
-  
-  .badge-card {
-    min-height: 100px;
-    height: 100px;
-    padding: var(--spacing-sm);
-  }
-  
-  .badge-icon {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .badge-earned-icon, .badge-locked-icon {
-    font-size: 1.125rem;
-  }
-  
-  .badge-name {
-    font-size: 0.8rem;
-  }
-  
-  .benefit-tracker-controls {
-    padding: var(--spacing-md) var(--spacing-sm);
-  }
-  
-  .chart-container {
-    padding: var(--spacing-sm);
-    height: 250px;
-  }
-  
-  .current-metric-average {
-    min-height: 80px;
-    padding: var(--spacing-md);
-  }
-  
-  .current-metric-value {
-    font-size: 1.25rem;
-  }
-  
-  .current-insight-card {
-    min-height: 90px;
-    padding: var(--spacing-md);
-    justify-content: center;
-  }
-  
-  .detailed-analysis-section {
-    padding: var(--spacing-md);
-  }
-  
-  .comparison-card {
-    min-height: 90px;
-    height: 90px;
-    padding: var(--spacing-sm);
-  }
-  
-  .comparison-value {
-    font-size: 1.25rem;
-  }
-  
-  .insight-card {
-    min-height: 90px;
-    padding: var(--spacing-sm);
-    justify-content: center;
-  }
-  
-  .insight-card-header {
-    gap: var(--spacing-xs);
-  }
-  
-  .insight-card-header .insight-icon {
-    font-size: 1rem;
-  }
-  
-  .insight-metric {
-    font-size: 0.8rem;
-  }
-  
-  .insight-text {
-    font-/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + REDESIGNED Benefit Insights Header */
+/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + REDESIGNED Benefit Insights Header */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -1804,5 +1323,488 @@
     right: 0;
     top: 50%;
     transform: translateY(-50%);
+  }
+}
+
+/* MOBILE RESPONSIVE: Stack Layout and Optimizations - FIXED HEADER ALIGNMENT */
+@media (max-width: 768px) {
+  /* Mobile header - reset button below title */
+  .stats-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    margin-top: 0;
+  }
+  
+  .stats-header h2 {
+    text-align: center;
+    order: 1;
+    width: 100%;
+  }
+  
+  .stats-header-actions {
+    width: 100%;
+    order: 2;
+    justify-self: center;
+  }
+  
+  /* FIXED: Mobile reset button to match Reset Calendar styling exactly */
+  .reset-stats-btn {
+    width: 100%;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md); /* CHANGED: Match reset calendar button */
+    font-size: 0.875rem; /* ENSURE: Same font size */
+  }
+  
+  /* Mobile: 2x2 grid for stats and badges */
+  .streak-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stat-card {
+    min-height: 120px;
+    height: 120px;
+    padding: var(--spacing-md);
+  }
+  
+  .stat-card .stat-value {
+    font-size: 2rem;
+  }
+  
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .badge-card {
+    min-height: 120px;
+    height: 120px;
+    padding: var(--spacing-md);
+  }
+  
+  .badge-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .badge-earned-icon, .badge-locked-icon {
+    font-size: 1.25rem;
+  }
+  
+  .badge-name {
+    font-size: 0.875rem;
+    line-height: 1.2;
+  }
+  
+  /* Mobile: Benefit tracker controls */
+  .benefit-tracker-controls {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+  
+  .metric-selector {
+    max-width: none;
+    width: 100%;
+  }
+  
+  /* MOBILE: Horizontal scroll behavior for metric pills */
+  .metric-pill-container {
+    justify-content: flex-start; /* MOBILE: Align left for scrolling */
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: var(--spacing-md); /* MOBILE: Extra padding for scroll comfort */
+  }
+  
+  .metric-pill-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .metric-btn {
+    white-space: nowrap;
+    min-width: fit-content;
+    flex-shrink: 0; /* MOBILE: Prevent pills from shrinking */
+  }
+  
+  .time-range-selector-container {
+    max-width: none;
+    width: 100%;
+  }
+
+  /* MOBILE RESPONSIVENESS for Progressive Premium */
+  /* Mobile benefit upgrade CTA adjustments */
+  .benefit-upgrade-cta {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-lg);
+  }
+
+  .upgrade-helmet-icon {
+    width: 70px; /* MATCH: Mobile scaling like Timeline */
+    height: 70px;
+  }
+
+  .upgrade-helmet-fallback {
+    font-size: 2.8rem; /* MATCH: Mobile scaling like Timeline */
+  }
+
+  .upgrade-text-section h4 {
+    font-size: 1.25rem;
+  }
+
+  .upgrade-text-section p {
+    font-size: 0.875rem;
+  }
+
+  .benefit-upgrade-btn {
+    font-size: 1rem; /* MATCH: Mobile size like Timeline */
+    padding: var(--spacing-md) var(--spacing-lg);
+    min-width: 180px; /* MATCH: Mobile width like Timeline */
+    min-height: 48px; /* MATCH: Mobile height like Timeline */
+    align-self: center;
+  }
+  
+  /* Mobile free benefit preview adjustments */
+  .free-average-display .current-metric-average {
+    max-width: 100%;
+    min-height: 100px;
+    padding: var(--spacing-md);
+  }
+  
+  .free-insight-preview .current-insight-card {
+    max-width: 100%;
+    min-height: 100px;
+    padding: var(--spacing-md);
+  }
+  
+  /* Mobile: Chart and insights remain stacked */
+  .chart-container {
+    padding: var(--spacing-md);
+  }
+  
+  .current-metric-average {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 100px;
+    justify-content: center; /* ADDED: Center content on mobile too */
+    /* REMOVED: flex-direction override since desktop now uses column too */
+  }
+  
+  .current-metric-value {
+    font-size: 1.5rem;
+  }
+  
+  .current-insight-card {
+    min-height: 100px;
+    justify-content: center; /* ENSURE: Centered on mobile */
+  }
+  
+  /* Mobile: Benefit Insights - UPDATED for new header structure */
+  .detailed-analysis-section {
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* MATCHED: Same padding as pattern-analysis-section */
+  }
+  
+  .detailed-analysis-title h4 {
+    font-size: 1.125rem; /* Mobile font size */
+  }
+  
+  /* Mobile: Benefit insights header - simplified to match Journey Guidance */
+  .detailed-analysis-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg); /* INCREASED: Match the gap used in desktop for phase indicator */
+    position: static; /* MOBILE: Reset position */
+    padding-bottom: 0; /* MOBILE: Remove extra padding */
+  }
+  
+  .detailed-analysis-title {
+    text-align: center; /* MOBILE: Ensure centered */
+    flex: none; /* MOBILE: Reset flex */
+  }
+  
+  /* Mobile: Compact phase indicator - SMALLER and centered */
+  .benefit-phase-indicator {
+    width: 100%;
+    max-width: 280px; /* SMALLER: Reduced width for mobile */
+    padding: var(--spacing-lg) var(--spacing-lg); /* INCREASED: Match UrgeToolkit mobile padding for proper text spacing */
+    justify-content: flex-start;
+    text-align: center;
+    position: relative;
+    align-self: center; /* CENTERED: Override desktop right alignment */
+    transform: none; /* MOBILE: Reset transform */
+    top: auto; /* MOBILE: Reset position */
+    right: auto; /* MOBILE: Reset position */
+  }
+  
+  .benefit-phase-content {
+    justify-content: flex-start;
+    gap: 0;
+    width: 100%;
+  }
+  
+  .benefit-phase-icon {
+    font-size: 1.25rem; /* SMALLER: Reduced icon size for mobile */
+    flex-shrink: 0;
+  }
+  
+  .benefit-phase-text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    align-items: center;
+    text-align: center;
+    width: auto;
+    margin-right: 0;
+    padding: var(--spacing-md) 0; /* INCREASED: Add vertical padding to push text away from borders */
+  }
+  
+  .benefit-phase-name {
+    font-size: 0.8125rem; /* SMALLER: Reduced font size for mobile */
+    text-align: center;
+    margin-bottom: 1px; /* REDUCED: Closer spacing between name and day */
+  }
+  
+  .benefit-phase-day {
+    font-size: 0.6875rem; /* SMALLER: Reduced font size for mobile */
+    text-align: center;
+    margin-top: 1px; /* REDUCED: Closer spacing between day and name */
+  }
+  
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .comparison-card {
+    min-height: 100px;
+    height: 100px;
+    padding: var(--spacing-md);
+  }
+  
+  .comparison-value {
+    font-size: 1.5rem;
+  }
+  
+  /* Mobile: Insights grid - single column */
+  .insights-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .insight-card {
+    min-height: 100px;
+    padding: var(--spacing-md);
+    justify-content: center; /* ENSURE: Centered on mobile */
+  }
+  
+  .insight-text {
+    font-size: 0.8rem;
+  }
+  
+  /* Mobile: Journey guidance with FIXED header spacing */
+  .pattern-analysis-section {
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* FIXED: Reduced top padding on mobile */
+  }
+  
+  .pattern-analysis-header {
+    margin-bottom: 0; /* FIXED: Ensure no margin on mobile too */
+  }
+  
+  .pattern-analysis-header h3 {
+    font-size: 1.125rem; /* Mobile font size */
+  }
+  
+  .pattern-insight-item {
+    padding: var(--spacing-md);
+  }
+  
+  .pattern-text {
+    font-size: 0.8rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .pattern-actionable {
+    font-size: 0.8rem;
+  }
+  
+  .no-patterns {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  /* Mobile: Modal actions */
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .modal-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* VERY SMALL SCREENS: Further optimizations */
+@media (max-width: 480px) {
+  /* Very small screen benefit upgrade adjustments */
+  .upgrade-helmet-icon {
+    width: 60px; /* MATCH: Very small screen scaling like Timeline */
+    height: 60px;
+  }
+
+  .upgrade-helmet-fallback {
+    font-size: 2.4rem; /* MATCH: Very small screen scaling like Timeline */
+  }
+
+  .upgrade-text-section h4 {
+    font-size: 1.125rem;
+  }
+
+  .upgrade-text-section p {
+    font-size: 0.8rem;
+  }
+
+  .benefit-upgrade-btn {
+    font-size: 0.875rem; /* MATCH: Very small screen size like Timeline */
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 160px; /* MATCH: Very small screen width like Timeline */
+    min-height: 44px; /* MATCH: Very small screen height like Timeline */
+  }
+  
+  .benefit-upgrade-cta {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  /* Very small screen benefit phase indicator - EVEN SMALLER */
+  .benefit-phase-indicator {
+    padding: var(--spacing-md) var(--spacing-md); /* INCREASED: Better padding for very small screens */
+    max-width: 240px; /* SMALLER: Reduced width for very small screens */
+  }
+  
+  .benefit-phase-icon {
+    font-size: 1.125rem; /* SMALLER: Even smaller icon */
+  }
+  
+  .benefit-phase-name {
+    font-size: 0.75rem; /* SMALLER: Even smaller text */
+    margin-bottom: 1px; /* REDUCED: Closer spacing */
+  }
+  
+  .benefit-phase-day {
+    font-size: 0.625rem; /* SMALLER: Even smaller text */
+    margin-top: 1px; /* REDUCED: Closer spacing */
+  }
+
+  /* Hide icons on very small screens to prevent overflow */
+  .current-insight-header .insight-icon,
+  .insight-card-header .insight-icon {
+    display: none;
+  }
+  
+  .stats-container {
+    gap: var(--spacing-md);
+  }
+  
+  .stat-card {
+    min-height: 100px;
+    height: 100px;
+    padding: var(--spacing-sm);
+  }
+  
+  .stat-card .stat-value {
+    font-size: 1.75rem;
+  }
+  
+  .stat-card .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .badge-card {
+    min-height: 100px;
+    height: 100px;
+    padding: var(--spacing-sm);
+  }
+  
+  .badge-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .badge-earned-icon, .badge-locked-icon {
+    font-size: 1.125rem;
+  }
+  
+  .badge-name {
+    font-size: 0.8rem;
+  }
+  
+  .benefit-tracker-controls {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+  
+  .chart-container {
+    padding: var(--spacing-sm);
+    height: 250px;
+  }
+  
+  .current-metric-average {
+    min-height: 80px;
+    padding: var(--spacing-md);
+  }
+  
+  .current-metric-value {
+    font-size: 1.25rem;
+  }
+  
+  .current-insight-card {
+    min-height: 90px;
+    padding: var(--spacing-md);
+    justify-content: center;
+  }
+  
+  .detailed-analysis-section {
+    padding: var(--spacing-md);
+  }
+  
+  .comparison-card {
+    min-height: 90px;
+    height: 90px;
+    padding: var(--spacing-sm);
+  }
+  
+  .comparison-value {
+    font-size: 1.25rem;
+  }
+  
+  .insight-card {
+    min-height: 90px;
+    padding: var(--spacing-sm);
+    justify-content: center;
+  }
+  
+  .insight-card-header {
+    gap: var(--spacing-xs);
+  }
+  
+  .insight-card-header .insight-icon {
+    font-size: 1rem;
+  }
+  
+  .insight-metric {
+    font-size: 0.8rem;
+  }
+  
+  .insight-text {
+    font-size: 0.75rem;
   }
 }
