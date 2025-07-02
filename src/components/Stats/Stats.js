@@ -1,11 +1,10 @@
-// components/Stats/Stats.js - FIXED: Badge unlocking logic + Consistent naming + 180-Day Emperor fixed
+// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration - COMPLETE FILE
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb, 
-  FaShieldAlt, FaDumbbell, FaFire } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -19,12 +18,21 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [timeRange, setTimeRange] = useState('week');
   const [showBadgeModal, setShowBadgeModal] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState(null);
-  const [showSmartResetDialog, setShowSmartResetDialog] = useState(false);
-  const [wisdomMode, setWisdomMode] = useState(false);
-  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
-  const insightsStartRef = useRef(null);
-  const patternSectionRef = useRef(null);
   
+  // UPDATED: Replace old reset modal with smart reset dialog
+  const [showSmartResetDialog, setShowSmartResetDialog] = useState(false);
+  
+  // NEW: Wisdom toggle states
+  const [wisdomMode, setWisdomMode] = useState(false); // false = practical, true = esoteric
+  
+  // NEW: Smart floating toggle visibility
+  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
+  
+  // NEW: Refs for scroll detection
+  const insightsStartRef = useRef(null); // Current insight section start
+  const patternSectionRef = useRef(null); // Pattern analysis section
+  
+  // Enhanced trigger options matching Calendar
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
     { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
@@ -35,141 +43,61 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     { id: 'home_environment', label: 'Home Environment', icon: FaHome }
   ];
 
-  // FIXED: Badge unlocking logic - automatically unlock badges when user reaches milestones
+  // NEW: Smart floating toggle scroll detection
   useEffect(() => {
-    if (!userData || !updateUserData) return;
-    
-    const currentStreak = userData.currentStreak || 0;
-    const currentBadges = userData.badges || [];
-    let hasChanges = false;
-    const today = new Date();
-    
-    // FIXED: Ensure badges array has correct names and all 6 badges
-    if (currentBadges.length !== 6) {
-      const standardBadges = [
-        { id: 1, name: '7-Day Warrior', earned: false, date: null },
-        { id: 2, name: '14-Day Monk', earned: false, date: null },
-        { id: 3, name: '30-Day Gladiator', earned: false, date: null },
-        { id: 4, name: '90-Day King', earned: false, date: null },
-        { id: 5, name: '180-Day Emperor', earned: false, date: null },
-        { id: 6, name: '365-Day Sage', earned: false, date: null }
-      ];
-      
-      // Preserve any existing earned status
-      const updatedStandardBadges = standardBadges.map(standardBadge => {
-        const existingBadge = currentBadges.find(badge => 
-          badge.name === standardBadge.name || 
-          (badge.name === '30-Day Master' && standardBadge.name === '30-Day Gladiator') // Handle old naming
-        );
-        
-        if (existingBadge && existingBadge.earned) {
-          return {
-            ...standardBadge,
-            earned: true,
-            date: existingBadge.date
-          };
-        }
-        
-        return standardBadge;
-      });
-      
-      updateUserData({
-        ...userData,
-        badges: updatedStandardBadges
-      });
-      return; // Let the effect run again with the corrected badges
-    }
-    
-    // Check each badge and unlock if criteria met
-    const updatedBadges = currentBadges.map(badge => {
-      // Skip if already earned
-      if (badge.earned) return badge;
-      
-      let shouldEarn = false;
-      
-      // FIXED: Consistent badge name checking
-      switch (badge.name) {
-        case '7-Day Warrior':
-          shouldEarn = currentStreak >= 7;
-          break;
-        case '14-Day Monk':
-          shouldEarn = currentStreak >= 14;
-          break;
-        case '30-Day Gladiator':
-        case '30-Day Master': // Handle legacy naming
-          shouldEarn = currentStreak >= 30;
-          break;
-        case '90-Day King':
-          shouldEarn = currentStreak >= 90;
-          break;
-        case '180-Day Emperor':
-          shouldEarn = currentStreak >= 180;
-          break;
-        case '365-Day Sage':
-          shouldEarn = currentStreak >= 365;
-          break;
-        default:
-          break;
-      }
-      
-      if (shouldEarn) {
-        hasChanges = true;
-        // FIXED: Ensure correct naming for legacy badges
-        return {
-          ...badge,
-          name: badge.name === '30-Day Master' ? '30-Day Gladiator' : badge.name,
-          earned: true,
-          date: today
-        };
-      }
-      
-      return badge;
-    });
-    
-    // Update user data if any badges were unlocked
-    if (hasChanges) {
-      updateUserData({
-        ...userData,
-        badges: updatedBadges
-      });
-    }
-  }, [userData?.currentStreak, userData?.badges?.length, updateUserData]);
-
-  useEffect(() => {
-    if (!isPremium) return;
+    if (!isPremium) return; // Only show for premium users
     
     const handleScroll = () => {
       if (!insightsStartRef.current || !patternSectionRef.current) return;
       
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const windowHeight = window.innerHeight;
+      
       const insightsStartTop = insightsStartRef.current.offsetTop;
       const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
       
+      // Show toggle when:
+      // 1. User has scrolled to the insights section start
+      // 2. User hasn't scrolled completely past the pattern analysis section
       const shouldShow = 
-        scrollTop + windowHeight >= insightsStartTop && 
-        scrollTop <= patternSectionBottom;
+        scrollTop + windowHeight >= insightsStartTop && // Reached insights area
+        scrollTop <= patternSectionBottom; // Haven't scrolled completely past pattern section
       
       setShowFloatingToggle(shouldShow);
     };
     
+    // Add scroll listener
     window.addEventListener('scroll', handleScroll);
+    
+    // Check initial position
     handleScroll();
+    
+    // Cleanup
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isPremium]);
+  }, [isPremium]); // Re-run when premium status changes
   
-  const timeRangeOptions = { week: 7, month: 30, quarter: 90 };
+  // Time range options for chart
+  const timeRangeOptions = {
+    week: 7,
+    month: 30,
+    quarter: 90
+  };
+  
+  // Format date for displaying
   const formatDate = (date) => format(new Date(date), 'MMM d, yyyy');
   
+  // Handle badge click
   const handleBadgeClick = (badge) => {
     setSelectedBadge(badge);
     setShowBadgeModal(true);
   };
 
+  // UPDATED: Handle smart reset - opens smart dialog instead of simple confirmation
   const handleResetStats = () => {
     setShowSmartResetDialog(true);
   };
 
+  // NEW: Enhanced reset function with different levels
   const confirmResetStats = (resetLevel) => {
     if (!updateUserData) {
       console.error('updateUserData function is not available');
@@ -180,22 +108,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     let resetUserData = { ...userData };
     const today = new Date();
 
-    // FIXED: Consistent badge names in reset logic
-    const getStandardBadges = () => [
-      { id: 1, name: '7-Day Warrior', earned: false, date: null },
-      { id: 2, name: '14-Day Monk', earned: false, date: null },
-      { id: 3, name: '30-Day Gladiator', earned: false, date: null },
-      { id: 4, name: '90-Day King', earned: false, date: null },
-      { id: 5, name: '180-Day Emperor', earned: false, date: null },
-      { id: 6, name: '365-Day Sage', earned: false, date: null }
-    ];
-
     switch (resetLevel) {
       case 'currentStreak':
+        // Reset only current streak, keep all history
         resetUserData = {
           ...userData,
           currentStreak: 0,
           startDate: today,
+          // Add new streak to history
           streakHistory: [
             ...(userData.streakHistory || []),
             {
@@ -211,13 +131,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         break;
 
       case 'allProgress':
+        // Reset most data but keep longest streak record
         resetUserData = {
           ...userData,
           startDate: today,
           currentStreak: 0,
           relapseCount: 0,
           wetDreamCount: 0,
+          // Keep only longest streak record
           longestStreak: userData.longestStreak || 0,
+          // Reset everything else
           streakHistory: [{
             id: 1,
             start: today,
@@ -227,24 +150,35 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           }],
           benefitTracking: [],
           notes: {},
+          // Reset badges but keep longest streak milestone if earned
           badges: userData.badges?.map(badge => ({
             ...badge,
-            name: badge.name === '30-Day Master' ? '30-Day Gladiator' : badge.name, // Fix naming
             earned: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.earned : false,
             date: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.date : null
-          })) || getStandardBadges()
+          })) || [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null }
+          ]
         };
         toast.success(`All progress reset. Longest streak record (${userData.longestStreak || 0} days) preserved.`);
         break;
 
       case 'everything':
+        // Complete nuclear reset - everything gone
         resetUserData = {
           startDate: today,
           currentStreak: 0,
           longestStreak: 0,
           wetDreamCount: 0,
           relapseCount: 0,
-          badges: getStandardBadges(),
+          badges: [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null }
+          ],
           benefitTracking: [],
           streakHistory: [{
             id: 1,
@@ -267,10 +201,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowSmartResetDialog(false);
   };
 
+  // ADDED: Premium upgrade handler
   const handleUpgradeClick = () => {
     toast.success('Premium upgrade coming soon! 🚀');
   };
 
+  // UPDATED: Helper function to get current phase data - matches Emotional Timeline exactly  
   const getCurrentPhaseData = (streak) => {
     if (streak <= 14) {
       return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
@@ -285,6 +221,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
+  // LEGACY: Keep old function for backward compatibility
   const getCurrentPhase = (streak) => {
     if (streak <= 7) return 'Foundation Phase';
     if (streak <= 30) return 'Adjustment Phase';
@@ -294,6 +231,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return 'Mastery Phase';
   };
   
+  // Filter benefit data based on selected time range
   const getFilteredBenefitData = () => {
     if (!userData.benefitTracking) return [];
     
@@ -305,6 +243,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       .sort((a, b) => new Date(a.date) - new Date(b.date));
   };
   
+  // Generate chart data - UPDATED: Handle sleep metric
   const generateChartData = () => {
     const filteredData = getFilteredBenefitData();
     
@@ -315,6 +254,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const datasets = [{
       label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
       data: filteredData.map(item => {
+        // MIGRATION: Handle old attraction data -> sleep data
         if (selectedMetric === 'sleep') {
           return item[selectedMetric] || item.attraction || 5;
         }
@@ -337,6 +277,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return { labels, datasets };
   };
   
+  // Chart options - reverted to original clean version
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -397,11 +338,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
   
+  // Calculate average for the selected metric - UPDATED: Handle sleep
   const calculateAverage = () => {
     const filteredData = getFilteredBenefitData();
     if (filteredData.length === 0) return '0.0';
     
     const sum = filteredData.reduce((acc, item) => {
+      // MIGRATION: Handle old attraction data -> sleep data
       if (selectedMetric === 'sleep') {
         return acc + (item[selectedMetric] || item.attraction || 0);
       }
@@ -410,6 +353,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return (sum / filteredData.length).toFixed(1);
   };
   
+  // ENHANCED: Generate streak comparison data with expanded benefit categories
   const generateStreakComparison = () => {
     const filteredData = getFilteredBenefitData();
     
@@ -426,13 +370,38 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     const baseValue = parseFloat(calculateAverage());
     
+    // Enhanced progression patterns based on the guide's timeline
     const progressionMultipliers = {
-      confidence: { short: -1.5, medium: 0.0, long: +2.0 },
-      energy: { short: -1.2, medium: 0.0, long: +2.5 },
-      focus: { short: -1.0, medium: 0.0, long: +2.3 },
-      aura: { short: -0.8, medium: 0.0, long: +2.8 },
-      sleep: { short: -1.1, medium: 0.0, long: +2.2 },
-      workout: { short: -0.6, medium: 0.0, long: +2.0 }
+      confidence: {
+        short: -1.5,  // Foundation phase - some confidence building
+        medium: 0.0,  // Adjustment phase - baseline confidence
+        long: +2.0    // Momentum+ phases - significant confidence boost
+      },
+      energy: {
+        short: -1.2,  // Initial adjustment period
+        medium: 0.0,  // Stabilization period
+        long: +2.5    // Major energy transformation
+      },
+      focus: {
+        short: -1.0,  // Some clarity improvements early
+        medium: 0.0,  // Baseline during adjustment
+        long: +2.3    // Significant mental enhancement
+      },
+      aura: {
+        short: -0.8,  // Subtle presence changes
+        medium: 0.0,  // Baseline magnetism
+        long: +2.8    // Powerful presence development
+      },
+      sleep: {
+        short: -1.1,  // Sleep pattern adjustment
+        medium: 0.0,  // Stabilized sleep
+        long: +2.2    // Optimized sleep quality
+      },
+      workout: {
+        short: -0.6,  // Some physical improvements
+        medium: 0.0,  // Baseline fitness
+        long: +2.0    // Significant physical enhancement
+      }
     };
     
     const result = {};
@@ -455,12 +424,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   const streakComparison = generateStreakComparison();
   
+  // Generate current insight for sidebar
   const getCurrentInsight = () => {
     const insights = generateAllInsights();
     const currentInsight = insights.find(insight => insight.metric === selectedMetric) || insights[0];
     return wisdomMode ? currentInsight.esoteric : currentInsight.practical;
   };
   
+  // UPDATED: Get metric-specific benefits based on timeline phase - matches Emotional Timeline
   const getMetricBenefits = (metric, phase, streak) => {
     const metricData = {
       energy: {
@@ -630,24 +601,40 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return metricData[metric][phase];
   };
   
+  // UPDATED: Get challenge-specific guidance based on phase - matches Emotional Timeline
   const getChallengeGuidance = (phase, streak) => {
     const challengeData = {
-      initial: { actionable: "Expect resistance and strong urges. Focus on building unbreakable daily habits. Remove all triggers from environment." },
-      purging: { actionable: "Flatlines and mood swings are normal. Accept emotions without resistance. Maintain practices even when motivation dips." },
-      expansion: { actionable: "Guard against ego inflation. Use increased mental abilities for meaningful goals and helping others." },
-      integration: { actionable: "Handle increased responsibility wisely. Some relationships may change as you transform - this is normal." },
-      mastery: { actionable: "Focus on legacy creation and service to others. Your development now serves humanity's evolution." }
+      initial: {
+        actionable: "Expect resistance and strong urges. Focus on building unbreakable daily habits. Remove all triggers from environment."
+      },
+      purging: {
+        actionable: "Flatlines and mood swings are normal. Accept emotions without resistance. Maintain practices even when motivation dips."
+      },
+      expansion: {
+        actionable: "Guard against ego inflation. Use increased mental abilities for meaningful goals and helping others."
+      },
+      integration: {
+        actionable: "Handle increased responsibility wisely. Some relationships may change as you transform - this is normal."
+      },
+      mastery: {
+        actionable: "Focus on legacy creation and service to others. Your development now serves humanity's evolution."
+      }
     };
+    
     return challengeData[phase];
   };
   
+  // Determine if user needs challenge-specific guidance
   const shouldShowChallengeGuidance = (streak, dataLength) => {
+    // Show during known difficult periods or if user seems to be struggling
     const isInDifficultPeriod = (streak >= 14 && streak <= 45) || (streak >= 60 && streak <= 120);
     const hasLimitedData = dataLength < 7;
     const isNewUser = streak <= 7;
+    
     return isInDifficultPeriod || hasLimitedData || isNewUser;
   };
   
+  // UPDATED: Get phase-specific challenge insight - matches Emotional Timeline
   const getChallengeInsight = (phase, streak) => {
     const challengeInsights = {
       initial: {
@@ -676,15 +663,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         actionable: "Focus on legacy creation and mentoring others. Your mastery should serve the awakening of all humanity."
       }
     };
+    
     return challengeInsights[phase];
   };
 
+  // ENHANCED: Timeline-based insights for all 6 metrics with challenge-specific guidance
   const generateAllInsights = () => {
     const filteredData = getFilteredBenefitData();
     const currentStreak = userData.currentStreak || 0;
     const insights = [];
+    
+    // Define all 6 enhanced benefit categories
     const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
     
+    // UPDATED: Timeline-based phase detection - matches Emotional Timeline exactly
     const getPhase = (streak) => {
       if (streak <= 14) return 'initial';
       if (streak <= 45) return 'purging'; 
@@ -695,9 +687,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     const currentPhase = getPhase(currentStreak);
     
+    // Generate insights for ALL 6 metrics based on timeline and phase
     allMetrics.forEach((metric, index) => {
       const avgValue = parseFloat(calculateAverage());
       const isSelectedMetric = metric === selectedMetric;
+      
+      // Get metric-specific benefits from the guide
       const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
       const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
       
@@ -712,6 +707,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     });
     
+    // Add phase-specific challenge insight if user needs guidance
     if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
       const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
       insights.push({
@@ -728,11 +724,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return insights;
   };
 
+  // UPDATED: Generate pattern insights with Emotional Timeline phases
   const generatePatternInsights = () => {
     const filteredData = getFilteredBenefitData();
     const currentStreak = userData.currentStreak || 0;
     const patterns = [];
     
+    // Get current phase for context
     const getPhase = (streak) => {
       if (streak <= 14) return 'initial';
       if (streak <= 45) return 'purging'; 
@@ -743,6 +741,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     const currentPhase = getPhase(currentStreak);
     
+    // UPDATED: Timeline-based challenge patterns matching Emotional Timeline
     const timelinePatterns = {
       initial: {
         practical: "Days 1-14: Initial Adaptation phase. Strong urges and energy fluctuations are completely normal - your body is learning to retain vital force.",
@@ -781,6 +780,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       }
     };
     
+    // Always show timeline-based pattern for current phase
     const currentPattern = timelinePatterns[currentPhase];
     if (currentPattern) {
       patterns.push({
@@ -792,6 +792,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     }
     
+    // Add specific challenge warnings based on timeline
     const getChallengeWarnings = () => {
       if (currentStreak >= 14 && currentStreak <= 21) {
         return {
@@ -837,6 +838,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     }
     
+    // Add relapse analysis if user has history
     if (userData.longestStreak && userData.longestStreak > currentStreak && currentStreak > 0) {
       patterns.push({
         id: patterns.length + 1,
@@ -848,6 +850,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       });
     }
     
+    // Add benefit tracking patterns if sufficient data
     if (filteredData.length >= 7) {
       const recentAvg = filteredData.slice(-7).reduce((sum, day) => sum + (day[selectedMetric] || 0), 0) / 7;
       const overallAvg = parseFloat(calculateAverage());
@@ -875,92 +878,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     return patterns;
   };
-
-  // ENHANCED: Complete badge information with accurate content from semen retention guide
-  const getBadgeInfo = (badgeName) => {
-    switch (badgeName) {
-      case '7-Day Warrior':
-        return {
-          description: "You've completed the Foundation Phase! Your body has begun adapting to energy retention and you've established the crucial daily habits that will carry you forward.",
-          benefits: [
-            { icon: FaCheckCircle, text: "Foundation established - new neural pathways forming" },
-            { icon: FaCheckCircle, text: "Energy fluctuations stabilizing" },
-            { icon: FaCheckCircle, text: "Brief moments of unusual mental clarity" },
-            { icon: FaCheckCircle, text: "Growing sense of possibility and self-confidence" }
-          ]
-        };
-      
-      case '14-Day Monk':
-        return {
-          description: "Two weeks of dedication! You're in the Adjustment Phase where initial benefits become noticeable. Your body is redirecting vital nutrients from reproduction to brain development.",
-          benefits: [
-            { icon: FaCheckCircle, text: "Memory enhancement and faster decision-making" },
-            { icon: FaCheckCircle, text: "Noticeable strength gains and better posture" },
-            { icon: FaCheckCircle, text: "Eyes becoming brighter and more alert" },
-            { icon: FaCheckCircle, text: "Natural magnetism - others notice something different" }
-          ]
-        };
-      
-      case '30-Day Gladiator':
-      case '30-Day Master': // Handle legacy naming
-        return {
-          description: "A full month of discipline! You've entered the Momentum Phase where major transformations begin. Your body composition naturally improves and sustained high energy emerges.",
-          benefits: [
-            { icon: FaCheckCircle, text: "Natural muscle gain and fat loss without extra effort" },
-            { icon: FaCheckCircle, text: "Sustained high energy throughout the day" },
-            { icon: FaCheckCircle, text: "Interest in philosophy and deeper subjects awakens" },
-            { icon: FaCheckCircle, text: "Attracting higher-quality people into your life" }
-          ]
-        };
-      
-      case '90-Day King':
-        return {
-          description: "Royal achievement! You've reached the Transformation Phase where profound changes manifest. At 90+ days, your brain has completed major restructuring and you've developed almost supernatural abilities.",
-          benefits: [
-            { icon: FaCheckCircle, text: "Face becomes more symmetric, features more defined" },
-            { icon: FaCheckCircle, text: "Wisdom development and intuitive decision-making" },
-            { icon: FaCheckCircle, text: "Natural charisma and leadership abilities emerge" },
-            { icon: FaCheckCircle, text: "Others automatically look to you for direction" }
-          ]
-        };
-      
-      case '180-Day Emperor':
-        return {
-          description: "You've reached the pinnacle of the Spiritual Integration phase! At 180 days, you've achieved profound inner transformation with abilities that feel almost supernatural.",
-          benefits: [
-            { icon: FaCheckCircle, text: "Memory becomes exceptional with photographic tendencies" },
-            { icon: FaCheckCircle, text: "Natural authority and influence expand significantly" },
-            { icon: FaCheckCircle, text: "People change behavior in your presence" },
-            { icon: FaCheckCircle, text: "Aura extends 50+ feet - energy field transforms others" }
-          ]
-        };
-      
-      case '365-Day Sage':
-        return {
-          description: "One full year of mastery! You've entered the true Mastery & Service phase where your individual development now serves the evolution of all humanity.",
-          benefits: [
-            { icon: FaCheckCircle, text: "Knowledge synthesis across disciplines becomes natural" },
-            { icon: FaCheckCircle, text: "Unshakeable inner confidence independent of circumstances" },
-            { icon: FaCheckCircle, text: "Consistent powerful presence that creates positive change" },
-            { icon: FaCheckCircle, text: "Energy signature becomes a beacon of light for others" }
-          ]
-        };
-      
-      default:
-        return {
-          description: "Congratulations on earning this achievement!",
-          benefits: [
-            { icon: FaCheckCircle, text: "Increased mental clarity" },
-            { icon: FaCheckCircle, text: "Enhanced self-discipline" },
-            { icon: FaCheckCircle, text: "Greater emotional stability" },
-            { icon: FaCheckCircle, text: "Improved energy levels" }
-          ]
-        };
-    }
-  };
   
   return (
     <div className="stats-container">
+      {/* Smart Floating Wisdom Toggle - Only shows for premium users when insights are visible */}
       {showFloatingToggle && isPremium && (
         <button 
           className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
@@ -971,6 +892,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </button>
       )}
 
+      {/* UPDATED: Header with new Reset Progress button */}
       <div className="stats-header">
         <div className="stats-header-spacer"></div>
         <h2>Your Stats</h2>
@@ -982,6 +904,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
+      {/* UPDATED: Smart Reset Dialog replaces old confirmation modal */}
       <SmartResetDialog
         isOpen={showSmartResetDialog}
         onClose={() => setShowSmartResetDialog(false)}
@@ -989,6 +912,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         userData={userData}
       />
       
+      {/* Streak Statistics - ALWAYS VISIBLE */}
       <div className="streak-stats">
         <div className="stat-card current-streak">
           <div className="stat-value">{userData.currentStreak || 0}</div>
@@ -1011,6 +935,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
+      {/* Milestone Badges - ALWAYS VISIBLE */}
       <div className="milestone-section">
         <h3>Your Achievements</h3>
         
@@ -1039,11 +964,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
+      {/* PROGRESSIVE PREMIUM: Benefit Tracker Section */}
       <div className="benefit-tracker-section">
         <h3>Benefit Tracker</h3>
         
+        {/* Controls - ALWAYS VISIBLE (so users can see different averages) */}
         <div className="benefit-tracker-controls">
           <div className="metric-selector">
+            {/* SINGLE ROW: All 6 benefit items in one container */}
             <div className="metric-pill-container">
               <button 
                 className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
@@ -1084,6 +1012,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
+          {/* Time range selector - UNCHANGED */}
           <div className="time-range-selector-container">
             <div className="time-range-selector">
               <button 
@@ -1108,8 +1037,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           </div>
         </div>
         
+        {/* FREE USER CONTENT: Average + One Insight */}
         {!isPremium && (
           <div className="free-benefit-preview">
+            {/* Average Display */}
             <div className="free-average-display">
               <div className="current-metric-average">
                 <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
@@ -1117,6 +1048,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
+            {/* Single Insight Preview */}
             <div className="free-insight-preview">
               <div className="current-insight-card">
                 <div className="current-insight-header">
@@ -1129,6 +1061,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
+            {/* PREMIUM UPGRADE CTA */}
             <div className="benefit-upgrade-cta">
               <div className="upgrade-helmet-section">
                 <img 
@@ -1156,8 +1089,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           </div>
         )}
         
+        {/* PREMIUM USER CONTENT: Full Analysis */}
         {isPremium && (
           <>
+            {/* Chart and Current Insight Container - REF MARKER for scroll detection */}
             <div className="chart-and-insight-container" ref={insightsStartRef}>
               <div className="chart-container">
                 <Line data={generateChartData()} options={chartOptions} height={300} />
@@ -1181,6 +1116,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
+            {/* UPDATED: Benefit Insights Section - Phase indicator positioned underneath header on the right */}
             <div className="detailed-analysis-section">
               <div className="detailed-analysis-header">
                 <div className="detailed-analysis-title">
@@ -1188,7 +1124,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 </div>
                 <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
                   <div className="benefit-phase-content">
-                    {React.createElement(getCurrentPhaseData(userData.currentStreak || 0).icon, { className: "benefit-phase-icon" })}
+                    {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
                     <div className="benefit-phase-text">
                       <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
                       <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
@@ -1238,6 +1174,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
+            {/* Journey Guidance Section - NO ICON */}
             <div className="pattern-analysis-section" ref={patternSectionRef}>
               <div className="pattern-analysis-header">
                 <h3>Journey Guidance</h3>
@@ -1266,6 +1203,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         )}
       </div>
       
+      {/* Badge Modal */}
       {showBadgeModal && selectedBadge && (
         <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
           <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
@@ -1280,18 +1218,40 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             </div>
             
             <div className="badge-description">
-              <p>{getBadgeInfo(selectedBadge.name).description}</p>
+              <p>
+                {
+                  selectedBadge.name === '7-Day Warrior' ? 
+                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
+                  selectedBadge.name === '14-Day Monk' ? 
+                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
+                  selectedBadge.name === '30-Day Master' ? 
+                    'A full month of commitment! You\'ve achieved true mastery over impulse and developed lasting self-control.' :
+                  selectedBadge.name === '90-Day King' ? 
+                    'Incredible achievement! 90 days represents complete transformation. You\'ve reached the pinnacle of self-mastery.' :
+                    'Congratulations on earning this achievement!'
+                }
+              </p>
             </div>
             
             <div className="badge-benefits">
               <h4>Benefits Unlocked:</h4>
               <ul>
-                {getBadgeInfo(selectedBadge.name).benefits.map((benefit, index) => (
-                  <li key={index}>
-                    <benefit.icon className="check-icon" />
-                    <span>{benefit.text}</span>
-                  </li>
-                ))}
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Increased mental clarity</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Enhanced self-discipline</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Greater emotional stability</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Improved energy levels</span>
+                </li>
               </ul>
             </div>
             
@@ -1307,4 +1267,4 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Stats;ility indicates old patterns being purged from your
+export default Stats;

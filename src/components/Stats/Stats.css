@@ -173,15 +173,6 @@
   gap: var(--spacing-md);
 }
 
-/* UPDATED: Left-aligned second row - 5th and 6th cards under 1st and 2nd */
-.badges-grid .badge-card:nth-child(5) {
-  grid-column: 1; /* Under 1st card */
-}
-
-.badges-grid .badge-card:nth-child(6) {
-  grid-column: 2; /* Under 2nd card */
-}
-
 .badge-card {
   display: flex;
   flex-direction: column;
@@ -1384,15 +1375,6 @@
   
   .badges-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  
-  /* MOBILE: Reset badge positioning for mobile 2-column layout */
-  .badges-grid .badge-card:nth-child(5) {
-    grid-column: 1; /* Reset to first column on mobile */
-  }
-
-  .badges-grid .badge-card:nth-child(6) {
-    grid-column: 2; /* Reset to second column on mobile */
   }
   
   .badge-card {
