@@ -743,48 +743,107 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
                 onClick={() => setTimeRange('quarter')}
               >
-                90 Days
+                3 Months
               </button>
             </div>
           </div>
         </div>
         
-        {/* PROGRESSIVE PREMIUM: Chart Section */}
-        {!isPremium ? (
-          <div className="premium-upgrade-banner">
-            <div className="premium-upgrade-content">
-              <img src={helmetImage} alt="Premium" className="premium-upgrade-icon" />
-              <div className="premium-upgrade-text">
-                <h4>Unlock Advanced Analytics</h4>
-                <p>Get detailed benefit tracking charts, progress insights, and trend analysis</p>
+        {/* FREE USER CONTENT: Average + One Insight */}
+        {!isPremium && (
+          <div className="free-benefit-preview">
+            {/* Average Display */}
+            <div className="free-average-display">
+              <div className="current-metric-average">
+                <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
+                <div className="current-metric-value">{calculateBenefitAverages()[selectedMetric] || 0}/10</div>
               </div>
-              <button className="premium-upgrade-btn" onClick={handleUpgradeClick}>
-                Upgrade Now
-              </button>
             </div>
-          </div>
-        ) : (
-          <div className="benefit-chart-container">
-            <div className="benefit-chart">
-              <Line data={generateChartData()} options={chartOptions} />
+            
+            {/* Single Insight Preview */}
+            <div className="free-insight-preview">
+              <div className="current-insight-card">
+                <div className="current-insight-header">
+                  <FaRegLightbulb className="insight-icon" />
+                  <span>Sample Insight</span>
+                </div>
+                <div className="current-insight-text">
+                  Track your benefits daily to unlock personalized insights and recommendations.
+                </div>
+              </div>
+            </div>
+            
+            {/* PREMIUM UPGRADE CTA */}
+            <div className="benefit-upgrade-cta">
+              <div className="upgrade-helmet-section">
+                <img 
+                  src={helmetImage} 
+                  alt="Premium Benefits" 
+                  className="upgrade-helmet-icon"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+                <div className="upgrade-helmet-fallback" style={{display: 'none'}}>⚡</div>
+              </div>
+              
+              <div className="upgrade-text-section">
+                <h4>Unlock Full Benefit Analysis</h4>
+                <p>Get detailed charts, advanced insights, pattern analysis, and personalized recommendations to optimize your journey.</p>
+                
+                <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
+                  <FaStar />
+                  Upgrade to Premium
+                </button>
+              </div>
             </div>
           </div>
         )}
         
-        {/* Benefit Averages Display - ALWAYS VISIBLE */}
-        <div className="benefit-averages">
-          <div className="averages-header">
-            <h4>Your Averages ({timeRange === 'week' ? '7' : timeRange === 'month' ? '30' : '90'} Days)</h4>
-          </div>
-          <div className="averages-grid">
-            {Object.entries(calculateBenefitAverages()).map(([metric, average]) => (
-              <div key={metric} className={`average-item ${selectedMetric === metric ? 'highlighted' : ''}`}>
-                <div className="average-value">{average}</div>
-                <div className="average-label">{metric.charAt(0).toUpperCase() + metric.slice(1)}</div>
+        {/* PREMIUM USER CONTENT: Full Analysis */}
+        {isPremium && (
+          <>
+            {/* Chart and Current Insight Container - REF MARKER for scroll detection */}
+            <div className="chart-and-insight-container" ref={insightsStartRef}>
+              <div className="chart-container">
+                <Line data={generateChartData()} options={chartOptions} height={300} />
               </div>
-            ))}
-          </div>
-        </div>
+              
+              <div className="current-insight-sidebar">
+                <div className="current-metric-average">
+                  <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
+                  <div className="current-metric-value">{calculateBenefitAverages()[selectedMetric] || 0}/10</div>
+                </div>
+                
+                <div className="current-insight-card">
+                  <div className="current-insight-header">
+                    <FaRegLightbulb className="insight-icon" />
+                    <span>Current Insight</span>
+                  </div>
+                  <div className="current-insight-text">
+                    {generateInsights()[0]?.practical || "Keep tracking your benefits to unlock insights!"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Full Benefit Averages Grid - PREMIUM ONLY */}
+            <div className="benefit-averages">
+              <div className="averages-header">
+                <h4>Your Averages ({timeRange === 'week' ? '7' : timeRange === 'month' ? '30' : '90'} Days)</h4>
+              </div>
+              <div className="averages-grid">
+                {Object.entries(calculateBenefitAverages()).map(([metric, average]) => (
+                  <div key={metric} className={`average-item ${selectedMetric === metric ? 'highlighted' : ''}`}>
+                    <div className="average-value">{average}</div>
+                    <div className="average-label">{metric.charAt(0).toUpperCase() + metric.slice(1)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* PROGRESSIVE PREMIUM: Benefit Insights Section */}
