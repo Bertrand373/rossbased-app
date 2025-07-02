@@ -1306,3 +1306,5 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     </div>
   );
 };
+
+export default Stats;ility indicates old patterns being purged from your
