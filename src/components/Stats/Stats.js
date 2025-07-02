@@ -1188,7 +1188,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 </div>
                 <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
                   <div className="benefit-phase-content">
-                    {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
+                    {React.createElement(getCurrentPhaseData(userData.currentStreak || 0).icon, { className: "benefit-phase-icon" })}
                     <div className="benefit-phase-text">
                       <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
                       <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
