@@ -567,7 +567,7 @@
   color: #000000;
 }
 
-/* REDESIGNED: Chart and Insight Container - GOLD BORDER FOR PREMIUM */
+/* REDESIGNED: Chart and Insight Container - NO TOP BORDER */
 .chart-and-insight-container {
   display: flex;
   flex-direction: column;
@@ -576,7 +576,6 @@
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   border: 1px solid var(--border);
-  border-top: 3px solid #ffdd00;
 }
 
 .chart-container {
@@ -652,13 +651,12 @@
   text-align: center;
 }
 
-/* UPDATED: Benefit Insights Section - GOLD BORDER FOR PREMIUM */
+/* UPDATED: Benefit Insights Section - NO TOP BORDER */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   border: 1px solid var(--border);
-  border-top: 3px solid #ffdd00;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -803,14 +801,14 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  background: linear-gradient(90deg, transparent, #ffdd00, transparent);
 }
 
 .comparison-value {
   font-size: 1.75rem;
   font-weight: 700;
   line-height: 1;
-  color: var(--primary);
+  color: #ffdd00;
   margin-bottom: var(--spacing-sm);
 }
 
@@ -862,7 +860,7 @@
 }
 
 .insight-card.highlighted.phase-specific {
-  border-left: 3px solid var(--primary);
+  border-left: 3px solid #ffdd00;
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
 }
 
@@ -1013,13 +1011,12 @@
   color: var(--text);
 }
 
-/* Journey Guidance section - GOLD BORDER FOR PREMIUM */
+/* Journey Guidance section - NO TOP BORDER */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   border: 1px solid var(--border);
-  border-top: 3px solid #ffdd00;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -1058,7 +1055,7 @@
 }
 
 .pattern-insight-item.timeline {
-  border-left: 4px solid var(--primary);
+  border-left: 4px solid #ffdd00;
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--card-background) 100%);
 }
 
@@ -1081,7 +1078,7 @@
 }
 
 .timeline-pattern .pattern-text {
-  color: var(--primary);
+  color: #ffdd00;
   font-weight: 600;
 }
 
