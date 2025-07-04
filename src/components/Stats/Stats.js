@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Essential Badge Checking Logic + INFO BANNER - COMPLETE FILE
+// components/Stats/Stats.js - UPDATED: Essential Badge Checking Logic + IMPROVED INFO BANNER - COMPLETE FILE
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -25,16 +25,18 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const insightsStartRef = useRef(null);
   const patternSectionRef = useRef(null);
 
-  // NEW: Function to determine if user has minimal data and should see info banner
+  // IMPROVED: Function to determine if user should see info banner
   const shouldShowInfoBanner = () => {
     const benefitData = getFilteredBenefitData();
+    
+    // Show banner if user has very little logged data (regardless of streak)
+    const hasMinimalData = benefitData.length < 7; // Less than a week of data
+    
+    // Also show for new users (first 3 days) even if they have some data
     const currentStreak = userData.currentStreak || 0;
+    const isNewUser = currentStreak <= 3;
     
-    // Show banner if user has a long streak but very little logged data
-    const hasLongStreak = currentStreak >= 7;
-    const hasMinimalData = benefitData.length < 5;
-    
-    return hasLongStreak && hasMinimalData;
+    return hasMinimalData || isNewUser;
   };
 
   // CORE: Badge checking logic - automatically unlocks badges when milestones are reached
@@ -735,14 +737,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* NEW: Info Banner - Shows for users with long streaks but minimal data */}
-      {shouldShowInfoBanner() && (
-        <div className="stats-info-banner">
-          <FaInfoCircle className="info-icon" />
-          <span>📊 <strong>Just getting started?</strong> Your insights will become more detailed as you log daily benefits and track your progress over time.</span>
-        </div>
-      )}
-      
       {/* Smart Reset Dialog */}
       <SmartResetDialog
         isOpen={showSmartResetDialog}
@@ -806,6 +800,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       {/* Benefit Tracker Section */}
       <div className="benefit-tracker-section">
         <h3>Benefit Tracker</h3>
+        
+        {/* MOVED: Info Banner - Now positioned under the Benefit Tracker header */}
+        {shouldShowInfoBanner() && (
+          <div className="stats-info-banner">
+            <span>📊 <strong>Just getting started?</strong> Your insights will become more detailed as you log daily benefits and track your progress over time.</span>
+          </div>
+        )}
         
         {/* Controls */}
         <div className="benefit-tracker-controls">
