@@ -64,12 +64,14 @@ export const comprehensiveMockData = {
     }
   ],
 
-  // COMPREHENSIVE: Badge progress (some earned, some not)
+  // COMPREHENSIVE: Badge progress (some earned, some not) - UPDATED with 6 badges
   badges: [
     { id: 1, name: '7-Day Warrior', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 18)) },
     { id: 2, name: '14-Day Monk', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 11)) },
     { id: 3, name: '30-Day Master', earned: false, date: null }, // Close but not yet earned
-    { id: 4, name: '90-Day King', earned: false, date: null }
+    { id: 4, name: '90-Day King', earned: false, date: null },
+    { id: 5, name: '180-Day Emperor', earned: false, date: null },
+    { id: 6, name: '365-Day Sage', earned: false, date: null }
   ],
 
   // COMPREHENSIVE: Benefit tracking for the last 10 days (mix of high and low days)
@@ -138,100 +140,49 @@ export const comprehensiveMockData = {
       aura: 7,
       sleep: 7,
       workout: 8
-    },
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 10)), // 10 days ago
-      energy: 6,
-      focus: 7,
-      confidence: 5,
-      aura: 6,
-      sleep: 6,
-      workout: 7
-    },
-    // From previous streak (before last relapse)
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 30)), // From previous streak
-      energy: 4,
-      focus: 5,
-      confidence: 3,
-      aura: 4,
-      sleep: 4,
-      workout: 5
-    },
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 35)), // From previous streak
-      energy: 3,
-      focus: 4,
-      confidence: 2,
-      aura: 3,
-      sleep: 3,
-      workout: 4
     }
   ],
 
-  // COMPREHENSIVE: Emotional tracking across different phases
+  // COMPREHENSIVE: Emotional tracking for each phase of the streak
   emotionalTracking: [
-    // Current streak - getting into Mental Expansion phase
+    // Current phase entry (Day 25 - Mental Expansion phase)
     {
-      date: new Date(),
+      date: new Date(), // Today
       day: 25,
-      phase: 1, // Still in Initial Adaptation in the data model
+      phase: 3, // Mental Expansion (days 15-45)
       anxiety: 3,
       moodStability: 8,
       mentalClarity: 9,
       emotionalProcessing: 7
     },
+    
+    // A week ago - still in Mental Expansion
     {
-      date: new Date(new Date().setDate(new Date().getDate() - 1)),
-      day: 24,
-      phase: 1,
+      date: new Date(new Date().setDate(new Date().getDate() - 7)),
+      day: 18,
+      phase: 3,
       anxiety: 4,
       moodStability: 7,
       mentalClarity: 8,
       emotionalProcessing: 6
     },
+    
+    // Two weeks ago - transition from Emotional Purging to Mental Expansion
     {
-      date: new Date(new Date().setDate(new Date().getDate() - 2)),
-      day: 23,
-      phase: 1,
-      anxiety: 2,
-      moodStability: 9,
-      mentalClarity: 8,
-      emotionalProcessing: 8
-    },
-    // Earlier in current streak - more turbulent
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 10)),
-      day: 15,
-      phase: 1,
-      anxiety: 6,
-      moodStability: 5,
-      mentalClarity: 6,
-      emotionalProcessing: 4
-    },
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 15)),
-      day: 10,
-      phase: 1,
+      date: new Date(new Date().setDate(new Date().getDate() - 14)),
+      day: 11,
+      phase: 2, // Emotional Purging (days 1-14)
       anxiety: 7,
       moodStability: 4,
       mentalClarity: 5,
       emotionalProcessing: 3
     },
-    // Very early in streak - high anxiety
+    
+    // Three weeks ago - early streak, Emotional Purging phase
     {
-      date: new Date(new Date().setDate(new Date().getDate() - 20)),
-      day: 5,
-      phase: 1,
-      anxiety: 8,
-      moodStability: 3,
-      mentalClarity: 4,
-      emotionalProcessing: 2
-    },
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 23)),
-      day: 2,
-      phase: 1,
+      date: new Date(new Date().setDate(new Date().getDate() - 21)),
+      day: 4,
+      phase: 2,
       anxiety: 9,
       moodStability: 2,
       mentalClarity: 3,
@@ -239,64 +190,53 @@ export const comprehensiveMockData = {
     }
   ],
 
-  // COMPREHENSIVE: Urge log showing different triggers and intensities
+  // COMPREHENSIVE: Urge log showing improvement over time
   urgeLog: [
-    // Recent urge management sessions
+    // Day 3 - worst urge during early streak
     {
-      date: new Date(new Date().setDate(new Date().getDate() - 1)), // Yesterday
+      date: new Date(new Date().setDate(new Date().getDate() - 22)),
+      intensity: 9,
+      trigger: 'lustful_thoughts',
+      protocol: 'timer',
+      phase: 'Emotional Purging Phase',
+      day: 3
+    },
+    
+    // Day 7 - still struggling but improving
+    {
+      date: new Date(new Date().setDate(new Date().getDate() - 18)),
       intensity: 7,
       trigger: 'stress',
       protocol: 'breathing',
-      phase: 'Mental Expansion Phase',
-      day: 24
+      phase: 'Emotional Purging Phase',
+      day: 7
     },
+    
+    // Day 12 - moderate urge handled well
     {
-      date: new Date(new Date().setDate(new Date().getDate() - 3)), // 3 days ago
-      intensity: 5,
-      trigger: 'boredom',
-      protocol: 'mental',
-      phase: 'Mental Expansion Phase',
-      day: 22
-    },
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 6)), // 6 days ago
-      intensity: 8,
-      trigger: 'explicit_content',
-      protocol: 'breathing',
-      phase: 'Initial Adaptation Phase',
-      day: 19
-    },
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 10)), // 10 days ago
+      date: new Date(new Date().setDate(new Date().getDate() - 13)),
       intensity: 6,
-      trigger: 'loneliness',
-      protocol: 'physical',
-      phase: 'Initial Adaptation Phase',
-      day: 15
+      trigger: 'boredom',
+      protocol: 'redirect',
+      phase: 'Emotional Purging Phase',
+      day: 12
     },
+    
+    // Day 20 - minor urge, easily handled
     {
-      date: new Date(new Date().setDate(new Date().getDate() - 15)), // 15 days ago
-      intensity: 9,
-      trigger: 'lustful_thoughts',
-      protocol: 'breathing',
-      phase: 'Initial Adaptation Phase',
-      day: 10
-    },
-    // From previous streak (before last relapse)
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 30)), // Before last relapse
-      intensity: 4,
+      date: new Date(new Date().setDate(new Date().getDate() - 5)),
+      intensity: 3,
       trigger: 'social_media',
-      protocol: 'mental',
-      phase: 'Foundation Phase',
-      day: 18 // Day 18 of previous streak
+      protocol: 'affirmation',
+      phase: 'Mental Expansion Phase',
+      day: 20
     }
   ],
 
-  // COMPREHENSIVE: Journal entries for different days and moods
+  // COMPREHENSIVE: Journal notes throughout the streak
   notes: {
-    // Today's entry
-    [new Date().toISOString().split('T')[0]]: "Day 25 and I'm feeling incredible! The mental clarity is next level - I solved a complex work problem that's been bugging me for weeks. My confidence is through the roof, and I can feel people responding to my energy differently. The timeline feature is helping me understand that this is normal for where I am in the journey. Going to keep pushing forward!",
+    // Today
+    [new Date().toISOString().split('T')[0]]: "Day 25 and feeling stronger than ever. The Mental Expansion phase is real - my focus at work has been incredible. People keep asking me what's different about me. I can actually feel the confidence building.",
     
     // Yesterday
     [new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0]]: "Had some stress at work and felt urges creeping in. Used the breathing protocol and it really helped. Amazing how much stronger I feel compared to my early days. The emotional processing is getting so much easier.",
@@ -347,7 +287,7 @@ export const comprehensiveMockData = {
 
 // ALTERNATIVE SCENARIOS: Different mock users for testing edge cases
 
-// Scenario 1: Brand new user (Day 1)
+// Scenario 1: Brand new user (Day 0)
 export const newUserMockData = {
   username: 'newbie',
   email: 'newbie@example.com',
@@ -361,7 +301,9 @@ export const newUserMockData = {
     { id: 1, name: '7-Day Warrior', earned: false, date: null },
     { id: 2, name: '14-Day Monk', earned: false, date: null },
     { id: 3, name: '30-Day Master', earned: false, date: null },
-    { id: 4, name: '90-Day King', earned: false, date: null }
+    { id: 4, name: '90-Day King', earned: false, date: null },
+    { id: 5, name: '180-Day Emperor', earned: false, date: null },
+    { id: 6, name: '365-Day Sage', earned: false, date: null }
   ],
   streakHistory: [{
     id: 1,
@@ -387,7 +329,7 @@ export const newUserMockData = {
   urgeToolUsage: []
 };
 
-// Scenario 2: Long-term successful user (90+ days)
+// Scenario 2: Long-term successful user (127 days)
 export const veteranUserMockData = {
   username: 'veteran',
   email: 'veteran@example.com',
@@ -401,7 +343,9 @@ export const veteranUserMockData = {
     { id: 1, name: '7-Day Warrior', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 120)) },
     { id: 2, name: '14-Day Monk', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 113)) },
     { id: 3, name: '30-Day Master', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 97)) },
-    { id: 4, name: '90-Day King', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 37)) }
+    { id: 4, name: '90-Day King', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 37)) },
+    { id: 5, name: '180-Day Emperor', earned: false, date: null }, // Not quite there yet
+    { id: 6, name: '365-Day Sage', earned: false, date: null }
   ],
   streakHistory: [
     // Old relapse from way back
@@ -486,7 +430,9 @@ export const strugglingUserMockData = {
     { id: 1, name: '7-Day Warrior', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 20)) }, // Earned once
     { id: 2, name: '14-Day Monk', earned: false, date: null },
     { id: 3, name: '30-Day Master', earned: false, date: null },
-    { id: 4, name: '90-Day King', earned: false, date: null }
+    { id: 4, name: '90-Day King', earned: false, date: null },
+    { id: 5, name: '180-Day Emperor', earned: false, date: null },
+    { id: 6, name: '365-Day Sage', earned: false, date: null }
   ],
   streakHistory: [
     // Multiple short streaks with various triggers

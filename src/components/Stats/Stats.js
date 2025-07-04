@@ -153,8 +153,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           // Reset badges but keep longest streak milestone if earned
           badges: userData.badges?.map(badge => ({
             ...badge,
-            earned: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.earned : false,
-            date: badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90 ? badge.date : null
+            earned: (badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90) ||
+                   (badge.name === '180-Day Emperor' && (userData.longestStreak || 0) >= 180) ||
+                   (badge.name === '365-Day Sage' && (userData.longestStreak || 0) >= 365) ? badge.earned : false,
+            date: ((badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90) ||
+                  (badge.name === '180-Day Emperor' && (userData.longestStreak || 0) >= 180) ||
+                  (badge.name === '365-Day Sage' && (userData.longestStreak || 0) >= 365)) ? badge.date : null
           })) || [
             { id: 1, name: '7-Day Warrior', earned: false, date: null },
             { id: 2, name: '14-Day Monk', earned: false, date: null },

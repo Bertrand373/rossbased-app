@@ -28,7 +28,9 @@ export const useUserData = () => {
       { id: 1, name: '7-Day Warrior', earned: false, date: null },
       { id: 2, name: '14-Day Monk', earned: false, date: null },
       { id: 3, name: '30-Day Master', earned: false, date: null },
-      { id: 4, name: '90-Day King', earned: false, date: null }
+      { id: 4, name: '90-Day King', earned: false, date: null },
+      { id: 5, name: '180-Day Emperor', earned: false, date: null },
+      { id: 6, name: '365-Day Sage', earned: false, date: null }
     ],
     benefitTracking: [],
     emotionalTracking: [],
@@ -156,7 +158,9 @@ export const useUserData = () => {
         { id: 1, name: '7-Day Warrior', earned: false, date: null },
         { id: 2, name: '14-Day Monk', earned: false, date: null },
         { id: 3, name: '30-Day Master', earned: false, date: null },
-        { id: 4, name: '90-Day King', earned: false, date: null }
+        { id: 4, name: '90-Day King', earned: false, date: null },
+        { id: 5, name: '180-Day Emperor', earned: false, date: null },
+        { id: 6, name: '365-Day Sage', earned: false, date: null }
       ],
       benefitTracking: [],
       emotionalTracking: [],
