@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Essential Badge Checking Logic - COMPLETE FILE
+// components/Stats/Stats.js - UPDATED: Essential Badge Checking Logic + INFO BANNER - COMPLETE FILE
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -24,6 +24,18 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   const insightsStartRef = useRef(null);
   const patternSectionRef = useRef(null);
+
+  // NEW: Function to determine if user has minimal data and should see info banner
+  const shouldShowInfoBanner = () => {
+    const benefitData = getFilteredBenefitData();
+    const currentStreak = userData.currentStreak || 0;
+    
+    // Show banner if user has a long streak but very little logged data
+    const hasLongStreak = currentStreak >= 7;
+    const hasMinimalData = benefitData.length < 5;
+    
+    return hasLongStreak && hasMinimalData;
+  };
 
   // CORE: Badge checking logic - automatically unlocks badges when milestones are reached
   const checkAndUpdateBadges = (userData) => {
@@ -722,6 +734,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           </button>
         </div>
       </div>
+      
+      {/* NEW: Info Banner - Shows for users with long streaks but minimal data */}
+      {shouldShowInfoBanner() && (
+        <div className="stats-info-banner">
+          <FaInfoCircle className="info-icon" />
+          <span>📊 <strong>Just getting started?</strong> Your insights will become more detailed as you log daily benefits and track your progress over time.</span>
+        </div>
+      )}
       
       {/* Smart Reset Dialog */}
       <SmartResetDialog
