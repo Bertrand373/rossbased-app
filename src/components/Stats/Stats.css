@@ -167,9 +167,10 @@
   padding: var(--spacing-lg) 0;
 }
 
+/* UPDATED: Badges grid to accommodate 6 badges */
 .badges-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: var(--spacing-md);
 }
 
@@ -1358,7 +1359,7 @@
     font-size: 0.875rem; /* ENSURE: Same font size */
   }
   
-  /* Mobile: 2x2 grid for stats and badges */
+  /* Mobile: 2x2 grid for stats and 3x2 grid for badges */
   .streak-stats {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1374,7 +1375,7 @@
   }
   
   .badges-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
   
   .badge-card {

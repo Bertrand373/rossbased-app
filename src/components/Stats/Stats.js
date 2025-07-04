@@ -159,7 +159,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             { id: 1, name: '7-Day Warrior', earned: false, date: null },
             { id: 2, name: '14-Day Monk', earned: false, date: null },
             { id: 3, name: '30-Day Master', earned: false, date: null },
-            { id: 4, name: '90-Day King', earned: false, date: null }
+            { id: 4, name: '90-Day King', earned: false, date: null },
+            { id: 5, name: '180-Day Emperor', earned: false, date: null },
+            { id: 6, name: '365-Day Sage', earned: false, date: null }
           ]
         };
         toast.success(`All progress reset. Longest streak record (${userData.longestStreak || 0} days) preserved.`);
@@ -177,7 +179,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             { id: 1, name: '7-Day Warrior', earned: false, date: null },
             { id: 2, name: '14-Day Monk', earned: false, date: null },
             { id: 3, name: '30-Day Master', earned: false, date: null },
-            { id: 4, name: '90-Day King', earned: false, date: null }
+            { id: 4, name: '90-Day King', earned: false, date: null },
+            { id: 5, name: '180-Day Emperor', earned: false, date: null },
+            { id: 6, name: '365-Day Sage', earned: false, date: null }
           ],
           benefitTracking: [],
           streakHistory: [{
@@ -1219,16 +1223,19 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             
             <div className="badge-description">
               <p>
-                {
-                  selectedBadge.name === '7-Day Warrior' ? 
-                    'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your journey to mastery has begun!' :
-                  selectedBadge.name === '14-Day Monk' ? 
-                    'Two weeks of focus and control! You\'re developing the mindset of a monk, with greater clarity and purpose.' :
-                  selectedBadge.name === '30-Day Master' ? 
-                    'A full month of commitment! You\'ve achieved true mastery over impulse and developed lasting self-control.' :
-                  selectedBadge.name === '90-Day King' ? 
-                    'Incredible achievement! 90 days represents complete transformation. You\'ve reached the pinnacle of self-mastery.' :
-                    'Congratulations on earning this achievement!'
+                {selectedBadge.name === '7-Day Warrior' ? 
+                  'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your foundation phase is complete - energy fluctuations are stabilizing and mental clarity is emerging!' :
+                selectedBadge.name === '14-Day Monk' ? 
+                  'Two weeks of dedication! You\'re in the adjustment phase with noticeable strength gains, improved posture, and enhanced focus. Your transformation is becoming visible!' :
+                selectedBadge.name === '30-Day Master' ? 
+                  'A full month of commitment! You\'ve entered the momentum phase with natural body composition changes, sustained energy, and mental clarity. True mastery developing!' :
+                selectedBadge.name === '90-Day King' ? 
+                  'Incredible achievement! 90 days represents complete physical and mental transformation. You\'ve reached royal status with emotional mastery and magnetic presence!' :
+                selectedBadge.name === '180-Day Emperor' ? 
+                  'Extraordinary dedication! Six months of practice has brought spiritual integration and identity transformation. You embody the divine masculine archetype!' :
+                selectedBadge.name === '365-Day Sage' ? 
+                  'Ultimate mastery achieved! One full year represents complete energy transmutation and service-oriented consciousness. You are now a teacher and healer for others!' :
+                  'Congratulations on earning this achievement!'
                 }
               </p>
             </div>
@@ -1236,22 +1243,53 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             <div className="badge-benefits">
               <h4>Benefits Unlocked:</h4>
               <ul>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>Increased mental clarity</span>
-                </li>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>Enhanced self-discipline</span>
-                </li>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>Greater emotional stability</span>
-                </li>
-                <li>
-                  <FaCheckCircle className="check-icon" />
-                  <span>Improved energy levels</span>
-                </li>
+                {selectedBadge.name === '7-Day Warrior' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Energy fluctuations stabilizing</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Brief periods of mental sharpness</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Growing sense of possibility</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Motivation to improve life areas</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '14-Day Monk' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Noticeable strength gains</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Improved posture and presence</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Enhanced memory and focus</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Mood stabilization beginning</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '30-Day Master' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Natural muscle gain and fat loss</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Sustained high energy levels</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Sleep optimization and better rest</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Mental clarity and pattern recognition</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '90-Day King' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Complete emotional regulation</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Natural magnetism and charisma</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Exceptional mental performance</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Physical transformation complete</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '180-Day Emperor' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Spiritual integration and wisdom</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Natural leadership presence</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Identity transformation complete</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '365-Day Sage' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Mastery of sexual energy transmutation</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Service-oriented consciousness</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Generational pattern breaking</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Teaching and healing abilities</span></li>
+                  </>
+                )}
               </ul>
             </div>
             
