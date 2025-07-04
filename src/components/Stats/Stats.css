@@ -25,7 +25,7 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  margin-bottom: var(--spacing-xl); /* MATCH: Calendar spacing exactly */
+  margin-bottom: var(--spacing-xl);
   margin-top: 0;
 }
 
@@ -129,7 +129,7 @@
 /* Mobile: Position above mobile navigation */
 @media (max-width: 768px) {
   .floating-wisdom-toggle {
-    bottom: 100px; /* Above mobile navigation */
+    bottom: 100px;
     right: 16px;
     width: 48px;
     height: 48px;
@@ -187,11 +187,10 @@
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
-  /* ADDED: Consistent spacing above and below like other tab headers */
   padding: var(--spacing-lg) 0;
 }
 
-/* CORRECTED: Badges grid - back to original 4 columns (4 per row desktop, 2 per row mobile) */
+/* CORRECTED: Badges grid - back to original 4 columns */
 .badges-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -335,7 +334,7 @@
   flex-direction: column;
   gap: var(--spacing-md);
   width: 100%;
-  max-width: 800px; /* INCREASED: To accommodate 6 items in one row */
+  max-width: 800px;
   align-items: center;
 }
 
@@ -348,10 +347,10 @@
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   width: 100%;
-  justify-content: center; /* DESKTOP: Center the pills */
+  justify-content: center;
 }
 
-/* Time range selector - UNCHANGED */
+/* Time range selector */
 .time-range-selector-container {
   width: 100%;
   max-width: 360px;
@@ -393,8 +392,7 @@
   color: var(--primary);
 }
 
-/* ===== ADDED: FREE USER BENEFIT PREVIEW SECTION - PROGRESSIVE PREMIUM LOCK ===== */
-
+/* FREE USER BENEFIT PREVIEW SECTION */
 .free-benefit-preview {
   display: flex;
   flex-direction: column;
@@ -402,7 +400,7 @@
   margin-bottom: var(--spacing-xl);
 }
 
-/* FREE: Average Display - Same styling as premium sidebar */
+/* FREE: Average Display */
 .free-average-display {
   display: flex;
   justify-content: center;
@@ -443,7 +441,7 @@
   width: 100%;
 }
 
-/* ENHANCED: Benefit Upgrade CTA - Matching Timeline early teaser design exactly */
+/* ENHANCED: Benefit Upgrade CTA */
 .benefit-upgrade-cta {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid var(--border);
@@ -462,17 +460,17 @@
   flex-shrink: 0;
 }
 
-/* ENHANCED: Benefit upgrade helmet - EXACT copy of Timeline early teaser helmet sizing */
+/* ENHANCED: Benefit upgrade helmet */
 .upgrade-helmet-icon {
-  width: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
-  height: 80px; /* MATCH: Same as Timeline early-teaser-helmet */
+  width: 80px;
+  height: 80px;
   flex-shrink: 0;
   animation: benefit-helmet-pulse 2.5s ease-in-out infinite;
   filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
 }
 
 .upgrade-helmet-fallback {
-  font-size: 3.2rem; /* MATCH: Same as Timeline early-teaser-helmet-fallback */
+  font-size: 3.2rem;
   color: var(--primary);
   flex-shrink: 0;
   animation: benefit-helmet-pulse 2.5s ease-in-out infinite;
@@ -510,39 +508,37 @@
   line-height: 1.5;
 }
 
-/* ENHANCED: Benefit upgrade button - EXACT copy of Timeline early-teaser-upgrade-btn */
+/* ENHANCED: Benefit upgrade button */
 .benefit-upgrade-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl); /* MATCH: Same as Timeline */
-  background-color: var(--primary); /* MATCH: Same as Timeline */
-  border: none; /* MATCH: Same as Timeline */
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: var(--primary);
+  border: none;
   border-radius: var(--radius-full);
-  color: #000000; /* MATCH: Same as Timeline */
-  font-size: 1.125rem; /* MATCH: Same as Timeline */
-  font-weight: 600; /* MATCH: Same as Timeline */
+  color: #000000;
+  font-size: 1.125rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease; /* MATCH: Same as Timeline */
+  transition: all 0.2s ease;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  min-width: 200px; /* MATCH: Same as Timeline */
-  min-height: 48px; /* MATCH: Same as Timeline */
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as Timeline */
+  min-width: 200px;
+  min-height: 48px;
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
   align-self: flex-start;
 }
 
 .benefit-upgrade-btn:hover {
-  background-color: var(--primary-dark); /* MATCH: Same as Timeline */
-  transform: translateY(-2px); /* MATCH: Same as Timeline */
-  box-shadow: 0 6px 16px rgba(255, 221, 0, 0.4); /* MATCH: Enhanced shadow on hover */
-  color: #000000; /* MATCH: Same as Timeline */
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 221, 0, 0.4);
+  color: #000000;
 }
 
-/* ===== END: FREE USER BENEFIT PREVIEW SECTION ===== */
-
-/* REDESIGNED: Chart and Insight Container - Mobile-first with Desktop Sidebar */
+/* REDESIGNED: Chart and Insight Container */
 .chart-and-insight-container {
   display: flex;
   flex-direction: column;
@@ -561,7 +557,7 @@
   border: 1px solid var(--border);
 }
 
-/* Current Insight Sidebar (Mobile: Card, Desktop: Sidebar) */
+/* Current Insight Sidebar */
 .current-insight-sidebar {
   display: flex;
   flex-direction: column;
@@ -570,9 +566,9 @@
 
 .current-metric-average {
   display: flex;
-  flex-direction: column; /* CHANGED: Always use column layout like mobile */
-  gap: var(--spacing-sm); /* CHANGED: Use mobile gap */
-  align-items: center; /* ADDED: Center content */
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: center;
   padding: var(--spacing-lg);
   background-color: var(--card-background);
   border-radius: var(--radius-md);
@@ -601,7 +597,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  justify-content: center; /* ADDED: Vertically center all content */
+  justify-content: center;
 }
 
 .current-insight-header {
@@ -626,33 +622,31 @@
   text-align: center;
 }
 
-/* UPDATED: Benefit Insights Section - Phase indicator positioned underneath header on the right */
+/* UPDATED: Benefit Insights Section */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* FIXED: Reduced top padding to match pattern-analysis-section */
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: relative; /* ADDED: For absolute positioning of phase indicator on desktop */
+  position: relative;
 }
 
-/* UPDATED: Header layout - simplified to match pattern-analysis-header */
 .detailed-analysis-header {
   display: flex;
-  flex-direction: column; /* CHANGED: Stack vertically */
+  flex-direction: column;
   align-items: center;
   gap: var(--spacing-lg);
   margin-bottom: 0;
 }
 
-/* Title section - simplified */
 .detailed-analysis-title {
   margin: 0;
-  width: 100%; /* ADDED: Full width for true centering */
-  text-align: center; /* ADDED: Center the text */
+  width: 100%;
+  text-align: center;
 }
 
 .detailed-analysis-title h4 {
@@ -660,7 +654,195 @@
   font-size: 1.25rem;
   color: var(--text);
   font-weight: 600;
-  padding: var(--spacing-lg) 0; /* ADDED: Match the padding of Journey Guidance h3 */
+  padding: var(--spacing-lg) 0;
+}
+
+.benefit-phase-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(135deg, 
+    color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
+    var(--card-background) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--phase-color, var(--primary)) 20%, var(--border));
+  border-radius: var(--radius-lg);
+  min-width: 180px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.benefit-phase-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.benefit-phase-icon {
+  font-size: 1.5rem;
+  color: var(--phase-color, var(--primary));
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.benefit-phase-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  align-items: center;
+  text-align: center;
+}
+
+.benefit-phase-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--phase-color, var(--text));
+  line-height: 1.2;
+  margin: 0;
+}
+
+.benefit-phase-day {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.streak-comparison {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.streak-comparison h5 {
+  margin-bottom: var(--spacing-lg);
+  font-size: 1rem;
+  color: var(--text);
+  text-align: center;
+  font-weight: 600;
+}
+
+.metric-highlight {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.phase-highlight {
+  color: var(--primary);
+  font-weight: 700;
+  text-shadow: 0 0 4px rgba(255, 221, 0, 0.3);
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.comparison-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  transition: none;
+  min-height: 140px;
+  height: 140px;
+}
+
+.comparison-card.phase-aware {
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.comparison-card.phase-aware::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.comparison-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.comparison-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+/* Personalized Analysis */
+.personalized-analysis h5 {
+  margin-bottom: var(--spacing-lg);
+  font-size: 1rem;
+  color: var(--text);
+  text-align: center;
+  font-weight: 600;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.insight-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  min-height: 120px;
+  justify-content: center;
+}
+
+.insight-card.highlighted {
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.15);
+}
+
+.insight-card.phase-specific {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
+}
+
+.insight-card.highlighted.phase-specific {
+  border-left: 3px solid var(--primary);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
+}
+
+.insight-card.challenge-warning {
+  border-left: 3px solid var(--danger);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--card-background) 100%);
+}
+
+.insight-card.timeline-based {
+  border-left: 3px solid var(--success);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
 }
 
 /* Phase-specific animations */
@@ -683,7 +865,7 @@
   gap: var(--spacing-sm);
   font-weight: 600;
   color: var(--text);
-  justify-content: center; /* ADDED: Center the header content */
+  justify-content: center;
 }
 
 .insight-card-header .insight-icon {
@@ -706,7 +888,7 @@
   font-size: 0.875rem;
   line-height: 1.4;
   font-weight: 500;
-  text-align: center; /* CHANGED: Center-aligned the insight text */
+  text-align: center;
 }
 
 .insight-card.highlighted .insight-text {
@@ -800,26 +982,24 @@
   color: var(--text);
 }
 
-/* UPDATED: Journey Guidance section - REMOVED left yellow border - SIMPLIFIED HEADER */
+/* Journey Guidance section */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* FIXED: Reduced top padding */
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  /* REMOVED: Left yellow border as requested */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Simple header matching detailed-analysis-header - NO ICON */
 .pattern-analysis-header {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-  margin-bottom: 0; /* FIXED: Remove margin-bottom to prevent double spacing with flex gap */
+  margin-bottom: 0;
 }
 
 .pattern-analysis-header h3 {
@@ -827,7 +1007,7 @@
   font-size: 1.25rem;
   color: var(--text);
   font-weight: 600;
-  padding: var(--spacing-lg) 0; /* ADDED: Explicit padding for consistency */
+  padding: var(--spacing-lg) 0;
 }
 
 .pattern-insights {
@@ -845,9 +1025,8 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* ENHANCED: Pattern-specific styling - ONLY timeline patterns get yellow left border */
 .pattern-insight-item.timeline {
-  border-left: 4px solid var(--primary); /* KEPT: Timeline patterns get yellow left border */
+  border-left: 4px solid var(--primary);
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--card-background) 100%);
 }
 
@@ -861,7 +1040,6 @@
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
 }
 
-/* Timeline pattern styling */
 .timeline-pattern {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--card-background) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -875,7 +1053,6 @@
   font-weight: 600;
 }
 
-/* Challenge warning styling */
 .challenge-warning {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, var(--card-background) 100%);
   border: 1px solid rgba(239, 68, 68, 0.2);
@@ -889,7 +1066,6 @@
   font-weight: 600;
 }
 
-/* Recovery pattern styling */
 .recovery-pattern {
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
   border: 1px solid rgba(34, 197, 94, 0.1);
@@ -908,14 +1084,14 @@
   color: var(--text);
   margin-bottom: var(--spacing-sm);
   font-size: 0.875rem;
-  text-align: center; /* CHANGED: Center-aligned pattern text */
+  text-align: center;
 }
 
 .pattern-actionable {
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-style: italic;
-  text-align: center; /* CHANGED: Center-aligned actionable text */
+  text-align: center;
 }
 
 .no-patterns {
@@ -1103,9 +1279,8 @@
   color: var(--text-secondary);
 }
 
-/* DESKTOP RESPONSIVE: Sidebar Layout for Chart and Insights */
+/* DESKTOP RESPONSIVE */
 @media (min-width: 769px) {
-  /* Desktop: Chart with Sidebar Layout */
   .chart-and-insight-container {
     flex-direction: row;
     gap: var(--spacing-lg);
@@ -1113,32 +1288,29 @@
   
   .chart-container {
     flex: 2;
-    min-width: 0; /* Allow flex shrinking */
+    min-width: 0;
   }
   
   .current-insight-sidebar {
     flex: 1;
-    min-width: 280px; /* Minimum sidebar width */
-    max-width: 320px; /* Maximum sidebar width */
+    min-width: 280px;
+    max-width: 320px;
   }
   
-  /* Desktop: Better spacing for sidebar cards */
   .current-metric-average {
     min-height: 100px;
-    justify-content: center; /* ENSURE: Centered on desktop */
-    /* REMOVED: flex-direction override - keep column layout */
+    justify-content: center;
   }
   
   .current-insight-card {
     min-height: 180px;
-    justify-content: center; /* ENSURE: Centered on desktop */
+    justify-content: center;
   }
   
-  /* DESKTOP: Benefit Insights header with right-aligned phase indicator */
   .detailed-analysis-header {
-    flex-direction: row; /* DESKTOP: Side by side layout */
-    position: relative; /* For absolute positioning context */
-    padding-bottom: var(--spacing-lg); /* Add space for absolutely positioned indicator */
+    flex-direction: row;
+    position: relative;
+    padding-bottom: var(--spacing-lg);
   }
   
   .detailed-analysis-title {
@@ -1146,7 +1318,6 @@
     text-align: center;
   }
   
-  /* DESKTOP: Position phase indicator absolutely at the right */
   .benefit-phase-indicator {
     position: absolute;
     right: 0;
@@ -1155,9 +1326,8 @@
   }
 }
 
-/* MOBILE RESPONSIVE: Stack Layout and Optimizations - FIXED HEADER ALIGNMENT */
+/* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
-  /* Mobile header - reset button below title */
   .stats-header {
     display: flex;
     flex-direction: column;
@@ -1179,15 +1349,13 @@
     justify-self: center;
   }
   
-  /* FIXED: Mobile reset button to match Reset Calendar styling exactly */
   .reset-stats-btn {
     width: 100%;
     justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-md); /* CHANGED: Match reset calendar button */
-    font-size: 0.875rem; /* ENSURE: Same font size */
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
   }
   
-  /* Mobile: 2x2 grid for stats and 2x3 grid for badges */
   .streak-stats {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1227,7 +1395,6 @@
     line-height: 1.2;
   }
   
-  /* Mobile: Benefit tracker controls */
   .benefit-tracker-controls {
     padding: var(--spacing-lg) var(--spacing-md);
   }
@@ -1237,13 +1404,12 @@
     width: 100%;
   }
   
-  /* MOBILE: Horizontal scroll behavior for metric pills */
   .metric-pill-container {
-    justify-content: flex-start; /* MOBILE: Align left for scrolling */
+    justify-content: flex-start;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-right: var(--spacing-md); /* MOBILE: Extra padding for scroll comfort */
+    padding-right: var(--spacing-md);
   }
   
   .metric-pill-container::-webkit-scrollbar {
@@ -1253,7 +1419,7 @@
   .metric-btn {
     white-space: nowrap;
     min-width: fit-content;
-    flex-shrink: 0; /* MOBILE: Prevent pills from shrinking */
+    flex-shrink: 0;
   }
   
   .time-range-selector-container {
@@ -1261,8 +1427,6 @@
     width: 100%;
   }
 
-  /* MOBILE RESPONSIVENESS for Progressive Premium */
-  /* Mobile benefit upgrade CTA adjustments */
   .benefit-upgrade-cta {
     flex-direction: column;
     text-align: center;
@@ -1270,12 +1434,12 @@
   }
 
   .upgrade-helmet-icon {
-    width: 70px; /* MATCH: Mobile scaling like Timeline */
+    width: 70px;
     height: 70px;
   }
 
   .upgrade-helmet-fallback {
-    font-size: 2.8rem; /* MATCH: Mobile scaling like Timeline */
+    font-size: 2.8rem;
   }
 
   .upgrade-text-section h4 {
@@ -1287,14 +1451,13 @@
   }
 
   .benefit-upgrade-btn {
-    font-size: 1rem; /* MATCH: Mobile size like Timeline */
+    font-size: 1rem;
     padding: var(--spacing-md) var(--spacing-lg);
-    min-width: 180px; /* MATCH: Mobile width like Timeline */
-    min-height: 48px; /* MATCH: Mobile height like Timeline */
+    min-width: 180px;
+    min-height: 48px;
     align-self: center;
   }
   
-  /* Mobile free benefit preview adjustments */
   .free-average-display .current-metric-average {
     max-width: 100%;
     min-height: 100px;
@@ -1307,7 +1470,6 @@
     padding: var(--spacing-md);
   }
   
-  /* Mobile: Chart and insights remain stacked */
   .chart-container {
     padding: var(--spacing-md);
   }
@@ -1316,8 +1478,7 @@
     flex-direction: column;
     gap: var(--spacing-sm);
     min-height: 100px;
-    justify-content: center; /* ADDED: Center content on mobile too */
-    /* REMOVED: flex-direction override since desktop now uses column too */
+    justify-content: center;
   }
   
   .current-metric-value {
@@ -1326,45 +1487,42 @@
   
   .current-insight-card {
     min-height: 100px;
-    justify-content: center; /* ENSURE: Centered on mobile */
+    justify-content: center;
   }
   
-  /* Mobile: Benefit Insights - UPDATED for new header structure */
   .detailed-analysis-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* MATCHED: Same padding as pattern-analysis-section */
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
   }
   
   .detailed-analysis-title h4 {
-    font-size: 1.125rem; /* Mobile font size */
+    font-size: 1.125rem;
   }
   
-  /* Mobile: Benefit insights header - simplified to match Journey Guidance */
   .detailed-analysis-header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-lg); /* INCREASED: Match the gap used in desktop for phase indicator */
-    position: static; /* MOBILE: Reset position */
-    padding-bottom: 0; /* MOBILE: Remove extra padding */
+    gap: var(--spacing-lg);
+    position: static;
+    padding-bottom: 0;
   }
   
   .detailed-analysis-title {
-    text-align: center; /* MOBILE: Ensure centered */
-    flex: none; /* MOBILE: Reset flex */
+    text-align: center;
+    flex: none;
   }
   
-  /* Mobile: Compact phase indicator - SMALLER and centered */
   .benefit-phase-indicator {
     width: 100%;
-    max-width: 280px; /* SMALLER: Reduced width for mobile */
-    padding: var(--spacing-lg) var(--spacing-lg); /* INCREASED: Match UrgeToolkit mobile padding for proper text spacing */
+    max-width: 280px;
+    padding: var(--spacing-lg) var(--spacing-lg);
     justify-content: flex-start;
     text-align: center;
     position: relative;
-    align-self: center; /* CENTERED: Override desktop right alignment */
-    transform: none; /* MOBILE: Reset transform */
-    top: auto; /* MOBILE: Reset position */
-    right: auto; /* MOBILE: Reset position */
+    align-self: center;
+    transform: none;
+    top: auto;
+    right: auto;
   }
   
   .benefit-phase-content {
@@ -1374,7 +1532,7 @@
   }
   
   .benefit-phase-icon {
-    font-size: 1.25rem; /* SMALLER: Reduced icon size for mobile */
+    font-size: 1.25rem;
     flex-shrink: 0;
   }
   
@@ -1387,19 +1545,19 @@
     text-align: center;
     width: auto;
     margin-right: 0;
-    padding: var(--spacing-md) 0; /* INCREASED: Add vertical padding to push text away from borders */
+    padding: var(--spacing-md) 0;
   }
   
   .benefit-phase-name {
-    font-size: 0.8125rem; /* SMALLER: Reduced font size for mobile */
+    font-size: 0.8125rem;
     text-align: center;
-    margin-bottom: 1px; /* REDUCED: Closer spacing between name and day */
+    margin-bottom: 1px;
   }
   
   .benefit-phase-day {
-    font-size: 0.6875rem; /* SMALLER: Reduced font size for mobile */
+    font-size: 0.6875rem;
     text-align: center;
-    margin-top: 1px; /* REDUCED: Closer spacing between day and name */
+    margin-top: 1px;
   }
   
   .comparison-grid {
@@ -1416,7 +1574,6 @@
     font-size: 1.5rem;
   }
   
-  /* Mobile: Insights grid - single column */
   .insights-grid {
     grid-template-columns: 1fr;
   }
@@ -1424,24 +1581,23 @@
   .insight-card {
     min-height: 100px;
     padding: var(--spacing-md);
-    justify-content: center; /* ENSURE: Centered on mobile */
+    justify-content: center;
   }
   
   .insight-text {
     font-size: 0.8rem;
   }
   
-  /* Mobile: Journey guidance with FIXED header spacing */
   .pattern-analysis-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* FIXED: Reduced top padding on mobile */
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
   }
   
   .pattern-analysis-header {
-    margin-bottom: 0; /* FIXED: Ensure no margin on mobile too */
+    margin-bottom: 0;
   }
   
   .pattern-analysis-header h3 {
-    font-size: 1.125rem; /* Mobile font size */
+    font-size: 1.125rem;
   }
   
   .pattern-insight-item {
@@ -1463,7 +1619,6 @@
     text-align: center;
   }
   
-  /* Mobile: Modal actions */
   .form-actions {
     flex-direction: column;
   }
@@ -1483,16 +1638,15 @@
   }
 }
 
-/* VERY SMALL SCREENS: Further optimizations */
+/* VERY SMALL SCREENS */
 @media (max-width: 480px) {
-  /* Very small screen benefit upgrade adjustments */
   .upgrade-helmet-icon {
-    width: 60px; /* MATCH: Very small screen scaling like Timeline */
+    width: 60px;
     height: 60px;
   }
 
   .upgrade-helmet-fallback {
-    font-size: 2.4rem; /* MATCH: Very small screen scaling like Timeline */
+    font-size: 2.4rem;
   }
 
   .upgrade-text-section h4 {
@@ -1504,37 +1658,35 @@
   }
 
   .benefit-upgrade-btn {
-    font-size: 0.875rem; /* MATCH: Very small screen size like Timeline */
+    font-size: 0.875rem;
     padding: var(--spacing-sm) var(--spacing-md);
-    min-width: 160px; /* MATCH: Very small screen width like Timeline */
-    min-height: 44px; /* MATCH: Very small screen height like Timeline */
+    min-width: 160px;
+    min-height: 44px;
   }
   
   .benefit-upgrade-cta {
     padding: var(--spacing-lg) var(--spacing-md);
   }
 
-  /* Very small screen benefit phase indicator - EVEN SMALLER */
   .benefit-phase-indicator {
-    padding: var(--spacing-md) var(--spacing-md); /* INCREASED: Better padding for very small screens */
-    max-width: 240px; /* SMALLER: Reduced width for very small screens */
+    padding: var(--spacing-md) var(--spacing-md);
+    max-width: 240px;
   }
   
   .benefit-phase-icon {
-    font-size: 1.125rem; /* SMALLER: Even smaller icon */
+    font-size: 1.125rem;
   }
   
   .benefit-phase-name {
-    font-size: 0.75rem; /* SMALLER: Even smaller text */
-    margin-bottom: 1px; /* REDUCED: Closer spacing */
+    font-size: 0.75rem;
+    margin-bottom: 1px;
   }
   
   .benefit-phase-day {
-    font-size: 0.625rem; /* SMALLER: Even smaller text */
-    margin-top: 1px; /* REDUCED: Closer spacing */
+    font-size: 0.625rem;
+    margin-top: 1px;
   }
 
-  /* Hide icons on very small screens to prevent overflow */
   .current-insight-header .insight-icon,
   .insight-card-header .insight-icon {
     display: none;
@@ -1636,200 +1788,4 @@
   .insight-text {
     font-size: 0.75rem;
   }
-} indicator positioned underneath the title, aligned to the right */
-.benefit-phase-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-md) var(--spacing-lg); /* SMALLER: Reduced padding for inline positioning */
-  background: linear-gradient(135deg, 
-    color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
-    var(--card-background) 100%
-  );
-  border: 1px solid color-mix(in srgb, var(--phase-color, var(--primary)) 20%, var(--border));
-  border-radius: var(--radius-lg);
-  min-width: 180px; /* SMALLER: Reduced width for inline positioning */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
 }
-
-.benefit-phase-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md); /* SMALLER: Reduced gap */
-  width: 100%;
-}
-
-.benefit-phase-icon {
-  font-size: 1.5rem; /* SMALLER: Reduced icon size */
-  color: var(--phase-color, var(--primary));
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.benefit-phase-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  align-items: center;
-  text-align: center;
-}
-
-.benefit-phase-name {
-  font-size: 0.875rem; /* SMALLER: Reduced font size */
-  font-weight: 600;
-  color: var(--phase-color, var(--text));
-  line-height: 1.2;
-  margin: 0;
-}
-
-.benefit-phase-day {
-  font-size: 0.75rem; /* SMALLER: Reduced font size */
-  color: var(--text-secondary);
-  line-height: 1.2;
-  margin: 0;
-}
-
-.streak-comparison {
-  margin-top: var(--spacing-lg); /* ADDED: Match the gap between header and content like Journey Guidance */
-  margin-bottom: var(--spacing-md); /* REDUCED: Less space after comparison cards */
-}
-
-.streak-comparison h5 {
-  margin-bottom: var(--spacing-lg);
-  font-size: 1rem;
-  color: var(--text);
-  text-align: center;
-  font-weight: 600;
-}
-
-/* ADDED: Yellow metric highlighting */
-.metric-highlight {
-  color: var(--primary);
-  font-weight: 700;
-}
-
-/* ENHANCED: Phase-specific highlighting */
-.phase-highlight {
-  color: var(--primary);
-  font-weight: 700;
-  text-shadow: 0 0 4px rgba(255, 221, 0, 0.3);
-}
-
-.comparison-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-md);
-}
-
-.comparison-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  text-align: center;
-  transition: none;
-  min-height: 140px;
-  height: 140px;
-}
-
-/* ENHANCED: Phase-aware comparison cards */
-.comparison-card.phase-aware {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-}
-
-.comparison-card.phase-aware::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
-}
-
-.comparison-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--primary);
-  margin-bottom: var(--spacing-sm);
-}
-
-.comparison-label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.3;
-  font-weight: 500;
-}
-
-/* Personalized Analysis */
-.personalized-analysis h5 {
-  margin-bottom: var(--spacing-lg); /* CHANGED: Match the spacing of streak comparison header */
-  font-size: 1rem;
-  color: var(--text);
-  text-align: center; /* CHANGED: Centered the header */
-  font-weight: 600;
-}
-
-/* ENHANCED: Insights Grid with phase-specific styling */
-.insights-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
-  width: 100%;
-}
-
-.insight-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  transition: all 0.2s ease;
-  /* CHANGED: Dynamic height for better content readability */
-  min-height: 120px;
-  justify-content: center; /* ADDED: Vertically center all content */
-}
-
-.insight-card.highlighted {
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.15);
-}
-
-/* ENHANCED: Phase-specific insight card styling - ONLY highlighted cards get left border */
-.insight-card.phase-specific {
-  /* REMOVED: Default yellow left border - only highlighted cards get it */
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
-}
-
-.insight-card.highlighted.phase-specific {
-  border-left: 3px solid var(--primary); /* KEPT: Only highlighted cards get yellow left border */
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
-}
-
-.insight-card.challenge-warning {
-  border-left: 3px solid var(--danger);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--card-background) 100%);
-}
-
-.insight-card.timeline-based {
-  border-left: 3px solid var(--success);
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
-}
-
-/* Phase
