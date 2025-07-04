@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Essential Badge Checking Logic + IMPROVED INFO BANNER - COMPLETE FILE
+// components/Stats/Stats.js - UPDATED: Free tier access control + Energy insights + Info icon
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -24,6 +24,30 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   const insightsStartRef = useRef(null);
   const patternSectionRef = useRef(null);
+
+  // NEW: Force free users to energy metric on mount and when premium status changes
+  useEffect(() => {
+    if (!isPremium && selectedMetric !== 'energy') {
+      setSelectedMetric('energy');
+    }
+  }, [isPremium, selectedMetric]);
+
+  // NEW: Handle metric selection with access control
+  const handleMetricClick = (metric) => {
+    // Free users can only access 'energy' metric
+    if (!isPremium && metric !== 'energy') {
+      toast.error('Upgrade to Premium to unlock all benefit metrics', {
+        duration: 3000,
+        style: {
+          background: 'var(--card-background)',
+          color: 'var(--text-primary)',
+          border: '1px solid var(--border)'
+        }
+      });
+      return;
+    }
+    setSelectedMetric(metric);
+  };
 
   // IMPROVED: Function to determine if user should see info banner
   const shouldShowInfoBanner = () => {
@@ -411,8 +435,28 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
   
-  // Calculate average for the selected metric
+  // NEW: Calculate average for last 7 days (for free users) 
   const calculateAverage = () => {
+    if (!isPremium) {
+      // For free users: last 7 days average
+      const allData = userData.benefitTracking || [];
+      const last7DaysData = allData
+        .filter(item => {
+          const itemDate = new Date(item.date);
+          const cutoffDate = subDays(new Date(), 7);
+          return itemDate >= cutoffDate;
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      if (last7DaysData.length === 0) return '0.0';
+      
+      const sum = last7DaysData.reduce((acc, item) => {
+        return acc + (item.energy || 0);
+      }, 0);
+      return (sum / last7DaysData.length).toFixed(1);
+    }
+    
+    // For premium users: use existing filtered data logic
     const filteredData = getFilteredBenefitData();
     if (filteredData.length === 0) return '0.0';
     
@@ -801,10 +845,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       <div className="benefit-tracker-section">
         <h3>Benefit Tracker</h3>
         
-        {/* MOVED: Info Banner - Now positioned under the Benefit Tracker header */}
+        {/* UPDATED: Info Banner with icon - positioned under header */}
         {shouldShowInfoBanner() && (
           <div className="stats-info-banner">
-            <span>📊 <strong>Just getting started?</strong> Your insights will become more detailed as you log daily benefits and track your progress over time.</span>
+            <FaInfoCircle className="info-icon" />
+            <span><strong>Just getting started?</strong> Your insights will become more detailed as you log daily benefits and track your progress over time.</span>
           </div>
         )}
         
@@ -814,65 +859,73 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             <div className="metric-pill-container">
               <button 
                 className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('energy')}
+                onClick={() => handleMetricClick('energy')}
               >
                 Energy
               </button>
               <button 
-                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('focus')}
+                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                onClick={() => handleMetricClick('focus')}
+                disabled={!isPremium}
               >
-                Focus
+                Focus {!isPremium && <FaLock className="metric-lock-icon" />}
               </button>
               <button 
-                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('confidence')}
+                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                onClick={() => handleMetricClick('confidence')}
+                disabled={!isPremium}
               >
-                Confidence
+                Confidence {!isPremium && <FaLock className="metric-lock-icon" />}
               </button>
               <button 
-                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('aura')}
+                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                onClick={() => handleMetricClick('aura')}
+                disabled={!isPremium}
               >
-                Aura
+                Aura {!isPremium && <FaLock className="metric-lock-icon" />}
               </button>
               <button 
-                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('sleep')}
+                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                onClick={() => handleMetricClick('sleep')}
+                disabled={!isPremium}
               >
-                Sleep Quality
+                Sleep Quality {!isPremium && <FaLock className="metric-lock-icon" />}
               </button>
               <button 
-                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
-                onClick={() => setSelectedMetric('workout')}
+                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                onClick={() => handleMetricClick('workout')}
+                disabled={!isPremium}
               >
-                Workout
+                Workout {!isPremium && <FaLock className="metric-lock-icon" />}
               </button>
             </div>
           </div>
           
-          <div className="time-range-selector-container">
-            <div className="time-range-selector">
-              <button 
-                className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
-                onClick={() => setTimeRange('week')}
-              >
-                Week
-              </button>
-              <button 
-                className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
-                onClick={() => setTimeRange('month')}
-              >
-                Month
-              </button>
-              <button 
-                className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
-                onClick={() => setTimeRange('quarter')}
-              >
-                3 Months
-              </button>
+          {/* UPDATED: Only show time range selector for premium users */}
+          {isPremium && (
+            <div className="time-range-selector-container">
+              <div className="time-range-selector">
+                <button 
+                  className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
+                  onClick={() => setTimeRange('week')}
+                >
+                  Week
+                </button>
+                <button 
+                  className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
+                  onClick={() => setTimeRange('month')}
+                >
+                  Month
+                </button>
+                <button 
+                  className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
+                  onClick={() => setTimeRange('quarter')}
+                >
+                  3 Months
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
         
         {/* FREE USER CONTENT */}
@@ -880,7 +933,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           <div className="free-benefit-preview">
             <div className="free-average-display">
               <div className="current-metric-average">
-                <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
+                <div className="current-metric-label">Energy Level (last 7 days)</div>
                 <div className="current-metric-value">{calculateAverage()}/10</div>
               </div>
             </div>
@@ -889,7 +942,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <div className="current-insight-card">
                 <div className="current-insight-header">
                   <FaRegLightbulb className="insight-icon" />
-                  <span>Sample Insight</span>
+                  <span>Energy Insights</span>
                 </div>
                 <div className="current-insight-text">
                   {getCurrentInsight()}

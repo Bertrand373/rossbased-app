@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Timeline-based enhancements + REDESIGNED Benefit Insights Header + INFO BANNER */
+/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Locked metrics + Info icon banner */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -61,7 +61,7 @@
   transition: none;
 }
 
-/* NEW: Stats Info Banner - For users with minimal data */
+/* UPDATED: Stats Info Banner - With yellow info icon */
 .stats-info-banner {
   display: flex;
   align-items: center;
@@ -368,6 +368,7 @@
   width: 100%;
 }
 
+/* UPDATED: Metric buttons with locked states */
 .metric-btn, .time-btn {
   flex: 1;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -380,6 +381,11 @@
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  position: relative;
 }
 
 .metric-btn:hover, .time-btn:hover {
@@ -390,6 +396,30 @@
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
+}
+
+/* NEW: Locked metric button styles */
+.metric-btn.locked {
+  background-color: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.metric-btn.locked:hover {
+  background-color: rgba(128, 128, 128, 0.1);
+  transform: none;
+}
+
+.metric-btn:disabled {
+  pointer-events: none;
+}
+
+/* NEW: Lock icon styling */
+.metric-lock-icon {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-left: var(--spacing-xs);
 }
 
 /* FREE USER BENEFIT PREVIEW SECTION */
