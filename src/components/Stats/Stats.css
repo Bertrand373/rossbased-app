@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Locked metrics + Info icon banner */
+/* components/Stats/Stats.css - UPDATED: Progressive premium lock styles + Locked metrics + Info icon banner + GOLD BORDERS */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -471,14 +471,13 @@
   width: 100%;
 }
 
-/* ENHANCED: Benefit Upgrade CTA */
+/* ENHANCED: Benefit Upgrade CTA - NO TOP BORDER */
 .benefit-upgrade-cta {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
   display: flex;
   align-items: center;
   gap: var(--spacing-xl);
@@ -568,7 +567,7 @@
   color: #000000;
 }
 
-/* REDESIGNED: Chart and Insight Container */
+/* REDESIGNED: Chart and Insight Container - GOLD BORDER FOR PREMIUM */
 .chart-and-insight-container {
   display: flex;
   flex-direction: column;
@@ -577,6 +576,7 @@
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   border: 1px solid var(--border);
+  border-top: 3px solid #ffdd00;
 }
 
 .chart-container {
@@ -652,12 +652,13 @@
   text-align: center;
 }
 
-/* UPDATED: Benefit Insights Section */
+/* UPDATED: Benefit Insights Section - GOLD BORDER FOR PREMIUM */
 .detailed-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   border: 1px solid var(--border);
+  border-top: 3px solid #ffdd00;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -1012,12 +1013,13 @@
   color: var(--text);
 }
 
-/* Journey Guidance section */
+/* Journey Guidance section - GOLD BORDER FOR PREMIUM */
 .pattern-analysis-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   border: 1px solid var(--border);
+  border-top: 3px solid #ffdd00;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
