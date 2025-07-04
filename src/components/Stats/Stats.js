@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration - COMPLETE FILE
+// components/Stats/Stats.js - UPDATED: Smart Reset Dialog Integration + Badge Migration - COMPLETE FILE
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -31,6 +31,64 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   // NEW: Refs for scroll detection
   const insightsStartRef = useRef(null); // Current insight section start
   const patternSectionRef = useRef(null); // Pattern analysis section
+
+  // UPDATED: Enhanced data migration function to handle old badge arrays
+  const migrateBadgeData = (userData) => {
+    // If user data has old 4-badge system, upgrade to 6-badge system
+    if (userData.badges && userData.badges.length === 4) {
+      console.log('Migrating user badges from 4 to 6 badge system');
+      
+      const updatedBadges = [
+        ...userData.badges,
+        { id: 5, name: '180-Day Emperor', earned: false, date: null },
+        { id: 6, name: '365-Day Sage', earned: false, date: null }
+      ];
+      
+      // Check if user has earned the new badges based on their longest streak
+      const longestStreak = userData.longestStreak || 0;
+      
+      if (longestStreak >= 180) {
+        updatedBadges[4].earned = true;
+        updatedBadges[4].date = new Date(); // Use current date as placeholder
+      }
+      
+      if (longestStreak >= 365) {
+        updatedBadges[5].earned = true;
+        updatedBadges[5].date = new Date(); // Use current date as placeholder
+      }
+      
+      return { ...userData, badges: updatedBadges };
+    }
+    
+    // If no badges at all, initialize with full 6-badge system
+    if (!userData.badges || userData.badges.length === 0) {
+      return {
+        ...userData,
+        badges: [
+          { id: 1, name: '7-Day Warrior', earned: false, date: null },
+          { id: 2, name: '14-Day Monk', earned: false, date: null },
+          { id: 3, name: '30-Day Master', earned: false, date: null },
+          { id: 4, name: '90-Day King', earned: false, date: null },
+          { id: 5, name: '180-Day Emperor', earned: false, date: null },
+          { id: 6, name: '365-Day Sage', earned: false, date: null }
+        ]
+      };
+    }
+    
+    return userData;
+  };
+
+  // NEW: Check and migrate badge data on component mount
+  useEffect(() => {
+    if (userData && userData.badges && userData.badges.length < 6) {
+      console.log('Detected old badge system, migrating to 6-badge system');
+      const migratedData = migrateBadgeData(userData);
+      if (JSON.stringify(migratedData.badges) !== JSON.stringify(userData.badges)) {
+        updateUserData(migratedData);
+        toast.success('Achievement system updated! New badges unlocked!');
+      }
+    }
+  }, [userData]); // Run when userData changes
   
   // Enhanced trigger options matching Calendar
   const triggerOptions = [
