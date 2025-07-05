@@ -860,17 +860,14 @@
 }
 
 .insight-card.highlighted.phase-specific {
-  border-left: 3px solid #ffdd00;
   background-color: var(--card-background);
 }
 
 .insight-card.challenge-warning {
-  border-left: 3px solid var(--danger);
   background-color: var(--card-background);
 }
 
 .insight-card.timeline-based {
-  border-left: 3px solid var(--success);
   background-color: var(--card-background);
 }
 
@@ -902,19 +899,7 @@
   animation: metric-glow 3s ease-in-out infinite;
 }
 
-/* NEW: Phase Indicator Dynamic Glow */
-@keyframes phase-indicator-glow {
-  0%, 100% {
-    box-shadow: 0 0 6px color-mix(in srgb, var(--phase-color, var(--primary)) 20%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 16px color-mix(in srgb, var(--phase-color, var(--primary)) 35%, transparent);
-  }
-}
-
-.benefit-phase-indicator {
-  animation: phase-indicator-glow 2.5s ease-in-out infinite;
-}
+/* NEW: Phase Indicator Dynamic Glow - REMOVED */
 
 /* NEW: Journey Guidance Pattern Glow */
 @keyframes pattern-glow {
