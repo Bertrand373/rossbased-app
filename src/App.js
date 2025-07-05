@@ -6,7 +6,15 @@ import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
 
 // Icons for header
-import { FaPowerOff, FaUser } from 'react-icons/fa';
+import { 
+  FaPowerOff, 
+  FaUser,
+  FaHome,
+  FaCalendarAlt,
+  FaChartBar,
+  FaMapSigns,
+  FaShieldAlt
+} from 'react-icons/fa';
 
 // Tabs
 import Tracker from './components/Tracker/Tracker';
@@ -200,31 +208,36 @@ function App() {
                         to="/" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('tracker')}>
-                        Tracker
+                        <FaHome />
+                        <span>Tracker</span>
                       </NavLink>
                       <NavLink 
                         to="/calendar" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('calendar')}>
-                        Calendar
+                        <FaCalendarAlt />
+                        <span>Calendar</span>
                       </NavLink>
                       <NavLink 
                         to="/stats" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('stats')}>
-                        Stats
+                        <FaChartBar />
+                        <span>Stats</span>
                       </NavLink>
                       <NavLink 
                         to="/timeline" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('timeline')}>
-                        Timeline
+                        <FaMapSigns />
+                        <span>Timeline</span>
                       </NavLink>
                       <NavLink 
                         to="/urge-toolkit" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('urge-toolkit')}>
-                        Urge Toolkit
+                        <FaShieldAlt />
+                        <span>Urge Toolkit</span>
                       </NavLink>
                     </div>
                   </nav>
