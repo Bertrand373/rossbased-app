@@ -888,6 +888,62 @@
   animation: phase-glow 2s ease-in-out infinite;
 }
 
+/* NEW: Current Metric Average Pulsing Glow */
+@keyframes metric-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(255, 221, 0, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 221, 0, 0.3);
+  }
+}
+
+.current-metric-average {
+  animation: metric-glow 3s ease-in-out infinite;
+}
+
+/* NEW: Phase Indicator Dynamic Glow */
+@keyframes phase-indicator-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px color-mix(in srgb, var(--phase-color, var(--primary)) 20%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 16px color-mix(in srgb, var(--phase-color, var(--primary)) 35%, transparent);
+  }
+}
+
+.benefit-phase-indicator {
+  animation: phase-indicator-glow 2.5s ease-in-out infinite;
+}
+
+/* NEW: Journey Guidance Pattern Glow */
+@keyframes pattern-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(255, 221, 0, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(255, 221, 0, 0.25);
+  }
+}
+
+.pattern-insight-item.timeline {
+  animation: pattern-glow 2.8s ease-in-out infinite;
+}
+
+/* NEW: Challenge Warning Card Red Glow */
+@keyframes challenge-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.3);
+  }
+}
+
+.insight-card.challenge-warning {
+  animation: challenge-glow 2.2s ease-in-out infinite;
+}
+
 .insight-card-header {
   display: flex;
   align-items: center;
