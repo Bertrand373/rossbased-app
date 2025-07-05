@@ -788,7 +788,7 @@
 }
 
 .comparison-card.phase-aware {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  background-color: var(--card-background);
   border: 1px solid var(--border);
   position: relative;
   overflow: hidden;
@@ -849,29 +849,29 @@
 }
 
 .insight-card.highlighted {
-  background-color: rgba(255, 221, 0, 0.1);
+  background-color: var(--card-background);
   border: 1px solid rgba(255, 221, 0, 0.2);
   transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(255, 221, 0, 0.15);
 }
 
 .insight-card.phase-specific {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
 }
 
 .insight-card.highlighted.phase-specific {
   border-left: 3px solid #ffdd00;
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
 }
 
 .insight-card.challenge-warning {
   border-left: 3px solid var(--danger);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
 }
 
 .insight-card.timeline-based {
   border-left: 3px solid var(--success);
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
 }
 
 /* Phase-specific animations */
@@ -1056,21 +1056,21 @@
 
 .pattern-insight-item.timeline {
   border-left: 4px solid #ffdd00;
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
 }
 
 .pattern-insight-item.warning {
   border-left: 4px solid var(--danger);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
 }
 
 .pattern-insight-item.recovery {
   border-left: 4px solid var(--success);
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
 }
 
 .timeline-pattern {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
@@ -1083,7 +1083,7 @@
 }
 
 .challenge-warning {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
   border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
@@ -1096,7 +1096,7 @@
 }
 
 .recovery-pattern {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--card-background) 100%);
+  background-color: var(--card-background);
   border: 1px solid rgba(34, 197, 94, 0.1);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
