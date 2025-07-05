@@ -5,8 +5,16 @@ import { Toaster } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
 
-// Icons for header
-import { FaPowerOff, FaUser } from 'react-icons/fa';
+// Icons for header - UPDATED: Added navigation icons
+import { 
+  FaPowerOff, 
+  FaUser,
+  FaHome,
+  FaCalendarAlt,
+  FaChartBar,
+  FaMapSigns,
+  FaShieldAlt
+} from 'react-icons/fa';
 
 // Tabs
 import Tracker from './components/Tracker/Tracker';
@@ -72,123 +80,59 @@ const MobileProfileButton = () => {
 };
 
 function App() {
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const { userData, isLoggedIn, isPremium, isLoading, login, logout, updateUserData } = useUserData();
-
-  // Monitor screen size for responsive design
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
+  const { userData, isLoggedIn, loading, updateUserData, login, logout, isPremium } = useUserData();
+
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth <= 768);
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Handle initial app loading (for page refreshes)
-  useEffect(() => {
-    // Simulate checking authentication state
-    const timer = setTimeout(() => {
-      setIsInitialLoading(false);
-    }, 1500); // Show helmet for 1.5 seconds on page load/refresh
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Handle login
-  const handleLogin = async (username, password) => {
-    const success = await login(username, password);
-    if (success) {
-      setShowAuthModal(false);
-    }
-    return success;
+  const handleLogin = (loginData) => {
+    login(loginData);
+    setIsAuthOpen(false);
   };
 
-  // FIXED: Show SpartanLoader when loading OR when initially loading the app
-  if (isLoading || isInitialLoading) {
+  if (loading) {
     return (
-      <div className="spartan-loading-screen">
-        <SpartanLoader 
-          size={100}
-          message={isLoading ? "Logging you in..." : "Loading your dashboard..."}
-          showMessage={true}
-          animationType="warrior"
-        />
+      <div className="app-container">
+        <SpartanLoader message="Loading your tracker..." />
       </div>
     );
   }
 
   return (
     <Router>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: 'var(--card-background)',
+            color: 'var(--text)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+            padding: 'var(--spacing-md) var(--spacing-lg)',
+            fontWeight: '500',
+            fontSize: '0.875rem',
+          },
+        }}
+      />
+      
       <div className="app-container">
-        <Toaster 
-          position="top-center"
-          toastOptions={{
-            // Default options for all toasts
-            duration: 4000,
-            style: {
-              background: 'linear-gradient(135deg, #2c2c2c 0%, #333333 100%)',
-              color: '#ffffff',
-              border: '1px solid #444444',
-              borderRadius: '12px',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-              padding: '16px 20px',
-              fontWeight: '500',
-              fontSize: '14px',
-              minWidth: '300px',
-              maxWidth: '400px',
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            },
-            // Success toasts
-            success: {
-              style: {
-                borderLeft: '4px solid #22c55e',
-              },
-              iconTheme: {
-                primary: '#22c55e',
-                secondary: '#ffffff',
-              },
-            },
-            // Error toasts
-            error: {
-              style: {
-                borderLeft: '4px solid #ef4444',
-              },
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#ffffff',
-              },
-            },
-            // Loading toasts
-            loading: {
-              style: {
-                borderLeft: '4px solid #ffdd00',
-              },
-              iconTheme: {
-                primary: '#ffdd00',
-                secondary: '#000000',
-              },
-            },
-          }}
-        />
-        
-        {showAuthModal && (
-          <AuthModal 
-            onClose={() => setShowAuthModal(false)} 
-            onLogin={handleLogin}
-          />
-        )}
-        
         {isLoggedIn ? (
-          // Show main app UI if logged in
           <>
             <header className="app-header">
               {!isMobile ? (
-                // Desktop Layout - Logo, Navigation, User Controls
+                // Desktop Layout - Single row with proper grid
                 <>
                   <div className="logo-container">
                     <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
@@ -200,31 +144,36 @@ function App() {
                         to="/" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('tracker')}>
-                        Tracker
+                        <FaHome className="nav-link-icon" />
+                        <span>Tracker</span>
                       </NavLink>
                       <NavLink 
                         to="/calendar" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('calendar')}>
-                        Calendar
+                        <FaCalendarAlt className="nav-link-icon" />
+                        <span>Calendar</span>
                       </NavLink>
                       <NavLink 
                         to="/stats" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('stats')}>
-                        Stats
+                        <FaChartBar className="nav-link-icon" />
+                        <span>Stats</span>
                       </NavLink>
                       <NavLink 
                         to="/timeline" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('timeline')}>
-                        Timeline
+                        <FaMapSigns className="nav-link-icon" />
+                        <span>Timeline</span>
                       </NavLink>
                       <NavLink 
                         to="/urge-toolkit" 
                         className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={() => setActiveTab('urge-toolkit')}>
-                        Urge Toolkit
+                        <FaShieldAlt className="nav-link-icon" />
+                        <span>Urge Toolkit</span>
                       </NavLink>
                     </div>
                   </nav>
@@ -287,6 +236,15 @@ function App() {
           <Routes>
             <Route path="*" element={<Landing onLogin={handleLogin} />} />
           </Routes>
+        )}
+        
+        {/* Auth Modal */}
+        {isAuthOpen && (
+          <AuthModal 
+            isOpen={isAuthOpen} 
+            onClose={() => setIsAuthOpen(false)} 
+            onLogin={handleLogin}
+          />
         )}
       </div>
     </Router>
