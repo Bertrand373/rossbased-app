@@ -25,7 +25,7 @@
   line-height: 1.5;
 }
 
-/* Reset Options */
+/* Reset Options Container */
 .reset-options {
   display: flex;
   flex-direction: column;
@@ -34,16 +34,16 @@
 }
 
 .reset-option {
-  display: flex;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg);
   background-color: var(--medium-gray);
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
 }
 
 .reset-option::before {
@@ -127,15 +127,15 @@
 }
 
 .option-badge.gentle {
-  background-color: rgba(34, 197, 94, 0.1);
-  color: var(--success);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  background-color: rgba(255, 221, 0, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(255, 221, 0, 0.2);
 }
 
 .option-badge.moderate {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: var(--warning);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background-color: rgba(255, 221, 0, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(255, 221, 0, 0.2);
 }
 
 .option-badge.nuclear {
@@ -154,13 +154,13 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  color: var(--success);
+  color: var(--primary);
   font-size: 0.875rem;
   font-weight: 500;
 }
 
 .preserve-icon {
-  color: var(--success);
+  color: var(--primary);
   font-size: 0.875rem;
   flex-shrink: 0;
 }
@@ -285,8 +285,8 @@
 }
 
 .detail-section.preserves {
-  border-left: 4px solid var(--success);
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--medium-gray) 100%);
+  border-left: 4px solid var(--primary);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--medium-gray) 100%);
 }
 
 .detail-section.deletes {
@@ -305,7 +305,7 @@
 }
 
 .section-icon.preserve {
-  color: var(--success);
+  color: var(--primary);
 }
 
 .section-icon.delete {
@@ -333,7 +333,7 @@
 }
 
 .list-check.preserve {
-  color: var(--success);
+  color: var(--primary);
   font-size: 0.75rem;
   margin-top: 2px;
   flex-shrink: 0;
