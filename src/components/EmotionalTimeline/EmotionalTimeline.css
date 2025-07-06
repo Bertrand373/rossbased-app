@@ -421,15 +421,15 @@
   flex-shrink: 0;
 }
 
-/* UPDATED: Current phase indicator - matches current phase color */
+/* UPDATED: Current phase indicator - solid background in phase color with white text */
 .timeline-phase-current {
   font-size: 0.875rem;
   font-weight: 600;
   flex-shrink: 0;
   padding: var(--spacing-xs) var(--spacing-sm);
-  background-color: rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-full);
-  border: 1px solid;
+  border: none;
+  color: white !important;
 }
 
 /* Lock indicator for non-premium users */
