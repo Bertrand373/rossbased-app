@@ -899,8 +899,6 @@
   animation: metric-glow 3s ease-in-out infinite;
 }
 
-/* NEW: Phase Indicator Dynamic Glow - REMOVED */
-
 /* NEW: Journey Guidance Pattern Glow */
 @keyframes pattern-glow {
   0%, 100% {
@@ -1096,7 +1094,6 @@
 }
 
 .pattern-insight-item.timeline {
-  border-left: 4px solid #ffdd00;
   background-color: var(--card-background);
 }
 

@@ -994,7 +994,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 <div className="current-insight-card">
                   <div className="current-insight-header">
                     <FaRegLightbulb className="insight-icon" />
-                    <span>Current Insight</span>
+                    <span>Current Insights</span>
                   </div>
                   <div className="current-insight-text">
                     {getCurrentInsight()}
