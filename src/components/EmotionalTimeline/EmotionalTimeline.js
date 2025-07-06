@@ -616,7 +616,13 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                             </div>
                           )}
                           {isCurrent && (
-                            <div className="timeline-phase-current" style={{ color: phase.color }}>
+                            <div 
+                              className="timeline-phase-current" 
+                              style={{ 
+                                color: phase.color,
+                                borderColor: phase.color
+                              }}
+                            >
                               Current
                             </div>
                           )}
