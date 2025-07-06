@@ -429,7 +429,8 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
   border: none;
-  color: white !important;
+  color: #ffffff !important;
+  text-shadow: none;
 }
 
 /* Lock indicator for non-premium users */
