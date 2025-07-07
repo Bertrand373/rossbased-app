@@ -1050,8 +1050,9 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                       {recentData.length < 7 && (
                         <div className="insight-data-banner">
                           <div className="insight-data-banner-content">
+                            <FaInfoCircle className="insight-data-icon" />
                             <div className="insight-data-text">
-                              <strong>💡 Your insights improve with data:</strong> The more you complete your daily emotional check-ins, the more personalized and accurate these insights become. 
+                              <strong>Your insights improve with data:</strong> The more you complete your daily emotional check-ins, the more personalized and accurate these insights become. 
                               {recentData.length === 0 && " Start logging your emotions to unlock deeper pattern recognition."}
                               {recentData.length > 0 && recentData.length < 3 && ` You've logged ${recentData.length} day${recentData.length === 1 ? '' : 's'} - keep going to unlock trend analysis.`}
                               {recentData.length >= 3 && recentData.length < 7 && ` You've logged ${recentData.length} days - log 7+ days to unlock advanced pattern recognition.`}
