@@ -1204,16 +1204,6 @@
   }
 }
 
-.insight-card.dynamic-insight::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.4), transparent);
-}
-
 .insight-header {
   display: flex;
   align-items: center;
@@ -1222,8 +1212,6 @@
   color: var(--text);
   justify-content: center;
 }
-
-/* REMOVED: Icon from header - no longer displayed */
 
 .insight-icon-advanced {
   color: #10b981;
