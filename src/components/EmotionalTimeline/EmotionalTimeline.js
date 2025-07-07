@@ -7,7 +7,7 @@ import './EmotionalTimeline.css';
 // Icons
 import { FaMapSigns, FaLightbulb, FaHeart, FaBrain, FaLeaf, FaTrophy, 
   FaCheckCircle, FaLock, FaPen, FaInfoCircle, FaExclamationTriangle, 
-  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine, FaTrendingUp } from 'react-icons/fa';
+  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine, FaArrowUp } from 'react-icons/fa';
 
 // Import helmet image to match Tracker design
 import helmetImage from '../../assets/helmet.png';
@@ -1067,7 +1067,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                             {dynamicInsight?.type === 'encouragement' ? (
                               <FaRegLightbulb className="insight-icon" />
                             ) : dynamicInsight?.type === 'advanced' ? (
-                              <FaTrendingUp className="insight-icon insight-icon-advanced" />
+                              <FaArrowUp className="insight-icon insight-icon-advanced" />
                             ) : (
                               <FaChartLine className="insight-icon insight-icon-data" />
                             )}
