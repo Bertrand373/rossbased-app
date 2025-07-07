@@ -1,13 +1,13 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - FIXED: Hard premium cutoff after upgrade banner
+// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Dynamic phase insights based on emotional data
 import React, { useState, useEffect } from 'react';
-import { format, differenceInDays } from 'date-fns';
+import { format, differenceInDays, subDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
 
 // Icons
 import { FaMapSigns, FaLightbulb, FaHeart, FaBrain, FaLeaf, FaTrophy, 
   FaCheckCircle, FaLock, FaPen, FaInfoCircle, FaExclamationTriangle, 
-  FaRegLightbulb, FaEye, FaTimes, FaStar } from 'react-icons/fa';
+  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine, FaTrendingUp } from 'react-icons/fa';
 
 // Import helmet image to match Tracker design
 import helmetImage from '../../assets/helmet.png';
@@ -350,6 +350,159 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   };
 
   const currentPhase = getCurrentPhase();
+
+  // NEW: Dynamic insight generation based on emotional tracking data
+  const generateDynamicPhaseInsight = () => {
+    if (!currentPhase || !isPremium) return null;
+
+    const emotionalData = userData.emotionalTracking || [];
+    const recentData = emotionalData.filter(entry => 
+      differenceInDays(new Date(), new Date(entry.date)) <= 14
+    );
+
+    // Check data sufficiency
+    const hasMinimalData = recentData.length >= 3;
+    const hasGoodData = recentData.length >= 7;
+    const hasRichData = recentData.length >= 14;
+
+    // Base insight if no data
+    if (!hasMinimalData) {
+      return {
+        type: 'encouragement',
+        practical: `You're on day ${currentDay} of the ${currentPhase.name} phase. Track your emotions daily to unlock personalized insights about your unique journey through this phase.`,
+        esoteric: `Day ${currentDay} brings you deeper into the ${currentPhase.name} initiation. Record your emotional states to receive guidance tailored to your spiritual progression.`,
+        dataStatus: 'insufficient'
+      };
+    }
+
+    // Calculate trends and patterns
+    const avgAnxiety = recentData.reduce((sum, entry) => sum + (entry.anxiety || 5), 0) / recentData.length;
+    const avgMoodStability = recentData.reduce((sum, entry) => sum + (entry.moodStability || 5), 0) / recentData.length;
+    const avgMentalClarity = recentData.reduce((sum, entry) => sum + (entry.mentalClarity || 5), 0) / recentData.length;
+    const avgEmotionalProcessing = recentData.reduce((sum, entry) => sum + (entry.emotionalProcessing || 5), 0) / recentData.length;
+
+    // Calculate trends (if we have enough data)
+    let anxietyTrend = 'stable';
+    let moodTrend = 'stable';
+    let clarityTrend = 'stable';
+    let processingTrend = 'stable';
+
+    if (hasGoodData) {
+      const recent = recentData.slice(-3);
+      const earlier = recentData.slice(0, 3);
+      
+      const recentAvgAnxiety = recent.reduce((sum, entry) => sum + (entry.anxiety || 5), 0) / recent.length;
+      const earlierAvgAnxiety = earlier.reduce((sum, entry) => sum + (entry.anxiety || 5), 0) / earlier.length;
+      
+      const recentAvgMood = recent.reduce((sum, entry) => sum + (entry.moodStability || 5), 0) / recent.length;
+      const earlierAvgMood = earlier.reduce((sum, entry) => sum + (entry.moodStability || 5), 0) / earlier.length;
+      
+      const recentAvgClarity = recent.reduce((sum, entry) => sum + (entry.mentalClarity || 5), 0) / recent.length;
+      const earlierAvgClarity = earlier.reduce((sum, entry) => sum + (entry.mentalClarity || 5), 0) / earlier.length;
+      
+      const recentAvgProcessing = recent.reduce((sum, entry) => sum + (entry.emotionalProcessing || 5), 0) / recent.length;
+      const earlierAvgProcessing = earlier.reduce((sum, entry) => sum + (entry.emotionalProcessing || 5), 0) / earlier.length;
+
+      anxietyTrend = recentAvgAnxiety < earlierAvgAnxiety - 0.5 ? 'improving' : 
+                     recentAvgAnxiety > earlierAvgAnxiety + 0.5 ? 'challenging' : 'stable';
+      moodTrend = recentAvgMood > earlierAvgMood + 0.5 ? 'improving' : 
+                  recentAvgMood < earlierAvgMood - 0.5 ? 'challenging' : 'stable';
+      clarityTrend = recentAvgClarity > earlierAvgClarity + 0.5 ? 'improving' : 
+                     recentAvgClarity < earlierAvgClarity - 0.5 ? 'challenging' : 'stable';
+      processingTrend = recentAvgProcessing > earlierAvgProcessing + 0.5 ? 'improving' : 
+                        recentAvgProcessing < earlierAvgProcessing - 0.5 ? 'challenging' : 'stable';
+    }
+
+    // Phase-specific insights with data analysis
+    const phaseInsights = {
+      1: { // Initial Adaptation
+        practical: () => {
+          if (avgAnxiety > 7) {
+            return `Day ${currentDay}: Your anxiety levels (${avgAnxiety.toFixed(1)}/10) are higher than typical for this phase. This intense energy needs physical outlets - increase exercise and cold exposure.`;
+          } else if (avgAnxiety < 4) {
+            return `Day ${currentDay}: Your anxiety levels (${avgAnxiety.toFixed(1)}/10) are surprisingly low for the Initial Adaptation phase. You're handling the transition exceptionally well.`;
+          }
+          return `Day ${currentDay}: Your emotional data shows typical Initial Adaptation patterns. Anxiety at ${avgAnxiety.toFixed(1)}/10 is normal as your body learns new energy patterns.`;
+        },
+        esoteric: () => {
+          if (avgEmotionalProcessing > 7) {
+            return `Day ${currentDay}: Your emotional processing (${avgEmotionalProcessing.toFixed(1)}/10) shows the life force is flowing freely. You're integrating this sacred energy beautifully.`;
+          }
+          return `Day ${currentDay}: The vital force awakening shows in your emotional data. Processing at ${avgEmotionalProcessing.toFixed(1)}/10 indicates your energy body is adapting to higher frequencies.`;
+        }
+      },
+      2: { // Emotional Purging
+        practical: () => {
+          if (moodTrend === 'challenging' && avgMoodStability < 4) {
+            return `Day ${currentDay}: Your mood stability (${avgMoodStability.toFixed(1)}/10) and recent trends confirm you're in deep purging. This emotional volatility is necessary healing - maintain your practices.`;
+          } else if (moodTrend === 'improving') {
+            return `Day ${currentDay}: Your mood stability is improving (${avgMoodStability.toFixed(1)}/10 trending up). You're successfully processing and releasing stored emotional content.`;
+          }
+          return `Day ${currentDay}: Emotional Purging phase data shows mood stability at ${avgMoodStability.toFixed(1)}/10. The turbulence is your psyche healing itself.`;
+        },
+        esoteric: () => {
+          if (avgEmotionalProcessing > 6 && processingTrend === 'improving') {
+            return `Day ${currentDay}: Your emotional processing (${avgEmotionalProcessing.toFixed(1)}/10, trending up) shows the heart chakra opening beautifully. Ancient karma is being transmuted.`;
+          }
+          return `Day ${currentDay}: The sacred purging process shows in your data. Emotional processing at ${avgEmotionalProcessing.toFixed(1)}/10 indicates old patterns dissolving to reveal your authentic self.`;
+        }
+      },
+      3: { // Mental Expansion
+        practical: () => {
+          if (clarityTrend === 'improving' && avgMentalClarity > 7) {
+            return `Day ${currentDay}: Your mental clarity (${avgMentalClarity.toFixed(1)}/10, trending up) confirms you're entering enhanced cognitive function. Channel this into ambitious goals.`;
+          } else if (avgMentalClarity < 5) {
+            return `Day ${currentDay}: Mental clarity at ${avgMentalClarity.toFixed(1)}/10 suggests you may still be processing emotions. The cognitive benefits will emerge as emotional stability increases.`;
+          }
+          return `Day ${currentDay}: Mental Expansion phase data shows clarity at ${avgMentalClarity.toFixed(1)}/10. Your brain is optimizing neurotransmitter balance.`;
+        },
+        esoteric: () => {
+          if (avgMentalClarity > 8) {
+            return `Day ${currentDay}: Mental clarity at ${avgMentalClarity.toFixed(1)}/10 indicates third eye activation. The retained life force is powering higher mental faculties.`;
+          }
+          return `Day ${currentDay}: Your consciousness is expanding beyond ordinary perception. Clarity at ${avgMentalClarity.toFixed(1)}/10 shows connection to universal mind strengthening.`;
+        }
+      },
+      4: { // Spiritual Integration
+        practical: () => {
+          const overallWellbeing = (avgMoodStability + avgMentalClarity + avgEmotionalProcessing - avgAnxiety) / 3;
+          if (overallWellbeing > 6) {
+            return `Day ${currentDay}: Your emotional data shows deep integration (overall wellbeing: ${overallWellbeing.toFixed(1)}/10). You're embodying the discipline and wisdom of this phase.`;
+          }
+          return `Day ${currentDay}: Integration continues with overall wellbeing at ${overallWellbeing.toFixed(1)}/10. You're developing mastery over one of humanity's strongest drives.`;
+        },
+        esoteric: () => {
+          const spiritualAlignment = (avgEmotionalProcessing + avgMentalClarity + avgMoodStability) / 3;
+          return `Day ${currentDay}: Spiritual alignment at ${spiritualAlignment.toFixed(1)}/10 shows divine masculine energy awakening. You're transmuting base life force into spiritual gold.`;
+        }
+      },
+      5: { // Mastery & Service
+        practical: () => {
+          const masteryLevel = (avgMoodStability + avgMentalClarity + avgEmotionalProcessing + (10 - avgAnxiety)) / 4;
+          return `Day ${currentDay}: Your emotional mastery (${masteryLevel.toFixed(1)}/10) demonstrates complete integration. You've transcended the need for external validation and now inspire others.`;
+        },
+        esoteric: () => {
+          return `Day ${currentDay}: Your consciousness operates at Avatar level. Emotional data shows you've merged individual awareness with universal consciousness, serving the evolution of all.`;
+        }
+      }
+    };
+
+    const insight = phaseInsights[currentPhase.id];
+    if (!insight) return null;
+
+    return {
+      type: hasRichData ? 'advanced' : hasGoodData ? 'intermediate' : 'basic',
+      practical: insight.practical(),
+      esoteric: insight.esoteric(),
+      dataStatus: hasRichData ? 'rich' : hasGoodData ? 'good' : 'minimal',
+      trends: {
+        anxiety: anxietyTrend,
+        mood: moodTrend,
+        clarity: clarityTrend,
+        processing: processingTrend
+      }
+    };
+  };
 
   // UPDATED: Calculate progress percentage with mastery level support
   const getPhaseProgress = (phase) => {
@@ -879,26 +1032,84 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
               )}
             </div>
 
-            {/* Current Phase Insight */}
+            {/* NEW: Dynamic Current Phase Insight */}
             {currentPhase && (
               <div className="phase-insight-section">
                 <h3>Understanding Your Current Phase</h3>
-                {isPremium ? (
-                  <div className="insight-card">
-                    <div className="insight-header">
-                      <FaRegLightbulb className="insight-icon" />
-                      <span>{wisdomMode ? 'Spiritual Insight' : 'Practical Insight'}</span>
-                    </div>
-                    <div className="insight-text">
-                      {wisdomMode ? currentPhase.insights.esoteric : currentPhase.insights.practical}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="insight-premium-teaser">
-                    <FaLock className="lock-icon" />
-                    <p>Get deep insights into your current phase with practical and spiritual perspectives.</p>
-                  </div>
-                )}
+                
+                {/* NEW: Data Quality Info Banner */}
+                {(() => {
+                  const dynamicInsight = generateDynamicPhaseInsight();
+                  const emotionalData = userData.emotionalTracking || [];
+                  const recentData = emotionalData.filter(entry => 
+                    differenceInDays(new Date(), new Date(entry.date)) <= 14
+                  );
+                  
+                  return (
+                    <>
+                      {recentData.length < 7 && (
+                        <div className="insight-data-banner">
+                          <div className="insight-data-banner-content">
+                            <FaChartLine className="insight-data-icon" />
+                            <div className="insight-data-text">
+                              <strong>💡 Your insights improve with data:</strong> The more you complete your daily emotional check-ins, the more personalized and accurate these insights become. 
+                              {recentData.length === 0 && " Start logging your emotions to unlock deeper pattern recognition."}
+                              {recentData.length > 0 && recentData.length < 3 && ` You've logged ${recentData.length} day${recentData.length === 1 ? '' : 's'} - keep going to unlock trend analysis.`}
+                              {recentData.length >= 3 && recentData.length < 7 && ` You've logged ${recentData.length} days - log 7+ days to unlock advanced pattern recognition.`}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {isPremium ? (
+                        <div className="insight-card dynamic-insight">
+                          <div className="insight-header">
+                            {dynamicInsight?.type === 'encouragement' ? (
+                              <FaRegLightbulb className="insight-icon" />
+                            ) : dynamicInsight?.type === 'advanced' ? (
+                              <FaTrendingUp className="insight-icon insight-icon-advanced" />
+                            ) : (
+                              <FaChartLine className="insight-icon insight-icon-data" />
+                            )}
+                            <span>
+                              {dynamicInsight?.type === 'encouragement' && (wisdomMode ? 'Begin Your Insight Journey' : 'Start Tracking for Insights')}
+                              {dynamicInsight?.type === 'basic' && (wisdomMode ? 'Early Spiritual Patterns' : 'Initial Data Analysis')}
+                              {dynamicInsight?.type === 'intermediate' && (wisdomMode ? 'Emerging Consciousness Trends' : 'Pattern Recognition Active')}
+                              {dynamicInsight?.type === 'advanced' && (wisdomMode ? 'Deep Soul Analytics' : 'Advanced Pattern Analysis')}
+                            </span>
+                          </div>
+                          <div className="insight-text">
+                            {dynamicInsight ? (wisdomMode ? dynamicInsight.esoteric : dynamicInsight.practical) : 
+                             (wisdomMode ? currentPhase.insights.esoteric : currentPhase.insights.practical)}
+                          </div>
+                          
+                          {/* Show data status for intermediate/advanced insights */}
+                          {dynamicInsight && dynamicInsight.type !== 'encouragement' && (
+                            <div className="insight-data-status">
+                              <div className="data-status-indicator">
+                                <span className={`data-quality ${dynamicInsight.dataStatus}`}>
+                                  {dynamicInsight.dataStatus === 'minimal' && '📊 Basic Analysis'}
+                                  {dynamicInsight.dataStatus === 'good' && '📈 Good Data Set'}
+                                  {dynamicInsight.dataStatus === 'rich' && '🎯 Rich Analytics'}
+                                </span>
+                                <span className="data-days">
+                                  Based on {userData.emotionalTracking?.filter(entry => 
+                                    differenceInDays(new Date(), new Date(entry.date)) <= 14
+                                  ).length || 0} days of tracking
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="insight-premium-teaser">
+                          <FaLock className="lock-icon" />
+                          <p>Get deep insights into your current phase with practical and spiritual perspectives.</p>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>
