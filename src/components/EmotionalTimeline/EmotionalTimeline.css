@@ -421,17 +421,21 @@
   flex-shrink: 0;
 }
 
-/* FIXED: Current phase indicator - uses phase color as background with white text */
+/* FIXED: Current phase indicator - styled like urge toolkit phase indicator with transparent background and colored border */
 .timeline-phase-current {
   font-size: 0.875rem;
   font-weight: 600;
   flex-shrink: 0;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
-  border: none;
-  color: #ffffff !important;
+  background: linear-gradient(135deg, 
+    color-mix(in srgb, var(--current-phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
+    var(--card-background) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--current-phase-color, var(--primary)) 20%, var(--border));
+  color: color-mix(in srgb, var(--current-phase-color, var(--primary)) 90%, var(--text)) !important;
   text-shadow: none;
-  background-color: var(--current-phase-color) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Lock indicator for non-premium users */
