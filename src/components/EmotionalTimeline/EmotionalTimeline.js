@@ -38,31 +38,10 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   // FIXED: Use current streak instead of calculated day difference
   const currentDay = userData.currentStreak || 0;
 
-  // NEW: Smart floating toggle scroll detection - EXACT COPY from Stats
+  // NEW: Always show floating toggle - no scroll detection needed
   useEffect(() => {
-    const handleScroll = () => {
-      if (!timelineStartRef.current || !insightSectionRef.current) return;
-      
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const windowHeight = window.innerHeight;
-      
-      const timelineStartTop = timelineStartRef.current.offsetTop;
-      const insightSectionBottom = insightSectionRef.current.offsetTop + insightSectionRef.current.offsetHeight;
-      
-      // Show toggle when:
-      // 1. User has scrolled to the timeline overview section start
-      // 2. User hasn't scrolled past the insight section end
-      const shouldShow = 
-        scrollTop + windowHeight >= timelineStartTop && 
-        scrollTop <= insightSectionBottom;
-      
-      setShowFloatingToggle(shouldShow);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check initial position
-    
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Always show the toggle
+    setShowFloatingToggle(true);
   }, []);
 
   // UPDATED: Much better mastery levels with consistent durations and better progression
@@ -718,7 +697,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="emotional-timeline-container">
-      {/* NEW: Smart Floating Wisdom Toggle - Shows when timeline content is visible */}
+      {/* NEW: Smart Floating Wisdom Toggle - Always visible */}
       {showFloatingToggle && (
         <button 
           className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
@@ -1087,6 +1066,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                       {recentData.length < 7 && (
                         <div className="insight-data-banner">
                           <div className="insight-data-banner-content">
+                            <FaInfoCircle className="insight-data-icon" />
                             <div className="insight-data-text">
                               <strong>💡 Your insights improve with data:</strong> The more you complete your daily emotional check-ins, the more personalized and accurate these insights become. 
                               {recentData.length === 0 && " Start logging your emotions to unlock deeper pattern recognition."}
