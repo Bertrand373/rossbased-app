@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Dynamic phase insights based on emotional data
+// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Info icon banner and phase insight section styling
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, subDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -1032,12 +1032,12 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
               )}
             </div>
 
-            {/* NEW: Dynamic Current Phase Insight */}
+            {/* NEW: Dynamic Current Phase Insight - STYLED LIKE STATS JOURNEY GUIDANCE */}
             {currentPhase && (
               <div className="phase-insight-section">
                 <h3>Understanding Your Current Phase</h3>
                 
-                {/* NEW: Data Quality Info Banner */}
+                {/* NEW: Data Quality Info Banner - MATCHING STATS with I icon */}
                 {(() => {
                   const dynamicInsight = generateDynamicPhaseInsight();
                   const emotionalData = userData.emotionalTracking || [];
@@ -1050,7 +1050,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                       {recentData.length < 7 && (
                         <div className="insight-data-banner">
                           <div className="insight-data-banner-content">
-                            <FaChartLine className="insight-data-icon" />
+                            <FaInfoCircle className="insight-data-icon" />
                             <div className="insight-data-text">
                               <strong>💡 Your insights improve with data:</strong> The more you complete your daily emotional check-ins, the more personalized and accurate these insights become. 
                               {recentData.length === 0 && " Start logging your emotions to unlock deeper pattern recognition."}
@@ -1073,7 +1073,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                             )}
                             <span>
                               {dynamicInsight?.type === 'encouragement' && (wisdomMode ? 'Begin Your Insight Journey' : 'Start Tracking for Insights')}
-                              {dynamicInsight?.type === 'basic' && (wisdomMode ? 'Early Spiritual Patterns' : 'Initial Data Analysis')}
+                              {dynamicInsight?.type === 'basic' && (wisdomMode ? 'Early Spiritual Patterns' : 'Basic Analysis')}
                               {dynamicInsight?.type === 'intermediate' && (wisdomMode ? 'Emerging Consciousness Trends' : 'Pattern Recognition Active')}
                               {dynamicInsight?.type === 'advanced' && (wisdomMode ? 'Deep Soul Analytics' : 'Advanced Pattern Analysis')}
                             </span>

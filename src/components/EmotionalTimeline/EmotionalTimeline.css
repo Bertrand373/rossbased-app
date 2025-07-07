@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - UPDATED: Dynamic insight styles */
+/* components/EmotionalTimeline/EmotionalTimeline.css - UPDATED: Removed gold borders, styled phase insight section like Stats journey guidance */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -80,7 +80,7 @@
   gap: var(--spacing-lg);
 }
 
-/* Current Phase Card - styled like Stats streak cards */
+/* Current Phase Card - REMOVED: Gold top border */
 .current-phase-container {
   display: flex;
   flex-direction: column;
@@ -98,7 +98,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
 }
 
 .phase-date {
@@ -201,14 +200,13 @@
   cursor: not-allowed;
 }
 
-/* NEW: Early Premium Teaser Section - Shown immediately after current phase */
+/* NEW: Early Premium Teaser Section - REMOVED: Gold top border */
 .early-premium-teaser {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
 }
 
 .early-teaser-content {
@@ -688,14 +686,13 @@
   color: var(--text-secondary);
 }
 
-/* Emotional Check-in Section - styled like Stats benefit tracker */
+/* Emotional Check-in Section - REMOVED: Gold top border */
 .emotional-checkin-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -1122,13 +1119,15 @@
   margin-bottom: var(--spacing-sm);
 }
 
-/* Phase Insight Section - styled like Stats insight cards with NEW dynamic styles */
+/* Phase Insight Section - STYLED LIKE STATS JOURNEY GUIDANCE */
 .phase-insight-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   border: 1px solid var(--border);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -1137,25 +1136,14 @@
   font-size: 1.25rem;
   color: var(--text);
   text-align: center;
-  position: relative;
-  margin-bottom: var(--spacing-lg);
+  font-weight: 600;
+  padding: var(--spacing-lg) 0;
 }
 
-.phase-insight-section h3::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
-}
-
-/* NEW: Data quality info banner */
+/* NEW: Data quality info banner - MATCHING STATS with I icon */
 .insight-data-banner {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.15);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
@@ -1169,7 +1157,7 @@
 
 .insight-data-icon {
   font-size: 1.125rem;
-  color: #3b82f6;
+  color: var(--primary);
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -1188,13 +1176,15 @@
 
 /* Enhanced insight card with dynamic states */
 .insight-card {
+  background-color: var(--card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
   justify-content: center;
 }
 
@@ -1234,8 +1224,8 @@
 }
 
 .insight-icon-data {
-  color: #3b82f6;
-  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.3));
+  color: var(--primary);
+  filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.3));
 }
 
 .insight-text {
@@ -1270,9 +1260,9 @@
 }
 
 .data-quality.minimal {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
 }
 
 .data-quality.good {
@@ -1295,14 +1285,16 @@
 
 /* Insight premium teaser */
 .insight-premium-teaser {
+  background-color: var(--card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-md);
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
   text-align: center;
 }
 
@@ -1760,7 +1752,7 @@
   }
   
   .phase-insight-section {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
   }
   
   .insight-card {
