@@ -655,12 +655,18 @@
   box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
 }
 
-/* REDESIGNED: Better positioned status indicators */
+/* FIXED: Better positioned status indicators - moved to flow layout */
 .mastery-level-status {
-  position: absolute;
+  /* REMOVED: Absolute positioning that was causing overlap */
+  /* position: absolute;
   top: var(--spacing-lg);
   right: var(--spacing-lg);
-  z-index: 2;
+  z-index: 2; */
+  
+  /* NEW: Added to normal flow to prevent overlap */
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-sm);
 }
 
 .mastery-level-check {
@@ -680,6 +686,9 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   box-shadow: 0 2px 8px rgba(255, 221, 0, 0.2);
+  /* NEW: Center the badge and make it inline */
+  display: inline-block;
+  text-align: center;
 }
 
 .mastery-level-lock {
@@ -1685,12 +1694,15 @@
   }
   
   .mastery-level-duration {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
   }
   
-  .mastery-level-current-badge {
-    font-size: 0.7rem;
-    padding: 2px var(--spacing-xs);
+  /* FIXED: Mobile mastery level status - keep in normal flow */
+  .mastery-level-status {
+    /* Keep normal flow on mobile too */
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-sm);
   }
   
   /* Mobile main timeline helmet adjustments - MATCH Tracker sizing */
@@ -1877,9 +1889,11 @@
     font-size: 0.75rem;
   }
   
+  /* FIXED: Very small screen mastery level status - keep in normal flow */
   .mastery-level-status {
-    position: static;
-    align-self: center;
+    /* Keep normal flow on very small screens too */
+    display: flex;
+    justify-content: center;
     margin-top: var(--spacing-sm);
   }
 
