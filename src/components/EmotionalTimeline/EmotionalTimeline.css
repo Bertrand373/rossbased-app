@@ -1119,7 +1119,7 @@
   margin-bottom: var(--spacing-sm);
 }
 
-/* Phase Insight Section - STYLED LIKE STATS JOURNEY GUIDANCE */
+/* Phase Insight Section - STYLED LIKE STATS JOURNEY GUIDANCE WITH GLOW */
 .phase-insight-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -1174,7 +1174,7 @@
   font-weight: 600;
 }
 
-/* Enhanced insight card with dynamic states */
+/* Enhanced insight card with dynamic states and GLOW ANIMATION */
 .insight-card {
   background-color: var(--card-background);
   padding: var(--spacing-lg);
@@ -1191,6 +1191,17 @@
 .insight-card.dynamic-insight {
   position: relative;
   overflow: hidden;
+  animation: insight-glow 2.8s ease-in-out infinite;
+}
+
+/* NEW: Insight glow animation matching Stats pattern-glow */
+@keyframes insight-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(255, 221, 0, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(255, 221, 0, 0.25);
+  }
 }
 
 .insight-card.dynamic-insight::before {
@@ -1212,11 +1223,7 @@
   justify-content: center;
 }
 
-.insight-icon {
-  color: var(--primary);
-  font-size: 1.125rem;
-  flex-shrink: 0;
-}
+/* REMOVED: Icon from header - no longer displayed */
 
 .insight-icon-advanced {
   color: #10b981;
@@ -1257,6 +1264,9 @@
   border-radius: var(--radius-full);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .data-quality.minimal {

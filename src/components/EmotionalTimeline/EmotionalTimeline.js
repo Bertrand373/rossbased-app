@@ -1064,16 +1064,9 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                       {isPremium ? (
                         <div className="insight-card dynamic-insight">
                           <div className="insight-header">
-                            {dynamicInsight?.type === 'encouragement' ? (
-                              <FaRegLightbulb className="insight-icon" />
-                            ) : dynamicInsight?.type === 'advanced' ? (
-                              <FaArrowUp className="insight-icon insight-icon-advanced" />
-                            ) : (
-                              <FaChartLine className="insight-icon insight-icon-data" />
-                            )}
                             <span>
                               {dynamicInsight?.type === 'encouragement' && (wisdomMode ? 'Begin Your Insight Journey' : 'Start Tracking for Insights')}
-                              {dynamicInsight?.type === 'basic' && (wisdomMode ? 'Early Spiritual Patterns' : 'Basic Analysis')}
+                              {dynamicInsight?.type === 'basic' && (wisdomMode ? 'Early Spiritual Patterns' : 'Initial Data Patterns')}
                               {dynamicInsight?.type === 'intermediate' && (wisdomMode ? 'Emerging Consciousness Trends' : 'Pattern Recognition Active')}
                               {dynamicInsight?.type === 'advanced' && (wisdomMode ? 'Deep Soul Analytics' : 'Advanced Pattern Analysis')}
                             </span>
@@ -1088,9 +1081,24 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                             <div className="insight-data-status">
                               <div className="data-status-indicator">
                                 <span className={`data-quality ${dynamicInsight.dataStatus}`}>
-                                  {dynamicInsight.dataStatus === 'minimal' && '📊 Basic Analysis'}
-                                  {dynamicInsight.dataStatus === 'good' && '📈 Good Data Set'}
-                                  {dynamicInsight.dataStatus === 'rich' && '🎯 Rich Analytics'}
+                                  {dynamicInsight.dataStatus === 'minimal' && (
+                                    <>
+                                      <FaChartLine />
+                                      Basic Analysis
+                                    </>
+                                  )}
+                                  {dynamicInsight.dataStatus === 'good' && (
+                                    <>
+                                      <FaChartLine />
+                                      Good Data Set
+                                    </>
+                                  )}
+                                  {dynamicInsight.dataStatus === 'rich' && (
+                                    <>
+                                      <FaChartLine />
+                                      Rich Analytics
+                                    </>
+                                  )}
                                 </span>
                                 <span className="data-days">
                                   Based on {userData.emotionalTracking?.filter(entry => 
