@@ -599,7 +599,10 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                       key={phase.id} 
                       className={`timeline-phase ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                       onClick={() => isPremium && showPhaseDetails(phase)}
-                      style={{ cursor: isPremium ? 'pointer' : 'default' }}
+                      style={{ 
+                        cursor: isPremium ? 'pointer' : 'default',
+                        '--current-phase-color': isCurrent ? phase.color : undefined
+                      }}
                     >
                       <div className="timeline-phase-icon" style={{ color: phase.color }}>
                         <phase.icon />
@@ -619,7 +622,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                             <div 
                               className="timeline-phase-current" 
                               style={{ 
-                                backgroundColor: phase.color
+                                '--current-phase-color': phase.color
                               }}
                             >
                               Current
@@ -652,11 +655,17 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                           className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                         >
                           <div className="mastery-level-header">
-                            <div className="mastery-level-number">Level {level.id}</div>
+                            <div className="mastery-level-number">
+                              <div>LVL</div>
+                              <div>{level.id}</div>
+                            </div>
                             <div className="mastery-level-name">{level.name}</div>
                           </div>
-                          <div className="mastery-level-range">Days {level.dayRange}</div>
-                          <div className="mastery-level-duration">{level.duration}</div>
+                          
+                          <div className="mastery-level-details">
+                            <div className="mastery-level-range">Days {level.dayRange}</div>
+                            <div className="mastery-level-duration">{level.duration}</div>
+                          </div>
                           
                           {isPremium && isCurrent && (
                             <div className="mastery-level-progress">

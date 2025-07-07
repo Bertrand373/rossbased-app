@@ -421,7 +421,7 @@
   flex-shrink: 0;
 }
 
-/* UPDATED: Current phase indicator - solid background in phase color with white text */
+/* FIXED: Current phase indicator - uses phase color as background with white text */
 .timeline-phase-current {
   font-size: 0.875rem;
   font-weight: 600;
@@ -431,6 +431,7 @@
   border: none;
   color: #ffffff !important;
   text-shadow: none;
+  background-color: var(--current-phase-color) !important;
 }
 
 /* Lock indicator for non-premium users */
