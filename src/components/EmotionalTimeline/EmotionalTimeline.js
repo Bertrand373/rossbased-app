@@ -31,14 +31,62 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   // FIXED: Use current streak instead of calculated day difference
   const currentDay = userData.currentStreak || 0;
 
-  // UPDATED: Mastery Levels System - replaces confusing milestones
+  // UPDATED: Much better mastery levels with consistent durations and better progression
   const masteryLevels = [
-    { id: 1, name: "Master", dayRange: "181-365", startDay: 181, endDay: 365, duration: "6 months" },
-    { id: 2, name: "Sage", dayRange: "366-730", startDay: 366, endDay: 730, duration: "1 year" },
-    { id: 3, name: "Enlightened", dayRange: "731-1095", startDay: 731, endDay: 1095, duration: "1 year" },
-    { id: 4, name: "Transcendent", dayRange: "1096-1460", startDay: 1096, endDay: 1460, duration: "1 year" },
-    { id: 5, name: "Ascended Master", dayRange: "1461-1825", startDay: 1461, endDay: 1825, duration: "1 year" },
-    { id: 6, name: "Divine Avatar", dayRange: "1826+", startDay: 1826, endDay: 999999, duration: "Eternal" }
+    { 
+      id: 1, 
+      name: "Master", 
+      subtitle: "Foundation of Self-Control",
+      dayRange: "181-365", 
+      startDay: 181, 
+      endDay: 365, 
+      duration: "6 months" 
+    },
+    { 
+      id: 2, 
+      name: "Sage", 
+      subtitle: "Wisdom Through Experience",
+      dayRange: "366-730", 
+      startDay: 366, 
+      endDay: 730, 
+      duration: "1 year" 
+    },
+    { 
+      id: 3, 
+      name: "Enlightened", 
+      subtitle: "Higher Consciousness",
+      dayRange: "731-1095", 
+      startDay: 731, 
+      endDay: 1095, 
+      duration: "1 year" 
+    },
+    { 
+      id: 4, 
+      name: "Transcendent", 
+      subtitle: "Beyond Physical Desires",
+      dayRange: "1096-1460", 
+      startDay: 1096, 
+      endDay: 1460, 
+      duration: "1 year" 
+    },
+    { 
+      id: 5, 
+      name: "Ascended Master", 
+      subtitle: "Guide for Others",
+      dayRange: "1461-1825", 
+      startDay: 1461, 
+      endDay: 1825, 
+      duration: "1 year" 
+    },
+    { 
+      id: 6, 
+      name: "Divine Avatar", 
+      subtitle: "Pure Consciousness",
+      dayRange: "1826+", 
+      startDay: 1826, 
+      endDay: 999999, 
+      duration: "Eternal Journey" 
+    }
   ];
 
   // UPDATED: Get current mastery level for advanced practitioners
@@ -656,10 +704,12 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         >
                           <div className="mastery-level-header">
                             <div className="mastery-level-number">
-                              <div>LVL</div>
-                              <div>{level.id}</div>
+                              {level.id}
                             </div>
-                            <div className="mastery-level-name">{level.name}</div>
+                            <div className="mastery-level-info">
+                              <div className="mastery-level-name">{level.name}</div>
+                              <div className="mastery-level-subtitle">{level.subtitle}</div>
+                            </div>
                           </div>
                           
                           <div className="mastery-level-details">
@@ -678,24 +728,26 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                             </div>
                           )}
                           
-                          {isPremium ? (
-                            <>
-                              {isCompleted && (
-                                <div className="mastery-level-check">
-                                  <FaCheckCircle />
-                                </div>
-                              )}
-                              {isCurrent && (
-                                <div className="mastery-level-current">
-                                  Current Level
-                                </div>
-                              )}
-                            </>
-                          ) : (
-                            <div className="mastery-level-lock">
-                              <FaLock />
-                            </div>
-                          )}
+                          <div className="mastery-level-status">
+                            {isPremium ? (
+                              <>
+                                {isCompleted && (
+                                  <div className="mastery-level-check">
+                                    <FaCheckCircle />
+                                  </div>
+                                )}
+                                {isCurrent && (
+                                  <div className="mastery-level-current-badge">
+                                    Current Level
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <div className="mastery-level-lock">
+                                <FaLock />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
