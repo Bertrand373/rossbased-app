@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - UPDATED: Removed gold borders, styled phase insight section like Stats journey guidance */
+/* components/EmotionalTimeline/EmotionalTimeline.css - UPDATED: Added floating wisdom toggle, removed old toggle */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@
   background: var(--phase-color) !important;
 }
 
-/* Header matching Stats header exactly */
+/* Header matching Stats header exactly - REMOVED old wisdom toggle */
 .timeline-header {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -40,36 +40,65 @@
 }
 
 .timeline-header-actions {
+  /* Empty for now - can be used for future actions */
   display: flex;
   gap: var(--spacing-md);
   justify-self: end;
 }
 
-/* Wisdom toggle button matching stats reset button */
-.wisdom-toggle-btn {
+/* ENHANCED: Floating wisdom toggle - EXACT COPY from Stats */
+.floating-wisdom-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 2px solid var(--border);
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
+  justify-content: center;
   cursor: pointer;
-  transition: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  transition: all 0.3s ease;
 }
 
-.wisdom-toggle-btn.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
+.floating-wisdom-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.floating-wisdom-toggle.active {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.2) 100%);
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(255, 221, 0, 0.3);
+}
+
+.floating-wisdom-eye {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.floating-wisdom-eye.active {
   color: var(--primary);
+  filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.5));
 }
 
-.wisdom-toggle-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* Mobile: Position above mobile navigation */
+@media (max-width: 768px) {
+  .floating-wisdom-toggle {
+    bottom: 100px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .floating-wisdom-eye {
+    font-size: 1.125rem;
+  }
 }
 
 /* Timeline content container for premium locks */
@@ -1140,38 +1169,50 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* NEW: Data quality info banner - MATCHING STATS with I icon */
+/* NEW: Data quality info banner - EXACT MATCH to Stats info banner */
 .insight-data-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.05);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
-  padding: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
+  line-height: 1.4;
 }
 
 .insight-data-banner-content {
   display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 .insight-data-icon {
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: var(--primary);
   flex-shrink: 0;
-  margin-top: 2px;
 }
 
 .insight-data-text {
   flex: 1;
-  color: var(--text);
+  color: var(--text-secondary);
   font-size: 0.875rem;
   line-height: 1.4;
+  font-weight: 500;
+  text-align: center;
 }
 
 .insight-data-text strong {
-  color: var(--text);
-  font-weight: 600;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 /* Enhanced insight card with dynamic states and GLOW ANIMATION */
@@ -1542,11 +1583,6 @@
     justify-self: center;
   }
   
-  .wisdom-toggle-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
   /* Mobile early premium teaser adjustments */
   .early-teaser-content {
     flex-direction: column;
@@ -1703,10 +1739,10 @@
     height: 28px;
   }
   
-  /* NEW: Mobile insight data banner adjustments */
+  /* NEW: Mobile insight data banner adjustments - EXACT MATCH to Stats */
   .insight-data-banner-content {
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
     text-align: center;
   }
   
@@ -1717,6 +1753,7 @@
   
   .insight-data-text {
     font-size: 0.8rem;
+    text-align: center;
   }
   
   /* NEW: Mobile data status adjustments */
