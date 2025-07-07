@@ -1,5 +1,5 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Info icon banner and phase insight section styling
-import React, { useState, useEffect } from 'react';
+// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Added floating wisdom toggle, removed old toggle
+import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays, subDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
@@ -19,6 +19,13 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showPhaseDetail, setShowPhaseDetail] = useState(false);
   
+  // NEW: Floating toggle visibility state
+  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
+  
+  // NEW: Refs for scroll detection - matching Stats exactly
+  const timelineStartRef = useRef(null); // Timeline overview section start
+  const insightSectionRef = useRef(null); // Phase insight section
+  
   // Enhanced emotional tracking states
   const [todayEmotions, setTodayEmotions] = useState({
     anxiety: 5,
@@ -30,6 +37,33 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
 
   // FIXED: Use current streak instead of calculated day difference
   const currentDay = userData.currentStreak || 0;
+
+  // NEW: Smart floating toggle scroll detection - EXACT COPY from Stats
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!timelineStartRef.current || !insightSectionRef.current) return;
+      
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      
+      const timelineStartTop = timelineStartRef.current.offsetTop;
+      const insightSectionBottom = insightSectionRef.current.offsetTop + insightSectionRef.current.offsetHeight;
+      
+      // Show toggle when:
+      // 1. User has scrolled to the timeline overview section start
+      // 2. User hasn't scrolled past the insight section end
+      const shouldShow = 
+        scrollTop + windowHeight >= timelineStartTop && 
+        scrollTop <= insightSectionBottom;
+      
+      setShowFloatingToggle(shouldShow);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check initial position
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // UPDATED: Much better mastery levels with consistent durations and better progression
   const masteryLevels = [
@@ -684,20 +718,23 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="emotional-timeline-container">
-      {/* Header */}
+      {/* NEW: Smart Floating Wisdom Toggle - Shows when timeline content is visible */}
+      {showFloatingToggle && (
+        <button 
+          className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
+          onClick={() => setWisdomMode(!wisdomMode)}
+          title={wisdomMode ? "Switch to Practical View" : "Switch to Esoteric View"}
+        >
+          <FaEye className={`floating-wisdom-eye ${wisdomMode ? 'active' : ''}`} />
+        </button>
+      )}
+
+      {/* Header - REMOVED old wisdom toggle */}
       <div className="timeline-header">
         <div className="timeline-header-spacer"></div>
         <h2>Emotional Timeline</h2>
         <div className="timeline-header-actions">
-          <button 
-            className={`wisdom-toggle-btn ${wisdomMode ? 'active' : ''}`}
-            onClick={() => isPremium ? setWisdomMode(!wisdomMode) : handleUpgradeClick()}
-            title={isPremium ? (wisdomMode ? "Switch to Practical View" : "Switch to Esoteric View") : "Premium Feature"}
-            disabled={!isPremium}
-          >
-            <FaEye />
-            <span>{wisdomMode ? 'Esoteric' : 'Practical'}</span>
-          </button>
+          {/* Empty for now - can be used for future actions */}
         </div>
       </div>
 
@@ -786,8 +823,8 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
         ) : (
           // PREMIUM FEATURES SECTION - Only visible to premium users
           <div className="premium-features-section">
-            {/* Timeline Overview */}
-            <div className="timeline-overview">
+            {/* Timeline Overview - REF: timelineStartRef for scroll detection */}
+            <div className="timeline-overview" ref={timelineStartRef}>
               <h3>Complete Journey Map</h3>
               <div className="phases-timeline">
                 {emotionalPhases.map((phase, index) => {
@@ -1032,9 +1069,9 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
               )}
             </div>
 
-            {/* NEW: Dynamic Current Phase Insight - STYLED LIKE STATS JOURNEY GUIDANCE */}
+            {/* NEW: Dynamic Current Phase Insight - STYLED LIKE STATS JOURNEY GUIDANCE - REF: insightSectionRef for scroll detection */}
             {currentPhase && (
-              <div className="phase-insight-section">
+              <div className="phase-insight-section" ref={insightSectionRef}>
                 <h3>Understanding Your Current Phase</h3>
                 
                 {/* NEW: Data Quality Info Banner - MATCHING STATS with I icon */}
@@ -1050,9 +1087,8 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                       {recentData.length < 7 && (
                         <div className="insight-data-banner">
                           <div className="insight-data-banner-content">
-                            <FaInfoCircle className="insight-data-icon" />
                             <div className="insight-data-text">
-                              <strong>Your insights improve with data:</strong> The more you complete your daily emotional check-ins, the more personalized and accurate these insights become. 
+                              <strong>💡 Your insights improve with data:</strong> The more you complete your daily emotional check-ins, the more personalized and accurate these insights become. 
                               {recentData.length === 0 && " Start logging your emotions to unlock deeper pattern recognition."}
                               {recentData.length > 0 && recentData.length < 3 && ` You've logged ${recentData.length} day${recentData.length === 1 ? '' : 's'} - keep going to unlock trend analysis.`}
                               {recentData.length >= 3 && recentData.length < 7 && ` You've logged ${recentData.length} days - log 7+ days to unlock advanced pattern recognition.`}
