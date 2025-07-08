@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Free tier access control + Energy insights + Info icon
+// components/Stats/Stats.js - UPDATED: Redundancy removal + Benefit pattern detection
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -23,7 +23,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   
   const insightsStartRef = useRef(null);
-  const patternSectionRef = useRef(null);
+  const benefitSectionRef = useRef(null);
 
   // NEW: Force free users to energy metric on mount and when premium status changes
   useEffect(() => {
@@ -136,33 +136,22 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   }, [userData?.currentStreak, userData?.longestStreak]);
 
-  // Enhanced trigger options matching Calendar
-  const triggerOptions = [
-    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
-    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
-    { id: 'boredom', label: 'Boredom', icon: FaClock },
-    { id: 'social_media', label: 'Social Media', icon: FaLaptop },
-    { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
-    { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
-    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
-  ];
-
   // Smart floating toggle scroll detection
   useEffect(() => {
     if (!isPremium) return;
     
     const handleScroll = () => {
-      if (!insightsStartRef.current || !patternSectionRef.current) return;
+      if (!insightsStartRef.current || !benefitSectionRef.current) return;
       
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const windowHeight = window.innerHeight;
       
       const insightsStartTop = insightsStartRef.current.offsetTop;
-      const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
+      const benefitSectionBottom = benefitSectionRef.current.offsetTop + benefitSectionRef.current.offsetHeight;
       
       const shouldShow = 
         scrollTop + windowHeight >= insightsStartTop && 
-        scrollTop <= patternSectionBottom;
+        scrollTop <= benefitSectionBottom;
       
       setShowFloatingToggle(shouldShow);
     };
@@ -304,31 +293,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     toast.success('Premium upgrade coming soon! 🚀');
   };
 
-  // Helper function to get current phase data - matches Emotional Timeline exactly  
-  const getCurrentPhaseData = (streak) => {
-    if (streak <= 14) {
-      return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
-    } else if (streak <= 45) {
-      return { name: "Emotional Purging", icon: FaHeart, color: "#f59e0b" };
-    } else if (streak <= 90) {
-      return { name: "Mental Expansion", icon: FaBrain, color: "#3b82f6" };
-    } else if (streak <= 180) {
-      return { name: "Spiritual Integration", icon: FaLightbulb, color: "#8b5cf6" };
-    } else {
-      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
-    }
-  };
-
-  // Legacy function for backward compatibility
-  const getCurrentPhase = (streak) => {
-    if (streak <= 7) return 'Foundation Phase';
-    if (streak <= 30) return 'Adjustment Phase';
-    if (streak <= 90) return 'Momentum Phase';
-    if (streak <= 180) return 'Transformation Phase';
-    if (streak <= 365) return 'Integration Phase';
-    return 'Mastery Phase';
-  };
-  
   // Filter benefit data based on selected time range
   const getFilteredBenefitData = () => {
     if (!userData.benefitTracking) return [];
@@ -514,246 +478,386 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   };
   
   const streakComparison = generateStreakComparison();
+
+  // NEW: BENEFIT PATTERN DETECTION FUNCTIONS
   
-  // Generate current insight for sidebar
-  const getCurrentInsight = () => {
-    const insights = generateAllInsights();
-    const currentInsight = insights.find(insight => insight.metric === selectedMetric) || insights[0];
-    return wisdomMode ? currentInsight.esoteric : currentInsight.practical;
-  };
-  
-  // Get metric-specific benefits based on timeline phase
-  const getMetricBenefits = (metric, phase, streak) => {
-    const metricData = {
-      energy: {
-        initial: {
-          practical: "Energy fluctuations are normal as your body adjusts to conserving vital force. Expect periods of high energy alternating with fatigue.",
-          esoteric: "Your life force is beginning to accumulate instead of being scattered. The body temple is learning to contain divine energy.",
-          actionable: "Establish consistent morning exercise and avoid energy-draining activities during this critical foundation period."
-        },
-        purging: {
-          practical: "Noticeable strength gains and vitality increases. Your physical power and endurance are improving significantly.",
-          esoteric: "Raw sexual energy (Jing) is being refined into life energy (Qi). Your vital force is stabilizing at higher frequencies.",
-          actionable: "Channel this increased energy into productive activities - exercise, creative projects, and skill development."
-        },
-        expansion: {
-          practical: "Sustained high energy throughout the day. Your body composition improves naturally without extra effort.",
-          esoteric: "You're entering the alchemical refinement stage. Sexual energy transforms into pure vitality and creative power.",
-          actionable: "Use this momentum phase to tackle your biggest goals and challenges while maintaining spiritual practices."
-        },
-        integration: {
-          practical: "Your presence amplifies - others can feel your energy from across a room. Consistent, reliable energy levels.",
-          esoteric: "Energy transmutation is nearly complete. You're operating on refined life force rather than base sexual energy.",
-          actionable: "Focus on service and helping others while maintaining the practices that brought you to this level."
-        },
-        mastery: {
-          practical: "Energy consistency is natural and effortless. You rarely get sick and recover quickly when you do.",
-          esoteric: "Vital force flows freely through all energy centers. You've achieved energetic harmony and balance.",
-          actionable: "Share your knowledge and help others achieve similar energy mastery through teaching and mentoring."
+  // Analyze correlations between different benefit metrics
+  const generateBenefitCorrelations = () => {
+    const allData = userData.benefitTracking || [];
+    if (allData.length < 7) return [];
+    
+    const correlations = [];
+    const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    
+    // Calculate correlations between metrics
+    for (let i = 0; i < metrics.length; i++) {
+      for (let j = i + 1; j < metrics.length; j++) {
+        const metric1 = metrics[i];
+        const metric2 = metrics[j];
+        
+        const validData = allData.filter(item => 
+          item[metric1] !== undefined && item[metric2] !== undefined
+        );
+        
+        if (validData.length >= 5) {
+          const correlation = calculateCorrelation(
+            validData.map(item => item[metric1]),
+            validData.map(item => item[metric2])
+          );
+          
+          if (Math.abs(correlation) > 0.3) {
+            const strength = Math.abs(correlation) > 0.7 ? 'strong' : 'moderate';
+            const direction = correlation > 0 ? 'positive' : 'negative';
+            
+            correlations.push({
+              metric1: metric1,
+              metric2: metric2,
+              correlation: correlation,
+              strength: strength,
+              direction: direction,
+              insight: `${metric1.charAt(0).toUpperCase() + metric1.slice(1)} and ${metric2} show a ${strength} ${direction} relationship (${(correlation * 100).toFixed(0)}% correlation)`
+            });
+          }
         }
-      },
-      // ... (I'll include the other metrics in the same format but shortened for space)
-      focus: {
-        initial: { practical: "Brief periods of unusual mental sharpness alternating with mind racing.", esoteric: "Mental fog clearing.", actionable: "Start with short meditation sessions." },
-        purging: { practical: "Improved memory and decision-making.", esoteric: "Brain optimization occurring.", actionable: "Take on learning challenges." },
-        expansion: { practical: "Mental clarity reaches new levels.", esoteric: "Mind purifies completely.", actionable: "Apply focus to important goals." },
-        integration: { practical: "Memory becomes exceptional.", esoteric: "Mental body expands.", actionable: "Share enhanced capabilities." },
-        mastery: { practical: "Knowledge synthesis becomes natural.", esoteric: "Unity consciousness achieved.", actionable: "Bridge different knowledge fields." }
-      },
-      confidence: {
-        initial: { practical: "Growing sense of possibility.", esoteric: "Personal power awakening.", actionable: "Practice boundary setting." },
-        purging: { practical: "Natural leadership emerging.", esoteric: "Solar plexus activating.", actionable: "Take leadership opportunities." },
-        expansion: { practical: "Natural confidence without arrogance.", esoteric: "Authentic authority developing.", actionable: "Use influence responsibly." },
-        integration: { practical: "Others seek your direction.", esoteric: "Divine masculine activated.", actionable: "Accept leadership responsibilities." },
-        mastery: { practical: "Unshakeable inner confidence.", esoteric: "Cosmic confidence achieved.", actionable: "Mentor others in confidence." }
-      },
-      aura: {
-        initial: { practical: "Others notice something different.", esoteric: "Electromagnetic field strengthening.", actionable: "Practice positive energy." },
-        purging: { practical: "Magnetism increasing.", esoteric: "Aura expanding significantly.", actionable: "Use magnetism responsibly." },
-        expansion: { practical: "Attracting higher-quality people.", esoteric: "Energy signature purifying.", actionable: "Radiate positive energy." },
-        integration: { practical: "People change in your presence.", esoteric: "Aura extends 50+ feet.", actionable: "Accept energetic responsibility." },
-        mastery: { practical: "Consistent powerful presence.", esoteric: "Master-level energy field.", actionable: "Create positive change." }
-      },
-      sleep: {
-        initial: { practical: "Sleep patterns adjusting.", esoteric: "Circadian rhythms resetting.", actionable: "Maintain consistent schedule." },
-        purging: { practical: "Sleep optimization beginning.", esoteric: "Energy body purifying.", actionable: "Pay attention to dreams." },
-        expansion: { practical: "Deep, restorative sleep.", esoteric: "Spiritual regeneration occurring.", actionable: "Use pre-sleep meditation." },
-        integration: { practical: "Minimal sleep needed.", esoteric: "Sleep merges with contemplation.", actionable: "Morning gratitude practice." },
-        mastery: { practical: "Perfect sleep efficiency.", esoteric: "Cosmic rhythm alignment.", actionable: "Share sleep optimization." }
-      },
-      workout: {
-        initial: { practical: "Physical restlessness increasing.", esoteric: "Life force seeking movement.", actionable: "Establish exercise routine." },
-        purging: { practical: "Noticeable strength gains.", esoteric: "Muscle efficiency improving.", actionable: "Challenge yourself progressively." },
-        expansion: { practical: "Natural muscle gain.", esoteric: "Body becomes spiritual vessel.", actionable: "Inspire others physically." },
-        integration: { practical: "Movement becomes graceful.", esoteric: "Physical-spiritual harmony.", actionable: "Train others in development." },
-        mastery: { practical: "Peak condition maintained.", esoteric: "Body as divine temple.", actionable: "Demonstrate integration." }
       }
-    };
+    }
     
-    return metricData[metric][phase];
-  };
-  
-  // Get challenge-specific guidance based on phase
-  const getChallengeGuidance = (phase, streak) => {
-    const challengeData = {
-      initial: { actionable: "Focus on building unbreakable daily habits." },
-      purging: { actionable: "Accept emotions without resistance." },
-      expansion: { actionable: "Use abilities for meaningful goals." },
-      integration: { actionable: "Handle responsibility wisely." },
-      mastery: { actionable: "Focus on legacy and service." }
-    };
-    
-    return challengeData[phase];
-  };
-  
-  // Determine if user needs challenge-specific guidance
-  const shouldShowChallengeGuidance = (streak, dataLength) => {
-    const isInDifficultPeriod = (streak >= 14 && streak <= 45) || (streak >= 60 && streak <= 120);
-    const hasLimitedData = dataLength < 7;
-    const isNewUser = streak <= 7;
-    
-    return isInDifficultPeriod || hasLimitedData || isNewUser;
-  };
-  
-  // Get phase-specific challenge insight
-  const getChallengeInsight = (phase, streak) => {
-    const challengeInsights = {
-      initial: {
-        practical: `Day ${streak}: Initial Adaptation phase. Strong urges are normal.`,
-        esoteric: `Day ${streak}: Beginning the hero's journey.`,
-        actionable: "Build unbreakable daily habits."
-      },
-      purging: {
-        practical: `Day ${streak}: Emotional Purging phase brings healing.`,
-        esoteric: `Day ${streak}: Purification stage in progress.`,
-        actionable: "Journal and accept emotions."
-      },
-      expansion: {
-        practical: `Day ${streak}: Mental Expansion phase enhances abilities.`,
-        esoteric: `Day ${streak}: Alchemical refinement occurring.`,
-        actionable: "Apply focus to important goals."
-      },
-      integration: {
-        practical: `Day ${streak}: Spiritual Integration brings transformation.`,
-        esoteric: `Day ${streak}: Consciousness expansion occurring.`,
-        actionable: "Share wisdom humbly."
-      },
-      mastery: {
-        practical: `Day ${streak}: Mastery & Service phase achieved.`,
-        esoteric: `Day ${streak}: Serving cosmic evolution.`,
-        actionable: "Focus on mentoring others."
-      }
-    };
-    
-    return challengeInsights[phase];
+    return correlations.slice(0, 3); // Top 3 correlations
   };
 
-  // Timeline-based insights for all 6 metrics
-  const generateAllInsights = () => {
-    const filteredData = getFilteredBenefitData();
-    const currentStreak = userData.currentStreak || 0;
-    const insights = [];
+  // Calculate correlation coefficient between two arrays
+  const calculateCorrelation = (x, y) => {
+    const n = x.length;
+    if (n !== y.length || n === 0) return 0;
     
-    const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    const sumX = x.reduce((a, b) => a + b, 0);
+    const sumY = y.reduce((a, b) => a + b, 0);
+    const sumXY = x.reduce((acc, val, i) => acc + val * y[i], 0);
+    const sumXX = x.reduce((acc, val) => acc + val * val, 0);
+    const sumYY = y.reduce((acc, val) => acc + val * val, 0);
     
-    const getPhase = (streak) => {
-      if (streak <= 14) return 'initial';
-      if (streak <= 45) return 'purging'; 
-      if (streak <= 90) return 'expansion';
-      if (streak <= 180) return 'integration';
-      return 'mastery';
-    };
+    const numerator = n * sumXY - sumX * sumY;
+    const denominator = Math.sqrt((n * sumXX - sumX * sumX) * (n * sumYY - sumY * sumY));
     
-    const currentPhase = getPhase(currentStreak);
+    return denominator === 0 ? 0 : numerator / denominator;
+  };
+
+  // Analyze relapse predictor patterns
+  const analyzeRelapsePredicators = () => {
+    const streakHistory = userData.streakHistory || [];
+    const benefitData = userData.benefitTracking || [];
     
-    allMetrics.forEach((metric, index) => {
-      const isSelectedMetric = metric === selectedMetric;
-      const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
-      const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
+    if (streakHistory.length < 2 || benefitData.length < 14) return [];
+    
+    const relapsePatterns = [];
+    
+    // Find completed streaks (with end dates)
+    const completedStreaks = streakHistory.filter(streak => streak.end);
+    
+    completedStreaks.forEach(streak => {
+      const endDate = new Date(streak.end);
       
-      insights.push({
-        id: index + 1,
-        practical: metricBenefits.practical,
-        esoteric: metricBenefits.esoteric,
-        actionable: isSelectedMetric ? challengeGuidance.actionable : metricBenefits.actionable,
-        metric: metric,
-        phase: currentPhase,
-        isPhaseSpecific: true
+      // Look at benefit data 3-7 days before relapse
+      const preRelapseData = benefitData.filter(item => {
+        const itemDate = new Date(item.date);
+        const daysBefore = Math.floor((endDate - itemDate) / (1000 * 60 * 60 * 24));
+        return daysBefore >= 1 && daysBefore <= 7;
       });
+      
+      if (preRelapseData.length >= 3) {
+        const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+        
+        metrics.forEach(metric => {
+          const values = preRelapseData
+            .map(item => item[metric])
+            .filter(val => val !== undefined);
+          
+          if (values.length >= 3) {
+            const avgValue = values.reduce((a, b) => a + b, 0) / values.length;
+            const trend = analyzeTrend(values);
+            
+            if (avgValue < 4 || trend === 'declining') {
+              relapsePatterns.push({
+                metric: metric,
+                pattern: avgValue < 4 ? 'low_values' : 'declining_trend',
+                avgValue: avgValue.toFixed(1),
+                insight: avgValue < 4 
+                  ? `${metric} dropped to ${avgValue.toFixed(1)}/10 before relapse`
+                  : `${metric} showed declining trend before relapse`
+              });
+            }
+          }
+        });
+      }
     });
     
-    if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
-      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
+    // Group similar patterns
+    const groupedPatterns = {};
+    relapsePatterns.forEach(pattern => {
+      const key = `${pattern.metric}_${pattern.pattern}`;
+      if (!groupedPatterns[key]) {
+        groupedPatterns[key] = { ...pattern, count: 1 };
+      } else {
+        groupedPatterns[key].count++;
+      }
+    });
+    
+    return Object.values(groupedPatterns)
+      .filter(pattern => pattern.count >= 1)
+      .slice(0, 3);
+  };
+
+  // Analyze trend in array of values
+  const analyzeTrend = (values) => {
+    if (values.length < 3) return 'insufficient_data';
+    
+    let increasing = 0;
+    let decreasing = 0;
+    
+    for (let i = 1; i < values.length; i++) {
+      if (values[i] > values[i - 1]) increasing++;
+      if (values[i] < values[i - 1]) decreasing++;
+    }
+    
+    if (decreasing > increasing) return 'declining';
+    if (increasing > decreasing) return 'improving';
+    return 'stable';
+  };
+
+  // Analyze benefit recovery patterns after relapses
+  const analyzeBenefitRecovery = () => {
+    const streakHistory = userData.streakHistory || [];
+    const benefitData = userData.benefitTracking || [];
+    
+    if (streakHistory.length < 2 || benefitData.length < 14) return [];
+    
+    const recoveryPatterns = [];
+    
+    // Find streak starts (recovery periods)
+    const recoveryPeriods = streakHistory.slice(1); // Skip first streak
+    
+    recoveryPeriods.forEach(streak => {
+      const startDate = new Date(streak.start);
+      
+      // Look at benefit data 0-14 days after streak start
+      const postRecoveryData = benefitData.filter(item => {
+        const itemDate = new Date(item.date);
+        const daysAfter = Math.floor((itemDate - startDate) / (1000 * 60 * 60 * 24));
+        return daysAfter >= 0 && daysAfter <= 14;
+      }).sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      if (postRecoveryData.length >= 5) {
+        const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+        
+        metrics.forEach(metric => {
+          const values = postRecoveryData
+            .map(item => item[metric])
+            .filter(val => val !== undefined);
+          
+          if (values.length >= 5) {
+            const initialValue = values[0];
+            const finalValue = values[values.length - 1];
+            const daysToRecover = findRecoveryDay(values, initialValue);
+            
+            if (finalValue > initialValue + 1) {
+              recoveryPatterns.push({
+                metric: metric,
+                recoveryDays: daysToRecover,
+                improvement: (finalValue - initialValue).toFixed(1),
+                insight: `${metric} typically recovers to normal levels within ${daysToRecover} days`
+              });
+            }
+          }
+        });
+      }
+    });
+    
+    // Average recovery patterns
+    const avgRecovery = {};
+    recoveryPatterns.forEach(pattern => {
+      if (!avgRecovery[pattern.metric]) {
+        avgRecovery[pattern.metric] = { days: [], improvements: [] };
+      }
+      avgRecovery[pattern.metric].days.push(pattern.recoveryDays);
+      avgRecovery[pattern.metric].improvements.push(parseFloat(pattern.improvement));
+    });
+    
+    return Object.keys(avgRecovery).map(metric => {
+      const data = avgRecovery[metric];
+      const avgDays = Math.round(data.days.reduce((a, b) => a + b, 0) / data.days.length);
+      const avgImprovement = (data.improvements.reduce((a, b) => a + b, 0) / data.improvements.length).toFixed(1);
+      
+      return {
+        metric: metric,
+        avgRecoveryDays: avgDays,
+        avgImprovement: avgImprovement,
+        insight: `${metric} typically normalizes within ${avgDays} days after starting fresh`
+      };
+    }).slice(0, 3);
+  };
+
+  // Find day when metric recovers to acceptable level
+  const findRecoveryDay = (values, initialValue) => {
+    const targetValue = initialValue + 2; // Recovery threshold
+    
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] >= targetValue) {
+        return i + 1; // Return day number (1-indexed)
+      }
+    }
+    
+    return values.length; // If never fully recovered in timeframe
+  };
+
+  // Identify optimal benefit ranges for streak maintenance
+  const analyzeOptimalRanges = () => {
+    const benefitData = userData.benefitTracking || [];
+    const streakHistory = userData.streakHistory || [];
+    
+    if (benefitData.length < 14 || streakHistory.length < 2) return [];
+    
+    const optimalRanges = [];
+    const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    
+    // Find periods of successful streak maintenance (7+ days)
+    const successfulPeriods = [];
+    
+    streakHistory.forEach(streak => {
+      const startDate = new Date(streak.start);
+      const endDate = streak.end ? new Date(streak.end) : new Date();
+      const streakLength = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+      
+      if (streakLength >= 7) {
+        const periodData = benefitData.filter(item => {
+          const itemDate = new Date(item.date);
+          return itemDate >= startDate && itemDate <= endDate;
+        });
+        
+        if (periodData.length >= 5) {
+          successfulPeriods.push({
+            data: periodData,
+            length: streakLength
+          });
+        }
+      }
+    });
+    
+    if (successfulPeriods.length === 0) return [];
+    
+    metrics.forEach(metric => {
+      const successfulValues = [];
+      
+      successfulPeriods.forEach(period => {
+        const values = period.data
+          .map(item => item[metric])
+          .filter(val => val !== undefined);
+        
+        successfulValues.push(...values);
+      });
+      
+      if (successfulValues.length >= 10) {
+        const sortedValues = successfulValues.sort((a, b) => a - b);
+        const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
+        const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
+        const median = sortedValues[Math.floor(sortedValues.length * 0.5)];
+        
+        optimalRanges.push({
+          metric: metric,
+          optimalMin: q1.toFixed(1),
+          optimalMax: q3.toFixed(1),
+          optimalMedian: median.toFixed(1),
+          insight: `Maintain ${metric} between ${q1.toFixed(1)}-${q3.toFixed(1)} for optimal streak success`
+        });
+      }
+    });
+    
+    return optimalRanges.slice(0, 3);
+  };
+
+  // Main benefit pattern analysis function
+  const analyzeBenefitPatterns = () => {
+    const correlations = generateBenefitCorrelations();
+    const relapsePatterns = analyzeRelapsePredicators();
+    const recoveryPatterns = analyzeBenefitRecovery();
+    const optimalRanges = analyzeOptimalRanges();
+    
+    return {
+      correlations,
+      relapsePatterns,
+      recoveryPatterns,
+      optimalRanges
+    };
+  };
+
+  // Generate benefit-focused insights (replacing phase-based insights)
+  const generateBenefitInsights = () => {
+    const filteredData = getFilteredBenefitData();
+    const insights = [];
+    
+    if (filteredData.length < 3) {
+      return [{
+        id: 1,
+        practical: "Start tracking your daily benefits to unlock personalized pattern recognition and optimization insights.",
+        esoteric: "The universe reveals its patterns to those who observe with consistency and intention.",
+        actionable: "Log your energy, focus, and other metrics daily for at least a week to see meaningful patterns."
+      }];
+    }
+    
+    const currentAvg = parseFloat(calculateAverage());
+    const trend = analyzeTrend(filteredData.map(item => item[selectedMetric] || 5).slice(-7));
+    
+    // Current metric insight
+    if (currentAvg >= 7) {
       insights.push({
-        id: insights.length + 1,
-        practical: challengeInsight.practical,
-        esoteric: challengeInsight.esoteric,
-        actionable: challengeInsight.actionable,
-        metric: 'challenge',
-        phase: currentPhase,
-        isChallenge: true
+        id: 1,
+        practical: `Your ${selectedMetric} levels are excellent (${currentAvg}/10). This puts you in the top performance range.`,
+        esoteric: `Your ${selectedMetric} energy resonates at a high frequency, attracting abundance and clarity.`,
+        actionable: `Maintain current practices that support your ${selectedMetric}. Document what's working well.`
+      });
+    } else if (currentAvg >= 5) {
+      insights.push({
+        id: 1,
+        practical: `Your ${selectedMetric} is in a healthy range (${currentAvg}/10) with room for optimization.`,
+        esoteric: `Your ${selectedMetric} energy is stabilizing. Focus on consistency to reach higher states.`,
+        actionable: `Identify specific activities that boost your ${selectedMetric} and do them more frequently.`
+      });
+    } else {
+      insights.push({
+        id: 1,
+        practical: `Your ${selectedMetric} needs attention (${currentAvg}/10). This is a key area for improvement.`,
+        esoteric: `Your ${selectedMetric} energy is calling for nurturing and conscious cultivation.`,
+        actionable: `Prioritize practices that restore your ${selectedMetric}. Consider what might be draining it.`
+      });
+    }
+    
+    // Trend insight
+    if (trend === 'improving') {
+      insights.push({
+        id: 2,
+        practical: `Your ${selectedMetric} is trending upward - your efforts are paying off!`,
+        esoteric: `The ascending energy of your ${selectedMetric} reflects your spiritual alignment and growth.`,
+        actionable: `Continue your current approach and consider intensifying the practices that are working.`
+      });
+    } else if (trend === 'declining') {
+      insights.push({
+        id: 2,
+        practical: `Your ${selectedMetric} has been declining recently. Time to reassess your approach.`,
+        esoteric: `Declining ${selectedMetric} signals a need to realign with your higher purpose and practices.`,
+        actionable: `Review recent changes in your routine and identify what might be impacting your ${selectedMetric}.`
       });
     }
     
     return insights;
   };
-
-  // Generate pattern insights
-  const generatePatternInsights = () => {
-    const filteredData = getFilteredBenefitData();
-    const currentStreak = userData.currentStreak || 0;
-    const patterns = [];
-    
-    const getPhase = (streak) => {
-      if (streak <= 14) return 'initial';
-      if (streak <= 45) return 'purging'; 
-      if (streak <= 90) return 'expansion';
-      if (streak <= 180) return 'integration';
-      return 'mastery';
+  
+  // Generate current insight for sidebar
+  const getCurrentInsight = () => {
+    const insights = generateBenefitInsights();
+    const currentInsight = insights[0] || {
+      practical: "Track your benefits daily to unlock personalized insights.",
+      esoteric: "Consistent observation reveals the deeper patterns of your journey."
     };
-    
-    const currentPhase = getPhase(currentStreak);
-    
-    const timelinePatterns = {
-      initial: {
-        practical: "Days 1-14: Initial Adaptation phase. Strong urges are normal.",
-        esoteric: "Days 1-14: Beginning the hero's journey.",
-        actionable: "Focus on building habits."
-      },
-      purging: {
-        practical: "Days 15-45: Emotional Purging phase. Healing in progress.",
-        esoteric: "Days 15-45: Energy body adapting.",
-        actionable: "Trust the process."
-      },
-      expansion: {
-        practical: "Days 46-90: Mental Expansion phase. Abilities emerging.",
-        esoteric: "Days 46-90: Alchemical refinement.",
-        actionable: "Use enhanced focus."
-      },
-      integration: {
-        practical: "Days 91-180: Spiritual Integration phase. Deep transformation.",
-        esoteric: "Days 91-180: Major consciousness expansion.",
-        actionable: "Handle responsibility wisely."
-      },
-      mastery: {
-        practical: "180+ Days: Mastery & Service phase. Complete integration.",
-        esoteric: "180+ Days: Serving universal consciousness.",
-        actionable: "Focus on legacy creation."
-      }
-    };
-    
-    const currentPattern = timelinePatterns[currentPhase];
-    if (currentPattern) {
-      patterns.push({
-        id: 1,
-        practical: currentPattern.practical,
-        esoteric: currentPattern.esoteric,
-        actionable: currentPattern.actionable,
-        isTimeline: true
-      });
-    }
-    
-    return patterns;
+    return wisdomMode ? currentInsight.esoteric : currentInsight.practical;
   };
   
   return (
@@ -845,7 +949,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       <div className="benefit-tracker-section">
         <h3>Benefit Tracker</h3>
         
-        {/* UPDATED: Info Banner with icon - positioned under header */}
+        {/* Info Banner */}
         {shouldShowInfoBanner() && (
           <div className="stats-info-banner">
             <FaInfoCircle className="info-icon" />
@@ -901,7 +1005,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          {/* UPDATED: Only show time range selector for premium users */}
+          {/* Time range selector for premium users only */}
           {isPremium && (
             <div className="time-range-selector-container">
               <div className="time-range-selector">
@@ -1006,16 +1110,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             <div className="detailed-analysis-section">
               <div className="detailed-analysis-header">
                 <div className="detailed-analysis-title">
-                  <h4>Benefit Insights</h4>
-                </div>
-                <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
-                  <div className="benefit-phase-content">
-                    {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
-                    <div className="benefit-phase-text">
-                      <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
-                      <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
-                    </div>
-                  </div>
+                  <h4>Benefit Analysis</h4>
                 </div>
               </div>
               
@@ -1044,44 +1139,140 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 <h5>Personalized Analysis</h5>
                 
                 <div className="insights-grid">
-                  {generateAllInsights().map(insight => (
+                  {generateBenefitInsights().map(insight => (
                     <div 
                       key={insight.id} 
-                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''} ${insight.isPhaseSpecific ? 'phase-specific' : ''} ${insight.isChallenge ? 'challenge-warning' : ''}`}
+                      className="insight-card benefit-focused"
                     >
                       <div className="insight-card-header">
                         <FaRegLightbulb className="insight-icon" />
-                        <span className="insight-metric">{insight.metric === 'sleep' ? 'Sleep Quality' : insight.metric === 'challenge' ? 'Current Phase' : insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
+                        <span className="insight-metric">Benefit Intelligence</span>
                       </div>
                       <div className="insight-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
+                      {insight.actionable && (
+                        <div className="insight-actionable">{insight.actionable}</div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
             </div>
             
-            <div className="pattern-analysis-section" ref={patternSectionRef}>
-              <div className="pattern-analysis-header">
-                <h3>Journey Guidance</h3>
+            {/* NEW: Benefit Intelligence Section (replaces pattern analysis) */}
+            <div className="benefit-intelligence-section" ref={benefitSectionRef}>
+              <div className="benefit-intelligence-header">
+                <h3>Benefit Intelligence</h3>
               </div>
               
-              <div className="pattern-insights">
-                {generatePatternInsights().length > 0 ? (
-                  generatePatternInsights().map(insight => (
-                    <div key={insight.id} className={`pattern-insight-item ${insight.isTimeline ? 'timeline' : ''} ${insight.isWarning ? 'warning' : ''}`}>
-                      <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
-                      <div className="pattern-actionable">{insight.actionable}</div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="no-patterns">
-                    <FaInfoCircle className="no-patterns-icon" />
-                    <span>{wisdomMode ? 
-                      "Track more cycles to discover the deeper rhythms and cosmic patterns governing your journey." :
-                      "Track more cycles to identify behavioral patterns and optimize your approach."
-                    }</span>
-                  </div>
-                )}
+              <div className="benefit-patterns">
+                {(() => {
+                  const patterns = analyzeBenefitPatterns();
+                  const hasAnyPatterns = patterns.correlations.length > 0 || 
+                                       patterns.relapsePatterns.length > 0 || 
+                                       patterns.recoveryPatterns.length > 0 || 
+                                       patterns.optimalRanges.length > 0;
+                  
+                  if (!hasAnyPatterns) {
+                    return (
+                      <div className="no-patterns">
+                        <FaInfoCircle className="no-patterns-icon" />
+                        <span>
+                          {wisdomMode ? 
+                            "Track more benefit cycles to discover the deeper correlations and optimization patterns governing your transformation." :
+                            "Track more benefit data to unlock pattern recognition, correlation analysis, and personalized optimization insights."
+                          }
+                        </span>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <>
+                      {/* Benefit Correlations */}
+                      {patterns.correlations.length > 0 && (
+                        <div className="pattern-group">
+                          <h4>Benefit Correlations</h4>
+                          {patterns.correlations.map((correlation, index) => (
+                            <div key={index} className="pattern-insight-item correlation">
+                              <div className="pattern-text">
+                                {wisdomMode ? 
+                                  `The energies of ${correlation.metric1} and ${correlation.metric2} flow in ${correlation.direction === 'positive' ? 'harmony' : 'opposition'}, revealing deeper synchronicities in your development.` :
+                                  correlation.insight
+                                }
+                              </div>
+                              <div className="pattern-actionable">
+                                {correlation.direction === 'positive' ? 
+                                  `When working on ${correlation.metric1}, also focus on ${correlation.metric2} for amplified results.` :
+                                  `Balance is key - when ${correlation.metric1} is high, give extra attention to ${correlation.metric2}.`
+                                }
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Relapse Predictors */}
+                      {patterns.relapsePatterns.length > 0 && (
+                        <div className="pattern-group">
+                          <h4>Relapse Predictor Patterns</h4>
+                          {patterns.relapsePatterns.map((pattern, index) => (
+                            <div key={index} className="pattern-insight-item warning">
+                              <div className="pattern-text">
+                                {wisdomMode ? 
+                                  `When your ${pattern.metric} energy falls below harmony, disruption in your path may follow.` :
+                                  pattern.insight
+                                }
+                              </div>
+                              <div className="pattern-actionable">
+                                Monitor your {pattern.metric} levels closely and take action when they start declining.
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Recovery Patterns */}
+                      {patterns.recoveryPatterns.length > 0 && (
+                        <div className="pattern-group">
+                          <h4>Benefit Recovery Patterns</h4>
+                          {patterns.recoveryPatterns.map((pattern, index) => (
+                            <div key={index} className="pattern-insight-item recovery">
+                              <div className="pattern-text">
+                                {wisdomMode ? 
+                                  `Your ${pattern.metric} energy typically realigns with cosmic flow within ${pattern.avgRecoveryDays} cycles of renewal.` :
+                                  pattern.insight
+                                }
+                              </div>
+                              <div className="pattern-actionable">
+                                Be patient during recovery - your {pattern.metric} will stabilize within {pattern.avgRecoveryDays} days.
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Optimal Ranges */}
+                      {patterns.optimalRanges.length > 0 && (
+                        <div className="pattern-group">
+                          <h4>Optimal Benefit Ranges</h4>
+                          {patterns.optimalRanges.map((range, index) => (
+                            <div key={index} className="pattern-insight-item optimal">
+                              <div className="pattern-text">
+                                {wisdomMode ? 
+                                  `Your ${range.metric} energy achieves optimal resonance between ${range.optimalMin}-${range.optimalMax}, creating conditions for sustained transformation.` :
+                                  range.insight
+                                }
+                              </div>
+                              <div className="pattern-actionable">
+                                Target {range.metric} levels of {range.optimalMedian}/10 for best streak maintenance.
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </>
