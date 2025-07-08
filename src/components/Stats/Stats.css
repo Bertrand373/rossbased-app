@@ -471,6 +471,14 @@
   width: 100%;
 }
 
+/* FREE: Intelligence Preview Grid - Add spacing between cards */
+.intelligence-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
 /* ENHANCED: Benefit Upgrade CTA - NO TOP BORDER */
 .benefit-upgrade-cta {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
@@ -899,6 +907,62 @@
   color: var(--text);
   line-height: 1.4;
   text-align: center;
+}
+
+/* NEW: Intelligence data status indicator - EXACT COPY from EmotionalTimeline */
+.intelligence-data-status {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.intelligence-data-status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.intelligence-data-quality {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.intelligence-data-quality.minimal {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+.intelligence-data-quality.good {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.intelligence-data-quality.rich {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.intelligence-data-quality.insufficient {
+  background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  color: var(--text-secondary);
+}
+
+.intelligence-data-days {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 /* REDESIGNED: Historical comparison - cleaner layout */
@@ -1461,6 +1525,13 @@
   
   .performance-metric-value {
     font-size: 1.25rem;
+  }
+  
+  /* NEW: Mobile intelligence data status adjustments - EXACT MATCH to EmotionalTimeline */
+  .intelligence-data-status-indicator {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
   }
   
   .form-actions {

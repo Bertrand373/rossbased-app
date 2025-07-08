@@ -590,11 +590,32 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return hasMinimalData || isNewUser;
   };
 
+  // NEW: Calculate data quality for intelligence analysis
+  const calculateDataQuality = () => {
+    const allData = userData.benefitTracking || [];
+    const recentData = allData.filter(item => {
+      const itemDate = new Date(item.date);
+      const cutoffDate = subDays(new Date(), 14);
+      return itemDate >= cutoffDate;
+    });
+
+    if (recentData.length >= 14) {
+      return { level: 'rich', label: 'Rich Analytics', days: recentData.length };
+    } else if (recentData.length >= 7) {
+      return { level: 'good', label: 'Good Data Set', days: recentData.length };
+    } else if (recentData.length >= 3) {
+      return { level: 'minimal', label: 'Basic Analysis', days: recentData.length };
+    } else {
+      return { level: 'insufficient', label: 'Insufficient Data', days: recentData.length };
+    }
+  };
+
   const riskAnalysis = calculateRelapseRisk();
   const correlations = calculateCorrelations();
   const performanceZones = calculatePerformanceZones();
   const predictiveInsights = generatePredictiveInsights();
   const amplificationRecs = generateAmplificationRecommendations();
+  const dataQuality = calculateDataQuality();
   
   return (
     <div className="stats-container">
@@ -809,7 +830,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 
                 <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
                   <FaStar />
-                  Upgrade to Premium Intelligence
+                  Upgrade to Premium
                 </button>
               </div>
             </div>
@@ -885,6 +906,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                       )}
                     </div>
                   </div>
+                  {/* Data Quality Indicator */}
+                  {dataQuality.level !== 'insufficient' && (
+                    <div className="intelligence-data-status">
+                      <div className="intelligence-data-status-indicator">
+                        <span className={`intelligence-data-quality ${dataQuality.level}`}>
+                          <FaChartLine />
+                          {dataQuality.label}
+                        </span>
+                        <span className="intelligence-data-days">
+                          Based on {dataQuality.days} days of tracking
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -901,6 +936,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                         <div key={index} className="correlation-item">{correlation}</div>
                       ))}
                     </div>
+                    {/* Data Quality Indicator */}
+                    {dataQuality.level !== 'insufficient' && (
+                      <div className="intelligence-data-status">
+                        <div className="intelligence-data-status-indicator">
+                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
+                            <FaChartLine />
+                            {dataQuality.label}
+                          </span>
+                          <span className="intelligence-data-days">
+                            Based on {dataQuality.days} days of tracking
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -935,6 +984,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                         </div>
                       </div>
                     </div>
+                    {/* Data Quality Indicator */}
+                    {dataQuality.level !== 'insufficient' && (
+                      <div className="intelligence-data-status">
+                        <div className="intelligence-data-status-indicator">
+                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
+                            <FaChartLine />
+                            {dataQuality.label}
+                          </span>
+                          <span className="intelligence-data-days">
+                            Based on {dataQuality.days} days of tracking
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -952,6 +1015,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                         <div key={index} className="predictive-insight-item">{insight}</div>
                       ))}
                     </div>
+                    {/* Data Quality Indicator */}
+                    {dataQuality.level !== 'insufficient' && (
+                      <div className="intelligence-data-status">
+                        <div className="intelligence-data-status-indicator">
+                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
+                            <FaChartLine />
+                            {dataQuality.label}
+                          </span>
+                          <span className="intelligence-data-days">
+                            Based on {dataQuality.days} days of tracking
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -969,6 +1046,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                         <div key={index} className="amplification-item">{rec}</div>
                       ))}
                     </div>
+                    {/* Data Quality Indicator */}
+                    {dataQuality.level !== 'insufficient' && (
+                      <div className="intelligence-data-status">
+                        <div className="intelligence-data-status-indicator">
+                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
+                            <FaChartLine />
+                            {dataQuality.label}
+                          </span>
+                          <span className="intelligence-data-days">
+                            Based on {dataQuality.days} days of tracking
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
