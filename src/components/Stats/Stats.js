@@ -766,29 +766,26 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
+            {/* Intelligence Preview Grid - using existing insight card patterns */}
             <div className="intelligence-preview-grid">
-              <div className="intelligence-preview-card">
-                <div className="intelligence-preview-header">
-                  <FaShieldAlt className="intelligence-icon" />
+              <div className="current-insight-card">
+                <div className="current-insight-header">
+                  <FaShieldAlt className="insight-icon" />
                   <span>Relapse Risk Analysis</span>
                 </div>
-                <div className="intelligence-preview-content">
-                  <div className="risk-score-preview">{riskAnalysis.level} Risk</div>
-                  <div className="intelligence-preview-text">
-                    Basic risk assessment available. Upgrade for detailed analysis with specific factors and mitigation strategies.
-                  </div>
+                <div className="current-insight-text">
+                  <div className="comparison-value" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{riskAnalysis.level} Risk</div>
+                  Basic risk assessment available. Upgrade for detailed analysis with specific factors and mitigation strategies.
                 </div>
               </div>
               
-              <div className="intelligence-preview-card">
-                <div className="intelligence-preview-header">
-                  <FaBolt className="intelligence-icon" />
+              <div className="current-insight-card">
+                <div className="current-insight-header">
+                  <FaBolt className="insight-icon" />
                   <span>Performance Insights</span>
                 </div>
-                <div className="intelligence-preview-content">
-                  <div className="intelligence-preview-text">
-                    Advanced correlations, optimization zones, and predictive analytics available with Premium upgrade.
-                  </div>
+                <div className="current-insight-text">
+                  Advanced correlations, optimization zones, and predictive analytics available with Premium upgrade.
                 </div>
               </div>
             </div>
@@ -849,138 +846,159 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Intelligence Analysis Section */}
+            {/* Intelligence Analysis Section - using existing detailed-analysis-section pattern */}
             <div className="detailed-analysis-section">
               <div className="detailed-analysis-header">
                 <h4>Intelligence Analysis</h4>
               </div>
               
-              {/* Relapse Risk Predictor */}
-              <div className="intelligence-section">
+              {/* Relapse Risk Predictor - using existing comparison cards */}
+              <div className="personalized-analysis">
                 <h5>
-                  <FaShieldAlt className="section-icon" />
+                  <FaShieldAlt style={{ marginRight: '0.5rem', color: 'var(--primary)' }} />
                   Relapse Risk Predictor
                 </h5>
-                <div className="risk-analysis-card">
-                  <div className="risk-score-display">
-                    <div className={`risk-score ${riskAnalysis.level.toLowerCase()}`}>
+                <div className="comparison-grid">
+                  <div className="comparison-card" style={{ 
+                    backgroundColor: riskAnalysis.level === 'High' ? 'rgba(239, 68, 68, 0.1)' : 
+                                   riskAnalysis.level === 'Medium' ? 'rgba(245, 158, 11, 0.1)' : 
+                                   'rgba(34, 197, 94, 0.1)',
+                    borderColor: riskAnalysis.level === 'High' ? 'rgba(239, 68, 68, 0.3)' : 
+                                riskAnalysis.level === 'Medium' ? 'rgba(245, 158, 11, 0.3)' : 
+                                'rgba(34, 197, 94, 0.3)'
+                  }}>
+                    <div className="comparison-value" style={{ 
+                      color: riskAnalysis.level === 'High' ? '#ef4444' : 
+                            riskAnalysis.level === 'Medium' ? '#f59e0b' : 
+                            '#22c55e'
+                    }}>
                       {riskAnalysis.score}%
                     </div>
-                    <div className="risk-level">{riskAnalysis.level} Risk</div>
+                    <div className="comparison-label">{riskAnalysis.level} Risk Level</div>
                   </div>
-                  <div className="risk-factors">
-                    <div className="risk-factors-label">Risk Factors:</div>
-                    <ul className="risk-factors-list">
+                  <div className="comparison-card" style={{ gridColumn: 'span 2' }}>
+                    <div className="comparison-label" style={{ marginBottom: '0.75rem', fontWeight: '600' }}>Risk Factors:</div>
+                    <div style={{ fontSize: '0.875rem', lineHeight: '1.4' }}>
                       {riskAnalysis.factors.map((factor, index) => (
-                        <li key={index}>{factor}</li>
+                        <div key={index} style={{ marginBottom: '0.25rem' }}>• {factor}</div>
                       ))}
-                    </ul>
-                  </div>
-                  {riskAnalysis.level !== 'Low' && (
-                    <div className="risk-mitigation">
-                      <strong>Immediate Actions:</strong> Increase exercise, improve sleep schedule, limit social media, reach out to support network.
                     </div>
-                  )}
+                    {riskAnalysis.level !== 'Low' && (
+                      <div style={{ 
+                        marginTop: '0.75rem', 
+                        padding: '0.75rem', 
+                        backgroundColor: 'rgba(255, 221, 0, 0.1)', 
+                        borderRadius: 'var(--radius-md)', 
+                        fontSize: '0.875rem' 
+                      }}>
+                        <strong>Immediate Actions:</strong> Increase exercise, improve sleep schedule, limit social media, reach out to support network.
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              {/* Benefit Correlation Matrix */}
+              {/* Benefit Correlations - using existing insight cards */}
               {correlations.length > 0 && (
-                <div className="intelligence-section">
+                <div className="personalized-analysis">
                   <h5>
-                    <FaChartLine className="section-icon" />
+                    <FaChartLine style={{ marginRight: '0.5rem', color: 'var(--primary)' }} />
                     Your Benefit Correlations
                   </h5>
-                  <div className="correlation-cards">
+                  <div className="insights-grid">
                     {correlations.map((correlation, index) => (
-                      <div key={index} className="correlation-card">
-                        <FaBolt className="correlation-icon" />
-                        <div className="correlation-text">{correlation}</div>
+                      <div key={index} className="insight-card">
+                        <div className="insight-card-header">
+                          <FaBolt className="insight-icon" />
+                          <span className="insight-metric">Correlation Insight</span>
+                        </div>
+                        <div className="insight-text">{correlation}</div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
               
-              {/* Performance Zones */}
+              {/* Performance Zones - using existing comparison cards */}
               {performanceZones && (
-                <div className="intelligence-section">
+                <div className="personalized-analysis">
                   <h5>
-                    <FaBullseye className="section-icon" />
+                    <FaBullseye style={{ marginRight: '0.5rem', color: 'var(--primary)' }} />
                     Your Performance Zones
                   </h5>
-                  <div className="performance-zones-card">
-                    <div className="zone-definition">
+                  <div className="comparison-card" style={{ marginBottom: '1rem', padding: '1.5rem' }}>
+                    <div className="comparison-label" style={{ marginBottom: '1rem', fontWeight: '600', fontSize: '1rem' }}>
                       <strong>Your Peak Performance Zone:</strong> {performanceZones.criteria}
                     </div>
-                    <div className="zone-stats">
-                      <div className="zone-stat">
-                        <div className="zone-stat-value">{performanceZones.optimalPercentage}%</div>
-                        <div className="zone-stat-label">Days in optimal zone</div>
+                    <div className="comparison-grid">
+                      <div className="comparison-card phase-aware">
+                        <div className="comparison-value">{performanceZones.optimalPercentage}%</div>
+                        <div className="comparison-label">Days in optimal zone</div>
                       </div>
                       {performanceZones.focusPerformance && (
-                        <div className="zone-stat">
-                          <div className="zone-stat-value">{performanceZones.focusPerformance}%</div>
-                          <div className="zone-stat-label">High focus achievement rate in this zone</div>
+                        <div className="comparison-card phase-aware">
+                          <div className="comparison-value">{performanceZones.focusPerformance}%</div>
+                          <div className="comparison-label">High focus achievement rate</div>
                         </div>
                       )}
-                    </div>
-                    <div className="zone-breakdown">
-                      <div className="zone-breakdown-item optimal">
-                        <div className="zone-breakdown-count">{performanceZones.optimalDays}</div>
-                        <div className="zone-breakdown-label">Optimal Days</div>
-                      </div>
-                      <div className="zone-breakdown-item suboptimal">
-                        <div className="zone-breakdown-count">{performanceZones.suboptimalDays}</div>
-                        <div className="zone-breakdown-label">Suboptimal Days</div>
+                      <div className="comparison-card" style={{ 
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)', 
+                        borderColor: 'rgba(34, 197, 94, 0.3)' 
+                      }}>
+                        <div className="comparison-value" style={{ color: '#22c55e' }}>{performanceZones.optimalDays}</div>
+                        <div className="comparison-label">Optimal Days</div>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
               
-              {/* Predictive Insights */}
+              {/* Predictive Insights - using existing insight cards */}
               {predictiveInsights.length > 0 && (
-                <div className="intelligence-section">
+                <div className="personalized-analysis">
                   <h5>
-                    <FaRegLightbulb className="section-icon" />
+                    <FaRegLightbulb style={{ marginRight: '0.5rem', color: 'var(--primary)' }} />
                     Predictive Insights
                   </h5>
-                  <div className="predictive-cards">
+                  <div className="insights-grid">
                     {predictiveInsights.map((insight, index) => (
-                      <div key={index} className="predictive-card">
-                        <FaEye className="predictive-icon" />
-                        <div className="predictive-text">{insight}</div>
+                      <div key={index} className="insight-card highlighted">
+                        <div className="insight-card-header">
+                          <FaEye className="insight-icon" />
+                          <span className="insight-metric">Prediction</span>
+                        </div>
+                        <div className="insight-text">{insight}</div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
               
-              {/* Performance Amplification */}
+              {/* Performance Amplification - using existing insight cards */}
               {amplificationRecs.length > 0 && (
-                <div className="intelligence-section">
+                <div className="personalized-analysis">
                   <h5>
-                    <FaBolt className="section-icon" />
+                    <FaBolt style={{ marginRight: '0.5rem', color: 'var(--primary)' }} />
                     Performance Amplification
                   </h5>
-                  <div className="amplification-cards">
+                  <div className="insights-grid">
                     {amplificationRecs.map((rec, index) => (
-                      <div key={index} className="amplification-card">
-                        <FaTrophy className="amplification-icon" />
-                        <div className="amplification-text">{rec}</div>
+                      <div key={index} className="insight-card phase-specific">
+                        <div className="insight-card-header">
+                          <FaTrophy className="insight-icon" />
+                          <span className="insight-metric">Optimization</span>
+                        </div>
+                        <div className="insight-text">{rec}</div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
               
-              {/* Historical Comparison */}
-              <div className="intelligence-section">
-                <h5>
-                  <FaChartLine className="section-icon" />
-                  Historical Comparison
-                </h5>
+              {/* Historical Comparison - using existing streak comparison */}
+              <div className="streak-comparison">
+                <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Historical Comparison</h5>
+                
                 <div className="comparison-grid">
                   <div className="comparison-card">
                     <div className="comparison-value">
