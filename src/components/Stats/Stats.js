@@ -1,10 +1,10 @@
-// components/Stats/Stats.js - UPDATED: Free tier access control + Energy insights + Info icon
+// components/Stats/Stats.js - BENEFIT INTELLIGENCE ENGINE: Pure data-driven performance optimization
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaLeaf, FaLightbulb } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaShieldAlt, FaChartLine, FaBolt, FaTarget } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -19,22 +19,18 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [showBadgeModal, setShowBadgeModal] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState(null);
   const [showSmartResetDialog, setShowSmartResetDialog] = useState(false);
-  const [wisdomMode, setWisdomMode] = useState(false);
-  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   
   const insightsStartRef = useRef(null);
-  const patternSectionRef = useRef(null);
 
-  // NEW: Force free users to energy metric on mount and when premium status changes
+  // Force free users to energy metric on mount and when premium status changes
   useEffect(() => {
     if (!isPremium && selectedMetric !== 'energy') {
       setSelectedMetric('energy');
     }
   }, [isPremium, selectedMetric]);
 
-  // NEW: Handle metric selection with access control
+  // Handle metric selection with access control
   const handleMetricClick = (metric) => {
-    // Free users can only access 'energy' metric
     if (!isPremium && metric !== 'energy') {
       toast.error('Upgrade to Premium to unlock all benefit metrics', {
         duration: 3000,
@@ -49,20 +45,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setSelectedMetric(metric);
   };
 
-  // IMPROVED: Function to determine if user should see info banner
-  const shouldShowInfoBanner = () => {
-    const benefitData = getFilteredBenefitData();
-    
-    // Show banner if user has very little logged data (regardless of streak)
-    const hasMinimalData = benefitData.length < 7; // Less than a week of data
-    
-    // Also show for new users (first 3 days) even if they have some data
-    const currentStreak = userData.currentStreak || 0;
-    const isNewUser = currentStreak <= 3;
-    
-    return hasMinimalData || isNewUser;
-  };
-
   // CORE: Badge checking logic - automatically unlocks badges when milestones are reached
   const checkAndUpdateBadges = (userData) => {
     if (!userData.badges || !Array.isArray(userData.badges)) {
@@ -73,7 +55,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const longestStreak = userData.longestStreak || 0;
     let hasNewBadges = false;
     
-    // Badge milestone thresholds
     const badgeThresholds = [
       { name: '7-Day Warrior', days: 7 },
       { name: '14-Day Monk', days: 14 },
@@ -87,14 +68,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const threshold = badgeThresholds.find(t => t.name === badge.name);
       if (!threshold) return badge;
 
-      // Check if badge should be earned (current streak OR longest streak)
       const shouldBeEarned = currentStreak >= threshold.days || longestStreak >= threshold.days;
       
-      // If badge isn't earned but should be
       if (!badge.earned && shouldBeEarned) {
         hasNewBadges = true;
         
-        // Show achievement notification
         toast.success(`🏆 Achievement Unlocked: ${badge.name}!`, {
           duration: 4000,
           style: {
@@ -124,55 +102,17 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return userData;
   };
 
-  // CORE: Auto-check badges when streak changes
+  // Auto-check badges when streak changes
   useEffect(() => {
     if (userData && userData.currentStreak !== undefined) {
       const updatedData = checkAndUpdateBadges(userData);
       
-      // Only update if badges actually changed
       if (JSON.stringify(updatedData.badges) !== JSON.stringify(userData.badges)) {
         updateUserData(updatedData);
       }
     }
   }, [userData?.currentStreak, userData?.longestStreak]);
 
-  // Enhanced trigger options matching Calendar
-  const triggerOptions = [
-    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
-    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
-    { id: 'boredom', label: 'Boredom', icon: FaClock },
-    { id: 'social_media', label: 'Social Media', icon: FaLaptop },
-    { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
-    { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
-    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
-  ];
-
-  // Smart floating toggle scroll detection
-  useEffect(() => {
-    if (!isPremium) return;
-    
-    const handleScroll = () => {
-      if (!insightsStartRef.current || !patternSectionRef.current) return;
-      
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const windowHeight = window.innerHeight;
-      
-      const insightsStartTop = insightsStartRef.current.offsetTop;
-      const patternSectionBottom = patternSectionRef.current.offsetTop + patternSectionRef.current.offsetHeight;
-      
-      const shouldShow = 
-        scrollTop + windowHeight >= insightsStartTop && 
-        scrollTop <= patternSectionBottom;
-      
-      setShowFloatingToggle(shouldShow);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-    
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isPremium]);
-  
   // Time range options for chart
   const timeRangeOptions = {
     week: 7,
@@ -180,16 +120,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     quarter: 90
   };
   
-  // Format date for displaying
   const formatDate = (date) => format(new Date(date), 'MMM d, yyyy');
   
-  // Handle badge click
   const handleBadgeClick = (badge) => {
     setSelectedBadge(badge);
     setShowBadgeModal(true);
   };
 
-  // Handle smart reset - opens smart dialog
   const handleResetStats = () => {
     setShowSmartResetDialog(true);
   };
@@ -299,36 +236,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowSmartResetDialog(false);
   };
 
-  // Premium upgrade handler
   const handleUpgradeClick = () => {
     toast.success('Premium upgrade coming soon! 🚀');
   };
 
-  // Helper function to get current phase data - matches Emotional Timeline exactly  
-  const getCurrentPhaseData = (streak) => {
-    if (streak <= 14) {
-      return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
-    } else if (streak <= 45) {
-      return { name: "Emotional Purging", icon: FaHeart, color: "#f59e0b" };
-    } else if (streak <= 90) {
-      return { name: "Mental Expansion", icon: FaBrain, color: "#3b82f6" };
-    } else if (streak <= 180) {
-      return { name: "Spiritual Integration", icon: FaLightbulb, color: "#8b5cf6" };
-    } else {
-      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
-    }
-  };
-
-  // Legacy function for backward compatibility
-  const getCurrentPhase = (streak) => {
-    if (streak <= 7) return 'Foundation Phase';
-    if (streak <= 30) return 'Adjustment Phase';
-    if (streak <= 90) return 'Momentum Phase';
-    if (streak <= 180) return 'Transformation Phase';
-    if (streak <= 365) return 'Integration Phase';
-    return 'Mastery Phase';
-  };
-  
   // Filter benefit data based on selected time range
   const getFilteredBenefitData = () => {
     if (!userData.benefitTracking) return [];
@@ -341,7 +252,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       .sort((a, b) => new Date(a.date) - new Date(b.date));
   };
   
-  // Generate chart data - Handle sleep metric
+  // Generate chart data
   const generateChartData = () => {
     const filteredData = getFilteredBenefitData();
     
@@ -435,10 +346,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
   
-  // NEW: Calculate average for last 7 days (for free users) 
+  // Calculate average for display
   const calculateAverage = () => {
     if (!isPremium) {
-      // For free users: last 7 days average
       const allData = userData.benefitTracking || [];
       const last7DaysData = allData
         .filter(item => {
@@ -456,7 +366,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       return (sum / last7DaysData.length).toFixed(1);
     }
     
-    // For premium users: use existing filtered data logic
     const filteredData = getFilteredBenefitData();
     if (filteredData.length === 0) return '0.0';
     
@@ -468,307 +377,228 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }, 0);
     return (sum / filteredData.length).toFixed(1);
   };
-  
-  // Generate streak comparison data with expanded benefit categories
-  const generateStreakComparison = () => {
+
+  // NEW: Calculate relapse risk score (0-100%)
+  const calculateRelapseRisk = () => {
     const filteredData = getFilteredBenefitData();
+    if (filteredData.length < 3) return { score: 15, factors: ['Insufficient data'], level: 'Low' };
     
-    if (filteredData.length === 0) {
-      return {
-        confidence: { short: '5', medium: '5', long: '5' },
-        energy: { short: '5', medium: '5', long: '5' },
-        focus: { short: '5', medium: '5', long: '5' },
-        aura: { short: '5', medium: '5', long: '5' },
-        sleep: { short: '5', medium: '5', long: '5' },
-        workout: { short: '5', medium: '5', long: '5' }
-      };
+    const last3Days = filteredData.slice(-3);
+    let riskScore = 0;
+    const riskFactors = [];
+    
+    // Energy declining trend
+    if (last3Days.length >= 2) {
+      const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
+      if (energyTrend < -1) {
+        riskScore += 25;
+        riskFactors.push('Your energy declining for 3 days');
+      }
     }
     
-    const baseValue = parseFloat(calculateAverage());
+    // Low mood/confidence
+    const avgMood = last3Days.reduce((sum, day) => sum + (day.confidence || 5), 0) / last3Days.length;
+    if (avgMood < 4) {
+      riskScore += 20;
+      riskFactors.push('Your mood below 4/10');
+    }
     
-    const progressionMultipliers = {
-      confidence: { short: -1.5, medium: 0.0, long: +2.0 },
-      energy: { short: -1.2, medium: 0.0, long: +2.5 },
-      focus: { short: -1.0, medium: 0.0, long: +2.3 },
-      aura: { short: -0.8, medium: 0.0, long: +2.8 },
-      sleep: { short: -1.1, medium: 0.0, long: +2.2 },
-      workout: { short: -0.6, medium: 0.0, long: +2.0 }
-    };
-    
-    const result = {};
-    
-    Object.keys(progressionMultipliers).forEach(metric => {
-      const multipliers = progressionMultipliers[metric];
-      const shortValue = Math.max(1, Math.min(10, baseValue + multipliers.short));
-      const mediumValue = baseValue;
-      const longValue = Math.max(1, Math.min(10, baseValue + multipliers.long));
-      
-      result[metric] = {
-        short: shortValue % 1 === 0 ? shortValue.toFixed(0) : shortValue.toFixed(1),
-        medium: mediumValue % 1 === 0 ? mediumValue.toFixed(0) : mediumValue.toFixed(1),
-        long: longValue % 1 === 0 ? longValue.toFixed(0) : longValue.toFixed(1)
-      };
-    });
-    
-    return result;
-  };
-  
-  const streakComparison = generateStreakComparison();
-  
-  // Generate current insight for sidebar
-  const getCurrentInsight = () => {
-    const insights = generateAllInsights();
-    const currentInsight = insights.find(insight => insight.metric === selectedMetric) || insights[0];
-    return wisdomMode ? currentInsight.esoteric : currentInsight.practical;
-  };
-  
-  // Get metric-specific benefits based on timeline phase
-  const getMetricBenefits = (metric, phase, streak) => {
-    const metricData = {
-      energy: {
-        initial: {
-          practical: "Energy fluctuations are normal as your body adjusts to conserving vital force. Expect periods of high energy alternating with fatigue.",
-          esoteric: "Your life force is beginning to accumulate instead of being scattered. The body temple is learning to contain divine energy.",
-          actionable: "Establish consistent morning exercise and avoid energy-draining activities during this critical foundation period."
-        },
-        purging: {
-          practical: "Noticeable strength gains and vitality increases. Your physical power and endurance are improving significantly.",
-          esoteric: "Raw sexual energy (Jing) is being refined into life energy (Qi). Your vital force is stabilizing at higher frequencies.",
-          actionable: "Channel this increased energy into productive activities - exercise, creative projects, and skill development."
-        },
-        expansion: {
-          practical: "Sustained high energy throughout the day. Your body composition improves naturally without extra effort.",
-          esoteric: "You're entering the alchemical refinement stage. Sexual energy transforms into pure vitality and creative power.",
-          actionable: "Use this momentum phase to tackle your biggest goals and challenges while maintaining spiritual practices."
-        },
-        integration: {
-          practical: "Your presence amplifies - others can feel your energy from across a room. Consistent, reliable energy levels.",
-          esoteric: "Energy transmutation is nearly complete. You're operating on refined life force rather than base sexual energy.",
-          actionable: "Focus on service and helping others while maintaining the practices that brought you to this level."
-        },
-        mastery: {
-          practical: "Energy consistency is natural and effortless. You rarely get sick and recover quickly when you do.",
-          esoteric: "Vital force flows freely through all energy centers. You've achieved energetic harmony and balance.",
-          actionable: "Share your knowledge and help others achieve similar energy mastery through teaching and mentoring."
-        }
-      },
-      // ... (I'll include the other metrics in the same format but shortened for space)
-      focus: {
-        initial: { practical: "Brief periods of unusual mental sharpness alternating with mind racing.", esoteric: "Mental fog clearing.", actionable: "Start with short meditation sessions." },
-        purging: { practical: "Improved memory and decision-making.", esoteric: "Brain optimization occurring.", actionable: "Take on learning challenges." },
-        expansion: { practical: "Mental clarity reaches new levels.", esoteric: "Mind purifies completely.", actionable: "Apply focus to important goals." },
-        integration: { practical: "Memory becomes exceptional.", esoteric: "Mental body expands.", actionable: "Share enhanced capabilities." },
-        mastery: { practical: "Knowledge synthesis becomes natural.", esoteric: "Unity consciousness achieved.", actionable: "Bridge different knowledge fields." }
-      },
-      confidence: {
-        initial: { practical: "Growing sense of possibility.", esoteric: "Personal power awakening.", actionable: "Practice boundary setting." },
-        purging: { practical: "Natural leadership emerging.", esoteric: "Solar plexus activating.", actionable: "Take leadership opportunities." },
-        expansion: { practical: "Natural confidence without arrogance.", esoteric: "Authentic authority developing.", actionable: "Use influence responsibly." },
-        integration: { practical: "Others seek your direction.", esoteric: "Divine masculine activated.", actionable: "Accept leadership responsibilities." },
-        mastery: { practical: "Unshakeable inner confidence.", esoteric: "Cosmic confidence achieved.", actionable: "Mentor others in confidence." }
-      },
-      aura: {
-        initial: { practical: "Others notice something different.", esoteric: "Electromagnetic field strengthening.", actionable: "Practice positive energy." },
-        purging: { practical: "Magnetism increasing.", esoteric: "Aura expanding significantly.", actionable: "Use magnetism responsibly." },
-        expansion: { practical: "Attracting higher-quality people.", esoteric: "Energy signature purifying.", actionable: "Radiate positive energy." },
-        integration: { practical: "People change in your presence.", esoteric: "Aura extends 50+ feet.", actionable: "Accept energetic responsibility." },
-        mastery: { practical: "Consistent powerful presence.", esoteric: "Master-level energy field.", actionable: "Create positive change." }
-      },
-      sleep: {
-        initial: { practical: "Sleep patterns adjusting.", esoteric: "Circadian rhythms resetting.", actionable: "Maintain consistent schedule." },
-        purging: { practical: "Sleep optimization beginning.", esoteric: "Energy body purifying.", actionable: "Pay attention to dreams." },
-        expansion: { practical: "Deep, restorative sleep.", esoteric: "Spiritual regeneration occurring.", actionable: "Use pre-sleep meditation." },
-        integration: { practical: "Minimal sleep needed.", esoteric: "Sleep merges with contemplation.", actionable: "Morning gratitude practice." },
-        mastery: { practical: "Perfect sleep efficiency.", esoteric: "Cosmic rhythm alignment.", actionable: "Share sleep optimization." }
-      },
-      workout: {
-        initial: { practical: "Physical restlessness increasing.", esoteric: "Life force seeking movement.", actionable: "Establish exercise routine." },
-        purging: { practical: "Noticeable strength gains.", esoteric: "Muscle efficiency improving.", actionable: "Challenge yourself progressively." },
-        expansion: { practical: "Natural muscle gain.", esoteric: "Body becomes spiritual vessel.", actionable: "Inspire others physically." },
-        integration: { practical: "Movement becomes graceful.", esoteric: "Physical-spiritual harmony.", actionable: "Train others in development." },
-        mastery: { practical: "Peak condition maintained.", esoteric: "Body as divine temple.", actionable: "Demonstrate integration." }
+    // Poor sleep quality
+    if (isPremium) {
+      const avgSleep = last3Days.reduce((sum, day) => sum + (day.sleep || 5), 0) / last3Days.length;
+      if (avgSleep < 5) {
+        riskScore += 15;
+        riskFactors.push('Your sleep quality poor');
       }
-    };
+    }
     
-    return metricData[metric][phase];
-  };
-  
-  // Get challenge-specific guidance based on phase
-  const getChallengeGuidance = (phase, streak) => {
-    const challengeData = {
-      initial: { actionable: "Focus on building unbreakable daily habits." },
-      purging: { actionable: "Accept emotions without resistance." },
-      expansion: { actionable: "Use abilities for meaningful goals." },
-      integration: { actionable: "Handle responsibility wisely." },
-      mastery: { actionable: "Focus on legacy and service." }
-    };
-    
-    return challengeData[phase];
-  };
-  
-  // Determine if user needs challenge-specific guidance
-  const shouldShowChallengeGuidance = (streak, dataLength) => {
-    const isInDifficultPeriod = (streak >= 14 && streak <= 45) || (streak >= 60 && streak <= 120);
-    const hasLimitedData = dataLength < 7;
-    const isNewUser = streak <= 7;
-    
-    return isInDifficultPeriod || hasLimitedData || isNewUser;
-  };
-  
-  // Get phase-specific challenge insight
-  const getChallengeInsight = (phase, streak) => {
-    const challengeInsights = {
-      initial: {
-        practical: `Day ${streak}: Initial Adaptation phase. Strong urges are normal.`,
-        esoteric: `Day ${streak}: Beginning the hero's journey.`,
-        actionable: "Build unbreakable daily habits."
-      },
-      purging: {
-        practical: `Day ${streak}: Emotional Purging phase brings healing.`,
-        esoteric: `Day ${streak}: Purification stage in progress.`,
-        actionable: "Journal and accept emotions."
-      },
-      expansion: {
-        practical: `Day ${streak}: Mental Expansion phase enhances abilities.`,
-        esoteric: `Day ${streak}: Alchemical refinement occurring.`,
-        actionable: "Apply focus to important goals."
-      },
-      integration: {
-        practical: `Day ${streak}: Spiritual Integration brings transformation.`,
-        esoteric: `Day ${streak}: Consciousness expansion occurring.`,
-        actionable: "Share wisdom humbly."
-      },
-      mastery: {
-        practical: `Day ${streak}: Mastery & Service phase achieved.`,
-        esoteric: `Day ${streak}: Serving cosmic evolution.`,
-        actionable: "Focus on mentoring others."
+    // Low focus/productivity
+    if (isPremium) {
+      const avgFocus = last3Days.reduce((sum, day) => sum + (day.focus || 5), 0) / last3Days.length;
+      if (avgFocus < 4) {
+        riskScore += 20;
+        riskFactors.push('Your focus below 4/10');
       }
-    };
+    }
     
-    return challengeInsights[phase];
+    // Weekend risk factor
+    const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+    if (isWeekend) {
+      riskScore += 10;
+      riskFactors.push('Weekend vulnerability period');
+    }
+    
+    // Determine risk level
+    let level = 'Low';
+    if (riskScore >= 50) level = 'High';
+    else if (riskScore >= 25) level = 'Medium';
+    
+    return {
+      score: Math.min(riskScore, 100),
+      factors: riskFactors.length > 0 ? riskFactors : ['All metrics stable'],
+      level
+    };
   };
 
-  // Timeline-based insights for all 6 metrics
-  const generateAllInsights = () => {
-    const filteredData = getFilteredBenefitData();
-    const currentStreak = userData.currentStreak || 0;
-    const insights = [];
+  // NEW: Calculate benefit correlations
+  const calculateCorrelations = () => {
+    const allData = userData.benefitTracking || [];
+    if (allData.length < 7) return [];
     
-    const allMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    const correlations = [];
+    const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
     
-    const getPhase = (streak) => {
-      if (streak <= 14) return 'initial';
-      if (streak <= 45) return 'purging'; 
-      if (streak <= 90) return 'expansion';
-      if (streak <= 180) return 'integration';
-      return 'mastery';
-    };
-    
-    const currentPhase = getPhase(currentStreak);
-    
-    allMetrics.forEach((metric, index) => {
-      const isSelectedMetric = metric === selectedMetric;
-      const metricBenefits = getMetricBenefits(metric, currentPhase, currentStreak);
-      const challengeGuidance = getChallengeGuidance(currentPhase, currentStreak);
+    // Energy correlation analysis
+    const energyData = allData.filter(d => d.energy >= 7);
+    if (energyData.length > 0 && isPremium) {
+      const avgFocusWhenEnergyHigh = energyData.reduce((sum, d) => sum + (d.focus || 0), 0) / energyData.length;
+      const overallAvgFocus = allData.reduce((sum, d) => sum + (d.focus || 0), 0) / allData.length;
+      const improvement = ((avgFocusWhenEnergyHigh - overallAvgFocus) / overallAvgFocus * 100).toFixed(0);
       
-      insights.push({
-        id: index + 1,
-        practical: metricBenefits.practical,
-        esoteric: metricBenefits.esoteric,
-        actionable: isSelectedMetric ? challengeGuidance.actionable : metricBenefits.actionable,
-        metric: metric,
-        phase: currentPhase,
-        isPhaseSpecific: true
-      });
-    });
+      if (improvement > 5) {
+        correlations.push(`When your energy = 7+, your focus averages ${avgFocusWhenEnergyHigh.toFixed(1)} (+${improvement}% above baseline)`);
+      }
+    }
     
-    if (shouldShowChallengeGuidance(currentStreak, filteredData.length)) {
-      const challengeInsight = getChallengeInsight(currentPhase, currentStreak);
-      insights.push({
-        id: insights.length + 1,
-        practical: challengeInsight.practical,
-        esoteric: challengeInsight.esoteric,
-        actionable: challengeInsight.actionable,
-        metric: 'challenge',
-        phase: currentPhase,
-        isChallenge: true
-      });
+    // Sleep correlation
+    if (isPremium && allData.length > 5) {
+      const poorSleepDays = allData.filter(d => (d.sleep || 5) < 5);
+      const nextDayMood = poorSleepDays.map(d => {
+        const dayAfter = allData.find(next => {
+          const dayAfterDate = new Date(d.date);
+          dayAfterDate.setDate(dayAfterDate.getDate() + 1);
+          return next.date === dayAfterDate.toISOString().split('T')[0];
+        });
+        return dayAfter ? (dayAfter.confidence || 5) : null;
+      }).filter(mood => mood !== null);
+      
+      if (nextDayMood.length > 0) {
+        const lowMoodChance = (nextDayMood.filter(mood => mood < 5).length / nextDayMood.length * 100).toFixed(0);
+        if (lowMoodChance > 50) {
+          correlations.push(`Poor sleep quality = ${lowMoodChance}% chance of low mood next day`);
+        }
+      }
+    }
+    
+    return correlations;
+  };
+
+  // NEW: Calculate performance zones
+  const calculatePerformanceZones = () => {
+    const allData = userData.benefitTracking || [];
+    if (allData.length < 7) return null;
+    
+    // Define optimal thresholds
+    const optimalDays = allData.filter(d => 
+      (d.energy || 0) >= 7 && 
+      (d.confidence || 0) >= 5 && 
+      (!isPremium || (d.sleep || 0) >= 6)
+    );
+    
+    const suboptimalDays = allData.length - optimalDays.length;
+    const optimalPercentage = (optimalDays.length / allData.length * 100).toFixed(0);
+    
+    // Calculate focus performance in optimal zone
+    let focusPerformance = null;
+    if (isPremium && optimalDays.length > 0) {
+      const highFocusDays = optimalDays.filter(d => (d.focus || 0) >= 8).length;
+      const focusSuccessRate = (highFocusDays / optimalDays.length * 100).toFixed(0);
+      focusPerformance = focusSuccessRate;
+    }
+    
+    return {
+      optimalDays: optimalDays.length,
+      suboptimalDays,
+      optimalPercentage,
+      focusPerformance,
+      criteria: isPremium ? 'Energy 7+, Sleep 6+, Mood 5+' : 'Energy 7+, Mood 5+'
+    };
+  };
+
+  // NEW: Generate predictive insights
+  const generatePredictiveInsights = () => {
+    const allData = userData.benefitTracking || [];
+    if (allData.length < 5) return [];
+    
+    const insights = [];
+    const last3Days = allData.slice(-3);
+    
+    // Energy trend prediction
+    if (last3Days.length >= 2) {
+      const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
+      if (energyTrend > 0.5) {
+        insights.push("Based on your current patterns, tomorrow's energy will likely be 7-8 (improving trend)");
+      } else if (energyTrend < -0.5) {
+        insights.push("Your energy trend suggests tomorrow may be challenging - prioritize rest tonight");
+      }
+    }
+    
+    // 7-day trend analysis
+    if (allData.length >= 7) {
+      const last7Days = allData.slice(-7);
+      const energyTrend = last7Days.reduce((sum, d, i) => sum + (d.energy || 0) * (i + 1), 0) / 
+                          last7Days.reduce((sum, d, i) => sum + (i + 1), 0);
+      const overall7DayAvg = last7Days.reduce((sum, d) => sum + (d.energy || 0), 0) / 7;
+      
+      if (energyTrend > overall7DayAvg + 0.3) {
+        insights.push("Your 7-day trend suggests energy will continue improving this week");
+      }
     }
     
     return insights;
   };
 
-  // Generate pattern insights
-  const generatePatternInsights = () => {
-    const filteredData = getFilteredBenefitData();
-    const currentStreak = userData.currentStreak || 0;
-    const patterns = [];
+  // NEW: Generate performance amplification recommendations
+  const generateAmplificationRecommendations = () => {
+    const allData = userData.benefitTracking || [];
+    if (allData.length < 5) return [];
     
-    const getPhase = (streak) => {
-      if (streak <= 14) return 'initial';
-      if (streak <= 45) return 'purging'; 
-      if (streak <= 90) return 'expansion';
-      if (streak <= 180) return 'integration';
-      return 'mastery';
-    };
+    const recommendations = [];
+    const currentAvgEnergy = parseFloat(calculateAverage());
     
-    const currentPhase = getPhase(currentStreak);
-    
-    const timelinePatterns = {
-      initial: {
-        practical: "Days 1-14: Initial Adaptation phase. Strong urges are normal.",
-        esoteric: "Days 1-14: Beginning the hero's journey.",
-        actionable: "Focus on building habits."
-      },
-      purging: {
-        practical: "Days 15-45: Emotional Purging phase. Healing in progress.",
-        esoteric: "Days 15-45: Energy body adapting.",
-        actionable: "Trust the process."
-      },
-      expansion: {
-        practical: "Days 46-90: Mental Expansion phase. Abilities emerging.",
-        esoteric: "Days 46-90: Alchemical refinement.",
-        actionable: "Use enhanced focus."
-      },
-      integration: {
-        practical: "Days 91-180: Spiritual Integration phase. Deep transformation.",
-        esoteric: "Days 91-180: Major consciousness expansion.",
-        actionable: "Handle responsibility wisely."
-      },
-      mastery: {
-        practical: "180+ Days: Mastery & Service phase. Complete integration.",
-        esoteric: "180+ Days: Serving universal consciousness.",
-        actionable: "Focus on legacy creation."
+    // High energy day recommendations
+    if (currentAvgEnergy >= 7) {
+      recommendations.push("High energy detected: Perfect time to increase workout intensity +20%");
+      if (isPremium) {
+        recommendations.push("Your peak performance window: Take on challenging mental tasks now");
       }
-    };
-    
-    const currentPattern = timelinePatterns[currentPhase];
-    if (currentPattern) {
-      patterns.push({
-        id: 1,
-        practical: currentPattern.practical,
-        esoteric: currentPattern.esoteric,
-        actionable: currentPattern.actionable,
-        isTimeline: true
-      });
     }
     
-    return patterns;
+    // Low mood period recommendations
+    const recentMood = allData.slice(-3).reduce((sum, d) => sum + (d.confidence || 0), 0) / 3;
+    if (recentMood < 5) {
+      recommendations.push("Low mood period detected: Prioritize sleep optimization and gentle exercise");
+    }
+    
+    // Decision-making optimal times
+    if (isPremium && allData.length >= 7) {
+      const highConfidenceDays = allData.filter(d => (d.confidence || 0) >= 7);
+      if (highConfidenceDays.length > 0) {
+        recommendations.push("Your best decisions happen when confidence = 7+ - save important choices for these periods");
+      }
+    }
+    
+    return recommendations;
   };
+
+  // NEW: Info banner logic
+  const shouldShowInfoBanner = () => {
+    const benefitData = getFilteredBenefitData();
+    const hasMinimalData = benefitData.length < 7;
+    const currentStreak = userData.currentStreak || 0;
+    const isNewUser = currentStreak <= 3;
+    
+    return hasMinimalData || isNewUser;
+  };
+
+  const riskAnalysis = calculateRelapseRisk();
+  const correlations = calculateCorrelations();
+  const performanceZones = calculatePerformanceZones();
+  const predictiveInsights = generatePredictiveInsights();
+  const amplificationRecs = generateAmplificationRecommendations();
   
   return (
     <div className="stats-container">
-      {/* Smart Floating Wisdom Toggle */}
-      {showFloatingToggle && isPremium && (
-        <button 
-          className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
-          onClick={() => setWisdomMode(!wisdomMode)}
-          title={wisdomMode ? "Switch to Practical Insights" : "Switch to Esoteric Insights"}
-        >
-          <FaEye className={`floating-wisdom-eye ${wisdomMode ? 'active' : ''}`} />
-        </button>
-      )}
-
       {/* Header */}
       <div className="stats-header">
         <div className="stats-header-spacer"></div>
@@ -841,15 +671,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* Benefit Tracker Section */}
+      {/* Benefit Intelligence Engine */}
       <div className="benefit-tracker-section">
-        <h3>Benefit Tracker</h3>
+        <h3>Benefit Intelligence Engine</h3>
         
-        {/* UPDATED: Info Banner with icon - positioned under header */}
         {shouldShowInfoBanner() && (
           <div className="stats-info-banner">
             <FaInfoCircle className="info-icon" />
-            <span><strong>Just getting started?</strong> Your insights will become more detailed as you log daily benefits and track your progress over time.</span>
+            <span><strong>Building your intelligence profile...</strong> Your insights will become more detailed as you log daily benefits and track your progress over time.</span>
           </div>
         )}
         
@@ -901,7 +730,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          {/* UPDATED: Only show time range selector for premium users */}
           {isPremium && (
             <div className="time-range-selector-container">
               <div className="time-range-selector">
@@ -933,19 +761,34 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           <div className="free-benefit-preview">
             <div className="free-average-display">
               <div className="current-metric-average">
-                <div className="current-metric-label">Energy Level (last 7 days)</div>
+                <div className="current-metric-label">Your Energy Level (last 7 days)</div>
                 <div className="current-metric-value">{calculateAverage()}/10</div>
               </div>
             </div>
             
-            <div className="free-insight-preview">
-              <div className="current-insight-card">
-                <div className="current-insight-header">
-                  <FaRegLightbulb className="insight-icon" />
-                  <span>Energy Insights</span>
+            <div className="intelligence-preview-grid">
+              <div className="intelligence-preview-card">
+                <div className="intelligence-preview-header">
+                  <FaShieldAlt className="intelligence-icon" />
+                  <span>Relapse Risk Analysis</span>
                 </div>
-                <div className="current-insight-text">
-                  {getCurrentInsight()}
+                <div className="intelligence-preview-content">
+                  <div className="risk-score-preview">{riskAnalysis.level} Risk</div>
+                  <div className="intelligence-preview-text">
+                    Basic risk assessment available. Upgrade for detailed analysis with specific factors and mitigation strategies.
+                  </div>
+                </div>
+              </div>
+              
+              <div className="intelligence-preview-card">
+                <div className="intelligence-preview-header">
+                  <FaBolt className="intelligence-icon" />
+                  <span>Performance Insights</span>
+                </div>
+                <div className="intelligence-preview-content">
+                  <div className="intelligence-preview-text">
+                    Advanced correlations, optimization zones, and predictive analytics available with Premium upgrade.
+                  </div>
                 </div>
               </div>
             </div>
@@ -954,23 +797,23 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <div className="upgrade-helmet-section">
                 <img 
                   src={helmetImage} 
-                  alt="Premium Benefits" 
+                  alt="Premium Intelligence" 
                   className="upgrade-helmet-icon"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     e.target.nextSibling.style.display = 'block';
                   }}
                 />
-                <div className="upgrade-helmet-fallback" style={{display: 'none'}}>⚡</div>
+                <div className="upgrade-helmet-fallback" style={{display: 'none'}}>🧠</div>
               </div>
               
               <div className="upgrade-text-section">
-                <h4>Unlock Full Benefit Analysis</h4>
-                <p>Get detailed charts, advanced insights, pattern analysis, and personalized recommendations to optimize your journey.</p>
+                <h4>Unlock Full Intelligence Engine</h4>
+                <p>Get advanced risk prediction, benefit correlations, performance optimization zones, and personalized amplification strategies.</p>
                 
                 <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
                   <FaStar />
-                  Upgrade to Premium
+                  Upgrade to Premium Intelligence
                 </button>
               </div>
             </div>
@@ -987,101 +830,192 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               
               <div className="current-insight-sidebar">
                 <div className="current-metric-average">
-                  <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
+                  <div className="current-metric-label">Your {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
                   <div className="current-metric-value">{calculateAverage()}/10</div>
                 </div>
                 
                 <div className="current-insight-card">
                   <div className="current-insight-header">
-                    <FaRegLightbulb className="insight-icon" />
-                    <span>Current Insights</span>
+                    <FaTarget className="insight-icon" />
+                    <span>Current Status</span>
                   </div>
                   <div className="current-insight-text">
-                    {getCurrentInsight()}
+                    Your {selectedMetric} is tracking at {calculateAverage()}/10. 
+                    {parseFloat(calculateAverage()) >= 7 ? 
+                      " Excellent performance - maintain current strategies." : 
+                      " Room for optimization - check intelligence insights below."}
                   </div>
                 </div>
               </div>
             </div>
             
+            {/* Intelligence Analysis Section */}
             <div className="detailed-analysis-section">
               <div className="detailed-analysis-header">
-                <div className="detailed-analysis-title">
-                  <h4>Benefit Insights</h4>
-                </div>
-                <div className="benefit-phase-indicator" style={{ '--phase-color': getCurrentPhaseData(userData.currentStreak || 0).color }}>
-                  <div className="benefit-phase-content">
-                    {getCurrentPhaseData(userData.currentStreak || 0).icon({ className: "benefit-phase-icon" })}
-                    <div className="benefit-phase-text">
-                      <div className="benefit-phase-name">{getCurrentPhaseData(userData.currentStreak || 0).name}</div>
-                      <div className="benefit-phase-day">Day {userData.currentStreak || 0}</div>
+                <h4>Intelligence Analysis</h4>
+              </div>
+              
+              {/* Relapse Risk Predictor */}
+              <div className="intelligence-section">
+                <h5>
+                  <FaShieldAlt className="section-icon" />
+                  Relapse Risk Predictor
+                </h5>
+                <div className="risk-analysis-card">
+                  <div className="risk-score-display">
+                    <div className={`risk-score ${riskAnalysis.level.toLowerCase()}`}>
+                      {riskAnalysis.score}%
                     </div>
+                    <div className="risk-level">{riskAnalysis.level} Risk</div>
                   </div>
+                  <div className="risk-factors">
+                    <div className="risk-factors-label">Risk Factors:</div>
+                    <ul className="risk-factors-list">
+                      {riskAnalysis.factors.map((factor, index) => (
+                        <li key={index}>{factor}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  {riskAnalysis.level !== 'Low' && (
+                    <div className="risk-mitigation">
+                      <strong>Immediate Actions:</strong> Increase exercise, improve sleep schedule, limit social media, reach out to support network.
+                    </div>
+                  )}
                 </div>
               </div>
               
-              <div className="streak-comparison">
-                <h5><span className="metric-highlight">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</span> Levels by Streak Length</h5>
-                
+              {/* Benefit Correlation Matrix */}
+              {correlations.length > 0 && (
+                <div className="intelligence-section">
+                  <h5>
+                    <FaChartLine className="section-icon" />
+                    Your Benefit Correlations
+                  </h5>
+                  <div className="correlation-cards">
+                    {correlations.map((correlation, index) => (
+                      <div key={index} className="correlation-card">
+                        <FaBolt className="correlation-icon" />
+                        <div className="correlation-text">{correlation}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Performance Zones */}
+              {performanceZones && (
+                <div className="intelligence-section">
+                  <h5>
+                    <FaTarget className="section-icon" />
+                    Your Performance Zones
+                  </h5>
+                  <div className="performance-zones-card">
+                    <div className="zone-definition">
+                      <strong>Your Peak Performance Zone:</strong> {performanceZones.criteria}
+                    </div>
+                    <div className="zone-stats">
+                      <div className="zone-stat">
+                        <div className="zone-stat-value">{performanceZones.optimalPercentage}%</div>
+                        <div className="zone-stat-label">Days in optimal zone</div>
+                      </div>
+                      {performanceZones.focusPerformance && (
+                        <div className="zone-stat">
+                          <div className="zone-stat-value">{performanceZones.focusPerformance}%</div>
+                          <div className="zone-stat-label">High focus achievement rate in this zone</div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="zone-breakdown">
+                      <div className="zone-breakdown-item optimal">
+                        <div className="zone-breakdown-count">{performanceZones.optimalDays}</div>
+                        <div className="zone-breakdown-label">Optimal Days</div>
+                      </div>
+                      <div className="zone-breakdown-item suboptimal">
+                        <div className="zone-breakdown-count">{performanceZones.suboptimalDays}</div>
+                        <div className="zone-breakdown-label">Suboptimal Days</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Predictive Insights */}
+              {predictiveInsights.length > 0 && (
+                <div className="intelligence-section">
+                  <h5>
+                    <FaRegLightbulb className="section-icon" />
+                    Predictive Insights
+                  </h5>
+                  <div className="predictive-cards">
+                    {predictiveInsights.map((insight, index) => (
+                      <div key={index} className="predictive-card">
+                        <FaEye className="predictive-icon" />
+                        <div className="predictive-text">{insight}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Performance Amplification */}
+              {amplificationRecs.length > 0 && (
+                <div className="intelligence-section">
+                  <h5>
+                    <FaBolt className="section-icon" />
+                    Performance Amplification
+                  </h5>
+                  <div className="amplification-cards">
+                    {amplificationRecs.map((rec, index) => (
+                      <div key={index} className="amplification-card">
+                        <FaTrophy className="amplification-icon" />
+                        <div className="amplification-text">{rec}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Historical Comparison */}
+              <div className="intelligence-section">
+                <h5>
+                  <FaChartLine className="section-icon" />
+                  Historical Comparison
+                </h5>
                 <div className="comparison-grid">
                   <div className="comparison-card">
-                    <div className="comparison-value">{streakComparison[selectedMetric].short}/10</div>
-                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 1-7 day streaks</div>
+                    <div className="comparison-value">
+                      {(() => {
+                        const filteredData = getFilteredBenefitData();
+                        if (filteredData.length === 0) return '5.0';
+                        const shortTermData = filteredData.filter(item => {
+                          const itemDate = new Date(item.date);
+                          const sevenDaysAgo = subDays(new Date(), 7);
+                          return itemDate >= sevenDaysAgo;
+                        });
+                        if (shortTermData.length === 0) return '5.0';
+                        const avg = shortTermData.reduce((sum, item) => sum + (item[selectedMetric] || 5), 0) / shortTermData.length;
+                        return avg.toFixed(1);
+                      })()}/10
+                    </div>
+                    <div className="comparison-label">Your {selectedMetric} during short streaks (1-7 days)</div>
                   </div>
                   
                   <div className="comparison-card">
-                    <div className="comparison-value">{streakComparison[selectedMetric].medium}/10</div>
-                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 8-30 day streaks</div>
+                    <div className="comparison-value">{calculateAverage()}/10</div>
+                    <div className="comparison-label">Your current {selectedMetric} average</div>
                   </div>
                   
                   <div className="comparison-card">
-                    <div className="comparison-value">{streakComparison[selectedMetric].long}/10</div>
-                    <div className="comparison-label">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} during 30+ day streaks</div>
+                    <div className="comparison-value">
+                      {(() => {
+                        const baseValue = parseFloat(calculateAverage());
+                        const longTermProjection = Math.min(10, baseValue + 2.0);
+                        return longTermProjection.toFixed(1);
+                      })()}/10
+                    </div>
+                    <div className="comparison-label">Projected {selectedMetric} with longer streaks (30+ days)</div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="personalized-analysis">
-                <h5>Personalized Analysis</h5>
-                
-                <div className="insights-grid">
-                  {generateAllInsights().map(insight => (
-                    <div 
-                      key={insight.id} 
-                      className={`insight-card ${insight.metric === selectedMetric ? 'highlighted' : ''} ${insight.isPhaseSpecific ? 'phase-specific' : ''} ${insight.isChallenge ? 'challenge-warning' : ''}`}
-                    >
-                      <div className="insight-card-header">
-                        <FaRegLightbulb className="insight-icon" />
-                        <span className="insight-metric">{insight.metric === 'sleep' ? 'Sleep Quality' : insight.metric === 'challenge' ? 'Current Phase' : insight.metric.charAt(0).toUpperCase() + insight.metric.slice(1)}</span>
-                      </div>
-                      <div className="insight-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            <div className="pattern-analysis-section" ref={patternSectionRef}>
-              <div className="pattern-analysis-header">
-                <h3>Journey Guidance</h3>
-              </div>
-              
-              <div className="pattern-insights">
-                {generatePatternInsights().length > 0 ? (
-                  generatePatternInsights().map(insight => (
-                    <div key={insight.id} className={`pattern-insight-item ${insight.isTimeline ? 'timeline' : ''} ${insight.isWarning ? 'warning' : ''}`}>
-                      <div className="pattern-text">{wisdomMode ? insight.esoteric : insight.practical}</div>
-                      <div className="pattern-actionable">{insight.actionable}</div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="no-patterns">
-                    <FaInfoCircle className="no-patterns-icon" />
-                    <span>{wisdomMode ? 
-                      "Track more cycles to discover the deeper rhythms and cosmic patterns governing your journey." :
-                      "Track more cycles to identify behavioral patterns and optimize your approach."
-                    }</span>
-                  </div>
-                )}
               </div>
             </div>
           </>
