@@ -406,11 +406,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       }
     }
     
-    // Low mood/confidence with educational context
-    const avgMood = last3Days.reduce((sum, day) => sum + (day.confidence || 5), 0) / last3Days.length;
-    if (avgMood < 4) {
+    // Low confidence (not mood)
+    const avgConfidence = last3Days.reduce((sum, day) => sum + (day.confidence || 5), 0) / last3Days.length;
+    if (avgConfidence < 4) {
       riskScore += 20;
-      riskFactors.push(`Confidence averaging ${avgMood.toFixed(1)}/10 - emotional instability increases vulnerability to relapse`);
+      riskFactors.push(`Confidence averaging ${avgConfidence.toFixed(1)}/10 - emotional instability increases vulnerability to relapse`);
     }
     
     // Poor sleep quality with educational context
@@ -476,22 +476,22 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       }
     }
     
-    // Sleep-mood correlation with circadian optimization insights
+    // Sleep-confidence correlation with circadian optimization insights
     if (isPremium && allData.length > 5) {
       const poorSleepDays = allData.filter(d => (d.sleep || 5) < 5);
-      const nextDayMood = poorSleepDays.map(d => {
+      const nextDayConfidence = poorSleepDays.map(d => {
         const dayAfter = allData.find(next => {
           const dayAfterDate = new Date(d.date);
           dayAfterDate.setDate(dayAfterDate.getDate() + 1);
           return next.date === dayAfterDate.toISOString().split('T')[0];
         });
         return dayAfter ? (dayAfter.confidence || 5) : null;
-      }).filter(mood => mood !== null);
+      }).filter(confidence => confidence !== null);
       
-      if (nextDayMood.length > 0) {
-        const lowMoodChance = (nextDayMood.filter(mood => mood < 5).length / nextDayMood.length * 100).toFixed(0);
-        if (lowMoodChance > 50) {
-          correlations.push(`Sleep quality <5 creates ${lowMoodChance}% chance of low mood next day. Sleep architecture optimization through circadian rhythm alignment significantly improves retention success rates`);
+      if (nextDayConfidence.length > 0) {
+        const lowConfidenceChance = (nextDayConfidence.filter(confidence => confidence < 5).length / nextDayConfidence.length * 100).toFixed(0);
+        if (lowConfidenceChance > 50) {
+          correlations.push(`Sleep quality <5 creates ${lowConfidenceChance}% chance of low confidence next day. Sleep architecture optimization through circadian rhythm alignment significantly improves retention success rates`);
         }
       }
     }
@@ -557,7 +557,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       
       const avgEnergySubOptimal = subOptimalData.reduce((sum, d) => sum + (d.energy || 0), 0) / subOptimalData.length;
       const avgSleepSubOptimal = isPremium ? subOptimalData.reduce((sum, d) => sum + (d.sleep || 0), 0) / subOptimalData.length : 0;
-      const avgMoodSubOptimal = subOptimalData.reduce((sum, d) => sum + (d.confidence || 0), 0) / subOptimalData.length;
+      const avgConfidenceSubOptimal = subOptimalData.reduce((sum, d) => sum + (d.confidence || 0), 0) / subOptimalData.length;
       
       // Educational recommendations based on retention principles
       if (avgEnergySubOptimal < 6) {
@@ -571,8 +571,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         return "Optimize sleep for retention benefits";
       }
       
-      if (avgMoodSubOptimal < 4) {
-        return "Build emotional resilience";
+      if (avgConfidenceSubOptimal < 4) {
+        return "Build emotional resilience and confidence";
       }
       
       return "Multiple areas need optimization";
@@ -584,7 +584,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       optimalPercentage,
       focusPerformance,
       improvementArea: getImprovementArea(),
-      criteria: isPremium ? 'Energy 7+, Sleep 6+, Mood 5+' : 'Energy 7+, Mood 5+'
+      criteria: isPremium ? 'Energy 7+, Sleep 6+, Confidence 5+' : 'Energy 7+, Confidence 5+'
     };
   };
 
