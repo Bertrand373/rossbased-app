@@ -715,6 +715,29 @@
   flex-shrink: 0;
 }
 
+/* NEW: Intelligence info banner - EXACT COPY of stats-info-banner */
+.intelligence-info-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
+  line-height: 1.4;
+}
+
+.intelligence-info-banner .info-icon {
+  font-size: 1rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
 .intelligence-card-content {
   display: flex;
   flex-direction: column;
@@ -752,6 +775,11 @@
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+.risk-level-indicator.insufficient {
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
 .risk-score {
   font-size: 2rem;
   font-weight: 700;
@@ -768,6 +796,10 @@
 
 .risk-score.high {
   color: #ef4444;
+}
+
+.risk-score.insufficient {
+  color: var(--text-secondary);
 }
 
 .risk-level-text {
@@ -846,18 +878,24 @@
   color: var(--text-secondary);
 }
 
-.performance-metrics {
+/* NEW: Simplified performance metrics - 3 cards in a row */
+.performance-metrics-simplified {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-md);
 }
 
-.performance-metric {
+.performance-metric-card {
   background-color: rgba(255, 255, 255, 0.02);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  justify-content: center;
+  min-height: 120px;
 }
 
 .performance-metric-value {
@@ -869,8 +907,16 @@
 
 .performance-metric-label {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--text);
+  font-weight: 600;
   line-height: 1.3;
+}
+
+.performance-metric-context {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+  margin-top: var(--spacing-xs);
 }
 
 /* REDESIGNED: Predictive insights display */
@@ -1317,8 +1363,8 @@
     grid-template-columns: repeat(3, 1fr);
   }
   
-  .performance-metrics {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  .performance-metrics-simplified {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -1515,11 +1561,11 @@
     font-size: 1.25rem;
   }
   
-  .performance-metrics {
+  .performance-metrics-simplified {
     grid-template-columns: 1fr;
   }
   
-  .performance-metric {
+  .performance-metric-card {
     padding: var(--spacing-md);
   }
   
@@ -1532,6 +1578,12 @@
     flex-direction: column;
     gap: var(--spacing-xs);
     text-align: center;
+  }
+  
+  /* NEW: Mobile info banner adjustments */
+  .intelligence-info-banner {
+    font-size: 0.8rem;
+    padding: var(--spacing-sm);
   }
   
   .form-actions {
@@ -1665,11 +1717,17 @@
     font-size: 1.125rem;
   }
   
-  .performance-metric {
+  .performance-metric-card {
     padding: var(--spacing-sm);
   }
   
   .performance-metric-value {
     font-size: 1.125rem;
+  }
+  
+  /* NEW: Very small screen info banner adjustments */
+  .intelligence-info-banner {
+    font-size: 0.75rem;
+    padding: var(--spacing-sm);
   }
 }

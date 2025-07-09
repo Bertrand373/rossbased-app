@@ -972,12 +972,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 <div className="intelligence-card-header">
                   <FaShieldAlt className="intelligence-card-icon" />
                   <span>Relapse Risk Predictor</span>
-                  <div className="info-tooltip-container">
-                    <FaInfoCircle className="info-tooltip-icon" />
-                    <div className="info-tooltip">
-                      Analyzes your recent benefit trends to predict vulnerability periods. Based on energy, mood, and focus patterns from your last 3-14 days of tracking.
-                    </div>
-                  </div>
+                </div>
+                <div className="intelligence-info-banner">
+                  <FaInfoCircle className="info-icon" />
+                  <span>Analyzes your recent benefit trends to predict vulnerability periods. Based on energy, mood, and focus patterns from your last 3-14 days of tracking.</span>
                 </div>
                 <div className="intelligence-card-content">
                   <div className="risk-predictor-display">
@@ -1041,12 +1039,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   <div className="intelligence-card-header">
                     <FaChartLine className="intelligence-card-icon" />
                     <span>Your Benefit Correlations</span>
-                    <div className="info-tooltip-container">
-                      <FaInfoCircle className="info-tooltip-icon" />
-                      <div className="info-tooltip">
-                        Identifies patterns between your different benefit metrics. For example, how high energy days affect your focus levels.
-                      </div>
-                    </div>
+                  </div>
+                  <div className="intelligence-info-banner">
+                    <FaInfoCircle className="info-icon" />
+                    <span>Identifies patterns between your different benefit metrics. For example, how high energy days affect your focus levels.</span>
                   </div>
                   <div className="intelligence-card-content">
                     <div className="correlations-display">
@@ -1078,12 +1074,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   <div className="intelligence-card-header">
                     <FaBullseye className="intelligence-card-icon" />
                     <span>Your Performance Zones</span>
-                    <div className="info-tooltip-container">
-                      <FaInfoCircle className="info-tooltip-icon" />
-                      <div className="info-tooltip">
-                        Shows your peak performance rate based on Energy 7+, Sleep 6+, Mood 5+ criteria. Calculated from days where you logged benefits.
-                      </div>
-                    </div>
+                  </div>
+                  <div className="intelligence-info-banner">
+                    <FaInfoCircle className="info-icon" />
+                    <span>Shows your peak performance rate based on Energy 7+, Sleep 6+, Mood 5+ criteria. Calculated from days where you logged benefits.</span>
                   </div>
                   <div className="intelligence-card-content">
                     <div className="performance-zones-display">
