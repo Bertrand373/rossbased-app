@@ -45,6 +45,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setSelectedMetric(metric);
   };
 
+  // Helper function to convert markdown-style **text** to HTML bold
+  const renderTextWithBold = (text) => {
+    if (!text) return { __html: text };
+    const htmlText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return { __html: htmlText };
+  };
+
   // CORE: Badge checking logic - automatically unlocks badges when milestones are reached
   const checkAndUpdateBadges = (userData) => {
     if (!userData.badges || !Array.isArray(userData.badges)) {
@@ -403,7 +410,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       if (energyTrend < -1) {
         riskScore += 25;
         const drop = Math.abs(energyTrend).toFixed(1);
-        riskFactors.push(`Energy declined **${drop} points** over 3 days. This often indicates adrenal fatigue from energy transmutation stress.`);
+        riskFactors.push(`Energy declined ${drop} points over 3 days. This often indicates adrenal fatigue from energy transmutation stress.`);
       }
     }
     
@@ -411,7 +418,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const avgConfidence = last3Days.reduce((sum, day) => sum + (day.confidence || 5), 0) / last3Days.length;
     if (avgConfidence < 4) {
       riskScore += 20;
-      riskFactors.push(`Confidence averaging **${avgConfidence.toFixed(1)}/10**. Emotional instability increases vulnerability to relapse episodes.`);
+      riskFactors.push(`Confidence averaging ${avgConfidence.toFixed(1)}/10. Emotional instability increases vulnerability to relapse episodes.`);
     }
     
     // Poor sleep quality with educational context
@@ -419,7 +426,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const avgSleep = last3Days.reduce((sum, day) => sum + (day.sleep || 5), 0) / last3Days.length;
       if (avgSleep < 5) {
         riskScore += 15;
-        riskFactors.push(`Sleep quality **${avgSleep.toFixed(1)}/10**. Poor circadian rhythm disrupts hormone balance and willpower.`);
+        riskFactors.push(`Sleep quality ${avgSleep.toFixed(1)}/10. Poor circadian rhythm disrupts hormone balance and willpower.`);
       }
     }
     
@@ -428,14 +435,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const avgFocus = last3Days.reduce((sum, day) => sum + (day.focus || 5), 0) / last3Days.length;
       if (avgFocus < 4) {
         riskScore += 20;
-        riskFactors.push(`Focus averaging **${avgFocus.toFixed(1)}/10**. Mental clarity decline often precedes relapse episodes.`);
+        riskFactors.push(`Focus averaging ${avgFocus.toFixed(1)}/10. Mental clarity decline often precedes relapse episodes.`);
       }
     }
     
     // Spermatogenesis cycle insights
     if (currentStreak >= 60 && currentStreak <= 74) {
       riskScore += 15;
-      riskFactors.push(`Day **${currentStreak}** - approaching spermatogenesis completion (**67-74 days**). Biological transition period increases urge intensity.`);
+      riskFactors.push(`Day ${currentStreak} - approaching spermatogenesis completion (67-74 days). Biological transition period increases urge intensity.`);
     }
     
     // Weekend vulnerability with educational context
@@ -473,7 +480,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const improvement = ((avgFocusWhenEnergyHigh - overallAvgFocus) / overallAvgFocus * 100).toFixed(0);
       
       if (improvement > 5) {
-        correlations.push(`When energy reaches **7 or higher**, focus averages **${avgFocusWhenEnergyHigh.toFixed(1)}/10** (representing a **${improvement}% improvement** above baseline). This demonstrates energy transmutation—sexual energy converting to mental clarity, explaining enhanced cognitive function through retention practice.`);
+        correlations.push(`When energy reaches 7 or higher, focus averages ${avgFocusWhenEnergyHigh.toFixed(1)}/10 (representing a ${improvement}% improvement above baseline). This demonstrates energy transmutation—sexual energy converting to mental clarity, explaining enhanced cognitive function through retention practice.`);
       }
     }
     
@@ -492,7 +499,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       if (nextDayConfidence.length > 0) {
         const lowConfidenceChance = (nextDayConfidence.filter(confidence => confidence < 5).length / nextDayConfidence.length * 100).toFixed(0);
         if (lowConfidenceChance > 50) {
-          correlations.push(`Sleep quality below **5/10** creates a **${lowConfidenceChance}% probability** of low confidence the following day. Sleep architecture optimization through circadian rhythm alignment significantly improves retention success rates.`);
+          correlations.push(`Sleep quality below 5/10 creates a ${lowConfidenceChance}% probability of low confidence the following day. Sleep architecture optimization through circadian rhythm alignment significantly improves retention success rates.`);
         }
       }
     }
@@ -513,7 +520,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         
         const improvement = ((avgEnergyPost74 - avgEnergyPre74) / avgEnergyPre74 * 100).toFixed(0);
         if (improvement > 10) {
-          correlations.push(`Post-spermatogenesis phase (**74+ days**): Energy averages **${avgEnergyPost74.toFixed(1)}/10** (representing a **${improvement}% improvement** versus pre-74 day levels). Your body has completed the biological transition from reproduction to cellular optimization mode.`);
+          correlations.push(`Post-spermatogenesis phase (74+ days): Energy averages ${avgEnergyPost74.toFixed(1)}/10 (representing a ${improvement}% improvement versus pre-74 day levels). Your body has completed the biological transition from reproduction to cellular optimization mode.`);
         }
       }
     }
@@ -602,17 +609,17 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     if (last3Days.length >= 2) {
       const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
       if (energyTrend > 0.5) {
-        insights.push(`Based on your **+${energyTrend.toFixed(1)}** energy trend, tomorrow's energy is predicted at **7-8/10**. Energy improvements during retention reflect successful transmutation of sexual energy into life force.`);
+        insights.push(`Based on your +${energyTrend.toFixed(1)} energy trend, tomorrow's energy is predicted at 7-8/10. Energy improvements during retention reflect successful transmutation of sexual energy into life force.`);
       } else if (energyTrend < -0.5) {
-        insights.push(`Your energy declined **${Math.abs(energyTrend).toFixed(1)} points** over 3 days. Energy fluctuations are normal as your body redirects sexual energy toward higher functions. Prioritize rest and hydration for energy restoration.`);
+        insights.push(`Your energy declined ${Math.abs(energyTrend).toFixed(1)} points over 3 days. Energy fluctuations are normal as your body redirects sexual energy toward higher functions. Prioritize rest and hydration for energy restoration.`);
       }
     }
     
     // Spermatogenesis cycle predictions
     if (currentStreak >= 60 && currentStreak <= 67) {
-      insights.push(`Day **${currentStreak}**: Approaching spermatogenesis completion (**67-74 days**). Expect significant energy shifts as your body transitions from sperm production to nutrient reabsorption mode for cellular repair.`);
+      insights.push(`Day ${currentStreak}: Approaching spermatogenesis completion (67-74 days). Expect significant energy shifts as your body transitions from sperm production to nutrient reabsorption mode for cellular repair.`);
     } else if (currentStreak >= 74) {
-      insights.push(`Day **${currentStreak}**: Post-spermatogenesis phase active. Your body has completed the biological transition from reproduction to self-enhancement, explaining your sustained energy improvements.`);
+      insights.push(`Day ${currentStreak}: Post-spermatogenesis phase active. Your body has completed the biological transition from reproduction to self-enhancement, explaining your sustained energy improvements.`);
     }
     
     // 7-day trend analysis with educational context
@@ -641,7 +648,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     // High energy period recommendations with educational context
     if (currentAvgEnergy >= 7) {
-      recommendations.push(`Energy at **${currentAvgEnergy}/10** enables optimal physical training. Research shows **85% higher testosterone** when exercising during peak energy windows. Consider increasing workout intensity by **20%**.`);
+      recommendations.push(`Energy at ${currentAvgEnergy}/10 enables optimal physical training. Research shows 85% higher testosterone when exercising during peak energy windows. Consider increasing workout intensity by 20%.`);
       
       if (isPremium) {
         recommendations.push("Your peak performance window is active. Take on challenging mental tasks now—high energy states maximize cognitive function through enhanced brain blood flow.");
@@ -664,7 +671,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const highConfidenceDays = allData.filter(d => (d.confidence || 0) >= 7);
       if (highConfidenceDays.length > 0) {
         const avgEnergyHighConfidence = highConfidenceDays.reduce((sum, d) => sum + (d.energy || 0), 0) / highConfidenceDays.length;
-        recommendations.push(`Your best decisions occur when confidence reaches **7 or higher** (average energy **${avgEnergyHighConfidence.toFixed(1)}/10**). Save important choices for these periods—retention enhances decision-making through improved prefrontal cortex function.`);
+        recommendations.push(`Your best decisions occur when confidence reaches 7 or higher (average energy ${avgEnergyHighConfidence.toFixed(1)}/10). Save important choices for these periods—retention enhances decision-making through improved prefrontal cortex function.`);
       }
     }
     
@@ -998,7 +1005,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                         {riskAnalysis.score === 'N/A' ? 'Data Requirements:' : 'Risk Factors:'}
                       </div>
                       {riskAnalysis.factors.map((factor, index) => (
-                        <div key={index} className="risk-factor-item">• {factor}</div>
+                        <div key={index} className="risk-factor-item" dangerouslySetInnerHTML={renderTextWithBold(factor)}></div>
                       ))}
                       {riskAnalysis.level !== 'Low' && riskAnalysis.score !== 'N/A' && (
                         <div style={{ 
@@ -1043,7 +1050,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   <div className="intelligence-card-content">
                     <div className="correlations-display">
                       {correlations.map((correlation, index) => (
-                        <div key={index} className="correlation-item">{correlation}</div>
+                        <div key={index} className="correlation-item" dangerouslySetInnerHTML={renderTextWithBold(correlation)}></div>
                       ))}
                     </div>
                     {/* Data Quality Indicator */}
@@ -1127,7 +1134,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   <div className="intelligence-card-content">
                     <div className="predictive-insights-display">
                       {predictiveInsights.map((insight, index) => (
-                        <div key={index} className="predictive-insight-item">{insight}</div>
+                        <div key={index} className="predictive-insight-item" dangerouslySetInnerHTML={renderTextWithBold(insight)}></div>
                       ))}
                     </div>
                     {/* Data Quality Indicator */}
@@ -1157,7 +1164,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   <div className="intelligence-card-content">
                     <div className="amplification-display">
                       {amplificationRecs.map((rec, index) => (
-                        <div key={index} className="amplification-item">{rec}</div>
+                        <div key={index} className="amplification-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></div>
                       ))}
                     </div>
                     {/* Data Quality Indicator */}
