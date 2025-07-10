@@ -4,7 +4,7 @@ import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaShieldAlt, FaChartLine, FaBolt, FaBullseye } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -53,6 +53,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
     const currentStreak = userData.currentStreak || 0;
     const longestStreak = userData.longestStreak || 0;
+    const maxStreak = Math.max(currentStreak, longestStreak); // FIXED: Use max for badge checking
     let hasNewBadges = false;
     
     const badgeThresholds = [
@@ -68,7 +69,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const threshold = badgeThresholds.find(t => t.name === badge.name);
       if (!threshold) return badge;
 
-      const shouldBeEarned = currentStreak >= threshold.days || longestStreak >= threshold.days;
+      const shouldBeEarned = maxStreak >= threshold.days; // FIXED: Use maxStreak
       
       if (!badge.earned && shouldBeEarned) {
         hasNewBadges = true;
@@ -880,7 +881,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             <div className="intelligence-preview-grid">
               <div className="current-insight-card">
                 <div className="current-insight-header">
-                  <FaShieldAlt className="insight-icon" />
                   <span>Relapse Risk Analysis</span>
                 </div>
                 <div className="current-insight-text">
@@ -896,7 +896,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               
               <div className="current-insight-card">
                 <div className="current-insight-header">
-                  <FaBolt className="insight-icon" />
                   <span>Performance Insights</span>
                 </div>
                 <div className="current-insight-text">
@@ -948,7 +947,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 
                 <div className="current-insight-card">
                   <div className="current-insight-header">
-                    <FaBullseye className="insight-icon" />
                     <span>Current Status</span>
                   </div>
                   <div className="current-insight-text">
@@ -970,7 +968,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {/* Relapse Risk Predictor */}
               <div className="intelligence-analysis-card">
                 <div className="intelligence-card-header">
-                  <FaShieldAlt className="intelligence-card-icon" />
                   <span>Relapse Risk Predictor</span>
                 </div>
                 <div className="intelligence-info-banner">
@@ -1037,7 +1034,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {correlations.length > 0 && (
                 <div className="intelligence-analysis-card">
                   <div className="intelligence-card-header">
-                    <FaChartLine className="intelligence-card-icon" />
                     <span>Your Benefit Correlations</span>
                   </div>
                   <div className="intelligence-info-banner">
@@ -1072,7 +1068,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {performanceZones && (
                 <div className="intelligence-analysis-card">
                   <div className="intelligence-card-header">
-                    <FaBullseye className="intelligence-card-icon" />
                     <span>Your Performance Zones</span>
                   </div>
                   <div className="intelligence-info-banner">
@@ -1127,7 +1122,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {predictiveInsights.length > 0 && (
                 <div className="intelligence-analysis-card">
                   <div className="intelligence-card-header">
-                    <FaEye className="intelligence-card-icon" />
                     <span>Predictive Insights</span>
                   </div>
                   <div className="intelligence-card-content">
@@ -1158,7 +1152,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {amplificationRecs.length > 0 && (
                 <div className="intelligence-analysis-card">
                   <div className="intelligence-card-header">
-                    <FaBolt className="intelligence-card-icon" />
                     <span>Performance Amplification</span>
                   </div>
                   <div className="intelligence-card-content">
@@ -1188,7 +1181,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {/* Historical Comparison */}
               <div className="historical-comparison-section">
                 <div className="historical-comparison-header">
-                  <FaChartLine className="intelligence-card-icon" />
                   <span>{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Historical Comparison</span>
                 </div>
                 <div className="historical-comparison-grid">
