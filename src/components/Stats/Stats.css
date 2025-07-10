@@ -955,7 +955,7 @@
   text-align: center;
 }
 
-/* NEW: Intelligence data status indicator - EXACT COPY from EmotionalTimeline */
+/* FIXED: Intelligence data status indicator - ALL YELLOW LIKE EMOTIONAL TIMELINE */
 .intelligence-data-status {
   margin-top: var(--spacing-md);
   padding-top: var(--spacing-md);
@@ -981,6 +981,7 @@
   gap: var(--spacing-xs);
 }
 
+/* FIXED: All data quality indicators now use yellow styling like emotional timeline */
 .intelligence-data-quality.minimal {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
   border: 1px solid rgba(255, 221, 0, 0.2);
@@ -988,15 +989,15 @@
 }
 
 .intelligence-data-quality.good {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  color: #f59e0b;
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
 }
 
 .intelligence-data-quality.rich {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  color: #10b981;
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
 }
 
 .intelligence-data-quality.insufficient {

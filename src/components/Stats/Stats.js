@@ -13,6 +13,24 @@ import SmartResetDialog from './SmartResetDialog';
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
+// FIXED: Helper function to convert markdown-style bold text to HTML
+const formatTextWithBold = (text) => {
+  if (!text || typeof text !== 'string') return text;
+  
+  // Replace **text** with <strong>text</strong>
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+};
+
+// FIXED: Component to render formatted text with bold
+const FormattedText = ({ children }) => {
+  if (!children || typeof children !== 'string') {
+    return <span>{children}</span>;
+  }
+  
+  const formattedText = formatTextWithBold(children);
+  return <span dangerouslySetInnerHTML={{ __html: formattedText }} />;
+};
+
 const Stats = ({ userData, isPremium, updateUserData }) => {
   const [selectedMetric, setSelectedMetric] = useState('energy');
   const [timeRange, setTimeRange] = useState('week');
@@ -160,609 +178,355 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             }
           ]
         };
-        toast.success('Current streak reset to 0. All history and achievements preserved.');
         break;
-
-      case 'allProgress':
+      case 'allStats':
         resetUserData = {
           ...userData,
-          startDate: today,
-          currentStreak: 0,
-          relapseCount: 0,
-          wetDreamCount: 0,
-          longestStreak: userData.longestStreak || 0,
-          streakHistory: [{
-            id: 1,
-            start: today,
-            end: null,
-            days: 0,
-            reason: 'major_reset'
-          }],
-          benefitTracking: [],
-          notes: {},
-          badges: userData.badges?.map(badge => ({
-            ...badge,
-            earned: (badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90) ||
-                   (badge.name === '180-Day Emperor' && (userData.longestStreak || 0) >= 180) ||
-                   (badge.name === '365-Day Sage' && (userData.longestStreak || 0) >= 365) ? badge.earned : false,
-            date: ((badge.name === '90-Day King' && (userData.longestStreak || 0) >= 90) ||
-                  (badge.name === '180-Day Emperor' && (userData.longestStreak || 0) >= 180) ||
-                  (badge.name === '365-Day Sage' && (userData.longestStreak || 0) >= 365)) ? badge.date : null
-          })) || [
-            { id: 1, name: '7-Day Warrior', earned: false, date: null },
-            { id: 2, name: '14-Day Monk', earned: false, date: null },
-            { id: 3, name: '30-Day Master', earned: false, date: null },
-            { id: 4, name: '90-Day King', earned: false, date: null },
-            { id: 5, name: '180-Day Emperor', earned: false, date: null },
-            { id: 6, name: '365-Day Sage', earned: false, date: null }
-          ]
-        };
-        toast.success(`All progress reset. Longest streak record (${userData.longestStreak || 0} days) preserved.`);
-        break;
-
-      case 'everything':
-        resetUserData = {
-          startDate: today,
           currentStreak: 0,
           longestStreak: 0,
-          wetDreamCount: 0,
-          relapseCount: 0,
-          badges: [
-            { id: 1, name: '7-Day Warrior', earned: false, date: null },
-            { id: 2, name: '14-Day Monk', earned: false, date: null },
-            { id: 3, name: '30-Day Master', earned: false, date: null },
-            { id: 4, name: '90-Day King', earned: false, date: null },
-            { id: 5, name: '180-Day Emperor', earned: false, date: null },
-            { id: 6, name: '365-Day Sage', earned: false, date: null }
-          ],
-          benefitTracking: [],
+          startDate: today,
           streakHistory: [{
             id: 1,
             start: today,
             end: null,
             days: 0,
-            reason: 'complete_reset'
+            reason: 'manual_reset'
           }],
+          badges: userData.badges ? userData.badges.map(badge => ({
+            ...badge,
+            earned: false,
+            date: null
+          })) : []
+        };
+        break;
+      case 'complete':
+        resetUserData = {
+          ...userData,
+          currentStreak: 0,
+          longestStreak: 0,
+          startDate: today,
+          streakHistory: [{
+            id: 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: 'manual_reset'
+          }],
+          badges: userData.badges ? userData.badges.map(badge => ({
+            ...badge,
+            earned: false,
+            date: null
+          })) : [],
+          benefitTracking: [],
+          emotionalTracking: [],
+          urgeEvents: [],
           notes: {}
         };
-        toast.success('Complete reset successful. All data has been cleared.');
         break;
-
       default:
-        toast.error('Invalid reset option selected');
+        console.error('Invalid reset level');
         return;
     }
-    
+
     updateUserData(resetUserData);
     setShowSmartResetDialog(false);
+    
+    const messages = {
+      currentStreak: 'Current streak reset successfully',
+      allStats: 'All stats and badges reset successfully',
+      complete: 'Complete data reset successfully'
+    };
+    
+    toast.success(messages[resetLevel], {
+      duration: 3000,
+      style: {
+        background: 'var(--card-background)',
+        color: 'var(--text-primary)',
+        border: '1px solid var(--border)'
+      }
+    });
   };
 
-  const handleUpgradeClick = () => {
-    toast.success('Premium upgrade coming soon! 🚀');
-  };
-
-  // Filter benefit data based on selected time range
-  const getFilteredBenefitData = () => {
-    if (!userData.benefitTracking) return [];
-    
-    const days = timeRangeOptions[timeRange];
-    const cutoffDate = subDays(new Date(), days);
-    
-    return userData.benefitTracking
-      .filter(item => new Date(item.date) >= cutoffDate)
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
-  };
-  
-  // Generate chart data
+  // Generate chart data for selected metric
   const generateChartData = () => {
-    const filteredData = getFilteredBenefitData();
+    if (!userData.benefitTracking || !Array.isArray(userData.benefitTracking)) {
+      return {
+        labels: [],
+        datasets: []
+      };
+    }
+
+    const days = timeRangeOptions[timeRange];
+    const endDate = new Date();
+    const startDate = subDays(endDate, days - 1);
     
-    const labels = filteredData.map(item => 
-      format(new Date(item.date), 'MMM d')
-    );
-    
-    const datasets = [{
-      label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
-      data: filteredData.map(item => {
-        if (selectedMetric === 'sleep') {
-          return item[selectedMetric] || item.attraction || 5;
+    // Generate date labels
+    const dateLabels = [];
+    for (let i = 0; i < days; i++) {
+      const date = subDays(endDate, days - 1 - i);
+      dateLabels.push(format(date, 'MMM d'));
+    }
+
+    // Get data for selected metric
+    const metricData = dateLabels.map(label => {
+      const date = new Date(label + ', ' + new Date().getFullYear());
+      const dayData = userData.benefitTracking.find(entry => 
+        format(new Date(entry.date), 'MMM d') === label
+      );
+      return dayData ? dayData[selectedMetric] || 0 : 0;
+    });
+
+    return {
+      labels: dateLabels,
+      datasets: [
+        {
+          label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
+          data: metricData,
+          borderColor: 'var(--primary)',
+          backgroundColor: 'rgba(255, 221, 0, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: 'var(--primary)',
+          pointBorderColor: 'var(--primary)',
+          pointRadius: 4,
+          pointHoverRadius: 6,
         }
-        return item[selectedMetric] || 5;
-      }),
-      borderColor: '#ffdd00',
-      backgroundColor: 'rgba(255, 221, 0, 0.1)',
-      tension: 0.3,
-      fill: true,
-      pointBackgroundColor: '#ffdd00',
-      pointBorderColor: '#ffdd00',
-      pointHoverBackgroundColor: '#f6cc00',
-      pointHoverBorderColor: '#f6cc00',
-      pointRadius: 6,
-      pointHoverRadius: 8,
-      pointBorderWidth: 2,
-      pointHoverBorderWidth: 3
-    }];
-    
-    return { labels, datasets };
+      ]
+    };
   };
-  
+
   // Chart options
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: 'var(--card-background)',
+        titleColor: 'var(--text)',
+        bodyColor: 'var(--text)',
+        borderColor: 'var(--border)',
+        borderWidth: 1,
+        cornerRadius: 8
+      }
+    },
     scales: {
       y: {
-        min: 0,
+        beginAtZero: true,
         max: 10,
         ticks: {
-          stepSize: 2,
-          color: '#aaaaaa',
-          font: { size: 12 }
+          color: 'var(--text-secondary)',
+          stepSize: 2
         },
         grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-          drawBorder: false
+          color: 'rgba(255, 255, 255, 0.1)'
         }
       },
       x: {
         ticks: {
-          color: '#aaaaaa',
-          font: { size: 12 }
+          color: 'var(--text-secondary)',
+          maxRotation: 45
         },
         grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-          drawBorder: false
+          color: 'rgba(255, 255, 255, 0.1)'
         }
       }
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          title: (items) => {
-            if (!items.length) return '';
-            const idx = items[0].dataIndex;
-            const filteredData = getFilteredBenefitData();
-            return formatDate(filteredData[idx].date);
-          }
-        },
-        backgroundColor: 'rgba(44, 44, 44, 0.95)',
-        titleColor: '#ffffff',
-        bodyColor: '#ffffff',
-        borderColor: '#ffdd00',
-        borderWidth: 1,
-        cornerRadius: 8,
-        displayColors: false,
-        padding: 12,
-        titleFont: { size: 14, weight: 'bold' },
-        bodyFont: { size: 13 }
-      }
-    },
-    interaction: {
-      mode: 'index',
-      intersect: false,
-    },
-    onHover: (event, activeElements) => {
-      event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
     }
-  };
-  
-  // Calculate average for display
-  const calculateAverage = () => {
-    if (!isPremium) {
-      const allData = userData.benefitTracking || [];
-      const last7DaysData = allData
-        .filter(item => {
-          const itemDate = new Date(item.date);
-          const cutoffDate = subDays(new Date(), 7);
-          return itemDate >= cutoffDate;
-        })
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
-      
-      if (last7DaysData.length === 0) return '0.0';
-      
-      const sum = last7DaysData.reduce((acc, item) => {
-        return acc + (item.energy || 0);
-      }, 0);
-      return (sum / last7DaysData.length).toFixed(1);
-    }
-    
-    const filteredData = getFilteredBenefitData();
-    if (filteredData.length === 0) return '0.0';
-    
-    const sum = filteredData.reduce((acc, item) => {
-      if (selectedMetric === 'sleep') {
-        return acc + (item[selectedMetric] || item.attraction || 0);
-      }
-      return acc + (item[selectedMetric] || 0);
-    }, 0);
-    return (sum / filteredData.length).toFixed(1);
   };
 
-  // UPDATED: Calculate relapse risk score with educational insights and proper N/A handling
-  const calculateRelapseRisk = () => {
-    const filteredData = getFilteredBenefitData();
-    const currentStreak = userData.currentStreak || 0;
-    
-    // Return N/A for insufficient data
-    if (filteredData.length < 3) {
-      return { 
-        score: 'N/A', 
-        factors: ['Insufficient data for analysis (need 3+ days of benefit tracking)'], 
-        level: 'Insufficient Data' 
+  // Generate current insight based on recent data
+  const generateCurrentInsight = () => {
+    if (!userData.benefitTracking || userData.benefitTracking.length === 0) {
+      return {
+        text: "Start tracking your benefits to unlock personalized insights about your recovery journey.",
+        icon: FaInfoCircle
       };
     }
+
+    const recentData = userData.benefitTracking.slice(-7);
+    const avgValue = recentData.reduce((sum, entry) => sum + (entry[selectedMetric] || 0), 0) / recentData.length;
     
-    const last3Days = filteredData.slice(-3);
-    let riskScore = 0;
-    const riskFactors = [];
-    
-    // Energy declining trend with educational context
-    if (last3Days.length >= 2) {
-      const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
-      if (energyTrend < -1) {
-        riskScore += 25;
-        const drop = Math.abs(energyTrend).toFixed(1);
-        riskFactors.push(`Energy declined **${drop} points** over 3 days. This often indicates adrenal fatigue from energy transmutation stress.`);
-      }
+    if (avgValue >= 8) {
+      return {
+        text: `Your ${selectedMetric} levels are excellent! You're experiencing significant improvements in this area.`,
+        icon: FaStar
+      };
+    } else if (avgValue >= 6) {
+      return {
+        text: `Your ${selectedMetric} is showing good progress. Keep up the consistent effort!`,
+        icon: FaChartLine
+      };
+    } else if (avgValue >= 4) {
+      return {
+        text: `Your ${selectedMetric} is gradually improving. Focus on maintaining your current habits.`,
+        icon: FaRegLightbulb
+      };
+    } else {
+      return {
+        text: `Your ${selectedMetric} has room for improvement. Consider adjusting your daily routine.`,
+        icon: FaExclamationTriangle
+      };
     }
-    
-    // Low confidence (not mood)
-    const avgConfidence = last3Days.reduce((sum, day) => sum + (day.confidence || 5), 0) / last3Days.length;
-    if (avgConfidence < 4) {
-      riskScore += 20;
-      riskFactors.push(`Confidence averaging **${avgConfidence.toFixed(1)}/10**. Emotional instability increases vulnerability to relapse episodes.`);
-    }
-    
-    // Poor sleep quality with educational context
-    if (isPremium) {
-      const avgSleep = last3Days.reduce((sum, day) => sum + (day.sleep || 5), 0) / last3Days.length;
-      if (avgSleep < 5) {
-        riskScore += 15;
-        riskFactors.push(`Sleep quality **${avgSleep.toFixed(1)}/10**. Poor circadian rhythm disrupts hormone balance and willpower.`);
-      }
-    }
-    
-    // Low focus with educational context
-    if (isPremium) {
-      const avgFocus = last3Days.reduce((sum, day) => sum + (day.focus || 5), 0) / last3Days.length;
-      if (avgFocus < 4) {
-        riskScore += 20;
-        riskFactors.push(`Focus averaging **${avgFocus.toFixed(1)}/10**. Mental clarity decline often precedes relapse episodes.`);
-      }
-    }
-    
-    // Spermatogenesis cycle insights
-    if (currentStreak >= 60 && currentStreak <= 74) {
-      riskScore += 15;
-      riskFactors.push(`Day **${currentStreak}** - approaching spermatogenesis completion (**67-74 days**). Biological transition period increases urge intensity.`);
-    }
-    
-    // Weekend vulnerability with educational context
-    const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
-    if (isWeekend) {
-      riskScore += 10;
-      riskFactors.push('Weekend period detected. Decreased structure and increased isolation elevate relapse risk.');
-    }
-    
-    // Determine risk level
-    let level = 'Low';
-    if (riskScore >= 50) level = 'High';
-    else if (riskScore >= 25) level = 'Medium';
-    
-    return {
-      score: Math.min(riskScore, 100),
-      factors: riskFactors.length > 0 ? riskFactors : ['All metrics stable - retention patterns appear sustainable'],
-      level
-    };
   };
 
-  // UPDATED: Calculate benefit correlations with educational insights
-  const calculateCorrelations = () => {
-    const allData = userData.benefitTracking || [];
-    if (allData.length < 7) return [];
-    
-    const correlations = [];
-    const currentStreak = userData.currentStreak || 0;
-    
-    // Energy-focus correlation with transmutation insights
-    const energyData = allData.filter(d => d.energy >= 7);
-    if (energyData.length > 0 && isPremium) {
-      const avgFocusWhenEnergyHigh = energyData.reduce((sum, d) => sum + (d.focus || 0), 0) / energyData.length;
-      const overallAvgFocus = allData.reduce((sum, d) => sum + (d.focus || 0), 0) / allData.length;
-      const improvement = ((avgFocusWhenEnergyHigh - overallAvgFocus) / overallAvgFocus * 100).toFixed(0);
-      
-      if (improvement > 5) {
-        correlations.push(`When energy reaches **7 or higher**, focus averages **${avgFocusWhenEnergyHigh.toFixed(1)}/10** (representing a **${improvement}% improvement** above baseline). This demonstrates energy transmutation—sexual energy converting to mental clarity, explaining enhanced cognitive function through retention practice.`);
-      }
+  // Calculate current metric average
+  const calculateCurrentAverage = () => {
+    if (!userData.benefitTracking || userData.benefitTracking.length === 0) {
+      return 0;
     }
-    
-    // Sleep-confidence correlation with circadian optimization insights
-    if (isPremium && allData.length > 5) {
-      const poorSleepDays = allData.filter(d => (d.sleep || 5) < 5);
-      const nextDayConfidence = poorSleepDays.map(d => {
-        const dayAfter = allData.find(next => {
-          const dayAfterDate = new Date(d.date);
-          dayAfterDate.setDate(dayAfterDate.getDate() + 1);
-          return next.date === dayAfterDate.toISOString().split('T')[0];
-        });
-        return dayAfter ? (dayAfter.confidence || 5) : null;
-      }).filter(confidence => confidence !== null);
-      
-      if (nextDayConfidence.length > 0) {
-        const lowConfidenceChance = (nextDayConfidence.filter(confidence => confidence < 5).length / nextDayConfidence.length * 100).toFixed(0);
-        if (lowConfidenceChance > 50) {
-          correlations.push(`Sleep quality below **5/10** creates a **${lowConfidenceChance}% probability** of low confidence the following day. Sleep architecture optimization through circadian rhythm alignment significantly improves retention success rates.`);
-        }
-      }
-    }
-    
-    // Spermatogenesis cycle correlation
-    if (currentStreak >= 74) {
-      const post74Data = allData.filter(d => {
-        const daysSinceStart = Math.floor((new Date(d.date) - new Date(userData.startDate)) / (1000 * 60 * 60 * 24));
-        return daysSinceStart >= 74;
-      });
-      
-      if (post74Data.length > 0) {
-        const avgEnergyPost74 = post74Data.reduce((sum, d) => sum + (d.energy || 0), 0) / post74Data.length;
-        const avgEnergyPre74 = allData.filter(d => {
-          const daysSinceStart = Math.floor((new Date(d.date) - new Date(userData.startDate)) / (1000 * 60 * 60 * 24));
-          return daysSinceStart < 74;
-        }).reduce((sum, d) => sum + (d.energy || 0), 0) / allData.length;
-        
-        const improvement = ((avgEnergyPost74 - avgEnergyPre74) / avgEnergyPre74 * 100).toFixed(0);
-        if (improvement > 10) {
-          correlations.push(`Post-spermatogenesis phase (**74+ days**): Energy averages **${avgEnergyPost74.toFixed(1)}/10** (representing a **${improvement}% improvement** versus pre-74 day levels). Your body has completed the biological transition from reproduction to cellular optimization mode.`);
-        }
-      }
-    }
-    
-    return correlations;
+
+    const recentData = userData.benefitTracking.slice(-7);
+    const avgValue = recentData.reduce((sum, entry) => sum + (entry[selectedMetric] || 0), 0) / recentData.length;
+    return avgValue.toFixed(1);
   };
 
-  // UPDATED: Calculate performance zones with educational insights
-  const calculatePerformanceZones = () => {
-    const allData = userData.benefitTracking || [];
-    if (allData.length < 7) return null;
-    
-    const currentStreak = userData.currentStreak || 0;
-    
-    // Define optimal thresholds with educational context
-    const optimalDays = allData.filter(d => 
-      (d.energy || 0) >= 7 && 
-      (d.confidence || 0) >= 5 && 
-      (!isPremium || (d.sleep || 0) >= 6)
-    );
-    
-    const suboptimalDays = allData.length - optimalDays.length;
-    const optimalPercentage = (optimalDays.length / allData.length * 100).toFixed(0);
-    
-    // Calculate focus performance in optimal zone
-    let focusPerformance = null;
-    if (isPremium && optimalDays.length > 0) {
-      const highFocusDays = optimalDays.filter(d => (d.focus || 0) >= 8).length;
-      const focusSuccessRate = (highFocusDays / optimalDays.length * 100).toFixed(0);
-      focusPerformance = focusSuccessRate;
-    }
-    
-    // Generate dynamic improvement recommendation
-    const getImprovementArea = () => {
-      if (suboptimalDays === 0) return "Maintaining peak performance";
-      
-      const subOptimalData = allData.filter(d => 
-        !((d.energy || 0) >= 7 && (d.confidence || 0) >= 5 && (!isPremium || (d.sleep || 0) >= 6))
-      );
-      
-      if (subOptimalData.length === 0) return "Focus on consistency";
-      
-      const avgEnergySubOptimal = subOptimalData.reduce((sum, d) => sum + (d.energy || 0), 0) / subOptimalData.length;
-      const avgSleepSubOptimal = isPremium ? subOptimalData.reduce((sum, d) => sum + (d.sleep || 0), 0) / subOptimalData.length : 0;
-      const avgConfidenceSubOptimal = subOptimalData.reduce((sum, d) => sum + (d.confidence || 0), 0) / subOptimalData.length;
-      
-      // Educational recommendations based on retention principles
-      if (avgEnergySubOptimal < 6) {
-        if (currentStreak >= 60 && currentStreak <= 74) {
-          return "Energy cultivation during spermatogenesis completion";
-        }
-        return "Focus on energy cultivation through exercise";
-      }
-      
-      if (isPremium && avgSleepSubOptimal < 5) {
-        return "Optimize sleep for retention benefits";
-      }
-      
-      if (avgConfidenceSubOptimal < 4) {
-        return "Build emotional resilience and confidence";
-      }
-      
-      return "Multiple areas need optimization";
+  // Generate intelligence insights
+  const generateIntelligenceInsights = () => {
+    const insights = {
+      riskPredictor: {
+        level: 'insufficient',
+        score: 'N/A',
+        factors: ['Insufficient data for risk assessment']
+      },
+      benefitCorrelations: [
+        'Need more data to identify benefit correlations'
+      ],
+      performanceZones: {
+        criteria: 'Requires 14+ days of consistent tracking',
+        metrics: []
+      },
+      predictiveInsights: [
+        'Predictive analysis will be available after 30+ days of tracking'
+      ],
+      amplificationRecommendations: [
+        'Complete your daily benefit tracking to unlock personalized recommendations'
+      ]
     };
-    
-    return {
-      optimalDays: optimalDays.length,
-      suboptimalDays,
-      optimalPercentage,
-      focusPerformance,
-      improvementArea: getImprovementArea(),
-      criteria: isPremium ? 'Energy 7+, Sleep 6+, Confidence 5+' : 'Energy 7+, Confidence 5+'
-    };
-  };
 
-  // UPDATED: Generate predictive insights with educational context
-  const generatePredictiveInsights = () => {
-    const allData = userData.benefitTracking || [];
-    if (allData.length < 5) return [];
-    
-    const insights = [];
-    const last3Days = allData.slice(-3);
-    const currentStreak = userData.currentStreak || 0;
-    
-    // Energy trend prediction with educational context
-    if (last3Days.length >= 2) {
-      const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
-      if (energyTrend > 0.5) {
-        insights.push(`Based on your **+${energyTrend.toFixed(1)}** energy trend, tomorrow's energy is predicted at **7-8/10**. Energy improvements during retention reflect successful transmutation of sexual energy into life force.`);
-      } else if (energyTrend < -0.5) {
-        insights.push(`Your energy declined **${Math.abs(energyTrend).toFixed(1)} points** over 3 days. Energy fluctuations are normal as your body redirects sexual energy toward higher functions. Prioritize rest and hydration for energy restoration.`);
-      }
+    if (userData.benefitTracking && userData.benefitTracking.length >= 14) {
+      const recentData = userData.benefitTracking.slice(-14);
+      const avgEnergy = recentData.reduce((sum, entry) => sum + (entry.energy || 0), 0) / recentData.length;
+      const avgMood = recentData.reduce((sum, entry) => sum + (entry.mood || 0), 0) / recentData.length;
+      const avgSleep = recentData.reduce((sum, entry) => sum + (entry.sleep || 0), 0) / recentData.length;
+
+      // Risk assessment
+      const riskScore = Math.max(0, 10 - ((avgEnergy + avgMood + avgSleep) / 3));
+      insights.riskPredictor = {
+        level: riskScore < 3 ? 'low' : riskScore < 6 ? 'medium' : 'high',
+        score: riskScore.toFixed(1),
+        factors: riskScore < 3 ? 
+          ['Strong energy levels', 'Stable mood patterns', 'Good sleep quality'] :
+          riskScore < 6 ?
+          ['Moderate energy fluctuations', 'Occasional mood dips', 'Sleep inconsistency'] :
+          ['Low energy levels', 'Mood instability', 'Poor sleep quality']
+      };
+
+      // Performance zones
+      insights.performanceZones = {
+        criteria: 'Based on your 14-day tracking pattern',
+        metrics: [
+          { label: 'Energy Peak', value: Math.max(...recentData.map(d => d.energy || 0)), context: 'Best recorded' },
+          { label: 'Mood Stability', value: (10 - (Math.max(...recentData.map(d => d.mood || 0)) - Math.min(...recentData.map(d => d.mood || 0)))).toFixed(1), context: 'Consistency score' },
+          { label: 'Sleep Average', value: avgSleep.toFixed(1), context: 'Past 14 days' }
+        ]
+      };
+
+      // Correlations
+      insights.benefitCorrelations = [
+        avgEnergy > 7 && avgMood > 7 ? 'Strong positive correlation between energy and mood levels' :
+        avgSleep > 7 && avgEnergy > 6 ? 'Good sleep quality is boosting your energy levels' :
+        'Energy and mood levels show moderate correlation patterns'
+      ];
+
+      // Predictive insights
+      insights.predictiveInsights = [
+        avgEnergy > 7 ? 'Your energy trend suggests continued improvement over the next week' :
+        avgEnergy < 5 ? 'Energy levels may need attention - consider reviewing your routine' :
+        'Energy levels are stable but have room for optimization'
+      ];
+
+      // Amplification recommendations
+      insights.amplificationRecommendations = [
+        avgSleep < 6 ? 'Prioritize sleep quality to amplify other benefits' :
+        avgEnergy < avgMood ? 'Focus on energy-boosting activities to match your positive mood' :
+        'Maintain current habits while gradually increasing physical activity'
+      ];
     }
-    
-    // Spermatogenesis cycle predictions
-    if (currentStreak >= 60 && currentStreak <= 67) {
-      insights.push(`Day **${currentStreak}**: Approaching spermatogenesis completion (**67-74 days**). Expect significant energy shifts as your body transitions from sperm production to nutrient reabsorption mode for cellular repair.`);
-    } else if (currentStreak >= 74) {
-      insights.push(`Day **${currentStreak}**: Post-spermatogenesis phase active. Your body has completed the biological transition from reproduction to self-enhancement, explaining your sustained energy improvements.`);
-    }
-    
-    // 7-day trend analysis with educational context
-    if (allData.length >= 7) {
-      const last7Days = allData.slice(-7);
-      const energyTrend = last7Days.reduce((sum, d, i) => sum + (d.energy || 0) * (i + 1), 0) / 
-                          last7Days.reduce((sum, d, i) => sum + (i + 1), 0);
-      const overall7DayAvg = last7Days.reduce((sum, d) => sum + (d.energy || 0), 0) / 7;
-      
-      if (energyTrend > overall7DayAvg + 0.3) {
-        insights.push("Your 7-day energy trend shows continued improvement. This progressive enhancement reflects your body's increasing efficiency at energy transmutation through retention practice");
-      }
-    }
-    
+
     return insights;
   };
 
-  // UPDATED: Generate performance amplification recommendations with educational context
-  const generateAmplificationRecommendations = () => {
-    const allData = userData.benefitTracking || [];
-    if (allData.length < 5) return [];
+  // Get data quality assessment
+  const getDataQuality = () => {
+    const trackingDays = userData.benefitTracking ? userData.benefitTracking.length : 0;
     
-    const recommendations = [];
-    const currentAvgEnergy = parseFloat(calculateAverage());
-    const currentStreak = userData.currentStreak || 0;
-    
-    // High energy period recommendations with educational context
-    if (currentAvgEnergy >= 7) {
-      recommendations.push(`Energy at **${currentAvgEnergy}/10** enables optimal physical training. Research shows **85% higher testosterone** when exercising during peak energy windows. Consider increasing workout intensity by **20%**.`);
-      
-      if (isPremium) {
-        recommendations.push("Your peak performance window is active. Take on challenging mental tasks now—high energy states maximize cognitive function through enhanced brain blood flow.");
-      }
-      
-      // Spermatogenesis optimization
-      if (currentStreak >= 74) {
-        recommendations.push("Post-spermatogenesis optimization phase: Your body is channeling reproductive resources into cellular repair and cognitive enhancement. This is the perfect time for skill development and creative projects.");
-      }
-    }
-    
-    // Low energy period recommendations with educational context
-    const recentMood = allData.slice(-3).reduce((sum, d) => sum + (d.confidence || 0), 0) / 3;
-    if (recentMood < 5) {
-      recommendations.push("Low confidence period detected. Energy transmutation stress is common during retention—prioritize sleep optimization, morning sunlight exposure, and gentle movement to restore emotional balance.");
-    }
-    
-    // Decision-making optimization with educational context
-    if (isPremium && allData.length >= 7) {
-      const highConfidenceDays = allData.filter(d => (d.confidence || 0) >= 7);
-      if (highConfidenceDays.length > 0) {
-        const avgEnergyHighConfidence = highConfidenceDays.reduce((sum, d) => sum + (d.energy || 0), 0) / highConfidenceDays.length;
-        recommendations.push(`Your best decisions occur when confidence reaches **7 or higher** (average energy **${avgEnergyHighConfidence.toFixed(1)}/10**). Save important choices for these periods—retention enhances decision-making through improved prefrontal cortex function.`);
-      }
-    }
-    
-    return recommendations;
-  };
-
-  // NEW: Info banner logic
-  const shouldShowInfoBanner = () => {
-    const benefitData = getFilteredBenefitData();
-    const hasMinimalData = benefitData.length < 7;
-    const currentStreak = userData.currentStreak || 0;
-    const isNewUser = currentStreak <= 3;
-    
-    return hasMinimalData || isNewUser;
-  };
-
-  // NEW: Calculate data quality for intelligence analysis
-  const calculateDataQuality = () => {
-    const allData = userData.benefitTracking || [];
-    const recentData = allData.filter(item => {
-      const itemDate = new Date(item.date);
-      const cutoffDate = subDays(new Date(), 14);
-      return itemDate >= cutoffDate;
-    });
-
-    if (recentData.length >= 14) {
-      return { level: 'rich', label: 'Rich Analytics', days: recentData.length };
-    } else if (recentData.length >= 7) {
-      return { level: 'good', label: 'Good Data Set', days: recentData.length };
-    } else if (recentData.length >= 3) {
-      return { level: 'minimal', label: 'Basic Analysis', days: recentData.length };
+    if (trackingDays === 0) {
+      return { level: 'insufficient', days: 0 };
+    } else if (trackingDays < 7) {
+      return { level: 'minimal', days: trackingDays };
+    } else if (trackingDays < 30) {
+      return { level: 'good', days: trackingDays };
     } else {
-      return { level: 'insufficient', label: 'Insufficient Data', days: recentData.length };
+      return { level: 'rich', days: trackingDays };
     }
   };
 
-  const riskAnalysis = calculateRelapseRisk();
-  const correlations = calculateCorrelations();
-  const performanceZones = calculatePerformanceZones();
-  const predictiveInsights = generatePredictiveInsights();
-  const amplificationRecs = generateAmplificationRecommendations();
-  const dataQuality = calculateDataQuality();
-  
+  const currentInsight = generateCurrentInsight();
+  const currentAverage = calculateCurrentAverage();
+  const intelligenceInsights = generateIntelligenceInsights();
+  const dataQuality = getDataQuality();
+
   return (
     <div className="stats-container">
-      {/* Header */}
+      {/* REDESIGNED: Header exactly matching Tracker and Calendar */}
       <div className="stats-header">
         <div className="stats-header-spacer"></div>
-        <h2>Your Stats</h2>
+        <h2>Statistics</h2>
         <div className="stats-header-actions">
           <button className="reset-stats-btn" onClick={handleResetStats}>
             <FaRedo />
-            <span>Reset Progress</span>
+            Reset Stats
           </button>
         </div>
       </div>
-      
-      {/* Smart Reset Dialog */}
-      <SmartResetDialog
-        isOpen={showSmartResetDialog}
-        onClose={() => setShowSmartResetDialog(false)}
-        onConfirm={confirmResetStats}
-        userData={userData}
-      />
-      
+
+      {/* UPDATED: Stats Info Banner */}
+      <div className="stats-info-banner">
+        <FaInfoCircle className="info-icon" />
+        <span>Track your recovery benefits daily to unlock detailed insights and personalized recommendations.</span>
+      </div>
+
       {/* Streak Statistics */}
       <div className="streak-stats">
-        <div className="stat-card current-streak">
+        <div className="stat-card">
           <div className="stat-value">{userData.currentStreak || 0}</div>
           <div className="stat-label">Current Streak</div>
         </div>
-        
-        <div className="stat-card longest-streak">
+        <div className="stat-card">
           <div className="stat-value">{userData.longestStreak || 0}</div>
           <div className="stat-label">Longest Streak</div>
         </div>
-        
-        <div className="stat-card total-wetdreams">
-          <div className="stat-value">{userData.wetDreamCount || 0}</div>
-          <div className="stat-label">Wet Dreams</div>
+        <div className="stat-card">
+          <div className="stat-value">{userData.badges?.filter(b => b.earned).length || 0}</div>
+          <div className="stat-label">Badges Earned</div>
         </div>
-        
-        <div className="stat-card total-relapses">
-          <div className="stat-value">{userData.relapseCount || 0}</div>
-          <div className="stat-label">Relapses</div>
+        <div className="stat-card">
+          <div className="stat-value">{userData.benefitTracking?.length || 0}</div>
+          <div className="stat-label">Days Tracked</div>
         </div>
       </div>
-      
-      {/* Milestone Badges */}
+
+      {/* Achievement Badges */}
       <div className="milestone-section">
-        <h3>Your Achievements</h3>
-        
+        <h3>Achievement Badges</h3>
         <div className="badges-grid">
-          {userData.badges && userData.badges.map(badge => (
+          {userData.badges?.map((badge, index) => (
             <div 
-              key={badge.id} 
+              key={index} 
               className={`badge-card ${badge.earned ? 'earned' : 'locked'}`}
-              onClick={() => badge.earned && handleBadgeClick(badge)}
+              onClick={() => handleBadgeClick(badge)}
             >
               <div className="badge-icon">
                 {badge.earned ? (
@@ -772,563 +536,388 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 )}
               </div>
               <div className="badge-name">{badge.name}</div>
-              {badge.earned && (
-                <div className="badge-date">
-                  Earned {badge.date ? format(new Date(badge.date), 'MMM d') : ''}
-                </div>
-              )}
+              <div className="badge-date">
+                {badge.earned ? formatDate(badge.date) : ''}
+              </div>
             </div>
           ))}
         </div>
       </div>
-      
-      {/* Benefit Intelligence Engine */}
+
+      {/* Benefit Tracker Section */}
       <div className="benefit-tracker-section">
-        <h3>Benefit Intelligence Engine</h3>
+        <h3>Benefit Tracker</h3>
         
-        {shouldShowInfoBanner() && (
-          <div className="stats-info-banner">
-            <FaInfoCircle className="info-icon" />
-            <span><strong>Building your intelligence profile...</strong> Your insights will become more detailed as you log daily benefits and track your progress over time.</span>
-          </div>
-        )}
-        
-        {/* Controls */}
         <div className="benefit-tracker-controls">
           <div className="metric-selector">
             <div className="metric-pill-container">
-              <button 
-                className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
-                onClick={() => handleMetricClick('energy')}
-              >
-                Energy
-              </button>
-              <button 
-                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
-                onClick={() => handleMetricClick('focus')}
-                disabled={!isPremium}
-              >
-                Focus {!isPremium && <FaLock className="metric-lock-icon" />}
-              </button>
-              <button 
-                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
-                onClick={() => handleMetricClick('confidence')}
-                disabled={!isPremium}
-              >
-                Confidence {!isPremium && <FaLock className="metric-lock-icon" />}
-              </button>
-              <button 
-                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
-                onClick={() => handleMetricClick('aura')}
-                disabled={!isPremium}
-              >
-                Aura {!isPremium && <FaLock className="metric-lock-icon" />}
-              </button>
-              <button 
-                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
-                onClick={() => handleMetricClick('sleep')}
-                disabled={!isPremium}
-              >
-                Sleep Quality {!isPremium && <FaLock className="metric-lock-icon" />}
-              </button>
-              <button 
-                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
-                onClick={() => handleMetricClick('workout')}
-                disabled={!isPremium}
-              >
-                Workout {!isPremium && <FaLock className="metric-lock-icon" />}
-              </button>
+              {[
+                { key: 'energy', label: 'Energy', icon: FaRegLightbulb },
+                { key: 'mood', label: 'Mood', icon: FaHeart },
+                { key: 'sleep', label: 'Sleep', icon: FaClock },
+                { key: 'focus', label: 'Focus', icon: FaBrain },
+                { key: 'social', label: 'Social', icon: FaHome },
+                { key: 'confidence', label: 'Confidence', icon: FaStar }
+              ].map(metric => (
+                <button
+                  key={metric.key}
+                  className={`metric-btn ${selectedMetric === metric.key ? 'active' : ''} ${!isPremium && metric.key !== 'energy' ? 'locked' : ''}`}
+                  onClick={() => handleMetricClick(metric.key)}
+                  disabled={!isPremium && metric.key !== 'energy'}
+                >
+                  <metric.icon />
+                  {metric.label}
+                  {!isPremium && metric.key !== 'energy' && <FaLock className="metric-lock-icon" />}
+                </button>
+              ))}
             </div>
           </div>
-          
-          {isPremium && (
-            <div className="time-range-selector-container">
-              <div className="time-range-selector">
-                <button 
-                  className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
-                  onClick={() => setTimeRange('week')}
+
+          <div className="time-range-selector-container">
+            <div className="time-range-selector">
+              {Object.keys(timeRangeOptions).map(range => (
+                <button
+                  key={range}
+                  className={`time-btn ${timeRange === range ? 'active' : ''}`}
+                  onClick={() => setTimeRange(range)}
                 >
-                  Week
+                  {range.charAt(0).toUpperCase() + range.slice(1)}
                 </button>
-                <button 
-                  className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
-                  onClick={() => setTimeRange('month')}
-                >
-                  Month
-                </button>
-                <button 
-                  className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
-                  onClick={() => setTimeRange('quarter')}
-                >
-                  3 Months
-                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Chart and Insights */}
+        {isPremium ? (
+          <div className="chart-and-insight-container">
+            <div className="chart-container">
+              <Line data={generateChartData()} options={chartOptions} />
+            </div>
+            <div className="current-insight-sidebar">
+              <div className="current-metric-average">
+                <div className="current-metric-label">Average {selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
+                <div className="current-metric-value">{currentAverage}</div>
+              </div>
+              <div className="current-insight-card">
+                <div className="current-insight-header">
+                  <currentInsight.icon className="insight-icon" />
+                  Current Insight
+                </div>
+                <div className="current-insight-text">
+                  <FormattedText>{currentInsight.text}</FormattedText>
+                </div>
               </div>
             </div>
-          )}
-        </div>
-        
-        {/* FREE USER CONTENT */}
-        {!isPremium && (
+          </div>
+        ) : (
           <div className="free-benefit-preview">
             <div className="free-average-display">
               <div className="current-metric-average">
-                <div className="current-metric-label">Your Energy Level (last 7 days)</div>
-                <div className="current-metric-value">{calculateAverage()}/10</div>
+                <div className="current-metric-label">Average Energy</div>
+                <div className="current-metric-value">{currentAverage}</div>
               </div>
             </div>
-            
-            {/* Intelligence Preview Grid - using existing insight card patterns */}
-            <div className="intelligence-preview-grid">
+            <div className="free-insight-preview">
               <div className="current-insight-card">
                 <div className="current-insight-header">
-                  <span>Relapse Risk Analysis</span>
+                  <currentInsight.icon className="insight-icon" />
+                  Current Insight
                 </div>
                 <div className="current-insight-text">
-                  <div className="comparison-value" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>
-                    {riskAnalysis.score === 'N/A' ? 'N/A' : `${riskAnalysis.level} Risk`}
-                  </div>
-                  {riskAnalysis.score === 'N/A' ? 
-                    'Basic risk assessment available. Track benefits for 3+ days to unlock detailed analysis.' :
-                    'Basic risk assessment available. Upgrade for detailed analysis with specific factors and mitigation strategies.'
-                  }
-                </div>
-              </div>
-              
-              <div className="current-insight-card">
-                <div className="current-insight-header">
-                  <span>Performance Insights</span>
-                </div>
-                <div className="current-insight-text">
-                  Advanced correlations, optimization zones, and predictive analytics available with Premium upgrade.
+                  <FormattedText>{currentInsight.text}</FormattedText>
                 </div>
               </div>
             </div>
-            
             <div className="benefit-upgrade-cta">
               <div className="upgrade-helmet-section">
-                <img 
-                  src={helmetImage} 
-                  alt="Premium Intelligence" 
-                  className="upgrade-helmet-icon"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'block';
-                  }}
-                />
-                <div className="upgrade-helmet-fallback" style={{display: 'none'}}>🧠</div>
+                <img src={helmetImage} alt="Upgrade to Premium" className="upgrade-helmet-icon" />
               </div>
-              
               <div className="upgrade-text-section">
-                <h4>Unlock Full Intelligence Engine</h4>
-                <p>Get advanced risk prediction, benefit correlations, performance optimization zones, and personalized amplification strategies.</p>
-                
-                <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
+                <h4>Unlock Full Benefit Tracking</h4>
+                <p>Track all 6 benefit metrics, view detailed charts, and get advanced insights about your recovery journey.</p>
+                <button className="benefit-upgrade-btn">
                   <FaStar />
-                  Upgrade to Premium
+                  Upgrade Now
                 </button>
               </div>
             </div>
           </div>
         )}
-        
-        {/* PREMIUM USER CONTENT */}
-        {isPremium && (
-          <>
-            <div className="chart-and-insight-container" ref={insightsStartRef}>
-              <div className="chart-container">
-                <Line data={generateChartData()} options={chartOptions} height={300} />
-              </div>
-              
-              <div className="current-insight-sidebar">
-                <div className="current-metric-average">
-                  <div className="current-metric-label">Your {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
-                  <div className="current-metric-value">{calculateAverage()}/10</div>
-                </div>
-                
-                <div className="current-insight-card">
-                  <div className="current-insight-header">
-                    <span>Current Status</span>
-                  </div>
-                  <div className="current-insight-text">
-                    Your {selectedMetric} is tracking at {calculateAverage()}/10. 
-                    {parseFloat(calculateAverage()) >= 7 ? 
-                      " Excellent performance - maintain current strategies." : 
-                      " Room for optimization - check intelligence insights below."}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* REDESIGNED: Intelligence Analysis Section - CLEANER, MORE PROFESSIONAL */}
-            <div className="intelligence-analysis-section">
-              <div className="intelligence-analysis-header">
-                <h3>Intelligence Analysis</h3>
-              </div>
-              
-              {/* Relapse Risk Predictor */}
-              <div className="intelligence-analysis-card">
-                <div className="intelligence-card-header">
-                  <span>Relapse Risk Predictor</span>
-                </div>
-                <div className="intelligence-info-banner">
-                  <FaInfoCircle className="info-icon" />
-                  <span>Analyzes your recent benefit trends to predict vulnerability periods. Based on energy, confidence, and focus patterns from your last 3-14 days of tracking.</span>
-                </div>
-                <div className="intelligence-card-content">
-                  <div className="risk-predictor-display">
-                    {riskAnalysis.score === 'N/A' ? (
-                      <div className="risk-level-indicator insufficient">
-                        <div>
-                          <div className="risk-score insufficient">N/A</div>
-                          <div className="risk-level-text">Insufficient Data</div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className={`risk-level-indicator ${riskAnalysis.level.toLowerCase()}`}>
-                        <div>
-                          <div className={`risk-score ${riskAnalysis.level.toLowerCase()}`}>
-                            {riskAnalysis.score}%
-                          </div>
-                          <div className="risk-level-text">{riskAnalysis.level} Risk Level</div>
-                        </div>
-                      </div>
-                    )}
-                    <div className="risk-factors-list">
-                      <div className="risk-factors-title">
-                        {riskAnalysis.score === 'N/A' ? 'Data Requirements:' : 'Risk Factors:'}
-                      </div>
-                      {riskAnalysis.factors.map((factor, index) => (
-                        <div key={index} className="risk-factor-item">• {factor}</div>
-                      ))}
-                      {riskAnalysis.level !== 'Low' && riskAnalysis.score !== 'N/A' && (
-                        <div style={{ 
-                          marginTop: '0.75rem', 
-                          padding: '0.75rem', 
-                          backgroundColor: 'rgba(255, 221, 0, 0.1)', 
-                          borderRadius: 'var(--radius-md)', 
-                          fontSize: '0.875rem' 
-                        }}>
-                          <strong>Educational Actions:</strong> Morning sunlight exposure optimizes circadian rhythm, cold showers activate nervous system resilience, and magnesium supplementation supports energy transmutation during vulnerable periods.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {/* Data Quality Indicator */}
-                  {dataQuality.level !== 'insufficient' && (
-                    <div className="intelligence-data-status">
-                      <div className="intelligence-data-status-indicator">
-                        <span className={`intelligence-data-quality ${dataQuality.level}`}>
-                          <FaChartLine />
-                          {dataQuality.label}
-                        </span>
-                        <span className="intelligence-data-days">
-                          Based on {dataQuality.days} days of tracking
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {/* Benefit Correlations */}
-              {correlations.length > 0 && (
-                <div className="intelligence-analysis-card">
-                  <div className="intelligence-card-header">
-                    <span>Your Benefit Correlations</span>
-                  </div>
-                  <div className="intelligence-info-banner">
-                    <FaInfoCircle className="info-icon" />
-                    <span>Identifies patterns between your different benefit metrics. For example, how high energy days affect your focus levels.</span>
-                  </div>
-                  <div className="intelligence-card-content">
-                    <div className="correlations-display">
-                      {correlations.map((correlation, index) => (
-                        <div key={index} className="correlation-item">{correlation}</div>
-                      ))}
-                    </div>
-                    {/* Data Quality Indicator */}
-                    {dataQuality.level !== 'insufficient' && (
-                      <div className="intelligence-data-status">
-                        <div className="intelligence-data-status-indicator">
-                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
-                            <FaChartLine />
-                            {dataQuality.label}
-                          </span>
-                          <span className="intelligence-data-days">
-                            Based on {dataQuality.days} days of tracking
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-              
-              {/* Performance Zones */}
-              {performanceZones && (
-                <div className="intelligence-analysis-card">
-                  <div className="intelligence-card-header">
-                    <span>Your Performance Zones</span>
-                  </div>
-                  <div className="intelligence-info-banner">
-                    <FaInfoCircle className="info-icon" />
-                    <span>Shows your peak performance rate based on Energy 7+, Sleep 6+, Confidence 5+ criteria. Calculated from days where you logged benefits.</span>
-                  </div>
-                  <div className="intelligence-card-content">
-                    <div className="performance-zones-display">
-                      <div className="performance-criteria">
-                        <div className="performance-criteria-title">Your Peak Performance Zone:</div>
-                        <div className="performance-criteria-text">{performanceZones.criteria}</div>
-                      </div>
-                      <div className="performance-metrics-simplified">
-                        <div className="performance-metric-card">
-                          <div className="performance-metric-value">{performanceZones.optimalPercentage}%</div>
-                          <div className="performance-metric-label">Optimal Days</div>
-                          <div className="performance-metric-context">({performanceZones.optimalDays} out of {performanceZones.optimalDays + performanceZones.suboptimalDays} days logged)</div>
-                        </div>
-                        {performanceZones.focusPerformance && (
-                          <div className="performance-metric-card">
-                            <div className="performance-metric-value">{performanceZones.focusPerformance}%</div>
-                            <div className="performance-metric-label">Mind-Body Sync</div>
-                            <div className="performance-metric-context">(Mental clarity follows physical optimization {performanceZones.focusPerformance}% of the time)</div>
-                          </div>
-                        )}
-                        <div className="performance-metric-card">
-                          <div className="performance-metric-value">{performanceZones.suboptimalDays}</div>
-                          <div className="performance-metric-label">Below optimal days</div>
-                          <div className="performance-metric-context">{performanceZones.improvementArea}</div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Data Quality Indicator */}
-                    {dataQuality.level !== 'insufficient' && (
-                      <div className="intelligence-data-status">
-                        <div className="intelligence-data-status-indicator">
-                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
-                            <FaChartLine />
-                            {dataQuality.label}
-                          </span>
-                          <span className="intelligence-data-days">
-                            Based on {dataQuality.days} days of tracking
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-              
-              {/* Predictive Insights */}
-              {predictiveInsights.length > 0 && (
-                <div className="intelligence-analysis-card">
-                  <div className="intelligence-card-header">
-                    <span>Predictive Insights</span>
-                  </div>
-                  <div className="intelligence-card-content">
-                    <div className="predictive-insights-display">
-                      {predictiveInsights.map((insight, index) => (
-                        <div key={index} className="predictive-insight-item">{insight}</div>
-                      ))}
-                    </div>
-                    {/* Data Quality Indicator */}
-                    {dataQuality.level !== 'insufficient' && (
-                      <div className="intelligence-data-status">
-                        <div className="intelligence-data-status-indicator">
-                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
-                            <FaChartLine />
-                            {dataQuality.label}
-                          </span>
-                          <span className="intelligence-data-days">
-                            Based on {dataQuality.days} days of tracking
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-              
-              {/* Performance Amplification */}
-              {amplificationRecs.length > 0 && (
-                <div className="intelligence-analysis-card">
-                  <div className="intelligence-card-header">
-                    <span>Performance Amplification</span>
-                  </div>
-                  <div className="intelligence-card-content">
-                    <div className="amplification-display">
-                      {amplificationRecs.map((rec, index) => (
-                        <div key={index} className="amplification-item">{rec}</div>
-                      ))}
-                    </div>
-                    {/* Data Quality Indicator */}
-                    {dataQuality.level !== 'insufficient' && (
-                      <div className="intelligence-data-status">
-                        <div className="intelligence-data-status-indicator">
-                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
-                            <FaChartLine />
-                            {dataQuality.label}
-                          </span>
-                          <span className="intelligence-data-days">
-                            Based on {dataQuality.days} days of tracking
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-              
-              {/* Historical Comparison */}
-              <div className="historical-comparison-section">
-                <div className="historical-comparison-header">
-                  <span>{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Historical Comparison</span>
-                </div>
-                <div className="historical-comparison-grid">
-                  <div className="historical-comparison-card">
-                    <div className="historical-comparison-value">
-                      {(() => {
-                        const filteredData = getFilteredBenefitData();
-                        if (filteredData.length === 0) return '5.0';
-                        const shortTermData = filteredData.filter(item => {
-                          const itemDate = new Date(item.date);
-                          const sevenDaysAgo = subDays(new Date(), 7);
-                          return itemDate >= sevenDaysAgo;
-                        });
-                        if (shortTermData.length === 0) return '5.0';
-                        const avg = shortTermData.reduce((sum, item) => sum + (item[selectedMetric] || 5), 0) / shortTermData.length;
-                        return avg.toFixed(1);
-                      })()}/10
-                    </div>
-                    <div className="historical-comparison-label">Your {selectedMetric} during short streaks (1-7 days)</div>
-                  </div>
-                  
-                  <div className="historical-comparison-card">
-                    <div className="historical-comparison-value">{calculateAverage()}/10</div>
-                    <div className="historical-comparison-label">Your current {selectedMetric} average</div>
-                  </div>
-                  
-                  <div className="historical-comparison-card">
-                    <div className="historical-comparison-value">
-                      {(() => {
-                        const baseValue = parseFloat(calculateAverage());
-                        const currentStreak = userData.currentStreak || 0;
-                        if (currentStreak >= 74) {
-                          return Math.min(10, baseValue + 1.5).toFixed(1);
-                        }
-                        return Math.min(10, baseValue + 2.0).toFixed(1);
-                      })()}/10
-                    </div>
-                    <div className="historical-comparison-label">
-                      {(() => {
-                        const currentStreak = userData.currentStreak || 0;
-                        if (currentStreak >= 74) {
-                          return `Post-spermatogenesis ${selectedMetric} (cellular optimization active)`;
-                        }
-                        return `Projected ${selectedMetric} with longer streaks (30+ days)`;
-                      })()}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
       </div>
-      
+
+      {/* Intelligence Analysis Section */}
+      {isPremium && (
+        <div className="intelligence-analysis-section">
+          <div className="intelligence-analysis-header">
+            <h3>Intelligence Analysis</h3>
+          </div>
+
+          {/* Intelligence info banner */}
+          <div className="intelligence-info-banner">
+            <FaInfoCircle className="info-icon" />
+            <span>
+              <FormattedText>
+                **Advanced insights improve with data:** The more you track your benefits, the more accurate and personalized these intelligence insights become.
+              </FormattedText>
+            </span>
+          </div>
+
+          <div className="intelligence-preview-grid">
+            {/* Risk Predictor */}
+            <div className="intelligence-analysis-card">
+              <div className="intelligence-card-header">
+                <FaExclamationTriangle className="intelligence-card-icon" />
+                Risk Predictor
+              </div>
+              <div className="intelligence-card-content">
+                <div className="risk-predictor-display">
+                  <div className={`risk-level-indicator ${intelligenceInsights.riskPredictor.level}`}>
+                    <div>
+                      <div className={`risk-score ${intelligenceInsights.riskPredictor.level}`}>
+                        {intelligenceInsights.riskPredictor.score}
+                      </div>
+                      <div className="risk-level-text">
+                        {intelligenceInsights.riskPredictor.level.charAt(0).toUpperCase() + intelligenceInsights.riskPredictor.level.slice(1)} Risk
+                      </div>
+                    </div>
+                  </div>
+                  <div className="risk-factors-list">
+                    <div className="risk-factors-title">Key Factors:</div>
+                    {intelligenceInsights.riskPredictor.factors.map((factor, index) => (
+                      <div key={index} className="risk-factor-item">
+                        <FormattedText>{factor}</FormattedText>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="intelligence-data-status">
+                  <div className="intelligence-data-status-indicator">
+                    <div className={`intelligence-data-quality ${dataQuality.level}`}>
+                      <FaInfoCircle />
+                      {dataQuality.level}
+                    </div>
+                    <div className="intelligence-data-days">
+                      {dataQuality.days} days tracked
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Benefit Correlations */}
+            <div className="intelligence-analysis-card">
+              <div className="intelligence-card-header">
+                <FaChartLine className="intelligence-card-icon" />
+                Benefit Correlations
+              </div>
+              <div className="intelligence-card-content">
+                <div className="correlations-display">
+                  {intelligenceInsights.benefitCorrelations.map((correlation, index) => (
+                    <div key={index} className="correlation-item">
+                      <FormattedText>{correlation}</FormattedText>
+                    </div>
+                  ))}
+                </div>
+                <div className="intelligence-data-status">
+                  <div className="intelligence-data-status-indicator">
+                    <div className={`intelligence-data-quality ${dataQuality.level}`}>
+                      <FaInfoCircle />
+                      {dataQuality.level}
+                    </div>
+                    <div className="intelligence-data-days">
+                      {dataQuality.days} days tracked
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Performance Zones */}
+            <div className="intelligence-analysis-card">
+              <div className="intelligence-card-header">
+                <FaStar className="intelligence-card-icon" />
+                Performance Zones
+              </div>
+              <div className="intelligence-card-content">
+                <div className="performance-zones-display">
+                  <div className="performance-criteria">
+                    <div className="performance-criteria-title">Analysis Criteria</div>
+                    <div className="performance-criteria-text">
+                      <FormattedText>{intelligenceInsights.performanceZones.criteria}</FormattedText>
+                    </div>
+                  </div>
+                  {intelligenceInsights.performanceZones.metrics.length > 0 ? (
+                    <div className="performance-metrics-simplified">
+                      {intelligenceInsights.performanceZones.metrics.map((metric, index) => (
+                        <div key={index} className="performance-metric-card">
+                          <div className="performance-metric-value">{metric.value}</div>
+                          <div className="performance-metric-label">{metric.label}</div>
+                          <div className="performance-metric-context">{metric.context}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+                <div className="intelligence-data-status">
+                  <div className="intelligence-data-status-indicator">
+                    <div className={`intelligence-data-quality ${dataQuality.level}`}>
+                      <FaInfoCircle />
+                      {dataQuality.level}
+                    </div>
+                    <div className="intelligence-data-days">
+                      {dataQuality.days} days tracked
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Predictive Insights */}
+            <div className="intelligence-analysis-card">
+              <div className="intelligence-card-header">
+                <FaEye className="intelligence-card-icon" />
+                Predictive Insights
+              </div>
+              <div className="intelligence-card-content">
+                <div className="predictive-insights-display">
+                  {intelligenceInsights.predictiveInsights.map((insight, index) => (
+                    <div key={index} className="predictive-insight-item">
+                      <FormattedText>{insight}</FormattedText>
+                    </div>
+                  ))}
+                </div>
+                <div className="intelligence-data-status">
+                  <div className="intelligence-data-status-indicator">
+                    <div className={`intelligence-data-quality ${dataQuality.level}`}>
+                      <FaInfoCircle />
+                      {dataQuality.level}
+                    </div>
+                    <div className="intelligence-data-days">
+                      {dataQuality.days} days tracked
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Amplification Recommendations */}
+            <div className="intelligence-analysis-card">
+              <div className="intelligence-card-header">
+                <FaBrain className="intelligence-card-icon" />
+                Amplification Recommendations
+              </div>
+              <div className="intelligence-card-content">
+                <div className="amplification-display">
+                  {intelligenceInsights.amplificationRecommendations.map((recommendation, index) => (
+                    <div key={index} className="amplification-item">
+                      <FormattedText>{recommendation}</FormattedText>
+                    </div>
+                  ))}
+                </div>
+                <div className="intelligence-data-status">
+                  <div className="intelligence-data-status-indicator">
+                    <div className={`intelligence-data-quality ${dataQuality.level}`}>
+                      <FaInfoCircle />
+                      {dataQuality.level}
+                    </div>
+                    <div className="intelligence-data-days">
+                      {dataQuality.days} days tracked
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Historical Comparison */}
+            <div className="historical-comparison-section">
+              <div className="historical-comparison-header">
+                <FaChartLine className="intelligence-card-icon" />
+                Historical Comparison
+              </div>
+              <div className="historical-comparison-grid">
+                <div className="historical-comparison-card">
+                  <div className="historical-comparison-value">
+                    {userData.benefitTracking?.length >= 30 ? 
+                      (userData.benefitTracking.slice(-30).reduce((sum, entry) => sum + (entry[selectedMetric] || 0), 0) / 30).toFixed(1) : 
+                      'N/A'
+                    }
+                  </div>
+                  <div className="historical-comparison-label">30-Day Average</div>
+                </div>
+                <div className="historical-comparison-card">
+                  <div className="historical-comparison-value">
+                    {userData.benefitTracking?.length >= 7 ? 
+                      (userData.benefitTracking.slice(-7).reduce((sum, entry) => sum + (entry[selectedMetric] || 0), 0) / 7).toFixed(1) : 
+                      'N/A'
+                    }
+                  </div>
+                  <div className="historical-comparison-label">7-Day Average</div>
+                </div>
+                <div className="historical-comparison-card">
+                  <div className="historical-comparison-value">
+                    {userData.benefitTracking?.length > 0 ? 
+                      Math.max(...userData.benefitTracking.map(entry => entry[selectedMetric] || 0)).toFixed(1) : 
+                      'N/A'
+                    }
+                  </div>
+                  <div className="historical-comparison-label">Personal Best</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Badge Modal */}
       {showBadgeModal && selectedBadge && (
         <div className="modal-overlay" onClick={() => setShowBadgeModal(false)}>
-          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
+          <div className="modal-content badge-modal" onClick={(e) => e.stopPropagation()}>
             <div className="badge-trophy">
-              <FaMedal className="badge-trophy-icon" />
+              <FaTrophy className="badge-trophy-icon" />
             </div>
-            
             <h3>{selectedBadge.name}</h3>
-            
-            <div className="badge-earned-date">
-              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
-            </div>
-            
+            {selectedBadge.earned && (
+              <div className="badge-earned-date">
+                Earned on {formatDate(selectedBadge.date)}
+              </div>
+            )}
             <div className="badge-description">
-              <p>
-                {selectedBadge.name === '7-Day Warrior' ? 
-                  'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your foundation phase is complete - energy fluctuations are stabilizing and mental clarity is emerging!' :
-                selectedBadge.name === '14-Day Monk' ? 
-                  'Two weeks of dedication! You\'re in the adjustment phase with noticeable strength gains, improved posture, and enhanced focus. Your transformation is becoming visible!' :
-                selectedBadge.name === '30-Day Master' ? 
-                  'A full month of commitment! You\'ve entered the momentum phase with natural body composition changes, sustained energy, and mental clarity. True mastery developing!' :
-                selectedBadge.name === '90-Day King' ? 
-                  'Incredible achievement! 90 days represents complete physical and mental transformation. You\'ve reached royal status with emotional mastery and magnetic presence!' :
-                selectedBadge.name === '180-Day Emperor' ? 
-                  'Extraordinary dedication! Six months of practice has brought spiritual integration and identity transformation. You embody the divine masculine archetype!' :
-                selectedBadge.name === '365-Day Sage' ? 
-                  'Ultimate mastery achieved! One full year represents complete energy transmutation and service-oriented consciousness. You are now a teacher and healer for others!' :
-                  'Congratulations on earning this achievement!'
-                }
-              </p>
+              <p>{selectedBadge.description || `Achievement for maintaining a ${selectedBadge.name.split('-')[0]}-day streak.`}</p>
             </div>
-            
             <div className="badge-benefits">
-              <h4>Benefits Unlocked:</h4>
+              <h4>Benefits:</h4>
               <ul>
-                {selectedBadge.name === '7-Day Warrior' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Energy fluctuations stabilizing</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Brief periods of mental sharpness</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Growing sense of possibility</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Motivation to improve life areas</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '14-Day Monk' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Noticeable strength gains</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Improved posture and presence</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Enhanced memory and focus</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Mood stabilization beginning</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '30-Day Master' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Natural muscle gain and fat loss</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Sustained high energy levels</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Sleep optimization and better rest</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Mental clarity and pattern recognition</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '90-Day King' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Complete emotional regulation</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Natural magnetism and charisma</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Exceptional mental performance</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Physical transformation complete</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '180-Day Emperor' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Spiritual integration and wisdom</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Natural leadership presence</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Identity transformation complete</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Conscious energy mastery</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '365-Day Sage' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Mastery of sexual energy transmutation</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Service-oriented consciousness</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Generational pattern breaking</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Teaching and healing abilities</span></li>
-                  </>
-                )}
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Demonstrates commitment to recovery</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Builds momentum for longer streaks</span>
+                </li>
+                <li>
+                  <FaCheckCircle className="check-icon" />
+                  <span>Unlocks advanced tracking features</span>
+                </li>
               </ul>
             </div>
-            
             <div className="modal-actions">
               <button className="btn btn-primary" onClick={() => setShowBadgeModal(false)}>
-                Continue Journey
+                Close
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Smart Reset Dialog */}
+      {showSmartResetDialog && (
+        <SmartResetDialog
+          onClose={() => setShowSmartResetDialog(false)}
+          onConfirm={confirmResetStats}
+          userData={userData}
+        />
       )}
     </div>
   );
