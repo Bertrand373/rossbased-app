@@ -1561,6 +1561,29 @@
     margin-bottom: var(--spacing-md);
   }
   
+  /* NEW: Mobile info banner adjustments - EXACT MATCH to Emotional Timeline */
+  .stats-info-banner {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .stats-info-banner .info-icon {
+    align-self: center;
+    margin-top: 0;
+  }
+  
+  .intelligence-info-banner {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .intelligence-info-banner .info-icon {
+    align-self: center;
+    margin-top: 0;
+  }
+  
   .historical-comparison-section {
     padding: var(--spacing-lg);
   }
