@@ -403,7 +403,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       if (energyTrend < -1) {
         riskScore += 25;
         const drop = Math.abs(energyTrend).toFixed(1);
-        riskFactors.push(`Energy declined ${drop} points over 3 days - often indicates adrenal fatigue from energy transmutation stress`);
+        riskFactors.push(`Energy declined **${drop} points** over 3 days. This often indicates adrenal fatigue from energy transmutation stress.`);
       }
     }
     
@@ -411,7 +411,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const avgConfidence = last3Days.reduce((sum, day) => sum + (day.confidence || 5), 0) / last3Days.length;
     if (avgConfidence < 4) {
       riskScore += 20;
-      riskFactors.push(`Confidence averaging ${avgConfidence.toFixed(1)}/10 - emotional instability increases vulnerability to relapse`);
+      riskFactors.push(`Confidence averaging **${avgConfidence.toFixed(1)}/10**. Emotional instability increases vulnerability to relapse episodes.`);
     }
     
     // Poor sleep quality with educational context
@@ -419,7 +419,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const avgSleep = last3Days.reduce((sum, day) => sum + (day.sleep || 5), 0) / last3Days.length;
       if (avgSleep < 5) {
         riskScore += 15;
-        riskFactors.push(`Sleep quality ${avgSleep.toFixed(1)}/10 - poor circadian rhythm disrupts hormone balance and willpower`);
+        riskFactors.push(`Sleep quality **${avgSleep.toFixed(1)}/10**. Poor circadian rhythm disrupts hormone balance and willpower.`);
       }
     }
     
@@ -428,21 +428,21 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const avgFocus = last3Days.reduce((sum, day) => sum + (day.focus || 5), 0) / last3Days.length;
       if (avgFocus < 4) {
         riskScore += 20;
-        riskFactors.push(`Focus averaging ${avgFocus.toFixed(1)}/10 - mental clarity decline often precedes relapse episodes`);
+        riskFactors.push(`Focus averaging **${avgFocus.toFixed(1)}/10**. Mental clarity decline often precedes relapse episodes.`);
       }
     }
     
     // Spermatogenesis cycle insights
     if (currentStreak >= 60 && currentStreak <= 74) {
       riskScore += 15;
-      riskFactors.push(`Day ${currentStreak} - approaching spermatogenesis completion (67-74 days). Biological transition period increases urge intensity`);
+      riskFactors.push(`Day **${currentStreak}** - approaching spermatogenesis completion (**67-74 days**). Biological transition period increases urge intensity.`);
     }
     
     // Weekend vulnerability with educational context
     const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
     if (isWeekend) {
       riskScore += 10;
-      riskFactors.push('Weekend period - decreased structure and increased isolation elevate relapse risk');
+      riskFactors.push('Weekend period detected. Decreased structure and increased isolation elevate relapse risk.');
     }
     
     // Determine risk level
@@ -473,7 +473,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const improvement = ((avgFocusWhenEnergyHigh - overallAvgFocus) / overallAvgFocus * 100).toFixed(0);
       
       if (improvement > 5) {
-        correlations.push(`When energy ≥ 7, focus averages ${avgFocusWhenEnergyHigh.toFixed(1)} (+${improvement}% above baseline). This demonstrates energy transmutation - sexual energy converting to mental clarity, explaining enhanced cognitive function through retention`);
+        correlations.push(`When energy reaches **7 or higher**, focus averages **${avgFocusWhenEnergyHigh.toFixed(1)}/10** (representing a **${improvement}% improvement** above baseline). This demonstrates energy transmutation—sexual energy converting to mental clarity, explaining enhanced cognitive function through retention practice.`);
       }
     }
     
@@ -492,7 +492,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       if (nextDayConfidence.length > 0) {
         const lowConfidenceChance = (nextDayConfidence.filter(confidence => confidence < 5).length / nextDayConfidence.length * 100).toFixed(0);
         if (lowConfidenceChance > 50) {
-          correlations.push(`Sleep quality <5 creates ${lowConfidenceChance}% chance of low confidence next day. Sleep architecture optimization through circadian rhythm alignment significantly improves retention success rates`);
+          correlations.push(`Sleep quality below **5/10** creates a **${lowConfidenceChance}% probability** of low confidence the following day. Sleep architecture optimization through circadian rhythm alignment significantly improves retention success rates.`);
         }
       }
     }
@@ -513,7 +513,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         
         const improvement = ((avgEnergyPost74 - avgEnergyPre74) / avgEnergyPre74 * 100).toFixed(0);
         if (improvement > 10) {
-          correlations.push(`Post-spermatogenesis (74+ days): Energy averages ${avgEnergyPost74.toFixed(1)} (+${improvement}% vs pre-74). Your body has completed biological transition from reproduction to cellular optimization mode`);
+          correlations.push(`Post-spermatogenesis phase (**74+ days**): Energy averages **${avgEnergyPost74.toFixed(1)}/10** (representing a **${improvement}% improvement** versus pre-74 day levels). Your body has completed the biological transition from reproduction to cellular optimization mode.`);
         }
       }
     }
@@ -602,17 +602,17 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     if (last3Days.length >= 2) {
       const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
       if (energyTrend > 0.5) {
-        insights.push(`Based on your +${energyTrend.toFixed(1)} energy trend, tomorrow's energy predicted at 7-8. Energy improvements during retention reflect successful transmutation of sexual energy into life force`);
+        insights.push(`Based on your **+${energyTrend.toFixed(1)}** energy trend, tomorrow's energy is predicted at **7-8/10**. Energy improvements during retention reflect successful transmutation of sexual energy into life force.`);
       } else if (energyTrend < -0.5) {
-        insights.push(`Your energy declined ${Math.abs(energyTrend).toFixed(1)} points over 3 days. Energy fluctuations are normal as your body redirects sexual energy toward higher functions - prioritize rest and hydration for energy restoration`);
+        insights.push(`Your energy declined **${Math.abs(energyTrend).toFixed(1)} points** over 3 days. Energy fluctuations are normal as your body redirects sexual energy toward higher functions. Prioritize rest and hydration for energy restoration.`);
       }
     }
     
     // Spermatogenesis cycle predictions
     if (currentStreak >= 60 && currentStreak <= 67) {
-      insights.push(`Day ${currentStreak}: Approaching spermatogenesis completion (67-74 days). Expect significant energy shifts as your body transitions from sperm production to nutrient reabsorption mode for cellular repair`);
+      insights.push(`Day **${currentStreak}**: Approaching spermatogenesis completion (**67-74 days**). Expect significant energy shifts as your body transitions from sperm production to nutrient reabsorption mode for cellular repair.`);
     } else if (currentStreak >= 74) {
-      insights.push(`Day ${currentStreak}: Post-spermatogenesis phase active. Your body has completed the biological transition from reproduction to self-enhancement, explaining your sustained energy improvements`);
+      insights.push(`Day **${currentStreak}**: Post-spermatogenesis phase active. Your body has completed the biological transition from reproduction to self-enhancement, explaining your sustained energy improvements.`);
     }
     
     // 7-day trend analysis with educational context
@@ -641,22 +641,22 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     // High energy period recommendations with educational context
     if (currentAvgEnergy >= 7) {
-      recommendations.push(`Energy at ${currentAvgEnergy}/10 enables optimal physical training. Research shows 85% higher testosterone when exercising during peak energy windows - increase workout intensity by 20%`);
+      recommendations.push(`Energy at **${currentAvgEnergy}/10** enables optimal physical training. Research shows **85% higher testosterone** when exercising during peak energy windows. Consider increasing workout intensity by **20%**.`);
       
       if (isPremium) {
-        recommendations.push("Your peak performance window is active. Take on challenging mental tasks now - high energy states maximize cognitive function through enhanced brain blood flow");
+        recommendations.push("Your peak performance window is active. Take on challenging mental tasks now—high energy states maximize cognitive function through enhanced brain blood flow.");
       }
       
       // Spermatogenesis optimization
       if (currentStreak >= 74) {
-        recommendations.push("Post-spermatogenesis optimization phase: Your body is channeling reproductive resources into cellular repair and cognitive enhancement. Perfect time for skill development and creative projects");
+        recommendations.push("Post-spermatogenesis optimization phase: Your body is channeling reproductive resources into cellular repair and cognitive enhancement. This is the perfect time for skill development and creative projects.");
       }
     }
     
     // Low energy period recommendations with educational context
     const recentMood = allData.slice(-3).reduce((sum, d) => sum + (d.confidence || 0), 0) / 3;
     if (recentMood < 5) {
-      recommendations.push("Low confidence period detected. Energy transmutation stress is common during retention - prioritize sleep optimization, morning sunlight exposure, and gentle movement to restore emotional balance");
+      recommendations.push("Low confidence period detected. Energy transmutation stress is common during retention—prioritize sleep optimization, morning sunlight exposure, and gentle movement to restore emotional balance.");
     }
     
     // Decision-making optimization with educational context
@@ -664,7 +664,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const highConfidenceDays = allData.filter(d => (d.confidence || 0) >= 7);
       if (highConfidenceDays.length > 0) {
         const avgEnergyHighConfidence = highConfidenceDays.reduce((sum, d) => sum + (d.energy || 0), 0) / highConfidenceDays.length;
-        recommendations.push(`Your best decisions occur when confidence ≥ 7 (avg energy ${avgEnergyHighConfidence.toFixed(1)}). Save important choices for these periods - retention enhances decision-making through improved prefrontal cortex function`);
+        recommendations.push(`Your best decisions occur when confidence reaches **7 or higher** (average energy **${avgEnergyHighConfidence.toFixed(1)}/10**). Save important choices for these periods—retention enhances decision-making through improved prefrontal cortex function.`);
       }
     }
     
@@ -972,7 +972,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 </div>
                 <div className="intelligence-info-banner">
                   <FaInfoCircle className="info-icon" />
-                  <span>Analyzes your recent benefit trends to predict vulnerability periods. Based on energy, mood, and focus patterns from your last 3-14 days of tracking.</span>
+                  <span>Analyzes your recent benefit trends to predict vulnerability periods. Based on energy, confidence, and focus patterns from your last 3-14 days of tracking.</span>
                 </div>
                 <div className="intelligence-card-content">
                   <div className="risk-predictor-display">
@@ -1072,7 +1072,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   </div>
                   <div className="intelligence-info-banner">
                     <FaInfoCircle className="info-icon" />
-                    <span>Shows your peak performance rate based on Energy 7+, Sleep 6+, Mood 5+ criteria. Calculated from days where you logged benefits.</span>
+                    <span>Shows your peak performance rate based on Energy 7+, Sleep 6+, Confidence 5+ criteria. Calculated from days where you logged benefits.</span>
                   </div>
                   <div className="intelligence-card-content">
                     <div className="performance-zones-display">
@@ -1083,14 +1083,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                       <div className="performance-metrics-simplified">
                         <div className="performance-metric-card">
                           <div className="performance-metric-value">{performanceZones.optimalPercentage}%</div>
-                          <div className="performance-metric-label">Peak performance days</div>
+                          <div className="performance-metric-label">Optimal Days</div>
                           <div className="performance-metric-context">({performanceZones.optimalDays} out of {performanceZones.optimalDays + performanceZones.suboptimalDays} days logged)</div>
                         </div>
                         {performanceZones.focusPerformance && (
                           <div className="performance-metric-card">
                             <div className="performance-metric-value">{performanceZones.focusPerformance}%</div>
-                            <div className="performance-metric-label">Mental peak performance</div>
-                            <div className="performance-metric-context">(8+ focus on peak days)</div>
+                            <div className="performance-metric-label">Mind-Body Sync</div>
+                            <div className="performance-metric-context">(Mental clarity follows physical optimization {performanceZones.focusPerformance}% of the time)</div>
                           </div>
                         )}
                         <div className="performance-metric-card">
