@@ -1368,7 +1368,7 @@
   }
 }
 
-/* MOBILE RESPONSIVE */
+/* MOBILE RESPONSIVE - IMPROVED INTELLIGENCE CARD SPACING */
 @media (max-width: 768px) {
   .stats-header {
     display: flex;
@@ -1532,20 +1532,36 @@
     justify-content: center;
   }
   
+  /* IMPROVED: Intelligence Analysis Mobile Spacing */
   .intelligence-analysis-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+    padding: var(--spacing-lg);
   }
   
   .intelligence-analysis-header h3 {
     font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
   }
   
+  /* IMPROVED: Intelligence card mobile spacing - more breathing room */
   .intelligence-analysis-card {
+    padding: var(--spacing-lg);
+    gap: var(--spacing-lg);
+  }
+  
+  .intelligence-card-header {
+    padding: var(--spacing-sm) 0;
+    font-size: 1rem;
+  }
+  
+  .intelligence-info-banner {
+    font-size: 0.8rem;
     padding: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
   }
   
   .historical-comparison-section {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
   
   .historical-comparison-grid {
@@ -1554,7 +1570,7 @@
   
   .historical-comparison-card {
     min-height: 100px;
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
   
   .historical-comparison-value {
@@ -1566,24 +1582,18 @@
   }
   
   .performance-metric-card {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
   
   .performance-metric-value {
     font-size: 1.25rem;
   }
   
-  /* NEW: Mobile intelligence data status adjustments - EXACT MATCH to EmotionalTimeline */
+  /* IMPROVED: Mobile intelligence data status adjustments */
   .intelligence-data-status-indicator {
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
     text-align: center;
-  }
-  
-  /* NEW: Mobile info banner adjustments */
-  .intelligence-info-banner {
-    font-size: 0.8rem;
-    padding: var(--spacing-sm);
   }
   
   .form-actions {
@@ -1605,7 +1615,7 @@
   }
 }
 
-/* VERY SMALL SCREENS */
+/* VERY SMALL SCREENS - IMPROVED INTELLIGENCE CARD SPACING */
 @media (max-width: 480px) {
   .upgrade-helmet-icon {
     width: 60px;
@@ -1696,21 +1706,41 @@
     justify-content: center;
   }
   
+  /* IMPROVED: Very small screen intelligence analysis spacing */
   .intelligence-analysis-section {
     padding: var(--spacing-md);
   }
   
+  .intelligence-analysis-header h3 {
+    font-size: 1rem;
+    padding: var(--spacing-sm) 0;
+  }
+  
+  /* IMPROVED: Very small screen intelligence cards - generous padding */
   .intelligence-analysis-card {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    gap: var(--spacing-md);
+  }
+  
+  .intelligence-card-header {
+    padding: var(--spacing-md) 0;
+    font-size: 0.9rem;
+  }
+  
+  .intelligence-info-banner {
+    font-size: 0.75rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-top: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
   }
   
   .historical-comparison-section {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
   
   .historical-comparison-card {
     min-height: 90px;
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
   
   .historical-comparison-value {
@@ -1718,16 +1748,10 @@
   }
   
   .performance-metric-card {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
   
   .performance-metric-value {
     font-size: 1.125rem;
-  }
-  
-  /* NEW: Very small screen info banner adjustments */
-  .intelligence-info-banner {
-    font-size: 0.75rem;
-    padding: var(--spacing-sm);
   }
 }
