@@ -248,7 +248,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     toast.success('Premium upgrade coming soon! 🚀');
   };
 
-  // Filter benefit data based on selected time range
+  // UPDATED: Filter benefit data based on selected time range with proper date handling
   const getFilteredBenefitData = () => {
     if (!userData.benefitTracking) return [];
     
@@ -256,17 +256,50 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const cutoffDate = subDays(new Date(), days);
     
     return userData.benefitTracking
-      .filter(item => new Date(item.date) >= cutoffDate)
+      .filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= cutoffDate;
+      })
       .sort((a, b) => new Date(a.date) - new Date(b.date));
   };
   
-  // Generate chart data
+  // UPDATED: Generate chart data with proper time range filtering
   const generateChartData = () => {
     const filteredData = getFilteredBenefitData();
     
-    const labels = filteredData.map(item => 
-      format(new Date(item.date), 'MMM d')
-    );
+    if (filteredData.length === 0) {
+      return {
+        labels: [],
+        datasets: [{
+          label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
+          data: [],
+          borderColor: '#ffdd00',
+          backgroundColor: 'rgba(255, 221, 0, 0.1)',
+          tension: 0.3,
+          fill: true,
+          pointBackgroundColor: '#ffdd00',
+          pointBorderColor: '#ffdd00',
+          pointHoverBackgroundColor: '#f6cc00',
+          pointHoverBorderColor: '#f6cc00',
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointBorderWidth: 2,
+          pointHoverBorderWidth: 3
+        }]
+      };
+    }
+    
+    // Generate labels based on time range for better readability
+    const labels = filteredData.map(item => {
+      const date = new Date(item.date);
+      if (timeRange === 'week') {
+        return format(date, 'EEE'); // Mon, Tue, Wed
+      } else if (timeRange === 'month') {
+        return format(date, 'MMM d'); // Jan 15
+      } else {
+        return format(date, 'MMM d'); // Jan 15 (for quarter view)
+      }
+    });
     
     const datasets = [{
       label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
@@ -284,8 +317,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       pointBorderColor: '#ffdd00',
       pointHoverBackgroundColor: '#f6cc00',
       pointHoverBorderColor: '#f6cc00',
-      pointRadius: 6,
-      pointHoverRadius: 8,
+      pointRadius: timeRange === 'quarter' ? 4 : 6, // Smaller points for quarter view
+      pointHoverRadius: timeRange === 'quarter' ? 6 : 8,
       pointBorderWidth: 2,
       pointHoverBorderWidth: 3
     }];
@@ -293,7 +326,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return { labels, datasets };
   };
   
-  // Chart options
+  // UPDATED: Chart options with dynamic scaling based on time range
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -314,7 +347,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       x: {
         ticks: {
           color: '#aaaaaa',
-          font: { size: 12 }
+          font: { size: 12 },
+          maxTicksLimit: timeRange === 'quarter' ? 12 : timeRange === 'month' ? 15 : 7, // Limit ticks based on range
+          maxRotation: timeRange === 'quarter' ? 45 : 0 // Rotate labels for quarter view
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
@@ -330,7 +365,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             if (!items.length) return '';
             const idx = items[0].dataIndex;
             const filteredData = getFilteredBenefitData();
+            if (!filteredData[idx]) return '';
             return formatDate(filteredData[idx].date);
+          },
+          label: (context) => {
+            const value = context.parsed.y;
+            const metricName = selectedMetric === 'sleep' ? 'Sleep Quality' : 
+                             selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1);
+            return `${metricName}: ${value}/10`;
           }
         },
         backgroundColor: 'rgba(44, 44, 44, 0.95)',
@@ -354,7 +396,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
   
-  // Calculate average for display
+  // Calculate average for display - UPDATED: Handle no data cases
   const calculateAverage = () => {
     if (!isPremium) {
       const allData = userData.benefitTracking || [];
@@ -366,7 +408,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         })
         .sort((a, b) => new Date(a.date) - new Date(b.date));
       
-      if (last7DaysData.length === 0) return '0.0';
+      if (last7DaysData.length === 0) return 'N/A';
       
       const sum = last7DaysData.reduce((acc, item) => {
         return acc + (item.energy || 0);
@@ -375,7 +417,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
     
     const filteredData = getFilteredBenefitData();
-    if (filteredData.length === 0) return '0.0';
+    if (filteredData.length === 0) return 'N/A';
     
     const sum = filteredData.reduce((acc, item) => {
       if (selectedMetric === 'sleep') {
@@ -384,6 +426,49 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       return acc + (item[selectedMetric] || 0);
     }, 0);
     return (sum / filteredData.length).toFixed(1);
+  };
+
+  // UPDATED: Calculate historical comparison values with proper N/A handling
+  const calculateHistoricalComparison = () => {
+    const allData = userData.benefitTracking || [];
+    const filteredData = getFilteredBenefitData();
+    
+    // Short streaks (1-7 days)
+    const getShortStreakAverage = () => {
+      if (filteredData.length === 0) return 'N/A';
+      const shortTermData = filteredData.filter(item => {
+        const itemDate = new Date(item.date);
+        const sevenDaysAgo = subDays(new Date(), 7);
+        return itemDate >= sevenDaysAgo;
+      });
+      if (shortTermData.length === 0) return 'N/A';
+      const avg = shortTermData.reduce((sum, item) => sum + (item[selectedMetric] || 5), 0) / shortTermData.length;
+      return avg.toFixed(1);
+    };
+    
+    // Current average
+    const getCurrentAverage = () => {
+      return calculateAverage();
+    };
+    
+    // Projected longer streak average
+    const getProjectedAverage = () => {
+      const currentAvg = calculateAverage();
+      if (currentAvg === 'N/A') return 'N/A';
+      
+      const baseValue = parseFloat(currentAvg);
+      const currentStreak = userData.currentStreak || 0;
+      if (currentStreak >= 74) {
+        return Math.min(10, baseValue + 1.5).toFixed(1);
+      }
+      return Math.min(10, baseValue + 2.0).toFixed(1);
+    };
+    
+    return {
+      shortStreak: getShortStreakAverage(),
+      current: getCurrentAverage(),
+      projected: getProjectedAverage()
+    };
   };
 
   // UPDATED: Calculate relapse risk score with educational insights and proper N/A handling
@@ -943,13 +1028,36 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           <>
             <div className="chart-and-insight-container" ref={insightsStartRef}>
               <div className="chart-container">
-                <Line data={generateChartData()} options={chartOptions} height={300} />
+                {(() => {
+                  const chartData = generateChartData();
+                  const hasData = chartData.labels.length > 0;
+                  
+                  if (!hasData) {
+                    return (
+                      <div className="no-chart-data">
+                        <div className="no-data-icon">
+                          <FaChartLine />
+                        </div>
+                        <div className="no-data-text">
+                          <h4>No Data for {timeRange === 'week' ? 'Last 7 Days' : timeRange === 'month' ? 'Last 30 Days' : 'Last 90 Days'}</h4>
+                          <p>Start logging your {selectedMetric} benefits to see your progress chart.</p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  return <Line data={chartData} options={chartOptions} height={300} />;
+                })()}
               </div>
               
               <div className="current-insight-sidebar">
                 <div className="current-metric-average">
-                  <div className="current-metric-label">Your {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
-                  <div className="current-metric-value">{calculateAverage()}/10</div>
+                  <div className="current-metric-label">
+                    Your {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} {getTimeRangeDisplayText()}
+                  </div>
+                  <div className="current-metric-value">
+                    {calculateAverage() === 'N/A' ? 'N/A' : `${calculateAverage()}/10`}
+                  </div>
                 </div>
                 
                 <div className="current-insight-card">
@@ -957,10 +1065,23 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                     <span>Current Status</span>
                   </div>
                   <div className="current-insight-text">
-                    Your {selectedMetric} is tracking at {calculateAverage()}/10. 
-                    {parseFloat(calculateAverage()) >= 7 ? 
-                      " Excellent performance - maintain current strategies." : 
-                      " Room for optimization - check intelligence insights below."}
+                    {(() => {
+                      const avg = calculateAverage();
+                      const filteredData = getFilteredBenefitData();
+                      
+                      if (avg === 'N/A') {
+                        return `No ${selectedMetric} data for the selected ${timeRange} period. Start logging benefits to see your progress.`;
+                      }
+                      
+                      const timeRangeText = timeRange === 'week' ? 'week' : timeRange === 'month' ? 'month' : '3 months';
+                      const avgValue = parseFloat(avg);
+                      
+                      if (avgValue >= 7) {
+                        return `Your ${selectedMetric} is excellent this ${timeRangeText} at ${avg}/10. Maintain current strategies.`;
+                      } else {
+                        return `Your ${selectedMetric} averaged ${avg}/10 this ${timeRangeText}. Check intelligence insights below for optimization.`;
+                      }
+                    })()}
                   </div>
                 </div>
               </div>
@@ -1194,36 +1315,29 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   <div className="historical-comparison-card">
                     <div className="historical-comparison-value">
                       {(() => {
-                        const filteredData = getFilteredBenefitData();
-                        if (filteredData.length === 0) return '5.0';
-                        const shortTermData = filteredData.filter(item => {
-                          const itemDate = new Date(item.date);
-                          const sevenDaysAgo = subDays(new Date(), 7);
-                          return itemDate >= sevenDaysAgo;
-                        });
-                        if (shortTermData.length === 0) return '5.0';
-                        const avg = shortTermData.reduce((sum, item) => sum + (item[selectedMetric] || 5), 0) / shortTermData.length;
-                        return avg.toFixed(1);
-                      })()}/10
+                        const comparison = calculateHistoricalComparison();
+                        return comparison.shortStreak === 'N/A' ? 'N/A' : `${comparison.shortStreak}/10`;
+                      })()}
                     </div>
                     <div className="historical-comparison-label">Your {selectedMetric} during short streaks (1-7 days)</div>
                   </div>
                   
                   <div className="historical-comparison-card">
-                    <div className="historical-comparison-value">{calculateAverage()}/10</div>
+                    <div className="historical-comparison-value">
+                      {(() => {
+                        const comparison = calculateHistoricalComparison();
+                        return comparison.current === 'N/A' ? 'N/A' : `${comparison.current}/10`;
+                      })()}
+                    </div>
                     <div className="historical-comparison-label">Your current {selectedMetric} average</div>
                   </div>
                   
                   <div className="historical-comparison-card">
                     <div className="historical-comparison-value">
                       {(() => {
-                        const baseValue = parseFloat(calculateAverage());
-                        const currentStreak = userData.currentStreak || 0;
-                        if (currentStreak >= 74) {
-                          return Math.min(10, baseValue + 1.5).toFixed(1);
-                        }
-                        return Math.min(10, baseValue + 2.0).toFixed(1);
-                      })()}/10
+                        const comparison = calculateHistoricalComparison();
+                        return comparison.projected === 'N/A' ? 'N/A' : `${comparison.projected}/10`;
+                      })()}
                     </div>
                     <div className="historical-comparison-label">
                       {(() => {

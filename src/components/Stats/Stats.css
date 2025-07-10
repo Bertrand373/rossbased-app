@@ -592,6 +592,39 @@
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* NEW: No chart data state */
+.no-chart-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  text-align: center;
+  color: var(--text-secondary);
+  height: 100%;
+}
+
+.no-data-icon {
+  font-size: 3rem;
+  color: var(--primary);
+  opacity: 0.7;
+}
+
+.no-data-text h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text);
+  font-size: 1.125rem;
+}
+
+.no-data-text p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
 /* Current Insight Sidebar */
