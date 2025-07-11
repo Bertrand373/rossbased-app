@@ -1,6 +1,6 @@
 // components/Stats/Stats.js - REDESIGNED: Pro Intelligence Analysis Section
 import React, { useState, useEffect, useRef } from 'react';
-import { format, subDays } from 'date-fns';
+import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
@@ -277,67 +277,72 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       .sort((a, b) => new Date(a.date) - new Date(b.date));
   };
   
-  // UPDATED: Generate chart data with proper time range filtering
+  // NEW: Generate bird's eye view chart data - shows full time range even with limited data
   const generateChartData = () => {
-    const filteredData = getFilteredBenefitData();
+    const allUserData = userData.benefitTracking || [];
+    const days = timeRangeOptions[timeRange];
+    const today = new Date();
     
-    if (filteredData.length === 0) {
-      return {
-        labels: [],
-        datasets: [{
-          label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
-          data: [],
-          borderColor: '#ffdd00',
-          backgroundColor: 'rgba(255, 221, 0, 0.1)',
-          tension: 0.3,
-          fill: true,
-          pointBackgroundColor: '#ffdd00',
-          pointBorderColor: '#ffdd00',
-          pointHoverBackgroundColor: '#f6cc00',
-          pointHoverBorderColor: '#f6cc00',
-          pointRadius: 6,
-          pointHoverRadius: 8,
-          pointBorderWidth: 2,
-          pointHoverBorderWidth: 3
-        }]
-      };
+    // Create complete time range array
+    const timeRangeArray = [];
+    const dataMap = new Map();
+    
+    // Build data map from user's actual data
+    allUserData.forEach(item => {
+      const itemDate = startOfDay(new Date(item.date));
+      const value = selectedMetric === 'sleep' ? 
+        (item[selectedMetric] || item.attraction || null) : 
+        (item[selectedMetric] || null);
+      dataMap.set(itemDate.getTime(), value);
+    });
+    
+    // Generate time range labels and data
+    for (let i = days - 1; i >= 0; i--) {
+      const date = startOfDay(subDays(today, i));
+      timeRangeArray.push({
+        date,
+        value: dataMap.get(date.getTime()) || null
+      });
     }
     
-    // Generate labels based on time range for better readability
-    const labels = filteredData.map(item => {
-      const date = new Date(item.date);
+    // Format labels based on time range
+    const labels = timeRangeArray.map(item => {
       if (timeRange === 'week') {
-        return format(date, 'EEE'); // Mon, Tue, Wed
+        return format(item.date, 'EEE'); // Mon, Tue, Wed
       } else if (timeRange === 'month') {
-        return format(date, 'MMM d'); // Jan 15
+        return format(item.date, 'MMM d'); // Jan 15
       } else {
-        return format(date, 'MMM d'); // Jan 15 (for quarter view)
+        return format(item.date, 'MMM d'); // Jan 15 (for quarter view)
       }
     });
     
+    // Create data array with nulls for missing data (creates gaps in the line)
+    const data = timeRangeArray.map(item => item.value);
+    
     const datasets = [{
       label: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
-      data: filteredData.map(item => {
-        if (selectedMetric === 'sleep') {
-          return item[selectedMetric] || item.attraction || 5;
-        }
-        return item[selectedMetric] || 5;
-      }),
+      data: data,
       borderColor: '#ffdd00',
       backgroundColor: 'rgba(255, 221, 0, 0.1)',
       tension: 0.3,
-      fill: true,
+      fill: false, // Don't fill when we have gaps
       pointBackgroundColor: '#ffdd00',
       pointBorderColor: '#ffdd00',
       pointHoverBackgroundColor: '#f6cc00',
       pointHoverBorderColor: '#f6cc00',
-      pointRadius: timeRange === 'quarter' ? 4 : 6, // Smaller points for quarter view
-      pointHoverRadius: timeRange === 'quarter' ? 6 : 8,
+      pointRadius: (context) => {
+        // Only show points where we have data
+        return context.parsed.y !== null ? (timeRange === 'quarter' ? 4 : 6) : 0;
+      },
+      pointHoverRadius: (context) => {
+        return context.parsed.y !== null ? (timeRange === 'quarter' ? 6 : 8) : 0;
+      },
       pointBorderWidth: 2,
-      pointHoverBorderWidth: 3
+      pointHoverBorderWidth: 3,
+      spanGaps: false // Don't connect across null values
     }];
     
-    return { labels, datasets };
+    return { labels, datasets, timeRangeArray };
   };
   
   // UPDATED: Chart options with dynamic scaling based on time range
@@ -362,8 +367,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         ticks: {
           color: '#aaaaaa',
           font: { size: 12 },
-          maxTicksLimit: timeRange === 'quarter' ? 12 : timeRange === 'month' ? 15 : 7, // Limit ticks based on range
-          maxRotation: timeRange === 'quarter' ? 45 : 0 // Rotate labels for quarter view
+          maxTicksLimit: timeRange === 'quarter' ? 12 : timeRange === 'month' ? 15 : 7,
+          maxRotation: timeRange === 'quarter' ? 45 : 0
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
@@ -374,16 +379,21 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     plugins: {
       legend: { display: false },
       tooltip: {
+        filter: (tooltipItem) => {
+          // Only show tooltip for data points that exist
+          return tooltipItem.parsed.y !== null;
+        },
         callbacks: {
           title: (items) => {
             if (!items.length) return '';
             const idx = items[0].dataIndex;
-            const filteredData = getFilteredBenefitData();
-            if (!filteredData[idx]) return '';
-            return formatDate(filteredData[idx].date);
+            const chartData = generateChartData();
+            if (!chartData.timeRangeArray[idx]) return '';
+            return formatDate(chartData.timeRangeArray[idx].date);
           },
           label: (context) => {
             const value = context.parsed.y;
+            if (value === null) return '';
             const metricName = selectedMetric === 'sleep' ? 'Sleep Quality' : 
                              selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1);
             return `${metricName}: ${value}/10`;
@@ -1044,9 +1054,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <div className="chart-container">
                 {(() => {
                   const chartData = generateChartData();
-                  const hasData = chartData.labels.length > 0;
+                  const hasAnyData = chartData.datasets[0].data.some(val => val !== null);
                   
-                  if (!hasData) {
+                  if (!hasAnyData) {
                     return (
                       <div className="no-chart-data">
                         <div className="no-data-icon">
