@@ -52,6 +52,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return { __html: htmlText };
   };
 
+  // Helper function to get time range display text
+  const getTimeRangeDisplayText = () => {
+    switch (timeRange) {
+      case 'week':
+        return '(Last 7 Days)';
+      case 'month':
+        return '(Last 30 Days)';
+      case 'quarter':
+        return '(Last 90 Days)';
+      default:
+        return '';
+    }
+  };
+
   // CORE: Badge checking logic - automatically unlocks badges when milestones are reached
   const checkAndUpdateBadges = (userData) => {
     if (!userData.badges || !Array.isArray(userData.badges)) {
