@@ -1,10 +1,10 @@
-// components/Stats/Stats.js - REDESIGNED: Pro Intelligence Analysis Section
+// components/Stats/Stats.js - REFINED: Practitioner-Focused Analysis Section
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine, FaShieldAlt, FaFire } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -74,7 +74,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
     const currentStreak = userData.currentStreak || 0;
     const longestStreak = userData.longestStreak || 0;
-    const maxStreak = Math.max(currentStreak, longestStreak); // FIXED: Use max for badge checking
+    const maxStreak = Math.max(currentStreak, longestStreak);
     let hasNewBadges = false;
     
     const badgeThresholds = [
@@ -90,7 +90,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       const threshold = badgeThresholds.find(t => t.name === badge.name);
       if (!threshold) return badge;
 
-      const shouldBeEarned = maxStreak >= threshold.days; // FIXED: Use maxStreak
+      const shouldBeEarned = maxStreak >= threshold.days;
       
       if (!badge.earned && shouldBeEarned) {
         hasNewBadges = true;
@@ -262,7 +262,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     toast.success('Premium upgrade coming soon! 🚀');
   };
 
-  // UPDATED: Filter benefit data based on selected time range with proper date handling
+  // Filter benefit data based on selected time range
   const getFilteredBenefitData = () => {
     if (!userData.benefitTracking) return [];
     
@@ -277,7 +277,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       .sort((a, b) => new Date(a.date) - new Date(b.date));
   };
   
-  // NEW: Generate bird's eye view chart data - shows full time range even with limited data
+  // Generate bird's eye view chart data
   const generateChartData = () => {
     const allUserData = userData.benefitTracking || [];
     const days = timeRangeOptions[timeRange];
@@ -308,15 +308,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     // Format labels based on time range
     const labels = timeRangeArray.map(item => {
       if (timeRange === 'week') {
-        return format(item.date, 'EEE'); // Mon, Tue, Wed
+        return format(item.date, 'EEE');
       } else if (timeRange === 'month') {
-        return format(item.date, 'MMM d'); // Jan 15
+        return format(item.date, 'MMM d');
       } else {
-        return format(item.date, 'MMM d'); // Jan 15 (for quarter view)
+        return format(item.date, 'MMM d');
       }
     });
     
-    // Create data array with nulls for missing data (creates gaps in the line)
     const data = timeRangeArray.map(item => item.value);
     
     const datasets = [{
@@ -325,13 +324,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       borderColor: '#ffdd00',
       backgroundColor: 'rgba(255, 221, 0, 0.1)',
       tension: 0.3,
-      fill: false, // Don't fill when we have gaps
+      fill: false,
       pointBackgroundColor: '#ffdd00',
       pointBorderColor: '#ffdd00',
       pointHoverBackgroundColor: '#f6cc00',
       pointHoverBorderColor: '#f6cc00',
       pointRadius: (context) => {
-        // Only show points where we have data
         return context.parsed.y !== null ? (timeRange === 'quarter' ? 4 : 6) : 0;
       },
       pointHoverRadius: (context) => {
@@ -339,13 +337,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       },
       pointBorderWidth: 2,
       pointHoverBorderWidth: 3,
-      spanGaps: false // Don't connect across null values
+      spanGaps: false
     }];
     
     return { labels, datasets, timeRangeArray };
   };
   
-  // UPDATED: Chart options with dynamic scaling based on time range
+  // Chart options with dynamic scaling
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -380,7 +378,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       legend: { display: false },
       tooltip: {
         filter: (tooltipItem) => {
-          // Only show tooltip for data points that exist
           return tooltipItem.parsed.y !== null;
         },
         callbacks: {
@@ -420,7 +417,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
   
-  // Calculate average for display - UPDATED: Handle no data cases
+  // Calculate average for display
   const calculateAverage = () => {
     if (!isPremium) {
       const allData = userData.benefitTracking || [];
@@ -452,12 +449,229 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return (sum / filteredData.length).toFixed(1);
   };
 
-  // UPDATED: Calculate historical comparison values with proper N/A handling
+  // Get current phase based on streak
+  const getCurrentPhase = () => {
+    const currentStreak = userData.currentStreak || 0;
+    if (currentStreak <= 14) return 'Foundation';
+    if (currentStreak <= 45) return 'Purification';
+    if (currentStreak <= 90) return 'Expansion';
+    if (currentStreak <= 180) return 'Integration';
+    return 'Mastery';
+  };
+
+  // REFINED: Smart Urge Management with timing and streak-specific guidance
+  const generateUrgeManagementGuidance = () => {
+    const currentStreak = userData.currentStreak || 0;
+    const currentHour = new Date().getHours();
+    const currentDay = new Date().getDay();
+    const isWeekend = currentDay === 0 || currentDay === 6;
+    const isEvening = currentHour >= 20 && currentHour <= 23;
+    const filteredData = getFilteredBenefitData();
+    
+    const guidance = [];
+    let riskLevel = 'Low';
+    
+    // Time-based vulnerability
+    if (isEvening) {
+      riskLevel = 'Medium';
+      guidance.push("**Evening Hours (8-11pm)**: High-risk period detected. Dopamine peaks naturally at night, increasing urge intensity. Consider ending screen time now.");
+    }
+    
+    if (isWeekend) {
+      riskLevel = riskLevel === 'Medium' ? 'High' : 'Medium';
+      guidance.push("**Weekend Period**: Reduced structure increases vulnerability. Plan activities now - visit family, go to gym, or work on projects.");
+    }
+    
+    // Critical spermatogenesis phase
+    if (currentStreak >= 60 && currentStreak <= 74) {
+      riskLevel = 'High';
+      guidance.push(`**Day ${currentStreak} - Critical Phase**: Approaching spermatogenesis completion (67-74 days). Your body is transitioning from reproduction mode to optimization mode. Urges may intensify temporarily.`);
+    }
+    
+    // Energy-based recommendations
+    if (filteredData.length >= 3) {
+      const last3Days = filteredData.slice(-3);
+      const avgEnergy = last3Days.reduce((sum, day) => sum + (day.energy || 5), 0) / last3Days.length;
+      
+      if (avgEnergy < 5) {
+        riskLevel = riskLevel === 'Low' ? 'Medium' : 'High';
+        guidance.push(`**Low Energy Detected**: Energy averaging ${avgEnergy.toFixed(1)}/10. Low vitality increases relapse risk. Take a cold shower, do 20 push-ups, or call a friend immediately.`);
+      }
+    }
+    
+    // Phase-specific guidance
+    const phase = getCurrentPhase();
+    switch (phase) {
+      case 'Foundation':
+        guidance.push("**Foundation Phase (Days 1-14)**: Building new neural pathways. Every urge resisted literally rewires your brain for self-mastery. You're becoming stronger each moment.");
+        break;
+      case 'Purification':
+        guidance.push("**Purification Phase (Days 15-45)**: Emotional purging active. If feeling anxious or depressed, this is normal - your psyche is healing. Urges may spike during emotional lows.");
+        break;
+      case 'Expansion':
+        guidance.push("**Expansion Phase (Days 46-90)**: Mental clarity emerging. Channel rising energy into creative projects, learning, or physical challenges. Your mind is becoming your superpower.");
+        break;
+      case 'Integration':
+        guidance.push("**Integration Phase (Days 91-180)**: Spiritual integration beginning. You're developing natural magnetism. Others may test you - stay centered and lead by example.");
+        break;
+      case 'Mastery':
+        guidance.push("**Mastery Phase (180+ days)**: You've transcended basic urges. Any current challenge is about service and using your power responsibly. You're now a teacher and healer.");
+        break;
+    }
+    
+    return { guidance, riskLevel };
+  };
+
+  // REFINED: Pattern Recognition combining correlations and predictive insights
+  const generatePatternRecognition = () => {
+    const allData = userData.benefitTracking || [];
+    const currentStreak = userData.currentStreak || 0;
+    if (allData.length < 7) return [];
+    
+    const patterns = [];
+    
+    // Energy-focus relationship (practical only)
+    if (isPremium && allData.length >= 10) {
+      const energyData = allData.filter(d => d.energy >= 7);
+      if (energyData.length > 3) {
+        const avgFocusWhenEnergyHigh = energyData.reduce((sum, d) => sum + (d.focus || 0), 0) / energyData.length;
+        const overallAvgFocus = allData.reduce((sum, d) => sum + (d.focus || 0), 0) / allData.length;
+        const improvement = ((avgFocusWhenEnergyHigh - overallAvgFocus) / overallAvgFocus * 100).toFixed(0);
+        
+        if (improvement > 15) {
+          patterns.push(`**Energy-Focus Pattern**: When your energy hits 7+, focus averages ${avgFocusWhenEnergyHigh.toFixed(1)}/10 (${improvement}% above baseline). This shows sexual energy transmuting into mental clarity - schedule important work during high-energy periods.`);
+        }
+      }
+    }
+    
+    // Sleep-confidence pattern
+    if (isPremium && allData.length > 10) {
+      const poorSleepDays = allData.filter(d => (d.sleep || 5) < 5);
+      if (poorSleepDays.length > 2) {
+        const nextDayConfidence = poorSleepDays.map(d => {
+          const dayAfter = allData.find(next => {
+            const dayAfterDate = new Date(d.date);
+            dayAfterDate.setDate(dayAfterDate.getDate() + 1);
+            return next.date === dayAfterDate.toISOString().split('T')[0];
+          });
+          return dayAfter ? (dayAfter.confidence || 5) : null;
+        }).filter(confidence => confidence !== null);
+        
+        if (nextDayConfidence.length > 0) {
+          const lowConfidenceRate = (nextDayConfidence.filter(c => c < 5).length / nextDayConfidence.length * 100).toFixed(0);
+          if (lowConfidenceRate > 50) {
+            patterns.push(`**Sleep-Confidence Pattern**: Poor sleep (below 5/10) leads to low confidence the next day ${lowConfidenceRate}% of the time. Your circadian rhythm directly affects emotional stability - prioritize sleep optimization.`);
+          }
+        }
+      }
+    }
+    
+    // Spermatogenesis phase insights
+    if (currentStreak >= 74) {
+      const post74Data = allData.filter(d => {
+        const daysSinceStart = Math.floor((new Date(d.date) - new Date(userData.startDate)) / (1000 * 60 * 60 * 24));
+        return daysSinceStart >= 74;
+      });
+      
+      if (post74Data.length > 7) {
+        const avgEnergyPost74 = post74Data.reduce((sum, d) => sum + (d.energy || 0), 0) / post74Data.length;
+        const pre74Data = allData.filter(d => {
+          const daysSinceStart = Math.floor((new Date(d.date) - new Date(userData.startDate)) / (1000 * 60 * 60 * 24));
+          return daysSinceStart < 74;
+        });
+        const avgEnergyPre74 = pre74Data.reduce((sum, d) => sum + (d.energy || 0), 0) / pre74Data.length;
+        
+        const improvement = ((avgEnergyPost74 - avgEnergyPre74) / avgEnergyPre74 * 100).toFixed(0);
+        if (improvement > 10) {
+          patterns.push(`**Post-Spermatogenesis Pattern**: Energy after day 74 averages ${avgEnergyPost74.toFixed(1)}/10 (${improvement}% higher than pre-74). Your body completed the biological transition from reproduction to cellular optimization.`);
+        }
+      }
+    }
+    
+    // Energy trend prediction
+    if (allData.length >= 5) {
+      const last3Days = allData.slice(-3);
+      if (last3Days.length >= 2) {
+        const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
+        if (energyTrend > 0.5) {
+          patterns.push(`**Energy Trend Prediction**: Based on your +${energyTrend.toFixed(1)} energy trend, expect 7-8/10 energy tomorrow. Rising energy reflects successful transmutation - channel this into challenging projects.`);
+        } else if (energyTrend < -0.5) {
+          patterns.push(`**Energy Decline Alert**: Energy dropped ${Math.abs(energyTrend).toFixed(1)} points over 3 days. This is normal during retention as your body adjusts. Focus on rest, hydration, and gentle movement for restoration.`);
+        }
+      }
+    }
+    
+    return patterns;
+  };
+
+  // REFINED: Optimization Guidance combining performance zones and practical strategies
+  const generateOptimizationGuidance = () => {
+    const allData = userData.benefitTracking || [];
+    const currentStreak = userData.currentStreak || 0;
+    const currentHour = new Date().getHours();
+    if (allData.length < 7) return null;
+    
+    // Calculate optimal performance zone
+    const optimalDays = allData.filter(d => 
+      (d.energy || 0) >= 7 && 
+      (d.confidence || 0) >= 5 && 
+      (!isPremium || (d.sleep || 0) >= 6)
+    );
+    
+    const optimalPercentage = (optimalDays.length / allData.length * 100).toFixed(0);
+    const currentAvgEnergy = parseFloat(calculateAverage());
+    
+    const guidance = {
+      optimalRate: `${optimalPercentage}% optimal days`,
+      criteria: isPremium ? 'Energy 7+, Sleep 6+, Confidence 5+' : 'Energy 7+, Confidence 5+',
+      recommendations: []
+    };
+    
+    // High energy period optimization
+    if (currentAvgEnergy >= 7 && !isNaN(currentAvgEnergy)) {
+      guidance.recommendations.push(`**Peak Performance Active**: Energy at ${currentAvgEnergy}/10 enables optimal training. Increase workout intensity by 20% - your body can handle more stress during retention.`);
+      
+      if (currentHour >= 6 && currentHour <= 11) {
+        guidance.recommendations.push("**Morning Power Window**: Peak energy + optimal cortisol timing. Schedule your most challenging work now - mental clarity is at maximum.");
+      }
+      
+      if (currentStreak >= 74) {
+        guidance.recommendations.push("**Post-Spermatogenesis Optimization**: Your body is channeling reproductive resources into enhancement. Perfect time for skill development and creative projects.");
+      }
+    }
+    
+    // Recovery period guidance
+    if (currentAvgEnergy < 6 && !isNaN(currentAvgEnergy)) {
+      guidance.recommendations.push(`**Recovery Mode**: Energy at ${currentAvgEnergy}/10 indicates integration phase. Prioritize sleep, gentle movement, and avoid major decisions.`);
+      
+      if (currentStreak >= 15 && currentStreak <= 45) {
+        guidance.recommendations.push("**Purification Support**: Low energy during emotional purging phase is normal. Your psyche is healing - allow rest and practice self-compassion.");
+      }
+    }
+    
+    // Decision-making optimization
+    if (isPremium && allData.length >= 14) {
+      const highConfidenceDays = allData.filter(d => (d.confidence || 0) >= 7);
+      if (highConfidenceDays.length > 0) {
+        const avgEnergyHighConfidence = highConfidenceDays.reduce((sum, d) => sum + (d.energy || 0), 0) / highConfidenceDays.length;
+        guidance.recommendations.push(`**Optimal Decision-Making**: Make important choices when confidence reaches 7+ (your energy averages ${avgEnergyHighConfidence.toFixed(1)}/10 then). Retention enhances judgment through improved prefrontal cortex function.`);
+      }
+    }
+    
+    // Weekend planning
+    const currentDay = new Date().getDay();
+    if (currentDay === 5 || currentDay === 6) { // Friday or Saturday
+      guidance.recommendations.push("**Weekend Structure**: Plan activities now to maintain momentum. Unstructured time increases relapse risk - schedule gym sessions, social events, or personal projects.");
+    }
+    
+    return guidance;
+  };
+
+  // Calculate historical comparison values
   const calculateHistoricalComparison = () => {
     const allData = userData.benefitTracking || [];
     const filteredData = getFilteredBenefitData();
     
-    // Short streaks (1-7 days)
     const getShortStreakAverage = () => {
       if (filteredData.length === 0) return 'N/A';
       const shortTermData = filteredData.filter(item => {
@@ -470,12 +684,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       return avg.toFixed(1);
     };
     
-    // Current average
     const getCurrentAverage = () => {
       return calculateAverage();
     };
     
-    // Projected longer streak average
     const getProjectedAverage = () => {
       const currentAvg = calculateAverage();
       if (currentAvg === 'N/A') return 'N/A';
@@ -495,16 +707,15 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     };
   };
 
-  // UPDATED: Calculate relapse risk score with educational insights and proper N/A handling
+  // REFINED: Relapse risk assessment with practical insights
   const calculateRelapseRisk = () => {
     const filteredData = getFilteredBenefitData();
     const currentStreak = userData.currentStreak || 0;
     
-    // Return N/A for insufficient data
     if (filteredData.length < 3) {
       return { 
         score: 'N/A', 
-        factors: ['Insufficient data for analysis (need 3+ days of benefit tracking)'], 
+        factors: ['Need 3+ days of benefit tracking for risk assessment'], 
         level: 'Insufficient Data' 
       };
     }
@@ -513,52 +724,59 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     let riskScore = 0;
     const riskFactors = [];
     
-    // Energy declining trend with educational context
+    // Energy decline trend
     if (last3Days.length >= 2) {
       const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
       if (energyTrend < -1) {
         riskScore += 25;
-        const drop = Math.abs(energyTrend).toFixed(1);
-        riskFactors.push(`Energy declined ${drop} points over 3 days. This often indicates adrenal fatigue from energy transmutation stress.`);
+        riskFactors.push(`**Energy declining**: Dropped ${Math.abs(energyTrend).toFixed(1)} points in 3 days. Low vitality increases vulnerability - take cold shower or exercise immediately.`);
       }
     }
     
-    // Low confidence (not mood)
+    // Low confidence
     const avgConfidence = last3Days.reduce((sum, day) => sum + (day.confidence || 5), 0) / last3Days.length;
     if (avgConfidence < 4) {
       riskScore += 20;
-      riskFactors.push(`Confidence averaging ${avgConfidence.toFixed(1)}/10. Emotional instability increases vulnerability to relapse episodes.`);
+      riskFactors.push(`**Confidence low**: Averaging ${avgConfidence.toFixed(1)}/10. Emotional instability precedes most relapses - practice self-compassion and avoid isolation.`);
     }
     
-    // Poor sleep quality with educational context
+    // Poor sleep quality
     if (isPremium) {
       const avgSleep = last3Days.reduce((sum, day) => sum + (day.sleep || 5), 0) / last3Days.length;
       if (avgSleep < 5) {
         riskScore += 15;
-        riskFactors.push(`Sleep quality ${avgSleep.toFixed(1)}/10. Poor circadian rhythm disrupts hormone balance and willpower.`);
+        riskFactors.push(`**Sleep disrupted**: Quality at ${avgSleep.toFixed(1)}/10. Poor sleep weakens willpower - optimize evening routine and avoid screens after 9pm.`);
       }
     }
     
-    // Low focus with educational context
+    // Low focus
     if (isPremium) {
       const avgFocus = last3Days.reduce((sum, day) => sum + (day.focus || 5), 0) / last3Days.length;
       if (avgFocus < 4) {
         riskScore += 20;
-        riskFactors.push(`Focus averaging ${avgFocus.toFixed(1)}/10. Mental clarity decline often precedes relapse episodes.`);
+        riskFactors.push(`**Focus scattered**: Averaging ${avgFocus.toFixed(1)}/10. Mental fog often signals approaching flatline - maintain practices and trust the process.`);
       }
     }
     
-    // Spermatogenesis cycle insights
+    // Critical spermatogenesis phase
     if (currentStreak >= 60 && currentStreak <= 74) {
       riskScore += 15;
-      riskFactors.push(`Day ${currentStreak} - approaching spermatogenesis completion (67-74 days). Biological transition period increases urge intensity.`);
+      riskFactors.push(`**Critical phase**: Day ${currentStreak} approaching spermatogenesis completion. Biological transition increases urge intensity - extra vigilance needed.`);
     }
     
-    // Weekend vulnerability with educational context
+    // Time-based risks
+    const currentHour = new Date().getHours();
     const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+    const isEvening = currentHour >= 20 && currentHour <= 23;
+    
     if (isWeekend) {
       riskScore += 10;
-      riskFactors.push('Weekend period detected. Decreased structure and increased isolation elevate relapse risk.');
+      riskFactors.push('**Weekend vulnerability**: Reduced structure increases risk - plan specific activities and avoid idle time.');
+    }
+    
+    if (isEvening) {
+      riskScore += 10;
+      riskFactors.push('**Evening hours**: Natural dopamine peaks increase urge intensity - end screen time and prepare for sleep.');
     }
     
     // Determine risk level
@@ -566,228 +784,18 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     if (riskScore >= 50) level = 'High';
     else if (riskScore >= 25) level = 'Medium';
     
+    if (riskFactors.length === 0) {
+      riskFactors.push('All metrics stable - retention patterns appear sustainable');
+    }
+    
     return {
       score: Math.min(riskScore, 100),
-      factors: riskFactors.length > 0 ? riskFactors : ['All metrics stable - retention patterns appear sustainable'],
+      factors: riskFactors,
       level
     };
   };
 
-  // UPDATED: Calculate benefit correlations with educational insights
-  const calculateCorrelations = () => {
-    const allData = userData.benefitTracking || [];
-    if (allData.length < 7) return [];
-    
-    const correlations = [];
-    const currentStreak = userData.currentStreak || 0;
-    
-    // Energy-focus correlation with transmutation insights
-    const energyData = allData.filter(d => d.energy >= 7);
-    if (energyData.length > 0 && isPremium) {
-      const avgFocusWhenEnergyHigh = energyData.reduce((sum, d) => sum + (d.focus || 0), 0) / energyData.length;
-      const overallAvgFocus = allData.reduce((sum, d) => sum + (d.focus || 0), 0) / allData.length;
-      const improvement = ((avgFocusWhenEnergyHigh - overallAvgFocus) / overallAvgFocus * 100).toFixed(0);
-      
-      if (improvement > 5) {
-        correlations.push(`When energy reaches 7 or higher, focus averages ${avgFocusWhenEnergyHigh.toFixed(1)}/10 (representing a ${improvement}% improvement above baseline). This demonstrates energy transmutation—sexual energy converting to mental clarity, explaining enhanced cognitive function through retention practice.`);
-      }
-    }
-    
-    // Sleep-confidence correlation with circadian optimization insights
-    if (isPremium && allData.length > 5) {
-      const poorSleepDays = allData.filter(d => (d.sleep || 5) < 5);
-      const nextDayConfidence = poorSleepDays.map(d => {
-        const dayAfter = allData.find(next => {
-          const dayAfterDate = new Date(d.date);
-          dayAfterDate.setDate(dayAfterDate.getDate() + 1);
-          return next.date === dayAfterDate.toISOString().split('T')[0];
-        });
-        return dayAfter ? (dayAfter.confidence || 5) : null;
-      }).filter(confidence => confidence !== null);
-      
-      if (nextDayConfidence.length > 0) {
-        const lowConfidenceChance = (nextDayConfidence.filter(confidence => confidence < 5).length / nextDayConfidence.length * 100).toFixed(0);
-        if (lowConfidenceChance > 50) {
-          correlations.push(`Sleep quality below 5/10 creates a ${lowConfidenceChance}% probability of low confidence the following day. Sleep architecture optimization through circadian rhythm alignment significantly improves retention success rates.`);
-        }
-      }
-    }
-    
-    // Spermatogenesis cycle correlation
-    if (currentStreak >= 74) {
-      const post74Data = allData.filter(d => {
-        const daysSinceStart = Math.floor((new Date(d.date) - new Date(userData.startDate)) / (1000 * 60 * 60 * 24));
-        return daysSinceStart >= 74;
-      });
-      
-      if (post74Data.length > 0) {
-        const avgEnergyPost74 = post74Data.reduce((sum, d) => sum + (d.energy || 0), 0) / post74Data.length;
-        const avgEnergyPre74 = allData.filter(d => {
-          const daysSinceStart = Math.floor((new Date(d.date) - new Date(userData.startDate)) / (1000 * 60 * 60 * 24));
-          return daysSinceStart < 74;
-        }).reduce((sum, d) => sum + (d.energy || 0), 0) / allData.length;
-        
-        const improvement = ((avgEnergyPost74 - avgEnergyPre74) / avgEnergyPre74 * 100).toFixed(0);
-        if (improvement > 10) {
-          correlations.push(`Post-spermatogenesis phase (74+ days): Energy averages ${avgEnergyPost74.toFixed(1)}/10 (representing a ${improvement}% improvement versus pre-74 day levels). Your body has completed the biological transition from reproduction to cellular optimization mode.`);
-        }
-      }
-    }
-    
-    return correlations;
-  };
-
-  // UPDATED: Calculate performance zones with educational insights
-  const calculatePerformanceZones = () => {
-    const allData = userData.benefitTracking || [];
-    if (allData.length < 7) return null;
-    
-    const currentStreak = userData.currentStreak || 0;
-    
-    // Define optimal thresholds with educational context
-    const optimalDays = allData.filter(d => 
-      (d.energy || 0) >= 7 && 
-      (d.confidence || 0) >= 5 && 
-      (!isPremium || (d.sleep || 0) >= 6)
-    );
-    
-    const suboptimalDays = allData.length - optimalDays.length;
-    const optimalPercentage = (optimalDays.length / allData.length * 100).toFixed(0);
-    
-    // Calculate focus performance in optimal zone
-    let focusPerformance = null;
-    if (isPremium && optimalDays.length > 0) {
-      const highFocusDays = optimalDays.filter(d => (d.focus || 0) >= 8).length;
-      const focusSuccessRate = (highFocusDays / optimalDays.length * 100).toFixed(0);
-      focusPerformance = focusSuccessRate;
-    }
-    
-    // Generate dynamic improvement recommendation
-    const getImprovementArea = () => {
-      if (suboptimalDays === 0) return "Maintaining peak performance";
-      
-      const subOptimalData = allData.filter(d => 
-        !((d.energy || 0) >= 7 && (d.confidence || 0) >= 5 && (!isPremium || (d.sleep || 0) >= 6))
-      );
-      
-      if (subOptimalData.length === 0) return "Focus on consistency";
-      
-      const avgEnergySubOptimal = subOptimalData.reduce((sum, d) => sum + (d.energy || 0), 0) / subOptimalData.length;
-      const avgSleepSubOptimal = isPremium ? subOptimalData.reduce((sum, d) => sum + (d.sleep || 0), 0) / subOptimalData.length : 0;
-      const avgConfidenceSubOptimal = subOptimalData.reduce((sum, d) => sum + (d.confidence || 0), 0) / subOptimalData.length;
-      
-      // Educational recommendations based on retention principles
-      if (avgEnergySubOptimal < 6) {
-        if (currentStreak >= 60 && currentStreak <= 74) {
-          return "Energy cultivation during spermatogenesis completion";
-        }
-        return "Focus on energy cultivation through exercise";
-      }
-      
-      if (isPremium && avgSleepSubOptimal < 5) {
-        return "Optimize sleep for retention benefits";
-      }
-      
-      if (avgConfidenceSubOptimal < 4) {
-        return "Build emotional resilience and confidence";
-      }
-      
-      return "Multiple areas need optimization";
-    };
-    
-    return {
-      optimalDays: optimalDays.length,
-      suboptimalDays,
-      optimalPercentage,
-      focusPerformance,
-      improvementArea: getImprovementArea(),
-      criteria: isPremium ? 'Energy 7+, Sleep 6+, Confidence 5+' : 'Energy 7+, Confidence 5+'
-    };
-  };
-
-  // UPDATED: Generate predictive insights with educational context
-  const generatePredictiveInsights = () => {
-    const allData = userData.benefitTracking || [];
-    if (allData.length < 5) return [];
-    
-    const insights = [];
-    const last3Days = allData.slice(-3);
-    const currentStreak = userData.currentStreak || 0;
-    
-    // Energy trend prediction with educational context
-    if (last3Days.length >= 2) {
-      const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
-      if (energyTrend > 0.5) {
-        insights.push(`Based on your +${energyTrend.toFixed(1)} energy trend, tomorrow's energy is predicted at 7-8/10. Energy improvements during retention reflect successful transmutation of sexual energy into life force.`);
-      } else if (energyTrend < -0.5) {
-        insights.push(`Your energy declined ${Math.abs(energyTrend).toFixed(1)} points over 3 days. Energy fluctuations are normal as your body redirects sexual energy toward higher functions. Prioritize rest and hydration for energy restoration.`);
-      }
-    }
-    
-    // Spermatogenesis cycle predictions
-    if (currentStreak >= 60 && currentStreak <= 67) {
-      insights.push(`Day ${currentStreak}: Approaching spermatogenesis completion (67-74 days). Expect significant energy shifts as your body transitions from sperm production to nutrient reabsorption mode for cellular repair.`);
-    } else if (currentStreak >= 74) {
-      insights.push(`Day ${currentStreak}: Post-spermatogenesis phase active. Your body has completed the biological transition from reproduction to self-enhancement, explaining your sustained energy improvements.`);
-    }
-    
-    // 7-day trend analysis with educational context
-    if (allData.length >= 7) {
-      const last7Days = allData.slice(-7);
-      const energyTrend = last7Days.reduce((sum, d, i) => sum + (d.energy || 0) * (i + 1), 0) / 
-                          last7Days.reduce((sum, d, i) => sum + (i + 1), 0);
-      const overall7DayAvg = last7Days.reduce((sum, d) => sum + (d.energy || 0), 0) / 7;
-      
-      if (energyTrend > overall7DayAvg + 0.3) {
-        insights.push("Your 7-day energy trend shows continued improvement. This progressive enhancement reflects your body's increasing efficiency at energy transmutation through retention practice");
-      }
-    }
-    
-    return insights;
-  };
-
-  // UPDATED: Generate performance amplification recommendations with educational context
-  const generateAmplificationRecommendations = () => {
-    const allData = userData.benefitTracking || [];
-    if (allData.length < 5) return [];
-    
-    const recommendations = [];
-    const currentAvgEnergy = parseFloat(calculateAverage());
-    const currentStreak = userData.currentStreak || 0;
-    
-    // High energy period recommendations with educational context
-    if (currentAvgEnergy >= 7) {
-      recommendations.push(`Energy at ${currentAvgEnergy}/10 enables optimal physical training. Research shows 85% higher testosterone when exercising during peak energy windows. Consider increasing workout intensity by 20%.`);
-      
-      if (isPremium) {
-        recommendations.push("Your peak performance window is active. Take on challenging mental tasks now—high energy states maximize cognitive function through enhanced brain blood flow.");
-      }
-      
-      // Spermatogenesis optimization
-      if (currentStreak >= 74) {
-        recommendations.push("Post-spermatogenesis optimization phase: Your body is channeling reproductive resources into cellular repair and cognitive enhancement. This is the perfect time for skill development and creative projects.");
-      }
-    }
-    
-    // Low energy period recommendations with educational context
-    const recentMood = allData.slice(-3).reduce((sum, d) => sum + (d.confidence || 0), 0) / 3;
-    if (recentMood < 5) {
-      recommendations.push("Low confidence period detected. Energy transmutation stress is common during retention—prioritize sleep optimization, morning sunlight exposure, and gentle movement to restore emotional balance.");
-    }
-    
-    // Decision-making optimization with educational context
-    if (isPremium && allData.length >= 7) {
-      const highConfidenceDays = allData.filter(d => (d.confidence || 0) >= 7);
-      if (highConfidenceDays.length > 0) {
-        const avgEnergyHighConfidence = highConfidenceDays.reduce((sum, d) => sum + (d.energy || 0), 0) / highConfidenceDays.length;
-        recommendations.push(`Your best decisions occur when confidence reaches 7 or higher (average energy ${avgEnergyHighConfidence.toFixed(1)}/10). Save important choices for these periods—retention enhances decision-making through improved prefrontal cortex function.`);
-      }
-    }
-    
-    return recommendations;
-  };
-
-  // NEW: Info banner logic
+  // Info banner logic
   const shouldShowInfoBanner = () => {
     const benefitData = getFilteredBenefitData();
     const hasMinimalData = benefitData.length < 7;
@@ -797,7 +805,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return hasMinimalData || isNewUser;
   };
 
-  // NEW: Calculate data quality for intelligence analysis
+  // Calculate data quality for analysis
   const calculateDataQuality = () => {
     const allData = userData.benefitTracking || [];
     const recentData = allData.filter(item => {
@@ -818,10 +826,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   };
 
   const riskAnalysis = calculateRelapseRisk();
-  const correlations = calculateCorrelations();
-  const performanceZones = calculatePerformanceZones();
-  const predictiveInsights = generatePredictiveInsights();
-  const amplificationRecs = generateAmplificationRecommendations();
+  const urgeManagement = generateUrgeManagementGuidance();
+  const patternInsights = generatePatternRecognition();
+  const optimizationGuidance = generateOptimizationGuidance();
   const dataQuality = calculateDataQuality();
   
   return (
@@ -898,14 +905,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* Benefit Intelligence Engine */}
+      {/* Benefit Tracker */}
       <div className="benefit-tracker-section">
-        <h3>Benefit Intelligence Engine</h3>
+        <h3>Benefit Tracker</h3>
         
         {shouldShowInfoBanner() && (
           <div className="stats-info-banner">
             <FaInfoCircle className="info-icon" />
-            <span><strong>Building your intelligence profile...</strong> Your insights will become more detailed as you log daily benefits and track your progress over time.</span>
+            <span><strong>Building your profile...</strong> Your insights become more detailed as you log daily benefits and track progress over time.</span>
           </div>
         )}
         
@@ -993,7 +1000,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* Intelligence Preview Grid - using existing insight card patterns */}
             <div className="intelligence-preview-grid">
               <div className="current-insight-card">
                 <div className="current-insight-header">
@@ -1005,17 +1011,17 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   </div>
                   {riskAnalysis.score === 'N/A' ? 
                     'Basic risk assessment available. Track benefits for 3+ days to unlock detailed analysis.' :
-                    'Basic risk assessment available. Upgrade for detailed analysis with specific factors and mitigation strategies.'
+                    'Basic risk assessment available. Upgrade for detailed analysis with specific factors and strategies.'
                   }
                 </div>
               </div>
               
               <div className="current-insight-card">
                 <div className="current-insight-header">
-                  <span>Performance Insights</span>
+                  <span>Personalized Insights</span>
                 </div>
                 <div className="current-insight-text">
-                  Advanced correlations, optimization zones, and predictive analytics available with Premium upgrade.
+                  Advanced pattern recognition, optimization guidance, and smart urge management available with Premium upgrade.
                 </div>
               </div>
             </div>
@@ -1024,7 +1030,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <div className="upgrade-helmet-section">
                 <img 
                   src={helmetImage} 
-                  alt="Premium Intelligence" 
+                  alt="Premium Insights" 
                   className="upgrade-helmet-icon"
                   onError={(e) => {
                     e.target.style.display = 'none';
@@ -1035,8 +1041,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
               
               <div className="upgrade-text-section">
-                <h4>Unlock Full Intelligence Engine</h4>
-                <p>Get advanced risk prediction, benefit correlations, performance optimization zones, and personalized amplification strategies.</p>
+                <h4>Unlock Complete Analysis</h4>
+                <p>Get smart urge management, pattern recognition, optimization guidance, and personalized strategies based on your phase and data.</p>
                 
                 <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
                   <FaStar />
@@ -1091,19 +1097,18 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                   <div className="current-insight-text">
                     {(() => {
                       const avg = calculateAverage();
-                      const filteredData = getFilteredBenefitData();
+                      const phase = getCurrentPhase();
                       
                       if (avg === 'N/A') {
                         return `No ${selectedMetric} data for the selected ${timeRange} period. Start logging benefits to see your progress.`;
                       }
                       
-                      const timeRangeText = timeRange === 'week' ? 'week' : timeRange === 'month' ? 'month' : '3 months';
                       const avgValue = parseFloat(avg);
                       
                       if (avgValue >= 7) {
-                        return `Your ${selectedMetric} is excellent this ${timeRangeText} at ${avg}/10. Maintain current strategies.`;
+                        return `Your ${selectedMetric} is excellent at ${avg}/10. You're in the ${phase} phase - maintain current strategies and channel this energy into growth.`;
                       } else {
-                        return `Your ${selectedMetric} averaged ${avg}/10 this ${timeRangeText}. Check intelligence insights below for optimization.`;
+                        return `Your ${selectedMetric} averaged ${avg}/10 during ${phase} phase. Check personalized insights below for optimization strategies.`;
                       }
                     })()}
                   </div>
@@ -1111,22 +1116,66 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* REDESIGNED: Intelligence Analysis Section - CLEANER, MORE PROFESSIONAL */}
-            <div className="intelligence-analysis-section">
-              <div className="intelligence-analysis-header">
-                <h3>Intelligence Analysis</h3>
+            {/* REFINED: Personalized Insights Section */}
+            <div className="personalized-insights-section">
+              <div className="personalized-insights-header">
+                <h3>Personalized Insights</h3>
+              </div>
+              
+              {/* Smart Urge Management */}
+              <div className="insight-card">
+                <div className="insight-card-header">
+                  <FaShieldAlt className="insight-card-icon" />
+                  <span>Smart Urge Management</span>
+                </div>
+                <div className="insight-info-banner">
+                  <FaInfoCircle className="info-icon" />
+                  <span>Real-time vulnerability assessment based on your current streak phase, time of day, and recent benefit patterns.</span>
+                </div>
+                <div className="insight-card-content">
+                  <div className="urge-management-display">
+                    <div className={`risk-level-indicator ${urgeManagement.riskLevel.toLowerCase()}`}>
+                      <div>
+                        <div className={`risk-score ${urgeManagement.riskLevel.toLowerCase()}`}>
+                          {urgeManagement.riskLevel}
+                        </div>
+                        <div className="risk-level-text">Current Risk Level</div>
+                      </div>
+                    </div>
+                    <div className="guidance-list">
+                      <div className="guidance-title">Current Guidance:</div>
+                      {urgeManagement.guidance.map((guide, index) => (
+                        <div key={index} className="guidance-item" dangerouslySetInnerHTML={renderTextWithBold(guide)}></div>
+                      ))}
+                    </div>
+                  </div>
+                  {dataQuality.level !== 'insufficient' && (
+                    <div className="insight-data-status">
+                      <div className="insight-data-status-indicator">
+                        <span className={`insight-data-quality ${dataQuality.level}`}>
+                          <FaChartLine />
+                          {dataQuality.label}
+                        </span>
+                        <span className="insight-data-days">
+                          Based on {dataQuality.days} days of tracking
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               
               {/* Relapse Risk Predictor */}
-              <div className="intelligence-analysis-card">
-                <div className="intelligence-card-header">
+              <div className="insight-card">
+                <div className="insight-card-header">
+                  <FaExclamationTriangle className="insight-card-icon" />
                   <span>Relapse Risk Predictor</span>
                 </div>
-                <div className="intelligence-info-banner">
+                <div className="insight-info-banner">
                   <FaInfoCircle className="info-icon" />
-                  <span>Analyzes your recent benefit trends to predict vulnerability periods. Based on energy, confidence, and focus patterns from your last 3-14 days of tracking.</span>
+                  <span>Analyzes your recent benefit trends to predict vulnerability periods and provide specific mitigation strategies.</span>
                 </div>
-                <div className="intelligence-card-content">
+                <div className="insight-card-content">
                   <div className="risk-predictor-display">
                     {riskAnalysis.score === 'N/A' ? (
                       <div className="risk-level-indicator insufficient">
@@ -1147,33 +1196,21 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                     )}
                     <div className="risk-factors-list">
                       <div className="risk-factors-title">
-                        {riskAnalysis.score === 'N/A' ? 'Data Requirements:' : 'Risk Factors:'}
+                        {riskAnalysis.score === 'N/A' ? 'Data Requirements:' : 'Risk Factors & Actions:'}
                       </div>
                       {riskAnalysis.factors.map((factor, index) => (
                         <div key={index} className="risk-factor-item" dangerouslySetInnerHTML={renderTextWithBold(factor)}></div>
                       ))}
-                      {riskAnalysis.level !== 'Low' && riskAnalysis.score !== 'N/A' && (
-                        <div style={{ 
-                          marginTop: '0.75rem', 
-                          padding: '0.75rem', 
-                          backgroundColor: 'rgba(255, 221, 0, 0.1)', 
-                          borderRadius: 'var(--radius-md)', 
-                          fontSize: '0.875rem' 
-                        }}>
-                          <strong>Educational Actions:</strong> Morning sunlight exposure optimizes circadian rhythm, cold showers activate nervous system resilience, and magnesium supplementation supports energy transmutation during vulnerable periods.
-                        </div>
-                      )}
                     </div>
                   </div>
-                  {/* Data Quality Indicator */}
                   {dataQuality.level !== 'insufficient' && (
-                    <div className="intelligence-data-status">
-                      <div className="intelligence-data-status-indicator">
-                        <span className={`intelligence-data-quality ${dataQuality.level}`}>
+                    <div className="insight-data-status">
+                      <div className="insight-data-status-indicator">
+                        <span className={`insight-data-quality ${dataQuality.level}`}>
                           <FaChartLine />
                           {dataQuality.label}
                         </span>
-                        <span className="intelligence-data-days">
+                        <span className="insight-data-days">
                           Based on {dataQuality.days} days of tracking
                         </span>
                       </div>
@@ -1182,31 +1219,31 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 </div>
               </div>
               
-              {/* Benefit Correlations */}
-              {correlations.length > 0 && (
-                <div className="intelligence-analysis-card">
-                  <div className="intelligence-card-header">
-                    <span>Your Benefit Correlations</span>
+              {/* Pattern Recognition */}
+              {patternInsights.length > 0 && (
+                <div className="insight-card">
+                  <div className="insight-card-header">
+                    <FaBrain className="insight-card-icon" />
+                    <span>Pattern Recognition</span>
                   </div>
-                  <div className="intelligence-info-banner">
+                  <div className="insight-info-banner">
                     <FaInfoCircle className="info-icon" />
-                    <span>Identifies patterns between your different benefit metrics. For example, how high energy days affect your focus levels.</span>
+                    <span>Identifies correlations between your metrics and predicts trends based on your unique retention journey patterns.</span>
                   </div>
-                  <div className="intelligence-card-content">
-                    <div className="correlations-display">
-                      {correlations.map((correlation, index) => (
-                        <div key={index} className="correlation-item" dangerouslySetInnerHTML={renderTextWithBold(correlation)}></div>
+                  <div className="insight-card-content">
+                    <div className="patterns-display">
+                      {patternInsights.map((pattern, index) => (
+                        <div key={index} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></div>
                       ))}
                     </div>
-                    {/* Data Quality Indicator */}
                     {dataQuality.level !== 'insufficient' && (
-                      <div className="intelligence-data-status">
-                        <div className="intelligence-data-status-indicator">
-                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
+                      <div className="insight-data-status">
+                        <div className="insight-data-status-indicator">
+                          <span className={`insight-data-quality ${dataQuality.level}`}>
                             <FaChartLine />
                             {dataQuality.label}
                           </span>
-                          <span className="intelligence-data-days">
+                          <span className="insight-data-days">
                             Based on {dataQuality.days} days of tracking
                           </span>
                         </div>
@@ -1216,111 +1253,44 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 </div>
               )}
               
-              {/* Performance Zones */}
-              {performanceZones && (
-                <div className="intelligence-analysis-card">
-                  <div className="intelligence-card-header">
-                    <span>Your Performance Zones</span>
+              {/* Optimization Guidance */}
+              {optimizationGuidance && (
+                <div className="insight-card">
+                  <div className="insight-card-header">
+                    <FaFire className="insight-card-icon" />
+                    <span>Optimization Guidance</span>
                   </div>
-                  <div className="intelligence-info-banner">
+                  <div className="insight-info-banner">
                     <FaInfoCircle className="info-icon" />
-                    <span>Shows your peak performance rate based on Energy 7+, Sleep 6+, Confidence 5+ criteria. Calculated from days where you logged benefits.</span>
+                    <span>Shows your peak performance rate and provides timing-based recommendations for maximizing your retention benefits.</span>
                   </div>
-                  <div className="intelligence-card-content">
-                    <div className="performance-zones-display">
-                      <div className="performance-criteria">
-                        <div className="performance-criteria-title">Your Peak Performance Zone:</div>
-                        <div className="performance-criteria-text">{performanceZones.criteria}</div>
+                  <div className="insight-card-content">
+                    <div className="optimization-display">
+                      <div className="optimization-criteria">
+                        <div className="optimization-criteria-title">Your Peak Performance Zone:</div>
+                        <div className="optimization-criteria-text">{optimizationGuidance.criteria}</div>
                       </div>
-                      <div className="performance-metrics-simplified">
-                        <div className="performance-metric-card">
-                          <div className="performance-metric-value">{performanceZones.optimalPercentage}%</div>
-                          <div className="performance-metric-label">Optimal Days</div>
-                          <div className="performance-metric-context">({performanceZones.optimalDays} out of {performanceZones.optimalDays + performanceZones.suboptimalDays} days logged)</div>
+                      <div className="optimization-metrics">
+                        <div className="optimization-metric-card">
+                          <div className="optimization-metric-value">{optimizationGuidance.optimalRate}</div>
+                          <div className="optimization-metric-label">Operating in optimal zone</div>
                         </div>
-                        {performanceZones.focusPerformance && (
-                          <div className="performance-metric-card">
-                            <div className="performance-metric-value">{performanceZones.focusPerformance}%</div>
-                            <div className="performance-metric-label">Mind-Body Sync</div>
-                            <div className="performance-metric-context">(Mental clarity follows physical optimization {performanceZones.focusPerformance}% of the time)</div>
-                          </div>
-                        )}
-                        <div className="performance-metric-card">
-                          <div className="performance-metric-value">{performanceZones.suboptimalDays}</div>
-                          <div className="performance-metric-label">Below optimal days</div>
-                          <div className="performance-metric-context">{performanceZones.improvementArea}</div>
-                        </div>
+                      </div>
+                      <div className="optimization-recommendations">
+                        <div className="optimization-title">Current Recommendations:</div>
+                        {optimizationGuidance.recommendations.map((rec, index) => (
+                          <div key={index} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></div>
+                        ))}
                       </div>
                     </div>
-                    {/* Data Quality Indicator */}
                     {dataQuality.level !== 'insufficient' && (
-                      <div className="intelligence-data-status">
-                        <div className="intelligence-data-status-indicator">
-                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
+                      <div className="insight-data-status">
+                        <div className="insight-data-status-indicator">
+                          <span className={`insight-data-quality ${dataQuality.level}`}>
                             <FaChartLine />
                             {dataQuality.label}
                           </span>
-                          <span className="intelligence-data-days">
-                            Based on {dataQuality.days} days of tracking
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-              
-              {/* Predictive Insights */}
-              {predictiveInsights.length > 0 && (
-                <div className="intelligence-analysis-card">
-                  <div className="intelligence-card-header">
-                    <span>Predictive Insights</span>
-                  </div>
-                  <div className="intelligence-card-content">
-                    <div className="predictive-insights-display">
-                      {predictiveInsights.map((insight, index) => (
-                        <div key={index} className="predictive-insight-item" dangerouslySetInnerHTML={renderTextWithBold(insight)}></div>
-                      ))}
-                    </div>
-                    {/* Data Quality Indicator */}
-                    {dataQuality.level !== 'insufficient' && (
-                      <div className="intelligence-data-status">
-                        <div className="intelligence-data-status-indicator">
-                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
-                            <FaChartLine />
-                            {dataQuality.label}
-                          </span>
-                          <span className="intelligence-data-days">
-                            Based on {dataQuality.days} days of tracking
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-              
-              {/* Performance Amplification */}
-              {amplificationRecs.length > 0 && (
-                <div className="intelligence-analysis-card">
-                  <div className="intelligence-card-header">
-                    <span>Performance Amplification</span>
-                  </div>
-                  <div className="intelligence-card-content">
-                    <div className="amplification-display">
-                      {amplificationRecs.map((rec, index) => (
-                        <div key={index} className="amplification-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></div>
-                      ))}
-                    </div>
-                    {/* Data Quality Indicator */}
-                    {dataQuality.level !== 'insufficient' && (
-                      <div className="intelligence-data-status">
-                        <div className="intelligence-data-status-indicator">
-                          <span className={`intelligence-data-quality ${dataQuality.level}`}>
-                            <FaChartLine />
-                            {dataQuality.label}
-                          </span>
-                          <span className="intelligence-data-days">
+                          <span className="insight-data-days">
                             Based on {dataQuality.days} days of tracking
                           </span>
                         </div>
@@ -1343,7 +1313,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                         return comparison.shortStreak === 'N/A' ? 'N/A' : `${comparison.shortStreak}/10`;
                       })()}
                     </div>
-                    <div className="historical-comparison-label">Your {selectedMetric} during short streaks (1-7 days)</div>
+                    <div className="historical-comparison-label">Short streaks (1-7 days)</div>
                   </div>
                   
                   <div className="historical-comparison-card">
@@ -1353,7 +1323,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                         return comparison.current === 'N/A' ? 'N/A' : `${comparison.current}/10`;
                       })()}
                     </div>
-                    <div className="historical-comparison-label">Your current {selectedMetric} average</div>
+                    <div className="historical-comparison-label">Current average</div>
                   </div>
                   
                   <div className="historical-comparison-card">
@@ -1367,9 +1337,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                       {(() => {
                         const currentStreak = userData.currentStreak || 0;
                         if (currentStreak >= 74) {
-                          return `Post-spermatogenesis ${selectedMetric} (cellular optimization active)`;
+                          return `Post-spermatogenesis optimization phase`;
                         }
-                        return `Projected ${selectedMetric} with longer streaks (30+ days)`;
+                        return `Projected with longer streaks`;
                       })()}
                     </div>
                   </div>

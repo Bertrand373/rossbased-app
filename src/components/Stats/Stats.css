@@ -1,4 +1,4 @@
-/* components/Stats/Stats.css - UPDATED: Professional Intelligence Analysis Section */
+/* components/Stats/Stats.css - REFINED: Practitioner-Focused Analysis Section */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@
   background: var(--phase-color) !important;
 }
 
-/* REDESIGNED: Header exactly matching Tracker and Calendar */
+/* Header exactly matching Tracker and Calendar */
 .stats-header {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -45,7 +45,7 @@
   justify-self: end;
 }
 
-/* REDESIGNED: Reset button styled like Edit Date and Reset Calendar buttons */
+/* Reset button styled like Edit Date and Reset Calendar buttons */
 .reset-stats-btn {
   display: flex;
   align-items: center;
@@ -61,7 +61,7 @@
   transition: none;
 }
 
-/* UPDATED: Stats Info Banner - With yellow info icon */
+/* Stats Info Banner - With yellow info icon */
 .stats-info-banner {
   display: flex;
   align-items: center;
@@ -83,61 +83,6 @@
   font-size: 1rem;
   color: var(--primary);
   flex-shrink: 0;
-}
-
-/* ENHANCED: Floating wisdom toggle with better visibility and animations */
-.floating-wisdom-toggle {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  z-index: 999;
-  transition: all 0.3s ease;
-}
-
-.floating-wisdom-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-}
-
-.floating-wisdom-toggle.active {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.2) 100%);
-  border-color: var(--primary);
-  box-shadow: 0 4px 16px rgba(255, 221, 0, 0.3);
-}
-
-.floating-wisdom-eye {
-  font-size: 1.25rem;
-  color: var(--text-secondary);
-  transition: all 0.3s ease;
-}
-
-.floating-wisdom-eye.active {
-  color: var(--primary);
-  filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.5));
-}
-
-/* Mobile: Position above mobile navigation */
-@media (max-width: 768px) {
-  .floating-wisdom-toggle {
-    bottom: 100px;
-    right: 16px;
-    width: 48px;
-    height: 48px;
-  }
-  
-  .floating-wisdom-eye {
-    font-size: 1.125rem;
-  }
 }
 
 /* Streak Statistics - maintain consistent card heights */
@@ -175,7 +120,7 @@
   margin-top: var(--spacing-sm);
 }
 
-/* REDESIGNED: Section Headers with Consistent Spacing */
+/* Section Headers with Consistent Spacing */
 .milestone-section {
   display: flex;
   flex-direction: column;
@@ -190,7 +135,7 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* CORRECTED: Badges grid - back to original 4 columns */
+/* Badges grid - 4 columns */
 .badges-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -302,7 +247,7 @@
   justify-content: center;
 }
 
-/* UPDATED: Benefit Tracker Section - Single Row Design */
+/* REFINED: Benefit Tracker Section */
 .benefit-tracker-section {
   display: flex;
   flex-direction: column;
@@ -317,7 +262,7 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* Controls with SINGLE-row pill layout */
+/* Controls with single-row pill layout */
 .benefit-tracker-controls {
   display: flex;
   flex-direction: column;
@@ -338,7 +283,7 @@
   align-items: center;
 }
 
-/* SINGLE ROW: All 6 benefit items in one container */
+/* Single row: All 6 benefit items in one container */
 .metric-pill-container {
   display: flex;
   gap: var(--spacing-xs);
@@ -368,7 +313,7 @@
   width: 100%;
 }
 
-/* UPDATED: Metric buttons with locked states */
+/* Metric buttons with locked states */
 .metric-btn, .time-btn {
   flex: 1;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -398,7 +343,7 @@
   color: var(--primary);
 }
 
-/* NEW: Locked metric button styles */
+/* Locked metric button styles */
 .metric-btn.locked {
   background-color: rgba(128, 128, 128, 0.1);
   color: var(--text-secondary);
@@ -415,7 +360,7 @@
   pointer-events: none;
 }
 
-/* NEW: Lock icon styling */
+/* Lock icon styling */
 .metric-lock-icon {
   font-size: 0.75rem;
   color: var(--text-secondary);
@@ -451,27 +396,7 @@
   width: 100%;
 }
 
-/* FREE: Single Insight Preview */
-.free-insight-preview {
-  display: flex;
-  justify-content: center;
-}
-
-.free-insight-preview .current-insight-card {
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  justify-content: center;
-  max-width: 600px;
-  width: 100%;
-}
-
-/* FREE: Intelligence Preview Grid - Add spacing between cards */
+/* FREE: Intelligence Preview Grid */
 .intelligence-preview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -479,7 +404,7 @@
   width: 100%;
 }
 
-/* ENHANCED: Benefit Upgrade CTA - NO TOP BORDER */
+/* ENHANCED: Benefit Upgrade CTA */
 .benefit-upgrade-cta {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid var(--border);
@@ -497,7 +422,7 @@
   flex-shrink: 0;
 }
 
-/* ENHANCED: Benefit upgrade helmet */
+/* Benefit upgrade helmet */
 .upgrade-helmet-icon {
   width: 80px;
   height: 80px;
@@ -545,7 +470,7 @@
   line-height: 1.5;
 }
 
-/* ENHANCED: Benefit upgrade button */
+/* Benefit upgrade button */
 .benefit-upgrade-btn {
   display: flex;
   align-items: center;
@@ -575,7 +500,7 @@
   color: #000000;
 }
 
-/* REDESIGNED: Chart and Insight Container - NO TOP BORDER */
+/* Chart and Insight Container */
 .chart-and-insight-container {
   display: flex;
   flex-direction: column;
@@ -597,7 +522,7 @@
   justify-content: center;
 }
 
-/* NEW: No chart data state */
+/* No chart data state */
 .no-chart-data {
   display: flex;
   flex-direction: column;
@@ -692,8 +617,8 @@
   text-align: center;
 }
 
-/* REDESIGNED: Intelligence Analysis Section - CLEANER, MORE PROFESSIONAL */
-.intelligence-analysis-section {
+/* REFINED: Personalized Insights Section */
+.personalized-insights-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
@@ -704,7 +629,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.intelligence-analysis-header {
+.personalized-insights-header {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -712,7 +637,7 @@
   margin-bottom: 0;
 }
 
-.intelligence-analysis-header h3 {
+.personalized-insights-header h3 {
   margin: 0;
   font-size: 1.25rem;
   color: var(--text);
@@ -720,8 +645,8 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* REDESIGNED: Intelligence analysis cards - CLEAN LAYOUT */
-.intelligence-analysis-card {
+/* Insight cards - clean layout */
+.insight-card {
   background-color: var(--card-background);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
@@ -732,7 +657,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.intelligence-card-header {
+.insight-card-header {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -742,14 +667,14 @@
   font-size: 1rem;
 }
 
-.intelligence-card-icon {
+.insight-card-icon {
   font-size: 1.125rem;
   color: var(--primary);
   flex-shrink: 0;
 }
 
-/* NEW: Intelligence info banner - EXACT COPY of stats-info-banner */
-.intelligence-info-banner {
+/* Insight info banner */
+.insight-info-banner {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -765,25 +690,51 @@
   line-height: 1.4;
 }
 
-.intelligence-info-banner .info-icon {
+.insight-info-banner .info-icon {
   font-size: 1rem;
   color: var(--primary);
   flex-shrink: 0;
 }
 
-.intelligence-card-content {
+.insight-card-content {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
 }
 
-/* REDESIGNED: Risk predictor display */
-.risk-predictor-display {
+/* Smart Urge Management Display */
+.urge-management-display {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
+.guidance-list {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.guidance-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.guidance-item {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: var(--spacing-sm);
+}
+
+.guidance-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Risk level indicators */
 .risk-level-indicator {
   display: flex;
   align-items: center;
@@ -866,14 +817,21 @@
   margin-bottom: 0;
 }
 
-/* REDESIGNED: Benefit correlations display */
-.correlations-display {
+/* Risk predictor display */
+.risk-predictor-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Pattern Recognition */
+.patterns-display {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
 }
 
-.correlation-item {
+.pattern-item {
   background-color: rgba(255, 255, 255, 0.02);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
@@ -884,14 +842,14 @@
   text-align: center;
 }
 
-/* REDESIGNED: Performance zones display */
-.performance-zones-display {
+/* Optimization Guidance */
+.optimization-display {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
 }
 
-.performance-criteria {
+.optimization-criteria {
   background-color: rgba(255, 221, 0, 0.05);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
@@ -899,26 +857,25 @@
   text-align: center;
 }
 
-.performance-criteria-title {
+.optimization-criteria-title {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
   margin-bottom: var(--spacing-xs);
 }
 
-.performance-criteria-text {
+.optimization-criteria-text {
   font-size: 0.875rem;
   color: var(--text-secondary);
 }
 
-/* NEW: Simplified performance metrics - 3 cards in a row */
-.performance-metrics-simplified {
+.optimization-metrics {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: var(--spacing-md);
 }
 
-.performance-metric-card {
+.optimization-metric-card {
   background-color: rgba(255, 255, 255, 0.02);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
@@ -928,38 +885,37 @@
   flex-direction: column;
   gap: var(--spacing-xs);
   justify-content: center;
-  min-height: 120px;
+  min-height: 80px;
 }
 
-.performance-metric-value {
+.optimization-metric-value {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary);
   margin-bottom: var(--spacing-xs);
 }
 
-.performance-metric-label {
+.optimization-metric-label {
   font-size: 0.875rem;
   color: var(--text);
   font-weight: 600;
   line-height: 1.3;
 }
 
-.performance-metric-context {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.2;
-  margin-top: var(--spacing-xs);
-}
-
-/* REDESIGNED: Predictive insights display */
-.predictive-insights-display {
+.optimization-recommendations {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
 }
 
-.predictive-insight-item {
+.optimization-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.optimization-item {
   background-color: rgba(255, 255, 255, 0.02);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
@@ -970,39 +926,21 @@
   text-align: center;
 }
 
-/* REDESIGNED: Amplification recommendations display */
-.amplification-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.amplification-item {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  font-size: 0.875rem;
-  color: var(--text);
-  line-height: 1.4;
-  text-align: center;
-}
-
-/* UPDATED: Intelligence data status indicator - ALL YELLOW like EmotionalTimeline */
-.intelligence-data-status {
+/* Insight data status indicator */
+.insight-data-status {
   margin-top: var(--spacing-md);
   padding-top: var(--spacing-md);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.intelligence-data-status-indicator {
+.insight-data-status-indicator {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-sm);
 }
 
-.intelligence-data-quality {
+.insight-data-quality {
   font-size: 0.75rem;
   font-weight: 600;
   padding: var(--spacing-xs) var(--spacing-sm);
@@ -1014,38 +952,28 @@
   gap: var(--spacing-xs);
 }
 
-/* UPDATED: All data quality indicators now yellow */
-.intelligence-data-quality.minimal {
+/* All data quality indicators yellow */
+.insight-data-quality.minimal,
+.insight-data-quality.good,
+.insight-data-quality.rich {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
   border: 1px solid rgba(255, 221, 0, 0.2);
   color: var(--primary);
 }
 
-.intelligence-data-quality.good {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.intelligence-data-quality.rich {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.intelligence-data-quality.insufficient {
+.insight-data-quality.insufficient {
   background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
   border: 1px solid rgba(128, 128, 128, 0.2);
   color: var(--text-secondary);
 }
 
-.intelligence-data-days {
+.insight-data-days {
   font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-/* REDESIGNED: Historical comparison - cleaner layout */
+/* Historical comparison - cleaner layout */
 .historical-comparison-section {
   background-color: var(--card-background);
   padding: var(--spacing-lg);
@@ -1099,7 +1027,7 @@
   line-height: 1.3;
 }
 
-/* NEW: Current Metric Average Pulsing Glow */
+/* Current Metric Average Pulsing Glow */
 @keyframes metric-glow {
   0%, 100% {
     box-shadow: 0 0 8px rgba(255, 221, 0, 0.15);
@@ -1111,93 +1039,6 @@
 
 .current-metric-average {
   animation: metric-glow 3s ease-in-out infinite;
-}
-
-/* Premium Lock */
-.premium-lock {
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(15, 15, 15, 0.9);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-  border-radius: var(--radius-md);
-}
-
-.lock-icon {
-  font-size: 2rem;
-  color: var(--primary);
-  margin-bottom: var(--spacing-md);
-}
-
-.premium-message {
-  text-align: center;
-  margin-bottom: var(--spacing-md);
-  color: var(--text);
-}
-
-.premium-message h3 {
-  margin-bottom: var(--spacing-sm);
-  color: var(--text);
-}
-
-.premium-message p {
-  color: var(--text-secondary);
-}
-
-.free-benefit-tracker {
-  padding: var(--spacing-lg);
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.free-benefit-tracker h4 {
-  margin-bottom: var(--spacing-md);
-  font-size: 1rem;
-  color: var(--text);
-}
-
-.benefit-rating {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.benefit-rating span {
-  color: var(--text);
-}
-
-.rating-slider {
-  width: 100%;
-}
-
-.rating-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: var(--spacing-xs);
-}
-
-.limited-stats {
-  margin-top: var(--spacing-lg);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--border);
-}
-
-.limited-stats p {
-  color: var(--text);
 }
 
 /* Badge Modal */
@@ -1305,33 +1146,6 @@
   color: var(--text-secondary);
 }
 
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
-}
-
-.form-actions .btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: none;
-  border: 1px solid;
-}
-
-.form-actions .btn-danger {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -1397,12 +1211,12 @@
     grid-template-columns: repeat(3, 1fr);
   }
   
-  .performance-metrics-simplified {
-    grid-template-columns: repeat(3, 1fr);
+  .optimization-metrics {
+    grid-template-columns: 1fr;
   }
 }
 
-/* MOBILE RESPONSIVE - IMPROVED INTELLIGENCE CARD SPACING */
+/* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
   .stats-header {
     display: flex;
@@ -1540,12 +1354,6 @@
     padding: var(--spacing-md);
   }
   
-  .free-insight-preview .current-insight-card {
-    max-width: 100%;
-    min-height: 100px;
-    padding: var(--spacing-md);
-  }
-  
   .chart-container {
     padding: var(--spacing-md);
   }
@@ -1566,35 +1374,41 @@
     justify-content: center;
   }
   
-  /* IMPROVED: Intelligence Analysis Mobile Spacing */
-  .intelligence-analysis-section {
+  /* Personalized Insights Mobile Spacing */
+  .personalized-insights-section {
     padding: var(--spacing-lg);
   }
   
-  .intelligence-analysis-header h3 {
+  .personalized-insights-header h3 {
     font-size: 1.125rem;
     padding: var(--spacing-md) 0;
   }
   
-  /* IMPROVED: Intelligence card mobile spacing - more breathing room */
-  .intelligence-analysis-card {
+  .insight-card {
     padding: var(--spacing-lg);
     gap: var(--spacing-lg);
   }
   
-  .intelligence-card-header {
+  .insight-card-header {
     padding: var(--spacing-sm) 0;
     font-size: 1rem;
   }
   
-  .intelligence-info-banner {
+  .insight-info-banner {
     font-size: 0.8rem;
     padding: var(--spacing-md);
     margin-top: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
   }
   
-  /* NEW: Mobile info banner adjustments - EXACT MATCH to Emotional Timeline */
+  .insight-info-banner .info-icon {
+    align-self: center;
+    margin-top: 0;
+  }
+  
   .stats-info-banner {
     flex-direction: column;
     gap: var(--spacing-xs);
@@ -1602,17 +1416,6 @@
   }
   
   .stats-info-banner .info-icon {
-    align-self: center;
-    margin-top: 0;
-  }
-  
-  .intelligence-info-banner {
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    text-align: center;
-  }
-  
-  .intelligence-info-banner .info-icon {
     align-self: center;
     margin-top: 0;
   }
@@ -1634,32 +1437,22 @@
     font-size: 1.25rem;
   }
   
-  .performance-metrics-simplified {
+  .optimization-metrics {
     grid-template-columns: 1fr;
   }
   
-  .performance-metric-card {
+  .optimization-metric-card {
     padding: var(--spacing-lg);
   }
   
-  .performance-metric-value {
+  .optimization-metric-value {
     font-size: 1.25rem;
   }
   
-  /* IMPROVED: Mobile intelligence data status adjustments */
-  .intelligence-data-status-indicator {
+  .insight-data-status-indicator {
     flex-direction: column;
     gap: var(--spacing-sm);
     text-align: center;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions .btn {
-    width: 100%;
-    justify-content: center;
   }
   
   .modal-actions {
@@ -1672,7 +1465,7 @@
   }
 }
 
-/* VERY SMALL SCREENS - IMPROVED INTELLIGENCE CARD SPACING */
+/* VERY SMALL SCREENS */
 @media (max-width: 480px) {
   .upgrade-helmet-icon {
     width: 60px;
@@ -1763,28 +1556,26 @@
     justify-content: center;
   }
   
-  /* IMPROVED: Very small screen intelligence analysis spacing */
-  .intelligence-analysis-section {
+  .personalized-insights-section {
     padding: var(--spacing-md);
   }
   
-  .intelligence-analysis-header h3 {
+  .personalized-insights-header h3 {
     font-size: 1rem;
     padding: var(--spacing-sm) 0;
   }
   
-  /* IMPROVED: Very small screen intelligence cards - generous padding */
-  .intelligence-analysis-card {
+  .insight-card {
     padding: var(--spacing-md) var(--spacing-lg);
     gap: var(--spacing-md);
   }
   
-  .intelligence-card-header {
+  .insight-card-header {
     padding: var(--spacing-md) 0;
     font-size: 0.9rem;
   }
   
-  .intelligence-info-banner {
+  .insight-info-banner {
     font-size: 0.75rem;
     padding: var(--spacing-sm) var(--spacing-md);
     margin-top: var(--spacing-xs);
@@ -1804,11 +1595,11 @@
     font-size: 1.125rem;
   }
   
-  .performance-metric-card {
+  .optimization-metric-card {
     padding: var(--spacing-md);
   }
   
-  .performance-metric-value {
+  .optimization-metric-value {
     font-size: 1.125rem;
   }
 }
