@@ -133,7 +133,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         updateUserData(updatedData);
       }
     }
-  }, [userData?.currentStreak, userData?.longestStreak]);
+  }, [userData?.currentStreak, userData?.longestStreak, updateUserData]);
 
   // Time range options for chart
   const timeRangeOptions = {
@@ -640,7 +640,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       default:
         return `Continue building momentum with consistent daily practices.`;
     }
-  };
   };
 
   // REFINED: Optimization Guidance based on actual data patterns only
