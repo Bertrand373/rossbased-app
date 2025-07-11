@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - REDESIGNED: Professional Intelligence Analysis Section
+// components/Stats/Stats.js - REDESIGNED: Pro Intelligence Analysis Section
 import React, { useState, useEffect, useRef } from 'react';
 import { format, subDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
