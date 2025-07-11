@@ -468,6 +468,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const isEvening = currentHour >= 20 && currentHour <= 23;
     const filteredData = getFilteredBenefitData();
     
+    // Return N/A if insufficient data for meaningful analysis
+    if (filteredData.length < 3 && currentStreak < 7) {
+      return {
+        guidance: ['Need 7+ days of streak data or 3+ days of benefit tracking for urge management assessment'],
+        riskLevel: 'N/A'
+      };
+    }
+    
     const guidance = [];
     let riskLevel = 'Low';
     
@@ -522,32 +530,36 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return { guidance, riskLevel };
   };
 
-  // REFINED: Pattern Recognition combining correlations and predictive insights
+  // REFINED: Pattern Recognition with proper data requirements
   const generatePatternRecognition = () => {
     const allData = userData.benefitTracking || [];
     const currentStreak = userData.currentStreak || 0;
-    if (allData.length < 7) return [];
+    
+    // Require substantial data for meaningful patterns
+    if (allData.length < 14) {
+      return ['Need 14+ days of benefit tracking to identify meaningful patterns in your data'];
+    }
     
     const patterns = [];
     
-    // Energy-focus relationship (practical only)
-    if (isPremium && allData.length >= 10) {
+    // Energy-focus relationship (require significant data)
+    if (isPremium && allData.length >= 20) {
       const energyData = allData.filter(d => d.energy >= 7);
-      if (energyData.length > 3) {
+      if (energyData.length >= 5) { // Need at least 5 high energy days
         const avgFocusWhenEnergyHigh = energyData.reduce((sum, d) => sum + (d.focus || 0), 0) / energyData.length;
         const overallAvgFocus = allData.reduce((sum, d) => sum + (d.focus || 0), 0) / allData.length;
         const improvement = ((avgFocusWhenEnergyHigh - overallAvgFocus) / overallAvgFocus * 100).toFixed(0);
         
-        if (improvement > 15) {
-          patterns.push(`**Energy-Focus Pattern**: When your energy hits 7+, focus averages ${avgFocusWhenEnergyHigh.toFixed(1)}/10 (${improvement}% above baseline). This shows sexual energy transmuting into mental clarity - schedule important work during high-energy periods.`);
+        if (improvement > 20) { // Only show if significant improvement
+          patterns.push(`**Energy-Focus Pattern**: When your energy hits 7+, focus averages ${avgFocusWhenEnergyHigh.toFixed(1)}/10 (${improvement}% above baseline). Schedule important work during high-energy periods.`);
         }
       }
     }
     
-    // Sleep-confidence pattern
-    if (isPremium && allData.length > 10) {
+    // Sleep-confidence pattern (require significant data)
+    if (isPremium && allData.length >= 20) {
       const poorSleepDays = allData.filter(d => (d.sleep || 5) < 5);
-      if (poorSleepDays.length > 2) {
+      if (poorSleepDays.length >= 5) { // Need at least 5 poor sleep days
         const nextDayConfidence = poorSleepDays.map(d => {
           const dayAfter = allData.find(next => {
             const dayAfterDate = new Date(d.date);
@@ -557,10 +569,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           return dayAfter ? (dayAfter.confidence || 5) : null;
         }).filter(confidence => confidence !== null);
         
-        if (nextDayConfidence.length > 0) {
+        if (nextDayConfidence.length >= 3) { // Need at least 3 data points
           const lowConfidenceRate = (nextDayConfidence.filter(c => c < 5).length / nextDayConfidence.length * 100).toFixed(0);
-          if (lowConfidenceRate > 50) {
-            patterns.push(`**Sleep-Confidence Pattern**: Poor sleep (below 5/10) leads to low confidence the next day ${lowConfidenceRate}% of the time. Your circadian rhythm directly affects emotional stability - prioritize sleep optimization.`);
+          if (lowConfidenceRate >= 60) { // Only show if strong pattern
+            patterns.push(`**Sleep-Confidence Pattern**: Poor sleep leads to low confidence the next day ${lowConfidenceRate}% of the time (${nextDayConfidence.length} instances tracked). Sleep optimization is critical for emotional stability.`);
           }
         }
       }
@@ -588,30 +600,63 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       }
     }
     
-    // Energy trend prediction
-    if (allData.length >= 5) {
-      const last3Days = allData.slice(-3);
-      if (last3Days.length >= 2) {
-        const energyTrend = last3Days[last3Days.length - 1].energy - last3Days[0].energy;
-        if (energyTrend > 0.5) {
-          patterns.push(`**Energy Trend Prediction**: Based on your +${energyTrend.toFixed(1)} energy trend, expect 7-8/10 energy tomorrow. Rising energy reflects successful transmutation - channel this into challenging projects.`);
-        } else if (energyTrend < -0.5) {
-          patterns.push(`**Energy Decline Alert**: Energy dropped ${Math.abs(energyTrend).toFixed(1)} points over 3 days. This is normal during retention as your body adjusts. Focus on rest, hydration, and gentle movement for restoration.`);
+    // Energy trend prediction (require sufficient recent data)
+    if (allData.length >= 7) {
+      const last5Days = allData.slice(-5);
+      if (last5Days.length >= 3) { // Need at least 3 recent days
+        const energyTrend = last5Days[last5Days.length - 1].energy - last5Days[0].energy;
+        if (Math.abs(energyTrend) >= 1) { // Only show significant trends
+          if (energyTrend > 0) {
+            patterns.push(`**Energy Trend**: Rising ${energyTrend.toFixed(1)} points over 5 days. This upward momentum suggests successful energy transmutation - maintain current practices.`);
+          } else {
+            patterns.push(`**Energy Decline**: Dropped ${Math.abs(energyTrend).toFixed(1)} points over 5 days. Energy fluctuations during retention are normal - focus on rest and gentle movement.`);
+          }
         }
       }
     }
     
+    // Only add phase insights if user has been in current phase for meaningful time
+    if (currentStreak >= 7) {
+      const phase = getCurrentPhase();
+      patterns.push(`**${phase} Phase**: ${getPhaseGuidance(phase, currentStreak)}`);
+    }
+    
     return patterns;
   };
+  
+  // Helper function for phase guidance
+  const getPhaseGuidance = (phase, streak) => {
+    switch (phase) {
+      case 'Foundation':
+        return `Day ${streak}: Building new neural pathways. Every urge resisted strengthens your willpower circuitry.`;
+      case 'Purification':
+        return `Day ${streak}: Emotional purging active. Mood swings indicate deep healing - maintain practices even when motivation dips.`;
+      case 'Expansion':
+        return `Day ${streak}: Mental clarity emerging. Channel rising energy into creative projects and learning.`;
+      case 'Integration':
+        return `Day ${streak}: Spiritual integration beginning. You're developing natural magnetism and leadership presence.`;
+      case 'Mastery':
+        return `Day ${streak}: Mastery phase - your energy serves higher purposes. Focus on mentoring and service.`;
+      default:
+        return `Continue building momentum with consistent daily practices.`;
+    }
+  };
+  };
 
-  // REFINED: Optimization Guidance combining performance zones and practical strategies
+  // REFINED: Optimization Guidance based on actual data patterns only
   const generateOptimizationGuidance = () => {
     const allData = userData.benefitTracking || [];
     const currentStreak = userData.currentStreak || 0;
-    const currentHour = new Date().getHours();
-    if (allData.length < 7) return null;
     
-    // Calculate optimal performance zone
+    if (allData.length < 10) {
+      return {
+        optimalRate: 'N/A',
+        criteria: isPremium ? 'Energy 7+, Sleep 6+, Confidence 5+' : 'Energy 7+, Confidence 5+',
+        recommendations: ['Need 10+ days of benefit tracking for optimization analysis']
+      };
+    }
+    
+    // Calculate optimal performance zone based on actual data
     const optimalDays = allData.filter(d => 
       (d.energy || 0) >= 7 && 
       (d.confidence || 0) >= 5 && 
@@ -627,83 +672,102 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       recommendations: []
     };
     
-    // High energy period optimization
+    // Base recommendations on actual data patterns, not assumptions
     if (currentAvgEnergy >= 7 && !isNaN(currentAvgEnergy)) {
-      guidance.recommendations.push(`**Peak Performance Active**: Energy at ${currentAvgEnergy}/10 enables optimal training. Increase workout intensity by 20% - your body can handle more stress during retention.`);
+      guidance.recommendations.push(`**Peak Performance Active**: Energy at ${currentAvgEnergy}/10 enables optimal training and decision-making. Your body can handle increased physical and mental challenges.`);
       
-      if (currentHour >= 6 && currentHour <= 11) {
-        guidance.recommendations.push("**Morning Power Window**: Peak energy + optimal cortisol timing. Schedule your most challenging work now - mental clarity is at maximum.");
-      }
-      
-      if (currentStreak >= 74) {
-        guidance.recommendations.push("**Post-Spermatogenesis Optimization**: Your body is channeling reproductive resources into enhancement. Perfect time for skill development and creative projects.");
+      // Only mention timing if we have data to support it
+      if (allData.length >= 14) {
+        guidance.recommendations.push("**High Energy Period**: This is your window for important decisions, challenging workouts, and creative projects. Your retention benefits are maximized right now.");
       }
     }
     
-    // Recovery period guidance
+    // Recovery period guidance based on data
     if (currentAvgEnergy < 6 && !isNaN(currentAvgEnergy)) {
-      guidance.recommendations.push(`**Recovery Mode**: Energy at ${currentAvgEnergy}/10 indicates integration phase. Prioritize sleep, gentle movement, and avoid major decisions.`);
+      guidance.recommendations.push(`**Integration Mode**: Energy at ${currentAvgEnergy}/10 indicates natural recovery cycle. Prioritize rest, gentle movement, and avoid forcing major decisions.`);
       
+      // Phase-specific context only if meaningful
       if (currentStreak >= 15 && currentStreak <= 45) {
-        guidance.recommendations.push("**Purification Support**: Low energy during emotional purging phase is normal. Your psyche is healing - allow rest and practice self-compassion.");
+        guidance.recommendations.push("**Purification Phase Support**: Lower energy during emotional purging is normal. Your psyche is healing - allow the process and maintain basic practices.");
       }
     }
     
-    // Decision-making optimization
-    if (isPremium && allData.length >= 14) {
+    // Pattern-based optimization (only with sufficient data)
+    if (isPremium && allData.length >= 20) {
       const highConfidenceDays = allData.filter(d => (d.confidence || 0) >= 7);
-      if (highConfidenceDays.length > 0) {
+      if (highConfidenceDays.length >= 5) {
         const avgEnergyHighConfidence = highConfidenceDays.reduce((sum, d) => sum + (d.energy || 0), 0) / highConfidenceDays.length;
-        guidance.recommendations.push(`**Optimal Decision-Making**: Make important choices when confidence reaches 7+ (your energy averages ${avgEnergyHighConfidence.toFixed(1)}/10 then). Retention enhances judgment through improved prefrontal cortex function.`);
+        guidance.recommendations.push(`**Decision-Making Pattern**: Your energy averages ${avgEnergyHighConfidence.toFixed(1)}/10 when confidence is high. This is your optimal window for important choices.`);
       }
-    }
-    
-    // Weekend planning
-    const currentDay = new Date().getDay();
-    if (currentDay === 5 || currentDay === 6) { // Friday or Saturday
-      guidance.recommendations.push("**Weekend Structure**: Plan activities now to maintain momentum. Unstructured time increases relapse risk - schedule gym sessions, social events, or personal projects.");
     }
     
     return guidance;
   };
 
-  // Calculate historical comparison values
+  // IMPROVED: Historical comparison with meaningful insights
   const calculateHistoricalComparison = () => {
     const allData = userData.benefitTracking || [];
-    const filteredData = getFilteredBenefitData();
+    const currentStreak = userData.currentStreak || 0;
     
-    const getShortStreakAverage = () => {
-      if (filteredData.length === 0) return 'N/A';
-      const shortTermData = filteredData.filter(item => {
-        const itemDate = new Date(item.date);
-        const sevenDaysAgo = subDays(new Date(), 7);
-        return itemDate >= sevenDaysAgo;
+    if (allData.length < 14) {
+      return {
+        hasData: false,
+        message: 'Need 14+ days of benefit tracking for meaningful historical analysis'
+      };
+    }
+    
+    // Phase-based analysis instead of arbitrary time periods
+    const getPhaseData = (phaseName, dayRange) => {
+      const phaseData = allData.filter(item => {
+        const daysSinceStart = Math.floor((new Date(item.date) - new Date(userData.startDate)) / (1000 * 60 * 60 * 24));
+        return daysSinceStart >= dayRange.start && daysSinceStart <= dayRange.end;
       });
-      if (shortTermData.length === 0) return 'N/A';
-      const avg = shortTermData.reduce((sum, item) => sum + (item[selectedMetric] || 5), 0) / shortTermData.length;
-      return avg.toFixed(1);
-    };
-    
-    const getCurrentAverage = () => {
-      return calculateAverage();
-    };
-    
-    const getProjectedAverage = () => {
-      const currentAvg = calculateAverage();
-      if (currentAvg === 'N/A') return 'N/A';
       
-      const baseValue = parseFloat(currentAvg);
-      const currentStreak = userData.currentStreak || 0;
-      if (currentStreak >= 74) {
-        return Math.min(10, baseValue + 1.5).toFixed(1);
-      }
-      return Math.min(10, baseValue + 2.0).toFixed(1);
+      if (phaseData.length === 0) return null;
+      
+      const avg = phaseData.reduce((sum, item) => {
+        const value = selectedMetric === 'sleep' ? 
+          (item[selectedMetric] || item.attraction || 0) : 
+          (item[selectedMetric] || 0);
+        return sum + value;
+      }, 0) / phaseData.length;
+      
+      return { average: avg.toFixed(1), days: phaseData.length };
     };
+    
+    // Define meaningful phases
+    const foundationPhase = getPhaseData('Foundation', { start: 1, end: 14 });
+    const purificationPhase = getPhaseData('Purification', { start: 15, end: 45 });
+    const expansionPhase = getPhaseData('Expansion', { start: 46, end: 90 });
+    
+    // Current phase average
+    const currentAvg = calculateAverage();
+    
+    // Find your best performing phase
+    const phases = [
+      { name: 'Foundation', data: foundationPhase, range: '1-14 days' },
+      { name: 'Purification', data: purificationPhase, range: '15-45 days' },
+      { name: 'Expansion', data: expansionPhase, range: '46-90 days' }
+    ].filter(p => p.data !== null);
+    
+    if (phases.length === 0) {
+      return {
+        hasData: false,
+        message: 'Tracking multiple phases needed for comparison'
+      };
+    }
+    
+    const bestPhase = phases.reduce((best, current) => 
+      parseFloat(current.data.average) > parseFloat(best.data.average) ? current : best
+    );
     
     return {
-      shortStreak: getShortStreakAverage(),
-      current: getCurrentAverage(),
-      projected: getProjectedAverage()
+      hasData: true,
+      current: currentAvg,
+      bestPhase: bestPhase,
+      allPhases: phases,
+      insight: currentAvg !== 'N/A' && parseFloat(currentAvg) >= parseFloat(bestPhase.data.average) ? 
+        'current_best' : 'room_for_improvement'
     };
   };
 
@@ -1125,7 +1189,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {/* Smart Urge Management */}
               <div className="insight-card">
                 <div className="insight-card-header">
-                  <FaShieldAlt className="insight-card-icon" />
                   <span>Smart Urge Management</span>
                 </div>
                 <div className="insight-info-banner">
@@ -1134,16 +1197,27 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 </div>
                 <div className="insight-card-content">
                   <div className="urge-management-display">
-                    <div className={`risk-level-indicator ${urgeManagement.riskLevel.toLowerCase()}`}>
-                      <div>
-                        <div className={`risk-score ${urgeManagement.riskLevel.toLowerCase()}`}>
-                          {urgeManagement.riskLevel}
+                    {urgeManagement.riskLevel === 'N/A' ? (
+                      <div className="risk-level-indicator insufficient">
+                        <div>
+                          <div className="risk-score insufficient">N/A</div>
+                          <div className="risk-level-text">Insufficient Data</div>
                         </div>
-                        <div className="risk-level-text">Current Risk Level</div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className={`risk-level-indicator ${urgeManagement.riskLevel.toLowerCase()}`}>
+                        <div>
+                          <div className={`risk-score ${urgeManagement.riskLevel.toLowerCase()}`}>
+                            {urgeManagement.riskLevel}
+                          </div>
+                          <div className="risk-level-text">Current Risk Level</div>
+                        </div>
+                      </div>
+                    )}
                     <div className="guidance-list">
-                      <div className="guidance-title">Current Guidance:</div>
+                      <div className="guidance-title">
+                        {urgeManagement.riskLevel === 'N/A' ? 'Data Requirements:' : 'Current Guidance:'}
+                      </div>
                       {urgeManagement.guidance.map((guide, index) => (
                         <div key={index} className="guidance-item" dangerouslySetInnerHTML={renderTextWithBold(guide)}></div>
                       ))}
@@ -1168,7 +1242,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {/* Relapse Risk Predictor */}
               <div className="insight-card">
                 <div className="insight-card-header">
-                  <FaExclamationTriangle className="insight-card-icon" />
                   <span>Relapse Risk Predictor</span>
                 </div>
                 <div className="insight-info-banner">
@@ -1223,7 +1296,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {patternInsights.length > 0 && (
                 <div className="insight-card">
                   <div className="insight-card-header">
-                    <FaBrain className="insight-card-icon" />
                     <span>Pattern Recognition</span>
                   </div>
                   <div className="insight-info-banner">
@@ -1231,11 +1303,19 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                     <span>Identifies correlations between your metrics and predicts trends based on your unique retention journey patterns.</span>
                   </div>
                   <div className="insight-card-content">
-                    <div className="patterns-display">
-                      {patternInsights.map((pattern, index) => (
-                        <div key={index} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></div>
-                      ))}
-                    </div>
+                    {patternInsights.length === 1 && patternInsights[0].includes('Need 14+') ? (
+                      <div className="insufficient-data-message">
+                        <div className="insufficient-data-text">
+                          Continue tracking daily benefits to unlock pattern analysis. The more data you provide, the more detailed your insights become.
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="patterns-display">
+                        {patternInsights.map((pattern, index) => (
+                          <div key={index} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></div>
+                        ))}
+                      </div>
+                    )}
                     {dataQuality.level !== 'insufficient' && (
                       <div className="insight-data-status">
                         <div className="insight-data-status-indicator">
@@ -1257,7 +1337,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {optimizationGuidance && (
                 <div className="insight-card">
                   <div className="insight-card-header">
-                    <FaFire className="insight-card-icon" />
                     <span>Optimization Guidance</span>
                   </div>
                   <div className="insight-info-banner">
@@ -1303,47 +1382,63 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               {/* Historical Comparison */}
               <div className="historical-comparison-section">
                 <div className="historical-comparison-header">
-                  <span>{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Historical Comparison</span>
+                  <span>{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Journey Analysis</span>
                 </div>
-                <div className="historical-comparison-grid">
-                  <div className="historical-comparison-card">
-                    <div className="historical-comparison-value">
-                      {(() => {
-                        const comparison = calculateHistoricalComparison();
-                        return comparison.shortStreak === 'N/A' ? 'N/A' : `${comparison.shortStreak}/10`;
-                      })()}
-                    </div>
-                    <div className="historical-comparison-label">Short streaks (1-7 days)</div>
-                  </div>
+                {(() => {
+                  const comparison = calculateHistoricalComparison();
                   
-                  <div className="historical-comparison-card">
-                    <div className="historical-comparison-value">
-                      {(() => {
-                        const comparison = calculateHistoricalComparison();
-                        return comparison.current === 'N/A' ? 'N/A' : `${comparison.current}/10`;
-                      })()}
-                    </div>
-                    <div className="historical-comparison-label">Current average</div>
-                  </div>
+                  if (!comparison.hasData) {
+                    return (
+                      <div className="historical-comparison-card" style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
+                        <div className="historical-comparison-value">N/A</div>
+                        <div className="historical-comparison-label">{comparison.message}</div>
+                      </div>
+                    );
+                  }
                   
-                  <div className="historical-comparison-card">
-                    <div className="historical-comparison-value">
-                      {(() => {
-                        const comparison = calculateHistoricalComparison();
-                        return comparison.projected === 'N/A' ? 'N/A' : `${comparison.projected}/10`;
-                      })()}
-                    </div>
-                    <div className="historical-comparison-label">
-                      {(() => {
-                        const currentStreak = userData.currentStreak || 0;
-                        if (currentStreak >= 74) {
-                          return `Post-spermatogenesis optimization phase`;
-                        }
-                        return `Projected with longer streaks`;
-                      })()}
-                    </div>
-                  </div>
-                </div>
+                  return (
+                    <>
+                      <div className="historical-comparison-grid">
+                        <div className="historical-comparison-card">
+                          <div className="historical-comparison-value">
+                            {comparison.current === 'N/A' ? 'N/A' : `${comparison.current}/10`}
+                          </div>
+                          <div className="historical-comparison-label">Current Average</div>
+                        </div>
+                        
+                        <div className="historical-comparison-card">
+                          <div className="historical-comparison-value">
+                            {comparison.bestPhase.data.average}/10
+                          </div>
+                          <div className="historical-comparison-label">
+                            Your peak during {comparison.bestPhase.name} phase ({comparison.bestPhase.range})
+                          </div>
+                        </div>
+                        
+                        <div className="historical-comparison-card">
+                          <div className="historical-comparison-value">
+                            {comparison.allPhases.length}
+                          </div>
+                          <div className="historical-comparison-label">
+                            Phases with data for analysis
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="historical-insight">
+                        {comparison.insight === 'current_best' ? (
+                          <div className="insight-positive">
+                            🔥 You're currently performing at or above your historical peak! Your {selectedMetric} development is accelerating.
+                          </div>
+                        ) : (
+                          <div className="insight-improvement">
+                            📈 Your peak {selectedMetric} was {comparison.bestPhase.data.average}/10 during {comparison.bestPhase.name} phase. You have proven potential to reach this level again.
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </>
