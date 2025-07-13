@@ -115,6 +115,7 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
   border: 1px solid rgba(255, 221, 0, 0.2);
+  white-space: nowrap;
 }
 
 .data-progress-bar {
@@ -598,6 +599,7 @@
   gap: var(--spacing-md);
 }
 
+/* REMOVED GLOW: No more animation on current metric average */
 .current-metric-average {
   display: flex;
   flex-direction: column;
@@ -612,23 +614,6 @@
   position: relative;
 }
 
-.current-metric-average::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(255, 221, 0, 0.05) 50%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  border-radius: var(--radius-md);
-}
-
-.current-metric-average:hover::before {
-  opacity: 1;
-}
-
 .current-metric-label {
   font-size: 1rem;
   color: var(--text);
@@ -641,7 +626,7 @@
   color: var(--primary);
 }
 
-/* ENHANCED: Insight Cards */
+/* ENHANCED: Insight Cards - REMOVED YELLOW BORDERS */
 .current-insight-card {
   padding: var(--spacing-lg);
   background-color: var(--card-background);
@@ -655,22 +640,6 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-}
-
-.current-insight-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.current-insight-card:hover::before {
-  opacity: 1;
 }
 
 .current-insight-header {
@@ -742,7 +711,7 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* ENHANCED: Insight cards with subtle animations */
+/* ENHANCED: Insight cards - REMOVED YELLOW BORDERS */
 .insight-card {
   background-color: var(--card-background);
   padding: var(--spacing-lg);
@@ -757,25 +726,10 @@
   overflow: hidden;
 }
 
-.insight-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
-  transition: left 0.6s ease;
-}
-
-.insight-card:hover::before {
-  left: 100%;
-}
-
+/* KEEP ZOOM BUT REMOVE YELLOW BORDER */
 .insight-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.1);
 }
 
 .insight-card-header {
@@ -990,7 +944,7 @@
 
 .pattern-item:hover {
   background-color: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 221, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 /* Optimization Guidance */
@@ -1091,7 +1045,7 @@
 
 .optimization-item:hover {
   background-color: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 221, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 /* Insight data status indicator */
@@ -1146,7 +1100,7 @@
   font-weight: 500;
 }
 
-/* Historical comparison - cleaner layout */
+/* Historical comparison - cleaner layout - REMOVED YELLOW BORDERS */
 .historical-comparison-section {
   background-color: var(--card-background);
   padding: var(--spacing-lg);
@@ -1197,7 +1151,6 @@
 .historical-comparison-card:hover {
   background-color: rgba(255, 255, 255, 0.04);
   transform: translateY(-2px);
-  border-color: rgba(255, 221, 0, 0.1);
 }
 
 .historical-comparison-value {
@@ -1243,20 +1196,6 @@
   background-color: rgba(255, 221, 0, 0.1);
   border: 1px solid rgba(255, 221, 0, 0.2);
   color: var(--primary);
-}
-
-/* Current Metric Average Pulsing Glow */
-@keyframes metric-glow {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(255, 221, 0, 0.15);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(255, 221, 0, 0.3);
-  }
-}
-
-.current-metric-average {
-  animation: metric-glow 3s ease-in-out infinite;
 }
 
 /* ENHANCED: Keyboard Navigation Improvements */
@@ -1339,7 +1278,7 @@
     grid-template-columns: 1fr;
   }
 
-  /* ENHANCED: Desktop hover effects */
+  /* ENHANCED: Desktop hover effects - KEEP ZOOM, REMOVE YELLOW */
   .insight-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -1442,9 +1381,10 @@
     justify-content: center;
   }
   
-  /* Personalized Insights Mobile Spacing */
+  /* MOBILE FIXES: Personalized Insights Mobile Spacing */
   .personalized-insights-section {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
+    margin: var(--spacing-lg) 0;
   }
   
   .personalized-insights-header h3 {
@@ -1453,45 +1393,96 @@
   }
   
   .insight-card {
-    padding: var(--spacing-lg);
-    gap: var(--spacing-lg);
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
   }
   
   .insight-card-header {
     padding: var(--spacing-sm) 0;
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
   
+  /* MOBILE FIXES: Compact info banners */
   .insight-info-banner {
     font-size: 0.8rem;
-    padding: var(--spacing-md);
-    margin-top: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    text-align: center;
+    padding: var(--spacing-sm);
+    margin: var(--spacing-sm) 0;
+    text-align: left;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
   }
   
   .insight-info-banner .info-icon {
-    align-self: center;
-    margin-top: 0;
+    margin-top: 2px;
+    flex-shrink: 0;
   }
   
+  /* MOBILE FIXES: Compact empty states */
+  .insight-empty-state {
+    min-height: 120px;
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .insight-empty-icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .insight-empty-title {
+    font-size: 1rem;
+  }
+  
+  .insight-empty-description {
+    font-size: 0.8rem;
+  }
+  
+  /* MOBILE FIXES: Compact chart no-data state */
+  .chart-container {
+    height: 200px;
+    padding: var(--spacing-sm);
+  }
+  
+  .no-chart-data {
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+  }
+  
+  .no-data-icon {
+    font-size: 2rem;
+  }
+  
+  .no-data-text h4 {
+    font-size: 1rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .no-data-text p {
+    font-size: 0.8rem;
+  }
+  
+  /* MOBILE FIXES: Historical comparison */
   .historical-comparison-section {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
   }
   
   .historical-comparison-grid {
     grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
   }
   
   .historical-comparison-card {
-    min-height: 100px;
-    padding: var(--spacing-lg);
+    min-height: 80px;
+    padding: var(--spacing-md);
   }
   
   .historical-comparison-value {
     font-size: 1.25rem;
+  }
+  
+  .historical-comparison-label {
+    font-size: 0.8rem;
   }
   
   .optimization-metrics {
@@ -1499,17 +1490,41 @@
   }
   
   .optimization-metric-card {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
+    min-height: 70px;
   }
   
   .optimization-metric-value {
     font-size: 1.25rem;
   }
   
+  /* MOBILE FIXES: Risk indicators */
+  .risk-level-indicator {
+    padding: var(--spacing-md);
+  }
+  
+  .risk-score {
+    font-size: 1.5rem;
+  }
+  
+  .risk-level-text {
+    font-size: 0.8rem;
+  }
+  
+  /* MOBILE FIXES: Insight data status */
   .insight-data-status-indicator {
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
     text-align: center;
+  }
+  
+  .insight-data-quality {
+    font-size: 0.7rem;
+    align-self: center;
+  }
+  
+  .insight-data-days {
+    font-size: 0.7rem;
   }
 
   /* Mobile: Reduced animations for performance */
@@ -1561,13 +1576,13 @@
   }
   
   .chart-container {
-    padding: var(--spacing-sm);
-    height: 250px;
+    padding: var(--spacing-xs);
+    height: 180px;
   }
   
   .current-metric-average {
-    min-height: 80px;
-    padding: var(--spacing-md);
+    min-height: 70px;
+    padding: var(--spacing-sm);
   }
   
   .current-metric-value {
@@ -1575,13 +1590,15 @@
   }
   
   .current-insight-card {
-    min-height: 90px;
-    padding: var(--spacing-md);
+    min-height: 80px;
+    padding: var(--spacing-sm);
     justify-content: center;
   }
   
+  /* VERY SMALL: Extra compact personalized insights */
   .personalized-insights-section {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
+    gap: var(--spacing-md);
   }
   
   .personalized-insights-header h3 {
@@ -1590,41 +1607,84 @@
   }
   
   .insight-card {
-    padding: var(--spacing-md) var(--spacing-lg);
-    gap: var(--spacing-md);
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
   }
   
   .insight-card-header {
-    padding: var(--spacing-md) 0;
+    padding: var(--spacing-xs) 0;
+    font-size: 0.85rem;
+  }
+  
+  /* VERY SMALL: Ultra compact info banners */
+  .insight-info-banner {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs);
+    margin: var(--spacing-xs) 0;
+  }
+  
+  /* VERY SMALL: Empty states */
+  .insight-empty-state {
+    min-height: 100px;
+    padding: var(--spacing-sm);
+  }
+  
+  .insight-empty-icon {
+    font-size: 1.5rem;
+  }
+  
+  .insight-empty-title {
     font-size: 0.9rem;
   }
   
-  .insight-info-banner {
+  .insight-empty-description {
     font-size: 0.75rem;
-    padding: var(--spacing-sm) var(--spacing-md);
-    margin-top: var(--spacing-xs);
-    margin-bottom: var(--spacing-sm);
+  }
+  
+  .no-data-icon {
+    font-size: 1.5rem;
+  }
+  
+  .no-data-text h4 {
+    font-size: 0.9rem;
+  }
+  
+  .no-data-text p {
+    font-size: 0.75rem;
   }
   
   .historical-comparison-section {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
   }
   
   .historical-comparison-card {
-    min-height: 90px;
-    padding: var(--spacing-md);
+    min-height: 70px;
+    padding: var(--spacing-sm);
   }
   
   .historical-comparison-value {
-    font-size: 1.125rem;
+    font-size: 1.1rem;
+  }
+  
+  .historical-comparison-label {
+    font-size: 0.75rem;
   }
   
   .optimization-metric-card {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
+    min-height: 60px;
   }
   
   .optimization-metric-value {
-    font-size: 1.125rem;
+    font-size: 1.1rem;
+  }
+  
+  .risk-score {
+    font-size: 1.25rem;
+  }
+  
+  .risk-level-text {
+    font-size: 0.75rem;
   }
 
   /* Very small screens: Disable all hover animations */

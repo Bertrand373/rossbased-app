@@ -709,7 +709,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                           <h4>No Data for {timeRange === 'week' ? 'Last 7 Days' : timeRange === 'month' ? 'Last 30 Days' : 'Last 90 Days'}</h4>
                           <p>Start logging your {selectedMetric} benefits to see your progress chart.</p>
                         </div>
-                        <DataProgressIndicator userData={safeUserData} />
                       </div>
                     );
                   }
