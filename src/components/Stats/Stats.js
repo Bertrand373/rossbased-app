@@ -62,7 +62,7 @@ const InsightLoadingState = ({ insight, isVisible }) => {
   );
 };
 
-// ENHANCED: Progress indicator component
+// ENHANCED: Progress indicator component with mobile optimizations
 const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
   const trackedDays = userData.benefitTracking?.length || 0;
   const progressPercentage = Math.min((trackedDays / targetDays) * 100, 100);
@@ -75,7 +75,7 @@ const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
           {isComplete ? 'Analytics Ready' : 'Building Your Profile'}
         </div>
         <div className="data-progress-count">
-          {trackedDays}/{targetDays} days tracked
+          {trackedDays}/{targetDays} days
         </div>
       </div>
       <div className="data-progress-bar">
@@ -86,7 +86,7 @@ const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
       </div>
       {!isComplete && (
         <div className="data-progress-message">
-          Track {targetDays - trackedDays} more days to unlock detailed insights
+          Track {targetDays - trackedDays} more days for detailed insights
         </div>
       )}
     </div>
