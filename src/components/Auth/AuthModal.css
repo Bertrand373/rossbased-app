@@ -1,4 +1,4 @@
-/* components/Auth/AuthModal.css - Fixed responsive design and app styling */
+/* components/Auth/AuthModal.css - Fixed responsive design and app styling with helmet loading */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -59,6 +59,83 @@
 .close-modal-btn:hover {
   color: var(--text);
   background-color: rgba(128, 128, 128, 0.1);
+}
+
+/* ENHANCED: Auth Loading State - Match upgrade banner helmet */
+.auth-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.auth-loading-helmet {
+  width: 80px; /* MATCH: Same as benefit-upgrade-helmet */
+  height: 80px; /* MATCH: Same as benefit-upgrade-helmet */
+  flex-shrink: 0;
+  animation: auth-helmet-pulse 2.5s ease-in-out infinite;
+  /* MATCH: Same glow as upgrade banner helmet */
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+.auth-loading-helmet-fallback {
+  font-size: 3.2rem; /* MATCH: Same as benefit-upgrade-helmet-fallback */
+  color: var(--primary);
+  flex-shrink: 0;
+  animation: auth-helmet-pulse 2.5s ease-in-out infinite;
+}
+
+/* MATCH: Same animation as upgrade banner helmet */
+@keyframes auth-helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.auth-loading-text {
+  color: var(--text);
+  font-size: 1.25rem; /* MATCH: Same as spartan-loader-message */
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+}
+
+.auth-loading-dots {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: center;
+  margin-top: var(--spacing-sm);
+}
+
+.auth-loading-dots span {
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  animation: auth-loading-bounce 1.4s ease-in-out infinite both;
+}
+
+.auth-loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.auth-loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.auth-loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes auth-loading-bounce {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .auth-social-buttons {
@@ -303,6 +380,20 @@
     font-size: 1.375rem;
     margin-bottom: var(--spacing-md);
   }
+
+  /* Mobile auth loading helmet adjustments */
+  .auth-loading-helmet {
+    width: 70px; /* MATCH: Mobile scaling like upgrade banner */
+    height: 70px;
+  }
+
+  .auth-loading-helmet-fallback {
+    font-size: 2.8rem; /* MATCH: Mobile scaling like upgrade banner */
+  }
+
+  .auth-loading-text {
+    font-size: 1.125rem;
+  }
   
   .social-btn {
     padding: var(--spacing-md);
@@ -344,6 +435,15 @@
   .close-modal-btn {
     top: var(--spacing-sm);
     right: var(--spacing-sm);
+  }
+
+  .auth-loading-helmet {
+    width: 60px;
+    height: 60px;
+  }
+
+  .auth-loading-helmet-fallback {
+    font-size: 2.4rem;
   }
 }
 

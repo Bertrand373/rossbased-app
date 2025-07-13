@@ -1,6 +1,7 @@
-// components/Auth/AuthModal.js - Fixed username validation and styling
+// components/Auth/AuthModal.js - Fixed username validation and styling with helmet loading
 import React, { useState, useEffect } from 'react';
 import './AuthModal.css';
+import helmetImage from '../../assets/helmet.png';
 
 // Icons
 import { FaTimes, FaUser, FaLock, FaGoogle, FaDiscord, FaEnvelope, FaSpinner } from 'react-icons/fa';
@@ -137,6 +138,38 @@ const AuthModal = ({ onClose, onLogin }) => {
     if (isLoading) return;
     onClose();
   };
+
+  // ENHANCED: Loading State with Helmet Animation
+  if (isLoading) {
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content auth-modal">
+          <div className="auth-loading-state">
+            <img 
+              src={helmetImage} 
+              alt="Logging you in" 
+              className="auth-loading-helmet"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'block';
+              }}
+            />
+            <div className="auth-loading-helmet-fallback" style={{display: 'none'}}>⚡</div>
+            
+            <div className="auth-loading-text">
+              {isLogin ? 'Logging you in...' : 'Creating your account...'}
+            </div>
+            
+            <div className="auth-loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="modal-overlay" onClick={handleClose}>

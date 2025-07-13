@@ -1,9 +1,10 @@
-// App.js - Updated with Profile Component and improved profile button functionality
+// App.js - Updated with Profile Component and improved profile button functionality with helmet loading
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
+import helmetImage from './assets/helmet.png';
 
 // Icons for header
 import { 
@@ -116,16 +117,28 @@ function App() {
     return success;
   };
 
-  // FIXED: Show SpartanLoader when loading OR when initially loading the app
+  // ENHANCED: Show helmet loading when loading OR when initially loading the app
   if (isLoading || isInitialLoading) {
+    const loadingMessage = isLoading ? 
+      (isInitialLoading ? 'Loading your dashboard...' : 'Authenticating...') : 
+      'Loading your dashboard...';
+
     return (
-      <div className="spartan-loading-screen">
-        <SpartanLoader 
-          size={100}
-          message={isLoading ? "Logging you in..." : "Loading your dashboard..."}
-          showMessage={true}
-          animationType="warrior"
+      <div className="app-loading-screen">
+        <img 
+          src={helmetImage} 
+          alt="Loading" 
+          className="app-loading-helmet"
+          onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.nextElementSibling.style.display = 'block';
+          }}
         />
+        <div className="app-loading-helmet-fallback" style={{display: 'none'}}>⚡</div>
+        
+        <div className="app-loading-text">
+          {loadingMessage}
+        </div>
       </div>
     );
   }

@@ -1,4 +1,4 @@
-/* App.css - Main application styles with updated header navigation */
+/* App.css - Main application styles with updated header navigation and enhanced loading */
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -37,7 +37,7 @@ body {
   flex-direction: column;
 }
 
-/* FIXED: Seamless Loading Screen - within app container structure */
+/* ENHANCED: App Loading Screen - Match upgrade banner helmet */
 .spartan-loading-screen {
   max-width: 1200px;
   margin: var(--spacing-md) auto;
@@ -50,6 +50,60 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+/* ENHANCED: App loading styles for main loading states */
+.app-loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  z-index: 9999;
+}
+
+.app-loading-helmet {
+  width: 100px; /* LARGER: Premium loading experience */
+  height: 100px;
+  flex-shrink: 0;
+  animation: app-helmet-pulse 2s ease-in-out infinite;
+  /* ENHANCED: Stronger glow for main loading */
+  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6));
+}
+
+.app-loading-helmet-fallback {
+  font-size: 4rem; /* LARGER: Match 100px helmet */
+  color: var(--primary);
+  flex-shrink: 0;
+  animation: app-helmet-pulse 2s ease-in-out infinite;
+}
+
+/* ENHANCED: Slightly different animation for main app loading */
+@keyframes app-helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(0.96);
+  }
+}
+
+.app-loading-text {
+  color: var(--text);
+  font-size: 1.5rem; /* LARGER: More prominent for main loading */
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  /* ENHANCED: Subtle glow for readability */
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 /* ADDED: Additional Toast Overrides in App.css as backup */
@@ -283,6 +337,32 @@ body {
     margin-right: var(--spacing-sm);
     min-height: calc(100vh - 16px);
   }
+
+  /* Mobile app loading helmet adjustments */
+  .app-loading-helmet {
+    width: 80px; /* SCALED: Mobile main loading */
+    height: 80px;
+  }
+
+  .app-loading-helmet-fallback {
+    font-size: 3.2rem;
+  }
+
+  .app-loading-text {
+    font-size: 1.25rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .app-loading-helmet {
+    width: 70px;
+    height: 70px;
+  }
+
+  .app-loading-helmet-fallback {
+    font-size: 2.8rem;
+  }
 }
 
 button {
@@ -489,8 +569,6 @@ input:checked + .toggle-slider:before {
   display: inline-block;
   margin-top: var(--spacing-sm);
 }
-
-/* REMOVED: Old loading styles - replaced with Spartan */
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
