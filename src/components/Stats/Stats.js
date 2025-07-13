@@ -706,8 +706,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                           <FaChartLine />
                         </div>
                         <div className="no-data-text">
-                          <h4>No Data for {timeRange === 'week' ? 'Last 7 Days' : timeRange === 'month' ? 'Last 30 Days' : 'Last 90 Days'}</h4>
-                          <p>Start logging your {selectedMetric} benefits to see your progress chart.</p>
+                          <h4>No Chart Data Available</h4>
+                          <p>Start logging your {selectedMetric} benefits to see your progress visualization.</p>
                         </div>
                       </div>
                     );
