@@ -1,4 +1,4 @@
-// App.js - Updated with Profile Component and improved profile button functionality with helmet loading
+// App.js - Fixed to keep original container structure with helmet styling
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -117,27 +117,26 @@ function App() {
     return success;
   };
 
-  // ENHANCED: Show helmet loading when loading OR when initially loading the app
+  // FIXED: Keep original SpartanLoader within grey container - just update the helmet
   if (isLoading || isInitialLoading) {
-    const loadingMessage = isLoading ? 
-      (isInitialLoading ? 'Loading your dashboard...' : 'Authenticating...') : 
-      'Loading your dashboard...';
-
     return (
-      <div className="app-loading-screen">
-        <img 
-          src={helmetImage} 
-          alt="Loading" 
-          className="app-loading-helmet"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            e.target.nextElementSibling.style.display = 'block';
-          }}
-        />
-        <div className="app-loading-helmet-fallback" style={{display: 'none'}}>⚡</div>
-        
-        <div className="app-loading-text">
-          {loadingMessage}
+      <div className="spartan-loading-screen">
+        <div className="spartan-loader-container">
+          <div className="spartan-loader-animation">
+            <img 
+              src={helmetImage} 
+              alt="Loading" 
+              className="spartan-helmet-image app-loading-helmet-size"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'block';
+              }}
+            />
+            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>⚡</div>
+          </div>
+          <div className="spartan-loader-message">
+            {isLoading ? "Logging you in..." : "Loading your dashboard..."}
+          </div>
         </div>
       </div>
     );
