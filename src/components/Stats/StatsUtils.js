@@ -1,4 +1,4 @@
-// components/Stats/StatsUtils.js - ENHANCED: Performance Optimized with Defensive Programming
+// components/Stats/StatsUtils.js - ENHANCED: Performance Optimized with Defensive Programming + Relapse Pattern Analytics
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -55,7 +55,8 @@ const validateUserData = (userData) => {
       longestStreak: 0,
       startDate: new Date(),
       benefitTracking: [],
-      badges: []
+      badges: [],
+      streakHistory: []
     };
   }
 
@@ -65,6 +66,7 @@ const validateUserData = (userData) => {
     startDate: userData.startDate ? new Date(userData.startDate) : new Date(),
     benefitTracking: Array.isArray(userData.benefitTracking) ? userData.benefitTracking : [],
     badges: Array.isArray(userData.badges) ? userData.badges : [],
+    streakHistory: Array.isArray(userData.streakHistory) ? userData.streakHistory : [],
     ...userData
   };
 };
@@ -453,6 +455,261 @@ export const calculateAverage = (userData, selectedMetric, timeRange, isPremium)
   } catch (error) {
     console.error('Average calculation error:', error);
     return 'N/A';
+  }
+};
+
+// NEW: Relapse Pattern Analytics - Brutally Honest Trigger Analysis
+export const generateRelapsePatternAnalysis = (userData) => {
+  try {
+    const cacheKey = generateCacheKey(userData, 'relapsePatterns');
+    const cached = getCachedResult(cacheKey);
+    if (cached) return cached;
+
+    const safeData = validateUserData(userData);
+    const streakHistory = safeData.streakHistory || [];
+    const currentStreak = safeData.currentStreak || 0;
+    
+    // Filter for actual relapses (not wet dreams or other reasons)
+    const relapses = streakHistory.filter(streak => 
+      streak && streak.reason === 'relapse' && streak.trigger && streak.end
+    );
+    
+    if (relapses.length === 0) {
+      const result = {
+        hasData: false,
+        message: 'No relapse data available for pattern analysis',
+        insights: ['Track your relapses with triggers to identify dangerous patterns and build targeted defenses.']
+      };
+      setCachedResult(cacheKey, result);
+      return result;
+    }
+
+    if (relapses.length < 2) {
+      const result = {
+        hasData: false,
+        message: 'Need 2+ relapses for meaningful pattern analysis',
+        insights: [`Your single relapse trigger was **${relapses[0].trigger}**. This is your known vulnerability - build specific countermeasures now.`]
+      };
+      setCachedResult(cacheKey, result);
+      return result;
+    }
+
+    const insights = [];
+    
+    // 1. PRIMARY TRIGGER ANALYSIS
+    const triggerCounts = {};
+    relapses.forEach(relapse => {
+      const trigger = relapse.trigger;
+      triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
+    });
+    
+    const sortedTriggers = Object.entries(triggerCounts)
+      .sort(([,a], [,b]) => b - a);
+    
+    const primaryTrigger = sortedTriggers[0];
+    const primaryTriggerRate = ((primaryTrigger[1] / relapses.length) * 100).toFixed(0);
+    
+    if (primaryTriggerRate >= 40) {
+      insights.push(`**Primary Vulnerability**: ${primaryTriggerRate}% of your relapses stem from **${primaryTrigger[0]}**. This is your Achilles heel - you cannot achieve mastery without addressing this specific trigger.`);
+    }
+
+    // 2. PHASE-SPECIFIC TRIGGER ANALYSIS
+    const getPhaseFromDays = (days) => {
+      if (days <= 7) return 'Foundation (Days 1-7)';
+      if (days <= 14) return 'Early Foundation (Days 8-14)';
+      if (days <= 30) return 'Purification (Days 15-30)';
+      if (days <= 45) return 'Deep Purification (Days 31-45)';
+      if (days <= 90) return 'Expansion (Days 46-90)';
+      if (days <= 180) return 'Integration (Days 91-180)';
+      return 'Mastery (180+ Days)';
+    };
+
+    const phaseBreakdowns = {};
+    relapses.forEach(relapse => {
+      try {
+        const streakDays = relapse.days || 0;
+        const phase = getPhaseFromDays(streakDays);
+        const trigger = relapse.trigger;
+        
+        if (!phaseBreakdowns[phase]) {
+          phaseBreakdowns[phase] = {};
+        }
+        phaseBreakdowns[phase][trigger] = (phaseBreakdowns[phase][trigger] || 0) + 1;
+      } catch (phaseError) {
+        console.warn('Phase breakdown error:', phaseError);
+      }
+    });
+
+    // Identify most dangerous phase
+    const phaseRelapseCount = Object.entries(phaseBreakdowns)
+      .map(([phase, triggers]) => [phase, Object.values(triggers).reduce((sum, count) => sum + count, 0)])
+      .sort(([,a], [,b]) => b - a);
+    
+    if (phaseRelapseCount.length > 0) {
+      const [dangerousPhase, relapseCount] = phaseRelapseCount[0];
+      const dangerousPhaseRate = ((relapseCount / relapses.length) * 100).toFixed(0);
+      
+      if (dangerousPhaseRate >= 40) {
+        const phaseTriggers = Object.entries(phaseBreakdowns[dangerousPhase])
+          .sort(([,a], [,b]) => b - a);
+        const mainPhaseTrigger = phaseTriggers[0];
+        
+        insights.push(`**Critical Phase Vulnerability**: ${dangerousPhaseRate}% of relapses occur during **${dangerousPhase}** - specifically from **${mainPhaseTrigger[0]}**. This phase-trigger combination is your greatest threat.`);
+      }
+    }
+
+    // 3. TRIGGER-SPECIFIC COUNTERMEASURES (Brutal honesty + retention wisdom)
+    const triggerCountermeasures = {
+      'stress': {
+        explanation: 'Stress floods your system with cortisol, which directly depletes semen. Your body mistakenly believes reproduction is urgent during stress.',
+        countermeasures: [
+          '**Immediate**: 4-7-8 breathing technique (inhale 4, hold 7, exhale 8) to reset nervous system',
+          '**Daily**: Cold exposure builds stress resilience - cold showers become your armor',
+          '**Deep Work**: Stress often comes from unfinished business - complete what you start',
+          '**Energy Management**: Schedule high-stress activities during your peak energy hours'
+        ]
+      },
+      'boredom': {
+        explanation: 'Boredom is dopamine starvation. Your brain craves stimulation and will destroy months of progress for 30 seconds of pleasure.',
+        countermeasures: [
+          '**Immediate**: Physical movement - 20 push-ups or 60-second plank breaks the boredom trance',
+          '**Prevention**: Always have 3 meaningful activities ready when boredom hits',
+          '**Purpose**: Boredom means you lack compelling life direction - find your mission',
+          '**Environment**: Remove all triggers from your space - boredom + access = relapse'
+        ]
+      },
+      'loneliness': {
+        explanation: 'Loneliness triggers pair-bonding neurochemicals that make you crave connection. Your brain confuses sexual release with human intimacy.',
+        countermeasures: [
+          '**Immediate**: Call a friend or family member - actual human connection breaks the loneliness spiral',
+          '**Social Investment**: Build genuine relationships before you need them',
+          '**Self-Companionship**: Learn to enjoy your own company through meditation and journaling',
+          '**Service**: Help others when lonely - it dissolves self-focused isolation'
+        ]
+      },
+      'lustful_thoughts': {
+        explanation: 'Mental fantasies drain sexual energy as much as physical acts. Thoughts become chemistry become actions become destiny.',
+        countermeasures: [
+          '**Immediate**: "Thought replacement" - immediately engage in complex mental tasks (math, memory games)',
+          '**Transmutation**: Channel sexual energy upward through breathwork and movement',
+          '**Mental Discipline**: Treat your mind like a muscle - train it to reject unwanted thoughts',
+          '**Environmental Control**: Avoid known triggers - certain places, content, or people activate lustful thinking'
+        ]
+      },
+      'social_media': {
+        explanation: 'Social media hijacks your dopamine system with infinite scroll and suggestive content. Each scroll weakens your retention willpower.',
+        countermeasures: [
+          '**Immediate**: Delete apps during vulnerable periods - friction prevents impulsive usage',
+          '**Time Limits**: Use built-in screen time controls - treat social media like a controlled substance',
+          '**Content Curation**: Unfollow anything remotely suggestive - your feed determines your thoughts',
+          '**Replacement Activity**: Have analog alternatives ready - books, exercise, real-world activities'
+        ]
+      },
+      'relationship': {
+        explanation: 'Relationship conflicts create emotional turbulence that clouds judgment. Wounded emotions seek quick relief through sexual release.',
+        countermeasures: [
+          '**Immediate**: Process emotions through journaling before acting - write out the pain',
+          '**Communication**: Address conflicts directly instead of avoiding through sexual distraction',
+          '**Boundary Setting**: Relationship drama often stems from unclear boundaries',
+          '**Self-Worth**: Don\'t seek validation through sexual conquest - build internal confidence'
+        ]
+      },
+      'home_environment': {
+        explanation: 'Your environment programs your behavior. Familiar spaces with old habits trigger automatic relapse patterns.',
+        countermeasures: [
+          '**Immediate**: Change your physical location - leave the triggering space',
+          '**Environmental Design**: Remove all triggers from your living space - create a retention sanctuary',
+          '**New Associations**: Build new positive habits in the same spaces where you used to relapse',
+          '**Accountability**: Have someone who can check your environment and hold you accountable'
+        ]
+      }
+    };
+
+    // Add specific countermeasures for primary trigger
+    if (primaryTrigger && triggerCountermeasures[primaryTrigger[0]]) {
+      const triggerData = triggerCountermeasures[primaryTrigger[0]];
+      insights.push(`**Why ${primaryTrigger[0]} Destroys Retention**: ${triggerData.explanation}`);
+      
+      triggerData.countermeasures.forEach(countermeasure => {
+        insights.push(countermeasure);
+      });
+    }
+
+    // 4. CURRENT STREAK VULNERABILITY ASSESSMENT
+    const currentPhase = getCurrentPhase(safeData);
+    const currentPhaseRelapses = relapses.filter(relapse => {
+      const streakDays = relapse.days || 0;
+      const relapsePhase = getPhaseFromDays(streakDays);
+      return relapsePhase.includes(currentPhase);
+    });
+
+    if (currentPhaseRelapses.length > 0) {
+      const currentPhaseTriggers = {};
+      currentPhaseRelapses.forEach(relapse => {
+        const trigger = relapse.trigger;
+        currentPhaseTriggers[trigger] = (currentPhaseTriggers[trigger] || 0) + 1;
+      });
+      
+      const mostDangerousTrigger = Object.entries(currentPhaseTriggers)
+        .sort(([,a], [,b]) => b - a)[0];
+      
+      insights.push(`**Current Phase Alert**: You're in ${currentPhase} phase where **${mostDangerousTrigger[0]}** has caused ${mostDangerousTrigger[1]} previous relapse(s). Extra vigilance required against this specific trigger.`);
+    }
+
+    // 5. PATTERN EVOLUTION ANALYSIS
+    if (relapses.length >= 3) {
+      const recentRelapses = relapses.slice(-3);
+      const oldRelapses = relapses.slice(0, -3);
+      
+      const recentTriggers = {};
+      const oldTriggers = {};
+      
+      recentRelapses.forEach(relapse => {
+        const trigger = relapse.trigger;
+        recentTriggers[trigger] = (recentTriggers[trigger] || 0) + 1;
+      });
+      
+      oldRelapses.forEach(relapse => {
+        const trigger = relapse.trigger;
+        oldTriggers[trigger] = (oldTriggers[trigger] || 0) + 1;
+      });
+      
+      const recentMostCommon = Object.entries(recentTriggers)
+        .sort(([,a], [,b]) => b - a)[0];
+      const oldMostCommon = Object.entries(oldTriggers)
+        .sort(([,a], [,b]) => b - a)[0];
+      
+      if (recentMostCommon && oldMostCommon && recentMostCommon[0] !== oldMostCommon[0]) {
+        insights.push(`**Evolving Threat Pattern**: Your relapse triggers have shifted from **${oldMostCommon[0]}** to **${recentMostCommon[0]}**. As you master one trigger, others become more dangerous.`);
+      }
+    }
+
+    // 6. STREAK LENGTH vs TRIGGER ANALYSIS
+    const avgStreakLength = relapses.reduce((sum, relapse) => sum + (relapse.days || 0), 0) / relapses.length;
+    
+    if (avgStreakLength < 7) {
+      insights.push(`**Foundation Phase Trap**: Average streak length ${avgStreakLength.toFixed(1)} days indicates you're stuck in Foundation phase. Focus on basic habits before advanced retention techniques.`);
+    } else if (avgStreakLength > 30) {
+      insights.push(`**Advanced Practitioner Warning**: ${avgStreakLength.toFixed(1)}-day average streaks show advanced practice, but recurring relapses indicate subtle vulnerabilities that require deeper self-awareness.`);
+    }
+
+    const result = {
+      hasData: true,
+      relapseCount: relapses.length,
+      primaryTrigger: primaryTrigger[0],
+      insights: insights,
+      triggerBreakdown: sortedTriggers
+    };
+    
+    setCachedResult(cacheKey, result);
+    return result;
+  } catch (error) {
+    console.error('Relapse pattern analysis error:', error);
+    return {
+      hasData: false,
+      message: 'Unable to analyze relapse patterns at this time',
+      insights: ['Pattern analysis temporarily unavailable. Continue tracking relapses with triggers for future insights.']
+    };
   }
 };
 

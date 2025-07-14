@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - ENHANCED: Professional UX Polish with Loading States and Progress Indicators
+// components/Stats/Stats.js - ENHANCED: Professional UX Polish with Loading States and Relapse Pattern Analytics
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -26,7 +26,8 @@ import {
   calculateHistoricalComparison,
   calculateRelapseRisk,
   shouldShowInfoBanner,
-  calculateDataQuality
+  calculateDataQuality,
+  generateRelapsePatternAnalysis
 } from './StatsUtils';
 
 // Register ChartJS components
@@ -99,7 +100,8 @@ const InsightEmptyState = ({ insight, userData }) => {
     'Smart Urge Management': 'Track your daily benefits to receive personalized vulnerability assessments and timing-based guidance.',
     'Relapse Risk Predictor': 'Build a benefit tracking history to unlock predictive analytics and risk mitigation strategies.',
     'Pattern Recognition': 'Continue logging daily benefits to identify correlations and trends in your retention journey.',
-    'Optimization Guidance': 'Track benefits consistently to discover your peak performance zones and optimization opportunities.'
+    'Optimization Guidance': 'Track benefits consistently to discover your peak performance zones and optimization opportunities.',
+    'Relapse Pattern Analytics': 'Track relapses with triggers in the Calendar to identify dangerous patterns and build targeted defenses.'
   };
 
   return (
@@ -130,7 +132,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     urgeManagement: false,
     riskPredictor: false,
     patternRecognition: false,
-    optimization: false
+    optimization: false,
+    relapsePatterns: false
   });
   
   const insightsStartRef = useRef(null);
@@ -143,6 +146,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     relapseCount: 0,
     startDate: new Date(),
     benefitTracking: [],
+    streakHistory: [],
     badges: [
       { id: 1, name: '7-Day Warrior', earned: false, date: null },
       { id: 2, name: '14-Day Monk', earned: false, date: null },
@@ -176,6 +180,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       setTimeout(() => simulateInsightLoading('riskPredictor', 700), 200);
       setTimeout(() => simulateInsightLoading('patternRecognition', 800), 400);
       setTimeout(() => simulateInsightLoading('optimization', 600), 600);
+      setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 800);
     }
   }, [timeRange, selectedMetric, isPremium, simulateInsightLoading]);
 
@@ -205,7 +210,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       patternInsights: generatePatternRecognition(safeUserData, selectedMetric, isPremium),
       optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, isPremium),
       dataQuality: calculateDataQuality(safeUserData),
-      historicalComparison: calculateHistoricalComparison(safeUserData, selectedMetric)
+      historicalComparison: calculateHistoricalComparison(safeUserData, selectedMetric),
+      relapsePatterns: generateRelapsePatternAnalysis(safeUserData)
     };
   }, [safeUserData, timeRange, selectedMetric, isPremium]);
 
@@ -753,7 +759,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* ENHANCED: Personalized Insights Section with Loading States */}
+            {/* ENHANCED: Personalized Insights Section with Loading States + NEW Relapse Pattern Analytics */}
             <div className="personalized-insights-section">
               <div className="personalized-insights-header">
                 <h3>Personalized Insights</h3>
@@ -870,6 +876,61 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                         </span>
                         <span className="insight-data-days">
                           Based on {memoizedInsights.dataQuality?.days || 0} days of tracking
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* NEW: Relapse Pattern Analytics */}
+              <div className="insight-card">
+                <div className="insight-card-header">
+                  <span>Relapse Pattern Analytics</span>
+                </div>
+                <div className="insight-info-banner">
+                  <FaInfoCircle className="info-icon" />
+                  <span>Analyzes your relapse history to identify trigger patterns, phase vulnerabilities, and provides brutally honest countermeasures based on retention wisdom.</span>
+                </div>
+                <div className="insight-card-content">
+                  {loadingStates.relapsePatterns ? (
+                    <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
+                  ) : !memoizedInsights.relapsePatterns?.hasData ? (
+                    <InsightEmptyState insight="Relapse Pattern Analytics" userData={safeUserData} />
+                  ) : (
+                    <div className="relapse-patterns-display">
+                      {memoizedInsights.relapsePatterns.relapseCount && (
+                        <div className="relapse-summary-stats">
+                          <div className="relapse-stat-card">
+                            <div className="relapse-stat-value">{memoizedInsights.relapsePatterns.relapseCount}</div>
+                            <div className="relapse-stat-label">Total Relapses Analyzed</div>
+                          </div>
+                          {memoizedInsights.relapsePatterns.primaryTrigger && (
+                            <div className="relapse-stat-card primary-trigger">
+                              <div className="relapse-stat-value">{memoizedInsights.relapsePatterns.primaryTrigger}</div>
+                              <div className="relapse-stat-label">Primary Vulnerability</div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      <div className="relapse-insights-list">
+                        <div className="relapse-insights-title">Pattern Analysis:</div>
+                        {(memoizedInsights.relapsePatterns?.insights || []).map((insight, index) => (
+                          <div key={index} className="relapse-insight-item" dangerouslySetInnerHTML={renderTextWithBold(insight)}></div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {memoizedInsights.relapsePatterns?.hasData && (
+                    <div className="insight-data-status">
+                      <div className="insight-data-status-indicator">
+                        <span className="insight-data-quality rich">
+                          <FaShieldAlt />
+                          Relapse Intelligence
+                        </span>
+                        <span className="insight-data-days">
+                          Based on {memoizedInsights.relapsePatterns.relapseCount || 0} relapse records
                         </span>
                       </div>
                     </div>

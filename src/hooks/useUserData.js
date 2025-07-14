@@ -1,9 +1,16 @@
-// src/hooks/useUserData.js - UPDATED: Using comprehensive mock data
+// src/hooks/useUserData.js - UPDATED: Using comprehensive mock data + NEW personality-based users
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
-// IMPORT: The comprehensive mock data
-import comprehensiveMockData, { newUserMockData, veteranUserMockData, strugglingUserMockData } from '../mockData';
+// IMPORT: The comprehensive mock data including new personality users
+import comprehensiveMockData, { 
+  newUserMockData, 
+  veteranUserMockData, 
+  strugglingUserMockData,
+  intjMockData,
+  intpMockData,
+  enfpMockData
+} from '../mockData';
 
 /**
  * Premium Features Control
@@ -52,7 +59,7 @@ export const useUserData = () => {
   const [isPremium, setIsPremium] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // UPDATED: Login function with comprehensive mock data scenarios
+  // UPDATED: Login function with comprehensive mock data scenarios + NEW personality users
   const login = async (username, password = 'demo') => {
     try {
       setIsLoading(true);
@@ -92,6 +99,22 @@ export const useUserData = () => {
         case 'hard':
           // STRUGGLING: Multiple relapses, day 3
           mockUserData = strugglingUserMockData;
+          break;
+          
+        // NEW PERSONALITY-BASED USERS
+        case 'intj':
+          // INTJ: Long-term retainer (425 days) with religious benefit tracking
+          mockUserData = intjMockData;
+          break;
+          
+        case 'intp':
+          // INTP: 9 months retainer with good tracking history
+          mockUserData = intpMockData;
+          break;
+          
+        case 'enfp':
+          // ENFP: Long SR streaks with some relapses, moderate tracking (can be lazy)
+          mockUserData = enfpMockData;
           break;
           
         default:
@@ -139,6 +162,12 @@ export const useUserData = () => {
       case 'struggle':
       case 'hard':
         return '(Struggling - Day 3)';
+      case 'intj':
+        return '(INTJ - 425 days, Religious Tracker)';
+      case 'intp':
+        return '(INTP - 275 days, Good Tracker)';
+      case 'enfp':
+        return '(ENFP - 89 days, Previous 423 day streak)';
       default:
         return '(Main Demo - Day 25)';
     }

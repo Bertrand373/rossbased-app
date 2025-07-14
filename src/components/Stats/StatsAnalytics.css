@@ -1,4 +1,4 @@
-/* components/Stats/StatsAnalytics.css - ENHANCED: Professional UX Polish with Loading States */
+/* components/Stats/StatsAnalytics.css - ENHANCED: Professional UX Polish with Loading States + Relapse Pattern Analytics */
 
 /* ENHANCED: Loading States for Insights */
 .insight-loading-state {
@@ -935,6 +935,107 @@
   gap: var(--spacing-lg);
 }
 
+/* NEW: Relapse Pattern Analytics Styles */
+.relapse-patterns-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.relapse-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.relapse-stat-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  min-height: 100px;
+  transition: all 0.3s ease;
+}
+
+.relapse-stat-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
+}
+
+.relapse-stat-card.primary-trigger {
+  background-color: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.relapse-stat-card.primary-trigger:hover {
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+.relapse-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+  transition: transform 0.3s ease;
+  text-transform: capitalize;
+}
+
+.relapse-stat-card:hover .relapse-stat-value {
+  transform: scale(1.05);
+}
+
+.relapse-stat-card.primary-trigger .relapse-stat-value {
+  color: #ef4444;
+}
+
+.relapse-stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.relapse-insights-list {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.relapse-insights-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-md);
+}
+
+.relapse-insight-item {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.relapse-insight-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.relapse-insight-item:last-child {
+  margin-bottom: 0;
+}
+
 /* Pattern Recognition */
 .patterns-display {
   display: flex;
@@ -1292,6 +1393,10 @@
     grid-template-columns: 1fr;
   }
 
+  .relapse-summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   /* ENHANCED: Desktop hover effects - KEEP ZOOM, REMOVE YELLOW */
   .insight-card:hover {
     transform: translateY(-4px);
@@ -1548,6 +1653,30 @@
   .risk-level-text {
     font-size: 0.8rem;
   }
+
+  /* MOBILE FIXES: Relapse pattern analytics */
+  .relapse-summary-stats {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .relapse-stat-card {
+    min-height: 80px;
+    padding: var(--spacing-md);
+  }
+
+  .relapse-stat-value {
+    font-size: 1.25rem;
+  }
+
+  .relapse-stat-label {
+    font-size: 0.8rem;
+  }
+
+  .relapse-insight-item {
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
   
   /* MOBILE FIXES: Insight data status */
   .insight-data-status-indicator {
@@ -1575,6 +1704,14 @@
   }
 
   .optimization-metric-card:hover {
+    transform: none;
+  }
+
+  .relapse-stat-card:hover {
+    transform: none;
+  }
+
+  .relapse-insight-item:hover {
     transform: none;
   }
 }
@@ -1726,6 +1863,25 @@
     font-size: 0.75rem;
   }
 
+  .relapse-stat-card {
+    min-height: 70px;
+    padding: var(--spacing-sm);
+  }
+
+  .relapse-stat-value {
+    font-size: 1.1rem;
+  }
+
+  .relapse-stat-label {
+    font-size: 0.75rem;
+  }
+
+  .relapse-insight-item {
+    padding: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.8rem;
+  }
+
   /* Very small screens: Disable all hover animations */
   * {
     transition: none !important;
@@ -1735,7 +1891,9 @@
   .historical-comparison-card:hover,
   .optimization-metric-card:hover,
   .chart-container:hover,
-  .current-metric-average:hover {
+  .current-metric-average:hover,
+  .relapse-stat-card:hover,
+  .relapse-insight-item:hover {
     transform: none !important;
     box-shadow: initial !important;
   }
