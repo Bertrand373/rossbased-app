@@ -499,6 +499,23 @@ export const calculateDaysSinceLastRelapse = (userData) => {
   }
 };
 
+// Helper function to format trigger names for display
+const formatTriggerName = (trigger) => {
+  if (!trigger || typeof trigger !== 'string') return 'unknown trigger';
+  
+  const triggerMap = {
+    'stress': 'stress',
+    'boredom': 'boredom', 
+    'loneliness': 'loneliness',
+    'lustful_thoughts': 'lustful thoughts',
+    'social_media': 'social media',
+    'relationship': 'relationship issues',
+    'home_environment': 'being home alone'
+  };
+  
+  return triggerMap[trigger] || trigger.replace(/_/g, ' ');
+};
+
 // NEW: Relapse Pattern Analytics - Brutally Honest Trigger Analysis
 export const generateRelapsePatternAnalysis = (userData) => {
   try {
@@ -526,10 +543,11 @@ export const generateRelapsePatternAnalysis = (userData) => {
     }
 
     if (relapses.length < 2) {
+      const formattedSingleTrigger = formatTriggerName(relapses[0].trigger);
       const result = {
         hasData: false,
         message: 'Need 2+ relapses for meaningful pattern analysis',
-        insights: [`Your single relapse trigger was **${relapses[0].trigger}**. This is your known vulnerability - build specific countermeasures now.`]
+        insights: [`Your single relapse trigger was **${formattedSingleTrigger}**. This is your known vulnerability - build specific countermeasures now.`]
       };
       setCachedResult(cacheKey, result);
       return result;
@@ -549,9 +567,10 @@ export const generateRelapsePatternAnalysis = (userData) => {
     
     const primaryTrigger = sortedTriggers[0];
     const primaryTriggerRate = ((primaryTrigger[1] / relapses.length) * 100).toFixed(0);
+    const formattedPrimaryTrigger = formatTriggerName(primaryTrigger[0]);
     
     if (primaryTriggerRate >= 40) {
-      insights.push(`**Primary Vulnerability**: ${primaryTriggerRate}% of your relapses stem from **${primaryTrigger[0]}**. This is your Achilles heel - you cannot achieve mastery without addressing this specific trigger.`);
+      insights.push(`**Primary Vulnerability**: ${primaryTriggerRate}% of your relapses stem from **${formattedPrimaryTrigger}**. This is your Achilles heel - you cannot achieve mastery without addressing this specific trigger.`);
     }
 
     // 2. PHASE-SPECIFIC TRIGGER ANALYSIS
@@ -594,8 +613,9 @@ export const generateRelapsePatternAnalysis = (userData) => {
         const phaseTriggers = Object.entries(phaseBreakdowns[dangerousPhase])
           .sort(([,a], [,b]) => b - a);
         const mainPhaseTrigger = phaseTriggers[0];
+        const formattedPhaseTrigger = formatTriggerName(mainPhaseTrigger[0]);
         
-        insights.push(`**Critical Phase Vulnerability**: ${dangerousPhaseRate}% of relapses occur during **${dangerousPhase}** - specifically from **${mainPhaseTrigger[0]}**. This phase-trigger combination is your greatest threat.`);
+        insights.push(`**Critical Phase Vulnerability**: ${dangerousPhaseRate}% of relapses occur during **${dangerousPhase}** - specifically from **${formattedPhaseTrigger}**. This phase-trigger combination is your greatest threat.`);
       }
     }
 
@@ -669,7 +689,7 @@ export const generateRelapsePatternAnalysis = (userData) => {
     // Add specific countermeasures for primary trigger
     if (primaryTrigger && triggerCountermeasures[primaryTrigger[0]]) {
       const triggerData = triggerCountermeasures[primaryTrigger[0]];
-      insights.push(`**Why ${primaryTrigger[0]} Destroys Retention**: ${triggerData.explanation}`);
+      insights.push(`**Why ${formattedPrimaryTrigger} Destroys Retention**: ${triggerData.explanation}`);
       
       triggerData.countermeasures.forEach(countermeasure => {
         insights.push(countermeasure);
@@ -693,8 +713,9 @@ export const generateRelapsePatternAnalysis = (userData) => {
       
       const mostDangerousTrigger = Object.entries(currentPhaseTriggers)
         .sort(([,a], [,b]) => b - a)[0];
+      const formattedDangerousTrigger = formatTriggerName(mostDangerousTrigger[0]);
       
-      insights.push(`**Current Phase Alert**: You're in ${currentPhase} phase where **${mostDangerousTrigger[0]}** has caused ${mostDangerousTrigger[1]} previous relapse(s). Extra vigilance required against this specific trigger.`);
+      insights.push(`**Current Phase Alert**: You're in ${currentPhase} phase where **${formattedDangerousTrigger}** has caused ${mostDangerousTrigger[1]} previous relapse(s). Extra vigilance required against this specific trigger.`);
     }
 
     // 5. PATTERN EVOLUTION ANALYSIS
@@ -721,7 +742,9 @@ export const generateRelapsePatternAnalysis = (userData) => {
         .sort(([,a], [,b]) => b - a)[0];
       
       if (recentMostCommon && oldMostCommon && recentMostCommon[0] !== oldMostCommon[0]) {
-        insights.push(`**Evolving Threat Pattern**: Your relapse triggers have shifted from **${oldMostCommon[0]}** to **${recentMostCommon[0]}**. As you master one trigger, others become more dangerous.`);
+        const formattedRecentTrigger = formatTriggerName(recentMostCommon[0]);
+        const formattedOldTrigger = formatTriggerName(oldMostCommon[0]);
+        insights.push(`**Evolving Threat Pattern**: Your relapse triggers have shifted from **${formattedOldTrigger}** to **${formattedRecentTrigger}**. As you master one trigger, others become more dangerous.`);
       }
     }
 
@@ -737,9 +760,9 @@ export const generateRelapsePatternAnalysis = (userData) => {
     const result = {
       hasData: true,
       relapseCount: relapses.length,
-      primaryTrigger: primaryTrigger[0],
+      primaryTrigger: formatTriggerName(primaryTrigger[0]),
       insights: insights,
-      triggerBreakdown: sortedTriggers
+      triggerBreakdown: sortedTriggers.map(([trigger, count]) => [formatTriggerName(trigger), count])
     };
     
     setCachedResult(cacheKey, result);
