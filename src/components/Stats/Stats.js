@@ -1,10 +1,10 @@
-// components/Stats/Stats.js - ENHANCED: Professional UX Polish with Loading States and Relapse Pattern Analytics
+// components/Stats/Stats.js - ENHANCED: Professional UX Polish with Loading States and Relapse Pattern Analytics + Stat Card Modals
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine, FaShieldAlt, FaFire } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine, FaShieldAlt, FaFire, FaTimes } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -127,6 +127,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [selectedBadge, setSelectedBadge] = useState(null);
   const [showSmartResetDialog, setShowSmartResetDialog] = useState(false);
   
+  // NEW: Stat card modal states
+  const [showStatModal, setShowStatModal] = useState(false);
+  const [selectedStatCard, setSelectedStatCard] = useState(null);
+  
   // ENHANCED: Loading states for insights
   const [loadingStates, setLoadingStates] = useState({
     urgeManagement: false,
@@ -206,6 +210,143 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
     setSelectedMetric(metric);
   }, [isPremium]);
+
+  // NEW: Handle stat card click
+  const handleStatCardClick = useCallback((statType) => {
+    // Only show modals for the clickable cards (not current streak)
+    if (statType === 'currentStreak') return;
+    
+    setSelectedStatCard(statType);
+    setShowStatModal(true);
+  }, []);
+
+  // NEW: Generate stat card modal content - PURE FACTS ONLY
+  const generateStatCardContent = useCallback((statType) => {
+    const streakHistory = safeUserData.streakHistory || [];
+    const startDate = safeUserData.startDate ? new Date(safeUserData.startDate) : new Date();
+    
+    switch (statType) {
+      case 'longestStreak':
+        const longestStreak = safeUserData.longestStreak || 0;
+        
+        // Find the longest streak record from history
+        const longestStreakRecord = streakHistory
+          .filter(streak => streak && streak.days)
+          .reduce((longest, current) => {
+            return (current.days || 0) > (longest?.days || 0) ? current : longest;
+          }, null);
+
+        const longestStreakStart = longestStreakRecord?.start ? 
+          format(new Date(longestStreakRecord.start), 'MMMM d, yyyy') : 'Not recorded';
+        const longestStreakEnd = longestStreakRecord?.end ? 
+          format(new Date(longestStreakRecord.end), 'MMMM d, yyyy') : 'Current streak';
+
+        return {
+          title: 'Longest Streak Record',
+          icon: <FaTrophy />,
+          mainValue: `${longestStreak} days`,
+          content: [
+            longestStreak === 0 ? 
+              'No streak longer than 1 day recorded yet.' :
+              `Personal best streak: ${longestStreak} consecutive days.`,
+            
+            longestStreakRecord ? 
+              `Duration: ${longestStreakStart} to ${longestStreakEnd}` : 
+              'Date records not available for this streak.',
+            
+            longestStreakRecord?.reason ? 
+              `Ended due to: ${longestStreakRecord.reason.replace(/_/g, ' ')}` :
+              'End reason not recorded.'
+          ]
+        };
+
+      case 'wetDreams':
+        const wetDreamCount = safeUserData.wetDreamCount || 0;
+        
+        // Calculate tracking period
+        const daysSinceStart = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
+        const frequency = daysSinceStart > 30 && wetDreamCount > 0 ? 
+          Math.round(daysSinceStart / wetDreamCount) : null;
+
+        return {
+          title: 'Wet Dream Record',
+          icon: <FaClock />,
+          mainValue: `${wetDreamCount} total`,
+          content: [
+            `Total occurrences: ${wetDreamCount} wet dreams recorded.`,
+            
+            `Tracking period: ${daysSinceStart} days since ${format(startDate, 'MMMM d, yyyy')}.`,
+            
+            frequency ? 
+              `Average frequency: approximately every ${frequency} days.` : 
+              wetDreamCount === 0 ? 
+                'No wet dreams recorded during tracking period.' :
+                'Frequency calculation requires longer tracking period.'
+          ]
+        };
+
+      case 'relapses':
+        const relapseCount = safeUserData.relapseCount || 0;
+        
+        // Find most recent relapse
+        const relapses = streakHistory.filter(streak => 
+          streak && streak.reason === 'relapse'
+        );
+        
+        const mostRecentRelapse = relapses.length > 0 ? 
+          relapses.reduce((latest, current) => {
+            try {
+              const currentDate = new Date(current.end || current.start);
+              const latestDate = new Date(latest.end || latest.start);
+              return currentDate > latestDate ? current : latest;
+            } catch (error) {
+              return latest;
+            }
+          }) : null;
+
+        const daysSinceLastRelapse = mostRecentRelapse ? 
+          Math.floor((new Date() - new Date(mostRecentRelapse.end || mostRecentRelapse.start)) / (1000 * 60 * 60 * 24)) : null;
+
+        // Find most recorded trigger (no analysis, just facts)
+        const triggerCounts = {};
+        relapses.forEach(relapse => {
+          const trigger = relapse.trigger || 'not recorded';
+          triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
+        });
+        
+        const mostRecordedTrigger = Object.keys(triggerCounts).length > 0 ? 
+          Object.entries(triggerCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0] : null;
+
+        return {
+          title: 'Relapse Record',
+          icon: <FaShieldAlt />,
+          mainValue: `${relapseCount} total`,
+          content: [
+            `Total relapses: ${relapseCount} recorded since starting.`,
+            
+            daysSinceLastRelapse !== null ? 
+              `Most recent: ${daysSinceLastRelapse} days ago (${format(new Date(mostRecentRelapse.end || mostRecentRelapse.start), 'MMMM d, yyyy')})` :
+              relapseCount > 0 ? 
+                'Most recent relapse date not recorded.' :
+                'No relapses recorded.',
+            
+            mostRecordedTrigger && mostRecordedTrigger !== 'not recorded' ? 
+              `Most frequent trigger: ${mostRecordedTrigger.replace(/_/g, ' ')} (${triggerCounts[mostRecordedTrigger]} times)` :
+              relapseCount > 0 ? 
+                'Trigger information not available.' :
+                'No trigger data to display.'
+          ]
+        };
+
+      default:
+        return {
+          title: 'Stat Information',
+          icon: <FaInfoCircle />,
+          mainValue: 'N/A',
+          content: ['Information not available for this statistic.']
+        };
+    }
+  }, [safeUserData]);
 
   // ENHANCED: Memoized calculations for performance
   const memoizedInsights = useMemo(() => {
@@ -467,21 +608,84 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           <div className="stat-label">Current Streak</div>
         </div>
         
-        <div className="stat-card longest-streak">
+        <div 
+          className="stat-card longest-streak clickable-stat" 
+          onClick={() => handleStatCardClick('longestStreak')}
+          onKeyDown={(e) => e.key === 'Enter' && handleStatCardClick('longestStreak')}
+          tabIndex={0}
+          role="button"
+          aria-label="View longest streak details"
+        >
           <div className="stat-value">{safeUserData.longestStreak || 0}</div>
           <div className="stat-label">Longest Streak</div>
         </div>
         
-        <div className="stat-card total-wetdreams">
+        <div 
+          className="stat-card total-wetdreams clickable-stat" 
+          onClick={() => handleStatCardClick('wetDreams')}
+          onKeyDown={(e) => e.key === 'Enter' && handleStatCardClick('wetDreams')}
+          tabIndex={0}
+          role="button"
+          aria-label="View wet dreams analysis"
+        >
           <div className="stat-value">{safeUserData.wetDreamCount || 0}</div>
           <div className="stat-label">Wet Dreams</div>
         </div>
         
-        <div className="stat-card total-relapses">
+        <div 
+          className="stat-card total-relapses clickable-stat" 
+          onClick={() => handleStatCardClick('relapses')}
+          onKeyDown={(e) => e.key === 'Enter' && handleStatCardClick('relapses')}
+          tabIndex={0}
+          role="button"
+          aria-label="View relapse analysis"
+        >
           <div className="stat-value">{safeUserData.relapseCount || 0}</div>
           <div className="stat-label">Relapses</div>
         </div>
       </div>
+      
+      {/* NEW: Stat Card Details Modal */}
+      {showStatModal && selectedStatCard && (
+        <div className="modal-overlay" onClick={() => setShowStatModal(false)} role="dialog" aria-modal="true" aria-labelledby="stat-modal-title">
+          <div className="modal-content stat-details-modal" onClick={e => e.stopPropagation()}>
+            <div className="stat-details-header">
+              <div className="stat-details-icon">
+                {generateStatCardContent(selectedStatCard).icon}
+              </div>
+              <h3 id="stat-modal-title">{generateStatCardContent(selectedStatCard).title}</h3>
+              <button 
+                className="stat-modal-close"
+                onClick={() => setShowStatModal(false)}
+                aria-label="Close modal"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            
+            <div className="stat-details-value">
+              {generateStatCardContent(selectedStatCard).mainValue}
+            </div>
+            
+            <div className="stat-details-content">
+              {generateStatCardContent(selectedStatCard).content.map((text, index) => (
+                <p key={index}>{text}</p>
+              ))}
+            </div>
+            
+            <div className="modal-actions">
+              <button 
+                className="btn btn-primary" 
+                onClick={() => setShowStatModal(false)}
+                onKeyDown={(e) => e.key === 'Enter' && setShowStatModal(false)}
+                autoFocus
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Milestone Badges */}
       <div className="milestone-section">
