@@ -458,6 +458,47 @@ export const calculateAverage = (userData, selectedMetric, timeRange, isPremium)
   }
 };
 
+// NEW: Calculate days since last relapse for smart reframing
+export const calculateDaysSinceLastRelapse = (userData) => {
+  try {
+    const safeData = validateUserData(userData);
+    const streakHistory = safeData.streakHistory || [];
+    
+    // Filter for actual relapses (not wet dreams or other reasons)
+    const relapses = streakHistory.filter(streak => 
+      streak && streak.reason === 'relapse' && streak.end
+    );
+    
+    if (relapses.length === 0) {
+      return null; // Never relapsed
+    }
+    
+    // Find the most recent relapse
+    const mostRecentRelapse = relapses.reduce((latest, current) => {
+      try {
+        const currentDate = new Date(current.end);
+        const latestDate = new Date(latest.end);
+        return currentDate > latestDate ? current : latest;
+      } catch (error) {
+        return latest;
+      }
+    });
+    
+    if (!mostRecentRelapse || !mostRecentRelapse.end) {
+      return null;
+    }
+    
+    const lastRelapseDate = new Date(mostRecentRelapse.end);
+    const today = new Date();
+    const daysDifference = Math.floor((today - lastRelapseDate) / (1000 * 60 * 60 * 24));
+    
+    return daysDifference >= 0 ? daysDifference : 0;
+  } catch (error) {
+    console.error('Days since last relapse calculation error:', error);
+    return null;
+  }
+};
+
 // NEW: Relapse Pattern Analytics - Brutally Honest Trigger Analysis
 export const generateRelapsePatternAnalysis = (userData) => {
   try {

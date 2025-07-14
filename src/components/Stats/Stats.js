@@ -27,7 +27,8 @@ import {
   calculateRelapseRisk,
   shouldShowInfoBanner,
   calculateDataQuality,
-  generateRelapsePatternAnalysis
+  generateRelapsePatternAnalysis,
+  calculateDaysSinceLastRelapse
 } from './StatsUtils';
 
 // Register ChartJS components
@@ -100,8 +101,7 @@ const InsightEmptyState = ({ insight, userData }) => {
     'Smart Urge Management': 'Track your daily benefits to receive personalized vulnerability assessments and timing-based guidance.',
     'Relapse Risk Predictor': 'Build a benefit tracking history to unlock predictive analytics and risk mitigation strategies.',
     'Pattern Recognition': 'Continue logging daily benefits to identify correlations and trends in your retention journey.',
-    'Optimization Guidance': 'Track benefits consistently to discover your peak performance zones and optimization opportunities.',
-    'Relapse Pattern Analytics': 'Track relapses with triggers in the Calendar to identify dangerous patterns and build targeted defenses.'
+    'Optimization Guidance': 'Track benefits consistently to discover your peak performance zones and optimization opportunities.'
   };
 
   return (
@@ -180,9 +180,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       setTimeout(() => simulateInsightLoading('riskPredictor', 700), 200);
       setTimeout(() => simulateInsightLoading('patternRecognition', 800), 400);
       setTimeout(() => simulateInsightLoading('optimization', 600), 600);
-      setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 800);
+      
+      // Only load relapse patterns if user has actual relapse data
+      const hasRelapseData = safeUserData.streakHistory?.some(streak => 
+        streak && streak.reason === 'relapse' && streak.trigger
+      );
+      if (hasRelapseData) {
+        setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 800);
+      }
     }
-  }, [timeRange, selectedMetric, isPremium, simulateInsightLoading]);
+  }, [timeRange, selectedMetric, isPremium, simulateInsightLoading, safeUserData.streakHistory]);
 
   // Handle metric selection with access control
   const handleMetricClick = useCallback((metric) => {
@@ -211,7 +218,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, isPremium),
       dataQuality: calculateDataQuality(safeUserData),
       historicalComparison: calculateHistoricalComparison(safeUserData, selectedMetric),
-      relapsePatterns: generateRelapsePatternAnalysis(safeUserData)
+      relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
+      daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData)
     };
   }, [safeUserData, timeRange, selectedMetric, isPremium]);
 
@@ -883,60 +891,100 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 </div>
               </div>
               
-              {/* NEW: Relapse Pattern Analytics */}
-              <div className="insight-card">
-                <div className="insight-card-header">
-                  <span>Relapse Pattern Analytics</span>
-                </div>
-                <div className="insight-info-banner">
-                  <FaInfoCircle className="info-icon" />
-                  <span>Analyzes your relapse history to identify trigger patterns, phase vulnerabilities, and provides brutally honest countermeasures based on retention wisdom.</span>
-                </div>
-                <div className="insight-card-content">
-                  {loadingStates.relapsePatterns ? (
-                    <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
-                  ) : !memoizedInsights.relapsePatterns?.hasData ? (
-                    <InsightEmptyState insight="Relapse Pattern Analytics" userData={safeUserData} />
-                  ) : (
-                    <div className="relapse-patterns-display">
-                      {memoizedInsights.relapsePatterns.relapseCount && (
-                        <div className="relapse-summary-stats">
-                          <div className="relapse-stat-card">
-                            <div className="relapse-stat-value">{memoizedInsights.relapsePatterns.relapseCount}</div>
-                            <div className="relapse-stat-label">Total Relapses Analyzed</div>
+              {/* NEW: Relapse Pattern Analytics - ONLY SHOW IF USER HAS ACTUAL RELAPSES */}
+              {memoizedInsights.relapsePatterns?.hasData && (
+                <div className="insight-card">
+                  <div className="insight-card-header">
+                    <span>
+                      {memoizedInsights.daysSinceLastRelapse >= 90 
+                        ? 'Conquered Patterns Analysis' 
+                        : 'Relapse Pattern Analytics'
+                      }
+                    </span>
+                  </div>
+                  <div className="insight-info-banner">
+                    <FaInfoCircle className="info-icon" />
+                    <span>
+                      {memoizedInsights.daysSinceLastRelapse >= 90
+                        ? `Review the patterns you've successfully overcome ${memoizedInsights.daysSinceLastRelapse} days ago. This wisdom helps maintain vigilance and can guide others on their journey.`
+                        : 'Analyzes your relapse history to identify trigger patterns, phase vulnerabilities, and provides brutally honest countermeasures based on retention wisdom.'
+                      }
+                    </span>
+                  </div>
+                  <div className="insight-card-content">
+                    {loadingStates.relapsePatterns ? (
+                      <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
+                    ) : (
+                      <div className="relapse-patterns-display">
+                        {memoizedInsights.relapsePatterns.relapseCount && (
+                          <div className="relapse-summary-stats">
+                            <div className="relapse-stat-card">
+                              <div className="relapse-stat-value">{memoizedInsights.relapsePatterns.relapseCount}</div>
+                              <div className="relapse-stat-label">
+                                {memoizedInsights.daysSinceLastRelapse >= 90 
+                                  ? 'Patterns Conquered' 
+                                  : 'Total Relapses Analyzed'
+                                }
+                              </div>
+                            </div>
+                            {memoizedInsights.relapsePatterns.primaryTrigger && (
+                              <div className={`relapse-stat-card ${memoizedInsights.daysSinceLastRelapse >= 90 ? 'conquered-trigger' : 'primary-trigger'}`}>
+                                <div className="relapse-stat-value">{memoizedInsights.relapsePatterns.primaryTrigger}</div>
+                                <div className="relapse-stat-label">
+                                  {memoizedInsights.daysSinceLastRelapse >= 90 
+                                    ? 'Mastered Weakness' 
+                                    : 'Primary Vulnerability'
+                                  }
+                                </div>
+                              </div>
+                            )}
+                            {memoizedInsights.daysSinceLastRelapse >= 90 && (
+                              <div className="relapse-stat-card victory-days">
+                                <div className="relapse-stat-value">{memoizedInsights.daysSinceLastRelapse}</div>
+                                <div className="relapse-stat-label">Days Since Victory</div>
+                              </div>
+                            )}
                           </div>
-                          {memoizedInsights.relapsePatterns.primaryTrigger && (
-                            <div className="relapse-stat-card primary-trigger">
-                              <div className="relapse-stat-value">{memoizedInsights.relapsePatterns.primaryTrigger}</div>
-                              <div className="relapse-stat-label">Primary Vulnerability</div>
+                        )}
+                        
+                        <div className="relapse-insights-list">
+                          <div className="relapse-insights-title">
+                            {memoizedInsights.daysSinceLastRelapse >= 90 
+                              ? 'Wisdom From Your Journey:' 
+                              : 'Pattern Analysis:'
+                            }
+                          </div>
+                          {(memoizedInsights.relapsePatterns?.insights || []).map((insight, index) => (
+                            <div key={index} className="relapse-insight-item" dangerouslySetInnerHTML={renderTextWithBold(insight)}></div>
+                          ))}
+                          {memoizedInsights.daysSinceLastRelapse >= 90 && (
+                            <div className="relapse-insight-item victory-reminder">
+                              <strong>🏆 Victory Reminder:</strong> You've successfully overcome these patterns for {memoizedInsights.daysSinceLastRelapse} days. This analysis serves as both a testament to your growth and a reminder to stay vigilant. Your journey can inspire others facing similar challenges.
                             </div>
                           )}
                         </div>
-                      )}
-                      
-                      <div className="relapse-insights-list">
-                        <div className="relapse-insights-title">Pattern Analysis:</div>
-                        {(memoizedInsights.relapsePatterns?.insights || []).map((insight, index) => (
-                          <div key={index} className="relapse-insight-item" dangerouslySetInnerHTML={renderTextWithBold(insight)}></div>
-                        ))}
                       </div>
-                    </div>
-                  )}
-                  {memoizedInsights.relapsePatterns?.hasData && (
+                    )}
                     <div className="insight-data-status">
                       <div className="insight-data-status-indicator">
-                        <span className="insight-data-quality rich">
-                          <FaShieldAlt />
-                          Relapse Intelligence
+                        <span className={`insight-data-quality ${memoizedInsights.daysSinceLastRelapse >= 90 ? 'conquered' : 'rich'}`}>
+                          {memoizedInsights.daysSinceLastRelapse >= 90 ? <FaTrophy /> : <FaShieldAlt />}
+                          {memoizedInsights.daysSinceLastRelapse >= 90 
+                            ? 'Conquered Intelligence' 
+                            : 'Relapse Intelligence'
+                          }
                         </span>
                         <span className="insight-data-days">
-                          Based on {memoizedInsights.relapsePatterns.relapseCount || 0} relapse records
+                          {memoizedInsights.daysSinceLastRelapse >= 90 
+                            ? `Victory maintained for ${memoizedInsights.daysSinceLastRelapse} days`
+                            : `Based on ${memoizedInsights.relapsePatterns.relapseCount || 0} relapse records`
+                          }
                         </span>
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
               
               {/* Pattern Recognition */}
               <div className="insight-card">
