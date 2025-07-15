@@ -569,7 +569,7 @@ export const enfpMockData = {
     [format(subDays(new Date(), 89), 'yyyy-MM-dd')]: "Back to day 1 again. But I know I can do this - I've done over a year before! This time I'll be more mindful in relationships.",
     [format(addDays(subDays(new Date(), 89), 30), 'yyyy-MM-dd')]: "Month in on this new streak. The energy is coming back fast since I have experience. Social connections feel electric again.",
     [format(addDays(subDays(new Date(), 89), 60), 'yyyy-MM-dd')]: "2 months back! My charisma is through the roof. People keep commenting on my 'glow' - if they only knew! 😄"
-  ],
+  },
   discordUsername: 'ENFP_Vibes#9999',
   showOnLeaderboard: true,
   dataSharing: true, // ENFP loves sharing experiences
