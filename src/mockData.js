@@ -105,14 +105,14 @@ export const comprehensiveMockData = {
       trigger: 'stress'
     },
     
-    // Second attempt: 8 days, relapsed due to explicit content
+    // Second attempt: 8 days, relapsed due to social media
     {
       id: 2,
       start: new Date(new Date().setDate(new Date().getDate() - 105)), // Next day after relapse
       end: new Date(new Date().setDate(new Date().getDate() - 97)), // Relapsed after 8 days
       days: 8,
       reason: 'relapse',
-      trigger: 'explicit_content'
+      trigger: 'social_media'
     },
     
     // Third attempt: BEST STREAK - 47 days, relapsed due to loneliness
@@ -132,7 +132,7 @@ export const comprehensiveMockData = {
       end: new Date(new Date().setDate(new Date().getDate() - 26)), // Relapsed after 22 days
       days: 22,
       reason: 'relapse',
-      trigger: 'home_alone'
+      trigger: 'home_environment'
     },
     
     // CURRENT STREAK: 25 days and counting (started 25 days ago)
@@ -518,17 +518,17 @@ export const enfpMockData = {
       end: subDays(new Date(), 156), // 20 day streak
       days: 20,
       reason: 'relapse',
-      trigger: 'social_pressure'
+      trigger: 'stress'
     },
     
-    // Another short streak
+    // Another short streak - FIXED: Changed 'celebration' to 'social_media'
     {
       id: 3,
       start: subDays(new Date(), 155),
       end: subDays(new Date(), 90), // 65 day streak
       days: 65,
       reason: 'relapse',
-      trigger: 'celebration' // Got carried away celebrating something
+      trigger: 'social_media' // FIXED: Changed from invalid 'celebration' trigger
     },
     
     // CURRENT STREAK: 89 days and building back up
@@ -569,7 +569,7 @@ export const enfpMockData = {
     [format(subDays(new Date(), 89), 'yyyy-MM-dd')]: "Back to day 1 again. But I know I can do this - I've done over a year before! This time I'll be more mindful in relationships.",
     [format(addDays(subDays(new Date(), 89), 30), 'yyyy-MM-dd')]: "Month in on this new streak. The energy is coming back fast since I have experience. Social connections feel electric again.",
     [format(addDays(subDays(new Date(), 89), 60), 'yyyy-MM-dd')]: "2 months back! My charisma is through the roof. People keep commenting on my 'glow' - if they only knew! 😄"
-  },
+  ],
   discordUsername: 'ENFP_Vibes#9999',
   showOnLeaderboard: true,
   dataSharing: true, // ENFP loves sharing experiences
@@ -672,7 +672,7 @@ export const veteranUserMockData = {
       end: new Date(new Date().setDate(new Date().getDate() - 128)),
       days: 56,
       reason: 'relapse',
-      trigger: 'explicit_content'
+      trigger: 'social_media'
     },
     // Current epic streak
     {
@@ -776,7 +776,7 @@ export const strugglingUserMockData = {
       end: new Date(new Date().setDate(new Date().getDate() - 25)),
       days: 2,
       reason: 'relapse',
-      trigger: 'explicit_content'
+      trigger: 'social_media'
     },
     {
       id: 5,
@@ -800,7 +800,7 @@ export const strugglingUserMockData = {
       end: new Date(new Date().setDate(new Date().getDate() - 7)),
       days: 6,
       reason: 'relapse',
-      trigger: 'home_alone'
+      trigger: 'home_environment'
     },
     {
       id: 8,

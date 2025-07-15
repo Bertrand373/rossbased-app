@@ -4,7 +4,7 @@ import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine, FaShieldAlt, FaFire, FaTimes } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine, FaShieldAlt, FaFire, FaTimes, FaMoon } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -270,7 +270,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
         return {
           title: 'Wet Dream Record',
-          icon: <FaClock />,
+          icon: <FaMoon />,
           mainValue: `${wetDreamCount} total`,
           content: [
             `Total occurrences: ${wetDreamCount} wet dreams recorded.`,
@@ -319,7 +319,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
         return {
           title: 'Relapse Record',
-          icon: <FaShieldAlt />,
+          icon: <FaExclamationTriangle />,
           mainValue: `${relapseCount} total`,
           content: [
             `Total relapses: ${relapseCount} recorded since starting.`,
