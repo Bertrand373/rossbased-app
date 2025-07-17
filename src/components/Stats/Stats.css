@@ -1,7 +1,10 @@
-/* components/Stats/Stats.css - Main Import File */
+/* components/Stats/Stats.css - Updated Main Import File */
 
 /* Import base stats components - core display, streaks, badges */
 @import './StatsBase.css';
 
 /* Import advanced analytics components - insights, charts, tracking */
 @import './StatsAnalytics.css';
+
+/* Import modal components styling */
+@import './StatsModals.css';

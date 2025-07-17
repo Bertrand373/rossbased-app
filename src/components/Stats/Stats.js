@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - ENHANCED: Professional UX Polish with Loading States and Relapse Pattern Analytics + Stat Card Modals
+// components/Stats/Stats.js - COMPLETE REFACTORED: Main Stats Component
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -10,6 +10,16 @@ import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
 import SmartResetDialog from './SmartResetDialog';
 
+// Import extracted components
+import { StatCardModal } from './StatsComponents';
+import { 
+  SmartUrgeManagement, 
+  RelapseRiskPredictor, 
+  RelapsePatternAnalytics, 
+  PatternRecognition, 
+  OptimizationGuidance 
+} from './StatsInsights';
+
 // Import utility functions
 import {
   renderTextWithBold,
@@ -20,105 +30,24 @@ import {
   getFilteredBenefitData,
   generateChartData,
   calculateAverage,
+  shouldShowInfoBanner,
+  calculateDataQuality,
+  calculateDaysSinceLastRelapse,
+  validateUserData
+} from './StatsUtils';
+
+// Import analytics functions
+import {
   generateUrgeManagementGuidance,
   generatePatternRecognition,
   generateOptimizationGuidance,
   calculateHistoricalComparison,
   calculateRelapseRisk,
-  shouldShowInfoBanner,
-  calculateDataQuality,
-  generateRelapsePatternAnalysis,
-  calculateDaysSinceLastRelapse
-} from './StatsUtils';
+  generateRelapsePatternAnalysis
+} from './StatsAnalyticsUtils';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
-
-// ENHANCED: Loading states component with helmet animation
-const InsightLoadingState = ({ insight, isVisible }) => {
-  if (!isVisible) return null;
-  
-  return (
-    <div className="insight-loading-state">
-      <div className="insight-loading-content">
-        <img 
-          src={helmetImage} 
-          alt="Analyzing" 
-          className="insight-loading-helmet"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'block';
-          }}
-        />
-        <div className="insight-loading-helmet-fallback" style={{display: 'none'}}>🧠</div>
-        <div className="insight-loading-text">
-          <div className="insight-loading-title">Calculating {insight}...</div>
-          <div className="insight-loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ENHANCED: Progress indicator component with mobile optimizations
-const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
-  const trackedDays = userData.benefitTracking?.length || 0;
-  const progressPercentage = Math.min((trackedDays / targetDays) * 100, 100);
-  const isComplete = trackedDays >= targetDays;
-  
-  return (
-    <div className="data-progress-indicator">
-      <div className="data-progress-header">
-        <div className="data-progress-title">
-          {isComplete ? 'Analytics Ready' : 'Building Your Profile'}
-        </div>
-        <div className="data-progress-count">
-          {trackedDays}/{targetDays} days
-        </div>
-      </div>
-      <div className="data-progress-bar">
-        <div 
-          className="data-progress-fill"
-          style={{ width: `${progressPercentage}%` }}
-        />
-      </div>
-      {!isComplete && (
-        <div className="data-progress-message">
-          Track {targetDays - trackedDays} more days for detailed insights
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ENHANCED: Empty state component with encouragement
-const InsightEmptyState = ({ insight, userData }) => {
-  const suggestions = {
-    'Smart Urge Management': 'Track your daily benefits to receive personalized vulnerability assessments and timing-based guidance.',
-    'Relapse Risk Predictor': 'Build a benefit tracking history to unlock predictive analytics and risk mitigation strategies.',
-    'Pattern Recognition': 'Continue logging daily benefits to identify correlations and trends in your retention journey.',
-    'Optimization Guidance': 'Track benefits consistently to discover your peak performance zones and optimization opportunities.'
-  };
-
-  return (
-    <div className="insight-empty-state">
-      <div className="insight-empty-icon">
-        <FaChartLine />
-      </div>
-      <div className="insight-empty-content">
-        <div className="insight-empty-title">Building Your {insight}</div>
-        <div className="insight-empty-description">
-          {suggestions[insight] || 'Continue tracking to unlock personalized insights.'}
-        </div>
-        <DataProgressIndicator userData={userData} />
-      </div>
-    </div>
-  );
-};
 
 const Stats = ({ userData, isPremium, updateUserData }) => {
   const [selectedMetric, setSelectedMetric] = useState('energy');
@@ -143,24 +72,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const insightsStartRef = useRef(null);
 
   // ENHANCED: Defensive programming - ensure userData structure
-  const safeUserData = useMemo(() => ({
-    currentStreak: 0,
-    longestStreak: 0,
-    wetDreamCount: 0,
-    relapseCount: 0,
-    startDate: new Date(),
-    benefitTracking: [],
-    streakHistory: [],
-    badges: [
-      { id: 1, name: '7-Day Warrior', earned: false, date: null },
-      { id: 2, name: '14-Day Monk', earned: false, date: null },
-      { id: 3, name: '30-Day Master', earned: false, date: null },
-      { id: 4, name: '90-Day King', earned: false, date: null },
-      { id: 5, name: '180-Day Emperor', earned: false, date: null },
-      { id: 6, name: '365-Day Sage', earned: false, date: null }
-    ],
-    ...userData
-  }), [userData]);
+  const safeUserData = useMemo(() => validateUserData(userData), [userData]);
 
   // Force free users to energy metric on mount and when premium status changes
   useEffect(() => {
@@ -219,134 +131,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setSelectedStatCard(statType);
     setShowStatModal(true);
   }, []);
-
-  // NEW: Generate stat card modal content - PURE FACTS ONLY
-  const generateStatCardContent = useCallback((statType) => {
-    const streakHistory = safeUserData.streakHistory || [];
-    const startDate = safeUserData.startDate ? new Date(safeUserData.startDate) : new Date();
-    
-    switch (statType) {
-      case 'longestStreak':
-        const longestStreak = safeUserData.longestStreak || 0;
-        
-        // Find the longest streak record from history
-        const longestStreakRecord = streakHistory
-          .filter(streak => streak && streak.days)
-          .reduce((longest, current) => {
-            return (current.days || 0) > (longest?.days || 0) ? current : longest;
-          }, null);
-
-        const longestStreakStart = longestStreakRecord?.start ? 
-          format(new Date(longestStreakRecord.start), 'MMMM d, yyyy') : 'Not recorded';
-        const longestStreakEnd = longestStreakRecord?.end ? 
-          format(new Date(longestStreakRecord.end), 'MMMM d, yyyy') : 'Current streak';
-
-        return {
-          title: 'Longest Streak Record',
-          icon: <FaTrophy />,
-          mainValue: `${longestStreak} days`,
-          content: [
-            longestStreak === 0 ? 
-              'No streak longer than 1 day recorded yet.' :
-              `Personal best streak: ${longestStreak} consecutive days.`,
-            
-            longestStreakRecord ? 
-              `Duration: ${longestStreakStart} to ${longestStreakEnd}` : 
-              'Date records not available for this streak.',
-            
-            longestStreakRecord?.reason ? 
-              `Ended due to: ${longestStreakRecord.reason.replace(/_/g, ' ')}` :
-              'End reason not recorded.'
-          ]
-        };
-
-      case 'wetDreams':
-        const wetDreamCount = safeUserData.wetDreamCount || 0;
-        
-        // Calculate tracking period
-        const daysSinceStart = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
-        const frequency = daysSinceStart > 30 && wetDreamCount > 0 ? 
-          Math.round(daysSinceStart / wetDreamCount) : null;
-
-        return {
-          title: 'Wet Dream Record',
-          icon: <FaMoon />,
-          mainValue: `${wetDreamCount} total`,
-          content: [
-            `Total occurrences: ${wetDreamCount} wet dreams recorded.`,
-            
-            `Tracking period: ${daysSinceStart} days since ${format(startDate, 'MMMM d, yyyy')}.`,
-            
-            frequency ? 
-              `Average frequency: approximately every ${frequency} days.` : 
-              wetDreamCount === 0 ? 
-                'No wet dreams recorded during tracking period.' :
-                'Frequency calculation requires longer tracking period.'
-          ]
-        };
-
-      case 'relapses':
-        const relapseCount = safeUserData.relapseCount || 0;
-        
-        // Find most recent relapse
-        const relapses = streakHistory.filter(streak => 
-          streak && streak.reason === 'relapse'
-        );
-        
-        const mostRecentRelapse = relapses.length > 0 ? 
-          relapses.reduce((latest, current) => {
-            try {
-              const currentDate = new Date(current.end || current.start);
-              const latestDate = new Date(latest.end || latest.start);
-              return currentDate > latestDate ? current : latest;
-            } catch (error) {
-              return latest;
-            }
-          }) : null;
-
-        const daysSinceLastRelapse = mostRecentRelapse ? 
-          Math.floor((new Date() - new Date(mostRecentRelapse.end || mostRecentRelapse.start)) / (1000 * 60 * 60 * 24)) : null;
-
-        // Find most recorded trigger (no analysis, just facts)
-        const triggerCounts = {};
-        relapses.forEach(relapse => {
-          const trigger = relapse.trigger || 'not recorded';
-          triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
-        });
-        
-        const mostRecordedTrigger = Object.keys(triggerCounts).length > 0 ? 
-          Object.entries(triggerCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0] : null;
-
-        return {
-          title: 'Relapse Record',
-          icon: <FaExclamationTriangle />,
-          mainValue: `${relapseCount} total`,
-          content: [
-            `Total relapses: ${relapseCount} recorded since starting.`,
-            
-            daysSinceLastRelapse !== null ? 
-              `Most recent: ${daysSinceLastRelapse} days ago (${format(new Date(mostRecentRelapse.end || mostRecentRelapse.start), 'MMMM d, yyyy')})` :
-              relapseCount > 0 ? 
-                'Most recent relapse date not recorded.' :
-                'No relapses recorded.',
-            
-            mostRecordedTrigger && mostRecordedTrigger !== 'not recorded' ? 
-              `Most frequent trigger: ${mostRecordedTrigger.replace(/_/g, ' ')} (${triggerCounts[mostRecordedTrigger]} times)` :
-              relapseCount > 0 ? 
-                'Trigger information not available.' :
-                'No trigger data to display.'
-          ]
-        };
-
-      default:
-        return {
-          title: 'Stat Information',
-          icon: <FaInfoCircle />,
-          mainValue: 'N/A',
-          content: ['Information not available for this statistic.']
-        };
-    }
-  }, [safeUserData]);
 
   // ENHANCED: Memoized calculations for performance
   const memoizedInsights = useMemo(() => {
@@ -645,47 +429,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* NEW: Stat Card Details Modal */}
-      {showStatModal && selectedStatCard && (
-        <div className="modal-overlay" onClick={() => setShowStatModal(false)} role="dialog" aria-modal="true" aria-labelledby="stat-modal-title">
-          <div className="modal-content stat-details-modal" onClick={e => e.stopPropagation()}>
-            <div className="stat-details-header">
-              <div className="stat-details-icon">
-                {generateStatCardContent(selectedStatCard).icon}
-              </div>
-              <h3 id="stat-modal-title">{generateStatCardContent(selectedStatCard).title}</h3>
-              <button 
-                className="stat-modal-close"
-                onClick={() => setShowStatModal(false)}
-                aria-label="Close modal"
-              >
-                <FaTimes />
-              </button>
-            </div>
-            
-            <div className="stat-details-value">
-              {generateStatCardContent(selectedStatCard).mainValue}
-            </div>
-            
-            <div className="stat-details-content">
-              {generateStatCardContent(selectedStatCard).content.map((text, index) => (
-                <p key={index}>{text}</p>
-              ))}
-            </div>
-            
-            <div className="modal-actions">
-              <button 
-                className="btn btn-primary" 
-                onClick={() => setShowStatModal(false)}
-                onKeyDown={(e) => e.key === 'Enter' && setShowStatModal(false)}
-                autoFocus
-              >
-                Got It
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Stat Card Details Modal */}
+      <StatCardModal
+        showModal={showStatModal}
+        selectedStatCard={selectedStatCard}
+        onClose={() => setShowStatModal(false)}
+        userData={safeUserData}
+      />
       
       {/* Milestone Badges */}
       <div className="milestone-section">
@@ -971,322 +721,54 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
             </div>
             
-            {/* ENHANCED: Personalized Insights Section with Loading States + NEW Relapse Pattern Analytics */}
+            {/* Personalized Insights Section */}
             <div className="personalized-insights-section">
               <div className="personalized-insights-header">
                 <h3>Personalized Insights</h3>
               </div>
               
               {/* Smart Urge Management */}
-              <div className="insight-card">
-                <div className="insight-card-header">
-                  <span>Smart Urge Management</span>
-                </div>
-                <div className="insight-info-banner">
-                  <FaInfoCircle className="info-icon" />
-                  <span>Real-time vulnerability assessment based on your current streak phase, time of day, and recent benefit patterns.</span>
-                </div>
-                <div className="insight-card-content">
-                  {loadingStates.urgeManagement ? (
-                    <InsightLoadingState insight="Smart Urge Management" isVisible={true} />
-                  ) : hasInsufficientData ? (
-                    <InsightEmptyState insight="Smart Urge Management" userData={safeUserData} />
-                  ) : (
-                    <div className="urge-management-display">
-                      {memoizedInsights.urgeManagement?.riskLevel === 'N/A' ? (
-                        <div className="risk-level-indicator insufficient">
-                          <div>
-                            <div className="risk-score insufficient">N/A</div>
-                            <div className="risk-level-text">Insufficient Data</div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className={`risk-level-indicator ${memoizedInsights.urgeManagement?.riskLevel?.toLowerCase() || 'low'}`}>
-                          <div>
-                            <div className={`risk-score ${memoizedInsights.urgeManagement?.riskLevel?.toLowerCase() || 'low'}`}>
-                              {memoizedInsights.urgeManagement?.riskLevel || 'Low'}
-                            </div>
-                            <div className="risk-level-text">Current Risk Level</div>
-                          </div>
-                        </div>
-                      )}
-                      <div className="guidance-list">
-                        <div className="guidance-title">
-                          {memoizedInsights.urgeManagement?.riskLevel === 'N/A' ? 'Data Requirements:' : 'Current Guidance:'}
-                        </div>
-                        {(memoizedInsights.urgeManagement?.guidance || []).map((guide, index) => (
-                          <div key={index} className="guidance-item" dangerouslySetInnerHTML={renderTextWithBold(guide)}></div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {memoizedInsights.dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
-                    <div className="insight-data-status">
-                      <div className="insight-data-status-indicator">
-                        <span className={`insight-data-quality ${memoizedInsights.dataQuality?.level || 'minimal'}`}>
-                          <FaChartLine />
-                          {memoizedInsights.dataQuality?.label || 'Basic Analysis'}
-                        </span>
-                        <span className="insight-data-days">
-                          Based on {memoizedInsights.dataQuality?.days || 0} days of tracking
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <SmartUrgeManagement
+                isLoading={loadingStates.urgeManagement}
+                hasInsufficientData={hasInsufficientData}
+                userData={safeUserData}
+                urgeManagement={memoizedInsights.urgeManagement}
+                dataQuality={memoizedInsights.dataQuality}
+              />
               
               {/* Relapse Risk Predictor */}
-              <div className="insight-card">
-                <div className="insight-card-header">
-                  <span>Relapse Risk Predictor</span>
-                </div>
-                <div className="insight-info-banner">
-                  <FaInfoCircle className="info-icon" />
-                  <span>Analyzes your recent benefit trends to predict vulnerability periods and provide specific mitigation strategies.</span>
-                </div>
-                <div className="insight-card-content">
-                  {loadingStates.riskPredictor ? (
-                    <InsightLoadingState insight="Risk Analysis" isVisible={true} />
-                  ) : hasInsufficientData ? (
-                    <InsightEmptyState insight="Relapse Risk Predictor" userData={safeUserData} />
-                  ) : (
-                    <div className="risk-predictor-display">
-                      {memoizedInsights.riskAnalysis?.score === 'N/A' ? (
-                        <div className="risk-level-indicator insufficient">
-                          <div>
-                            <div className="risk-score insufficient">N/A</div>
-                            <div className="risk-level-text">Insufficient Data</div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className={`risk-level-indicator ${memoizedInsights.riskAnalysis?.level?.toLowerCase() || 'low'}`}>
-                          <div>
-                            <div className={`risk-score ${memoizedInsights.riskAnalysis?.level?.toLowerCase() || 'low'}`}>
-                              {memoizedInsights.riskAnalysis?.score || 0}%
-                            </div>
-                            <div className="risk-level-text">{memoizedInsights.riskAnalysis?.level || 'Low'} Risk Level</div>
-                          </div>
-                        </div>
-                      )}
-                      <div className="risk-factors-list">
-                        <div className="risk-factors-title">
-                          {memoizedInsights.riskAnalysis?.score === 'N/A' ? 'Data Requirements:' : 'Risk Factors & Actions:'}
-                        </div>
-                        {(memoizedInsights.riskAnalysis?.factors || []).map((factor, index) => (
-                          <div key={index} className="risk-factor-item" dangerouslySetInnerHTML={renderTextWithBold(factor)}></div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {memoizedInsights.dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
-                    <div className="insight-data-status">
-                      <div className="insight-data-status-indicator">
-                        <span className={`insight-data-quality ${memoizedInsights.dataQuality?.level || 'minimal'}`}>
-                          <FaChartLine />
-                          {memoizedInsights.dataQuality?.label || 'Basic Analysis'}
-                        </span>
-                        <span className="insight-data-days">
-                          Based on {memoizedInsights.dataQuality?.days || 0} days of tracking
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <RelapseRiskPredictor
+                isLoading={loadingStates.riskPredictor}
+                hasInsufficientData={hasInsufficientData}
+                userData={safeUserData}
+                riskAnalysis={memoizedInsights.riskAnalysis}
+                dataQuality={memoizedInsights.dataQuality}
+              />
               
-              {/* NEW: Relapse Pattern Analytics - ONLY SHOW IF USER HAS ACTUAL RELAPSES */}
-              {memoizedInsights.relapsePatterns?.hasData && (
-                <div className="insight-card">
-                  <div className="insight-card-header">
-                    <span>
-                      {memoizedInsights.daysSinceLastRelapse >= 90 
-                        ? 'Conquered Patterns Analysis' 
-                        : 'Relapse Pattern Analytics'
-                      }
-                    </span>
-                  </div>
-                  <div className="insight-info-banner">
-                    <FaInfoCircle className="info-icon" />
-                    <span>
-                      {memoizedInsights.daysSinceLastRelapse >= 90
-                        ? `Review the patterns you've successfully overcome ${memoizedInsights.daysSinceLastRelapse} days ago. This wisdom helps maintain vigilance and can guide others on their journey.`
-                        : 'Analyzes your relapse history to identify trigger patterns, phase vulnerabilities, and provides brutally honest countermeasures based on retention wisdom.'
-                      }
-                    </span>
-                  </div>
-                  <div className="insight-card-content">
-                    {loadingStates.relapsePatterns ? (
-                      <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
-                    ) : (
-                      <div className="relapse-patterns-display">
-                        {memoizedInsights.relapsePatterns.relapseCount && (
-                          <div className="relapse-summary-stats">
-                            <div className="relapse-stat-card">
-                              <div className="relapse-stat-value">{memoizedInsights.relapsePatterns.relapseCount}</div>
-                              <div className="relapse-stat-label">
-                                {memoizedInsights.daysSinceLastRelapse >= 90 
-                                  ? 'Patterns Conquered' 
-                                  : 'Total Relapses Analyzed'
-                                }
-                              </div>
-                            </div>
-                            {memoizedInsights.relapsePatterns.primaryTrigger && (
-                              <div className={`relapse-stat-card ${memoizedInsights.daysSinceLastRelapse >= 90 ? 'conquered-trigger' : 'primary-trigger'}`}>
-                                <div className="relapse-stat-value">{memoizedInsights.relapsePatterns.primaryTrigger}</div>
-                                <div className="relapse-stat-label">
-                                  {memoizedInsights.daysSinceLastRelapse >= 90 
-                                    ? 'Mastered Weakness' 
-                                    : 'Primary Vulnerability'
-                                  }
-                                </div>
-                              </div>
-                            )}
-                            {memoizedInsights.daysSinceLastRelapse >= 90 && (
-                              <div className="relapse-stat-card victory-days">
-                                <div className="relapse-stat-value">{memoizedInsights.daysSinceLastRelapse}</div>
-                                <div className="relapse-stat-label">Days Since Victory</div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        
-                        <div className="relapse-insights-list">
-                          <div className="relapse-insights-title">
-                            {memoizedInsights.daysSinceLastRelapse >= 90 
-                              ? 'Wisdom From Your Journey:' 
-                              : 'Pattern Analysis:'
-                            }
-                          </div>
-                          {(memoizedInsights.relapsePatterns?.insights || []).map((insight, index) => (
-                            <div key={index} className="relapse-insight-item" dangerouslySetInnerHTML={renderTextWithBold(insight)}></div>
-                          ))}
-                          {memoizedInsights.daysSinceLastRelapse >= 90 && (
-                            <div className="relapse-insight-item victory-reminder">
-                              <strong>🏆 Victory Reminder:</strong> You've successfully overcome these patterns for {memoizedInsights.daysSinceLastRelapse} days. This analysis serves as both a testament to your growth and a reminder to stay vigilant. Your journey can inspire others facing similar challenges.
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    <div className="insight-data-status">
-                      <div className="insight-data-status-indicator">
-                        <span className={`insight-data-quality ${memoizedInsights.daysSinceLastRelapse >= 90 ? 'conquered' : 'rich'}`}>
-                          {memoizedInsights.daysSinceLastRelapse >= 90 ? <FaTrophy /> : <FaShieldAlt />}
-                          {memoizedInsights.daysSinceLastRelapse >= 90 
-                            ? 'Conquered Intelligence' 
-                            : 'Relapse Intelligence'
-                          }
-                        </span>
-                        <span className="insight-data-days">
-                          {memoizedInsights.daysSinceLastRelapse >= 90 
-                            ? `Victory maintained for ${memoizedInsights.daysSinceLastRelapse} days`
-                            : `Based on ${memoizedInsights.relapsePatterns.relapseCount || 0} relapse records`
-                          }
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* Relapse Pattern Analytics */}
+              <RelapsePatternAnalytics
+                isLoading={loadingStates.relapsePatterns}
+                relapsePatterns={memoizedInsights.relapsePatterns}
+                daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
+              />
               
               {/* Pattern Recognition */}
-              <div className="insight-card">
-                <div className="insight-card-header">
-                  <span>Pattern Recognition</span>
-                </div>
-                <div className="insight-info-banner">
-                  <FaInfoCircle className="info-icon" />
-                  <span>Identifies correlations between your metrics and predicts trends based on your unique retention journey patterns.</span>
-                </div>
-                <div className="insight-card-content">
-                  {loadingStates.patternRecognition ? (
-                    <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
-                  ) : hasInsufficientData ? (
-                    <InsightEmptyState insight="Pattern Recognition" userData={safeUserData} />
-                  ) : (
-                    <>
-                      {(!memoizedInsights.patternInsights || memoizedInsights.patternInsights.length === 0 || 
-                        (memoizedInsights.patternInsights.length === 1 && memoizedInsights.patternInsights[0].includes('Need 14+'))) ? (
-                        <div className="insufficient-data-message">
-                          <div className="insufficient-data-text">
-                            Continue tracking daily benefits to unlock pattern analysis. The more data you provide, the more detailed your insights become.
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="patterns-display">
-                          {memoizedInsights.patternInsights.map((pattern, index) => (
-                            <div key={index} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></div>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                  {memoizedInsights.dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
-                    <div className="insight-data-status">
-                      <div className="insight-data-status-indicator">
-                        <span className={`insight-data-quality ${memoizedInsights.dataQuality?.level || 'minimal'}`}>
-                          <FaChartLine />
-                          {memoizedInsights.dataQuality?.label || 'Basic Analysis'}
-                        </span>
-                        <span className="insight-data-days">
-                          Based on {memoizedInsights.dataQuality?.days || 0} days of tracking
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <PatternRecognition
+                isLoading={loadingStates.patternRecognition}
+                hasInsufficientData={hasInsufficientData}
+                userData={safeUserData}
+                patternInsights={memoizedInsights.patternInsights}
+                dataQuality={memoizedInsights.dataQuality}
+              />
               
               {/* Optimization Guidance */}
-              <div className="insight-card">
-                <div className="insight-card-header">
-                  <span>Optimization Guidance</span>
-                </div>
-                <div className="insight-info-banner">
-                  <FaInfoCircle className="info-icon" />
-                  <span>Shows your peak performance rate and provides timing-based recommendations for maximizing your retention benefits.</span>
-                </div>
-                <div className="insight-card-content">
-                  {loadingStates.optimization ? (
-                    <InsightLoadingState insight="Optimization Analysis" isVisible={true} />
-                  ) : hasInsufficientData ? (
-                    <InsightEmptyState insight="Optimization Guidance" userData={safeUserData} />
-                  ) : (
-                    <div className="optimization-display">
-                      <div className="optimization-criteria">
-                        <div className="optimization-criteria-title">Your Peak Performance Zone:</div>
-                        <div className="optimization-criteria-text">{memoizedInsights.optimizationGuidance?.criteria || 'Energy 7+, Confidence 5+'}</div>
-                      </div>
-                      <div className="optimization-metrics">
-                        <div className="optimization-metric-card">
-                          <div className="optimization-metric-value">{memoizedInsights.optimizationGuidance?.optimalRate || 'N/A'}</div>
-                          <div className="optimization-metric-label">Operating in optimal zone</div>
-                        </div>
-                      </div>
-                      <div className="optimization-recommendations">
-                        <div className="optimization-title">Current Recommendations:</div>
-                        {(memoizedInsights.optimizationGuidance?.recommendations || []).map((rec, index) => (
-                          <div key={index} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {memoizedInsights.dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
-                    <div className="insight-data-status">
-                      <div className="insight-data-status-indicator">
-                        <span className={`insight-data-quality ${memoizedInsights.dataQuality?.level || 'minimal'}`}>
-                          <FaChartLine />
-                          {memoizedInsights.dataQuality?.label || 'Basic Analysis'}
-                        </span>
-                        <span className="insight-data-days">
-                          Based on {memoizedInsights.dataQuality?.days || 0} days of tracking
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <OptimizationGuidance
+                isLoading={loadingStates.optimization}
+                hasInsufficientData={hasInsufficientData}
+                userData={safeUserData}
+                optimizationGuidance={memoizedInsights.optimizationGuidance}
+                dataQuality={memoizedInsights.dataQuality}
+              />
               
               {/* Historical Comparison */}
               <div className="historical-comparison-section">
