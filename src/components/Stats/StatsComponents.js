@@ -90,6 +90,26 @@ export const InsightEmptyState = ({ insight, userData }) => {
   );
 };
 
+// FIXED: Helper function to format trigger names - handles invalid triggers
+const formatTriggerName = (trigger) => {
+  if (!trigger || typeof trigger !== 'string') return 'not recorded';
+  
+  const triggerMap = {
+    'lustful_thoughts': 'lustful thoughts',
+    'stress': 'stress',
+    'boredom': 'boredom',
+    'social_media': 'social media',
+    'loneliness': 'loneliness',
+    'relationship': 'relationship issues',
+    'home_environment': 'being home alone',
+    'home_alone': 'being home alone',
+    'explicit_content': 'explicit content'
+  };
+  
+  // Return mapped name or sanitized version of unknown trigger
+  return triggerMap[trigger] || trigger.replace(/_/g, ' ').replace(/[^a-zA-Z0-9\s]/g, '');
+};
+
 // NEW: Stat Card Details Modal Content Generator
 export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }) => {
   if (!showModal || !selectedStatCard) return null;
@@ -180,11 +200,14 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
         const daysSinceLastRelapse = mostRecentRelapse ? 
           Math.floor((new Date() - new Date(mostRecentRelapse.end || mostRecentRelapse.start)) / (1000 * 60 * 60 * 24)) : null;
 
-        // Find most recorded trigger (no analysis, just facts)
+        // FIXED: Find most recorded trigger with proper validation
         const triggerCounts = {};
         relapses.forEach(relapse => {
           const trigger = relapse.trigger || 'not recorded';
-          triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
+          // Only count valid triggers, skip invalid ones like 'celebration'
+          if (trigger !== 'celebration' && trigger !== 'not recorded') {
+            triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
+          }
         });
         
         const mostRecordedTrigger = Object.keys(triggerCounts).length > 0 ? 
@@ -203,8 +226,8 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
                 'Most recent relapse date not recorded.' :
                 'No relapses recorded.',
             
-            mostRecordedTrigger && mostRecordedTrigger !== 'not recorded' ? 
-              `Most frequent trigger: ${mostRecordedTrigger.replace(/_/g, ' ')} (${triggerCounts[mostRecordedTrigger]} times)` :
+            mostRecordedTrigger ? 
+              `Most frequent trigger: ${formatTriggerName(mostRecordedTrigger)} (${triggerCounts[mostRecordedTrigger]} times)` :
               relapseCount > 0 ? 
                 'Trigger information not available.' :
                 'No trigger data to display.'
