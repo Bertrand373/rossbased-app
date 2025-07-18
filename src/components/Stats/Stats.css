@@ -3,11 +3,8 @@
 /* Import base stats components - core display, streaks, badges */
 @import './StatsBase.css';
 
-/* Import core analytics components - loading states, controls, charts */
+/* Import advanced analytics components - insights, charts, tracking */
 @import './StatsAnalytics.css';
-
-/* Import insights components - personalized analytics, metric intelligence, responsive design */
-@import './StatsInsights.css';
 
 /* Import modal components styling */
 @import './StatsModals.css';

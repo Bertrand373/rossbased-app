@@ -1,4 +1,4 @@
-/* components/Stats/StatsAnalytics.css - Core Components & Loading States */
+/* components/Stats/StatsAnalytics.css - ENHANCED: Professional UX Polish with Loading States + Relapse Pattern Analytics */
 
 /* ENHANCED: Loading States for Insights */
 .insight-loading-state {
@@ -216,7 +216,7 @@
   margin: 0;
 }
 
-/* ENHANCED: Focus States and Accessibility */
+/* ENHANCED: Focus States and Accessibility - REFINED */
 .metric-btn:focus-visible,
 .time-btn:focus-visible {
   outline: 2px solid var(--primary);
@@ -224,6 +224,7 @@
   box-shadow: 0 0 0 4px rgba(255, 221, 0, 0.1);
 }
 
+/* Remove focus outline on mouse click, keep for keyboard navigation */
 .metric-btn:focus:not(:focus-visible),
 .time-btn:focus:not(:focus-visible) {
   outline: none;
@@ -254,6 +255,7 @@
   padding: var(--spacing-lg) 0;
 }
 
+/* Controls with single-row pill layout */
 .benefit-tracker-controls {
   display: flex;
   flex-direction: column;
@@ -274,6 +276,7 @@
   align-items: center;
 }
 
+/* Single row: All 6 benefit items in one container */
 .metric-pill-container {
   display: flex;
   gap: var(--spacing-xs);
@@ -285,6 +288,7 @@
   justify-content: center;
 }
 
+/* Time range selector */
 .time-range-selector-container {
   width: 100%;
   max-width: 360px;
@@ -335,6 +339,7 @@
   box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
 }
 
+/* Locked metric button styles */
 .metric-btn.locked {
   background-color: rgba(128, 128, 128, 0.1);
   color: var(--text-secondary);
@@ -351,6 +356,7 @@
   pointer-events: none;
 }
 
+/* Lock icon styling */
 .metric-lock-icon {
   font-size: 0.75rem;
   color: var(--text-secondary);
@@ -365,6 +371,7 @@
   margin-bottom: var(--spacing-xl);
 }
 
+/* FREE: Average Display */
 .free-average-display {
   display: flex;
   justify-content: center;
@@ -385,6 +392,7 @@
   width: 100%;
 }
 
+/* FREE: Intelligence Preview Grid */
 .intelligence-preview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -392,7 +400,7 @@
   width: 100%;
 }
 
-/* ENHANCED: Benefit Upgrade CTA */
+/* ENHANCED: Benefit Upgrade CTA with improved interactions */
 .benefit-upgrade-cta {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid var(--border);
@@ -416,6 +424,7 @@
   flex-shrink: 0;
 }
 
+/* Benefit upgrade helmet */
 .upgrade-helmet-icon {
   width: 80px;
   height: 80px;
@@ -468,6 +477,7 @@
   line-height: 1.5;
 }
 
+/* ENHANCED: Benefit upgrade button with improved interactions */
 .benefit-upgrade-btn {
   display: flex;
   align-items: center;
@@ -548,6 +558,7 @@
   background-color: rgba(255, 255, 255, 0.03);
 }
 
+/* ENHANCED: No chart data state */
 .no-chart-data {
   display: flex;
   flex-direction: column;
@@ -594,6 +605,7 @@
   gap: var(--spacing-md);
 }
 
+/* REMOVED GLOW: No more animation on current metric average */
 .current-metric-average {
   display: flex;
   flex-direction: column;
@@ -622,6 +634,7 @@
   color: var(--primary);
 }
 
+/* ENHANCED: Insight Cards - REMOVED YELLOW BORDERS */
 .current-insight-card {
   padding: var(--spacing-xl) var(--spacing-lg);
   background-color: var(--card-background);
@@ -661,6 +674,7 @@
   padding: 0 var(--spacing-sm);
 }
 
+/* Insufficient data message styling */
 .insufficient-data-message {
   display: flex;
   justify-content: center;
@@ -677,6 +691,1256 @@
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.4;
+}
+
+/* REFINED: Personalized Insights Section */
+.personalized-insights-section {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.personalized-insights-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: 0;
+}
+
+.personalized-insights-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text);
+  font-weight: 600;
+  padding: var(--spacing-lg) 0;
+}
+
+/* ENHANCED: Insight cards - REMOVED YELLOW BORDERS */
+.insight-card {
+  background-color: var(--card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* KEEP ZOOM BUT REMOVE YELLOW BORDER */
+.insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.insight-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.insight-card-icon {
+  font-size: 1.125rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* Insight info banner */
+.insight-info-banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: left;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
+  line-height: 1.4;
+  margin-top: var(--spacing-md);
+}
+
+.insight-info-banner .info-icon {
+  font-size: 1rem;
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.insight-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Smart Urge Management Display */
+.urge-management-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.guidance-list {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.guidance-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.guidance-item {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: var(--spacing-sm);
+}
+
+.guidance-item:last-child {
+  margin-bottom: 0;
+}
+
+/* ENHANCED: Risk level indicators with subtle animations */
+.risk-level-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.risk-level-indicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.risk-level-indicator:hover::before {
+  opacity: 1;
+}
+
+.risk-level-indicator.low {
+  background-color: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.risk-level-indicator.medium {
+  background-color: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.risk-level-indicator.high {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.risk-level-indicator.insufficient {
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.risk-score {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+  transition: transform 0.3s ease;
+}
+
+.risk-level-indicator:hover .risk-score {
+  transform: scale(1.05);
+}
+
+.risk-score.low {
+  color: #22c55e;
+}
+
+.risk-score.medium {
+  color: #f59e0b;
+}
+
+.risk-score.high {
+  color: #ef4444;
+}
+
+.risk-score.insufficient {
+  color: var(--text-secondary);
+}
+
+.risk-level-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.risk-factors-list {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.risk-factors-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.risk-factor-item {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: var(--spacing-xs);
+}
+
+.risk-factor-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Risk predictor display */
+.risk-predictor-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* NEW: Relapse Pattern Analytics Styles */
+.relapse-patterns-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.relapse-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.relapse-stat-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  min-height: 100px;
+  transition: all 0.3s ease;
+}
+
+.relapse-stat-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
+}
+
+/* NEW: Victory-themed styles for long-term clean users */
+.relapse-stat-card.conquered-trigger {
+  background-color: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.relapse-stat-card.conquered-trigger:hover {
+  background-color: rgba(34, 197, 94, 0.08);
+}
+
+.relapse-stat-card.conquered-trigger .relapse-stat-value {
+  color: #22c55e;
+}
+
+.relapse-stat-card.victory-days {
+  background-color: rgba(255, 221, 0, 0.05);
+  border-color: rgba(255, 221, 0, 0.2);
+}
+
+.relapse-stat-card.victory-days:hover {
+  background-color: rgba(255, 221, 0, 0.08);
+}
+
+.relapse-stat-card.victory-days .relapse-stat-value {
+  color: var(--primary);
+}
+
+.relapse-insight-item.victory-reminder {
+  background-color: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.relapse-insight-item.victory-reminder:hover {
+  background-color: rgba(34, 197, 94, 0.08);
+}
+
+.insight-data-quality.conquered {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.relapse-stat-card.primary-trigger {
+  background-color: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.relapse-stat-card.primary-trigger:hover {
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+.relapse-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+  transition: transform 0.3s ease;
+  text-transform: capitalize;
+}
+
+.relapse-stat-card:hover .relapse-stat-value {
+  transform: scale(1.05);
+}
+
+.relapse-stat-card.primary-trigger .relapse-stat-value {
+  color: #ef4444;
+}
+
+.relapse-stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.relapse-insights-list {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.relapse-insights-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-md);
+}
+
+.relapse-insight-item {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.relapse-insight-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.relapse-insight-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Pattern Recognition */
+.patterns-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.pattern-item {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.4;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.pattern-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Optimization Guidance */
+.optimization-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.optimization-criteria {
+  background-color: rgba(255, 221, 0, 0.05);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.optimization-criteria:hover {
+  background-color: rgba(255, 221, 0, 0.08);
+}
+
+.optimization-criteria-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.optimization-criteria-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.optimization-metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.optimization-metric-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  justify-content: center;
+  min-height: 80px;
+  transition: all 0.3s ease;
+}
+
+.optimization-metric-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.optimization-metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.optimization-metric-label {
+  font-size: 0.875rem;
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.optimization-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.optimization-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.optimization-item {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.4;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.optimization-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Insight data status indicator */
+.insight-data-status {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.insight-data-status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.insight-data-quality {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  transition: all 0.3s ease;
+}
+
+.insight-data-quality:hover {
+  transform: scale(1.05);
+}
+
+/* All data quality indicators yellow */
+.insight-data-quality.minimal,
+.insight-data-quality.good,
+.insight-data-quality.rich {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+.insight-data-quality.insufficient {
+  background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  color: var(--text-secondary);
+}
+
+.insight-data-days {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Historical comparison - cleaner layout - REMOVED YELLOW BORDERS */
+.historical-comparison-section {
+  background-color: var(--card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.historical-comparison-section:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.historical-comparison-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.historical-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.historical-comparison-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  min-height: 120px;
+  transition: all 0.3s ease;
+}
+
+.historical-comparison-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
+}
+
+.historical-comparison-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+  transition: transform 0.3s ease;
+}
+
+.historical-comparison-card:hover .historical-comparison-value {
+  transform: scale(1.05);
+}
+
+.historical-comparison-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* New historical insight styles */
+.historical-insight {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.historical-insight:hover {
+  transform: translateY(-1px);
+}
+
+.insight-positive {
+  background-color: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.insight-improvement {
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+/* ENHANCED: Keyboard Navigation Improvements */
+.badge-card {
+  transition: all 0.3s ease;
+}
+
+.badge-card:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  transform: translateY(-2px);
+}
+
+.badge-card:focus:not(.locked) {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 0 0 4px rgba(255, 221, 0, 0.1);
+}
+
+/* ENHANCED: Modal Accessibility */
+.modal-overlay {
+  animation: modal-fade-in 0.3s ease;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  animation: modal-slide-in 0.3s ease;
+}
+
+@keyframes modal-slide-in {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* DESKTOP RESPONSIVE - Analytics Components */
+@media (min-width: 769px) {
+  .chart-and-insight-container {
+    flex-direction: row;
+    gap: var(--spacing-lg);
+  }
+  
+  .chart-container {
+    flex: 2;
+    min-width: 0;
+  }
+  
+  .current-insight-sidebar {
+    flex: 1;
+    min-width: 280px;
+    max-width: 320px;
+  }
+  
+  .current-metric-average {
+    min-height: 100px;
+    justify-content: center;
+    padding: var(--spacing-xl);
+  }
+  
+  .current-insight-card {
+    min-height: 180px;
+    justify-content: center;
+    padding: var(--spacing-xl);
+  }
+  
+  .historical-comparison-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .optimization-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .relapse-summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* ENHANCED: Desktop hover effects - KEEP ZOOM, REMOVE YELLOW */
+  .insight-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .chart-container:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* DESKTOP: Better spacing for insight card headers and info banners */
+  .insight-card-header {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .insight-info-banner {
+    margin-top: var(--spacing-md);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .insight-info-banner .info-icon {
+    margin-top: 0;
+  }
+}
+
+/* MOBILE RESPONSIVE - Analytics Components */
+@media (max-width: 768px) {
+  .benefit-tracker-controls {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+  
+  .metric-selector {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .metric-pill-container {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: var(--spacing-md);
+  }
+  
+  .metric-pill-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .metric-btn {
+    white-space: nowrap;
+    min-width: fit-content;
+    flex-shrink: 0;
+  }
+  
+  .time-range-selector-container {
+    max-width: none;
+    width: 100%;
+  }
+
+  .benefit-upgrade-cta {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-lg);
+  }
+
+  .upgrade-helmet-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .upgrade-helmet-fallback {
+    font-size: 2.8rem;
+  }
+
+  .upgrade-text-section h4 {
+    font-size: 1.25rem;
+  }
+
+  .upgrade-text-section p {
+    font-size: 0.875rem;
+  }
+
+  .benefit-upgrade-btn {
+    font-size: 1rem;
+    padding: var(--spacing-md) var(--spacing-lg);
+    min-width: 180px;
+    min-height: 48px;
+    align-self: center;
+  }
+  
+  .free-average-display .current-metric-average {
+    max-width: 100%;
+    min-height: 100px;
+    padding: var(--spacing-md);
+  }
+  
+  .chart-container {
+    padding: var(--spacing-md);
+  }
+  
+  .current-metric-average {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 100px;
+    justify-content: center;
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+  
+  .current-metric-value {
+    font-size: 1.5rem;
+  }
+  
+  .current-insight-card {
+    min-height: 100px;
+    justify-content: center;
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+  
+  .current-insight-text {
+    padding: 0 var(--spacing-md);
+  }
+  
+  /* MOBILE FIXES: Personalized Insights Mobile Spacing */
+  .personalized-insights-section {
+    padding: var(--spacing-md);
+    margin: var(--spacing-lg) 0;
+  }
+  
+  .personalized-insights-header h3 {
+    font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
+  }
+  
+  .insight-card {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .insight-card-header {
+    padding: var(--spacing-sm) 0;
+    font-size: 0.9rem;
+  }
+  
+  /* MOBILE FIXES: Compact info banners */
+  .insight-info-banner {
+    font-size: 0.8rem;
+    padding: var(--spacing-sm);
+    margin: var(--spacing-sm) 0;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .insight-info-banner .info-icon {
+    margin-top: 0;
+    flex-shrink: 0;
+  }
+  
+  /* MOBILE FIXES: Compact empty states */
+  .insight-empty-state {
+    min-height: 120px;
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .insight-empty-icon {
+    font-size: 2rem;
+    margin: var(--spacing-sm) 0;
+  }
+  
+  .insight-empty-title {
+    font-size: 1rem;
+  }
+  
+  .insight-empty-description {
+    font-size: 0.8rem;
+  }
+  
+  /* MOBILE FIXES: Compact chart no-data state */
+  .chart-container {
+    height: 200px;
+    padding: var(--spacing-sm);
+  }
+  
+  .no-chart-data {
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+  }
+  
+  .no-data-icon {
+    font-size: 2rem;
+  }
+  
+  .no-data-text h4 {
+    font-size: 1rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .no-data-text p {
+    font-size: 0.8rem;
+  }
+  
+  /* MOBILE FIXES: Historical comparison */
+  .historical-comparison-section {
+    padding: var(--spacing-md);
+  }
+  
+  .historical-comparison-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .historical-comparison-card {
+    min-height: 80px;
+    padding: var(--spacing-md);
+  }
+  
+  .historical-comparison-value {
+    font-size: 1.25rem;
+  }
+  
+  .historical-comparison-label {
+    font-size: 0.8rem;
+  }
+  
+  .optimization-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .optimization-metric-card {
+    padding: var(--spacing-md);
+    min-height: 70px;
+  }
+  
+  .optimization-metric-value {
+    font-size: 1.25rem;
+  }
+  
+  /* MOBILE FIXES: Risk indicators */
+  .risk-level-indicator {
+    padding: var(--spacing-md);
+  }
+  
+  .risk-score {
+    font-size: 1.5rem;
+  }
+  
+  .risk-level-text {
+    font-size: 0.8rem;
+  }
+
+  /* MOBILE FIXES: Relapse pattern analytics */
+  .relapse-summary-stats {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .relapse-stat-card {
+    min-height: 80px;
+    padding: var(--spacing-md);
+  }
+
+  .relapse-stat-value {
+    font-size: 1.25rem;
+  }
+
+  .relapse-stat-label {
+    font-size: 0.8rem;
+  }
+
+  .relapse-insight-item {
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  /* MOBILE FIXES: Insight data status */
+  .insight-data-status-indicator {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .insight-data-quality {
+    font-size: 0.7rem;
+    align-self: center;
+  }
+  
+  .insight-data-days {
+    font-size: 0.7rem;
+  }
+
+  /* Mobile: Reduced animations for performance */
+  .insight-card:hover {
+    transform: none;
+  }
+
+  .historical-comparison-card:hover {
+    transform: none;
+  }
+
+  .optimization-metric-card:hover {
+    transform: none;
+  }
+
+  .relapse-stat-card:hover {
+    transform: none;
+  }
+
+  .relapse-insight-item:hover {
+    transform: none;
+  }
+}
+
+/* VERY SMALL SCREENS - Analytics Components */
+@media (max-width: 480px) {
+  .upgrade-helmet-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .upgrade-helmet-fallback {
+    font-size: 2.4rem;
+  }
+
+  .upgrade-text-section h4 {
+    font-size: 1.125rem;
+  }
+
+  .upgrade-text-section p {
+    font-size: 0.8rem;
+  }
+
+  .benefit-upgrade-btn {
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 160px;
+    min-height: 44px;
+  }
+  
+  .benefit-upgrade-cta {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .benefit-tracker-controls {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+  
+  .chart-container {
+    padding: var(--spacing-xs);
+    height: 180px;
+  }
+  
+  .current-metric-average {
+    min-height: 70px;
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
+  
+  .current-metric-value {
+    font-size: 1.25rem;
+  }
+  
+  .current-insight-card {
+    min-height: 80px;
+    padding: var(--spacing-lg) var(--spacing-sm);
+    justify-content: center;
+  }
+  
+  /* VERY SMALL: Extra compact personalized insights */
+  .personalized-insights-section {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-md);
+  }
+  
+  .personalized-insights-header h3 {
+    font-size: 1rem;
+    padding: var(--spacing-sm) 0;
+  }
+  
+  .insight-card {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+  
+  .insight-card-header {
+    padding: var(--spacing-xs) 0;
+    font-size: 0.85rem;
+  }
+  
+  /* VERY SMALL: Ultra compact info banners */
+  .insight-info-banner {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs);
+    margin: var(--spacing-xs) 0;
+  }
+  
+  /* VERY SMALL: Empty states */
+  .insight-empty-state {
+    min-height: 100px;
+    padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .insight-empty-icon {
+    font-size: 1.5rem;
+    margin: var(--spacing-xs) 0;
+  }
+  
+  .insight-empty-title {
+    font-size: 0.9rem;
+  }
+  
+  .insight-empty-description {
+    font-size: 0.75rem;
+  }
+  
+  .no-data-icon {
+    font-size: 1.5rem;
+  }
+  
+  .no-data-text h4 {
+    font-size: 0.9rem;
+  }
+  
+  .no-data-text p {
+    font-size: 0.75rem;
+  }
+  
+  .historical-comparison-section {
+    padding: var(--spacing-sm);
+  }
+  
+  .historical-comparison-card {
+    min-height: 70px;
+    padding: var(--spacing-sm);
+  }
+  
+  .historical-comparison-value {
+    font-size: 1.1rem;
+  }
+  
+  .historical-comparison-label {
+    font-size: 0.75rem;
+  }
+  
+  .optimization-metric-card {
+    padding: var(--spacing-sm);
+    min-height: 60px;
+  }
+  
+  .optimization-metric-value {
+    font-size: 1.1rem;
+  }
+  
+  .risk-score {
+    font-size: 1.25rem;
+  }
+  
+  .risk-level-text {
+    font-size: 0.75rem;
+  }
+
+  .relapse-stat-card {
+    min-height: 70px;
+    padding: var(--spacing-sm);
+  }
+
+  .relapse-stat-value {
+    font-size: 1.1rem;
+  }
+
+  .relapse-stat-label {
+    font-size: 0.75rem;
+  }
+
+  .relapse-insight-item {
+    padding: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.8rem;
+  }
+
+  /* Very small screens: Disable all hover animations */
+  * {
+    transition: none !important;
+  }
+
+  .insight-card:hover,
+  .historical-comparison-card:hover,
+  .optimization-metric-card:hover,
+  .chart-container:hover,
+  .current-metric-average:hover,
+  .relapse-stat-card:hover,
+  .relapse-insight-item:hover {
+    transform: none !important;
+    box-shadow: initial !important;
+  }
 }
 
 /* ENHANCED: Reduced motion preferences */
@@ -701,22 +1965,6 @@
   }
 
   .data-progress-fill::after {
-    animation: none !important;
-  }
-
-  .empty-state-float {
-    animation: none !important;
-  }
-
-  .no-data-pulse {
-    animation: none !important;
-  }
-
-  .progress-shimmer {
-    animation: none !important;
-  }
-
-  .benefit-helmet-pulse {
     animation: none !important;
   }
 }
