@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - COMPLETE REFACTORED: Main Stats Component
+// components/Stats/Stats.js - COMPLETE REFACTORED: Main Stats Component with Metric-Specific Intelligence
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -770,7 +770,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 dataQuality={memoizedInsights.dataQuality}
               />
               
-              {/* Historical Comparison */}
+              {/* ENHANCED: Metric-Specific Historical Journey Analysis */}
               <div className="historical-comparison-section">
                 <div className="historical-comparison-header">
                   <span>{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Journey Analysis</span>
@@ -802,30 +802,30 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                             {comparison.bestPhase?.data?.average || 'N/A'}/10
                           </div>
                           <div className="historical-comparison-label">
-                            Your peak during {comparison.bestPhase?.name || 'Unknown'} phase ({comparison.bestPhase?.range || 'N/A'})
+                            Peak during {comparison.bestPhase?.name || 'Unknown'} phase
                           </div>
                         </div>
                         
                         <div className="historical-comparison-card">
                           <div className="historical-comparison-value">
-                            {comparison.allPhases?.length || 0}
+                            {comparison.expectation?.split(':')[1]?.trim() || 'N/A'}
                           </div>
                           <div className="historical-comparison-label">
-                            Phases with data for analysis
+                            Expected for current phase
                           </div>
                         </div>
                       </div>
                       
+                      {/* ENHANCED: Metric-Specific Intelligence Display */}
                       <div className="historical-insight">
-                        {comparison.insight === 'current_best' ? (
-                          <div className="insight-positive">
-                            🔥 You're currently performing at or above your historical peak! Your {selectedMetric} development is accelerating.
-                          </div>
-                        ) : (
-                          <div className="insight-improvement">
-                            📈 Your peak {selectedMetric} was {comparison.bestPhase?.data?.average || 'N/A'}/10 during {comparison.bestPhase?.name || 'Unknown'} phase. You have proven potential to reach this level again.
-                          </div>
-                        )}
+                        <div className={`insight-${comparison.insight?.replace('_', '-') || 'normal'}`}>
+                          <div className="metric-journey-guidance" dangerouslySetInnerHTML={renderTextWithBold(comparison.guidance || 'Continue tracking for personalized insights')}></div>
+                          {comparison.expectation && (
+                            <div className="phase-expectation-note" style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                              📋 {comparison.expectation}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </>
                   );

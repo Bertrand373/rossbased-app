@@ -346,7 +346,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
   }
 };
 
-// ENHANCED: Historical comparison with better error handling
+// NEW: Enhanced Historical Comparison with Metric-Specific Intelligence
 export const calculateHistoricalComparison = (userData, selectedMetric) => {
   try {
     const safeData = validateUserData(userData);
@@ -360,7 +360,7 @@ export const calculateHistoricalComparison = (userData, selectedMetric) => {
       };
     }
     
-    // Phase-based analysis instead of arbitrary time periods
+    // Phase-based analysis with metric-specific intelligence
     const getPhaseData = (phaseName, dayRange) => {
       try {
         if (!safeData.startDate) return null;
@@ -406,6 +406,7 @@ export const calculateHistoricalComparison = (userData, selectedMetric) => {
     const foundationPhase = getPhaseData('Foundation', { start: 1, end: 14 });
     const purificationPhase = getPhaseData('Purification', { start: 15, end: 45 });
     const expansionPhase = getPhaseData('Expansion', { start: 46, end: 90 });
+    const integrationPhase = getPhaseData('Integration', { start: 91, end: 180 });
     
     // Current phase average
     const currentAvg = calculateAverage(safeData, selectedMetric, 'week', true);
@@ -414,7 +415,8 @@ export const calculateHistoricalComparison = (userData, selectedMetric) => {
     const phases = [
       { name: 'Foundation', data: foundationPhase, range: '1-14 days' },
       { name: 'Purification', data: purificationPhase, range: '15-45 days' },
-      { name: 'Expansion', data: expansionPhase, range: '46-90 days' }
+      { name: 'Expansion', data: expansionPhase, range: '46-90 days' },
+      { name: 'Integration', data: integrationPhase, range: '91-180 days' }
     ].filter(p => p.data !== null);
     
     if (phases.length === 0) {
@@ -428,19 +430,137 @@ export const calculateHistoricalComparison = (userData, selectedMetric) => {
       parseFloat(current.data.average) > parseFloat(best.data.average) ? current : best
     );
     
+    // Generate metric-specific insights
+    const metricInsights = generateMetricSpecificInsight(selectedMetric, currentStreak, currentAvg, bestPhase, phases);
+    
     return {
       hasData: true,
       current: currentAvg,
       bestPhase: bestPhase,
       allPhases: phases,
-      insight: currentAvg !== 'N/A' && parseFloat(currentAvg) >= parseFloat(bestPhase.data.average) ? 
-        'current_best' : 'room_for_improvement'
+      insight: metricInsights.insight,
+      guidance: metricInsights.guidance,
+      expectation: metricInsights.expectation
     };
   } catch (error) {
     console.error('Historical comparison error:', error);
     return {
       hasData: false,
       message: 'Unable to calculate historical comparison at this time'
+    };
+  }
+};
+
+// NEW: Generate Metric-Specific Intelligence
+const generateMetricSpecificInsight = (metric, currentStreak, currentAvg, bestPhase, phases) => {
+  try {
+    const getCurrentPhaseFromStreak = (streak) => {
+      if (streak <= 14) return 'Foundation';
+      if (streak <= 45) return 'Purification';
+      if (streak <= 90) return 'Expansion';
+      if (streak <= 180) return 'Integration';
+      return 'Mastery';
+    };
+    
+    const currentPhase = getCurrentPhaseFromStreak(currentStreak);
+    const currentValue = parseFloat(currentAvg);
+    const bestValue = parseFloat(bestPhase.data.average);
+    const difference = Math.abs(currentValue - bestValue);
+    
+    // Metric-specific phase expectations and insights
+    const metricData = {
+      energy: {
+        Foundation: { expected: '5-7', insight: 'Energy fluctuations normal as body learns to retain vital force' },
+        Purification: { expected: '4-6', insight: 'Energy dips during emotional purging are part of healing process' },
+        Expansion: { expected: '6-8', insight: 'Sustained vitality emerges as sexual energy transmutes to life force' },
+        Integration: { expected: '7-9', insight: 'Stable high energy as body completes optimization for retention' },
+        Mastery: { expected: '8-10', insight: 'Effortless energy consistency from complete transmutation' }
+      },
+      focus: {
+        Foundation: { expected: '5-7', insight: 'Mental clarity building as brain chemistry rebalances' },
+        Purification: { expected: '4-6', insight: 'Focus may scatter during emotional processing - temporary' },
+        Expansion: { expected: '7-9', insight: 'Enhanced cognitive function as brain receives premium nutrients' },
+        Integration: { expected: '8-10', insight: 'Laser focus capabilities from optimized neurotransmitters' },
+        Mastery: { expected: '9-10', insight: 'Sustained concentration for hours becomes natural ability' }
+      },
+      confidence: {
+        Foundation: { expected: '6-8', insight: 'Self-respect building from taking control of sexual energy' },
+        Purification: { expected: '3-6', insight: 'Confidence drops during emotional purging - necessary healing' },
+        Expansion: { expected: '7-9', insight: 'Inner authority strengthens as you prove self-mastery' },
+        Integration: { expected: '8-10', insight: 'Unshakeable confidence from deep self-knowledge' },
+        Mastery: { expected: '9-10', insight: 'Quiet confidence that needs no external validation' }
+      },
+      aura: {
+        Foundation: { expected: '5-7', insight: 'Subtle presence changes as electromagnetic field strengthens' },
+        Purification: { expected: '4-6', insight: 'Charisma may fluctuate during internal energy reorganization' },
+        Expansion: { expected: '7-9', insight: 'Magnetic presence emerges as vital force accumulates' },
+        Integration: { expected: '8-10', insight: 'Powerful aura affects rooms when you enter' },
+        Mastery: { expected: '9-10', insight: 'Others transformed just by being in your presence' }
+      },
+      sleep: {
+        Foundation: { expected: '4-6', insight: 'Sleep disruption as body adjusts to energy retention' },
+        Purification: { expected: '5-7', insight: 'Sleep patterns optimize as nervous system heals' },
+        Expansion: { expected: '7-9', insight: 'Deep restorative sleep with vivid, meaningful dreams' },
+        Integration: { expected: '8-9', insight: 'Minimal sleep needed but maximum recovery achieved' },
+        Mastery: { expected: '8-10', insight: 'Sleep becomes meditation, consciousness remains aware' }
+      },
+      workout: {
+        Foundation: { expected: '5-7', insight: 'Physical gains as body redirects energy to muscle building' },
+        Purification: { expected: '6-8', insight: 'Strength increases as testosterone optimizes naturally' },
+        Expansion: { expected: '7-9', insight: 'Athletic performance peaks from enhanced recovery' },
+        Integration: { expected: '8-10', insight: 'Physical capabilities seem almost superhuman' },
+        Mastery: { expected: '9-10', insight: 'Body becomes perfected vessel for spiritual energy' }
+      }
+    };
+    
+    const phaseData = metricData[metric]?.[currentPhase];
+    
+    if (!phaseData) {
+      return {
+        insight: 'normal_variation',
+        guidance: `Continue tracking ${metric} to identify your optimal patterns`,
+        expectation: 'Data building for analysis'
+      };
+    }
+    
+    // Generate phase-aware insight
+    let insight, guidance;
+    
+    if (difference <= 0.5) {
+      insight = 'performing_optimally';
+      guidance = `**Optimal Performance**: Your ${metric} (${currentValue}/10) aligns perfectly with ${currentPhase} phase expectations. ${phaseData.insight}.`;
+    } else if (currentValue > bestValue) {
+      insight = 'exceeding_peak';
+      guidance = `**Breaking New Ground**: Your ${metric} (${currentValue}/10) exceeds your ${bestPhase.name} phase peak of ${bestValue}/10. You're entering uncharted territory for your journey.`;
+    } else if (currentValue < bestValue - 1.5) {
+      // Check if this is expected for current phase
+      const expectedRange = phaseData.expected.split('-');
+      const expectedMin = parseFloat(expectedRange[0]);
+      const expectedMax = parseFloat(expectedRange[1]);
+      
+      if (currentValue >= expectedMin && currentValue <= expectedMax) {
+        insight = 'phase_appropriate';
+        guidance = `**Phase-Appropriate Range**: Your ${metric} (${currentValue}/10) is normal for ${currentPhase} phase (expected: ${phaseData.expected}). ${phaseData.insight}.`;
+      } else {
+        insight = 'needs_attention';
+        guidance = `**Below Phase Expectations**: ${metric} at ${currentValue}/10 is below typical ${currentPhase} range (${phaseData.expected}). Consider optimizing practices supporting this benefit.`;
+      }
+    } else {
+      insight = 'steady_progress';
+      guidance = `**Steady Development**: Your ${metric} (${currentValue}/10) shows consistent progress. Peak was ${bestValue}/10 during ${bestPhase.name} - you're building toward new heights.`;
+    }
+    
+    return {
+      insight,
+      guidance,
+      expectation: `${currentPhase} phase: ${phaseData.expected}/10 expected`
+    };
+  } catch (error) {
+    console.warn('Metric insight generation error:', error);
+    return {
+      insight: 'analysis_error',
+      guidance: 'Continue tracking for personalized insights',
+      expectation: 'Building data for analysis'
     };
   }
 };
