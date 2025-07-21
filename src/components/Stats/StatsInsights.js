@@ -1,6 +1,6 @@
 // components/Stats/StatsInsights.js - Analytics and Insights Components
 import React from 'react';
-import { FaChartLine, FaShieldAlt, FaTrophy, FaFire } from 'react-icons/fa';
+import { FaChartLine, FaShieldAlt, FaTrophy, FaFire, FaArrowUp, FaArrowDown, FaEquals, FaBrain } from 'react-icons/fa';
 import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
 import { renderTextWithBold } from './StatsUtils';
 
@@ -359,6 +359,109 @@ export const OptimizationGuidance = ({
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+// NEW: Phase Evolution Analysis Component - Replaces Historical Comparison
+export const PhaseEvolutionAnalysis = ({ 
+  isLoading, 
+  phaseEvolution, 
+  selectedMetric, 
+  dataQuality 
+}) => {
+  return (
+    <div className="phase-evolution-section">
+      <div className="phase-evolution-header">
+        <FaBrain className="phase-evolution-icon" />
+        <span>Phase Evolution Analysis</span>
+      </div>
+      <div className="insight-info-banner">
+        <FaBrain className="info-icon" />
+        <span>Tracks how your {selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} develops through the retention phases and identifies phase-specific patterns and challenges.</span>
+      </div>
+      
+      {isLoading ? (
+        <InsightLoadingState insight="Phase Analysis" isVisible={true} />
+      ) : !phaseEvolution?.hasData ? (
+        <div className="phase-evolution-empty">
+          <div className="phase-evolution-empty-content">
+            <div className="phase-evolution-empty-text">
+              {phaseEvolution?.message || 'Building phase evolution data...'}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Current Phase Status */}
+          <div className="phase-evolution-current">
+            <div className="current-phase-card">
+              <div className="current-phase-label">Current Phase</div>
+              <div className="current-phase-name">{phaseEvolution.currentPhase.name}</div>
+              <div className="current-phase-range">{phaseEvolution.currentPhase.range}</div>
+              <div className="current-phase-average">
+                {phaseEvolution.currentPhase.currentAverage === 'N/A' ? 'N/A' : `${phaseEvolution.currentPhase.currentAverage}/10`}
+              </div>
+            </div>
+          </div>
+
+          {/* Phase Comparison Grid */}
+          <div className="phase-evolution-grid">
+            {Object.entries(phaseEvolution.phaseAverages).map(([phaseKey, phaseData]) => {
+              const isCurrentPhase = phaseData.displayName === phaseEvolution.currentPhase.name;
+              return (
+                <div 
+                  key={phaseKey} 
+                  className={`phase-evolution-card ${isCurrentPhase ? 'current-phase' : ''}`}
+                >
+                  <div className="phase-evolution-name">{phaseData.displayName}</div>
+                  <div className="phase-evolution-range">{phaseData.range}</div>
+                  <div className="phase-evolution-average">{phaseData.average}/10</div>
+                  <div className="phase-evolution-data-points">{phaseData.dataPoints} days tracked</div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Evolution Insights */}
+          <div className="phase-evolution-insights">
+            <div className="phase-evolution-insights-title">Phase Evolution Insights:</div>
+            {phaseEvolution.insights.map((insight, index) => (
+              <div 
+                key={index} 
+                className="phase-evolution-insight-item" 
+                dangerouslySetInnerHTML={renderTextWithBold(insight)}
+              />
+            ))}
+          </div>
+
+          {/* Progress Summary */}
+          <div className="phase-evolution-summary">
+            <div className="evolution-summary-stat">
+              <div className="evolution-summary-value">{phaseEvolution.completedPhases}</div>
+              <div className="evolution-summary-label">Phases with Analysis</div>
+            </div>
+            <div className="evolution-summary-stat">
+              <div className="evolution-summary-value">{phaseEvolution.totalPhases}</div>
+              <div className="evolution-summary-label">Total Phases Tracked</div>
+            </div>
+          </div>
+
+          {dataQuality?.level !== 'insufficient' && (
+            <div className="insight-data-status">
+              <div className="insight-data-status-indicator">
+                <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
+                  <FaBrain />
+                  Phase Intelligence
+                </span>
+                <span className="insight-data-days">
+                  Tracking {selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} evolution through retention phases
+                </span>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

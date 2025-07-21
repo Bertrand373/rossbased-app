@@ -346,8 +346,8 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
   }
 };
 
-// ENHANCED: Historical comparison with better error handling
-export const calculateHistoricalComparison = (userData, selectedMetric) => {
+// COMPLETELY REDESIGNED: Phase Evolution Analysis - Replaces Historical Comparison
+export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
   try {
     const safeData = validateUserData(userData);
     const allData = safeData.benefitTracking || [];
@@ -356,91 +356,186 @@ export const calculateHistoricalComparison = (userData, selectedMetric) => {
     if (allData.length < 14) {
       return {
         hasData: false,
-        message: 'Need 14+ days of benefit tracking for meaningful historical analysis'
+        message: 'Need 14+ days of benefit tracking for meaningful phase evolution analysis'
       };
     }
     
-    // Phase-based analysis instead of arbitrary time periods
-    const getPhaseData = (phaseName, dayRange) => {
-      try {
-        if (!safeData.startDate) return null;
-        
-        const startDate = new Date(safeData.startDate);
-        if (isNaN(startDate.getTime())) return null;
-        
-        const phaseData = allData.filter(item => {
-          try {
-            if (!item || !item.date) return false;
-            const itemDate = new Date(item.date);
-            const daysSinceStart = Math.floor((itemDate - startDate) / (1000 * 60 * 60 * 24));
-            return !isNaN(daysSinceStart) && daysSinceStart >= dayRange.start && daysSinceStart <= dayRange.end;
-          } catch (filterError) {
-            return false;
-          }
-        });
-        
-        if (phaseData.length === 0) return null;
-        
-        const validValues = phaseData.map(item => {
-          let value = null;
-          if (selectedMetric === 'sleep') {
-            value = item[selectedMetric] || item.attraction || 0;
-          } else {
-            value = item[selectedMetric] || 0;
-          }
-          return typeof value === 'number' && value >= 1 && value <= 10 ? value : null;
-        }).filter(val => val !== null);
-        
-        if (validValues.length === 0) return null;
-        
-        const avg = validValues.reduce((sum, val) => sum + val, 0) / validValues.length;
-        
-        return { average: avg.toFixed(1), days: validValues.length };
-      } catch (phaseError) {
-        console.warn('Phase data error:', phaseError);
-        return null;
-      }
+    // Define retention phases based on your guide
+    const getRetentionPhase = (daysSinceStart) => {
+      if (daysSinceStart <= 14) return 'foundation';
+      if (daysSinceStart <= 45) return 'purification'; 
+      if (daysSinceStart <= 90) return 'expansion';
+      if (daysSinceStart <= 180) return 'integration';
+      return 'mastery';
     };
     
-    // Define meaningful phases
-    const foundationPhase = getPhaseData('Foundation', { start: 1, end: 14 });
-    const purificationPhase = getPhaseData('Purification', { start: 15, end: 45 });
-    const expansionPhase = getPhaseData('Expansion', { start: 46, end: 90 });
+    const getPhaseDisplayName = (phase) => {
+      const names = {
+        foundation: 'Foundation',
+        purification: 'Purification', 
+        expansion: 'Expansion',
+        integration: 'Integration',
+        mastery: 'Mastery'
+      };
+      return names[phase] || phase;
+    };
     
-    // Current phase average
-    const currentAvg = calculateAverage(safeData, selectedMetric, 'week', true);
+    const getPhaseRange = (phase) => {
+      const ranges = {
+        foundation: '1-14 days',
+        purification: '15-45 days',
+        expansion: '46-90 days', 
+        integration: '91-180 days',
+        mastery: '180+ days'
+      };
+      return ranges[phase] || 'Unknown range';
+    };
     
-    // Find your best performing phase
-    const phases = [
-      { name: 'Foundation', data: foundationPhase, range: '1-14 days' },
-      { name: 'Purification', data: purificationPhase, range: '15-45 days' },
-      { name: 'Expansion', data: expansionPhase, range: '46-90 days' }
-    ].filter(p => p.data !== null);
-    
-    if (phases.length === 0) {
+    // Calculate phase-based data only if we have start date
+    if (!safeData.startDate) {
       return {
         hasData: false,
-        message: 'Tracking multiple phases needed for comparison'
+        message: 'Start date needed for phase evolution tracking'
       };
     }
     
-    const bestPhase = phases.reduce((best, current) => 
-      parseFloat(current.data.average) > parseFloat(best.data.average) ? current : best
+    const startDate = new Date(safeData.startDate);
+    if (isNaN(startDate.getTime())) {
+      return {
+        hasData: false,
+        message: 'Invalid start date for phase tracking'
+      };
+    }
+    
+    // Group data by phase
+    const phaseData = {};
+    allData.forEach(item => {
+      try {
+        if (!item || !item.date) return;
+        const itemDate = new Date(item.date);
+        const daysSinceStart = Math.floor((itemDate - startDate) / (1000 * 60 * 60 * 24));
+        if (isNaN(daysSinceStart) || daysSinceStart < 1) return;
+        
+        const phase = getRetentionPhase(daysSinceStart);
+        
+        if (!phaseData[phase]) {
+          phaseData[phase] = [];
+        }
+        
+        let value = null;
+        if (selectedMetric === 'sleep') {
+          value = item[selectedMetric] || item.attraction || null;
+        } else {
+          value = item[selectedMetric] || null;
+        }
+        
+        if (typeof value === 'number' && value >= 1 && value <= 10) {
+          phaseData[phase].push({
+            value: value,
+            daysSinceStart: daysSinceStart,
+            date: itemDate
+          });
+        }
+      } catch (itemError) {
+        console.warn('Phase data processing error:', itemError);
+      }
+    });
+    
+    if (Object.keys(phaseData).length === 0) {
+      return {
+        hasData: false,
+        message: 'No valid data points found for phase analysis'
+      };
+    }
+    
+    // Calculate averages for each phase with data
+    const phaseAverages = {};
+    Object.keys(phaseData).forEach(phase => {
+      const values = phaseData[phase];
+      if (values.length > 0) {
+        const avg = values.reduce((sum, item) => sum + item.value, 0) / values.length;
+        phaseAverages[phase] = {
+          average: avg,
+          dataPoints: values.length,
+          range: getPhaseRange(phase),
+          displayName: getPhaseDisplayName(phase)
+        };
+      }
+    });
+    
+    // Current phase analysis
+    const currentPhase = getRetentionPhase(currentStreak);
+    const currentAvg = calculateAverage(safeData, selectedMetric, 'week', true);
+    
+    // Generate evolution insights
+    const insights = [];
+    const completedPhases = Object.keys(phaseAverages).filter(phase => 
+      phase !== currentPhase || currentStreak > (phase === 'foundation' ? 14 : 
+                                                  phase === 'purification' ? 45 :
+                                                  phase === 'expansion' ? 90 : 180)
     );
+    
+    if (completedPhases.length === 0) {
+      insights.push('Still building data in your current phase - evolution patterns will emerge as you progress.');
+    } else {
+      // Find progression patterns
+      const phaseOrder = ['foundation', 'purification', 'expansion', 'integration', 'mastery'];
+      const completedInOrder = completedPhases.filter(phase => phaseOrder.includes(phase))
+                                             .sort((a, b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b));
+      
+      if (completedInOrder.length >= 2) {
+        const firstPhase = completedInOrder[0];
+        const lastCompleted = completedInOrder[completedInOrder.length - 1];
+        const firstAvg = phaseAverages[firstPhase].average;
+        const lastAvg = phaseAverages[lastCompleted].average;
+        
+        const evolution = ((lastAvg - firstAvg) / firstAvg * 100).toFixed(0);
+        
+        if (Math.abs(evolution) >= 15) {
+          if (evolution > 0) {
+            insights.push(`**Phase Evolution**: Your ${selectedMetric} improved ${evolution}% from ${getPhaseDisplayName(firstPhase)} (${firstAvg.toFixed(1)}/10) to ${getPhaseDisplayName(lastCompleted)} (${lastAvg.toFixed(1)}/10). This shows successful energy transmutation through the phases.`);
+          } else {
+            insights.push(`**Phase Challenge**: ${selectedMetric} declined ${Math.abs(evolution)}% from ${getPhaseDisplayName(firstPhase)} to ${getPhaseDisplayName(lastCompleted)}. This suggests phase-specific challenges that need addressing.`);
+          }
+        }
+      }
+      
+      // Phase-specific challenges based on your guide
+      if (phaseAverages.purification && phaseAverages.purification.average < 5.5) {
+        insights.push(`**Purification Phase Pattern**: ${selectedMetric} averaged ${phaseAverages.purification.average.toFixed(1)}/10 during emotional purging (days 15-45). Lower metrics during this phase are normal - your psyche was healing suppressed emotions.`);
+      }
+      
+      if (phaseAverages.expansion && phaseAverages.expansion.average > 7) {
+        insights.push(`**Expansion Phase Success**: ${selectedMetric} peaked at ${phaseAverages.expansion.average.toFixed(1)}/10 during mental expansion (days 46-90). This confirms successful transmutation of sexual energy into enhanced cognitive abilities.`);
+      }
+      
+      // Current phase guidance
+      if (currentPhase === 'purification' && currentAvg !== 'N/A' && parseFloat(currentAvg) < 6) {
+        insights.push(`**Current Phase Alert**: You're in Purification phase where emotional turbulence naturally lowers benefit scores. This is temporary but necessary healing - maintain practices even when metrics dip.`);
+      }
+      
+      if (currentPhase === 'expansion' && currentAvg !== 'N/A' && parseFloat(currentAvg) >= 7) {
+        insights.push(`**Peak Performance Zone**: You're in Expansion phase with ${selectedMetric} at ${currentAvg}/10. This is optimal timing for ambitious goals, creative projects, and major life decisions.`);
+      }
+    }
     
     return {
       hasData: true,
-      current: currentAvg,
-      bestPhase: bestPhase,
-      allPhases: phases,
-      insight: currentAvg !== 'N/A' && parseFloat(currentAvg) >= parseFloat(bestPhase.data.average) ? 
-        'current_best' : 'room_for_improvement'
+      currentPhase: {
+        name: getPhaseDisplayName(currentPhase),
+        range: getPhaseRange(currentPhase),
+        currentAverage: currentAvg
+      },
+      phaseAverages: phaseAverages,
+      insights: insights,
+      completedPhases: completedPhases.length,
+      totalPhases: Object.keys(phaseAverages).length
     };
   } catch (error) {
-    console.error('Historical comparison error:', error);
+    console.error('Phase evolution analysis error:', error);
     return {
       hasData: false,
-      message: 'Unable to calculate historical comparison at this time'
+      message: 'Unable to calculate phase evolution at this time'
     };
   }
 };

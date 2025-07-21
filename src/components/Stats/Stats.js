@@ -17,7 +17,8 @@ import {
   RelapseRiskPredictor, 
   RelapsePatternAnalytics, 
   PatternRecognition, 
-  OptimizationGuidance 
+  OptimizationGuidance,
+  PhaseEvolutionAnalysis
 } from './StatsInsights';
 
 // Import utility functions
@@ -41,7 +42,7 @@ import {
   generateUrgeManagementGuidance,
   generatePatternRecognition,
   generateOptimizationGuidance,
-  calculateHistoricalComparison,
+  calculatePhaseEvolutionAnalysis,
   calculateRelapseRisk,
   generateRelapsePatternAnalysis
 } from './StatsAnalyticsUtils';
@@ -66,7 +67,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     riskPredictor: false,
     patternRecognition: false,
     optimization: false,
-    relapsePatterns: false
+    relapsePatterns: false,
+    phaseEvolution: false
   });
   
   const insightsStartRef = useRef(null);
@@ -96,13 +98,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       setTimeout(() => simulateInsightLoading('riskPredictor', 700), 200);
       setTimeout(() => simulateInsightLoading('patternRecognition', 800), 400);
       setTimeout(() => simulateInsightLoading('optimization', 600), 600);
+      setTimeout(() => simulateInsightLoading('phaseEvolution', 900), 800);
       
       // Only load relapse patterns if user has actual relapse data
       const hasRelapseData = safeUserData.streakHistory?.some(streak => 
         streak && streak.reason === 'relapse' && streak.trigger
       );
       if (hasRelapseData) {
-        setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 800);
+        setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 1000);
       }
     }
   }, [timeRange, selectedMetric, isPremium, simulateInsightLoading, safeUserData.streakHistory]);
@@ -142,7 +145,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       patternInsights: generatePatternRecognition(safeUserData, selectedMetric, isPremium),
       optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, isPremium),
       dataQuality: calculateDataQuality(safeUserData),
-      historicalComparison: calculateHistoricalComparison(safeUserData, selectedMetric),
+      phaseEvolution: calculatePhaseEvolutionAnalysis(safeUserData, selectedMetric),
       relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
       daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData)
     };
@@ -770,67 +773,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 dataQuality={memoizedInsights.dataQuality}
               />
               
-              {/* Historical Comparison */}
-              <div className="historical-comparison-section">
-                <div className="historical-comparison-header">
-                  <span>{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Journey Analysis</span>
-                </div>
-                {(() => {
-                  const comparison = memoizedInsights.historicalComparison;
-                  
-                  if (!comparison?.hasData) {
-                    return (
-                      <div className="historical-comparison-card" style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
-                        <div className="historical-comparison-value">N/A</div>
-                        <div className="historical-comparison-label">{comparison?.message || 'Insufficient data for analysis'}</div>
-                      </div>
-                    );
-                  }
-                  
-                  return (
-                    <>
-                      <div className="historical-comparison-grid">
-                        <div className="historical-comparison-card">
-                          <div className="historical-comparison-value">
-                            {comparison.current === 'N/A' ? 'N/A' : `${comparison.current}/10`}
-                          </div>
-                          <div className="historical-comparison-label">Current Average</div>
-                        </div>
-                        
-                        <div className="historical-comparison-card">
-                          <div className="historical-comparison-value">
-                            {comparison.bestPhase?.data?.average || 'N/A'}/10
-                          </div>
-                          <div className="historical-comparison-label">
-                            Your peak during {comparison.bestPhase?.name || 'Unknown'} phase ({comparison.bestPhase?.range || 'N/A'})
-                          </div>
-                        </div>
-                        
-                        <div className="historical-comparison-card">
-                          <div className="historical-comparison-value">
-                            {comparison.allPhases?.length || 0}
-                          </div>
-                          <div className="historical-comparison-label">
-                            Phases with data for analysis
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="historical-insight">
-                        {comparison.insight === 'current_best' ? (
-                          <div className="insight-positive">
-                            🔥 You're currently performing at or above your historical peak! Your {selectedMetric} development is accelerating.
-                          </div>
-                        ) : (
-                          <div className="insight-improvement">
-                            📈 Your peak {selectedMetric} was {comparison.bestPhase?.data?.average || 'N/A'}/10 during {comparison.bestPhase?.name || 'Unknown'} phase. You have proven potential to reach this level again.
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
+              {/* Phase Evolution Analysis - Replaces Historical Comparison */}
+              <PhaseEvolutionAnalysis
+                isLoading={loadingStates.phaseEvolution}
+                phaseEvolution={memoizedInsights.phaseEvolution}
+                selectedMetric={selectedMetric}
+                dataQuality={memoizedInsights.dataQuality}
+              />
             </div>
           </>
         )}
