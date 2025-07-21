@@ -6,5 +6,8 @@
 /* Import advanced analytics components - insights, charts, tracking */
 @import './StatsAnalytics.css';
 
+/* Import responsive design and mobile optimizations */
+@import './StatsAnalyticsResponsive.css';
+
 /* Import modal components styling */
 @import './StatsModals.css';
