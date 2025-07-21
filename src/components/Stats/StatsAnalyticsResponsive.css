@@ -462,11 +462,40 @@
   }
 
   /* Very small screens: Disable all hover animations */
-  * {
-    transition: none !important;
-  }
-
   .insight-card:hover,
   .historical-comparison-card:hover,
   .optimization-metric-card:hover,
-  .chart-container:
+  .chart-container:hover,
+  .current-metric-average:hover,
+  .relapse-stat-card:hover,
+  .relapse-insight-item:hover {
+    transform: none !important;
+    box-shadow: initial !important;
+  }
+}
+
+/* ENHANCED: Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .insight-loading-helmet,
+  .insight-loading-helmet-fallback,
+  .upgrade-helmet-icon,
+  .upgrade-helmet-fallback {
+    animation: none !important;
+  }
+
+  .insight-loading-dots span {
+    animation: none !important;
+  }
+
+  .data-progress-fill::after {
+    animation: none !important;
+  }
+}
