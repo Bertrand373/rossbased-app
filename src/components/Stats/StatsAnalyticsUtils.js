@@ -346,7 +346,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
   }
 };
 
-// COMPLETELY REDESIGNED: Phase Evolution Analysis - Replaces Historical Comparison
+// FIXED: Phase Evolution Analysis with proper decimals and wisdom-based insights
 export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
   try {
     const safeData = validateUserData(userData);
@@ -448,14 +448,15 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
       };
     }
     
-    // Calculate averages for each phase with data
+    // FIXED: Calculate averages with proper decimals (1 decimal place max)
     const phaseAverages = {};
     Object.keys(phaseData).forEach(phase => {
       const values = phaseData[phase];
       if (values.length > 0) {
-        const avg = values.reduce((sum, item) => sum + item.value, 0) / values.length;
+        const sum = values.reduce((acc, item) => acc + item.value, 0);
+        const avg = sum / values.length;
         phaseAverages[phase] = {
-          average: avg,
+          average: Math.round(avg * 10) / 10, // Round to 1 decimal place
           dataPoints: values.length,
           range: getPhaseRange(phase),
           displayName: getPhaseDisplayName(phase)
@@ -467,7 +468,7 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
     const currentPhase = getRetentionPhase(currentStreak);
     const currentAvg = calculateAverage(safeData, selectedMetric, 'week', true);
     
-    // Generate evolution insights
+    // ENHANCED: Generate wisdom-based evolution insights
     const insights = [];
     const completedPhases = Object.keys(phaseAverages).filter(phase => 
       phase !== currentPhase || currentStreak > (phase === 'foundation' ? 14 : 
@@ -476,7 +477,16 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
     );
     
     if (completedPhases.length === 0) {
-      insights.push('Still building data in your current phase - evolution patterns will emerge as you progress.');
+      // Current phase insights based on wisdom from guide
+      const currentPhaseInsights = {
+        'foundation': `**Foundation Building**: Your ${selectedMetric} is stabilizing as your body learns to conserve vital force. Energy fluctuations are normal - your nervous system is adapting to higher frequencies.`,
+        'purification': `**Emotional Purging Active**: ${selectedMetric} patterns during days 15-45 reflect your psyche healing suppressed emotions. Lower scores are therapeutic - old patterns are being purged.`,
+        'expansion': `**Mental Transmutation**: ${selectedMetric} improvements show sexual energy converting to cognitive power. You're entering the alchemical refinement stage where raw energy becomes mental clarity.`,
+        'integration': `**Spiritual Integration**: ${selectedMetric} stability indicates major consciousness expansion. You're embodying the divine masculine archetype and developing natural magnetism.`,
+        'mastery': `**Service Orientation**: Your ${selectedMetric} consistency shows mastery - individual development now serves universal consciousness evolution. You're becoming a teacher and healer.`
+      };
+      
+      insights.push(currentPhaseInsights[currentPhase] || 'Still building data in your current phase - evolution patterns will emerge as you progress.');
     } else {
       // Find progression patterns
       const phaseOrder = ['foundation', 'purification', 'expansion', 'integration', 'mastery'];
@@ -493,20 +503,28 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
         
         if (Math.abs(evolution) >= 15) {
           if (evolution > 0) {
-            insights.push(`**Phase Evolution**: Your ${selectedMetric} improved ${evolution}% from ${getPhaseDisplayName(firstPhase)} (${firstAvg.toFixed(1)}/10) to ${getPhaseDisplayName(lastCompleted)} (${lastAvg.toFixed(1)}/10). This shows successful energy transmutation through the phases.`);
+            insights.push(`**Phase Evolution**: Your ${selectedMetric} improved ${evolution}% from ${getPhaseDisplayName(firstPhase)} (${firstAvg}/10) to ${getPhaseDisplayName(lastCompleted)} (${lastAvg}/10). This shows successful energy transmutation through the phases.`);
           } else {
             insights.push(`**Phase Challenge**: ${selectedMetric} declined ${Math.abs(evolution)}% from ${getPhaseDisplayName(firstPhase)} to ${getPhaseDisplayName(lastCompleted)}. This suggests phase-specific challenges that need addressing.`);
           }
         }
       }
       
-      // Phase-specific challenges based on your guide
+      // ENHANCED: Phase-specific insights based on your guide's wisdom
       if (phaseAverages.purification && phaseAverages.purification.average < 5.5) {
-        insights.push(`**Purification Phase Pattern**: ${selectedMetric} averaged ${phaseAverages.purification.average.toFixed(1)}/10 during emotional purging (days 15-45). Lower metrics during this phase are normal - your psyche was healing suppressed emotions.`);
+        insights.push(`**Purification Phase Pattern**: ${selectedMetric} averaged ${phaseAverages.purification.average}/10 during emotional purging (days 15-45). Lower metrics during this phase are normal - your psyche was healing suppressed emotions.`);
       }
       
       if (phaseAverages.expansion && phaseAverages.expansion.average > 7) {
-        insights.push(`**Expansion Phase Success**: ${selectedMetric} peaked at ${phaseAverages.expansion.average.toFixed(1)}/10 during mental expansion (days 46-90). This confirms successful transmutation of sexual energy into enhanced cognitive abilities.`);
+        insights.push(`**Expansion Phase Success**: ${selectedMetric} peaked at ${phaseAverages.expansion.average}/10 during mental expansion (days 46-90). This confirms successful transmutation of sexual energy into enhanced cognitive abilities.`);
+      }
+      
+      if (phaseAverages.integration && phaseAverages.integration.average > 7.5) {
+        insights.push(`**Integration Mastery**: ${selectedMetric} at ${phaseAverages.integration.average}/10 during spiritual integration (days 91-180) shows major consciousness expansion. You embodied the divine masculine archetype.`);
+      }
+      
+      if (phaseAverages.mastery && phaseAverages.mastery.average > 8) {
+        insights.push(`**Service Excellence**: ${selectedMetric} maintains ${phaseAverages.mastery.average}/10 in mastery phase (180+ days). Your individual development now serves universal consciousness evolution.`);
       }
       
       // Current phase guidance
@@ -521,11 +539,7 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
     
     return {
       hasData: true,
-      currentPhase: {
-        name: getPhaseDisplayName(currentPhase),
-        range: getPhaseRange(currentPhase),
-        currentAverage: currentAvg
-      },
+      // Remove the redundant current phase card since it's highlighted in the grid
       phaseAverages: phaseAverages,
       insights: insights,
       completedPhases: completedPhases.length,

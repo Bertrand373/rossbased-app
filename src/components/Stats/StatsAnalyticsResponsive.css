@@ -184,27 +184,73 @@
     font-size: 0.8rem;
   }
   
-  /* MOBILE FIXES: Historical comparison */
-  .historical-comparison-section {
+  /* MOBILE FIXES: Phase Evolution - FIXED Layout */
+  .phase-evolution-section {
     padding: var(--spacing-md);
+    /* FIXED: Ensure proper mobile containment */
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
   }
   
-  .historical-comparison-grid {
+  .phase-evolution-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+    /* FIXED: Prevent grid overflow */
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .phase-evolution-card {
+    min-height: 90px;
+    padding: var(--spacing-sm);
+    /* FIXED: Ensure cards fit properly */
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .phase-evolution-average {
+    font-size: 1.2rem;
+  }
+  
+  .phase-evolution-name {
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+  
+  .phase-evolution-range {
+    font-size: 0.7rem;
+  }
+  
+  .phase-evolution-data-points {
+    font-size: 0.65rem;
+  }
+  
+  .phase-evolution-insights {
+    padding: var(--spacing-sm);
+  }
+  
+  .phase-evolution-insight-item {
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+  
+  .phase-evolution-summary {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
   }
   
-  .historical-comparison-card {
-    min-height: 80px;
-    padding: var(--spacing-md);
+  .evolution-summary-stat {
+    padding: var(--spacing-sm);
   }
   
-  .historical-comparison-value {
-    font-size: 1.25rem;
+  .evolution-summary-value {
+    font-size: 1.2rem;
   }
   
-  .historical-comparison-label {
-    font-size: 0.8rem;
+  .evolution-summary-label {
+    font-size: 0.75rem;
   }
   
   .optimization-metrics {
@@ -278,7 +324,11 @@
     transform: none;
   }
 
-  .historical-comparison-card:hover {
+  .phase-evolution-card:hover {
+    transform: none;
+  }
+
+  .phase-evolution-insight-item:hover {
     transform: none;
   }
 
@@ -408,21 +458,60 @@
     font-size: 0.75rem;
   }
   
-  .historical-comparison-section {
+  /* VERY SMALL: Phase Evolution - ULTRA COMPACT */
+  .phase-evolution-section {
     padding: var(--spacing-sm);
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
   }
   
-  .historical-comparison-card {
-    min-height: 70px;
-    padding: var(--spacing-sm);
+  .phase-evolution-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xs);
+    width: 100%;
   }
   
-  .historical-comparison-value {
+  .phase-evolution-card {
+    min-height: 80px;
+    padding: var(--spacing-xs);
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .phase-evolution-average {
     font-size: 1.1rem;
   }
   
-  .historical-comparison-label {
+  .phase-evolution-name {
+    font-size: 0.8rem;
+    line-height: 1.1;
+  }
+  
+  .phase-evolution-range {
+    font-size: 0.65rem;
+  }
+  
+  .phase-evolution-data-points {
+    font-size: 0.6rem;
+  }
+  
+  .phase-evolution-insight-item {
+    padding: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
     font-size: 0.75rem;
+  }
+  
+  .evolution-summary-stat {
+    padding: var(--spacing-xs);
+  }
+  
+  .evolution-summary-value {
+    font-size: 1.1rem;
+  }
+  
+  .evolution-summary-label {
+    font-size: 0.7rem;
   }
   
   .optimization-metric-card {
@@ -463,7 +552,8 @@
 
   /* Very small screens: Disable all hover animations */
   .insight-card:hover,
-  .historical-comparison-card:hover,
+  .phase-evolution-card:hover,
+  .phase-evolution-insight-item:hover,
   .optimization-metric-card:hover,
   .chart-container:hover,
   .current-metric-average:hover,
