@@ -1,6 +1,6 @@
-// components/Stats/StatsInsights.js - Analytics and Insights Components
+// components/Stats/StatsInsights.js - Analytics and Insights Components - COMPLETE UPDATED FILE
 import React from 'react';
-import { FaChartLine, FaShieldAlt, FaTrophy, FaFire, FaArrowUp, FaArrowDown, FaEquals, FaBrain } from 'react-icons/fa';
+import { FaChartLine, FaShieldAlt, FaTrophy, FaFire, FaArrowUp, FaArrowDown, FaEquals, FaBrain, FaInfoCircle } from 'react-icons/fa';
 import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
 import { renderTextWithBold } from './StatsUtils';
 
@@ -18,7 +18,7 @@ export const SmartUrgeManagement = ({
         <span>Smart Urge Management</span>
       </div>
       <div className="insight-info-banner">
-        <FaChartLine className="info-icon" />
+        <FaInfoCircle className="info-icon" />
         <span>Real-time vulnerability assessment based on your current streak phase, time of day, and recent benefit patterns.</span>
       </div>
       <div className="insight-card-content">
@@ -87,7 +87,7 @@ export const RelapseRiskPredictor = ({
         <span>Relapse Risk Predictor</span>
       </div>
       <div className="insight-info-banner">
-        <FaShieldAlt className="info-icon" />
+        <FaInfoCircle className="info-icon" />
         <span>Analyzes your recent benefit trends to predict vulnerability periods and provide specific mitigation strategies.</span>
       </div>
       <div className="insight-card-content">
@@ -161,7 +161,7 @@ export const RelapsePatternAnalytics = ({
         </span>
       </div>
       <div className="insight-info-banner">
-        <FaShieldAlt className="info-icon" />
+        <FaInfoCircle className="info-icon" />
         <span>
           {daysSinceLastRelapse >= 90
             ? `Review the patterns you've successfully overcome ${daysSinceLastRelapse} days ago. This wisdom helps maintain vigilance and can guide others on their journey.`
@@ -259,7 +259,7 @@ export const PatternRecognition = ({
         <span>Pattern Recognition</span>
       </div>
       <div className="insight-info-banner">
-        <FaChartLine className="info-icon" />
+        <FaInfoCircle className="info-icon" />
         <span>Identifies correlations between your metrics and predicts trends based on your unique retention journey patterns.</span>
       </div>
       <div className="insight-card-content">
@@ -317,7 +317,7 @@ export const OptimizationGuidance = ({
         <span>Optimization Guidance</span>
       </div>
       <div className="insight-info-banner">
-        <FaFire className="info-icon" />
+        <FaInfoCircle className="info-icon" />
         <span>Shows your peak performance rate and provides timing-based recommendations for maximizing your retention benefits.</span>
       </div>
       <div className="insight-card-content">
@@ -363,21 +363,33 @@ export const OptimizationGuidance = ({
   );
 };
 
-// FIXED: Phase Evolution Analysis Component - Removed redundant current phase card
+// FIXED: Phase Evolution Analysis Component - Removed brain icon, added clear labels, consistent info icon
 export const PhaseEvolutionAnalysis = ({ 
   isLoading, 
   phaseEvolution, 
   selectedMetric, 
-  dataQuality 
+  dataQuality,
+  currentStreak // Add currentStreak prop to determine current phase
 }) => {
+  // Function to determine current phase based on streak
+  const getCurrentPhaseKey = (streak) => {
+    if (streak <= 14) return 'foundation';
+    if (streak <= 45) return 'purification';
+    if (streak <= 90) return 'expansion';
+    if (streak <= 180) return 'integration';
+    return 'mastery';
+  };
+
+  const currentPhaseKey = getCurrentPhaseKey(currentStreak || 0);
+
   return (
     <div className="phase-evolution-section">
+      {/* REMOVED: Brain icon from header to match other sections */}
       <div className="phase-evolution-header">
-        <FaBrain className="phase-evolution-icon" />
         <span>Phase Evolution Analysis</span>
       </div>
       <div className="insight-info-banner">
-        <FaBrain className="info-icon" />
+        <FaInfoCircle className="info-icon" />
         <span>Tracks how your {selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} develops through the retention phases and identifies phase-specific patterns and challenges.</span>
       </div>
       
@@ -393,17 +405,10 @@ export const PhaseEvolutionAnalysis = ({
         </div>
       ) : (
         <>
-          {/* FIXED: Phase Comparison Grid - No separate current phase card, just highlight current phase */}
+          {/* FIXED: Phase Comparison Grid with clear labels and current phase detection */}
           <div className="phase-evolution-grid">
             {Object.entries(phaseEvolution.phaseAverages).map(([phaseKey, phaseData]) => {
-              // Determine if this is the current phase based on phase ranges
-              const getCurrentPhase = (phaseKey) => {
-                // This will be determined by the parent component's current streak
-                // For now, we'll use a simple heuristic or pass it via props
-                return phaseKey === 'expansion'; // This should come from parent component
-              };
-              
-              const isCurrentPhase = getCurrentPhase(phaseKey);
+              const isCurrentPhase = phaseKey === currentPhaseKey;
               
               return (
                 <div 
@@ -415,7 +420,9 @@ export const PhaseEvolutionAnalysis = ({
                     {isCurrentPhase && <span className="current-phase-indicator"> (Current)</span>}
                   </div>
                   <div className="phase-evolution-range">{phaseData.range}</div>
+                  {/* FIXED: Added clear label to show this is phase average */}
                   <div className="phase-evolution-average">{phaseData.average}/10</div>
+                  <div className="phase-evolution-label">Phase Average</div>
                   <div className="phase-evolution-data-points">{phaseData.dataPoints} days tracked</div>
                 </div>
               );

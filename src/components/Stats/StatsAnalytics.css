@@ -1,4 +1,4 @@
-/* components/Stats/StatsAnalytics.css - ENHANCED: Professional UX Polish with Loading States + Core Analytics Components */
+/* components/Stats/StatsAnalytics.css - ENHANCED: Professional UX Polish with Loading States + Core Analytics Components - COMPLETE FILE */
 
 /* ENHANCED: Loading States for Insights */
 .insight-loading-state {
@@ -1227,21 +1227,15 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* FIXED: Phase Evolution Header - Removed brain icon */
 .phase-evolution-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
   font-weight: 600;
   color: var(--text);
   font-size: 1rem;
   margin-bottom: var(--spacing-md);
-}
-
-.phase-evolution-icon {
-  font-size: 1.125rem;
-  color: var(--primary);
-  flex-shrink: 0;
 }
 
 .phase-evolution-empty {
@@ -1281,7 +1275,7 @@
   flex-direction: column;
   gap: var(--spacing-xs);
   justify-content: center;
-  min-height: 110px;
+  min-height: 130px;
   transition: all 0.3s ease;
   position: relative;
 }
@@ -1339,6 +1333,17 @@
 
 .phase-evolution-card:hover .phase-evolution-average {
   transform: scale(1.05);
+}
+
+/* FIXED: Added clear label for phase average */
+.phase-evolution-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: var(--spacing-xs);
 }
 
 .phase-evolution-data-points {
@@ -1543,5 +1548,26 @@
   
   .insight-info-banner .info-icon {
     margin-top: 0;
+  }
+}
+
+/* Mobile responsive updates for new phase label */
+@media (max-width: 768px) {
+  .phase-evolution-label {
+    font-size: 0.65rem;
+  }
+  
+  .phase-evolution-card {
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .phase-evolution-label {
+    font-size: 0.6rem;
+  }
+  
+  .phase-evolution-card {
+    min-height: 110px;
   }
 }
