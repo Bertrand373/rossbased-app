@@ -363,7 +363,7 @@ export const OptimizationGuidance = ({
   );
 };
 
-// FIXED: Phase Evolution Analysis Component - Removed brain icon, added clear labels, consistent info icon
+// FIXED: Phase Evolution Analysis Component - Updated with clearer labels
 export const PhaseEvolutionAnalysis = ({ 
   isLoading, 
   phaseEvolution, 
@@ -441,15 +441,15 @@ export const PhaseEvolutionAnalysis = ({
             ))}
           </div>
 
-          {/* Progress Summary */}
+          {/* UPDATED: Progress Summary with much clearer labels */}
           <div className="phase-evolution-summary">
             <div className="evolution-summary-stat">
               <div className="evolution-summary-value">{phaseEvolution.completedPhases}</div>
-              <div className="evolution-summary-label">Phases with Analysis</div>
+              <div className="evolution-summary-label">Phases with Analysis (met data minimum for insights)</div>
             </div>
             <div className="evolution-summary-stat">
               <div className="evolution-summary-value">{phaseEvolution.totalPhases}</div>
-              <div className="evolution-summary-label">Total Phases Tracked</div>
+              <div className="evolution-summary-label">Total Phases Experienced (your complete journey)</div>
             </div>
           </div>
 
