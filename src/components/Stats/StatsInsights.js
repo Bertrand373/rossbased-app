@@ -303,7 +303,7 @@ export const PatternRecognition = ({
   );
 };
 
-// Optimization Guidance Component
+// UPDATED: Optimization Guidance Component with Enhanced Dynamic Analysis
 export const OptimizationGuidance = ({ 
   isLoading, 
   hasInsufficientData, 
@@ -314,31 +314,40 @@ export const OptimizationGuidance = ({
   return (
     <div className="insight-card">
       <div className="insight-card-header">
-        <span>Optimization Guidance</span>
+        <span>Performance Optimization</span>
       </div>
       <div className="insight-info-banner">
         <FaInfoCircle className="info-icon" />
-        <span>Shows your peak performance rate and provides timing-based recommendations for maximizing your retention benefits.</span>
+        <span>Analyzes your personal performance patterns to identify your optimal windows and provides phase-aware optimization strategies.</span>
       </div>
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Optimization Analysis" isVisible={true} />
         ) : hasInsufficientData ? (
-          <InsightEmptyState insight="Optimization Guidance" userData={userData} />
+          <InsightEmptyState insight="Performance Optimization" userData={userData} />
         ) : (
           <div className="optimization-display">
             <div className="optimization-criteria">
-              <div className="optimization-criteria-title">Your Peak Performance Zone:</div>
-              <div className="optimization-criteria-text">{optimizationGuidance?.criteria || 'Energy 7+, Confidence 5+'}</div>
+              <div className="optimization-criteria-title">
+                {optimizationGuidance?.phase ? `${optimizationGuidance.phase} Phase - High Performance Criteria:` : 'Your High Performance Criteria:'}
+              </div>
+              <div className="optimization-criteria-text">{optimizationGuidance?.criteria || 'Building personalized criteria...'}</div>
             </div>
             <div className="optimization-metrics">
               <div className="optimization-metric-card">
                 <div className="optimization-metric-value">{optimizationGuidance?.optimalRate || 'N/A'}</div>
-                <div className="optimization-metric-label">Operating in optimal zone</div>
+                <div className="optimization-metric-label">
+                  {optimizationGuidance?.optimalRate && optimizationGuidance.optimalRate !== 'N/A' 
+                    ? 'Meeting your high performance criteria'
+                    : 'High performance tracking'
+                  }
+                </div>
               </div>
             </div>
             <div className="optimization-recommendations">
-              <div className="optimization-title">Current Recommendations:</div>
+              <div className="optimization-title">
+                {optimizationGuidance?.phase ? `${optimizationGuidance.phase} Phase Guidance:` : 'Current Recommendations:'}
+              </div>
               {(optimizationGuidance?.recommendations || []).map((rec, index) => (
                 <div key={index} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></div>
               ))}
@@ -350,10 +359,13 @@ export const OptimizationGuidance = ({
             <div className="insight-data-status-indicator">
               <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
                 <FaChartLine />
-                {dataQuality?.label || 'Basic Analysis'}
+                {optimizationGuidance?.thresholds ? 'Dynamic Performance Analysis' : (dataQuality?.label || 'Basic Analysis')}
               </span>
               <span className="insight-data-days">
-                Based on {dataQuality?.days || 0} days of tracking
+                {optimizationGuidance?.thresholds 
+                  ? `Personalized thresholds based on your top 25% performance days`
+                  : `Based on ${dataQuality?.days || 0} days of tracking`
+                }
               </span>
             </div>
           </div>

@@ -250,7 +250,7 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
   }
 };
 
-// ENHANCED: Optimization Guidance with better error handling
+// ENHANCED: Optimization Guidance with Dynamic Performance Analysis
 export const generateOptimizationGuidance = (userData, selectedMetric, timeRange, isPremium) => {
   try {
     const safeData = validateUserData(userData);
@@ -260,79 +260,182 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
     if (allData.length < 10) {
       return {
         optimalRate: 'N/A',
-        criteria: isPremium ? 'Energy 7+, Sleep 6+, Confidence 5+' : 'Energy 7+, Confidence 5+',
-        recommendations: ['Need 10+ days of benefit tracking for optimization analysis']
+        criteria: 'Need more data for analysis',
+        recommendations: ['Track 10+ days of benefits to unlock personalized optimization guidance']
       };
     }
     
-    // Calculate optimal performance zone based on actual data
-    const optimalDays = allData.filter(d => {
+    // FIXED: Calculate dynamic performance thresholds based on user's actual data
+    const calculateDynamicThresholds = (data) => {
+      const validEnergyData = data.map(d => d.energy || 0).filter(val => val >= 1 && val <= 10);
+      const validConfidenceData = data.map(d => d.confidence || 0).filter(val => val >= 1 && val <= 10);
+      const validSleepData = data.map(d => d.sleep || 0).filter(val => val >= 1 && val <= 10);
+      
+      if (validEnergyData.length < 5) {
+        return null; // Not enough data for meaningful analysis
+      }
+      
+      // Calculate percentiles for dynamic thresholds
+      const getPercentile = (arr, percentile) => {
+        const sorted = [...arr].sort((a, b) => a - b);
+        const index = Math.ceil((percentile / 100) * sorted.length) - 1;
+        return sorted[Math.max(0, index)];
+      };
+      
+      // Use 75th percentile as "high performance" threshold
+      const energyThreshold = Math.max(7, getPercentile(validEnergyData, 75));
+      const confidenceThreshold = Math.max(6, getPercentile(validConfidenceData, 75));
+      const sleepThreshold = validSleepData.length >= 5 ? Math.max(7, getPercentile(validSleepData, 75)) : 7;
+      
+      return {
+        energy: energyThreshold,
+        confidence: confidenceThreshold,
+        sleep: sleepThreshold,
+        energyAvg: validEnergyData.reduce((sum, val) => sum + val, 0) / validEnergyData.length,
+        confidenceAvg: validConfidenceData.length > 0 ? validConfidenceData.reduce((sum, val) => sum + val, 0) / validConfidenceData.length : 5,
+        sleepAvg: validSleepData.length > 0 ? validSleepData.reduce((sum, val) => sum + val, 0) / validSleepData.length : 6
+      };
+    };
+    
+    const thresholds = calculateDynamicThresholds(allData);
+    
+    if (!thresholds) {
+      return {
+        optimalRate: 'N/A',
+        criteria: 'Insufficient metric data',
+        recommendations: ['Track more complete daily metrics for personalized optimization analysis']
+      };
+    }
+    
+    // FIXED: Calculate high performance days using dynamic thresholds
+    const highPerformanceDays = allData.filter(d => {
       try {
         if (!d) return false;
         const energy = d.energy || 0;
         const confidence = d.confidence || 0;
         const sleep = d.sleep || 0;
         
-        const energyValid = typeof energy === 'number' && energy >= 7;
-        const confidenceValid = typeof confidence === 'number' && confidence >= 5;
-        const sleepValid = !isPremium || (typeof sleep === 'number' && sleep >= 6);
+        const energyMeetsThreshold = typeof energy === 'number' && energy >= thresholds.energy;
+        const confidenceMeetsThreshold = typeof confidence === 'number' && confidence >= thresholds.confidence;
+        const sleepMeetsThreshold = !isPremium || (typeof sleep === 'number' && sleep >= thresholds.sleep);
         
-        return energyValid && confidenceValid && sleepValid;
+        return energyMeetsThreshold && confidenceMeetsThreshold && sleepMeetsThreshold;
       } catch (filterError) {
         return false;
       }
     });
     
-    const optimalPercentage = allData.length > 0 ? (optimalDays.length / allData.length * 100).toFixed(0) : '0';
+    const highPerformanceRate = allData.length > 0 ? (highPerformanceDays.length / allData.length * 100).toFixed(0) : '0';
     const currentAvgEnergy = parseFloat(calculateAverage(safeData, selectedMetric, timeRange, isPremium));
     
-    const guidance = {
-      optimalRate: `${optimalPercentage}% optimal days`,
-      criteria: isPremium ? 'Energy 7+, Sleep 6+, Confidence 5+' : 'Energy 7+, Confidence 5+',
-      recommendations: []
+    // FIXED: Generate phase-aware criteria labels
+    const getCurrentPhaseFromStreak = (streak) => {
+      if (streak <= 14) return 'Foundation';
+      if (streak <= 45) return 'Purification';
+      if (streak <= 90) return 'Expansion';
+      if (streak <= 180) return 'Integration';
+      return 'Mastery';
     };
     
-    // Base recommendations on actual data patterns, not assumptions
-    if (currentAvgEnergy >= 7 && !isNaN(currentAvgEnergy)) {
-      guidance.recommendations.push(`**Peak Performance Active**: Energy at ${currentAvgEnergy}/10 enables optimal training and decision-making. Your body can handle increased physical and mental challenges.`);
+    const phase = getCurrentPhaseFromStreak(currentStreak);
+    
+    // FIXED: Create realistic, personalized criteria description
+    let criteriaLabel;
+    if (isPremium) {
+      criteriaLabel = `Your Top 25%: Energy ${thresholds.energy}+, Confidence ${thresholds.confidence}+, Sleep ${thresholds.sleep}+`;
+    } else {
+      criteriaLabel = `Your High Performance: Energy ${thresholds.energy}+, Confidence ${thresholds.confidence}+`;
+    }
+    
+    const guidance = {
+      optimalRate: `${highPerformanceRate}% high performance days`,
+      criteria: criteriaLabel,
+      recommendations: [],
+      phase: phase,
+      thresholds: thresholds
+    };
+    
+    // ENHANCED: Phase-aware performance context
+    const isCurrentlyHigh = currentAvgEnergy >= thresholds.energy && !isNaN(currentAvgEnergy);
+    const isAboveBaseline = currentAvgEnergy > thresholds.energyAvg && !isNaN(currentAvgEnergy);
+    
+    if (isCurrentlyHigh) {
+      guidance.recommendations.push(`**${phase} Phase Peak Performance**: Your energy at ${currentAvgEnergy}/10 matches your top 25% of days. This is your optimal window for challenging decisions, intense workouts, and ambitious goals.`);
       
-      // Only mention timing if we have data to support it
-      if (allData.length >= 14) {
-        guidance.recommendations.push("**High Energy Period**: This is your window for important decisions, challenging workouts, and creative projects. Your retention benefits are maximized right now.");
+      // Phase-specific peak performance guidance
+      if (phase === 'Foundation') {
+        guidance.recommendations.push("**Foundation Phase Excellence**: High energy this early shows exceptional adaptation. Use this momentum to establish unbreakable daily routines and eliminate environmental triggers.");
+      } else if (phase === 'Expansion') {
+        guidance.recommendations.push("**Expansion Phase Optimization**: Peak mental clarity is active. This is the ideal time for learning new skills, making important decisions, and tackling complex projects.");
+      } else if (phase === 'Integration' || phase === 'Mastery') {
+        guidance.recommendations.push("**Advanced Phase Mastery**: Your sustained high performance demonstrates spiritual-physical integration. Channel this energy into mentoring others and creating lasting value.");
+      }
+    } else if (isAboveBaseline) {
+      guidance.recommendations.push(`**Above Baseline Performance**: Energy at ${currentAvgEnergy}/10 exceeds your average (${thresholds.energyAvg.toFixed(1)}/10). Good for moderate challenges and steady progress.`);
+    } else {
+      guidance.recommendations.push(`**Integration Period**: Energy at ${currentAvgEnergy}/10 below your peak threshold (${thresholds.energy}/10). Natural recovery cycle - prioritize rest, reflection, and gentle activities.`);
+      
+      // Phase-specific low energy context
+      if (phase === 'Purification') {
+        guidance.recommendations.push("**Purification Phase Normal**: Lower energy during days 15-45 indicates emotional purging. This temporary dip is therapeutic - maintain basic practices and trust the process.");
       }
     }
     
-    // Recovery period guidance based on data
-    if (currentAvgEnergy < 6 && !isNaN(currentAvgEnergy)) {
-      guidance.recommendations.push(`**Integration Mode**: Energy at ${currentAvgEnergy}/10 indicates natural recovery cycle. Prioritize rest, gentle movement, and avoid forcing major decisions.`);
-      
-      // Phase-specific context only if meaningful
-      if (currentStreak >= 15 && currentStreak <= 45) {
-        guidance.recommendations.push("**Purification Phase Support**: Lower energy during emotional purging is normal. Your psyche is healing - allow the process and maintain basic practices.");
-      }
-    }
-    
-    // Pattern-based optimization (only with sufficient data)
+    // ENHANCED: Pattern-based insights using dynamic thresholds
     if (isPremium && allData.length >= 20) {
       try {
+        // Find correlation between high confidence and other metrics
         const highConfidenceDays = allData.filter(d => {
           const confidence = d?.confidence || 0;
-          return typeof confidence === 'number' && confidence >= 7;
+          return typeof confidence === 'number' && confidence >= thresholds.confidence;
         });
         
         if (highConfidenceDays.length >= 5) {
-          const validEnergyValues = highConfidenceDays
+          const avgEnergyDuringHighConfidence = highConfidenceDays
             .map(d => d.energy || 0)
-            .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
+            .filter(val => val >= 1 && val <= 10)
+            .reduce((sum, val, _, arr) => sum + val / arr.length, 0);
             
-          if (validEnergyValues.length > 0) {
-            const avgEnergyHighConfidence = validEnergyValues.reduce((sum, val) => sum + val, 0) / validEnergyValues.length;
-            guidance.recommendations.push(`**Decision-Making Pattern**: Your energy averages ${avgEnergyHighConfidence.toFixed(1)}/10 when confidence is high. This is your optimal window for important choices.`);
+          if (avgEnergyDuringHighConfidence > thresholds.energyAvg + 0.5) {
+            guidance.recommendations.push(`**Confidence-Energy Synergy**: When confidence hits ${thresholds.confidence}+, your energy averages ${avgEnergyDuringHighConfidence.toFixed(1)}/10. Build confidence through small wins to unlock higher energy states.`);
+          }
+        }
+        
+        // Sleep-performance correlation
+        const goodSleepDays = allData.filter(d => {
+          const sleep = d?.sleep || 0;
+          return typeof sleep === 'number' && sleep >= thresholds.sleep;
+        });
+        
+        if (goodSleepDays.length >= 5) {
+          const nextDayEnergy = goodSleepDays.map(d => {
+            const dayAfter = allData.find(next => {
+              if (!next?.date || !d.date) return false;
+              const dayAfterDate = new Date(d.date);
+              dayAfterDate.setDate(dayAfterDate.getDate() + 1);
+              const nextDate = new Date(next.date);
+              return nextDate.toISOString().split('T')[0] === dayAfterDate.toISOString().split('T')[0];
+            });
+            return dayAfter?.energy || null;
+          }).filter(e => e !== null && e >= 1 && e <= 10);
+          
+          if (nextDayEnergy.length >= 3) {
+            const avgNextDayEnergy = nextDayEnergy.reduce((sum, val) => sum + val, 0) / nextDayEnergy.length;
+            if (avgNextDayEnergy > thresholds.energyAvg + 0.5) {
+              guidance.recommendations.push(`**Sleep-Energy Optimization**: Quality sleep (${thresholds.sleep}+) leads to ${avgNextDayEnergy.toFixed(1)}/10 energy the next day. Prioritize sleep for consistent high performance.`);
+            }
           }
         }
       } catch (patternError) {
-        console.warn('Optimization pattern error:', patternError);
+        console.warn('Optimization pattern analysis error:', patternError);
       }
+    }
+    
+    // ENHANCED: Data quality and improvement suggestions
+    if (highPerformanceRate < 20) {
+      guidance.recommendations.push(`**Performance Opportunity**: Only ${highPerformanceRate}% of days meet your high performance criteria. Focus on sleep optimization, stress management, and consistent daily practices to increase this rate.`);
+    } else if (highPerformanceRate > 40) {
+      guidance.recommendations.push(`**Exceptional Consistency**: ${highPerformanceRate}% high performance rate shows mastery of retention principles. Consider raising your standards or helping others achieve similar consistency.`);
     }
     
     return guidance;
@@ -340,7 +443,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
     console.error('Optimization guidance error:', error);
     return {
       optimalRate: 'N/A',
-      criteria: 'Energy 7+, Confidence 5+',
+      criteria: 'Analysis unavailable',
       recommendations: ['Unable to generate optimization guidance at this time.']
     };
   }
