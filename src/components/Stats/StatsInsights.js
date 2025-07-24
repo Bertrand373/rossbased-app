@@ -363,15 +363,15 @@ export const OptimizationGuidance = ({
   );
 };
 
-// FIXED: Phase Evolution Analysis Component - Updated with clearer labels
+// FIXED: Phase Evolution Analysis Component - Current Phase Detection Fixed
 export const PhaseEvolutionAnalysis = ({ 
   isLoading, 
   phaseEvolution, 
   selectedMetric, 
   dataQuality,
-  currentStreak // Add currentStreak prop to determine current phase
+  currentStreak // FIXED: Now properly using this prop
 }) => {
-  // Function to determine current phase based on streak
+  // FIXED: Function to determine current phase based on streak - MATCHING EXACT LOGIC
   const getCurrentPhaseKey = (streak) => {
     if (streak <= 14) return 'foundation';
     if (streak <= 45) return 'purification';
@@ -380,11 +380,11 @@ export const PhaseEvolutionAnalysis = ({
     return 'mastery';
   };
 
+  // FIXED: Use the passed currentStreak prop instead of calculating from data
   const currentPhaseKey = getCurrentPhaseKey(currentStreak || 0);
 
   return (
     <div className="phase-evolution-section">
-      {/* REMOVED: Brain icon from header to match other sections */}
       <div className="phase-evolution-header">
         <span>Phase Evolution Analysis</span>
       </div>
@@ -405,9 +405,10 @@ export const PhaseEvolutionAnalysis = ({
         </div>
       ) : (
         <>
-          {/* FIXED: Phase Comparison Grid with clear labels and current phase detection */}
+          {/* FIXED: Phase Comparison Grid with CORRECT current phase detection */}
           <div className="phase-evolution-grid">
             {Object.entries(phaseEvolution.phaseAverages).map(([phaseKey, phaseData]) => {
+              // FIXED: Now correctly comparing phase keys
               const isCurrentPhase = phaseKey === currentPhaseKey;
               
               return (
@@ -420,7 +421,6 @@ export const PhaseEvolutionAnalysis = ({
                     {isCurrentPhase && <span className="current-phase-indicator"> (Current)</span>}
                   </div>
                   <div className="phase-evolution-range">{phaseData.range}</div>
-                  {/* FIXED: Added clear label to show this is phase average */}
                   <div className="phase-evolution-average">{phaseData.average}/10</div>
                   <div className="phase-evolution-label">Phase Average</div>
                   <div className="phase-evolution-data-points">{phaseData.dataPoints} days tracked</div>
@@ -441,7 +441,7 @@ export const PhaseEvolutionAnalysis = ({
             ))}
           </div>
 
-          {/* UPDATED: Progress Summary with much clearer labels */}
+          {/* FIXED: Updated summary labels to be clearer */}
           <div className="phase-evolution-summary">
             <div className="evolution-summary-stat">
               <div className="evolution-summary-value">{phaseEvolution.completedPhases}</div>

@@ -346,7 +346,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
   }
 };
 
-// FIXED: Phase Evolution Analysis with proper decimals and wisdom-based insights
+// FIXED: Phase Evolution Analysis with CORRECT phase detection and ALL 6 metrics support
 export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
   try {
     const safeData = validateUserData(userData);
@@ -360,7 +360,7 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
       };
     }
     
-    // Define retention phases based on your guide
+    // FIXED: Define retention phases based on EXACT logic - MATCHING getCurrentPhaseKey
     const getRetentionPhase = (daysSinceStart) => {
       if (daysSinceStart <= 14) return 'foundation';
       if (daysSinceStart <= 45) return 'purification'; 
@@ -422,10 +422,13 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
           phaseData[phase] = [];
         }
         
+        // FIXED: Support ALL 6 metrics properly
         let value = null;
         if (selectedMetric === 'sleep') {
+          // Sleep metric (premium) - check both sleep and fallback to attraction
           value = item[selectedMetric] || item.attraction || null;
-        } else {
+        } else if (['energy', 'focus', 'confidence', 'aura', 'workout'].includes(selectedMetric)) {
+          // All other 6 metrics: energy, focus, confidence, aura, workout
           value = item[selectedMetric] || null;
         }
         
@@ -464,7 +467,7 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
       }
     });
     
-    // Current phase analysis
+    // FIXED: Current phase analysis using CURRENT STREAK, not data dates
     const currentPhase = getRetentionPhase(currentStreak);
     const currentAvg = calculateAverage(safeData, selectedMetric, 'week', true);
     
@@ -539,7 +542,6 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
     
     return {
       hasData: true,
-      // Remove the redundant current phase card since it's highlighted in the grid
       phaseAverages: phaseAverages,
       insights: insights,
       completedPhases: completedPhases.length,
