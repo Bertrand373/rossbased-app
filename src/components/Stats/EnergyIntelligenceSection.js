@@ -20,11 +20,27 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
     [userData]
   );
 
-  // Calculate progress indicator data
-  const trackedDays = userData.benefitTracking?.length || 0;
-  const targetDays = 14;
-  const progressPercentage = Math.min((trackedDays / targetDays) * 100, 100);
-  const isAnalyticsReady = trackedDays >= targetDays;
+  // Calculate insight-specific progress indicators
+  const getInsightProgress = (insightType) => {
+    const requirements = {
+      patterns: 7,
+      phase: 3,
+      risk: 3,
+      optimization: 10
+    };
+    
+    const required = requirements[insightType] || 7;
+    const progressPercentage = Math.min((trackedDays / required) * 100, 100);
+    const isReady = trackedDays >= required;
+    
+    return {
+      required,
+      current: trackedDays,
+      percentage: progressPercentage,
+      isReady,
+      remaining: Math.max(0, required - trackedDays)
+    };
+  };
 
   // Simulate loading when switching tabs
   const handleTabSwitch = (insightId) => {
@@ -68,27 +84,25 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
         <h3>Energy Intelligence</h3>
       </div>
 
-      {/* UPDATED: Premium-style Progress Indicator (replaces data quality badge) */}
+      {/* UPDATED: Overall Progress Indicator */}
       <div className="energy-data-progress-indicator">
         <div className="energy-data-progress-header">
           <div className="energy-data-progress-title">
-            {isAnalyticsReady ? 'Analytics Ready' : 'Building Your Profile'}
+            Energy Intelligence Progress
           </div>
           <div className="energy-data-progress-count">
-            {trackedDays}/{targetDays} days
+            {trackedDays} days tracked
           </div>
         </div>
         <div className="energy-data-progress-bar">
           <div 
             className="energy-data-progress-fill"
-            style={{ width: `${progressPercentage}%` }}
+            style={{ width: `${Math.min((trackedDays / 10) * 100, 100)}%` }}
           />
         </div>
-        {!isAnalyticsReady && (
-          <div className="energy-data-progress-message">
-            Track {targetDays - trackedDays} more days for detailed insights
-          </div>
-        )}
+        <div className="energy-data-progress-message">
+          Track daily energy to unlock personalized insights and patterns
+        </div>
       </div>
 
       {/* Info Banner - Match Stats Info Banner Style */}
@@ -138,6 +152,7 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
             data={energyAnalysis.personalPatterns} 
             isLoading={loadingStates.patterns}
             dataQuality={energyAnalysis.dataQuality}
+            progress={getInsightProgress('patterns')}
           />
         )}
         {selectedInsight === 'phase' && (
@@ -145,6 +160,7 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
             data={energyAnalysis.phaseIntelligence} 
             isLoading={loadingStates.phase}
             dataQuality={energyAnalysis.dataQuality}
+            progress={getInsightProgress('phase')}
           />
         )}
         {selectedInsight === 'risk' && (
@@ -152,6 +168,7 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
             data={energyAnalysis.riskPrediction} 
             isLoading={loadingStates.risk}
             dataQuality={energyAnalysis.dataQuality}
+            progress={getInsightProgress('risk')}
           />
         )}
         {selectedInsight === 'optimization' && (
@@ -159,6 +176,7 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
             data={energyAnalysis.optimizationInsights} 
             isLoading={loadingStates.optimization}
             dataQuality={energyAnalysis.dataQuality}
+            progress={getInsightProgress('optimization')}
           />
         )}
       </div>
@@ -260,8 +278,8 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
   );
 };
 
-// Individual Insight Card Components - Match Premium Style (No Icons)
-const PatternInsightCard = ({ data, isLoading, dataQuality }) => (
+// Individual Insight Card Components - With Progress Indicators
+const PatternInsightCard = ({ data, isLoading, dataQuality, progress }) => (
   <div className="insight-content-card patterns">
     <div className="insight-card-header">
       <span>Your Personal Energy Patterns</span>
@@ -269,6 +287,24 @@ const PatternInsightCard = ({ data, isLoading, dataQuality }) => (
     <div className="insight-main-content">
       {isLoading ? (
         <LoadingState title="Analyzing patterns..." />
+      ) : !progress.isReady ? (
+        <div className="insufficient-data">
+          <div className="insufficient-message">
+            Track {progress.remaining} more days to unlock personal energy pattern analysis (requires {progress.required} days)
+          </div>
+          <div className="energy-data-progress-indicator">
+            <div className="energy-data-progress-header">
+              <div className="energy-data-progress-title">Pattern Analysis Progress</div>
+              <div className="energy-data-progress-count">{progress.current}/{progress.required} days</div>
+            </div>
+            <div className="energy-data-progress-bar">
+              <div 
+                className="energy-data-progress-fill"
+                style={{ width: `${progress.percentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           <div className="pattern-status">
@@ -301,16 +337,16 @@ const PatternInsightCard = ({ data, isLoading, dataQuality }) => (
         </>
       )}
     </div>
-    {/* Data Quality Status - Match Premium Style */}
-    {dataQuality?.level !== 'insufficient' && !isLoading && (
+    {/* Data Quality Status */}
+    {progress.isReady && !isLoading && (
       <div className="energy-insight-data-status">
         <div className="energy-insight-data-status-indicator">
           <span className={`energy-insight-data-quality ${dataQuality?.level || 'minimal'}`}>
             <FaFire />
-            {dataQuality?.label || 'Basic Analysis'}
+            {dataQuality?.label || 'Pattern Analysis'}
           </span>
           <span className="energy-insight-data-days">
-            Based on {dataQuality?.days || 0} days of tracking
+            Based on {progress.current} days of tracking
           </span>
         </div>
       </div>
@@ -318,7 +354,7 @@ const PatternInsightCard = ({ data, isLoading, dataQuality }) => (
   </div>
 );
 
-const PhaseInsightCard = ({ data, isLoading, dataQuality }) => (
+const PhaseInsightCard = ({ data, isLoading, dataQuality, progress }) => (
   <div className="insight-content-card phase">
     <div className="insight-card-header">
       <span>{data.phase} Phase Intelligence</span>
@@ -326,6 +362,24 @@ const PhaseInsightCard = ({ data, isLoading, dataQuality }) => (
     <div className="insight-main-content">
       {isLoading ? (
         <LoadingState title="Analyzing phase..." />
+      ) : !progress.isReady ? (
+        <div className="insufficient-data">
+          <div className="insufficient-message">
+            Track {progress.remaining} more days to unlock phase intelligence analysis (requires {progress.required} days)
+          </div>
+          <div className="energy-data-progress-indicator">
+            <div className="energy-data-progress-header">
+              <div className="energy-data-progress-title">Phase Analysis Progress</div>
+              <div className="energy-data-progress-count">{progress.current}/{progress.required} days</div>
+            </div>
+            <div className="energy-data-progress-bar">
+              <div 
+                className="energy-data-progress-fill"
+                style={{ width: `${progress.percentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           <div className="phase-status-bar">
@@ -344,7 +398,7 @@ const PhaseInsightCard = ({ data, isLoading, dataQuality }) => (
       )}
     </div>
     {/* Data Quality Status */}
-    {dataQuality?.level !== 'insufficient' && !isLoading && (
+    {progress.isReady && !isLoading && (
       <div className="energy-insight-data-status">
         <div className="energy-insight-data-status-indicator">
           <span className={`energy-insight-data-quality ${dataQuality?.level || 'minimal'}`}>
@@ -360,7 +414,7 @@ const PhaseInsightCard = ({ data, isLoading, dataQuality }) => (
   </div>
 );
 
-const RiskInsightCard = ({ data, isLoading, dataQuality }) => (
+const RiskInsightCard = ({ data, isLoading, dataQuality, progress }) => (
   <div className="insight-content-card risk">
     <div className="insight-card-header">
       <span>Smart Risk Prediction</span>
@@ -368,6 +422,24 @@ const RiskInsightCard = ({ data, isLoading, dataQuality }) => (
     <div className="insight-main-content">
       {isLoading ? (
         <LoadingState title="Calculating risk..." />
+      ) : !progress.isReady ? (
+        <div className="insufficient-data">
+          <div className="insufficient-message">
+            Track {progress.remaining} more days to unlock risk prediction analysis (requires {progress.required} days)
+          </div>
+          <div className="energy-data-progress-indicator">
+            <div className="energy-data-progress-header">
+              <div className="energy-data-progress-title">Risk Analysis Progress</div>
+              <div className="energy-data-progress-count">{progress.current}/{progress.required} days</div>
+            </div>
+            <div className="energy-data-progress-bar">
+              <div 
+                className="energy-data-progress-fill"
+                style={{ width: `${progress.percentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           <div className="risk-level-display">
@@ -398,7 +470,7 @@ const RiskInsightCard = ({ data, isLoading, dataQuality }) => (
       )}
     </div>
     {/* Data Quality Status */}
-    {dataQuality?.level !== 'insufficient' && !isLoading && (
+    {progress.isReady && !isLoading && (
       <div className="energy-insight-data-status">
         <div className="energy-insight-data-status-indicator">
           <span className={`energy-insight-data-quality ${dataQuality?.level || 'minimal'}`}>
@@ -414,7 +486,7 @@ const RiskInsightCard = ({ data, isLoading, dataQuality }) => (
   </div>
 );
 
-const OptimizationInsightCard = ({ data, isLoading, dataQuality }) => (
+const OptimizationInsightCard = ({ data, isLoading, dataQuality, progress }) => (
   <div className="insight-content-card optimization">
     <div className="insight-card-header">
       <span>Energy Optimization</span>
@@ -422,6 +494,24 @@ const OptimizationInsightCard = ({ data, isLoading, dataQuality }) => (
     <div className="insight-main-content">
       {isLoading ? (
         <LoadingState title="Optimizing strategy..." />
+      ) : !progress.isReady ? (
+        <div className="insufficient-data">
+          <div className="insufficient-message">
+            Track {progress.remaining} more days to unlock optimization insights (requires {progress.required} days)
+          </div>
+          <div className="energy-data-progress-indicator">
+            <div className="energy-data-progress-header">
+              <div className="energy-data-progress-title">Optimization Progress</div>
+              <div className="energy-data-progress-count">{progress.current}/{progress.required} days</div>
+            </div>
+            <div className="energy-data-progress-bar">
+              <div 
+                className="energy-data-progress-fill"
+                style={{ width: `${progress.percentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           {data.status === 'insufficient' ? (
@@ -430,6 +520,66 @@ const OptimizationInsightCard = ({ data, isLoading, dataQuality }) => (
             </div>
           ) : (
             <>
+              <div className="optimization-status">
+                <div className="status-badge active">Active Analysis</div>
+              </div>
+              
+              <div className="optimization-recommendations">
+                {data.recommendations.map((rec, index) => (
+                  <div key={index} className="optimization-rec" dangerouslySetInnerHTML={renderTextWithBold(rec)} />
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </div>
+    {/* Data Quality Status */}
+    {dataQuality?.level !== 'insufficient' && !isLoading && (
+      <div className="energy-insight-data-status">
+        <div className="energy-insight-data-status-indicator">
+          <span className={`energy-insight-data-quality ${dataQuality?.level || 'minimal'}`}>
+            <FaFire />
+            Optimization Engine
+          </span>
+          <span className="energy-insight-data-days">
+            Performance analysis
+          </span>
+        </div>
+      </div>
+    )}
+  </div>
+);
+              <div className="optimization-status">
+                <div className="status-badge active">Active Analysis</div>
+              </div>
+              
+              <div className="optimization-recommendations">
+                {data.recommendations.map((rec, index) => (
+                  <div key={index} className="optimization-rec" dangerouslySetInnerHTML={renderTextWithBold(rec)} />
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </div>
+    {/* Data Quality Status */}
+    {progress.isReady && !isLoading && (
+      <div className="energy-insight-data-status">
+        <div className="energy-insight-data-status-indicator">
+          <span className={`energy-insight-data-quality ${dataQuality?.level || 'minimal'}`}>
+            <FaFire />
+            Optimization Engine
+          </span>
+          <span className="energy-insight-data-days">
+            Performance analysis
+          </span>
+        </div>
+      </div>
+    )}
+  </div>
+);
               <div className="optimization-status">
                 <div className="status-badge active">Active Analysis</div>
               </div>
