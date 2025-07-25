@@ -519,6 +519,7 @@ const OptimizationInsightCard = ({ data, isLoading, dataQuality, progress }) => 
               <div className="insufficient-message">{data.message}</div>
             </div>
           ) : (
+          ) : (
             <>
               <div className="optimization-status">
                 <div className="status-badge active">Active Analysis</div>
@@ -535,7 +536,7 @@ const OptimizationInsightCard = ({ data, isLoading, dataQuality, progress }) => 
       )}
     </div>
     {/* Data Quality Status */}
-    {dataQuality?.level !== 'insufficient' && !isLoading && (
+    {progress.isReady && !isLoading && (
       <div className="energy-insight-data-status">
         <div className="energy-insight-data-status-indicator">
           <span className={`energy-insight-data-quality ${dataQuality?.level || 'minimal'}`}>
