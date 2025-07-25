@@ -1,24 +1,24 @@
-/* components/Stats/EnergyIntelligence.css - Enhanced Free User Energy Intelligence Styling */
+/* components/Stats/EnergyIntelligence.css - Enhanced Free User Energy Intelligence Styling - CONGRUENT WITH PREMIUM DESIGN */
 
-/* Main Energy Intelligence Section */
+/* UPDATED: Main Energy Intelligence Section - Match Premium Personalized Insights Container */
 .energy-intelligence-section {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  border: 1px solid var(--border);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Header Section */
+/* UPDATED: Header Section - Match Premium Insights Header */
 .energy-intelligence-header {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  text-align: center;
-  margin-bottom: var(--spacing-md);
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: 0;
 }
 
 .energy-header-main {
@@ -31,11 +31,13 @@
 
 .energy-intelligence-header h3 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--text);
   font-weight: 600;
+  padding: var(--spacing-lg) 0;
 }
 
+/* UPDATED: Data Quality Badge - Match Premium Style */
 .energy-data-quality {
   display: flex;
   align-items: center;
@@ -86,13 +88,31 @@
   font-weight: 500;
 }
 
-.energy-header-subtitle {
-  font-size: 0.875rem;
+/* UPDATED: Energy Info Banner - Match Stats Info Banner Exactly */
+.energy-info-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
   color: var(--text-secondary);
-  font-style: italic;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.4;
 }
 
-/* Current Energy Display */
+.energy-info-banner .info-icon {
+  font-size: 1rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* UPDATED: Current Energy Display - Match Premium Current Metric Average */
 .current-energy-display {
   display: flex;
   justify-content: center;
@@ -102,31 +122,23 @@
 .energy-average-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-xl);
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  min-width: 280px;
+  align-items: center;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  min-height: 120px;
   transition: all 0.3s ease;
   position: relative;
-  overflow: hidden;
-}
-
-.energy-average-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.4), transparent);
+  max-width: 320px;
+  width: 100%;
+  justify-content: center;
 }
 
 .energy-average-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 221, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .energy-average-label {
@@ -134,18 +146,13 @@
   color: var(--text);
   font-weight: 600;
   text-align: center;
+  line-height: 1.3;
 }
 
 .energy-average-value {
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--primary);
-  text-shadow: 0 0 10px rgba(255, 221, 0, 0.3);
-  transition: transform 0.3s ease;
-}
-
-.energy-average-card:hover .energy-average-value {
-  transform: scale(1.05);
 }
 
 .energy-phase-context {
@@ -153,48 +160,62 @@
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.4;
+  padding: 0 var(--spacing-sm);
 }
 
-/* Insight Selector Tabs */
+/* UPDATED: Insight Selector Tabs - Match Benefit Tracker Pills Exactly */
 .insight-selector-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-xs);
-  background-color: var(--card-background);
-  padding: var(--spacing-xs);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
   margin-bottom: var(--spacing-lg);
 }
 
-.insight-tab {
+.insight-pill-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
   gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: transparent;
-  border: none;
+  padding: var(--spacing-xs);
+  background-color: var(--card-background);
   border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  width: 100%;
+  justify-content: center;
+  max-width: 800px;
+}
+
+/* UPDATED: Insight tabs - Match metric buttons exactly */
+.insight-tab {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: transparent;
+  border: 1px solid transparent;
   color: var(--text-secondary);
+  border-radius: var(--radius-full);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  position: relative;
   outline: none;
+  min-height: 44px;
 }
 
-.insight-tab:hover {
+.insight-tab:hover:not(.active) {
   background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text);
   transform: translateY(-1px);
 }
 
 .insight-tab.active {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.15) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
   box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
 }
@@ -210,29 +231,24 @@
   box-shadow: none;
 }
 
-.tab-icon {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
+/* REMOVED: tab-icon and tab-title classes - no icons in new design */
 
-.tab-title {
-  font-weight: 600;
-}
-
-/* Selected Insight Display */
+/* UPDATED: Selected Insight Display - Match Premium Cards */
 .selected-insight-display {
   min-height: 280px;
   margin-bottom: var(--spacing-lg);
 }
 
+/* UPDATED: Insight cards - Match premium insight cards exactly (no yellow borders, no icons) */
 .insight-content-card {
   background-color: var(--card-background);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -240,24 +256,22 @@
 
 .insight-content-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* UPDATED: Card header - Remove icons, match premium style */
 .insight-card-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 1.125rem;
+  justify-content: center;
   font-weight: 600;
   color: var(--text);
+  font-size: 1rem;
   padding-bottom: var(--spacing-md);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.insight-icon {
-  font-size: 1.25rem;
-  color: var(--primary);
-}
+/* REMOVED: insight-icon class - no icons */
 
 .insight-main-content {
   display: flex;
@@ -265,7 +279,89 @@
   gap: var(--spacing-lg);
 }
 
-/* Pattern Insights Styling */
+/* UPDATED: Loading states - Match premium loading animations */
+.energy-insight-loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  padding: var(--spacing-lg);
+}
+
+.energy-insight-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
+}
+
+.energy-insight-loading-helmet {
+  width: 48px;
+  height: 48px;
+  animation: insight-helmet-pulse 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.3));
+}
+
+.energy-insight-loading-helmet-fallback {
+  font-size: 2.5rem;
+  animation: insight-helmet-pulse 1.2s ease-in-out infinite;
+  color: var(--primary);
+}
+
+@keyframes insight-helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+}
+
+.energy-insight-loading-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.energy-insight-loading-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.energy-insight-loading-dots {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.energy-insight-loading-dots span {
+  width: 6px;
+  height: 6px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  animation: insight-loading-bounce 1.4s ease-in-out infinite both;
+}
+
+.energy-insight-loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.energy-insight-loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.energy-insight-loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes insight-loading-bounce {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Pattern Insights Styling - Keep existing styling but remove icons */
 .pattern-status {
   display: flex;
   justify-content: center;
@@ -536,11 +632,7 @@
   padding: var(--spacing-xl);
 }
 
-.info-icon {
-  font-size: 2rem;
-  color: var(--primary);
-  opacity: 0.7;
-}
+/* REMOVED: info-icon class - no icons */
 
 .insufficient-message {
   font-size: 1rem;
@@ -587,6 +679,57 @@
 .optimization-rec:hover {
   background-color: rgba(255, 255, 255, 0.04);
   transform: translateY(-1px);
+}
+
+/* UPDATED: Data Quality Status - Match Premium Style */
+.energy-insight-data-status {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.energy-insight-data-status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.energy-insight-data-quality {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  transition: all 0.3s ease;
+}
+
+.energy-insight-data-quality:hover {
+  transform: scale(1.05);
+}
+
+.energy-insight-data-quality.minimal,
+.energy-insight-data-quality.good,
+.energy-insight-data-quality.rich {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+.energy-insight-data-quality.insufficient {
+  background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  color: var(--text-secondary);
+}
+
+.energy-insight-data-days {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 /* Premium Correlations Preview */
@@ -805,34 +948,16 @@
   box-shadow: none;
 }
 
-/* Shimmer effect for loading states */
-.loading-shimmer {
-  background: linear-gradient(90deg, 
-    rgba(255, 255, 255, 0.0) 0%, 
-    rgba(255, 255, 255, 0.1) 50%, 
-    rgba(255, 255, 255, 0.0) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .energy-intelligence-section {
-    padding: var(--spacing-lg);
-    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    margin: var(--spacing-lg) 0;
   }
 
   .energy-intelligence-header h3 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
   }
 
   .energy-header-main {
@@ -845,35 +970,39 @@
   }
 
   .energy-average-card {
-    min-width: 240px;
-    padding: var(--spacing-lg);
+    max-width: 100%;
+    min-height: 100px;
+    padding: var(--spacing-md);
   }
 
   .energy-average-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 
-  .insight-selector-tabs {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-xs);
+  /* UPDATED: Mobile tabs - horizontal scroll like benefit tracker */
+  .insight-pill-container {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: var(--spacing-md);
+  }
+
+  .insight-pill-container::-webkit-scrollbar {
+    display: none;
   }
 
   .insight-tab {
+    white-space: nowrap;
+    min-width: fit-content;
+    flex-shrink: 0;
     padding: var(--spacing-sm);
     font-size: 0.8rem;
     min-height: 40px;
   }
 
-  .tab-title {
-    display: none;
-  }
-
-  .tab-icon {
-    font-size: 1.125rem;
-  }
-
   .insight-content-card {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
     gap: var(--spacing-md);
   }
 
@@ -926,25 +1055,53 @@
     min-width: 140px;
     min-height: 44px;
   }
+
+  /* UPDATED: Mobile energy info banner - match Stats mobile styling */
+  .energy-info-banner {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+
+  .energy-info-banner .info-icon {
+    align-self: center;
+    margin-top: 0;
+  }
+
+  /* UPDATED: Mobile data status indicators */
+  .energy-insight-data-status-indicator {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+
+  .energy-insight-data-quality {
+    font-size: 0.7rem;
+    align-self: center;
+  }
+
+  .energy-insight-data-days {
+    font-size: 0.7rem;
+  }
 }
 
 @media (max-width: 480px) {
   .energy-intelligence-section {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     gap: var(--spacing-sm);
   }
 
   .energy-intelligence-header h3 {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
 
   .energy-average-card {
     min-width: 200px;
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
   }
 
   .energy-average-value {
-    font-size: 1.75rem;
+    font-size: 1.25rem;
   }
 
   .energy-average-label {
@@ -955,32 +1112,20 @@
     font-size: 0.8rem;
   }
 
-  .insight-selector-tabs {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .insight-tab {
     padding: var(--spacing-xs);
     font-size: 0.75rem;
     min-height: 36px;
   }
 
-  .tab-icon {
-    font-size: 1rem;
-  }
-
   .insight-content-card {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     gap: var(--spacing-sm);
   }
 
   .insight-card-header {
     font-size: 0.9rem;
     gap: var(--spacing-xs);
-  }
-
-  .insight-icon {
-    font-size: 1rem;
   }
 
   .pattern-insight,
@@ -1052,15 +1197,13 @@
   }
 
   .upgrade-helmet-small,
-  .upgrade-helmet-small-fallback {
+  .upgrade-helmet-small-fallback,
+  .energy-insight-loading-helmet,
+  .energy-insight-loading-helmet-fallback {
     animation: none !important;
   }
 
   .energy-upgrade-btn::before {
-    animation: none !important;
-  }
-
-  .loading-shimmer {
     animation: none !important;
   }
 
