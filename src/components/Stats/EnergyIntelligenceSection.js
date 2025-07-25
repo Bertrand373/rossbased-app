@@ -1,6 +1,6 @@
-// components/Stats/EnergyIntelligenceSection.js - Enhanced Free User Energy Intelligence UI - CONGRUENT WITH PREMIUM DESIGN
+// components/Stats/EnergyIntelligenceSection.js - Final Congruent Design with Premium Progress Indicator
 import React, { useState, useMemo } from 'react';
-import { FaFire, FaStar, FaLock, FaInfoCircle } from 'react-icons/fa';
+import { FaFire, FaStar, FaLock, FaInfoCircle, FaChartLine, FaBrain, FaRocket, FaEye } from 'react-icons/fa';
 import { generateFreeUserEnergyAnalysis } from './StatsEnergyIntelligence';
 import { renderTextWithBold } from './StatsUtils';
 import helmetImage from '../../assets/helmet.png';
@@ -19,6 +19,12 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
     generateFreeUserEnergyAnalysis(userData, 'week'), 
     [userData]
   );
+
+  // Calculate progress indicator data
+  const trackedDays = userData.benefitTracking?.length || 0;
+  const targetDays = 14;
+  const progressPercentage = Math.min((trackedDays / targetDays) * 100, 100);
+  const isAnalyticsReady = trackedDays >= targetDays;
 
   // Simulate loading when switching tabs
   const handleTabSwitch = (insightId) => {
@@ -57,25 +63,41 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
 
   return (
     <div className="energy-intelligence-section">
-      {/* UPDATED: Header with Data Quality Badge - Match Premium Style */}
+      {/* Header - Clean like Premium */}
       <div className="energy-intelligence-header">
-        <div className="energy-header-main">
-          <h3>Energy Intelligence</h3>
-          <div className={`energy-data-quality ${energyAnalysis.dataQuality.level}`}>
-            <FaFire className="quality-icon" />
-            <span>{energyAnalysis.dataQuality.label}</span>
-            <span className="quality-days">({energyAnalysis.dataQuality.days} days)</span>
-          </div>
-        </div>
+        <h3>Energy Intelligence</h3>
       </div>
 
-      {/* UPDATED: Info Banner - Match Stats Info Banner Style */}
+      {/* UPDATED: Premium-style Progress Indicator (replaces data quality badge) */}
+      <div className="energy-data-progress-indicator">
+        <div className="energy-data-progress-header">
+          <div className="energy-data-progress-title">
+            {isAnalyticsReady ? 'Analytics Ready' : 'Building Your Profile'}
+          </div>
+          <div className="energy-data-progress-count">
+            {trackedDays}/{targetDays} days
+          </div>
+        </div>
+        <div className="energy-data-progress-bar">
+          <div 
+            className="energy-data-progress-fill"
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+        {!isAnalyticsReady && (
+          <div className="energy-data-progress-message">
+            Track {targetDays - trackedDays} more days for detailed insights
+          </div>
+        )}
+      </div>
+
+      {/* Info Banner - Match Stats Info Banner Style */}
       <div className="energy-info-banner">
         <FaInfoCircle className="info-icon" />
         <span><strong>Personalized insights from your energy tracking patterns.</strong> Your analysis becomes more detailed as you log daily benefits and track progress over time.</span>
       </div>
 
-      {/* UPDATED: Current Energy Average Display - Match Premium Current Metric Average */}
+      {/* Current Energy Average Display - Match Premium Style */}
       <div className="current-energy-display">
         <div className="energy-average-card">
           <div className="energy-average-label">Your Energy Level (Last 7 Days)</div>
@@ -91,7 +113,7 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
         </div>
       </div>
 
-      {/* UPDATED: Insight Selector Tabs - Match Benefit Tracker Pills */}
+      {/* Insight Selector Tabs - Match Benefit Tracker Pills */}
       <div className="insight-selector-tabs">
         <div className="insight-pill-container">
           {insights.map(insight => (
@@ -109,7 +131,7 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
         </div>
       </div>
 
-      {/* UPDATED: Selected Insight Display - Match Premium Insight Cards */}
+      {/* Selected Insight Display - Match Premium Insight Cards */}
       <div className="selected-insight-display">
         {selectedInsight === 'patterns' && (
           <PatternInsightCard 
@@ -141,41 +163,85 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
         )}
       </div>
 
-      {/* Premium Upgrade Preview */}
-      <div className="premium-correlations-preview">
-        <div className="correlations-header">
-          <FaLock className="lock-icon" />
-          <h4>Unlock Multi-Metric Correlations</h4>
+      {/* UPDATED: Quick Risk Check - Match Premium Style (no icon) */}
+      <div className="quick-risk-overview">
+        <div className="quick-risk-card">
+          <div className="quick-risk-header">
+            <span>Quick Risk Check</span>
+          </div>
+          <div className="quick-risk-content">
+            <div className="quick-risk-level">
+              {energyAnalysis.riskPrediction?.score === 'N/A' ? 'N/A' : `${energyAnalysis.riskPrediction?.level || 'Low'} Risk`}
+            </div>
+            <div className="quick-risk-description">
+              {energyAnalysis.riskPrediction?.score === 'N/A' ? 
+                'Track energy for 3+ days to unlock personalized risk assessment with your relapse history.' :
+                'Basic risk level calculated. Energy Intelligence above provides detailed analysis and personal vulnerability insights.'
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CONSOLIDATED: Single Premium Upgrade Section */}
+      <div className="energy-premium-upgrade">
+        <div className="energy-upgrade-header">
+          <FaLock className="energy-upgrade-lock-icon" />
+          <h4>Complete Energy Mastery</h4>
         </div>
         
-        <div className="correlations-grid">
-          {energyAnalysis.upgradePreview.correlations.map((correlation, index) => (
-            <div key={index} className="correlation-preview-card locked">
-              <div className="correlation-title">{correlation.title}</div>
-              <div className="correlation-description">{correlation.description}</div>
-              <FaLock className="correlation-lock" />
+        <div className="energy-upgrade-features">
+          <div className="energy-upgrade-feature">
+            <FaChartLine className="energy-upgrade-feature-icon" />
+            <div className="energy-upgrade-feature-text">
+              <div className="energy-upgrade-feature-title">Multi-Metric Charts</div>
+              <div className="energy-upgrade-feature-desc">Energy, Focus, Confidence, Aura, Sleep & Workout tracking</div>
             </div>
-          ))}
+          </div>
+          
+          <div className="energy-upgrade-feature">
+            <FaBrain className="energy-upgrade-feature-icon" />
+            <div className="energy-upgrade-feature-text">
+              <div className="energy-upgrade-feature-title">Advanced AI Insights</div>
+              <div className="energy-upgrade-feature-desc">Pattern recognition across all metrics with optimization timing</div>
+            </div>
+          </div>
+          
+          <div className="energy-upgrade-feature">
+            <FaFire className="energy-upgrade-feature-icon" />
+            <div className="energy-upgrade-feature-text">
+              <div className="energy-upgrade-feature-title">Phase Evolution Analysis</div>
+              <div className="energy-upgrade-feature-desc">Track how all benefits evolve through retention phases</div>
+            </div>
+          </div>
+          
+          <div className="energy-upgrade-feature">
+            <FaRocket className="energy-upgrade-feature-icon" />
+            <div className="energy-upgrade-feature-text">
+              <div className="energy-upgrade-feature-title">Smart Correlations</div>
+              <div className="energy-upgrade-feature-desc">Discover hidden connections between all your metrics</div>
+            </div>
+          </div>
         </div>
 
-        <div className="upgrade-action-section">
-          <div className="upgrade-helmet-container">
+        <div className="energy-upgrade-cta">
+          <div className="energy-upgrade-helmet-container">
             <img 
               src={helmetImage} 
               alt="Premium Intelligence" 
-              className="upgrade-helmet-small"
+              className="energy-upgrade-helmet"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'block';
               }}
             />
-            <div className="upgrade-helmet-small-fallback" style={{display: 'none'}}>🧠</div>
+            <div className="energy-upgrade-helmet-fallback" style={{display: 'none'}}>🧠</div>
           </div>
           
-          <div className="upgrade-content">
-            <div className="upgrade-title">Complete Energy Mastery</div>
-            <div className="upgrade-description">
-              Track 6 metrics, unlock correlations, get optimization timing, and receive phase-specific strategies
+          <div className="energy-upgrade-content">
+            <div className="energy-upgrade-title">Unlock Premium Intelligence</div>
+            <div className="energy-upgrade-description">
+              Get complete multi-metric analysis, advanced correlations, and phase-specific optimization strategies for your retention journey.
             </div>
           </div>
           
@@ -194,7 +260,7 @@ const EnergyIntelligenceSection = ({ userData, onUpgradeClick }) => {
   );
 };
 
-// UPDATED: Individual Insight Card Components - Match Premium Style (No Icons)
+// Individual Insight Card Components - Match Premium Style (No Icons)
 const PatternInsightCard = ({ data, isLoading, dataQuality }) => (
   <div className="insight-content-card patterns">
     <div className="insight-card-header">
@@ -235,7 +301,7 @@ const PatternInsightCard = ({ data, isLoading, dataQuality }) => (
         </>
       )}
     </div>
-    {/* UPDATED: Data Quality Status - Match Premium Style */}
+    {/* Data Quality Status - Match Premium Style */}
     {dataQuality?.level !== 'insufficient' && !isLoading && (
       <div className="energy-insight-data-status">
         <div className="energy-insight-data-status-indicator">
@@ -277,7 +343,7 @@ const PhaseInsightCard = ({ data, isLoading, dataQuality }) => (
         </>
       )}
     </div>
-    {/* UPDATED: Data Quality Status */}
+    {/* Data Quality Status */}
     {dataQuality?.level !== 'insufficient' && !isLoading && (
       <div className="energy-insight-data-status">
         <div className="energy-insight-data-status-indicator">
@@ -331,7 +397,7 @@ const RiskInsightCard = ({ data, isLoading, dataQuality }) => (
         </>
       )}
     </div>
-    {/* UPDATED: Data Quality Status */}
+    {/* Data Quality Status */}
     {dataQuality?.level !== 'insufficient' && !isLoading && (
       <div className="energy-insight-data-status">
         <div className="energy-insight-data-status-indicator">
@@ -378,7 +444,7 @@ const OptimizationInsightCard = ({ data, isLoading, dataQuality }) => (
         </>
       )}
     </div>
-    {/* UPDATED: Data Quality Status */}
+    {/* Data Quality Status */}
     {dataQuality?.level !== 'insufficient' && !isLoading && (
       <div className="energy-insight-data-status">
         <div className="energy-insight-data-status-indicator">
@@ -395,7 +461,7 @@ const OptimizationInsightCard = ({ data, isLoading, dataQuality }) => (
   </div>
 );
 
-// UPDATED: Loading State Component - Match Premium Loading Animations
+// Loading State Component - Match Premium Loading Animations
 const LoadingState = ({ title }) => (
   <div className="energy-insight-loading-state">
     <div className="energy-insight-loading-content">

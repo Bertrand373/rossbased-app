@@ -1,6 +1,6 @@
-/* components/Stats/EnergyIntelligence.css - Enhanced Free User Energy Intelligence Styling - CONGRUENT WITH PREMIUM DESIGN */
+/* components/Stats/EnergyIntelligence.css - Final Congruent Design with Premium Progress Indicator */
 
-/* UPDATED: Main Energy Intelligence Section - Match Premium Personalized Insights Container */
+/* Main Energy Intelligence Section - Match Premium Personalized Insights Container */
 .energy-intelligence-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -12,21 +12,13 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Header Section - Match Premium Insights Header */
+/* Header Section - Clean like Premium */
 .energy-intelligence-header {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
   margin-bottom: 0;
-}
-
-.energy-header-main {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  flex-wrap: wrap;
 }
 
 .energy-intelligence-header h3 {
@@ -37,58 +29,90 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* UPDATED: Data Quality Badge - Match Premium Style */
-.energy-data-quality {
+/* UPDATED: Premium-style Progress Indicator (replaces data quality badge) */
+.energy-data-progress-indicator {
   display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
+}
+
+.energy-data-progress-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
+}
+
+.energy-data-progress-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.energy-data-progress-count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-}
-
-.energy-data-quality.insufficient {
-  background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.15) 100%);
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  color: var(--text-secondary);
-}
-
-.energy-data-quality.basic,
-.energy-data-quality.good,
-.energy-data-quality.rich {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.15) 100%);
   border: 1px solid rgba(255, 221, 0, 0.2);
-  color: var(--primary);
+  white-space: nowrap;
 }
 
-.energy-data-quality:hover {
-  transform: scale(1.05);
-  animation: quality-pulse 0.6s ease-in-out;
+.energy-data-progress-bar {
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-@keyframes quality-pulse {
-  0%, 100% {
-    transform: scale(1);
+.energy-data-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, rgba(255, 221, 0, 0.8) 100%);
+  border-radius: var(--radius-full);
+  transition: width 0.8s ease-out;
+  box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
+  position: relative;
+}
+
+.energy-data-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    transparent 100%);
+  animation: progress-shimmer 2s infinite;
+}
+
+@keyframes progress-shimmer {
+  0% {
+    transform: translateX(-100%);
   }
-  50% {
-    transform: scale(1.05);
+  100% {
+    transform: translateX(100%);
   }
 }
 
-.quality-icon {
-  font-size: 0.875rem;
+.energy-data-progress-message {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
 }
 
-.quality-days {
-  opacity: 0.8;
-  font-weight: 500;
-}
-
-/* UPDATED: Energy Info Banner - Match Stats Info Banner Exactly */
+/* Energy Info Banner - Match Stats Info Banner */
 .energy-info-banner {
   display: flex;
   align-items: center;
@@ -112,7 +136,7 @@
   flex-shrink: 0;
 }
 
-/* UPDATED: Current Energy Display - Match Premium Current Metric Average */
+/* Current Energy Display - Match Premium Current Metric Average */
 .current-energy-display {
   display: flex;
   justify-content: center;
@@ -163,7 +187,7 @@
   padding: 0 var(--spacing-sm);
 }
 
-/* UPDATED: Insight Selector Tabs - Match Benefit Tracker Pills Exactly */
+/* Insight Selector Tabs - Match Benefit Tracker Pills */
 .insight-selector-tabs {
   display: flex;
   flex-direction: column;
@@ -186,7 +210,6 @@
   max-width: 800px;
 }
 
-/* UPDATED: Insight tabs - Match metric buttons exactly */
 .insight-tab {
   flex: 1;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -231,15 +254,13 @@
   box-shadow: none;
 }
 
-/* REMOVED: tab-icon and tab-title classes - no icons in new design */
-
-/* UPDATED: Selected Insight Display - Match Premium Cards */
+/* Selected Insight Display */
 .selected-insight-display {
   min-height: 280px;
   margin-bottom: var(--spacing-lg);
 }
 
-/* UPDATED: Insight cards - Match premium insight cards exactly (no yellow borders, no icons) */
+/* Insight cards - Match premium style (no yellow borders, no icons) */
 .insight-content-card {
   background-color: var(--card-background);
   border: 1px solid var(--border);
@@ -259,7 +280,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Card header - Remove icons, match premium style */
+/* Card header - No icons, match premium style */
 .insight-card-header {
   display: flex;
   align-items: center;
@@ -271,15 +292,299 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* REMOVED: insight-icon class - no icons */
-
 .insight-main-content {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Loading states - Match premium loading animations */
+/* UPDATED: Quick Risk Check Card - Match Premium Style (no icon) */
+.quick-risk-overview {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-xl) 0;
+}
+
+.quick-risk-card {
+  background-color: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  max-width: 500px;
+  width: 100%;
+}
+
+.quick-risk-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* UPDATED: Risk header - No icon, match premium style */
+.quick-risk-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1rem;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.quick-risk-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.quick-risk-level {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.quick-risk-description {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+/* CONSOLIDATED: Single Premium Upgrade Section */
+.energy-premium-upgrade {
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.energy-premium-upgrade::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.4), transparent);
+}
+
+.energy-premium-upgrade:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.energy-upgrade-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.energy-upgrade-header h4 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.energy-upgrade-lock-icon {
+  font-size: 1.25rem;
+  color: var(--primary);
+}
+
+.energy-upgrade-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.energy-upgrade-feature {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  opacity: 0.8;
+}
+
+.energy-upgrade-feature:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.energy-upgrade-feature-icon {
+  font-size: 1.5rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.energy-upgrade-feature-text {
+  flex: 1;
+}
+
+.energy-upgrade-feature-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.energy-upgrade-feature-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.energy-upgrade-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.energy-upgrade-helmet-container {
+  flex-shrink: 0;
+}
+
+.energy-upgrade-helmet {
+  width: 60px;
+  height: 60px;
+  animation: helmet-pulse 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+.energy-upgrade-helmet-fallback {
+  font-size: 2.5rem;
+  color: var(--primary);
+  animation: helmet-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
+}
+
+.energy-upgrade-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.energy-upgrade-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.energy-upgrade-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.energy-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: var(--primary);
+  border: none;
+  border-radius: var(--radius-full);
+  color: #000000;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  min-width: 160px;
+  min-height: 48px;
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+  flex-shrink: 0;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.energy-upgrade-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.energy-upgrade-btn:hover::before {
+  left: 100%;
+}
+
+.energy-upgrade-btn:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 221, 0, 0.4);
+  color: #000000;
+}
+
+.energy-upgrade-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+}
+
+.energy-upgrade-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 221, 0, 0.1);
+}
+
+.energy-upgrade-btn:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Loading states - Match premium */
 .energy-insight-loading-state {
   display: flex;
   align-items: center;
@@ -361,7 +666,7 @@
   }
 }
 
-/* Pattern Insights Styling - Keep existing styling but remove icons */
+/* Pattern Insights, Phase Intelligence, Risk, Optimization styles remain the same */
 .pattern-status {
   display: flex;
   justify-content: center;
@@ -632,8 +937,6 @@
   padding: var(--spacing-xl);
 }
 
-/* REMOVED: info-icon class - no icons */
-
 .insufficient-message {
   font-size: 1rem;
   color: var(--text-secondary);
@@ -681,7 +984,7 @@
   transform: translateY(-1px);
 }
 
-/* UPDATED: Data Quality Status - Match Premium Style */
+/* Data Quality Status - Match Premium Style */
 .energy-insight-data-status {
   margin-top: var(--spacing-md);
   padding-top: var(--spacing-md);
@@ -732,222 +1035,6 @@
   font-weight: 500;
 }
 
-/* Premium Correlations Preview */
-.premium-correlations-preview {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  margin-top: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-correlations-preview::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.4), transparent);
-}
-
-.correlations-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
-}
-
-.correlations-header h4 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  font-weight: 600;
-}
-
-.lock-icon {
-  font-size: 1.125rem;
-  color: var(--primary);
-}
-
-.correlations-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
-}
-
-.correlation-preview-card {
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  text-align: center;
-  position: relative;
-  transition: all 0.3s ease;
-  opacity: 0.7;
-}
-
-.correlation-preview-card:hover {
-  opacity: 1;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.correlation-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-sm);
-}
-
-.correlation-description {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: var(--spacing-md);
-}
-
-.correlation-lock {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  font-size: 0.875rem;
-  color: var(--primary);
-}
-
-/* Upgrade Action Section */
-.upgrade-action-section {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xl);
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  transition: all 0.3s ease;
-}
-
-.upgrade-action-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 221, 0, 0.15);
-}
-
-.upgrade-helmet-container {
-  flex-shrink: 0;
-}
-
-.upgrade-helmet-small {
-  width: 60px;
-  height: 60px;
-  animation: helmet-pulse 2.5s ease-in-out infinite;
-  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
-}
-
-.upgrade-helmet-small-fallback {
-  font-size: 2.5rem;
-  color: var(--primary);
-  animation: helmet-pulse 2.5s ease-in-out infinite;
-}
-
-@keyframes helmet-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.95);
-  }
-}
-
-.upgrade-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.upgrade-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-}
-
-.upgrade-description {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.energy-upgrade-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
-  background-color: var(--primary);
-  border: none;
-  border-radius: var(--radius-full);
-  color: #000000;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  min-width: 160px;
-  min-height: 48px;
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
-  flex-shrink: 0;
-  outline: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.energy-upgrade-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.energy-upgrade-btn:hover::before {
-  left: 100%;
-}
-
-.energy-upgrade-btn:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 221, 0, 0.4);
-  color: #000000;
-}
-
-.energy-upgrade-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
-}
-
-.energy-upgrade-btn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(255, 221, 0, 0.1);
-}
-
-.energy-upgrade-btn:focus:not(:focus-visible) {
-  outline: none;
-  box-shadow: none;
-}
-
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .energy-intelligence-section {
@@ -960,15 +1047,6 @@
     padding: var(--spacing-md) 0;
   }
 
-  .energy-header-main {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
-
-  .energy-data-quality {
-    font-size: 0.7rem;
-  }
-
   .energy-average-card {
     max-width: 100%;
     min-height: 100px;
@@ -979,7 +1057,7 @@
     font-size: 1.5rem;
   }
 
-  /* UPDATED: Mobile tabs - horizontal scroll like benefit tracker */
+  /* Mobile tabs - horizontal scroll like benefit tracker */
   .insight-pill-container {
     justify-content: flex-start;
     overflow-x: auto;
@@ -1021,31 +1099,51 @@
     gap: var(--spacing-sm);
   }
 
-  .correlations-grid {
+  .quick-risk-card {
+    padding: var(--spacing-md);
+    margin: var(--spacing-lg) 0;
+  }
+
+  .quick-risk-header {
+    font-size: 1rem;
+    padding-bottom: var(--spacing-sm);
+  }
+
+  .quick-risk-level {
+    font-size: 1.25rem;
+    padding: var(--spacing-sm);
+  }
+
+  .quick-risk-description {
+    font-size: 0.8rem;
+    padding: var(--spacing-sm);
+  }
+
+  .energy-upgrade-features {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
   }
 
-  .upgrade-action-section {
+  .energy-upgrade-cta {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-lg);
   }
 
-  .upgrade-helmet-small {
+  .energy-upgrade-helmet {
     width: 50px;
     height: 50px;
   }
 
-  .upgrade-helmet-small-fallback {
+  .energy-upgrade-helmet-fallback {
     font-size: 2rem;
   }
 
-  .upgrade-title {
+  .energy-upgrade-title {
     font-size: 1.125rem;
   }
 
-  .upgrade-description {
+  .energy-upgrade-description {
     font-size: 0.8rem;
   }
 
@@ -1056,7 +1154,7 @@
     min-height: 44px;
   }
 
-  /* UPDATED: Mobile energy info banner - match Stats mobile styling */
+  /* Mobile info banner - match Stats mobile styling */
   .energy-info-banner {
     flex-direction: column;
     gap: var(--spacing-xs);
@@ -1068,7 +1166,7 @@
     margin-top: 0;
   }
 
-  /* UPDATED: Mobile data status indicators */
+  /* Mobile data status indicators */
   .energy-insight-data-status-indicator {
     flex-direction: column;
     gap: var(--spacing-xs);
@@ -1082,6 +1180,17 @@
 
   .energy-insight-data-days {
     font-size: 0.7rem;
+  }
+
+  /* Mobile progress indicator */
+  .energy-data-progress-header {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+
+  .energy-data-progress-count {
+    align-self: center;
   }
 }
 
@@ -1145,36 +1254,55 @@
     min-width: 140px;
   }
 
-  .correlation-preview-card {
-    padding: var(--spacing-md);
+  .quick-risk-card {
+    padding: var(--spacing-sm);
   }
 
-  .correlation-title {
+  .quick-risk-header {
     font-size: 0.9rem;
+    flex-direction: column;
+    gap: var(--spacing-xs);
   }
 
-  .correlation-description {
+  .energy-upgrade-header h4 {
+    font-size: 1.25rem;
+  }
+
+  .energy-upgrade-feature {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+
+  .energy-upgrade-feature-icon {
+    font-size: 1.25rem;
+  }
+
+  .energy-upgrade-feature-title {
     font-size: 0.8rem;
   }
 
-  .upgrade-action-section {
-    padding: var(--spacing-lg);
+  .energy-upgrade-feature-desc {
+    font-size: 0.7rem;
   }
 
-  .upgrade-helmet-small {
+  .energy-upgrade-cta {
+    padding: var(--spacing-md);
+  }
+
+  .energy-upgrade-helmet {
     width: 40px;
     height: 40px;
   }
 
-  .upgrade-helmet-small-fallback {
+  .energy-upgrade-helmet-fallback {
     font-size: 1.75rem;
   }
 
-  .upgrade-title {
+  .energy-upgrade-title {
     font-size: 1rem;
   }
 
-  .upgrade-description {
+  .energy-upgrade-description {
     font-size: 0.75rem;
   }
 
@@ -1196,18 +1324,15 @@
     transition-duration: 0.01ms !important;
   }
 
-  .upgrade-helmet-small,
-  .upgrade-helmet-small-fallback,
+  .energy-upgrade-helmet,
+  .energy-upgrade-helmet-fallback,
   .energy-insight-loading-helmet,
   .energy-insight-loading-helmet-fallback {
     animation: none !important;
   }
 
-  .energy-upgrade-btn::before {
-    animation: none !important;
-  }
-
-  .energy-data-quality:hover {
+  .energy-upgrade-btn::before,
+  .energy-data-progress-fill::after {
     animation: none !important;
   }
 }
