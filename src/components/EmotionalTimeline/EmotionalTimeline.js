@@ -1699,4 +1699,4 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default
+export default;
