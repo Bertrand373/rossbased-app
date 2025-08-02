@@ -358,7 +358,7 @@
   gap: var(--spacing-md);
 }
 
-/* Timeline phases with proper color inheritance and lock states */
+/* Timeline phases with proper color inheritance and lock states - ENHANCED hover effects from Stats */
 .timeline-phase {
   display: flex;
   align-items: center;
@@ -367,7 +367,7 @@
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-lg);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease; /* ENHANCED: Smoother transition */
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -383,10 +383,11 @@
   background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
 }
 
+/* ENHANCED: Subtle hover effects from Stats pattern */
 .timeline-phase:hover {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border-color: rgba(255, 221, 0, 0.1);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.04); /* ENHANCED: Subtle background like Stats */
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px); /* ENHANCED: Subtle movement from Stats */
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
@@ -396,11 +397,15 @@
   border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
-/* UPDATED: Current timeline phase - Yellow pilled background like main buttons */
+/* UPDATED: Current timeline phase - Clean background with yellow glowing pill */
 .timeline-phase.current {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  transform: scale(1.02);
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%); /* REMOVED: Yellow tint */
+  border: 1px solid rgba(255, 255, 255, 0.05); /* REMOVED: Yellow border */
+  transform: none; /* REMOVED: Scale transform */
+}
+
+.timeline-phase.current:hover {
+  transform: translateY(-1px); /* ENHANCED: Consistent with other phases */
 }
 
 .timeline-phase.upcoming {
@@ -408,8 +413,8 @@
 }
 
 .timeline-phase.upcoming:hover {
-  transform: none;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  transform: translateY(-1px); /* ENHANCED: Subtle movement for upcoming */
+  background: rgba(255, 255, 255, 0.02); /* ENHANCED: Subtle hover for upcoming */
 }
 
 /* Timeline phase icon with color inheritance */
@@ -448,21 +453,32 @@
   flex-shrink: 0;
 }
 
-/* FIXED: Current phase indicator - styled like urge toolkit phase indicator with transparent background and colored border */
+/* REDESIGNED: Yellow glowing "Current" pill matching main menu style */
 .timeline-phase-current {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   flex-shrink: 0;
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, 
-    color-mix(in srgb, var(--current-phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
-    var(--card-background) 100%
-  );
-  border: 1px solid color-mix(in srgb, var(--current-phase-color, var(--primary)) 20%, var(--border));
-  color: color-mix(in srgb, var(--current-phase-color, var(--primary)) 90%, var(--text)) !important;
+  /* MAIN MENU STYLE: Yellow glowing pill */
+  background: linear-gradient(135deg, var(--primary) 0%, rgba(255, 221, 0, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #000000 !important; /* Black text like main menu */
   text-shadow: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 12px rgba(255, 221, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: current-phase-glow 2s ease-in-out infinite;
+}
+
+/* MAIN MENU STYLE: Glowing animation */
+@keyframes current-phase-glow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(255, 221, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 221, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* Lock indicator for non-premium users */
@@ -494,14 +510,14 @@
   gap: var(--spacing-lg);
 }
 
-/* REDESIGNED: Much cleaner mastery level cards */
+/* REDESIGNED: Much cleaner mastery level cards - ENHANCED hover effects from Stats */
 .mastery-level-card {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease; /* ENHANCED: Smoother transition */
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -520,11 +536,12 @@
   background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
 }
 
+/* ENHANCED: Stats-style hover effects with better hierarchy */
 .mastery-level-card:hover {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border-color: rgba(255, 221, 0, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.04); /* ENHANCED: Subtle background like Stats */
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px); /* ENHANCED: Slightly more pronounced for mastery cards */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); /* ENHANCED: Better shadow depth */
 }
 
 .mastery-level-card.completed {
@@ -543,8 +560,8 @@
 }
 
 .mastery-level-card.upcoming:hover {
-  transform: none;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  transform: translateY(-1px); /* ENHANCED: Subtle movement for upcoming cards */
+  background: rgba(255, 255, 255, 0.02); /* ENHANCED: Subtle hover for upcoming */
 }
 
 /* REDESIGNED: Much larger, cleaner header section */
@@ -1215,18 +1232,25 @@
   font-weight: 500;
 }
 
-/* Enhanced insight card with dynamic states and GLOW ANIMATION */
+/* Enhanced insight card with dynamic states and GLOW ANIMATION - ENHANCED hover from Stats */
 .insight-card {
   background-color: var(--card-background);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  transition: none;
+  transition: all 0.3s ease; /* ENHANCED: Smoother transition */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
   justify-content: center;
+}
+
+/* ENHANCED: Stats-style hover effects */
+.insight-card:hover {
+  background-color: rgba(255, 255, 255, 0.04); /* ENHANCED: Subtle background like Stats */
+  transform: translateY(-2px); /* ENHANCED: Subtle movement */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* ENHANCED: Better shadow depth */
 }
 
 .insight-card.dynamic-insight {
@@ -1322,19 +1346,26 @@
   font-weight: 500;
 }
 
-/* Insight premium teaser */
+/* Insight premium teaser - ENHANCED hover effects */
 .insight-premium-teaser {
   background-color: var(--card-background);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  transition: none;
+  transition: all 0.3s ease; /* ENHANCED: Add transition */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-md);
   text-align: center;
+}
+
+/* ENHANCED: Subtle hover effect */
+.insight-premium-teaser:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .insight-premium-teaser .lock-icon {

@@ -817,8 +817,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                       className={`timeline-phase ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                       onClick={() => isPremium && showPhaseDetails(phase)}
                       style={{ 
-                        cursor: isPremium ? 'pointer' : 'default',
-                        '--current-phase-color': isCurrent ? phase.color : undefined
+                        cursor: isPremium ? 'pointer' : 'default'
                       }}
                     >
                       <div className="timeline-phase-icon" style={{ color: phase.color }}>
@@ -836,12 +835,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                             </div>
                           )}
                           {isCurrent && (
-                            <div 
-                              className="timeline-phase-current" 
-                              style={{ 
-                                '--current-phase-color': phase.color
-                              }}
-                            >
+                            <div className="timeline-phase-current">
                               Current
                             </div>
                           )}
