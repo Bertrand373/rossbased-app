@@ -1,4 +1,4 @@
-// components/Profile/Profile.js - FIXED: Removed redundant streak data and improved mobile layout
+// components/Profile/Profile.js - UPDATED: Removed subscription section, all features free
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -93,7 +93,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       email: feedbackEmail.trim(),
       userData: {
         username: userData.username,
-        isPremium,
+        isPremium: true, // Everyone is premium now
         currentStreak: userData.currentStreak,
         appVersion: '1.0.0'
       },
@@ -118,7 +118,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       profile: {
         username: userData.username,
         memberSince: userData.startDate,
-        isPremium,
+        isPremium: true, // Everyone is premium now
         discordUsername: userData.discordUsername
       },
       streakData: {
@@ -160,25 +160,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     onLogout();
   };
 
-  // Get current plan info
-  const getCurrentPlan = () => {
-    if (isPremium) {
-      return {
-        name: 'Premium',
-        price: '$3.99/month',
-        features: ['All premium features', 'Community access', 'Advanced analytics', 'Priority support']
-      };
-    } else {
-      return {
-        name: 'Free',
-        price: 'Free',
-        features: ['Basic tracking', 'Limited features', 'Standard support']
-      };
-    }
-  };
-
-  const currentPlan = getCurrentPlan();
-
   return (
     <div className="profile-container">
       {/* Header */}
@@ -196,29 +177,27 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       </div>
 
-      {/* FIXED: Profile Overview Card - Removed streak stats completely */}
+      {/* Profile Overview Card - Simplified since all features are free */}
       <div className="profile-overview-card">
         <div className="profile-avatar-section">
           <div className="profile-avatar">
             <FaUser />
-            {isPremium && <div className="premium-crown"><FaCrown /></div>}
+            <div className="premium-crown"><FaCrown /></div>
           </div>
           <div className="profile-basic-info">
             <div className="profile-username">{userData.username}</div>
             <div className="profile-plan">
-              {currentPlan.name} Plan
-              {isPremium && <FaCrown className="plan-crown" />}
+              All Features Unlocked
+              <FaCrown className="plan-crown" />
             </div>
             <div className="profile-member-since">
               Member since {userStats.memberSince}
             </div>
           </div>
         </div>
-        
-        {/* REMOVED: Quick stats section completely - no more redundant streak data */}
       </div>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - REMOVED: Subscription tab */}
       <div className="profile-tabs">
         <button 
           className={`profile-tab ${activeTab === 'account' ? 'active' : ''}`}
@@ -226,13 +205,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         >
           <FaUser />
           <span>Account</span>
-        </button>
-        <button 
-          className={`profile-tab ${activeTab === 'subscription' ? 'active' : ''}`}
-          onClick={() => setActiveTab('subscription')}
-        >
-          <FaCrown />
-          <span>Subscription</span>
         </button>
         <button 
           className={`profile-tab ${activeTab === 'privacy' ? 'active' : ''}`}
@@ -338,87 +310,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Subscription Tab */}
-        {activeTab === 'subscription' && (
-          <div className="subscription-section">
-            <div className="current-plan-card">
-              <div className="plan-header">
-                <h3>Current Plan</h3>
-                <div className={`plan-badge ${isPremium ? 'premium' : 'free'}`}>
-                  {isPremium && <FaCrown />}
-                  {currentPlan.name}
-                </div>
-              </div>
-              
-              <div className="plan-details">
-                <div className="plan-price">{currentPlan.price}</div>
-                <div className="plan-features">
-                  {currentPlan.features.map((feature, index) => (
-                    <div key={index} className="plan-feature">
-                      <FaCheckCircle />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {!isPremium ? (
-                <button className="upgrade-btn">
-                  <FaCrown />
-                  Upgrade to Premium
-                </button>
-              ) : (
-                <div className="subscription-actions">
-                  <button className="manage-btn">
-                    <FaCreditCard />
-                    Manage Billing
-                  </button>
-                  <button className="cancel-btn">
-                    <FaTimes />
-                    Cancel Subscription
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {!isPremium && (
-              <div className="premium-benefits">
-                <h4>Premium Benefits</h4>
-                <div className="benefits-grid">
-                  <div className="benefit-item">
-                    <div className="benefit-icon">📊</div>
-                    <div className="benefit-text">
-                      <div className="benefit-title">Advanced Analytics</div>
-                      <div className="benefit-description">Detailed insights and progress tracking</div>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <div className="benefit-icon">🛡️</div>
-                    <div className="benefit-text">
-                      <div className="benefit-title">Full Urge Toolkit</div>
-                      <div className="benefit-description">Access all emergency management tools</div>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <FaDiscord className="benefit-icon" />
-                    <div className="benefit-text">
-                      <div className="benefit-title">Community Access</div>
-                      <div className="benefit-description">Join the exclusive Discord community</div>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <div className="benefit-icon">⭐</div>
-                    <div className="benefit-text">
-                      <div className="benefit-title">Priority Support</div>
-                      <div className="benefit-description">Get help faster when you need it</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Privacy Tab */}
         {activeTab === 'privacy' && (
           <div className="privacy-section">
@@ -495,7 +386,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* FIXED: Settings Tab - Changed "Language & Region" to just "Language" */}
+        {/* Settings Tab */}
         {activeTab === 'settings' && (
           <div className="settings-section">
             <h3>App Settings</h3>

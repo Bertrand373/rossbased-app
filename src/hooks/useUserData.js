@@ -1,4 +1,4 @@
-// src/hooks/useUserData.js - UPDATED: Using comprehensive mock data + NEW personality-based users
+// src/hooks/useUserData.js - UPDATED: All users are now premium by default
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
@@ -12,14 +12,6 @@ import comprehensiveMockData, {
   enfpMockData
 } from '../mockData';
 
-/**
- * Premium Features Control
- * 
- * Currently all users have premium features enabled for testing purposes.
- * To re-enable premium restrictions, search for "isPremium: true" below
- * and change it back to "isPremium: username === 'premium'"
- */
-
 // Custom hook to manage user data
 export const useUserData = () => {
   const [userData, setUserData] = useState({
@@ -30,7 +22,7 @@ export const useUserData = () => {
     longestStreak: 0,
     wetDreamCount: 0,
     relapseCount: 0,
-    isPremium: false,
+    isPremium: true, // CHANGED: All users are premium now
     badges: [
       { id: 1, name: '7-Day Warrior', earned: false, date: null },
       { id: 2, name: '14-Day Monk', earned: false, date: null },
@@ -56,10 +48,10 @@ export const useUserData = () => {
     wisdomMode: false
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isPremium, setIsPremium] = useState(false);
+  const [isPremium, setIsPremium] = useState(true); // CHANGED: Default to premium
   const [isLoading, setIsLoading] = useState(false);
 
-  // UPDATED: Login function with comprehensive mock data scenarios + NEW personality users
+  // UPDATED: Login function - all users get premium features
   const login = async (username, password = 'demo') => {
     try {
       setIsLoading(true);
@@ -123,9 +115,12 @@ export const useUserData = () => {
           break;
       }
       
+      // CHANGED: Force all users to have premium features
+      mockUserData.isPremium = true;
+      
       setUserData(mockUserData);
       setIsLoggedIn(true);
-      setIsPremium(mockUserData.isPremium);
+      setIsPremium(true); // CHANGED: Always set to premium
       
       // Save to localStorage to persist
       localStorage.setItem('userData', JSON.stringify(mockUserData));
@@ -135,7 +130,7 @@ export const useUserData = () => {
       
       // Show success toast with scenario info
       const scenarioInfo = getScenarioInfo(username);
-      toast.success(`Welcome, ${username}! ${scenarioInfo}`);
+      toast.success(`Welcome, ${username}! ${scenarioInfo} - All features unlocked!`);
       
       return true;
     } catch (err) {
@@ -182,7 +177,7 @@ export const useUserData = () => {
       longestStreak: 0,
       wetDreamCount: 0,
       relapseCount: 0,
-      isPremium: false,
+      isPremium: true, // CHANGED: Keep premium even for empty state
       badges: [
         { id: 1, name: '7-Day Warrior', earned: false, date: null },
         { id: 2, name: '14-Day Monk', earned: false, date: null },
@@ -208,7 +203,7 @@ export const useUserData = () => {
       wisdomMode: false
     });
     setIsLoggedIn(false);
-    setIsPremium(false);
+    setIsPremium(true); // CHANGED: Keep premium even when logged out
     
     // Clear localStorage
     localStorage.removeItem('userData');
@@ -219,13 +214,12 @@ export const useUserData = () => {
 
   const updateUserData = (newData) => {
     try {
-      const updatedData = { ...userData, ...newData };
+      // CHANGED: Ensure isPremium stays true
+      const updatedData = { ...userData, ...newData, isPremium: true };
       setUserData(updatedData);
       
-      // Update premium status if it changed
-      if (newData.isPremium !== undefined) {
-        setIsPremium(newData.isPremium);
-      }
+      // Always keep premium status
+      setIsPremium(true);
       
       // Save to localStorage
       localStorage.setItem('userData', JSON.stringify(updatedData));
@@ -305,9 +299,12 @@ export const useUserData = () => {
         parsedUserData.language = parsedUserData.language || 'en';
         parsedUserData.wisdomMode = parsedUserData.wisdomMode || false;
         
+        // CHANGED: Force premium to true
+        parsedUserData.isPremium = true;
+        
         setUserData(parsedUserData);
         setIsLoggedIn(true);
-        setIsPremium(parsedUserData.isPremium || false);
+        setIsPremium(true); // CHANGED: Always premium
       } catch (err) {
         console.error('Error parsing stored user data:', err);
         localStorage.removeItem('userData');
@@ -319,7 +316,7 @@ export const useUserData = () => {
   return { 
     userData, 
     isLoggedIn, 
-    isPremium, 
+    isPremium: true, // CHANGED: Always return true
     isLoading,
     login, 
     logout, 

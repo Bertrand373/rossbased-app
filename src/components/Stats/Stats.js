@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - COMPLETE REFACTORED: Main Stats Component with Energy Intelligence
+// components/Stats/Stats.js - UPDATED: All features unlocked for everyone
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -79,12 +79,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   // ENHANCED: Defensive programming - ensure userData structure
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
 
-  // Force free users to energy metric on mount and when premium status changes
-  useEffect(() => {
-    if (!isPremium && selectedMetric !== 'energy') {
-      setSelectedMetric('energy');
-    }
-  }, [isPremium, selectedMetric]);
+  // REMOVED: Premium restrictions on metric selection
+  // All users can now access all metrics
 
   // ENHANCED: Simulate loading for insights calculation
   const simulateInsightLoading = useCallback((insightType, duration = 800) => {
@@ -96,38 +92,26 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
   // ENHANCED: Trigger loading when time range or metric changes
   useEffect(() => {
-    if (isPremium) {
-      simulateInsightLoading('urgeManagement', 600);
-      setTimeout(() => simulateInsightLoading('riskPredictor', 700), 200);
-      setTimeout(() => simulateInsightLoading('patternRecognition', 800), 400);
-      setTimeout(() => simulateInsightLoading('optimization', 600), 600);
-      setTimeout(() => simulateInsightLoading('phaseEvolution', 900), 800);
-      
-      // Only load relapse patterns if user has actual relapse data
-      const hasRelapseData = safeUserData.streakHistory?.some(streak => 
-        streak && streak.reason === 'relapse' && streak.trigger
-      );
-      if (hasRelapseData) {
-        setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 1000);
-      }
+    // CHANGED: Always load insights since everyone is premium
+    simulateInsightLoading('urgeManagement', 600);
+    setTimeout(() => simulateInsightLoading('riskPredictor', 700), 200);
+    setTimeout(() => simulateInsightLoading('patternRecognition', 800), 400);
+    setTimeout(() => simulateInsightLoading('optimization', 600), 600);
+    setTimeout(() => simulateInsightLoading('phaseEvolution', 900), 800);
+    
+    // Only load relapse patterns if user has actual relapse data
+    const hasRelapseData = safeUserData.streakHistory?.some(streak => 
+      streak && streak.reason === 'relapse' && streak.trigger
+    );
+    if (hasRelapseData) {
+      setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 1000);
     }
-  }, [timeRange, selectedMetric, isPremium, simulateInsightLoading, safeUserData.streakHistory]);
+  }, [timeRange, selectedMetric, simulateInsightLoading, safeUserData.streakHistory]);
 
-  // Handle metric selection with access control
+  // Handle metric selection - REMOVED: Premium restrictions
   const handleMetricClick = useCallback((metric) => {
-    if (!isPremium && metric !== 'energy') {
-      toast.error('Upgrade to Premium to unlock all benefit metrics', {
-        duration: 3000,
-        style: {
-          background: 'var(--card-background)',
-          color: 'var(--text-primary)',
-          border: '1px solid var(--border)'
-        }
-      });
-      return;
-    }
     setSelectedMetric(metric);
-  }, [isPremium]);
+  }, []);
 
   // NEW: Handle stat card click
   const handleStatCardClick = useCallback((statType) => {
@@ -143,16 +127,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     if (!safeUserData) return {};
     
     return {
-      riskAnalysis: calculateRelapseRisk(safeUserData, timeRange, isPremium),
+      riskAnalysis: calculateRelapseRisk(safeUserData, timeRange, true), // Always premium
       urgeManagement: generateUrgeManagementGuidance(safeUserData, timeRange),
-      patternInsights: generatePatternRecognition(safeUserData, selectedMetric, isPremium),
-      optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, isPremium),
+      patternInsights: generatePatternRecognition(safeUserData, selectedMetric, true), // Always premium
+      optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, true), // Always premium
       dataQuality: calculateDataQuality(safeUserData),
       phaseEvolution: calculatePhaseEvolutionAnalysis(safeUserData, selectedMetric),
       relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
       daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData)
     };
-  }, [safeUserData, timeRange, selectedMetric, isPremium]);
+  }, [safeUserData, timeRange, selectedMetric]);
 
   // Auto-check badges when streak changes
   useEffect(() => {
@@ -282,7 +266,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   }, [safeUserData, updateUserData]);
 
   const handleUpgradeClick = useCallback(() => {
-    toast.success('Premium upgrade coming soon! 🚀');
+    toast.success('All features are now free! 🎉');
   }, []);
 
   // ENHANCED: Memoized chart options
@@ -501,325 +485,207 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Energy
               </button>
               <button 
-                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('focus')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('focus')}
-                disabled={!isPremium}
-                tabIndex={isPremium ? 0 : -1}
+                tabIndex={0}
                 aria-pressed={selectedMetric === 'focus'}
-                aria-label={!isPremium ? "Focus metric - Premium feature" : "Focus metric"}
               >
-                Focus {!isPremium && <FaLock className="metric-lock-icon" />}
+                Focus
               </button>
               <button 
-                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('confidence')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('confidence')}
-                disabled={!isPremium}
-                tabIndex={isPremium ? 0 : -1}
+                tabIndex={0}
                 aria-pressed={selectedMetric === 'confidence'}
-                aria-label={!isPremium ? "Confidence metric - Premium feature" : "Confidence metric"}
               >
-                Confidence {!isPremium && <FaLock className="metric-lock-icon" />}
+                Confidence
               </button>
               <button 
-                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('aura')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('aura')}
-                disabled={!isPremium}
-                tabIndex={isPremium ? 0 : -1}
+                tabIndex={0}
                 aria-pressed={selectedMetric === 'aura'}
-                aria-label={!isPremium ? "Aura metric - Premium feature" : "Aura metric"}
               >
-                Aura {!isPremium && <FaLock className="metric-lock-icon" />}
+                Aura
               </button>
               <button 
-                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('sleep')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('sleep')}
-                disabled={!isPremium}
-                tabIndex={isPremium ? 0 : -1}
+                tabIndex={0}
                 aria-pressed={selectedMetric === 'sleep'}
-                aria-label={!isPremium ? "Sleep Quality metric - Premium feature" : "Sleep Quality metric"}
               >
-                Sleep Quality {!isPremium && <FaLock className="metric-lock-icon" />}
+                Sleep Quality
               </button>
               <button 
-                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''} ${!isPremium ? 'locked' : ''}`}
+                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('workout')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('workout')}
-                disabled={!isPremium}
-                tabIndex={isPremium ? 0 : -1}
+                tabIndex={0}
                 aria-pressed={selectedMetric === 'workout'}
-                aria-label={!isPremium ? "Workout metric - Premium feature" : "Workout metric"}
               >
-                Workout {!isPremium && <FaLock className="metric-lock-icon" />}
+                Workout
               </button>
             </div>
           </div>
           
-          {isPremium && (
-            <div className="time-range-selector-container">
-              <div className="time-range-selector" role="radiogroup" aria-label="Time range selection">
-                <button 
-                  className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
-                  onClick={() => setTimeRange('week')}
-                  onKeyDown={(e) => e.key === 'Enter' && setTimeRange('week')}
-                  tabIndex={0}
-                  role="radio"
-                  aria-checked={timeRange === 'week'}
-                >
-                  Week
-                </button>
-                <button 
-                  className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
-                  onClick={() => setTimeRange('month')}
-                  onKeyDown={(e) => e.key === 'Enter' && setTimeRange('month')}
-                  tabIndex={0}
-                  role="radio"
-                  aria-checked={timeRange === 'month'}
-                >
-                  Month
-                </button>
-                <button 
-                  className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
-                  onClick={() => setTimeRange('quarter')}
-                  onKeyDown={(e) => e.key === 'Enter' && setTimeRange('quarter')}
-                  tabIndex={0}
-                  role="radio"
-                  aria-checked={timeRange === 'quarter'}
-                >
-                  3 Months
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        {/* FREE USER CONTENT - ENHANCED ENERGY INTELLIGENCE */}
-        {!isPremium && (
-          <div className="free-benefit-preview">
-            {/* NEW: Enhanced Energy Intelligence System */}
-            <EnergyIntelligenceSection 
-              userData={safeUserData}
-              onUpgradeClick={handleUpgradeClick}
-            />
-            
-            {/* ENHANCED: Simplified Risk Overview (kept for context) */}
-            <div className="quick-risk-overview">
-              <div className="quick-risk-card">
-                <div className="quick-risk-header">
-                  <FaShieldAlt className="risk-overview-icon" />
-                  <span>Quick Risk Check</span>
-                </div>
-                <div className="quick-risk-content">
-                  <div className="quick-risk-level">
-                    {memoizedInsights.riskAnalysis?.score === 'N/A' ? 'N/A' : `${memoizedInsights.riskAnalysis?.level || 'Low'} Risk`}
-                  </div>
-                  <div className="quick-risk-description">
-                    {memoizedInsights.riskAnalysis?.score === 'N/A' ? 
-                      'Track energy for 3+ days to unlock personalized risk assessment with your relapse history.' :
-                      'Basic risk level calculated. Energy Intelligence above provides detailed analysis and personal vulnerability insights.'
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ENHANCED: Premium Feature Teaser */}
-            <div className="premium-features-teaser">
-              <div className="teaser-header">
-                <img 
-                  src={helmetImage} 
-                  alt="Premium Features" 
-                  className="teaser-helmet-icon"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'block';
-                  }}
-                />
-                <div className="teaser-helmet-fallback" style={{display: 'none'}}>🧠</div>
-                <div className="teaser-content">
-                  <h4>Complete Retention Mastery</h4>
-                  <p>Track 6 metrics, unlock advanced correlations, get predictive analytics, and receive phase-specific optimization strategies.</p>
-                </div>
-              </div>
-              
-              <div className="premium-features-grid">
-                <div className="premium-feature-item">
-                  <FaChartLine className="feature-icon" />
-                  <div className="feature-text">
-                    <div className="feature-title">Multi-Metric Charts</div>
-                    <div className="feature-desc">Energy, Focus, Confidence, Aura, Sleep & Workout tracking</div>
-                  </div>
-                  <FaLock className="feature-lock" />
-                </div>
-                
-                <div className="premium-feature-item">
-                  <FaBrain className="feature-icon" />
-                  <div className="feature-text">
-                    <div className="feature-title">Advanced AI Insights</div>
-                    <div className="feature-desc">Pattern recognition across all metrics with optimization timing</div>
-                  </div>
-                  <FaLock className="feature-lock" />
-                </div>
-                
-                <div className="premium-feature-item">
-                  <FaFire className="feature-icon" />
-                  <div className="feature-text">
-                    <div className="feature-title">Phase Evolution Analysis</div>
-                    <div className="feature-desc">Track how all benefits evolve through retention phases</div>
-                  </div>
-                  <FaLock className="feature-lock" />
-                </div>
-                
-                <div className="premium-feature-item">
-                  <FaRocket className="feature-icon" />
-                  <div className="feature-text">
-                    <div className="feature-title">Smart Urge Management</div>
-                    <div className="feature-desc">Real-time vulnerability assessment with countermeasures</div>
-                  </div>
-                  <FaLock className="feature-lock" />
-                </div>
-              </div>
-              
+          <div className="time-range-selector-container">
+            <div className="time-range-selector" role="radiogroup" aria-label="Time range selection">
               <button 
-                className="main-upgrade-btn" 
-                onClick={handleUpgradeClick}
-                onKeyDown={(e) => e.key === 'Enter' && handleUpgradeClick()}
+                className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
+                onClick={() => setTimeRange('week')}
+                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('week')}
                 tabIndex={0}
+                role="radio"
+                aria-checked={timeRange === 'week'}
               >
-                <FaStar />
-                Unlock Premium Intelligence
-                <span className="upgrade-arrow">→</span>
+                Week
+              </button>
+              <button 
+                className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
+                onClick={() => setTimeRange('month')}
+                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('month')}
+                tabIndex={0}
+                role="radio"
+                aria-checked={timeRange === 'month'}
+              >
+                Month
+              </button>
+              <button 
+                className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
+                onClick={() => setTimeRange('quarter')}
+                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('quarter')}
+                tabIndex={0}
+                role="radio"
+                aria-checked={timeRange === 'quarter'}
+              >
+                3 Months
               </button>
             </div>
           </div>
-        )}
+        </div>
         
-        {/* PREMIUM USER CONTENT */}
-        {isPremium && (
-          <>
-            <div className="chart-and-insight-container" ref={insightsStartRef}>
-              <div className="chart-container">
-                {(() => {
-                  const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
-                  const hasAnyData = chartData.datasets[0].data.some(val => val !== null);
-                  
-                  if (!hasAnyData) {
-                    return (
-                      <div className="no-chart-data">
-                        <div className="no-data-icon">
-                          <FaChartLine />
-                        </div>
-                        <div className="no-data-text">
-                          <h4>No Chart Data Available</h4>
-                          <p>Start logging your {selectedMetric} benefits to see your progress visualization.</p>
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  return <Line data={chartData} options={chartOptions} height={300} />;
-                })()}
-              </div>
+        <div className="chart-and-insight-container" ref={insightsStartRef}>
+          <div className="chart-container">
+            {(() => {
+              const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
+              const hasAnyData = chartData.datasets[0].data.some(val => val !== null);
               
-              <div className="current-insight-sidebar">
-                <div className="current-metric-average">
-                  <div className="current-metric-label">
-                    Your {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} {getTimeRangeDisplayText(timeRange)}
+              if (!hasAnyData) {
+                return (
+                  <div className="no-chart-data">
+                    <div className="no-data-icon">
+                      <FaChartLine />
+                    </div>
+                    <div className="no-data-text">
+                      <h4>No Chart Data Available</h4>
+                      <p>Start logging your {selectedMetric} benefits to see your progress visualization.</p>
+                    </div>
                   </div>
-                  <div className="current-metric-value">
-                    {calculateAverage(safeUserData, selectedMetric, timeRange, isPremium) === 'N/A' ? 'N/A' : `${calculateAverage(safeUserData, selectedMetric, timeRange, isPremium)}/10`}
-                  </div>
-                </div>
-                
-                <div className="current-insight-card">
-                  <div className="current-insight-header">
-                    <span>Current Status</span>
-                  </div>
-                  <div className="current-insight-text">
-                    {(() => {
-                      const avg = calculateAverage(safeUserData, selectedMetric, timeRange, isPremium);
-                      const phase = getCurrentPhase(safeUserData);
-                      
-                      if (avg === 'N/A') {
-                        return `No ${selectedMetric} data for the selected ${timeRange} period. Start logging benefits to see your progress.`;
-                      }
-                      
-                      const avgValue = parseFloat(avg);
-                      
-                      if (avgValue >= 7) {
-                        return `Your ${selectedMetric} is excellent at ${avg}/10. You're in the ${phase} phase - maintain current strategies and channel this energy into growth.`;
-                      } else {
-                        return `Your ${selectedMetric} averaged ${avg}/10 during ${phase} phase. Check personalized insights below for optimization strategies.`;
-                      }
-                    })()}
-                  </div>
-                </div>
+                );
+              }
+              
+              return <Line data={chartData} options={chartOptions} height={300} />;
+            })()}
+          </div>
+          
+          <div className="current-insight-sidebar">
+            <div className="current-metric-average">
+              <div className="current-metric-label">
+                Your {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} {getTimeRangeDisplayText(timeRange)}
+              </div>
+              <div className="current-metric-value">
+                {calculateAverage(safeUserData, selectedMetric, timeRange, true) === 'N/A' ? 'N/A' : `${calculateAverage(safeUserData, selectedMetric, timeRange, true)}/10`}
               </div>
             </div>
             
-            {/* Personalized Insights Section */}
-            <div className="personalized-insights-section">
-              <div className="personalized-insights-header">
-                <h3>Personalized Insights</h3>
+            <div className="current-insight-card">
+              <div className="current-insight-header">
+                <span>Current Status</span>
               </div>
-              
-              {/* Smart Urge Management */}
-              <SmartUrgeManagement
-                isLoading={loadingStates.urgeManagement}
-                hasInsufficientData={hasInsufficientData}
-                userData={safeUserData}
-                urgeManagement={memoizedInsights.urgeManagement}
-                dataQuality={memoizedInsights.dataQuality}
-              />
-              
-              {/* Relapse Risk Predictor */}
-              <RelapseRiskPredictor
-                isLoading={loadingStates.riskPredictor}
-                hasInsufficientData={hasInsufficientData}
-                userData={safeUserData}
-                riskAnalysis={memoizedInsights.riskAnalysis}
-                dataQuality={memoizedInsights.dataQuality}
-              />
-              
-              {/* Relapse Pattern Analytics */}
-              <RelapsePatternAnalytics
-                isLoading={loadingStates.relapsePatterns}
-                relapsePatterns={memoizedInsights.relapsePatterns}
-                daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
-              />
-              
-              {/* Pattern Recognition */}
-              <PatternRecognition
-                isLoading={loadingStates.patternRecognition}
-                hasInsufficientData={hasInsufficientData}
-                userData={safeUserData}
-                patternInsights={memoizedInsights.patternInsights}
-                dataQuality={memoizedInsights.dataQuality}
-              />
-              
-              {/* Optimization Guidance */}
-              <OptimizationGuidance
-                isLoading={loadingStates.optimization}
-                hasInsufficientData={hasInsufficientData}
-                userData={safeUserData}
-                optimizationGuidance={memoizedInsights.optimizationGuidance}
-                dataQuality={memoizedInsights.dataQuality}
-              />
-              
-              {/* Phase Evolution Analysis */}
-              <PhaseEvolutionAnalysis
-                isLoading={loadingStates.phaseEvolution}
-                phaseEvolution={memoizedInsights.phaseEvolution}
-                selectedMetric={selectedMetric}
-                dataQuality={memoizedInsights.dataQuality}
-                currentStreak={safeUserData.currentStreak}
-              />
+              <div className="current-insight-text">
+                {(() => {
+                  const avg = calculateAverage(safeUserData, selectedMetric, timeRange, true);
+                  const phase = getCurrentPhase(safeUserData);
+                  
+                  if (avg === 'N/A') {
+                    return `No ${selectedMetric} data for the selected ${timeRange} period. Start logging benefits to see your progress.`;
+                  }
+                  
+                  const avgValue = parseFloat(avg);
+                  
+                  if (avgValue >= 7) {
+                    return `Your ${selectedMetric} is excellent at ${avg}/10. You're in the ${phase} phase - maintain current strategies and channel this energy into growth.`;
+                  } else {
+                    return `Your ${selectedMetric} averaged ${avg}/10 during ${phase} phase. Check personalized insights below for optimization strategies.`;
+                  }
+                })()}
+              </div>
             </div>
-          </>
-        )}
+          </div>
+        </div>
+        
+        {/* Personalized Insights Section */}
+        <div className="personalized-insights-section">
+          <div className="personalized-insights-header">
+            <h3>Personalized Insights</h3>
+          </div>
+          
+          {/* Smart Urge Management */}
+          <SmartUrgeManagement
+            isLoading={loadingStates.urgeManagement}
+            hasInsufficientData={hasInsufficientData}
+            userData={safeUserData}
+            urgeManagement={memoizedInsights.urgeManagement}
+            dataQuality={memoizedInsights.dataQuality}
+          />
+          
+          {/* Relapse Risk Predictor */}
+          <RelapseRiskPredictor
+            isLoading={loadingStates.riskPredictor}
+            hasInsufficientData={hasInsufficientData}
+            userData={safeUserData}
+            riskAnalysis={memoizedInsights.riskAnalysis}
+            dataQuality={memoizedInsights.dataQuality}
+          />
+          
+          {/* Relapse Pattern Analytics */}
+          <RelapsePatternAnalytics
+            isLoading={loadingStates.relapsePatterns}
+            relapsePatterns={memoizedInsights.relapsePatterns}
+            daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
+          />
+          
+          {/* Pattern Recognition */}
+          <PatternRecognition
+            isLoading={loadingStates.patternRecognition}
+            hasInsufficientData={hasInsufficientData}
+            userData={safeUserData}
+            patternInsights={memoizedInsights.patternInsights}
+            dataQuality={memoizedInsights.dataQuality}
+          />
+          
+          {/* Optimization Guidance */}
+          <OptimizationGuidance
+            isLoading={loadingStates.optimization}
+            hasInsufficientData={hasInsufficientData}
+            userData={safeUserData}
+            optimizationGuidance={memoizedInsights.optimizationGuidance}
+            dataQuality={memoizedInsights.dataQuality}
+          />
+          
+          {/* Phase Evolution Analysis */}
+          <PhaseEvolutionAnalysis
+            isLoading={loadingStates.phaseEvolution}
+            phaseEvolution={memoizedInsights.phaseEvolution}
+            selectedMetric={selectedMetric}
+            dataQuality={memoizedInsights.dataQuality}
+            currentStreak={safeUserData.currentStreak}
+          />
+        </div>
       </div>
       
       {/* Badge Modal */}
