@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Horizontal mastery levels, modern icons
+// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Fixed mobile mastery card sizing and layout
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays, subDays } from 'date-fns';
 import toast from 'react-hot-toast';

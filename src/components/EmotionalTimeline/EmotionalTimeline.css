@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - UPDATED: Horizontal mastery levels, modern icons */
+/* components/EmotionalTimeline/EmotionalTimeline.css - UPDATED: Fixed mobile mastery card sizing to match timeline phase cards */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -608,14 +608,15 @@
   line-height: 1.3;
 }
 
-/* UPDATED: Mastery level details - simplified without icons */
+/* REDESIGNED: Mastery level details - REORGANIZED to prevent text wrapping */
 .mastery-level-details {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
   align-items: flex-end;
   text-align: right;
-  margin-right: var(--spacing-lg);
+  margin-right: var(--spacing-md); /* REDUCED margin for mobile */
+  min-width: 80px; /* ADDED: Ensure minimum width */
 }
 
 .mastery-level-range {
@@ -623,6 +624,7 @@
   font-weight: 600;
   color: var(--text);
   margin: 0;
+  white-space: nowrap; /* ADDED: Prevent text wrapping */
 }
 
 /* Progress bar for current mastery level */
@@ -656,10 +658,11 @@
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
+/* REDESIGNED: Compact "Current Level" badge to prevent text wrapping */
 .mastery-level-current-badge {
-  font-size: 0.75rem;
+  font-size: 0.625rem; /* REDUCED: Smaller font size */
   font-weight: 700;
-  padding: var(--spacing-xs) var(--spacing-md);
+  padding: 4px 8px; /* REDUCED: Smaller padding */
   border-radius: var(--radius-full);
   background: linear-gradient(135deg, var(--primary) 0%, rgba(255, 221, 0, 0.9) 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -669,6 +672,9 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   animation: current-phase-glow 2s ease-in-out infinite;
+  white-space: nowrap; /* ADDED: Prevent text wrapping */
+  min-width: 60px; /* ADDED: Minimum width */
+  text-align: center;
 }
 
 .mastery-level-lock {
@@ -1617,43 +1623,47 @@
     font-size: 1rem;
   }
   
-  /* UPDATED: Mobile mastery levels - keep horizontal layout on mobile */
+  /* FIXED: Mobile mastery levels - EXACT SAME sizing as timeline phases */
   .mastery-levels-timeline {
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md); /* MATCH: Same as timeline phases */
   }
   
   .mastery-level-card {
-    padding: var(--spacing-md);
+    padding: var(--spacing-md); /* MATCH: Same as timeline phases */
   }
   
   .mastery-level-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.25rem;
+    width: 40px; /* MATCH: Same as timeline phase icons */
+    height: 40px; /* MATCH: Same as timeline phase icons */
+    font-size: 1.25rem; /* MATCH: Same as timeline phase icons */
   }
   
   .mastery-level-info {
-    margin-left: var(--spacing-md);
+    margin-left: var(--spacing-md); /* MATCH: Same as timeline phase info */
   }
   
   .mastery-level-name {
-    font-size: 1rem;
+    font-size: 1rem; /* MATCH: Same as timeline phase names */
   }
   
   .mastery-level-subtitle {
-    font-size: 0.8rem;
+    font-size: 0.875rem; /* IMPROVED: Slightly larger on mobile */
   }
   
   .mastery-level-details {
-    margin-right: var(--spacing-md);
+    margin-right: var(--spacing-md); /* MATCH: Same as timeline phases */
   }
   
   .mastery-level-range {
-    font-size: 0.875rem;
+    font-size: 0.875rem; /* CONSISTENT: Match timeline phase range */
   }
   
-  .mastery-level-duration {
-    font-size: 0.875rem;
+  /* FIXED: Mobile current level badge - more compact to prevent wrapping */
+  .mastery-level-current-badge {
+    font-size: 0.625rem; /* COMPACT: Even smaller on mobile */
+    padding: 2px 6px; /* COMPACT: Smaller padding */
+    min-width: 50px; /* REDUCED: Smaller minimum width */
+    letter-spacing: 0.25px; /* REDUCED: Less letter spacing */
   }
   
   .emotional-checkin-section {
@@ -1780,38 +1790,43 @@
     padding: var(--spacing-md) 0;
   }
   
+  /* FIXED: Very small screen mastery cards - MATCH timeline phase sizing exactly */
   .mastery-level-card {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-sm); /* MATCH: Same as very small timeline phases */
   }
   
   .mastery-level-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 1.125rem;
+    width: 36px; /* MATCH: Same as very small timeline phase icons */
+    height: 36px; /* MATCH: Same as very small timeline phase icons */
+    font-size: 1.125rem; /* MATCH: Same as very small timeline phase icons */
   }
   
   .mastery-level-info {
-    margin-left: var(--spacing-sm);
+    margin-left: var(--spacing-sm); /* MATCH: Same as very small timeline phase info */
   }
   
   .mastery-level-name {
-    font-size: 0.875rem;
+    font-size: 0.875rem; /* MATCH: Same as very small timeline phase names */
   }
   
   .mastery-level-subtitle {
-    font-size: 0.75rem;
+    font-size: 0.75rem; /* MATCH: Proportional to timeline phase range */
   }
   
   .mastery-level-details {
-    margin-right: var(--spacing-sm);
+    margin-right: var(--spacing-sm); /* MATCH: Same as very small timeline phases */
   }
   
   .mastery-level-range {
-    font-size: 0.8rem;
+    font-size: 0.8rem; /* MATCH: Similar to timeline phase range */
   }
   
-  .mastery-level-duration {
-    font-size: 0.75rem;
+  /* FIXED: Ultra-compact current level badge for very small screens */
+  .mastery-level-current-badge {
+    font-size: 0.5rem; /* ULTRA-COMPACT: Very small font */
+    padding: 1px 4px; /* ULTRA-COMPACT: Minimal padding */
+    min-width: 40px; /* ULTRA-COMPACT: Very small width */
+    letter-spacing: 0.1px; /* MINIMAL: Almost no letter spacing */
   }
 
   /* Very small screen early premium teaser adjustments */
