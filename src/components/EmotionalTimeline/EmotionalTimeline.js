@@ -1699,6 +1699,4 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default EmotionalTimeline;Data.length === 0 && " Start logging emotions to unlock pattern recognition."}
-                              {recentData.length > 0 && recentData.length < 3 && ` You've logged ${recentData.length} day${recentData.length === 1 ? '' : 's'} - track 3+ days for trend analysis.`}
-                              {recent
+export default
