@@ -4,11 +4,10 @@ import { format, differenceInDays, subDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
 
-// Icons - UPDATED: Added modern icons (replaced FaArrowTrendUp with FaArrowUp)
+// Icons - UPDATED: Removed FaBullseye and FaArrowUp (no longer needed)
 import { FaMapSigns, FaLightbulb, FaHeart, FaBrain, FaLeaf, FaTrophy, 
   FaCheckCircle, FaLock, FaPen, FaInfoCircle, FaExclamationTriangle, 
-  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine, FaArrowUp, 
-  FaBullseye } from 'react-icons/fa';
+  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine } from 'react-icons/fa';
 
 // Import helmet image to match Tracker design
 import helmetImage from '../../assets/helmet.png';
@@ -45,67 +44,61 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     setShowFloatingToggle(true);
   }, []);
 
-  // UPDATED: Mastery levels with Roman numerals and modern structure
+  // UPDATED: Mastery levels with month/year ranges and cleaner structure
   const masteryLevels = [
     { 
       id: 1, 
       level: "I",
       name: "Master", 
       subtitle: "Foundation of Self-Control",
-      dayRange: "181-365", 
+      timeRange: "Months 6-12", 
       startDay: 181, 
-      endDay: 365, 
-      duration: "6 months" 
+      endDay: 365
     },
     { 
       id: 2, 
       level: "II",
       name: "Sage", 
       subtitle: "Wisdom Through Experience",
-      dayRange: "366-730", 
+      timeRange: "Year 1-2", 
       startDay: 366, 
-      endDay: 730, 
-      duration: "1 year" 
+      endDay: 730
     },
     { 
       id: 3, 
       level: "III",
       name: "Enlightened", 
       subtitle: "Higher Consciousness",
-      dayRange: "731-1095", 
+      timeRange: "Year 2-3", 
       startDay: 731, 
-      endDay: 1095, 
-      duration: "1 year" 
+      endDay: 1095
     },
     { 
       id: 4, 
       level: "IV",
       name: "Transcendent", 
       subtitle: "Beyond Physical Desires",
-      dayRange: "1096-1460", 
+      timeRange: "Year 3-4", 
       startDay: 1096, 
-      endDay: 1460, 
-      duration: "1 year" 
+      endDay: 1460
     },
     { 
       id: 5, 
       level: "V",
       name: "Ascended Master", 
       subtitle: "Guide for Others",
-      dayRange: "1461-1825", 
+      timeRange: "Year 4-5", 
       startDay: 1461, 
-      endDay: 1825, 
-      duration: "1 year" 
+      endDay: 1825
     },
     { 
       id: 6, 
       level: "VI",
       name: "Divine Avatar", 
       subtitle: "Pure Consciousness",
-      dayRange: "1826+", 
+      timeRange: "Year 5+", 
       startDay: 1826, 
-      endDay: 999999, 
-      duration: "Eternal Journey" 
+      endDay: 999999
     }
   ];
 
@@ -838,7 +831,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         <>
                           {isCompleted && (
                             <div className="timeline-phase-check">
-                              <FaCheckCircle style={{ color: phase.color }} />
+                              <FaCheckCircle style={{ color: "#22c55e" }} />
                             </div>
                           )}
                           {isCurrent && (
@@ -877,21 +870,16 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                             <FaTrophy />
                           </div>
                           
-                          {/* UPDATED: Mastery level info - same structure as timeline phases */}
+                          {/* UPDATED: Mastery level info - cleaner time range display */}
                           <div className="mastery-level-info">
                             <div className="mastery-level-name">Level {level.level}: {level.name}</div>
                             <div className="mastery-level-subtitle">{level.subtitle}</div>
                           </div>
                           
-                          {/* UPDATED: Mastery level details - positioned like timeline phase range */}
+                          {/* UPDATED: Simple time range - no icons */}
                           <div className="mastery-level-details">
                             <div className="mastery-level-range">
-                              <FaBullseye />
-                              Days {level.dayRange}
-                            </div>
-                            <div className="mastery-level-duration">
-                              <FaArrowUp />
-                              {level.duration}
+                              {level.timeRange}
                             </div>
                           </div>
                           
