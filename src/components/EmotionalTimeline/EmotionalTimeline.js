@@ -4,10 +4,10 @@ import { format, differenceInDays, subDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
 
-// Icons - UPDATED: Added modern icons (replaced FaTarget with FaBullseye)
+// Icons - UPDATED: Added modern icons (replaced FaArrowTrendUp with FaArrowUp)
 import { FaMapSigns, FaLightbulb, FaHeart, FaBrain, FaLeaf, FaTrophy, 
   FaCheckCircle, FaLock, FaPen, FaInfoCircle, FaExclamationTriangle, 
-  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine, FaArrowTrendUp, 
+  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine, FaArrowUp, 
   FaBullseye } from 'react-icons/fa';
 
 // Import helmet image to match Tracker design
@@ -890,7 +890,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                               Days {level.dayRange}
                             </div>
                             <div className="mastery-level-duration">
-                              <FaArrowTrendUp />
+                              <FaArrowUp />
                               {level.duration}
                             </div>
                           </div>
