@@ -1,13 +1,14 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Added floating wisdom toggle, removed old toggle
+// components/EmotionalTimeline/EmotionalTimeline.js - UPDATED: Horizontal mastery levels, modern icons
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays, subDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
 
-// Icons
+// Icons - UPDATED: Added modern icons
 import { FaMapSigns, FaLightbulb, FaHeart, FaBrain, FaLeaf, FaTrophy, 
   FaCheckCircle, FaLock, FaPen, FaInfoCircle, FaExclamationTriangle, 
-  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine, FaArrowUp } from 'react-icons/fa';
+  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine, FaArrowTrendUp, 
+  FaTarget } from 'react-icons/fa';
 
 // Import helmet image to match Tracker design
 import helmetImage from '../../assets/helmet.png';
@@ -44,10 +45,11 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     setShowFloatingToggle(true);
   }, []);
 
-  // UPDATED: Much better mastery levels with consistent durations and better progression
+  // UPDATED: Mastery levels with Roman numerals and modern structure
   const masteryLevels = [
     { 
       id: 1, 
+      level: "I",
       name: "Master", 
       subtitle: "Foundation of Self-Control",
       dayRange: "181-365", 
@@ -57,6 +59,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     },
     { 
       id: 2, 
+      level: "II",
       name: "Sage", 
       subtitle: "Wisdom Through Experience",
       dayRange: "366-730", 
@@ -66,6 +69,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     },
     { 
       id: 3, 
+      level: "III",
       name: "Enlightened", 
       subtitle: "Higher Consciousness",
       dayRange: "731-1095", 
@@ -75,6 +79,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     },
     { 
       id: 4, 
+      level: "IV",
       name: "Transcendent", 
       subtitle: "Beyond Physical Desires",
       dayRange: "1096-1460", 
@@ -84,6 +89,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     },
     { 
       id: 5, 
+      level: "V",
       name: "Ascended Master", 
       subtitle: "Guide for Others",
       dayRange: "1461-1825", 
@@ -93,6 +99,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
     },
     { 
       id: 6, 
+      level: "VI",
       name: "Divine Avatar", 
       subtitle: "Pure Consciousness",
       dayRange: "1826+", 
@@ -557,11 +564,11 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
       
       if (masteryLevel.endDay === 999999) {
         // Divine Avatar level - eternal
-        return `Level ${masteryLevel.id} ${masteryLevel.name} - Day ${currentDayInLevel} (Eternal Journey)`;
+        return `Level ${masteryLevel.level} ${masteryLevel.name} - Day ${currentDayInLevel} (Eternal Journey)`;
       } else {
         const totalDaysInLevel = masteryLevel.endDay - masteryLevel.startDay + 1;
         const daysRemainingInLevel = masteryLevel.endDay - currentDay;
-        return `Level ${masteryLevel.id} ${masteryLevel.name} - Day ${currentDayInLevel} of ${totalDaysInLevel} (${daysRemainingInLevel} days to next level)`;
+        return `Level ${masteryLevel.level} ${masteryLevel.name} - Day ${currentDayInLevel} of ${totalDaysInLevel} (${daysRemainingInLevel} days to next level)`;
       }
     }
     
@@ -850,11 +857,11 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                 })}
               </div>
 
-              {/* Mastery Levels Display for advanced practitioners */}
+              {/* UPDATED: Mastery Levels Display - HORIZONTAL LAYOUT like timeline phases */}
               {currentDay >= 181 && (
                 <div className="mastery-levels-section">
                   <h3>Mastery Levels (Days 181+)</h3>
-                  <div className="mastery-levels-grid">
+                  <div className="mastery-levels-timeline">
                     {masteryLevels.map((level, index) => {
                       const isCompleted = currentDay > level.endDay && level.endDay !== 999999;
                       const isCurrent = getCurrentMasteryLevel()?.id === level.id;
@@ -865,32 +872,40 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                           key={level.id}
                           className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                         >
-                          <div className="mastery-level-header">
-                            <div className="mastery-level-number">
-                              {level.id}
-                            </div>
-                            <div className="mastery-level-info">
-                              <div className="mastery-level-name">{level.name}</div>
-                              <div className="mastery-level-subtitle">{level.subtitle}</div>
-                            </div>
+                          {/* UPDATED: Mastery level icon - consistent with timeline phases */}
+                          <div className="mastery-level-icon">
+                            <FaTrophy />
                           </div>
                           
+                          {/* UPDATED: Mastery level info - same structure as timeline phases */}
+                          <div className="mastery-level-info">
+                            <div className="mastery-level-name">Level {level.level}: {level.name}</div>
+                            <div className="mastery-level-subtitle">{level.subtitle}</div>
+                          </div>
+                          
+                          {/* UPDATED: Mastery level details - positioned like timeline phase range */}
                           <div className="mastery-level-details">
-                            <div className="mastery-level-range">Days {level.dayRange}</div>
-                            <div className="mastery-level-duration">{level.duration}</div>
+                            <div className="mastery-level-range">
+                              <FaTarget />
+                              Days {level.dayRange}
+                            </div>
+                            <div className="mastery-level-duration">
+                              <FaArrowTrendUp />
+                              {level.duration}
+                            </div>
                           </div>
                           
+                          {/* UPDATED: Progress bar for current mastery level */}
                           {isPremium && isCurrent && (
                             <div className="mastery-level-progress">
-                              <div className="mastery-progress-bar">
-                                <div 
-                                  className="mastery-progress-fill"
-                                  style={{ width: `${getPhaseProgress(currentPhase)}%` }}
-                                ></div>
-                              </div>
+                              <div 
+                                className="mastery-progress-fill"
+                                style={{ width: `${getPhaseProgress(currentPhase)}%` }}
+                              ></div>
                             </div>
                           )}
                           
+                          {/* UPDATED: Status indicators - same positioning as timeline phases */}
                           <div className="mastery-level-status">
                             {isPremium ? (
                               <>
