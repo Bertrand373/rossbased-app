@@ -553,9 +553,31 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                           </div>
                         </div>
                       )}
+
+                      {/* Getting Started Banner for Insufficient Data */}
+                      {analysis?.dataAnalysis?.type === 'insufficient' && (
+                        <div className="insufficient-data-section">
+                          <div className="optimization-criteria">
+                            <div className="optimization-criteria-title">Begin Your Analysis Journey</div>
+                            <div className="optimization-criteria-text">
+                              You're on day {currentDay - currentPhase.startDay + 1} of the {currentPhase.name} phase (total streak: day {currentDay}). 
+                              Start tracking your emotions daily to unlock personalized insights about your unique journey.
+                            </div>
+                          </div>
+                          <div className="guidance-list">
+                            <div className="guidance-title">What You'll Unlock</div>
+                            <div className="guidance-item">Pattern recognition across emotional metrics</div>
+                            <div className="guidance-item">Phase-specific challenge identification</div>
+                            <div className="guidance-item">Predictive guidance for upcoming phases</div>
+                            <div className="guidance-item">Personalized strategy recommendations</div>
+                            <div className="guidance-item">Scientific explanations for your experiences</div>
+                          </div>
+                        </div>
+                      )}
                       
-                      {/* Analysis Cards Grid - EXACT STATS STYLING */}
-                      <div className="insights-grid">
+                      {/* Analysis Cards Grid - ONLY WHEN SUFFICIENT DATA */}
+                      {analysis?.dataAnalysis?.type === 'comprehensive' && (
+                        <div className="insights-grid">
                         
                         {/* Phase Education Card */}
                         {analysis?.phaseEducation && (
@@ -781,35 +803,8 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                           </div>
                         )}
 
-                        {/* Insufficient Data Card */}
-                        {analysis?.dataAnalysis?.type === 'insufficient' && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Getting Started</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="optimization-display">
-                                <div className="optimization-criteria">
-                                  <div className="optimization-criteria-title">Begin Your Analysis Journey</div>
-                                  <div className="optimization-criteria-text">
-                                    You're on day {currentDay} of the {currentPhase.name} phase. 
-                                    Start tracking your emotions daily to unlock personalized insights about your unique journey.
-                                  </div>
-                                </div>
-                                <div className="guidance-list">
-                                  <div className="guidance-title">What You'll Unlock</div>
-                                  <div className="guidance-item">Pattern recognition across emotional metrics</div>
-                                  <div className="guidance-item">Phase-specific challenge identification</div>
-                                  <div className="guidance-item">Predictive guidance for upcoming phases</div>
-                                  <div className="guidance-item">Personalized strategy recommendations</div>
-                                  <div className="guidance-item">Scientific explanations for your experiences</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                      </div>
+                        </div>
+                      )}
 
                       {/* Analysis Quality Footer - WITH PROGRESS ANIMATION */}
                       {analysis && (
