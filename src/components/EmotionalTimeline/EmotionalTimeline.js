@@ -535,28 +535,24 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         </div>
                       )}
                       
-                      {/* Analysis Cards - STYLED LIKE STATS */}
-                      <div className="analysis-cards-grid">
+                      {/* Analysis Cards Grid - MATCH STATS EXACTLY */}
+                      <div className="insights-grid">
                         
                         {/* Phase Education Card */}
                         {analysis?.phaseEducation && (
                           <div className="insight-card">
-                            <div className="insight-header">
-                              Phase Education
+                            <div className="insight-card-header">
+                              <FaRegLightbulb className="insight-icon" />
+                              <span className="insight-metric">Phase Education</span>
                             </div>
-                            <div className="insight-content">
-                              <div className="phase-overview">
-                                <strong>Current Focus:</strong> {analysis.phaseEducation.phaseOverview}
-                              </div>
-                              <div className="key-learning">
-                                <strong>Key Learning:</strong> {analysis.phaseEducation.keyLearning}
-                              </div>
-                              <div className="expectation">
-                                <strong>What to Expect:</strong> {analysis.phaseEducation.expectation}
-                              </div>
-                              <div className="phase-progress-detail">
-                                <strong>Progress:</strong> Day {analysis.phaseEducation.dayInPhase} of phase ({Math.round(analysis.phaseEducation.phaseProgress)}% complete)
-                              </div>
+                            <div className="insight-text">
+                              <strong>Current Focus:</strong> {analysis.phaseEducation.phaseOverview}
+                              <br/><br/>
+                              <strong>Key Learning:</strong> {analysis.phaseEducation.keyLearning}
+                              <br/><br/>
+                              <strong>What to Expect:</strong> {analysis.phaseEducation.expectation}
+                              <br/><br/>
+                              <strong>Progress:</strong> Day {analysis.phaseEducation.dayInPhase} of phase ({Math.round(analysis.phaseEducation.phaseProgress)}% complete)
                             </div>
                           </div>
                         )}
@@ -564,19 +560,16 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {/* Scientific Explanation Card */}
                         {analysis?.scientificExplanation && (
                           <div className="insight-card">
-                            <div className="insight-header">
-                              {wisdomMode ? 'Energetic Understanding' : 'Scientific Mechanisms'}
+                            <div className="insight-card-header">
+                              <FaRegLightbulb className="insight-icon" />
+                              <span className="insight-metric">{wisdomMode ? 'Energetic Understanding' : 'Scientific Mechanisms'}</span>
                             </div>
-                            <div className="insight-content">
-                              <div className="mechanism-explanation">
-                                <strong>{wisdomMode ? 'Energetic:' : 'Neurochemical:'}</strong> {analysis.scientificExplanation.neurochemical}
-                              </div>
-                              <div className="physiological-explanation">
-                                <strong>Physiological:</strong> {analysis.scientificExplanation.physiological}
-                              </div>
-                              <div className="behavioral-explanation">
-                                <strong>{wisdomMode ? 'Consciousness:' : 'Behavioral:'}</strong> {analysis.scientificExplanation.behavioral}
-                              </div>
+                            <div className="insight-text">
+                              <strong>{wisdomMode ? 'Energetic:' : 'Neurochemical:'}</strong> {analysis.scientificExplanation.neurochemical}
+                              <br/><br/>
+                              <strong>Physiological:</strong> {analysis.scientificExplanation.physiological}
+                              <br/><br/>
+                              <strong>{wisdomMode ? 'Consciousness:' : 'Behavioral:'}</strong> {analysis.scientificExplanation.behavioral}
                             </div>
                           </div>
                         )}
@@ -584,65 +577,49 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {/* Data Analysis Card */}
                         {analysis?.dataAnalysis?.type === 'comprehensive' && (
                           <div className="insight-card">
-                            <div className="insight-header">
-                              Personal Data Analysis
+                            <div className="insight-card-header">
+                              <FaRegLightbulb className="insight-icon" />
+                              <span className="insight-metric">Personal Data Analysis</span>
                             </div>
-                            <div className="insight-content">
-                              <div className="wellbeing-score">
-                                <strong>Wellbeing Score:</strong> {analysis.dataAnalysis.wellbeingScore.toFixed(1)}/10
-                                <span className={`score-indicator ${
-                                  analysis.dataAnalysis.wellbeingScore >= 7 ? 'excellent' : 
-                                  analysis.dataAnalysis.wellbeingScore >= 5 ? 'good' : 'needs-attention'
-                                }`}>
-                                  {analysis.dataAnalysis.wellbeingScore >= 7 ? 'Excellent' : 
-                                   analysis.dataAnalysis.wellbeingScore >= 5 ? 'Good' : 'Needs Attention'}
+                            <div className="insight-text">
+                              <strong>Wellbeing Score:</strong> {analysis.dataAnalysis.wellbeingScore.toFixed(1)}/10
+                              <br/><br/>
+                              <strong>Anxiety:</strong> {analysis.dataAnalysis.averages.avgAnxiety.toFixed(1)}/10 
+                              {analysis.dataAnalysis.trends?.anxiety && (
+                                <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
+                                  {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓' : 
+                                   analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑' : ' →'}
                                 </span>
-                              </div>
-                              <div className="metric-breakdown">
-                                <div className="metric-item">
-                                  <span>Anxiety: {analysis.dataAnalysis.averages.avgAnxiety.toFixed(1)}/10</span>
-                                  {analysis.dataAnalysis.trends?.anxiety && (
-                                    <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
-                                      {analysis.dataAnalysis.trends.anxiety === 'improving' ? '↓' : 
-                                       analysis.dataAnalysis.trends.anxiety === 'concerning' ? '↑' : '→'}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="metric-item">
-                                  <span>Mood: {analysis.dataAnalysis.averages.avgMoodStability.toFixed(1)}/10</span>
-                                  {analysis.dataAnalysis.trends?.mood && (
-                                    <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
-                                      {analysis.dataAnalysis.trends.mood === 'improving' ? '↑' : 
-                                       analysis.dataAnalysis.trends.mood === 'concerning' ? '↓' : '→'}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="metric-item">
-                                  <span>Clarity: {analysis.dataAnalysis.averages.avgMentalClarity.toFixed(1)}/10</span>
-                                  {analysis.dataAnalysis.trends?.clarity && (
-                                    <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
-                                      {analysis.dataAnalysis.trends.clarity === 'improving' ? '↑' : 
-                                       analysis.dataAnalysis.trends.clarity === 'concerning' ? '↓' : '→'}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="metric-item">
-                                  <span>Processing: {analysis.dataAnalysis.averages.avgEmotionalProcessing.toFixed(1)}/10</span>
-                                  {analysis.dataAnalysis.trends?.processing && (
-                                    <span className={`trend ${analysis.dataAnalysis.trends.processing}`}>
-                                      {analysis.dataAnalysis.trends.processing === 'improving' ? '↑' : 
-                                       analysis.dataAnalysis.trends.processing === 'concerning' ? '↓' : '→'}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
+                              )}
+                              <br/>
+                              <strong>Mood:</strong> {analysis.dataAnalysis.averages.avgMoodStability.toFixed(1)}/10
+                              {analysis.dataAnalysis.trends?.mood && (
+                                <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
+                                  {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑' : 
+                                   analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓' : ' →'}
+                                </span>
+                              )}
+                              <br/>
+                              <strong>Clarity:</strong> {analysis.dataAnalysis.averages.avgMentalClarity.toFixed(1)}/10
+                              {analysis.dataAnalysis.trends?.clarity && (
+                                <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
+                                  {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑' : 
+                                   analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓' : ' →'}
+                                </span>
+                              )}
+                              <br/>
+                              <strong>Processing:</strong> {analysis.dataAnalysis.averages.avgEmotionalProcessing.toFixed(1)}/10
+                              {analysis.dataAnalysis.trends?.processing && (
+                                <span className={`trend ${analysis.dataAnalysis.trends.processing}`}>
+                                  {analysis.dataAnalysis.trends.processing === 'improving' ? ' ↑' : 
+                                   analysis.dataAnalysis.trends.processing === 'concerning' ? ' ↓' : ' →'}
+                                </span>
+                              )}
                               {analysis.dataAnalysis.phaseAlignment && (
-                                <div className="phase-alignment">
-                                  <strong>Phase Alignment:</strong> 
-                                  <span className={`alignment-score ${analysis.dataAnalysis.phaseAlignment.interpretation}`}>
-                                    {analysis.dataAnalysis.phaseAlignment.interpretation} ({Math.round(analysis.dataAnalysis.phaseAlignment.score * 100)}%)
-                                  </span>
-                                </div>
+                                <>
+                                  <br/><br/>
+                                  <strong>Phase Alignment:</strong> {analysis.dataAnalysis.phaseAlignment.interpretation} ({Math.round(analysis.dataAnalysis.phaseAlignment.score * 100)}%)
+                                </>
                               )}
                             </div>
                           </div>
@@ -651,23 +628,21 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {/* Challenge Identification Card */}
                         {analysis?.challengeIdentification?.challenges?.length > 0 && (
                           <div className="insight-card">
-                            <div className="insight-header">
-                              Challenge Analysis
-                              <span className={`risk-level ${analysis.challengeIdentification.riskLevel}`}>
-                                {analysis.challengeIdentification.riskLevel.toUpperCase()} RISK
-                              </span>
+                            <div className="insight-card-header">
+                              <FaRegLightbulb className="insight-icon" />
+                              <span className="insight-metric">Challenge Analysis</span>
                             </div>
-                            <div className="insight-content">
+                            <div className="insight-text">
+                              <strong>Risk Level:</strong> {analysis.challengeIdentification.riskLevel.toUpperCase()}
+                              <br/><br/>
                               {analysis.challengeIdentification.challenges.map((challenge, index) => (
-                                <div key={index} className={`challenge-item ${challenge.severity}`}>
-                                  <div className="challenge-title">
-                                    <strong>{challenge.challenge}</strong>
-                                    <span className={`severity-badge ${challenge.severity}`}>{challenge.severity}</span>
-                                  </div>
-                                  <div className="challenge-explanation">{challenge.explanation}</div>
-                                  <div className="challenge-solution">
-                                    <strong>Solution:</strong> {challenge.solution}
-                                  </div>
+                                <div key={index} style={{ marginBottom: '12px' }}>
+                                  <strong>{challenge.challenge}</strong> ({challenge.severity})
+                                  <br/>
+                                  {challenge.explanation}
+                                  <br/>
+                                  <strong>Solution:</strong> {challenge.solution}
+                                  {index < analysis.challengeIdentification.challenges.length - 1 && <br/>}
                                 </div>
                               ))}
                             </div>
@@ -677,22 +652,18 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {/* Predictive Guidance Card */}
                         {analysis?.predictiveGuidance && (
                           <div className="insight-card">
-                            <div className="insight-header">
-                              Predictive Guidance
+                            <div className="insight-card-header">
+                              <FaRegLightbulb className="insight-icon" />
+                              <span className="insight-metric">Predictive Guidance</span>
                             </div>
-                            <div className="insight-content">
-                              <div className="current-focus">
-                                <strong>Current Focus:</strong> {analysis.predictiveGuidance.currentFocus}
-                              </div>
-                              <div className="upcoming-challenge">
-                                <strong>Upcoming Challenge:</strong> {analysis.predictiveGuidance.upcomingChallenge}
-                              </div>
-                              <div className="preparation">
-                                <strong>Preparation:</strong> {analysis.predictiveGuidance.preparation}
-                              </div>
-                              <div className="timeline">
-                                <strong>Timeline:</strong> {analysis.predictiveGuidance.timeline}
-                              </div>
+                            <div className="insight-text">
+                              <strong>Current Focus:</strong> {analysis.predictiveGuidance.currentFocus}
+                              <br/><br/>
+                              <strong>Upcoming Challenge:</strong> {analysis.predictiveGuidance.upcomingChallenge}
+                              <br/><br/>
+                              <strong>Preparation:</strong> {analysis.predictiveGuidance.preparation}
+                              <br/><br/>
+                              <strong>Timeline:</strong> {analysis.predictiveGuidance.timeline}
                             </div>
                           </div>
                         )}
@@ -700,44 +671,38 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {/* Actionable Strategies Card */}
                         {analysis?.actionableStrategies && (
                           <div className="insight-card">
-                            <div className="insight-header">
-                              Actionable Strategies
+                            <div className="insight-card-header">
+                              <FaRegLightbulb className="insight-icon" />
+                              <span className="insight-metric">Actionable Strategies</span>
                             </div>
-                            <div className="insight-content">
+                            <div className="insight-text">
                               {analysis.actionableStrategies.urgent.length > 0 && (
-                                <div className="strategy-section urgent">
+                                <>
                                   <strong>🚨 Urgent Actions:</strong>
-                                  <ul>
-                                    {analysis.actionableStrategies.urgent.map((action, index) => (
-                                      <li key={index}>{action}</li>
-                                    ))}
-                                  </ul>
-                                </div>
+                                  <br/>
+                                  {analysis.actionableStrategies.urgent.map((action, index) => (
+                                    <span key={index}>• {action}<br/></span>
+                                  ))}
+                                  <br/>
+                                </>
                               )}
-                              <div className="strategy-section daily">
-                                <strong>📅 Daily Practices:</strong>
-                                <ul>
-                                  {analysis.actionableStrategies.daily.map((action, index) => (
-                                    <li key={index}>{action}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                              <div className="strategy-section weekly">
-                                <strong>📊 Weekly Focus:</strong>
-                                <ul>
-                                  {analysis.actionableStrategies.weekly.map((action, index) => (
-                                    <li key={index}>{action}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                              <div className="strategy-section long-term">
-                                <strong>🎯 Long-term Development:</strong>
-                                <ul>
-                                  {analysis.actionableStrategies.longTerm.map((action, index) => (
-                                    <li key={index}>{action}</li>
-                                  ))}
-                                </ul>
-                              </div>
+                              <strong>📅 Daily Practices:</strong>
+                              <br/>
+                              {analysis.actionableStrategies.daily.map((action, index) => (
+                                <span key={index}>• {action}<br/></span>
+                              ))}
+                              <br/>
+                              <strong>📊 Weekly Focus:</strong>
+                              <br/>
+                              {analysis.actionableStrategies.weekly.map((action, index) => (
+                                <span key={index}>• {action}<br/></span>
+                              ))}
+                              <br/>
+                              <strong>🎯 Long-term Development:</strong>
+                              <br/>
+                              {analysis.actionableStrategies.longTerm.map((action, index) => (
+                                <span key={index}>• {action}<br/></span>
+                              ))}
                             </div>
                           </div>
                         )}
@@ -745,24 +710,25 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {/* Insufficient Data Card */}
                         {analysis?.dataAnalysis?.type === 'insufficient' && (
                           <div className="insight-card">
-                            <div className="insight-header">
-                              Getting Started
+                            <div className="insight-card-header">
+                              <FaRegLightbulb className="insight-icon" />
+                              <span className="insight-metric">Getting Started</span>
                             </div>
-                            <div className="insight-content">
-                              <div className="encouragement">
-                                <strong>Begin Your Analysis Journey:</strong> You're on day {currentDay} of the {currentPhase.name} phase. 
-                                Start tracking your emotions daily to unlock personalized insights about your unique journey.
-                              </div>
-                              <div className="data-benefits">
-                                <strong>What You'll Unlock:</strong>
-                                <ul>
-                                  <li>• Pattern recognition across emotional metrics</li>
-                                  <li>• Phase-specific challenge identification</li>
-                                  <li>• Predictive guidance for upcoming phases</li>
-                                  <li>• Personalized strategy recommendations</li>
-                                  <li>• Scientific explanations for your experiences</li>
-                                </ul>
-                              </div>
+                            <div className="insight-text">
+                              <strong>Begin Your Analysis Journey:</strong> You're on day {currentDay} of the {currentPhase.name} phase. 
+                              Start tracking your emotions daily to unlock personalized insights about your unique journey.
+                              <br/><br/>
+                              <strong>What You'll Unlock:</strong>
+                              <br/>
+                              • Pattern recognition across emotional metrics
+                              <br/>
+                              • Phase-specific challenge identification
+                              <br/>
+                              • Predictive guidance for upcoming phases
+                              <br/>
+                              • Personalized strategy recommendations
+                              <br/>
+                              • Scientific explanations for your experiences
                             </div>
                           </div>
                         )}
