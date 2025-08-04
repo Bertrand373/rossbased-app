@@ -535,24 +535,32 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         </div>
                       )}
                       
-                      {/* Analysis Cards Grid - MATCH STATS EXACTLY */}
+                      {/* Analysis Cards Grid - EXACT STATS STYLING */}
                       <div className="insights-grid">
                         
                         {/* Phase Education Card */}
                         {analysis?.phaseEducation && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaRegLightbulb className="insight-icon" />
                               <span className="insight-metric">Phase Education</span>
                             </div>
                             <div className="insight-text">
-                              <strong>Current Focus:</strong> {analysis.phaseEducation.phaseOverview}
-                              <br/><br/>
-                              <strong>Key Learning:</strong> {analysis.phaseEducation.keyLearning}
-                              <br/><br/>
-                              <strong>What to Expect:</strong> {analysis.phaseEducation.expectation}
-                              <br/><br/>
-                              <strong>Progress:</strong> Day {analysis.phaseEducation.dayInPhase} of phase ({Math.round(analysis.phaseEducation.phaseProgress)}% complete)
+                              <div className="optimization-display">
+                                <div className="optimization-metric-card">
+                                  <div className="optimization-metric-value">Day {analysis.phaseEducation.dayInPhase}</div>
+                                  <div className="optimization-metric-label">Current Phase Progress</div>
+                                </div>
+                                <div className="optimization-criteria">
+                                  <div className="optimization-criteria-title">Current Focus</div>
+                                  <div className="optimization-criteria-text">{analysis.phaseEducation.phaseOverview}</div>
+                                </div>
+                                <div className="optimization-item">
+                                  <strong>Key Learning:</strong> {analysis.phaseEducation.keyLearning}
+                                </div>
+                                <div className="optimization-item">
+                                  <strong>What to Expect:</strong> {analysis.phaseEducation.expectation}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -561,15 +569,20 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {analysis?.scientificExplanation && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaRegLightbulb className="insight-icon" />
                               <span className="insight-metric">{wisdomMode ? 'Energetic Understanding' : 'Scientific Mechanisms'}</span>
                             </div>
                             <div className="insight-text">
-                              <strong>{wisdomMode ? 'Energetic:' : 'Neurochemical:'}</strong> {analysis.scientificExplanation.neurochemical}
-                              <br/><br/>
-                              <strong>Physiological:</strong> {analysis.scientificExplanation.physiological}
-                              <br/><br/>
-                              <strong>{wisdomMode ? 'Consciousness:' : 'Behavioral:'}</strong> {analysis.scientificExplanation.behavioral}
+                              <div className="patterns-display">
+                                <div className="pattern-item">
+                                  <strong>{wisdomMode ? 'Energetic:' : 'Neurochemical:'}</strong> {analysis.scientificExplanation.neurochemical}
+                                </div>
+                                <div className="pattern-item">
+                                  <strong>Physiological:</strong> {analysis.scientificExplanation.physiological}
+                                </div>
+                                <div className="pattern-item">
+                                  <strong>{wisdomMode ? 'Consciousness:' : 'Behavioral:'}</strong> {analysis.scientificExplanation.behavioral}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -578,49 +591,69 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {analysis?.dataAnalysis?.type === 'comprehensive' && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaRegLightbulb className="insight-icon" />
                               <span className="insight-metric">Personal Data Analysis</span>
                             </div>
                             <div className="insight-text">
-                              <strong>Wellbeing Score:</strong> {analysis.dataAnalysis.wellbeingScore.toFixed(1)}/10
-                              <br/><br/>
-                              <strong>Anxiety:</strong> {analysis.dataAnalysis.averages.avgAnxiety.toFixed(1)}/10 
-                              {analysis.dataAnalysis.trends?.anxiety && (
-                                <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
-                                  {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓' : 
-                                   analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑' : ' →'}
-                                </span>
-                              )}
-                              <br/>
-                              <strong>Mood:</strong> {analysis.dataAnalysis.averages.avgMoodStability.toFixed(1)}/10
-                              {analysis.dataAnalysis.trends?.mood && (
-                                <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
-                                  {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑' : 
-                                   analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓' : ' →'}
-                                </span>
-                              )}
-                              <br/>
-                              <strong>Clarity:</strong> {analysis.dataAnalysis.averages.avgMentalClarity.toFixed(1)}/10
-                              {analysis.dataAnalysis.trends?.clarity && (
-                                <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
-                                  {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑' : 
-                                   analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓' : ' →'}
-                                </span>
-                              )}
-                              <br/>
-                              <strong>Processing:</strong> {analysis.dataAnalysis.averages.avgEmotionalProcessing.toFixed(1)}/10
-                              {analysis.dataAnalysis.trends?.processing && (
-                                <span className={`trend ${analysis.dataAnalysis.trends.processing}`}>
-                                  {analysis.dataAnalysis.trends.processing === 'improving' ? ' ↑' : 
-                                   analysis.dataAnalysis.trends.processing === 'concerning' ? ' ↓' : ' →'}
-                                </span>
-                              )}
-                              {analysis.dataAnalysis.phaseAlignment && (
-                                <>
-                                  <br/><br/>
-                                  <strong>Phase Alignment:</strong> {analysis.dataAnalysis.phaseAlignment.interpretation} ({Math.round(analysis.dataAnalysis.phaseAlignment.score * 100)}%)
-                                </>
-                              )}
+                              <div className="optimization-display">
+                                <div className="optimization-metric-card">
+                                  <div className="optimization-metric-value">{analysis.dataAnalysis.wellbeingScore.toFixed(1)}/10</div>
+                                  <div className="optimization-metric-label">Overall Wellbeing Score</div>
+                                </div>
+                                <div className="relapse-summary-stats">
+                                  <div className={`relapse-stat-card ${analysis.dataAnalysis.averages.avgAnxiety <= 4 ? 'conquered-trigger' : analysis.dataAnalysis.averages.avgAnxiety >= 7 ? 'primary-trigger' : ''}`}>
+                                    <div className="relapse-stat-value">{analysis.dataAnalysis.averages.avgAnxiety.toFixed(1)}</div>
+                                    <div className="relapse-stat-label">Anxiety Level
+                                      {analysis.dataAnalysis.trends?.anxiety && (
+                                        <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
+                                          {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓' : 
+                                           analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑' : ' →'}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className={`relapse-stat-card ${analysis.dataAnalysis.averages.avgMoodStability >= 7 ? 'conquered-trigger' : analysis.dataAnalysis.averages.avgMoodStability <= 4 ? 'primary-trigger' : ''}`}>
+                                    <div className="relapse-stat-value">{analysis.dataAnalysis.averages.avgMoodStability.toFixed(1)}</div>
+                                    <div className="relapse-stat-label">Mood Stability
+                                      {analysis.dataAnalysis.trends?.mood && (
+                                        <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
+                                          {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑' : 
+                                           analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓' : ' →'}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className={`relapse-stat-card ${analysis.dataAnalysis.averages.avgMentalClarity >= 7 ? 'conquered-trigger' : analysis.dataAnalysis.averages.avgMentalClarity <= 4 ? 'primary-trigger' : ''}`}>
+                                    <div className="relapse-stat-value">{analysis.dataAnalysis.averages.avgMentalClarity.toFixed(1)}</div>
+                                    <div className="relapse-stat-label">Mental Clarity
+                                      {analysis.dataAnalysis.trends?.clarity && (
+                                        <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
+                                          {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑' : 
+                                           analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓' : ' →'}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className={`relapse-stat-card ${analysis.dataAnalysis.averages.avgEmotionalProcessing >= 7 ? 'conquered-trigger' : analysis.dataAnalysis.averages.avgEmotionalProcessing <= 4 ? 'primary-trigger' : ''}`}>
+                                    <div className="relapse-stat-value">{analysis.dataAnalysis.averages.avgEmotionalProcessing.toFixed(1)}</div>
+                                    <div className="relapse-stat-label">Emotional Processing
+                                      {analysis.dataAnalysis.trends?.processing && (
+                                        <span className={`trend ${analysis.dataAnalysis.trends.processing}`}>
+                                          {analysis.dataAnalysis.trends.processing === 'improving' ? ' ↑' : 
+                                           analysis.dataAnalysis.trends.processing === 'concerning' ? ' ↓' : ' →'}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                {analysis.dataAnalysis.phaseAlignment && (
+                                  <div className="optimization-criteria">
+                                    <div className="optimization-criteria-title">Phase Alignment</div>
+                                    <div className="optimization-criteria-text">
+                                      {analysis.dataAnalysis.phaseAlignment.interpretation} ({Math.round(analysis.dataAnalysis.phaseAlignment.score * 100)}%)
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         )}
@@ -629,22 +662,29 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {analysis?.challengeIdentification?.challenges?.length > 0 && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaRegLightbulb className="insight-icon" />
                               <span className="insight-metric">Challenge Analysis</span>
                             </div>
                             <div className="insight-text">
-                              <strong>Risk Level:</strong> {analysis.challengeIdentification.riskLevel.toUpperCase()}
-                              <br/><br/>
-                              {analysis.challengeIdentification.challenges.map((challenge, index) => (
-                                <div key={index} style={{ marginBottom: '12px' }}>
-                                  <strong>{challenge.challenge}</strong> ({challenge.severity})
-                                  <br/>
-                                  {challenge.explanation}
-                                  <br/>
-                                  <strong>Solution:</strong> {challenge.solution}
-                                  {index < analysis.challengeIdentification.challenges.length - 1 && <br/>}
+                              <div className={`risk-level-indicator ${analysis.challengeIdentification.riskLevel}`}>
+                                <div className="risk-score-container">
+                                  <div className={`risk-score ${analysis.challengeIdentification.riskLevel}`}>
+                                    {analysis.challengeIdentification.riskLevel.toUpperCase()}
+                                  </div>
+                                  <div className="risk-level-text">Risk Level</div>
                                 </div>
-                              ))}
+                              </div>
+                              <div className="relapse-insights-list">
+                                <div className="relapse-insights-title">Identified Challenges</div>
+                                {analysis.challengeIdentification.challenges.map((challenge, index) => (
+                                  <div key={index} className={`relapse-insight-item ${challenge.severity === 'high' ? 'primary-trigger' : ''}`}>
+                                    <strong>{challenge.challenge}</strong> ({challenge.severity})
+                                    <br/>
+                                    {challenge.explanation}
+                                    <br/>
+                                    <strong>Solution:</strong> {challenge.solution}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         )}
@@ -653,17 +693,24 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {analysis?.predictiveGuidance && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaRegLightbulb className="insight-icon" />
                               <span className="insight-metric">Predictive Guidance</span>
                             </div>
                             <div className="insight-text">
-                              <strong>Current Focus:</strong> {analysis.predictiveGuidance.currentFocus}
-                              <br/><br/>
-                              <strong>Upcoming Challenge:</strong> {analysis.predictiveGuidance.upcomingChallenge}
-                              <br/><br/>
-                              <strong>Preparation:</strong> {analysis.predictiveGuidance.preparation}
-                              <br/><br/>
-                              <strong>Timeline:</strong> {analysis.predictiveGuidance.timeline}
+                              <div className="patterns-display">
+                                <div className="pattern-item">
+                                  <strong>Current Focus:</strong> {analysis.predictiveGuidance.currentFocus}
+                                </div>
+                                <div className="pattern-item">
+                                  <strong>Upcoming Challenge:</strong> {analysis.predictiveGuidance.upcomingChallenge}
+                                </div>
+                                <div className="pattern-item">
+                                  <strong>Preparation:</strong> {analysis.predictiveGuidance.preparation}
+                                </div>
+                                <div className="optimization-criteria">
+                                  <div className="optimization-criteria-title">Timeline</div>
+                                  <div className="optimization-criteria-text">{analysis.predictiveGuidance.timeline}</div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -672,37 +719,45 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {analysis?.actionableStrategies && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaRegLightbulb className="insight-icon" />
                               <span className="insight-metric">Actionable Strategies</span>
                             </div>
                             <div className="insight-text">
-                              {analysis.actionableStrategies.urgent.length > 0 && (
-                                <>
-                                  <strong>🚨 Urgent Actions:</strong>
-                                  <br/>
-                                  {analysis.actionableStrategies.urgent.map((action, index) => (
-                                    <span key={index}>• {action}<br/></span>
+                              <div className="optimization-display">
+                                {analysis.actionableStrategies.urgent.length > 0 && (
+                                  <div className="optimization-recommendations">
+                                    <div className="optimization-title">Urgent Actions</div>
+                                    {analysis.actionableStrategies.urgent.map((action, index) => (
+                                      <div key={index} className="optimization-item" style={{ backgroundColor: 'rgba(239, 68, 68, 0.05)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
+                                        {action}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                <div className="optimization-recommendations">
+                                  <div className="optimization-title">Daily Practices</div>
+                                  {analysis.actionableStrategies.daily.map((action, index) => (
+                                    <div key={index} className="optimization-item">
+                                      {action}
+                                    </div>
                                   ))}
-                                  <br/>
-                                </>
-                              )}
-                              <strong>📅 Daily Practices:</strong>
-                              <br/>
-                              {analysis.actionableStrategies.daily.map((action, index) => (
-                                <span key={index}>• {action}<br/></span>
-                              ))}
-                              <br/>
-                              <strong>📊 Weekly Focus:</strong>
-                              <br/>
-                              {analysis.actionableStrategies.weekly.map((action, index) => (
-                                <span key={index}>• {action}<br/></span>
-                              ))}
-                              <br/>
-                              <strong>🎯 Long-term Development:</strong>
-                              <br/>
-                              {analysis.actionableStrategies.longTerm.map((action, index) => (
-                                <span key={index}>• {action}<br/></span>
-                              ))}
+                                </div>
+                                <div className="optimization-recommendations">
+                                  <div className="optimization-title">Weekly Focus</div>
+                                  {analysis.actionableStrategies.weekly.map((action, index) => (
+                                    <div key={index} className="optimization-item">
+                                      {action}
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="optimization-recommendations">
+                                  <div className="optimization-title">Long-term Development</div>
+                                  {analysis.actionableStrategies.longTerm.map((action, index) => (
+                                    <div key={index} className="optimization-item" style={{ backgroundColor: 'rgba(34, 197, 94, 0.05)', borderColor: 'rgba(34, 197, 94, 0.2)' }}>
+                                      {action}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -711,47 +766,52 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                         {analysis?.dataAnalysis?.type === 'insufficient' && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaRegLightbulb className="insight-icon" />
                               <span className="insight-metric">Getting Started</span>
                             </div>
                             <div className="insight-text">
-                              <strong>Begin Your Analysis Journey:</strong> You're on day {currentDay} of the {currentPhase.name} phase. 
-                              Start tracking your emotions daily to unlock personalized insights about your unique journey.
-                              <br/><br/>
-                              <strong>What You'll Unlock:</strong>
-                              <br/>
-                              • Pattern recognition across emotional metrics
-                              <br/>
-                              • Phase-specific challenge identification
-                              <br/>
-                              • Predictive guidance for upcoming phases
-                              <br/>
-                              • Personalized strategy recommendations
-                              <br/>
-                              • Scientific explanations for your experiences
+                              <div className="optimization-display">
+                                <div className="optimization-criteria">
+                                  <div className="optimization-criteria-title">Begin Your Analysis Journey</div>
+                                  <div className="optimization-criteria-text">
+                                    You're on day {currentDay} of the {currentPhase.name} phase. 
+                                    Start tracking your emotions daily to unlock personalized insights about your unique journey.
+                                  </div>
+                                </div>
+                                <div className="guidance-list">
+                                  <div className="guidance-title">What You'll Unlock</div>
+                                  <div className="guidance-item">Pattern recognition across emotional metrics</div>
+                                  <div className="guidance-item">Phase-specific challenge identification</div>
+                                  <div className="guidance-item">Predictive guidance for upcoming phases</div>
+                                  <div className="guidance-item">Personalized strategy recommendations</div>
+                                  <div className="guidance-item">Scientific explanations for your experiences</div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}
 
                       </div>
 
-                      {/* Analysis Quality Footer */}
+                      {/* Analysis Quality Footer - WITH PROGRESS ANIMATION */}
                       {analysis && (
                         <div className="analysis-footer">
-                          <div className="comprehensiveness-score">
-                            <strong>Analysis Comprehensiveness: {analysis.comprehensivenessScore}%</strong>
-                            <div className="progress-indicator">
+                          <div className="energy-data-progress-indicator">
+                            <div className="energy-data-progress-header">
+                              <div className="energy-data-progress-title">Analysis Comprehensiveness</div>
+                              <div className="energy-data-progress-count">{analysis.comprehensivenessScore}%</div>
+                            </div>
+                            <div className="energy-data-progress-bar">
                               <div 
-                                className="progress-fill" 
+                                className="energy-data-progress-fill"
                                 style={{ width: `${analysis.comprehensivenessScore}%` }}
                               ></div>
                             </div>
                           </div>
                           <div className="data-quality-indicator">
-                            <span className={`quality-badge ${analysis.dataQuality.level}`}>
+                            <div className={`insight-data-quality ${analysis.dataQuality.level}`}>
                               {analysis.dataQuality.description}
-                            </span>
-                            <span className="data-points">Based on {recentData.length} days of tracking</span>
+                            </div>
+                            <div className="insight-data-days">Based on {recentData.length} days of tracking</div>
                           </div>
                         </div>
                       )}
