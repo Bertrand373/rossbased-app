@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - WORLD-CLASS: Enhanced styling for comprehensive analysis */
+/* components/EmotionalTimeline/EmotionalTimeline.css - Enhanced styling with pill navigation */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
@@ -229,6 +229,92 @@
   cursor: not-allowed;
 }
 
+/* NEW: Timeline Section Controls - Styled like Stats */
+.timeline-section-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-lg);
+}
+
+.timeline-section-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+  max-width: 600px;
+  align-items: center;
+}
+
+.timeline-pill-container {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  background-color: var(--card-background);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  width: 100%;
+  justify-content: center;
+}
+
+.timeline-section-btn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  position: relative;
+  outline: none;
+}
+
+.timeline-section-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.timeline-section-btn.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
+}
+
+/* Mobile pill scrolling */
+@media (max-width: 768px) {
+  .timeline-pill-container {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: var(--spacing-md);
+  }
+  
+  .timeline-pill-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .timeline-section-btn {
+    white-space: nowrap;
+    min-width: fit-content;
+    flex-shrink: 0;
+  }
+}
+
 /* Early Premium Teaser Section */
 .early-premium-teaser {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
@@ -319,20 +405,6 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
   color: #000000;
-}
-
-/* Premium Features Section - Container for all premium content */
-.premium-features-section {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.premium-features-section.locked-features {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
 }
 
 /* Timeline Overview - styled like Stats milestone section */
@@ -1022,7 +1094,7 @@
   border: 1px solid var(--border);
 }
 
-/* WORLD-CLASS: Comprehensive Phase Analysis Section */
+/* UPDATED: Comprehensive Phase Analysis Section - STYLED LIKE STATS */
 .phase-insight-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -1089,24 +1161,27 @@
   font-weight: 500;
 }
 
-/* WORLD-CLASS: Analysis Cards Grid */
+/* UPDATED: Analysis Cards Grid - STYLED LIKE STATS */
 .analysis-cards-grid {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* Base insight card styling */
+/* UPDATED: Base insight card styling - MATCH STATS EXACTLY */
 .insight-card {
+  padding: var(--spacing-xl) var(--spacing-lg);
   background-color: var(--card-background);
-  padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  min-height: 120px;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .insight-card:hover {
@@ -1115,55 +1190,19 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Card headers with different icons */
+/* UPDATED: Card headers - NO ICONS, SIMPLE TEXT */
 .insight-header {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   font-weight: 600;
   color: var(--text);
-  justify-content: space-between;
+  justify-content: center;
+  text-align: center;
   margin-bottom: var(--spacing-sm);
 }
 
-.insight-header span:first-of-type {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-/* Icon styling for different card types */
-.insight-icon-education {
-  color: #3b82f6;
-  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.3));
-}
-
-.insight-icon-science {
-  color: #8b5cf6;
-  filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.3));
-}
-
-.insight-icon-data {
-  color: var(--primary);
-  filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.3));
-}
-
-.insight-icon-challenge {
-  color: #f59e0b;
-  filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.3));
-}
-
-.insight-icon-predictive {
-  color: #10b981;
-  filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.3));
-}
-
-.insight-icon-strategies {
-  color: #ef4444;
-  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.3));
-}
-
-/* Card content styling */
+/* UPDATED: Card content styling - MATCH STATS */
 .insight-content {
   display: flex;
   flex-direction: column;
@@ -1174,6 +1213,8 @@
   font-size: 0.875rem;
   line-height: 1.4;
   color: var(--text);
+  text-align: center;
+  padding: 0 var(--spacing-sm);
 }
 
 .insight-content strong {
@@ -1195,6 +1236,8 @@
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .score-indicator {
