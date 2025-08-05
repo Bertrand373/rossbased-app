@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Main Component with Pill Navigation
+// components/EmotionalTimeline/EmotionalTimeline.js - Main Component with Pill Navi
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
