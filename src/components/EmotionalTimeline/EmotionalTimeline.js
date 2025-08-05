@@ -528,108 +528,127 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
             )}
 
             {/* Analysis Section */}
-            {activeSection === 'analysis' && currentPhase && (
+            {activeSection === 'analysis' && (
               <div className="phase-insight-section" ref={insightSectionRef}>
                 <h3>Comprehensive Phase Analysis</h3>
                 
-                {(() => {
-                  const analysis = generateComprehensivePhaseAnalysis(currentPhase, currentDay, userData, wisdomMode, isPremium);
-                  const emotionalData = userData.emotionalTracking || [];
-                  const recentData = emotionalData.filter(entry => 
-                    differenceInDays(new Date(), new Date(entry.date)) <= 14
-                  );
-                  
-                  return (
-                    <>
-                      {/* Data Quality Banner */}
-                      {recentData.length < 7 && (
-                        <div className="insight-data-banner">
-                          <div className="insight-data-banner-content">
-                            <FaInfoCircle className="insight-data-icon" />
-                            <div className="insight-data-text">
-                              <strong>Analysis improves with data:</strong> The more you track emotions, the more personalized and accurate this analysis becomes.
-                              {recentData.length >= 3 && recentData.length < 7 && ` You've logged ${recentData.length} days - track 7+ days to unlock advanced pattern recognition.`}
+                {/* Handle no current phase (reset scenario) */}
+                {!currentPhase || currentDay <= 0 ? (
+                  <div className="analysis-reset-state">
+                    <div className="optimization-criteria">
+                      <div className="optimization-criteria-title">Analysis Unavailable</div>
+                      <div className="optimization-criteria-text">
+                        Phase analysis requires an active retention streak. Start your journey to unlock comprehensive insights about your emotional progression through the phases.
+                      </div>
+                    </div>
+                    <div className="guidance-list">
+                      <div className="guidance-title">What Analysis Provides</div>
+                      <div className="guidance-item">Scientific explanations for each phase you experience</div>
+                      <div className="guidance-item">Personal data analysis with trend recognition</div>
+                      <div className="guidance-item">Challenge identification and solutions</div>
+                      <div className="guidance-item">Predictive guidance for upcoming phases</div>
+                      <div className="guidance-item">Actionable strategies based on your current phase</div>
+                    </div>
+                  </div>
+                ) : (
+                  (() => {
+                    const analysis = generateComprehensivePhaseAnalysis(currentPhase, currentDay, userData, wisdomMode, isPremium);
+                    const emotionalData = userData.emotionalTracking || [];
+                    const recentData = emotionalData.filter(entry => 
+                      differenceInDays(new Date(), new Date(entry.date)) <= 14
+                    );
+                    
+                    return (
+                      <>
+                        {/* Data Quality Banner */}
+                        {recentData.length < 7 && (
+                          <div className="insight-data-banner">
+                            <div className="insight-data-banner-content">
+                              <FaInfoCircle className="insight-data-icon" />
+                              <div className="insight-data-text">
+                                <strong>Analysis improves with data:</strong> The more you track emotions, the more personalized and accurate this analysis becomes.
+                                {recentData.length >= 3 && recentData.length < 7 && ` You've logged ${recentData.length} days - track 7+ days to unlock advanced pattern recognition.`}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Getting Started Banner for Insufficient Data */}
-                      {analysis?.dataAnalysis?.type === 'insufficient' && (
-                        <div className="insufficient-data-section">
-                          <div className="optimization-criteria">
-                            <div className="optimization-criteria-title">Begin Your Analysis Journey</div>
-                            <div className="optimization-criteria-text">
-                              You're on day {currentDay - currentPhase.startDay + 1} of the {currentPhase.name} phase (total streak: day {currentDay}). 
-                              Start tracking your emotions daily to unlock personalized insights about your unique journey.
+                        {/* Getting Started Banner - ONLY when very little data */}
+                        {recentData.length < 3 && (
+                          <div className="insufficient-data-section">
+                            <div className="optimization-criteria">
+                              <div className="optimization-criteria-title">Begin Your Analysis Journey</div>
+                              <div className="optimization-criteria-text">
+                                You're on day {currentDay - currentPhase.startDay + 1} of the {currentPhase.name} phase (total streak: day {currentDay}). 
+                                Start tracking your emotions daily to unlock personalized insights about your unique journey.
+                              </div>
+                            </div>
+                            <div className="guidance-list">
+                              <div className="guidance-title">What You'll Unlock</div>
+                              <div className="guidance-item">Pattern recognition across emotional metrics</div>
+                              <div className="guidance-item">Phase-specific challenge identification</div>
+                              <div className="guidance-item">Predictive guidance for upcoming phases</div>
+                              <div className="guidance-item">Personalized strategy recommendations</div>
+                              <div className="guidance-item">Scientific explanations for your experiences</div>
                             </div>
                           </div>
-                          <div className="guidance-list">
-                            <div className="guidance-title">What You'll Unlock</div>
-                            <div className="guidance-item">Pattern recognition across emotional metrics</div>
-                            <div className="guidance-item">Phase-specific challenge identification</div>
-                            <div className="guidance-item">Predictive guidance for upcoming phases</div>
-                            <div className="guidance-item">Personalized strategy recommendations</div>
-                            <div className="guidance-item">Scientific explanations for your experiences</div>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Analysis Cards Grid - ONLY WHEN SUFFICIENT DATA */}
-                      {analysis?.dataAnalysis?.type === 'comprehensive' && (
-                        <div className="insights-grid">
+                        )}
                         
-                        {/* Phase Education Card */}
-                        {analysis?.phaseEducation && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Phase Education</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="optimization-display">
-                                <div className="optimization-metric-card">
-                                  <div className="optimization-metric-value">Day {analysis.phaseEducation.dayInPhase}</div>
-                                  <div className="optimization-metric-label">Current Phase Progress</div>
+                        {/* Analysis Cards Grid - SHOW when we have analysis OR when we have 3+ days */}
+                        {analysis && (
+                          <div className="insights-grid">
+                        
+                            {/* Phase Education Card - ALWAYS SHOW */}
+                            {analysis?.phaseEducation && (
+                              <div className="insight-card">
+                                <div className="insight-card-header">
+                                  <span className="insight-metric">Phase Education</span>
                                 </div>
-                                <div className="optimization-criteria">
-                                  <div className="optimization-criteria-title">Current Focus</div>
-                                  <div className="optimization-criteria-text">{analysis.phaseEducation.phaseOverview}</div>
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>Key Learning:</strong> {analysis.phaseEducation.keyLearning}
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>What to Expect:</strong> {analysis.phaseEducation.expectation}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Scientific Explanation Card */}
-                        {analysis?.scientificExplanation && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">{wisdomMode ? 'Energetic Understanding' : 'Scientific Mechanisms'}</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="patterns-display">
-                                <div className="pattern-item">
-                                  <strong>{wisdomMode ? 'Energetic:' : 'Neurochemical:'}</strong> {analysis.scientificExplanation.neurochemical}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>Physiological:</strong> {analysis.scientificExplanation.physiological}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>{wisdomMode ? 'Consciousness:' : 'Behavioral:'}</strong> {analysis.scientificExplanation.behavioral}
+                                <div className="insight-text">
+                                  <div className="optimization-display">
+                                    <div className="optimization-metric-card">
+                                      <div className="optimization-metric-value">Day {analysis.phaseEducation.dayInPhase}</div>
+                                      <div className="optimization-metric-label">Current Phase Progress</div>
+                                    </div>
+                                    <div className="optimization-criteria">
+                                      <div className="optimization-criteria-title">Current Focus</div>
+                                      <div className="optimization-criteria-text">{analysis.phaseEducation.phaseOverview}</div>
+                                    </div>
+                                    <div className="optimization-item">
+                                      <strong>Key Learning:</strong> {analysis.phaseEducation.keyLearning}
+                                    </div>
+                                    <div className="optimization-item">
+                                      <strong>What to Expect:</strong> {analysis.phaseEducation.expectation}
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </div>
-                        )}
+                            )}
 
-                        {/* Data Analysis Card */}
-                        {analysis?.dataAnalysis?.type === 'comprehensive' && (
+                            {/* Scientific Explanation Card - ALWAYS SHOW */}
+                            {analysis?.scientificExplanation && (
+                              <div className="insight-card">
+                                <div className="insight-card-header">
+                                  <span className="insight-metric">{wisdomMode ? 'Energetic Understanding' : 'Scientific Mechanisms'}</span>
+                                </div>
+                                <div className="insight-text">
+                                  <div className="patterns-display">
+                                    <div className="pattern-item">
+                                      <strong>{wisdomMode ? 'Energetic:' : 'Neurochemical:'}</strong> {analysis.scientificExplanation.neurochemical}
+                                    </div>
+                                    <div className="pattern-item">
+                                      <strong>Physiological:</strong> {analysis.scientificExplanation.physiological}
+                                    </div>
+                                    <div className="pattern-item">
+                                      <strong>{wisdomMode ? 'Consciousness:' : 'Behavioral:'}</strong> {analysis.scientificExplanation.behavioral}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Data Analysis Card - ONLY when sufficient data */}
+                            {analysis?.dataAnalysis?.type === 'comprehensive' && (
                           <div className="insight-card">
                             <div className="insight-card-header">
                               <span className="insight-metric">Personal Data Analysis</span>
