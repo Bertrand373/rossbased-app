@@ -2,7 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
+
+// Import both CSS files
 import './EmotionalTimeline.css';
+import './EmotionalTimelineSections.css';
 
 // Icons
 import { 
