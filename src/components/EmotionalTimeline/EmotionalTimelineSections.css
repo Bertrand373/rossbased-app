@@ -1014,278 +1014,6 @@
   color: var(--text-secondary);
 }
 
-/* Phase Education Card specific styling */
-.phase-education-card .phase-overview,
-.phase-education-card .key-learning,
-.phase-education-card .expectation,
-.phase-education-card .phase-progress-detail {
-  margin-bottom: var(--spacing-sm);
-}
-
-/* Data Analysis Card specific styling */
-.data-analysis-card .wellbeing-score {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.score-indicator {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.score-indicator.excellent {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
-  border: 1px solid rgba(34, 197, 94, 0.2);
-  color: #22c55e;
-}
-
-.score-indicator.good {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.score-indicator.needs-attention {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  color: #f59e0b;
-}
-
-.metric-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  margin-bottom: var(--spacing-md);
-}
-
-.metric-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-xs) 0;
-}
-
-.trend {
-  font-size: 1rem;
-  font-weight: bold;
-  margin-left: var(--spacing-sm);
-}
-
-.trend.improving {
-  color: #22c55e;
-}
-
-.trend.concerning {
-  color: #ef4444;
-}
-
-.trend.stable {
-  color: var(--text-secondary);
-}
-
-.phase-alignment {
-  padding: var(--spacing-sm);
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.alignment-score {
-  font-weight: 600;
-  margin-left: var(--spacing-sm);
-}
-
-.alignment-score.excellent {
-  color: #22c55e;
-}
-
-.alignment-score.good {
-  color: var(--primary);
-}
-
-.alignment-score.concerning {
-  color: #f59e0b;
-}
-
-.alignment-score.misaligned {
-  color: #ef4444;
-}
-
-/* Challenge Card specific styling */
-.challenge-card .insight-header {
-  position: relative;
-}
-
-.risk-level {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.risk-level.low {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
-  border: 1px solid rgba(34, 197, 94, 0.2);
-  color: #22c55e;
-}
-
-.risk-level.moderate {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.risk-level.high {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-}
-
-.challenge-item {
-  padding: var(--spacing-md);
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: var(--spacing-md);
-}
-
-.challenge-item:last-child {
-  margin-bottom: 0;
-}
-
-.challenge-item.high {
-  border-color: rgba(239, 68, 68, 0.3);
-  background-color: rgba(239, 68, 68, 0.05);
-}
-
-.challenge-item.moderate {
-  border-color: rgba(255, 221, 0, 0.3);
-  background-color: rgba(255, 221, 0, 0.05);
-}
-
-.challenge-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-sm);
-}
-
-.severity-badge {
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.severity-badge.high {
-  background-color: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-}
-
-.severity-badge.moderate {
-  background-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.challenge-explanation {
-  color: var(--text-secondary);
-  font-size: 0.8125rem;
-  margin-bottom: var(--spacing-sm);
-  line-height: 1.4;
-}
-
-.challenge-solution {
-  font-size: 0.8125rem;
-  line-height: 1.4;
-}
-
-/* Strategies Card specific styling */
-.strategy-section {
-  margin-bottom: var(--spacing-md);
-}
-
-.strategy-section:last-child {
-  margin-bottom: 0;
-}
-
-.strategy-section strong {
-  display: block;
-  margin-bottom: var(--spacing-sm);
-  color: var(--text);
-}
-
-.strategy-section.urgent strong {
-  color: #ef4444;
-}
-
-.strategy-section ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.strategy-section li {
-  position: relative;
-  padding-left: var(--spacing-lg);
-  margin-bottom: var(--spacing-xs);
-  color: var(--text);
-  font-size: 0.875rem;
-  line-height: 1.4;
-}
-
-.strategy-section li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: var(--primary);
-  font-weight: bold;
-}
-
-.strategy-section.urgent li::before {
-  color: #ef4444;
-}
-
-/* Insufficient Data Card */
-.insufficient-data-card .encouragement {
-  margin-bottom: var(--spacing-md);
-  font-size: 0.9375rem;
-}
-
-.insufficient-data-card .data-benefits ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.insufficient-data-card .data-benefits li {
-  position: relative;
-  padding-left: var(--spacing-lg);
-  margin-bottom: var(--spacing-xs);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  line-height: 1.4;
-}
-
-.insufficient-data-card .data-benefits li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: var(--primary);
-  font-weight: bold;
-}
-
 /* Phase Detail Modal enhancements */
 .phase-detail-modal {
   max-width: 700px;
@@ -1375,6 +1103,31 @@
   font-weight: bold;
 }
 
+/* NEW: Spiritual Section Styling */
+.spiritual-section {
+  background-color: rgba(138, 92, 246, 0.05);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(138, 92, 246, 0.1);
+}
+
+.spiritual-section h4 {
+  color: #8b5cf6;
+}
+
+.spiritual-insight {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: rgba(138, 92, 246, 0.05);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(138, 92, 246, 0.1);
+  font-style: italic;
+}
+
+.spiritual-insight strong {
+  color: #8b5cf6;
+}
+
 .warning-section {
   background-color: rgba(239, 68, 68, 0.05);
   padding: var(--spacing-md);
@@ -1425,6 +1178,45 @@
   margin: 0;
   color: var(--text);
   line-height: 1.5;
+}
+
+/* NEW: Static "Got It" Button - Matching Stats Modal Buttons */
+.modal-got-it-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  width: 100% !important;
+  min-height: auto !important;
+  transform: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* NUCLEAR: Completely static - NO hover effects */
+.modal-got-it-btn:hover,
+.modal-got-it-btn:focus,
+.modal-got-it-btn:active,
+.modal-got-it-btn:focus-visible {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  outline: none !important;
+  filter: none !important;
+  animation: none !important;
+  transition: none !important;
 }
 
 /* Journal Modal */
@@ -1492,7 +1284,7 @@
   border: 1px solid;
 }
 
-.form-actions .action-btn:not(.primary-action) {
+.form-actions .action-btn:not(.primary-action):not(.cancel-action) {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
   color: var(--text-secondary);
@@ -1537,6 +1329,16 @@
   margin-bottom: var(--spacing-md);
   color: var(--text);
   text-align: center;
+}
+
+/* Modal Actions - Matching Stats modals exactly */
+.modal-actions {
+  margin-top: var(--spacing-lg);
+  display: flex !important;
+  gap: var(--spacing-md) !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* Mobile Responsiveness for Sections */

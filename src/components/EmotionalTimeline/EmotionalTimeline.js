@@ -11,7 +11,7 @@ import './EmotionalTimelineSections.css';
 import { 
   FaMapSigns, FaLightbulb, FaHeart, FaBrain, FaLeaf, FaTrophy, 
   FaCheckCircle, FaLock, FaPen, FaInfoCircle, FaExclamationTriangle, 
-  FaRegLightbulb, FaEye, FaTimes, FaStar, FaChartLine, FaFire, FaSearch,
+  FaRegLightbulb, FaTimes, FaStar, FaChartLine, FaFire, FaSearch,
   FaShieldAlt, FaBolt, FaUserGraduate, FaFlask, FaAtom, FaStethoscope 
 } from 'react-icons/fa';
 
@@ -33,10 +33,8 @@ import {
 const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   const [showJournalModal, setShowJournalModal] = useState(false);
   const [currentNote, setCurrentNote] = useState('');
-  const [wisdomMode, setWisdomMode] = useState(false);
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showPhaseDetail, setShowPhaseDetail] = useState(false);
-  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   
   // NEW: Pill navigation state
   const [activeSection, setActiveSection] = useState('journey-map');
@@ -59,11 +57,6 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
   // Get current phase and mastery level
   const currentPhase = getCurrentPhase(currentDay, emotionalPhases);
   const currentMasteryLevel = getCurrentMasteryLevel(currentDay, masteryLevels);
-
-  // Always show floating toggle
-  useEffect(() => {
-    setShowFloatingToggle(true);
-  }, []);
 
   // Check if emotions are already logged for today
   useEffect(() => {
@@ -179,17 +172,6 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="emotional-timeline-container">
-      {/* Smart Floating Wisdom Toggle */}
-      {showFloatingToggle && (
-        <button 
-          className={`floating-wisdom-toggle ${wisdomMode ? 'active' : ''}`}
-          onClick={() => setWisdomMode(!wisdomMode)}
-          title={wisdomMode ? "Switch to Scientific View" : "Switch to Esoteric View"}
-        >
-          <FaEye className={`floating-wisdom-eye ${wisdomMode ? 'active' : ''}`} />
-        </button>
-      )}
-
       {/* Header */}
       <div className="timeline-header">
         <div className="timeline-header-spacer"></div>
@@ -214,7 +196,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
             </div>
             
             <div className="phase-description">
-              {wisdomMode ? currentPhase.esotericDescription : currentPhase.description}
+              {currentPhase.description}
             </div>
 
             {/* Progress bar */}
@@ -557,7 +539,7 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                   </div>
                 ) : (
                   (() => {
-                    const analysis = generateComprehensivePhaseAnalysis(currentPhase, currentDay, userData, wisdomMode, isPremium);
+                    const analysis = generateComprehensivePhaseAnalysis(currentPhase, currentDay, userData, false, isPremium);
                     const emotionalData = userData.emotionalTracking || [];
                     const recentData = emotionalData.filter(entry => 
                       differenceInDays(new Date(), new Date(entry.date)) <= 14
@@ -634,18 +616,37 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
                             {analysis?.scientificExplanation && (
                               <div className="insight-card">
                                 <div className="insight-card-header">
-                                  <span className="insight-metric">{wisdomMode ? 'Energetic Understanding' : 'Scientific Mechanisms'}</span>
+                                  <span className="insight-metric">Scientific Mechanisms</span>
                                 </div>
                                 <div className="insight-text">
                                   <div className="patterns-display">
                                     <div className="pattern-item">
-                                      <strong>{wisdomMode ? 'Energetic:' : 'Neurochemical:'}</strong> {analysis.scientificExplanation.neurochemical}
+                                      <strong>Neurochemical:</strong> {analysis.scientificExplanation.neurochemical}
                                     </div>
                                     <div className="pattern-item">
                                       <strong>Physiological:</strong> {analysis.scientificExplanation.physiological}
                                     </div>
                                     <div className="pattern-item">
-                                      <strong>{wisdomMode ? 'Consciousness:' : 'Behavioral:'}</strong> {analysis.scientificExplanation.behavioral}
+                                      <strong>Behavioral:</strong> {analysis.scientificExplanation.behavioral}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* NEW: Spiritual Understanding Card - ALWAYS SHOW */}
+                            {currentPhase && (
+                              <div className="insight-card">
+                                <div className="insight-card-header">
+                                  <span className="insight-metric">Spiritual Understanding</span>
+                                </div>
+                                <div className="insight-text">
+                                  <div className="patterns-display">
+                                    <div className="pattern-item">
+                                      <strong>Energetic Perspective:</strong> {currentPhase.esotericDescription}
+                                    </div>
+                                    <div className="pattern-item">
+                                      <strong>Spiritual Insight:</strong> {currentPhase.insights.esoteric}
                                     </div>
                                   </div>
                                 </div>
@@ -882,13 +883,22 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
             </div>
 
             <div className="phase-modal-description">
-              <p>{wisdomMode ? selectedPhase.esotericDescription : selectedPhase.description}</p>
+              <p>{selectedPhase.description}</p>
             </div>
 
             {/* Scientific Mechanism */}
             <div className="phase-modal-section">
-              <h4>{wisdomMode ? 'Energetic Mechanism' : 'Scientific Mechanism'}</h4>
+              <h4>Scientific Mechanism</h4>
               <p>{selectedPhase.scientificMechanism}</p>
+            </div>
+
+            {/* NEW: Spiritual Understanding Section */}
+            <div className="phase-modal-section spiritual-section">
+              <h4>Spiritual Understanding</h4>
+              <p>{selectedPhase.esotericDescription}</p>
+              <div className="spiritual-insight">
+                <strong>Esoteric Insight:</strong> {selectedPhase.insights.esoteric}
+              </div>
             </div>
 
             {/* Expected Symptoms */}
@@ -943,8 +953,19 @@ const EmotionalTimeline = ({ userData, isPremium, updateUserData }) => {
             )}
 
             <div className="phase-modal-insight">
-              <h4>{wisdomMode ? 'Spiritual Understanding' : 'Scientific Understanding'}</h4>
-              <p>{wisdomMode ? selectedPhase.insights.esoteric : selectedPhase.insights.scientific}</p>
+              <h4>Scientific Understanding</h4>
+              <p>{selectedPhase.insights.scientific}</p>
+            </div>
+
+            {/* NEW: Static "Got It" Button */}
+            <div className="modal-actions">
+              <button 
+                className="modal-got-it-btn"
+                onClick={() => setShowPhaseDetail(false)}
+              >
+                <FaCheckCircle />
+                <span>Got It</span>
+              </button>
             </div>
           </div>
         </div>

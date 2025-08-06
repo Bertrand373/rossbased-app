@@ -404,31 +404,31 @@ const generatePhaseEducationInsight = (currentPhase, currentDay, wisdomMode) => 
       earlyPhase: `Days 1-7: Foundation Phase - Your hypothalamic-pituitary axis is beginning hormonal rebalancing. Testosterone stabilization causes energy fluctuations.`,
       midPhase: `Days 8-14: Adjustment Phase - Seminal vesicles reducing overproduction. First strength gains and posture improvements emerge naturally.`,
       keyLearning: "Understanding urge waves: Sexual thoughts trigger dopamine release expecting ejaculatory reward. Each resistance strengthens prefrontal cortex control.",
-      whatToExpect: `Expect ${wisdomMode ? 'ego resistance as old patterns fight change' : 'strong urges and restlessness as your body adapts'}. This is completely normal brain rewiring.`
+      whatToExpect: `Expect strong urges and restlessness as your body adapts. This is completely normal brain rewiring.`
     },
     2: { // Emotional Purging  
       earlyPhase: `Days 15-30: Emotional Flooding Begins - Without ejaculation's endorphin numbing, suppressed emotions MUST surface. This is healing, not pathology.`,
       midPhase: `Days 31-45: Deep Purging Intensifies - Past relationship trauma and betrayals surface for processing. Your psyche is courageously healing itself.`,
       keyLearning: "Trauma-energy connection: Sexual activity was unconsciously medicating emotional pain. Retention forces proper emotional processing.",
-      whatToExpected: `Expect ${wisdomMode ? 'karmic memories and shadow integration' : 'intense mood swings and emotional rawness'}. Decades of suppressed content is releasing.`
+      whatToExpect: `Expect intense mood swings and emotional rawness. Decades of suppressed content is releasing.`
     },
     3: { // Mental Expansion
       earlyPhase: `Days 46-60: Cognitive Emergence - Retained nutrients (lecithin, zinc, B12) rebuild nerve sheaths. Mental fog lifts permanently.`,
       midPhase: `Days 61-90: Intellectual Peak - Brain tissue becomes more densely connected. Pattern recognition and strategic thinking expand dramatically.`,
       keyLearning: "Neuroplasticity advantage: Higher zinc and B-vitamin availability optimizes neurotransmitter synthesis for peak mental performance.",
-      whatToExpect: `Expect ${wisdomMode ? 'third eye activation and intuitive downloads' : 'enhanced focus and problem-solving abilities'}. Your brain is operating at higher efficiency.`
+      whatToExpect: `Expect enhanced focus and problem-solving abilities. Your brain is operating at higher efficiency.`
     },
     4: { // Spiritual Integration
       earlyPhase: `Days 91-120: Integration Deepens - Complete endocrine rebalancing. Nervous system optimizes for retention, not ejaculation.`,
       midPhase: `Days 121-180: Mastery Emergence - Natural charisma and leadership qualities develop. Others unconsciously sense your increased presence.`,
       keyLearning: "Electromagnetic field changes: Retained practitioners show brighter, more extensive energy fields detectable by sensitive individuals.",
-      whatToExpect: `Expect ${wisdomMode ? 'divine masculine energy awakening and soul integration' : 'natural leadership abilities and magnetic presence'}. You're embodying refined energy.`
+      whatToExpect: `Expect natural leadership abilities and magnetic presence. You're embodying refined energy.`
     },
     5: { // Mastery & Service
       earlyPhase: `Day ${currentDay}: Avatar Consciousness - Sexual energy permanently redirected upward. 'Ojas' accumulation creates sustained expanded awareness.`,
       midPhase: `Advanced Mastery: You demonstrate peak human potential through disciplined energy management. Others seek your wisdom naturally.`,
       keyLearning: "Permanent neuroplastic changes: Brain imaging would show enhanced connectivity between self-control and higher cognition regions.",
-      whatToExpected: `You now ${wisdomMode ? 'channel cosmic intelligence for humanity\'s evolution' : 'inspire others through your living example of human potential'}. Your presence teaches.`
+      whatToExpect: `You now inspire others through your living example of human potential. Your presence teaches.`
     }
   };
 
@@ -438,8 +438,8 @@ const generatePhaseEducationInsight = (currentPhase, currentDay, wisdomMode) => 
   return {
     phaseOverview: dayInPhase <= 7 ? content.earlyPhase : content.midPhase,
     keyLearning: content.keyLearning,
-    expectation: content.whatToExpected || content.whatToExpect,
-    mechanismExplanation: wisdomMode ? currentPhase.esotericDescription : currentPhase.scientificMechanism,
+    expectation: content.whatToExpect,
+    mechanismExplanation: currentPhase.scientificMechanism,
     dayInPhase,
     phaseProgress: Math.min(100, Math.max(0, phaseProgress))
   };
