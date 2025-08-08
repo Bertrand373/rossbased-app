@@ -1,8 +1,8 @@
-/* components/EmotionalTimeline/EmotionalTimelineSections.css - Sections, Forms & Analysis */
+/* components/EmotionalTimeline/EmotionalTimelineSections.css - Complete Clean Version */
 
-/* IMPORT ALL STATS ANALYSIS STYLING */
+/* ANALYSIS COMPONENTS - Shared styles from Stats */
 
-/* Optimization Display - From Stats */
+/* Optimization Display */
 .optimization-display {
   display: flex;
   flex-direction: column;
@@ -103,7 +103,7 @@
   transform: translateY(-1px);
 }
 
-/* Pattern Recognition - From Stats */
+/* Pattern Recognition */
 .patterns-display {
   display: flex;
   flex-direction: column;
@@ -127,7 +127,7 @@
   transform: translateY(-1px);
 }
 
-/* Risk Level Indicators - From Stats */
+/* Risk Level Indicators */
 .risk-level-indicator {
   display: flex;
   align-items: center;
@@ -176,6 +176,13 @@
   border: 1px solid rgba(128, 128, 128, 0.3);
 }
 
+.risk-score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
 .risk-score {
   font-size: 2rem;
   font-weight: 700;
@@ -209,7 +216,7 @@
   font-weight: 500;
 }
 
-/* Relapse Pattern Analytics - From Stats */
+/* Analysis Summary Stats */
 .relapse-summary-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -341,7 +348,7 @@
   background-color: rgba(34, 197, 94, 0.08);
 }
 
-/* Guidance List - From Stats */
+/* Guidance List */
 .guidance-list {
   background-color: rgba(255, 255, 255, 0.02);
   padding: var(--spacing-md);
@@ -367,7 +374,7 @@
   margin-bottom: 0;
 }
 
-/* Energy Data Progress Indicator - From Stats */
+/* Progress Indicator */
 .energy-data-progress-indicator {
   display: flex;
   flex-direction: column;
@@ -443,7 +450,7 @@
   }
 }
 
-/* Insight Data Quality - From Stats */
+/* Data Quality */
 .insight-data-quality {
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
@@ -478,7 +485,7 @@
   font-weight: 500;
 }
 
-/* Data Quality Indicator - From Stats */
+/* Data Quality Indicator */
 .data-quality-indicator {
   display: flex;
   align-items: center;
@@ -486,7 +493,7 @@
   gap: var(--spacing-md);
 }
 
-/* Analysis Reset State - When no active streak */
+/* Analysis Reset State */
 .analysis-reset-state {
   display: flex;
   flex-direction: column;
@@ -494,7 +501,7 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* Insufficient Data Section - Under Header */
+/* Insufficient Data Section */
 .insufficient-data-section {
   display: flex;
   flex-direction: column;
@@ -591,7 +598,7 @@
   transition: none;
 }
 
-/* Emotion sliders - matching Tracker exactly */
+/* Emotion sliders */
 .emotion-sliders {
   display: flex;
   flex-direction: column;
@@ -715,7 +722,6 @@
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
-/* Slider labels matching Tracker exactly */
 .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
@@ -869,7 +875,7 @@
   border: 1px solid var(--border);
 }
 
-/* UPDATED: Comprehensive Phase Analysis Section - STYLED LIKE STATS */
+/* Phase Analysis Section */
 .phase-insight-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -936,14 +942,14 @@
   font-weight: 500;
 }
 
-/* UPDATED: Analysis Cards Grid - MATCH STATS EXACTLY */
+/* Analysis Cards Grid */
 .insights-grid {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Insight Cards - EXACT MATCH TO STATS */
+/* Insight Cards */
 .insight-card {
   padding: var(--spacing-xl) var(--spacing-lg);
   background-color: var(--card-background);
@@ -964,7 +970,7 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-/* UPDATED: Card Headers - EXACT MATCH TO STATS */
+/* Card Headers */
 .insight-card-header {
   display: flex;
   align-items: center;
@@ -986,7 +992,7 @@
   font-weight: 600;
 }
 
-/* UPDATED: Card Content - EXACT MATCH TO STATS */
+/* Card Content */
 .insight-text {
   color: var(--text);
   font-size: 0.875rem;
@@ -1103,31 +1109,6 @@
   font-weight: bold;
 }
 
-/* NEW: Spiritual Section Styling */
-.spiritual-section {
-  background-color: rgba(138, 92, 246, 0.05);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(138, 92, 246, 0.1);
-}
-
-.spiritual-section h4 {
-  color: #8b5cf6;
-}
-
-.spiritual-insight {
-  margin-top: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: rgba(138, 92, 246, 0.05);
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(138, 92, 246, 0.1);
-  font-style: italic;
-}
-
-.spiritual-insight strong {
-  color: #8b5cf6;
-}
-
 .warning-section {
   background-color: rgba(239, 68, 68, 0.05);
   padding: var(--spacing-md);
@@ -1180,7 +1161,7 @@
   line-height: 1.5;
 }
 
-/* NEW: Static "Got It" Button - Matching Stats Modal Buttons */
+/* Static "Got It" Button */
 .modal-got-it-btn {
   display: flex !important;
   align-items: center !important;
@@ -1202,7 +1183,6 @@
   outline: none !important;
 }
 
-/* NUCLEAR: Completely static - NO hover effects */
 .modal-got-it-btn:hover,
 .modal-got-it-btn:focus,
 .modal-got-it-btn:active,
@@ -1331,7 +1311,7 @@
   text-align: center;
 }
 
-/* Modal Actions - Matching Stats modals exactly */
+/* Modal Actions */
 .modal-actions {
   margin-top: var(--spacing-lg);
   display: flex !important;
@@ -1385,7 +1365,7 @@
   }
   
   /* Mobile analysis cards */
-  .analysis-cards-grid {
+  .insights-grid {
     gap: var(--spacing-md);
   }
   
@@ -1459,5 +1439,257 @@
   .form-actions .action-btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .emotional-checkin-section {
+    padding: var(--spacing-md);
+  }
+  
+  .emotion-label {
+    font-size: 0.8rem !important;
+  }
+  
+  .emotion-value {
+    font-size: 0.75rem !important;
+    min-width: 40px;
+  }
+  
+  .emotion-range-slider {
+    height: 36px;
+  }
+  
+  .emotion-range-slider::-webkit-slider-thumb {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .emotion-range-slider::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .slider-labels {
+    font-size: 0.75rem !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  
+  .phase-insight-section {
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
+  }
+  
+  .phase-insight-section h3 {
+    font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
+  }
+  
+  .insight-card {
+    padding: var(--spacing-sm);
+    min-height: 100px;
+  }
+  
+  .insight-card-header {
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .insight-card-header .insight-icon {
+    font-size: 1rem;
+  }
+  
+  .insight-text {
+    font-size: 0.8rem;
+    padding: 0;
+  }
+  
+  .optimization-metric-card {
+    min-height: 70px;
+    padding: var(--spacing-sm);
+  }
+  
+  .optimization-metric-value {
+    font-size: 1.25rem;
+  }
+  
+  .optimization-metric-label {
+    font-size: 0.8rem;
+  }
+  
+  .optimization-item {
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+  
+  .pattern-item {
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+  
+  .relapse-summary-stats {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .relapse-stat-card {
+    padding: var(--spacing-md);
+    min-height: 80px;
+  }
+  
+  .relapse-stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .relapse-stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .risk-level-indicator {
+    padding: var(--spacing-md);
+  }
+  
+  .risk-score {
+    font-size: 1.5rem;
+  }
+  
+  .risk-level-text {
+    font-size: 0.8rem;
+  }
+  
+  .relapse-insights-list {
+    padding: var(--spacing-sm);
+  }
+  
+  .relapse-insight-item {
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .guidance-list {
+    padding: var(--spacing-sm);
+  }
+  
+  .guidance-item {
+    font-size: 0.8rem;
+  }
+  
+  .energy-data-progress-indicator {
+    padding: var(--spacing-sm);
+  }
+  
+  .energy-data-progress-title {
+    font-size: 0.8rem;
+  }
+  
+  .energy-data-progress-count {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+  
+  .insight-data-quality {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+  
+  .insight-data-days {
+    font-size: 0.7rem;
+  }
+  
+  .modal-content {
+    padding: var(--spacing-lg);
+    max-width: 95%;
+  }
+  
+  .phase-modal-header {
+    gap: var(--spacing-sm);
+  }
+  
+  .phase-modal-icon {
+    font-size: 1.75rem;
+  }
+  
+  .phase-modal-info h3 {
+    font-size: 1.25rem;
+  }
+  
+  .phase-modal-range {
+    font-size: 0.8rem;
+  }
+  
+  .phase-modal-description {
+    padding: var(--spacing-sm);
+  }
+  
+  .phase-modal-section {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .phase-modal-section h4 {
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .phase-modal-section li {
+    font-size: 0.8rem;
+    padding-left: var(--spacing-md);
+    margin-bottom: 6px;
+  }
+  
+  .trauma-stage {
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+  
+  .phase-modal-insight {
+    padding: var(--spacing-sm);
+  }
+  
+  .phase-modal-insight h4 {
+    font-size: 0.9rem;
+  }
+  
+  .phase-modal-insight p {
+    font-size: 0.8rem;
+  }
+  
+  .journal-prompt {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+  
+  .journal-prompt p {
+    font-size: 0.8rem;
+  }
+  
+  .journal-preview {
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+  
+  .empty-journal {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+  
+  .form-group textarea {
+    padding: var(--spacing-sm);
+    font-size: 0.9rem;
+  }
+  
+  .action-btn {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .save-emotions-btn {
+    padding: var(--spacing-sm) var(--spacing-lg) !important;
+    font-size: 0.875rem !important;
+  }
+  
+  .modal-got-it-btn {
+    padding: var(--spacing-xs) var(--spacing-sm) !important;
+    font-size: 0.8rem !important;
   }
 }

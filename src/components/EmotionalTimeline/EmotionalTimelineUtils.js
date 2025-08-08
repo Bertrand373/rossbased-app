@@ -1,8 +1,8 @@
-// components/EmotionalTimeline/EmotionalTimelineUtils.js - Utility Functions and Data
+// components/EmotionalTimeline/EmotionalTimelineUtils.js - Simplified Free Version
 import { differenceInDays } from 'date-fns';
 import { FaMapSigns, FaLightbulb, FaHeart, FaBrain, FaLeaf, FaTrophy } from 'react-icons/fa';
 
-// WORLD-CLASS: Enhanced phase definitions with scientific backing from the guide
+// Enhanced phase definitions with scientific backing
 export const emotionalPhases = [
   {
     id: 1,
@@ -13,7 +13,6 @@ export const emotionalPhases = [
     icon: FaLeaf,
     color: "#22c55e",
     description: "Your body begins adapting to retention while initial urges peak",
-    esotericDescription: "The vital force begins redirecting from lower centers to higher consciousness",
     scientificMechanism: "Cessation of regular ejaculation triggers hypothalamic-pituitary adjustments. Testosterone begins stabilizing while dopamine receptors start rebalancing from overstimulation.",
     expectedSymptoms: [
       "Strong physical urges and restlessness",
@@ -38,20 +37,18 @@ export const emotionalPhases = [
     ],
     insights: {
       practical: "This phase builds new neural pathways. Your brain is rewiring dopamine pathways away from instant gratification patterns established by regular ejaculation.",
-      esoteric: "You're beginning the hero's journey of consciousness evolution. The resistance represents old patterns fighting for survival as new awareness emerges.",
       scientific: "Neuroplasticity is highest during initial behavior change. The prefrontal cortex strengthens its control over limbic impulses through repeated conscious choice."
     }
   },
   {
     id: 2,
-    name: "Emotional Purging",
+    name: "Emotional Processing",
     dayRange: "15-45",
     startDay: 15,
     endDay: 45,
     icon: FaHeart,
     color: "#f59e0b",
-    description: "Suppressed emotions surface for healing - this is the most challenging phase",
-    esotericDescription: "The heart chakra opens, releasing stored emotional trauma for spiritual purification",
+    description: "Suppressed emotions surface for healing - this is often the most challenging phase",
     scientificMechanism: "Without ejaculation's endorphin/prolactin release numbing emotional pain, stored trauma surfaces. Retained sexual energy amplifies all emotions as the psyche heals itself.",
     expectedSymptoms: [
       "Intense mood swings and emotional volatility",
@@ -81,11 +78,10 @@ export const emotionalPhases = [
       weeks1to4: "Recent frustrations and current life stressors clear first",
       months2to3: "Past relationship pain, betrayals, and heartbreak surface",
       months4to6: "Childhood programming and family dysfunction emerge",
-      sixMonthsPlus: "Ancestral patterns and generational trauma release"
+      sixMonthsPlus: "Deeper patterns and generational trauma release"
     },
     insights: {
       practical: "This emotional turbulence is your psyche's natural healing process. Sexual activity was unconsciously numbing emotional pain that must now be processed.",
-      esoteric: "You're undergoing sacred initiation - the dissolution of ego's protective armor to reveal your authentic self. Ancient karma is being transmuted.",
       scientific: "Without prolactin and endorphin flooding from ejaculation, the brain can no longer suppress stored emotional content. This purging is necessary for psychological integration."
     }
   },
@@ -98,7 +94,6 @@ export const emotionalPhases = [
     icon: FaBrain,
     color: "#3b82f6",
     description: "Cognitive abilities enhance as emotional turbulence stabilizes",
-    esotericDescription: "The third eye awakens as mental faculties expand beyond ordinary consciousness",
     scientificMechanism: "Retained seminal nutrients (lecithin, zinc, B12) rebuild nerve sheaths. Brain tissue becomes more densely connected as resources redirect from reproduction to cognition.",
     expectedSymptoms: [
       "Dramatically improved focus and concentration",
@@ -124,20 +119,18 @@ export const emotionalPhases = [
     ],
     insights: {
       practical: "Your brain operates at higher efficiency due to optimized neurotransmitter balance and increased blood flow. This is the ideal time for intellectual achievement.",
-      esoteric: "The retained life force powers higher mental faculties, connecting you to universal intelligence beyond personal consciousness.",
       scientific: "Increased zinc and B-vitamin availability enhances neurotransmitter synthesis. Reduced prolactin levels improve dopamine function and cognitive performance."
     }
   },
   {
     id: 4,
-    name: "Spiritual Integration",
+    name: "Integration & Growth",
     dayRange: "91-180",
     startDay: 91,
     endDay: 180,
     icon: FaLightbulb,
     color: "#8b5cf6",
     description: "Profound inner transformation as benefits become deeply integrated",
-    esotericDescription: "Soul integration as the divine masculine energy fully awakens within",
     scientificMechanism: "Complete endocrine rebalancing occurs. The entire nervous system optimizes for retention rather than ejaculation, creating stable high-performance states.",
     expectedSymptoms: [
       "Deep sense of life purpose and direction",
@@ -149,10 +142,10 @@ export const emotionalPhases = [
       "Intuitive abilities strengthen significantly"
     ],
     warningSigns: [
-      "Spiritual bypassing of practical responsibilities",
-      "Messiah complex or grandiose thinking",
+      "Avoiding practical responsibilities",
+      "Grandiose thinking or unrealistic goals",
       "Isolation from human connection",
-      "Judging others as 'unawakened' or inferior"
+      "Judging others as inferior or unenlightened"
     ],
     specificTechniques: [
       "Take on leadership roles in your field",
@@ -163,21 +156,19 @@ export const emotionalPhases = [
     ],
     insights: {
       practical: "You've developed mastery over one of humanity's strongest drives. This discipline transfers to exceptional performance in all life areas.",
-      esoteric: "You've successfully transmuted base sexual energy into spiritual gold, embodying the refined energy of awakened consciousness.",
       scientific: "Neuroplastic changes become permanent. The prefrontal cortex maintains dominance over limbic impulses, creating stable self-regulation abilities."
     }
   },
   {
     id: 5,
-    name: "Mastery & Service",
+    name: "Mastery & Purpose",
     dayRange: "181+",
     startDay: 181,
     endDay: 999999,
     icon: FaTrophy,
     color: "#ffdd00",
     description: "Complete integration - you've transcended the need for external validation",
-    esotericDescription: "Bodhisattva consciousness - enlightened being choosing to serve others",
-    scientificMechanism: "Sexual energy permanently redirected upward. 'Ojas' (vital essence) accumulates in brain tissue, creating sustained states of expanded awareness.",
+    scientificMechanism: "Sexual energy permanently redirected upward. Vital essence accumulates in brain tissue, creating sustained states of expanded awareness.",
     expectedSymptoms: [
       "Effortless self-control without conscious effort",
       "Natural influence and inspiring presence",
@@ -185,7 +176,7 @@ export const emotionalPhases = [
       "Visionary thinking and long-term perspective",
       "Ability to remain calm in any situation",
       "Others seeking your wisdom and guidance",
-      "Mysterious synchronicities and 'luck'"
+      "Mysterious synchronicities and opportunities"
     ],
     warningSigns: [
       "Using abilities for purely selfish gain",
@@ -196,19 +187,18 @@ export const emotionalPhases = [
     specificTechniques: [
       "Focus on legacy creation and impact",
       "Teach and guide others on the path",
-      "Apply abilities to serve humanity's evolution",
+      "Apply abilities to serve humanity's progress",
       "Maintain humility despite extraordinary abilities",
       "Stay connected to beginners' struggles"
     ],
     insights: {
       practical: "You embody peak human potential. Your presence alone inspires others to pursue their highest path. You demonstrate what's possible through disciplined energy management.",
-      esoteric: "You've become a conscious co-creator with divine intelligence, wielding transmuted sexual energy for cosmic purposes and human evolution.",
       scientific: "Permanent neuroplastic changes create self-sustaining high-performance states. Brain imaging would show enhanced connectivity between regions associated with self-control and higher cognition."
     }
   }
 ];
 
-// WORLD-CLASS: Advanced mastery levels for 181+ day practitioners
+// Simplified mastery levels for 181+ day practitioners
 export const masteryLevels = [
   { 
     id: 1, 
@@ -218,7 +208,8 @@ export const masteryLevels = [
     timeRange: "Months 6-12", 
     startDay: 181, 
     endDay: 365,
-    description: "Building the foundation of permanent energy mastery"
+    description: "Building the foundation of permanent energy mastery",
+    icon: FaMapSigns
   },
   { 
     id: 2, 
@@ -228,47 +219,19 @@ export const masteryLevels = [
     timeRange: "Year 1-2", 
     startDay: 366, 
     endDay: 730,
-    description: "Integrating wisdom gained from sustained practice"
+    description: "Integrating wisdom gained from sustained practice",
+    icon: FaBrain
   },
   { 
     id: 3, 
     level: "III",
-    name: "Consciousness Pioneer", 
-    subtitle: "Exploring Higher States",
-    timeRange: "Year 2-3", 
-    startDay: 731, 
-    endDay: 1095,
-    description: "Accessing expanded states of awareness"
-  },
-  { 
-    id: 4, 
-    level: "IV",
-    name: "Energy Adept", 
-    subtitle: "Mastery Over Physical Desires",
-    timeRange: "Year 3-4", 
-    startDay: 1096, 
-    endDay: 1460,
-    description: "Complete transcendence of lower impulses"
-  },
-  { 
-    id: 5, 
-    level: "V",
     name: "Guide & Teacher", 
-    subtitle: "Serving Others' Awakening",
-    timeRange: "Year 4-5", 
-    startDay: 1461, 
-    endDay: 1825,
-    description: "Using mastery to elevate others"
-  },
-  { 
-    id: 6, 
-    level: "VI",
-    name: "Embodied Avatar", 
-    subtitle: "Living Divine Consciousness",
-    timeRange: "Year 5+", 
-    startDay: 1826, 
+    subtitle: "Serving Others' Growth",
+    timeRange: "Year 2+", 
+    startDay: 731, 
     endDay: 999999,
-    description: "Pure consciousness operating through human form"
+    description: "Using mastery to elevate and inspire others",
+    icon: FaTrophy
   }
 ];
 
@@ -331,7 +294,7 @@ export const getPhaseProgressText = (phase, currentDay, masteryLevel = null) => 
     const currentDayInLevel = daysIntoLevel + 1;
     
     if (masteryLevel.endDay === 999999) {
-      return `Level ${masteryLevel.level} ${masteryLevel.name} - Day ${currentDayInLevel} (Eternal Journey)`;
+      return `Level ${masteryLevel.level} ${masteryLevel.name} - Day ${currentDayInLevel} (Ongoing Journey)`;
     } else {
       const totalDaysInLevel = masteryLevel.endDay - masteryLevel.startDay + 1;
       const daysRemainingInLevel = masteryLevel.endDay - currentDay;
@@ -347,24 +310,24 @@ export const getPhaseProgressText = (phase, currentDay, masteryLevel = null) => 
   return `Day ${currentDayInPhase} of ${totalDaysInPhase} in this phase (${daysRemainingInPhase} remaining)`;
 };
 
-// Get phase-specific journal prompt from the guide
+// Get phase-specific journal prompt
 export const getPhaseJournalPrompt = (currentPhase) => {
   if (!currentPhase) return "How are you feeling about your journey today?";
   
   const prompts = {
     1: "What urges are you experiencing? How are you channeling this new energy? What triggers have you identified?",
-    2: "What emotions or memories are surfacing? Remember, this emotional purging is healing. How are you processing these feelings?",
+    2: "What emotions or memories are surfacing? Remember, this emotional processing is healing. How are you working through these feelings?",
     3: "How has your mental clarity improved? What new insights or creative ideas are emerging? How are you applying enhanced focus?", 
-    4: "What deeper purpose is emerging in your life? How do you want to serve others? What leadership opportunities are appearing?",
+    4: "What deeper purpose is emerging in your life? How do you want to contribute to others? What leadership opportunities are appearing?",
     5: "How are you using your mastery to inspire and help others? What legacy are you creating? How do you stay humble while wielding these abilities?"
   };
   
   return prompts[currentPhase.id] || prompts[1];
 };
 
-// WORLD-CLASS: Advanced phase analysis system matching Stats complexity
-export const generateComprehensivePhaseAnalysis = (currentPhase, currentDay, userData, wisdomMode, isPremium) => {
-  if (!currentPhase || !isPremium) return null;
+// Advanced phase analysis system
+export const generateComprehensivePhaseAnalysis = (currentPhase, currentDay, userData, wisdomMode, isEnabled) => {
+  if (!currentPhase || !isEnabled) return null;
 
   const emotionalData = userData.emotionalTracking || [];
   const recentData = emotionalData.filter(entry => 
@@ -376,11 +339,11 @@ export const generateComprehensivePhaseAnalysis = (currentPhase, currentDay, use
   
   // Multi-layered analysis
   const analysis = {
-    phaseEducation: generatePhaseEducationInsight(currentPhase, currentDay, wisdomMode),
+    phaseEducation: generatePhaseEducationInsight(currentPhase, currentDay),
     dataAnalysis: generateDataPatternAnalysis(recentData),
     challengeIdentification: generateChallengeAnalysis(currentPhase, recentData),
     predictiveGuidance: generatePredictiveGuidance(currentPhase, currentDay),
-    scientificExplanation: generateScientificExplanation(currentPhase, wisdomMode),
+    scientificExplanation: generateScientificExplanation(currentPhase),
     actionableStrategies: generateActionableStrategies(currentPhase, recentData)
   };
 
@@ -391,14 +354,14 @@ export const generateComprehensivePhaseAnalysis = (currentPhase, currentDay, use
   };
 };
 
-// WORLD-CLASS: Phase-specific education based on guide knowledge
-const generatePhaseEducationInsight = (currentPhase, currentDay, wisdomMode) => {
+// Phase-specific education based on scientific knowledge
+const generatePhaseEducationInsight = (currentPhase, currentDay) => {
   if (!currentPhase) return null;
 
   const dayInPhase = currentDay - currentPhase.startDay + 1;
   const phaseProgress = ((currentDay - currentPhase.startDay) / (currentPhase.endDay - currentPhase.startDay + 1)) * 100;
 
-  // Phase-specific educational content from the guide
+  // Phase-specific educational content
   const educationalContent = {
     1: { // Initial Adaptation
       earlyPhase: `Days 1-7: Foundation Phase - Your hypothalamic-pituitary axis is beginning hormonal rebalancing. Testosterone stabilization causes energy fluctuations.`,
@@ -406,11 +369,11 @@ const generatePhaseEducationInsight = (currentPhase, currentDay, wisdomMode) => 
       keyLearning: "Understanding urge waves: Sexual thoughts trigger dopamine release expecting ejaculatory reward. Each resistance strengthens prefrontal cortex control.",
       whatToExpect: `Expect strong urges and restlessness as your body adapts. This is completely normal brain rewiring.`
     },
-    2: { // Emotional Purging  
-      earlyPhase: `Days 15-30: Emotional Flooding Begins - Without ejaculation's endorphin numbing, suppressed emotions MUST surface. This is healing, not pathology.`,
-      midPhase: `Days 31-45: Deep Purging Intensifies - Past relationship trauma and betrayals surface for processing. Your psyche is courageously healing itself.`,
+    2: { // Emotional Processing  
+      earlyPhase: `Days 15-30: Emotional Processing Begins - Without ejaculation's endorphin numbing, suppressed emotions MUST surface. This is healing, not pathology.`,
+      midPhase: `Days 31-45: Deep Processing Intensifies - Past relationship trauma and betrayals surface for healing. Your psyche is courageously healing itself.`,
       keyLearning: "Trauma-energy connection: Sexual activity was unconsciously medicating emotional pain. Retention forces proper emotional processing.",
-      whatToExpect: `Expect intense mood swings and emotional rawness. Decades of suppressed content is releasing.`
+      whatToExpected: `Expect intense mood swings and emotional rawness. Years of suppressed content is releasing.`
     },
     3: { // Mental Expansion
       earlyPhase: `Days 46-60: Cognitive Emergence - Retained nutrients (lecithin, zinc, B12) rebuild nerve sheaths. Mental fog lifts permanently.`,
@@ -418,17 +381,17 @@ const generatePhaseEducationInsight = (currentPhase, currentDay, wisdomMode) => 
       keyLearning: "Neuroplasticity advantage: Higher zinc and B-vitamin availability optimizes neurotransmitter synthesis for peak mental performance.",
       whatToExpect: `Expect enhanced focus and problem-solving abilities. Your brain is operating at higher efficiency.`
     },
-    4: { // Spiritual Integration
+    4: { // Integration & Growth
       earlyPhase: `Days 91-120: Integration Deepens - Complete endocrine rebalancing. Nervous system optimizes for retention, not ejaculation.`,
-      midPhase: `Days 121-180: Mastery Emergence - Natural charisma and leadership qualities develop. Others unconsciously sense your increased presence.`,
-      keyLearning: "Electromagnetic field changes: Retained practitioners show brighter, more extensive energy fields detectable by sensitive individuals.",
+      midPhase: `Days 121-180: Growth Acceleration - Natural charisma and leadership qualities develop. Others unconsciously sense your increased presence.`,
+      keyLearning: "Energy field changes: Practitioners show brighter, more extensive energy fields detectable by sensitive individuals.",
       whatToExpect: `Expect natural leadership abilities and magnetic presence. You're embodying refined energy.`
     },
-    5: { // Mastery & Service
-      earlyPhase: `Day ${currentDay}: Avatar Consciousness - Sexual energy permanently redirected upward. 'Ojas' accumulation creates sustained expanded awareness.`,
+    5: { // Mastery & Purpose
+      earlyPhase: `Day ${currentDay}: Mastery Consciousness - Sexual energy permanently redirected upward. Vital essence accumulation creates sustained expanded awareness.`,
       midPhase: `Advanced Mastery: You demonstrate peak human potential through disciplined energy management. Others seek your wisdom naturally.`,
       keyLearning: "Permanent neuroplastic changes: Brain imaging would show enhanced connectivity between self-control and higher cognition regions.",
-      whatToExpect: `You now inspire others through your living example of human potential. Your presence teaches.`
+      whatToExpected: `You now inspire others through your living example of human potential. Your presence teaches.`
     }
   };
 
@@ -445,7 +408,7 @@ const generatePhaseEducationInsight = (currentPhase, currentDay, wisdomMode) => 
   };
 };
 
-// WORLD-CLASS: Data pattern analysis with challenge identification
+// Data pattern analysis with challenge identification
 const generateDataPatternAnalysis = (recentData) => {
   if (recentData.length < 3) {
     return {
@@ -506,9 +469,8 @@ const getTrend = (recent, earlier, metric) => {
   }
 };
 
-// WORLD-CLASS: Phase alignment evaluation
+// Phase alignment evaluation
 const evaluatePhaseAlignment = (anxiety, mood, clarity, processing) => {
-  // This would need access to current phase - simplified for now
   const generalExpected = {
     expectedAnxiety: [3, 7],
     expectedMood: [4, 8],
@@ -536,7 +498,7 @@ const evaluatePhaseAlignment = (anxiety, mood, clarity, processing) => {
   };
 };
 
-// WORLD-CLASS: Challenge identification from guide knowledge
+// Challenge identification from scientific knowledge
 const generateChallengeAnalysis = (currentPhase, recentData) => {
   if (!currentPhase || recentData.length < 3) return null;
 
@@ -547,7 +509,7 @@ const generateChallengeAnalysis = (currentPhase, recentData) => {
     processing: recentData.reduce((sum, entry) => sum + (entry.emotionalProcessing || 5), 0) / recentData.length
   };
 
-  // Phase-specific challenge identification from the guide
+  // Phase-specific challenge identification
   const challengePatterns = {
     1: { // Initial Adaptation
       highAnxiety: {
@@ -563,17 +525,17 @@ const generateChallengeAnalysis = (currentPhase, recentData) => {
         solution: "Maintain consistent sleep schedule. This energy instability resolves by day 21."
       }
     },
-    2: { // Emotional Purging
+    2: { // Emotional Processing
       emotionalVolatility: {
         condition: avgData.mood < 4 || avgData.processing < 4,
-        challenge: "Intense emotional purging phase",
+        challenge: "Intense emotional processing phase",
         explanation: "Suppressed emotions surfacing as sexual numbing mechanism removed",
         solution: "Journal extensively. Accept emotions without resistance. This is healing, not pathology."
       },
       overwhelm: {
         condition: avgData.anxiety > 7 && avgData.processing < 3,
-        challenge: "Trauma flooding beyond capacity",
-        explanation: "Decades of suppressed content releasing faster than processing ability",
+        challenge: "Emotional flooding beyond capacity",
+        explanation: "Years of suppressed content releasing faster than processing ability",
         solution: "Consider professional therapy. Use cold water for emotional regulation."
       }
     },
@@ -591,15 +553,15 @@ const generateChallengeAnalysis = (currentPhase, recentData) => {
         solution: "Practice humility. Use enhanced abilities to serve others, not dominate."
       }
     },
-    4: { // Spiritual Integration
+    4: { // Integration & Growth
       integration_resistance: {
         condition: avgData.mood < 6 || avgData.processing < 6,
-        challenge: "Spiritual integration difficulties",
+        challenge: "Integration difficulties",
         explanation: "Ego resisting identity transformation and expanded responsibilities",
         solution: "Accept changing relationships. Your evolution naturally shifts social dynamics."
       }
     },
-    5: { // Mastery
+    5: { // Mastery & Purpose
       service_avoidance: {
         condition: avgData.processing < 7,
         challenge: "Avoiding service responsibilities",
@@ -647,24 +609,24 @@ const getSeverity = (avgData, challengeType) => {
   return severityThresholds[challengeType] || 'moderate';
 };
 
-// WORLD-CLASS: Predictive guidance based on guide's timeline knowledge
+// Predictive guidance based on scientific timeline knowledge
 const generatePredictiveGuidance = (currentPhase, currentDay) => {
   if (!currentPhase) return null;
 
   const daysRemaining = currentPhase.endDay === 999999 ? null : currentPhase.endDay - currentDay;
   const dayInPhase = currentDay - currentPhase.startDay + 1;
 
-  // Predictive insights based on the guide's detailed timelines
+  // Predictive insights based on detailed timelines
   const predictiveInsights = {
     1: { // Initial Adaptation
       currentFocus: dayInPhase <= 7 ? 
         "Focus on establishing unbreakable morning routine and removing all triggers" :
         "Build urge management skills - this phase tests your foundational commitment",
-      upcomingChallenge: "Days 15-45 bring emotional purging. Prepare for mood swings and old memories surfacing.",
+      upcomingChallenge: "Days 15-45 bring emotional processing. Prepare for mood swings and old memories surfacing.",
       preparation: "Start journaling now. Emotional turbulence ahead requires processing tools.",
-      timeline: `${daysRemaining} days until Emotional Purging phase begins`
+      timeline: `${daysRemaining} days until Emotional Processing phase begins`
     },
-    2: { // Emotional Purging
+    2: { // Emotional Processing
       currentFocus: dayInPhase <= 15 ?
         "Accept emotional flooding as healing, not pathology. Journal extensively." :
         "Deep trauma processing intensifies. Maintain practices even when motivation dips.",
@@ -676,31 +638,31 @@ const generatePredictiveGuidance = (currentPhase, currentDay) => {
       currentFocus: dayInPhase <= 22 ?
         "Apply enhanced focus to important goals. Channel mental energy productively." :
         "Guard against intellectual arrogance. Use abilities to serve, not dominate.",
-      upcomingChallenge: "Days 91-180 bring spiritual integration and identity transformation.",
+      upcomingChallenge: "Days 91-180 bring integration and identity transformation.",
       preparation: "Prepare for changing relationships as you transform.",
-      timeline: `${daysRemaining} days until Spiritual Integration phase begins`
+      timeline: `${daysRemaining} days until Integration & Growth phase begins`
     },
-    4: { // Spiritual Integration
+    4: { // Integration & Growth
       currentFocus: dayInPhase <= 45 ?
         "Accept increased responsibility gracefully. Others will seek your guidance." :
         "Prepare for mastery phase. Consider how you'll serve others with your abilities.",
-      upcomingChallenge: "Day 181+ begins mastery phase with service obligations.",
+      upcomingChallenge: "Day 181+ begins mastery phase with service opportunities.",
       preparation: "Develop teaching and mentoring skills. Your wisdom will be needed.",
       timeline: `${daysRemaining} days until Mastery phase begins`
     },
-    5: { // Mastery
-      currentFocus: "Focus on legacy creation and serving humanity's evolution.",
+    5: { // Mastery & Purpose
+      currentFocus: "Focus on legacy creation and serving humanity's progress.",
       upcomingChallenge: "Maintaining humility while wielding extraordinary abilities.",
       preparation: "Connect with other masters. Share wisdom while staying grounded.",
-      timeline: "Eternal journey of service and consciousness expansion"
+      timeline: "Ongoing journey of service and consciousness expansion"
     }
   };
 
   return predictiveInsights[currentPhase.id];
 };
 
-// WORLD-CLASS: Scientific explanation system
-const generateScientificExplanation = (currentPhase, wisdomMode) => {
+// Scientific explanation system
+const generateScientificExplanation = (currentPhase) => {
   if (!currentPhase) return null;
 
   const explanations = {
@@ -725,7 +687,7 @@ const generateScientificExplanation = (currentPhase, wisdomMode) => {
       behavioral: "Permanent neuroplastic changes establish automatic self-regulation, freeing cognitive resources for higher-order thinking and creativity."
     },
     5: {
-      neurochemical: "'Ojas' (refined sexual energy) accumulates in brain tissue, creating sustained expanded awareness and enhanced intuitive capabilities.",
+      neurochemical: "Refined sexual energy accumulates in brain tissue, creating sustained expanded awareness and enhanced intuitive capabilities.",
       physiological: "Sexual energy permanently redirected upward through spinal channels, maintaining constant high-coherence brainwave states.",
       behavioral: "Complete integration allows effortless expression of peak human potential while maintaining connection to universal intelligence."
     }
@@ -734,7 +696,7 @@ const generateScientificExplanation = (currentPhase, wisdomMode) => {
   return explanations[currentPhase.id];
 };
 
-// WORLD-CLASS: Actionable strategies from the guide
+// Actionable strategies from scientific knowledge
 const generateActionableStrategies = (currentPhase, recentData) => {
   if (!currentPhase) return null;
 
@@ -745,25 +707,25 @@ const generateActionableStrategies = (currentPhase, recentData) => {
     processing: recentData.reduce((sum, entry) => sum + (entry.emotionalProcessing || 5), 0) / recentData.length
   } : null;
 
-  // Phase-specific strategies from the guide
+  // Phase-specific strategies
   const strategies = {
     1: {
       urgent: avgData?.anxiety > 7 ? ["Immediate cold shower protocol: 2-5 minutes daily", "Remove ALL triggers from environment NOW"] : [],
       daily: ["Establish non-negotiable morning routine", "Practice 4-7-8 breathing during urges", "Intense physical exercise to channel energy"],
       weekly: ["Track urge patterns and triggers", "Build support system connections", "Study retention science and benefits"],
-      longTerm: ["Commit to 90-day minimum trial", "Prepare for emotional purging phase", "Develop urge management toolkit"]
+      longTerm: ["Commit to 90-day minimum trial", "Prepare for emotional processing phase", "Develop urge management toolkit"]
     },
     2: {
       urgent: avgData?.mood < 3 ? ["Seek professional therapy consultation", "Emergency emotional regulation: cold water on face"] : [],
       daily: ["Journal extensively without censoring", "Accept emotions without resistance", "Cold exposure for nervous system reset"],
-      weekly: ["Process memories with support", "Practice emotional alchemy techniques", "Connect with understanding community"],
+      weekly: ["Process memories with support", "Practice emotional healing techniques", "Connect with understanding community"],
       longTerm: ["Understand this is healing, not pathology", "Prepare for mental expansion phase", "Build emotional intelligence skills"]
     },
     3: {
       urgent: avgData?.clarity < 4 ? ["Reduce mental stimulation", "Increase meditation time for brain optimization"] : [],
       daily: ["Take on challenging mental projects", "Learn new skills while neuroplasticity peaks", "Practice strategic thinking"],
       weekly: ["Read complex philosophical material", "Engage in creative problem-solving", "Avoid intellectual arrogance traps"],
-      longTerm: ["Apply abilities to meaningful goals", "Prepare for spiritual integration", "Develop teaching capabilities"]
+      longTerm: ["Apply abilities to meaningful goals", "Prepare for integration phase", "Develop teaching capabilities"]
     },
     4: {
       urgent: avgData?.processing < 6 ? ["Address integration resistance", "Accept changing relationships as natural"] : [],
@@ -773,7 +735,7 @@ const generateActionableStrategies = (currentPhase, recentData) => {
     },
     5: {
       urgent: ["Avoid using abilities for purely selfish gain", "Stay connected to beginners' struggles"],
-      daily: ["Focus on legacy creation", "Serve humanity's evolution", "Maintain beginner's mind"],
+      daily: ["Focus on legacy creation", "Serve humanity's progress", "Maintain beginner's mind"],
       weekly: ["Teach and guide others", "Practice radical humility", "Connect with other masters"],
       longTerm: ["Establish lasting positive impact", "Prepare successors", "Transcend personal achievement for universal service"]
     }
