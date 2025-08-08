@@ -9,8 +9,7 @@ import './EmotionalTimelineSections.css';
 
 // Icons
 import { 
-  FaCheckCircle, FaPen, FaInfoCircle, FaRegLightbulb, FaTimes, 
-  FaChartLine, FaFlask, FaShieldAlt, FaUserGraduate 
+  FaCheckCircle, FaPen, FaInfoCircle, FaRegLightbulb, FaTimes
 } from 'react-icons/fa';
 
 // Import utility functions and data
@@ -525,7 +524,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         {analysis?.phaseEducation && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaUserGraduate className="insight-icon" />
                               <span className="insight-metric">Phase Education</span>
                             </div>
                             <div className="insight-text">
@@ -553,7 +551,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         {analysis?.scientificExplanation && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaFlask className="insight-icon" />
                               <span className="insight-metric">Scientific Mechanisms</span>
                             </div>
                             <div className="insight-text">
@@ -576,7 +573,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         {analysis?.dataAnalysis?.type === 'comprehensive' && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaChartLine className="insight-icon" />
                               <span className="insight-metric">Personal Data Analysis</span>
                             </div>
                             <div className="insight-text">
@@ -648,7 +644,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         {analysis?.challengeIdentification?.challenges?.length > 0 && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaShieldAlt className="insight-icon" />
                               <span className="insight-metric">Challenge Analysis</span>
                             </div>
                             <div className="insight-text">
@@ -680,7 +675,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         {analysis?.predictiveGuidance && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaRegLightbulb className="insight-icon" />
                               <span className="insight-metric">Predictive Guidance</span>
                             </div>
                             <div className="insight-text">
@@ -707,7 +701,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         {analysis?.actionableStrategies && (
                           <div className="insight-card">
                             <div className="insight-card-header">
-                              <FaCheckCircle className="insight-icon" />
                               <span className="insight-metric">Actionable Strategies</span>
                             </div>
                             <div className="insight-text">
