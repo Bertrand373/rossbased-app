@@ -531,14 +531,14 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Header without yellow line */
+/* UPDATED: Header to match Analysis header styling exactly */
 .emotional-checkin-section h3 {
-  margin-bottom: var(--spacing-lg);
-  font-size: 1.125rem;
+  margin: 0;
+  font-size: 1.25rem;
   color: var(--text);
   text-align: center;
-  position: relative;
-  margin-top: 0;
+  font-weight: 600;
+  padding: var(--spacing-lg) 0;
 }
 
 .emotion-status-section {
@@ -798,11 +798,14 @@
   /* Empty spacer for centering */
 }
 
+/* UPDATED: Journal header to match Analysis header styling exactly */
 .journal-header h3 {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   color: var(--text);
   text-align: center;
+  font-weight: 600;
+  padding: var(--spacing-lg) 0;
 }
 
 .journal-actions {
@@ -1482,6 +1485,18 @@
   }
   
   .phase-insight-section h3 {
+    font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
+  }
+  
+  /* ADDED: Mobile responsive styling for check-in header */
+  .emotional-checkin-section h3 {
+    font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
+  }
+  
+  /* ADDED: Mobile responsive styling for journal header */
+  .journal-header h3 {
     font-size: 1.125rem;
     padding: var(--spacing-md) 0;
   }
