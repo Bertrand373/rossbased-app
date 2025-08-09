@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  padding: 0; /* Ensure no padding affecting spacing */
 }
 
 /* Using CSS custom properties for progress bar colors */
@@ -672,8 +673,14 @@
 
 /* Mobile Responsiveness for Core Layout */
 @media (max-width: 768px) {
+  .emotional-timeline-container {
+    gap: var(--spacing-lg);
+    padding: 0;
+  }
+  
   .integrated-timeline-header {
     padding: var(--spacing-lg);
+    margin: 0; /* Ensure no additional margins affecting spacing */
   }
   
   .header-title-section {
@@ -754,8 +761,14 @@
 }
 
 @media (max-width: 480px) {
+  .emotional-timeline-container {
+    gap: var(--spacing-lg);
+    padding: 0;
+  }
+  
   .integrated-timeline-header {
     padding: var(--spacing-lg);
+    margin: 0; /* Ensure no additional margins affecting spacing */
   }
   
   .header-title-section {
