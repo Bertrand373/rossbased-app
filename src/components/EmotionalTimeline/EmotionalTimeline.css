@@ -46,18 +46,8 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text);
+  opacity: 0.85;
   text-align: center;
-}
-
-.header-title-section::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
 .header-navigation-section {
@@ -690,10 +680,6 @@
     font-size: 1.25rem;
   }
   
-  .header-title-section::after {
-    width: 50px;
-  }
-  
   .phase-icon-section {
     flex-direction: column;
     gap: var(--spacing-md);
@@ -770,10 +756,6 @@
   
   .header-title-section h2 {
     font-size: 1.125rem;
-  }
-  
-  .header-title-section::after {
-    width: 40px;
   }
   
   .mastery-levels-section h3 {

@@ -174,8 +174,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       </div>
 
-      {/* Current Phase Display - ALWAYS VISIBLE */}
-      {currentPhase && currentDay > 0 && (
+      {/* Current Phase Display - ONLY VISIBLE ON JOURNEY MAP TAB */}
+      {currentPhase && currentDay > 0 && activeSection === 'journey-map' && (
         <div className="current-phase-container">
           <div className="phase-card current">
             <div className="phase-date">Day {currentDay} of your journey</div>
