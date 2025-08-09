@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Free Version
+// components/EmotionalTimeline/EmotionalTimeline.js - Free Version with Integrated Header
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -138,11 +138,40 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   return (
     <div className="emotional-timeline-container">
-      {/* Header */}
-      <div className="timeline-header">
-        <div className="timeline-header-spacer"></div>
-        <h2>Emotional Timeline</h2>
-        <div className="timeline-header-actions"></div>
+      {/* NEW: Integrated Header with Navigation */}
+      <div className="integrated-timeline-header">
+        <div className="header-title-section">
+          <h2>Emotional Timeline</h2>
+        </div>
+        
+        <div className="header-navigation-section">
+          <div className="navigation-pill-container">
+            <button 
+              className={`navigation-section-btn ${activeSection === 'journey-map' ? 'active' : ''}`}
+              onClick={() => handleSectionClick('journey-map')}
+            >
+              Journey Map
+            </button>
+            <button 
+              className={`navigation-section-btn ${activeSection === 'check-in' ? 'active' : ''}`}
+              onClick={() => handleSectionClick('check-in')}
+            >
+              Check-in
+            </button>
+            <button 
+              className={`navigation-section-btn ${activeSection === 'journal' ? 'active' : ''}`}
+              onClick={() => handleSectionClick('journal')}
+            >
+              Journal
+            </button>
+            <button 
+              className={`navigation-section-btn ${activeSection === 'analysis' ? 'active' : ''}`}
+              onClick={() => handleSectionClick('analysis')}
+            >
+              Analysis
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Current Phase Display - ALWAYS VISIBLE */}
@@ -210,38 +239,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           </div>
         </div>
       )}
-
-      {/* Timeline Section Navigation */}
-      <div className="timeline-section-controls">
-        <div className="timeline-section-selector">
-          <div className="timeline-pill-container">
-            <button 
-              className={`timeline-section-btn ${activeSection === 'journey-map' ? 'active' : ''}`}
-              onClick={() => handleSectionClick('journey-map')}
-            >
-              Journey Map
-            </button>
-            <button 
-              className={`timeline-section-btn ${activeSection === 'check-in' ? 'active' : ''}`}
-              onClick={() => handleSectionClick('check-in')}
-            >
-              Check-in
-            </button>
-            <button 
-              className={`timeline-section-btn ${activeSection === 'journal' ? 'active' : ''}`}
-              onClick={() => handleSectionClick('journal')}
-            >
-              Journal
-            </button>
-            <button 
-              className={`timeline-section-btn ${activeSection === 'analysis' ? 'active' : ''}`}
-              onClick={() => handleSectionClick('analysis')}
-            >
-              Analysis
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Section Content */}
       <div className="timeline-content-container">
