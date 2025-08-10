@@ -1,6 +1,6 @@
-// components/Stats/StatsComponents.js - Extracted UI Components for Stats - UPDATED: Modal buttons with check marks
+// components/Stats/StatsComponents.js - Extracted UI Components for Stats - UPDATED: Modal buttons with FaCheckCircle
 import React from 'react';
-import { FaChartLine, FaTrophy, FaInfoCircle, FaTimes, FaExclamationTriangle, FaMoon, FaCheck } from 'react-icons/fa';
+import { FaChartLine, FaTrophy, FaInfoCircle, FaTimes, FaExclamationTriangle, FaMoon, FaCheckCircle } from 'react-icons/fa';
 import { format } from 'date-fns';
 import helmetImage from '../../assets/helmet.png';
 
@@ -280,7 +280,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
             onKeyDown={(e) => e.key === 'Enter' && onClose()}
             autoFocus
           >
-            <FaCheck />
+            <FaCheckCircle />
             Got It
           </button>
         </div>

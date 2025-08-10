@@ -1,6 +1,6 @@
-// components/Stats/SmartResetDialog.js - Smart Reset Dialog Component - UPDATED: Modal buttons with check marks
+// components/Stats/SmartResetDialog.js - Smart Reset Dialog Component - UPDATED: Modal buttons with FaCheckCircle
 import React, { useState } from 'react';
-import { FaRedo, FaExclamationTriangle, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
+import { FaRedo, FaExclamationTriangle, FaCheckCircle, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import './SmartResetDialog.css';
 
 const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
@@ -148,7 +148,7 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
                 onClick={() => handleOptionChange('currentStreak')}
               >
                 <div className="option-checkbox">
-                  {selectedOptions.currentStreak && <FaCheck className="check-icon" />}
+                  {selectedOptions.currentStreak && <FaCheckCircle className="check-icon" />}
                 </div>
                 <div className="option-content">
                   <div className="option-header">
@@ -169,7 +169,7 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
                 onClick={() => handleOptionChange('allProgress')}
               >
                 <div className="option-checkbox">
-                  {selectedOptions.allProgress && <FaCheck className="check-icon" />}
+                  {selectedOptions.allProgress && <FaCheckCircle className="check-icon" />}
                 </div>
                 <div className="option-content">
                   <div className="option-header">
@@ -190,7 +190,7 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
                 onClick={() => handleOptionChange('everything')}
               >
                 <div className="option-checkbox">
-                  {selectedOptions.everything && <FaCheck className="check-icon" />}
+                  {selectedOptions.everything && <FaCheckCircle className="check-icon" />}
                 </div>
                 <div className="option-content">
                   <div className="option-header">
@@ -212,7 +212,7 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
                 onClick={handleProceed}
                 disabled={!resetLevel}
               >
-                <FaCheck />
+                <FaCheckCircle />
                 Continue
               </button>
               <button className="btn-cancel" onClick={handleClose}>
@@ -232,13 +232,13 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
             <div className="confirmation-details">
               <div className="detail-section preserves">
                 <h4>
-                  <FaCheck className="section-icon preserve" />
+                  <FaCheckCircle className="section-icon preserve" />
                   What Will Be Preserved
                 </h4>
                 <ul>
                   {confirmationDetails.preserves.map((item, index) => (
                     <li key={index}>
-                      <FaCheck className="list-check preserve" />
+                      <FaCheckCircle className="list-check preserve" />
                       {item}
                     </li>
                   ))}
@@ -268,7 +268,7 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
 
             <div className="confirmation-actions">
               <button className="btn-confirm-reset" onClick={handleFinalConfirm}>
-                <FaCheck />
+                <FaCheckCircle />
                 Yes, Reset
               </button>
               <button className="btn-back" onClick={() => setShowConfirmation(false)}>

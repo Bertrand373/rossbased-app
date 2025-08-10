@@ -4,7 +4,7 @@ import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
-  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine, FaShieldAlt, FaFire, FaTimes, FaMoon, FaRocket, FaCheck } from 'react-icons/fa';
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine, FaShieldAlt, FaFire, FaTimes, FaMoon, FaRocket } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 import helmetImage from '../../assets/helmet.png';
@@ -793,7 +793,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 onKeyDown={(e) => e.key === 'Enter' && setShowBadgeModal(false)}
                 autoFocus
               >
-                <FaCheck />
+                <FaCheckCircle />
                 Continue Journey
               </button>
             </div>
