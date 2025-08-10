@@ -1,4 +1,4 @@
-// components/Stats/SmartResetDialog.js - Smart Reset Dialog Component
+// components/Stats/SmartResetDialog.js - Smart Reset Dialog Component - UPDATED: Modal buttons with check marks
 import React, { useState } from 'react';
 import { FaRedo, FaExclamationTriangle, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import './SmartResetDialog.css';
@@ -204,7 +204,7 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
                 onClick={handleProceed}
                 disabled={!resetLevel}
               >
-                <FaRedo />
+                <FaCheck />
                 Continue
               </button>
               <button className="btn-cancel" onClick={handleClose}>
@@ -260,7 +260,7 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
 
             <div className="confirmation-actions">
               <button className="btn-confirm-reset" onClick={handleFinalConfirm}>
-                <FaRedo />
+                <FaCheck />
                 Yes, Reset
               </button>
               <button className="btn-back" onClick={() => setShowConfirmation(false)}>

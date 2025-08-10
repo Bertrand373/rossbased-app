@@ -1,6 +1,6 @@
-// components/Stats/StatsComponents.js - Extracted UI Components for Stats
+// components/Stats/StatsComponents.js - Extracted UI Components for Stats - UPDATED: Modal buttons with check marks
 import React from 'react';
-import { FaChartLine, FaTrophy, FaInfoCircle, FaTimes, FaExclamationTriangle, FaMoon } from 'react-icons/fa';
+import { FaChartLine, FaTrophy, FaInfoCircle, FaTimes, FaExclamationTriangle, FaMoon, FaCheck } from 'react-icons/fa';
 import { format } from 'date-fns';
 import helmetImage from '../../assets/helmet.png';
 
@@ -110,7 +110,7 @@ const formatTriggerName = (trigger) => {
   return triggerMap[trigger] || trigger.replace(/_/g, ' ').replace(/[^a-zA-Z0-9\s]/g, '');
 };
 
-// NEW: Stat Card Details Modal Content Generator
+// UPDATED: Stat Card Details Modal Content Generator with check mark button
 export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }) => {
   if (!showModal || !selectedStatCard) return null;
 
@@ -275,11 +275,12 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
         
         <div className="modal-actions">
           <button 
-            className="btn btn-primary" 
+            className="modal-got-it-btn" 
             onClick={onClose}
             onKeyDown={(e) => e.key === 'Enter' && onClose()}
             autoFocus
           >
+            <FaCheck />
             Got It
           </button>
         </div>
