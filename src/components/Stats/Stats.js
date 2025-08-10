@@ -350,20 +350,23 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   return (
     <div className="stats-container">
-      {/* Header */}
+      {/* UPDATED: Header with integrated design */}
       <div className="stats-header">
-        <div className="stats-header-spacer"></div>
-        <h2>Your Stats</h2>
-        <div className="stats-header-actions">
-          <button 
-            className="reset-stats-btn" 
-            onClick={handleResetStats}
-            onKeyDown={(e) => e.key === 'Enter' && handleResetStats()}
-            tabIndex={0}
-          >
-            <FaRedo />
-            <span>Reset Progress</span>
-          </button>
+        <div className="stats-header-title-section">
+          <h2>Your Stats</h2>
+        </div>
+        <div className="stats-header-actions-section">
+          <div className="stats-header-actions">
+            <button 
+              className="reset-stats-btn" 
+              onClick={handleResetStats}
+              onKeyDown={(e) => e.key === 'Enter' && handleResetStats()}
+              tabIndex={0}
+            >
+              <FaRedo />
+              <span>Reset Progress</span>
+            </button>
+          </div>
         </div>
       </div>
       
