@@ -1,4 +1,4 @@
-/* components/Stats/SmartResetDialog.css - Smart Reset Dialog Styling - UPDATED: X button and green preserve icons */
+/* components/Stats/SmartResetDialog.css - Smart Reset Dialog Styling - UPDATED: X button matching Emotional Timeline sizing */
 
 /* Modal sizing override for smart reset */
 .smart-reset-modal {
@@ -7,7 +7,7 @@
   position: relative;
 }
 
-/* ADDED: Close X button in upper right */
+/* UPDATED: Close X button matching Emotional Timeline sizing */
 .modal-close-x {
   position: absolute;
   top: var(--spacing-md);
@@ -15,12 +15,12 @@
   background: none;
   border: none;
   color: var(--text-secondary);
-  font-size: 1.25rem;
+  font-size: 1rem;
   cursor: pointer;
   padding: var(--spacing-xs);
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
