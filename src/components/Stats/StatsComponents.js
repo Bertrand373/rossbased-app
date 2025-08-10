@@ -132,7 +132,13 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
         const longestStreakStart = longestStreakRecord?.start ? 
           format(new Date(longestStreakRecord.start), 'MMMM d, yyyy') : 'Not recorded';
         const longestStreakEnd = longestStreakRecord?.end ? 
-          format(new Date(longestStreakRecord.end), 'MMMM d, yyyy') : 'today';
+          format(new Date(longestStreakRecord.end), 'MMMM d, yyyy') : format(new Date(), 'MMMM d, yyyy');
+        
+        // Determine if this longest streak is still active (no end date)
+        const isStillActive = !longestStreakRecord?.end;
+        const durationText = longestStreakRecord ? 
+          `${longestStreakStart} to ${longestStreakEnd}${isStillActive ? ' (still active)' : ''}` : 
+          'Date records not available for this streak.';
 
         return {
           title: 'Longest Streak Record',
@@ -143,13 +149,11 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
               'No streak longer than 1 day recorded yet.' :
               `Personal best streak: ${longestStreak} consecutive days.`,
             
-            longestStreakRecord ? 
-              `Duration: ${longestStreakStart} to ${longestStreakEnd}` : 
-              'Date records not available for this streak.',
+            durationText,
             
             longestStreakRecord?.reason ? 
               `Ended due to: ${longestStreakRecord.reason.replace(/_/g, ' ')}` :
-              'End reason not recorded.'
+              isStillActive ? 'Currently ongoing - keep up the great work!' : 'End reason not recorded.'
           ]
         };
 
