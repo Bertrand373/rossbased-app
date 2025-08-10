@@ -125,6 +125,14 @@ const SmartResetDialog = ({ isOpen, onClose, onConfirm, userData }) => {
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content smart-reset-modal" onClick={e => e.stopPropagation()}>
+        <button 
+          className="modal-close-x"
+          onClick={handleClose}
+          aria-label="Close modal"
+        >
+          <FaTimes />
+        </button>
+        
         {!showConfirmation ? (
           // Step 1: Option Selection
           <>

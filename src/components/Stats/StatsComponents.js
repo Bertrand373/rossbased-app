@@ -132,7 +132,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
         const longestStreakStart = longestStreakRecord?.start ? 
           format(new Date(longestStreakRecord.start), 'MMMM d, yyyy') : 'Not recorded';
         const longestStreakEnd = longestStreakRecord?.end ? 
-          format(new Date(longestStreakRecord.end), 'MMMM d, yyyy') : 'Current streak';
+          format(new Date(longestStreakRecord.end), 'MMMM d, yyyy') : 'today';
 
         return {
           title: 'Longest Streak Record',
