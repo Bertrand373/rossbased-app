@@ -7,9 +7,9 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons - ADDED: FaTimes for X icons on Close and Cancel buttons
+// Icons - REMOVED: FaRedo for reset button
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
-  FaInfoCircle, FaEdit, FaRedo, FaExclamationTriangle, FaFrown, 
+  FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes } from 'react-icons/fa';
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
@@ -19,7 +19,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [editDayModal, setEditDayModal] = useState(false);
   const [editingDate, setEditingDate] = useState(null);
   const [viewMode, setViewMode] = useState('month'); // 'month' or 'week'
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  // REMOVED: showResetConfirm state
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
@@ -60,46 +60,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return { weekStart, weekEnd };
   };
 
-  // Reset Calendar - Only clear calendar/streak data, not all stats
-  const handleResetCalendar = () => {
-    setShowResetConfirm(true);
-  };
-
-  const confirmResetCalendar = () => {
-    if (!updateUserData) {
-      console.error('updateUserData function is not available');
-      toast.error('Unable to reset calendar - please refresh the page');
-      return;
-    }
-    
-    // Only reset calendar-related data, keep overall stats
-    const resetUserData = {
-      ...userData,
-      startDate: new Date(),
-      currentStreak: 0,
-      streakHistory: [{
-        id: 1,
-        start: new Date(),
-        end: null,
-        days: 0,
-        reason: null,
-        trigger: null
-      }],
-      // Clear benefits and journal entries as these are calendar-specific
-      benefitTracking: [],
-      notes: {},
-      // Keep these stats as they're overall progress indicators
-      // longestStreak: userData.longestStreak, (keep existing)
-      // wetDreamCount: userData.wetDreamCount, (keep existing) 
-      // relapseCount: userData.relapseCount, (keep existing)
-      // badges: userData.badges, (keep existing)
-      urgeLog: [] // New field for tracking urges with triggers
-    };
-    
-    updateUserData(resetUserData);
-    setShowResetConfirm(false);
-    toast.success('Calendar data has been reset (streak history, benefits, and journal entries cleared)');
-  };
+  // REMOVED: handleResetCalendar, confirmResetCalendar functions
 
   // VERIFIED: Helper function to determine day status - CORRECT relapse logic
   const getDayStatus = (day) => {
@@ -563,56 +524,23 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="calendar-container">
-      <div className="calendar-header">
-        <div className="calendar-header-spacer"></div>
-        <h2>Streak Calendar</h2>
-        <div className="calendar-header-actions">
-          <button className="reset-calendar-btn" onClick={handleResetCalendar}>
-            <FaRedo />
-            <span>Reset Calendar</span>
-          </button>
+      {/* NEW: Integrated Header Design like Emotional Timeline */}
+      <div className="integrated-calendar-header">
+        <div className="header-title-section">
+          <h2>Streak Calendar</h2>
         </div>
-      </div>
-      
-      {/* Reset Confirmation Modal */}
-      {showResetConfirm && (
-        <div className="modal-overlay" onClick={() => setShowResetConfirm(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3>Reset Calendar Data</h3>
-            <p>This will clear your streak history, benefit tracking, and journal entries. Your overall stats (longest streak, total relapses) will be preserved.</p>
-            <p><strong>This action cannot be undone.</strong></p>
-            <div className="form-actions">
-              <button 
-                className="btn-danger" 
-                onClick={confirmResetCalendar}
-              >
-                Reset Calendar
-              </button>
-              <button 
-                className="btn-outline" 
-                onClick={() => setShowResetConfirm(false)}
-              >
-                <FaTimes />
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="calendar-main-section">
-        {/* Calendar Controls */}
-        <div className="calendar-controls">
-          {/* View Mode Toggle */}
-          <div className="view-mode-toggle">
+        
+        <div className="header-navigation-section">
+          {/* View Mode Toggle Pills */}
+          <div className="navigation-pill-container">
             <button 
-              className={`view-toggle-btn ${viewMode === 'month' ? 'active' : ''}`}
+              className={`navigation-section-btn ${viewMode === 'month' ? 'active' : ''}`}
               onClick={() => setViewMode('month')}
             >
               Month
             </button>
             <button 
-              className={`view-toggle-btn ${viewMode === 'week' ? 'active' : ''}`}
+              className={`navigation-section-btn ${viewMode === 'week' ? 'active' : ''}`}
               onClick={() => setViewMode('week')}
             >
               Week
@@ -630,7 +558,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </button>
           </div>
         </div>
+      </div>
 
+      {/* REMOVED: Reset Confirmation Modal */}
+
+      <div className="calendar-main-section">
         {/* Calendar Legend */}
         <div className="calendar-legend">
           <div className="legend-item">
