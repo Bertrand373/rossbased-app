@@ -1,4 +1,4 @@
-/* components/Stats/StatsBase.css - Core Stats Display Components + Stat Card Modals */
+/* components/Stats/StatsBase.css - Core Stats Display Components + Stat Card Modals - FIXED: Header spacing */
 
 /* Container and Layout */
 .stats-container {
@@ -22,7 +22,7 @@
   background: var(--phase-color) !important;
 }
 
-/* UPDATED: Header styled like Emotional Timeline integrated header */
+/* FIXED: Header styled like Emotional Timeline with equal spacing above and below */
 .stats-header {
   display: flex;
   flex-direction: column;
@@ -32,7 +32,7 @@
   padding: var(--spacing-lg);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: var(--spacing-lg);
-  margin-top: 0;
+  margin-top: var(--spacing-lg);
 }
 
 .stats-header-title-section {
@@ -207,12 +207,12 @@
   background: none;
   border: none;
   color: var(--text-secondary);
-  font-size: 1.25rem;
+  font-size: 1rem;
   cursor: pointer;
   padding: var(--spacing-xs);
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -531,6 +531,7 @@
   .stats-header {
     padding: var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
   }
   
   .stats-header-title-section {
@@ -650,6 +651,8 @@
   
   .stats-header {
     padding: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
   }
   
   .stats-header h2 {
