@@ -1,10 +1,11 @@
-// components/Calendar/Calendar.js - UPDATED: Removed "Clear Status" option and verified relapse logic
+// components/Calendar/Calendar.js - UPDATED: Import both CSS files
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
   startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
 import toast from 'react-hot-toast';
-import './Calendar.css';
+import './CalendarBase.css';
+import './CalendarModals.css';
 
 // Icons - ADDED: FaTimes for X icons on Close and Cancel buttons
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
