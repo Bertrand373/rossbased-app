@@ -434,6 +434,11 @@
   color: var(--success);
 }
 
+/* UPDATED: Former streak checkmarks now blue to match blue day backgrounds */
+.former-streak-day .success-icon {
+  color: #3b82f6 !important;
+}
+
 .relapse-icon {
   color: var(--danger);
 }
