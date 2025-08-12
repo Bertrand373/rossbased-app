@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: All benefits unlocked for everyone + Integrated Header Design
+// components/Tracker/Tracker.js - UPDATED: Centered modal text & close buttons in upper right
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -251,10 +251,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   return (
     <div className="tracker-container">
-      {/* UPDATED: React DatePicker Modal (replacing iframe) */}
+      {/* UPDATED: React DatePicker Modal with close button */}
       {showSetStartDate && (
         <div className="modal-overlay">
           <div className="modal-content">
+            <button className="modal-close-btn" onClick={handleDateCancel}>
+              <FaTimes />
+            </button>
             <h2>Set Your Start Date</h2>
             <p>When did you begin your current streak?</p>
             
@@ -268,10 +271,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* FIXED: Journal Note Modal with side-by-side buttons matching DatePicker */}
+      {/* UPDATED: Journal Note Modal with close button */}
       {showNoteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
+            <button className="modal-close-btn" onClick={() => setShowNoteModal(false)}>
+              <FaTimes />
+            </button>
             <h2>Journal Entry</h2>
             <p>Record your thoughts, feelings, and insights for today:</p>
             
@@ -382,7 +388,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* UPDATED: Benefit Logging Section - All Benefits Available */}
+      {/* UPDATED: Benefit Logging Section with proper spacing */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -492,7 +498,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* Discord Integration */}
+      {/* UPDATED: Discord Integration with proper spacing */}
       <div className="discord-section">
         <h3>Discord Integration</h3>
         

@@ -272,11 +272,13 @@ button.action-btn:hover {
   transform: scale(1.05);
 }
 
-/* COMPLETELY REDESIGNED: Benefit section styled exactly like Timeline emotional check-in */
+/* UPDATED: Daily Benefits section with journal-style spacing */
 .benefit-logging-container {
   display: flex;
   flex-direction: column;
   gap: 0;
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 .benefit-logging-section {
@@ -290,7 +292,7 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
 }
 
-/* COMPLETELY REDESIGNED: Timeline-style section header with underline */
+/* UPDATED: Simple section header without underline, matching journal spacing */
 .benefit-logging-section-header {
   margin-bottom: var(--spacing-lg);
   font-size: 1.125rem;
@@ -299,17 +301,6 @@ button.action-btn:hover {
   position: relative;
   margin-top: 0;
   font-weight: 600;
-}
-
-.benefit-logging-section-header::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
 .benefit-logging-header {
@@ -817,6 +808,8 @@ button.action-btn:hover {
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   border: 1px solid var(--border);
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 .discord-section h3 {
@@ -1058,6 +1051,7 @@ button.action-btn:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   color: var(--text);
   border: 1px solid var(--border);
+  position: relative;
 }
 
 .modal-content h2 {
@@ -1069,6 +1063,28 @@ button.action-btn:hover {
 .modal-content p {
   margin-bottom: var(--spacing-lg);
   color: var(--text-secondary);
+  text-align: center;
+}
+
+/* ADDED: Close button in upper right corner */
+.modal-close-btn {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text);
 }
 
 /* Mobile responsiveness */
