@@ -36,7 +36,7 @@
 .header-navigation-section {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   width: 100%;
   align-items: center;
 }
@@ -48,13 +48,12 @@
   background-color: var(--card-background);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
-  width: 100%;
-  max-width: 300px;
+  width: fit-content;
+  min-width: 200px;
   justify-content: center;
 }
 
 .navigation-section-btn {
-  flex: 1;
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: transparent;
   border: 1px solid transparent;
@@ -71,6 +70,7 @@
   gap: var(--spacing-xs);
   position: relative;
   outline: none;
+  min-width: 80px;
 }
 
 .navigation-section-btn:hover:not(:disabled) {
@@ -91,6 +91,7 @@
   align-items: center;
   gap: var(--spacing-lg);
   order: 2;
+  margin-top: var(--spacing-lg);
 }
 
 .period-navigation h3 {
@@ -605,7 +606,7 @@
   }
   
   .header-title-section {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
   }
   
   .header-title-section h2 {
@@ -613,20 +614,22 @@
   }
   
   .header-navigation-section {
-    gap: var(--spacing-sm);
+    gap: var(--spacing-lg);
   }
   
   .navigation-pill-container {
-    max-width: 250px;
+    min-width: 180px;
   }
   
   .navigation-section-btn {
-    font-size: 0.8rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 75px;
   }
   
   .period-navigation {
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
   }
   
   .period-navigation h3 {
@@ -765,17 +768,30 @@
     padding: var(--spacing-sm);
   }
   
+  .header-title-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
   .header-title-section h2 {
-    font-size: 1rem;
+    font-size: 1.125rem;
+  }
+  
+  .header-navigation-section {
+    gap: var(--spacing-lg);
   }
   
   .navigation-pill-container {
-    max-width: 200px;
+    min-width: 160px;
   }
   
   .navigation-section-btn {
-    font-size: 0.75rem;
-    padding: var(--spacing-xs);
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 65px;
+  }
+  
+  .period-navigation {
+    margin-top: var(--spacing-lg);
   }
   
   .period-navigation h3 {
