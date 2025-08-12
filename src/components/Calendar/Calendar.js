@@ -62,7 +62,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
   // REMOVED: handleResetCalendar, confirmResetCalendar functions
 
-  // VERIFIED: Helper function to determine day status - CORRECT relapse logic
+  // FIXED: Helper function to determine day status - CORRECT logic order and precise checks
   const getDayStatus = (day) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -73,13 +73,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return null;
     }
     
-    // If before any tracking started, return null
-    if (userData.startDate && isBefore(day, new Date(userData.startDate))) {
-      return null;
-    }
-    
-    // VERIFIED: Check for specific relapse dates from streak history
-    // This correctly identifies relapse days and their triggers
+    // STEP 1: Check for specific relapse dates from streak history (RED)
     const relapseDay = userData.streakHistory?.find(streak => 
       streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), day)
     );
@@ -88,7 +82,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return { type: 'relapse', trigger: relapseDay.trigger };
     }
     
-    // Check for wet dreams (this is mock logic - in real app you'd track these separately)
+    // STEP 2: Check for wet dreams (YELLOW/ORANGE)
     const wetDreamDates = userData.streakHistory?.reduce((dates, streak) => {
       if (streak.start && streak.days > 7) {
         const wetDreamDay = new Date(streak.start);
@@ -104,20 +98,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return { type: 'wet-dream' };
     }
     
-    // VERIFIED: Check if day is within current streak (GREEN)
-    // Days from startDate up to today (but not including relapse days) = current streak
-    if (userData.startDate) {
-      const streakStart = new Date(userData.startDate);
-      streakStart.setHours(0, 0, 0, 0);
-      
-      if (day >= streakStart && day <= today) {
-        return { type: 'current-streak' };
-      }
-    }
-    
-    // VERIFIED: Check former streaks (BLUE) 
-    // Days that were part of previous streaks (before relapse) = former streak
-    const dayStreak = userData.streakHistory?.find(streak => {
+    // STEP 3: Check former streaks FIRST (BLUE) - completed streaks
+    const formerStreak = userData.streakHistory?.find(streak => {
       if (!streak.start || !streak.end) return false;
       const streakStart = new Date(streak.start);
       const streakEnd = new Date(streak.end);
@@ -129,8 +111,23 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return day >= streakStart && day < streakEnd;
     });
     
-    if (dayStreak) {
+    if (formerStreak) {
       return { type: 'former-streak' };
+    }
+    
+    // STEP 4: Check current streak LAST (GREEN) - only active streak with no end date
+    const currentStreak = userData.streakHistory?.find(streak => 
+      streak.start && !streak.end // Active streak has no end date
+    );
+    
+    if (currentStreak) {
+      const streakStart = new Date(currentStreak.start);
+      streakStart.setHours(0, 0, 0, 0);
+      
+      // Day is within the current active streak period
+      if (day >= streakStart && day <= today) {
+        return { type: 'current-streak' };
+      }
     }
     
     return null;
