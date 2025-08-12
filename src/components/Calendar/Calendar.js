@@ -605,6 +605,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       {dayInfoModal && selectedDate && (
         <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
           <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
+            <button 
+              className="modal-close-x" 
+              onClick={() => setDayInfoModal(false)}
+              aria-label="Close"
+            >
+              <FaTimes />
+            </button>
+            
             <h3>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
             
             {/* Day Status */}
@@ -827,6 +835,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       {editDayModal && editingDate && (
         <div className="modal-overlay" onClick={() => setEditDayModal(false)}>
           <div className="modal-content edit-day-modal" onClick={e => e.stopPropagation()}>
+            <button 
+              className="modal-close-x" 
+              onClick={() => setEditDayModal(false)}
+              aria-label="Close"
+            >
+              <FaTimes />
+            </button>
+            
             <div className="modal-header-simple">
               <h3>Edit {format(editingDate, 'MMM d, yyyy')}</h3>
             </div>

@@ -257,6 +257,32 @@
   filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
 }
 
+/* NEW: Modal close X button matching other components */
+.modal-close-x {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close-x:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
 .calendar-instructions {
   text-align: center;
   font-size: 0.875rem;
@@ -862,11 +888,27 @@
   .legend-item:nth-child(4) { grid-column: 2 !important; grid-row: 2 !important; }
   
   /* 5th item (Has Data) centered on third row */
+  /* First 4 items in 2x2 grid */
+  .legend-item:nth-child(1) { grid-column: 1 !important; grid-row: 1 !important; }
+  .legend-item:nth-child(2) { grid-column: 2 !important; grid-row: 1 !important; }
+  .legend-item:nth-child(3) { grid-column: 1 !important; grid-row: 2 !important; }
+  .legend-item:nth-child(4) { grid-column: 2 !important; grid-row: 2 !important; }
+  
+  /* 5th item (Has Data) centered on third row */
   .legend-has-data {
     grid-column: 1 / -1 !important;
     grid-row: 3 !important;
     justify-self: center !important;
     max-width: 100px !important;
+  }
+  
+  /* Small mobile X button */
+  .modal-close-x {
+    top: var(--spacing-xs);
+    right: var(--spacing-xs);
+    width: 24px;
+    height: 24px;
+    font-size: 0.875rem;
   }
   
   .calendar-main-section {
