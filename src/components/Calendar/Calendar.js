@@ -637,6 +637,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </div>
         </div>
 
+        {/* Calendar Instructions - MOVED: Now appears after legend, before calendar */}
+        <div className="calendar-instructions">
+          Click on any day to view details and edit status
+        </div>
+
         {/* Calendar Display */}
         <div className="calendar-display">
           {viewMode === 'month' ? (
@@ -646,10 +651,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           ) : (
             renderWeekView()
           )}
-        </div>
-
-        <div className="calendar-instructions">
-          Click on any day to view details and edit status
         </div>
       </div>
 
