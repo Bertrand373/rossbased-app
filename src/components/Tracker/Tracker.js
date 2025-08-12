@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: All benefits unlocked for everyone
+// components/Tracker/Tracker.js - UPDATED: All benefits unlocked for everyone + Integrated Header Design
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -299,20 +299,24 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* Header Section */}
-      <div className="tracker-header">
-        <div className="tracker-header-spacer"></div>
-        <h2>Streak Tracker</h2>
-        <div className="tracker-actions">
-          {userData.startDate && (
-            <button 
-              className="action-btn"
-              onClick={() => setShowSetStartDate(true)}
-            >
-              <FaEdit />
-              <span>Edit Date</span>
-            </button>
-          )}
+      {/* UPDATED: New Integrated Header Section matching Stats, Calendar, and Emotional Timeline */}
+      <div className="integrated-tracker-header">
+        <div className="tracker-header-title-section">
+          <h2>Streak Tracker</h2>
+        </div>
+        
+        <div className="tracker-header-actions-section">
+          <div className="tracker-header-actions">
+            {userData.startDate && (
+              <button 
+                className="action-btn"
+                onClick={() => setShowSetStartDate(true)}
+              >
+                <FaEdit />
+                <span>Edit Date</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
       
