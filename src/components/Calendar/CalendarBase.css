@@ -33,11 +33,12 @@
   text-align: center;
 }
 
+/* UPDATED: Changed margin-bottom to var(--spacing-lg) to match the top spacing */
 .header-navigation-section {
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
 }
 
 .navigation-pill-container {
@@ -705,6 +706,55 @@
   }
   
   .calendar-main-section {
+    padding: var(--spacing-sm);
+  }
+  
+  .calendar-legend {
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+  }
+  
+  .legend-item {
+    font-size: 0.7rem;
+  }
+  
+  .day-header {
+    padding: 4px 2px;
+    font-size: 0.65rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .day-cell {
+    height: 50px;
+    padding: 2px;
+  }
+  
+  .day-number {
+    font-size: 0.7rem;
+  }
+  
+  .today .day-number {
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    font-size: 0.6rem;
+  }
+  
+  .day-indicators {
+    gap: 2px;
+    min-height: 16px;
+  }
+  
+  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
+    font-size: 0.7rem !important;
+  }
+  
+  .trigger-icon {
+    font-size: 0.6rem !important;
+  }
+}
     padding: var(--spacing-md);
   }
   
@@ -912,52 +962,3 @@
   }
   
   .calendar-main-section {
-    padding: var(--spacing-sm);
-  }
-  
-  .calendar-legend {
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm);
-  }
-  
-  .legend-item {
-    font-size: 0.7rem;
-  }
-  
-  .day-header {
-    padding: 4px 2px;
-    font-size: 0.65rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  .day-cell {
-    height: 50px;
-    padding: 2px;
-  }
-  
-  .day-number {
-    font-size: 0.7rem;
-  }
-  
-  .today .day-number {
-    width: 18px;
-    height: 18px;
-    line-height: 18px;
-    font-size: 0.6rem;
-  }
-  
-  .day-indicators {
-    gap: 2px;
-    min-height: 16px;
-  }
-  
-  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
-    font-size: 0.7rem !important;
-  }
-  
-  .trigger-icon {
-    font-size: 0.6rem !important;
-  }
-}
