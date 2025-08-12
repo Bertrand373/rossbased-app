@@ -68,7 +68,7 @@
   justify-self: end;
 }
 
-/* FIXED: Edit Date button styled like Calendar Cancel button - NO HOVER EFFECTS */
+/* UPDATED: Edit Date button styled exactly like Stats Reset button - matching all properties */
 .action-btn {
   display: flex;
   align-items: center;
@@ -82,14 +82,18 @@
   font-weight: 500;
   cursor: pointer;
   transition: none;
+  outline: none !important;
 }
 
-/* NUCLEAR OPTION: Force remove ALL hover effects with maximum specificity */
+/* UPDATED: All hover effects removed to match Stats Reset button exactly */
 .action-btn:hover,
 .tracker-actions .action-btn:hover,
 .tracker-header-actions .action-btn:hover,
 .journal-actions .action-btn:hover,
-button.action-btn:hover {
+button.action-btn:hover,
+.action-btn:focus,
+.action-btn:active,
+.action-btn:focus-visible {
   background-color: rgba(128, 128, 128, 0.1) !important;
   border-color: var(--border) !important;
   color: var(--text-secondary) !important;
@@ -97,6 +101,7 @@ button.action-btn:hover {
   opacity: 1 !important;
   box-shadow: none !important;
   outline: none !important;
+  filter: none !important;
 }
 
 /* UPDATED: Current Streak Section */
@@ -273,7 +278,6 @@ button.action-btn:hover {
   padding: var(--spacing-xl);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
