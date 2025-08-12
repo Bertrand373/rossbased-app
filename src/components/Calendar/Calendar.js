@@ -546,23 +546,21 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               Week
             </button>
           </div>
-
-          {/* Period Navigation */}
-          <div className="period-navigation">
-            <button className="period-nav-btn" onClick={prevPeriod}>
-              ←
-            </button>
-            <h3>{getPeriodHeaderText()}</h3>
-            <button className="period-nav-btn" onClick={nextPeriod}>
-              →
-            </button>
-          </div>
         </div>
       </div>
 
-      {/* REMOVED: Reset Confirmation Modal */}
-
       <div className="calendar-main-section">
+        {/* NEW: Period Navigation moved to calendar section */}
+        <div className="calendar-period-navigation">
+          <button className="period-nav-btn" onClick={prevPeriod}>
+            ←
+          </button>
+          <h3>{getPeriodHeaderText()}</h3>
+          <button className="period-nav-btn" onClick={nextPeriod}>
+            →
+          </button>
+        </div>
+
         {/* Calendar Legend */}
         <div className="calendar-legend">
           <div className="legend-item">
@@ -581,7 +579,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             <div className="legend-indicator wet-dream"></div>
             <span>Wet Dream</span>
           </div>
-          <div className="legend-item">
+          <div className="legend-item legend-has-data">
             <FaInfoCircle className="legend-info-icon" />
             <span>Has Data</span>
           </div>

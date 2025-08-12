@@ -14,7 +14,6 @@
   border: 1px solid var(--border);
   padding: var(--spacing-lg);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  min-height: 200px;
 }
 
 .header-title-section {
@@ -36,12 +35,8 @@
 
 .header-navigation-section {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
+  justify-content: center;
   width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  flex: 1;
 }
 
 .navigation-pill-container {
@@ -88,13 +83,29 @@
   box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
 }
 
-/* Period navigation */
-.period-navigation {
+/* NEW: Period navigation moved to calendar section */
+.calendar-period-navigation {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-lg);
-  order: 2;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
+
+.calendar-period-navigation h3 {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  min-width: 220px;
+  text-align: center;
+}
+
+/* REMOVED: Old period navigation styles */
 
 .period-navigation h3 {
   color: var(--text);
@@ -166,7 +177,7 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Calendar legend with BLUE former streak indicator */
+/* UPDATED: Calendar legend with mobile 2+2+1 layout */
 .calendar-legend {
   display: flex;
   justify-content: center;
@@ -770,7 +781,6 @@
 @media (max-width: 480px) {
   .integrated-calendar-header {
     padding: var(--spacing-lg);
-    min-height: 160px;
   }
   
   .header-title-section {
@@ -779,12 +789,6 @@
   
   .header-title-section h2 {
     font-size: 1.125rem;
-  }
-  
-  .header-navigation-section {
-    gap: 0;
-    justify-content: space-between;
-    flex: 1;
   }
   
   .navigation-pill-container {
@@ -797,7 +801,13 @@
     min-width: 65px;
   }
   
-  .period-navigation h3 {
+  .calendar-period-navigation {
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-xs);
+    gap: var(--spacing-md);
+  }
+  
+  .calendar-period-navigation h3 {
     font-size: 1rem;
     min-width: 140px;
   }
@@ -820,6 +830,21 @@
     border-color: var(--border);
     color: var(--text-secondary);
     transform: none;
+  }
+  
+  /* Small mobile legend: same 2+2+1 layout, more compact */
+  .calendar-legend {
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+  }
+  
+  .legend-item {
+    font-size: 0.7rem;
+    max-width: 120px;
+  }
+  
+  .legend-has-data {
+    max-width: 100px;
   }
   
   .calendar-main-section {
