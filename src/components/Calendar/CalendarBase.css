@@ -633,17 +633,20 @@
   }
   
   .navigation-pill-container {
+    display: flex;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    background-color: var(--card-background);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border);
     width: fit-content;
-    min-width: 0;
-    flex-shrink: 0;
   }
   
   .navigation-section-btn {
+    flex: 1;
     font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-md);
-    flex: 0 0 auto;
-    min-width: 0;
-    width: auto;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    min-width: 80px;
   }
   
   .period-navigation {
