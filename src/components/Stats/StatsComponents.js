@@ -103,7 +103,9 @@ const formatTriggerName = (trigger) => {
     'relationship': 'relationship issues',
     'home_environment': 'being home alone',
     'home_alone': 'being home alone',
-    'explicit_content': 'explicit content'
+    'explicit_content': 'explicit content',
+    'alcohol_substances': 'alcohol/substances',
+    'sleep_deprivation': 'sleep deprivation'
   };
   
   // Return mapped name or sanitized version of unknown trigger
@@ -137,7 +139,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
         // Determine if this longest streak is still active (no end date)
         const isStillActive = !longestStreakRecord?.end;
         const durationText = longestStreakRecord ? 
-          `${longestStreakStart} to ${longestStreakEnd}${isStillActive ? ' (still active)' : ''}` : 
+          `Duration: ${longestStreakStart} to ${longestStreakEnd}${isStillActive ? ' (still active)' : ''}` : 
           'Date records not available for this streak.';
 
         return {

@@ -812,7 +812,11 @@ const formatTriggerName = (trigger) => {
     'lustful_thoughts': 'lustful thoughts',
     'social_media': 'social media',
     'relationship': 'relationship issues',
-    'home_environment': 'being home alone'
+    'home_environment': 'being home alone',
+    'home_alone': 'being home alone',
+    'explicit_content': 'explicit content',
+    'alcohol_substances': 'alcohol/substances',
+    'sleep_deprivation': 'sleep deprivation'
   };
   
   return triggerMap[trigger] || trigger.replace(/_/g, ' ');
