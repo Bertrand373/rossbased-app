@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - Core calendar functionality and layout */
+/* components/Calendar/CalendarBase.css - UPDATED: Grey→yellow hover effects for static buttons */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -116,32 +116,31 @@
   text-align: center;
 }
 
-/* FIXED: Navigation buttons styled like grey static buttons throughout the app */
+/* UPDATED: Navigation buttons with grey→yellow hover effects */
 .period-nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  /* FIXED: Grey static button styling like all other static buttons */
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: 50%; /* CIRCLE: Make it circular */
   color: var(--text-secondary);
   cursor: pointer;
-  transition: none; /* NO ANIMATIONS: Keep it static */
+  transition: all 0.2s ease; /* UPDATED: Added transition */
   font-size: 1.25rem; /* INCREASED: Make Unicode arrows bigger and more prominent */
   font-weight: 600; /* BOLD: Make arrows more visible */
   line-height: 1; /* CENTERED: Remove line-height spacing */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; /* SYSTEM: Use system font for better Unicode rendering */
 }
 
-/* FIXED: Static hover - no animations or color changes */
+/* UPDATED: Grey→yellow hover effects */
 .period-nav-btn:hover {
-  background-color: rgba(128, 128, 128, 0.1); /* STATIC: No change */
-  border-color: var(--border); /* STATIC: No change */
-  color: var(--text-secondary); /* STATIC: No change */
-  transform: none; /* NO ANIMATIONS */
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* Mobile navigation scrolling */
@@ -258,7 +257,7 @@
   filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
 }
 
-/* NEW: Modal close X button matching other components */
+/* UPDATED: Modal close X button with grey→yellow hover */
 .modal-close-x {
   position: absolute;
   top: var(--spacing-md);
@@ -280,8 +279,8 @@
 }
 
 .modal-close-x:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text);
+  background-color: rgba(255, 221, 0, 0.1);
+  color: var(--primary);
 }
 
 .calendar-instructions {
@@ -699,10 +698,10 @@
   }
   
   .period-nav-btn:hover {
-    background-color: rgba(128, 128, 128, 0.1);
-    border-color: var(--border);
-    color: var(--text-secondary);
-    transform: none;
+    background-color: rgba(255, 221, 0, 0.1) !important;
+    border-color: rgba(255, 221, 0, 0.2) !important;
+    color: var(--primary) !important;
+    transform: translateY(-1px) !important;
   }
   
   .calendar-main-section {
@@ -858,10 +857,10 @@
   }
   
   .period-nav-btn:hover {
-    background-color: rgba(128, 128, 128, 0.1);
-    border-color: var(--border);
-    color: var(--text-secondary);
-    transform: none;
+    background-color: rgba(255, 221, 0, 0.1) !important;
+    border-color: rgba(255, 221, 0, 0.2) !important;
+    color: var(--primary) !important;
+    transform: translateY(-1px) !important;
   }
   
   /* Small mobile legend: same 2+2+1 layout, more compact */

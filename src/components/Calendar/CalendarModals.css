@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarModals.css - Modal components and forms */
+/* components/Calendar/CalendarModals.css - UPDATED: Grey→yellow hover effects for appropriate buttons */
 
 /* UPDATED: Edit day modal with better back button placement */
 .edit-day-modal {
@@ -32,7 +32,7 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* UPDATED: Status buttons with calendar-matching colors */
+/* KEEP: Status buttons unchanged - these are the colored action buttons */
 .edit-option-btn {
   display: flex;
   align-items: center;
@@ -144,6 +144,7 @@
   margin-top: var(--spacing-lg);
 }
 
+/* UPDATED: Trigger action buttons with grey→yellow hover */
 .trigger-actions .btn {
   display: flex;
   align-items: center;
@@ -153,10 +154,21 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: all 0.2s ease;
   border: 1px solid;
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
 }
 
+.trigger-actions .btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* KEEP: Primary button styling for specific use cases */
 .trigger-actions .btn-primary {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: var(--primary);
@@ -462,15 +474,12 @@
   background-color: var(--primary-dark);
 }
 
-/* 🚨 NUCLEAR FIX: Back to Info Button - MAXIMUM OVERRIDE POWER 🚨 */
-
-/* STEP 1: Nuclear override for back-to-info button - match DatePicker cancel EXACTLY */
+/* UPDATED: Back to Info Button with grey→yellow hover effects */
 .back-to-info-btn,
 button.back-to-info-btn,
 .modal-actions .back-to-info-btn,
 .calendar-container .back-to-info-btn,
 .edit-day-modal .back-to-info-btn {
-  /* NUCLEAR: Maximum specificity override */
   display: flex !important;
   align-items: center !important;
   gap: var(--spacing-sm) !important;
@@ -482,7 +491,7 @@ button.back-to-info-btn,
   font-size: 0.875rem !important;
   font-weight: 500 !important;
   cursor: pointer !important;
-  transition: none !important;
+  transition: all 0.2s ease !important;
   flex: 1 !important;
   justify-content: center !important;
   min-height: auto !important;
@@ -492,7 +501,7 @@ button.back-to-info-btn,
   outline: none !important;
 }
 
-/* STEP 2: NUCLEAR hover override - completely static like DatePicker cancel */
+/* UPDATED: Grey→yellow hover effects for back button */
 .back-to-info-btn:hover,
 .back-to-info-btn:focus,
 .back-to-info-btn:active,
@@ -508,11 +517,10 @@ button.back-to-info-btn:active,
 .edit-day-modal .back-to-info-btn:hover,
 .edit-day-modal .back-to-info-btn:focus,
 .edit-day-modal .back-to-info-btn:active {
-  /* NUCLEAR: Force static state - NO CHANGES WHATSOEVER */
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-  transform: none !important;
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
   box-shadow: none !important;
   opacity: 1 !important;
   outline: none !important;
@@ -521,7 +529,7 @@ button.back-to-info-btn:active,
   background-image: none !important;
   background-size: auto !important;
   animation: none !important;
-  transition: none !important;
+  transition: all 0.2s ease !important;
 }
 
 /* STEP 3: Modal actions container - side-by-side layout like DatePicker */
@@ -534,7 +542,7 @@ button.back-to-info-btn:active,
   justify-content: center !important;
 }
 
-/* STEP 4: ALL modal action buttons styled exactly like DatePicker */
+/* UPDATED: Modal action buttons with grey→yellow hover effects */
 .modal-actions button,
 .modal-actions .btn-primary,
 .modal-actions .edit-day-btn,
@@ -547,31 +555,19 @@ button.back-to-info-btn:active,
   font-size: 0.875rem !important;
   font-weight: 500 !important;
   cursor: pointer !important;
-  transition: none !important;
+  transition: all 0.2s ease !important;
   border: 1px solid !important;
   flex: 1 !important;
   justify-content: center !important;
   min-height: auto !important;
   transform: none !important;
   box-shadow: none !important;
-}
-
-/* STEP 5: Primary buttons - static grey like DatePicker primary */
-.modal-actions .btn-primary,
-.modal-actions .edit-day-btn {
   background-color: rgba(128, 128, 128, 0.1) !important;
   border-color: var(--border) !important;
   color: var(--text-secondary) !important;
 }
 
-/* STEP 6: Outline/Cancel buttons - static grey like DatePicker cancel */
-.modal-actions .btn-outline {
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-}
-
-/* STEP 7: NUCLEAR hover removal for ALL modal buttons */
+/* UPDATED: Grey→yellow hover effects for all modal buttons */
 .modal-actions button:hover,
 .modal-actions button:focus,
 .modal-actions button:active,
@@ -584,19 +580,19 @@ button.back-to-info-btn:active,
 .modal-actions .btn-outline:hover,
 .modal-actions .btn-outline:focus,
 .modal-actions .btn-outline:active {
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-  transform: none !important;
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
   box-shadow: none !important;
   opacity: 1 !important;
   outline: none !important;
   filter: none !important;
   animation: none !important;
-  transition: none !important;
+  transition: all 0.2s ease !important;
 }
 
-/* Form actions for modals - ALSO side-by-side like DatePicker */
+/* UPDATED: Form actions with grey→yellow hover effects */
 .form-actions {
   display: flex;
   gap: var(--spacing-md);
@@ -613,29 +609,34 @@ button.back-to-info-btn:active,
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: all 0.2s ease;
   border: 1px solid;
   flex: 1;
   min-height: auto;
-}
-
-.form-actions .btn-danger {
-  background-color: rgba(239, 68, 68, 0.1);
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
-.form-actions .btn-outline {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
   color: var(--text-secondary);
 }
 
-/* REMOVED: All hover effects for form action buttons - static like DatePicker */
-.form-actions .btn-danger:hover,
-.form-actions .btn-outline:hover {
-  transform: none !important;
-  box-shadow: none !important;
+.form-actions button:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* KEEP: Danger button styling unchanged */
+.form-actions .btn-danger {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+.form-actions .btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* Mobile responsiveness for modals */
@@ -727,7 +728,7 @@ button.back-to-info-btn:active,
     width: 100%;
   }
   
-  /* 🚨 NUCLEAR MOBILE: Back button stays side-by-side like DatePicker 🚨 */
+  /* Mobile modal actions with grey→yellow hover */
   .modal-actions {
     flex-direction: row !important;
     width: 100% !important;
@@ -735,7 +736,6 @@ button.back-to-info-btn:active,
     align-items: center !important;
   }
   
-  /* NUCLEAR: Mobile back button override with maximum specificity */
   .modal-actions .back-to-info-btn,
   .modal-actions button.back-to-info-btn,
   .calendar-container .modal-actions .back-to-info-btn,
@@ -750,22 +750,21 @@ button.back-to-info-btn:active,
     color: var(--text-secondary) !important;
     transform: none !important;
     box-shadow: none !important;
-    transition: none !important;
+    transition: all 0.2s ease !important;
   }
   
-  /* NUCLEAR: Mobile hover override */
   .modal-actions .back-to-info-btn:hover,
   .modal-actions .back-to-info-btn:focus,
   .modal-actions .back-to-info-btn:active,
   .modal-actions button.back-to-info-btn:hover,
   .modal-actions button.back-to-info-btn:focus,
   .modal-actions button.back-to-info-btn:active {
-    background-color: rgba(128, 128, 128, 0.1) !important;
-    border-color: var(--border) !important;
-    color: var(--text-secondary) !important;
-    transform: none !important;
+    background-color: rgba(255, 221, 0, 0.1) !important;
+    border-color: rgba(255, 221, 0, 0.2) !important;
+    color: var(--primary) !important;
+    transform: translateY(-1px) !important;
     box-shadow: none !important;
-    transition: none !important;
+    transition: all 0.2s ease !important;
   }
   
   .modal-actions button {
