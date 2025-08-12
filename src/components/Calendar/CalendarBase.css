@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
   position: relative;
 }
 
@@ -36,9 +36,10 @@
 .header-navigation-section {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
   width: 100%;
   align-items: center;
+  margin-bottom: var(--spacing-xl);
 }
 
 .navigation-pill-container {
@@ -91,7 +92,6 @@
   align-items: center;
   gap: var(--spacing-lg);
   order: 2;
-  margin-top: var(--spacing-lg);
 }
 
 .period-navigation h3 {
@@ -602,11 +602,11 @@
 /* Mobile responsiveness for calendar base */
 @media (max-width: 768px) {
   .integrated-calendar-header {
-    padding: var(--spacing-md);
+    padding: var(--spacing-xl);
   }
   
   .header-title-section {
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
   }
   
   .header-title-section h2 {
@@ -614,7 +614,8 @@
   }
   
   .header-navigation-section {
-    gap: var(--spacing-lg);
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
   }
   
   .navigation-pill-container {
@@ -629,7 +630,6 @@
   
   .period-navigation {
     gap: var(--spacing-lg);
-    margin-top: var(--spacing-lg);
   }
   
   .period-navigation h3 {
@@ -765,11 +765,11 @@
 /* Very small screens */
 @media (max-width: 480px) {
   .integrated-calendar-header {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-lg);
   }
   
   .header-title-section {
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
   }
   
   .header-title-section h2 {
@@ -777,7 +777,8 @@
   }
   
   .header-navigation-section {
-    gap: var(--spacing-lg);
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
   }
   
   .navigation-pill-container {
@@ -788,10 +789,6 @@
     font-size: 0.875rem;
     padding: var(--spacing-sm) var(--spacing-md);
     min-width: 65px;
-  }
-  
-  .period-navigation {
-    margin-top: var(--spacing-lg);
   }
   
   .period-navigation h3 {
