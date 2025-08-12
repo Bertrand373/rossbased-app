@@ -1,7 +1,7 @@
-// components/Shared/DatePicker.js - IMPROVED: Better styling and consistent with other modals
+// components/Shared/DatePicker.js - UPDATED: Yellow info icon, fixed mobile, consistent hover effects
 import React, { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
-import { FaCheckCircle, FaTimes } from 'react-icons/fa';
+import { FaCheckCircle, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import './DatePicker.css';
 
 const DatePicker = ({ currentDate, onSubmit, onCancel, hasExistingDate = false }) => {
@@ -200,7 +200,8 @@ const DatePicker = ({ currentDate, onSubmit, onCancel, hasExistingDate = false }
         </div>
         
         <div className="helper-text">
-          💡 Enter MM/DD/YYYY format - cursor will automatically advance between fields
+          <FaInfoCircle className="helper-icon" />
+          Enter MM/DD/YYYY format - cursor will automatically advance between fields
         </div>
         
         <div className="date-picker-actions">
