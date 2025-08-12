@@ -7,10 +7,11 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons - REMOVED: FaRedo for reset button
+// Icons - UPDATED: Added FaWineBottle and FaBed for new triggers
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
-  FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes } from 'react-icons/fa';
+  FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
+  FaWineBottle, FaBed } from 'react-icons/fa';
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -24,7 +25,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
 
-  // UPDATED: Enhanced trigger options with theater masks for explicit content and brain for lustful thoughts
+  // UPDATED: Enhanced trigger options with all unique icons - Added alcohol/substances and sleep deprivation
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
     { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
@@ -33,7 +34,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
     { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
     { id: 'home_alone', label: 'Being Home Alone', icon: FaHome },
-    { id: 'explicit_content', label: 'Explicit Content', icon: FaTheaterMasks }
+    { id: 'explicit_content', label: 'Explicit Content', icon: FaTheaterMasks },
+    { id: 'alcohol_substances', label: 'Alcohol/Substances', icon: FaWineBottle },
+    { id: 'sleep_deprivation', label: 'Sleep Deprivation', icon: FaBed }
   ];
 
   // Next and previous navigation (works for both month and week)
