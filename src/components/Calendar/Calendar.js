@@ -144,12 +144,64 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return { hasBenefits, hasJournal };
   };
 
-  // Check if day is part of streak journey (only show counter for streak days)
-  const isDayPartOfJourney = (day) => {
+  // ENHANCED: Get streak journey info for any streak day (current or former)
+  const getStreakJourneyInfo = (day) => {
     const dayStatus = getDayStatus(day);
     
-    // Only show journey counter for current streak and former streak days
-    return dayStatus && (dayStatus.type === 'current-streak' || dayStatus.type === 'former-streak');
+    if (!dayStatus || (dayStatus.type !== 'current-streak' && dayStatus.type !== 'former-streak')) {
+      return null;
+    }
+    
+    if (dayStatus.type === 'current-streak') {
+      // Current streak: show day number from current streak start
+      const currentStreak = userData.streakHistory?.find(streak => 
+        streak.start && !streak.end
+      );
+      
+      if (currentStreak) {
+        const streakStart = new Date(currentStreak.start);
+        const dayNumber = differenceInDays(day, streakStart) + 1;
+        return {
+          dayNumber: dayNumber > 0 ? dayNumber : 0,
+          text: "Day of your retention journey",
+          type: 'current'
+        };
+      }
+    }
+    
+    if (dayStatus.type === 'former-streak') {
+      // Former streak: show day number within that specific streak + total length
+      const formerStreak = userData.streakHistory?.find(streak => {
+        if (!streak.start || !streak.end) return false;
+        const streakStart = new Date(streak.start);
+        const streakEnd = new Date(streak.end);
+        streakStart.setHours(0, 0, 0, 0);
+        streakEnd.setHours(0, 0, 0, 0);
+        day.setHours(0, 0, 0, 0);
+        
+        return day >= streakStart && day < streakEnd;
+      });
+      
+      if (formerStreak) {
+        const streakStart = new Date(formerStreak.start);
+        const dayNumber = differenceInDays(day, streakStart) + 1;
+        const totalDays = formerStreak.days;
+        
+        return {
+          dayNumber: dayNumber > 0 ? dayNumber : 0,
+          text: `Day of your ${totalDays}-day streak`,
+          type: 'former',
+          totalDays
+        };
+      }
+    }
+    
+    return null;
+  };
+
+  // Check if day is part of streak journey (only show counter for streak days)
+  const isDayPartOfJourney = (day) => {
+    return getStreakJourneyInfo(day) !== null;
   };
 
   // Show day details with edit option
@@ -673,20 +725,21 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               })()}
             </div>
 
-            {/* Journey Day Counter */}
+            {/* ENHANCED: Journey Day Counter with Former Streak Support */}
             {isDayPartOfJourney(selectedDate) && (
               <div className="day-streak-info">
                 <div className="streak-day-number">
                   {(() => {
-                    if (userData.startDate) {
-                      const streakStart = new Date(userData.startDate);
-                      const dayNumber = differenceInDays(selectedDate, streakStart) + 1;
-                      return dayNumber > 0 ? dayNumber : 0;
-                    }
-                    return 0;
+                    const journeyInfo = getStreakJourneyInfo(selectedDate);
+                    return journeyInfo ? journeyInfo.dayNumber : 0;
                   })()}
                 </div>
-                <div className="streak-context">Day of your retention journey</div>
+                <div className="streak-context">
+                  {(() => {
+                    const journeyInfo = getStreakJourneyInfo(selectedDate);
+                    return journeyInfo ? journeyInfo.text : "Day of your retention journey";
+                  })()}
+                </div>
               </div>
             )}
 
