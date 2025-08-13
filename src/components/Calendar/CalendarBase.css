@@ -52,9 +52,9 @@
   justify-content: center;
 }
 
-/* UPDATED: More compact navigation pills for desktop - reduced padding significantly */
+/* UPDATED: Much more compact navigation pills - dramatically reduced padding */
 .navigation-section-btn {
-  padding: var(--spacing-sm) var(--spacing-lg); /* CHANGED: More compact horizontal padding */
+  padding: var(--spacing-xs) var(--spacing-sm); /* CHANGED: From var(--spacing-sm) var(--spacing-md) - much smaller horizontal padding */
   background-color: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
@@ -70,7 +70,7 @@
   gap: var(--spacing-xs);
   position: relative;
   outline: none;
-  min-width: 70px; /* ADDED: Consistent minimum width */
+  min-width: 60px; /* CHANGED: Reduced from 70px to 60px for more compact look */
 }
 
 .navigation-section-btn:hover:not(:disabled) {
