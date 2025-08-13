@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Restrict future days and pre-journey days
+// components/Calendar/Calendar.js - UPDATED: View-only access for former streak days
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameDay, 
   isSameMonth, addMonths, subMonths, differenceInDays, isAfter, isBefore } from 'date-fns';
@@ -32,7 +32,7 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
     { id: 'home_environment', label: 'Home Environment', icon: FaHome }
   ];
 
-  // UPDATED: Check if day is editable - restrict future days and pre-journey days
+  // UPDATED: Check if day is editable for viewing (basic editability)
   const isDayEditable = (day) => {
     const today = new Date();
     today.setHours(23, 59, 59, 999);
@@ -50,6 +50,22 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
       if (day < journeyStart) {
         return false;
       }
+    }
+    
+    return true;
+  };
+
+  // NEW: Check if day allows status editing (stricter than viewing)
+  const isDayStatusEditable = (day) => {
+    // First check basic editability
+    if (!isDayEditable(day)) {
+      return false;
+    }
+    
+    // Don't allow editing former streak days (blue days)
+    const dayStatus = getDayStatus(day);
+    if (dayStatus?.type === 'former-streak') {
+      return false;
     }
     
     return true;
@@ -209,9 +225,9 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
     return getStreakJourneyInfo(day) !== null;
   };
 
-  // UPDATED: Show day details with restrictions
+  // UPDATED: Show day details - allow viewing former streaks, restrict editing
   const showDayDetails = (day) => {
-    // EARLY RETURN: Check if day is editable
+    // UPDATED: Only check basic editability (allows former streak viewing)
     if (!isDayEditable(day)) {
       // Show appropriate message for different restrictions
       const today = new Date();
@@ -219,14 +235,14 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
       day.setHours(0, 0, 0, 0);
       
       if (day > today) {
-        toast.error("Can't edit future days");
+        toast.error("Can't view future days");
       } else if (userData.startDate && day < new Date(userData.startDate)) {
-        toast.error("Can't edit days before your journey started");
+        toast.error("Can't view days before your journey started");
       }
       return; // Exit function immediately
     }
     
-    // Only editable days reach this point
+    // All days within journey can be viewed
     setSelectedDate(day);
     setEditingDate(day);
     setDayInfoModal(true);
@@ -237,8 +253,19 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
     setPendingStatusUpdate(null);
   };
 
-  // Show edit day modal from info modal
+  // UPDATED: Show edit day modal with status editing restriction
   const showEditFromInfo = () => {
+    // Check if this day's status can be edited
+    if (!isDayStatusEditable(editingDate)) {
+      const dayStatus = getDayStatus(editingDate);
+      if (dayStatus?.type === 'former-streak') {
+        toast.info("Former streak days are view-only. Status cannot be changed.");
+      } else {
+        toast.error("This day cannot be edited.");
+      }
+      return;
+    }
+    
     setDayInfoModal(false);
     setEditDayModal(true);
     setShowTriggerSelection(false);
@@ -399,14 +426,15 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
     setCurrentDate(subMonths(currentDate, 1));
   };
 
-  // UPDATED: Render month day with restrictions
+  // UPDATED: Render month day - allow clicking former streaks for viewing
   const renderMonthDay = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
     const dayTracking = getDayTracking(day);
     const isToday = isSameDay(day, new Date());
     const isSelected = selectedDate && isSameDay(day, selectedDate);
     const isCurrentMonth = isSameMonth(day, currentDate);
-    const isEditable = isDayEditable(day);
+    const isEditable = isDayEditable(day); // Basic editability for viewing
+    const isStatusEditable = isDayStatusEditable(day); // Stricter for editing
     
     // Build CSS classes
     const dayClasses = [
@@ -414,7 +442,8 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
       !isCurrentMonth ? 'other-month' : '',
       isToday ? 'today' : '',
       isSelected ? 'selected' : '',
-      !isEditable ? 'non-editable' : '', // Add non-editable class
+      !isEditable ? 'non-editable' : '',
+      !isStatusEditable && isEditable ? 'view-only' : '', // NEW: View-only class
       dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
       dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
       dayStatus?.type === 'relapse' ? 'relapse-day' : '',
@@ -426,10 +455,20 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
         key={dayIndex} 
         className={dayClasses}
         onClick={() => isEditable ? showDayDetails(day) : null}
-        style={{ cursor: isEditable ? 'pointer' : 'not-allowed' }}
+        style={{ 
+          cursor: isEditable ? 'pointer' : 'not-allowed',
+          // Visual hint for view-only days
+          opacity: (!isStatusEditable && isEditable) ? 0.8 : 1
+        }}
       >
         <div className="day-content">
           <div className="day-number">{format(day, 'd')}</div>
+          {/* NEW: Visual indicator for view-only */}
+          {(!isStatusEditable && isEditable) && (
+            <div className="view-only-indicator">
+              <FaInfoCircle style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }} />
+            </div>
+          )}
         </div>
         
         {/* Day indicators WITHOUT trophy badge */}
@@ -583,7 +622,7 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
 
-      {/* Day Info Modal */}
+      {/* UPDATED: Day Info Modal with view-only support */}
       {dayInfoModal && selectedDate && (
         <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
           <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
@@ -601,12 +640,18 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
             <div className="day-status-info">
               {(() => {
                 const dayStatus = getDayStatus(selectedDate);
+                const isStatusEditable = isDayStatusEditable(selectedDate);
+                
                 if (dayStatus) {
                   switch (dayStatus.type) {
                     case 'current-streak':
                       return <div className="status-badge current-streak">✓ Current Streak Day</div>;
                     case 'former-streak':
-                      return <div className="status-badge former-streak">✓ Former Streak Day</div>;
+                      return (
+                        <div className={`status-badge former-streak ${!isStatusEditable ? 'view-only' : ''}`}>
+                          ✓ Former Streak Day
+                        </div>
+                      );
                     case 'relapse':
                       return <div className="status-badge relapse">✗ Relapse Day</div>;
                     case 'wet-dream':
@@ -616,6 +661,22 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
                   }
                 }
                 return <div className="status-badge">No Status</div>;
+              })()}
+
+              {/* NEW: View-only notice for former streaks */}
+              {(() => {
+                const dayStatus = getDayStatus(selectedDate);
+                const isStatusEditable = isDayStatusEditable(selectedDate);
+                
+                if (dayStatus?.type === 'former-streak' && !isStatusEditable) {
+                  return (
+                    <div className="view-only-notice">
+                      <FaInfoCircle className="view-only-notice-icon" />
+                      <span>This is a former streak day. You can view the data but cannot edit the status.</span>
+                    </div>
+                  );
+                }
+                return null;
               })()}
 
               {/* Trigger info */}
@@ -781,10 +842,22 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
             })()}
 
             <div className="modal-actions">
-              <button className="btn-primary edit-day-btn" onClick={showEditFromInfo}>
-                <FaEdit />
-                Edit Day
-              </button>
+              {/* UPDATED: Conditional edit button based on status editability */}
+              {isDayStatusEditable(selectedDate) ? (
+                <button className="btn-primary edit-day-btn" onClick={showEditFromInfo}>
+                  <FaEdit />
+                  Edit Day
+                </button>
+              ) : (
+                <button 
+                  className="btn-primary edit-day-btn disabled" 
+                  disabled 
+                  title="Former streak days are view-only"
+                >
+                  <FaEdit />
+                  View Only
+                </button>
+              )}
               <button className="btn-outline" onClick={() => setDayInfoModal(false)}>
                 <FaTimes />
                 Close

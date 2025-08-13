@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - UPDATED: Grey→yellow hover effects for static buttons */
+/* components/Calendar/CalendarBase.css - UPDATED: View-only access for former streak days */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -360,6 +360,26 @@
   color: var(--text-secondary) !important;
 }
 
+/* NEW: View-only days styling (different from non-editable) */
+.day-cell.view-only {
+  position: relative;
+  cursor: pointer !important; /* Allow clicking for viewing */
+  opacity: 0.8;
+}
+
+.day-cell.view-only:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  transform: none;
+}
+
+/* NEW: View-only indicator in day header */
+.view-only-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 1;
+}
+
 .day-cell:last-child {
   border-right: none;
 }
@@ -412,10 +432,20 @@
   border-left: 4px solid var(--success) !important;
 }
 
-/* UPDATED: Former streak days now use BLUE (#3b82f6) */
+/* UPDATED: Former streak days now use BLUE (#3b82f6) with view-only styling */
 .former-streak-day {
   background-color: rgba(59, 130, 246, 0.2) !important;
   border-left: 4px solid #3b82f6 !important;
+}
+
+.former-streak-day.view-only {
+  background-color: rgba(59, 130, 246, 0.15) !important; /* Slightly more muted */
+  border-left: 4px solid #3b82f6 !important;
+  cursor: pointer !important;
+}
+
+.former-streak-day.view-only:hover {
+  background-color: rgba(59, 130, 246, 0.25) !important;
 }
 
 .relapse-day {
@@ -791,6 +821,11 @@
     font-size: 0.65rem !important;
   }
   
+  .view-only-indicator {
+    top: 1px;
+    right: 1px;
+  }
+  
   .week-view-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
@@ -882,6 +917,14 @@
     border-color: rgba(255, 221, 0, 0.2) !important;
     color: var(--primary) !important;
     transform: translateY(-1px) !important;
+  }
+  
+  .day-cell.view-only {
+    opacity: 0.9; /* Less opacity reduction on small screens */
+  }
+  
+  .view-only-indicator {
+    display: none; /* Hide tiny icon on very small screens */
   }
   
   /* Small mobile legend: same 2+2+1 layout, more compact */
