@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - UPDATED: View-only access for former streak days */
+/* components/Calendar/CalendarBase.css - FIXED: Restored legend position and navigation styling */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -105,8 +105,6 @@
   text-align: center;
 }
 
-/* REMOVED: Old period navigation styles */
-
 .period-navigation h3 {
   color: var(--text);
   margin: 0;
@@ -116,52 +114,43 @@
   text-align: center;
 }
 
-/* UPDATED: Navigation buttons with grey→yellow hover effects */
+/* FIXED: Navigation buttons restored to proper styling */
 .period-nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: 50%; /* CIRCLE: Make it circular */
-  color: var(--text-secondary);
+  background-color: var(--card-background);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md); /* RESTORED: Rounded corners instead of circle */
+  color: var(--text);
   cursor: pointer;
-  transition: all 0.2s ease; /* UPDATED: Added transition */
-  font-size: 1.25rem; /* INCREASED: Make Unicode arrows bigger and more prominent */
-  font-weight: 600; /* BOLD: Make arrows more visible */
-  line-height: 1; /* CENTERED: Remove line-height spacing */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; /* SYSTEM: Use system font for better Unicode rendering */
+  transition: all 0.2s ease;
+  font-size: 1rem; /* RESTORED: Normal size */
+  font-weight: 500; /* RESTORED: Normal weight */
+  line-height: 1;
+  font-family: inherit; /* RESTORED: Use default font */
 }
 
-/* UPDATED: Grey→yellow hover effects */
+/* RESTORED: Proper hover effects */
 .period-nav-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--dark-gray) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3) !important;
 }
 
-/* Mobile navigation scrolling */
-@media (max-width: 768px) {
-  .navigation-pill-container {
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-right: var(--spacing-md);
-  }
-  
-  .navigation-pill-container::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .navigation-section-btn {
-    white-space: nowrap;
-    min-width: fit-content;
-    flex-shrink: 0;
-  }
+/* Add better content for navigation buttons */
+.period-nav-btn::before {
+  content: "‹"; /* Left arrow */
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.period-nav-btn.next::before {
+  content: "›"; /* Right arrow */
 }
 
 /* FIXED: Main calendar section spacing to perfectly match other tabs */
@@ -176,32 +165,18 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Calendar legend with mobile 2+2+1 layout */
+/* FIXED: Calendar legend restored to original position */
 .calendar-legend {
-  display: flex;
-  justify-content: center;
+  display: flex !important;
+  justify-content: center !important;
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border-radius: var(--radius-lg);
-  /* CHANGED: More subtle border like average energy card */
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   flex-wrap: wrap;
-  position: relative;
-  overflow: hidden;
-}
-
-/* CHANGED: More subtle glow effect */
-.calendar-legend::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  /* CHANGED: More subtle glow like average energy card */
-  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
+  align-items: center;
+  margin-bottom: var(--spacing-md);
 }
 
 .legend-item {
@@ -210,82 +185,63 @@
   gap: var(--spacing-sm);
   font-size: 0.875rem;
   color: var(--text);
-  white-space: nowrap;
   font-weight: 500;
   padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.2s ease;
 }
 
 .legend-item:hover {
-  background-color: rgba(255, 221, 0, 0.05);
-  border-color: rgba(255, 221, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
   transform: translateY(-1px);
 }
 
 .legend-indicator {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .legend-indicator.current-streak {
-  background: linear-gradient(135deg, var(--success) 0%, rgba(34, 197, 94, 0.8) 100%);
+  background-color: rgba(34, 197, 94, 0.6);
+  border-left: 4px solid var(--success);
 }
 
-/* UPDATED: Former streak legend indicator - now BLUE (#3b82f6) */
 .legend-indicator.former-streak {
-  background: linear-gradient(135deg, #3b82f6 0%, rgba(59, 130, 246, 0.8) 100%);
+  background-color: rgba(59, 130, 246, 0.6);
+  border-left: 4px solid #3b82f6;
 }
 
 .legend-indicator.relapse {
-  background: linear-gradient(135deg, var(--danger) 0%, rgba(239, 68, 68, 0.8) 100%);
+  background-color: rgba(239, 68, 68, 0.6);
+  border-left: 4px solid var(--danger);
 }
 
 .legend-indicator.wet-dream {
-  background: linear-gradient(135deg, var(--warning) 0%, rgba(245, 158, 11, 0.8) 100%);
+  background-color: rgba(245, 158, 11, 0.6);
+  border-left: 4px solid var(--warning);
 }
 
-/* UPDATED: Direct icon styling for legend (no trophy icon) */
+.legend-indicator.has-data {
+  background-color: rgba(255, 221, 0, 0.6);
+  border-left: 4px solid var(--primary);
+}
+
+.legend-has-data {
+  position: relative;
+}
+
 .legend-info-icon {
-  color: var(--primary);
-  font-size: 0.875rem;
-  filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
-}
-
-/* UPDATED: Modal close X button with grey→yellow hover */
-.modal-close-x {
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  background: none;
-  border: none;
   color: var(--text-secondary);
-  font-size: 1rem;
-  cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.modal-close-x:hover {
-  background-color: rgba(255, 221, 0, 0.1);
-  color: var(--primary);
+  margin-left: var(--spacing-xs);
+  font-size: 0.875rem;
+  cursor: help;
 }
 
 .calendar-instructions {
-  text-align: center;
-  font-size: 0.875rem;
   color: var(--text-secondary);
   font-style: italic;
   padding: var(--spacing-sm);
@@ -519,119 +475,46 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
-  cursor: pointer;
-  transition: background-color 0.2s;
+  min-height: 120px;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  min-height: 120px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .week-day-cell:hover {
   background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .week-day-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .week-day-name {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-size: 0.875rem;
   font-weight: 600;
-  text-transform: uppercase;
+  color: var(--text);
 }
 
 .week-day-number {
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
 }
 
-.week-day-number.today {
-  background-color: var(--primary);
-  color: #000;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-}
-
-.week-day-status {
-  display: flex;
-  gap: var(--spacing-xs);
-  align-items: center;
-}
-
-.week-status-badge {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
+.week-day-streak {
   font-size: 0.75rem;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
-.week-status-badge.current-streak {
-  background-color: rgba(34, 197, 94, 0.15);
-  color: var(--success);
-}
-
-/* UPDATED: Week view former streak badge - now BLUE */
-.week-status-badge.former-streak {
-  background-color: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
-}
-
-.week-status-badge.relapse {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: var(--danger);
-}
-
-.week-status-badge.wet-dream {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: var(--warning);
-}
-
-.week-badge-indicator {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.week-badge-icon {
-  color: var(--primary);
-  font-size: 0.875rem;
-}
-
-.badge-tooltip {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--background);
-  color: var(--text);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-  border: 1px solid var(--border);
-}
-
-.week-badge-indicator:hover .badge-tooltip {
-  opacity: 1;
-}
-
 .week-benefits {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
@@ -641,13 +524,15 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  font-size: 0.75rem;
+  margin-bottom: var(--spacing-xs);
 }
 
 .benefit-mini-label {
   color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
   min-width: 32px;
-  font-size: 0.7rem;
+  text-align: right;
 }
 
 .benefit-mini-slider {
@@ -710,20 +595,21 @@
   }
   
   .navigation-pill-container {
-    display: flex;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-xs);
-    background-color: var(--card-background);
-    border-radius: var(--radius-full);
-    border: 1px solid var(--border);
-    width: fit-content;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: var(--spacing-md);
+  }
+  
+  .navigation-pill-container::-webkit-scrollbar {
+    display: none;
   }
   
   .navigation-section-btn {
-    flex: 1;
-    font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    min-width: 80px;
+    white-space: nowrap;
+    min-width: fit-content;
+    flex-shrink: 0;
   }
   
   .period-navigation {
@@ -738,38 +624,31 @@
   .period-nav-btn {
     width: 36px;
     height: 36px;
-    font-size: 1.125rem;
-    font-weight: 600;
-    line-height: 1;
-    background-color: rgba(128, 128, 128, 0.1);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    color: var(--text-secondary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  }
-  
-  .period-nav-btn:hover {
-    background-color: rgba(255, 221, 0, 0.1) !important;
-    border-color: rgba(255, 221, 0, 0.2) !important;
-    color: var(--primary) !important;
-    transform: translateY(-1px) !important;
+    font-size: 1rem;
   }
   
   .calendar-main-section {
     padding: var(--spacing-md);
   }
   
+  /* FIXED: Keep legend above calendar on mobile */
   .calendar-legend {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    align-items: center;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: var(--spacing-sm) !important;
+    padding: var(--spacing-md) !important;
+    /* Remove all grid properties */
+    grid-template-columns: unset !important;
+    grid-template-rows: unset !important;
   }
   
   .legend-item {
-    font-size: 0.75rem;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.75rem !important;
+    flex: 0 1 auto !important;
+    /* Remove grid positioning */
+    grid-column: unset !important;
+    grid-row: unset !important;
   }
   
   .legend-indicator {
@@ -902,83 +781,27 @@
   .period-nav-btn {
     width: 32px;
     height: 32px;
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1;
-    background-color: rgba(128, 128, 128, 0.1);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    color: var(--text-secondary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.9rem;
   }
   
-  .period-nav-btn:hover {
-    background-color: rgba(255, 221, 0, 0.1) !important;
-    border-color: rgba(255, 221, 0, 0.2) !important;
-    color: var(--primary) !important;
-    transform: translateY(-1px) !important;
-  }
-  
-  .day-cell.view-only {
-    opacity: 0.9; /* Less opacity reduction on small screens */
-  }
-  
-  .view-only-indicator {
-    display: none; /* Hide tiny icon on very small screens */
-  }
-  
-  /* Small mobile legend: same 2+2+1 layout, more compact */
+  /* FIXED: Very small screen legend - keep as flex */
   .calendar-legend {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: auto auto auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
     gap: var(--spacing-xs) !important;
-    justify-items: center !important;
     padding: var(--spacing-sm) !important;
-    flex-wrap: initial !important;
   }
   
   .legend-item {
     font-size: 0.7rem !important;
-    max-width: 120px !important;
     width: 100% !important;
+    max-width: 200px !important;
     justify-content: center !important;
-  }
-  
-  /* First 4 items in 2x2 grid */
-  .legend-item:nth-child(1) { grid-column: 1 !important; grid-row: 1 !important; }
-  .legend-item:nth-child(2) { grid-column: 2 !important; grid-row: 1 !important; }
-  .legend-item:nth-child(3) { grid-column: 1 !important; grid-row: 2 !important; }
-  .legend-item:nth-child(4) { grid-column: 2 !important; grid-row: 2 !important; }
-  
-  /* 5th item (Has Data) centered on third row */
-  .legend-has-data {
-    grid-column: 1 / -1 !important;
-    grid-row: 3 !important;
-    justify-self: center !important;
-    max-width: 100px !important;
-  }
-  
-  /* Small mobile X button */
-  .modal-close-x {
-    top: var(--spacing-xs);
-    right: var(--spacing-xs);
-    width: 24px;
-    height: 24px;
-    font-size: 0.875rem;
   }
   
   .calendar-main-section {
     padding: var(--spacing-sm);
-  }
-  
-  .calendar-legend {
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm);
-  }
-  
-  .legend-item {
-    font-size: 0.7rem;
   }
   
   .day-header {
