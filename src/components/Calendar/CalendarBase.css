@@ -52,8 +52,9 @@
   justify-content: center;
 }
 
+/* UPDATED: More compact navigation pills for desktop - reduced padding significantly */
 .navigation-section-btn {
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg); /* CHANGED: More compact horizontal padding */
   background-color: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
@@ -69,6 +70,7 @@
   gap: var(--spacing-xs);
   position: relative;
   outline: none;
+  min-width: 70px; /* ADDED: Consistent minimum width */
 }
 
 .navigation-section-btn:hover:not(:disabled) {
@@ -673,6 +675,7 @@
     width: fit-content;
   }
   
+  /* UPDATED: Mobile navigation pills maintain better sizing */
   .navigation-section-btn {
     flex: 1;
     font-size: 0.875rem;
@@ -832,6 +835,7 @@
     width: fit-content;
   }
   
+  /* UPDATED: Small screen navigation pills remain compact */
   .navigation-section-btn {
     font-size: 0.875rem;
     padding: var(--spacing-sm) var(--spacing-md);
