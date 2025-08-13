@@ -52,9 +52,9 @@
   justify-content: center;
 }
 
-/* UPDATED: Much more compact navigation pills - dramatically reduced padding */
+/* UPDATED: MUCH MORE COMPACT navigation pills - FORCE with !important */
 .navigation-section-btn {
-  padding: var(--spacing-xs) var(--spacing-sm); /* CHANGED: From var(--spacing-sm) var(--spacing-md) - much smaller horizontal padding */
+  padding: var(--spacing-xs) var(--spacing-sm) !important; /* CHANGED: From var(--spacing-sm) var(--spacing-md) - much smaller */
   background-color: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
@@ -70,7 +70,7 @@
   gap: var(--spacing-xs);
   position: relative;
   outline: none;
-  min-width: 60px; /* CHANGED: Reduced from 70px to 60px for more compact look */
+  min-width: 60px !important; /* CHANGED: Reduced from default for compact look */
 }
 
 .navigation-section-btn:hover:not(:disabled) {
@@ -679,8 +679,8 @@
   .navigation-section-btn {
     flex: 1;
     font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    min-width: 80px;
+    padding: var(--spacing-sm) var(--spacing-lg) !important;
+    min-width: 80px !important;
   }
   
   .period-navigation {
@@ -838,7 +838,7 @@
   /* UPDATED: Small screen navigation pills remain compact */
   .navigation-section-btn {
     font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md) !important;
   }
   
   .calendar-period-navigation {
