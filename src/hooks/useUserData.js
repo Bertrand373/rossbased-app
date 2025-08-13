@@ -1,5 +1,6 @@
-// src/hooks/useUserData.js - UPDATED: All users are now premium by default
+// src/hooks/useUserData.js - UPDATED: Added goal system to userData structure
 import { useState, useEffect } from 'react';
+import { addDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
 // IMPORT: The comprehensive mock data including new personality users
@@ -23,6 +24,14 @@ export const useUserData = () => {
     wetDreamCount: 0,
     relapseCount: 0,
     isPremium: true, // CHANGED: All users are premium now
+    // NEW: Goal system addition
+    goal: {
+      targetDays: null,         // 30, 60, 90, 180, or 365
+      isActive: false,          // whether goal is set
+      targetDate: null,         // startDate + targetDays
+      achieved: false,          // whether current goal achieved
+      achievementDate: null     // when goal was achieved
+    },
     badges: [
       { id: 1, name: '7-Day Warrior', earned: false, date: null },
       { id: 2, name: '14-Day Monk', earned: false, date: null },
@@ -50,6 +59,17 @@ export const useUserData = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isPremium, setIsPremium] = useState(true); // CHANGED: Default to premium
   const [isLoading, setIsLoading] = useState(false);
+
+  // NEW: Helper function to calculate goal target date
+  const calculateGoalTargetDate = (startDate, targetDays) => {
+    if (!startDate || !targetDays) return null;
+    return addDays(new Date(startDate), targetDays - 1); // -1 because day 1 is the start date
+  };
+
+  // NEW: Helper function to check if goal is achieved
+  const checkGoalAchievement = (currentStreak, targetDays) => {
+    return currentStreak >= targetDays;
+  };
 
   // UPDATED: Login function - all users get premium features
   const login = async (username, password = 'demo') => {
@@ -117,6 +137,36 @@ export const useUserData = () => {
       
       // CHANGED: Force all users to have premium features
       mockUserData.isPremium = true;
+
+      // NEW: Initialize goal if not present
+      if (!mockUserData.goal) {
+        mockUserData.goal = {
+          targetDays: null,
+          isActive: false,
+          targetDate: null,
+          achieved: false,
+          achievementDate: null
+        };
+      }
+
+      // NEW: Calculate goal target date if goal is active
+      if (mockUserData.goal.isActive && mockUserData.goal.targetDays && mockUserData.startDate) {
+        mockUserData.goal.targetDate = calculateGoalTargetDate(
+          mockUserData.startDate, 
+          mockUserData.goal.targetDays
+        );
+        
+        // Check if goal is achieved
+        if (checkGoalAchievement(mockUserData.currentStreak, mockUserData.goal.targetDays)) {
+          if (!mockUserData.goal.achieved) {
+            mockUserData.goal.achieved = true;
+            mockUserData.goal.achievementDate = addDays(
+              new Date(mockUserData.startDate), 
+              mockUserData.goal.targetDays - 1
+            );
+          }
+        }
+      }
       
       setUserData(mockUserData);
       setIsLoggedIn(true);
@@ -178,6 +228,14 @@ export const useUserData = () => {
       wetDreamCount: 0,
       relapseCount: 0,
       isPremium: true, // CHANGED: Keep premium even for empty state
+      // NEW: Reset goal on logout
+      goal: {
+        targetDays: null,
+        isActive: false,
+        targetDate: null,
+        achieved: false,
+        achievementDate: null
+      },
       badges: [
         { id: 1, name: '7-Day Warrior', earned: false, date: null },
         { id: 2, name: '14-Day Monk', earned: false, date: null },
@@ -212,10 +270,48 @@ export const useUserData = () => {
     toast.success('Logged out successfully');
   };
 
+  // UPDATED: updateUserData to handle goal recalculation
   const updateUserData = (newData) => {
     try {
       // CHANGED: Ensure isPremium stays true
       const updatedData = { ...userData, ...newData, isPremium: true };
+
+      // NEW: Auto-recalculate goal when startDate changes (handles relapses)
+      if (newData.startDate && updatedData.goal && updatedData.goal.isActive) {
+        // Recalculate target date based on new start date
+        updatedData.goal.targetDate = calculateGoalTargetDate(
+          newData.startDate, 
+          updatedData.goal.targetDays
+        );
+        
+        // Reset achievement status since we have a new start date
+        updatedData.goal.achieved = false;
+        updatedData.goal.achievementDate = null;
+        
+        // Check if goal is immediately achieved (for cases where user sets goal after already having streak)
+        if (updatedData.currentStreak >= updatedData.goal.targetDays) {
+          updatedData.goal.achieved = true;
+          updatedData.goal.achievementDate = addDays(
+            new Date(newData.startDate), 
+            updatedData.goal.targetDays - 1
+          );
+        }
+      }
+
+      // NEW: Check goal achievement when currentStreak updates
+      if (newData.currentStreak !== undefined && updatedData.goal && updatedData.goal.isActive) {
+        if (!updatedData.goal.achieved && checkGoalAchievement(newData.currentStreak, updatedData.goal.targetDays)) {
+          updatedData.goal.achieved = true;
+          updatedData.goal.achievementDate = addDays(
+            new Date(updatedData.startDate), 
+            updatedData.goal.targetDays - 1
+          );
+          
+          // Show achievement toast
+          toast.success(`🎉 Goal achieved! You reached ${updatedData.goal.targetDays} days!`);
+        }
+      }
+
       setUserData(updatedData);
       
       // Always keep premium status
@@ -232,6 +328,65 @@ export const useUserData = () => {
     }
   };
 
+  // NEW: Goal management functions
+  const setGoal = (targetDays) => {
+    try {
+      if (!userData.startDate) {
+        toast.error('Please set your start date first');
+        return false;
+      }
+
+      const targetDate = calculateGoalTargetDate(userData.startDate, targetDays);
+      const isAchieved = checkGoalAchievement(userData.currentStreak, targetDays);
+      
+      const goalData = {
+        goal: {
+          targetDays,
+          isActive: true,
+          targetDate,
+          achieved: isAchieved,
+          achievementDate: isAchieved ? addDays(new Date(userData.startDate), targetDays - 1) : null
+        }
+      };
+
+      updateUserData(goalData);
+      
+      if (isAchieved) {
+        toast.success(`🎉 Goal set and already achieved! You've reached ${targetDays} days!`);
+      } else {
+        toast.success(`Goal set: Reach ${targetDays} days!`);
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Set goal error:', err);
+      toast.error('Failed to set goal');
+      return false;
+    }
+  };
+
+  const cancelGoal = () => {
+    try {
+      const goalData = {
+        goal: {
+          targetDays: null,
+          isActive: false,
+          targetDate: null,
+          achieved: false,
+          achievementDate: null
+        }
+      };
+
+      updateUserData(goalData);
+      toast.success('Goal cancelled');
+      return true;
+    } catch (err) {
+      console.error('Cancel goal error:', err);
+      toast.error('Failed to cancel goal');
+      return false;
+    }
+  };
+
   // Load data from localStorage on mount
   useEffect(() => {
     const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
@@ -244,6 +399,25 @@ export const useUserData = () => {
         // Convert string dates back to Date objects
         if (parsedUserData.startDate) {
           parsedUserData.startDate = new Date(parsedUserData.startDate);
+        }
+
+        // NEW: Handle goal data conversion
+        if (parsedUserData.goal) {
+          if (parsedUserData.goal.targetDate) {
+            parsedUserData.goal.targetDate = new Date(parsedUserData.goal.targetDate);
+          }
+          if (parsedUserData.goal.achievementDate) {
+            parsedUserData.goal.achievementDate = new Date(parsedUserData.goal.achievementDate);
+          }
+        } else {
+          // Initialize goal if not present
+          parsedUserData.goal = {
+            targetDays: null,
+            isActive: false,
+            targetDate: null,
+            achieved: false,
+            achievementDate: null
+          };
         }
         
         if (parsedUserData.badges) {
@@ -320,7 +494,10 @@ export const useUserData = () => {
     isLoading,
     login, 
     logout, 
-    updateUserData 
+    updateUserData,
+    // NEW: Goal management functions
+    setGoal,
+    cancelGoal
   };
 };
 

@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Import both CSS files
+// components/Calendar/Calendar.js - UPDATED: Added goal system integration
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -7,11 +7,11 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons - UPDATED: Added FaWineBottle and FaBed for new triggers
+// Icons - UPDATED: Added FaWineBottle, FaBed, FaTrophy, and FaFlag for goal system
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
-  FaWineBottle, FaBed } from 'react-icons/fa';
+  FaWineBottle, FaBed, FaTrophy, FaFlag } from 'react-icons/fa';
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -20,7 +20,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [editDayModal, setEditDayModal] = useState(false);
   const [editingDate, setEditingDate] = useState(null);
   const [viewMode, setViewMode] = useState('month'); // 'month' or 'week'
-  // REMOVED: showResetConfirm state
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
@@ -63,7 +62,18 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return { weekStart, weekEnd };
   };
 
-  // REMOVED: handleResetCalendar, confirmResetCalendar functions
+  // NEW: Goal-related helper functions
+  const isGoalTargetDate = (day) => {
+    const goal = userData.goal;
+    if (!goal || !goal.isActive || !goal.targetDate) return false;
+    return isSameDay(day, new Date(goal.targetDate));
+  };
+
+  const isGoalAchievementDate = (day) => {
+    const goal = userData.goal;
+    if (!goal || !goal.achieved || !goal.achievementDate) return false;
+    return isSameDay(day, new Date(goal.achievementDate));
+  };
 
   // FIXED: Helper function to determine day status - CORRECT logic order and precise checks
   const getDayStatus = (day) => {
@@ -337,8 +347,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         }
         break;
         
-      // REMOVED: 'clear' case - no longer available as an option
-        
       default:
         break;
     }
@@ -383,9 +391,26 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return <IconComponent className="trigger-icon" />;
   };
 
-  // Render day cell WITHOUT trophy badges
+  // NEW: Helper function to get goal-related day info
+  const getGoalDayInfo = (day) => {
+    const goal = userData.goal;
+    if (!goal || !goal.isActive) return null;
+
+    if (isGoalAchievementDate(day)) {
+      return { type: 'goal-achievement', goalDays: goal.targetDays };
+    }
+
+    if (isGoalTargetDate(day)) {
+      return { type: 'goal-target', goalDays: goal.targetDays };
+    }
+
+    return null;
+  };
+
+  // Render day cell WITH goal indicators
   const renderDayCell = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
+    const goalInfo = getGoalDayInfo(day);
     const isSelected = selectedDate && isSameDay(day, selectedDate);
     const isToday = isSameDay(day, new Date());
     const dayTracking = getDayTracking(day);
@@ -399,7 +424,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
       dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
       dayStatus?.type === 'relapse' ? 'relapse-day' : '',
-      dayStatus?.type === 'wet-dream' ? 'wet-dream-day' : ''
+      dayStatus?.type === 'wet-dream' ? 'wet-dream-day' : '',
+      goalInfo?.type === 'goal-target' ? 'goal-target-day' : '',
+      goalInfo?.type === 'goal-achievement' ? 'goal-achievement-day' : ''
     ].filter(Boolean).join(' ');
 
     return (
@@ -412,7 +439,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           <div className="day-number">{format(day, 'd')}</div>
         </div>
         
-        {/* Day indicators WITHOUT trophy badge */}
+        {/* Day indicators WITH goal indicators */}
         <div className="day-indicators">
           {dayStatus && (
             <div className="day-status-indicator">
@@ -420,6 +447,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 <FaCheckCircle className="success-icon" />}
               {dayStatus.type === 'relapse' && <FaTimesCircle className="relapse-icon" />}
               {dayStatus.type === 'wet-dream' && <FaMoon className="wet-dream-icon" />}
+            </div>
+          )}
+
+          {/* NEW: Goal indicators */}
+          {goalInfo && (
+            <div className="day-goal-indicator">
+              {goalInfo.type === 'goal-target' && <FaFlag className="goal-target-icon" />}
+              {goalInfo.type === 'goal-achievement' && <FaTrophy className="goal-achievement-icon" />}
             </div>
           )}
           
@@ -439,7 +474,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     );
   };
 
-  // UPDATED: Week view rendering with sleep quality support
+  // UPDATED: Week view rendering with goal support
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
     const days = [];
@@ -447,6 +482,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     for (let i = 0; i < 7; i++) {
       const day = addDays(weekStart, i);
       const dayStatus = getDayStatus(day);
+      const goalInfo = getGoalDayInfo(day);
       const dayBenefits = getDayBenefits(day);
       const dayTracking = getDayTracking(day);
       
@@ -466,6 +502,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 {dayStatus.type === 'former-streak' && <FaCheckCircle />}
                 {dayStatus.type === 'relapse' && <FaTimesCircle />}
                 {dayStatus.type === 'wet-dream' && <FaMoon />}
+              </div>
+            )}
+
+            {/* NEW: Goal status in week view */}
+            {goalInfo && (
+              <div className={`week-goal-badge ${goalInfo.type}`}>
+                {goalInfo.type === 'goal-target' && <FaFlag />}
+                {goalInfo.type === 'goal-achievement' && <FaTrophy />}
               </div>
             )}
           </div>
@@ -613,7 +657,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </button>
         </div>
 
-        {/* Calendar Legend */}
+        {/* UPDATED: Calendar legend with goal indicators */}
         <div className="calendar-legend">
           <div className="legend-item">
             <div className="legend-indicator current-streak"></div>
@@ -630,6 +674,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           <div className="legend-item">
             <div className="legend-indicator wet-dream"></div>
             <span>Wet Dream</span>
+          </div>
+          <div className="legend-item">
+            <FaFlag className="legend-goal-target-icon" />
+            <span>Goal Target</span>
+          </div>
+          <div className="legend-item">
+            <FaTrophy className="legend-goal-achievement-icon" />
+            <span>Goal Achieved</span>
           </div>
           <div className="legend-item legend-has-data">
             <FaInfoCircle className="legend-info-icon" />
@@ -654,7 +706,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
 
-      {/* Day Info Modal */}
+      {/* UPDATED: Day Info Modal with goal information */}
       {dayInfoModal && selectedDate && (
         <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
           <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
@@ -672,6 +724,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             <div className="day-status-info">
               {(() => {
                 const dayStatus = getDayStatus(selectedDate);
+                const goalInfo = getGoalDayInfo(selectedDate);
+                
                 if (dayStatus) {
                   return (
                     <div className={`status-badge ${dayStatus.type}`}>
@@ -702,6 +756,26 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     </div>
                   );
                 }
+                
+                if (goalInfo) {
+                  return (
+                    <div className={`status-badge ${goalInfo.type === 'goal-achievement' ? 'goal-achievement' : 'goal-target'}`}>
+                      {goalInfo.type === 'goal-target' && (
+                        <>
+                          <FaFlag />
+                          <span>Goal Target ({goalInfo.goalDays} days)</span>
+                        </>
+                      )}
+                      {goalInfo.type === 'goal-achievement' && (
+                        <>
+                          <FaTrophy />
+                          <span>Goal Achieved! ({goalInfo.goalDays} days)</span>
+                        </>
+                      )}
+                    </div>
+                  );
+                }
+                
                 return (
                   <div className="status-badge">
                     <span>No specific status</span>
@@ -928,8 +1002,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                   <FaTimesCircle />
                   <span>Mark as Relapse</span>
                 </button>
-                
-                {/* REMOVED: Clear Status button */}
               </div>
             ) : (
               <div className="trigger-selection">

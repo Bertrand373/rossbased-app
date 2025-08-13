@@ -1,4 +1,4 @@
-// App.js - Fixed to keep original container structure with helmet styling
+// App.js - UPDATED: Added goal functions from useUserData hook
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -84,7 +84,19 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const { userData, isLoggedIn, isPremium, isLoading, login, logout, updateUserData } = useUserData();
+  
+  // UPDATED: Destructure goal functions from useUserData hook
+  const { 
+    userData, 
+    isLoggedIn, 
+    isPremium, 
+    isLoading, 
+    login, 
+    logout, 
+    updateUserData,
+    setGoal,
+    cancelGoal
+  } = useUserData();
 
   // Monitor screen size for responsive design
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -297,7 +309,16 @@ function App() {
             
             <main className="app-content">
               <Routes>
-                <Route path="/" element={<Tracker userData={userData} updateUserData={updateUserData} isPremium={isPremium} />} />
+                {/* UPDATED: Pass goal functions to Tracker component */}
+                <Route path="/" element={
+                  <Tracker 
+                    userData={userData} 
+                    updateUserData={updateUserData} 
+                    isPremium={isPremium}
+                    setGoal={setGoal}
+                    cancelGoal={cancelGoal}
+                  />
+                } />
                 <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                 <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                 <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
