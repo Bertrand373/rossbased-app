@@ -9,7 +9,10 @@ const Footer = () => {
       <div className="footer-content">
         <div className="footer-branding">
           <span className="footer-text">
-            Created by <strong>rossbased</strong> • Part of the rossbased ecosystem
+            Built with 💪 by <strong>rossbased</strong>
+          </span>
+          <span className="footer-tagline">
+            Helping you stay strong, one day at a time
           </span>
         </div>
         
@@ -18,22 +21,22 @@ const Footer = () => {
             href="https://youtube.com/@rossbased" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="social-link youtube-link"
-            title="Subscribe to rossbased on YouTube"
+            className="social-btn youtube-btn"
+            title="Subscribe for more content"
           >
             <FaYoutube />
             <span>Subscribe</span>
           </a>
           
           <a 
-            href="https://discord.gg/your-discord-invite" 
+            href="https://discord.gg/RDFC5eUtuA" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="social-link discord-link"
-            title="Join our Discord community"
+            className="social-btn discord-btn"
+            title="Join our supportive community"
           >
             <FaDiscord />
-            <span>Discord</span>
+            <span>Community</span>
           </a>
         </div>
       </div>

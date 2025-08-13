@@ -1,4 +1,4 @@
-// App.js - Fixed to keep original container structure with helmet styling
+// App.js - Updated with Footer integration
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -31,6 +31,7 @@ import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 import SpartanLoader from './components/Shared/SpartanLoader';
+import Footer from './components/Shared/Footer';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -306,6 +307,9 @@ function App() {
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </main>
+            
+            {/* Footer - only shown when logged in */}
+            <Footer />
           </>
         ) : (
           // Show landing page if not logged in

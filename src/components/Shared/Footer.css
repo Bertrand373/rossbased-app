@@ -1,10 +1,12 @@
 /* src/components/Shared/Footer.css */
 .app-footer {
   margin-top: auto;
-  padding: var(--spacing-lg) var(--spacing-md);
-  background-color: var(--card-background);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   color: var(--text-secondary);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .footer-content {
@@ -13,22 +15,31 @@
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
 .footer-branding {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .footer-text {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .footer-text strong {
   color: var(--primary);
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.footer-tagline {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  opacity: 0.8;
 }
 
 .footer-social {
@@ -37,7 +48,8 @@
   align-items: center;
 }
 
-.social-link {
+/* UPDATED: Match your app's navigation button styling */
+.social-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -48,60 +60,77 @@
   font-weight: 500;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  cursor: pointer;
+  position: relative;
+  outline: none;
 }
 
-.youtube-link {
+.social-btn:hover {
+  transform: translateY(-2px);
+}
+
+.youtube-btn {
   color: #ff0000;
   background-color: rgba(255, 0, 0, 0.1);
   border-color: rgba(255, 0, 0, 0.2);
 }
 
-.youtube-link:hover {
+.youtube-btn:hover {
   background-color: rgba(255, 0, 0, 0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(255, 0, 0, 0.25);
+  border-color: rgba(255, 0, 0, 0.4);
 }
 
-.discord-link {
+.discord-btn {
   color: #5865f2;
   background-color: rgba(88, 101, 242, 0.1);
   border-color: rgba(88, 101, 242, 0.2);
 }
 
-.discord-link:hover {
+.discord-btn:hover {
   background-color: rgba(88, 101, 242, 0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(88, 101, 242, 0.2);
+  box-shadow: 0 6px 16px rgba(88, 101, 242, 0.25);
+  border-color: rgba(88, 101, 242, 0.4);
 }
 
-.social-link svg {
+.social-btn svg {
   font-size: 1.125rem;
 }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
+  .app-footer {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+  
   .footer-content {
     flex-direction: column;
     text-align: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
   }
   
   .footer-branding {
     order: 2;
+    align-items: center;
   }
   
   .footer-social {
     order: 1;
     justify-content: center;
+    gap: var(--spacing-lg);
   }
   
   .footer-text {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
   
-  .social-link {
+  .footer-tagline {
+    font-size: 0.75rem;
+  }
+  
+  .social-btn {
     font-size: 0.8rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 }
 
@@ -112,16 +141,24 @@
   }
   
   .footer-social {
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
   }
   
-  .social-link span {
+  .social-btn span {
     display: none; /* Hide text on very small screens, show only icons */
   }
   
-  .social-link {
+  .social-btn {
     padding: var(--spacing-sm);
-    min-width: 40px;
+    min-width: 44px;
     justify-content: center;
+  }
+  
+  .footer-text {
+    font-size: 0.8rem;
+  }
+  
+  .footer-tagline {
+    font-size: 0.7rem;
   }
 }
