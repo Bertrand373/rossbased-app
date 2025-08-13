@@ -1,27 +1,31 @@
-// components/Calendar/Calendar.js - UPDATED: View-only access for former streak days
+// components/Calendar/Calendar.js - UPDATED: Import both CSS files
 import React, { useState, useEffect } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameDay, 
-  isSameMonth, addMonths, subMonths, differenceInDays, isAfter, isBefore } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
+  isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
+  startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
 import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons
-import { FaEdit, FaTimes, FaCheckCircle, FaTimesCircle, FaMoon, FaInfoCircle,
-  FaBrain, FaExclamationTriangle, FaClock, FaLaptop, FaFrown, FaHeart, FaHome, FaArrowLeft } from 'react-icons/fa';
+// Icons - UPDATED: Added FaWineBottle and FaBed for new triggers
+import { FaCheckCircle, FaTimesCircle, FaMoon, 
+  FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
+  FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
+  FaWineBottle, FaBed } from 'react-icons/fa';
 
-const Calendar = ({ userData, updateUserData, isPremium }) => {
+const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [dayInfoModal, setDayInfoModal] = useState(false);
   const [editDayModal, setEditDayModal] = useState(false);
   const [editingDate, setEditingDate] = useState(null);
-  const [showTriggerSelection, setShowTriggerSelection] = useState(false);
+  const [viewMode, setViewMode] = useState('month'); // 'month' or 'week'
+  // REMOVED: showResetConfirm state
   const [selectedTrigger, setSelectedTrigger] = useState('');
+  const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
-  const [calendarView, setCalendarView] = useState('month'); // 'month' or 'week'
 
-  // Enhanced trigger options matching other components
+  // UPDATED: Enhanced trigger options with all unique icons - Added alcohol/substances and sleep deprivation
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
     { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
@@ -29,59 +33,45 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
     { id: 'social_media', label: 'Social Media', icon: FaLaptop },
     { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
     { id: 'relationship', label: 'Relationship Issues', icon: FaHeart },
-    { id: 'home_environment', label: 'Home Environment', icon: FaHome }
+    { id: 'home_alone', label: 'Being Home Alone', icon: FaHome },
+    { id: 'explicit_content', label: 'Explicit Content', icon: FaTheaterMasks },
+    { id: 'alcohol_substances', label: 'Alcohol/Substances', icon: FaWineBottle },
+    { id: 'sleep_deprivation', label: 'Sleep Deprivation', icon: FaBed }
   ];
 
-  // UPDATED: Check if day is editable for viewing (basic editability)
-  const isDayEditable = (day) => {
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    day.setHours(0, 0, 0, 0);
-    
-    // Don't allow future days
-    if (day > today) {
-      return false;
+  // Next and previous navigation (works for both month and week)
+  const prevPeriod = () => {
+    if (viewMode === 'month') {
+      setCurrentDate(subMonths(currentDate, 1));
+    } else {
+      setCurrentDate(subWeeks(currentDate, 1));
     }
-    
-    // Don't allow days before the user's journey started
-    if (userData.startDate) {
-      const journeyStart = new Date(userData.startDate);
-      journeyStart.setHours(0, 0, 0, 0);
-      if (day < journeyStart) {
-        return false;
-      }
-    }
-    
-    return true;
   };
 
-  // NEW: Check if day allows status editing (stricter than viewing)
-  const isDayStatusEditable = (day) => {
-    // First check basic editability
-    if (!isDayEditable(day)) {
-      return false;
+  const nextPeriod = () => {
+    if (viewMode === 'month') {
+      setCurrentDate(addMonths(currentDate, 1));
+    } else {
+      setCurrentDate(addWeeks(currentDate, 1));
     }
-    
-    // Don't allow editing former streak days (blue days)
-    const dayStatus = getDayStatus(day);
-    if (dayStatus?.type === 'former-streak') {
-      return false;
-    }
-    
-    return true;
   };
 
-  // UPDATED: Enhanced day status logic with FORMER streak support (BLUE)
+  // Get week range for week view
+  const getWeekRange = (date) => {
+    const weekStart = getWeekStart(date);
+    const weekEnd = addDays(weekStart, 6);
+    return { weekStart, weekEnd };
+  };
+
+  // REMOVED: handleResetCalendar, confirmResetCalendar functions
+
+  // FIXED: Helper function to determine day status - CORRECT logic order and precise checks
   const getDayStatus = (day) => {
-    if (!userData.streakHistory || userData.streakHistory.length === 0) {
-      return null;
-    }
-    
     const today = new Date();
-    today.setHours(23, 59, 59, 999);
+    today.setHours(0, 0, 0, 0);
     day.setHours(0, 0, 0, 0);
     
-    // Don't show status for future days
+    // If day is in the future, return null
     if (isAfter(day, today)) {
       return null;
     }
@@ -120,6 +110,7 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
       streakEnd.setHours(0, 0, 0, 0);
       
       // Day is within a completed streak period (but not the relapse day itself)
+      // Example: If relapse on Day 5, then Days 1,2,3,4 = former streak (blue)
       return day >= streakStart && day < streakEnd;
     });
     
@@ -154,15 +145,6 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
     const hasJournal = userData.notes && userData.notes[dayStr];
     
     return { hasBenefits, hasJournal };
-  };
-
-  // Get day benefits data
-  const getDayBenefits = (day) => {
-    if (!userData.benefitTracking) return null;
-    const dayStr = format(day, 'yyyy-MM-dd');
-    return userData.benefitTracking.find(benefit => 
-      format(new Date(benefit.date), 'yyyy-MM-dd') === dayStr
-    );
   };
 
   // ENHANCED: Get streak journey info for any streak day (current or former)
@@ -225,24 +207,8 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
     return getStreakJourneyInfo(day) !== null;
   };
 
-  // UPDATED: Show day details - allow viewing former streaks, restrict editing
+  // Show day details with edit option
   const showDayDetails = (day) => {
-    // UPDATED: Only check basic editability (allows former streak viewing)
-    if (!isDayEditable(day)) {
-      // Show appropriate message for different restrictions
-      const today = new Date();
-      today.setHours(23, 59, 59, 999);
-      day.setHours(0, 0, 0, 0);
-      
-      if (day > today) {
-        toast.error("Can't view future days");
-      } else if (userData.startDate && day < new Date(userData.startDate)) {
-        toast.error("Can't view days before your journey started");
-      }
-      return; // Exit function immediately
-    }
-    
-    // All days within journey can be viewed
     setSelectedDate(day);
     setEditingDate(day);
     setDayInfoModal(true);
@@ -253,19 +219,8 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
     setPendingStatusUpdate(null);
   };
 
-  // UPDATED: Show edit day modal with status editing restriction
+  // Show edit day modal from info modal
   const showEditFromInfo = () => {
-    // Check if this day's status can be edited
-    if (!isDayStatusEditable(editingDate)) {
-      const dayStatus = getDayStatus(editingDate);
-      if (dayStatus?.type === 'former-streak') {
-        toast.info("Former streak days are view-only. Status cannot be changed.");
-      } else {
-        toast.error("This day cannot be edited.");
-      }
-      return;
-    }
-    
     setDayInfoModal(false);
     setEditDayModal(true);
     setShowTriggerSelection(false);
@@ -333,117 +288,114 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
           };
         }
         
-        // 3. Create a new streak starting the day after relapse
+        // 3. Start a new streak the day AFTER the relapse
         const newStreakStart = addDays(editingDate, 1);
-        if (newStreakStart <= today) {
-          const newStreakDays = differenceInDays(today, newStreakStart) + 1;
-          updatedStreakHistory.push({
-            id: Date.now(),
-            start: newStreakStart,
-            end: null,
-            days: newStreakDays > 0 ? newStreakDays : 0,
-            reason: null
-          });
-          
-          // Update current streak counter
-          updatedUserData.currentStreak = newStreakDays > 0 ? newStreakDays : 0;
-          updatedUserData.startDate = newStreakStart;
-        } else {
-          // If relapse is today, reset everything
-          updatedUserData.currentStreak = 0;
-          updatedUserData.startDate = today;
-        }
+        updatedStreakHistory.push({
+          id: updatedStreakHistory.length + 1,
+          start: newStreakStart,
+          end: null,
+          days: 0,
+          reason: null,
+          trigger: null
+        });
         
-        // Increment relapse count
-        updatedUserData.relapseCount = (userData.relapseCount || 0) + 1;
-        break;
+        // 4. Calculate new current streak (days from new start to today)
+        const newCurrentStreak = newStreakStart <= today ? 
+          differenceInDays(today, newStreakStart) + 1 : 0;
         
-      case 'current-streak':
-        // Mark day as part of current streak
-        // This might require adjusting streak start date
-        const currentStreakData = updatedStreakHistory.find(streak => !streak.end);
-        if (currentStreakData) {
-          const currentStart = new Date(currentStreakData.start);
-          if (editingDate < currentStart) {
-            // Extend streak start to earlier date
-            currentStreakData.start = editingDate;
-            updatedUserData.startDate = editingDate;
-            updatedUserData.currentStreak = differenceInDays(today, editingDate) + 1;
-          }
-        } else {
-          // Create new current streak
-          updatedStreakHistory.push({
-            id: Date.now(),
-            start: editingDate,
-            end: null,
-            days: differenceInDays(today, editingDate) + 1,
-            reason: null
-          });
-          updatedUserData.startDate = editingDate;
-          updatedUserData.currentStreak = differenceInDays(today, editingDate) + 1;
-        }
+        updatedUserData = {
+          ...updatedUserData,
+          streakHistory: updatedStreakHistory,
+          relapseCount: (userData.relapseCount || 0) + 1,
+          currentStreak: Math.max(0, newCurrentStreak),
+          startDate: newStreakStart
+        };
+        
+        const triggerText = selectedTrigger ? 
+          ` (Trigger: ${triggerOptions.find(t => t.id === selectedTrigger)?.label})` : '';
+        toast.success(`Marked ${format(editingDate, 'MMM d')} as relapse day${triggerText}`);
         break;
         
       case 'wet-dream':
-        // Mark as wet dream day - doesn't break streak
-        // Implementation depends on how you want to track wet dreams
-        updatedUserData.wetDreamCount = (userData.wetDreamCount || 0) + 1;
+        // Wet dreams don't break streaks, just increment counter
+        updatedUserData = {
+          ...updatedUserData,
+          wetDreamCount: (userData.wetDreamCount || 0) + 1
+        };
+        toast.success(`Marked ${format(editingDate, 'MMM d')} as wet dream`);
         break;
+        
+      case 'current-streak':
+        // Confirm/mark as streak day (informational only)
+        if (userData.startDate) {
+          const streakStart = new Date(userData.startDate);
+          if (editingDate >= streakStart && editingDate <= today) {
+            toast.success(`Confirmed ${format(editingDate, 'MMM d')} as streak day`);
+          } else {
+            toast.info(`${format(editingDate, 'MMM d')} is outside your current streak period`);
+          }
+        }
+        break;
+        
+      // REMOVED: 'clear' case - no longer available as an option
         
       default:
         break;
     }
     
-    // Update user data
-    updatedUserData.streakHistory = updatedStreakHistory;
-    updateUserData(updatedUserData);
+    if (updatedUserData !== userData) {
+      updateUserData(updatedUserData);
+    }
     
-    // Close modals and reset states
+    // Close all modals and reset states
     setEditDayModal(false);
     setDayInfoModal(false);
-    setShowTriggerSelection(false);
+    setEditingDate(null);
     setSelectedTrigger('');
+    setShowTriggerSelection(false);
     setPendingStatusUpdate(null);
-    
-    toast.success('Day status updated successfully');
   };
 
-  // Render trigger icon
+  // UPDATED: Get day benefits data - handle sleep quality migration
+  const getDayBenefits = (day) => {
+    if (!userData.benefitTracking) return null;
+    const benefits = userData.benefitTracking.find(benefit => 
+      isSameDay(new Date(benefit.date), day)
+    );
+    
+    // MIGRATION: Handle old attraction data -> sleep data
+    if (benefits && !benefits.sleep && benefits.attraction) {
+      return {
+        ...benefits,
+        sleep: benefits.attraction // Migrate attraction to sleep
+      };
+    }
+    
+    return benefits;
+  };
+
+  // Helper function to render trigger icon
   const renderTriggerIcon = (triggerId) => {
     const trigger = triggerOptions.find(t => t.id === triggerId);
-    if (!trigger) return null;
+    if (!trigger) return <FaExclamationTriangle className="trigger-icon" />;
     
     const IconComponent = trigger.icon;
     return <IconComponent className="trigger-icon" />;
   };
 
-  // Navigation functions
-  const nextMonth = () => {
-    setCurrentDate(addMonths(currentDate, 1));
-  };
-
-  const prevMonth = () => {
-    setCurrentDate(subMonths(currentDate, 1));
-  };
-
-  // UPDATED: Render month day - allow clicking former streaks for viewing
-  const renderMonthDay = (day, dayIndex) => {
+  // Render day cell WITHOUT trophy badges
+  const renderDayCell = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
-    const dayTracking = getDayTracking(day);
-    const isToday = isSameDay(day, new Date());
     const isSelected = selectedDate && isSameDay(day, selectedDate);
+    const isToday = isSameDay(day, new Date());
+    const dayTracking = getDayTracking(day);
     const isCurrentMonth = isSameMonth(day, currentDate);
-    const isEditable = isDayEditable(day); // Basic editability for viewing
-    const isStatusEditable = isDayStatusEditable(day); // Stricter for editing
     
-    // Build CSS classes
     const dayClasses = [
       'day-cell',
       !isCurrentMonth ? 'other-month' : '',
       isToday ? 'today' : '',
       isSelected ? 'selected' : '',
-      !isEditable ? 'non-editable' : '',
-      !isStatusEditable && isEditable ? 'view-only' : '', // NEW: View-only class
       dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
       dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
       dayStatus?.type === 'relapse' ? 'relapse-day' : '',
@@ -454,21 +406,10 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
       <div 
         key={dayIndex} 
         className={dayClasses}
-        onClick={() => isEditable ? showDayDetails(day) : null}
-        style={{ 
-          cursor: isEditable ? 'pointer' : 'not-allowed',
-          // Visual hint for view-only days
-          opacity: (!isStatusEditable && isEditable) ? 0.8 : 1
-        }}
+        onClick={() => showDayDetails(day)}
       >
         <div className="day-content">
           <div className="day-number">{format(day, 'd')}</div>
-          {/* NEW: Visual indicator for view-only */}
-          {(!isStatusEditable && isEditable) && (
-            <div className="view-only-indicator">
-              <FaInfoCircle style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }} />
-            </div>
-          )}
         </div>
         
         {/* Day indicators WITHOUT trophy badge */}
@@ -498,6 +439,83 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
     );
   };
 
+  // UPDATED: Week view rendering with sleep quality support
+  const renderWeekView = () => {
+    const { weekStart } = getWeekRange(currentDate);
+    const days = [];
+    
+    for (let i = 0; i < 7; i++) {
+      const day = addDays(weekStart, i);
+      const dayStatus = getDayStatus(day);
+      const dayBenefits = getDayBenefits(day);
+      const dayTracking = getDayTracking(day);
+      
+      days.push(
+        <div key={i} className="week-day-cell" onClick={() => showDayDetails(day)}>
+          <div className="week-day-header">
+            <div className="week-day-name">{format(day, 'EEE')}</div>
+            <div className={`week-day-number ${isSameDay(day, new Date()) ? 'today' : ''}`}>
+              {format(day, 'd')}
+            </div>
+          </div>
+          
+          <div className="week-day-status">
+            {dayStatus && (
+              <div className={`week-status-badge ${dayStatus.type}`}>
+                {dayStatus.type === 'current-streak' && <FaCheckCircle />}
+                {dayStatus.type === 'former-streak' && <FaCheckCircle />}
+                {dayStatus.type === 'relapse' && <FaTimesCircle />}
+                {dayStatus.type === 'wet-dream' && <FaMoon />}
+              </div>
+            )}
+          </div>
+          
+          {dayBenefits && isPremium && (
+            <div className="week-benefits">
+              <div className="week-benefit-item">
+                <span className="benefit-mini-label">Energy</span>
+                <div className="benefit-mini-slider">
+                  <div 
+                    className="benefit-mini-fill" 
+                    style={{ width: `${dayBenefits.energy * 10}%` }}
+                  ></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.energy}/10</span>
+              </div>
+              <div className="week-benefit-item">
+                <span className="benefit-mini-label">Focus</span>
+                <div className="benefit-mini-slider">
+                  <div 
+                    className="benefit-mini-fill" 
+                    style={{ width: `${dayBenefits.focus * 10}%` }}
+                  ></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.focus}/10</span>
+              </div>
+              <div className="week-benefit-item">
+                <span className="benefit-mini-label">Sleep</span>
+                <div className="benefit-mini-slider">
+                  <div 
+                    className="benefit-mini-fill" 
+                    style={{ width: `${(dayBenefits.sleep || dayBenefits.confidence) * 10}%` }}
+                  ></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.sleep || dayBenefits.confidence}/10</span>
+              </div>
+            </div>
+          )}
+          
+          <div className="week-tracking-indicators">
+            {dayTracking.hasJournal && <FaInfoCircle className="week-journal-icon" />}
+            {dayStatus?.trigger && renderTriggerIcon(dayStatus.trigger)}
+          </div>
+        </div>
+      );
+    }
+    
+    return <div className="week-view-grid">{days}</div>;
+  };
+
   // Build calendar days for month view
   const renderCalendarDays = () => {
     const monthStart = startOfMonth(currentDate);
@@ -520,53 +538,62 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
       day = addDays(day, 1);
     }
     
-    rows.push(
-      <div key="header-row" className="calendar-row header-row">
-        {daysHeader}
-      </div>
-    );
+    rows.push(<div className="calendar-row header-row" key="header">{daysHeader}</div>);
     
-    let days = [];
     day = startDate;
-    let dayIndex = 0;
     
     while (day <= endDate) {
+      const week = [];
+      
       for (let i = 0; i < 7; i++) {
-        days.push(renderMonthDay(day, dayIndex));
+        week.push(renderDayCell(day, i));
         day = addDays(day, 1);
-        dayIndex++;
       }
       
       rows.push(
-        <div key={`week-${Math.floor(dayIndex / 7)}`} className="calendar-row">
-          {days}
+        <div className="calendar-row" key={`row-${format(day, 'yyyy-MM-dd')}`}>
+          {week}
         </div>
       );
-      days = [];
     }
     
-    return <div className="calendar-grid">{rows}</div>;
+    return rows;
+  };
+
+  // Format period header text
+  const getPeriodHeaderText = () => {
+    if (viewMode === 'month') {
+      return format(currentDate, 'MMMM yyyy');
+    } else {
+      const { weekStart, weekEnd } = getWeekRange(currentDate);
+      if (isSameMonth(weekStart, weekEnd)) {
+        return `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'd, yyyy')}`;
+      } else {
+        return `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d, yyyy')}`;
+      }
+    }
   };
 
   return (
     <div className="calendar-container">
-      {/* UPDATED: Integrated Header Design */}
+      {/* NEW: Integrated Header Design like Emotional Timeline */}
       <div className="integrated-calendar-header">
         <div className="header-title-section">
-          <h2>Calendar</h2>
+          <h2>Streak Calendar</h2>
         </div>
         
         <div className="header-navigation-section">
+          {/* View Mode Toggle Pills */}
           <div className="navigation-pill-container">
-            <button
-              className={`navigation-section-btn ${calendarView === 'month' ? 'active' : ''}`}
-              onClick={() => setCalendarView('month')}
+            <button 
+              className={`navigation-section-btn ${viewMode === 'month' ? 'active' : ''}`}
+              onClick={() => setViewMode('month')}
             >
               Month
             </button>
-            <button
-              className={`navigation-section-btn ${calendarView === 'week' ? 'active' : ''}`}
-              onClick={() => setCalendarView('week')}
+            <button 
+              className={`navigation-section-btn ${viewMode === 'week' ? 'active' : ''}`}
+              onClick={() => setViewMode('week')}
             >
               Week
             </button>
@@ -574,27 +601,16 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
 
-      {/* Calendar Main Section */}
       <div className="calendar-main-section">
-        {/* Period Navigation */}
+        {/* NEW: Period Navigation moved to calendar section */}
         <div className="calendar-period-navigation">
-          <button className="period-nav-btn" onClick={prevMonth}>
-            ‹
+          <button className="period-nav-btn" onClick={prevPeriod}>
+            ←
           </button>
-          <h3>{format(currentDate, 'MMMM yyyy')}</h3>
-          <button className="period-nav-btn" onClick={nextMonth}>
-            ›
+          <h3>{getPeriodHeaderText()}</h3>
+          <button className="period-nav-btn" onClick={nextPeriod}>
+            →
           </button>
-        </div>
-
-        {/* Instructions */}
-        <div className="calendar-instructions">
-          Click on any day within your journey to view details or edit status
-        </div>
-
-        {/* Calendar Display */}
-        <div className="calendar-display">
-          {calendarView === 'month' ? renderCalendarDays() : null}
         </div>
 
         {/* Calendar Legend */}
@@ -620,9 +636,25 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
             <span>Has Data</span>
           </div>
         </div>
+
+        {/* Calendar Instructions - MOVED: Now appears after legend, before calendar */}
+        <div className="calendar-instructions">
+          Click on any day to view details and edit status
+        </div>
+
+        {/* Calendar Display */}
+        <div className="calendar-display">
+          {viewMode === 'month' ? (
+            <div className="calendar-grid">
+              {renderCalendarDays()}
+            </div>
+          ) : (
+            renderWeekView()
+          )}
+        </div>
       </div>
 
-      {/* UPDATED: Day Info Modal with view-only support */}
+      {/* Day Info Modal */}
       {dayInfoModal && selectedDate && (
         <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
           <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
@@ -635,51 +667,49 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
             </button>
             
             <h3>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
-
-            {/* Day Status Info */}
+            
+            {/* Day Status */}
             <div className="day-status-info">
               {(() => {
                 const dayStatus = getDayStatus(selectedDate);
-                const isStatusEditable = isDayStatusEditable(selectedDate);
-                
                 if (dayStatus) {
-                  switch (dayStatus.type) {
-                    case 'current-streak':
-                      return <div className="status-badge current-streak">✓ Current Streak Day</div>;
-                    case 'former-streak':
-                      return (
-                        <div className={`status-badge former-streak ${!isStatusEditable ? 'view-only' : ''}`}>
-                          ✓ Former Streak Day
-                        </div>
-                      );
-                    case 'relapse':
-                      return <div className="status-badge relapse">✗ Relapse Day</div>;
-                    case 'wet-dream':
-                      return <div className="status-badge wet-dream">~ Wet Dream</div>;
-                    default:
-                      return <div className="status-badge">No Status</div>;
-                  }
-                }
-                return <div className="status-badge">No Status</div>;
-              })()}
-
-              {/* NEW: View-only notice for former streaks */}
-              {(() => {
-                const dayStatus = getDayStatus(selectedDate);
-                const isStatusEditable = isDayStatusEditable(selectedDate);
-                
-                if (dayStatus?.type === 'former-streak' && !isStatusEditable) {
                   return (
-                    <div className="view-only-notice">
-                      <FaInfoCircle className="view-only-notice-icon" />
-                      <span>This is a former streak day. You can view the data but cannot edit the status.</span>
+                    <div className={`status-badge ${dayStatus.type}`}>
+                      {dayStatus.type === 'current-streak' && (
+                        <>
+                          <FaCheckCircle />
+                          <span>Current Streak Day</span>
+                        </>
+                      )}
+                      {dayStatus.type === 'former-streak' && (
+                        <>
+                          <FaCheckCircle />
+                          <span>Former Streak Day</span>
+                        </>
+                      )}
+                      {dayStatus.type === 'relapse' && (
+                        <>
+                          <FaTimesCircle />
+                          <span>Relapse Day</span>
+                        </>
+                      )}
+                      {dayStatus.type === 'wet-dream' && (
+                        <>
+                          <FaMoon />
+                          <span>Wet Dream</span>
+                        </>
+                      )}
                     </div>
                   );
                 }
-                return null;
+                return (
+                  <div className="status-badge">
+                    <span>No specific status</span>
+                  </div>
+                );
               })()}
 
-              {/* Trigger info */}
+              {/* Trigger Info */}
               {(() => {
                 const dayStatus = getDayStatus(selectedDate);
                 if (dayStatus?.trigger) {
@@ -842,22 +872,10 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
             })()}
 
             <div className="modal-actions">
-              {/* UPDATED: Conditional edit button based on status editability */}
-              {isDayStatusEditable(selectedDate) ? (
-                <button className="btn-primary edit-day-btn" onClick={showEditFromInfo}>
-                  <FaEdit />
-                  Edit Day
-                </button>
-              ) : (
-                <button 
-                  className="btn-primary edit-day-btn disabled" 
-                  disabled 
-                  title="Former streak days are view-only"
-                >
-                  <FaEdit />
-                  View Only
-                </button>
-              )}
+              <button className="btn-primary edit-day-btn" onClick={showEditFromInfo}>
+                <FaEdit />
+                Edit Day
+              </button>
               <button className="btn-outline" onClick={() => setDayInfoModal(false)}>
                 <FaTimes />
                 Close
@@ -886,80 +904,71 @@ const Calendar = ({ userData, updateUserData, isPremium }) => {
             <p>What happened on this day?</p>
 
             {!showTriggerSelection ? (
-              <>
-                <div className="edit-day-options">
-                  <button 
-                    className="edit-option-btn current-streak-btn"
-                    onClick={() => handleStatusClick('current-streak')}
-                  >
-                    <FaCheckCircle />
-                    <span>Successful Day (Current Streak)</span>
-                  </button>
-                  
-                  <button 
-                    className="edit-option-btn wet-dream-btn"
-                    onClick={() => handleStatusClick('wet-dream')}
-                  >
-                    <FaMoon />
-                    <span>Wet Dream (No Streak Break)</span>
-                  </button>
-                  
-                  <button 
-                    className="edit-option-btn relapse-btn"
-                    onClick={() => handleStatusClick('relapse')}
-                  >
-                    <FaTimesCircle />
-                    <span>Relapse (Reset Streak)</span>
-                  </button>
-                </div>
-
-                <div className="modal-actions">
-                  <button className="back-to-info-btn" onClick={backToDayInfo}>
-                    <FaArrowLeft />
-                    Back to Info
-                  </button>
-                </div>
-              </>
+              <div className="edit-day-options">
+                <button 
+                  className="edit-option-btn current-streak-btn"
+                  onClick={() => handleStatusClick('current-streak')}
+                >
+                  <FaCheckCircle />
+                  <span>Mark as Streak Day</span>
+                </button>
+                
+                <button 
+                  className="edit-option-btn wet-dream-btn"
+                  onClick={() => handleStatusClick('wet-dream')}
+                >
+                  <FaMoon />
+                  <span>Mark as Wet Dream</span>
+                </button>
+                
+                <button 
+                  className="edit-option-btn relapse-btn"
+                  onClick={() => handleStatusClick('relapse')}
+                >
+                  <FaTimesCircle />
+                  <span>Mark as Relapse</span>
+                </button>
+                
+                {/* REMOVED: Clear Status button */}
+              </div>
             ) : (
-              <>
-                <div className="trigger-selection">
-                  <h4>What triggered the relapse?</h4>
-                  <div className="trigger-options">
-                    {triggerOptions.map(trigger => {
-                      const IconComponent = trigger.icon;
-                      return (
-                        <button
-                          key={trigger.id}
-                          className={`trigger-option-pill ${selectedTrigger === trigger.id ? 'selected' : ''}`}
-                          onClick={() => setSelectedTrigger(trigger.id)}
-                        >
-                          <IconComponent className="trigger-option-icon" />
-                          <span>{trigger.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+              <div className="trigger-selection">
+                <h4>What triggered this relapse?</h4>
+                <div className="trigger-options">
+                  {triggerOptions.map(trigger => (
+                    <button
+                      key={trigger.id}
+                      className={`trigger-option-pill ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                      onClick={() => setSelectedTrigger(trigger.id)}
+                    >
+                      <trigger.icon className="trigger-option-icon" />
+                      <span>{trigger.label}</span>
+                    </button>
+                  ))}
                 </div>
-
+                
                 <div className="trigger-actions">
                   <button 
                     className="btn btn-primary"
                     onClick={handleTriggerSelection}
                     disabled={!selectedTrigger}
                   >
-                    <FaCheckCircle />
                     Confirm Relapse
                   </button>
                 </div>
-
-                <div className="modal-actions">
-                  <button className="back-to-info-btn" onClick={() => setShowTriggerSelection(false)}>
-                    <FaArrowLeft />
-                    Back to Options
-                  </button>
-                </div>
-              </>
+              </div>
             )}
+
+            <div className="modal-actions">
+              <button className="back-to-info-btn" onClick={backToDayInfo}>
+                <FaArrowLeft />
+                Back to Info
+              </button>
+              <button className="btn-outline" onClick={() => setEditDayModal(false)}>
+                <FaTimes />
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

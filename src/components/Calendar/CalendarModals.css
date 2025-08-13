@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarModals.css - UPDATED: View-only access for former streak days */
+/* components/Calendar/CalendarModals.css - UPDATED: Grey→yellow hover effects for appropriate buttons */
 
 /* UPDATED: Edit day modal with better back button placement */
 .edit-day-modal {
@@ -214,25 +214,11 @@
   border: 1px solid var(--success);
 }
 
-/* UPDATED: Former streak status badge - now BLUE with view-only support */
+/* UPDATED: Former streak status badge - now BLUE */
 .status-badge.former-streak {
   background-color: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
   border: 1px solid #3b82f6;
-}
-
-.status-badge.former-streak.view-only {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-  border: 1px solid #3b82f6;
-  position: relative;
-}
-
-.status-badge.former-streak.view-only::after {
-  content: " (View Only)";
-  font-size: 0.75rem;
-  opacity: 0.7;
-  font-weight: 400;
 }
 
 .status-badge.relapse {
@@ -251,25 +237,6 @@
   background-color: rgba(255, 221, 0, 0.1);
   color: var(--primary);
   border: 1px solid var(--primary);
-}
-
-/* NEW: View-only notice styling */
-.view-only-notice {
-  background-color: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-sm) var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 0.875rem;
-  color: #3b82f6;
-}
-
-.view-only-notice-icon {
-  font-size: 1rem;
-  flex-shrink: 0;
 }
 
 /* UPDATED: Enhanced trigger info display */
@@ -507,26 +474,6 @@
   background-color: var(--primary-dark);
 }
 
-/* NEW: Disabled edit button styling for view-only days */
-.edit-day-btn.disabled,
-.edit-day-btn:disabled {
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-  cursor: not-allowed !important;
-  opacity: 0.6;
-  transform: none !important;
-}
-
-.edit-day-btn.disabled:hover,
-.edit-day-btn:disabled:hover {
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
 /* UPDATED: Back to Info Button with grey→yellow hover effects */
 .back-to-info-btn,
 button.back-to-info-btn,
@@ -580,6 +527,7 @@ button.back-to-info-btn:active,
   filter: none !important;
   text-shadow: none !important;
   background-image: none !important;
+  background-size: auto !important;
   animation: none !important;
   transition: all 0.2s ease !important;
 }
@@ -706,20 +654,6 @@ button.back-to-info-btn:active,
   .status-badge {
     font-size: 0.8rem;
     padding: var(--spacing-xs) var(--spacing-sm);
-  }
-  
-  .status-badge.former-streak.view-only::after {
-    content: " (View)";
-    font-size: 0.7rem;
-  }
-  
-  .view-only-notice {
-    font-size: 0.8rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
-  }
-  
-  .view-only-notice-icon {
-    font-size: 0.875rem;
   }
   
   .modal-header-simple h3 {
@@ -894,9 +828,5 @@ button.back-to-info-btn:active,
   
   .modal-header-simple h3 {
     font-size: 0.9rem;
-  }
-  
-  .status-badge.former-streak.view-only::after {
-    display: none; /* Hide text on very small screens */
   }
 }
