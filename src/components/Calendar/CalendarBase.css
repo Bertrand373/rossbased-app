@@ -33,14 +33,17 @@
   text-align: center;
 }
 
-/* UPDATED: Changed margin-bottom to var(--spacing-lg) to match the top spacing */
+/* UPDATED: Navigation section styled exactly like EmotionalTimeline */
 .header-navigation-section {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: var(--spacing-md);
   width: 100%;
+  align-items: center;
   margin-bottom: var(--spacing-lg);
 }
 
+/* UPDATED: Container styled exactly like EmotionalTimeline but narrower for 2 buttons */
 .navigation-pill-container {
   display: flex;
   gap: var(--spacing-xs);
@@ -49,12 +52,14 @@
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   width: fit-content;
+  max-width: 300px; /* NARROWER than Timeline's 600px since we only have 2 buttons */
   justify-content: center;
 }
 
-/* UPDATED: CALENDAR-SPECIFIC narrow navigation pills */
+/* UPDATED: Navigation pills styled EXACTLY like EmotionalTimeline */
 .integrated-calendar-header .navigation-section-btn {
-  padding: var(--spacing-xs) var(--spacing-sm) !important; /* NARROW for Calendar */
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md) !important; /* SAME as Timeline */
   background-color: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
@@ -70,7 +75,6 @@
   gap: var(--spacing-xs);
   position: relative;
   outline: none;
-  min-width: 60px !important; /* COMPACT for Calendar */
 }
 
 .integrated-calendar-header .navigation-section-btn:hover:not(:disabled) {
@@ -153,6 +157,8 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding-right: var(--spacing-md);
+    width: fit-content;
+    max-width: 100%;
   }
   
   .navigation-pill-container::-webkit-scrollbar {
@@ -675,7 +681,7 @@
     width: fit-content;
   }
   
-  /* UPDATED: Mobile navigation pills maintain better sizing */
+  /* UPDATED: Mobile navigation pills maintain Timeline styling */
   .integrated-calendar-header .navigation-section-btn {
     flex: 1;
     font-size: 0.875rem;
@@ -835,7 +841,7 @@
     width: fit-content;
   }
   
-  /* UPDATED: Small screen navigation pills remain compact */
+  /* UPDATED: Small screen navigation pills maintain Timeline styling */
   .integrated-calendar-header .navigation-section-btn {
     font-size: 0.875rem;
     padding: var(--spacing-sm) var(--spacing-md) !important;
