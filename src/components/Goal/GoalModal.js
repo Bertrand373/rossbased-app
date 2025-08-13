@@ -1,7 +1,7 @@
 // src/components/Goal/GoalModal.js - Goal Management Modal Component
 import React, { useState } from 'react';
 import { format, addDays } from 'date-fns';
-import { FaTimes, FaTarget, FaCheckCircle, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaTimes, FaBullseye, FaCheckCircle, FaEdit, FaTrash } from 'react-icons/fa'; // FIXED: Changed FaTarget to FaBullseye
 import './GoalModal.css';
 
 const GoalModal = ({ 
@@ -67,7 +67,7 @@ const GoalModal = ({
         </button>
 
         <div className="goal-modal-header">
-          <FaTarget className="goal-modal-icon" />
+          <FaBullseye className="goal-modal-icon" /> {/* FIXED: Changed from FaTarget */}
           <h2>Streak Goals</h2>
         </div>
 
@@ -151,7 +151,7 @@ const GoalModal = ({
                 onClick={handleSetGoal}
                 disabled={!selectedGoal}
               >
-                <FaTarget />
+                <FaBullseye />
                 <span>{hasActiveGoal ? 'Change Goal' : 'Set Goal'}</span>
               </button>
               <button className="btn-outline" onClick={onClose}>
@@ -191,7 +191,7 @@ const GoalModal = ({
         {!userData.startDate && (
           <div className="goal-info-section">
             <div className="goal-info-notice">
-              <FaTarget className="info-icon" />
+              <FaBullseye className="info-icon" />
               <p>Set your start date first to enable goal tracking</p>
             </div>
           </div>

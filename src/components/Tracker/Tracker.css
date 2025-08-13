@@ -110,6 +110,158 @@ button.action-btn:hover {
   filter: none !important;
 }
 
+/* =================================================
+   GOAL SYSTEM STYLES - NEW ADDITION
+   ================================================= */
+
+/* Goal Progress Section */
+.goal-progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.goal-progress-card {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.goal-progress-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.goal-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 2px solid rgba(255, 221, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.goal-target-icon {
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+.goal-trophy-icon {
+  font-size: 1.5rem;
+  color: #f59e0b;
+  animation: trophy-glow 2s ease-in-out infinite;
+}
+
+@keyframes trophy-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.goal-progress-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.goal-progress-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.goal-progress-stats {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--primary);
+  margin: 0;
+}
+
+.goal-target-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.goal-achievement-date {
+  font-size: 0.875rem;
+  color: #f59e0b;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Goal Progress Bar */
+.goal-progress-bar-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.goal-progress-bar {
+  flex: 1;
+  height: 12px;
+  background-color: rgba(128, 128, 128, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(255, 221, 0, 0.8) 0%, 
+    rgba(255, 221, 0, 1) 50%, 
+    rgba(255, 221, 0, 0.9) 100%
+  );
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.goal-progress-fill.achieved {
+  background: linear-gradient(90deg, 
+    rgba(245, 158, 11, 0.8) 0%, 
+    rgba(245, 158, 11, 1) 50%, 
+    rgba(245, 158, 11, 0.9) 100%
+  );
+  animation: achievement-glow 2s ease-in-out infinite;
+}
+
+@keyframes achievement-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  }
+}
+
+.goal-progress-percentage {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 40px;
+  text-align: right;
+}
+
 /* UPDATED: Current Streak Section */
 .current-streak-container {
   display: flex;
@@ -683,737 +835,3 @@ button.action-btn:hover {
 .benefit-logging-section .free-benefit-container .slider-labels,
 .benefit-logging-section .premium-benefits-container .slider-labels,
 .free-benefit-container .benefit-slider-item .slider-labels,
-.premium-benefits-container .benefit-slider-item .slider-labels,
-.tracker-container .free-benefit-container .slider-labels,
-.tracker-container .premium-benefits-container .slider-labels,
-.tracker-container .benefit-logging-section .slider-labels,
-.benefit-logging-container .free-benefit-container .slider-labels,
-.benefit-logging-container .premium-benefits-container .slider-labels {
-  display: flex !important;
-  justify-content: space-between !important;
-  font-size: 0.8125rem !important;
-  color: var(--text-secondary) !important;
-  margin-top: 8px !important;
-  margin-bottom: 0px !important;
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  line-height: 1 !important;
-  transform: none !important;
-  padding-left: 14px !important;
-  padding-right: 14px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.025em !important;
-  position: relative !important;
-  z-index: 1 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-/* Consistent label colors */
-.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8) !important;
-}
-
-.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.7) !important;
-}
-
-.journal-section {
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border);
-}
-
-.journal-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  margin-bottom: var(--spacing-lg);
-}
-
-.journal-header-spacer {
-  /* Empty spacer for centering */
-}
-
-.journal-header h3 {
-  margin: 0;
-  font-size: 1.125rem;
-  color: var(--text);
-  text-align: center;
-}
-
-.journal-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-self: end;
-}
-
-.journal-preview {
-  background-color: var(--light-gray);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  font-style: italic;
-  margin-bottom: var(--spacing-md);
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
-.empty-journal {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  background-color: var(--light-gray);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-md);
-  border: 1px solid var(--border);
-}
-
-.journal-prompt {
-  background-color: var(--medium-gray);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  font-style: italic;
-  margin-bottom: var(--spacing-md);
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
-.discord-section {
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border);
-  margin-top: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-}
-
-.discord-section h3 {
-  margin-bottom: var(--spacing-md);
-  font-size: 1.125rem;
-  color: var(--text);
-  text-align: center;
-}
-
-.discord-toggle-container {
-  margin-bottom: var(--spacing-md);
-}
-
-.discord-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-md);
-  background-color: var(--light-gray);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.discord-toggle span {
-  color: var(--text);
-  font-weight: 500;
-}
-
-.custom-toggle-switch {
-  position: relative;
-  width: 56px;
-  height: 28px;
-  background-color: var(--medium-gray);
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.custom-toggle-switch.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-}
-
-.custom-toggle-switch::before {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 22px;
-  height: 22px;
-  background-color: white;
-  border-radius: 50%;
-  transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.custom-toggle-switch.active::before {
-  transform: translateX(28px);
-  background-color: var(--primary);
-}
-
-.toggle-container {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  cursor: pointer;
-}
-
-.toggle-label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  transition: none;
-}
-
-.toggle-container.active .toggle-label {
-  color: var(--primary);
-  font-weight: 500;
-}
-
-.discord-details {
-  background-color: var(--light-gray);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.discord-username-display {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
-}
-
-.discord-icon {
-  color: #5865F2;
-  font-size: 1.25rem;
-}
-
-.discord-username-display span {
-  font-weight: 500;
-  color: var(--text);
-}
-
-.discord-note {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-.form-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.form-group textarea {
-  width: 100%;
-  padding: var(--spacing-md);
-  background-color: var(--medium-gray);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text);
-  font-family: inherit;
-  resize: vertical;
-}
-
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-/* UPDATED: Modal buttons - grey → yellow hover pattern */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
-}
-
-.form-actions .action-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid;
-  background-color: rgba(128, 128, 128, 0.1);
-  border-color: var(--border);
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
-}
-
-.form-actions .action-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* UPDATED: Journal modal specific button styling - grey → yellow hover */
-.journal-modal-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-md);
-}
-
-.journal-primary-action {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-full) !important;
-  color: var(--text-secondary) !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  flex: 1 !important;
-  justify-content: center !important;
-  min-height: auto !important;
-}
-
-.journal-primary-action:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.journal-cancel-action {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-full) !important;
-  color: var(--text-secondary) !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  flex: 1 !important;
-  justify-content: center !important;
-  min-height: auto !important;
-}
-
-.journal-cancel-action:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  color: var(--text);
-  border: 1px solid var(--border);
-  position: relative;
-}
-
-.modal-content h2 {
-  margin-bottom: var(--spacing-md);
-  color: var(--text);
-  text-align: center;
-}
-
-.modal-content p {
-  margin-bottom: var(--spacing-lg);
-  color: var(--text-secondary);
-  text-align: center;
-}
-
-/* ADDED: Close button in upper right corner */
-.modal-close-btn {
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1.25rem;
-  cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.modal-close-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  /* UPDATED: New integrated header mobile styles */
-  .integrated-tracker-header {
-    padding: var(--spacing-lg);
-    margin: 0;
-  }
-  
-  .tracker-header-title-section {
-    margin-bottom: var(--spacing-lg);
-  }
-  
-  .tracker-header-title-section h2 {
-    font-size: 1.25rem;
-  }
-  
-  .tracker-header-actions-section {
-    width: 100%;
-  }
-  
-  .tracker-header-actions {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  /* FIXED: Ensure consistent mobile button sizing with stats reset button */
-  .tracker-header-actions .action-btn,
-  .integrated-tracker-header .action-btn {
-    flex: 1;
-    justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    min-height: auto !important;
-  }
-  
-  /* LEGACY: Keep old header mobile styles for backward compatibility */
-  .tracker-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    margin-top: 0;
-  }
-  
-  .tracker-header h2 {
-    text-align: center;
-    order: 1;
-  }
-  
-  .tracker-actions {
-    width: 100%;
-    order: 2;
-    justify-self: center;
-  }
-  
-  .action-btn {
-    flex: 1;
-    justify-content: center;
-  }
-  
-  .journal-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
-  }
-  
-  .journal-header h3 {
-    text-align: center;
-    order: 1;
-  }
-  
-  .journal-actions {
-    width: 100%;
-    order: 2;
-    justify-self: center;
-  }
-  
-  .journal-actions .action-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .streak-number {
-    font-size: 3rem;
-  }
-  
-  .streak-milestones {
-    flex-wrap: nowrap; /* FIXED: Keep all 3 items in one row */
-    gap: var(--spacing-sm); /* REDUCED: Smaller gap to fit better */
-    justify-content: space-between; /* CHANGED: Distribute evenly */
-    margin: 0;
-  }
-  
-  .streak-actions {
-    flex-direction: column;
-    gap: var(--spacing-md);
-  }
-  
-  .streak-action-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .benefit-logging-section {
-    padding: var(--spacing-lg);
-  }
-  
-  .free-benefit-container, .premium-benefits-container {
-    gap: var(--spacing-md);
-  }
-  
-  .benefit-status-section {
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .benefits-logged, .benefits-not-logged {
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    text-align: center;
-  }
-  
-  .edit-benefits-btn {
-    margin-left: 0;
-    margin-top: var(--spacing-sm);
-  }
-
-  /* Mobile benefit upgrade banner adjustments */
-  .benefit-upgrade-content {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-lg);
-  }
-
-  .benefit-upgrade-helmet {
-    width: 70px; /* MATCH: Mobile scaling like EmotionalTimeline */
-    height: 70px;
-  }
-
-  .benefit-upgrade-helmet-fallback {
-    font-size: 2.8rem; /* MATCH: Mobile scaling like EmotionalTimeline */
-  }
-
-  .benefit-upgrade-text h3 {
-    font-size: 1.25rem;
-  }
-
-  .benefit-upgrade-text p {
-    font-size: 0.875rem;
-  }
-
-  .benefit-upgrade-btn {
-    font-size: 1rem; /* MATCH: Mobile size like EmotionalTimeline */
-    padding: var(--spacing-md) var(--spacing-lg);
-    min-width: 180px; /* MATCH: Mobile width like EmotionalTimeline */
-    min-height: 48px; /* MATCH: Mobile height like EmotionalTimeline */
-    align-self: center;
-  }
-  
-  /* REFINED: Mobile slider adjustments with professional styling */
-  .benefit-range-slider {
-    height: 32px;
-  }
-  
-  .benefit-range-slider::-webkit-slider-thumb {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .benefit-range-slider::-moz-range-thumb {
-    width: 28px;
-    height: 28px;
-  }
-  
-  /* Mobile slider labels with perfect spacing */
-  .benefit-logging-section .free-benefit-container .slider-labels,
-  .benefit-logging-section .premium-benefits-container .slider-labels,
-  .free-benefit-container .benefit-slider-item .slider-labels,
-  .premium-benefits-container .benefit-slider-item .slider-labels,
-  .tracker-container .free-benefit-container .slider-labels,
-  .tracker-container .premium-benefits-container .slider-labels,
-  .tracker-container .benefit-logging-section .slider-labels,
-  .benefit-logging-container .free-benefit-container .slider-labels,
-  .benefit-logging-container .premium-benefits-container .slider-labels {
-    margin-top: 10px !important;
-    margin-bottom: 0px !important;
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
-    line-height: 1 !important;
-    transform: none !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    font-size: 0.75rem !important;
-    font-weight: 500 !important;
-    letter-spacing: 0.025em !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    color: var(--text-secondary) !important;
-  }
-  
-  .benefit-actions-row {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    align-items: center;
-  }
-  
-  .save-benefits-btn.partial,
-  .upgrade-benefits-btn {
-    max-width: 100%;
-    width: 100%;
-  }
-  
-  .discord-toggle {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    text-align: center;
-  }
-  
-  .toggle-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions .action-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  /* ADDED: Mobile styling for journal modal buttons - keep side-by-side like DatePicker */
-  .journal-modal-actions {
-    flex-direction: row; /* KEEP: Side-by-side on mobile like DatePicker */
-    gap: var(--spacing-sm);
-  }
-  
-  .journal-primary-action,
-  .journal-cancel-action {
-    flex: 1 !important; /* EQUAL: Equal width buttons */
-    justify-content: center !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    font-size: 0.875rem !important;
-    min-height: auto !important;
-  }
-}
-
-/* Very small screens */
-@media (max-width: 480px) {
-  /* UPDATED: Very small screen integrated header styles */
-  .integrated-tracker-header {
-    padding: var(--spacing-lg);
-    margin: 0;
-  }
-  
-  .tracker-header-title-section {
-    margin-bottom: var(--spacing-lg);
-  }
-  
-  .tracker-header-title-section h2 {
-    font-size: 1.125rem;
-  }
-  
-  .benefit-logging-section {
-    padding: var(--spacing-md);
-  }
-  
-  .streak-number {
-    font-size: 2.5rem;
-  }
-  
-  .milestone-item {
-    min-width: 70px; /* REDUCED: Smaller minimum width for tight spacing */
-    flex: 1;
-    max-width: 90px; /* REDUCED: Smaller max width to fit 3 in one row */
-  }
-
-  .milestone-value {
-    font-size: 1rem; /* REDUCED: Smaller font size for very small screens */
-  }
-
-  .milestone-label {
-    font-size: 0.75rem; /* REDUCED: Smaller label font size */
-  }
-
-  /* Very small screen benefit upgrade banner adjustments */
-  .benefit-upgrade-helmet {
-    width: 60px; /* MATCH: Very small screen scaling like EmotionalTimeline */
-    height: 60px;
-  }
-
-  .benefit-upgrade-helmet-fallback {
-    font-size: 2.4rem; /* MATCH: Very small screen scaling like EmotionalTimeline */
-  }
-
-  .benefit-upgrade-text h3 {
-    font-size: 1.125rem;
-  }
-
-  .benefit-upgrade-text p {
-    font-size: 0.8rem;
-  }
-
-  .benefit-upgrade-btn {
-    font-size: 0.875rem; /* MATCH: Very small screen size like EmotionalTimeline */
-    padding: var(--spacing-sm) var(--spacing-md);
-    min-width: 160px; /* MATCH: Very small screen width like EmotionalTimeline */
-    min-height: 44px; /* MATCH: Very small screen height like EmotionalTimeline */
-  }
-  
-  .benefit-actions-row {
-    gap: var(--spacing-xs);
-  }
-  
-  .benefit-slider-header {
-    flex-wrap: wrap;
-    gap: var(--spacing-xs);
-  }
-  
-  .benefit-label {
-    font-size: 0.875rem;
-  }
-  
-  .benefit-value {
-    font-size: 0.8rem;
-  }
-}

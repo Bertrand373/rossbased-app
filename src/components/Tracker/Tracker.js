@@ -26,7 +26,7 @@ import {
   FaCheckCircle,
   FaLock,
   FaStar,
-  FaTarget,
+  FaBullseye, // FIXED: Changed from FaTarget to FaBullseye
   FaTrophy
 } from 'react-icons/fa';
 
@@ -353,7 +353,7 @@ const Tracker = ({ userData, updateUserData, isPremium, setGoal, cancelGoal }) =
               className="action-btn"
               onClick={() => setShowGoalModal(true)}
             >
-              <FaTarget />
+              <FaBullseye />
               <span>{userData.goal?.isActive ? 'Manage Goal' : 'Set Goal'}</span>
             </button>
           </div>
@@ -366,7 +366,7 @@ const Tracker = ({ userData, updateUserData, isPremium, setGoal, cancelGoal }) =
           <div className="goal-progress-card">
             <div className="goal-progress-header">
               <div className="goal-icon-container">
-                {userData.goal.achieved ? <FaTrophy className="goal-trophy-icon" /> : <FaTarget className="goal-target-icon" />}
+                {userData.goal.achieved ? <FaTrophy className="goal-trophy-icon" /> : <FaBullseye className="goal-target-icon" />}
               </div>
               <div className="goal-progress-info">
                 <div className="goal-progress-title">
