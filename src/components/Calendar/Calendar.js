@@ -599,34 +599,10 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
         cancelGoal={cancelGoal}
       />
 
-      {/* UPDATED: Simplified Header with Progress Bar Under Title */}
+      {/* UPDATED: Header with Progress Bar Under Month/Week Pills */}
       <div className="integrated-calendar-header">
         <div className="header-title-section">
           <h2>Streak Calendar</h2>
-          
-          {/* NEW: Progress bar under title - clickable to open goal modal */}
-          <div 
-            className="goal-progress-underline"
-            onClick={() => setShowGoalModal(true)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && setShowGoalModal(true)}
-          >
-            {userData.goal?.isActive ? (
-              <>
-                <div 
-                  className={`goal-progress-bar-fill ${userData.goal.achieved ? 'achieved' : ''}`}
-                  style={{ width: `${getGoalProgress()?.percentage || 0}%` }}
-                ></div>
-                <div className="goal-progress-text">
-                  {getGoalProgress()?.current || 0} / {getGoalProgress()?.target || 0} days
-                  {userData.goal.achieved && " ✓"}
-                </div>
-              </>
-            ) : (
-              <div className="goal-set-text">Click to set goal</div>
-            )}
-          </div>
         </div>
         
         <div className="header-navigation-section">
@@ -645,6 +621,37 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
               Week
             </button>
           </div>
+
+          {/* NEW: Goal Progress Bar Under Pills - styled like Emotional Timeline */}
+          {userData.goal?.isActive || !userData.goal ? (
+            <div className="goal-progress-section">
+              <div 
+                className="goal-progress-bar"
+                onClick={() => setShowGoalModal(true)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && setShowGoalModal(true)}
+              >
+                {userData.goal?.isActive && (
+                  <div 
+                    className={`goal-progress-fill ${userData.goal.achieved ? 'achieved' : ''}`}
+                    style={{ width: `${getGoalProgress()?.percentage || 0}%` }}
+                  ></div>
+                )}
+              </div>
+              
+              <div className="goal-progress-text-container">
+                {userData.goal?.isActive ? (
+                  <div className="goal-progress-text">
+                    {getGoalProgress()?.current || 0} / {getGoalProgress()?.target || 0} days
+                    {userData.goal.achieved && " ✓"}
+                  </div>
+                ) : (
+                  <div className="goal-set-text">Click to set goal</div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
