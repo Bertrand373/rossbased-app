@@ -278,10 +278,10 @@
   filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
 }
 
-/* NEW: Moon Phase Guide */
+/* NEW: Simplified Moon Phase Guide */
 .moon-phase-guide {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   background-color: var(--card-background);
@@ -312,21 +312,13 @@
   flex-shrink: 0;
 }
 
-/* NEW: Moon Phase Colors */
+/* NEW: Moon Phase Colors - Only new and full moon */
 .moon-new, .guide-icon.new {
   color: #6b7280;
 }
 
-.moon-waxing, .guide-icon.waxing {
-  color: #f59e0b;
-}
-
 .moon-full, .guide-icon.full {
   color: #fbbf24;
-}
-
-.moon-waning, .guide-icon.waning {
-  color: #8b5cf6;
 }
 
 /* Modal close button */
@@ -454,22 +446,14 @@
   transform: scale(1.1);
 }
 
-/* NEW: Moon Phase Day Cell Backgrounds */
+/* NEW: Simplified Moon Phase Day Cell Backgrounds - only new and full moon */
 .day-cell.moon-new {
-  background: linear-gradient(135deg, var(--card-background) 0%, rgba(107, 114, 128, 0.05) 100%);
-}
-
-.day-cell.moon-waxing {
-  background: linear-gradient(135deg, var(--card-background) 0%, rgba(245, 158, 11, 0.05) 100%);
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(107, 114, 128, 0.03) 100%);
 }
 
 .day-cell.moon-full {
-  background: linear-gradient(135deg, var(--card-background) 0%, rgba(251, 191, 36, 0.08) 100%);
-  border-left: 2px solid rgba(251, 191, 36, 0.3);
-}
-
-.day-cell.moon-waning {
-  background: linear-gradient(135deg, var(--card-background) 0%, rgba(139, 92, 246, 0.05) 100%);
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(251, 191, 36, 0.05) 100%);
+  border-left: 2px solid rgba(251, 191, 36, 0.2);
 }
 
 .other-month {
@@ -626,22 +610,14 @@
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* NEW: Week view moon phase backgrounds */
+/* NEW: Simplified week view moon phase backgrounds - only new and full moon */
 .week-day-cell.moon-new {
-  background: linear-gradient(135deg, var(--card-background) 0%, rgba(107, 114, 128, 0.05) 100%);
-}
-
-.week-day-cell.moon-waxing {
-  background: linear-gradient(135deg, var(--card-background) 0%, rgba(245, 158, 11, 0.05) 100%);
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(107, 114, 128, 0.03) 100%);
 }
 
 .week-day-cell.moon-full {
-  background: linear-gradient(135deg, var(--card-background) 0%, rgba(251, 191, 36, 0.08) 100%);
-  border-left: 3px solid rgba(251, 191, 36, 0.4);
-}
-
-.week-day-cell.moon-waning {
-  background: linear-gradient(135deg, var(--card-background) 0%, rgba(139, 92, 246, 0.05) 100%);
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(251, 191, 36, 0.05) 100%);
+  border-left: 3px solid rgba(251, 191, 36, 0.3);
 }
 
 .week-day-header {
