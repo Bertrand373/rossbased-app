@@ -1,11 +1,11 @@
-/* components/Calendar/CalendarBase.css - UPDATED: Complete file with simplified Goal system */
+/* components/Calendar/CalendarBase.css - UPDATED: Goal system removed, Moon phases enhanced */
 .calendar-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Simplified Header Design with Progress Bar Under Month/Week Pills */
+/* UPDATED: Simplified Header Design with Moon Phase Display */
 .integrated-calendar-header {
   display: flex;
   flex-direction: column;
@@ -18,6 +18,7 @@
 
 .header-title-section {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-bottom: var(--spacing-lg);
@@ -33,7 +34,15 @@
   text-align: center;
 }
 
-/* Navigation section with even spacing above and below progress bar */
+.header-subtitle {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
+}
+
+/* Navigation section with moon phase display */
 .header-navigation-section {
   display: flex;
   flex-direction: column;
@@ -42,79 +51,51 @@
   align-items: center;
 }
 
-/* NEW: Goal Progress Bar Under Month/Week Pills - styled like Emotional Timeline */
-.goal-progress-section {
+/* NEW: Current Moon Phase Display */
+.current-moon-display {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
+  justify-content: center;
   width: 100%;
-  max-width: 400px;
 }
 
-.goal-progress-bar {
-  width: 100%;
-  height: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
+.moon-phase-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--card-background);
   border-radius: var(--radius-full);
-  overflow: hidden;
   border: 1px solid var(--border);
-  position: relative;
-  cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.goal-progress-bar:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+.moon-phase-info:hover {
+  background-color: rgba(255, 255, 255, 0.05);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.goal-progress-fill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  transition: width 0.6s ease;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-  background-color: var(--text); /* White color to match finish line flags */
+.current-moon-icon {
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
 }
 
-.goal-progress-fill.achieved {
-  background-color: var(--success);
-  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
-}
-
-.goal-progress-text-container {
+.moon-phase-text {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--spacing-xs);
 }
 
-.goal-progress-text {
+.moon-phase-name {
   font-size: 0.875rem;
-  color: var(--text-secondary);
-  text-align: center;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.goal-progress-text:hover {
+  font-weight: 600;
   color: var(--text);
+  text-transform: capitalize;
 }
 
-.goal-set-text {
-  font-size: 0.875rem;
+.moon-phase-energy {
+  font-size: 0.75rem;
   color: var(--text-secondary);
-  text-align: center;
-  font-weight: 500;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: all 0.2s ease;
-}
-
-.goal-set-text:hover {
-  color: var(--primary);
-  opacity: 1;
+  font-style: italic;
 }
 
 /* View Mode Toggle Pills */
@@ -221,7 +202,7 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Calendar legend without goal indicators */
+/* UPDATED: Calendar legend with moon phases */
 .calendar-legend {
   display: flex;
   justify-content: center;
@@ -291,10 +272,61 @@
   background: linear-gradient(135deg, var(--warning) 0%, rgba(245, 158, 11, 0.8) 100%);
 }
 
-.legend-info-icon {
+.legend-info-icon, .legend-moon-icon {
   color: var(--primary);
   font-size: 0.875rem;
   filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
+}
+
+/* NEW: Moon Phase Guide */
+.moon-phase-guide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-md);
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+  color: var(--text);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s ease;
+}
+
+.guide-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.guide-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* NEW: Moon Phase Colors */
+.moon-new, .guide-icon.new {
+  color: #6b7280;
+}
+
+.moon-waxing, .guide-icon.waxing {
+  color: #f59e0b;
+}
+
+.moon-full, .guide-icon.full {
+  color: #fbbf24;
+}
+
+.moon-waning, .guide-icon.waning {
+  color: #8b5cf6;
 }
 
 /* Modal close button */
@@ -404,6 +436,42 @@
   font-size: 0.875rem;
 }
 
+/* NEW: Moon Phase Indicators in Day Cells */
+.moon-phase-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moon-icon {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.day-cell:hover .moon-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* NEW: Moon Phase Day Cell Backgrounds */
+.day-cell.moon-new {
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(107, 114, 128, 0.05) 100%);
+}
+
+.day-cell.moon-waxing {
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(245, 158, 11, 0.05) 100%);
+}
+
+.day-cell.moon-full {
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(251, 191, 36, 0.08) 100%);
+  border-left: 2px solid rgba(251, 191, 36, 0.3);
+}
+
+.day-cell.moon-waning {
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
 .other-month {
   color: var(--text-secondary);
   background-color: var(--light-gray);
@@ -461,7 +529,7 @@
   min-height: 20px;
 }
 
-.day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
+.day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
   font-size: 0.875rem;
   line-height: 1;
   display: flex;
@@ -494,6 +562,45 @@
   font-size: 0.75rem;
 }
 
+/* NEW: Day Moon Info Modal */
+.day-moon-info {
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  justify-content: center;
+}
+
+.moon-phase-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--light-gray);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.moon-badge-icon {
+  font-size: 1.5rem;
+}
+
+.moon-badge-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.moon-name {
+  font-weight: 600;
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.moon-energy {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
 /* Week view styling */
 .week-view-grid {
   display: grid;
@@ -517,6 +624,24 @@
 
 .week-day-cell:hover {
   background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* NEW: Week view moon phase backgrounds */
+.week-day-cell.moon-new {
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(107, 114, 128, 0.05) 100%);
+}
+
+.week-day-cell.moon-waxing {
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(245, 158, 11, 0.05) 100%);
+}
+
+.week-day-cell.moon-full {
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(251, 191, 36, 0.08) 100%);
+  border-left: 3px solid rgba(251, 191, 36, 0.4);
+}
+
+.week-day-cell.moon-waning {
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(139, 92, 246, 0.05) 100%);
 }
 
 .week-day-header {
@@ -658,17 +783,33 @@
     margin-bottom: var(--spacing-xs);
   }
   
-  .goal-progress-underline {
-    max-width: 250px;
-    height: 28px;
-  }
-  
-  .goal-progress-text, .goal-set-text {
+  .header-subtitle {
     font-size: 0.8rem;
   }
   
+  .current-moon-display {
+    width: 100%;
+  }
+  
+  .moon-phase-info {
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .current-moon-icon {
+    font-size: 1.25rem;
+  }
+  
+  .moon-phase-name {
+    font-size: 0.8rem;
+  }
+  
+  .moon-phase-energy {
+    font-size: 0.7rem;
+  }
+  
   .header-navigation-section {
-    gap: 0;
+    gap: var(--spacing-md);
   }
   
   .navigation-pill-container {
@@ -718,8 +859,23 @@
     height: 12px;
   }
   
-  .legend-info-icon {
+  .legend-info-icon, .legend-moon-icon {
     font-size: 0.75rem;
+  }
+  
+  .moon-phase-guide {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+  
+  .guide-item {
+    font-size: 0.8rem;
+    padding: var(--spacing-xs);
+  }
+  
+  .guide-icon {
+    font-size: 0.875rem;
   }
   
   .calendar-instructions {
@@ -749,17 +905,42 @@
     font-size: 0.65rem;
   }
   
+  .moon-icon {
+    font-size: 0.65rem;
+  }
+  
   .day-indicators {
     gap: 3px;
     min-height: 18px;
   }
   
-  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
+  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
     font-size: 0.75rem !important;
   }
   
   .trigger-icon {
     font-size: 0.65rem !important;
+  }
+  
+  .day-moon-info {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .moon-phase-badge {
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .moon-badge-icon {
+    font-size: 1.25rem;
+  }
+  
+  .moon-name {
+    font-size: 0.875rem;
+  }
+  
+  .moon-energy {
+    font-size: 0.75rem;
   }
   
   .week-view-grid {
@@ -811,13 +992,27 @@
     font-size: 1.125rem;
   }
   
-  .goal-progress-underline {
-    max-width: 200px;
-    height: 26px;
+  .header-subtitle {
+    font-size: 0.75rem;
   }
   
-  .goal-progress-text, .goal-set-text {
+  .moon-phase-info {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-xs);
+  }
+  
+  .current-moon-icon {
+    font-size: 1rem;
+  }
+  
+  .moon-phase-name {
     font-size: 0.75rem;
+  }
+  
+  .moon-phase-energy {
+    font-size: 0.65rem;
   }
   
   .navigation-pill-container {
@@ -846,7 +1041,7 @@
     font-size: 1rem;
   }
   
-  /* Small mobile legend: 2+2+1 layout */
+  /* Small mobile legend: 2+2+2 layout */
   .calendar-legend {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
@@ -870,12 +1065,23 @@
   .legend-item:nth-child(3) { grid-column: 1 !important; grid-row: 2 !important; }
   .legend-item:nth-child(4) { grid-column: 2 !important; grid-row: 2 !important; }
   
-  /* Has Data item centered on third row */
+  /* Last 2 items on third row */
   .legend-has-data {
-    grid-column: 1 / -1 !important;
+    grid-column: 1 !important;
     grid-row: 3 !important;
     justify-self: center !important;
     max-width: 100px !important;
+  }
+  
+  .legend-moon {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+    justify-self: center !important;
+    max-width: 100px !important;
+  }
+  
+  .moon-phase-guide {
+    display: none; /* Hide on very small screens to save space */
   }
   
   .modal-close-x {
@@ -923,12 +1129,16 @@
     font-size: 0.6rem;
   }
   
+  .moon-icon {
+    font-size: 0.55rem;
+  }
+  
   .day-indicators {
     gap: 2px;
     min-height: 16px;
   }
   
-  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
+  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
     font-size: 0.7rem !important;
   }
   

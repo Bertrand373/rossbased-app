@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Simplified Goal system with progress bar under title
+// components/Calendar/Calendar.js - UPDATED: Goal system completely removed, Moon cycles enhanced
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -7,16 +7,37 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Components
-import GoalModal from '../Goal/GoalModal';
-
-// Icons - UPDATED: Removed goal-specific icons from imports
+// Icons - UPDATED: Removed goal-specific icons, added moon phase icons
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
-  FaWineBottle, FaBed, FaBullseye } from 'react-icons/fa';
+  FaWineBottle, FaBed, FaRegMoon, FaAdjust } from 'react-icons/fa';
 
-const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) => {
+// UPDATED: Moon phase calculation utilities
+const getMoonPhase = (date) => {
+  // Moon phase calculation using astronomical formulas
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  
+  // Calculate Julian day number
+  const a = Math.floor((14 - month) / 12);
+  const y = year - a;
+  const m = month + 12 * a - 3;
+  const jd = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) + 1721119;
+  
+  // Moon phase calculation
+  const daysSinceNewMoon = (jd - 2451549.5) % 29.53058867;
+  const phase = daysSinceNewMoon / 29.53058867;
+  
+  // Determine phase name
+  if (phase < 0.125 || phase >= 0.875) return { name: 'new', icon: FaRegMoon, energy: 'new beginnings, intention setting' };
+  if (phase < 0.375) return { name: 'waxing', icon: FaAdjust, energy: 'building energy, taking action' };
+  if (phase < 0.625) return { name: 'full', icon: FaMoon, energy: 'peak energy, heightened urges' };
+  return { name: 'waning', icon: FaAdjust, energy: 'release, reflection, inner work' };
+};
+
+const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [dayInfoModal, setDayInfoModal] = useState(false);
@@ -26,7 +47,6 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
-  const [showGoalModal, setShowGoalModal] = useState(false); // Goal modal state
 
   // UPDATED: Enhanced trigger options with all unique icons - Added alcohol/substances and sleep deprivation
   const triggerOptions = [
@@ -64,21 +84,6 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
     const weekStart = getWeekStart(date);
     const weekEnd = addDays(weekStart, 6);
     return { weekStart, weekEnd };
-  };
-
-  // NEW: Get goal progress data
-  const getGoalProgress = () => {
-    const goal = userData.goal;
-    if (!goal || !goal.isActive) return null;
-    
-    const currentStreak = userData.currentStreak || 0;
-    return {
-      current: currentStreak,
-      target: goal.targetDays,
-      percentage: Math.min((currentStreak / goal.targetDays) * 100, 100),
-      achieved: goal.achieved,
-      targetDate: goal.targetDate
-    };
   };
 
   // FIXED: Helper function to determine day status - CORRECT logic order and precise checks
@@ -397,9 +402,21 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
     return <IconComponent className="trigger-icon" />;
   };
 
-  // Render day cell WITHOUT goal indicators
+  // NEW: Render moon phase icon for day
+  const renderMoonPhaseIcon = (day) => {
+    const moonPhase = getMoonPhase(day);
+    const IconComponent = moonPhase.icon;
+    return (
+      <div className="moon-phase-indicator" title={`${moonPhase.name} moon - ${moonPhase.energy}`}>
+        <IconComponent className={`moon-icon moon-${moonPhase.name}`} />
+      </div>
+    );
+  };
+
+  // Render day cell with moon phases (NO goal indicators)
   const renderDayCell = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
+    const moonPhase = getMoonPhase(day);
     const isSelected = selectedDate && isSameDay(day, selectedDate);
     const isToday = isSameDay(day, new Date());
     const dayTracking = getDayTracking(day);
@@ -413,7 +430,8 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
       dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
       dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
       dayStatus?.type === 'relapse' ? 'relapse-day' : '',
-      dayStatus?.type === 'wet-dream' ? 'wet-dream-day' : ''
+      dayStatus?.type === 'wet-dream' ? 'wet-dream-day' : '',
+      `moon-${moonPhase.name}`
     ].filter(Boolean).join(' ');
 
     return (
@@ -424,9 +442,10 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
       >
         <div className="day-content">
           <div className="day-number">{format(day, 'd')}</div>
+          {renderMoonPhaseIcon(day)}
         </div>
         
-        {/* Day indicators WITHOUT goal indicators */}
+        {/* Day indicators with moon phase awareness */}
         <div className="day-indicators">
           {dayStatus && (
             <div className="day-status-indicator">
@@ -453,7 +472,7 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
     );
   };
 
-  // UPDATED: Week view rendering without goal support
+  // UPDATED: Week view rendering with moon phases
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
     const days = [];
@@ -461,16 +480,18 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
     for (let i = 0; i < 7; i++) {
       const day = addDays(weekStart, i);
       const dayStatus = getDayStatus(day);
+      const moonPhase = getMoonPhase(day);
       const dayBenefits = getDayBenefits(day);
       const dayTracking = getDayTracking(day);
       
       days.push(
-        <div key={i} className="week-day-cell" onClick={() => showDayDetails(day)}>
+        <div key={i} className={`week-day-cell moon-${moonPhase.name}`} onClick={() => showDayDetails(day)}>
           <div className="week-day-header">
             <div className="week-day-name">{format(day, 'EEE')}</div>
             <div className={`week-day-number ${isSameDay(day, new Date()) ? 'today' : ''}`}>
               {format(day, 'd')}
             </div>
+            {renderMoonPhaseIcon(day)}
           </div>
           
           <div className="week-day-status">
@@ -590,19 +611,11 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
 
   return (
     <div className="calendar-container">
-      {/* Goal Modal */}
-      <GoalModal
-        isOpen={showGoalModal}
-        onClose={() => setShowGoalModal(false)}
-        userData={userData}
-        setGoal={setGoal}
-        cancelGoal={cancelGoal}
-      />
-
-      {/* UPDATED: Header with Progress Bar Under Month/Week Pills */}
+      {/* UPDATED: Simplified Header without goal features */}
       <div className="integrated-calendar-header">
         <div className="header-title-section">
-          <h2>Streak Calendar</h2>
+          <h2>Lunar Calendar</h2>
+          <p className="header-subtitle">Track your journey with natural cycles</p>
         </div>
         
         <div className="header-navigation-section">
@@ -622,36 +635,22 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
             </button>
           </div>
 
-          {/* NEW: Goal Progress Bar Under Pills - styled like Emotional Timeline */}
-          {(userData.goal?.isActive || !userData.goal) && (
-            <div className="goal-progress-section">
-              <div 
-                className="goal-progress-bar"
-                onClick={() => setShowGoalModal(true)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && setShowGoalModal(true)}
-              >
-                {userData.goal?.isActive && (
-                  <div 
-                    className={`goal-progress-fill ${userData.goal.achieved ? 'achieved' : ''}`}
-                    style={{ width: `${getGoalProgress()?.percentage || 0}%` }}
-                  ></div>
-                )}
-              </div>
-              
-              <div className="goal-progress-text-container">
-                {userData.goal?.isActive ? (
-                  <div className="goal-progress-text">
-                    {getGoalProgress()?.current || 0} / {getGoalProgress()?.target || 0} days
-                    {userData.goal.achieved && " ✓"}
+          {/* NEW: Current moon phase display */}
+          <div className="current-moon-display">
+            {(() => {
+              const todayMoonPhase = getMoonPhase(new Date());
+              const IconComponent = todayMoonPhase.icon;
+              return (
+                <div className="moon-phase-info">
+                  <IconComponent className={`current-moon-icon moon-${todayMoonPhase.name}`} />
+                  <div className="moon-phase-text">
+                    <span className="moon-phase-name">{todayMoonPhase.name} moon</span>
+                    <span className="moon-phase-energy">{todayMoonPhase.energy}</span>
                   </div>
-                ) : (
-                  <div className="goal-set-text">Click to set goal</div>
-                )}
-              </div>
-            </div>
-          )}
+                </div>
+              );
+            })()}
+          </div>
         </div>
       </div>
 
@@ -667,7 +666,7 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
           </button>
         </div>
 
-        {/* UPDATED: Calendar legend without goal indicators */}
+        {/* UPDATED: Calendar legend with moon phases */}
         <div className="calendar-legend">
           <div className="legend-item">
             <div className="legend-indicator current-streak"></div>
@@ -689,11 +688,35 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
             <FaInfoCircle className="legend-info-icon" />
             <span>Has Data</span>
           </div>
+          <div className="legend-item legend-moon">
+            <FaRegMoon className="legend-moon-icon" />
+            <span>Moon Phases</span>
+          </div>
+        </div>
+
+        {/* NEW: Moon phase guide */}
+        <div className="moon-phase-guide">
+          <div className="guide-item">
+            <FaRegMoon className="guide-icon new" />
+            <span>New Moon: Fresh starts, set intentions</span>
+          </div>
+          <div className="guide-item">
+            <FaAdjust className="guide-icon waxing" />
+            <span>Waxing: Building energy, take action</span>
+          </div>
+          <div className="guide-item">
+            <FaMoon className="guide-icon full" />
+            <span>Full Moon: Peak energy, heightened urges</span>
+          </div>
+          <div className="guide-item">
+            <FaAdjust className="guide-icon waning" />
+            <span>Waning: Release, reflection, inner work</span>
+          </div>
         </div>
 
         {/* Calendar Instructions */}
         <div className="calendar-instructions">
-          Click on any day to view details and edit status
+          Click on any day to view details and edit status. Moon phases show energy patterns that may affect your journey.
         </div>
 
         {/* Calendar Display */}
@@ -708,7 +731,7 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
         </div>
       </div>
 
-      {/* Day Info Modal without goal information */}
+      {/* Day Info Modal with moon phase information */}
       {dayInfoModal && selectedDate && (
         <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
           <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
@@ -721,6 +744,23 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
             </button>
             
             <h3>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
+            
+            {/* NEW: Moon Phase Info */}
+            {(() => {
+              const dayMoonPhase = getMoonPhase(selectedDate);
+              const IconComponent = dayMoonPhase.icon;
+              return (
+                <div className="day-moon-info">
+                  <div className="moon-phase-badge">
+                    <IconComponent className={`moon-badge-icon moon-${dayMoonPhase.name}`} />
+                    <div className="moon-badge-text">
+                      <span className="moon-name">{dayMoonPhase.name} moon</span>
+                      <span className="moon-energy">{dayMoonPhase.energy}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
             
             {/* Day Status */}
             <div className="day-status-info">

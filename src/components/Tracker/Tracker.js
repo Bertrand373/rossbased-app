@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Goal system moved to Calendar tab
+// components/Tracker/Tracker.js - UPDATED: Goal system and View Calendar button completely removed
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -8,10 +8,9 @@ import './Tracker.css';
 // Components
 import DatePicker from '../Shared/DatePicker';
 
-// Icons
+// Icons - UPDATED: Removed FaCalendarCheck import
 import { 
   FaCrown, 
-  FaCalendarCheck, 
   FaExclamationTriangle,
   FaInfoCircle, 
   FaEdit,
@@ -293,7 +292,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* UPDATED: Simplified Header Section - REMOVED Goal Button */}
+      {/* UPDATED: Simplified Header Section - REMOVED View Calendar Button */}
       <div className="integrated-tracker-header">
         <div className="tracker-header-title-section">
           <h2>Streak Tracker</h2>
@@ -310,13 +309,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <span>Edit Date</span>
               </button>
             )}
-            <button 
-              className="action-btn"
-              onClick={() => navigate('/calendar')}
-            >
-              <FaCalendarCheck />
-              <span>View Calendar</span>
-            </button>
           </div>
         </div>
       </div>
