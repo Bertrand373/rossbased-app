@@ -1,7 +1,7 @@
-// src/components/Goal/GoalModal.js - Goal Management Modal Component
+// src/components/Goal/GoalModal.js - UPDATED: Simplified Goal Modal inheriting Stats modal styling
 import React, { useState } from 'react';
 import { format, addDays } from 'date-fns';
-import { FaTimes, FaBullseye, FaCheckCircle, FaEdit, FaTrash } from 'react-icons/fa'; // FIXED: Changed FaTarget to FaBullseye
+import { FaTimes, FaBullseye } from 'react-icons/fa';
 import './GoalModal.css';
 
 const GoalModal = ({ 
@@ -53,75 +53,84 @@ const GoalModal = ({
     onClose();
   };
 
-  // Handle change goal
-  const handleChangeGoal = () => {
-    setShowConfirmCancel(false);
-    // Don't close modal, let user select new goal
-  };
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content goal-modal" onClick={e => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose}>
+        {/* X button in upper right - matching stats modal styling */}
+        <button 
+          className="modal-close-x" 
+          onClick={onClose}
+          aria-label="Close"
+        >
           <FaTimes />
         </button>
 
-        <div className="goal-modal-header">
-          <FaBullseye className="goal-modal-icon" /> {/* FIXED: Changed from FaTarget */}
-          <h2>Streak Goals</h2>
-        </div>
-
         {/* Show current goal status if one exists */}
-        {hasActiveGoal && (
-          <div className="current-goal-section">
-            <h3>Current Goal</h3>
-            <div className={`current-goal-card ${currentGoal.achieved ? 'achieved' : 'active'}`}>
-              <div className="current-goal-info">
-                <div className="current-goal-target">
-                  <span className="goal-days">{currentGoal.targetDays}</span>
-                  <span className="goal-days-label">days</span>
-                </div>
-                <div className="current-goal-details">
-                  <div className="goal-progress">
-                    {userData.currentStreak} / {currentGoal.targetDays} days
-                  </div>
-                  <div className="goal-target-date">
-                    Target: {currentGoal.targetDate ? format(currentGoal.targetDate, 'MMM d, yyyy') : 'Calculating...'}
-                  </div>
-                  {currentGoal.achieved && (
-                    <div className="goal-achievement">
-                      <FaCheckCircle className="achievement-icon" />
-                      <span>Achieved on {currentGoal.achievementDate ? format(currentGoal.achievementDate, 'MMM d, yyyy') : 'Unknown'}</span>
-                    </div>
-                  )}
-                </div>
+        {hasActiveGoal && !showConfirmCancel && (
+          <div className="current-goal-display">
+            <div className="goal-current-header">
+              <FaBullseye className="goal-icon" />
+              <h3>Current Goal: {currentGoal.targetDays} Days</h3>
+            </div>
+            
+            <div className="goal-current-progress">
+              <div className="goal-progress-stats">
+                {userData.currentStreak || 0} / {currentGoal.targetDays} days completed
               </div>
+              {currentGoal.targetDate && (
+                <div className="goal-target-info">
+                  Target: {format(currentGoal.targetDate, 'MMM d, yyyy')}
+                </div>
+              )}
+              {currentGoal.achieved && (
+                <div className="goal-achieved-info">
+                  ✓ Goal achieved on {currentGoal.achievementDate ? format(currentGoal.achievementDate, 'MMM d, yyyy') : 'Unknown'}
+                </div>
+              )}
             </div>
 
-            <div className="current-goal-actions">
+            <div className="goal-current-actions">
               <button 
-                className="goal-action-btn change-goal-btn"
-                onClick={handleChangeGoal}
-              >
-                <FaEdit />
-                <span>Change Goal</span>
-              </button>
-              <button 
-                className="goal-action-btn cancel-goal-btn"
+                className="btn-outline"
                 onClick={() => setShowConfirmCancel(true)}
               >
-                <FaTrash />
-                <span>Cancel Goal</span>
+                Remove Goal
               </button>
             </div>
           </div>
         )}
 
-        {/* Goal selection (always show if no goal, or show after clicking change) */}
-        {(!hasActiveGoal || showConfirmCancel === false) && (
-          <div className="goal-selection-section">
-            <h3>{hasActiveGoal ? 'Choose New Goal' : 'Set Your Goal'}</h3>
-            <p>Choose your target streak length:</p>
+        {/* Confirm cancel section */}
+        {showConfirmCancel && (
+          <div className="goal-confirm-cancel">
+            <h3>Remove Goal?</h3>
+            <p>Are you sure you want to remove your current {currentGoal.targetDays}-day goal?</p>
+            
+            <div className="modal-actions">
+              <button 
+                className="btn-outline btn-danger"
+                onClick={handleCancelGoal}
+              >
+                Yes, Remove Goal
+              </button>
+              <button 
+                className="btn-outline"
+                onClick={() => setShowConfirmCancel(false)}
+              >
+                Keep Goal
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Goal selection (show if no goal, or after clicking remove) */}
+        {(!hasActiveGoal || showConfirmCancel === false) && !showConfirmCancel && (
+          <div className="goal-selection">
+            <div className="goal-selection-header">
+              <FaBullseye className="goal-icon" />
+              <h3>{hasActiveGoal ? 'Change Goal' : 'Set Your Goal'}</h3>
+              <p>Choose your target streak length:</p>
+            </div>
 
             <div className="goal-options">
               {goalOptions.map((option) => (
@@ -130,70 +139,42 @@ const GoalModal = ({
                   className={`goal-option ${selectedGoal === option.days.toString() ? 'selected' : ''}`}
                   onClick={() => setSelectedGoal(option.days.toString())}
                 >
-                  <div className="goal-option-content">
-                    <div className="goal-option-header">
-                      <span className="goal-option-days">{option.label}</span>
-                      <span className="goal-option-description">{option.description}</span>
-                    </div>
-                    {userData.startDate && (
-                      <div className="goal-option-preview">
-                        Target date: {getTargetDatePreview(option.days)}
-                      </div>
-                    )}
+                  <div className="goal-option-main">
+                    <span className="goal-option-days">{option.label}</span>
+                    <span className="goal-option-description">{option.description}</span>
                   </div>
+                  {userData.startDate && (
+                    <div className="goal-option-preview">
+                      Target: {getTargetDatePreview(option.days)}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
-            <div className="goal-modal-actions">
+            <div className="modal-actions">
               <button 
-                className="btn-primary set-goal-btn"
+                className="btn-outline btn-primary"
                 onClick={handleSetGoal}
                 disabled={!selectedGoal}
               >
-                <FaBullseye />
-                <span>{hasActiveGoal ? 'Change Goal' : 'Set Goal'}</span>
-              </button>
-              <button className="btn-outline" onClick={onClose}>
-                <FaTimes />
-                <span>Cancel</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Confirm cancel modal */}
-        {showConfirmCancel && (
-          <div className="confirm-cancel-section">
-            <h3>Cancel Goal?</h3>
-            <p>Are you sure you want to cancel your current {currentGoal.targetDays}-day goal?</p>
-            
-            <div className="confirm-cancel-actions">
-              <button 
-                className="btn-danger confirm-cancel-btn"
-                onClick={handleCancelGoal}
-              >
-                <FaTrash />
-                <span>Yes, Cancel Goal</span>
+                {hasActiveGoal ? 'Change Goal' : 'Set Goal'}
               </button>
               <button 
-                className="btn-outline"
-                onClick={() => setShowConfirmCancel(false)}
+                className="btn-outline" 
+                onClick={onClose}
               >
-                <FaTimes />
-                <span>Keep Goal</span>
+                Cancel
               </button>
             </div>
           </div>
         )}
 
         {/* Info section for users without start date */}
-        {!userData.startDate && (
-          <div className="goal-info-section">
-            <div className="goal-info-notice">
-              <FaBullseye className="info-icon" />
-              <p>Set your start date first to enable goal tracking</p>
-            </div>
+        {!userData.startDate && !showConfirmCancel && (
+          <div className="goal-info-notice">
+            <FaBullseye className="goal-info-icon" />
+            <p>Set your start date first to enable goal tracking</p>
           </div>
         )}
       </div>

@@ -1,11 +1,11 @@
-/* components/Calendar/CalendarBase.css - UPDATED: Goal system integrated styling */
+/* components/Calendar/CalendarBase.css - UPDATED: Complete file with simplified Goal system */
 .calendar-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* NEW: Integrated Header Design with Goals */
+/* UPDATED: Simplified Header Design with Progress Bar Under Title */
 .integrated-calendar-header {
   display: flex;
   flex-direction: column;
@@ -18,6 +18,7 @@
 
 .header-title-section {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-bottom: var(--spacing-lg);
@@ -25,7 +26,7 @@
 }
 
 .header-title-section h2 {
-  margin: 0;
+  margin: 0 0 var(--spacing-sm) 0;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text);
@@ -33,11 +34,80 @@
   text-align: center;
 }
 
-/* UPDATED: Navigation section with Goals button */
+/* NEW: Goal Progress Bar Under Title */
+.goal-progress-underline {
+  width: 100%;
+  max-width: 300px;
+  height: 32px;
+  background-color: rgba(128, 128, 128, 0.1);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.goal-progress-underline:hover {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.goal-progress-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(255, 221, 0, 0.8) 0%, 
+    rgba(255, 221, 0, 1) 50%, 
+    rgba(255, 221, 0, 0.9) 100%
+  );
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
+
+.goal-progress-bar-fill.achieved {
+  background: linear-gradient(90deg, 
+    rgba(34, 197, 94, 0.8) 0%, 
+    rgba(34, 197, 94, 1) 50%, 
+    rgba(34, 197, 94, 0.9) 100%
+  );
+}
+
+.goal-progress-text {
+  position: relative;
+  z-index: 2;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.goal-set-text {
+  position: relative;
+  z-index: 2;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.goal-progress-underline:hover .goal-set-text {
+  color: var(--primary);
+  opacity: 1;
+}
+
+/* Navigation section - simplified */
 .header-navigation-section {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: 0;
   width: 100%;
   align-items: center;
 }
@@ -85,182 +155,6 @@
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
   box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
-}
-
-/* NEW: Header actions section for Goals button */
-.header-actions-section {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.goal-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none !important;
-}
-
-.goal-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* NEW: Goal Progress Section */
-.goal-progress-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.goal-progress-card {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.goal-progress-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-
-.goal-icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 2px solid rgba(255, 221, 0, 0.2);
-  flex-shrink: 0;
-}
-
-.goal-target-icon {
-  font-size: 1.5rem;
-  color: var(--primary);
-}
-
-.goal-trophy-icon {
-  font-size: 1.5rem;
-  color: #f59e0b;
-  animation: trophy-glow 2s ease-in-out infinite;
-}
-
-@keyframes trophy-glow {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
-.goal-progress-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.goal-progress-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-}
-
-.goal-progress-stats {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--primary);
-  margin: 0;
-}
-
-.goal-target-date {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.goal-achievement-date {
-  font-size: 0.875rem;
-  color: #f59e0b;
-  font-weight: 500;
-  margin: 0;
-}
-
-/* Goal Progress Bar */
-.goal-progress-bar-container {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.goal-progress-bar {
-  flex: 1;
-  height: 12px;
-  background-color: rgba(128, 128, 128, 0.1);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-
-.goal-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.8) 0%, 
-    rgba(255, 221, 0, 1) 50%, 
-    rgba(255, 221, 0, 0.9) 100%
-  );
-  border-radius: var(--radius-full);
-  transition: width 0.3s ease;
-  position: relative;
-}
-
-.goal-progress-fill.achieved {
-  background: linear-gradient(90deg, 
-    rgba(245, 158, 11, 0.8) 0%, 
-    rgba(245, 158, 11, 1) 50%, 
-    rgba(245, 158, 11, 0.9) 100%
-  );
-  animation: achievement-glow 2s ease-in-out infinite;
-}
-
-@keyframes achievement-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 rgba(245, 158, 11, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-  }
-}
-
-.goal-progress-percentage {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--primary);
-  min-width: 40px;
-  text-align: right;
 }
 
 /* Period navigation */
@@ -322,7 +216,7 @@
   gap: var(--spacing-lg);
 }
 
-/* Calendar legend with goal indicators */
+/* UPDATED: Calendar legend without goal indicators */
 .calendar-legend {
   display: flex;
   justify-content: center;
@@ -390,19 +284,6 @@
 
 .legend-indicator.wet-dream {
   background: linear-gradient(135deg, var(--warning) 0%, rgba(245, 158, 11, 0.8) 100%);
-}
-
-/* Goal legend icons */
-.legend-goal-target-icon {
-  color: rgba(128, 128, 128, 0.8);
-  font-size: 0.875rem;
-  filter: drop-shadow(0 2px 4px rgba(128, 128, 128, 0.3));
-}
-
-.legend-goal-achievement-icon {
-  color: #FFD700;
-  font-size: 0.875rem;
-  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4));
 }
 
 .legend-info-icon {
@@ -544,7 +425,7 @@
   border: 2px solid var(--primary) !important;
 }
 
-/* Calendar day background colors with goal support */
+/* Calendar day background colors */
 .current-streak-day {
   background-color: rgba(34, 197, 94, 0.2) !important;
   border-left: 4px solid var(--success) !important;
@@ -565,82 +446,7 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* Goal target day - checkered pattern */
-.goal-target-day {
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(128, 128, 128, 0.1),
-    rgba(128, 128, 128, 0.1) 8px,
-    rgba(255, 255, 255, 0.05) 8px,
-    rgba(255, 255, 255, 0.05) 16px
-  ) !important;
-  border-left: 4px solid rgba(128, 128, 128, 0.6) !important;
-  position: relative;
-}
-
-.goal-target-day::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 8px;
-  height: 8px;
-  background: rgba(128, 128, 128, 0.7);
-  border-radius: 2px;
-  box-shadow: 0 0 4px rgba(128, 128, 128, 0.5);
-}
-
-/* Goal achievement day - golden glow */
-.goal-achievement-day {
-  background: linear-gradient(135deg, 
-    rgba(255, 215, 0, 0.15) 0%, 
-    rgba(34, 197, 94, 0.15) 50%, 
-    rgba(255, 215, 0, 0.15) 100%
-  ) !important;
-  border-left: 4px solid #FFD700 !important;
-  position: relative;
-  box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.1);
-}
-
-.goal-achievement-day::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at center, 
-    rgba(255, 215, 0, 0.1) 0%, 
-    transparent 70%
-  );
-  pointer-events: none;
-}
-
-.goal-achievement-day::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 10px;
-  height: 10px;
-  background: #FFD700;
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
-  animation: goal-achievement-sparkle 2s ease-in-out infinite;
-}
-
-@keyframes goal-achievement-sparkle {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.2);
-  }
-}
-
-/* Day indicators with goal support */
+/* Day indicators */
 .day-indicators {
   display: flex;
   justify-content: flex-end;
@@ -650,7 +456,7 @@
   min-height: 20px;
 }
 
-.day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator, .day-goal-indicator {
+.day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
   font-size: 0.875rem;
   line-height: 1;
   display: flex;
@@ -681,31 +487,6 @@
 .trigger-icon {
   color: var(--text-secondary);
   font-size: 0.75rem;
-}
-
-/* Goal indicator icons */
-.goal-target-icon {
-  color: rgba(128, 128, 128, 0.8);
-  font-size: 0.75rem;
-  filter: drop-shadow(0 1px 2px rgba(128, 128, 128, 0.3));
-}
-
-.goal-achievement-icon {
-  color: #FFD700;
-  font-size: 0.875rem;
-  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4));
-  animation: goal-achievement-icon-glow 2s ease-in-out infinite;
-}
-
-@keyframes goal-achievement-icon-glow {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.1);
-  }
 }
 
 /* Week view styling */
@@ -800,37 +581,6 @@
   color: var(--warning);
 }
 
-/* Week view goal badges */
-.week-goal-badge {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.week-goal-badge.goal-target {
-  background-color: rgba(128, 128, 128, 0.1);
-  color: rgba(128, 128, 128, 0.8);
-}
-
-.week-goal-badge.goal-achievement {
-  background-color: rgba(255, 215, 0, 0.15);
-  color: #FFD700;
-  animation: week-goal-achievement-glow 2s ease-in-out infinite;
-}
-
-@keyframes week-goal-achievement-glow {
-  0%, 100% {
-    box-shadow: 0 0 4px rgba(255, 215, 0, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
-  }
-}
-
 .week-benefits {
   display: flex;
   flex-direction: column;
@@ -900,10 +650,20 @@
   
   .header-title-section h2 {
     font-size: 1.25rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .goal-progress-underline {
+    max-width: 250px;
+    height: 28px;
+  }
+  
+  .goal-progress-text, .goal-set-text {
+    font-size: 0.8rem;
   }
   
   .header-navigation-section {
-    gap: var(--spacing-md);
+    gap: 0;
   }
   
   .navigation-pill-container {
@@ -914,38 +674,6 @@
     font-size: 0.875rem;
     padding: var(--spacing-sm) var(--spacing-lg) !important;
     min-width: 80px !important;
-  }
-  
-  .goal-btn {
-    font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-  
-  .goal-progress-card {
-    padding: var(--spacing-lg);
-  }
-  
-  .goal-progress-header {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-lg);
-  }
-  
-  .goal-icon-container {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .goal-target-icon, .goal-trophy-icon {
-    font-size: 1.25rem;
-  }
-  
-  .goal-progress-title {
-    font-size: 1.125rem;
-  }
-  
-  .goal-progress-stats {
-    font-size: 1rem;
   }
   
   .calendar-period-navigation {
@@ -985,9 +713,7 @@
     height: 12px;
   }
   
-  .legend-info-icon,
-  .legend-goal-target-icon,
-  .legend-goal-achievement-icon {
+  .legend-info-icon {
     font-size: 0.75rem;
   }
   
@@ -1023,17 +749,12 @@
     min-height: 18px;
   }
   
-  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator, .day-goal-indicator {
+  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
     font-size: 0.75rem !important;
   }
   
   .trigger-icon {
     font-size: 0.65rem !important;
-  }
-  
-  .goal-target-icon,
-  .goal-achievement-icon {
-    font-size: 0.7rem !important;
   }
   
   .week-view-grid {
@@ -1085,6 +806,15 @@
     font-size: 1.125rem;
   }
   
+  .goal-progress-underline {
+    max-width: 200px;
+    height: 26px;
+  }
+  
+  .goal-progress-text, .goal-set-text {
+    font-size: 0.75rem;
+  }
+  
   .navigation-pill-container {
     width: fit-content;
   }
@@ -1092,32 +822,6 @@
   .integrated-calendar-header .navigation-section-btn {
     font-size: 0.875rem;
     padding: var(--spacing-sm) var(--spacing-md) !important;
-  }
-  
-  .goal-btn {
-    font-size: 0.75rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
-  }
-  
-  .goal-progress-card {
-    padding: var(--spacing-md);
-  }
-  
-  .goal-icon-container {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .goal-target-icon, .goal-trophy-icon {
-    font-size: 1rem;
-  }
-  
-  .goal-progress-title {
-    font-size: 1rem;
-  }
-  
-  .goal-progress-stats {
-    font-size: 0.875rem;
   }
   
   .calendar-period-navigation {
@@ -1141,7 +845,7 @@
   .calendar-legend {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: auto auto auto auto !important;
+    grid-template-rows: auto auto auto !important;
     gap: var(--spacing-xs) !important;
     justify-items: center !important;
     padding: var(--spacing-sm) !important;
@@ -1161,14 +865,10 @@
   .legend-item:nth-child(3) { grid-column: 1 !important; grid-row: 2 !important; }
   .legend-item:nth-child(4) { grid-column: 2 !important; grid-row: 2 !important; }
   
-  /* Goal items on third row */
-  .legend-item:nth-child(5) { grid-column: 1 !important; grid-row: 3 !important; }
-  .legend-item:nth-child(6) { grid-column: 2 !important; grid-row: 3 !important; }
-  
-  /* Has Data item centered on fourth row */
+  /* Has Data item centered on third row */
   .legend-has-data {
     grid-column: 1 / -1 !important;
-    grid-row: 4 !important;
+    grid-row: 3 !important;
     justify-self: center !important;
     max-width: 100px !important;
   }
@@ -1223,16 +923,11 @@
     min-height: 16px;
   }
   
-  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator, .day-goal-indicator {
+  .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator {
     font-size: 0.7rem !important;
   }
   
   .trigger-icon {
     font-size: 0.6rem !important;
-  }
-  
-  .goal-target-icon,
-  .goal-achievement-icon {
-    font-size: 0.65rem !important;
   }
 }
