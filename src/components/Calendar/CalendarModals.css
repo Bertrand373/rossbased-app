@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarModals.css - UPDATED: Greyâ†'yellow hover effects for appropriate buttons + Goal System */
+/* components/Calendar/CalendarModals.css - UPDATED: Added journal editing styles + existing styles */
 
 /* UPDATED: Edit day modal with better back button placement */
 .edit-day-modal {
@@ -144,7 +144,7 @@
   margin-top: var(--spacing-lg);
 }
 
-/* UPDATED: Trigger action buttons with greyâ†'yellow hover */
+/* UPDATED: Trigger action buttons with grey→yellow hover */
 .trigger-actions .btn {
   display: flex;
   align-items: center;
@@ -448,8 +448,121 @@
   border: 1px solid var(--border);
 }
 
+/* NEW: Journal editing styles */
 .day-journal {
   margin-top: var(--spacing-lg);
+}
+
+.journal-header-with-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.journal-header-with-actions h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.journal-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.journal-edit-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.journal-editing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.journal-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: var(--spacing-md);
+  background-color: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.journal-textarea:focus {
+  border-color: rgba(255, 221, 0, 0.3);
+  box-shadow: 0 0 0 2px rgba(255, 221, 0, 0.1);
+}
+
+.journal-textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.journal-edit-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+}
+
+.journal-save-btn,
+.journal-cancel-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+}
+
+.journal-save-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.journal-save-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.journal-cancel-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.journal-cancel-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .journal-entry {
@@ -461,6 +574,25 @@
   overflow-y: auto;
   border: 1px solid var(--border);
   color: var(--text);
+  line-height: 1.5;
+}
+
+.empty-journal-day {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: var(--light-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.empty-journal-day .info-icon {
+  color: var(--primary);
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .premium-teaser {
@@ -497,7 +629,7 @@
   background-color: var(--primary-dark);
 }
 
-/* UPDATED: Back to Info Button with greyâ†'yellow hover effects */
+/* UPDATED: Back to Info Button with grey→yellow hover effects */
 .back-to-info-btn,
 button.back-to-info-btn,
 .modal-actions .back-to-info-btn,
@@ -524,7 +656,7 @@ button.back-to-info-btn,
   outline: none !important;
 }
 
-/* UPDATED: Greyâ†'yellow hover effects for back button */
+/* UPDATED: Grey→yellow hover effects for back button */
 .back-to-info-btn:hover,
 .back-to-info-btn:focus,
 .back-to-info-btn:active,
@@ -565,7 +697,7 @@ button.back-to-info-btn:active,
   justify-content: center !important;
 }
 
-/* UPDATED: Modal action buttons with greyâ†'yellow hover effects */
+/* UPDATED: Modal action buttons with grey→yellow hover effects */
 .modal-actions button,
 .modal-actions .btn-primary,
 .modal-actions .edit-day-btn,
@@ -590,7 +722,7 @@ button.back-to-info-btn:active,
   color: var(--text-secondary) !important;
 }
 
-/* UPDATED: Greyâ†'yellow hover effects for all modal buttons */
+/* UPDATED: Grey→yellow hover effects for all modal buttons */
 .modal-actions button:hover,
 .modal-actions button:focus,
 .modal-actions button:active,
@@ -615,7 +747,7 @@ button.back-to-info-btn:active,
   transition: all 0.2s ease !important;
 }
 
-/* UPDATED: Form actions with greyâ†'yellow hover effects */
+/* UPDATED: Form actions with grey→yellow hover effects */
 .form-actions {
   display: flex;
   gap: var(--spacing-md);
@@ -751,7 +883,46 @@ button.back-to-info-btn:active,
     width: 100%;
   }
   
-  /* Mobile modal actions with greyâ†'yellow hover */
+  /* NEW: Mobile journal editing styles */
+  .journal-header-with-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+  
+  .journal-header-with-actions h4 {
+    text-align: center;
+  }
+  
+  .journal-edit-btn {
+    align-self: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+  }
+  
+  .journal-textarea {
+    min-height: 100px;
+    font-size: 0.875rem;
+  }
+  
+  .journal-edit-actions {
+    justify-content: center;
+    gap: var(--spacing-md);
+  }
+  
+  .journal-save-btn,
+  .journal-cancel-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+  }
+  
+  .empty-journal-day {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+  
+  /* Mobile modal actions with grey→yellow hover */
   .modal-actions {
     flex-direction: row !important;
     width: 100% !important;
@@ -851,5 +1022,22 @@ button.back-to-info-btn:active,
   
   .modal-header-simple h3 {
     font-size: 0.9rem;
+  }
+  
+  .journal-textarea {
+    min-height: 80px;
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+  
+  .journal-edit-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .journal-save-btn,
+  .journal-cancel-btn {
+    width: 100%;
+    justify-content: center;
   }
 }

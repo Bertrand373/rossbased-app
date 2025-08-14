@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Goal system completely removed, Moon cycles enhanced
+// components/Calendar/Calendar.js - UPDATED: Added journal editing functionality to day modals
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -7,13 +7,12 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons - UPDATED: Removed goal-specific icons, added moon phase icons
+// Icons - UPDATED: Added FaPen for journal editing
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
-  FaWineBottle, FaBed, FaRegMoon, FaAdjust } from 'react-icons/fa';
+  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen } from 'react-icons/fa';
 
-// UPDATED: Removed moon phase integration - keeping calendar clean and focused
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -25,7 +24,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
 
-  // UPDATED: Enhanced trigger options with all unique icons - Added alcohol/substances and sleep deprivation
+  // NEW: Journal editing states
+  const [isEditingNote, setIsEditingNote] = useState(false);
+  const [noteText, setNoteText] = useState('');
+
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
     { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
@@ -63,7 +65,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return { weekStart, weekEnd };
   };
 
-  // FIXED: Helper function to determine day status - CORRECT logic order and precise checks
+  // Helper function to determine day status
   const getDayStatus = (day) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -107,8 +109,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       streakStart.setHours(0, 0, 0, 0);
       streakEnd.setHours(0, 0, 0, 0);
       
-      // Day is within a completed streak period (but not the relapse day itself)
-      // Example: If relapse on Day 5, then Days 1,2,3,4 = former streak (blue)
       return day >= streakStart && day < streakEnd;
     });
     
@@ -118,14 +118,13 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     
     // STEP 4: Check current streak LAST (GREEN) - only active streak with no end date
     const currentStreak = userData.streakHistory?.find(streak => 
-      streak.start && !streak.end // Active streak has no end date
+      streak.start && !streak.end
     );
     
     if (currentStreak) {
       const streakStart = new Date(currentStreak.start);
       streakStart.setHours(0, 0, 0, 0);
       
-      // Day is within the current active streak period
       if (day >= streakStart && day <= today) {
         return { type: 'current-streak' };
       }
@@ -145,7 +144,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return { hasBenefits, hasJournal };
   };
 
-  // ENHANCED: Get streak journey info for any streak day (current or former)
+  // Get streak journey info for any streak day (current or former)
   const getStreakJourneyInfo = (day) => {
     const dayStatus = getDayStatus(day);
     
@@ -154,7 +153,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     }
     
     if (dayStatus.type === 'current-streak') {
-      // Current streak: show day number from current streak start
       const currentStreak = userData.streakHistory?.find(streak => 
         streak.start && !streak.end
       );
@@ -171,7 +169,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     }
     
     if (dayStatus.type === 'former-streak') {
-      // Former streak: show day number within that specific streak + total length
       const formerStreak = userData.streakHistory?.find(streak => {
         if (!streak.start || !streak.end) return false;
         const streakStart = new Date(streak.start);
@@ -200,7 +197,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return null;
   };
 
-  // Check if day is part of streak journey (only show counter for streak days)
+  // Check if day is part of streak journey
   const isDayPartOfJourney = (day) => {
     return getStreakJourneyInfo(day) !== null;
   };
@@ -209,6 +206,13 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const showDayDetails = (day) => {
     setSelectedDate(day);
     setEditingDate(day);
+    
+    // NEW: Initialize note text when opening modal
+    const dayStr = format(day, 'yyyy-MM-dd');
+    const existingNote = userData.notes && userData.notes[dayStr];
+    setNoteText(existingNote || '');
+    setIsEditingNote(false);
+    
     setDayInfoModal(true);
     // Reset edit modal states
     setEditDayModal(false);
@@ -235,14 +239,47 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     setPendingStatusUpdate(null);
   };
 
+  // NEW: Handle note editing functions
+  const startEditingNote = () => {
+    setIsEditingNote(true);
+  };
+
+  const cancelEditingNote = () => {
+    // Reset to original note text
+    const dayStr = format(selectedDate, 'yyyy-MM-dd');
+    const existingNote = userData.notes && userData.notes[dayStr];
+    setNoteText(existingNote || '');
+    setIsEditingNote(false);
+  };
+
+  const saveNote = () => {
+    if (!selectedDate || !updateUserData) {
+      console.error('Missing selectedDate or updateUserData function');
+      return;
+    }
+
+    const dayStr = format(selectedDate, 'yyyy-MM-dd');
+    const updatedNotes = { ...userData.notes };
+    
+    if (noteText.trim()) {
+      updatedNotes[dayStr] = noteText.trim();
+      toast.success('Journal entry saved!');
+    } else {
+      // Remove empty notes
+      delete updatedNotes[dayStr];
+      toast.success('Journal entry removed!');
+    }
+    
+    updateUserData({ notes: updatedNotes });
+    setIsEditingNote(false);
+  };
+
   // Handle status button click with proper trigger flow
   const handleStatusClick = (status) => {
     if (status === 'relapse') {
-      // Show trigger selection for relapse
       setPendingStatusUpdate(status);
       setShowTriggerSelection(true);
     } else {
-      // For other statuses, update immediately
       updateDayStatus(status);
     }
   };
@@ -254,7 +291,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  // VERIFIED: Enhanced day status update with CORRECT relapse logic
+  // Enhanced day status update with CORRECT relapse logic
   const updateDayStatus = (newStatus) => {
     if (!editingDate || !updateUserData) {
       console.error('Missing editingDate or updateUserData function');
@@ -269,24 +306,20 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     
     switch (newStatus) {
       case 'relapse':
-        // VERIFIED: Correct relapse logic
-        // 1. Find the active streak (no end date)
         const activeStreakIndex = updatedStreakHistory.findIndex(streak => !streak.end);
         if (activeStreakIndex !== -1) {
           const currentStreak = updatedStreakHistory[activeStreakIndex];
           const streakDays = differenceInDays(editingDate, new Date(currentStreak.start)) + 1;
           
-          // 2. End the current streak on the relapse date
           updatedStreakHistory[activeStreakIndex] = {
             ...currentStreak,
-            end: editingDate, // Relapse day becomes the end date
+            end: editingDate,
             days: streakDays > 0 ? streakDays : 0,
             reason: 'relapse',
             trigger: selectedTrigger || null
           };
         }
         
-        // 3. Start a new streak the day AFTER the relapse
         const newStreakStart = addDays(editingDate, 1);
         updatedStreakHistory.push({
           id: updatedStreakHistory.length + 1,
@@ -297,7 +330,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           trigger: null
         });
         
-        // 4. Calculate new current streak (days from new start to today)
         const newCurrentStreak = newStreakStart <= today ? 
           differenceInDays(today, newStreakStart) + 1 : 0;
         
@@ -315,7 +347,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         break;
         
       case 'wet-dream':
-        // Wet dreams don't break streaks, just increment counter
         updatedUserData = {
           ...updatedUserData,
           wetDreamCount: (userData.wetDreamCount || 0) + 1
@@ -324,7 +355,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         break;
         
       case 'current-streak':
-        // Confirm/mark as streak day (informational only)
         if (userData.startDate) {
           const streakStart = new Date(userData.startDate);
           if (editingDate >= streakStart && editingDate <= today) {
@@ -352,18 +382,17 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     setPendingStatusUpdate(null);
   };
 
-  // UPDATED: Get day benefits data - handle sleep quality migration
+  // Get day benefits data
   const getDayBenefits = (day) => {
     if (!userData.benefitTracking) return null;
     const benefits = userData.benefitTracking.find(benefit => 
       isSameDay(new Date(benefit.date), day)
     );
     
-    // MIGRATION: Handle old attraction data -> sleep data
     if (benefits && !benefits.sleep && benefits.attraction) {
       return {
         ...benefits,
-        sleep: benefits.attraction // Migrate attraction to sleep
+        sleep: benefits.attraction
       };
     }
     
@@ -379,7 +408,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return <IconComponent className="trigger-icon" />;
   };
 
-  // Render clean day cell without moon phases
+  // Render clean day cell
   const renderDayCell = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
     const isSelected = selectedDate && isSameDay(day, selectedDate);
@@ -408,7 +437,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           <div className="day-number">{format(day, 'd')}</div>
         </div>
         
-        {/* Clean day indicators */}
         <div className="day-indicators">
           {dayStatus && (
             <div className="day-status-indicator">
@@ -435,7 +463,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     );
   };
 
-  // UPDATED: Clean week view without moon phases
+  // Clean week view
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
     const days = [];
@@ -572,7 +600,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="calendar-container">
-      {/* UPDATED: Clean Header without moon phase features */}
+      {/* Clean Header */}
       <div className="integrated-calendar-header">
         <div className="header-title-section">
           <h2>Streak Calendar</h2>
@@ -580,7 +608,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
         
         <div className="header-navigation-section">
-          {/* View Mode Toggle Pills */}
           <div className="navigation-pill-container">
             <button 
               className={`navigation-section-btn ${viewMode === 'month' ? 'active' : ''}`}
@@ -610,7 +637,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </button>
         </div>
 
-        {/* UPDATED: Calendar legend without moon phases */}
+        {/* Calendar legend */}
         <div className="calendar-legend">
           <div className="legend-item">
             <div className="legend-indicator current-streak"></div>
@@ -636,7 +663,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
         {/* Calendar Instructions */}
         <div className="calendar-instructions">
-          Click on any day to view details and edit status. Different colors show your streak history and journey milestones.
+          Click on any day to view details, edit status, and add journal notes. Different colors show your streak history and journey milestones.
         </div>
 
         {/* Calendar Display */}
@@ -651,7 +678,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
 
-      {/* Day Info Modal with moon phase information */}
+      {/* UPDATED: Day Info Modal with journal editing functionality */}
       {dayInfoModal && selectedDate && (
         <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
           <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
@@ -664,8 +691,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </button>
             
             <h3>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
-            
-            {/* Clean Day Info Modal without moon phase information */}
             
             {/* Day Status */}
             <div className="day-status-info">
@@ -855,22 +880,62 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               return null;
             })()}
 
-            {/* Journal Entry */}
-            {(() => {
-              const dayStr = format(selectedDate, 'yyyy-MM-dd');
-              const dayNote = userData.notes && userData.notes[dayStr];
-              if (dayNote) {
-                return (
-                  <div className="day-journal">
-                    <h4>Journal Entry</h4>
-                    <div className="journal-entry">
-                      {dayNote}
-                    </div>
+            {/* NEW: Journal Entry Section with inline editing */}
+            <div className="day-journal">
+              <div className="journal-header-with-actions">
+                <h4>Journal Entry</h4>
+                {!isEditingNote && (
+                  <button 
+                    className="action-btn journal-edit-btn"
+                    onClick={startEditingNote}
+                  >
+                    <FaPen />
+                    <span>{noteText ? 'Edit' : 'Add Note'}</span>
+                  </button>
+                )}
+              </div>
+              
+              {isEditingNote ? (
+                <div className="journal-editing">
+                  <textarea
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                    rows="4"
+                    className="journal-textarea"
+                    placeholder="How were you feeling on this day? What benefits or challenges did you experience?"
+                  />
+                  <div className="journal-edit-actions">
+                    <button 
+                      className="action-btn journal-save-btn"
+                      onClick={saveNote}
+                    >
+                      <FaCheckCircle />
+                      <span>Save</span>
+                    </button>
+                    <button 
+                      className="action-btn journal-cancel-btn"
+                      onClick={cancelEditingNote}
+                    >
+                      <FaTimes />
+                      <span>Cancel</span>
+                    </button>
                   </div>
-                );
-              }
-              return null;
-            })()}
+                </div>
+              ) : (
+                <>
+                  {noteText ? (
+                    <div className="journal-entry">
+                      {noteText}
+                    </div>
+                  ) : (
+                    <div className="empty-journal-day">
+                      <FaInfoCircle className="info-icon" />
+                      <span>No journal entry for this day. Click "Add Note" to record your thoughts.</span>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
 
             <div className="modal-actions">
               <button className="btn-primary edit-day-btn" onClick={showEditFromInfo}>

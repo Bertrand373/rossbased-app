@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Goal system and View Calendar button completely removed
+// components/Tracker/Tracker.js - UPDATED: Journal section completely removed, now focused on daily dashboard
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import './Tracker.css';
 // Components
 import DatePicker from '../Shared/DatePicker';
 
-// Icons - UPDATED: Removed FaCalendarCheck import
+// Icons - UPDATED: Removed FaPen import (no longer needed)
 import { 
   FaCrown, 
   FaExclamationTriangle,
@@ -17,7 +17,6 @@ import {
   FaTimes,
   FaMoon,
   FaShieldAlt,
-  FaPen,
   FaDiscord,
   FaCheckCircle
 } from 'react-icons/fa';
@@ -31,11 +30,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     userData.startDate ? new Date(userData.startDate) : new Date()
   );
   
-  const [showNoteModal, setShowNoteModal] = useState(false);
-  const [currentNote, setCurrentNote] = useState('');
+  // REMOVED: Journal-related states (showNoteModal, currentNote)
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   
-  // UPDATED: Benefit tracking states - Sleep Quality replaces Attraction
+  // Benefit tracking states - Sleep Quality replaces Attraction
   const [todayBenefits, setTodayBenefits] = useState({ 
     energy: 5, 
     focus: 5, 
@@ -68,7 +66,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [userData.benefitTracking]);
 
-  // UPDATED: React DatePicker handlers (replacing iframe logic)
+  // React DatePicker handlers
   const handleDateSubmit = (newDate) => {
     try {
       // Calculate current streak based on the new start date
@@ -178,12 +176,12 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   };
 
-  // UPDATED: Handle urge redirection to urge tab instead of mini toolkit
+  // Handle urge redirection to urge tab
   const handleUrges = () => {
     navigate('/urge-toolkit');
   };
 
-  // Handle benefit logging - REMOVED: Premium restrictions
+  // Handle benefit logging
   const handleBenefitChange = (type, value) => {
     setTodayBenefits(prev => ({
       ...prev,
@@ -224,21 +222,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     toast.success('Benefits logged for today!');
   };
 
-  const saveNote = () => {
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const updatedNotes = { ...userData.notes, [today]: currentNote };
-    
-    updateUserData({ notes: updatedNotes });
-    setShowNoteModal(false);
-    toast.success('Journal entry saved!');
-  };
-
-  const todayStr = format(new Date(), 'yyyy-MM-dd');
-  const todayNote = userData.notes && userData.notes[todayStr];
+  // REMOVED: saveNote function (no longer needed)
 
   return (
     <div className="tracker-container">
-      {/* UPDATED: React DatePicker Modal with close button */}
+      {/* React DatePicker Modal with close button */}
       {showSetStartDate && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -258,44 +246,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* UPDATED: Journal Note Modal with close button */}
-      {showNoteModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button className="modal-close-btn" onClick={() => setShowNoteModal(false)}>
-              <FaTimes />
-            </button>
-            <h2>Journal Entry</h2>
-            <p>Record your thoughts, feelings, and insights for today:</p>
-            
-            <div className="form-group">
-              <textarea
-                value={currentNote}
-                onChange={(e) => setCurrentNote(e.target.value)}
-                rows="6"
-                placeholder="How are you feeling today? What benefits or challenges are you experiencing?"
-              ></textarea>
-            </div>
-            
-            {/* FIXED: Side-by-side button layout matching DatePicker exactly */}
-            <div className="journal-modal-actions">
-              <button onClick={saveNote} className="journal-primary-action">
-                <FaCheckCircle />
-                Save Entry
-              </button>
-              <button onClick={() => setShowNoteModal(false)} className="journal-cancel-action">
-                <FaTimes />
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* REMOVED: Journal Note Modal (no longer needed) */}
       
-      {/* UPDATED: Simplified Header Section - REMOVED View Calendar Button */}
+      {/* Simplified Header Section */}
       <div className="integrated-tracker-header">
         <div className="tracker-header-title-section">
-          <h2>Streak Tracker</h2>
+          <h2>Daily Dashboard</h2>
+          <p className="tracker-header-subtitle">Track your progress and log today's benefits</p>
         </div>
         
         <div className="tracker-header-actions-section">
@@ -375,7 +332,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* UPDATED: Benefit Logging Section with proper spacing */}
+      {/* Benefit Logging Section */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -390,7 +347,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                   className="action-btn edit-benefits-btn"
                   onClick={enableBenefitEditing}
                 >
-                  <FaPen />
+                  <FaEdit />
                   <span>Edit</span>
                 </button>
               </div>
@@ -402,9 +359,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* ALL BENEFITS CONTAINER - Available to everyone now */}
+          {/* ALL BENEFITS CONTAINER */}
           <div className="premium-benefits-container">
-            {/* ALL 6 BENEFIT SLIDERS - Available to everyone */}
+            {/* ALL 6 BENEFIT SLIDERS */}
             {[
               { key: 'energy', label: 'Energy', value: todayBenefits.energy, lowLabel: 'Low', highLabel: 'High' },
               { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
@@ -450,42 +407,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* Today's Journal Section - SEPARATE SECTION */}
-      <div className="journal-section">
-        <div className="journal-header">
-          <div className="journal-header-spacer"></div>
-          <h3>Today's Journal</h3>
-          <div className="journal-actions">
-            <button 
-              className="action-btn"
-              onClick={() => {
-                setCurrentNote(todayNote || '');
-                setShowNoteModal(true);
-              }}
-            >
-              <FaPen />
-              <span>{todayNote ? 'Edit Entry' : 'Add Entry'}</span>
-            </button>
-          </div>
-        </div>
-        
-        {todayNote ? (
-          <div className="journal-preview">
-            <p>"{todayNote.length > 150 ? `${todayNote.substring(0, 150)}...` : todayNote}"</p>
-          </div>
-        ) : (
-          <div className="empty-journal">
-            <FaInfoCircle className="info-icon" />
-            <p>No journal entry for today. Recording your thoughts can help track benefits and stay motivated.</p>
-          </div>
-        )}
-        
-        <div className="journal-prompt">
-          <p>How are you feeling today? What benefits or challenges are you experiencing?</p>
-        </div>
-      </div>
+      {/* REMOVED: Today's Journal Section - moved to Calendar */}
       
-      {/* UPDATED: Discord Integration with proper spacing */}
+      {/* Discord Integration */}
       <div className="discord-section">
         <h3>Discord Integration</h3>
         
@@ -518,6 +442,23 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
         )}
+      </div>
+      
+      {/* NEW: Calendar Navigation Helper */}
+      <div className="calendar-navigation-helper">
+        <div className="helper-content">
+          <FaInfoCircle className="helper-icon" />
+          <div className="helper-text">
+            <h4>Track Your Journey</h4>
+            <p>Want to add journal notes or view your historical data? Visit the Calendar tab to see your complete streak timeline and add daily notes.</p>
+          </div>
+          <button 
+            className="action-btn calendar-nav-btn"
+            onClick={() => navigate('/calendar')}
+          >
+            <span>View Calendar</span>
+          </button>
+        </div>
       </div>
     </div>
   );
