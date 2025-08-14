@@ -13,29 +13,7 @@ import { FaCheckCircle, FaTimesCircle, FaMoon,
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
   FaWineBottle, FaBed, FaRegMoon, FaAdjust } from 'react-icons/fa';
 
-// UPDATED: Simplified moon phase calculation - only new and full moon
-const getMoonPhase = (date) => {
-  // Moon phase calculation using astronomical formulas
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  
-  // Calculate Julian day number
-  const a = Math.floor((14 - month) / 12);
-  const y = year - a;
-  const m = month + 12 * a - 3;
-  const jd = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) + 1721119;
-  
-  // Moon phase calculation
-  const daysSinceNewMoon = (jd - 2451549.5) % 29.53058867;
-  const phase = daysSinceNewMoon / 29.53058867;
-  
-  // Only show new and full moon phases
-  if (phase < 0.05 || phase >= 0.95) return { name: 'new', icon: FaRegMoon, energy: 'fresh starts, set intentions' };
-  if (phase >= 0.45 && phase < 0.55) return { name: 'full', icon: FaMoon, energy: 'peak energy, heightened urges' };
-  return null; // No phase indicator for other days
-};
-
+// UPDATED: Removed moon phase integration - keeping calendar clean and focused
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -401,23 +379,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return <IconComponent className="trigger-icon" />;
   };
 
-  // NEW: Render moon phase icon for day (only new and full moon)
-  const renderMoonPhaseIcon = (day) => {
-    const moonPhase = getMoonPhase(day);
-    if (!moonPhase) return null; // No icon for regular days
-    
-    const IconComponent = moonPhase.icon;
-    return (
-      <div className="moon-phase-indicator" title={`${moonPhase.name} moon - ${moonPhase.energy}`}>
-        <IconComponent className={`moon-icon moon-${moonPhase.name}`} />
-      </div>
-    );
-  };
-
-  // Render day cell with subtle moon phases (only new and full moon)
+  // Render clean day cell without moon phases
   const renderDayCell = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
-    const moonPhase = getMoonPhase(day);
     const isSelected = selectedDate && isSameDay(day, selectedDate);
     const isToday = isSameDay(day, new Date());
     const dayTracking = getDayTracking(day);
@@ -431,8 +395,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
       dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
       dayStatus?.type === 'relapse' ? 'relapse-day' : '',
-      dayStatus?.type === 'wet-dream' ? 'wet-dream-day' : '',
-      moonPhase ? `moon-${moonPhase.name}` : ''
+      dayStatus?.type === 'wet-dream' ? 'wet-dream-day' : ''
     ].filter(Boolean).join(' ');
 
     return (
@@ -443,10 +406,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       >
         <div className="day-content">
           <div className="day-number">{format(day, 'd')}</div>
-          {renderMoonPhaseIcon(day)}
         </div>
         
-        {/* Day indicators with moon phase awareness */}
+        {/* Clean day indicators */}
         <div className="day-indicators">
           {dayStatus && (
             <div className="day-status-indicator">
@@ -473,7 +435,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     );
   };
 
-  // UPDATED: Week view rendering with simplified moon phases
+  // UPDATED: Clean week view without moon phases
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
     const days = [];
@@ -481,18 +443,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     for (let i = 0; i < 7; i++) {
       const day = addDays(weekStart, i);
       const dayStatus = getDayStatus(day);
-      const moonPhase = getMoonPhase(day);
       const dayBenefits = getDayBenefits(day);
       const dayTracking = getDayTracking(day);
       
       days.push(
-        <div key={i} className={`week-day-cell ${moonPhase ? `moon-${moonPhase.name}` : ''}`} onClick={() => showDayDetails(day)}>
+        <div key={i} className="week-day-cell" onClick={() => showDayDetails(day)}>
           <div className="week-day-header">
             <div className="week-day-name">{format(day, 'EEE')}</div>
             <div className={`week-day-number ${isSameDay(day, new Date()) ? 'today' : ''}`}>
               {format(day, 'd')}
             </div>
-            {renderMoonPhaseIcon(day)}
           </div>
           
           <div className="week-day-status">
@@ -612,11 +572,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="calendar-container">
-      {/* UPDATED: Simplified Header without goal features */}
+      {/* UPDATED: Clean Header without moon phase features */}
       <div className="integrated-calendar-header">
         <div className="header-title-section">
-          <h2>Lunar Calendar</h2>
-          <p className="header-subtitle">Track your journey with natural cycles</p>
+          <h2>Streak Calendar</h2>
+          <p className="header-subtitle">Visualize your journey and track your progress</p>
         </div>
         
         <div className="header-navigation-section">
@@ -635,25 +595,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               Week
             </button>
           </div>
-
-          {/* NEW: Current moon phase display - only show if today is new or full moon */}
-          {(() => {
-            const todayMoonPhase = getMoonPhase(new Date());
-            if (!todayMoonPhase) return null;
-            
-            const IconComponent = todayMoonPhase.icon;
-            return (
-              <div className="current-moon-display">
-                <div className="moon-phase-info">
-                  <IconComponent className={`current-moon-icon moon-${todayMoonPhase.name}`} />
-                  <div className="moon-phase-text">
-                    <span className="moon-phase-name">{todayMoonPhase.name} moon</span>
-                    <span className="moon-phase-energy">{todayMoonPhase.energy}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
         </div>
       </div>
 
@@ -669,7 +610,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </button>
         </div>
 
-        {/* UPDATED: Calendar legend with moon phases */}
+        {/* UPDATED: Calendar legend without moon phases */}
         <div className="calendar-legend">
           <div className="legend-item">
             <div className="legend-indicator current-streak"></div>
@@ -691,27 +632,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             <FaInfoCircle className="legend-info-icon" />
             <span>Has Data</span>
           </div>
-          <div className="legend-item legend-moon">
-            <FaRegMoon className="legend-moon-icon" />
-            <span>Moon Phases</span>
-          </div>
-        </div>
-
-        {/* UPDATED: Simplified moon phase guide - only new and full moon */}
-        <div className="moon-phase-guide">
-          <div className="guide-item">
-            <FaRegMoon className="guide-icon new" />
-            <span>New Moon: Fresh starts, set intentions</span>
-          </div>
-          <div className="guide-item">
-            <FaMoon className="guide-icon full" />
-            <span>Full Moon: Peak energy, heightened urges</span>
-          </div>
         </div>
 
         {/* Calendar Instructions */}
         <div className="calendar-instructions">
-          Click on any day to view details and edit status. Moon phases show energy patterns that may affect your journey.
+          Click on any day to view details and edit status. Different colors show your streak history and journey milestones.
         </div>
 
         {/* Calendar Display */}
@@ -740,24 +665,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             
             <h3>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
             
-            {/* NEW: Moon Phase Info - only show if the day has a moon phase */}
-            {(() => {
-              const dayMoonPhase = getMoonPhase(selectedDate);
-              if (!dayMoonPhase) return null;
-              
-              const IconComponent = dayMoonPhase.icon;
-              return (
-                <div className="day-moon-info">
-                  <div className="moon-phase-badge">
-                    <IconComponent className={`moon-badge-icon moon-${dayMoonPhase.name}`} />
-                    <div className="moon-badge-text">
-                      <span className="moon-name">{dayMoonPhase.name} moon</span>
-                      <span className="moon-energy">{dayMoonPhase.energy}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
+            {/* Clean Day Info Modal without moon phase information */}
             
             {/* Day Status */}
             <div className="day-status-info">
