@@ -623,7 +623,7 @@ const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) 
           </div>
 
           {/* NEW: Goal Progress Bar Under Pills - styled like Emotional Timeline */}
-          {userData.goal?.isActive || !userData.goal ? (
+          {(userData.goal?.isActive || !userData.goal) && (
             <div className="goal-progress-section">
               <div 
                 className="goal-progress-bar"
