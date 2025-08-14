@@ -443,23 +443,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
         )}
       </div>
-      
-      {/* NEW: Calendar Navigation Helper */}
-      <div className="calendar-navigation-helper">
-        <div className="helper-content">
-          <FaInfoCircle className="helper-icon" />
-          <div className="helper-text">
-            <h4>Track Your Journey</h4>
-            <p>Want to add journal notes or view your historical data? Visit the Calendar tab to see your complete streak timeline and add daily notes.</p>
-          </div>
-          <button 
-            className="action-btn calendar-nav-btn"
-            onClick={() => navigate('/calendar')}
-          >
-            <span>View Calendar</span>
-          </button>
-        </div>
-      </div>
+
     </div>
   );
 };

@@ -639,59 +639,6 @@ button.action-btn:hover {
   line-height: 1.4;
 }
 
-/* NEW: Calendar Navigation Helper - FIXED: Use mobile layout order for all screen sizes */
-.calendar-navigation-helper {
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border);
-  margin-top: var(--spacing-lg);
-  position: relative; /* FIXED: Ensure proper positioning */
-  z-index: 1; /* FIXED: Prevent layering issues */
-}
-
-.helper-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: var(--spacing-md);
-}
-
-.helper-icon {
-  color: var(--primary);
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  order: 1;
-}
-
-.helper-text {
-  order: 2;
-  width: 100%;
-}
-
-.helper-text h4 {
-  margin: 0 0 var(--spacing-xs) 0;
-  font-size: 1rem;
-  color: var(--text);
-  font-weight: 600;
-  text-align: center;
-}
-
-.helper-text p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  text-align: center;
-}
-
-.calendar-nav-btn {
-  order: 3;
-  flex-shrink: 0;
-  white-space: nowrap;
-  align-self: center;
-}
 
 /* Modal overlay and base */
 .modal-overlay {
@@ -908,27 +855,5 @@ button.action-btn:hover {
     justify-content: space-between !important;
     color: var(--text-secondary) !important;
   }
-  
-  /* UPDATED: Mobile calendar navigation helper - simplified since desktop now matches */
-  .calendar-navigation-helper {
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg); /* FIXED: Add bottom margin to prevent scroll issues */
-  }
-  
-  .helper-content {
-    gap: var(--spacing-sm); /* Slightly tighter spacing on mobile */
-  }
-  
-  .helper-text h4 {
-    font-size: 0.9rem;
-  }
-  
-  .helper-text p {
-    font-size: 0.8rem;
-  }
-  
-  .calendar-nav-btn {
-    padding: var(--spacing-sm) var(--spacing-lg) !important;
-    font-size: 0.875rem !important;
-  }
+
 }
