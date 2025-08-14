@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Added goal system integration
+// components/Tracker/Tracker.js - UPDATED: Goal system moved to Calendar tab
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,6 @@ import './Tracker.css';
 
 // Components
 import DatePicker from '../Shared/DatePicker';
-import GoalModal from '../Goal/GoalModal';
 
 // Icons
 import { 
@@ -21,22 +20,12 @@ import {
   FaShieldAlt,
   FaPen,
   FaDiscord,
-  FaToggleOn,
-  FaToggleOff,
-  FaCheckCircle,
-  FaLock,
-  FaStar,
-  FaBullseye, // FIXED: Changed from FaTarget to FaBullseye
-  FaTrophy
+  FaCheckCircle
 } from 'react-icons/fa';
 
-// Import helmet image
-import helmetImage from '../../assets/helmet.png';
-
-const Tracker = ({ userData, updateUserData, isPremium, setGoal, cancelGoal }) => {
+const Tracker = ({ userData, updateUserData, isPremium }) => {
   const navigate = useNavigate();
   const [showSetStartDate, setShowSetStartDate] = useState(!userData.startDate);
-  const [showGoalModal, setShowGoalModal] = useState(false);
   
   // Initialize with the current date if no start date exists
   const [startDate, setStartDate] = useState(
@@ -72,7 +61,7 @@ const Tracker = ({ userData, updateUserData, isPremium, setGoal, cancelGoal }) =
         energy: existingBenefits.energy,
         focus: existingBenefits.focus,
         confidence: existingBenefits.confidence,
-        aura: existingBenefits.aura || 5,
+        aura: existingBenefits.aura,
         sleep: existingBenefits.sleep || existingBenefits.attraction || 5, // MIGRATION: Handle old attraction data
         workout: existingBenefits.workout || existingBenefits.gymPerformance || 5
       });
@@ -195,20 +184,6 @@ const Tracker = ({ userData, updateUserData, isPremium, setGoal, cancelGoal }) =
     navigate('/urge-toolkit');
   };
 
-  // NEW: Goal-related helper functions
-  const getGoalProgress = () => {
-    const goal = userData.goal;
-    if (!goal || !goal.isActive) return null;
-    
-    return {
-      current: currentStreak,
-      target: goal.targetDays,
-      percentage: Math.min((currentStreak / goal.targetDays) * 100, 100),
-      achieved: goal.achieved,
-      targetDate: goal.targetDate
-    };
-  };
-
   // Handle benefit logging - REMOVED: Premium restrictions
   const handleBenefitChange = (type, value) => {
     setTodayBenefits(prev => ({
@@ -262,11 +237,6 @@ const Tracker = ({ userData, updateUserData, isPremium, setGoal, cancelGoal }) =
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
-  // REMOVED: Premium upgrade handler - all features are free
-  const handleUpgradeClick = () => {
-    toast.success('All features are now free! 🎉');
-  };
-
   return (
     <div className="tracker-container">
       {/* UPDATED: React DatePicker Modal with close button */}
@@ -288,15 +258,6 @@ const Tracker = ({ userData, updateUserData, isPremium, setGoal, cancelGoal }) =
           </div>
         </div>
       )}
-      
-      {/* NEW: Goal Modal */}
-      <GoalModal
-        isOpen={showGoalModal}
-        onClose={() => setShowGoalModal(false)}
-        userData={userData}
-        setGoal={setGoal}
-        cancelGoal={cancelGoal}
-      />
       
       {/* UPDATED: Journal Note Modal with close button */}
       {showNoteModal && (
@@ -332,7 +293,7 @@ const Tracker = ({ userData, updateUserData, isPremium, setGoal, cancelGoal }) =
         </div>
       )}
       
-      {/* UPDATED: New Integrated Header Section with Goal Button */}
+      {/* UPDATED: Simplified Header Section - REMOVED Goal Button */}
       <div className="integrated-tracker-header">
         <div className="tracker-header-title-section">
           <h2>Streak Tracker</h2>
@@ -351,57 +312,14 @@ const Tracker = ({ userData, updateUserData, isPremium, setGoal, cancelGoal }) =
             )}
             <button 
               className="action-btn"
-              onClick={() => setShowGoalModal(true)}
+              onClick={() => navigate('/calendar')}
             >
-              <FaBullseye />
-              <span>{userData.goal?.isActive ? 'Manage Goal' : 'Set Goal'}</span>
+              <FaCalendarCheck />
+              <span>View Calendar</span>
             </button>
           </div>
         </div>
       </div>
-      
-      {/* NEW: Goal Progress Section (only show if goal is active) */}
-      {userData.goal?.isActive && (
-        <div className="goal-progress-section">
-          <div className="goal-progress-card">
-            <div className="goal-progress-header">
-              <div className="goal-icon-container">
-                {userData.goal.achieved ? <FaTrophy className="goal-trophy-icon" /> : <FaBullseye className="goal-target-icon" />}
-              </div>
-              <div className="goal-progress-info">
-                <div className="goal-progress-title">
-                  {userData.goal.achieved ? 'Goal Achieved!' : 'Current Goal'}
-                </div>
-                <div className="goal-progress-stats">
-                  {getGoalProgress()?.current || 0} / {getGoalProgress()?.target || 0} days
-                </div>
-                {userData.goal.targetDate && !userData.goal.achieved && (
-                  <div className="goal-target-date">
-                    Target: {format(userData.goal.targetDate, 'MMM d, yyyy')}
-                  </div>
-                )}
-                {userData.goal.achieved && userData.goal.achievementDate && (
-                  <div className="goal-achievement-date">
-                    Achieved on {format(userData.goal.achievementDate, 'MMM d, yyyy')}
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="goal-progress-bar-container">
-              <div className="goal-progress-bar">
-                <div 
-                  className={`goal-progress-fill ${userData.goal.achieved ? 'achieved' : ''}`}
-                  style={{ width: `${getGoalProgress()?.percentage || 0}%` }}
-                ></div>
-              </div>
-              <div className="goal-progress-percentage">
-                {Math.round(getGoalProgress()?.percentage || 0)}%
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       
       {/* Current Streak Display */}
       <div className="current-streak-container">

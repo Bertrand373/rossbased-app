@@ -1,11 +1,11 @@
-/* components/Calendar/CalendarBase.css - UPDATED: Greyâ†'yellow hover effects for static buttons + Goal System */
+/* components/Calendar/CalendarBase.css - UPDATED: Goal system integrated styling */
 .calendar-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* NEW: Integrated Header Design like Emotional Timeline */
+/* NEW: Integrated Header Design with Goals */
 .integrated-calendar-header {
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
   position: relative;
 }
 
@@ -33,17 +33,16 @@
   text-align: center;
 }
 
-/* UPDATED: Navigation section styled exactly like EmotionalTimeline */
+/* UPDATED: Navigation section with Goals button */
 .header-navigation-section {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   width: 100%;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
 }
 
-/* UPDATED: Container styled exactly like EmotionalTimeline but narrower for 2 buttons */
+/* View Mode Toggle Pills */
 .navigation-pill-container {
   display: flex;
   gap: var(--spacing-xs);
@@ -52,14 +51,13 @@
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   width: fit-content;
-  max-width: 300px; /* NARROWER than Timeline's 600px since we only have 2 buttons */
+  max-width: 300px;
   justify-content: center;
 }
 
-/* UPDATED: Navigation pills styled EXACTLY like EmotionalTimeline */
 .integrated-calendar-header .navigation-section-btn {
   flex: 1;
-  padding: var(--spacing-sm) var(--spacing-md) !important; /* SAME as Timeline */
+  padding: var(--spacing-sm) var(--spacing-md) !important;
   background-color: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
@@ -89,7 +87,183 @@
   box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
 }
 
-/* NEW: Period navigation moved to calendar section */
+/* NEW: Header actions section for Goals button */
+.header-actions-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.goal-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none !important;
+}
+
+.goal-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* NEW: Goal Progress Section */
+.goal-progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.goal-progress-card {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.goal-progress-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.goal-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 2px solid rgba(255, 221, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.goal-target-icon {
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+.goal-trophy-icon {
+  font-size: 1.5rem;
+  color: #f59e0b;
+  animation: trophy-glow 2s ease-in-out infinite;
+}
+
+@keyframes trophy-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.goal-progress-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.goal-progress-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.goal-progress-stats {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--primary);
+  margin: 0;
+}
+
+.goal-target-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.goal-achievement-date {
+  font-size: 0.875rem;
+  color: #f59e0b;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Goal Progress Bar */
+.goal-progress-bar-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.goal-progress-bar {
+  flex: 1;
+  height: 12px;
+  background-color: rgba(128, 128, 128, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(255, 221, 0, 0.8) 0%, 
+    rgba(255, 221, 0, 1) 50%, 
+    rgba(255, 221, 0, 0.9) 100%
+  );
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.goal-progress-fill.achieved {
+  background: linear-gradient(90deg, 
+    rgba(245, 158, 11, 0.8) 0%, 
+    rgba(245, 158, 11, 1) 50%, 
+    rgba(245, 158, 11, 0.9) 100%
+  );
+  animation: achievement-glow 2s ease-in-out infinite;
+}
+
+@keyframes achievement-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  }
+}
+
+.goal-progress-percentage {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Period navigation */
 .calendar-period-navigation {
   display: flex;
   align-items: center;
@@ -111,7 +285,6 @@
   text-align: center;
 }
 
-/* UPDATED: Navigation buttons with greyâ†'yellow hover effects */
 .period-nav-btn {
   display: flex;
   align-items: center;
@@ -120,17 +293,16 @@
   height: 40px;
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
-  border-radius: 50%; /* CIRCLE: Make it circular */
+  border-radius: 50%;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease; /* UPDATED: Added transition */
-  font-size: 1.25rem; /* INCREASED: Make Unicode arrows bigger and more prominent */
-  font-weight: 600; /* BOLD: Make arrows more visible */
-  line-height: 1; /* CENTERED: Remove line-height spacing */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; /* SYSTEM: Use system font for better Unicode rendering */
+  transition: all 0.2s ease;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
-/* UPDATED: Greyâ†'yellow hover effects */
 .period-nav-btn:hover {
   background-color: rgba(255, 221, 0, 0.1) !important;
   border-color: rgba(255, 221, 0, 0.2) !important;
@@ -138,34 +310,11 @@
   transform: translateY(-1px) !important;
 }
 
-/* Mobile navigation scrolling */
-@media (max-width: 768px) {
-  .navigation-pill-container {
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-right: var(--spacing-md);
-    width: fit-content;
-    max-width: 100%;
-  }
-  
-  .navigation-pill-container::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .integrated-calendar-header .navigation-section-btn {
-    white-space: nowrap;
-    min-width: fit-content;
-    flex-shrink: 0;
-  }
-}
-
-/* FIXED: Main calendar section spacing to perfectly match other tabs */
+/* Main calendar section */
 .calendar-main-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+  padding: var(--spacing-xl);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
   display: flex;
@@ -173,7 +322,7 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Calendar legend with mobile 2+2+1 layout + Goal Indicators */
+/* Calendar legend with goal indicators */
 .calendar-legend {
   display: flex;
   justify-content: center;
@@ -181,7 +330,6 @@
   padding: var(--spacing-lg);
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border-radius: var(--radius-lg);
-  /* CHANGED: More subtle border like average energy card */
   border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   flex-wrap: wrap;
@@ -189,7 +337,6 @@
   overflow: hidden;
 }
 
-/* CHANGED: More subtle glow effect */
 .calendar-legend::before {
   content: '';
   position: absolute;
@@ -197,7 +344,6 @@
   left: 0;
   right: 0;
   height: 1px;
-  /* CHANGED: More subtle glow like average energy card */
   background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
 }
 
@@ -234,7 +380,6 @@
   background: linear-gradient(135deg, var(--success) 0%, rgba(34, 197, 94, 0.8) 100%);
 }
 
-/* UPDATED: Former streak legend indicator - now BLUE (#3b82f6) */
 .legend-indicator.former-streak {
   background: linear-gradient(135deg, #3b82f6 0%, rgba(59, 130, 246, 0.8) 100%);
 }
@@ -247,7 +392,7 @@
   background: linear-gradient(135deg, var(--warning) 0%, rgba(245, 158, 11, 0.8) 100%);
 }
 
-/* NEW: Goal legend icons */
+/* Goal legend icons */
 .legend-goal-target-icon {
   color: rgba(128, 128, 128, 0.8);
   font-size: 0.875rem;
@@ -260,14 +405,13 @@
   filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4));
 }
 
-/* UPDATED: Direct icon styling for legend (no trophy icon) */
 .legend-info-icon {
   color: var(--primary);
   font-size: 0.875rem;
   filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
 }
 
-/* UPDATED: Modal close X button with greyâ†'yellow hover */
+/* Modal close button */
 .modal-close-x {
   position: absolute;
   top: var(--spacing-md);
@@ -304,7 +448,7 @@
   border: 1px solid var(--border);
 }
 
-/* Calendar display container */
+/* Calendar display */
 .calendar-display {
   background-color: var(--card-background);
   border-radius: var(--radius-md);
@@ -314,7 +458,7 @@
 
 /* Month view styling */
 .calendar-grid {
-  /* Existing month view styles */
+  /* Grid styling handled by calendar-row */
 }
 
 .calendar-row {
@@ -400,13 +544,12 @@
   border: 2px solid var(--primary) !important;
 }
 
-/* UPDATED: Calendar day background colors - BLUE for former streaks + NEW goal colors */
+/* Calendar day background colors with goal support */
 .current-streak-day {
   background-color: rgba(34, 197, 94, 0.2) !important;
   border-left: 4px solid var(--success) !important;
 }
 
-/* UPDATED: Former streak days now use BLUE (#3b82f6) */
 .former-streak-day {
   background-color: rgba(59, 130, 246, 0.2) !important;
   border-left: 4px solid #3b82f6 !important;
@@ -422,7 +565,7 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* NEW: Goal target day - checkered flag pattern */
+/* Goal target day - checkered pattern */
 .goal-target-day {
   background: repeating-linear-gradient(
     45deg,
@@ -447,7 +590,7 @@
   box-shadow: 0 0 4px rgba(128, 128, 128, 0.5);
 }
 
-/* NEW: Goal achievement day - golden-green with glow */
+/* Goal achievement day - golden glow */
 .goal-achievement-day {
   background: linear-gradient(135deg, 
     rgba(255, 215, 0, 0.15) 0%, 
@@ -497,18 +640,18 @@
   }
 }
 
-/* FIXED: Calendar day indicators - BIGGER ICONS for better visibility + goal icons */
+/* Day indicators with goal support */
 .day-indicators {
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
-  gap: 4px; /* INCREASED: More space between icons */
+  gap: 4px;
   flex-wrap: wrap;
-  min-height: 20px; /* INCREASED: More height for bigger icons */
+  min-height: 20px;
 }
 
 .day-status-indicator, .day-tracking-indicator, .day-badge-indicator, .day-trigger-indicator, .day-goal-indicator {
-  font-size: 0.875rem; /* INCREASED: Much bigger icons - was 0.6rem */
+  font-size: 0.875rem;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -519,7 +662,6 @@
   color: var(--success);
 }
 
-/* UPDATED: Former streak checkmarks now blue to match blue day backgrounds */
 .former-streak-day .success-icon {
   color: #3b82f6 !important;
 }
@@ -536,16 +678,12 @@
   color: var(--primary);
 }
 
-.badge-icon {
-  display: none; /* Keep trophy hidden */
-}
-
 .trigger-icon {
   color: var(--text-secondary);
-  font-size: 0.75rem; /* INCREASED: Bigger trigger icons - was 0.55rem */
+  font-size: 0.75rem;
 }
 
-/* NEW: Goal indicator icons */
+/* Goal indicator icons */
 .goal-target-icon {
   color: rgba(128, 128, 128, 0.8);
   font-size: 0.75rem;
@@ -647,7 +785,6 @@
   color: var(--success);
 }
 
-/* UPDATED: Week view former streak badge - now BLUE */
 .week-status-badge.former-streak {
   background-color: rgba(59, 130, 246, 0.15);
   color: #3b82f6;
@@ -663,7 +800,7 @@
   color: var(--warning);
 }
 
-/* NEW: Week view goal badges */
+/* Week view goal badges */
 .week-goal-badge {
   display: flex;
   align-items: center;
@@ -692,38 +829,6 @@
   50% {
     box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
   }
-}
-
-.week-badge-indicator {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.week-badge-icon {
-  color: var(--primary);
-  font-size: 0.875rem;
-}
-
-.badge-tooltip {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--background);
-  color: var(--text);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-  border: 1px solid var(--border);
-}
-
-.week-badge-indicator:hover .badge-tooltip {
-  opacity: 1;
 }
 
 .week-benefits {
@@ -783,15 +888,14 @@
   color: var(--primary);
 }
 
-/* Mobile responsiveness for calendar base */
+/* Mobile responsiveness */
 @media (max-width: 768px) {
   .integrated-calendar-header {
-    padding: var(--spacing-xl);
-    min-height: 180px;
+    padding: var(--spacing-lg);
   }
   
   .header-title-section {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
   }
   
   .header-title-section h2 {
@@ -799,34 +903,56 @@
   }
   
   .header-navigation-section {
-    gap: 0;
-    justify-content: space-between;
-    flex: 1;
+    gap: var(--spacing-md);
   }
   
   .navigation-pill-container {
-    display: flex;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-xs);
-    background-color: var(--card-background);
-    border-radius: var(--radius-full);
-    border: 1px solid var(--border);
-    width: fit-content;
+    max-width: 100%;
   }
   
-  /* UPDATED: Mobile navigation pills maintain Timeline styling */
   .integrated-calendar-header .navigation-section-btn {
-    flex: 1;
     font-size: 0.875rem;
     padding: var(--spacing-sm) var(--spacing-lg) !important;
     min-width: 80px !important;
   }
   
-  .period-navigation {
+  .goal-btn {
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  
+  .goal-progress-card {
+    padding: var(--spacing-lg);
+  }
+  
+  .goal-progress-header {
+    flex-direction: column;
+    text-align: center;
     gap: var(--spacing-lg);
   }
   
-  .period-navigation h3 {
+  .goal-icon-container {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .goal-target-icon, .goal-trophy-icon {
+    font-size: 1.25rem;
+  }
+  
+  .goal-progress-title {
+    font-size: 1.125rem;
+  }
+  
+  .goal-progress-stats {
+    font-size: 1rem;
+  }
+  
+  .calendar-period-navigation {
+    gap: var(--spacing-lg);
+  }
+  
+  .calendar-period-navigation h3 {
     font-size: 1.125rem;
     min-width: 160px;
   }
@@ -835,20 +961,6 @@
     width: 36px;
     height: 36px;
     font-size: 1.125rem;
-    font-weight: 600;
-    line-height: 1;
-    background-color: rgba(128, 128, 128, 0.1);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    color: var(--text-secondary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  }
-  
-  .period-nav-btn:hover {
-    background-color: rgba(255, 221, 0, 0.1) !important;
-    border-color: rgba(255, 221, 0, 0.2) !important;
-    color: var(--primary) !important;
-    transform: translateY(-1px) !important;
   }
   
   .calendar-main-section {
@@ -969,10 +1081,6 @@
     padding: var(--spacing-lg);
   }
   
-  .header-title-section {
-    margin-bottom: var(--spacing-xl);
-  }
-  
   .header-title-section h2 {
     font-size: 1.125rem;
   }
@@ -981,10 +1089,35 @@
     width: fit-content;
   }
   
-  /* UPDATED: Small screen navigation pills maintain Timeline styling */
   .integrated-calendar-header .navigation-section-btn {
     font-size: 0.875rem;
     padding: var(--spacing-sm) var(--spacing-md) !important;
+  }
+  
+  .goal-btn {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .goal-progress-card {
+    padding: var(--spacing-md);
+  }
+  
+  .goal-icon-container {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .goal-target-icon, .goal-trophy-icon {
+    font-size: 1rem;
+  }
+  
+  .goal-progress-title {
+    font-size: 1rem;
+  }
+  
+  .goal-progress-stats {
+    font-size: 0.875rem;
   }
   
   .calendar-period-navigation {
@@ -1002,23 +1135,9 @@
     width: 32px;
     height: 32px;
     font-size: 1rem;
-    font-weight: 600;
-    line-height: 1;
-    background-color: rgba(128, 128, 128, 0.1);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    color: var(--text-secondary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   }
   
-  .period-nav-btn:hover {
-    background-color: rgba(255, 221, 0, 0.1) !important;
-    border-color: rgba(255, 221, 0, 0.2) !important;
-    color: var(--primary) !important;
-    transform: translateY(-1px) !important;
-  }
-  
-  /* Small mobile legend: same 2+2+1 layout, more compact */
+  /* Small mobile legend: 2+2+1 layout */
   .calendar-legend {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
@@ -1054,7 +1173,6 @@
     max-width: 100px !important;
   }
   
-  /* Small mobile X button */
   .modal-close-x {
     top: var(--spacing-xs);
     right: var(--spacing-xs);

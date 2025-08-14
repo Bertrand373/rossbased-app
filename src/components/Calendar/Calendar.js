@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Added goal system integration
+// components/Calendar/Calendar.js - UPDATED: Goal system integrated into Calendar tab
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -7,13 +7,16 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
+// Components
+import GoalModal from '../Goal/GoalModal';
+
 // Icons - UPDATED: Added FaWineBottle, FaBed, FaTrophy, and FaFlag for goal system
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
-  FaWineBottle, FaBed, FaTrophy, FaFlag } from 'react-icons/fa';
+  FaWineBottle, FaBed, FaTrophy, FaFlag, FaBullseye } from 'react-icons/fa';
 
-const Calendar = ({ userData, isPremium, updateUserData }) => {
+const Calendar = ({ userData, isPremium, updateUserData, setGoal, cancelGoal }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [dayInfoModal, setDayInfoModal] = useState(false);
@@ -23,6 +26,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
+  const [showGoalModal, setShowGoalModal] = useState(false); // NEW: Goal modal state
 
   // UPDATED: Enhanced trigger options with all unique icons - Added alcohol/substances and sleep deprivation
   const triggerOptions = [
@@ -73,6 +77,21 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     const goal = userData.goal;
     if (!goal || !goal.achieved || !goal.achievementDate) return false;
     return isSameDay(day, new Date(goal.achievementDate));
+  };
+
+  // NEW: Get goal progress data
+  const getGoalProgress = () => {
+    const goal = userData.goal;
+    if (!goal || !goal.isActive) return null;
+    
+    const currentStreak = userData.currentStreak || 0;
+    return {
+      current: currentStreak,
+      target: goal.targetDays,
+      percentage: Math.min((currentStreak / goal.targetDays) * 100, 100),
+      achieved: goal.achieved,
+      targetDate: goal.targetDate
+    };
   };
 
   // FIXED: Helper function to determine day status - CORRECT logic order and precise checks
@@ -620,7 +639,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="calendar-container">
-      {/* NEW: Integrated Header Design like Emotional Timeline */}
+      {/* NEW: Goal Modal */}
+      <GoalModal
+        isOpen={showGoalModal}
+        onClose={() => setShowGoalModal(false)}
+        userData={userData}
+        setGoal={setGoal}
+        cancelGoal={cancelGoal}
+      />
+
+      {/* UPDATED: Integrated Header Design with Goals button */}
       <div className="integrated-calendar-header">
         <div className="header-title-section">
           <h2>Streak Calendar</h2>
@@ -642,11 +670,65 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               Week
             </button>
           </div>
+
+          {/* NEW: Goals button */}
+          <div className="header-actions-section">
+            <button 
+              className="action-btn goal-btn"
+              onClick={() => setShowGoalModal(true)}
+            >
+              <FaBullseye />
+              <span>{userData.goal?.isActive ? 'Manage Goal' : 'Set Goal'}</span>
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* NEW: Goal Progress Section (only show if goal is active) */}
+      {userData.goal?.isActive && (
+        <div className="goal-progress-section">
+          <div className="goal-progress-card">
+            <div className="goal-progress-header">
+              <div className="goal-icon-container">
+                {userData.goal.achieved ? <FaTrophy className="goal-trophy-icon" /> : <FaBullseye className="goal-target-icon" />}
+              </div>
+              <div className="goal-progress-info">
+                <div className="goal-progress-title">
+                  {userData.goal.achieved ? 'Goal Achieved!' : 'Current Goal'}
+                </div>
+                <div className="goal-progress-stats">
+                  {getGoalProgress()?.current || 0} / {getGoalProgress()?.target || 0} days
+                </div>
+                {userData.goal.targetDate && !userData.goal.achieved && (
+                  <div className="goal-target-date">
+                    Target: {format(userData.goal.targetDate, 'MMM d, yyyy')}
+                  </div>
+                )}
+                {userData.goal.achieved && userData.goal.achievementDate && (
+                  <div className="goal-achievement-date">
+                    Achieved on {format(userData.goal.achievementDate, 'MMM d, yyyy')}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="goal-progress-bar-container">
+              <div className="goal-progress-bar">
+                <div 
+                  className={`goal-progress-fill ${userData.goal.achieved ? 'achieved' : ''}`}
+                  style={{ width: `${getGoalProgress()?.percentage || 0}%` }}
+                ></div>
+              </div>
+              <div className="goal-progress-percentage">
+                {Math.round(getGoalProgress()?.percentage || 0)}%
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="calendar-main-section">
-        {/* NEW: Period Navigation moved to calendar section */}
+        {/* Period Navigation */}
         <div className="calendar-period-navigation">
           <button className="period-nav-btn" onClick={prevPeriod}>
             ←
@@ -689,7 +771,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </div>
         </div>
 
-        {/* Calendar Instructions - MOVED: Now appears after legend, before calendar */}
+        {/* Calendar Instructions */}
         <div className="calendar-instructions">
           Click on any day to view details and edit status
         </div>
@@ -706,7 +788,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
 
-      {/* UPDATED: Day Info Modal with goal information */}
+      {/* Day Info Modal with goal information */}
       {dayInfoModal && selectedDate && (
         <div className="modal-overlay" onClick={() => setDayInfoModal(false)}>
           <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
@@ -803,7 +885,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               })()}
             </div>
 
-            {/* ENHANCED: Journey Day Counter with Former Streak Support */}
+            {/* Journey Day Counter */}
             {isDayPartOfJourney(selectedDate) && (
               <div className="day-streak-info">
                 <div className="streak-day-number">
@@ -959,7 +1041,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
 
-      {/* UPDATED: Edit Day Modal - REMOVED "Clear Status" option */}
+      {/* Edit Day Modal */}
       {editDayModal && editingDate && (
         <div className="modal-overlay" onClick={() => setEditDayModal(false)}>
           <div className="modal-content edit-day-modal" onClick={e => e.stopPropagation()}>

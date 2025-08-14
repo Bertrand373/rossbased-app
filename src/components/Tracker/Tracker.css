@@ -1,11 +1,11 @@
-/* components/Tracker/Tracker.css - UPDATED: Consistent grey → yellow hover for all buttons except main actions */
+/* components/Tracker/Tracker.css - UPDATED: Goal system removed, cleaner layout */
 .tracker-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: New integrated header design matching Stats, Calendar, and Emotional Timeline */
+/* UPDATED: Integrated header design without goal features */
 .integrated-tracker-header {
   display: flex;
   flex-direction: column;
@@ -108,158 +108,6 @@ button.action-btn:hover {
   box-shadow: none !important;
   outline: none !important;
   filter: none !important;
-}
-
-/* =================================================
-   GOAL SYSTEM STYLES - NEW ADDITION
-   ================================================= */
-
-/* Goal Progress Section */
-.goal-progress-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin-top: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-}
-
-.goal-progress-card {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.goal-progress-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-
-.goal-icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 2px solid rgba(255, 221, 0, 0.2);
-  flex-shrink: 0;
-}
-
-.goal-target-icon {
-  font-size: 1.5rem;
-  color: var(--primary);
-}
-
-.goal-trophy-icon {
-  font-size: 1.5rem;
-  color: #f59e0b;
-  animation: trophy-glow 2s ease-in-out infinite;
-}
-
-@keyframes trophy-glow {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
-.goal-progress-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.goal-progress-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-}
-
-.goal-progress-stats {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--primary);
-  margin: 0;
-}
-
-.goal-target-date {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.goal-achievement-date {
-  font-size: 0.875rem;
-  color: #f59e0b;
-  font-weight: 500;
-  margin: 0;
-}
-
-/* Goal Progress Bar */
-.goal-progress-bar-container {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.goal-progress-bar {
-  flex: 1;
-  height: 12px;
-  background-color: rgba(128, 128, 128, 0.1);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-
-.goal-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.8) 0%, 
-    rgba(255, 221, 0, 1) 50%, 
-    rgba(255, 221, 0, 0.9) 100%
-  );
-  border-radius: var(--radius-full);
-  transition: width 0.3s ease;
-  position: relative;
-}
-
-.goal-progress-fill.achieved {
-  background: linear-gradient(90deg, 
-    rgba(245, 158, 11, 0.8) 0%, 
-    rgba(245, 158, 11, 1) 50%, 
-    rgba(245, 158, 11, 0.9) 100%
-  );
-  animation: achievement-glow 2s ease-in-out infinite;
-}
-
-@keyframes achievement-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 rgba(245, 158, 11, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-  }
-}
-
-.goal-progress-percentage {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--primary);
-  min-width: 40px;
-  text-align: right;
 }
 
 /* UPDATED: Current Streak Section */
@@ -521,109 +369,7 @@ button.action-btn:hover {
   transform: translateY(-1px) !important;
 }
 
-/* NEW: Free Benefit Container - Energy slider for all users */
-.free-benefit-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* NEW: Benefit Upgrade Banner - Clean subscription prompt like EmotionalTimeline */
-.benefit-upgrade-banner {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
-}
-
-.benefit-upgrade-content {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xl);
-  text-align: left;
-}
-
-/* NEW: Benefit upgrade helmet - EXACT copy of EmotionalTimeline early teaser helmet sizing */
-.benefit-upgrade-helmet {
-  width: 80px; /* MATCH: Same as EmotionalTimeline early-teaser-helmet */
-  height: 80px; /* MATCH: Same as EmotionalTimeline early-teaser-helmet */
-  flex-shrink: 0;
-  animation: benefit-upgrade-helmet-pulse 2.5s ease-in-out infinite;
-  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
-}
-
-.benefit-upgrade-helmet-fallback {
-  font-size: 3.2rem; /* MATCH: Same as EmotionalTimeline early-teaser-helmet-fallback */
-  color: var(--primary);
-  flex-shrink: 0;
-  animation: benefit-upgrade-helmet-pulse 2.5s ease-in-out infinite;
-}
-
-@keyframes benefit-upgrade-helmet-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.98);
-  }
-}
-
-.benefit-upgrade-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.benefit-upgrade-text h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-}
-
-.benefit-upgrade-text p {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* NEW: Benefit upgrade button - EXACT copy of EmotionalTimeline early-teaser-upgrade-btn */
-.benefit-upgrade-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl); /* MATCH: Same as EmotionalTimeline */
-  background-color: var(--primary); /* MATCH: Same as EmotionalTimeline */
-  border: none; /* MATCH: Same as EmotionalTimeline */
-  border-radius: var(--radius-full);
-  color: #000000; /* MATCH: Same as EmotionalTimeline */
-  font-size: 1.125rem; /* MATCH: Same as EmotionalTimeline */
-  font-weight: 600; /* MATCH: Same as EmotionalTimeline */
-  cursor: pointer;
-  transition: all 0.2s ease; /* MATCH: Same as EmotionalTimeline */
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  min-width: 200px; /* MATCH: Same as EmotionalTimeline */
-  min-height: 48px; /* MATCH: Same as EmotionalTimeline */
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as EmotionalTimeline */
-  align-self: flex-start;
-}
-
-.benefit-upgrade-btn:hover {
-  background-color: var(--primary-dark); /* MATCH: Same as EmotionalTimeline */
-  transform: translateY(-2px); /* MATCH: Same as EmotionalTimeline */
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); /* MATCH: Same as EmotionalTimeline */
-  color: #000000; /* MATCH: Same as EmotionalTimeline */
-}
-
-/* Premium Benefits Container - Only for premium users */
+/* Premium Benefits Container - Available to everyone */
 .premium-benefits-container {
   display: flex;
   flex-direction: column;
@@ -764,15 +510,6 @@ button.action-btn:hover {
   margin-top: var(--spacing-lg);
 }
 
-/* ADDED: Benefit actions row for free users */
-.benefit-actions-row {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
 /* UPDATED: Save benefits button - grey → yellow hover pattern */
 .save-benefits-btn {
   display: flex;
@@ -797,49 +534,11 @@ button.action-btn:hover {
   transform: translateY(-1px) !important;
 }
 
-/* ADDED: Partial save button for free users */
-.save-benefits-btn.partial {
-  flex: 1;
-  max-width: 200px;
-}
-
-/* ADDED: Upgrade button styling */
-.upgrade-benefits-btn {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  border-radius: var(--radius-full);
-  color: #f59e0b;
-  padding: var(--spacing-md) var(--spacing-xl);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.1);
-  letter-spacing: 0.025em;
-  flex: 1;
-  max-width: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-}
-
-.upgrade-benefits-btn:hover {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.2) 100%);
-  border-color: rgba(251, 191, 36, 0.4);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.2);
-}
-
 /* Professional slider labels with perfect spacing */
-.benefit-logging-section .free-benefit-container .slider-labels,
 .benefit-logging-section .premium-benefits-container .slider-labels,
-.free-benefit-container .benefit-slider-item .slider-labels,
 .premium-benefits-container .benefit-slider-item .slider-labels,
-.tracker-container .free-benefit-container .slider-labels,
 .tracker-container .premium-benefits-container .slider-labels,
 .tracker-container .benefit-logging-section .slider-labels,
-.benefit-logging-container .free-benefit-container .slider-labels,
 .benefit-logging-container .premium-benefits-container .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
@@ -1045,7 +744,7 @@ button.action-btn:hover {
   text-align: center;
 }
 
-/* ADDED: Close button in upper right corner */
+/* Close button in upper right corner */
 .modal-close-btn {
   position: absolute;
   top: var(--spacing-md);
@@ -1091,7 +790,7 @@ button.action-btn:hover {
     justify-content: center;
   }
   
-  /* FIXED: Ensure consistent mobile button sizing with stats reset button */
+  /* FIXED: Ensure consistent mobile button sizing */
   .tracker-header-actions .action-btn,
   .integrated-tracker-header .action-btn {
     flex: 1;
@@ -1176,7 +875,7 @@ button.action-btn:hover {
     padding: var(--spacing-lg);
   }
   
-  .free-benefit-container, .premium-benefits-container {
+  .premium-benefits-container {
     gap: var(--spacing-md);
   }
   
@@ -1193,38 +892,6 @@ button.action-btn:hover {
   .edit-benefits-btn {
     margin-left: 0;
     margin-top: var(--spacing-sm);
-  }
-
-  /* Mobile benefit upgrade banner adjustments */
-  .benefit-upgrade-content {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-lg);
-  }
-
-  .benefit-upgrade-helmet {
-    width: 70px; /* MATCH: Mobile scaling like EmotionalTimeline */
-    height: 70px;
-  }
-
-  .benefit-upgrade-helmet-fallback {
-    font-size: 2.8rem; /* MATCH: Mobile scaling like EmotionalTimeline */
-  }
-
-  .benefit-upgrade-text h3 {
-    font-size: 1.25rem;
-  }
-
-  .benefit-upgrade-text p {
-    font-size: 0.875rem;
-  }
-
-  .benefit-upgrade-btn {
-    font-size: 1rem; /* MATCH: Mobile size like EmotionalTimeline */
-    padding: var(--spacing-md) var(--spacing-lg);
-    min-width: 180px; /* MATCH: Mobile width like EmotionalTimeline */
-    min-height: 48px; /* MATCH: Mobile height like EmotionalTimeline */
-    align-self: center;
   }
   
   /* REFINED: Mobile slider adjustments with professional styling */
@@ -1243,14 +910,10 @@ button.action-btn:hover {
   }
   
   /* Mobile slider labels with perfect spacing */
-  .benefit-logging-section .free-benefit-container .slider-labels,
   .benefit-logging-section .premium-benefits-container .slider-labels,
-  .free-benefit-container .benefit-slider-item .slider-labels,
   .premium-benefits-container .benefit-slider-item .slider-labels,
-  .tracker-container .free-benefit-container .slider-labels,
   .tracker-container .premium-benefits-container .slider-labels,
   .tracker-container .benefit-logging-section .slider-labels,
-  .benefit-logging-container .free-benefit-container .slider-labels,
   .benefit-logging-container .premium-benefits-container .slider-labels {
     margin-top: 10px !important;
     margin-bottom: 0px !important;
@@ -1266,17 +929,5 @@ button.action-btn:hover {
     display: flex !important;
     justify-content: space-between !important;
     color: var(--text-secondary) !important;
-  }
-  
-  .benefit-actions-row {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    align-items: center;
-  }
-  
-  .save-benefits-btn.partial,
-  .upgrade-benefits-btn {
-    max-width: none;
-    width: 100%;
   }
 }
