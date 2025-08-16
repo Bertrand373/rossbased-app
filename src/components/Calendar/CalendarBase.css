@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - UPDATED: Clean calendar without goals or moon phases */
+/* components/Calendar/CalendarBase.css - UPDATED: Fixed icon positioning with absolute positioning */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -385,14 +385,16 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* Day indicators */
+/* FIXED: Day indicators with absolute positioning for reliable layering */
 .day-indicators {
+  position: absolute;
+  bottom: var(--spacing-xs);
+  right: var(--spacing-xs);
   display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  gap: 4px;
-  flex-wrap: wrap;
-  min-height: 20px;
+  align-items: center;
+  gap: 3px;
+  min-height: 16px;
+  pointer-events: none; /* Allow clicks to pass through to day cell */
 }
 
 .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
@@ -401,6 +403,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  pointer-events: auto; /* Re-enable pointer events for icons */
+}
+
+/* FIXED: Explicit positioning - rightmost to leftmost */
+.day-status-indicator {
+  order: 3; /* Rightmost position */
+}
+
+.day-tracking-indicator {
+  order: 2; /* Middle position */
+}
+
+.day-trigger-indicator {
+  order: 1; /* Leftmost position */
 }
 
 .success-icon {
@@ -678,9 +695,12 @@
     font-size: 0.65rem;
   }
   
+  /* FIXED: Mobile day indicators positioning */
   .day-indicators {
-    gap: 3px;
-    min-height: 18px;
+    bottom: 2px;
+    right: 2px;
+    gap: 2px;
+    min-height: 14px;
   }
   
   .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
@@ -847,9 +867,12 @@
     font-size: 0.6rem;
   }
   
+  /* FIXED: Very small screen day indicators positioning */
   .day-indicators {
-    gap: 2px;
-    min-height: 16px;
+    bottom: 1px;
+    right: 1px;
+    gap: 1px;
+    min-height: 12px;
   }
   
   .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
