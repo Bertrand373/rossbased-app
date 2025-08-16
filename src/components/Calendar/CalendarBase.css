@@ -155,7 +155,7 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Calendar legend without goal indicators */
+/* UPDATED: Calendar legend with journal icon */
 .calendar-legend {
   display: flex;
   justify-content: center;
@@ -232,9 +232,9 @@
 }
 
 .legend-journal-icon {
-  color: var(--success);
+  color: var(--text-secondary);
   font-size: 0.875rem;
-  filter: drop-shadow(0 2px 4px rgba(34, 197, 94, 0.3));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 /* Modal close button */
@@ -336,6 +336,25 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  position: relative;
+}
+
+/* NEW: Journal indicator in top-right corner */
+.day-journal-indicator-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.75rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.journal-icon-top {
+  color: var(--text-secondary);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .day-number {
@@ -391,7 +410,7 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* FIXED: Day indicators with absolute positioning for reliable layering */
+/* UPDATED: Day indicators with simplified positioning (no journal icon here) */
 .day-indicators {
   position: absolute;
   bottom: var(--spacing-xs);
@@ -403,7 +422,7 @@
   pointer-events: none; /* Allow clicks to pass through to day cell */
 }
 
-.day-status-indicator, .day-tracking-indicator, .day-journal-indicator, .day-trigger-indicator {
+.day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
   font-size: 0.875rem;
   line-height: 1;
   display: flex;
@@ -413,17 +432,13 @@
   pointer-events: auto; /* Re-enable pointer events for icons */
 }
 
-/* UPDATED: Icon positioning with journal indicator */
+/* UPDATED: Simplified 3-level positioning */
 .day-status-indicator {
-  order: 4; /* Rightmost position */
+  order: 3; /* Rightmost position */
 }
 
 .day-tracking-indicator {
-  order: 3; /* Second from right */
-}
-
-.day-journal-indicator {
-  order: 2; /* Third from right */
+  order: 2; /* Middle position */
 }
 
 .day-trigger-indicator {
@@ -448,10 +463,6 @@
 
 .tracking-icon {
   color: var(--primary);
-}
-
-.journal-icon {
-  color: var(--success);
 }
 
 .trigger-icon {
@@ -609,7 +620,7 @@
 }
 
 .week-journal-icon {
-  color: var(--success);
+  color: var(--text-secondary);
 }
 
 /* Mobile responsiveness */
@@ -706,6 +717,11 @@
     font-size: 0.75rem;
   }
   
+  /* UPDATED: Mobile journal icon positioning */
+  .day-journal-indicator-top {
+    font-size: 0.65rem;
+  }
+  
   .today .day-number {
     width: 20px;
     height: 20px;
@@ -713,7 +729,7 @@
     font-size: 0.65rem;
   }
   
-  /* FIXED: Mobile day indicators positioning */
+  /* UPDATED: Mobile day indicators positioning (simplified) */
   .day-indicators {
     bottom: 2px;
     right: 2px;
@@ -721,7 +737,7 @@
     min-height: 14px;
   }
   
-  .day-status-indicator, .day-tracking-indicator, .day-journal-indicator, .day-trigger-indicator {
+  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
     font-size: 0.75rem !important;
   }
   
@@ -872,6 +888,11 @@
     font-size: 0.7rem;
   }
   
+  /* UPDATED: Very small screen journal icon */
+  .day-journal-indicator-top {
+    font-size: 0.6rem;
+  }
+  
   .today .day-number {
     width: 18px;
     height: 18px;
@@ -879,7 +900,7 @@
     font-size: 0.6rem;
   }
   
-  /* FIXED: Very small screen day indicators positioning */
+  /* UPDATED: Very small screen day indicators (simplified) */
   .day-indicators {
     bottom: 1px;
     right: 1px;
@@ -887,7 +908,7 @@
     min-height: 12px;
   }
   
-  .day-status-indicator, .day-tracking-indicator, .day-journal-indicator, .day-trigger-indicator {
+  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
     font-size: 0.7rem !important;
   }
   
