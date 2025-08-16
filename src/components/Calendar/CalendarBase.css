@@ -231,6 +231,12 @@
   filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
 }
 
+.legend-journal-icon {
+  color: var(--success);
+  font-size: 0.875rem;
+  filter: drop-shadow(0 2px 4px rgba(34, 197, 94, 0.3));
+}
+
 /* Modal close button */
 .modal-close-x {
   position: absolute;
@@ -397,7 +403,7 @@
   pointer-events: none; /* Allow clicks to pass through to day cell */
 }
 
-.day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
+.day-status-indicator, .day-tracking-indicator, .day-journal-indicator, .day-trigger-indicator {
   font-size: 0.875rem;
   line-height: 1;
   display: flex;
@@ -407,13 +413,17 @@
   pointer-events: auto; /* Re-enable pointer events for icons */
 }
 
-/* FIXED: Explicit positioning - rightmost to leftmost */
+/* UPDATED: Icon positioning with journal indicator */
 .day-status-indicator {
-  order: 3; /* Rightmost position */
+  order: 4; /* Rightmost position */
 }
 
 .day-tracking-indicator {
-  order: 2; /* Middle position */
+  order: 3; /* Second from right */
+}
+
+.day-journal-indicator {
+  order: 2; /* Third from right */
 }
 
 .day-trigger-indicator {
@@ -438,6 +448,10 @@
 
 .tracking-icon {
   color: var(--primary);
+}
+
+.journal-icon {
+  color: var(--success);
 }
 
 .trigger-icon {
@@ -585,13 +599,17 @@
   margin-top: auto;
 }
 
-.week-journal-icon, .week-trigger-icon {
+.week-benefits-icon, .week-journal-icon, .week-trigger-icon {
   font-size: 0.75rem;
   color: var(--text-secondary);
 }
 
-.week-journal-icon {
+.week-benefits-icon {
   color: var(--primary);
+}
+
+.week-journal-icon {
+  color: var(--success);
 }
 
 /* Mobile responsiveness */
@@ -703,7 +721,7 @@
     min-height: 14px;
   }
   
-  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
+  .day-status-indicator, .day-tracking-indicator, .day-journal-indicator, .day-trigger-indicator {
     font-size: 0.75rem !important;
   }
   
@@ -790,7 +808,7 @@
     font-size: 1rem;
   }
   
-  /* Small mobile legend: 2+2+1 layout */
+  /* Small mobile legend: 3 rows with 2 items each */
   .calendar-legend {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
@@ -808,19 +826,13 @@
     justify-content: center !important;
   }
   
-  /* First 4 items in 2x2 grid */
-  .legend-item:nth-child(1) { grid-column: 1 !important; grid-row: 1 !important; }
-  .legend-item:nth-child(2) { grid-column: 2 !important; grid-row: 1 !important; }
-  .legend-item:nth-child(3) { grid-column: 1 !important; grid-row: 2 !important; }
-  .legend-item:nth-child(4) { grid-column: 2 !important; grid-row: 2 !important; }
-  
-  /* Has Data item centered on third row */
-  .legend-has-data {
-    grid-column: 1 / -1 !important;
-    grid-row: 3 !important;
-    justify-self: center !important;
-    max-width: 100px !important;
-  }
+  /* 3 rows with 2 items each */
+  .legend-item:nth-child(1) { grid-column: 1 !important; grid-row: 1 !important; } /* Current Streak */
+  .legend-item:nth-child(2) { grid-column: 2 !important; grid-row: 1 !important; } /* Former Streak */
+  .legend-item:nth-child(3) { grid-column: 1 !important; grid-row: 2 !important; } /* Relapse */
+  .legend-item:nth-child(4) { grid-column: 2 !important; grid-row: 2 !important; } /* Wet Dream */
+  .legend-item:nth-child(5) { grid-column: 1 !important; grid-row: 3 !important; } /* Has Benefits */
+  .legend-item:nth-child(6) { grid-column: 2 !important; grid-row: 3 !important; } /* Has Journal */
   
   .modal-close-x {
     top: var(--spacing-xs);
@@ -875,7 +887,7 @@
     min-height: 12px;
   }
   
-  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator {
+  .day-status-indicator, .day-tracking-indicator, .day-journal-indicator, .day-trigger-indicator {
     font-size: 0.7rem !important;
   }
   

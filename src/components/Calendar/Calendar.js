@@ -7,11 +7,11 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons - UPDATED: Added FaPen for journal editing
+// Icons - UPDATED: Added FaBook for journal entries
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
-  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen } from 'react-icons/fa';
+  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen, FaBook } from 'react-icons/fa';
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -447,9 +447,15 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </div>
           )}
           
-          {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
+          {dayTracking.hasBenefits && (
             <div className="day-tracking-indicator">
               <FaInfoCircle className="tracking-icon" />
+            </div>
+          )}
+          
+          {dayTracking.hasJournal && (
+            <div className="day-journal-indicator">
+              <FaBook className="journal-icon" />
             </div>
           )}
           
@@ -530,7 +536,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           )}
           
           <div className="week-tracking-indicators">
-            {dayTracking.hasJournal && <FaInfoCircle className="week-journal-icon" />}
+            {dayTracking.hasBenefits && <FaInfoCircle className="week-benefits-icon" />}
+            {dayTracking.hasJournal && <FaBook className="week-journal-icon" />}
             {dayStatus?.trigger && renderTriggerIcon(dayStatus.trigger)}
           </div>
         </div>
