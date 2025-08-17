@@ -408,7 +408,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return <IconComponent className="trigger-icon" />;
   };
 
-  // Render clean day cell
+  // UPDATED: Render clean day cell with journal icon moved to upper right corner
   const renderDayCell = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
     const isSelected = selectedDate && isSameDay(day, selectedDate);
@@ -435,8 +435,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       >
         <div className="day-content">
           <div className="day-number">{format(day, 'd')}</div>
+          
+          {/* UPDATED: Journal icon moved to upper right corner */}
+          {dayTracking.hasJournal && (
+            <div className="day-journal-indicator-top">
+              <FaBook className="journal-icon-top" />
+            </div>
+          )}
         </div>
         
+        {/* UPDATED: Bottom indicators now only have status, benefits, and trigger icons */}
         <div className="day-indicators">
           {dayStatus && (
             <div className="day-status-indicator">
@@ -450,12 +458,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           {dayTracking.hasBenefits && (
             <div className="day-tracking-indicator">
               <FaInfoCircle className="tracking-icon" />
-            </div>
-          )}
-          
-          {dayTracking.hasJournal && (
-            <div className="day-journal-indicator">
-              <FaBook className="journal-icon" />
             </div>
           )}
           
@@ -644,7 +646,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </button>
         </div>
 
-        {/* Calendar legend */}
+        {/* UPDATED: Calendar legend with journal entry added */}
         <div className="calendar-legend">
           <div className="legend-item">
             <div className="legend-indicator current-streak"></div>
@@ -665,6 +667,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           <div className="legend-item legend-has-data">
             <FaInfoCircle className="legend-info-icon" />
             <span>Has Data</span>
+          </div>
+          <div className="legend-item legend-has-journal">
+            <FaBook className="legend-journal-icon" />
+            <span>Journal Entry</span>
           </div>
         </div>
 
