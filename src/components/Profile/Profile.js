@@ -1,4 +1,4 @@
-// components/Profile/Profile.js - UPDATED: Removed subscription section, all features free
+// components/Profile/Profile.js - UPDATED: Consistent header design matching tracker/calendar
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -162,18 +162,23 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   return (
     <div className="profile-container">
-      {/* Header */}
-      <div className="profile-header">
-        <div className="profile-header-spacer"></div>
-        <h2>Profile & Settings</h2>
-        <div className="profile-header-actions">
-          <button 
-            className="feedback-btn"
-            onClick={() => setShowFeedbackModal(true)}
-          >
-            <FaCommentAlt />
-            <span>Feedback</span>
-          </button>
+      {/* UPDATED: Integrated header design matching tracker/calendar */}
+      <div className="integrated-profile-header">
+        <div className="profile-header-title-section">
+          <h2>Profile & Settings</h2>
+          <p className="profile-header-subtitle">Manage your account, privacy settings, and preferences</p>
+        </div>
+        
+        <div className="profile-header-actions-section">
+          <div className="profile-header-actions">
+            <button 
+              className="feedback-btn"
+              onClick={() => setShowFeedbackModal(true)}
+            >
+              <FaCommentAlt />
+              <span>Send Feedback</span>
+            </button>
+          </div>
         </div>
       </div>
 
