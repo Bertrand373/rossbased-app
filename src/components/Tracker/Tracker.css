@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Journal section removed, added calendar navigation helper */
+/* components/Tracker/Tracker.css - UPDATED: Discord community section added, removed redundant toggle */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -597,48 +597,156 @@ button.action-btn:hover {
 
 /* REMOVED: All journal section styles */
 
-.discord-section {
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
+/* NEW: Discord Community Section - Clean, professional design */
+.discord-community-section {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
-  margin-top: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
-.discord-section h3 {
-  margin-bottom: var(--spacing-md);
-  font-size: 1.125rem;
-  color: var(--text);
-  text-align: center;
+.discord-community-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
 }
 
-.discord-toggle-container {
-  margin-bottom: var(--spacing-md);
-}
-
-.discord-toggle {
+.discord-community-icon {
+  background: linear-gradient(135deg, rgba(114, 137, 218, 0.1) 0%, rgba(114, 137, 218, 0.15) 100%);
+  border: 1px solid rgba(114, 137, 218, 0.2);
+  border-radius: var(--radius-lg);
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
+  flex-shrink: 0;
 }
 
-.discord-status {
-  color: var(--primary);
+.discord-community-icon svg {
+  font-size: 1.5rem;
+  color: #7289da;
+}
+
+.discord-community-content {
+  flex: 1;
+}
+
+.discord-community-content h3 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 1.125rem;
   font-weight: 600;
+  color: var(--text);
 }
 
-.discord-explanation {
+.discord-community-content p {
+  margin: 0;
   font-size: 0.875rem;
   color: var(--text-secondary);
-  text-align: center;
   line-height: 1.4;
 }
 
+.discord-community-stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+}
+
+.community-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.community-stat-icon {
+  font-size: 1rem;
+  color: var(--primary);
+}
+
+.discord-community-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.discord-join-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
+  border: 1px solid #7289da;
+  border-radius: var(--radius-full);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  letter-spacing: 0.025em;
+  position: relative;
+  overflow: hidden;
+}
+
+.discord-join-btn:hover {
+  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(114, 137, 218, 0.3);
+}
+
+.discord-join-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(114, 137, 218, 0.2);
+}
+
+.external-icon {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.leaderboard-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+  background-color: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.1);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.leaderboard-status .check-icon {
+  color: var(--success);
+}
+
+.discord-setup-note {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  line-height: 1.4;
+}
+
+.discord-setup-note .info-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
 
 /* Modal overlay and base */
 .modal-overlay {
@@ -856,4 +964,32 @@ button.action-btn:hover {
     color: var(--text-secondary) !important;
   }
 
+  /* Discord community mobile layout */
+  .discord-community-header {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-md);
+  }
+  
+  .discord-community-stats {
+    gap: var(--spacing-lg);
+  }
+  
+  .discord-join-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .leaderboard-status,
+  .discord-setup-note {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .discord-community-stats {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: center;
+  }
 }

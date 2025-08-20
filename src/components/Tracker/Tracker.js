@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Journal section completely removed, now focused on daily dashboard
+// components/Tracker/Tracker.js - UPDATED: Discord community section added, settings moved to Profile
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +18,9 @@ import {
   FaMoon,
   FaShieldAlt,
   FaDiscord,
-  FaCheckCircle
+  FaCheckCircle,
+  FaExternalLinkAlt,
+  FaUsers
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
@@ -222,6 +224,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     toast.success('Benefits logged for today!');
   };
 
+  // Handle Discord link
+  const handleDiscordJoin = () => {
+    window.open('https://discord.gg/RDFC5eUtuA', '_blank', 'noopener,noreferrer');
+  };
+
   // REMOVED: saveNote function (no longer needed)
 
   return (
@@ -409,37 +416,51 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       {/* REMOVED: Today's Journal Section - moved to Calendar */}
       
-      {/* Discord Integration */}
-      <div className="discord-section">
-        <h3>Discord Integration</h3>
-        
-        <div className="discord-toggle-container">
-          <div className="discord-toggle">
-            <span>Show my streak on Discord leaderboard</span>
-            <div 
-              className={`toggle-container ${userData.showOnLeaderboard ? 'active' : ''}`}
-              onClick={() => updateUserData({ showOnLeaderboard: !userData.showOnLeaderboard })}
-            >
-              <div className={`custom-toggle-switch ${userData.showOnLeaderboard ? 'active' : ''}`}></div>
-              <span className="toggle-label">
-                {userData.showOnLeaderboard ? 'Enabled' : 'Disabled'}
-              </span>
-            </div>
+      {/* NEW: Discord Community Section - CLEAN integration */}
+      <div className="discord-community-section">
+        <div className="discord-community-header">
+          <div className="discord-community-icon">
+            <FaDiscord />
+          </div>
+          <div className="discord-community-content">
+            <h3>Join Our Community</h3>
+            <p>Connect with others on the same journey, share progress, and get support</p>
           </div>
         </div>
         
-        {userData.showOnLeaderboard && (
-          <div className="discord-details">
-            <div className="discord-username-display">
-              <FaDiscord className="discord-icon" />
-              <span>Username: {userData.discordUsername || 'Not set'}</span>
+        <div className="discord-community-stats">
+          <div className="community-stat-item">
+            <FaUsers className="community-stat-icon" />
+            <span>Active Community</span>
+          </div>
+          <div className="community-stat-item">
+            <FaShieldAlt className="community-stat-icon" />
+            <span>24/7 Support</span>
+          </div>
+        </div>
+        
+        <div className="discord-community-actions">
+          <button 
+            className="discord-join-btn"
+            onClick={handleDiscordJoin}
+          >
+            <FaDiscord />
+            <span>Join Discord</span>
+            <FaExternalLinkAlt className="external-icon" />
+          </button>
+          
+          {userData.showOnLeaderboard && userData.discordUsername && (
+            <div className="leaderboard-status">
+              <FaCheckCircle className="check-icon" />
+              <span>You're on the leaderboard as <strong>{userData.discordUsername}</strong></span>
             </div>
-            
-            {!userData.discordUsername && (
-              <div className="discord-note">
-                <p>Set your Discord username in settings to appear on the leaderboard</p>
-              </div>
-            )}
+          )}
+        </div>
+        
+        {userData.showOnLeaderboard && !userData.discordUsername && (
+          <div className="discord-setup-note">
+            <FaInfoCircle className="info-icon" />
+            <span>Set your Discord username in Profile settings to appear on the leaderboard</span>
           </div>
         )}
       </div>

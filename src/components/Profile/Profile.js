@@ -259,17 +259,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
 
               <div className="form-group">
-                <label>Discord Username</label>
-                <input
-                  type="text"
-                  value={discordUsername}
-                  onChange={(e) => setDiscordUsername(e.target.value)}
-                  disabled={!isEditingProfile}
-                  placeholder="For leaderboard integration"
-                />
-              </div>
-
-              <div className="form-group">
                 <div className="toggle-setting">
                   <div className="toggle-info">
                     <span className="toggle-label">Show on Leaderboard</span>
@@ -282,6 +271,17 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                     <div className="toggle-slider"></div>
                   </div>
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label>Discord Username</label>
+                <input
+                  type="text"
+                  value={discordUsername}
+                  onChange={(e) => setDiscordUsername(e.target.value)}
+                  disabled={!isEditingProfile}
+                  placeholder="For leaderboard integration"
+                />
               </div>
 
               {isEditingProfile && (
