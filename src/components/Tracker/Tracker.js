@@ -8,7 +8,7 @@ import './Tracker.css';
 // Components
 import DatePicker from '../Shared/DatePicker';
 
-// Icons - UPDATED: Removed FaPen import (no longer needed)
+// Icons - UPDATED: Added YouTube icon
 import { 
   FaCrown, 
   FaExclamationTriangle,
@@ -20,7 +20,10 @@ import {
   FaDiscord,
   FaCheckCircle,
   FaExternalLinkAlt,
-  FaUsers
+  FaUsers,
+  FaYoutube,
+  FaPlay,
+  FaSubscript
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
@@ -229,6 +232,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     window.open('https://discord.gg/RDFC5eUtuA', '_blank', 'noopener,noreferrer');
   };
 
+  // Handle YouTube link
+  const handleYouTubeSubscribe = () => {
+    window.open('https://www.youtube.com/@RossBased', '_blank', 'noopener,noreferrer');
+  };
+
   // REMOVED: saveNote function (no longer needed)
 
   return (
@@ -277,7 +285,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* NEW: Main content container for two-column desktop layout */}
+      {/* NEW: Desktop layout with Discord + YouTube column */}
       <div className="tracker-main-content">
         {/* Current Streak Display */}
         <div className="current-streak-container">
@@ -341,53 +349,91 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
         </div>
 
-        {/* NEW: Discord Community Section - positioned for desktop two-column */}
-        <div className="discord-community-section">
-          <div className="discord-community-header">
-            <div className="discord-community-icon">
-              <FaDiscord />
+        {/* NEW: Discord + YouTube column */}
+        <div className="discord-youtube-column">
+          {/* Discord Community Section */}
+          <div className="discord-community-section">
+            <div className="discord-community-header">
+              <div className="discord-community-icon">
+                <FaDiscord />
+              </div>
+              <div className="discord-community-content">
+                <h3>Join Our Community</h3>
+                <p>Connect with others on the same journey, share progress, and get support</p>
+              </div>
             </div>
-            <div className="discord-community-content">
-              <h3>Join Our Community</h3>
-              <p>Connect with others on the same journey, share progress, and get support</p>
-            </div>
-          </div>
-          
-          <div className="discord-community-stats">
-            <div className="community-stat-item">
-              <FaUsers className="community-stat-icon" />
-              <span>Active Community</span>
-            </div>
-            <div className="community-stat-item">
-              <FaShieldAlt className="community-stat-icon" />
-              <span>24/7 Support</span>
-            </div>
-          </div>
-          
-          <div className="discord-community-actions">
-            <button 
-              className="discord-join-btn"
-              onClick={handleDiscordJoin}
-            >
-              <FaDiscord />
-              <span>Join Discord</span>
-              <FaExternalLinkAlt className="external-icon" />
-            </button>
             
-            {userData.showOnLeaderboard && userData.discordUsername && (
-              <div className="leaderboard-status">
-                <FaCheckCircle className="check-icon" />
-                <span>You're on the leaderboard as <strong>{userData.discordUsername}</strong></span>
+            <div className="discord-community-stats">
+              <div className="community-stat-item">
+                <FaUsers className="community-stat-icon" />
+                <span>Active Community</span>
+              </div>
+              <div className="community-stat-item">
+                <FaShieldAlt className="community-stat-icon" />
+                <span>24/7 Support</span>
+              </div>
+            </div>
+            
+            <div className="discord-community-actions">
+              <button 
+                className="discord-join-btn"
+                onClick={handleDiscordJoin}
+              >
+                <FaDiscord />
+                <span>Join Discord</span>
+                <FaExternalLinkAlt className="external-icon" />
+              </button>
+              
+              {userData.showOnLeaderboard && userData.discordUsername && (
+                <div className="leaderboard-status">
+                  <FaCheckCircle className="check-icon" />
+                  <span>You're on the leaderboard as <strong>{userData.discordUsername}</strong></span>
+                </div>
+              )}
+            </div>
+            
+            {userData.showOnLeaderboard && !userData.discordUsername && (
+              <div className="discord-setup-note">
+                <FaInfoCircle className="info-icon" />
+                <span>Set your Discord username in Profile settings to appear on the leaderboard</span>
               </div>
             )}
           </div>
-          
-          {userData.showOnLeaderboard && !userData.discordUsername && (
-            <div className="discord-setup-note">
-              <FaInfoCircle className="info-icon" />
-              <span>Set your Discord username in Profile settings to appear on the leaderboard</span>
+
+          {/* NEW: YouTube Channel Section */}
+          <div className="youtube-channel-section">
+            <div className="youtube-channel-header">
+              <div className="youtube-channel-icon">
+                <FaYoutube />
+              </div>
+              <div className="youtube-channel-content">
+                <h3>Rossbase Channel</h3>
+                <p>Educational content, guidance, and insights on your journey</p>
+              </div>
             </div>
-          )}
+            
+            <div className="youtube-channel-stats">
+              <div className="channel-stat-item">
+                <FaUsers className="channel-stat-icon" />
+                <span>5.4k Subscribers</span>
+              </div>
+              <div className="channel-stat-item">
+                <FaPlay className="channel-stat-icon" />
+                <span>Weekly Content</span>
+              </div>
+            </div>
+            
+            <div className="youtube-channel-actions">
+              <button 
+                className="youtube-subscribe-btn"
+                onClick={handleYouTubeSubscribe}
+              >
+                <FaYoutube />
+                <span>Subscribe</span>
+                <FaExternalLinkAlt className="external-icon" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       
