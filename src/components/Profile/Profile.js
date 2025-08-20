@@ -1,5 +1,5 @@
-// components/Profile/Profile.js - UPDATED: Consistent header design matching tracker/calendar, coming soon banner for language settings
-import React, { useState, useEffect } from 'react';
+// components/Profile/Profile.js - UPDATED: Consistent header design matching tracker/calendar, coming soon banner for language settings, SMOOTH SLIDING TAB ANIMATION
+import React, { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
@@ -37,12 +37,71 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
   
+  // NEW: Tab slider animation refs and state
+  const tabsRef = useRef(null);
+  const sliderRef = useRef(null);
+  const [tabsData, setTabsData] = useState([]);
+  
   const feedbackTypes = [
     { id: 'bug', label: 'Bug Report', icon: FaBug },
     { id: 'feature', label: 'Feature Request', icon: FaLightbulb },
     { id: 'improvement', label: 'Suggestion', icon: FaStar },
     { id: 'general', label: 'General', icon: FaCommentAlt }
   ];
+
+  // Tab configuration
+  const tabs = [
+    { id: 'account', label: 'Account', icon: FaUser },
+    { id: 'privacy', label: 'Privacy', icon: FaLock },
+    { id: 'settings', label: 'Settings', icon: FaCog },
+    { id: 'data', label: 'Data', icon: FaDownload }
+  ];
+
+  // NEW: Calculate tab positions and update slider
+  const updateTabSlider = () => {
+    if (!tabsRef.current || !sliderRef.current) return;
+    
+    const tabsContainer = tabsRef.current;
+    const slider = sliderRef.current;
+    const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeTab}"]`);
+    
+    if (activeTabElement) {
+      const containerRect = tabsContainer.getBoundingClientRect();
+      const tabRect = activeTabElement.getBoundingClientRect();
+      
+      // Calculate position relative to container, accounting for padding
+      const leftOffset = tabRect.left - containerRect.left - 8; // 8px is var(--spacing-xs)
+      const width = tabRect.width;
+      
+      slider.style.transform = `translateX(${leftOffset}px)`;
+      slider.style.width = `${width}px`;
+    }
+  };
+
+  // NEW: Update slider when active tab changes
+  useEffect(() => {
+    updateTabSlider();
+  }, [activeTab]);
+
+  // NEW: Update slider on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      updateTabSlider();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // NEW: Initialize slider after component mounts
+  useEffect(() => {
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      updateTabSlider();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Calculate basic user info for display - REMOVED: streak data
   const userStats = {
@@ -187,36 +246,22 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       </div>
 
-      {/* Tab Navigation - REMOVED: Subscription tab */}
-      <div className="profile-tabs">
-        <button 
-          className={`profile-tab ${activeTab === 'account' ? 'active' : ''}`}
-          onClick={() => setActiveTab('account')}
-        >
-          <FaUser />
-          <span>Account</span>
-        </button>
-        <button 
-          className={`profile-tab ${activeTab === 'privacy' ? 'active' : ''}`}
-          onClick={() => setActiveTab('privacy')}
-        >
-          <FaLock />
-          <span>Privacy</span>
-        </button>
-        <button 
-          className={`profile-tab ${activeTab === 'settings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('settings')}
-        >
-          <FaCog />
-          <span>Settings</span>
-        </button>
-        <button 
-          className={`profile-tab ${activeTab === 'data' ? 'active' : ''}`}
-          onClick={() => setActiveTab('data')}
-        >
-          <FaDownload />
-          <span>Data</span>
-        </button>
+      {/* NEW: Tab Navigation with Smooth Sliding Animation */}
+      <div className="profile-tabs" ref={tabsRef}>
+        {/* NEW: Sliding background indicator */}
+        <div className="profile-tab-slider" ref={sliderRef}></div>
+        
+        {tabs.map(tab => (
+          <button 
+            key={tab.id}
+            className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+            data-tab={tab.id}
+          >
+            <tab.icon />
+            <span>{tab.label}</span>
+          </button>
+        ))}
       </div>
 
       {/* Tab Content */}

@@ -1,4 +1,4 @@
-/* components/Profile/Profile.css - UPDATED: Consistent with tracker/calendar styling, fixed toggle switches, mobile headings, coming soon banner */
+/* components/Profile/Profile.css - UPDATED: Consistent with tracker/calendar styling, fixed toggle switches, mobile headings, coming soon banner, SMOOTH SLIDING TAB ANIMATION */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -181,7 +181,7 @@
   color: var(--text-secondary);
 }
 
-/* Tab Navigation - UPDATED: Centered and auto-width */
+/* NEW: Tab Navigation with Smooth Sliding Animation */
 .profile-tabs {
   display: flex;
   gap: var(--spacing-xs);
@@ -192,6 +192,21 @@
   overflow-x: auto;
   width: fit-content;
   margin: 0 auto;
+  position: relative; /* For sliding indicator positioning */
+}
+
+/* NEW: Sliding background indicator */
+.profile-tab-slider {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  height: calc(100% - calc(var(--spacing-xs) * 2));
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
+  transition: transform 0.3s ease, width 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .profile-tab {
@@ -209,6 +224,8 @@
   transition: all 0.2s;
   white-space: nowrap;
   min-width: fit-content;
+  position: relative; /* For z-index positioning above slider */
+  z-index: 2;
 }
 
 .profile-tab:hover {
@@ -216,9 +233,10 @@
 }
 
 .profile-tab.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
+  /* Remove background styles since slider handles it */
+  background-color: transparent;
+  border-color: transparent;
 }
 
 .profile-tab svg {
