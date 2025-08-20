@@ -1,72 +1,4 @@
-.toggle-setting {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    text-align: center;
-  }
-}
-
-/* Very Small Screens */
-@media (max-width: 480px) {
-  .integrated-profile-header {
-    padding: var(--spacing-md);
-  }
-  
-  .profile-header-title-section h2 {
-    font-size: 1.125rem;
-  }
-  
-  .profile-header-subtitle {
-    font-size: 0.75rem;
-  }
-  
-  .profile-overview-card {
-    padding: var(--spacing-lg);
-  }
-  
-  .profile-avatar {
-    width: 64px;
-    height: 64px;
-    font-size: 1.5rem;
-  }
-  
-  .premium-crown {
-    width: 20px;
-    height: 20px;
-    font-size: 0.625rem;
-  }
-  
-  .profile-username {
-    font-size: 1.25rem;
-  }
-  
-  .profile-tab-content {
-    padding: var(--spacing-md);
-  }
-  
-  .benefit-item {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-sm);
-  }
-  
-  .benefit-icon {
-    align-self: center;
-  }
-  
-  .modal-content {
-    padding: var(--spacing-lg);
-    margin: var(--spacing-sm);
-  }
-  
-  .feedback-modal {
-    max-width: 100%;
-  }
-  
-  .type-options {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
-  }
-}/* components/Profile/Profile.css - UPDATED: Consistent with tracker/calendar styling, fixed toggle switches */
+/* components/Profile/Profile.css - UPDATED: Consistent with tracker/calendar styling, fixed toggle switches */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -1069,12 +1001,6 @@
     display: inline;
   }
   
-  @media (max-width: 320px) {
-    .feedback-btn-text {
-      display: none;
-    }
-  }
-  
   /* LEGACY: Mobile profile header compatibility */
   .profile-header {
     display: flex;
@@ -1163,21 +1089,6 @@
     text-align: center;
   }
   
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions .action-btn,
-  .form-actions .save-btn,
-  .form-actions .cancel-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .type-options {
-    grid-template-columns: 1fr;
-  }
-  
   .modal-actions {
     flex-direction: row !important;
     width: 100% !important;
@@ -1206,5 +1117,81 @@
     padding: var(--spacing-md) var(--spacing-lg) !important;
     min-height: 44px !important;
     font-weight: 600 !important;
+  }
+  
+  .toggle-setting {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+}
+
+/* Hide feedback text on very small screens */
+@media (max-width: 320px) {
+  .feedback-btn-text {
+    display: none;
+  }
+}
+
+/* Very Small Screens */
+@media (max-width: 480px) {
+  .integrated-profile-header {
+    padding: var(--spacing-md);
+  }
+  
+  .profile-header-title-section h2 {
+    font-size: 1.125rem;
+  }
+  
+  .profile-header-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .profile-overview-card {
+    padding: var(--spacing-lg);
+  }
+  
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 1.5rem;
+  }
+  
+  .premium-crown {
+    width: 20px;
+    height: 20px;
+    font-size: 0.625rem;
+  }
+  
+  .profile-username {
+    font-size: 1.25rem;
+  }
+  
+  .profile-tab-content {
+    padding: var(--spacing-md);
+  }
+  
+  .benefit-item {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .benefit-icon {
+    align-self: center;
+  }
+  
+  .modal-content {
+    padding: var(--spacing-lg);
+    margin: var(--spacing-sm);
+  }
+  
+  .feedback-modal {
+    max-width: 100%;
+  }
+  
+  .type-options {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
   }
 }
