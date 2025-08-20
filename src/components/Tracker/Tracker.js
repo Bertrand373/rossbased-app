@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Discord community section added, settings moved to Profile
+// components/Tracker/Tracker.js - UPDATED: YouTube section added, two-column desktop layout
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import './Tracker.css';
 // Components
 import DatePicker from '../Shared/DatePicker';
 
-// Icons - UPDATED: Removed FaPen import (no longer needed)
+// Icons - UPDATED: Added YouTube icon import
 import { 
   FaCrown, 
   FaExclamationTriangle,
@@ -20,7 +20,10 @@ import {
   FaDiscord,
   FaCheckCircle,
   FaExternalLinkAlt,
-  FaUsers
+  FaUsers,
+  FaYoutube,
+  FaPlay,
+  FaCalendarAlt
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
@@ -32,7 +35,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     userData.startDate ? new Date(userData.startDate) : new Date()
   );
   
-  // REMOVED: Journal-related states (showNoteModal, currentNote)
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   
   // Benefit tracking states - Sleep Quality replaces Attraction
@@ -229,7 +231,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     window.open('https://discord.gg/RDFC5eUtuA', '_blank', 'noopener,noreferrer');
   };
 
-  // REMOVED: saveNote function (no longer needed)
+  // NEW: Handle YouTube link
+  const handleYouTubeSubscribe = () => {
+    window.open('https://www.youtube.com/@YourChannelName', '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div className="tracker-container">
@@ -253,8 +258,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* REMOVED: Journal Note Modal (no longer needed) */}
-      
       {/* Simplified Header Section */}
       <div className="integrated-tracker-header">
         <div className="tracker-header-title-section">
@@ -277,69 +280,159 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* Current Streak Display */}
-      <div className="current-streak-container">
-        <div className="streak-card">
-          <div className="streak-date">Today, {format(new Date(), 'MMMM d, yyyy')}</div>
-          
-          <div className="streak-content">
-            <div className="streak-number">{currentStreak}</div>
-            <div className="streak-label">Current Streak</div>
+      {/* NEW: Main content container for desktop two-column layout */}
+      <div className="tracker-main-content">
+        {/* Current Streak Display - Left Column on Desktop */}
+        <div className="current-streak-container">
+          <div className="streak-card">
+            <div className="streak-date">Today, {format(new Date(), 'MMMM d, yyyy')}</div>
+            
+            <div className="streak-content">
+              <div className="streak-number">{currentStreak}</div>
+              <div className="streak-label">Current Streak</div>
+            </div>
+            
+            <div className="streak-divider"></div>
+            
+            <div className="streak-milestones">
+              <div className="milestone-item">
+                <FaCrown className="milestone-icon" />
+                <div className="milestone-value">{userData.longestStreak || 0}</div>
+                <div className="milestone-label">Longest</div>
+              </div>
+              
+              <div className="milestone-item">
+                <FaMoon className="milestone-icon" />
+                <div className="milestone-value">{userData.wetDreamCount || 0}</div>
+                <div className="milestone-label">Wet Dreams</div>
+              </div>
+              
+              <div className="milestone-item">
+                <FaExclamationTriangle className="milestone-icon" />
+                <div className="milestone-value">{userData.relapseCount || 0}</div>
+                <div className="milestone-label">Relapses</div>
+              </div>
+            </div>
+            
+            <div className="streak-actions-divider"></div>
+            
+            <div className="streak-actions">
+              <button 
+                className="streak-action-btn relapse-btn-grey"
+                onClick={handleRelapse}
+              >
+                <FaExclamationTriangle />
+                <span>Log Relapse</span>
+              </button>
+              
+              <button 
+                className="streak-action-btn wetdream-btn"
+                onClick={handleWetDream}
+              >
+                <FaMoon />
+                <span>Log Wet Dream</span>
+              </button>
+              
+              <button 
+                className="streak-action-btn urge-btn"
+                onClick={handleUrges}
+              >
+                <FaShieldAlt />
+                <span>Fighting Urges?</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* NEW: Discord and YouTube Column - Right Column on Desktop */}
+        <div className="discord-youtube-column">
+          {/* Discord Community Section */}
+          <div className="discord-community-section">
+            <div className="discord-community-header">
+              <div className="discord-community-icon">
+                <FaDiscord />
+              </div>
+              <div className="discord-community-content">
+                <h3>Join Our Community</h3>
+                <p>Connect with others on the same journey, share progress, and get support</p>
+              </div>
+            </div>
+            
+            <div className="discord-community-stats">
+              <div className="community-stat-item">
+                <FaUsers className="community-stat-icon" />
+                <span>Active Community</span>
+              </div>
+              <div className="community-stat-item">
+                <FaShieldAlt className="community-stat-icon" />
+                <span>24/7 Support</span>
+              </div>
+            </div>
+            
+            <div className="discord-community-actions">
+              <button 
+                className="discord-join-btn"
+                onClick={handleDiscordJoin}
+              >
+                <FaDiscord />
+                <span>Join Discord</span>
+                <FaExternalLinkAlt className="external-icon" />
+              </button>
+              
+              {userData.showOnLeaderboard && userData.discordUsername && (
+                <div className="leaderboard-status">
+                  <FaCheckCircle className="check-icon" />
+                  <span>You're on the leaderboard as <strong>{userData.discordUsername}</strong></span>
+                </div>
+              )}
+            </div>
+            
+            {userData.showOnLeaderboard && !userData.discordUsername && (
+              <div className="discord-setup-note">
+                <FaInfoCircle className="info-icon" />
+                <span>Set your Discord username in Profile settings to appear on the leaderboard</span>
+              </div>
+            )}
           </div>
           
-          <div className="streak-divider"></div>
-          
-          <div className="streak-milestones">
-            <div className="milestone-item">
-              <FaCrown className="milestone-icon" />
-              <div className="milestone-value">{userData.longestStreak || 0}</div>
-              <div className="milestone-label">Longest</div>
+          {/* NEW: YouTube Channel Section */}
+          <div className="youtube-channel-section">
+            <div className="youtube-channel-header">
+              <div className="youtube-channel-icon">
+                <FaYoutube />
+              </div>
+              <div className="youtube-channel-content">
+                <h3>Weekly Content</h3>
+                <p>Get exclusive tips, motivation, and insights to accelerate your transformation</p>
+              </div>
             </div>
             
-            <div className="milestone-item">
-              <FaMoon className="milestone-icon" />
-              <div className="milestone-value">{userData.wetDreamCount || 0}</div>
-              <div className="milestone-label">Wet Dreams</div>
+            <div className="youtube-channel-stats">
+              <div className="youtube-stat-item">
+                <FaUsers className="youtube-stat-icon" />
+                <span>5.4k Subscribers</span>
+              </div>
+              <div className="youtube-stat-item">
+                <FaCalendarAlt className="youtube-stat-icon" />
+                <span>Weekly Content</span>
+              </div>
             </div>
             
-            <div className="milestone-item">
-              <FaExclamationTriangle className="milestone-icon" />
-              <div className="milestone-value">{userData.relapseCount || 0}</div>
-              <div className="milestone-label">Relapses</div>
+            <div className="youtube-channel-actions">
+              <button 
+                className="youtube-subscribe-btn"
+                onClick={handleYouTubeSubscribe}
+              >
+                <FaYoutube />
+                <span>Subscribe</span>
+                <FaExternalLinkAlt className="external-icon" />
+              </button>
             </div>
-          </div>
-          
-          <div className="streak-actions-divider"></div>
-          
-          <div className="streak-actions">
-            <button 
-              className="streak-action-btn relapse-btn-grey"
-              onClick={handleRelapse}
-            >
-              <FaExclamationTriangle />
-              <span>Log Relapse</span>
-            </button>
-            
-            <button 
-              className="streak-action-btn wetdream-btn"
-              onClick={handleWetDream}
-            >
-              <FaMoon />
-              <span>Log Wet Dream</span>
-            </button>
-            
-            <button 
-              className="streak-action-btn urge-btn"
-              onClick={handleUrges}
-            >
-              <FaShieldAlt />
-              <span>Fighting Urges?</span>
-            </button>
           </div>
         </div>
       </div>
       
-      {/* Benefit Logging Section */}
+      {/* Benefit Logging Section - Full Width Below on Desktop */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -412,57 +505,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
           )}
         </div>
-      </div>
-      
-      {/* REMOVED: Today's Journal Section - moved to Calendar */}
-      
-      {/* NEW: Discord Community Section - CLEAN integration */}
-      <div className="discord-community-section">
-        <div className="discord-community-header">
-          <div className="discord-community-icon">
-            <FaDiscord />
-          </div>
-          <div className="discord-community-content">
-            <h3>Join Our Community</h3>
-            <p>Connect with others on the same journey, share progress, and get support</p>
-          </div>
-        </div>
-        
-        <div className="discord-community-stats">
-          <div className="community-stat-item">
-            <FaUsers className="community-stat-icon" />
-            <span>Active Community</span>
-          </div>
-          <div className="community-stat-item">
-            <FaShieldAlt className="community-stat-icon" />
-            <span>24/7 Support</span>
-          </div>
-        </div>
-        
-        <div className="discord-community-actions">
-          <button 
-            className="discord-join-btn"
-            onClick={handleDiscordJoin}
-          >
-            <FaDiscord />
-            <span>Join Discord</span>
-            <FaExternalLinkAlt className="external-icon" />
-          </button>
-          
-          {userData.showOnLeaderboard && userData.discordUsername && (
-            <div className="leaderboard-status">
-              <FaCheckCircle className="check-icon" />
-              <span>You're on the leaderboard as <strong>{userData.discordUsername}</strong></span>
-            </div>
-          )}
-        </div>
-        
-        {userData.showOnLeaderboard && !userData.discordUsername && (
-          <div className="discord-setup-note">
-            <FaInfoCircle className="info-icon" />
-            <span>Set your Discord username in Profile settings to appear on the leaderboard</span>
-          </div>
-        )}
       </div>
 
     </div>
