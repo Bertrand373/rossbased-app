@@ -234,18 +234,25 @@
   border: 1px solid var(--border);
 }
 
-/* Section Headers */
+/* UPDATED: Section Headers - centered main headers with proper spacing */
 .section-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+  gap: var(--spacing-md);
 }
 
 .section-header h3 {
   margin: 0;
   font-size: 1.25rem;
   color: var(--text);
+}
+
+/* Edit button positioned below centered header */
+.section-header .edit-profile-btn {
+  align-self: center;
 }
 
 /* CORRECTED: Edit profile button matching tracker buttons - smaller, compact size */
