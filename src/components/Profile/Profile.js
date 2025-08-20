@@ -43,13 +43,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'improvement', label: 'Suggestion', icon: FaStar },
     { id: 'general', label: 'General', icon: FaCommentAlt }
   ];
-  
-  const priorityLevels = [
-    { id: 'low', label: 'Low Priority', color: '#6b7280' },
-    { id: 'medium', label: 'Medium Priority', color: '#f59e0b' },
-    { id: 'high', label: 'High Priority', color: '#ef4444' },
-    { id: 'critical', label: 'Critical/Urgent', color: '#dc2626' }
-  ];
 
   // Calculate basic user info for display - REMOVED: streak data
   const userStats = {
@@ -484,30 +477,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Subject</label>
-                <input
-                  type="text"
-                  value={feedbackSubject}
-                  onChange={(e) => setFeedbackSubject(e.target.value)}
-                  placeholder="Brief description of your feedback"
-                  maxLength={100}
-                />
-                <div className="char-count">{feedbackSubject.length}/100</div>
-              </div>
-
-              <div className="form-group">
-                <label>Message</label>
-                <textarea
-                  value={feedbackMessage}
-                  onChange={(e) => setFeedbackMessage(e.target.value)}
-                  placeholder="Please provide details about your feedback..."
-                  rows={5}
-                  maxLength={500}
-                ></textarea>
-                <div className="char-count">{feedbackMessage.length}/500</div>
-              </div>
-            </div>">
               <div className="form-group">
                 <label>Subject</label>
                 <input
