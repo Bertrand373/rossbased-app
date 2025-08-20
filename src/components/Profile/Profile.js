@@ -508,6 +508,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <div className="char-count">{feedbackMessage.length}/500</div>
               </div>
             </div>">
+              <div className="form-group">
                 <label>Subject</label>
                 <input
                   type="text"
@@ -525,20 +526,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   value={feedbackMessage}
                   onChange={(e) => setFeedbackMessage(e.target.value)}
                   placeholder="Please provide details about your feedback..."
-                  rows={6}
-                  maxLength={1000}
+                  rows={5}
+                  maxLength={500}
                 ></textarea>
-                <div className="char-count">{feedbackMessage.length}/1000</div>
-              </div>
-
-              <div className="form-group">
-                <label>Email (for follow-up)</label>
-                <input
-                  type="email"
-                  value={feedbackEmail}
-                  onChange={(e) => setFeedbackEmail(e.target.value)}
-                  placeholder="your.email@example.com"
-                />
+                <div className="char-count">{feedbackMessage.length}/500</div>
               </div>
             </div>
 
