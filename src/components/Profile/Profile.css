@@ -1057,6 +1057,8 @@
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    width: 100%;
+    margin: 0;
   }
   
   .profile-tabs::-webkit-scrollbar {
