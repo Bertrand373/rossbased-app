@@ -948,80 +948,42 @@ button.action-btn:hover {
     font-size: 0.9375rem;
   }
   
-  /* Better spacing for streak actions */
+  /* FIXED: Vertical stack for streak actions on desktop */
   .streak-actions {
+    flex-direction: column;
     gap: var(--spacing-md);
-    flex-wrap: wrap;
-    justify-content: center;
+    align-items: center;
   }
   
   .streak-action-btn {
-    flex: 1;
-    min-width: 140px;
-    max-width: 160px;
+    width: 100%;
+    max-width: 200px;
     padding: var(--spacing-md) var(--spacing-lg);
+    justify-content: center;
   }
   
-  /* FIXED: Desktop Discord section styling - better proportions */
+  /* CLEAN: Simplified Discord section - no forced content */
   .discord-community-section {
     padding: var(--spacing-xl);
     min-height: 400px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: var(--spacing-lg);
   }
   
   .discord-community-header {
-    margin-bottom: var(--spacing-xl);
-  }
-  
-  .discord-community-icon {
-    width: 64px;
-    height: 64px;
-  }
-  
-  .discord-community-icon svg {
-    font-size: 1.75rem;
-  }
-  
-  .discord-community-content h3 {
-    font-size: 1.25rem;
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .discord-community-content p {
-    font-size: 0.9375rem;
-    line-height: 1.5;
+    flex-shrink: 0;
   }
   
   .discord-community-stats {
-    margin: var(--spacing-xl) 0;
-    gap: var(--spacing-xl);
-  }
-  
-  .community-stat-item {
-    font-size: 0.9375rem;
-  }
-  
-  .community-stat-icon {
-    font-size: 1.125rem;
+    flex-shrink: 0;
+    margin: var(--spacing-lg) 0;
   }
   
   .discord-community-actions {
-    gap: var(--spacing-lg);
+    flex-shrink: 0;
     margin-top: auto;
-  }
-  
-  .discord-join-btn {
-    padding: var(--spacing-md) var(--spacing-xl);
-    font-size: 0.9375rem;
-    min-height: 44px;
-  }
-  
-  .leaderboard-status,
-  .discord-setup-note {
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-size: 0.9375rem;
   }
   
   /* Desktop hover effects */
