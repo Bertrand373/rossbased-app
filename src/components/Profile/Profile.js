@@ -1,4 +1,4 @@
-// components/Profile/Profile.js - UPDATED: Consistent header design matching tracker/calendar
+// components/Profile/Profile.js - UPDATED: Consistent header design matching tracker/calendar, coming soon banner for language settings
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -8,7 +8,7 @@ import './Profile.css';
 import { FaUser, FaEdit, FaCrown, FaDiscord, FaCog, FaCommentAlt, FaBug, 
   FaLightbulb, FaStar, FaPaperPlane, FaTimes, FaCheckCircle, 
   FaTrash, FaDownload, FaSignOutAlt, FaCreditCard, 
-  FaBell, FaGlobe, FaLock } from 'react-icons/fa';
+  FaBell, FaGlobe, FaLock, FaClock } from 'react-icons/fa';
 
 const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('account');
@@ -29,8 +29,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
   const [notifications, setNotifications] = useState(userData.notifications !== false); // Default true
   
-  // App Settings States - SIMPLIFIED: Only language
-  const [language, setLanguage] = useState(userData.language || 'en');
+  // App Settings States - REMOVED: language (now locked behind coming soon)
+  // No longer needed since language selection is locked
   
   // Feedback States - SIMPLIFIED: Removed email and priority
   const [feedbackType, setFeedbackType] = useState('general');
@@ -49,7 +49,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown'
   };
 
-  // Handle profile updates
+  // Handle profile updates - REMOVED: language from updates
   const handleProfileUpdate = () => {
     const updates = {
       username: username.trim(),
@@ -59,8 +59,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       dataSharing,
       analyticsOptIn,
       marketingEmails,
-      notifications,
-      language
+      notifications
+      // REMOVED: language (no longer tracked since it's locked)
     };
     
     updateUserData(updates);
@@ -376,36 +376,43 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Settings Tab */}
+        {/* Settings Tab - UPDATED: Coming Soon banner for language settings */}
         {activeTab === 'settings' && (
           <div className="settings-section">
             <h3>App Settings</h3>
             
             <div className="settings-groups">
               <div className="settings-group">
-                <h4>Language</h4>
+                <h4>Language & Localization</h4>
                 
-                <div className="select-setting">
-                  <label>Language</label>
-                  <select 
-                    value={language} 
-                    onChange={(e) => setLanguage(e.target.value)}
-                  >
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                    <option value="fr">Français</option>
-                    <option value="de">Deutsch</option>
-                    <option value="pt">Português</option>
-                  </select>
+                {/* NEW: Coming Soon Banner */}
+                <div className="coming-soon-banner">
+                  <div className="coming-soon-helmet-container">
+                    <img 
+                      className="coming-soon-helmet" 
+                      src="/helmet.png" 
+                      alt="Coming Soon" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'block';
+                      }}
+                    />
+                    <div className="coming-soon-helmet-fallback" style={{ display: 'none' }}>
+                      ⚔️
+                    </div>
+                  </div>
+                  
+                  <div className="coming-soon-content">
+                    <h4 className="coming-soon-title">
+                      <FaClock />
+                      Multi-Language Support
+                    </h4>
+                    <p className="coming-soon-description">
+                      Multiple language options are being developed and will be available soon. Stay tuned for updates!
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="settings-actions">
-              <button className="action-btn" onClick={handleProfileUpdate}>
-                <FaCheckCircle />
-                Save Settings
-              </button>
             </div>
           </div>
         )}
