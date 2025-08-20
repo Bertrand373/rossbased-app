@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Discord community section added, removed redundant toggle */
+/* components/Tracker/Tracker.css - UPDATED: Two-column desktop layout, consistent Discord button styling */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -117,6 +117,13 @@ button.action-btn:hover {
   box-shadow: none !important;
   outline: none !important;
   filter: none !important;
+}
+
+/* NEW: Desktop two-column layout container */
+.tracker-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
 /* Current Streak Section */
@@ -595,9 +602,7 @@ button.action-btn:hover {
   color: rgba(255, 221, 0, 0.7) !important;
 }
 
-/* REMOVED: All journal section styles */
-
-/* NEW: Discord Community Section - Clean, professional design */
+/* NEW: Discord Community Section - UPDATED with consistent button styling */
 .discord-community-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -677,34 +682,33 @@ button.action-btn:hover {
   align-items: center;
 }
 
+/* UPDATED: Discord button now matches app's button styling */
 .discord-join-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
-  background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
-  border: 1px solid #7289da;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(114, 137, 218, 0.1);
+  border: 1px solid rgba(114, 137, 218, 0.2);
   border-radius: var(--radius-full);
-  color: #ffffff;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  color: #7289da;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
   letter-spacing: 0.025em;
-  position: relative;
-  overflow: hidden;
 }
 
 .discord-join-btn:hover {
-  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(114, 137, 218, 0.3);
+  background-color: rgba(114, 137, 218, 0.15) !important;
+  border-color: #7289da !important;
+  color: #7289da !important;
+  transform: translateY(-1px) !important;
 }
 
 .discord-join-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(114, 137, 218, 0.2);
 }
 
 .external-icon {
@@ -815,6 +819,134 @@ button.action-btn:hover {
 .modal-close-btn:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: var(--text);
+}
+
+/* NEW: Desktop Two-Column Layout (≥1024px) */
+@media (min-width: 1024px) {
+  .tracker-main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    align-items: start;
+  }
+  
+  /* Left column: Streak counter */
+  .current-streak-container {
+    grid-column: 1;
+    margin-top: 0;
+  }
+  
+  /* Right column: Discord community */
+  .discord-community-section {
+    grid-column: 2;
+    margin-top: 0;
+    /* Match the height better with streak card */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100%;
+  }
+  
+  /* Benefits section spans both columns */
+  .benefit-logging-container {
+    grid-column: 1 / -1;
+    margin-top: var(--spacing-lg);
+    margin-bottom: 0;
+  }
+  
+  /* Desktop enhancements for streak card */
+  .streak-card {
+    /* Enhanced desktop spacing */
+    padding: var(--spacing-xl) var(--spacing-xxl);
+  }
+  
+  .streak-number {
+    font-size: 5rem;
+  }
+  
+  .streak-milestones {
+    gap: var(--spacing-xxl);
+  }
+  
+  .milestone-item {
+    min-width: 80px;
+  }
+  
+  .milestone-value {
+    font-size: 1.5rem;
+  }
+  
+  /* Desktop Discord section enhancements */
+  .discord-community-header {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .discord-community-stats {
+    margin: var(--spacing-lg) 0;
+    gap: var(--spacing-xxl);
+  }
+  
+  .discord-community-actions {
+    margin-top: auto;
+    padding-top: var(--spacing-lg);
+  }
+  
+  /* Desktop benefit sliders - show in 2 columns */
+  .premium-benefits-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg) var(--spacing-xl);
+  }
+  
+  .benefit-slider-item {
+    min-width: 0; /* Prevent overflow */
+  }
+  
+  /* Save button spans both columns */
+  .benefit-actions {
+    grid-column: 1 / -1;
+    margin-top: var(--spacing-xl);
+  }
+  
+  /* Desktop hover effects */
+  .streak-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  .discord-community-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  .benefit-logging-section:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Tablet layout (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tracker-main-content {
+    gap: var(--spacing-xl);
+  }
+  
+  .streak-card {
+    padding: var(--spacing-xl);
+  }
+  
+  .streak-number {
+    font-size: 4.5rem;
+  }
+  
+  /* Tablet benefit sliders - still single column but more spacious */
+  .premium-benefits-container {
+    gap: var(--spacing-lg);
+  }
+  
+  .benefit-slider-item {
+    padding: var(--spacing-md) 0;
+  }
 }
 
 /* Mobile responsiveness */
