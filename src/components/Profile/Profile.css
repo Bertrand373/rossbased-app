@@ -336,6 +336,8 @@
   gap: var(--spacing-sm);
 }
 
+/* REMOVED: Clock icon - no longer displayed */
+
 .coming-soon-description {
   font-size: 0.875rem;
   color: var(--text-secondary);
@@ -1215,11 +1217,19 @@
     text-align: center;
   }
   
-  /* FIXED: Coming soon banner mobile layout */
+  /* FIXED: Coming soon banner mobile layout - centered title */
   .coming-soon-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-md);
+  }
+  
+  .coming-soon-content {
+    text-align: center;
+  }
+  
+  .coming-soon-title {
+    justify-content: center;
   }
   
   .coming-soon-helmet {

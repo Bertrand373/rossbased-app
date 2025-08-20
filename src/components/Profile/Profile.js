@@ -404,7 +404,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   
                   <div className="coming-soon-content">
                     <h4 className="coming-soon-title">
-                      <FaClock />
                       Multi-Language Support
                     </h4>
                     <p className="coming-soon-description">
