@@ -360,7 +360,7 @@
   line-height: 1.4;
 }
 
-/* FIXED: Toggle switch - removed white circle overlay */
+/* FIXED: Toggle switch - completely removed white circle overlay */
 .toggle-switch {
   position: relative;
   width: 56px;
@@ -382,26 +382,20 @@
   border-color: var(--primary);
 }
 
-/* FIXED: Toggle slider - proper positioning without white circle */
+/* FIXED: Toggle slider - removed all white circle elements */
 .toggle-slider {
   width: 22px;
   height: 22px;
-  background-color: #ffffff;
+  background-color: var(--text-secondary);
   border-radius: 50%;
   transition: transform 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.625rem;
-  color: var(--text-secondary);
   position: relative;
 }
 
 .toggle-switch.active .toggle-slider {
   transform: translateX(28px);
   background-color: var(--primary);
-  color: #000;
 }
 
 .select-setting {
@@ -573,19 +567,28 @@
   line-height: 1.4;
 }
 
-/* Privacy & Settings Sections */
+/* Privacy & Settings Sections - UPDATED: Centered main headers, consistent spacing */
 .privacy-settings,
 .settings-groups {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
+}
+
+.privacy-section h3,
+.settings-section h3,
+.data-section h3 {
+  margin: 0 0 var(--spacing-xl) 0;
+  font-size: 1.25rem;
+  color: var(--text);
+  text-align: center;
 }
 
 .privacy-group,
 .settings-group {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
 .privacy-group h4,
@@ -595,21 +598,24 @@
   color: var(--text);
   padding-bottom: var(--spacing-sm);
   border-bottom: 1px solid var(--border);
+  text-align: left;
 }
 
+/* Privacy and Settings Actions - UPDATED: Consistent spacing */
 .privacy-actions,
 .settings-actions {
   display: flex;
   justify-content: center;
-  margin-top: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
 }
 
-/* Data Section */
+/* Data Section - UPDATED: Consistent spacing throughout */
 .data-actions {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
+  margin-top: var(--spacing-lg);
 }
 
 .data-action-card {
@@ -651,12 +657,12 @@
   border-top: 1px solid var(--border);
 }
 
-/* FIXED: Profile-specific logout button (different from header logout) */
+/* FIXED: Profile-specific logout button - same compact size as other buttons */
 .profile-container .logout-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
@@ -780,21 +786,27 @@
   background-color: var(--card-background);
 }
 
+/* UPDATED: Feedback Modal header - centered */
 .modal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: var(--spacing-lg);
+  position: relative;
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.25rem;
   color: var(--text);
+  text-align: center;
 }
 
-/* CORRECTED: Modal close button matching tracker compact style */
+/* Position close button absolutely in top right */
 .modal-close {
+  position: absolute;
+  top: 0;
+  right: 0;
   background: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   font-size: 1rem;
@@ -1055,10 +1067,12 @@
     padding: var(--spacing-lg);
   }
   
+  /* UPDATED: Mobile section headers remain centered */
   .section-header {
     flex-direction: column;
     gap: var(--spacing-md);
     align-items: center;
+    text-align: center;
   }
   
   .edit-profile-btn {
@@ -1080,14 +1094,10 @@
     text-align: center;
   }
   
-  .modal-actions {
-    flex-direction: row !important;
-    width: 100% !important;
-    gap: var(--spacing-sm) !important;
-    align-items: center !important;
-  }
-  
-  .modal-actions button {
+  .modal-actions button,
+  .form-actions button,
+  .privacy-actions button,
+  .settings-actions button {
     flex: 1 !important;
     justify-content: center !important;
     padding: var(--spacing-sm) var(--spacing-md) !important;
@@ -1099,13 +1109,6 @@
     flex-direction: row !important;
     gap: var(--spacing-sm);
     align-items: center;
-  }
-  
-  .form-actions button {
-    flex: 1 !important;
-    justify-content: center !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    font-weight: 500 !important;
   }
   
   .toggle-setting {

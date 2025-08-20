@@ -453,11 +453,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       {showFeedbackModal && (
         <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
           <div className="modal-content feedback-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowFeedbackModal(false)}>
+              <FaTimes />
+            </button>
+            
             <div className="modal-header">
               <h3>Send Feedback</h3>
-              <button className="modal-close" onClick={() => setShowFeedbackModal(false)}>
-                <FaTimes />
-              </button>
             </div>
 
             <div className="feedback-form">
