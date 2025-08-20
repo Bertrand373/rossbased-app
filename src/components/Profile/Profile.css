@@ -79,21 +79,20 @@
   justify-self: end;
 }
 
-/* UPDATED: Feedback button matching tracker "edit date" button style */
+/* CORRECTED: Feedback button matching tracker "edit date" button - smaller, compact size */
 .feedback-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
 }
 
 .feedback-btn:hover {
@@ -101,7 +100,6 @@
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
 /* UPDATED: Profile Overview Card - REMOVED gold accent border */
@@ -183,7 +181,7 @@
   color: var(--text-secondary);
 }
 
-/* Tab Navigation */
+/* Tab Navigation - UPDATED: Centered and auto-width */
 .profile-tabs {
   display: flex;
   gap: var(--spacing-xs);
@@ -192,6 +190,8 @@
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   overflow-x: auto;
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .profile-tab {
@@ -248,21 +248,20 @@
   color: var(--text);
 }
 
-/* UPDATED: Edit profile button matching tracker "edit date" button style */
+/* CORRECTED: Edit profile button matching tracker buttons - smaller, compact size */
 .edit-profile-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
 }
 
 .edit-profile-btn:hover {
@@ -270,7 +269,6 @@
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
 /* Form Elements */
@@ -493,22 +491,21 @@
   gap: var(--spacing-md);
 }
 
-/* UPDATED: All action buttons matching tracker "edit date" button style */
+/* CORRECTED: All action buttons matching tracker compact button style */
 .upgrade-btn,
 .manage-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
 }
 
 .upgrade-btn:hover,
@@ -517,7 +514,6 @@
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
 .premium-benefits h4 {
@@ -672,21 +668,20 @@
   transform: translateY(-1px) !important;
 }
 
-/* UPDATED: Profile action buttons matching tracker "edit date" button style */
+/* CORRECTED: Profile action buttons matching tracker compact button style */
 .profile-container .action-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
 }
 
 .profile-container .action-btn:hover {
@@ -694,24 +689,22 @@
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
-/* UPDATED: Delete account button styled like logout/sign out buttons */
+/* CORRECTED: Delete account button styled like logout - compact size */
 .danger-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
 }
 
 .danger-btn:hover {
@@ -719,24 +712,22 @@
   border-color: var(--danger) !important;
   color: var(--danger) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2) !important;
 }
 
-/* UPDATED: Profile cancel button matching tracker "edit date" button style */
+/* CORRECTED: Profile cancel button matching tracker compact style */
 .profile-container .cancel-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
 }
 
 .profile-container .cancel-btn:hover {
@@ -744,7 +735,6 @@
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
 /* KEEP: Save button styling (green) */
@@ -796,18 +786,18 @@
   color: var(--text);
 }
 
-/* UPDATED: Modal close button matching tracker button style */
+/* CORRECTED: Modal close button matching tracker compact style */
 .modal-close {
   background: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   font-size: 1rem;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs);
   border-radius: var(--radius-full);
   transition: all 0.2s ease;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -818,7 +808,6 @@
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
 .feedback-form {
@@ -842,21 +831,20 @@
   gap: var(--spacing-sm);
 }
 
-/* UPDATED: Type option buttons in feedback modal matching tracker style */
+/* CORRECTED: Type option buttons in feedback modal matching tracker compact style */
 .type-option {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-secondary);
-  min-height: 44px;
 }
 
 .type-option:hover {
@@ -864,14 +852,12 @@
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
 .type-option.active {
   background-color: rgba(255, 221, 0, 0.1) !important;
   border-color: var(--primary) !important;
   color: var(--primary) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
 .type-option svg {
@@ -890,21 +876,20 @@
   margin-top: var(--spacing-lg);
 }
 
-/* UPDATED: Submit button matching tracker "edit date" button style */
+/* CORRECTED: Submit button matching tracker compact style */
 .submit-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
 }
 
 .submit-btn:hover {
@@ -912,7 +897,6 @@
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2) !important;
 }
 
 /* Modal Styles */
@@ -1099,10 +1083,9 @@
   .modal-actions button {
     flex: 1 !important;
     justify-content: center !important;
-    padding: var(--spacing-md) var(--spacing-lg) !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
     font-size: 0.875rem !important;
-    min-height: 44px !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
   }
   
   .form-actions {
@@ -1114,9 +1097,8 @@
   .form-actions button {
     flex: 1 !important;
     justify-content: center !important;
-    padding: var(--spacing-md) var(--spacing-lg) !important;
-    min-height: 44px !important;
-    font-weight: 600 !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-weight: 500 !important;
   }
   
   .toggle-setting {
