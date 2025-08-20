@@ -425,42 +425,66 @@
   line-height: 1.4;
 }
 
-/* FIXED: Toggle switch - completely removed white circle overlay */
-.toggle-switch {
-  position: relative;
-  width: 56px;
-  height: 28px;
-  background-color: var(--light-gray);
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 2px;
+/* FIXED: Profile-specific toggle switch - overrides global App.css styles */
+.profile-container .toggle-switch {
+  position: relative !important;
+  width: 56px !important;
+  height: 28px !important;
+  background-color: var(--light-gray) !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--border) !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 2px !important;
 }
 
-.toggle-switch.active {
-  background-color: rgba(255, 221, 0, 0.2);
-  border-color: var(--primary);
+/* CRITICAL: Remove any input elements inside toggle (from global App.css) */
+.profile-container .toggle-switch input {
+  display: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
-/* FIXED: Toggle slider - removed all white circle elements */
-.toggle-slider {
-  width: 22px;
-  height: 22px;
-  background-color: var(--text-secondary);
-  border-radius: 50%;
-  transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  position: relative;
+/* CRITICAL: Remove global toggle slider pseudo-elements */
+.profile-container .toggle-switch::before,
+.profile-container .toggle-switch::after {
+  display: none !important;
+  content: none !important;
 }
 
-.toggle-switch.active .toggle-slider {
-  transform: translateX(28px);
-  background-color: var(--primary);
+.profile-container .toggle-switch.active {
+  background-color: rgba(255, 221, 0, 0.2) !important;
+  border-color: var(--primary) !important;
+}
+
+/* FIXED: Profile-specific toggle slider - completely override global styles */
+.profile-container .toggle-slider {
+  width: 22px !important;
+  height: 22px !important;
+  background-color: var(--text-secondary) !important;
+  border-radius: 50% !important;
+  transition: transform 0.3s ease !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  position: relative !important;
+  /* CRITICAL: Override any global pseudo-elements */
+  content: none !important;
+}
+
+/* CRITICAL: Remove any pseudo-elements from slider */
+.profile-container .toggle-slider::before,
+.profile-container .toggle-slider::after {
+  display: none !important;
+  content: none !important;
+}
+
+.profile-container .toggle-switch.active .toggle-slider {
+  transform: translateX(28px) !important;
+  background-color: var(--primary) !important;
 }
 
 .select-setting {
