@@ -32,18 +32,16 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   // App Settings States - SIMPLIFIED: Only language
   const [language, setLanguage] = useState(userData.language || 'en');
   
-  // Feedback States
+  // Feedback States - SIMPLIFIED: Removed email and priority
   const [feedbackType, setFeedbackType] = useState('general');
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
-  const [feedbackPriority, setFeedbackPriority] = useState('medium');
-  const [feedbackEmail, setFeedbackEmail] = useState(userData.email || '');
   
   const feedbackTypes = [
-    { id: 'bug', label: 'Bug Report', icon: FaBug, color: '#ef4444' },
-    { id: 'feature', label: 'Feature Request', icon: FaLightbulb, color: '#f59e0b' },
-    { id: 'improvement', label: 'Improvement Suggestion', icon: FaStar, color: '#3b82f6' },
-    { id: 'general', label: 'General Feedback', icon: FaCommentAlt, color: '#8b5cf6' }
+    { id: 'bug', label: 'Bug Report', icon: FaBug },
+    { id: 'feature', label: 'Feature Request', icon: FaLightbulb },
+    { id: 'improvement', label: 'Suggestion', icon: FaStar },
+    { id: 'general', label: 'General', icon: FaCommentAlt }
   ];
   
   const priorityLevels = [
@@ -77,7 +75,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     toast.success('Profile updated successfully!');
   };
 
-  // Handle feedback submission
+  // Handle feedback submission - SIMPLIFIED
   const handleFeedbackSubmit = () => {
     if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
       toast.error('Please fill in both subject and message');
@@ -89,15 +87,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       type: feedbackType,
       subject: feedbackSubject.trim(),
       message: feedbackMessage.trim(),
-      priority: feedbackPriority,
-      email: feedbackEmail.trim(),
       userData: {
         username: userData.username,
-        isPremium: true, // Everyone is premium now
-        currentStreak: userData.currentStreak,
-        appVersion: '1.0.0'
-      },
-      timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString()
+      }
     };
     
     console.log('Feedback submitted:', feedbackData);
@@ -106,7 +99,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     setFeedbackSubject('');
     setFeedbackMessage('');
     setFeedbackType('general');
-    setFeedbackPriority('medium');
     setShowFeedbackModal(false);
     
     toast.success('Thank you! Your feedback has been submitted.');
@@ -176,7 +168,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               onClick={() => setShowFeedbackModal(true)}
             >
               <FaCommentAlt />
-              <span>Send Feedback</span>
+              <span className="feedback-btn-text">Feedback</span>
             </button>
           </div>
         </div>
@@ -484,7 +476,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                       key={type.id}
                       className={`type-option ${feedbackType === type.id ? 'active' : ''}`}
                       onClick={() => setFeedbackType(type.id)}
-                      style={{ '--type-color': type.color }}
                     >
                       <type.icon />
                       <span>{type.label}</span>
@@ -494,20 +485,29 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
 
               <div className="form-group">
-                <label>Priority Level</label>
-                <select 
-                  value={feedbackPriority} 
-                  onChange={(e) => setFeedbackPriority(e.target.value)}
-                >
-                  {priorityLevels.map(priority => (
-                    <option key={priority.id} value={priority.id}>
-                      {priority.label}
-                    </option>
-                  ))}
-                </select>
+                <label>Subject</label>
+                <input
+                  type="text"
+                  value={feedbackSubject}
+                  onChange={(e) => setFeedbackSubject(e.target.value)}
+                  placeholder="Brief description of your feedback"
+                  maxLength={100}
+                />
+                <div className="char-count">{feedbackSubject.length}/100</div>
               </div>
 
               <div className="form-group">
+                <label>Message</label>
+                <textarea
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value)}
+                  placeholder="Please provide details about your feedback..."
+                  rows={5}
+                  maxLength={500}
+                ></textarea>
+                <div className="char-count">{feedbackMessage.length}/500</div>
+              </div>
+            </div>">
                 <label>Subject</label>
                 <input
                   type="text"
@@ -545,9 +545,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <div className="modal-actions">
               <button className="submit-btn" onClick={handleFeedbackSubmit}>
                 <FaPaperPlane />
-                Send Feedback
+                Submit
               </button>
               <button className="cancel-btn" onClick={() => setShowFeedbackModal(false)}>
+                <FaTimes />
                 Cancel
               </button>
             </div>
