@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Desktop two-column layout with enhanced centering */
+/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with better spacing and wider buttons */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -192,12 +192,15 @@ button.action-btn:hover {
   margin: 0;
 }
 
+/* REFINED: Better spacing for milestone stats */
 .streak-milestones {
   order: 4;
   display: flex;
-  justify-content: center;
-  gap: var(--spacing-xl);
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
   margin: 0;
+  padding: 0 var(--spacing-lg);
   flex-wrap: wrap;
 }
 
@@ -206,24 +209,29 @@ button.action-btn:hover {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  flex: 1;
+  min-width: 80px;
 }
 
 .milestone-icon {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: var(--primary);
   margin-bottom: var(--spacing-sm);
 }
 
 .milestone-value {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--text);
   margin-bottom: var(--spacing-xs);
+  line-height: 1;
 }
 
 .milestone-label {
   font-size: 0.875rem;
   color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.025em;
 }
 
 .streak-actions-divider {
@@ -609,7 +617,7 @@ button.action-btn:hover {
   color: rgba(255, 221, 0, 0.7) !important;
 }
 
-/* NEW: Discord Community Section - Clean, professional design */
+/* REFINED: Discord Community Section - More polished design */
 .discord-community-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -720,7 +728,7 @@ button.action-btn:hover {
   box-shadow: 0 2px 6px rgba(114, 137, 218, 0.2);
 }
 
-/* NEW: YouTube Channel Section - Red theming matching Discord structure */
+/* REFINED: YouTube Channel Section - Polished red theming */
 .youtube-channel-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -941,7 +949,7 @@ button.action-btn:hover {
   color: var(--text);
 }
 
-/* DESKTOP LAYOUT: Two-column grid for screens ≥1024px */
+/* DESKTOP LAYOUT: Two-column grid for screens ≥1024px with ENHANCED styling */
 @media (min-width: 1024px) {
   /* Desktop hover effects for cards */
   .discord-community-section:hover,
@@ -972,32 +980,128 @@ button.action-btn:hover {
     margin-top: var(--spacing-xl);
   }
   
-  /* Enhanced streak section for desktop */
+  /* ENHANCED: Better streak section for desktop */
   .streak-number {
-    font-size: 4.5rem !important;
+    font-size: 5rem !important;
+    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
   }
   
-  /* Center milestones and actions with max-width */
+  /* REFINED: Better milestone spacing and layout */
   .streak-milestones {
-    max-width: 400px;
+    max-width: 500px;
     margin: 0 auto;
+    padding: 0 var(--spacing-xl);
+    gap: var(--spacing-xl);
+    justify-content: space-evenly;
   }
   
+  .milestone-item {
+    min-width: 100px;
+    padding: var(--spacing-md);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+  }
+  
+  .milestone-item:hover {
+    background-color: rgba(255, 221, 0, 0.05);
+    border-color: rgba(255, 221, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .milestone-icon {
+    font-size: 1.6rem;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .milestone-value {
+    font-size: 1.75rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .milestone-label {
+    font-size: 0.9375rem;
+  }
+  
+  /* ENHANCED: Wider, more prominent action buttons on desktop */
   .streak-actions {
     flex-direction: column;
-    gap: var(--spacing-md);
-    max-width: 400px;
+    gap: var(--spacing-lg);
+    max-width: 500px;
     margin: 0 auto;
+    padding: 0 var(--spacing-lg);
   }
   
   .streak-action-btn {
     width: 100%;
     justify-content: center;
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-size: 0.9375rem;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    min-height: 54px;
+    position: relative;
+    overflow: hidden;
   }
   
-  /* Desktop Discord section - vertical layout */
+  .streak-action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .streak-action-btn:hover::before {
+    left: 100%;
+  }
+  
+  /* Enhanced button styling for desktop */
+  .relapse-btn-grey {
+    background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.15) 100%);
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .relapse-btn-grey:hover {
+    background: linear-gradient(135deg, rgba(128, 128, 128, 0.2) 0%, rgba(128, 128, 128, 0.25) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(128, 128, 128, 0.2);
+  }
+  
+  .wetdream-btn {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+  }
+  
+  .wetdream-btn:hover {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.25) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+  }
+  
+  .urge-btn {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.15) 100%);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  }
+  
+  .urge-btn:hover {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.25) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  }
+  
+  /* Desktop Discord section - enhanced vertical layout */
   .discord-community-header {
     flex-direction: column;
     text-align: center;
@@ -1005,49 +1109,59 @@ button.action-btn:hover {
   }
   
   .discord-community-icon {
-    width: 64px;
-    height: 64px;
+    width: 72px;
+    height: 72px;
     margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(114, 137, 218, 0.15);
   }
   
   .discord-community-icon svg {
-    font-size: 2rem;
+    font-size: 2.25rem;
   }
   
   .discord-community-content h3 {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
     text-align: center;
+    margin-bottom: var(--spacing-sm);
   }
   
   .discord-community-content p {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     text-align: center;
+    line-height: 1.5;
   }
   
   .discord-community-stats {
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
     align-items: center;
   }
   
   .community-stat-item {
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
     text-align: center;
+    padding: var(--spacing-md);
+    background-color: rgba(114, 137, 218, 0.05);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(114, 137, 218, 0.1);
+    min-width: 120px;
   }
   
   .community-stat-icon {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
   
   .discord-join-btn {
     width: 100%;
     justify-content: center;
     padding: var(--spacing-lg) var(--spacing-xl);
-    font-size: 1rem;
+    font-size: 1.125rem;
+    min-height: 54px;
+    box-shadow: 0 4px 12px rgba(114, 137, 218, 0.2);
   }
   
-  /* Desktop YouTube section - matching Discord layout */
+  /* Desktop YouTube section - matching enhanced Discord layout */
   .youtube-channel-header {
     flex-direction: column;
     text-align: center;
@@ -1055,46 +1169,56 @@ button.action-btn:hover {
   }
   
   .youtube-channel-icon {
-    width: 64px;
-    height: 64px;
+    width: 72px;
+    height: 72px;
     margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.15);
   }
   
   .youtube-channel-icon svg {
-    font-size: 2rem;
+    font-size: 2.25rem;
   }
   
   .youtube-channel-content h3 {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
     text-align: center;
+    margin-bottom: var(--spacing-sm);
   }
   
   .youtube-channel-content p {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     text-align: center;
+    line-height: 1.5;
   }
   
   .youtube-channel-stats {
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
     align-items: center;
   }
   
   .youtube-stat-item {
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
     text-align: center;
+    padding: var(--spacing-md);
+    background-color: rgba(255, 0, 0, 0.05);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 0, 0, 0.1);
+    min-width: 120px;
   }
   
   .youtube-stat-icon {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
   
   .youtube-subscribe-btn {
     width: 100%;
     justify-content: center;
     padding: var(--spacing-lg) var(--spacing-xl);
-    font-size: 1rem;
+    font-size: 1.125rem;
+    min-height: 54px;
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
   }
   
   /* Benefits section: 2-column slider grid on desktop */
@@ -1179,11 +1303,32 @@ button.action-btn:hover {
     font-size: 3rem;
   }
   
+  /* MOBILE: Better milestone spacing */
   .streak-milestones {
-    flex-wrap: nowrap; /* Keep all 3 items in one row */
-    gap: var(--spacing-sm); /* Smaller gap to fit better */
-    justify-content: space-between; /* Distribute evenly */
+    flex-wrap: nowrap;
+    gap: var(--spacing-sm);
+    justify-content: space-between;
     margin: 0;
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .milestone-item {
+    flex: 1;
+    min-width: 70px;
+  }
+  
+  .milestone-icon {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .milestone-value {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .milestone-label {
+    font-size: 0.75rem;
   }
   
   .streak-actions {
