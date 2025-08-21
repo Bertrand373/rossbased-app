@@ -1,4 +1,4 @@
-// App.js - UPDATED: Added goal functions from useUserData hook
+// App.js - UPDATED: Added goal functions from useUserData hook + DisclaimerFooter
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -31,6 +31,7 @@ import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 import SpartanLoader from './components/Shared/SpartanLoader';
+import DisclaimerFooter from './components/Shared/DisclaimerFooter';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -308,24 +309,29 @@ function App() {
             )}
             
             <main className="app-content">
-              <Routes>
-                {/* UPDATED: Pass goal functions to Tracker component */}
-                <Route path="/" element={
-                  <Tracker 
-                    userData={userData} 
-                    updateUserData={updateUserData} 
-                    isPremium={isPremium}
-                    setGoal={setGoal}
-                    cancelGoal={cancelGoal}
-                  />
-                } />
-                <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                <Route path="/profile" element={<Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />} />
-                <Route path="*" element={<Navigate to="/" />} />
-              </Routes>
+              <div className="main-content-wrapper">
+                <Routes>
+                  {/* UPDATED: Pass goal functions to Tracker component */}
+                  <Route path="/" element={
+                    <Tracker 
+                      userData={userData} 
+                      updateUserData={updateUserData} 
+                      isPremium={isPremium}
+                      setGoal={setGoal}
+                      cancelGoal={cancelGoal}
+                    />
+                  } />
+                  <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+                  <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+                  <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+                  <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
+                  <Route path="/profile" element={<Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />} />
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+              </div>
+              
+              {/* ADDED: Disclaimer footer inside the rounded container */}
+              <DisclaimerFooter />
             </main>
           </>
         ) : (

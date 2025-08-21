@@ -1,0 +1,79 @@
+/* src/components/Shared/DisclaimerFooter.css */
+.disclaimer-footer {
+  margin-top: auto;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, var(--medium-gray) 0%, rgba(255, 221, 0, 0.05) 100%);
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  /* Make it appear inside the rounded container */
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  margin: 0;
+  /* Subtle shadow to separate from content */
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.disclaimer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.disclaimer-section {
+  margin-bottom: 0.5rem;
+}
+
+.disclaimer-section:last-child {
+  margin-bottom: 0;
+}
+
+.disclaimer-text {
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.disclaimer-text strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Different colors for different types of disclaimers */
+.disclaimer-text.medical strong {
+  color: #dc3545;
+}
+
+.disclaimer-text.crisis strong {
+  color: #fd7e14;
+}
+
+.disclaimer-text.privacy strong {
+  color: #6f42c1;
+}
+
+.disclaimer-text.responsibility strong {
+  color: #20c997;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .disclaimer-footer {
+    padding: 0.75rem 1rem;
+    font-size: 0.7rem;
+  }
+  
+  .disclaimer-section {
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .disclaimer-footer {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.65rem;
+  }
+  
+  .disclaimer-text {
+    padding: 0.2rem 0;
+  }
+}
