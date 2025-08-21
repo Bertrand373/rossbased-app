@@ -703,24 +703,23 @@ button.action-btn:hover {
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-xl);
-  background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
+  background-color: rgba(114, 137, 218, 0.1);
   border: 1px solid #7289da;
   border-radius: var(--radius-full);
-  color: #ffffff;
+  color: #7289da;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
   letter-spacing: 0.025em;
-  position: relative;
-  overflow: hidden;
 }
 
 .discord-join-btn:hover {
-  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(114, 137, 218, 0.3);
+  background-color: rgba(114, 137, 218, 0.2);
+  border-color: #7289da;
+  color: #7289da;
+  transform: scale(1.05);
 }
 
 .discord-join-btn:active {
@@ -814,24 +813,23 @@ button.action-btn:hover {
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-xl);
-  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  background-color: rgba(255, 0, 0, 0.1);
   border: 1px solid #ff0000;
   border-radius: var(--radius-full);
-  color: #ffffff;
+  color: #ff0000;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
   letter-spacing: 0.025em;
-  position: relative;
-  overflow: hidden;
 }
 
 .youtube-subscribe-btn:hover {
-  background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+  background-color: rgba(255, 0, 0, 0.2);
+  border-color: #ff0000;
+  color: #ff0000;
+  transform: scale(1.05);
 }
 
 .youtube-subscribe-btn:active {
@@ -1051,18 +1049,7 @@ button.action-btn:hover {
   }
   
   .streak-action-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: left 0.5s ease;
-  }
-  
-  .streak-action-btn:hover::before {
-    left: 100%;
+    display: none;
   }
   
   /* Enhanced button styling for desktop */
@@ -1136,33 +1123,51 @@ button.action-btn:hover {
   }
   
   .discord-community-stats {
-    flex-direction: column;
-    gap: var(--spacing-lg);
+    flex-direction: row;
+    gap: var(--spacing-xl);
     align-items: center;
+    justify-content: center;
   }
   
   .community-stat-item {
-    flex-direction: column;
+    flex-direction: row;
     gap: var(--spacing-sm);
-    text-align: center;
-    padding: var(--spacing-md);
+    text-align: left;
+    padding: var(--spacing-sm) var(--spacing-md);
     background-color: rgba(114, 137, 218, 0.05);
     border-radius: var(--radius-md);
     border: 1px solid rgba(114, 137, 218, 0.1);
-    min-width: 120px;
+    min-width: auto;
+    white-space: nowrap;
   }
   
   .community-stat-icon {
-    font-size: 1.5rem;
+    font-size: 1.125rem;
   }
   
   .discord-join-btn {
-    width: 100%;
-    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
     padding: var(--spacing-lg) var(--spacing-xl);
+    background-color: rgba(114, 137, 218, 0.1);
+    border: 1px solid #7289da;
+    border-radius: var(--radius-full);
+    color: #7289da;
     font-size: 1.125rem;
-    min-height: 54px;
-    box-shadow: 0 4px 12px rgba(114, 137, 218, 0.2);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    letter-spacing: 0.025em;
+    min-height: 60px;
+  }
+
+  .discord-join-btn:hover {
+    background-color: rgba(114, 137, 218, 0.2);
+    border-color: #7289da;
+    color: #7289da;
+    transform: scale(1.05);
   }
   
   /* Desktop YouTube section - matching enhanced Discord layout */
@@ -1196,33 +1201,51 @@ button.action-btn:hover {
   }
   
   .youtube-channel-stats {
-    flex-direction: column;
-    gap: var(--spacing-lg);
+    flex-direction: row;
+    gap: var(--spacing-xl);
     align-items: center;
+    justify-content: center;
   }
   
   .youtube-stat-item {
-    flex-direction: column;
+    flex-direction: row;
     gap: var(--spacing-sm);
-    text-align: center;
-    padding: var(--spacing-md);
+    text-align: left;
+    padding: var(--spacing-sm) var(--spacing-md);
     background-color: rgba(255, 0, 0, 0.05);
     border-radius: var(--radius-md);
     border: 1px solid rgba(255, 0, 0, 0.1);
-    min-width: 120px;
+    min-width: auto;
+    white-space: nowrap;
   }
   
   .youtube-stat-icon {
-    font-size: 1.5rem;
+    font-size: 1.125rem;
   }
   
   .youtube-subscribe-btn {
-    width: 100%;
-    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
     padding: var(--spacing-lg) var(--spacing-xl);
+    background-color: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff0000;
+    border-radius: var(--radius-full);
+    color: #ff0000;
     font-size: 1.125rem;
-    min-height: 54px;
-    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    letter-spacing: 0.025em;
+    min-height: 60px;
+  }
+
+  .youtube-subscribe-btn:hover {
+    background-color: rgba(255, 0, 0, 0.2);
+    border-color: #ff0000;
+    color: #ff0000;
+    transform: scale(1.05);
   }
   
   /* Benefits section: 2-column slider grid on desktop */
