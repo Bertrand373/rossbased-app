@@ -702,7 +702,7 @@ button.action-btn:hover {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: var(--spacing-sm) var(--spacing-xl);
   background-color: rgba(114, 137, 218, 0.1);
   border: 1px solid #7289da;
   border-radius: var(--radius-full);
@@ -713,6 +713,7 @@ button.action-btn:hover {
   transition: all 0.2s ease;
   text-decoration: none;
   letter-spacing: 0.025em;
+  min-height: 44px;
 }
 
 .discord-join-btn:hover {
@@ -812,7 +813,7 @@ button.action-btn:hover {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: var(--spacing-sm) var(--spacing-xl);
   background-color: rgba(255, 0, 0, 0.1);
   border: 1px solid #ff0000;
   border-radius: var(--radius-full);
@@ -823,6 +824,7 @@ button.action-btn:hover {
   transition: all 0.2s ease;
   text-decoration: none;
   letter-spacing: 0.025em;
+  min-height: 44px;
 }
 
 .youtube-subscribe-btn:hover {
@@ -1143,9 +1145,9 @@ button.action-btn:hover {
     gap: var(--spacing-sm);
     text-align: left;
     padding: var(--spacing-sm) var(--spacing-md);
-    background-color: rgba(114, 137, 218, 0.05);
+    background-color: rgba(255, 221, 0, 0.08);
     border-radius: var(--radius-md);
-    border: 1px solid rgba(114, 137, 218, 0.1);
+    border: 1px solid rgba(255, 221, 0, 0.15);
     min-width: auto;
     white-space: nowrap;
   }
@@ -1158,7 +1160,7 @@ button.action-btn:hover {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: var(--spacing-sm) var(--spacing-xl);
     background-color: rgba(114, 137, 218, 0.1);
     border: 1px solid #7289da;
     border-radius: var(--radius-full);
@@ -1169,7 +1171,9 @@ button.action-btn:hover {
     transition: all 0.2s ease;
     text-decoration: none;
     letter-spacing: 0.025em;
-    min-height: 60px;
+    min-height: 44px;
+    width: 100% !important;
+    justify-content: center;
   }
 
   .discord-join-btn:hover {
@@ -1221,9 +1225,9 @@ button.action-btn:hover {
     gap: var(--spacing-sm);
     text-align: left;
     padding: var(--spacing-sm) var(--spacing-md);
-    background-color: rgba(255, 0, 0, 0.05);
+    background-color: rgba(255, 221, 0, 0.08);
     border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 221, 0, 0.15);
     min-width: auto;
     white-space: nowrap;
   }
@@ -1236,7 +1240,7 @@ button.action-btn:hover {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: var(--spacing-sm) var(--spacing-xl);
     background-color: rgba(255, 0, 0, 0.1);
     border: 1px solid #ff0000;
     border-radius: var(--radius-full);
@@ -1247,7 +1251,9 @@ button.action-btn:hover {
     transition: all 0.2s ease;
     text-decoration: none;
     letter-spacing: 0.025em;
-    min-height: 60px;
+    min-height: 44px;
+    width: 100% !important;
+    justify-content: center;
   }
 
   .youtube-subscribe-btn:hover {

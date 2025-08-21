@@ -370,6 +370,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
             
             <div className="discord-community-actions">
+              {userData.showOnLeaderboard && userData.discordUsername && (
+                <div className="leaderboard-status">
+                  <FaCheckCircle className="check-icon" />
+                  <span>You're on the leaderboard as <strong>{userData.discordUsername}</strong></span>
+                </div>
+              )}
+              
               <button 
                 className="discord-join-btn"
                 onClick={handleDiscordJoin}
@@ -378,13 +385,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <span>Join Discord</span>
                 <FaExternalLinkAlt className="external-icon" />
               </button>
-              
-              {userData.showOnLeaderboard && userData.discordUsername && (
-                <div className="leaderboard-status">
-                  <FaCheckCircle className="check-icon" />
-                  <span>You're on the leaderboard as <strong>{userData.discordUsername}</strong></span>
-                </div>
-              )}
             </div>
             
             {userData.showOnLeaderboard && !userData.discordUsername && (
