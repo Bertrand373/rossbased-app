@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: YouTube section added, two-column desktop layout
+// components/Tracker/Tracker.js - UPDATED: Shortened milestone text for uniform card heights
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';

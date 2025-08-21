@@ -988,7 +988,7 @@ button.action-btn:hover {
     text-shadow: none;
   }
   
-  /* REFINED: Better milestone spacing and layout */
+  /* REFINED: Better milestone spacing and uniform heights */
   .streak-milestones {
     max-width: 500px;
     margin: 0 auto;
@@ -1004,6 +1004,10 @@ button.action-btn:hover {
     border-radius: var(--radius-md);
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.2s ease;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   
   .milestone-item:hover {
@@ -1023,7 +1027,12 @@ button.action-btn:hover {
   }
   
   .milestone-label {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    height: 2.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   /* ENHANCED: Much wider, more prominent action buttons on desktop */
