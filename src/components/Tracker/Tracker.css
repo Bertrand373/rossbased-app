@@ -694,7 +694,7 @@ button.action-btn:hover {
 .discord-community-actions {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   align-items: center;
 }
 
@@ -703,10 +703,10 @@ button.action-btn:hover {
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-xl);
-  background-color: rgba(114, 137, 218, 0.1);
+  background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
   border: 1px solid #7289da;
   border-radius: var(--radius-full);
-  color: #7289da;
+  color: #ffffff;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
@@ -717,9 +717,9 @@ button.action-btn:hover {
 }
 
 .discord-join-btn:hover {
-  background-color: rgba(114, 137, 218, 0.2);
+  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
   border-color: #7289da;
-  color: #7289da;
+  color: #ffffff;
   transform: scale(1.05);
 }
 
@@ -805,7 +805,7 @@ button.action-btn:hover {
 .youtube-channel-actions {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   align-items: center;
 }
 
@@ -814,10 +814,10 @@ button.action-btn:hover {
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-xl);
-  background-color: rgba(255, 0, 0, 0.1);
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   border: 1px solid #ff0000;
   border-radius: var(--radius-full);
-  color: #ff0000;
+  color: #ffffff;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
@@ -828,9 +828,9 @@ button.action-btn:hover {
 }
 
 .youtube-subscribe-btn:hover {
-  background-color: rgba(255, 0, 0, 0.2);
+  background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
   border-color: #ff0000;
-  color: #ff0000;
+  color: #ffffff;
   transform: scale(1.05);
 }
 
@@ -1161,10 +1161,10 @@ button.action-btn:hover {
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm) var(--spacing-xl);
-    background-color: rgba(114, 137, 218, 0.1);
+    background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
     border: 1px solid #7289da;
     border-radius: var(--radius-full);
-    color: #7289da;
+    color: #ffffff;
     font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
@@ -1172,14 +1172,15 @@ button.action-btn:hover {
     text-decoration: none;
     letter-spacing: 0.025em;
     min-height: 44px;
+    max-width: 600px !important;
     width: 100% !important;
     justify-content: center;
   }
 
   .discord-join-btn:hover {
-    background-color: rgba(114, 137, 218, 0.2);
+    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
     border-color: #7289da;
-    color: #7289da;
+    color: #ffffff;
     transform: scale(1.05);
   }
   
@@ -1241,10 +1242,10 @@ button.action-btn:hover {
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm) var(--spacing-xl);
-    background-color: rgba(255, 0, 0, 0.1);
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
     border: 1px solid #ff0000;
     border-radius: var(--radius-full);
-    color: #ff0000;
+    color: #ffffff;
     font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
@@ -1252,14 +1253,15 @@ button.action-btn:hover {
     text-decoration: none;
     letter-spacing: 0.025em;
     min-height: 44px;
+    max-width: 600px !important;
     width: 100% !important;
     justify-content: center;
   }
 
   .youtube-subscribe-btn:hover {
-    background-color: rgba(255, 0, 0, 0.2);
+    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
     border-color: #ff0000;
-    color: #ff0000;
+    color: #ffffff;
     transform: scale(1.05);
   }
   
