@@ -402,7 +402,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <FaYoutube />
               </div>
               <div className="youtube-channel-content">
-                <h3>Weekly Content</h3>
+                <h3>Watch on YouTube</h3>
                 <p>Get exclusive tips, motivation, and insights to accelerate your transformation</p>
               </div>
             </div>
