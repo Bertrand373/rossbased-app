@@ -233,7 +233,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   // NEW: Handle YouTube link
   const handleYouTubeSubscribe = () => {
-    window.open('https://www.youtube.com/@YourChannelName', '_blank', 'noopener,noreferrer');
+    window.open('https://www.youtube.com/@RossBased', '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -350,7 +350,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           <div className="discord-community-section">
             <div className="discord-community-header">
               <div className="discord-community-content">
-                <h3>Join Our Community</h3>
+                <div className="discord-community-title">
+                  <FaDiscord className="discord-raw-icon" />
+                  <h3>Join Our Community</h3>
+                </div>
                 <p>Connect with others on the same journey, share progress, and get support</p>
               </div>
             </div>
@@ -396,7 +399,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           <div className="youtube-channel-section">
             <div className="youtube-channel-header">
               <div className="youtube-channel-content">
-                <h3>Watch on YouTube</h3>
+                <div className="youtube-channel-title">
+                  <FaYoutube className="youtube-raw-icon" />
+                  <h3>Watch on YouTube</h3>
+                </div>
                 <p>Get exclusive tips, motivation, and insights to accelerate your transformation</p>
               </div>
             </div>
