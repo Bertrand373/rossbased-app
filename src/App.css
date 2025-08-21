@@ -117,7 +117,255 @@ body {
   width: auto;
 }
 
-/* UPDATED: App content layout to support footer inside container */
+/* UPDATED: Header Navigation - styled exactly like time-range selector buttons */
+.header-nav {
+  justify-self: center;
+}
+
+.header-nav .nav-container {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  background-color: var(--card-background);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  width: 100%;
+}
+
+.header-nav .nav-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+  background-color: transparent;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  position: relative;
+  outline: none;
+}
+
+.header-nav .nav-link:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.header-nav .nav-link.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: var(--spacing-md);
+}
+
+/* Profile button styling - matches logout button non-hover state with active state */
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.profile-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.profile-btn.active {
+  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+}
+
+/* FIXED: Logout button styling - inactive grey with red hover */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--danger);
+  color: var(--danger);
+  transform: scale(1.05);
+}
+
+/* Mobile header adjustments - REVERTED: Changed mobile username back to yellow */
+@media (max-width: 768px) {
+  .app-header {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-sm);
+    align-items: stretch;
+    margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
+  }
+  
+  .app-logo {
+    height: 100px; /* Increased from 80px - 25% bigger */
+  }
+  
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-bottom-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: var(--spacing-xs);
+  }
+  
+  .user-controls {
+    gap: var(--spacing-md);
+  }
+  
+  /* Mobile user controls container */
+  .mobile-user-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  /* Mobile profile button - icon only */
+  .mobile-user-controls .profile-btn {
+    padding: var(--spacing-sm);
+    min-width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+  
+  .mobile-user-controls .profile-btn span {
+    display: none;
+  }
+  
+  /* Mobile logout button - icon only */
+  .mobile-user-controls .logout-btn {
+    padding: var(--spacing-sm);
+    min-width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+  
+  .mobile-user-controls .logout-btn span {
+    display: none;
+  }
+  
+  /* REVERTED: Mobile greeting back to yellow styling */
+  .mobile-username {
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.9375rem;
+    text-align: center;
+    letter-spacing: 0.025em;
+  }
+  
+  .mobile-username::before {
+    content: "Hey there, ";
+    color: var(--primary);
+    opacity: 0.8;
+    font-weight: 500;
+  }
+  
+  /* Make the username itself bold while keeping "Hey there" normal weight */
+  .mobile-username {
+    font-weight: 700; /* Make the username bold */
+    color: var(--primary); /* Back to yellow */
+  }
+  
+  /* Hide header navigation on mobile */
+  .header-nav {
+    display: none;
+  }
+  
+  /* Mobile loading screen adjustments */
+  .spartan-loading-screen {
+    margin: var(--spacing-sm);
+    margin-left: var(--spacing-sm);
+    margin-right: var(--spacing-sm);
+    min-height: calc(100vh - 16px);
+  }
+
+  /* Mobile app loading helmet adjustments */
+  .app-loading-helmet-size {
+    width: 80px !important; /* SCALED: Mobile main loading */
+    height: 80px !important;
+  }
+
+  .app-loading-helmet-fallback-size {
+    font-size: 3.2rem !important;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .app-loading-helmet-size {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .app-loading-helmet-fallback-size {
+    font-size: 2.8rem !important;
+  }
+}
+
+button {
+  cursor: pointer;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  transition: none;
+}
+
+button:active {
+  transform: none;
+}
+
+.login-btn {
+  background-color: var(--primary);
+  color: #000000;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.login-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+/* App content layout to support footer inside container */
 .app-content {
   display: flex;
   flex-direction: column;
@@ -127,7 +375,7 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border);
   border-top: none;
-  min-height: calc(100vh - 200px); /* Adjust based on header height */
+  min-height: calc(100vh - 200px);
 }
 
 /* Main content wrapper - takes up available space */
@@ -433,7 +681,7 @@ input:checked + .toggle-slider:before {
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .app-content {
-    margin: 0 var(--spacing-sm) 90px var(--spacing-sm); /* Account for mobile nav */
+    margin: 0 var(--spacing-sm) 90px var(--spacing-sm);
     min-height: calc(100vh - 250px);
   }
   
@@ -480,252 +728,4 @@ input:checked + .toggle-slider:before {
 .mobile-nav-icon {
   font-size: 1.5rem;
   margin-bottom: var(--spacing-xs);
-} Header Navigation - styled exactly like time-range selector buttons */
-.header-nav {
-  justify-self: center;
 }
-
-.header-nav .nav-container {
-  display: flex;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs);
-  background-color: var(--card-background);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  width: 100%;
-}
-
-.header-nav .nav-link {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.875rem;
-  border-radius: var(--radius-full);
-  transition: all 0.2s ease;
-  background-color: transparent;
-  border: 1px solid transparent;
-  white-space: nowrap;
-  position: relative;
-  outline: none;
-}
-
-.header-nav .nav-link:hover:not(.active) {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
-}
-
-.header-nav .nav-link.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
-}
-
-.user-controls {
-  display: flex;
-  align-items: center;
-  justify-self: end;
-  gap: var(--spacing-md);
-}
-
-/* Profile button styling - matches logout button non-hover state with active state */
-.profile-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.profile-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.profile-btn.active {
-  color: var(--primary);
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-}
-
-/* FIXED: Logout button styling - inactive grey with red hover */
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.logout-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1);
-  border-color: var(--danger);
-  color: var(--danger);
-  transform: scale(1.05);
-}
-
-/* Mobile header adjustments - REVERTED: Changed mobile username back to yellow */
-@media (max-width: 768px) {
-  .app-header {
-    display: flex;
-    flex-direction: column;
-    padding: var(--spacing-sm) var(--spacing-md);
-    gap: var(--spacing-sm);
-    align-items: stretch;
-    margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
-  }
-  
-  .app-logo {
-    height: 100px; /* Increased from 80px - 25% bigger */
-  }
-  
-  .header-top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .header-bottom-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: var(--spacing-xs);
-  }
-  
-  .user-controls {
-    gap: var(--spacing-md);
-  }
-  
-  /* Mobile user controls container */
-  .mobile-user-controls {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-  }
-  
-  /* Mobile profile button - icon only */
-  .mobile-user-controls .profile-btn {
-    padding: var(--spacing-sm);
-    min-width: 36px;
-    height: 36px;
-    justify-content: center;
-  }
-  
-  .mobile-user-controls .profile-btn span {
-    display: none;
-  }
-  
-  /* Mobile logout button - icon only */
-  .mobile-user-controls .logout-btn {
-    padding: var(--spacing-sm);
-    min-width: 36px;
-    height: 36px;
-    justify-content: center;
-  }
-  
-  .mobile-user-controls .logout-btn span {
-    display: none;
-  }
-  
-  /* REVERTED: Mobile greeting back to yellow styling */
-  .mobile-username {
-    font-weight: 500;
-    color: var(--text);
-    font-size: 0.9375rem;
-    text-align: center;
-    letter-spacing: 0.025em;
-  }
-  
-  .mobile-username::before {
-    content: "Hey there, ";
-    color: var(--primary);
-    opacity: 0.8;
-    font-weight: 500;
-  }
-  
-  /* Make the username itself bold while keeping "Hey there" normal weight */
-  .mobile-username {
-    font-weight: 700; /* Make the username bold */
-    color: var(--primary); /* Back to yellow */
-  }
-  
-  /* Hide header navigation on mobile */
-  .header-nav {
-    display: none;
-  }
-  
-  /* Mobile loading screen adjustments */
-  .spartan-loading-screen {
-    margin: var(--spacing-sm);
-    margin-left: var(--spacing-sm);
-    margin-right: var(--spacing-sm);
-    min-height: calc(100vh - 16px);
-  }
-
-  /* Mobile app loading helmet adjustments */
-  .app-loading-helmet-size {
-    width: 80px !important; /* SCALED: Mobile main loading */
-    height: 80px !important;
-  }
-
-  .app-loading-helmet-fallback-size {
-    font-size: 3.2rem !important;
-  }
-}
-
-/* Very small screens */
-@media (max-width: 480px) {
-  .app-loading-helmet-size {
-    width: 70px !important;
-    height: 70px !important;
-  }
-
-  .app-loading-helmet-fallback-size {
-    font-size: 2.8rem !important;
-  }
-}
-
-button {
-  cursor: pointer;
-  font-weight: 500;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-sm) var(--spacing-md);
-  transition: none;
-}
-
-button:active {
-  transform: none;
-}
-
-.login-btn {
-  background-color: var(--primary);
-  color: #000000;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.login-btn:hover {
-  background-color: var(--primary-dark);
-}
-
-/* UPDATED:
