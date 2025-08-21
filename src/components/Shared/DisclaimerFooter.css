@@ -34,24 +34,20 @@
 
 .disclaimer-text strong {
   color: var(--text);
-  font-weight: 600;
+  font-weight: 700; /* Make headers more bold */
 }
 
-/* Different colors for different types of disclaimers */
+/* Keep only medical disclaimer red for critical legal protection */
 .disclaimer-text.medical strong {
-  color: #dc3545;
+  color: #dc3545; /* Keep red for medical - most important */
 }
 
-.disclaimer-text.crisis strong {
-  color: #fd7e14;
-}
-
-.disclaimer-text.privacy strong {
-  color: #6f42c1;
-}
-
+/* All other disclaimers use bold body text color */
+.disclaimer-text.crisis strong,
+.disclaimer-text.privacy strong,
 .disclaimer-text.responsibility strong {
-  color: #20c997;
+  color: var(--text);
+  font-weight: 700;
 }
 
 /* Mobile responsiveness */
