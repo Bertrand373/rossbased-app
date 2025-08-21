@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Shortened milestone text for uniform card heights
+// components/Tracker/Tracker.js - UPDATED: Enhanced YouTube section with featured video embed
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +29,10 @@ import {
 const Tracker = ({ userData, updateUserData, isPremium }) => {
   const navigate = useNavigate();
   const [showSetStartDate, setShowSetStartDate] = useState(!userData.startDate);
+  
+  // NEW: Video modal state
+  const [showVideo, setShowVideo] = useState(false);
+  const [featuredVideoId] = useState('_1CcOqHD57E'); // Your video ID
   
   // Initialize with the current date if no start date exists
   const [startDate, setStartDate] = useState(
@@ -231,9 +235,18 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     window.open('https://discord.gg/RDFC5eUtuA', '_blank', 'noopener,noreferrer');
   };
 
-  // NEW: Handle YouTube link
+  // Handle YouTube link
   const handleYouTubeSubscribe = () => {
     window.open('https://www.youtube.com/@RossBased', '_blank', 'noopener,noreferrer');
+  };
+
+  // NEW: Video handlers
+  const handleWatchVideo = () => {
+    setShowVideo(true);
+  };
+
+  const handleCloseVideo = () => {
+    setShowVideo(false);
   };
 
   return (
@@ -254,6 +267,32 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               onCancel={handleDateCancel}
               hasExistingDate={!!userData.startDate}
             />
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Video Modal */}
+      {showVideo && (
+        <div className="video-modal-overlay" onClick={handleCloseVideo}>
+          <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="video-close-btn" onClick={handleCloseVideo}>
+              <FaTimes />
+            </button>
+            <div className="video-container">
+              <iframe
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${featuredVideoId}?autoplay=1&rel=0&modestbranding=1`}
+                title="Featured Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <div className="video-modal-info">
+              <h3>The Science of Semen Retention</h3>
+              <p>Discover the research-backed benefits and practical strategies for your transformation journey.</p>
+            </div>
           </div>
         </div>
       )}
@@ -280,7 +319,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* NEW: Main content container for desktop two-column layout */}
+      {/* Main content container for desktop two-column layout */}
       <div className="tracker-main-content">
         {/* Current Streak Display - Left Column on Desktop */}
         <div className="current-streak-container">
@@ -344,17 +383,17 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
         </div>
         
-        {/* NEW: Discord and YouTube Column - Right Column on Desktop */}
+        {/* Discord and YouTube Column - Right Column on Desktop */}
         <div className="discord-youtube-column">
           {/* Discord Community Section */}
           <div className="discord-community-section">
             <div className="discord-community-header">
-              <div className="discord-community-content">
-                <div className="discord-community-title">
-                  <FaDiscord className="discord-raw-icon" />
+              <div className="section-icon-header">
+                <FaDiscord className="section-header-icon discord-icon" />
+                <div className="discord-community-content">
                   <h3>Join Our Community</h3>
+                  <p>Connect with others on the same journey, share progress, and get support</p>
                 </div>
-                <p>Connect with others on the same journey, share progress, and get support</p>
               </div>
             </div>
             
@@ -395,15 +434,33 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* NEW: YouTube Channel Section */}
+          {/* ENHANCED: YouTube Channel Section with Featured Video */}
           <div className="youtube-channel-section">
             <div className="youtube-channel-header">
-              <div className="youtube-channel-content">
-                <div className="youtube-channel-title">
-                  <FaYoutube className="youtube-raw-icon" />
-                  <h3>Watch on YouTube</h3>
+              <div className="section-icon-header">
+                <FaYoutube className="section-header-icon youtube-icon" />
+                <div className="youtube-channel-content">
+                  <h3>Featured Content</h3>
+                  <p>Essential knowledge and motivation for your transformation journey</p>
                 </div>
-                <p>Get exclusive tips, motivation, and insights to accelerate your transformation</p>
+              </div>
+            </div>
+            
+            {/* Featured Video Preview */}
+            <div className="featured-video-preview">
+              <div className="video-thumbnail-container" onClick={handleWatchVideo}>
+                <img 
+                  src={`https://img.youtube.com/vi/${featuredVideoId}/maxresdefault.jpg`}
+                  alt="Featured Video Thumbnail"
+                  className="video-thumbnail"
+                />
+                <div className="video-play-overlay">
+                  <FaPlay className="play-icon" />
+                </div>
+                <div className="video-info">
+                  <h4>The Science of Semen Retention</h4>
+                  <p>Essential knowledge for your transformation journey</p>
+                </div>
               </div>
             </div>
             
@@ -416,15 +473,27 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <FaCalendarAlt className="youtube-stat-icon" />
                 <span>Weekly Content</span>
               </div>
+              <div className="youtube-stat-item">
+                <FaPlay className="youtube-stat-icon" />
+                <span>Featured Video</span>
+              </div>
             </div>
             
             <div className="youtube-channel-actions">
+              <button 
+                className="youtube-watch-btn"
+                onClick={handleWatchVideo}
+              >
+                <FaPlay />
+                <span>Watch Video</span>
+              </button>
+              
               <button 
                 className="youtube-subscribe-btn"
                 onClick={handleYouTubeSubscribe}
               >
                 <FaYoutube />
-                <span>Subscribe</span>
+                <span>Subscribe for More</span>
                 <FaExternalLinkAlt className="external-icon" />
               </button>
             </div>
@@ -506,7 +575,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           )}
         </div>
       </div>
-
     </div>
   );
 };

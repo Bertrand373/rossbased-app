@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with better spacing and wider buttons */
+/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and improved icon placement */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -617,6 +617,30 @@ button.action-btn:hover {
   color: rgba(255, 221, 0, 0.7) !important;
 }
 
+/* REFINED: Section Header Icon Layout - Professional and Clean */
+.section-icon-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-md);
+}
+
+.section-header-icon {
+  font-size: 1.75rem;
+  margin-bottom: var(--spacing-xs);
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.section-header-icon.discord-icon {
+  color: #7289da;
+}
+
+.section-header-icon.youtube-icon {
+  color: #ff0000;
+}
+
 /* REFINED: Discord Community Section - More polished design */
 .discord-community-section {
   background-color: var(--medium-gray);
@@ -632,29 +656,15 @@ button.action-btn:hover {
 
 .discord-community-header {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
+  justify-content: center;
 }
 
 .discord-community-content {
   flex: 1;
 }
 
-.discord-community-title {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-xs);
-}
-
-.discord-raw-icon {
-  font-size: 1.25rem;
-  color: #7289da;
-  flex-shrink: 0;
-}
-
 .discord-community-content h3 {
-  margin: 0;
+  margin: 0 0 var(--spacing-xs) 0;
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text);
@@ -734,29 +744,15 @@ button.action-btn:hover {
 
 .youtube-channel-header {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
+  justify-content: center;
 }
 
 .youtube-channel-content {
   flex: 1;
 }
 
-.youtube-channel-title {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-xs);
-}
-
-.youtube-raw-icon {
-  font-size: 1.25rem;
-  color: #ff0000;
-  flex-shrink: 0;
-}
-
 .youtube-channel-content h3 {
-  margin: 0;
+  margin: 0 0 var(--spacing-xs) 0;
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text);
@@ -819,6 +815,223 @@ button.action-btn:hover {
   border-color: #ff0000;
   color: #ffffff;
   transform: scale(1.05);
+}
+
+/* Featured Video Preview */
+.featured-video-preview {
+  margin: var(--spacing-md) 0;
+}
+
+.video-thumbnail-container {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.video-thumbnail-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.video-thumbnail {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.video-play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 0, 0, 0.9);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.video-thumbnail-container:hover .video-play-overlay {
+  background: rgba(255, 0, 0, 1);
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.play-icon {
+  color: white;
+  font-size: 1.5rem;
+  margin-left: 4px; /* Slight offset for visual centering */
+}
+
+.video-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md);
+}
+
+.video-info h4 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.video-info p {
+  margin: 0;
+  font-size: 0.875rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+/* Watch Video Button */
+.youtube-watch-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(255, 0, 0, 0.15) 100%);
+  border: 2px solid rgba(255, 0, 0, 0.3);
+  border-radius: var(--radius-full);
+  color: #ff0000;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  letter-spacing: 0.025em;
+  min-height: 44px;
+  width: 100%;
+  justify-content: center;
+}
+
+.youtube-watch-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 0, 0, 0.15) 0%, rgba(255, 0, 0, 0.2) 100%);
+  border-color: rgba(255, 0, 0, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+}
+
+/* Video Modal */
+.video-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: var(--spacing-md);
+  animation: modal-fade-in 0.3s ease-out;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.video-modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: 0;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  animation: video-modal-appear 0.4s ease-out;
+}
+
+@keyframes video-modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.video-close-btn {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.video-close-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+.video-container {
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  position: relative;
+  background-color: #000;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.video-modal-info {
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.video-modal-info h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.video-modal-info p {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 .external-icon {
@@ -1086,26 +1299,25 @@ button.action-btn:hover {
     transform: scale(1.05);
   }
   
-  /* Desktop Discord section - enhanced vertical layout */
-  .discord-community-header {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-lg);
-  }
-
-  .discord-community-title {
-    justify-content: center;
+  /* Desktop section icon positioning */
+  .section-header-icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-md);
   }
   
+  .section-header-icon:hover {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  
+  /* Desktop Discord section - enhanced vertical layout */
   .discord-community-content h3 {
     font-size: 1.375rem;
-    text-align: center;
     margin-bottom: var(--spacing-sm);
   }
   
   .discord-community-content p {
     font-size: 1rem;
-    text-align: center;
     line-height: 1.5;
   }
   
@@ -1159,25 +1371,13 @@ button.action-btn:hover {
   }
   
   /* Desktop YouTube section - matching enhanced Discord layout */
-  .youtube-channel-header {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-lg);
-  }
-
-  .youtube-channel-title {
-    justify-content: center;
-  }
-  
   .youtube-channel-content h3 {
     font-size: 1.375rem;
-    text-align: center;
     margin-bottom: var(--spacing-sm);
   }
   
   .youtube-channel-content p {
     font-size: 1rem;
-    text-align: center;
     line-height: 1.5;
   }
   
@@ -1230,6 +1430,44 @@ button.action-btn:hover {
     transform: scale(1.05);
   }
   
+  /* Desktop video enhancements */
+  .video-thumbnail {
+    height: 220px;
+  }
+  
+  .video-play-overlay {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .play-icon {
+    font-size: 1.75rem;
+  }
+  
+  .video-info h4 {
+    font-size: 1.125rem;
+  }
+  
+  .video-info p {
+    font-size: 1rem;
+  }
+  
+  .video-modal-content {
+    max-width: 1000px;
+  }
+  
+  .video-modal-info {
+    padding: var(--spacing-xl);
+  }
+  
+  .video-modal-info h3 {
+    font-size: 1.5rem;
+  }
+  
+  .video-modal-info p {
+    font-size: 1.125rem;
+  }
+  
   /* Benefits section: 2-column slider grid on desktop */
   .premium-benefits-container {
     display: grid;
@@ -1280,32 +1518,6 @@ button.action-btn:hover {
     font-size: 0.875rem !important;
     font-weight: 500 !important;
     min-height: auto !important;
-  }
-  
-  /* LEGACY: Keep old header mobile styles for backward compatibility */
-  .tracker-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    margin-top: 0;
-  }
-  
-  .tracker-header h2 {
-    text-align: center;
-    order: 1;
-  }
-  
-  .tracker-actions {
-    width: 100%;
-    order: 2;
-    justify-self: center;
-  }
-  
-  .action-btn {
-    flex: 1;
-    justify-content: center;
   }
   
   .streak-number {
@@ -1410,13 +1622,13 @@ button.action-btn:hover {
     color: var(--text-secondary) !important;
   }
 
-  /* Discord community mobile layout */
-  .discord-community-header {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-md);
+  /* Mobile section icon adjustments */
+  .section-header-icon {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-sm);
   }
-  
+
+  /* Discord community mobile layout */
   .discord-community-stats {
     gap: var(--spacing-lg);
   }
@@ -1427,12 +1639,6 @@ button.action-btn:hover {
   }
   
   /* YouTube channel mobile layout */
-  .youtube-channel-header {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-md);
-  }
-  
   .youtube-channel-stats {
     gap: var(--spacing-lg);
   }
@@ -1440,6 +1646,54 @@ button.action-btn:hover {
   .youtube-subscribe-btn {
     width: 100%;
     justify-content: center;
+  }
+  
+  /* Mobile video adjustments */
+  .video-thumbnail {
+    height: 180px;
+  }
+  
+  .video-play-overlay {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .play-icon {
+    font-size: 1.25rem;
+  }
+  
+  .video-info {
+    padding: var(--spacing-md) var(--spacing-sm) var(--spacing-sm);
+  }
+  
+  .video-info h4 {
+    font-size: 0.9375rem;
+  }
+  
+  .video-info p {
+    font-size: 0.8125rem;
+  }
+  
+  .video-modal-content {
+    margin: var(--spacing-sm);
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .video-modal-info {
+    padding: var(--spacing-md);
+  }
+  
+  .video-modal-info h3 {
+    font-size: 1.125rem;
+  }
+  
+  .video-modal-info p {
+    font-size: 0.875rem;
+  }
+  
+  .youtube-watch-btn {
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
   }
   
   .leaderboard-status,
