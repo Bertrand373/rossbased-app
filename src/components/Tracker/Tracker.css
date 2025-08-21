@@ -1067,39 +1067,42 @@ button.action-btn:hover {
   
   /* Enhanced button styling for desktop */
   .relapse-btn-grey {
-    background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.15) 100%);
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: rgba(128, 128, 128, 0.1);
+    color: var(--text-secondary);
+    border-color: var(--text-secondary);
   }
   
   .relapse-btn-grey:hover {
-    background: linear-gradient(135deg, rgba(128, 128, 128, 0.2) 0%, rgba(128, 128, 128, 0.25) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(128, 128, 128, 0.2);
+    background-color: rgba(128, 128, 128, 0.2);
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+    transform: scale(1.05);
   }
   
   .wetdream-btn {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.15) 100%);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border-color: var(--warning);
   }
   
   .wetdream-btn:hover {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.25) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    background-color: rgba(245, 158, 11, 0.2);
+    border-color: var(--warning);
+    color: var(--warning);
+    transform: scale(1.05);
   }
   
   .urge-btn {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.15) 100%);
-    border: 1px solid rgba(37, 99, 235, 0.3);
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    border-color: var(--primary);
   }
   
   .urge-btn:hover {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.25) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    background-color: rgba(37, 99, 235, 0.2);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: scale(1.05);
   }
   
   /* Desktop Discord section - enhanced vertical layout */
