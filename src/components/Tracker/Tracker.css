@@ -1028,13 +1028,14 @@ button.action-btn:hover {
     font-size: 0.9375rem;
   }
   
-  /* ENHANCED: Wider, more prominent action buttons on desktop */
+  /* ENHANCED: Much wider, more prominent action buttons on desktop */
   .streak-actions {
     flex-direction: column;
     gap: var(--spacing-lg);
-    max-width: 500px;
+    max-width: 600px !important;
+    width: 100% !important;
     margin: 0 auto;
-    padding: 0 var(--spacing-lg);
+    padding: 0 var(--spacing-md);
   }
   
   .streak-action-btn {
