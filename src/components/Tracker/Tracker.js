@@ -349,9 +349,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           {/* Discord Community Section */}
           <div className="discord-community-section">
             <div className="discord-community-header">
-              <div className="discord-community-icon">
-                <FaDiscord />
-              </div>
               <div className="discord-community-content">
                 <h3>Join Our Community</h3>
                 <p>Connect with others on the same journey, share progress, and get support</p>
@@ -398,9 +395,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           {/* NEW: YouTube Channel Section */}
           <div className="youtube-channel-section">
             <div className="youtube-channel-header">
-              <div className="youtube-channel-icon">
-                <FaYoutube />
-              </div>
               <div className="youtube-channel-content">
                 <h3>Watch on YouTube</h3>
                 <p>Get exclusive tips, motivation, and insights to accelerate your transformation</p>

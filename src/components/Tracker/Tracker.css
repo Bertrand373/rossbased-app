@@ -636,23 +636,6 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
 }
 
-.discord-community-icon {
-  background: linear-gradient(135deg, rgba(114, 137, 218, 0.1) 0%, rgba(114, 137, 218, 0.15) 100%);
-  border: 1px solid rgba(114, 137, 218, 0.2);
-  border-radius: var(--radius-lg);
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.discord-community-icon svg {
-  font-size: 1.5rem;
-  color: #7289da;
-}
-
 .discord-community-content {
   flex: 1;
 }
@@ -745,23 +728,6 @@ button.action-btn:hover {
   display: flex;
   align-items: center;
   gap: var(--spacing-lg);
-}
-
-.youtube-channel-icon {
-  background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(255, 0, 0, 0.15) 100%);
-  border: 1px solid rgba(255, 0, 0, 0.2);
-  border-radius: var(--radius-lg);
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.youtube-channel-icon svg {
-  font-size: 1.5rem;
-  color: #ff0000;
 }
 
 .youtube-channel-content {
@@ -1110,17 +1076,6 @@ button.action-btn:hover {
     gap: var(--spacing-lg);
   }
   
-  .discord-community-icon {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto;
-    box-shadow: 0 4px 12px rgba(114, 137, 218, 0.15);
-  }
-  
-  .discord-community-icon svg {
-    font-size: 2.25rem;
-  }
-  
   .discord-community-content h3 {
     font-size: 1.375rem;
     text-align: center;
@@ -1189,17 +1144,6 @@ button.action-btn:hover {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-lg);
-  }
-  
-  .youtube-channel-icon {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto;
-    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.15);
-  }
-  
-  .youtube-channel-icon svg {
-    font-size: 2.25rem;
   }
   
   .youtube-channel-content h3 {
