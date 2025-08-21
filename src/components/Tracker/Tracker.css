@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and improved icon placement */
+/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and fixed thumbnail */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -836,11 +836,13 @@ button.action-btn:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* FIXED: Thumbnail - No cropping, preserves full image */
 .video-thumbnail {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto; /* CHANGED: Let height be determined by aspect ratio */
+  object-fit: contain; /* CHANGED: Shows full image without cropping */
   display: block;
+  border-radius: var(--radius-lg); /* Keep rounded corners */
 }
 
 .video-play-overlay {
@@ -871,59 +873,11 @@ button.action-btn:hover {
   margin-left: 4px; /* Slight offset for visual centering */
 }
 
-.video-info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  color: white;
-  padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md);
-}
+/* REMOVED: video-info styles since we removed the text overlay */
 
-.video-info h4 {
-  margin: 0 0 var(--spacing-xs) 0;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.3;
-}
+/* REMOVED: youtube-watch-btn styles since we removed the redundant button */
 
-.video-info p {
-  margin: 0;
-  font-size: 0.875rem;
-  opacity: 0.9;
-  line-height: 1.4;
-}
-
-/* Watch Video Button */
-.youtube-watch-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-xl);
-  background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(255, 0, 0, 0.15) 100%);
-  border: 2px solid rgba(255, 0, 0, 0.3);
-  border-radius: var(--radius-full);
-  color: #ff0000;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  letter-spacing: 0.025em;
-  min-height: 44px;
-  width: 100%;
-  justify-content: center;
-}
-
-.youtube-watch-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 0, 0, 0.15) 0%, rgba(255, 0, 0, 0.2) 100%);
-  border-color: rgba(255, 0, 0, 0.5);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
-}
-
-/* Video Modal */
+/* Video Modal - CLEANED: No text section */
 .video-modal-overlay {
   position: fixed;
   top: 0;
@@ -1015,24 +969,7 @@ button.action-btn:hover {
   border: none;
 }
 
-.video-modal-info {
-  padding: var(--spacing-lg);
-  text-align: center;
-}
-
-.video-modal-info h3 {
-  margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.video-modal-info p {
-  margin: 0;
-  font-size: 0.9375rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
+/* REMOVED: video-modal-info styles since we removed the text section */
 
 .external-icon {
   font-size: 0.75rem;
@@ -1430,9 +1367,9 @@ button.action-btn:hover {
     transform: scale(1.05);
   }
   
-  /* Desktop video enhancements */
+  /* Desktop video enhancements - FIXED: No fixed heights */
   .video-thumbnail {
-    height: 220px;
+    height: auto; /* CHANGED: Remove fixed 220px height */
   }
   
   .video-play-overlay {
@@ -1444,28 +1381,8 @@ button.action-btn:hover {
     font-size: 1.75rem;
   }
   
-  .video-info h4 {
-    font-size: 1.125rem;
-  }
-  
-  .video-info p {
-    font-size: 1rem;
-  }
-  
   .video-modal-content {
     max-width: 1000px;
-  }
-  
-  .video-modal-info {
-    padding: var(--spacing-xl);
-  }
-  
-  .video-modal-info h3 {
-    font-size: 1.5rem;
-  }
-  
-  .video-modal-info p {
-    font-size: 1.125rem;
   }
   
   /* Benefits section: 2-column slider grid on desktop */
@@ -1648,9 +1565,9 @@ button.action-btn:hover {
     justify-content: center;
   }
   
-  /* Mobile video adjustments */
+  /* Mobile video adjustments - FIXED: No fixed heights */
   .video-thumbnail {
-    height: 180px;
+    height: auto; /* CHANGED: Remove fixed 180px height */
   }
   
   .video-play-overlay {
@@ -1662,38 +1579,9 @@ button.action-btn:hover {
     font-size: 1.25rem;
   }
   
-  .video-info {
-    padding: var(--spacing-md) var(--spacing-sm) var(--spacing-sm);
-  }
-  
-  .video-info h4 {
-    font-size: 0.9375rem;
-  }
-  
-  .video-info p {
-    font-size: 0.8125rem;
-  }
-  
   .video-modal-content {
     margin: var(--spacing-sm);
     max-width: calc(100vw - 2rem);
-  }
-  
-  .video-modal-info {
-    padding: var(--spacing-md);
-  }
-  
-  .video-modal-info h3 {
-    font-size: 1.125rem;
-  }
-  
-  .video-modal-info p {
-    font-size: 0.875rem;
-  }
-  
-  .youtube-watch-btn {
-    font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-md);
   }
   
   .leaderboard-status,

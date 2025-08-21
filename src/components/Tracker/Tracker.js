@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Enhanced YouTube section with featured video embed
+// components/Tracker/Tracker.js - UPDATED: Clean video section with no redundancy or text
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -271,7 +271,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* NEW: Video Modal */}
+      {/* CLEANED: Video Modal - No text, just video */}
       {showVideo && (
         <div className="video-modal-overlay" onClick={handleCloseVideo}>
           <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -288,10 +288,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
-            </div>
-            <div className="video-modal-info">
-              <h3>The Science of Semen Retention</h3>
-              <p>Discover the research-backed benefits and practical strategies for your transformation journey.</p>
             </div>
           </div>
         </div>
@@ -434,7 +430,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* ENHANCED: YouTube Channel Section with Featured Video */}
+          {/* CLEANED: YouTube Channel Section - No redundant button, no text overlays */}
           <div className="youtube-channel-section">
             <div className="youtube-channel-header">
               <div className="section-icon-header">
@@ -446,7 +442,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               </div>
             </div>
             
-            {/* Featured Video Preview */}
+            {/* Featured Video Preview - ONLY interaction needed */}
             <div className="featured-video-preview">
               <div className="video-thumbnail-container" onClick={handleWatchVideo}>
                 <img 
@@ -457,10 +453,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <div className="video-play-overlay">
                   <FaPlay className="play-icon" />
                 </div>
-                <div className="video-info">
-                  <h4>The Science of Semen Retention</h4>
-                  <p>Essential knowledge for your transformation journey</p>
-                </div>
+                {/* REMOVED: All video info text overlay */}
               </div>
             </div>
             
@@ -480,13 +473,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
             
             <div className="youtube-channel-actions">
-              <button 
-                className="youtube-watch-btn"
-                onClick={handleWatchVideo}
-              >
-                <FaPlay />
-                <span>Watch Video</span>
-              </button>
+              {/* REMOVED: Redundant "Watch Video" button */}
               
               <button 
                 className="youtube-subscribe-btn"
