@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and fixed thumbnail */
+/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and mobile enhancements */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -873,10 +873,6 @@ button.action-btn:hover {
   margin-left: 4px; /* Slight offset for visual centering */
 }
 
-/* REMOVED: video-info styles since we removed the text overlay */
-
-/* REMOVED: youtube-watch-btn styles since we removed the redundant button */
-
 /* Video Modal - CLEANED: No text section */
 .video-modal-overlay {
   position: fixed;
@@ -968,8 +964,6 @@ button.action-btn:hover {
   height: 100%;
   border: none;
 }
-
-/* REMOVED: video-modal-info styles since we removed the text section */
 
 .external-icon {
   font-size: 0.75rem;
@@ -1437,8 +1431,14 @@ button.action-btn:hover {
     min-height: auto !important;
   }
   
+  /* ENHANCED: Mobile gradient streak number to match desktop */
   .streak-number {
-    font-size: 3rem;
+    font-size: 3.5rem !important;
+    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
   }
   
   /* MOBILE: Better milestone spacing */
@@ -1450,9 +1450,25 @@ button.action-btn:hover {
     padding: 0 var(--spacing-sm);
   }
   
+  /* ENHANCED: Mobile milestone cards to match desktop styling */
   .milestone-item {
     flex: 1;
     min-width: 70px;
+    padding: var(--spacing-sm);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .milestone-item:active {
+    background-color: rgba(255, 221, 0, 0.05);
+    border-color: rgba(255, 221, 0, 0.1);
+    transform: translateY(-1px);
   }
   
   .milestone-icon {
@@ -1469,14 +1485,66 @@ button.action-btn:hover {
     font-size: 0.75rem;
   }
   
+  /* ENHANCED: Mobile action buttons - enhanced styling like desktop */
   .streak-actions {
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
   }
   
   .streak-action-btn {
     width: 100%;
     justify-content: center;
+    padding: var(--spacing-lg) var(--spacing-xl) !important;
+    font-size: 1rem !important;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    min-height: 50px !important;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* ENHANCED: Mobile button colors match desktop exactly */
+  .relapse-btn-grey {
+    background-color: rgba(128, 128, 128, 0.1);
+    color: var(--text-secondary);
+    border-color: var(--text-secondary);
+  }
+  
+  .relapse-btn-grey:active {
+    background-color: rgba(128, 128, 128, 0.2);
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+    transform: scale(1.02);
+  }
+  
+  .wetdream-btn {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border-color: var(--warning);
+  }
+  
+  .wetdream-btn:active {
+    background-color: rgba(245, 158, 11, 0.2);
+    border-color: var(--warning);
+    color: var(--warning);
+    transform: scale(1.02);
+  }
+  
+  .urge-btn {
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+  
+  .urge-btn:active {
+    background-color: rgba(37, 99, 235, 0.2);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: scale(1.02);
   }
   
   .benefit-logging-section {
@@ -1550,9 +1618,32 @@ button.action-btn:hover {
     gap: var(--spacing-lg);
   }
   
+  /* ENHANCED: Mobile Discord and YouTube buttons match desktop styling */
   .discord-join-btn {
     width: 100%;
     justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-xl);
+    background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
+    border: 1px solid #7289da;
+    border-radius: var(--radius-full);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    letter-spacing: 0.025em;
+    min-height: 44px;
+  }
+
+  .discord-join-btn:active {
+    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+    border-color: #7289da;
+    color: #ffffff;
+    transform: scale(1.02);
   }
   
   /* YouTube channel mobile layout */
@@ -1563,6 +1654,28 @@ button.action-btn:hover {
   .youtube-subscribe-btn {
     width: 100%;
     justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-xl);
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    border: 1px solid #ff0000;
+    border-radius: var(--radius-full);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    letter-spacing: 0.025em;
+    min-height: 44px;
+  }
+
+  .youtube-subscribe-btn:active {
+    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
+    border-color: #ff0000;
+    color: #ffffff;
+    transform: scale(1.02);
   }
   
   /* Mobile video adjustments - FIXED: No fixed heights */
