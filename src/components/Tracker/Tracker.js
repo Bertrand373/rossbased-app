@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Added daily benefits modal system
+// components/Tracker/Tracker.js - UPDATED: Clean video section with no redundancy or text
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -23,22 +23,16 @@ import {
   FaUsers,
   FaYoutube,
   FaPlay,
-  FaCalendarAlt,
-  FaHeart
+  FaCalendarAlt
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
   const navigate = useNavigate();
   const [showSetStartDate, setShowSetStartDate] = useState(!userData.startDate);
   
-  // Video modal state
+  // NEW: Video modal state
   const [showVideo, setShowVideo] = useState(false);
   const [featuredVideoId] = useState('_1CcOqHD57E'); // Your video ID
-  
-  // NEW: Benefits modal state and activity tracking
-  const [showBenefitsModal, setShowBenefitsModal] = useState(false);
-  const [userActiveTime, setUserActiveTime] = useState(0);
-  const [hasShownModalToday, setHasShownModalToday] = useState(false);
   
   // Initialize with the current date if no start date exists
   const [startDate, setStartDate] = useState(
@@ -59,38 +53,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [benefitsLogged, setBenefitsLogged] = useState(false);
   
   const today = new Date();
-
-  // NEW: Track user activity time
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setUserActiveTime(prev => prev + 1000);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  // NEW: Smart benefits modal logic
-  useEffect(() => {
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const existingBenefits = userData.benefitTracking?.find(
-      benefit => format(new Date(benefit.date), 'yyyy-MM-dd') === todayStr
-    );
-    
-    // Check if we should show the modal
-    const shouldShowModal = (
-      !existingBenefits && // Benefits not logged today
-      !hasShownModalToday && // Haven't shown modal today
-      userActiveTime > 20000 && // User has been active for 20+ seconds
-      userData.startDate && // User has set up their account
-      !showSetStartDate && // Not currently setting start date
-      !showVideo // Not watching video
-    );
-
-    if (shouldShowModal) {
-      setShowBenefitsModal(true);
-      setHasShownModalToday(true);
-    }
-  }, [userActiveTime, userData.benefitTracking, hasShownModalToday, userData.startDate, showSetStartDate, showVideo]);
 
   // Check if benefits are already logged for today
   useEffect(() => {
@@ -240,13 +202,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     setBenefitsLogged(false);
   };
 
-  // NEW: Handle modal benefit saving
-  const saveBenefitsFromModal = () => {
-    saveBenefits();
-    setShowBenefitsModal(false);
-    toast.success('Great job! Daily check-in complete! 🎉');
-  };
-
   const saveBenefits = () => {
     const today = new Date();
     const todayStr = format(today, 'yyyy-MM-dd');
@@ -272,19 +227,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     
     updateUserData({ benefitTracking: updatedBenefitTracking });
     setBenefitsLogged(true);
-    
-    if (!showBenefitsModal) {
-      toast.success('Benefits logged for today!');
-    }
-  };
-
-  // NEW: Handle modal dismissal
-  const handleDismissBenefitsModal = () => {
-    setShowBenefitsModal(false);
-    toast('You can always log your benefits later in the dashboard!', {
-      icon: '💭',
-      duration: 3000
-    });
+    toast.success('Benefits logged for today!');
   };
 
   // Handle Discord link
@@ -297,7 +240,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     window.open('https://www.youtube.com/@RossBased', '_blank', 'noopener,noreferrer');
   };
 
-  // Video handlers
+  // NEW: Video handlers
   const handleWatchVideo = () => {
     setShowVideo(true);
   };
@@ -328,70 +271,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* NEW: Daily Benefits Check-in Modal */}
-      {showBenefitsModal && (
-        <div className="benefits-modal-overlay">
-          <div className="benefits-modal-content">
-            <button className="benefits-modal-close-btn" onClick={handleDismissBenefitsModal}>
-              <FaTimes />
-            </button>
-            
-            <div className="benefits-modal-header">
-              <FaHeart className="benefits-modal-icon" />
-              <h3>Daily Check-In</h3>
-              <p>How are you feeling today? Track your progress to see your transformation!</p>
-            </div>
-            
-            <div className="benefits-modal-sliders">
-              {[
-                { key: 'energy', label: 'Energy', value: todayBenefits.energy, lowLabel: 'Low', highLabel: 'High' },
-                { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
-                { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
-                { key: 'aura', label: 'Aura', value: todayBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
-                { key: 'sleep', label: 'Sleep Quality', value: todayBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
-                { key: 'workout', label: 'Workout', value: todayBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
-              ].map((slider) => (
-                <div key={slider.key} className="benefits-modal-slider-item">
-                  <div className="benefits-modal-slider-header">
-                    <span className="benefits-modal-slider-label">{slider.label}</span>
-                    <span className="benefits-modal-slider-value">{slider.value}/10</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={slider.value}
-                    onChange={(e) => handleBenefitChange(slider.key, parseInt(e.target.value))}
-                    className="benefits-modal-range-slider"
-                  />
-                  <div className="benefits-modal-slider-labels">
-                    <span>{slider.lowLabel}</span>
-                    <span>{slider.highLabel}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="benefits-modal-actions">
-              <button 
-                className="benefits-modal-save-btn"
-                onClick={saveBenefitsFromModal}
-              >
-                <FaCheckCircle />
-                <span>Complete Check-In</span>
-              </button>
-              <button 
-                className="benefits-modal-skip-btn"
-                onClick={handleDismissBenefitsModal}
-              >
-                Skip for now
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Video Modal */}
+      {/* CLEANED: Video Modal - No text, just video */}
       {showVideo && (
         <div className="video-modal-overlay" onClick={handleCloseVideo}>
           <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -550,7 +430,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* YouTube Channel Section */}
+          {/* CLEANED: YouTube Channel Section - No redundant button, no text overlays */}
           <div className="youtube-channel-section">
             <div className="youtube-channel-header">
               <div className="section-icon-header">
@@ -562,7 +442,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               </div>
             </div>
             
-            {/* Featured Video Preview */}
+            {/* Featured Video Preview - ONLY interaction needed */}
             <div className="featured-video-preview">
               <div className="video-thumbnail-container" onClick={handleWatchVideo}>
                 <img 
@@ -573,6 +453,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <div className="video-play-overlay">
                   <FaPlay className="play-icon" />
                 </div>
+                {/* REMOVED: All video info text overlay */}
               </div>
             </div>
             
@@ -592,6 +473,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
             
             <div className="youtube-channel-actions">
+              {/* REMOVED: Redundant "Watch Video" button */}
+              
               <button 
                 className="youtube-subscribe-btn"
                 onClick={handleYouTubeSubscribe}
@@ -605,7 +488,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* Benefit Logging Section - Full Width Below on Desktop - SIMPLIFIED when modal is active */}
+      {/* Benefit Logging Section - Full Width Below on Desktop */}
       <div className="benefit-logging-container">
         <div className="benefit-logging-section">
           <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
@@ -627,60 +510,54 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             ) : (
               <div className="benefits-not-logged">
                 <FaInfoCircle className="info-icon" />
-                <span>Your daily check-in will help track your transformation progress</span>
-                <button 
-                  className="action-btn manual-checkin-btn"
-                  onClick={() => setShowBenefitsModal(true)}
-                >
-                  <FaHeart />
-                  <span>Start Check-In</span>
-                </button>
+                <span>Track your benefits for today - the more you log, the more powerful your analytics become</span>
               </div>
             )}
           </div>
           
-          {/* Show sliders only if benefits not logged and user wants to edit manually */}
-          {!benefitsLogged && (
-            <div className="premium-benefits-container">
-              {[
-                { key: 'energy', label: 'Energy', value: todayBenefits.energy, lowLabel: 'Low', highLabel: 'High' },
-                { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
-                { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
-                { key: 'aura', label: 'Aura', value: todayBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
-                { key: 'sleep', label: 'Sleep Quality', value: todayBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
-                { key: 'workout', label: 'Workout', value: todayBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
-              ].map((slider) => (
-                <div key={slider.key} className="benefit-slider-item">
-                  <div className="benefit-slider-header">
-                    <span className="benefit-label">{slider.label}</span>
-                    <span className="benefit-value">{slider.value}/10</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={slider.value}
-                    onChange={(e) => handleBenefitChange(slider.key, parseInt(e.target.value))}
-                    className="benefit-range-slider"
-                    disabled={benefitsLogged}
-                  />
-                  <div className="slider-labels">
-                    <span>{slider.lowLabel}</span>
-                    <span>{slider.highLabel}</span>
-                  </div>
+          {/* ALL BENEFITS CONTAINER */}
+          <div className="premium-benefits-container">
+            {/* ALL 6 BENEFIT SLIDERS */}
+            {[
+              { key: 'energy', label: 'Energy', value: todayBenefits.energy, lowLabel: 'Low', highLabel: 'High' },
+              { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
+              { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
+              { key: 'aura', label: 'Aura', value: todayBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
+              { key: 'sleep', label: 'Sleep Quality', value: todayBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
+              { key: 'workout', label: 'Workout', value: todayBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
+            ].map((slider) => (
+              <div key={slider.key} className="benefit-slider-item">
+                <div className="benefit-slider-header">
+                  <span className="benefit-label">{slider.label}</span>
+                  <span className="benefit-value">{slider.value}/10</span>
                 </div>
-              ))}
-              
-              {/* Save button */}
-              <div className="benefit-actions">
-                <button 
-                  className="action-btn save-benefits-btn"
-                  onClick={saveBenefits}
-                >
-                  <FaCheckCircle />
-                  <span>Save Today's Benefits</span>
-                </button>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={slider.value}
+                  onChange={(e) => handleBenefitChange(slider.key, parseInt(e.target.value))}
+                  className="benefit-range-slider"
+                  disabled={benefitsLogged}
+                />
+                <div className="slider-labels">
+                  <span>{slider.lowLabel}</span>
+                  <span>{slider.highLabel}</span>
+                </div>
               </div>
+            ))}
+          </div>
+          
+          {/* Save button */}
+          {!benefitsLogged && (
+            <div className="benefit-actions">
+              <button 
+                className="action-btn save-benefits-btn"
+                onClick={saveBenefits}
+              >
+                <FaCheckCircle />
+                <span>Save Today's Benefits</span>
+              </button>
             </div>
           )}
         </div>
