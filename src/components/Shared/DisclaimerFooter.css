@@ -33,7 +33,7 @@
 }
 
 .disclaimer-text strong {
-  color: var(--text);
+  color: var(--text-secondary); /* Same as body text but bold */
   font-weight: 700; /* Make headers more bold */
 }
 
@@ -42,11 +42,11 @@
   color: var(--primary); /* Changed from #dc3545 to app yellow */
 }
 
-/* UPDATED: All other disclaimers use bold body text color instead of white */
+/* UPDATED: All other disclaimers use same color as body text but bold */
 .disclaimer-text.crisis strong,
 .disclaimer-text.privacy strong,
 .disclaimer-text.responsibility strong {
-  color: var(--text);
+  color: var(--text-secondary); /* Same as body text but bold */
   font-weight: 700;
 }
 
@@ -55,8 +55,9 @@
   .disclaimer-footer {
     padding: 0.75rem 1rem;
     font-size: 0.7rem;
-    /* FIXED: No negative margins - let it align naturally with app container */
     margin: 0;
+    /* FIXED: Position above mobile navigation with proper bottom margin */
+    margin-bottom: 90px;
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   }
   
@@ -70,8 +71,9 @@
   .disclaimer-footer {
     padding: 0.6rem 0.8rem;
     font-size: 0.65rem;
-    /* FIXED: No negative margins on small screens either */
     margin: 0;
+    /* FIXED: Maintain mobile navigation spacing on small screens */
+    margin-bottom: 90px;
   }
   
   .disclaimer-text {
