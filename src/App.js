@@ -1,4 +1,4 @@
-// App.js - UPDATED: Added goal functions from useUserData hook + DisclaimerFooter
+// App.js - UPDATED: Removed DisclaimerFooter for cleaner UX
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -31,7 +31,6 @@ import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 import SpartanLoader from './components/Shared/SpartanLoader';
-import DisclaimerFooter from './components/Shared/DisclaimerFooter';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -145,7 +144,7 @@ function App() {
                 e.target.nextElementSibling.style.display = 'block';
               }}
             />
-            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>⚡</div>
+            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>âš¡</div>
           </div>
           <div className="spartan-loader-message">
             {isLoading ? "Logging you in..." : "Loading your dashboard..."}
@@ -329,9 +328,6 @@ function App() {
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>
-              
-              {/* ADDED: Disclaimer footer inside the rounded container */}
-              <DisclaimerFooter />
             </main>
           </>
         ) : (
