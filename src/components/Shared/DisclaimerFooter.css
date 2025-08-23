@@ -8,6 +8,8 @@
   color: var(--text-secondary);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  /* FIXED: Pull up into main-content-wrapper bottom padding */
+  margin-top: calc(-1 * var(--spacing-lg));
 }
 
 .disclaimer-content {
@@ -52,6 +54,8 @@
     padding: 0.75rem 1rem;
     font-size: 0.7rem;
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    /* FIXED: Pull up into main-content-wrapper mobile padding */
+    margin-top: calc(-1 * var(--spacing-md));
   }
   
   .disclaimer-section {
@@ -65,6 +69,8 @@
     padding: 0.6rem 0.8rem;
     font-size: 0.65rem;
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    /* FIXED: Pull up into main-content-wrapper mobile padding */
+    margin-top: calc(-1 * var(--spacing-md));
   }
   
   .disclaimer-text {
