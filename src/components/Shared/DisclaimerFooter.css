@@ -1,15 +1,12 @@
 /* src/components/Shared/DisclaimerFooter.css */
 .disclaimer-footer {
-  margin-top: auto;
   padding: 1rem 1.5rem;
   background: linear-gradient(135deg, var(--medium-gray) 0%, rgba(255, 221, 0, 0.05) 100%);
   border-top: 1px solid var(--border);
   font-size: 0.75rem;
   line-height: 1.4;
   color: var(--text-secondary);
-  /* Make it appear inside the rounded container */
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  /* Subtle shadow to separate from content */
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
