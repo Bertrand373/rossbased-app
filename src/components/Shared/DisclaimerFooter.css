@@ -37,12 +37,12 @@
   font-weight: 700; /* Make headers more bold */
 }
 
-/* Keep only medical disclaimer red for critical legal protection */
+/* UPDATED: Medical disclaimer now uses app yellow instead of red */
 .disclaimer-text.medical strong {
-  color: #dc3545; /* Keep red for medical - most important */
+  color: var(--primary); /* Changed from #dc3545 to app yellow */
 }
 
-/* All other disclaimers use bold body text color */
+/* UPDATED: All other disclaimers use bold body text color instead of white */
 .disclaimer-text.crisis strong,
 .disclaimer-text.privacy strong,
 .disclaimer-text.responsibility strong {
@@ -55,6 +55,10 @@
   .disclaimer-footer {
     padding: 0.75rem 1rem;
     font-size: 0.7rem;
+    /* FIXED: Remove margin to align with app container edges */
+    margin: 0 calc(-1 * var(--spacing-sm));
+    /* UPDATED: Ensure it extends to container edges */
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   }
   
   .disclaimer-section {
@@ -67,6 +71,8 @@
   .disclaimer-footer {
     padding: 0.6rem 0.8rem;
     font-size: 0.65rem;
+    /* FIXED: Ensure alignment on very small screens too */
+    margin: 0 calc(-1 * var(--spacing-sm));
   }
   
   .disclaimer-text {
