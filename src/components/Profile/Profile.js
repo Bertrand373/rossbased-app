@@ -1,5 +1,5 @@
-// components/Profile/Profile.js - UPDATED: Consistent header design matching tracker/calendar, coming soon banner for language settings, SMOOTH SLIDING TAB ANIMATION
-import React, { useState, useEffect, useRef } from 'react';
+// components/Profile/Profile.js - UPDATED: ROBUST SLIDING TAB ANIMATION with boundary checks and smooth transitions
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
@@ -29,18 +29,16 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
   const [notifications, setNotifications] = useState(userData.notifications !== false); // Default true
   
-  // App Settings States - REMOVED: language (now locked behind coming soon)
-  // No longer needed since language selection is locked
-  
   // Feedback States - SIMPLIFIED: Removed email and priority
   const [feedbackType, setFeedbackType] = useState('general');
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
   
-  // NEW: Tab slider animation refs and state
+  // IMPROVED: Tab slider animation refs with better state management
   const tabsRef = useRef(null);
   const sliderRef = useRef(null);
-  const [tabsData, setTabsData] = useState([]);
+  const [isSliderReady, setIsSliderReady] = useState(false);
+  const [lastActiveTab, setLastActiveTab] = useState(activeTab);
   
   const feedbackTypes = [
     { id: 'bug', label: 'Bug Report', icon: FaBug },
@@ -57,58 +55,138 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'data', label: 'Data', icon: FaDownload }
   ];
 
-  // NEW: Calculate tab positions and update slider
-  const updateTabSlider = () => {
-    if (!tabsRef.current || !sliderRef.current) return;
+  // ROBUST: Enhanced tab slider positioning with boundary checks and error handling
+  const updateTabSlider = useCallback(() => {
+    // Guard clauses for safety
+    if (!tabsRef.current || !sliderRef.current || !isSliderReady) {
+      return;
+    }
     
-    const tabsContainer = tabsRef.current;
-    const slider = sliderRef.current;
-    const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeTab}"]`);
-    
-    if (activeTabElement) {
+    try {
+      const tabsContainer = tabsRef.current;
+      const slider = sliderRef.current;
+      const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeTab}"]`);
+      
+      if (!activeTabElement) {
+        console.warn(`Active tab element not found: ${activeTab}`);
+        return;
+      }
+
+      // Get precise measurements using getBoundingClientRect
       const containerRect = tabsContainer.getBoundingClientRect();
       const tabRect = activeTabElement.getBoundingClientRect();
       
-      // Calculate position relative to container, accounting for padding
-      const leftOffset = tabRect.left - containerRect.left - 8; // 8px is var(--spacing-xs)
-      const width = tabRect.width;
-      
-      slider.style.transform = `translateX(${leftOffset}px)`;
-      slider.style.width = `${width}px`;
-    }
-  };
+      if (containerRect.width === 0 || tabRect.width === 0) {
+        // Container or tab not yet rendered, skip update
+        return;
+      }
 
-  // NEW: Update slider when active tab changes
-  useEffect(() => {
-    updateTabSlider();
+      // Calculate container padding (should be 8px based on CSS --spacing-xs)
+      const computedStyle = window.getComputedStyle(tabsContainer);
+      const paddingLeft = parseFloat(computedStyle.paddingLeft) || 8;
+      const paddingRight = parseFloat(computedStyle.paddingRight) || 8;
+      
+      // Calculate position relative to container's content box
+      const leftOffset = tabRect.left - containerRect.left - paddingLeft;
+      const tabWidth = tabRect.width;
+      
+      // BOUNDARY CHECKS: Ensure slider stays within container bounds
+      const maxLeftOffset = containerRect.width - paddingLeft - paddingRight - tabWidth;
+      const clampedLeftOffset = Math.max(0, Math.min(leftOffset, maxLeftOffset));
+      const clampedWidth = Math.min(tabWidth, containerRect.width - paddingLeft - paddingRight);
+      
+      // Apply smooth transition with bounds checking
+      slider.style.transform = `translateX(${clampedLeftOffset}px)`;
+      slider.style.width = `${clampedWidth}px`;
+      
+      // Ensure slider visibility
+      slider.style.opacity = '1';
+      
+    } catch (error) {
+      console.error('Error updating tab slider:', error);
+    }
+  }, [activeTab, isSliderReady]);
+
+  // IMPROVED: Handle tab changes with proper state management
+  const handleTabChange = useCallback((newTab) => {
+    if (newTab === activeTab) return;
+    
+    setLastActiveTab(activeTab);
+    setActiveTab(newTab);
   }, [activeTab]);
 
-  // NEW: Update slider on window resize
+  // Initialize slider after DOM is ready
   useEffect(() => {
-    const handleResize = () => {
+    const initializeSlider = () => {
+      if (tabsRef.current && sliderRef.current) {
+        // Ensure DOM is fully rendered
+        requestAnimationFrame(() => {
+          setIsSliderReady(true);
+          updateTabSlider();
+        });
+      }
+    };
+
+    // Small delay to ensure all tabs are rendered
+    const timer = setTimeout(initializeSlider, 150);
+    return () => clearTimeout(timer);
+  }, [updateTabSlider]);
+
+  // Update slider when active tab changes
+  useEffect(() => {
+    if (isSliderReady && activeTab !== lastActiveTab) {
       updateTabSlider();
+    }
+  }, [activeTab, isSliderReady, lastActiveTab, updateTabSlider]);
+
+  // Handle window resize with debouncing
+  useEffect(() => {
+    let resizeTimeout;
+    
+    const handleResize = () => {
+      // Clear previous timeout
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      
+      // Debounce resize events
+      resizeTimeout = setTimeout(() => {
+        if (isSliderReady) {
+          updateTabSlider();
+        }
+      }, 100);
     };
     
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    return () => {
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isSliderReady, updateTabSlider]);
 
-  // NEW: Initialize slider after component mounts
+  // Recalculate slider on font load (for proper text measurements)
   useEffect(() => {
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      updateTabSlider();
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    const handleFontLoad = () => {
+      setTimeout(() => {
+        if (isSliderReady) {
+          updateTabSlider();
+        }
+      }, 100);
+    };
 
-  // Calculate basic user info for display - REMOVED: streak data
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(handleFontLoad);
+    }
+  }, [isSliderReady, updateTabSlider]);
+
+  // Calculate basic user info for display
   const userStats = {
     memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown'
   };
 
-  // Handle profile updates - REMOVED: language from updates
+  // Handle profile updates
   const handleProfileUpdate = () => {
     const updates = {
       username: username.trim(),
@@ -119,7 +197,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       analyticsOptIn,
       marketingEmails,
       notifications
-      // REMOVED: language (no longer tracked since it's locked)
     };
     
     updateUserData(updates);
@@ -127,7 +204,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     toast.success('Profile updated successfully!');
   };
 
-  // Handle feedback submission - SIMPLIFIED
+  // Handle feedback submission
   const handleFeedbackSubmit = () => {
     if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
       toast.error('Please fill in both subject and message');
@@ -246,16 +323,24 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       </div>
 
-      {/* NEW: Tab Navigation with Smooth Sliding Animation */}
+      {/* ROBUST: Tab Navigation with Enhanced Sliding Animation */}
       <div className="profile-tabs" ref={tabsRef}>
-        {/* NEW: Sliding background indicator */}
-        <div className="profile-tab-slider" ref={sliderRef}></div>
+        {/* ENHANCED: Sliding background indicator with better initial state */}
+        <div 
+          className="profile-tab-slider" 
+          ref={sliderRef}
+          style={{ 
+            opacity: isSliderReady ? 1 : 0,
+            transform: 'translateX(0px)',
+            width: '0px'
+          }}
+        />
         
         {tabs.map(tab => (
           <button 
             key={tab.id}
             className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => handleTabChange(tab.id)}
             data-tab={tab.id}
           >
             <tab.icon />
