@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Clean video section with no redundancy or text
+// components/Tracker/Tracker.js - UPDATED: Changed "Edit Date" to "Edit Start Date"
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -308,7 +308,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 onClick={() => setShowSetStartDate(true)}
               >
                 <FaEdit />
-                <span>Edit Date</span>
+                <span>Edit Start Date</span>
               </button>
             )}
           </div>

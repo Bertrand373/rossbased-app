@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and mobile enhancements */
+/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and mobile enhancements + UPDATED: Close button styling to match Profile modal */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -1054,25 +1054,32 @@ button.action-btn:hover {
   text-align: center;
 }
 
-/* Close button in upper right corner */
+/* UPDATED: Close button in upper right corner - MATCHING Profile feedback modal exactly */
 .modal-close-btn {
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  background: none;
-  border: none;
+  background: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  font-size: 1rem;
   color: var(--text-secondary);
-  font-size: 1.25rem;
   cursor: pointer;
   padding: var(--spacing-xs);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 10;
 }
 
 .modal-close-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* DESKTOP LAYOUT: Two-column grid for screens ≥1024px with ENHANCED styling */
