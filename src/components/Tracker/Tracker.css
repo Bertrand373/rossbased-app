@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and mobile enhancements + UPDATED: Close button styling to match Profile modal */
+/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and mobile enhancements + UPDATED: Modern thin sliders */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -407,11 +407,11 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
 }
 
-/* Professional slider styling */
+/* COMPLETELY REDESIGNED: Modern thin slider styling */
 .benefit-slider-item {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   position: relative;
 }
 
@@ -419,7 +419,7 @@ button.action-btn:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
 }
 
 /* Benefit labels */
@@ -432,51 +432,52 @@ button.action-btn:hover {
   letter-spacing: 0.025em;
 }
 
-/* Enhanced value display */
+/* UPDATED: Enhanced value display - cleaner pill design */
 .benefit-value {
   font-weight: 700;
   color: var(--primary);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   background-color: rgba(255, 221, 0, 0.08);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
-  min-width: 48px;
+  min-width: 40px;
   text-align: center;
   border: 1px solid rgba(255, 221, 0, 0.15);
+  transition: all 0.2s ease;
 }
 
-/* Professional slider track */
+/* MODERN: Ultra-thin slider track */
 .benefit-range-slider {
   -webkit-appearance: none;
+  appearance: none;
   width: 100%;
-  height: 28px;
+  height: 6px; /* DRAMATICALLY THINNER: From 28px to 6px */
   border-radius: var(--radius-full);
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.15) 0%, 
-    rgba(255, 221, 0, 0.08) 50%, 
-    rgba(255, 221, 0, 0.12) 100%
+    rgba(128, 128, 128, 0.12) 50%, 
+    rgba(255, 221, 0, 0.08) 100%
   );
   outline: none;
   transition: all 0.2s ease;
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: var(--spacing-sm) 0;
   position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  margin-bottom: 0px !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  cursor: pointer;
 }
 
 .benefit-range-slider:hover:not(:disabled) {
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.18) 0%, 
-    rgba(255, 221, 0, 0.1) 50%, 
-    rgba(255, 221, 0, 0.15) 100%
+    rgba(128, 128, 128, 0.15) 50%, 
+    rgba(255, 221, 0, 0.12) 100%
   );
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 221, 0, 0.1);
 }
 
 .benefit-range-slider:focus:not(:disabled) {
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 2px rgba(255, 221, 0, 0.2);
 }
 
 .benefit-range-slider:disabled {
@@ -485,49 +486,64 @@ button.action-btn:hover {
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* WebKit thumb */
+/* PREMIUM: Modern floating thumb - WebKit */
 .benefit-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 20px; /* REFINED: Perfectly sized thumb */
+  height: 20px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  margin: 0 !important;
-  transition: all 0.15s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Premium spring animation */
+  border: none;
+  position: relative;
 }
 
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.05);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05); /* Subtle scale on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.15);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
 .benefit-range-slider:active::-webkit-slider-thumb {
   transform: scale(1.02);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.1s ease;
 }
 
-/* Firefox thumb */
+/* PREMIUM: Modern floating thumb - Firefox */
 .benefit-range-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  margin: 0 !important;
-  transition: all 0.15s ease;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
   transform: scale(1.05);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.15);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+}
+
+/* CLEAN: Minimalist track fill - WebKit */
+.benefit-range-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: inherit;
+}
+
+/* CLEAN: Minimalist track fill - Firefox */
+.benefit-range-slider::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: inherit;
+  border: none;
 }
 
 .benefit-actions {
@@ -560,7 +576,7 @@ button.action-btn:hover {
   transform: translateY(-1px) !important;
 }
 
-/* Professional slider labels with perfect spacing */
+/* UPDATED: Refined slider labels with better spacing */
 .benefit-logging-section .premium-benefits-container .slider-labels,
 .premium-benefits-container .benefit-slider-item .slider-labels,
 .tracker-container .premium-benefits-container .slider-labels,
@@ -570,14 +586,14 @@ button.action-btn:hover {
   justify-content: space-between !important;
   font-size: 0.8125rem !important;
   color: var(--text-secondary) !important;
-  margin-top: 8px !important;
+  margin-top: var(--spacing-sm) !important;
   margin-bottom: 0px !important;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   line-height: 1 !important;
   transform: none !important;
-  padding-left: 14px !important;
-  padding-right: 14px !important;
+  padding-left: 10px !important; /* ADJUSTED: Better alignment with thin track */
+  padding-right: 10px !important;
   font-weight: 500 !important;
   letter-spacing: 0.025em !important;
   position: relative !important;
@@ -1577,35 +1593,36 @@ button.action-btn:hover {
     margin-top: var(--spacing-sm);
   }
   
-  /* Mobile slider adjustments */
+  /* MOBILE: Thin slider adjustments */
   .benefit-range-slider {
-    height: 32px;
+    height: 6px; /* KEEP: Same thin height on mobile */
+    margin: var(--spacing-sm) 0;
   }
   
   .benefit-range-slider::-webkit-slider-thumb {
-    width: 28px;
-    height: 28px;
+    width: 18px; /* SLIGHTLY smaller on mobile */
+    height: 18px;
   }
   
   .benefit-range-slider::-moz-range-thumb {
-    width: 28px;
-    height: 28px;
+    width: 18px;
+    height: 18px;
   }
   
-  /* Mobile slider labels with perfect spacing */
+  /* Mobile slider labels with perfect spacing for thin sliders */
   .benefit-logging-section .premium-benefits-container .slider-labels,
   .premium-benefits-container .benefit-slider-item .slider-labels,
   .tracker-container .premium-benefits-container .slider-labels,
   .tracker-container .benefit-logging-section .slider-labels,
   .benefit-logging-container .premium-benefits-container .slider-labels {
-    margin-top: 10px !important;
+    margin-top: var(--spacing-sm) !important;
     margin-bottom: 0px !important;
     padding-top: 0px !important;
     padding-bottom: 0px !important;
     line-height: 1 !important;
     transform: none !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    padding-left: 9px !important; /* ADJUSTED for mobile thin track */
+    padding-right: 9px !important;
     font-size: 0.75rem !important;
     font-weight: 500 !important;
     letter-spacing: 0.025em !important;
