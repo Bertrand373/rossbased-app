@@ -1,4 +1,4 @@
-/* components/Profile/Profile.css - UPDATED: Consistent with tracker/calendar styling, fixed toggle switches, mobile headings, coming soon banner, SMOOTH SLIDING TAB ANIMATION */
+/* components/Profile/Profile.css - MOBILE-FIRST: Enhanced sliding tab animation with bulletproof mobile support */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -181,7 +181,7 @@
   color: var(--text-secondary);
 }
 
-/* NEW: Tab Navigation with Smooth Sliding Animation */
+/* BULLETPROOF: Mobile-First Tab Navigation with Ultra-Robust Sliding Animation */
 .profile-tabs {
   display: flex;
   gap: var(--spacing-xs);
@@ -192,10 +192,21 @@
   overflow-x: auto;
   width: fit-content;
   margin: 0 auto;
-  position: relative; /* For sliding indicator positioning */
+  position: relative;
+  /* MOBILE: Ensure proper 3D rendering context */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* MOBILE: Prevent scrollbar issues */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-/* NEW: Sliding background indicator */
+.profile-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* ENHANCED: Ultra-robust sliding background indicator with mobile-first optimizations */
 .profile-tab-slider {
   position: absolute;
   top: var(--spacing-xs);
@@ -204,11 +215,30 @@
   background-color: rgba(255, 221, 0, 0.1);
   border: 1px solid rgba(255, 221, 0, 0.2);
   border-radius: var(--radius-full);
-  transition: transform 0.3s ease, width 0.3s ease;
+  /* MOBILE-OPTIMIZED: Enhanced transition with hardware acceleration */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 1;
+  /* MOBILE: Force GPU acceleration and smooth rendering */
+  will-change: transform, width;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* MOBILE: Prevent subpixel rendering issues */
+  transform-origin: left center;
+  /* CRITICAL: Ensure slider is always visible when initialized */
+  opacity: 0;
+  visibility: hidden;
 }
 
+/* MOBILE: Faster transition on smaller screens */
+@media (max-width: 768px) {
+  .profile-tab-slider {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* ENHANCED: Mobile-optimized tab buttons with better touch targets */
 .profile-tab {
   display: flex;
   align-items: center;
@@ -221,26 +251,66 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   white-space: nowrap;
   min-width: fit-content;
-  position: relative; /* For z-index positioning above slider */
+  position: relative;
   z-index: 2;
+  /* MOBILE: Ensure proper touch targets and prevent text selection */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  /* MOBILE: Minimum touch target size */
+  min-height: 40px;
+  /* MOBILE: Prevent button zoom on double-tap */
+  touch-action: manipulation;
 }
 
-.profile-tab:hover {
+/* MOBILE: Enhanced touch interaction */
+@media (max-width: 768px) {
+  .profile-tab {
+    min-height: 44px; /* iOS recommendation for touch targets */
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+}
+
+.profile-tab:hover:not(.active) {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
+/* CRITICAL: Active tab styling - REMOVE any background that conflicts with slider */
 .profile-tab.active {
-  color: var(--primary);
-  /* Remove background styles since slider handles it */
-  background-color: transparent;
-  border-color: transparent;
+  color: var(--primary) !important;
+  /* IMPORTANT: No background - let slider handle visual feedback */
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* MOBILE: Ensure active state is always visible */
+@media (max-width: 768px) {
+  .profile-tab.active {
+    /* FALLBACK: In case slider fails, ensure active tab is distinguishable */
+    font-weight: 600;
+  }
 }
 
 .profile-tab svg {
   font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* MOBILE: Responsive icon sizing */
+@media (max-width: 480px) {
+  .profile-tab svg {
+    font-size: 0.875rem;
+  }
+  
+  .profile-tab {
+    font-size: 0.8rem;
+    gap: var(--spacing-xs);
+  }
 }
 
 /* Tab Content */
@@ -353,8 +423,6 @@
   align-items: center;
   gap: var(--spacing-sm);
 }
-
-/* REMOVED: Clock icon - no longer displayed */
 
 .coming-soon-description {
   font-size: 0.875rem;
@@ -1079,7 +1147,7 @@
   color: var(--text);
 }
 
-/* IMPROVED: Mobile Responsiveness with better centering and FIXED heading sizes */
+/* MOBILE-FIRST: Enhanced Mobile Responsiveness with bulletproof tab handling */
 @media (max-width: 768px) {
   /* UPDATED: Mobile header layout */
   .integrated-profile-header {
@@ -1162,16 +1230,31 @@
     text-align: center;
   }
   
+  /* CRITICAL: Mobile tab container enhancements */
   .profile-tabs {
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
     width: 100%;
     margin: 0;
+    /* MOBILE: Force hardware acceleration */
+    transform: translateZ(0);
+    /* MOBILE: Ensure smooth scrolling */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
   
   .profile-tabs::-webkit-scrollbar {
     display: none;
+  }
+  
+  /* MOBILE: Enhanced slider for mobile - more reliable positioning */
+  .profile-tab-slider {
+    /* MOBILE: Faster transitions */
+    transition: transform 0.25s ease-out, width 0.25s ease-out;
+    /* MOBILE: Force GPU acceleration */
+    transform: translateZ(0) translateX(0px);
+    will-change: transform, width;
   }
   
   .profile-tab-content {
@@ -1267,7 +1350,7 @@
   }
 }
 
-/* Very Small Screens */
+/* Very Small Screens - Enhanced mobile slider support */
 @media (max-width: 480px) {
   .integrated-profile-header {
     padding: var(--spacing-md);
@@ -1299,6 +1382,30 @@
   
   .profile-username {
     font-size: 1.25rem;
+  }
+  
+  /* MOBILE: Even more aggressive slider optimizations for small screens */
+  .profile-tabs {
+    padding: 6px;
+    gap: 4px;
+  }
+  
+  .profile-tab-slider {
+    top: 6px;
+    left: 6px;
+    height: calc(100% - 12px);
+    /* MOBILE: Ultra-fast transitions for small screens */
+    transition: transform 0.2s ease-out, width 0.2s ease-out;
+  }
+  
+  .profile-tab {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.8rem;
+    min-height: 36px;
+  }
+  
+  .profile-tab svg {
+    font-size: 0.8rem;
   }
   
   .profile-tab-content {
@@ -1359,5 +1466,19 @@
   
   .coming-soon-description {
     font-size: 0.8rem;
+  }
+}
+
+/* MOBILE: Additional support for landscape orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  .profile-tabs {
+    /* MOBILE: Ensure tabs are always visible in landscape */
+    max-width: 100vw;
+    overflow-x: auto;
+  }
+  
+  .profile-tab-slider {
+    /* MOBILE: Maintain smooth animation even in landscape */
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 }
