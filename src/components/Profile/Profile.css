@@ -206,7 +206,7 @@
   display: none;
 }
 
-/* ENHANCED: Ultra-robust sliding background indicator with mobile-first optimizations */
+/* ENHANCED: Sliding background indicator - ensure it's always ready to be visible */
 .profile-tab-slider {
   position: absolute;
   top: var(--spacing-xs);
@@ -215,20 +215,14 @@
   background-color: rgba(255, 221, 0, 0.1);
   border: 1px solid rgba(255, 221, 0, 0.2);
   border-radius: var(--radius-full);
-  /* MOBILE-OPTIMIZED: Enhanced transition with hardware acceleration */
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 1;
-  /* MOBILE: Force GPU acceleration and smooth rendering */
-  will-change: transform, width;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  /* MOBILE: Prevent subpixel rendering issues */
-  transform-origin: left center;
-  /* CRITICAL: Ensure slider is always visible when initialized */
+  /* IMPORTANT: Start hidden but ready to be shown */
   opacity: 0;
   visibility: hidden;
+  transform: translateX(0px);
+  width: 0px;
 }
 
 /* MOBILE: Faster transition on smaller screens */

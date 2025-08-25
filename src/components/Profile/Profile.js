@@ -63,10 +63,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     return isMobileDevice;
   }, []);
 
-  // SIMPLIFIED: Robust slider positioning that works on all devices
+  // FIXED: Proper slider positioning that works on all devices
   const updateTabSlider = useCallback(() => {
     // Guard clauses for safety
-    if (!tabsRef.current || !sliderRef.current || !isSliderInitialized) {
+    if (!tabsRef.current || !sliderRef.current) {
       return false;
     }
     
@@ -87,14 +87,19 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         return false;
       }
 
-      // Calculate position - simplified approach
+      // Calculate position - accounting for container padding
       const paddingLeft = 8; // var(--spacing-xs)
       const leftOffset = tabRect.left - containerRect.left - paddingLeft;
       const tabWidth = tabRect.width;
       
-      // Apply positioning
-      slider.style.transform = `translateX(${Math.max(0, leftOffset)}px)`;
-      slider.style.width = `${tabWidth}px`;
+      // Ensure we don't go negative or beyond bounds
+      const clampedOffset = Math.max(0, leftOffset);
+      const maxWidth = containerRect.width - paddingLeft * 2;
+      const clampedWidth = Math.min(tabWidth, maxWidth);
+      
+      // Apply positioning and make visible
+      slider.style.transform = `translateX(${clampedOffset}px)`;
+      slider.style.width = `${clampedWidth}px`;
       slider.style.opacity = '1';
       slider.style.visibility = 'visible';
       
@@ -104,7 +109,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       console.error('Slider update failed:', error);
       return false;
     }
-  }, [activeTab, isSliderInitialized]);
+  }, [activeTab]);
 
   // SIMPLIFIED: Clean tab change handler
   const handleTabChange = useCallback((newTab) => {
@@ -118,7 +123,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   }, [activeTab, isMobile, updateTabSlider]);
 
-  // SIMPLIFIED: Basic initialization
+  // FIXED: Proper slider initialization
   useEffect(() => {
     const initializeSlider = () => {
       detectMobile();
@@ -127,23 +132,36 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         return;
       }
 
-      // Simple initialization
-      const success = updateTabSlider();
-      
-      if (success) {
-        setIsSliderInitialized(true);
-      } else {
-        // Retry once after short delay
-        setTimeout(() => {
-          if (updateTabSlider()) {
-            setIsSliderInitialized(true);
-          }
-        }, 100);
-      }
+      // Initialize slider immediately
+      requestAnimationFrame(() => {
+        const success = updateTabSlider();
+        
+        if (success) {
+          setIsSliderInitialized(true);
+        } else {
+          // Retry after short delay to ensure DOM is ready
+          setTimeout(() => {
+            if (updateTabSlider()) {
+              setIsSliderInitialized(true);
+            } else {
+              // Final fallback - force slider to be visible
+              if (sliderRef.current) {
+                sliderRef.current.style.opacity = '1';
+                sliderRef.current.style.visibility = 'visible';
+                setIsSliderInitialized(true);
+                // Try to update position one more time
+                setTimeout(updateTabSlider, 50);
+              }
+            }
+          }, 100);
+        }
+      });
     };
 
     // Initialize after DOM is ready
-    setTimeout(initializeSlider, 50);
+    const timer = setTimeout(initializeSlider, 100);
+    
+    return () => clearTimeout(timer);
   }, [updateTabSlider, detectMobile]);
 
   // SIMPLIFIED: Basic resize handling
@@ -176,7 +194,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   // Update slider when active tab changes
   useEffect(() => {
     if (isSliderInitialized) {
-      updateTabSlider();
+      // Small delay to ensure DOM is updated
+      setTimeout(updateTabSlider, 10);
     }
   }, [activeTab, isSliderInitialized, updateTabSlider]);
 
