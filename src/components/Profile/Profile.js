@@ -91,7 +91,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       // MOBILE-SPECIFIC: Force reflow before measurements on mobile
       if (isMobile) {
         tabsContainer.style.transform = 'translateZ(0)'; // Trigger hardware acceleration
-        activeTabElement.offsetHeight; // Force reflow
+        void activeTabElement.offsetHeight; // Force reflow
       }
 
       // Multiple measurement attempts for mobile reliability
@@ -213,7 +213,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         // Force container to be ready
         const container = tabsRef.current;
         container.style.transform = 'translateZ(0)';
-        container.offsetHeight; // Force layout
+        void container.offsetHeight; // Force layout
       }
 
       // Multiple initialization attempts
@@ -592,6 +592,17 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
 
               <div className="form-group">
+                <label>Discord Username</label>
+                <input
+                  type="text"
+                  value={discordUsername}
+                  onChange={(e) => setDiscordUsername(e.target.value)}
+                  disabled={!isEditingProfile}
+                  placeholder="For leaderboard integration"
+                />
+              </div>
+
+              <div className="form-group">
                 <div className="toggle-setting">
                   <div className="toggle-info">
                     <span className="toggle-label">Show on Leaderboard</span>
@@ -604,17 +615,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                     <div className="toggle-slider"></div>
                   </div>
                 </div>
-              </div>
-
-              <div className="form-group">
-                <label>Discord Username</label>
-                <input
-                  type="text"
-                  value={discordUsername}
-                  onChange={(e) => setDiscordUsername(e.target.value)}
-                  disabled={!isEditingProfile}
-                  placeholder="For leaderboard integration"
-                />
               </div>
 
               {isEditingProfile && (
