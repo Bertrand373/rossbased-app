@@ -1,0 +1,611 @@
+/* components/Tracker/TrackerButtons.css - All button styles and responsive behavior */
+
+/* Base Button Styles */
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none !important;
+}
+
+.action-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.action-btn:focus,
+.action-btn:active,
+.action-btn:focus-visible {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  filter: none !important;
+}
+
+/* Streak Action Buttons */
+.streak-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.relapse-btn-grey {
+  background-color: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+.relapse-btn-grey:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+  transform: scale(1.05);
+}
+
+.wetdream-btn {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border-color: var(--warning);
+}
+
+.wetdream-btn:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+  border-color: var(--warning);
+  color: var(--warning);
+  transform: scale(1.05);
+}
+
+.urge-btn {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.urge-btn:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+/* Benefit Section Buttons */
+.edit-benefits-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  margin-left: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-benefits-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.save-benefits-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.025em;
+}
+
+.save-benefits-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Community Buttons */
+.discord-join-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
+  border: 1px solid #7289da;
+  border-radius: var(--radius-full);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  letter-spacing: 0.025em;
+  min-height: 44px;
+}
+
+.discord-join-btn:hover {
+  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+  border-color: #7289da;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.youtube-subscribe-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  border: 1px solid #ff0000;
+  border-radius: var(--radius-full);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  letter-spacing: 0.025em;
+  min-height: 44px;
+}
+
+.youtube-subscribe-btn:hover {
+  background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
+  border-color: #ff0000;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+/* DESKTOP RESPONSIVE STYLES */
+@media (min-width: 1024px) {
+  .tracker-main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    align-items: stretch;
+  }
+  
+  .discord-youtube-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    height: fit-content;
+  }
+  
+  .benefit-logging-container {
+    grid-column: 1 / -1;
+    margin-top: var(--spacing-xl);
+  }
+  
+  .streak-number {
+    font-size: 5rem !important;
+    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+  }
+  
+  .streak-milestones {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-xl);
+    gap: var(--spacing-xl);
+    justify-content: space-evenly;
+  }
+  
+  .milestone-item {
+    min-width: 100px;
+    padding: var(--spacing-md);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .milestone-item:hover {
+    background-color: rgba(255, 221, 0, 0.05);
+    border-color: rgba(255, 221, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .milestone-icon {
+    font-size: 1.6rem;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .milestone-value {
+    font-size: 1.75rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .milestone-label {
+    font-size: 0.875rem;
+    line-height: 1.2;
+    height: 2.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .streak-actions {
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    max-width: 600px !important;
+    width: 100% !important;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+  }
+  
+  .streak-action-btn {
+    width: 100% !important;
+    justify-content: center;
+    padding: var(--spacing-lg) var(--spacing-xl) !important;
+    font-size: 1.125rem !important;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    min-height: 60px !important;
+    position: relative;
+    overflow: hidden;
+    max-width: none !important;
+  }
+  
+  .section-header-icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .section-header-icon:hover {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  
+  .discord-community-section:hover,
+  .youtube-channel-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  .discord-community-content h3, .youtube-channel-content h3 {
+    font-size: 1.375rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .discord-community-content p, .youtube-channel-content p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .discord-community-stats, .youtube-channel-stats {
+    flex-direction: row;
+    gap: var(--spacing-xl);
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .community-stat-item, .youtube-stat-item {
+    flex-direction: row;
+    gap: var(--spacing-sm);
+    text-align: left;
+    padding: 0;
+    min-width: auto;
+    white-space: nowrap;
+  }
+  
+  .community-stat-icon, .youtube-stat-icon {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+  }
+  
+  .discord-join-btn, .youtube-subscribe-btn {
+    font-size: 1.125rem;
+    max-width: 600px !important;
+    width: 100% !important;
+    justify-content: center;
+  }
+  
+  .video-thumbnail {
+    height: auto;
+  }
+  
+  .video-play-overlay {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .play-icon {
+    font-size: 1.75rem;
+  }
+  
+  .video-modal-content {
+    max-width: 1000px;
+  }
+  
+  .premium-benefits-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg) var(--spacing-xl);
+  }
+  
+  .benefit-slider-item {
+    gap: var(--spacing-md);
+  }
+}
+
+/* MOBILE RESPONSIVE STYLES */
+@media (max-width: 768px) {
+  .integrated-tracker-header {
+    padding: var(--spacing-lg);
+    margin: 0;
+  }
+  
+  .tracker-header-title-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .tracker-header-title-section h2 {
+    font-size: 1.25rem;
+  }
+  
+  .tracker-header-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .tracker-header-actions-section {
+    width: 100%;
+  }
+  
+  .tracker-header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .tracker-header-actions .action-btn,
+  .integrated-tracker-header .action-btn {
+    flex: 1;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    min-height: auto !important;
+  }
+  
+  .streak-number {
+    font-size: 3.5rem !important;
+    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+  }
+  
+  .streak-milestones {
+    flex-wrap: nowrap;
+    gap: var(--spacing-sm);
+    justify-content: space-between;
+    margin: 0;
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .milestone-item {
+    flex: 1;
+    min-width: 70px;
+    padding: var(--spacing-sm);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .milestone-item:active {
+    background-color: rgba(255, 221, 0, 0.05);
+    border-color: rgba(255, 221, 0, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  .milestone-icon {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .milestone-value {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .milestone-label {
+    font-size: 0.75rem;
+  }
+  
+  .streak-actions {
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .streak-action-btn {
+    width: 100%;
+    justify-content: center;
+    padding: var(--spacing-lg) var(--spacing-xl) !important;
+    font-size: 1rem !important;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    min-height: 50px !important;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .relapse-btn-grey:active {
+    background-color: rgba(128, 128, 128, 0.2);
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+    transform: scale(1.02);
+  }
+  
+  .wetdream-btn:active {
+    background-color: rgba(245, 158, 11, 0.2);
+    border-color: var(--warning);
+    color: var(--warning);
+    transform: scale(1.02);
+  }
+  
+  .urge-btn:active {
+    background-color: rgba(37, 99, 235, 0.2);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: scale(1.02);
+  }
+  
+  .benefit-logging-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .premium-benefits-container {
+    gap: var(--spacing-md);
+  }
+  
+  .benefit-status-section {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .benefits-logged, .benefits-not-logged {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .edit-benefits-btn {
+    margin-left: 0;
+    margin-top: var(--spacing-sm);
+  }
+  
+  .benefit-range-slider {
+    height: 32px;
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .slider-labels {
+    margin-top: 10px !important;
+    margin-bottom: 0px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    line-height: 1 !important;
+    transform: none !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.025em !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    color: var(--text-secondary) !important;
+  }
+
+  .section-header-icon {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .discord-community-stats, .youtube-channel-stats {
+    gap: var(--spacing-lg);
+  }
+  
+  .discord-join-btn, .youtube-subscribe-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 1rem;
+  }
+
+  .discord-join-btn:active {
+    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+    border-color: #7289da;
+    color: #ffffff;
+    transform: scale(1.02);
+  }
+  
+  .youtube-subscribe-btn:active {
+    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
+    border-color: #ff0000;
+    color: #ffffff;
+    transform: scale(1.02);
+  }
+  
+  .video-thumbnail {
+    height: auto;
+  }
+  
+  .video-play-overlay {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .play-icon {
+    font-size: 1.25rem;
+  }
+  
+  .video-modal-content {
+    margin: var(--spacing-sm);
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .leaderboard-status,
+  .discord-setup-note {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .discord-community-stats, .youtube-channel-stats {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: center;
+  }
+}

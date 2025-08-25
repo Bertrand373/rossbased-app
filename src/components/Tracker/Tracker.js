@@ -3,7 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+
+// UPDATED: Import the 3 CSS files instead of single Tracker.css
 import './Tracker.css';
+import './TrackerSections.css';
+import './TrackerButtons.css';
 
 // Components
 import DatePicker from '../Shared/DatePicker';
