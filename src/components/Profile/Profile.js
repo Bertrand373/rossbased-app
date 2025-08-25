@@ -34,16 +34,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
   
-  // MOBILE-FIRST: Enhanced tab slider with mobile-specific handling
+  // MOBILE-FIRST: Enhanced tab slider with better state management
   const tabsRef = useRef(null);
   const sliderRef = useRef(null);
   const [isSliderInitialized, setIsSliderInitialized] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [lastActiveTab, setLastActiveTab] = useState(activeTab);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const initTimeoutRef = useRef(null);
   const resizeTimeoutRef = useRef(null);
-  const transitionTimeoutRef = useRef(null);
   
   const feedbackTypes = [
     { id: 'bug', label: 'Bug Report', icon: FaBug },
@@ -60,21 +56,17 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'data', label: 'Data', icon: FaDownload }
   ];
 
-  // MOBILE DETECTION: Enhanced mobile detection
+  // MOBILE DETECTION: Simplified mobile detection
   const detectMobile = useCallback(() => {
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-                          window.innerWidth <= 768 ||
-                          ('ontouchstart' in window) ||
-                          (navigator.maxTouchPoints > 0);
-    
+    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
     setIsMobile(isMobileDevice);
     return isMobileDevice;
   }, []);
 
-  // BULLETPROOF: Ultra-robust slider positioning with mobile-specific optimizations
-  const updateTabSlider = useCallback((forceUpdate = false) => {
-    // Skip if not ready or transitioning (prevents race conditions)
-    if (!tabsRef.current || !sliderRef.current || (isTransitioning && !forceUpdate)) {
+  // SIMPLIFIED: Robust slider positioning that works on all devices
+  const updateTabSlider = useCallback(() => {
+    // Guard clauses for safety
+    if (!tabsRef.current || !sliderRef.current || !isSliderInitialized) {
       return false;
     }
     
@@ -84,76 +76,27 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeTab}"]`);
       
       if (!activeTabElement) {
-        console.warn(`Tab element not found: ${activeTab}`);
         return false;
       }
 
-      // MOBILE-SPECIFIC: Force reflow before measurements on mobile
-      if (isMobile) {
-        tabsContainer.style.transform = 'translateZ(0)'; // Trigger hardware acceleration
-        void activeTabElement.offsetHeight; // Force reflow
-      }
-
-      // Multiple measurement attempts for mobile reliability
-      let containerRect, tabRect;
-      let attempts = 0;
-      const maxAttempts = 3;
+      // Get measurements
+      const containerRect = tabsContainer.getBoundingClientRect();
+      const tabRect = activeTabElement.getBoundingClientRect();
       
-      do {
-        containerRect = tabsContainer.getBoundingClientRect();
-        tabRect = activeTabElement.getBoundingClientRect();
-        attempts++;
-        
-        // If measurements are invalid, wait and retry
-        if ((containerRect.width === 0 || tabRect.width === 0) && attempts < maxAttempts) {
-          continue;
-        }
-      } while ((containerRect.width === 0 || tabRect.width === 0) && attempts < maxAttempts);
-      
-      // Final validation
       if (containerRect.width === 0 || tabRect.width === 0) {
-        console.warn('Invalid measurements, skipping slider update');
         return false;
       }
 
-      // ENHANCED: Cross-browser padding calculation
-      const computedStyle = window.getComputedStyle(tabsContainer);
-      const paddingLeft = parseFloat(computedStyle.paddingLeft) || 8;
-      const paddingRight = parseFloat(computedStyle.paddingRight) || 8;
+      // Calculate position - simplified approach
+      const paddingLeft = 8; // var(--spacing-xs)
+      const leftOffset = tabRect.left - containerRect.left - paddingLeft;
+      const tabWidth = tabRect.width;
       
-      // MOBILE-OPTIMIZED: More precise positioning calculation
-      const containerLeft = containerRect.left;
-      const tabLeft = tabRect.left;
-      const rawOffset = tabLeft - containerLeft - paddingLeft;
-      
-      // BOUNDARY PROTECTION: Advanced boundary calculations
-      const availableWidth = containerRect.width - paddingLeft - paddingRight;
-      const tabWidth = Math.min(tabRect.width, availableWidth);
-      const maxOffset = Math.max(0, availableWidth - tabWidth);
-      const clampedOffset = Math.max(0, Math.min(rawOffset, maxOffset));
-      
-      // MOBILE-SPECIFIC: Disable transitions during rapid updates
-      if (isMobile && isTransitioning) {
-        slider.style.transition = 'none';
-      } else {
-        slider.style.transition = '';
-      }
-      
-      // Apply positioning with pixel precision
-      const finalOffset = Math.round(clampedOffset * 100) / 100; // Round to 2 decimal places
-      const finalWidth = Math.round(tabWidth * 100) / 100;
-      
-      slider.style.transform = `translateX(${finalOffset}px)`;
-      slider.style.width = `${finalWidth}px`;
+      // Apply positioning
+      slider.style.transform = `translateX(${Math.max(0, leftOffset)}px)`;
+      slider.style.width = `${tabWidth}px`;
       slider.style.opacity = '1';
       slider.style.visibility = 'visible';
-      
-      // MOBILE: Force GPU acceleration
-      if (isMobile) {
-        slider.style.willChange = 'transform, width';
-        slider.style.backfaceVisibility = 'hidden';
-        slider.style.perspective = '1000px';
-      }
       
       return true;
       
@@ -161,45 +104,21 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       console.error('Slider update failed:', error);
       return false;
     }
-  }, [activeTab, isMobile, isTransitioning]);
+  }, [activeTab, isSliderInitialized]);
 
-  // ENHANCED: Robust tab change handler with mobile optimizations
+  // SIMPLIFIED: Clean tab change handler
   const handleTabChange = useCallback((newTab) => {
-    if (newTab === activeTab || isTransitioning) return;
+    if (newTab === activeTab) return;
     
-    setIsTransitioning(true);
-    setLastActiveTab(activeTab);
     setActiveTab(newTab);
     
-    // Clear any existing transition timeout
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
-    }
-    
-    // MOBILE: Immediate update followed by cleanup
+    // Update slider immediately on mobile for responsiveness
     if (isMobile) {
-      // Force immediate update on mobile
-      requestAnimationFrame(() => {
-        updateTabSlider(true);
-        
-        // Reset transition state
-        transitionTimeoutRef.current = setTimeout(() => {
-          setIsTransitioning(false);
-          if (sliderRef.current) {
-            sliderRef.current.style.transition = '';
-            sliderRef.current.style.willChange = 'auto';
-          }
-        }, 350); // Match CSS transition duration
-      });
-    } else {
-      // Desktop: Normal transition
-      transitionTimeoutRef.current = setTimeout(() => {
-        setIsTransitioning(false);
-      }, 300);
+      setTimeout(() => updateTabSlider(), 10);
     }
-  }, [activeTab, isTransitioning, isMobile, updateTabSlider]);
+  }, [activeTab, isMobile, updateTabSlider]);
 
-  // MOBILE-FIRST: Enhanced initialization with multiple fallbacks
+  // SIMPLIFIED: Basic initialization
   useEffect(() => {
     const initializeSlider = () => {
       detectMobile();
@@ -208,149 +127,63 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         return;
       }
 
-      // MOBILE: Additional initialization steps
-      if (isMobile) {
-        // Force container to be ready
-        const container = tabsRef.current;
-        container.style.transform = 'translateZ(0)';
-        void container.offsetHeight; // Force layout
-      }
-
-      // Multiple initialization attempts
-      const attemptInit = (attempt = 1) => {
-        const success = updateTabSlider(true);
-        
-        if (success) {
-          setIsSliderInitialized(true);
-          console.log(`Slider initialized successfully on attempt ${attempt}`);
-        } else if (attempt < 5) {
-          // Retry with exponential backoff
-          const delay = Math.min(100 * Math.pow(2, attempt - 1), 1000);
-          setTimeout(() => attemptInit(attempt + 1), delay);
-        } else {
-          console.warn('Slider initialization failed after 5 attempts');
-          // Fallback: Initialize with basic styling
-          if (sliderRef.current) {
-            sliderRef.current.style.opacity = '1';
-            sliderRef.current.style.visibility = 'visible';
+      // Simple initialization
+      const success = updateTabSlider();
+      
+      if (success) {
+        setIsSliderInitialized(true);
+      } else {
+        // Retry once after short delay
+        setTimeout(() => {
+          if (updateTabSlider()) {
             setIsSliderInitialized(true);
           }
-        }
-      };
-
-      // Start initialization
-      requestAnimationFrame(() => {
-        attemptInit();
-      });
-    };
-
-    // Clear any existing timeout
-    if (initTimeoutRef.current) {
-      clearTimeout(initTimeoutRef.current);
-    }
-
-    // Initialize with delay to ensure DOM is ready
-    initTimeoutRef.current = setTimeout(initializeSlider, 100);
-    
-    return () => {
-      if (initTimeoutRef.current) {
-        clearTimeout(initTimeoutRef.current);
+        }, 100);
       }
     };
-  }, [updateTabSlider, detectMobile, isMobile]);
 
-  // MOBILE-OPTIMIZED: Viewport and orientation change handling
+    // Initialize after DOM is ready
+    setTimeout(initializeSlider, 50);
+  }, [updateTabSlider, detectMobile]);
+
+  // SIMPLIFIED: Basic resize handling
   useEffect(() => {
-    const handleViewportChange = () => {
-      const wasMobile = isMobile;
-      const nowMobile = detectMobile();
+    const handleResize = () => {
+      detectMobile();
       
-      // Clear existing timeout
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
       
-      // MOBILE: Immediate update for device orientation changes
-      if (nowMobile) {
-        resizeTimeoutRef.current = setTimeout(() => {
-          updateTabSlider(true);
-        }, 50); // Faster response on mobile
-      } else {
-        // Desktop: Debounced update
-        resizeTimeoutRef.current = setTimeout(() => {
-          updateTabSlider(true);
-        }, 150);
-      }
-      
-      // Handle mobile/desktop transition
-      if (wasMobile !== nowMobile && sliderRef.current) {
-        sliderRef.current.style.transition = 'none';
-        requestAnimationFrame(() => {
-          updateTabSlider(true);
-          if (sliderRef.current) {
-            sliderRef.current.style.transition = '';
-          }
-        });
-      }
+      resizeTimeoutRef.current = setTimeout(() => {
+        if (isSliderInitialized) {
+          updateTabSlider();
+        }
+      }, 100);
     };
 
-    // Listen to multiple events for comprehensive coverage
-    window.addEventListener('resize', handleViewportChange);
-    window.addEventListener('orientationchange', handleViewportChange);
-    
-    // MOBILE: Additional touch-specific events
-    if (isMobile) {
-      window.addEventListener('touchstart', handleViewportChange);
-      document.addEventListener('visibilitychange', handleViewportChange);
-    }
+    window.addEventListener('resize', handleResize);
     
     return () => {
-      window.removeEventListener('resize', handleViewportChange);
-      window.removeEventListener('orientationchange', handleViewportChange);
-      if (isMobile) {
-        window.removeEventListener('touchstart', handleViewportChange);
-        document.removeEventListener('visibilitychange', handleViewportChange);
-      }
+      window.removeEventListener('resize', handleResize);
       
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
     };
-  }, [isMobile, detectMobile, updateTabSlider]);
+  }, [isSliderInitialized, detectMobile, updateTabSlider]);
 
   // Update slider when active tab changes
   useEffect(() => {
-    if (isSliderInitialized && activeTab !== lastActiveTab) {
+    if (isSliderInitialized) {
       updateTabSlider();
     }
-  }, [activeTab, isSliderInitialized, lastActiveTab, updateTabSlider]);
-
-  // MOBILE: Font loading and document ready handling
-  useEffect(() => {
-    const handleDocumentReady = () => {
-      if (isSliderInitialized) {
-        setTimeout(() => updateTabSlider(true), 100);
-      }
-    };
-
-    // Handle font loading
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(handleDocumentReady);
-    }
-
-    // Handle full document load
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', handleDocumentReady);
-      return () => document.removeEventListener('DOMContentLoaded', handleDocumentReady);
-    } else {
-      handleDocumentReady();
-    }
-  }, [isSliderInitialized, updateTabSlider]);
+  }, [activeTab, isSliderInitialized, updateTabSlider]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
-      [initTimeoutRef, resizeTimeoutRef, transitionTimeoutRef].forEach(ref => {
+      [resizeTimeoutRef].forEach(ref => {
         if (ref.current) {
           clearTimeout(ref.current);
         }
@@ -504,27 +337,16 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       <div 
         className="profile-tabs" 
         ref={tabsRef}
-        style={{
-          // MOBILE: Ensure proper rendering context
-          transform: isMobile ? 'translateZ(0)' : undefined,
-          willChange: isMobile ? 'transform' : 'auto'
-        }}
       >
         {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations */}
         <div 
           className="profile-tab-slider" 
           ref={sliderRef}
           style={{ 
-            opacity: isSliderInitialized ? 1 : 0,
-            visibility: isSliderInitialized ? 'visible' : 'hidden',
+            opacity: 0,
+            visibility: 'hidden',
             transform: 'translateX(0px)',
-            width: '0px',
-            // MOBILE: GPU acceleration and smooth rendering
-            willChange: isMobile ? 'transform, width' : 'auto',
-            backfaceVisibility: isMobile ? 'hidden' : 'visible',
-            WebkitBackfaceVisibility: isMobile ? 'hidden' : 'visible',
-            perspective: isMobile ? '1000px' : 'none',
-            WebkitPerspective: isMobile ? '1000px' : 'none'
+            width: '0px'
           }}
         />
         
@@ -533,18 +355,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             key={tab.id}
             className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
             onClick={() => handleTabChange(tab.id)}
-            onTouchStart={() => {
-              // MOBILE: Prevent touch delay and ensure responsiveness
-              if (isMobile) {
-                handleTabChange(tab.id);
-              }
-            }}
             data-tab={tab.id}
-            style={{
-              // MOBILE: Ensure proper touch targets
-              minHeight: isMobile ? '44px' : undefined,
-              touchAction: isMobile ? 'manipulation' : 'auto'
-            }}
           >
             <tab.icon />
             <span>{tab.label}</span>

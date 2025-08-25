@@ -238,7 +238,7 @@
   }
 }
 
-/* ENHANCED: Mobile-optimized tab buttons with better touch targets */
+/* ENHANCED: Tab buttons with proper sizing */
 .profile-tab {
   display: flex;
   align-items: center;
@@ -256,20 +256,17 @@
   min-width: fit-content;
   position: relative;
   z-index: 2;
-  /* MOBILE: Ensure proper touch targets and prevent text selection */
+  /* MOBILE: Prevent text selection and ensure proper touch */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  /* MOBILE: Minimum touch target size */
-  min-height: 40px;
-  /* MOBILE: Prevent button zoom on double-tap */
   touch-action: manipulation;
 }
 
-/* MOBILE: Enhanced touch interaction */
-@media (max-width: 768px) {
+/* MOBILE: Only adjust touch targets on actual mobile, not desktop */
+@media (max-width: 768px) and (pointer: coarse) {
   .profile-tab {
     min-height: 44px; /* iOS recommendation for touch targets */
     padding: var(--spacing-md) var(--spacing-lg);
