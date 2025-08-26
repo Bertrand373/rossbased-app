@@ -493,6 +493,15 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <div className="streak-actions-divider"></div>
             
             <div className="streak-actions">
+              {/* NEW: Benefits logging button - MOVED TO FIRST POSITION */}
+              <button 
+                className="streak-action-btn benefits-btn-primary"
+                onClick={handleBenefitsLog}
+              >
+                <FaChartLine />
+                <span>Log Benefits</span>
+              </button>
+
               <button 
                 className="streak-action-btn relapse-btn-grey"
                 onClick={handleRelapse}
@@ -515,15 +524,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               >
                 <FaShieldAlt />
                 <span>Fighting Urges?</span>
-              </button>
-
-              {/* NEW: Benefits logging button */}
-              <button 
-                className="streak-action-btn benefits-btn"
-                onClick={handleBenefitsLog}
-              >
-                <FaChartLine />
-                <span>Log Benefits</span>
               </button>
             </div>
           </div>

@@ -303,18 +303,55 @@ button.action-btn:hover {
   transform: scale(1.05);
 }
 
-/* NEW: Benefits button styling - Green theme for positive action */
-.benefits-btn {
-  background-color: rgba(34, 197, 94, 0.1);
-  color: var(--success);
-  border-color: var(--success);
+/* NEW: Benefits button styling - PRIMARY YELLOW like login button */
+.benefits-btn-primary {
+  background-color: rgba(255, 221, 0, 0.1);
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
-.benefits-btn:hover {
-  background-color: rgba(34, 197, 94, 0.2);
-  border-color: var(--success);
-  color: var(--success);
-  transform: scale(1.05);
+.benefits-btn-primary:hover {
+  background-color: rgba(255, 221, 0, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.05); /* CHANGED: Scale transform like login button */
+}
+
+/* UPDATED: All streak action buttons use scale transform */
+.relapse-btn-grey:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+  transform: scale(1.05); /* KEPT: Already using scale */
+}
+
+.wetdream-btn:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+  border-color: var(--warning);
+  color: var(--warning);
+  transform: scale(1.05); /* KEPT: Already using scale */
+}
+
+.urge-btn:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.05); /* KEPT: Already using scale */
+}
+
+/* UPDATED: Discord and YouTube buttons use scale transform */
+.discord-join-btn:hover {
+  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+  border-color: #7289da;
+  color: #ffffff;
+  transform: scale(1.05); /* CHANGED: From translateY to scale */
+}
+
+.youtube-subscribe-btn:hover {
+  background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
+  border-color: #ff0000;
+  color: #ffffff;
+  transform: scale(1.05); /* CHANGED: From translateY to scale */
 }
 
 /* NEW: Benefits Modal Styling - Matching existing modal patterns */
@@ -878,18 +915,33 @@ button.action-btn:hover {
     display: none;
   }
   
-  /* Desktop benefits button styling */
-  .benefits-btn {
-    background-color: rgba(34, 197, 94, 0.1);
-    color: var(--success);
-    border-color: var(--success);
+  /* Desktop benefits button styling - PRIMARY YELLOW */
+  .benefits-btn-primary {
+    background-color: rgba(255, 221, 0, 0.1);
+    color: var(--primary);
+    border-color: var(--primary);
   }
   
-  .benefits-btn:hover {
-    background-color: rgba(34, 197, 94, 0.2);
-    border-color: var(--success);
-    color: var(--success);
+  .benefits-btn-primary:hover {
+    background-color: rgba(255, 221, 0, 0.2);
+    border-color: var(--primary);
+    color: var(--primary);
     transform: scale(1.05);
+  }
+
+  /* Desktop Discord and YouTube button scale transforms */
+  .discord-join-btn:hover {
+    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+    border-color: #7289da;
+    color: #ffffff;
+    transform: scale(1.05); /* CHANGED: Scale instead of translateY */
+  }
+
+  .youtube-subscribe-btn:hover {
+    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
+    border-color: #ff0000;
+    color: #ffffff;
+    transform: scale(1.05); /* CHANGED: Scale instead of translateY */
   }
   
   /* Benefits section: 2-column slider grid on desktop */
@@ -1032,12 +1084,27 @@ button.action-btn:hover {
     overflow: hidden;
   }
   
-  /* Mobile benefits button active state */
-  .benefits-btn:active {
-    background-color: rgba(34, 197, 94, 0.2);
-    border-color: var(--success);
-    color: var(--success);
+  /* Mobile benefits button active state - PRIMARY YELLOW */
+  .benefits-btn-primary:active {
+    background-color: rgba(255, 221, 0, 0.2);
+    border-color: var(--primary);
+    color: var(--primary);
     transform: scale(1.02);
+  }
+
+  /* Mobile Discord and YouTube button scale transforms */
+  .discord-join-btn:active {
+    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+    border-color: #7289da;
+    color: #ffffff;
+    transform: scale(1.02); /* CHANGED: Scale instead of translateY */
+  }
+  
+  .youtube-subscribe-btn:active {
+    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
+    border-color: #ff0000;
+    color: #ffffff;
+    transform: scale(1.02); /* CHANGED: Scale instead of translateY */
   }
   
   .benefit-logging-section {
