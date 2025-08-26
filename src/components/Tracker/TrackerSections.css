@@ -17,7 +17,7 @@
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-sm);
 }
 
 .benefit-logging-section-header {
