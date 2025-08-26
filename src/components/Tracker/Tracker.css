@@ -387,6 +387,151 @@ button.action-btn:hover {
   padding-right: var(--spacing-xs);
 }
 
+/* RESTORED: Benefit Sliders - Thin Progress Bar Style for Modal */
+.benefit-slider-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  position: relative;
+}
+
+.benefit-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.benefit-label {
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  text-align: left;
+  font-size: 1rem;
+  letter-spacing: 0.025em;
+}
+
+.benefit-value {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.9375rem;
+  background-color: rgba(255, 221, 0, 0.08);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  min-width: 48px;
+  text-align: center;
+  border: 1px solid rgba(255, 221, 0, 0.15);
+}
+
+/* RESTORED: Thin Progress Bar Style Slider */
+.benefit-range-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  transition: all 0.2s ease;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  margin-bottom: 0px !important;
+}
+
+.benefit-range-slider:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.benefit-range-slider:focus:not(:disabled) {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
+}
+
+.benefit-range-slider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(128, 128, 128, 0.1);
+}
+
+/* RESTORED: Large, Prominent Handle - WebKit */
+.benefit-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  margin: 0 !important;
+  transition: all 0.15s ease;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.benefit-range-slider:active::-webkit-slider-thumb {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* RESTORED: Large, Prominent Handle - Firefox */
+.benefit-range-slider::-moz-range-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  margin: 0 !important;
+  transition: all 0.15s ease;
+}
+
+.benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* RESTORED: Slider Labels with Better Spacing */
+.slider-labels {
+  display: flex !important;
+  justify-content: space-between !important;
+  font-size: 0.8125rem !important;
+  color: var(--text-secondary) !important;
+  margin-top: 12px !important;
+  margin-bottom: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  line-height: 1 !important;
+  transform: none !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em !important;
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.slider-labels span:first-child {
+  color: rgba(156, 163, 175, 0.8) !important;
+}
+
+.slider-labels span:last-child {
+  color: rgba(255, 221, 0, 0.7) !important;
+}
+
 /* Modal benefit items - slightly more compact than full section */
 .modal-benefit-item {
   gap: var(--spacing-sm);
@@ -410,13 +555,15 @@ button.action-btn:hover {
   flex-wrap: wrap;
 }
 
+/* UPDATED: Modal buttons same height as edit date button */
 .modal-save-btn {
   flex: 1;
   min-width: 180px;
   justify-content: center;
-  padding: var(--spacing-md) var(--spacing-lg) !important;
-  font-size: 0.9375rem !important;
-  font-weight: 600 !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important; /* REDUCED: Match edit date button */
+  font-size: 0.875rem !important; /* REDUCED: Match edit date button */
+  font-weight: 500 !important; /* REDUCED: Match edit date button */
+  min-height: auto !important; /* REMOVED: Chunky height */
 }
 
 .cancel-benefits-btn {
@@ -424,14 +571,15 @@ button.action-btn:hover {
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: 0.9375rem;
-  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md); /* REDUCED: Match edit date button */
+  font-size: 0.875rem; /* REDUCED: Match edit date button */
+  font-weight: 500; /* REDUCED: Match edit date button */
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
   min-width: 120px;
   justify-content: center;
+  min-height: auto; /* REMOVED: Chunky height */
 }
 
 .cancel-benefits-btn:hover {
@@ -925,6 +1073,28 @@ button.action-btn:hover {
     gap: var(--spacing-lg);
     max-height: 60vh;
   }
+
+  /* Desktop slider adjustments */
+  .benefit-range-slider {
+    height: 10px; /* Thin design on desktop */
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .slider-labels {
+    margin-top: 12px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    font-size: 0.8125rem !important;
+  }
 }
 
 /* Mobile responsiveness */
@@ -1172,6 +1342,32 @@ button.action-btn:hover {
   .cancel-benefits-btn {
     width: 100%;
     min-width: auto;
+    padding: var(--spacing-sm) var(--spacing-md) !important; /* CONSISTENT: Match edit date button size */
+    font-size: 0.875rem !important; /* CONSISTENT: Match edit date button size */
+    font-weight: 500 !important; /* CONSISTENT: Match edit date button size */
+    min-height: auto !important; /* REMOVED: Chunky height */
+  }
+
+  /* Mobile slider adjustments - thin design */
+  .benefit-range-slider {
+    height: 12px; /* Slightly thicker on mobile for easier touch */
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 36px; /* Larger on mobile for touch */
+    height: 36px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .slider-labels {
+    margin-top: 14px !important; /* More space on mobile */
+    padding-left: 18px !important; /* Account for larger mobile handle */
+    padding-right: 18px !important;
+    font-size: 0.75rem !important; /* Smaller text on mobile */
   }
 }
 
