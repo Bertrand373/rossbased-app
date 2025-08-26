@@ -1,4 +1,4 @@
-/* components/Tracker/TrackerSections.css - Benefits, Community, and Interactive Sections */
+/* components/Tracker/TrackerSections.css - Benefits, Community, and Interactive Sections with NEW thin slider design */
 
 /* Benefits Logging Section */
 .benefit-logging-container {
@@ -524,5 +524,17 @@
     padding-left: 18px !important; /* CHANGED: Account for larger mobile handle */
     padding-right: 18px !important; /* CHANGED: Account for larger mobile handle */
     font-size: 0.75rem !important; /* CHANGED: Slightly smaller text on mobile */
+  }
+
+  /* Adjust benefit logging container spacing if needed */
+  .benefit-logging-container {
+    margin-top: var(--spacing-lg);
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 1024px) {
+  .benefit-logging-container {
+    margin-top: var(--spacing-xl);
   }
 }

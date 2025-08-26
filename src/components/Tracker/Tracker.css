@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and mobile enhancements + UPDATED: Close button styling to match Profile modal */
+/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and mobile enhancements + UPDATED: Close button styling to match Profile modal + NEW: Benefits Modal */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -303,6 +303,107 @@ button.action-btn:hover {
   transform: scale(1.05);
 }
 
+/* NEW: Benefits button styling - Green theme for positive action */
+.benefits-btn {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.benefits-btn:hover {
+  background-color: rgba(34, 197, 94, 0.2);
+  border-color: var(--success);
+  color: var(--success);
+  transform: scale(1.05);
+}
+
+/* NEW: Benefits Modal Styling - Matching existing modal patterns */
+.benefits-modal {
+  max-width: 600px;
+  max-height: 85vh;
+}
+
+.benefits-modal-header {
+  margin-top: 0;
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.25rem;
+  color: var(--text);
+  text-align: center;
+  font-weight: 600;
+}
+
+.benefits-modal-subtitle {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.benefits-modal-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: var(--spacing-xs);
+}
+
+/* Modal benefit items - slightly more compact than full section */
+.modal-benefit-item {
+  gap: var(--spacing-sm);
+}
+
+.modal-benefit-item .benefit-slider-header {
+  margin-bottom: var(--spacing-xs);
+}
+
+.modal-benefit-item .slider-labels {
+  margin-top: 8px !important;
+  font-size: 0.75rem !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+.benefits-modal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.modal-save-btn {
+  flex: 1;
+  min-width: 180px;
+  justify-content: center;
+  padding: var(--spacing-md) var(--spacing-lg) !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+}
+
+.cancel-benefits-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.cancel-benefits-btn:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+  transform: translateY(-1px);
+}
+
 /* Daily Benefits section */
 .benefit-logging-container {
   display: flex;
@@ -586,426 +687,6 @@ button.action-btn:hover {
   box-sizing: border-box !important;
 }
 
-/* Consistent label colors */
-.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
-.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:first-child,
-.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8) !important;
-}
-
-.benefit-logging-section .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
-.benefit-logging-section .benefit-slider-item:nth-child(6) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(1) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(2) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(3) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(4) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(5) .slider-labels span:last-child,
-.tracker-container .benefit-slider-item:nth-child(6) .slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.7) !important;
-}
-
-/* REFINED: Section Header Icon Layout - Professional and Clean */
-.section-icon-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: var(--spacing-md);
-}
-
-.section-header-icon {
-  font-size: 1.75rem;
-  margin-bottom: var(--spacing-xs);
-  opacity: 0.8;
-  transition: all 0.2s ease;
-}
-
-.section-header-icon.discord-icon {
-  color: #7289da;
-}
-
-.section-header-icon.youtube-icon {
-  color: #ff0000;
-}
-
-/* REFINED: Discord Community Section - More polished design */
-.discord-community-section {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  transition: all 0.2s ease;
-}
-
-.discord-community-header {
-  display: flex;
-  justify-content: center;
-}
-
-.discord-community-content {
-  flex: 1;
-}
-
-.discord-community-content h3 {
-  margin: 0 0 var(--spacing-xs) 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.discord-community-content p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.discord-community-stats {
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-xl);
-}
-
-.community-stat-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.community-stat-icon {
-  font-size: 1rem;
-  color: var(--text-secondary);
-}
-
-.discord-community-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  align-items: center;
-}
-
-.discord-join-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-xl);
-  background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
-  border: 1px solid #7289da;
-  border-radius: var(--radius-full);
-  color: #ffffff;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  letter-spacing: 0.025em;
-  min-height: 44px;
-}
-
-.discord-join-btn:hover {
-  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
-  border-color: #7289da;
-  color: #ffffff;
-  transform: scale(1.05);
-}
-
-/* REFINED: YouTube Channel Section - Polished red theming */
-.youtube-channel-section {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  transition: all 0.2s ease;
-}
-
-.youtube-channel-header {
-  display: flex;
-  justify-content: center;
-}
-
-.youtube-channel-content {
-  flex: 1;
-}
-
-.youtube-channel-content h3 {
-  margin: 0 0 var(--spacing-xs) 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.youtube-channel-content p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.youtube-channel-stats {
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-xl);
-}
-
-.youtube-stat-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.youtube-stat-icon {
-  font-size: 1rem;
-  color: var(--text-secondary);
-}
-
-.youtube-channel-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  align-items: center;
-}
-
-.youtube-subscribe-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-xl);
-  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
-  border: 1px solid #ff0000;
-  border-radius: var(--radius-full);
-  color: #ffffff;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  letter-spacing: 0.025em;
-  min-height: 44px;
-}
-
-.youtube-subscribe-btn:hover {
-  background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
-  border-color: #ff0000;
-  color: #ffffff;
-  transform: scale(1.05);
-}
-
-/* Featured Video Preview */
-.featured-video-preview {
-  margin: var(--spacing-md) 0;
-}
-
-.video-thumbnail-container {
-  position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.video-thumbnail-container:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* FIXED: Thumbnail - No cropping, preserves full image */
-.video-thumbnail {
-  width: 100%;
-  height: auto; /* CHANGED: Let height be determined by aspect ratio */
-  object-fit: contain; /* CHANGED: Shows full image without cropping */
-  display: block;
-  border-radius: var(--radius-lg); /* Keep rounded corners */
-}
-
-.video-play-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 0, 0, 0.9);
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.video-thumbnail-container:hover .video-play-overlay {
-  background: rgba(255, 0, 0, 1);
-  transform: translate(-50%, -50%) scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-}
-
-.play-icon {
-  color: white;
-  font-size: 1.5rem;
-  margin-left: 4px; /* Slight offset for visual centering */
-}
-
-/* Video Modal - CLEANED: No text section */
-.video-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: var(--spacing-md);
-  animation: modal-fade-in 0.3s ease-out;
-}
-
-@keyframes modal-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.video-modal-content {
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  padding: 0;
-  width: 100%;
-  max-width: 900px;
-  max-height: 90vh;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid var(--border);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-  animation: video-modal-appear 0.4s ease-out;
-}
-
-@keyframes video-modal-appear {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.video-close-btn {
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  background: rgba(0, 0, 0, 0.7);
-  border: none;
-  color: white;
-  font-size: 1.25rem;
-  cursor: pointer;
-  padding: var(--spacing-sm);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.video-close-btn:hover {
-  background: rgba(0, 0, 0, 0.9);
-  transform: scale(1.1);
-}
-
-.video-container {
-  width: 100%;
-  height: 0;
-  padding-bottom: 56.25%; /* 16:9 aspect ratio */
-  position: relative;
-  background-color: #000;
-}
-
-.video-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-.external-icon {
-  font-size: 0.75rem;
-  opacity: 0.8;
-}
-
-.leaderboard-status {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  text-align: center;
-  background-color: rgba(34, 197, 94, 0.05);
-  border: 1px solid rgba(34, 197, 94, 0.1);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-sm) var(--spacing-md);
-}
-
-.leaderboard-status .check-icon {
-  color: var(--success);
-}
-
-.discord-setup-note {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  text-align: center;
-  background-color: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  line-height: 1.4;
-}
-
-.discord-setup-note .info-icon {
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
 /* Modal overlay and base */
 .modal-overlay {
   position: fixed;
@@ -1170,10 +851,10 @@ button.action-btn:hover {
     justify-content: center;
   }
   
-  /* ENHANCED: Much wider, more prominent action buttons on desktop */
+  /* ENHANCED: Updated action buttons for 4-button layout */
   .streak-actions {
     flex-direction: column;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md); /* REDUCED: From var(--spacing-lg) for 4 buttons */
     max-width: 600px !important;
     width: 100% !important;
     margin: 0 auto;
@@ -1183,11 +864,11 @@ button.action-btn:hover {
   .streak-action-btn {
     width: 100% !important;
     justify-content: center;
-    padding: var(--spacing-lg) var(--spacing-xl) !important;
-    font-size: 1.125rem !important;
+    padding: var(--spacing-md) var(--spacing-xl) !important; /* REDUCED: From var(--spacing-lg) */
+    font-size: 1rem !important; /* REDUCED: From 1.125rem */
     font-weight: 600;
     letter-spacing: 0.025em;
-    min-height: 60px !important;
+    min-height: 52px !important; /* REDUCED: From 60px for 4 buttons */
     position: relative;
     overflow: hidden;
     max-width: none !important;
@@ -1197,193 +878,18 @@ button.action-btn:hover {
     display: none;
   }
   
-  /* Enhanced button styling for desktop */
-  .relapse-btn-grey {
-    background-color: rgba(128, 128, 128, 0.1);
-    color: var(--text-secondary);
-    border-color: var(--text-secondary);
+  /* Desktop benefits button styling */
+  .benefits-btn {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+    border-color: var(--success);
   }
   
-  .relapse-btn-grey:hover {
-    background-color: rgba(128, 128, 128, 0.2);
-    border-color: var(--text-secondary);
-    color: var(--text-secondary);
+  .benefits-btn:hover {
+    background-color: rgba(34, 197, 94, 0.2);
+    border-color: var(--success);
+    color: var(--success);
     transform: scale(1.05);
-  }
-  
-  .wetdream-btn {
-    background-color: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-    border-color: var(--warning);
-  }
-  
-  .wetdream-btn:hover {
-    background-color: rgba(245, 158, 11, 0.2);
-    border-color: var(--warning);
-    color: var(--warning);
-    transform: scale(1.05);
-  }
-  
-  .urge-btn {
-    background-color: rgba(37, 99, 235, 0.1);
-    color: var(--primary);
-    border-color: var(--primary);
-  }
-  
-  .urge-btn:hover {
-    background-color: rgba(37, 99, 235, 0.2);
-    border-color: var(--primary);
-    color: var(--primary);
-    transform: scale(1.05);
-  }
-  
-  /* Desktop section icon positioning */
-  .section-header-icon {
-    font-size: 2rem;
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .section-header-icon:hover {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-  
-  /* Desktop Discord section - enhanced vertical layout */
-  .discord-community-content h3 {
-    font-size: 1.375rem;
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .discord-community-content p {
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-  
-  .discord-community-stats {
-    flex-direction: row;
-    gap: var(--spacing-xl);
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .community-stat-item {
-    flex-direction: row;
-    gap: var(--spacing-sm);
-    text-align: left;
-    padding: 0;
-    min-width: auto;
-    white-space: nowrap;
-  }
-  
-  .community-stat-icon {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-  }
-  
-  .discord-join-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-xl);
-    background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
-    border: 1px solid #7289da;
-    border-radius: var(--radius-full);
-    color: #ffffff;
-    font-size: 1.125rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    letter-spacing: 0.025em;
-    min-height: 44px;
-    max-width: 600px !important;
-    width: 100% !important;
-    justify-content: center;
-  }
-
-  .discord-join-btn:hover {
-    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
-    border-color: #7289da;
-    color: #ffffff;
-    transform: scale(1.05);
-  }
-  
-  /* Desktop YouTube section - matching enhanced Discord layout */
-  .youtube-channel-content h3 {
-    font-size: 1.375rem;
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .youtube-channel-content p {
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-  
-  .youtube-channel-stats {
-    flex-direction: row;
-    gap: var(--spacing-xl);
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .youtube-stat-item {
-    flex-direction: row;
-    gap: var(--spacing-sm);
-    text-align: left;
-    padding: 0;
-    min-width: auto;
-    white-space: nowrap;
-  }
-  
-  .youtube-stat-icon {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-  }
-  
-  .youtube-subscribe-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-xl);
-    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
-    border: 1px solid #ff0000;
-    border-radius: var(--radius-full);
-    color: #ffffff;
-    font-size: 1.125rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    letter-spacing: 0.025em;
-    min-height: 44px;
-    max-width: 600px !important;
-    width: 100% !important;
-    justify-content: center;
-  }
-
-  .youtube-subscribe-btn:hover {
-    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
-    border-color: #ff0000;
-    color: #ffffff;
-    transform: scale(1.05);
-  }
-  
-  /* Desktop video enhancements - FIXED: No fixed heights */
-  .video-thumbnail {
-    height: auto; /* CHANGED: Remove fixed 220px height */
-  }
-  
-  .video-play-overlay {
-    width: 70px;
-    height: 70px;
-  }
-  
-  .play-icon {
-    font-size: 1.75rem;
-  }
-  
-  .video-modal-content {
-    max-width: 1000px;
   }
   
   /* Benefits section: 2-column slider grid on desktop */
@@ -1395,6 +901,18 @@ button.action-btn:hover {
   
   .benefit-slider-item {
     gap: var(--spacing-md);
+  }
+
+  /* Benefits modal desktop sizing */
+  .benefits-modal {
+    max-width: 650px;
+  }
+
+  .benefits-modal-sliders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    max-height: 60vh;
   }
 }
 
@@ -1492,10 +1010,10 @@ button.action-btn:hover {
     font-size: 0.75rem;
   }
   
-  /* ENHANCED: Mobile action buttons - enhanced styling like desktop */
+  /* ENHANCED: Mobile action buttons - enhanced styling like desktop with 4 buttons */
   .streak-actions {
     flex-direction: column;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md); /* REDUCED: From var(--spacing-lg) for 4 buttons */
     max-width: 100% !important;
     width: 100% !important;
     margin: 0 auto;
@@ -1505,52 +1023,20 @@ button.action-btn:hover {
   .streak-action-btn {
     width: 100%;
     justify-content: center;
-    padding: var(--spacing-lg) var(--spacing-xl) !important;
-    font-size: 1rem !important;
+    padding: var(--spacing-md) var(--spacing-lg) !important; /* REDUCED: Smaller padding for 4 buttons */
+    font-size: 0.9375rem !important; /* REDUCED: From 1rem for 4 buttons */
     font-weight: 600;
     letter-spacing: 0.025em;
-    min-height: 50px !important;
+    min-height: 46px !important; /* REDUCED: From 50px for 4 buttons */
     position: relative;
     overflow: hidden;
   }
   
-  /* ENHANCED: Mobile button colors match desktop exactly */
-  .relapse-btn-grey {
-    background-color: rgba(128, 128, 128, 0.1);
-    color: var(--text-secondary);
-    border-color: var(--text-secondary);
-  }
-  
-  .relapse-btn-grey:active {
-    background-color: rgba(128, 128, 128, 0.2);
-    border-color: var(--text-secondary);
-    color: var(--text-secondary);
-    transform: scale(1.02);
-  }
-  
-  .wetdream-btn {
-    background-color: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-    border-color: var(--warning);
-  }
-  
-  .wetdream-btn:active {
-    background-color: rgba(245, 158, 11, 0.2);
-    border-color: var(--warning);
-    color: var(--warning);
-    transform: scale(1.02);
-  }
-  
-  .urge-btn {
-    background-color: rgba(37, 99, 235, 0.1);
-    color: var(--primary);
-    border-color: var(--primary);
-  }
-  
-  .urge-btn:active {
-    background-color: rgba(37, 99, 235, 0.2);
-    border-color: var(--primary);
-    color: var(--primary);
+  /* Mobile benefits button active state */
+  .benefits-btn:active {
+    background-color: rgba(34, 197, 94, 0.2);
+    border-color: var(--success);
+    color: var(--success);
     transform: scale(1.02);
   }
   
@@ -1614,99 +1100,25 @@ button.action-btn:hover {
     color: var(--text-secondary) !important;
   }
 
-  /* Mobile section icon adjustments */
-  .section-header-icon {
-    font-size: 1.5rem;
-    margin-bottom: var(--spacing-sm);
-  }
-
-  /* Discord community mobile layout */
-  .discord-community-stats {
-    gap: var(--spacing-lg);
-  }
-  
-  /* ENHANCED: Mobile Discord and YouTube buttons match desktop styling */
-  .discord-join-btn {
-    width: 100%;
-    justify-content: center;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-xl);
-    background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
-    border: 1px solid #7289da;
-    border-radius: var(--radius-full);
-    color: #ffffff;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    letter-spacing: 0.025em;
-    min-height: 44px;
-  }
-
-  .discord-join-btn:active {
-    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
-    border-color: #7289da;
-    color: #ffffff;
-    transform: scale(1.02);
-  }
-  
-  /* YouTube channel mobile layout */
-  .youtube-channel-stats {
-    gap: var(--spacing-lg);
-  }
-  
-  .youtube-subscribe-btn {
-    width: 100%;
-    justify-content: center;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-xl);
-    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
-    border: 1px solid #ff0000;
-    border-radius: var(--radius-full);
-    color: #ffffff;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    letter-spacing: 0.025em;
-    min-height: 44px;
-  }
-
-  .youtube-subscribe-btn:active {
-    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
-    border-color: #ff0000;
-    color: #ffffff;
-    transform: scale(1.02);
-  }
-  
-  /* Mobile video adjustments - FIXED: No fixed heights */
-  .video-thumbnail {
-    height: auto; /* CHANGED: Remove fixed 180px height */
-  }
-  
-  .video-play-overlay {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .play-icon {
-    font-size: 1.25rem;
-  }
-  
-  .video-modal-content {
-    margin: var(--spacing-sm);
+  /* Mobile benefits modal adjustments */
+  .benefits-modal {
     max-width: calc(100vw - 2rem);
+    margin: var(--spacing-sm);
   }
-  
-  .leaderboard-status,
-  .discord-setup-note {
-    text-align: center;
+
+  .benefits-modal-sliders {
+    max-height: 45vh;
+  }
+
+  .benefits-modal-actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .modal-save-btn,
+  .cancel-benefits-btn {
+    width: 100%;
+    min-width: auto;
   }
 }
 
