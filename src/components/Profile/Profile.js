@@ -63,7 +63,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     return isMobileDevice;
   }, []);
 
-  // FIXED: Proper slider positioning that works on all devices
+  // ROBUST: Enhanced slider positioning with comprehensive error handling
   const updateTabSlider = useCallback(() => {
     // Guard clauses for safety
     if (!tabsRef.current || !sliderRef.current) {
@@ -76,32 +76,43 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeTab}"]`);
       
       if (!activeTabElement) {
+        console.warn(`Tab element not found: ${activeTab}`);
         return false;
       }
 
-      // Get measurements
-      const containerRect = tabsContainer.getBoundingClientRect();
-      const tabRect = activeTabElement.getBoundingClientRect();
-      
-      if (containerRect.width === 0 || tabRect.width === 0) {
-        return false;
-      }
+      // Wait for next frame to ensure layout is complete
+      requestAnimationFrame(() => {
+        try {
+          // Get measurements
+          const containerRect = tabsContainer.getBoundingClientRect();
+          const tabRect = activeTabElement.getBoundingClientRect();
+          
+          // Validate measurements
+          if (containerRect.width === 0 || tabRect.width === 0) {
+            console.warn('Invalid measurements, container or tab not rendered');
+            return;
+          }
 
-      // Calculate position - accounting for container padding
-      const paddingLeft = 8; // var(--spacing-xs)
-      const leftOffset = tabRect.left - containerRect.left - paddingLeft;
-      const tabWidth = tabRect.width;
-      
-      // Ensure we don't go negative or beyond bounds
-      const clampedOffset = Math.max(0, leftOffset);
-      const maxWidth = containerRect.width - paddingLeft * 2;
-      const clampedWidth = Math.min(tabWidth, maxWidth);
-      
-      // Apply positioning and make visible
-      slider.style.transform = `translateX(${clampedOffset}px)`;
-      slider.style.width = `${clampedWidth}px`;
-      slider.style.opacity = '1';
-      slider.style.visibility = 'visible';
+          // Calculate position - accounting for container padding
+          const paddingLeft = 8; // var(--spacing-xs)
+          const leftOffset = tabRect.left - containerRect.left - paddingLeft;
+          const tabWidth = tabRect.width;
+          
+          // Robust boundary checking
+          const containerWidth = containerRect.width - (paddingLeft * 2);
+          const clampedOffset = Math.max(0, Math.min(leftOffset, containerWidth - tabWidth));
+          const clampedWidth = Math.min(tabWidth, containerWidth);
+          
+          // Apply positioning and make visible
+          slider.style.transform = `translateX(${Math.round(clampedOffset)}px)`;
+          slider.style.width = `${Math.round(clampedWidth)}px`;
+          slider.style.opacity = '1';
+          slider.style.visibility = 'visible';
+          
+        } catch (innerError) {
+          console.error('Inner slider positioning failed:', innerError);
+        }
+      });
       
       return true;
       
