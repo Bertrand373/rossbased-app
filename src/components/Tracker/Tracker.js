@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Changed "Edit Date" to "Edit Start Date"
+// components/Tracker/Tracker.js - UPDATED: Added Benefits Modal functionality
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ import './TrackerButtons.css';
 // Components
 import DatePicker from '../Shared/DatePicker';
 
-// Icons - UPDATED: Added YouTube icon import
+// Icons - UPDATED: Added FaChartLine for benefits button
 import { 
   FaCrown, 
   FaExclamationTriangle,
@@ -27,16 +27,28 @@ import {
   FaUsers,
   FaYoutube,
   FaPlay,
-  FaCalendarAlt
+  FaCalendarAlt,
+  FaChartLine
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
   const navigate = useNavigate();
   const [showSetStartDate, setShowSetStartDate] = useState(!userData.startDate);
   
-  // NEW: Video modal state
+  // Video modal state
   const [showVideo, setShowVideo] = useState(false);
   const [featuredVideoId] = useState('_1CcOqHD57E'); // Your video ID
+  
+  // NEW: Benefits modal state
+  const [showBenefitsModal, setShowBenefitsModal] = useState(false);
+  const [modalBenefits, setModalBenefits] = useState({ 
+    energy: 5, 
+    focus: 5, 
+    confidence: 5, 
+    aura: 5, 
+    sleep: 5,
+    workout: 5 
+  });
   
   // Initialize with the current date if no start date exists
   const [startDate, setStartDate] = useState(
@@ -66,14 +78,16 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     );
     
     if (existingBenefits) {
-      setTodayBenefits({
+      const benefits = {
         energy: existingBenefits.energy,
         focus: existingBenefits.focus,
         confidence: existingBenefits.confidence,
         aura: existingBenefits.aura,
         sleep: existingBenefits.sleep || existingBenefits.attraction || 5, // MIGRATION: Handle old attraction data
         workout: existingBenefits.workout || existingBenefits.gymPerformance || 5
-      });
+      };
+      setTodayBenefits(benefits);
+      setModalBenefits(benefits); // NEW: Sync modal state
       setBenefitsLogged(true);
     }
   }, [userData.benefitTracking]);
@@ -193,7 +207,70 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     navigate('/urge-toolkit');
   };
 
-  // Handle benefit logging
+  // NEW: Handle benefits modal
+  const handleBenefitsLog = () => {
+    if (benefitsLogged) {
+      // If already logged, scroll to edit section for detailed editing
+      const benefitsSection = document.querySelector('.benefit-logging-container');
+      if (benefitsSection) {
+        benefitsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      // If not logged, open quick entry modal
+      setModalBenefits({ ...todayBenefits }); // Initialize modal with current values
+      setShowBenefitsModal(true);
+    }
+  };
+
+  // NEW: Handle modal benefit changes
+  const handleModalBenefitChange = (type, value) => {
+    setModalBenefits(prev => ({
+      ...prev,
+      [type]: value
+    }));
+  };
+
+  // NEW: Save benefits from modal
+  const saveBenefitsFromModal = () => {
+    const today = new Date();
+    const todayStr = format(today, 'yyyy-MM-dd');
+    
+    // Remove existing entry for today if it exists
+    const updatedBenefitTracking = (userData.benefitTracking || []).filter(
+      benefit => format(new Date(benefit.date), 'yyyy-MM-dd') !== todayStr
+    );
+    
+    // Add new entry
+    updatedBenefitTracking.push({
+      date: today,
+      energy: modalBenefits.energy,
+      focus: modalBenefits.focus,
+      confidence: modalBenefits.confidence,
+      aura: modalBenefits.aura,
+      sleep: modalBenefits.sleep,
+      workout: modalBenefits.workout
+    });
+    
+    // Sort by date
+    updatedBenefitTracking.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    updateUserData({ benefitTracking: updatedBenefitTracking });
+    
+    // Update local states
+    setTodayBenefits({ ...modalBenefits });
+    setBenefitsLogged(true);
+    setShowBenefitsModal(false);
+    
+    toast.success('Benefits logged for today!');
+  };
+
+  // NEW: Cancel modal
+  const cancelBenefitsModal = () => {
+    setShowBenefitsModal(false);
+    setModalBenefits({ ...todayBenefits }); // Reset to original values
+  };
+
+  // Handle benefit logging (existing detailed section)
   const handleBenefitChange = (type, value) => {
     setTodayBenefits(prev => ({
       ...prev,
@@ -244,7 +321,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     window.open('https://www.youtube.com/@RossBased', '_blank', 'noopener,noreferrer');
   };
 
-  // NEW: Video handlers
+  // Video handlers
   const handleWatchVideo = () => {
     setShowVideo(true);
   };
@@ -275,7 +352,67 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* CLEANED: Video Modal - No text, just video */}
+      {/* NEW: Benefits Logging Modal - Styled to match benefits section */}
+      {showBenefitsModal && (
+        <div className="modal-overlay">
+          <div className="modal-content benefits-modal">
+            <button className="modal-close-btn" onClick={cancelBenefitsModal}>
+              <FaTimes />
+            </button>
+            <h3 className="benefits-modal-header">Daily Benefits Check-In</h3>
+            <p className="benefits-modal-subtitle">How are you feeling today?</p>
+            
+            <div className="benefits-modal-sliders">
+              {[
+                { key: 'energy', label: 'Energy', value: modalBenefits.energy, lowLabel: 'Low', highLabel: 'High' },
+                { key: 'focus', label: 'Focus', value: modalBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
+                { key: 'confidence', label: 'Confidence', value: modalBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
+                { key: 'aura', label: 'Aura', value: modalBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
+                { key: 'sleep', label: 'Sleep Quality', value: modalBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
+                { key: 'workout', label: 'Workout', value: modalBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
+              ].map((slider) => (
+                <div key={slider.key} className="benefit-slider-item modal-benefit-item">
+                  <div className="benefit-slider-header">
+                    <span className="benefit-label">{slider.label}</span>
+                    <span className="benefit-value">{slider.value}/10</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={slider.value}
+                    onChange={(e) => handleModalBenefitChange(slider.key, parseInt(e.target.value))}
+                    className="benefit-range-slider"
+                  />
+                  <div className="slider-labels">
+                    <span>{slider.lowLabel}</span>
+                    <span>{slider.highLabel}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="benefits-modal-actions">
+              <button 
+                className="action-btn save-benefits-btn modal-save-btn"
+                onClick={saveBenefitsFromModal}
+              >
+                <FaCheckCircle />
+                <span>Save Today's Benefits</span>
+              </button>
+              <button 
+                className="action-btn cancel-benefits-btn"
+                onClick={cancelBenefitsModal}
+              >
+                <FaTimes />
+                <span>Cancel</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Modal */}
       {showVideo && (
         <div className="video-modal-overlay" onClick={handleCloseVideo}>
           <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -379,6 +516,15 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <FaShieldAlt />
                 <span>Fighting Urges?</span>
               </button>
+
+              {/* NEW: Benefits logging button */}
+              <button 
+                className="streak-action-btn benefits-btn"
+                onClick={handleBenefitsLog}
+              >
+                <FaChartLine />
+                <span>Log Benefits</span>
+              </button>
             </div>
           </div>
         </div>
@@ -434,7 +580,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* CLEANED: YouTube Channel Section - No redundant button, no text overlays */}
+          {/* YouTube Channel Section */}
           <div className="youtube-channel-section">
             <div className="youtube-channel-header">
               <div className="section-icon-header">
@@ -446,7 +592,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               </div>
             </div>
             
-            {/* Featured Video Preview - ONLY interaction needed */}
+            {/* Featured Video Preview */}
             <div className="featured-video-preview">
               <div className="video-thumbnail-container" onClick={handleWatchVideo}>
                 <img 
@@ -457,7 +603,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <div className="video-play-overlay">
                   <FaPlay className="play-icon" />
                 </div>
-                {/* REMOVED: All video info text overlay */}
               </div>
             </div>
             
@@ -477,8 +622,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
             
             <div className="youtube-channel-actions">
-              {/* REMOVED: Redundant "Watch Video" button */}
-              
               <button 
                 className="youtube-subscribe-btn"
                 onClick={handleYouTubeSubscribe}
