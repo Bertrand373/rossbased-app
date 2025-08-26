@@ -915,33 +915,33 @@ button.action-btn:hover {
     display: none;
   }
   
-  /* Desktop benefits button styling - PRIMARY YELLOW */
+  /* Desktop benefits button styling - SOLID YELLOW with black text */
   .benefits-btn-primary {
-    background-color: rgba(255, 221, 0, 0.1);
-    color: var(--primary);
-    border-color: var(--primary);
+    background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+    border: 1px solid #f0cc00;
+    color: #000000;
   }
   
   .benefits-btn-primary:hover {
-    background-color: rgba(255, 221, 0, 0.2);
-    border-color: var(--primary);
-    color: var(--primary);
-    transform: scale(1.05);
+    background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+    border-color: #f0cc00;
+    color: #000000;
+    transform: translateY(-1px); /* CONSISTENT: translateY like edit button */
   }
 
-  /* Desktop Discord and YouTube button scale transforms */
+  /* Desktop Discord and YouTube button translateY transforms */
   .discord-join-btn:hover {
     background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
     border-color: #7289da;
     color: #ffffff;
-    transform: scale(1.05); /* CHANGED: Scale instead of translateY */
+    transform: translateY(-1px); /* CHANGED: translateY instead of scale */
   }
 
   .youtube-subscribe-btn:hover {
     background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
     border-color: #ff0000;
     color: #ffffff;
-    transform: scale(1.05); /* CHANGED: Scale instead of translateY */
+    transform: translateY(-1px); /* CHANGED: translateY instead of scale */
   }
   
   /* Benefits section: 2-column slider grid on desktop */
@@ -1084,27 +1084,27 @@ button.action-btn:hover {
     overflow: hidden;
   }
   
-  /* Mobile benefits button active state - PRIMARY YELLOW */
+  /* Mobile benefits button active state - SOLID YELLOW with black text */
   .benefits-btn-primary:active {
-    background-color: rgba(255, 221, 0, 0.2);
-    border-color: var(--primary);
-    color: var(--primary);
-    transform: scale(1.02);
+    background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+    border-color: #f0cc00;
+    color: #000000;
+    transform: translateY(-1px); /* CONSISTENT: translateY on mobile too */
   }
 
-  /* Mobile Discord and YouTube button scale transforms */
+  /* Mobile Discord and YouTube button translateY transforms */
   .discord-join-btn:active {
     background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
     border-color: #7289da;
     color: #ffffff;
-    transform: scale(1.02); /* CHANGED: Scale instead of translateY */
+    transform: translateY(-1px); /* CHANGED: translateY instead of scale */
   }
   
   .youtube-subscribe-btn:active {
     background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
     border-color: #ff0000;
     color: #ffffff;
-    transform: scale(1.02); /* CHANGED: Scale instead of translateY */
+    transform: translateY(-1px); /* CHANGED: translateY instead of scale */
   }
   
   .benefit-logging-section {

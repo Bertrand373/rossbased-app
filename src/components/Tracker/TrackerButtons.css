@@ -90,18 +90,18 @@
   transform: scale(1.05);
 }
 
-/* NEW: Benefits Button - PRIMARY YELLOW like login button */
+/* NEW: Benefits Button - SOLID YELLOW with black text like Discord/YouTube pattern */
 .benefits-btn-primary {
-  background-color: rgba(255, 221, 0, 0.1);
-  color: var(--primary);
-  border-color: var(--primary);
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  border: 1px solid #f0cc00;
+  color: #000000; /* Black text on yellow background */
 }
 
 .benefits-btn-primary:hover {
-  background-color: rgba(255, 221, 0, 0.2);
-  border-color: var(--primary);
-  color: var(--primary);
-  transform: scale(1.05); /* Scale transform like login button */
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  border-color: #f0cc00;
+  color: #000000;
+  transform: translateY(-1px); /* CONSISTENT: translateY like edit button */
 }
 
 /* Benefit Section Buttons */
