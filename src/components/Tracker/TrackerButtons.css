@@ -200,6 +200,7 @@
 
 /* DESKTOP RESPONSIVE STYLES */
 @media (min-width: 1024px) {
+  /* SIMPLIFIED: Main content grid without benefits section constraint */
   .tracker-main-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -214,10 +215,7 @@
     height: fit-content;
   }
   
-  .benefit-logging-container {
-    grid-column: 1 / -1;
-    margin-top: var(--spacing-xl);
-  }
+  /* REMOVED: No more benefit-logging-container grid styling */
   
   .streak-number {
     font-size: 5rem !important;
@@ -533,60 +531,8 @@
     transform: scale(1.02);
   }
   
-  .benefit-logging-section {
-    padding: var(--spacing-lg);
-  }
+  /* REMOVED: Old benefit section mobile styles - no longer needed since consolidating to modal */
   
-  .premium-benefits-container {
-    gap: var(--spacing-md);
-  }
-  
-  .benefit-status-section {
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .benefits-logged, .benefits-not-logged {
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    text-align: center;
-  }
-  
-  .edit-benefits-btn {
-    margin-left: 0;
-    margin-top: var(--spacing-sm);
-  }
-  
-  .benefit-range-slider {
-    height: 32px;
-  }
-  
-  .benefit-range-slider::-webkit-slider-thumb {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .benefit-range-slider::-moz-range-thumb {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .slider-labels {
-    margin-top: 10px !important;
-    margin-bottom: 0px !important;
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
-    line-height: 1 !important;
-    transform: none !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    font-size: 0.75rem !important;
-    font-weight: 500 !important;
-    letter-spacing: 0.025em !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    color: var(--text-secondary) !important;
-  }
-
   .section-header-icon {
     font-size: 1.5rem;
     margin-bottom: var(--spacing-sm);

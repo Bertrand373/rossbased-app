@@ -441,48 +441,16 @@ button.action-btn:hover {
   transform: translateY(-1px);
 }
 
-/* Daily Benefits section */
-.benefit-logging-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin-top: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-}
-
-.benefit-logging-section {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* Simple section header */
-.benefit-logging-section-header {
-  margin-bottom: var(--spacing-lg);
-  font-size: 1.125rem;
-  color: var(--text);
-  text-align: center;
-  position: relative;
-  margin-top: 0;
-  font-weight: 600;
-}
-
-.benefit-logging-header {
-  display: none;
-}
-
-.benefit-status-section {
+/* NEW: Benefits Status Indicator in Streak Card */
+.benefits-status-indicator {
+  order: 5.5; /* Between streak-actions-divider and streak-actions */
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: var(--spacing-sm) 0;
 }
 
-.benefits-logged {
+.benefits-logged-status {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -490,52 +458,32 @@ button.action-btn:hover {
   color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.875rem;
-  flex-wrap: wrap;
-}
-
-.benefits-not-logged {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.check-icon, .info-icon {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.check-icon {
-  color: var(--primary);
-}
-
-.info-icon {
-  color: var(--primary);
-}
-
-/* Edit Benefits button - grey → yellow hover */
-.edit-benefits-btn {
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
+  background-color: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.1);
   border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  margin-left: var(--spacing-md);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  padding: var(--spacing-sm) var(--spacing-md);
 }
 
-.edit-benefits-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
+.benefits-logged-status .check-icon {
+  color: var(--success);
+}
+
+.benefits-not-logged-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.benefits-not-logged-status .info-icon {
+  color: var(--primary);
 }
 
 /* Premium Benefits Container */
@@ -825,10 +773,21 @@ button.action-btn:hover {
     height: fit-content;
   }
   
-  /* Benefits section spans full width */
-  .benefit-logging-container {
-    grid-column: 1 / -1;
-    margin-top: var(--spacing-xl);
+  /* SIMPLIFIED: No more benefits section spanning full width - removed grid constraint */
+  /* Main content grid container - simplified without benefits section */
+  .tracker-main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    align-items: stretch;
+  }
+  
+  /* Discord and YouTube column */
+  .discord-youtube-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    height: fit-content;
   }
   
   /* ENHANCED: Better streak section for desktop */
@@ -1107,15 +1066,42 @@ button.action-btn:hover {
     transform: translateY(-1px); /* CHANGED: translateY instead of scale */
   }
   
-  .benefit-logging-section {
-    padding: var(--spacing-lg);
+  /* Mobile benefits status indicator adjustments */
+  .benefits-status-indicator {
+    margin: var(--spacing-md) 0;
   }
-  
-  .premium-benefits-container {
-    gap: var(--spacing-md);
+
+  .benefits-logged-status,
+  .benefits-not-logged-status {
+    flex-direction: row;
+    gap: var(--spacing-xs);
+    text-align: center;
+    font-size: 0.8125rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
-  
-  .benefit-status-section {
+
+  /* Benefits modal mobile adjustments */
+  .benefits-modal {
+    max-width: calc(100vw - 2rem);
+    margin: var(--spacing-sm);
+  }
+
+  .benefits-modal-sliders {
+    max-height: 45vh;
+  }
+
+  .benefits-modal-actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .modal-save-btn,
+  .cancel-benefits-btn {
+    width: 100%;
+    min-width: auto;
+  }
+
+  /* Remove all old benefit section mobile styles - no longer needed */benefit-status-section {
     margin-bottom: var(--spacing-md);
   }
   

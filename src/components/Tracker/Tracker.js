@@ -1,10 +1,10 @@
-// components/Tracker/Tracker.js - UPDATED: Added Benefits Modal functionality
+// components/Tracker/Tracker.js - UPDATED: Consolidated benefits modal approach
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-// UPDATED: Import the 3 CSS files instead of single Tracker.css
+// Import the 3 CSS files
 import './Tracker.css';
 import './TrackerSections.css';
 import './TrackerButtons.css';
@@ -12,7 +12,7 @@ import './TrackerButtons.css';
 // Components
 import DatePicker from '../Shared/DatePicker';
 
-// Icons - UPDATED: Added FaChartLine for benefits button
+// Icons
 import { 
   FaCrown, 
   FaExclamationTriangle,
@@ -37,9 +37,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   
   // Video modal state
   const [showVideo, setShowVideo] = useState(false);
-  const [featuredVideoId] = useState('_1CcOqHD57E'); // Your video ID
+  const [featuredVideoId] = useState('_1CcOqHD57E');
   
-  // NEW: Benefits modal state
+  // Benefits modal state - SIMPLIFIED: Single modal for all benefit logging
   const [showBenefitsModal, setShowBenefitsModal] = useState(false);
   const [modalBenefits, setModalBenefits] = useState({ 
     energy: 5, 
@@ -57,15 +57,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   
-  // Benefit tracking states - Sleep Quality replaces Attraction
-  const [todayBenefits, setTodayBenefits] = useState({ 
-    energy: 5, 
-    focus: 5, 
-    confidence: 5, 
-    aura: 5, 
-    sleep: 5,  // CHANGED: sleep replaces attraction
-    workout: 5 
-  });
+  // SIMPLIFIED: Only need to track if benefits are logged, not maintain separate state
   const [benefitsLogged, setBenefitsLogged] = useState(false);
   
   const today = new Date();
@@ -83,11 +75,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         focus: existingBenefits.focus,
         confidence: existingBenefits.confidence,
         aura: existingBenefits.aura,
-        sleep: existingBenefits.sleep || existingBenefits.attraction || 5, // MIGRATION: Handle old attraction data
+        sleep: existingBenefits.sleep || existingBenefits.attraction || 5,
         workout: existingBenefits.workout || existingBenefits.gymPerformance || 5
       };
-      setTodayBenefits(benefits);
-      setModalBenefits(benefits); // NEW: Sync modal state
+      setModalBenefits(benefits);
       setBenefitsLogged(true);
     }
   }, [userData.benefitTracking]);
@@ -95,18 +86,15 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   // React DatePicker handlers
   const handleDateSubmit = (newDate) => {
     try {
-      // Calculate current streak based on the new start date
       const calculatedStreak = differenceInDays(today, newDate) + 1;
       const newStreak = calculatedStreak > 0 ? calculatedStreak : 0;
       
-      // Update user data with new start date and current streak
       updateUserData({
         startDate: newDate,
         currentStreak: newStreak,
         longestStreak: Math.max(userData.longestStreak || 0, newStreak)
       });
       
-      // Update local state
       setStartDate(newDate);
       setCurrentStreak(newStreak);
       setShowSetStartDate(false);
@@ -128,7 +116,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       const startDateObj = new Date(userData.startDate);
       setStartDate(startDateObj);
       
-      // Calculate current streak based on start date
       if (!isNaN(startDateObj.getTime())) {
         const calculatedStreak = differenceInDays(today, startDateObj) + 1;
         setCurrentStreak(calculatedStreak > 0 ? calculatedStreak : 0);
@@ -146,11 +133,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     : 0;
 
   const handleRelapse = () => {
-    // Confirm relapse
     if (window.confirm('Are you sure you want to log a relapse? This will reset your current streak.')) {
       const now = new Date();
       
-      // Update streak history to mark current streak as ended
       const updatedHistory = [...(userData.streakHistory || [])];
       const currentStreakIndex = updatedHistory.findIndex(streak => 
         streak.end === null || streak.end === undefined
@@ -165,7 +150,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         };
       }
       
-      // Add new streak starting today
       const newStreak = {
         id: (userData.streakHistory?.length || 0) + 1,
         start: now,
@@ -176,7 +160,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       updatedHistory.push(newStreak);
       
-      // Update user data
       updateUserData({
         startDate: now,
         currentStreak: 0,
@@ -184,7 +167,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         streakHistory: updatedHistory
       });
       
-      // Update local state
       setCurrentStreak(0);
       setStartDate(now);
       
@@ -202,27 +184,16 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   };
 
-  // Handle urge redirection to urge tab
   const handleUrges = () => {
     navigate('/urge-toolkit');
   };
 
-  // NEW: Handle benefits modal
+  // SIMPLIFIED: Benefits modal - single entry point for all benefit logging
   const handleBenefitsLog = () => {
-    if (benefitsLogged) {
-      // If already logged, scroll to edit section for detailed editing
-      const benefitsSection = document.querySelector('.benefit-logging-container');
-      if (benefitsSection) {
-        benefitsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    } else {
-      // If not logged, open quick entry modal
-      setModalBenefits({ ...todayBenefits }); // Initialize modal with current values
-      setShowBenefitsModal(true);
-    }
+    setShowBenefitsModal(true);
   };
 
-  // NEW: Handle modal benefit changes
+  // Handle modal benefit changes
   const handleModalBenefitChange = (type, value) => {
     setModalBenefits(prev => ({
       ...prev,
@@ -230,7 +201,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }));
   };
 
-  // NEW: Save benefits from modal
+  // Save benefits from modal
   const saveBenefitsFromModal = () => {
     const today = new Date();
     const todayStr = format(today, 'yyyy-MM-dd');
@@ -256,59 +227,41 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     
     updateUserData({ benefitTracking: updatedBenefitTracking });
     
-    // Update local states
-    setTodayBenefits({ ...modalBenefits });
     setBenefitsLogged(true);
     setShowBenefitsModal(false);
     
     toast.success('Benefits logged for today!');
   };
 
-  // NEW: Cancel modal
+  // Cancel modal
   const cancelBenefitsModal = () => {
     setShowBenefitsModal(false);
-    setModalBenefits({ ...todayBenefits }); // Reset to original values
-  };
-
-  // Handle benefit logging (existing detailed section)
-  const handleBenefitChange = (type, value) => {
-    setTodayBenefits(prev => ({
-      ...prev,
-      [type]: value
-    }));
-  };
-
-  // Enable editing of benefits
-  const enableBenefitEditing = () => {
-    setBenefitsLogged(false);
-  };
-
-  const saveBenefits = () => {
-    const today = new Date();
-    const todayStr = format(today, 'yyyy-MM-dd');
-    
-    // Remove existing entry for today if it exists
-    const updatedBenefitTracking = (userData.benefitTracking || []).filter(
-      benefit => format(new Date(benefit.date), 'yyyy-MM-dd') !== todayStr
+    // Reset to existing values if canceling
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const existingBenefits = userData.benefitTracking?.find(
+      benefit => format(new Date(benefit.date), 'yyyy-MM-dd') === todayStr
     );
     
-    // Add new entry
-    updatedBenefitTracking.push({
-      date: today,
-      energy: todayBenefits.energy,
-      focus: todayBenefits.focus,
-      confidence: todayBenefits.confidence,
-      aura: todayBenefits.aura,
-      sleep: todayBenefits.sleep, // CHANGED: sleep replaces attraction
-      workout: todayBenefits.workout
-    });
-    
-    // Sort by date
-    updatedBenefitTracking.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    updateUserData({ benefitTracking: updatedBenefitTracking });
-    setBenefitsLogged(true);
-    toast.success('Benefits logged for today!');
+    if (existingBenefits) {
+      setModalBenefits({
+        energy: existingBenefits.energy,
+        focus: existingBenefits.focus,
+        confidence: existingBenefits.confidence,
+        aura: existingBenefits.aura,
+        sleep: existingBenefits.sleep || existingBenefits.attraction || 5,
+        workout: existingBenefits.workout || existingBenefits.gymPerformance || 5
+      });
+    } else {
+      // Reset to defaults if no existing benefits
+      setModalBenefits({ 
+        energy: 5, 
+        focus: 5, 
+        confidence: 5, 
+        aura: 5, 
+        sleep: 5,
+        workout: 5 
+      });
+    }
   };
 
   // Handle Discord link
@@ -332,7 +285,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   return (
     <div className="tracker-container">
-      {/* React DatePicker Modal with close button */}
+      {/* React DatePicker Modal */}
       {showSetStartDate && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -352,7 +305,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* NEW: Benefits Logging Modal - Styled to match benefits section */}
+      {/* CONSOLIDATED: Benefits Logging Modal - Single source of truth */}
       {showBenefitsModal && (
         <div className="modal-overlay">
           <div className="modal-content benefits-modal">
@@ -360,7 +313,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               <FaTimes />
             </button>
             <h3 className="benefits-modal-header">Daily Benefits Check-In</h3>
-            <p className="benefits-modal-subtitle">How are you feeling today?</p>
+            <p className="benefits-modal-subtitle">
+              {benefitsLogged ? "Update how you're feeling today" : "How are you feeling today?"}
+            </p>
             
             <div className="benefits-modal-sliders">
               {[
@@ -398,7 +353,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 onClick={saveBenefitsFromModal}
               >
                 <FaCheckCircle />
-                <span>Save Today's Benefits</span>
+                <span>{benefitsLogged ? 'Update Benefits' : 'Save Benefits'}</span>
               </button>
               <button 
                 className="action-btn cancel-benefits-btn"
@@ -434,7 +389,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* Simplified Header Section */}
+      {/* Header Section */}
       <div className="integrated-tracker-header">
         <div className="tracker-header-title-section">
           <h2>Daily Dashboard</h2>
@@ -456,9 +411,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* Main content container for desktop two-column layout */}
+      {/* Main content container */}
       <div className="tracker-main-content">
-        {/* Current Streak Display - Left Column on Desktop */}
+        {/* Current Streak Display */}
         <div className="current-streak-container">
           <div className="streak-card">
             <div className="streak-date">Today, {format(new Date(), 'MMMM d, yyyy')}</div>
@@ -492,14 +447,29 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             <div className="streak-actions-divider"></div>
             
+            {/* UPDATED: Show benefits status above buttons */}
+            <div className="benefits-status-indicator">
+              {benefitsLogged ? (
+                <div className="benefits-logged-status">
+                  <FaCheckCircle className="check-icon" />
+                  <span>Benefits logged for today!</span>
+                </div>
+              ) : (
+                <div className="benefits-not-logged-status">
+                  <FaInfoCircle className="info-icon" />
+                  <span>Log your daily benefits</span>
+                </div>
+              )}
+            </div>
+            
             <div className="streak-actions">
-              {/* NEW: Benefits logging button - MOVED TO FIRST POSITION */}
+              {/* Benefits logging button - FIRST POSITION */}
               <button 
                 className="streak-action-btn benefits-btn-primary"
                 onClick={handleBenefitsLog}
               >
                 <FaChartLine />
-                <span>Log Benefits</span>
+                <span>{benefitsLogged ? 'Update Benefits' : 'Log Benefits'}</span>
               </button>
 
               <button 
@@ -529,7 +499,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
         </div>
         
-        {/* Discord and YouTube Column - Right Column on Desktop */}
+        {/* Discord and YouTube Column */}
         <div className="discord-youtube-column">
           {/* Discord Community Section */}
           <div className="discord-community-section">
@@ -635,80 +605,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* Benefit Logging Section - Full Width Below on Desktop */}
-      <div className="benefit-logging-container">
-        <div className="benefit-logging-section">
-          <h3 className="benefit-logging-section-header">Daily Benefits Check-In</h3>
-          
-          {/* Benefits logged status */}
-          <div className="benefit-status-section">
-            {benefitsLogged ? (
-              <div className="benefits-logged">
-                <FaCheckCircle className="check-icon" />
-                <span>Benefits logged for today!</span>
-                <button 
-                  className="action-btn edit-benefits-btn"
-                  onClick={enableBenefitEditing}
-                >
-                  <FaEdit />
-                  <span>Edit</span>
-                </button>
-              </div>
-            ) : (
-              <div className="benefits-not-logged">
-                <FaInfoCircle className="info-icon" />
-                <span>Track your benefits for today - the more you log, the more powerful your analytics become</span>
-              </div>
-            )}
-          </div>
-          
-          {/* ALL BENEFITS CONTAINER */}
-          <div className="premium-benefits-container">
-            {/* ALL 6 BENEFIT SLIDERS */}
-            {[
-              { key: 'energy', label: 'Energy', value: todayBenefits.energy, lowLabel: 'Low', highLabel: 'High' },
-              { key: 'focus', label: 'Focus', value: todayBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
-              { key: 'confidence', label: 'Confidence', value: todayBenefits.confidence, lowLabel: 'Insecure', highLabel: 'Very Confident' },
-              { key: 'aura', label: 'Aura', value: todayBenefits.aura, lowLabel: 'Invisible', highLabel: 'Magnetic' },
-              { key: 'sleep', label: 'Sleep Quality', value: todayBenefits.sleep, lowLabel: 'Poor', highLabel: 'Excellent' },
-              { key: 'workout', label: 'Workout', value: todayBenefits.workout, lowLabel: 'Weak', highLabel: 'Strong' }
-            ].map((slider) => (
-              <div key={slider.key} className="benefit-slider-item">
-                <div className="benefit-slider-header">
-                  <span className="benefit-label">{slider.label}</span>
-                  <span className="benefit-value">{slider.value}/10</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={slider.value}
-                  onChange={(e) => handleBenefitChange(slider.key, parseInt(e.target.value))}
-                  className="benefit-range-slider"
-                  disabled={benefitsLogged}
-                />
-                <div className="slider-labels">
-                  <span>{slider.lowLabel}</span>
-                  <span>{slider.highLabel}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Save button */}
-          {!benefitsLogged && (
-            <div className="benefit-actions">
-              <button 
-                className="action-btn save-benefits-btn"
-                onClick={saveBenefits}
-              >
-                <FaCheckCircle />
-                <span>Save Today's Benefits</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* REMOVED: Bottom benefits section - now handled entirely by modal */}
     </div>
   );
 };
