@@ -156,7 +156,7 @@
   border-radius: var(--radius-lg);
 }
 
-/* UPDATED: YouTube Play Button - App Pill Menu Style */
+/* UPDATED: YouTube Play Button - Circular Pill Menu Style */
 .video-play-overlay {
   position: absolute;
   top: 50%;
@@ -164,9 +164,9 @@
   transform: translate(-50%, -50%);
   background-color: rgba(255, 221, 0, 0.1);
   border: 1px solid rgba(255, 221, 0, 0.2);
-  border-radius: var(--radius-full);
-  width: 68px;
-  height: 48px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;

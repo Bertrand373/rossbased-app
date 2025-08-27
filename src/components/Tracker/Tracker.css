@@ -872,11 +872,11 @@ button.action-btn:hover {
   text-align: center;
 }
 
-/* UPDATED: Close button in upper right corner - MATCHING Profile feedback modal exactly */
+/* UPDATED: Close button positioned properly from edges - MATCHING Profile feedback modal exactly */
 .modal-close-btn {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
   background: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   font-size: 1rem;
