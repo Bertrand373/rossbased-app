@@ -156,14 +156,15 @@
   border-radius: var(--radius-lg);
 }
 
-/* UPDATED: YouTube-style Play Button */
+/* UPDATED: YouTube Play Button - App Pill Menu Style */
 .video-play-overlay {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 8px;
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
   width: 68px;
   height: 48px;
   display: flex;
@@ -171,26 +172,25 @@
   justify-content: center;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .video-thumbnail-container:hover .video-play-overlay {
-  background: rgba(0, 0, 0, 0.9);
+  background-color: rgba(255, 221, 0, 0.2);
+  border-color: rgba(255, 221, 0, 0.3);
   transform: translate(-50%, -50%) scale(1.05);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-  border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* YouTube Play Triangle */
+/* YouTube Play Triangle - Yellow like pill menus */
 .play-icon {
-  color: #ff0000;
+  color: var(--primary);
   font-size: 1.4rem;
   margin-left: 3px; /* Slight offset for visual centering */
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .video-thumbnail-container:hover .play-icon {
-  color: #ff3333;
+  color: var(--primary);
   transform: scale(1.1);
 }
 
