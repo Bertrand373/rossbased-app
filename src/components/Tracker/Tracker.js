@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Consolidated benefits modal approach
+// components/Tracker/Tracker.js - UPDATED: Enhanced benefits modal with default 5/10 values and smooth scrolling
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -39,7 +39,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [showVideo, setShowVideo] = useState(false);
   const [featuredVideoId] = useState('_1CcOqHD57E');
   
-  // Benefits modal state - SIMPLIFIED: Single modal for all benefit logging
+  // Benefits modal state - ENHANCED: Default to 5/10 for all values
   const [showBenefitsModal, setShowBenefitsModal] = useState(false);
   const [modalBenefits, setModalBenefits] = useState({ 
     energy: 5, 
@@ -57,12 +57,12 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   
   const [currentStreak, setCurrentStreak] = useState(userData.currentStreak || 0);
   
-  // SIMPLIFIED: Only need to track if benefits are logged, not maintain separate state
+  // Track if benefits are logged for today
   const [benefitsLogged, setBenefitsLogged] = useState(false);
   
   const today = new Date();
 
-  // Check if benefits are already logged for today
+  // Check if benefits are already logged for today and update modal state
   useEffect(() => {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const existingBenefits = userData.benefitTracking?.find(
@@ -70,16 +70,28 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     );
     
     if (existingBenefits) {
+      // Use existing values if they exist, otherwise default to 5
       const benefits = {
-        energy: existingBenefits.energy,
-        focus: existingBenefits.focus,
-        confidence: existingBenefits.confidence,
-        aura: existingBenefits.aura,
+        energy: existingBenefits.energy || 5,
+        focus: existingBenefits.focus || 5,
+        confidence: existingBenefits.confidence || 5,
+        aura: existingBenefits.aura || 5,
         sleep: existingBenefits.sleep || existingBenefits.attraction || 5,
         workout: existingBenefits.workout || existingBenefits.gymPerformance || 5
       };
       setModalBenefits(benefits);
       setBenefitsLogged(true);
+    } else {
+      // Reset to defaults (5/10 for all) if no existing benefits
+      setModalBenefits({ 
+        energy: 5, 
+        focus: 5, 
+        confidence: 5, 
+        aura: 5, 
+        sleep: 5,
+        workout: 5 
+      });
+      setBenefitsLogged(false);
     }
   }, [userData.benefitTracking]);
 
@@ -188,16 +200,16 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     navigate('/urge-toolkit');
   };
 
-  // SIMPLIFIED: Benefits modal - single entry point for all benefit logging
+  // Benefits modal handlers
   const handleBenefitsLog = () => {
     setShowBenefitsModal(true);
   };
 
-  // Handle modal benefit changes
+  // Handle modal benefit changes with smooth scrolling support
   const handleModalBenefitChange = (type, value) => {
     setModalBenefits(prev => ({
       ...prev,
-      [type]: value
+      [type]: parseInt(value)
     }));
   };
 
@@ -233,10 +245,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     toast.success('Benefits logged for today!');
   };
 
-  // Cancel modal
+  // Cancel modal and reset to existing values or defaults
   const cancelBenefitsModal = () => {
     setShowBenefitsModal(false);
-    // Reset to existing values if canceling
+    
+    // Reset to existing values if they exist, otherwise keep defaults (5/10)
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const existingBenefits = userData.benefitTracking?.find(
       benefit => format(new Date(benefit.date), 'yyyy-MM-dd') === todayStr
@@ -244,15 +257,15 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     
     if (existingBenefits) {
       setModalBenefits({
-        energy: existingBenefits.energy,
-        focus: existingBenefits.focus,
-        confidence: existingBenefits.confidence,
-        aura: existingBenefits.aura,
+        energy: existingBenefits.energy || 5,
+        focus: existingBenefits.focus || 5,
+        confidence: existingBenefits.confidence || 5,
+        aura: existingBenefits.aura || 5,
         sleep: existingBenefits.sleep || existingBenefits.attraction || 5,
         workout: existingBenefits.workout || existingBenefits.gymPerformance || 5
       });
     } else {
-      // Reset to defaults if no existing benefits
+      // Reset to defaults (5/10 for all)
       setModalBenefits({ 
         energy: 5, 
         focus: 5, 
@@ -305,7 +318,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* CONSOLIDATED: Benefits Logging Modal - Single source of truth */}
+      {/* ENHANCED: Benefits Logging Modal with Profile-style close button and smooth scrolling */}
       {showBenefitsModal && (
         <div className="modal-overlay">
           <div className="modal-content benefits-modal">
@@ -389,7 +402,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* Header Section */}
+      {/* Header Section with Calendar-matching sizing */}
       <div className="integrated-tracker-header">
         <div className="tracker-header-title-section">
           <h2>Daily Dashboard</h2>
@@ -447,7 +460,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             <div className="streak-actions-divider"></div>
             
-            {/* UPDATED: Show benefits status above buttons */}
+            {/* Benefits status above buttons */}
             <div className="benefits-status-indicator">
               {benefitsLogged ? (
                 <div className="benefits-logged-status">
@@ -604,8 +617,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
         </div>
       </div>
-      
-      {/* REMOVED: Bottom benefits section - now handled entirely by modal */}
     </div>
   );
 };

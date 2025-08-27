@@ -1,11 +1,11 @@
-/* components/Tracker/Tracker.css - REFINED: Enhanced desktop layout with video integration and mobile enhancements + UPDATED: Close button styling to match Profile modal + NEW: Benefits Modal */
+/* components/Tracker/Tracker.css - UPDATED: Header sizing to match Calendar + Enhanced benefits modal with smooth scrolling sliders */
 .tracker-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Integrated header design with subtitle */
+/* UPDATED: Integrated header design with subtitle and Calendar-matching sizing */
 .integrated-tracker-header {
   display: flex;
   flex-direction: column;
@@ -27,7 +27,7 @@
 
 .tracker-header-title-section h2 {
   margin: 0;
-  font-size: 1.25rem; /* STANDARDIZED: Match other tab headers */
+  font-size: 1.5rem; /* UPDATED: Match Calendar desktop size (was 1.25rem) */
   font-weight: 600;
   color: var(--text);
   opacity: 0.85;
@@ -37,7 +37,7 @@
 /* NEW: Header subtitle */
 .tracker-header-subtitle {
   margin: var(--spacing-xs) 0 0 0;
-  font-size: 0.875rem;
+  font-size: 0.875rem; /* MATCHES: Calendar desktop subtitle size */
   color: var(--text-secondary);
   text-align: center;
   font-style: italic;
@@ -314,7 +314,7 @@ button.action-btn:hover {
   background-color: rgba(255, 221, 0, 0.2);
   border-color: var(--primary);
   color: var(--primary);
-  transform: scale(1.05); /* CHANGED: Scale transform like login button */
+  transform: scale(1.05);
 }
 
 /* UPDATED: All streak action buttons use scale transform */
@@ -322,21 +322,21 @@ button.action-btn:hover {
   background-color: rgba(128, 128, 128, 0.2);
   border-color: var(--text-secondary);
   color: var(--text-secondary);
-  transform: scale(1.05); /* KEPT: Already using scale */
+  transform: scale(1.05);
 }
 
 .wetdream-btn:hover {
   background-color: rgba(245, 158, 11, 0.2);
   border-color: var(--warning);
   color: var(--warning);
-  transform: scale(1.05); /* KEPT: Already using scale */
+  transform: scale(1.05);
 }
 
 .urge-btn:hover {
   background-color: rgba(37, 99, 235, 0.2);
   border-color: var(--primary);
   color: var(--primary);
-  transform: scale(1.05); /* KEPT: Already using scale */
+  transform: scale(1.05);
 }
 
 /* UPDATED: Discord and YouTube buttons use scale transform */
@@ -344,17 +344,17 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
   border-color: #7289da;
   color: #ffffff;
-  transform: scale(1.05); /* CHANGED: From translateY to scale */
+  transform: scale(1.05);
 }
 
 .youtube-subscribe-btn:hover {
   background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
   border-color: #ff0000;
   color: #ffffff;
-  transform: scale(1.05); /* CHANGED: From translateY to scale */
+  transform: scale(1.05);
 }
 
-/* NEW: Benefits Modal Styling - Matching existing modal patterns */
+/* UPDATED: Benefits Modal Styling - ENHANCED with smooth scrolling sliders and profile-style close button */
 .benefits-modal {
   max-width: 600px;
   max-height: 85vh;
@@ -385,9 +385,12 @@ button.action-btn:hover {
   max-height: 50vh;
   overflow-y: auto;
   padding-right: var(--spacing-xs);
+  /* ADDED: Smooth scrolling */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* RESTORED: Benefit Sliders - Thin Progress Bar Style for Modal */
+/* ENHANCED: Benefit Sliders - Smooth Interactive Sliders with 5/10 default and perfect center alignment */
 .benefit-slider-item {
   display: flex;
   flex-direction: column;
@@ -423,7 +426,7 @@ button.action-btn:hover {
   border: 1px solid rgba(255, 221, 0, 0.15);
 }
 
-/* RESTORED: Thin Progress Bar Style Slider */
+/* ENHANCED: Smooth Interactive Range Slider */
 .benefit-range-slider {
   -webkit-appearance: none;
   width: 100%;
@@ -438,6 +441,7 @@ button.action-btn:hover {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
   margin-bottom: 0px !important;
+  cursor: pointer;
 }
 
 .benefit-range-slider:hover:not(:disabled) {
@@ -455,12 +459,12 @@ button.action-btn:hover {
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* RESTORED: Large, Prominent Handle - WebKit - REDUCED SIZE */
+/* ENHANCED: Large, Smooth Handle - WebKit */
 .benefit-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px; /* REDUCED: From 32px to prevent covering labels */
-  height: 24px; /* REDUCED: From 32px to prevent covering labels */
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -482,10 +486,10 @@ button.action-btn:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
-/* RESTORED: Large, Prominent Handle - Firefox - REDUCED SIZE */
+/* ENHANCED: Large, Smooth Handle - Firefox */
 .benefit-range-slider::-moz-range-thumb {
-  width: 24px; /* REDUCED: From 32px to prevent covering labels */
-  height: 24px; /* REDUCED: From 32px to prevent covering labels */
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -502,7 +506,7 @@ button.action-btn:hover {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* RESTORED: Slider Labels with Better Spacing */
+/* ENHANCED: Slider Labels with Perfect Center Alignment for 5/10 */
 .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
@@ -514,8 +518,8 @@ button.action-btn:hover {
   padding-bottom: 0px !important;
   line-height: 1 !important;
   transform: none !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
+  padding-left: 12px !important; /* PERFECT: Aligns with 5/10 center position */
+  padding-right: 12px !important; /* PERFECT: Aligns with 5/10 center position */
   font-weight: 500 !important;
   letter-spacing: 0.025em !important;
   position: relative !important;
@@ -560,10 +564,10 @@ button.action-btn:hover {
   flex: 1;
   min-width: 180px;
   justify-content: center;
-  padding: var(--spacing-sm) var(--spacing-md) !important; /* REDUCED: Match edit date button */
-  font-size: 0.875rem !important; /* REDUCED: Match edit date button */
-  font-weight: 500 !important; /* REDUCED: Match edit date button */
-  min-height: auto !important; /* REMOVED: Chunky height */
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  min-height: auto !important;
 }
 
 .cancel-benefits-btn {
@@ -571,15 +575,15 @@ button.action-btn:hover {
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
-  padding: var(--spacing-sm) var(--spacing-md); /* REDUCED: Match edit date button */
-  font-size: 0.875rem; /* REDUCED: Match edit date button */
-  font-weight: 500; /* REDUCED: Match edit date button */
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
   min-width: 120px;
   justify-content: center;
-  min-height: auto; /* REMOVED: Chunky height */
+  min-height: auto;
 }
 
 .cancel-benefits-btn:hover {
@@ -591,7 +595,7 @@ button.action-btn:hover {
 
 /* NEW: Benefits Status Indicator in Streak Card */
 .benefits-status-indicator {
-  order: 5.5; /* Between streak-actions-divider and streak-actions */
+  order: 5.5;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -898,6 +902,15 @@ button.action-btn:hover {
 
 /* DESKTOP LAYOUT: Two-column grid for screens ≥1024px with ENHANCED styling */
 @media (min-width: 1024px) {
+  /* UPDATED: Desktop header sizing to match Calendar exactly */
+  .tracker-header-title-section h2 {
+    font-size: 1.5rem !important; /* MATCHES: Calendar desktop header */
+  }
+  
+  .tracker-header-subtitle {
+    font-size: 0.875rem !important; /* MATCHES: Calendar desktop subtitle */
+  }
+
   /* Desktop hover effects for cards */
   .discord-community-section:hover,
   .youtube-channel-section:hover {
@@ -906,23 +919,6 @@ button.action-btn:hover {
   }
   
   /* Main content grid container */
-  .tracker-main-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-xl);
-    align-items: stretch;
-  }
-  
-  /* Discord and YouTube column */
-  .discord-youtube-column {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-    height: fit-content;
-  }
-  
-  /* SIMPLIFIED: No more benefits section spanning full width - removed grid constraint */
-  /* Main content grid container - simplified without benefits section */
   .tracker-main-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -998,7 +994,7 @@ button.action-btn:hover {
   /* ENHANCED: Updated action buttons for 4-button layout */
   .streak-actions {
     flex-direction: column;
-    gap: var(--spacing-md); /* REDUCED: From var(--spacing-lg) for 4 buttons */
+    gap: var(--spacing-md);
     max-width: 600px !important;
     width: 100% !important;
     margin: 0 auto;
@@ -1008,11 +1004,11 @@ button.action-btn:hover {
   .streak-action-btn {
     width: 100% !important;
     justify-content: center;
-    padding: var(--spacing-md) var(--spacing-xl) !important; /* REDUCED: From var(--spacing-lg) */
-    font-size: 1rem !important; /* REDUCED: From 1.125rem */
+    padding: var(--spacing-md) var(--spacing-xl) !important;
+    font-size: 1rem !important;
     font-weight: 600;
     letter-spacing: 0.025em;
-    min-height: 52px !important; /* REDUCED: From 60px for 4 buttons */
+    min-height: 52px !important;
     position: relative;
     overflow: hidden;
     max-width: none !important;
@@ -1033,7 +1029,7 @@ button.action-btn:hover {
     background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
     border-color: #f0cc00;
     color: #000000;
-    transform: translateY(-1px); /* CONSISTENT: translateY like edit button */
+    transform: translateY(-1px);
   }
 
   /* Desktop Discord and YouTube button translateY transforms */
@@ -1041,14 +1037,14 @@ button.action-btn:hover {
     background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
     border-color: #7289da;
     color: #ffffff;
-    transform: translateY(-1px); /* CHANGED: translateY instead of scale */
+    transform: translateY(-1px);
   }
 
   .youtube-subscribe-btn:hover {
     background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
     border-color: #ff0000;
     color: #ffffff;
-    transform: translateY(-1px); /* CHANGED: translateY instead of scale */
+    transform: translateY(-1px);
   }
   
   /* Benefits section: 2-column slider grid on desktop */
@@ -1074,31 +1070,40 @@ button.action-btn:hover {
     max-height: 60vh;
   }
 
-  /* Desktop slider adjustments - REDUCED HANDLE SIZE */
+  /* Desktop slider adjustments */
   .benefit-range-slider {
-    height: 10px; /* Thin design on desktop */
+    height: 10px;
   }
   
   .benefit-range-slider::-webkit-slider-thumb {
-    width: 24px; /* REDUCED: From 32px */
-    height: 24px; /* REDUCED: From 32px */
+    width: 24px;
+    height: 24px;
   }
   
   .benefit-range-slider::-moz-range-thumb {
-    width: 24px; /* REDUCED: From 32px */
-    height: 24px; /* REDUCED: From 32px */
+    width: 24px;
+    height: 24px;
   }
   
   .slider-labels {
     margin-top: 12px !important;
-    padding-left: 12px !important; /* REDUCED: Account for smaller handle */
-    padding-right: 12px !important; /* REDUCED: Account for smaller handle */
+    padding-left: 12px !important;
+    padding-right: 12px !important;
     font-size: 0.8125rem !important;
   }
 }
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
+  /* UPDATED: Mobile header sizing to match Calendar exactly */
+  .tracker-header-title-section h2 {
+    font-size: 1.25rem !important; /* MATCHES: Calendar mobile header */
+  }
+  
+  .tracker-header-subtitle {
+    font-size: 0.8rem !important; /* MATCHES: Calendar mobile subtitle */
+  }
+
   /* Integrated header mobile styles */
   .integrated-tracker-header {
     padding: var(--spacing-lg);
@@ -1107,14 +1112,6 @@ button.action-btn:hover {
   
   .tracker-header-title-section {
     margin-bottom: var(--spacing-lg);
-  }
-  
-  .tracker-header-title-section h2 {
-    font-size: 1.125rem; /* STANDARDIZED: Match other tab headers on mobile */
-  }
-  
-  .tracker-header-subtitle {
-    font-size: 0.8rem;
   }
   
   .tracker-header-actions-section {
@@ -1194,7 +1191,7 @@ button.action-btn:hover {
   /* ENHANCED: Mobile action buttons - enhanced styling like desktop with 4 buttons */
   .streak-actions {
     flex-direction: column;
-    gap: var(--spacing-md); /* REDUCED: From var(--spacing-lg) for 4 buttons */
+    gap: var(--spacing-md);
     max-width: 100% !important;
     width: 100% !important;
     margin: 0 auto;
@@ -1204,11 +1201,11 @@ button.action-btn:hover {
   .streak-action-btn {
     width: 100%;
     justify-content: center;
-    padding: var(--spacing-md) var(--spacing-lg) !important; /* REDUCED: Smaller padding for 4 buttons */
-    font-size: 0.9375rem !important; /* REDUCED: From 1rem for 4 buttons */
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    font-size: 0.9375rem !important;
     font-weight: 600;
     letter-spacing: 0.025em;
-    min-height: 46px !important; /* REDUCED: From 50px for 4 buttons */
+    min-height: 46px !important;
     position: relative;
     overflow: hidden;
   }
@@ -1218,7 +1215,7 @@ button.action-btn:hover {
     background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
     border-color: #f0cc00;
     color: #000000;
-    transform: translateY(-1px); /* CONSISTENT: translateY on mobile too */
+    transform: translateY(-1px);
   }
 
   /* Mobile Discord and YouTube button translateY transforms */
@@ -1226,14 +1223,14 @@ button.action-btn:hover {
     background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
     border-color: #7289da;
     color: #ffffff;
-    transform: translateY(-1px); /* CHANGED: translateY instead of scale */
+    transform: translateY(-1px);
   }
   
   .youtube-subscribe-btn:active {
     background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
     border-color: #ff0000;
     color: #ffffff;
-    transform: translateY(-1px); /* CHANGED: translateY instead of scale */
+    transform: translateY(-1px);
   }
   
   /* Mobile benefits status indicator adjustments */
@@ -1269,109 +1266,45 @@ button.action-btn:hover {
   .cancel-benefits-btn {
     width: 100%;
     min-width: auto;
-  }
-
-  /* Remove all old benefit section mobile styles - no longer needed */benefit-status-section {
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .benefits-logged, .benefits-not-logged {
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    text-align: center;
-  }
-  
-  .edit-benefits-btn {
-    margin-left: 0;
-    margin-top: var(--spacing-sm);
-  }
-  
-  /* Mobile slider adjustments */
-  .benefit-range-slider {
-    height: 32px;
-  }
-  
-  .benefit-range-slider::-webkit-slider-thumb {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .benefit-range-slider::-moz-range-thumb {
-    width: 28px;
-    height: 28px;
-  }
-  
-  /* Mobile slider labels with perfect spacing */
-  .benefit-logging-section .premium-benefits-container .slider-labels,
-  .premium-benefits-container .benefit-slider-item .slider-labels,
-  .tracker-container .premium-benefits-container .slider-labels,
-  .tracker-container .benefit-logging-section .slider-labels,
-  .benefit-logging-container .premium-benefits-container .slider-labels {
-    margin-top: 10px !important;
-    margin-bottom: 0px !important;
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
-    line-height: 1 !important;
-    transform: none !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    font-size: 0.75rem !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
     font-weight: 500 !important;
-    letter-spacing: 0.025em !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    color: var(--text-secondary) !important;
+    min-height: auto !important;
   }
 
-  /* Mobile benefits modal adjustments */
-  .benefits-modal {
-    max-width: calc(100vw - 2rem);
-    margin: var(--spacing-sm);
-  }
-
-  .benefits-modal-sliders {
-    max-height: 45vh;
-  }
-
-  .benefits-modal-actions {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
-
-  .modal-save-btn,
-  .cancel-benefits-btn {
-    width: 100%;
-    min-width: auto;
-    padding: var(--spacing-sm) var(--spacing-md) !important; /* CONSISTENT: Match edit date button size */
-    font-size: 0.875rem !important; /* CONSISTENT: Match edit date button size */
-    font-weight: 500 !important; /* CONSISTENT: Match edit date button size */
-    min-height: auto !important; /* REMOVED: Chunky height */
-  }
-
-  /* Mobile slider adjustments - thin design with REDUCED HANDLE SIZE */
+  /* Mobile slider adjustments - thin design */
   .benefit-range-slider {
-    height: 12px; /* Slightly thicker on mobile for easier touch */
+    height: 12px;
   }
   
   .benefit-range-slider::-webkit-slider-thumb {
-    width: 28px; /* REDUCED: From 36px to prevent covering labels */
-    height: 28px; /* REDUCED: From 36px to prevent covering labels */
+    width: 28px;
+    height: 28px;
   }
   
   .benefit-range-slider::-moz-range-thumb {
-    width: 28px; /* REDUCED: From 36px to prevent covering labels */
-    height: 28px; /* REDUCED: From 36px to prevent covering labels */
+    width: 28px;
+    height: 28px;
   }
   
   .slider-labels {
-    margin-top: 14px !important; /* More space on mobile */
-    padding-left: 14px !important; /* REDUCED: Account for smaller mobile handle */
-    padding-right: 14px !important; /* REDUCED: Account for smaller mobile handle */
-    font-size: 0.75rem !important; /* Smaller text on mobile */
+    margin-top: 14px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    font-size: 0.75rem !important;
   }
 }
 
+/* UPDATED: Very small mobile sizing to match Calendar exactly */
 @media (max-width: 480px) {
+  .tracker-header-title-section h2 {
+    font-size: 1.125rem !important; /* MATCHES: Calendar very small mobile header */
+  }
+  
+  .tracker-header-subtitle {
+    font-size: 0.75rem !important; /* MATCHES: Calendar very small mobile subtitle */
+  }
+
   .discord-community-stats {
     flex-direction: column;
     gap: var(--spacing-md);
