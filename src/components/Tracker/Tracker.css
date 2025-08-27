@@ -27,7 +27,7 @@
 
 .tracker-header-title-section h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem; /* STANDARDIZED: Match other tab headers */
   font-weight: 600;
   color: var(--text);
   opacity: 0.85;
@@ -455,12 +455,12 @@ button.action-btn:hover {
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* RESTORED: Large, Prominent Handle - WebKit */
+/* RESTORED: Large, Prominent Handle - WebKit - REDUCED SIZE */
 .benefit-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 32px;
-  height: 32px;
+  width: 24px; /* REDUCED: From 32px to prevent covering labels */
+  height: 24px; /* REDUCED: From 32px to prevent covering labels */
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -482,10 +482,10 @@ button.action-btn:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
-/* RESTORED: Large, Prominent Handle - Firefox */
+/* RESTORED: Large, Prominent Handle - Firefox - REDUCED SIZE */
 .benefit-range-slider::-moz-range-thumb {
-  width: 32px;
-  height: 32px;
+  width: 24px; /* REDUCED: From 32px to prevent covering labels */
+  height: 24px; /* REDUCED: From 32px to prevent covering labels */
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -871,8 +871,8 @@ button.action-btn:hover {
 /* UPDATED: Close button in upper right corner - MATCHING Profile feedback modal exactly */
 .modal-close-btn {
   position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
+  top: 0;
+  right: 0;
   background: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   font-size: 1rem;
@@ -1074,25 +1074,25 @@ button.action-btn:hover {
     max-height: 60vh;
   }
 
-  /* Desktop slider adjustments */
+  /* Desktop slider adjustments - REDUCED HANDLE SIZE */
   .benefit-range-slider {
     height: 10px; /* Thin design on desktop */
   }
   
   .benefit-range-slider::-webkit-slider-thumb {
-    width: 32px;
-    height: 32px;
+    width: 24px; /* REDUCED: From 32px */
+    height: 24px; /* REDUCED: From 32px */
   }
   
   .benefit-range-slider::-moz-range-thumb {
-    width: 32px;
-    height: 32px;
+    width: 24px; /* REDUCED: From 32px */
+    height: 24px; /* REDUCED: From 32px */
   }
   
   .slider-labels {
     margin-top: 12px !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    padding-left: 12px !important; /* REDUCED: Account for smaller handle */
+    padding-right: 12px !important; /* REDUCED: Account for smaller handle */
     font-size: 0.8125rem !important;
   }
 }
@@ -1110,7 +1110,7 @@ button.action-btn:hover {
   }
   
   .tracker-header-title-section h2 {
-    font-size: 1.25rem;
+    font-size: 1.125rem; /* STANDARDIZED: Match other tab headers on mobile */
   }
   
   .tracker-header-subtitle {
@@ -1348,25 +1348,25 @@ button.action-btn:hover {
     min-height: auto !important; /* REMOVED: Chunky height */
   }
 
-  /* Mobile slider adjustments - thin design */
+  /* Mobile slider adjustments - thin design with REDUCED HANDLE SIZE */
   .benefit-range-slider {
     height: 12px; /* Slightly thicker on mobile for easier touch */
   }
   
   .benefit-range-slider::-webkit-slider-thumb {
-    width: 36px; /* Larger on mobile for touch */
-    height: 36px;
+    width: 28px; /* REDUCED: From 36px to prevent covering labels */
+    height: 28px; /* REDUCED: From 36px to prevent covering labels */
   }
   
   .benefit-range-slider::-moz-range-thumb {
-    width: 36px;
-    height: 36px;
+    width: 28px; /* REDUCED: From 36px to prevent covering labels */
+    height: 28px; /* REDUCED: From 36px to prevent covering labels */
   }
   
   .slider-labels {
     margin-top: 14px !important; /* More space on mobile */
-    padding-left: 18px !important; /* Account for larger mobile handle */
-    padding-right: 18px !important;
+    padding-left: 14px !important; /* REDUCED: Account for smaller mobile handle */
+    padding-right: 14px !important; /* REDUCED: Account for smaller mobile handle */
     font-size: 0.75rem !important; /* Smaller text on mobile */
   }
 }
