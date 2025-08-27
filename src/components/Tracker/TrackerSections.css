@@ -156,14 +156,14 @@
   border-radius: var(--radius-lg);
 }
 
-/* UPDATED: YouTube Play Button - Circular Pill Menu Style */
+/* UPDATED: YouTube Play Button - Circular with YouTube Red Pill Styling */
 .video-play-overlay {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.2);
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -175,22 +175,22 @@
 }
 
 .video-thumbnail-container:hover .video-play-overlay {
-  background-color: rgba(255, 221, 0, 0.2);
-  border-color: rgba(255, 221, 0, 0.3);
+  background-color: rgba(255, 0, 0, 0.2);
+  border-color: rgba(255, 0, 0, 0.3);
   transform: translate(-50%, -50%) scale(1.05);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
 }
 
-/* YouTube Play Triangle - Yellow like pill menus */
+/* YouTube Play Triangle - Red to match button */
 .play-icon {
-  color: var(--primary);
+  color: #ff0000;
   font-size: 1.4rem;
   margin-left: 3px; /* Slight offset for visual centering */
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .video-thumbnail-container:hover .play-icon {
-  color: var(--primary);
+  color: #ff3333;
   transform: scale(1.1);
 }
 
