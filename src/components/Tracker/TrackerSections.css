@@ -1,6 +1,4 @@
-/* components/Tracker/TrackerSections.css - Community and Interactive Sections (Benefits now in modal only) */
-
-/* REMOVED: All old benefit logging section styles - now handled entirely by modal */
+/* components/Tracker/TrackerSections.css - Community and Interactive Sections with Original Red Circular Play Button */
 
 /* Community Sections */
 .section-icon-header {
@@ -156,14 +154,13 @@
   border-radius: var(--radius-lg);
 }
 
-/* UPDATED: YouTube Play Button - Circular with YouTube Red Pill Styling */
+/* ORIGINAL: Red Circular Play Button */
 .video-play-overlay {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(255, 0, 0, 0.1);
-  border: 1px solid rgba(255, 0, 0, 0.2);
+  background: rgba(255, 0, 0, 0.9);
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -171,27 +168,19 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .video-thumbnail-container:hover .video-play-overlay {
-  background-color: rgba(255, 0, 0, 0.2);
-  border-color: rgba(255, 0, 0, 0.3);
-  transform: translate(-50%, -50%) scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 0, 0, 1);
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* YouTube Play Triangle - Red to match button */
 .play-icon {
-  color: #ff0000;
-  font-size: 1.4rem;
-  margin-left: 3px; /* Slight offset for visual centering */
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-}
-
-.video-thumbnail-container:hover .play-icon {
-  color: #ff3333;
-  transform: scale(1.1);
+  color: white;
+  font-size: 1.5rem;
+  margin-left: 4px; /* Slight offset for visual centering */
 }
 
 /* Video Modal */
@@ -289,30 +278,23 @@
 /* Desktop adjustments */
 @media (min-width: 1024px) {
   .video-play-overlay {
-    width: 80px;
-    height: 56px;
-    border-radius: 10px;
+    width: 70px;
+    height: 70px;
   }
   
   .play-icon {
-    font-size: 1.6rem;
+    font-size: 1.75rem;
   }
 }
 
-/* MOBILE RESPONSIVE ADJUSTMENTS - Only community sections now */
+/* Mobile adjustments */
 @media (max-width: 768px) {
-  /* REMOVED: All benefit slider mobile styles - handled by modal only */
-  
   .video-play-overlay {
-    width: 56px;
-    height: 40px;
-    border-radius: 6px;
+    width: 50px;
+    height: 50px;
   }
   
   .play-icon {
-    font-size: 1.2rem;
-    margin-left: 2px;
+    font-size: 1.25rem;
   }
-  
-  /* Community section mobile adjustments remain the same */
 }
