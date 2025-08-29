@@ -192,10 +192,7 @@ body {
   touch-action: manipulation;
 }
 
-.header-nav .nav-link:hover:not(.active) {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
-}
+/* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
 
 /* CRITICAL: Active nav styling - REMOVE any background that conflicts with slider */
 .header-nav .nav-link.active {

@@ -95,10 +95,7 @@
   touch-action: manipulation;
 }
 
-.mobile-nav-item:hover:not(.active) {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
-}
+/* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
 
 /* CRITICAL: Active mobile nav styling - REMOVE any background that conflicts with slider */
 .mobile-nav-item.active {
