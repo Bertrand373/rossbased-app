@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - UPDATED: Journal icon positioned in upper right corner, resized, and added to legend */
+/* components/Calendar/CalendarBase.css - UPDATED: Added sliding navigation pills animation + existing styles */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -51,7 +51,7 @@
   align-items: center;
 }
 
-/* View Mode Toggle Pills */
+/* BULLETPROOF: Mobile-First Navigation Pills with Ultra-Robust Sliding Animation */
 .navigation-pill-container {
   display: flex;
   gap: var(--spacing-xs);
@@ -62,8 +62,48 @@
   width: fit-content;
   max-width: 300px;
   justify-content: center;
+  overflow-x: auto;
+  position: relative;
+  /* MOBILE: Ensure proper 3D rendering context */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* MOBILE: Prevent scrollbar issues */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
+.navigation-pill-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* NEW: Enhanced sliding background indicator - bulletproof mobile support */
+.navigation-pill-slider {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  height: calc(100% - calc(var(--spacing-xs) * 2));
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 1;
+  /* IMPORTANT: Start hidden but ready to be shown */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(0px);
+  width: 0px;
+}
+
+/* MOBILE: Faster transition on smaller screens */
+@media (max-width: 768px) {
+  .navigation-pill-slider {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* ENHANCED: Navigation section buttons with proper sizing and sliding support */
 .integrated-calendar-header .navigation-section-btn {
   flex: 1;
   padding: var(--spacing-sm) var(--spacing-md) !important;
@@ -82,18 +122,42 @@
   gap: var(--spacing-xs);
   position: relative;
   outline: none;
+  z-index: 2;
+  /* MOBILE: Prevent text selection and ensure proper touch */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-width: fit-content;
 }
 
-.integrated-calendar-header .navigation-section-btn:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
+/* MOBILE: Only adjust touch targets on actual mobile, not desktop */
+@media (max-width: 768px) and (pointer: coarse) {
+  .integrated-calendar-header .navigation-section-btn {
+    min-height: 44px; /* iOS recommendation for touch targets */
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+  }
 }
 
+/* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
+
+/* CRITICAL: Active navigation button styling - REMOVE any background that conflicts with slider */
 .integrated-calendar-header .navigation-section-btn.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
+  color: var(--primary) !important;
+  /* IMPORTANT: No background - let slider handle visual feedback */
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* MOBILE: Ensure active state is always visible */
+@media (max-width: 768px) {
+  .integrated-calendar-header .navigation-section-btn.active {
+    /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
+    font-weight: 600;
+  }
 }
 
 /* Period navigation */
@@ -155,7 +219,7 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Calendar legend with journal icon */
+/* Calendar legend with journal icon */
 .calendar-legend {
   display: flex;
   justify-content: center;
@@ -231,7 +295,6 @@
   filter: drop-shadow(0 2px 4px rgba(255, 221, 0, 0.3));
 }
 
-/* UPDATED: Journal icon in legend - consistent size with other legend icons */
 .legend-journal-icon {
   color: var(--text-secondary);
   font-size: 0.875rem;
@@ -340,12 +403,12 @@
   position: relative;
 }
 
-/* UPDATED: Journal indicator in upper right corner - consistent size with other icons */
+/* Journal indicator in upper right corner - consistent size with other icons */
 .day-journal-indicator-top {
   position: absolute;
   top: 0;
   right: 0;
-  font-size: 0.875rem; /* UPDATED: Made consistent with other day indicators */
+  font-size: 0.875rem;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -411,7 +474,7 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* UPDATED: Day indicators positioning - journal icon removed from here */
+/* Day indicators positioning - journal icon removed from here */
 .day-indicators {
   position: absolute;
   bottom: var(--spacing-xs);
@@ -433,7 +496,7 @@
   pointer-events: auto; /* Re-enable pointer events for icons */
 }
 
-/* UPDATED: Simplified 3-level positioning (journal icon removed) */
+/* Simplified 3-level positioning (journal icon removed) */
 .day-status-indicator {
   order: 3; /* Rightmost position */
 }
@@ -647,8 +710,32 @@
     gap: var(--spacing-md);
   }
   
+  /* MOBILE: Enhanced navigation pills for mobile */
   .navigation-pill-container {
     max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    width: 100%;
+    margin: 0;
+    /* MOBILE: Force hardware acceleration */
+    transform: translateZ(0);
+    /* MOBILE: Ensure smooth scrolling */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  .navigation-pill-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* MOBILE: Enhanced slider for mobile - more reliable positioning */
+  .navigation-pill-slider {
+    /* MOBILE: Faster transitions */
+    transition: transform 0.25s ease-out, width 0.25s ease-out;
+    /* MOBILE: Force GPU acceleration */
+    transform: translateZ(0) translateX(0px);
+    will-change: transform, width;
   }
   
   .integrated-calendar-header .navigation-section-btn {
@@ -718,9 +805,9 @@
     font-size: 0.75rem;
   }
   
-  /* UPDATED: Mobile journal icon positioning - consistent size */
+  /* Mobile journal icon positioning - consistent size */
   .day-journal-indicator-top {
-    font-size: 0.75rem; /* UPDATED: Made consistent with mobile other indicators */
+    font-size: 0.75rem;
   }
   
   .today .day-number {
@@ -730,7 +817,7 @@
     font-size: 0.65rem;
   }
   
-  /* UPDATED: Mobile day indicators positioning */
+  /* Mobile day indicators positioning */
   .day-indicators {
     bottom: 2px;
     right: 2px;
@@ -825,7 +912,7 @@
     font-size: 1rem;
   }
   
-  /* UPDATED: Small mobile legend - now 3 rows with 2 items each to accommodate journal entry */
+  /* Small mobile legend - now 3 rows with 2 items each to accommodate journal entry */
   .calendar-legend {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
@@ -843,7 +930,7 @@
     justify-content: center !important;
   }
   
-  /* UPDATED: 3 rows with 2 items each - journal entry included */
+  /* 3 rows with 2 items each - journal entry included */
   .legend-item:nth-child(1) { grid-column: 1 !important; grid-row: 1 !important; } /* Current Streak */
   .legend-item:nth-child(2) { grid-column: 2 !important; grid-row: 1 !important; } /* Former Streak */
   .legend-item:nth-child(3) { grid-column: 1 !important; grid-row: 2 !important; } /* Relapse */
@@ -889,9 +976,23 @@
     font-size: 0.7rem;
   }
   
-  /* UPDATED: Very small screen journal icon - consistent size */
+  /* MOBILE: Even more aggressive slider optimizations for small screens */
+  .navigation-pill-container {
+    padding: 6px;
+    gap: 4px;
+  }
+  
+  .navigation-pill-slider {
+    top: 6px;
+    left: 6px;
+    height: calc(100% - 12px);
+    /* MOBILE: Ultra-fast transitions for small screens */
+    transition: transform 0.2s ease-out, width 0.2s ease-out;
+  }
+  
+  /* Very small screen journal icon - consistent size */
   .day-journal-indicator-top {
-    font-size: 0.7rem; /* UPDATED: Made consistent with very small screen other indicators */
+    font-size: 0.7rem;
   }
   
   .today .day-number {
@@ -901,7 +1002,7 @@
     font-size: 0.6rem;
   }
   
-  /* UPDATED: Very small screen day indicators */
+  /* Very small screen day indicators */
   .day-indicators {
     bottom: 1px;
     right: 1px;
@@ -915,5 +1016,19 @@
   
   .trigger-icon {
     font-size: 0.6rem !important;
+  }
+}
+
+/* MOBILE: Additional support for landscape orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  .navigation-pill-container {
+    /* MOBILE: Ensure navigation pills are always visible in landscape */
+    max-width: 100vw;
+    overflow-x: auto;
+  }
+  
+  .navigation-pill-slider {
+    /* MOBILE: Maintain smooth animation even in landscape */
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 }
