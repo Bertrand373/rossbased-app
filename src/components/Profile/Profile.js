@@ -1,1478 +1,761 @@
-/* components/Profile/Profile.css - MOBILE-FIRST: Enhanced sliding tab animation with bulletproof mobile support */
-.profile-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
+// components/Profile/Profile.js - BULLETPROOF SLIDING TAB ANIMATION - Mobile-First with Enhanced Touch Support
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { format } from 'date-fns';
+import toast from 'react-hot-toast';
+import './Profile.css';
 
-/* UPDATED: Integrated header design matching tracker/calendar */
-.integrated-profile-header {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  padding: var(--spacing-lg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+// Icons
+import { FaUser, FaEdit, FaCrown, FaDiscord, FaCog, FaCommentAlt, FaBug, 
+  FaLightbulb, FaStar, FaPaperPlane, FaTimes, FaCheckCircle, 
+  FaTrash, FaDownload, FaSignOutAlt, FaCreditCard, 
+  FaBell, FaGlobe, FaLock, FaClock } from 'react-icons/fa';
 
-.profile-header-title-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--spacing-lg);
-  position: relative;
-}
-
-.profile-header-title-section h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text);
-  opacity: 0.85;
-  text-align: center;
-}
-
-/* NEW: Header subtitle matching other tabs */
-.profile-header-subtitle {
-  margin: var(--spacing-xs) 0 0 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  text-align: center;
-  font-style: italic;
-}
-
-.profile-header-actions-section {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.profile-header-actions {
-  display: flex;
-  gap: var(--spacing-md);
-}
-
-/* LEGACY: Keep old header for backward compatibility */
-.profile-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-  margin-top: 0;
-}
-
-.profile-header-spacer {
-  /* Empty spacer for centering */
-}
-
-.profile-header h2 {
-  text-align: center;
-  margin: 0;
-  justify-self: center;
-}
-
-.profile-header-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-self: end;
-}
-
-/* CORRECTED: Feedback button matching tracker "edit date" button - smaller, compact size */
-.feedback-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.feedback-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* UPDATED: Profile Overview Card - REMOVED gold accent border */
-.profile-overview-card {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--spacing-xl);
-}
-
-.profile-avatar-section {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-
-.profile-avatar {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: var(--text-secondary);
-}
-
-.premium-crown {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 24px;
-  height: 24px;
-  background-color: var(--primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #000;
-  font-size: 0.75rem;
-  border: 2px solid var(--background);
-}
-
-.profile-basic-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.profile-username {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.profile-plan {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 0.875rem;
-  color: var(--primary);
-  font-weight: 500;
-}
-
-.plan-crown {
-  font-size: 0.75rem;
-}
-
-.profile-member-since {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-/* FIXED: Perfectly aligned tab navigation container */
-.profile-tabs {
-  display: inline-flex;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs);
-  background-color: var(--card-background);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  position: relative;
-  margin: 0 auto;
-  /* CRITICAL: Use inline-flex and remove width constraints to ensure perfect content fitting */
-  width: auto;
-  min-width: fit-content;
-  /* MOBILE: Ensure proper 3D rendering context */
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  /* MOBILE: Handle overflow for very small screens only */
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.profile-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-/* ENHANCED: Sliding background indicator - ensure it's always ready to be visible */
-.profile-tab-slider {
-  position: absolute;
-  top: var(--spacing-xs);
-  left: var(--spacing-xs);
-  height: calc(100% - calc(var(--spacing-xs) * 2));
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  border-radius: var(--radius-full);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  z-index: 1;
-  /* IMPORTANT: Start hidden but ready to be shown */
-  opacity: 0;
-  visibility: hidden;
-  transform: translateX(0px);
-  width: 0px;
-}
-
-/* MOBILE: Faster transition on smaller screens */
-@media (max-width: 768px) {
-  .profile-tab-slider {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-/* ENHANCED: Tab buttons with proper sizing */
-.profile-tab {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: transparent;
-  border: 1px solid transparent;
-  color: var(--text-secondary);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  min-width: fit-content;
-  position: relative;
-  z-index: 2;
-  /* MOBILE: Prevent text selection and ensure proper touch */
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-/* MOBILE: Only adjust touch targets on actual mobile, not desktop */
-@media (max-width: 768px) and (pointer: coarse) {
-  .profile-tab {
-    min-height: 44px; /* iOS recommendation for touch targets */
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
-}
-
-/* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
-
-/* CRITICAL: Active tab styling - REMOVE any background that conflicts with slider */
-.profile-tab.active {
-  color: var(--primary) !important;
-  /* IMPORTANT: No background - let slider handle visual feedback */
-  background-color: transparent !important;
-  border-color: transparent !important;
-}
-
-/* MOBILE: Ensure active state is always visible */
-@media (max-width: 768px) {
-  .profile-tab.active {
-    /* FALLBACK: In case slider fails, ensure active tab is distinguishable */
-    font-weight: 600;
-  }
-}
-
-.profile-tab svg {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-/* MOBILE: Responsive icon sizing */
-@media (max-width: 480px) {
-  .profile-tab svg {
-    font-size: 0.875rem;
-  }
+const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
+  const [activeTab, setActiveTab] = useState('account');
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   
-  .profile-tab {
-    font-size: 0.8rem;
-    gap: var(--spacing-xs);
-  }
-}
-
-/* Tab Content */
-.profile-tab-content {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-}
-
-/* UPDATED: Section Headers - centered main headers with proper spacing */
-.section-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-  text-align: center;
-  gap: var(--spacing-md);
-}
-
-.section-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text);
-}
-
-/* Edit button positioned below centered header */
-.section-header .edit-profile-btn {
-  align-self: center;
-}
-
-/* CORRECTED: Edit profile button matching tracker buttons - smaller, compact size */
-.edit-profile-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.edit-profile-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* NEW: Coming Soon Banner for locked features */
-.coming-soon-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
-}
-
-.coming-soon-helmet-container {
-  flex-shrink: 0;
-}
-
-.coming-soon-helmet {
-  width: 40px;
-  height: 40px;
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
-}
-
-.coming-soon-helmet-fallback {
-  font-size: 1.5rem;
-  color: var(--primary);
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-}
-
-@keyframes coming-soon-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.96);
-  }
-}
-
-.coming-soon-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.coming-soon-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.coming-soon-description {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin: 0;
-}
-
-/* Form Elements */
-.account-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.form-group label {
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: var(--spacing-md);
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text);
-  font-size: 0.875rem;
-  transition: border-color 0.2s;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-.form-group input:disabled {
-  background-color: var(--light-gray);
-  color: var(--text-secondary);
-  cursor: not-allowed;
-}
-
-.char-count {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-align: right;
-  margin-top: var(--spacing-xs);
-}
-
-/* FIXED: Toggle Settings - removed white circle issue */
-.toggle-setting {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.toggle-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  flex: 1;
-}
-
-.toggle-label {
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
-}
-
-.toggle-description {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-/* FIXED: Profile-specific toggle switch - overrides global App.css styles */
-.profile-container .toggle-switch {
-  position: relative !important;
-  width: 56px !important;
-  height: 28px !important;
-  background-color: var(--light-gray) !important;
-  border-radius: 14px !important;
-  border: 1px solid var(--border) !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  flex-shrink: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  padding: 2px !important;
-}
-
-/* CRITICAL: Remove any input elements inside toggle (from global App.css) */
-.profile-container .toggle-switch input {
-  display: none !important;
-  opacity: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-/* CRITICAL: Remove global toggle slider pseudo-elements */
-.profile-container .toggle-switch::before,
-.profile-container .toggle-switch::after {
-  display: none !important;
-  content: none !important;
-}
-
-.profile-container .toggle-switch.active {
-  background-color: rgba(255, 221, 0, 0.2) !important;
-  border-color: var(--primary) !important;
-}
-
-/* FIXED: Profile-specific toggle slider - completely override global styles */
-.profile-container .toggle-slider {
-  width: 22px !important;
-  height: 22px !important;
-  background-color: var(--text-secondary) !important;
-  border-radius: 50% !important;
-  transition: transform 0.3s ease !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
-  position: relative !important;
-  /* CRITICAL: Override any global pseudo-elements */
-  content: none !important;
-}
-
-/* CRITICAL: Remove any pseudo-elements from slider */
-.profile-container .toggle-slider::before,
-.profile-container .toggle-slider::after {
-  display: none !important;
-  content: none !important;
-}
-
-.profile-container .toggle-switch.active .toggle-slider {
-  transform: translateX(28px) !important;
-  background-color: var(--primary) !important;
-}
-
-.select-setting {
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border);
-}
-
-.select-setting label {
-  display: block;
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
-  margin-bottom: var(--spacing-sm);
-}
-
-/* Subscription Section */
-.current-plan-card {
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border);
-  margin-bottom: var(--spacing-lg);
-}
-
-.plan-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-lg);
-}
-
-.plan-header h3 {
-  margin: 0;
-  font-size: 1.125rem;
-  color: var(--text);
-}
-
-.plan-badge {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.plan-badge.premium {
-  background-color: rgba(255, 221, 0, 0.1);
-  color: var(--primary);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-}
-
-.plan-badge.free {
-  background-color: rgba(128, 128, 128, 0.1);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-.plan-details {
-  margin-bottom: var(--spacing-lg);
-}
-
-.plan-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: var(--spacing-md);
-}
-
-.plan-features {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.plan-feature {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--text);
-  font-size: 0.875rem;
-}
-
-.plan-feature svg {
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
-.subscription-actions {
-  display: flex;
-  gap: var(--spacing-md);
-}
-
-/* CORRECTED: All action buttons matching tracker compact button style */
-.upgrade-btn,
-.manage-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.upgrade-btn:hover,
-.manage-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.premium-benefits h4 {
-  margin-bottom: var(--spacing-lg);
-  font-size: 1rem;
-  color: var(--text);
-  text-align: center;
-}
-
-.benefits-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
-}
-
-.benefit-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.benefit-icon {
-  width: 32px;
-  height: 32px;
-  color: var(--primary);
-  font-size: 1.125rem;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.benefit-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.benefit-title {
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
-}
-
-.benefit-description {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-/* Privacy & Settings Sections - UPDATED: Centered main headers, consistent spacing */
-.privacy-settings,
-.settings-groups {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-}
-
-.privacy-section h3,
-.settings-section h3,
-.data-section h3 {
-  margin: 0 0 var(--spacing-xl) 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  text-align: center;
-}
-
-.privacy-group,
-.settings-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.privacy-group h4,
-.settings-group h4 {
-  margin: 0;
-  font-size: 1rem;
-  color: var(--text);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-}
-
-/* Privacy and Settings Actions - UPDATED: Consistent spacing */
-.privacy-actions,
-.settings-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--spacing-xl);
-}
-
-/* Data Section - UPDATED: Consistent spacing throughout */
-.data-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-  margin-top: var(--spacing-lg);
-}
-
-.data-action-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.data-action-card.danger {
-  border-color: rgba(239, 68, 68, 0.3);
-  background-color: rgba(239, 68, 68, 0.05);
-}
-
-.data-action-info {
-  flex: 1;
-}
-
-.data-action-info h4 {
-  margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1rem;
-  color: var(--text);
-}
-
-.data-action-info p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.logout-section {
-  display: flex;
-  justify-content: center;
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid var(--border);
-}
-
-/* FIXED: Profile-specific logout button - same compact size as other buttons */
-.profile-container .logout-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* EXCEPTION: Logout button keeps red hover (not yellow) */
-.profile-container .logout-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1) !important;
-  border-color: var(--danger) !important;
-  color: var(--danger) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* CORRECTED: Profile action buttons matching tracker compact button style */
-.profile-container .action-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.profile-container .action-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* CORRECTED: Delete account button styled like logout - compact size */
-.danger-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.danger-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1) !important;
-  border-color: var(--danger) !important;
-  color: var(--danger) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* CORRECTED: Profile cancel button matching tracker compact style */
-.profile-container .cancel-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.profile-container .cancel-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* KEEP: Save button styling (green) */
-.save-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background-color: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.2);
-  border-radius: var(--radius-full);
-  color: var(--success);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.save-btn:hover {
-  background-color: rgba(34, 197, 94, 0.2) !important;
-  border-color: var(--success) !important;
-  color: var(--success) !important;
-  transform: translateY(-1px) !important;
-}
-
-.form-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-content: flex-end;
-  margin-top: var(--spacing-lg);
-}
-
-/* Feedback Modal */
-.feedback-modal {
-  max-width: 600px;
-  background-color: var(--card-background);
-}
-
-/* UPDATED: Feedback Modal header - centered */
-.modal-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: var(--spacing-lg);
-  position: relative;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  text-align: center;
-}
-
-/* Position close button absolutely in top right */
-.modal-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  font-size: 1rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: var(--radius-full);
-  transition: all 0.2s ease;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-close:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.feedback-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-}
-
-.feedback-types label {
-  display: block;
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
-  margin-bottom: var(--spacing-sm);
-}
-
-.type-options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-sm);
-}
-
-/* CORRECTED: Type option buttons in feedback modal matching tracker compact style */
-.type-option {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.type-option:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.type-option.active {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: var(--primary) !important;
-  color: var(--primary) !important;
-}
-
-.type-option svg {
-  font-size: 1rem;
-  color: var(--type-color, var(--text-secondary));
-}
-
-.type-option.active svg {
-  color: var(--primary);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
-}
-
-/* CORRECTED: Submit button matching tracker compact style */
-.submit-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.submit-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  padding: var(--spacing-md);
-  overflow-y: auto;
-}
-
-.modal-content {
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  color: var(--text);
-  border: 1px solid var(--border);
-  position: relative;
-}
-
-.modal-content h3 {
-  margin-bottom: var(--spacing-md);
-  color: var(--text);
-  text-align: center;
-}
-
-.modal-content p {
-  margin-bottom: var(--spacing-md);
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.modal-content ul {
-  margin-bottom: var(--spacing-lg);
-  padding-left: var(--spacing-lg);
-}
-
-.modal-content li {
-  margin-bottom: var(--spacing-xs);
-  color: var(--text);
-}
-
-/* MOBILE-FIRST: Enhanced Mobile Responsiveness with bulletproof tab handling */
-@media (max-width: 768px) {
-  /* UPDATED: Mobile header layout */
-  .integrated-profile-header {
-    padding: var(--spacing-lg);
-  }
+  // Account Settings States
+  const [username, setUsername] = useState(userData.username || '');
+  const [email, setEmail] = useState(userData.email || '');
+  const [discordUsername, setDiscordUsername] = useState(userData.discordUsername || '');
+  const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   
-  .profile-header-title-section {
-    margin-bottom: var(--spacing-lg);
-  }
+  // Privacy Settings States
+  const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
+  const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false); // Default true
+  const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
+  const [notifications, setNotifications] = useState(userData.notifications !== false); // Default true
   
-  .profile-header-title-section h2 {
-    font-size: 1.25rem;
-    margin-bottom: var(--spacing-xs);
-  }
+  // Feedback States - SIMPLIFIED: Removed email and priority
+  const [feedbackType, setFeedbackType] = useState('general');
+  const [feedbackSubject, setFeedbackSubject] = useState('');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
   
-  .profile-header-subtitle {
-    font-size: 0.8rem;
-  }
+  // MOBILE-FIRST: Enhanced tab slider with better state management
+  const tabsRef = useRef(null);
+  const sliderRef = useRef(null);
+  const [isSliderInitialized, setIsSliderInitialized] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const resizeTimeoutRef = useRef(null);
   
-  .profile-header-actions-section {
-    gap: var(--spacing-md);
-  }
-  
-  .feedback-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  /* FIXED: Mobile feedback button text responsiveness */
-  .feedback-btn-text {
-    display: inline;
-  }
-  
-  /* LEGACY: Mobile profile header compatibility */
-  .profile-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-    margin-top: 0;
-  }
-  
-  .profile-header h2 {
-    text-align: center;
-    order: 1;
-  }
-  
-  .profile-header-actions {
-    width: 100%;
-    order: 2;
-    justify-self: center;
-  }
-  
-  /* IMPROVED: Better mobile layout - completely centered */
-  .profile-overview-card {
-    flex-direction: column;
-    gap: var(--spacing-lg);
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .profile-avatar-section {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    align-items: center;
-    text-align: center;
-  }
-  
-  /* ADDED: Make sure all profile info is centered on mobile */
-  .profile-basic-info {
-    align-items: center;
-    text-align: center;
-  }
-  
-  .profile-username,
-  .profile-plan,
-  .profile-member-since {
-    text-align: center;
-  }
-  
-  /* FIXED: Mobile tab container - allow horizontal scrolling when needed */
-  .profile-tabs {
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    width: 100%;
-    margin: 0;
-    /* MOBILE: Force hardware acceleration */
-    transform: translateZ(0);
-    /* MOBILE: Ensure smooth scrolling */
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    /* MOBILE: Keep inline-flex for perfect content fitting */
-    display: inline-flex;
-    min-width: 100%;
-  }
-  
-  .profile-tabs::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* MOBILE: Enhanced slider for mobile - more reliable positioning */
-  .profile-tab-slider {
-    /* MOBILE: Faster transitions */
-    transition: transform 0.25s ease-out, width 0.25s ease-out;
-    /* MOBILE: Force GPU acceleration */
-    transform: translateZ(0) translateX(0px);
-    will-change: transform, width;
-  }
-  
-  .profile-tab-content {
-    padding: var(--spacing-lg);
-  }
-  
-  /* FIXED: Mobile section headers - proper font sizing consistent with app */
-  .section-header h3,
-  .privacy-section h3,
-  .settings-section h3,
-  .data-section h3 {
-    font-size: 1.125rem !important;
-  }
-  
-  /* FIXED: Mobile privacy and settings group headers */
-  .privacy-group h4,
-  .settings-group h4,
-  .data-action-info h4 {
-    font-size: 0.875rem !important;
-  }
-  
-  .edit-profile-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .benefits-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .subscription-actions {
-    flex-direction: column;
-  }
-  
-  .data-action-card {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    text-align: center;
-  }
-  
-  .modal-actions button,
-  .form-actions button,
-  .privacy-actions button,
-  .settings-actions button {
-    flex: 1 !important;
-    justify-content: center !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-  }
-  
-  .form-actions {
-    flex-direction: row !important;
-    gap: var(--spacing-sm);
-    align-items: center;
-  }
-  
-  .toggle-setting {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    text-align: center;
-  }
-  
-  /* FIXED: Coming soon banner mobile layout - centered title */
-  .coming-soon-banner {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-md);
-  }
-  
-  .coming-soon-content {
-    text-align: center;
-  }
-  
-  .coming-soon-title {
-    justify-content: center;
-  }
-  
-  .coming-soon-helmet {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .coming-soon-helmet-fallback {
-    font-size: 1.25rem;
-  }
-}
+  const feedbackTypes = [
+    { id: 'bug', label: 'Bug Report', icon: FaBug },
+    { id: 'feature', label: 'Feature Request', icon: FaLightbulb },
+    { id: 'improvement', label: 'Suggestion', icon: FaStar },
+    { id: 'general', label: 'General', icon: FaCommentAlt }
+  ];
 
-/* Hide feedback text on very small screens */
-@media (max-width: 320px) {
-  .feedback-btn-text {
-    display: none;
-  }
-}
+  // Tab configuration
+  const tabs = [
+    { id: 'account', label: 'Account', icon: FaUser },
+    { id: 'privacy', label: 'Privacy', icon: FaLock },
+    { id: 'settings', label: 'Settings', icon: FaCog },
+    { id: 'data', label: 'Data', icon: FaDownload }
+  ];
 
-/* Very Small Screens - Enhanced mobile slider support */
-@media (max-width: 480px) {
-  .integrated-profile-header {
-    padding: var(--spacing-md);
-  }
-  
-  .profile-header-title-section h2 {
-    font-size: 1.125rem;
-  }
-  
-  .profile-header-subtitle {
-    font-size: 0.75rem;
-  }
-  
-  .profile-overview-card {
-    padding: var(--spacing-lg);
-  }
-  
-  .profile-avatar {
-    width: 64px;
-    height: 64px;
-    font-size: 1.5rem;
-  }
-  
-  .premium-crown {
-    width: 20px;
-    height: 20px;
-    font-size: 0.625rem;
-  }
-  
-  .profile-username {
-    font-size: 1.25rem;
-  }
-  
-  /* MOBILE: Even more aggressive slider optimizations for small screens */
-  .profile-tabs {
-    padding: 6px;
-    gap: 4px;
-  }
-  
-  .profile-tab-slider {
-    top: 6px;
-    left: 6px;
-    height: calc(100% - 12px);
-    /* MOBILE: Ultra-fast transitions for small screens */
-    transition: transform 0.2s ease-out, width 0.2s ease-out;
-  }
-  
-  .profile-tab {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: 0.8rem;
-    min-height: 36px;
-  }
-  
-  .profile-tab svg {
-    font-size: 0.8rem;
-  }
-  
-  .profile-tab-content {
-    padding: var(--spacing-md);
-  }
-  
-  /* FIXED: Very small screen heading sizes */
-  .section-header h3,
-  .privacy-section h3,
-  .settings-section h3,
-  .data-section h3 {
-    font-size: 1rem !important;
-  }
-  
-  .privacy-group h4,
-  .settings-group h4,
-  .data-action-info h4 {
-    font-size: 0.8rem !important;
-  }
-  
-  .benefit-item {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-sm);
-  }
-  
-  .benefit-icon {
-    align-self: center;
-  }
-  
-  .modal-content {
-    padding: var(--spacing-lg);
-    margin: var(--spacing-sm);
-  }
-  
-  .feedback-modal {
-    max-width: 100%;
-  }
-  
-  .type-options {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
-  }
-  
-  /* FIXED: Very small coming soon banner */
-  .coming-soon-helmet {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .coming-soon-helmet-fallback {
-    font-size: 1rem;
-  }
-  
-  .coming-soon-title {
-    font-size: 0.875rem;
-  }
-  
-  .coming-soon-description {
-    font-size: 0.8rem;
-  }
-}
+  // MOBILE DETECTION: Simplified mobile detection
+  const detectMobile = useCallback(() => {
+    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
+    setIsMobile(isMobileDevice);
+    return isMobileDevice;
+  }, []);
 
-/* MOBILE: Additional support for landscape orientation */
-@media (max-width: 768px) and (orientation: landscape) {
-  .profile-tabs {
-    /* MOBILE: Ensure tabs are always visible in landscape */
-    max-width: 100vw;
-    overflow-x: auto;
-  }
-  
-  .profile-tab-slider {
-    /* MOBILE: Maintain smooth animation even in landscape */
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
-}
+  // FIXED: Enhanced slider positioning with perfect edge alignment
+  const updateTabSlider = useCallback(() => {
+    // Guard clauses for safety
+    if (!tabsRef.current || !sliderRef.current) {
+      return false;
+    }
+    
+    try {
+      const tabsContainer = tabsRef.current;
+      const slider = sliderRef.current;
+      const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeTab}"]`);
+      
+      if (!activeTabElement) {
+        console.warn(`Tab element not found: ${activeTab}`);
+        return false;
+      }
+
+      // Wait for next frame to ensure layout is complete
+      requestAnimationFrame(() => {
+        try {
+          // Get measurements relative to container
+          const containerRect = tabsContainer.getBoundingClientRect();
+          const tabRect = activeTabElement.getBoundingClientRect();
+          
+          // Validate measurements
+          if (containerRect.width === 0 || tabRect.width === 0) {
+            console.warn('Invalid measurements, container or tab not rendered');
+            return;
+          }
+
+          // FIXED: Calculate position based on actual container content bounds
+          // Get the computed padding from CSS and round to avoid sub-pixel issues
+          const containerStyle = window.getComputedStyle(tabsContainer);
+          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
+          
+          // Calculate exact position relative to container's content area
+          // Round all measurements to avoid sub-pixel positioning issues
+          const leftOffset = Math.round(tabRect.left - containerRect.left - paddingLeft);
+          const tabWidth = tabRect.width;
+          
+          // FIXED: Ensure slider matches container's dynamic sizing perfectly
+          // No boundary clamping needed - trust the container's fit-content sizing
+          
+          // Apply positioning and make visible
+          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
+          slider.style.width = `${Math.round(tabWidth)}px`;
+          slider.style.opacity = '1';
+          slider.style.visibility = 'visible';
+          
+        } catch (innerError) {
+          console.error('Inner slider positioning failed:', innerError);
+        }
+      });
+      
+      return true;
+      
+    } catch (error) {
+      console.error('Slider update failed:', error);
+      return false;
+    }
+  }, [activeTab]);
+
+  // SIMPLIFIED: Clean tab change handler
+  const handleTabChange = useCallback((newTab) => {
+    if (newTab === activeTab) return;
+    
+    setActiveTab(newTab);
+    
+    // Update slider immediately on mobile for responsiveness
+    if (isMobile) {
+      setTimeout(() => updateTabSlider(), 10);
+    }
+  }, [activeTab, isMobile, updateTabSlider]);
+
+  // FIXED: Proper slider initialization
+  useEffect(() => {
+    const initializeSlider = () => {
+      detectMobile();
+      
+      if (!tabsRef.current || !sliderRef.current) {
+        return;
+      }
+
+      // Initialize slider immediately
+      requestAnimationFrame(() => {
+        const success = updateTabSlider();
+        
+        if (success) {
+          setIsSliderInitialized(true);
+        } else {
+          // Retry after short delay to ensure DOM is ready
+          setTimeout(() => {
+            if (updateTabSlider()) {
+              setIsSliderInitialized(true);
+            } else {
+              // Final fallback - force slider to be visible
+              if (sliderRef.current) {
+                sliderRef.current.style.opacity = '1';
+                sliderRef.current.style.visibility = 'visible';
+                setIsSliderInitialized(true);
+                // Try to update position one more time
+                setTimeout(updateTabSlider, 50);
+              }
+            }
+          }, 100);
+        }
+      });
+    };
+
+    // Initialize after DOM is ready
+    const timer = setTimeout(initializeSlider, 100);
+    
+    return () => clearTimeout(timer);
+  }, [updateTabSlider, detectMobile]);
+
+  // SIMPLIFIED: Basic resize handling
+  useEffect(() => {
+    const handleResize = () => {
+      detectMobile();
+      
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+      
+      resizeTimeoutRef.current = setTimeout(() => {
+        if (isSliderInitialized) {
+          updateTabSlider();
+        }
+      }, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
+  }, [isSliderInitialized, detectMobile, updateTabSlider]);
+
+  // Update slider when active tab changes
+  useEffect(() => {
+    if (isSliderInitialized) {
+      // Small delay to ensure DOM is updated
+      setTimeout(updateTabSlider, 10);
+    }
+  }, [activeTab, isSliderInitialized, updateTabSlider]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      [resizeTimeoutRef].forEach(ref => {
+        if (ref.current) {
+          clearTimeout(ref.current);
+        }
+      });
+    };
+  }, []);
+
+  // Calculate basic user info for display
+  const userStats = {
+    memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown'
+  };
+
+  // Handle profile updates
+  const handleProfileUpdate = () => {
+    const updates = {
+      username: username.trim(),
+      email: email.trim(),
+      discordUsername: discordUsername.trim(),
+      showOnLeaderboard,
+      dataSharing,
+      analyticsOptIn,
+      marketingEmails,
+      notifications
+    };
+    
+    updateUserData(updates);
+    setIsEditingProfile(false);
+    toast.success('Profile updated successfully!');
+  };
+
+  // Handle feedback submission
+  const handleFeedbackSubmit = () => {
+    if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
+      toast.error('Please fill in both subject and message');
+      return;
+    }
+    
+    // In a real app, this would send to your feedback API
+    const feedbackData = {
+      type: feedbackType,
+      subject: feedbackSubject.trim(),
+      message: feedbackMessage.trim(),
+      userData: {
+        username: userData.username,
+        timestamp: new Date().toISOString()
+      }
+    };
+    
+    console.log('Feedback submitted:', feedbackData);
+    
+    // Reset form
+    setFeedbackSubject('');
+    setFeedbackMessage('');
+    setFeedbackType('general');
+    setShowFeedbackModal(false);
+    
+    toast.success('Thank you! Your feedback has been submitted.');
+  };
+
+  // Handle data export
+  const handleDataExport = () => {
+    const exportData = {
+      profile: {
+        username: userData.username,
+        memberSince: userData.startDate,
+        isPremium: true, // Everyone is premium now
+        discordUsername: userData.discordUsername
+      },
+      streakData: {
+        currentStreak: userData.currentStreak,
+        longestStreak: userData.longestStreak,
+        startDate: userData.startDate,
+        streakHistory: userData.streakHistory,
+        relapseCount: userData.relapseCount,
+        wetDreamCount: userData.wetDreamCount
+      },
+      benefitTracking: userData.benefitTracking || [],
+      emotionalTracking: userData.emotionalTracking || [],
+      journalEntries: userData.notes || {},
+      badges: userData.badges || [],
+      urgeLog: userData.urgeLog || [],
+      exportDate: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `titantrack-data-${format(new Date(), 'yyyy-MM-dd')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    setShowExportModal(false);
+    toast.success('Your data has been exported successfully!');
+  };
+
+  // Handle account deletion
+  const handleAccountDeletion = () => {
+    // In a real app, this would call your deletion API
+    localStorage.clear();
+    toast.success('Account deleted successfully');
+    onLogout();
+  };
+
+  return (
+    <div className="profile-container">
+      {/* UPDATED: Integrated header design matching tracker/calendar */}
+      <div className="integrated-profile-header">
+        <div className="profile-header-title-section">
+          <h2>Profile & Settings</h2>
+          <p className="profile-header-subtitle">Manage your account, privacy settings, and preferences</p>
+        </div>
+        
+        <div className="profile-header-actions-section">
+          <div className="profile-header-actions">
+            <button 
+              className="feedback-btn"
+              onClick={() => setShowFeedbackModal(true)}
+            >
+              <FaCommentAlt />
+              <span className="feedback-btn-text">Feedback</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Overview Card - Simplified since all features are free */}
+      <div className="profile-overview-card">
+        <div className="profile-avatar-section">
+          <div className="profile-avatar">
+            <FaUser />
+            <div className="premium-crown"><FaCrown /></div>
+          </div>
+          <div className="profile-basic-info">
+            <div className="profile-username">{userData.username}</div>
+            <div className="profile-plan">
+              All Features Unlocked
+              <FaCrown className="plan-crown" />
+            </div>
+            <div className="profile-member-since">
+              Member since {userStats.memberSince}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* BULLETPROOF: Mobile-First Tab Navigation with Ultra-Robust Sliding Animation */}
+      <div 
+        className="profile-tabs" 
+        ref={tabsRef}
+      >
+        {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations */}
+        <div 
+          className="profile-tab-slider" 
+          ref={sliderRef}
+          style={{ 
+            opacity: 0,
+            visibility: 'hidden',
+            transform: 'translateX(0px)',
+            width: '0px'
+          }}
+        />
+        
+        {tabs.map(tab => (
+          <button 
+            key={tab.id}
+            className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => handleTabChange(tab.id)}
+            data-tab={tab.id}
+          >
+            <tab.icon />
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="profile-tab-content">
+        {/* Account Tab */}
+        {activeTab === 'account' && (
+          <div className="account-section">
+            <div className="section-header">
+              <h3>Account Information</h3>
+              <button 
+                className="edit-profile-btn"
+                onClick={() => setIsEditingProfile(!isEditingProfile)}
+              >
+                <FaEdit />
+                <span>{isEditingProfile ? 'Cancel' : 'Edit Profile'}</span>
+              </button>
+            </div>
+
+            <div className="account-form">
+              <div className="form-group">
+                <label>Username</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={!isEditingProfile}
+                  placeholder="Enter your username"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={!isEditingProfile}
+                  placeholder="Enter your email"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Discord Username</label>
+                <input
+                  type="text"
+                  value={discordUsername}
+                  onChange={(e) => setDiscordUsername(e.target.value)}
+                  disabled={!isEditingProfile}
+                  placeholder="For leaderboard integration"
+                />
+              </div>
+
+              <div className="form-group">
+                <div className="toggle-setting">
+                  <div className="toggle-info">
+                    <span className="toggle-label">Show on Leaderboard</span>
+                    <span className="toggle-description">Display your streak on the Discord leaderboard</span>
+                  </div>
+                  <div 
+                    className={`toggle-switch ${showOnLeaderboard ? 'active' : ''}`}
+                    onClick={() => isEditingProfile && setShowOnLeaderboard(!showOnLeaderboard)}
+                  >
+                    <div className="toggle-slider"></div>
+                  </div>
+                </div>
+              </div>
+
+              {isEditingProfile && (
+                <div className="form-actions">
+                  <button className="save-btn" onClick={handleProfileUpdate}>
+                    <FaCheckCircle />
+                    Save Changes
+                  </button>
+                  <button className="cancel-btn" onClick={() => setIsEditingProfile(false)}>
+                    <FaTimes />
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Privacy Tab */}
+        {activeTab === 'privacy' && (
+          <div className="privacy-section">
+            <h3>Privacy Settings</h3>
+            
+            <div className="privacy-settings">
+              <div className="privacy-group">
+                <h4>Data & Analytics</h4>
+                
+                <div className="toggle-setting">
+                  <div className="toggle-info">
+                    <span className="toggle-label">Anonymous Analytics</span>
+                    <span className="toggle-description">Help improve the app by sharing anonymous usage data</span>
+                  </div>
+                  <div 
+                    className={`toggle-switch ${analyticsOptIn ? 'active' : ''}`}
+                    onClick={() => setAnalyticsOptIn(!analyticsOptIn)}
+                  >
+                    <div className="toggle-slider"></div>
+                  </div>
+                </div>
+
+                <div className="toggle-setting">
+                  <div className="toggle-info">
+                    <span className="toggle-label">Community Data Sharing</span>
+                    <span className="toggle-description">Allow aggregated data to be used for community insights</span>
+                  </div>
+                  <div 
+                    className={`toggle-switch ${dataSharing ? 'active' : ''}`}
+                    onClick={() => setDataSharing(!dataSharing)}
+                  >
+                    <div className="toggle-slider"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="privacy-group">
+                <h4>Communications</h4>
+                
+                <div className="toggle-setting">
+                  <div className="toggle-info">
+                    <span className="toggle-label">Marketing Emails</span>
+                    <span className="toggle-description">Receive updates about new features and tips</span>
+                  </div>
+                  <div 
+                    className={`toggle-switch ${marketingEmails ? 'active' : ''}`}
+                    onClick={() => setMarketingEmails(!marketingEmails)}
+                  >
+                    <div className="toggle-slider"></div>
+                  </div>
+                </div>
+
+                <div className="toggle-setting">
+                  <div className="toggle-info">
+                    <span className="toggle-label">Push Notifications</span>
+                    <span className="toggle-description">Receive reminders and encouragement</span>
+                  </div>
+                  <div 
+                    className={`toggle-switch ${notifications ? 'active' : ''}`}
+                    onClick={() => setNotifications(!notifications)}
+                  >
+                    <div className="toggle-slider"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="privacy-actions">
+              <button className="action-btn" onClick={handleProfileUpdate}>
+                <FaCheckCircle />
+                Save Privacy Settings
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Settings Tab - UPDATED: Coming Soon banner for language settings */}
+        {activeTab === 'settings' && (
+          <div className="settings-section">
+            <h3>App Settings</h3>
+            
+            <div className="settings-groups">
+              <div className="settings-group">
+                <h4>Language & Localization</h4>
+                
+                {/* NEW: Coming Soon Banner */}
+                <div className="coming-soon-banner">
+                  <div className="coming-soon-helmet-container">
+                    <img 
+                      className="coming-soon-helmet" 
+                      src="/helmet.png" 
+                      alt="Coming Soon" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'block';
+                      }}
+                    />
+                    <div className="coming-soon-helmet-fallback" style={{ display: 'none' }}>
+                      ⚔️
+                    </div>
+                  </div>
+                  
+                  <div className="coming-soon-content">
+                    <h4 className="coming-soon-title">
+                      Multi-Language Support
+                    </h4>
+                    <p className="coming-soon-description">
+                      Multiple language options are being developed and will be available soon. Stay tuned for updates!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Data Tab */}
+        {activeTab === 'data' && (
+          <div className="data-section">
+            <h3>Data Management</h3>
+            
+            <div className="data-actions">
+              <div className="data-action-card">
+                <div className="data-action-info">
+                  <h4>Export Your Data</h4>
+                  <p>Download all your tracking data, journal entries, and settings as a JSON file</p>
+                </div>
+                <button className="action-btn" onClick={() => setShowExportModal(true)}>
+                  <FaDownload />
+                  Export Data
+                </button>
+              </div>
+
+              <div className="data-action-card danger">
+                <div className="data-action-info">
+                  <h4>Delete Account</h4>
+                  <p>Permanently delete your account and all associated data. This action cannot be undone.</p>
+                </div>
+                <button className="danger-btn" onClick={() => setShowDeleteConfirm(true)}>
+                  <FaTrash />
+                  Delete Account
+                </button>
+              </div>
+            </div>
+
+            <div className="logout-section">
+              <button className="logout-btn" onClick={onLogout}>
+                <FaSignOutAlt />
+                Sign Out
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && (
+        <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
+          <div className="modal-content feedback-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowFeedbackModal(false)}>
+              <FaTimes />
+            </button>
+            
+            <div className="modal-header">
+              <h3>Send Feedback</h3>
+            </div>
+
+            <div className="feedback-form">
+              <div className="feedback-types">
+                <label>Feedback Type</label>
+                <div className="type-options">
+                  {feedbackTypes.map(type => (
+                    <button
+                      key={type.id}
+                      className={`type-option ${feedbackType === type.id ? 'active' : ''}`}
+                      onClick={() => setFeedbackType(type.id)}
+                    >
+                      <type.icon />
+                      <span>{type.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Subject</label>
+                <input
+                  type="text"
+                  value={feedbackSubject}
+                  onChange={(e) => setFeedbackSubject(e.target.value)}
+                  placeholder="Brief description of your feedback"
+                  maxLength={100}
+                />
+                <div className="char-count">{feedbackSubject.length}/100</div>
+              </div>
+
+              <div className="form-group">
+                <label>Message</label>
+                <textarea
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value)}
+                  placeholder="Please provide details about your feedback..."
+                  rows={5}
+                  maxLength={500}
+                ></textarea>
+                <div className="char-count">{feedbackMessage.length}/500</div>
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button className="submit-btn" onClick={handleFeedbackSubmit}>
+                <FaPaperPlane />
+                Submit
+              </button>
+              <button className="cancel-btn" onClick={() => setShowFeedbackModal(false)}>
+                <FaTimes />
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export Confirmation Modal */}
+      {showExportModal && (
+        <div className="modal-overlay" onClick={() => setShowExportModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h3>Export Your Data</h3>
+            <p>This will download all your tracking data, including:</p>
+            <ul>
+              <li>Profile information</li>
+              <li>Streak history and statistics</li>
+              <li>Benefit tracking data</li>
+              <li>Journal entries</li>
+              <li>Badges and achievements</li>
+              <li>Urge management logs</li>
+            </ul>
+            <div className="modal-actions">
+              <button className="action-btn" onClick={handleDataExport}>
+                <FaDownload />
+                Download Data
+              </button>
+              <button className="cancel-btn" onClick={() => setShowExportModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h3>Delete Account</h3>
+            <p>Are you absolutely sure you want to delete your account?</p>
+            <p><strong>This action cannot be undone.</strong> All your data including:</p>
+            <ul>
+              <li>Streak history and progress</li>
+              <li>Journal entries</li>
+              <li>Benefit tracking data</li>
+              <li>Badges and achievements</li>
+            </ul>
+            <p>will be permanently deleted.</p>
+            
+            <div className="modal-actions">
+              <button className="danger-btn" onClick={handleAccountDeletion}>
+                <FaTrash />
+                Yes, Delete My Account
+              </button>
+              <button className="cancel-btn" onClick={() => setShowDeleteConfirm(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Profile;
