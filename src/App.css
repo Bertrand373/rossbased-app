@@ -117,9 +117,10 @@ body {
   width: auto;
 }
 
-/* UPDATED: Header Navigation - styled exactly like time-range selector buttons */
+/* UPDATED: Header Navigation with bulletproof sliding pill animation - exactly like profile tabs */
 .header-nav {
   justify-self: center;
+  position: relative;
 }
 
 .header-nav .nav-container {
@@ -130,6 +131,37 @@ body {
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   width: 100%;
+  position: relative;
+  /* MOBILE: Ensure proper 3D rendering context */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* NEW: Header navigation slider - identical to profile tab slider */
+.header-nav-slider {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  height: calc(100% - calc(var(--spacing-xs) * 2));
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 1;
+  /* IMPORTANT: Start hidden but ready to be shown */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(0px);
+  width: 0px;
+}
+
+/* MOBILE: Faster transition on smaller screens */
+@media (max-width: 768px) {
+  .header-nav-slider {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 .header-nav .nav-link {
@@ -150,6 +182,14 @@ body {
   white-space: nowrap;
   position: relative;
   outline: none;
+  z-index: 2;
+  /* MOBILE: Prevent text selection and ensure proper touch */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .header-nav .nav-link:hover:not(.active) {
@@ -157,11 +197,20 @@ body {
   transform: translateY(-1px);
 }
 
+/* CRITICAL: Active nav styling - REMOVE any background that conflicts with slider */
 .header-nav .nav-link.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
+  color: var(--primary) !important;
+  /* IMPORTANT: No background - let slider handle visual feedback */
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* MOBILE: Ensure active state is always visible */
+@media (max-width: 768px) {
+  .header-nav .nav-link.active {
+    /* FALLBACK: In case slider fails, ensure active tab is distinguishable */
+    font-weight: 600;
+  }
 }
 
 .user-controls {
@@ -698,34 +747,19 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* Mobile navigation */
+/* Mobile navigation - UPDATED: Add sliding pill animation support */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--card-background);
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   display: flex;
-  justify-content: space-around;
-  padding: var(--spacing-sm) 0;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
+  border-top: 1px solid var(--border);
 }
 
-.mobile-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: var(--text-secondary);
-  font-size: 0.7rem;
-}
-
-.mobile-nav-item.active {
-  color: var(--primary);
-}
-
-.mobile-nav-icon {
-  font-size: 1.5rem;
-  margin-bottom: var(--spacing-xs);
-}
+/* Mobile navigation will use its own slider from MobileNavigation.css */
