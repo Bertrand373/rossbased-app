@@ -181,9 +181,9 @@
   color: var(--text-secondary);
 }
 
-/* FIXED: Perfectly aligned tab navigation container */
+/* FIXED: Responsive tab navigation container with proper width scaling */
 .profile-tabs {
-  display: inline-flex;
+  display: flex;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs);
   background-color: var(--card-background);
@@ -191,9 +191,10 @@
   border: 1px solid var(--border);
   position: relative;
   margin: 0 auto;
-  /* CRITICAL: Use inline-flex and remove width constraints to ensure perfect content fitting */
-  width: auto;
+  /* RESPONSIVE: Scale container width based on screen size */
+  width: min(90vw, 400px);
   min-width: fit-content;
+  max-width: 500px;
   /* MOBILE: Ensure proper 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
@@ -234,10 +235,11 @@
   }
 }
 
-/* ENHANCED: Tab buttons with proper sizing */
+/* ENHANCED: Tab buttons with flexible sizing that fills container evenly */
 .profile-tab {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: transparent;
@@ -249,7 +251,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  min-width: fit-content;
+  /* RESPONSIVE: Tabs expand to fill available space evenly */
+  flex: 1;
+  min-width: 0;
   position: relative;
   z-index: 2;
   /* MOBILE: Prevent text selection and ensure proper touch */
