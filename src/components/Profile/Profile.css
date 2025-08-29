@@ -181,10 +181,9 @@
   color: var(--text-secondary);
 }
 
-/* FIXED: Responsive tab navigation container with proper width scaling */
+/* FIXED: Responsive tab navigation container with even spacing */
 .profile-tabs {
   display: flex;
-  gap: var(--spacing-xs);
   padding: var(--spacing-xs);
   background-color: var(--card-background);
   border-radius: var(--radius-full);
@@ -195,6 +194,8 @@
   width: min(90vw, 400px);
   min-width: fit-content;
   max-width: 500px;
+  /* EVEN SPACING: Distribute tabs with consistent gaps */
+  justify-content: space-between;
   /* MOBILE: Ensure proper 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
@@ -235,7 +236,7 @@
   }
 }
 
-/* ENHANCED: Tab buttons with flexible sizing that fills container evenly */
+/* ENHANCED: Tab buttons with consistent natural sizing */
 .profile-tab {
   display: flex;
   align-items: center;
@@ -251,9 +252,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  /* RESPONSIVE: Tabs expand to fill available space evenly */
-  flex: 1;
-  min-width: 0;
+  /* CONSISTENT SIZING: Natural width based on content */
+  min-width: fit-content;
   position: relative;
   z-index: 2;
   /* MOBILE: Prevent text selection and ensure proper touch */
