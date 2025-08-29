@@ -181,23 +181,25 @@
   color: var(--text-secondary);
 }
 
-/* BULLETPROOF: Mobile-First Tab Navigation with Ultra-Robust Sliding Animation */
+/* FIXED: Perfectly aligned tab navigation container */
 .profile-tabs {
-  display: flex;
+  display: inline-flex;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs);
   background-color: var(--card-background);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
-  overflow-x: auto;
-  width: fit-content;
-  margin: 0 auto;
   position: relative;
+  margin: 0 auto;
+  /* CRITICAL: Use inline-flex and remove width constraints to ensure perfect content fitting */
+  width: auto;
+  min-width: fit-content;
   /* MOBILE: Ensure proper 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* MOBILE: Prevent scrollbar issues */
+  /* MOBILE: Handle overflow for very small screens only */
+  overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -1219,7 +1221,7 @@
     text-align: center;
   }
   
-  /* CRITICAL: Mobile tab container enhancements */
+  /* FIXED: Mobile tab container - allow horizontal scrolling when needed */
   .profile-tabs {
     overflow-x: auto;
     scrollbar-width: none;
@@ -1231,6 +1233,9 @@
     /* MOBILE: Ensure smooth scrolling */
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    /* MOBILE: Keep inline-flex for perfect content fitting */
+    display: inline-flex;
+    min-width: 100%;
   }
   
   .profile-tabs::-webkit-scrollbar {

@@ -63,7 +63,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     return isMobileDevice;
   }, []);
 
-  // ROBUST: Enhanced slider positioning with comprehensive error handling
+  // FIXED: Enhanced slider positioning with perfect edge alignment
   const updateTabSlider = useCallback(() => {
     // Guard clauses for safety
     if (!tabsRef.current || !sliderRef.current) {
@@ -83,7 +83,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       // Wait for next frame to ensure layout is complete
       requestAnimationFrame(() => {
         try {
-          // Get measurements
+          // Get measurements relative to container
           const containerRect = tabsContainer.getBoundingClientRect();
           const tabRect = activeTabElement.getBoundingClientRect();
           
@@ -93,19 +93,21 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             return;
           }
 
-          // Calculate position - accounting for container padding
-          const paddingLeft = 8; // var(--spacing-xs)
+          // FIXED: Calculate position based on actual container content bounds
+          // Get the computed padding from CSS
+          const containerStyle = window.getComputedStyle(tabsContainer);
+          const paddingLeft = parseFloat(containerStyle.paddingLeft) || 8;
+          
+          // Calculate exact position relative to container's content area
           const leftOffset = tabRect.left - containerRect.left - paddingLeft;
           const tabWidth = tabRect.width;
           
-          // Robust boundary checking
-          const containerWidth = containerRect.width - (paddingLeft * 2);
-          const clampedOffset = Math.max(0, Math.min(leftOffset, containerWidth - tabWidth));
-          const clampedWidth = Math.min(tabWidth, containerWidth);
+          // FIXED: Ensure slider matches container's dynamic sizing perfectly
+          // No boundary clamping needed - trust the container's fit-content sizing
           
           // Apply positioning and make visible
-          slider.style.transform = `translateX(${Math.round(clampedOffset)}px)`;
-          slider.style.width = `${Math.round(clampedWidth)}px`;
+          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
+          slider.style.width = `${Math.round(tabWidth)}px`;
           slider.style.opacity = '1';
           slider.style.visibility = 'visible';
           
