@@ -301,30 +301,32 @@
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* Modal close button */
+/* UPDATED: Modal close button - MATCHING Tracker modal styling EXACTLY */
 .modal-close-x {
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  background: none;
-  border: none;
-  color: var(--text-secondary);
+  background: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
   font-size: 1rem;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: var(--spacing-xs);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
   z-index: 10;
 }
 
 .modal-close-x:hover {
-  background-color: rgba(255, 221, 0, 0.1);
-  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 .calendar-instructions {
