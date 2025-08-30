@@ -64,7 +64,8 @@
   width: min(90vw, 250px); /* Narrower than before, matches Profile's compact style */
   min-width: fit-content;
   max-width: 300px;
-  justify-content: space-between;
+  /* FIXED: Remove justify-content to prevent gap - buttons will be naturally spaced */
+  gap: var(--spacing-xs); /* Add consistent gap instead of space-between */
   /* Mobile 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
@@ -121,6 +122,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  /* FIXED: Equal width for both buttons to prevent gap */
+  flex: 1;
   min-width: fit-content;
   position: relative;
   z-index: 2;
@@ -133,7 +136,7 @@
   touch-action: manipulation;
 }
 
-/* Mobile: Adjust touch targets on actual mobile */
+/* FIXED: Mobile touch targets matching Profile exactly */
 @media (max-width: 768px) and (pointer: coarse) {
   .calendar-nav-btn {
     min-height: 44px; /* iOS recommendation for touch targets */
@@ -724,16 +727,20 @@
     gap: var(--spacing-md);
   }
   
-  /* Mobile: Enhanced navigation pills */
+  /* FIXED: Mobile navigation pills matching Profile tabs exactly */
   .calendar-navigation-pills {
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    width: 100%;
-    margin: 0;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
     transform: translateZ(0);
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    /* FIXED: Ensure consistent padding on mobile */
+    padding: var(--spacing-xs);
+    gap: var(--spacing-xs);
   }
   
   .calendar-navigation-pills::-webkit-scrollbar {
@@ -749,8 +756,19 @@
   
   .calendar-nav-btn {
     font-size: 0.875rem;
+    /* FIXED: Match Profile mobile button sizing exactly */
     padding: var(--spacing-sm) var(--spacing-lg);
     min-width: 80px;
+    /* FIXED: Ensure proper height on mobile */
+    min-height: auto;
+  }
+  
+  /* FIXED: Mobile touch devices get proper height */
+  @media (pointer: coarse) {
+    .calendar-nav-btn {
+      min-height: 44px;
+      padding: var(--spacing-md) var(--spacing-lg);
+    }
   }
   
   .calendar-nav-btn svg {
