@@ -7,11 +7,12 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons - UPDATED: Using more reliable arrow icons
+// Icons - UPDATED: Added calendar view icons for navigation pills
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
-  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen, FaBook, FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen, FaBook, FaAngleLeft, FaAngleRight,
+  FaCalendarAlt, FaCalendarWeek } from 'react-icons/fa';
 
 // Bulletproof SVG Arrow Component for maximum reliability
 const SVGArrow = ({ direction }) => {
@@ -823,19 +824,22 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               }}
             />
             
+            {/* UPDATED: Navigation buttons with icons */}
             <button 
               className={`navigation-section-btn ${viewMode === 'month' ? 'active' : ''}`}
               onClick={() => handleViewModeChange('month')}
               data-view="month"
             >
-              Month
+              <FaCalendarAlt />
+              <span>Month</span>
             </button>
             <button 
               className={`navigation-section-btn ${viewMode === 'week' ? 'active' : ''}`}
               onClick={() => handleViewModeChange('week')}
               data-view="week"
             >
-              Week
+              <FaCalendarWeek />
+              <span>Week</span>
             </button>
           </div>
         </div>
