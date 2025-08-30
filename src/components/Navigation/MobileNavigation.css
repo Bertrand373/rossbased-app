@@ -13,9 +13,10 @@
   border-top: 1px solid var(--border);
 }
 
-/* UPDATED: Container for navigation items with bulletproof sliding animation support - identical to Profile */
+/* RESTORED: Original container layout with sliding animation support added */
 .mobile-nav-container {
   display: flex;
+  gap: var(--spacing-xs);
   padding: var(--spacing-xs);
   background-color: var(--card-background);
   border-radius: var(--radius-full);
@@ -23,14 +24,13 @@
   width: 100%;
   max-width: 500px;
   position: relative;
-  /* EVEN SPACING: Distribute navigation buttons with consistent gaps */
-  justify-content: space-between;
+  /* RESTORED: Original equal distribution */
+  justify-content: space-around;
   /* MOBILE: Ensure proper 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* MOBILE: Handle overflow for very small screens only */
-  overflow-x: auto;
+  /* MOBILE: Prevent scrollbar issues */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -68,8 +68,9 @@
   }
 }
 
-/* ENHANCED: Mobile nav items with consistent natural sizing - identical to profile tabs */
+/* RESTORED: Original mobile nav items with proper flex distribution */
 .mobile-nav-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,9 +88,6 @@
   outline: none;
   min-height: 60px;
   z-index: 2;
-  white-space: nowrap;
-  /* CONSISTENT SIZING: Natural width based on content */
-  min-width: fit-content;
   /* MOBILE: Prevent text selection and ensure proper touch */
   -webkit-user-select: none;
   -moz-user-select: none;
