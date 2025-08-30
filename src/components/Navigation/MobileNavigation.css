@@ -13,23 +13,24 @@
   border-top: 1px solid var(--border);
 }
 
-/* UPDATED: Container for navigation items with sliding animation support */
+/* UPDATED: Container for navigation items with bulletproof sliding animation support - identical to Profile */
 .mobile-nav-container {
   display: flex;
-  gap: var(--spacing-xs);
   padding: var(--spacing-xs);
   background-color: var(--card-background);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   width: 100%;
   max-width: 500px;
-  justify-content: space-around;
   position: relative;
+  /* EVEN SPACING: Distribute navigation buttons with consistent gaps */
+  justify-content: space-between;
   /* MOBILE: Ensure proper 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* MOBILE: Prevent scrollbar issues */
+  /* MOBILE: Handle overflow for very small screens only */
+  overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -64,9 +65,14 @@
 @media (max-width: 480px) {
   .mobile-nav-slider {
     transition: transform 0.2s ease-out, width 0.2s ease-out;
+    /* MOBILE: Even more aggressive slider optimizations for small screens */
+    top: 6px;
+    left: 6px;
+    height: calc(100% - 12px);
   }
 }
 
+/* ENHANCED: Mobile navigation items with consistent natural sizing - identical to Profile tabs */
 .mobile-nav-item {
   flex: 1;
   display: flex;
@@ -86,6 +92,9 @@
   outline: none;
   min-height: 60px;
   z-index: 2;
+  cursor: pointer;
+  /* CONSISTENT SIZING: Natural width based on content */
+  min-width: fit-content;
   /* MOBILE: Prevent text selection and ensure proper touch */
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -95,16 +104,30 @@
   touch-action: manipulation;
 }
 
+/* MOBILE: Only adjust touch targets on actual mobile, not desktop */
+@media (max-width: 768px) and (pointer: coarse) {
+  .mobile-nav-item {
+    min-height: 44px; /* iOS recommendation for touch targets */
+    padding: var(--spacing-md) var(--spacing-xs);
+  }
+}
+
 /* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
 
-/* CRITICAL: Active mobile nav styling - REMOVE any background that conflicts with slider */
+/* CRITICAL: Active mobile nav styling - REMOVE any background that conflicts with slider - identical to Profile */
 .mobile-nav-item.active {
   color: var(--primary) !important;
   /* IMPORTANT: No background - let slider handle visual feedback */
   background-color: transparent !important;
   border-color: transparent !important;
-  /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
-  font-weight: 600;
+}
+
+/* MOBILE: Ensure active state is always visible */
+@media (max-width: 768px) {
+  .mobile-nav-item.active {
+    /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
+    font-weight: 600;
+  }
 }
 
 .mobile-nav-icon {
@@ -136,13 +159,6 @@
     max-width: 100%;
     gap: 2px;
     padding: 2px;
-  }
-  
-  /* MOBILE: Enhanced slider for very small screens */
-  .mobile-nav-slider {
-    top: 2px;
-    left: 2px;
-    height: calc(100% - 4px);
   }
   
   .mobile-nav-item {

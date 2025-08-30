@@ -1,6 +1,6 @@
-// components/Navigation/MobileNavigation.js - UPDATED: Added bulletproof sliding pill animation
+// components/Navigation/MobileNavigation.js - UPDATED: Added bulletproof sliding pill animation matching profile tabs
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './MobileNavigation.css';
 
 // Icons
@@ -12,25 +12,33 @@ import {
   FaShieldAlt
 } from 'react-icons/fa';
 
-const MobileNavigation = ({ activeTab, setActiveTab }) => {
+const MobileNavigation = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   
-  // BULLETPROOF: Enhanced slider with mobile-first state management
+  // BULLETPROOF: Enhanced sliding animation with mobile-first state management - identical to Profile
   const navContainerRef = useRef(null);
   const sliderRef = useRef(null);
   const [isSliderInitialized, setIsSliderInitialized] = useState(false);
-  const [isMobile, setIsMobile] = useState(true); // Always mobile for this component
+  const [isMobile, setIsMobile] = useState(false);
   const resizeTimeoutRef = useRef(null);
-  
+
   const navItems = [
-    { path: '/', icon: FaHome, label: 'Tracker', tab: 'tracker' },
-    { path: '/calendar', icon: FaCalendarAlt, label: 'Calendar', tab: 'calendar' },
-    { path: '/stats', icon: FaChartBar, label: 'Stats', tab: 'stats' },
-    { path: '/timeline', icon: FaMapSigns, label: 'Timeline', tab: 'timeline' },
-    { path: '/urge-toolkit', icon: FaShieldAlt, label: 'Urges', tab: 'urge-toolkit' }
+    { path: '/', icon: FaHome, label: 'Tracker' },
+    { path: '/calendar', icon: FaCalendarAlt, label: 'Calendar' },
+    { path: '/stats', icon: FaChartBar, label: 'Stats' },
+    { path: '/timeline', icon: FaMapSigns, label: 'Timeline' },
+    { path: '/urge-toolkit', icon: FaShieldAlt, label: 'Urge Toolkit' }
   ];
 
-  // ROBUST: Enhanced slider positioning with comprehensive error handling
+  // MOBILE DETECTION: Simplified mobile detection - identical to Profile
+  const detectMobile = useCallback(() => {
+    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
+    setIsMobile(isMobileDevice);
+    return isMobileDevice;
+  }, []);
+
+  // FIXED: Enhanced slider positioning with perfect edge alignment - identical to Profile
   const updateMobileNavSlider = useCallback(() => {
     // Guard clauses for safety
     if (!navContainerRef.current || !sliderRef.current) {
@@ -43,38 +51,39 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
       const activeNavElement = navContainer.querySelector('.mobile-nav-item.active');
       
       if (!activeNavElement) {
-        // No active nav found, hide slider
-        slider.style.opacity = '0';
-        slider.style.visibility = 'hidden';
+        console.warn(`Mobile navigation element not found for path: ${location.pathname}`);
         return false;
       }
 
       // Wait for next frame to ensure layout is complete
       requestAnimationFrame(() => {
         try {
-          // Get measurements
+          // Get measurements relative to container
           const containerRect = navContainer.getBoundingClientRect();
           const navRect = activeNavElement.getBoundingClientRect();
           
           // Validate measurements
           if (containerRect.width === 0 || navRect.width === 0) {
-            console.warn('Invalid measurements, mobile nav container or nav not rendered');
+            console.warn('Invalid measurements, mobile container or nav not rendered');
             return;
           }
 
-          // Calculate position - accounting for container padding
-          const paddingLeft = 4; // var(--spacing-xs) for mobile
-          const leftOffset = navRect.left - containerRect.left - paddingLeft;
+          // FIXED: Calculate position based on actual container content bounds
+          // Get the computed padding from CSS and round to avoid sub-pixel issues
+          const containerStyle = window.getComputedStyle(navContainer);
+          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
+          
+          // Calculate exact position relative to container's content area
+          // Round all measurements to avoid sub-pixel positioning issues
+          const leftOffset = Math.round(navRect.left - containerRect.left - paddingLeft);
           const navWidth = navRect.width;
           
-          // Robust boundary checking
-          const containerWidth = containerRect.width - (paddingLeft * 2);
-          const clampedOffset = Math.max(0, Math.min(leftOffset, containerWidth - navWidth));
-          const clampedWidth = Math.min(navWidth, containerWidth);
+          // FIXED: Ensure slider matches container's dynamic sizing perfectly
+          // No boundary clamping needed - trust the container's fit-content sizing
           
           // Apply positioning and make visible
-          slider.style.transform = `translateX(${Math.round(clampedOffset)}px)`;
-          slider.style.width = `${Math.round(clampedWidth)}px`;
+          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
+          slider.style.width = `${Math.round(navWidth)}px`;
           slider.style.opacity = '1';
           slider.style.visibility = 'visible';
           
@@ -89,11 +98,25 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
       console.error('Mobile nav slider update failed:', error);
       return false;
     }
-  }, []);
+  }, [location.pathname]);
 
-  // FIXED: Proper slider initialization
+  // SIMPLIFIED: Clean navigation change handler - identical to Profile
+  const handleNavChange = useCallback((newPath) => {
+    if (newPath === location.pathname) return;
+    
+    navigate(newPath);
+    
+    // Update slider immediately on mobile for responsiveness
+    if (isMobile) {
+      setTimeout(() => updateMobileNavSlider(), 10);
+    }
+  }, [location.pathname, isMobile, updateMobileNavSlider, navigate]);
+
+  // FIXED: Proper slider initialization - identical to Profile
   useEffect(() => {
     const initializeSlider = () => {
+      detectMobile();
+      
       if (!navContainerRef.current || !sliderRef.current) {
         return;
       }
@@ -128,11 +151,13 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
     const timer = setTimeout(initializeSlider, 100);
     
     return () => clearTimeout(timer);
-  }, [updateMobileNavSlider]);
+  }, [updateMobileNavSlider, detectMobile]);
 
-  // SIMPLIFIED: Basic resize handling for mobile
+  // SIMPLIFIED: Basic resize handling - identical to Profile
   useEffect(() => {
     const handleResize = () => {
+      detectMobile();
+      
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
@@ -153,9 +178,9 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
         clearTimeout(resizeTimeoutRef.current);
       }
     };
-  }, [isSliderInitialized, updateMobileNavSlider]);
+  }, [isSliderInitialized, detectMobile, updateMobileNavSlider]);
 
-  // Update slider when location changes
+  // Update slider when location changes - identical to Profile
   useEffect(() => {
     if (isSliderInitialized) {
       // Small delay to ensure DOM is updated
@@ -163,7 +188,7 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
     }
   }, [location.pathname, isSliderInitialized, updateMobileNavSlider]);
 
-  // Cleanup timeouts on unmount
+  // Cleanup timeouts on unmount - identical to Profile
   useEffect(() => {
     return () => {
       if (resizeTimeoutRef.current) {
@@ -173,12 +198,12 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
   }, []);
 
   return (
-    <div className="mobile-navigation">
+    <nav className="mobile-navigation">
       <div 
         className="mobile-nav-container"
         ref={navContainerRef}
       >
-        {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations */}
+        {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations - identical to Profile */}
         <div 
           className="mobile-nav-slider" 
           ref={sliderRef}
@@ -190,21 +215,22 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
           }}
         />
         
-        {navItems.map(item => (
-          <NavLink 
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) => 
-              isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
-            }
-            onClick={() => setActiveTab(item.tab)}
-          >
-            <item.icon className="mobile-nav-icon" />
-            <span>{item.label}</span>
-          </NavLink>
-        ))}
+        {navItems.map(item => {
+          const isActive = location.pathname === item.path;
+          
+          return (
+            <button
+              key={item.path}
+              className={`mobile-nav-item ${isActive ? 'active' : ''}`}
+              onClick={() => handleNavChange(item.path)}
+            >
+              <item.icon className="mobile-nav-icon" />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
       </div>
-    </div>
+    </nav>
   );
 };
 
