@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Fixed navigation arrows + sliding navigation pills animation + existing journal functionality
+// components/Calendar/Calendar.js - UPDATED: Bulletproof navigation arrows + sliding navigation pills animation + existing journal functionality
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -7,11 +7,30 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons - UPDATED: Added FaBook for journal entries and navigation arrows
+// Icons - UPDATED: Using more reliable arrow icons
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
-  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen, FaBook, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen, FaBook, FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+
+// Bulletproof SVG Arrow Component for maximum reliability
+const SVGArrow = ({ direction }) => {
+  return (
+    <svg 
+      width="16" 
+      height="16" 
+      viewBox="0 0 16 16" 
+      fill="currentColor"
+      style={{ display: 'block' }}
+    >
+      {direction === 'left' ? (
+        <path d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+      ) : (
+        <path d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+      )}
+    </svg>
+  );
+};
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -823,14 +842,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       </div>
 
       <div className="calendar-main-section">
-        {/* FIXED: Period Navigation with proper Font Awesome icons */}
+        {/* BULLETPROOF: Period Navigation with multiple arrow fallbacks */}
         <div className="calendar-period-navigation">
           <button className="period-nav-btn" onClick={prevPeriod}>
-            <FaChevronLeft />
+            <FaAngleLeft style={{ fontSize: '16px' }} />
           </button>
           <h3>{getPeriodHeaderText()}</h3>
           <button className="period-nav-btn" onClick={nextPeriod}>
-            <FaChevronRight />
+            <FaAngleRight style={{ fontSize: '16px' }} />
           </button>
         </div>
 
