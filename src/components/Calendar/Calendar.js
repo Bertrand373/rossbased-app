@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Added sliding navigation pills animation + existing journal functionality
+// components/Calendar/Calendar.js - UPDATED: Fixed navigation arrows + sliding navigation pills animation + existing journal functionality
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -7,11 +7,11 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons - UPDATED: Added FaBook for journal entries
+// Icons - UPDATED: Added FaBook for journal entries and navigation arrows
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
-  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen, FaBook } from 'react-icons/fa';
+  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen, FaBook, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -823,14 +823,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       </div>
 
       <div className="calendar-main-section">
-        {/* Period Navigation */}
+        {/* FIXED: Period Navigation with proper Font Awesome icons */}
         <div className="calendar-period-navigation">
           <button className="period-nav-btn" onClick={prevPeriod}>
-            â†
+            <FaChevronLeft />
           </button>
           <h3>{getPeriodHeaderText()}</h3>
           <button className="period-nav-btn" onClick={nextPeriod}>
-            â†’
+            <FaChevronRight />
           </button>
         </div>
 
@@ -981,8 +981,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 return (
                   <div className="day-tracking-info">
                     <h4>Logged Data</h4>
-                    {dayTracking.hasBenefits && <p>âœ“ Benefits tracked for this day</p>}
-                    {dayTracking.hasJournal && <p>âœ“ Journal entry recorded</p>}
+                    {dayTracking.hasBenefits && <p>✓ Benefits tracked for this day</p>}
+                    {dayTracking.hasJournal && <p>✓ Journal entry recorded</p>}
                   </div>
                 );
               }
