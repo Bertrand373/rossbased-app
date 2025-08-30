@@ -161,17 +161,20 @@
   font-weight: 500;
 }
 
-/* FIXED: Period navigation with working Font Awesome icons */
+/* FIXED: Period navigation integrated into main section */
 .calendar-period-navigation {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-  padding: var(--spacing-lg) var(--spacing-md);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-md);
+  padding: 0 0 var(--spacing-md) 0;
+  /* REMOVED: Background and border for cleaner look */
+  background-color: transparent;
+  border-radius: 0;
+  border: none;
+  /* ADDED: Subtle bottom divider */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .calendar-period-navigation h3 {
@@ -181,6 +184,8 @@
   font-weight: 600;
   min-width: 220px;
   text-align: center;
+  /* ADDED: Slightly reduced opacity for subtlety */
+  opacity: 0.9;
 }
 
 /* FIXED: Navigation arrow buttons with Font Awesome icons */
