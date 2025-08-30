@@ -80,11 +80,11 @@ const MobileProfileButton = () => {
   );
 };
 
-// NEW: Header Navigation with BULLETPROOF Sliding Animation Component
+// NEW: Header Navigation with Sliding Animation Component
 const HeaderNavigation = () => {
   const location = useLocation();
   
-  // BULLETPROOF: Enhanced slider with mobile-first state management - identical to Profile
+  // BULLETPROOF: Enhanced slider with mobile-first state management
   const navContainerRef = useRef(null);
   const sliderRef = useRef(null);
   const [isSliderInitialized, setIsSliderInitialized] = useState(false);
@@ -99,14 +99,14 @@ const HeaderNavigation = () => {
     { path: '/urge-toolkit', icon: FaShieldAlt, label: 'Urge Toolkit' }
   ];
 
-  // MOBILE DETECTION: Simplified mobile detection - identical to Profile
+  // MOBILE DETECTION: Simplified mobile detection
   const detectMobile = useCallback(() => {
     const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
     setIsMobile(isMobileDevice);
     return isMobileDevice;
   }, []);
 
-  // FIXED: Enhanced slider positioning with perfect edge alignment - identical to Profile
+  // ROBUST: Enhanced slider positioning with comprehensive error handling
   const updateNavSlider = useCallback(() => {
     // Guard clauses for safety
     if (!navContainerRef.current || !sliderRef.current) {
@@ -119,14 +119,16 @@ const HeaderNavigation = () => {
       const activeNavElement = navContainer.querySelector('.nav-link.active');
       
       if (!activeNavElement) {
-        console.warn(`Navigation element not found for path: ${location.pathname}`);
+        // No active nav found, hide slider
+        slider.style.opacity = '0';
+        slider.style.visibility = 'hidden';
         return false;
       }
 
       // Wait for next frame to ensure layout is complete
       requestAnimationFrame(() => {
         try {
-          // Get measurements relative to container
+          // Get measurements
           const containerRect = navContainer.getBoundingClientRect();
           const navRect = activeNavElement.getBoundingClientRect();
           
@@ -136,22 +138,19 @@ const HeaderNavigation = () => {
             return;
           }
 
-          // FIXED: Calculate position based on actual container content bounds
-          // Get the computed padding from CSS and round to avoid sub-pixel issues
-          const containerStyle = window.getComputedStyle(navContainer);
-          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
-          
-          // Calculate exact position relative to container's content area
-          // Round all measurements to avoid sub-pixel positioning issues
-          const leftOffset = Math.round(navRect.left - containerRect.left - paddingLeft);
+          // Calculate position - accounting for container padding
+          const paddingLeft = 8; // var(--spacing-xs)
+          const leftOffset = navRect.left - containerRect.left - paddingLeft;
           const navWidth = navRect.width;
           
-          // FIXED: Ensure slider matches container's dynamic sizing perfectly
-          // No boundary clamping needed - trust the container's fit-content sizing
+          // Robust boundary checking
+          const containerWidth = containerRect.width - (paddingLeft * 2);
+          const clampedOffset = Math.max(0, Math.min(leftOffset, containerWidth - navWidth));
+          const clampedWidth = Math.min(navWidth, containerWidth);
           
           // Apply positioning and make visible
-          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
-          slider.style.width = `${Math.round(navWidth)}px`;
+          slider.style.transform = `translateX(${Math.round(clampedOffset)}px)`;
+          slider.style.width = `${Math.round(clampedWidth)}px`;
           slider.style.opacity = '1';
           slider.style.visibility = 'visible';
           
@@ -166,9 +165,9 @@ const HeaderNavigation = () => {
       console.error('Nav slider update failed:', error);
       return false;
     }
-  }, [location.pathname]);
+  }, []);
 
-  // FIXED: Proper slider initialization - identical to Profile
+  // FIXED: Proper slider initialization
   useEffect(() => {
     const initializeSlider = () => {
       detectMobile();
@@ -209,7 +208,7 @@ const HeaderNavigation = () => {
     return () => clearTimeout(timer);
   }, [updateNavSlider, detectMobile]);
 
-  // SIMPLIFIED: Basic resize handling - identical to Profile
+  // SIMPLIFIED: Basic resize handling
   useEffect(() => {
     const handleResize = () => {
       detectMobile();
@@ -236,7 +235,7 @@ const HeaderNavigation = () => {
     };
   }, [isSliderInitialized, detectMobile, updateNavSlider]);
 
-  // Update slider when location changes - identical to Profile
+  // Update slider when location changes
   useEffect(() => {
     if (isSliderInitialized) {
       // Small delay to ensure DOM is updated
@@ -244,7 +243,7 @@ const HeaderNavigation = () => {
     }
   }, [location.pathname, isSliderInitialized, updateNavSlider]);
 
-  // Cleanup timeouts on unmount - identical to Profile
+  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (resizeTimeoutRef.current) {
@@ -259,7 +258,7 @@ const HeaderNavigation = () => {
         className="nav-container"
         ref={navContainerRef}
       >
-        {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations - identical to Profile */}
+        {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations */}
         <div 
           className="header-nav-slider" 
           ref={sliderRef}
@@ -350,7 +349,7 @@ function App() {
                 e.target.nextElementSibling.style.display = 'block';
               }}
             />
-            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>⚡</div>
+            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>âš¡</div>
           </div>
           <div className="spartan-loader-message">
             {isLoading ? "Logging you in..." : "Loading your dashboard..."}

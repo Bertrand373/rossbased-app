@@ -1,4 +1,4 @@
-/* App.css - UPDATED: Added bulletproof sliding pill animation to header navigation matching Profile tabs */
+/* App.css - Main application styles with updated header navigation and enhanced loading (KEEP ORIGINAL CONTAINER) */
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -125,30 +125,17 @@ body {
 
 .header-nav .nav-container {
   display: flex;
+  gap: var(--spacing-xs);
   padding: var(--spacing-xs);
   background-color: var(--card-background);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
+  width: 100%;
   position: relative;
-  margin: 0 auto;
-  /* RESPONSIVE: Scale container width based on screen size like profile tabs */
-  width: min(90vw, 600px);
-  min-width: fit-content;
-  max-width: 700px;
-  /* EVEN SPACING: Distribute navigation buttons with consistent gaps */
-  justify-content: space-between;
   /* MOBILE: Ensure proper 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* MOBILE: Handle overflow for very small screens only */
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.header-nav .nav-container::-webkit-scrollbar {
-  display: none;
 }
 
 /* NEW: Header navigation slider - identical to profile tab slider */
@@ -177,26 +164,24 @@ body {
   }
 }
 
-/* ENHANCED: Navigation links with consistent natural sizing - identical to profile tabs */
 .header-nav .nav-link {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
   background-color: transparent;
   border: 1px solid transparent;
-  color: var(--text-secondary);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
   white-space: nowrap;
-  text-decoration: none;
-  /* CONSISTENT SIZING: Natural width based on content */
-  min-width: fit-content;
   position: relative;
+  outline: none;
   z-index: 2;
   /* MOBILE: Prevent text selection and ensure proper touch */
   -webkit-user-select: none;
@@ -205,14 +190,6 @@ body {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-}
-
-/* MOBILE: Only adjust touch targets on actual mobile, not desktop */
-@media (max-width: 768px) and (pointer: coarse) {
-  .header-nav .nav-link {
-    min-height: 44px; /* iOS recommendation for touch targets */
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
 }
 
 /* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
@@ -230,23 +207,6 @@ body {
   .header-nav .nav-link.active {
     /* FALLBACK: In case slider fails, ensure active tab is distinguishable */
     font-weight: 600;
-  }
-}
-
-.header-nav .nav-link svg {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-/* MOBILE: Responsive icon sizing */
-@media (max-width: 480px) {
-  .header-nav .nav-link svg {
-    font-size: 0.875rem;
-  }
-  
-  .header-nav .nav-link {
-    font-size: 0.8rem;
-    gap: var(--spacing-xs);
   }
 }
 
