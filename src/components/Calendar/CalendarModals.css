@@ -144,7 +144,7 @@
   margin-top: var(--spacing-lg);
 }
 
-/* UPDATED: Trigger action buttons with grey→yellow hover */
+/* UPDATED: Trigger action buttons with greyâ†’yellow hover */
 .trigger-actions .btn {
   display: flex;
   align-items: center;
@@ -629,7 +629,7 @@
   background-color: var(--primary-dark);
 }
 
-/* UPDATED: Back to Info Button with grey→yellow hover effects */
+/* UPDATED: Back to Info Button with greyâ†’yellow hover effects */
 .back-to-info-btn,
 button.back-to-info-btn,
 .modal-actions .back-to-info-btn,
@@ -656,7 +656,7 @@ button.back-to-info-btn,
   outline: none !important;
 }
 
-/* UPDATED: Grey→yellow hover effects for back button */
+/* UPDATED: Greyâ†’yellow hover effects for back button */
 .back-to-info-btn:hover,
 .back-to-info-btn:focus,
 .back-to-info-btn:active,
@@ -697,7 +697,7 @@ button.back-to-info-btn:active,
   justify-content: center !important;
 }
 
-/* UPDATED: Modal action buttons with grey→yellow hover effects */
+/* UPDATED: Modal action buttons with greyâ†’yellow hover effects */
 .modal-actions button,
 .modal-actions .btn-primary,
 .modal-actions .edit-day-btn,
@@ -722,7 +722,7 @@ button.back-to-info-btn:active,
   color: var(--text-secondary) !important;
 }
 
-/* UPDATED: Grey→yellow hover effects for all modal buttons */
+/* UPDATED: Greyâ†’yellow hover effects for all modal buttons */
 .modal-actions button:hover,
 .modal-actions button:focus,
 .modal-actions button:active,
@@ -747,7 +747,7 @@ button.back-to-info-btn:active,
   transition: all 0.2s ease !important;
 }
 
-/* UPDATED: Form actions with grey→yellow hover effects */
+/* UPDATED: Form actions with greyâ†’yellow hover effects */
 .form-actions {
   display: flex;
   gap: var(--spacing-md);
@@ -922,7 +922,7 @@ button.back-to-info-btn:active,
     gap: var(--spacing-sm);
   }
   
-  /* Mobile modal actions with grey→yellow hover */
+  /* Mobile modal actions with greyâ†’yellow hover */
   .modal-actions {
     flex-direction: row !important;
     width: 100% !important;

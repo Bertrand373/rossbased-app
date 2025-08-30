@@ -1,6 +1,4 @@
-/* CalendarBase.css - UPDATED: Enhanced Navigation Pills with bulletproof sliding animation matching Profile tabs */
-
-/* UPDATED: Enhanced Navigation Pills with responsive container sizing and consistent spacing - identical to Profile */
+/* UPDATED: Enhanced Navigation Pills with responsive container sizing and consistent spacing */
 .navigation-pill-container {
   display: flex;
   padding: var(--spacing-xs);
@@ -29,7 +27,7 @@
   display: none;
 }
 
-/* ENHANCED: Sliding background indicator - bulletproof mobile support - identical to Profile */
+/* ENHANCED: Sliding background indicator - bulletproof mobile support */
 .navigation-pill-slider {
   position: absolute;
   top: var(--spacing-xs);
@@ -55,7 +53,7 @@
   }
 }
 
-/* ENHANCED: Navigation section buttons with consistent natural sizing - identical to Profile */
+/* ENHANCED: Navigation section buttons with consistent natural sizing */
 .integrated-calendar-header .navigation-section-btn {
   display: flex;
   align-items: center;
@@ -95,7 +93,7 @@
 
 /* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
 
-/* CRITICAL: Active navigation button styling - REMOVE any background that conflicts with slider - identical to Profile */
+/* CRITICAL: Active navigation button styling - REMOVE any background that conflicts with slider */
 .integrated-calendar-header .navigation-section-btn.active {
   color: var(--primary) !important;
   /* IMPORTANT: No background - let slider handle visual feedback */

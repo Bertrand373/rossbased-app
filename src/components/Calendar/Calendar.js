@@ -826,11 +826,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         {/* Period Navigation */}
         <div className="calendar-period-navigation">
           <button className="period-nav-btn" onClick={prevPeriod}>
-            ←
+            â†
           </button>
           <h3>{getPeriodHeaderText()}</h3>
           <button className="period-nav-btn" onClick={nextPeriod}>
-            →
+            â†’
           </button>
         </div>
 
@@ -981,8 +981,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 return (
                   <div className="day-tracking-info">
                     <h4>Logged Data</h4>
-                    {dayTracking.hasBenefits && <p>✓ Benefits tracked for this day</p>}
-                    {dayTracking.hasJournal && <p>✓ Journal entry recorded</p>}
+                    {dayTracking.hasBenefits && <p>âœ“ Benefits tracked for this day</p>}
+                    {dayTracking.hasJournal && <p>âœ“ Journal entry recorded</p>}
                   </div>
                 );
               }
