@@ -70,14 +70,14 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
             return;
           }
 
-          // FIXED: Calculate position based on actual container content bounds
-          // Get the computed padding from CSS and round to avoid sub-pixel issues
+          // FIXED: Calculate position with additional spacing offset for visual breathing room
+          // Get the computed padding from CSS and add extra spacing for visual separation
           const containerStyle = window.getComputedStyle(navContainer);
           const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 4);
+          const extraSpacing = 2; // Additional spacing to match profile tabs visual separation
           
-          // Calculate exact position relative to container's content area
-          // Round all measurements to avoid sub-pixel positioning issues
-          const leftOffset = Math.round(navRect.left - containerRect.left - paddingLeft);
+          // Calculate exact position relative to container's content area with breathing room
+          const leftOffset = Math.round(navRect.left - containerRect.left - paddingLeft - extraSpacing);
           const navWidth = navRect.width;
           
           // Apply positioning and make visible

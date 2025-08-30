@@ -39,12 +39,12 @@
   display: none;
 }
 
-/* NEW: Mobile navigation slider - identical to profile tab slider but optimized for mobile */
+/* NEW: Mobile navigation slider with proper spacing from container edges */
 .mobile-nav-slider {
   position: absolute;
-  top: var(--spacing-xs);
-  left: var(--spacing-xs);
-  height: calc(100% - calc(var(--spacing-xs) * 2));
+  top: calc(var(--spacing-xs) + 2px);
+  left: calc(var(--spacing-xs) + 2px);
+  height: calc(100% - calc(var(--spacing-xs) * 2) - 4px);
   background-color: rgba(255, 221, 0, 0.1);
   border: 1px solid rgba(255, 221, 0, 0.2);
   border-radius: var(--radius-full);
@@ -148,11 +148,11 @@
     padding: 2px;
   }
   
-  /* MOBILE: Enhanced slider for very small screens */
+  /* MOBILE: Enhanced slider for very small screens with proper spacing */
   .mobile-nav-slider {
-    top: 2px;
-    left: 2px;
-    height: calc(100% - 4px);
+    top: calc(2px + 2px);
+    left: calc(2px + 2px);
+    height: calc(100% - 4px - 4px);
   }
   
   .mobile-nav-item {
