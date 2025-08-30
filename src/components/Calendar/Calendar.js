@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Bulletproof navigation arrows + sliding navigation pills animation + existing journal functionality
+// components/Calendar/Calendar.js - FIXED: Profile-style navigation pills + working arrows
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -7,31 +7,12 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-// Icons - UPDATED: Added calendar view icons for navigation pills
+// Icons - Fixed imports
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
   FaInfoCircle, FaEdit, FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft, FaEye, FaTimes, 
-  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen, FaBook, FaAngleLeft, FaAngleRight,
+  FaWineBottle, FaBed, FaRegMoon, FaAdjust, FaPen, FaBook, FaChevronLeft, FaChevronRight,
   FaCalendarAlt, FaCalendarWeek } from 'react-icons/fa';
-
-// Bulletproof SVG Arrow Component for maximum reliability
-const SVGArrow = ({ direction }) => {
-  return (
-    <svg 
-      width="16" 
-      height="16" 
-      viewBox="0 0 16 16" 
-      fill="currentColor"
-      style={{ display: 'block' }}
-    >
-      {direction === 'left' ? (
-        <path d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
-      ) : (
-        <path d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
-      )}
-    </svg>
-  );
-};
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -48,7 +29,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
 
-  // BULLETPROOF: Enhanced sliding navigation with mobile-first state management
+  // FIXED: Profile-style navigation with mobile-first state management
   const navigationRef = useRef(null);
   const navigationSliderRef = useRef(null);
   const [isNavigationSliderInitialized, setIsNavigationSliderInitialized] = useState(false);
@@ -68,16 +49,15 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     { id: 'sleep_deprivation', label: 'Sleep Deprivation', icon: FaBed }
   ];
 
-  // NEW: Mobile detection for sliding animation
+  // Mobile detection for sliding animation
   const detectMobile = useCallback(() => {
     const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
     setIsMobile(isMobileDevice);
     return isMobileDevice;
   }, []);
 
-  // NEW: Enhanced navigation slider positioning with comprehensive error handling
+  // FIXED: Enhanced navigation slider positioning matching Profile component
   const updateNavigationSlider = useCallback(() => {
-    // Guard clauses for safety
     if (!navigationRef.current || !navigationSliderRef.current) {
       return false;
     }
@@ -92,32 +72,25 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         return false;
       }
 
-      // Wait for next frame to ensure layout is complete
       requestAnimationFrame(() => {
         try {
-          // Get measurements
           const containerRect = navigationContainer.getBoundingClientRect();
           const navRect = activeNavElement.getBoundingClientRect();
           
-          // Validate measurements
           if (containerRect.width === 0 || navRect.width === 0) {
             console.warn('Invalid measurements, navigation container or element not rendered');
             return;
           }
 
-          // Calculate position - accounting for container padding
-          const paddingLeft = 8; // var(--spacing-xs)
-          const leftOffset = navRect.left - containerRect.left - paddingLeft;
+          // Match Profile component's exact calculation
+          const containerStyle = window.getComputedStyle(navigationContainer);
+          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
+          
+          const leftOffset = Math.round(navRect.left - containerRect.left - paddingLeft);
           const navWidth = navRect.width;
           
-          // Robust boundary checking
-          const containerWidth = containerRect.width - (paddingLeft * 2);
-          const clampedOffset = Math.max(0, Math.min(leftOffset, containerWidth - navWidth));
-          const clampedWidth = Math.min(navWidth, containerWidth);
-          
-          // Apply positioning and make visible
-          slider.style.transform = `translateX(${Math.round(clampedOffset)}px)`;
-          slider.style.width = `${Math.round(clampedWidth)}px`;
+          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
+          slider.style.width = `${Math.round(navWidth)}px`;
           slider.style.opacity = '1';
           slider.style.visibility = 'visible';
           
@@ -134,19 +107,18 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     }
   }, [viewMode]);
 
-  // NEW: Clean navigation change handler
+  // Clean navigation change handler
   const handleViewModeChange = useCallback((newViewMode) => {
     if (newViewMode === viewMode) return;
     
     setViewMode(newViewMode);
     
-    // Update slider immediately on mobile for responsiveness
     if (isMobile) {
       setTimeout(() => updateNavigationSlider(), 10);
     }
   }, [viewMode, isMobile, updateNavigationSlider]);
 
-  // NEW: Proper navigation slider initialization
+  // Proper navigation slider initialization
   useEffect(() => {
     const initializeNavigationSlider = () => {
       detectMobile();
@@ -155,24 +127,20 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         return;
       }
 
-      // Initialize slider immediately
       requestAnimationFrame(() => {
         const success = updateNavigationSlider();
         
         if (success) {
           setIsNavigationSliderInitialized(true);
         } else {
-          // Retry after short delay to ensure DOM is ready
           setTimeout(() => {
             if (updateNavigationSlider()) {
               setIsNavigationSliderInitialized(true);
             } else {
-              // Final fallback - force slider to be visible
               if (navigationSliderRef.current) {
                 navigationSliderRef.current.style.opacity = '1';
                 navigationSliderRef.current.style.visibility = 'visible';
                 setIsNavigationSliderInitialized(true);
-                // Try to update position one more time
                 setTimeout(updateNavigationSlider, 50);
               }
             }
@@ -181,13 +149,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       });
     };
 
-    // Initialize after DOM is ready
     const timer = setTimeout(initializeNavigationSlider, 100);
     
     return () => clearTimeout(timer);
   }, [updateNavigationSlider, detectMobile]);
 
-  // NEW: Basic resize handling for navigation slider
+  // Basic resize handling for navigation slider
   useEffect(() => {
     const handleNavigationResize = () => {
       detectMobile();
@@ -214,15 +181,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     };
   }, [isNavigationSliderInitialized, detectMobile, updateNavigationSlider]);
 
-  // NEW: Update slider when view mode changes
+  // Update slider when view mode changes
   useEffect(() => {
     if (isNavigationSliderInitialized) {
-      // Small delay to ensure DOM is updated
       setTimeout(updateNavigationSlider, 10);
     }
   }, [viewMode, isNavigationSliderInitialized, updateNavigationSlider]);
 
-  // NEW: Cleanup navigation timeouts on unmount
+  // Cleanup navigation timeouts on unmount
   useEffect(() => {
     return () => {
       if (navigationResizeTimeoutRef.current) {
@@ -261,12 +227,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     today.setHours(0, 0, 0, 0);
     day.setHours(0, 0, 0, 0);
     
-    // If day is in the future, return null
     if (isAfter(day, today)) {
       return null;
     }
     
-    // STEP 1: Check for specific relapse dates from streak history (RED)
     const relapseDay = userData.streakHistory?.find(streak => 
       streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), day)
     );
@@ -275,7 +239,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return { type: 'relapse', trigger: relapseDay.trigger };
     }
     
-    // STEP 2: Check for wet dreams (YELLOW/ORANGE)
     const wetDreamDates = userData.streakHistory?.reduce((dates, streak) => {
       if (streak.start && streak.days > 7) {
         const wetDreamDay = new Date(streak.start);
@@ -291,7 +254,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return { type: 'wet-dream' };
     }
     
-    // STEP 3: Check former streaks FIRST (BLUE) - completed streaks
     const formerStreak = userData.streakHistory?.find(streak => {
       if (!streak.start || !streak.end) return false;
       const streakStart = new Date(streak.start);
@@ -306,7 +268,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return { type: 'former-streak' };
     }
     
-    // STEP 4: Check current streak LAST (GREEN) - only active streak with no end date
     const currentStreak = userData.streakHistory?.find(streak => 
       streak.start && !streak.end
     );
@@ -397,14 +358,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     setSelectedDate(day);
     setEditingDate(day);
     
-    // Initialize note text when opening modal
     const dayStr = format(day, 'yyyy-MM-dd');
     const existingNote = userData.notes && userData.notes[dayStr];
     setNoteText(existingNote || '');
     setIsEditingNote(false);
     
     setDayInfoModal(true);
-    // Reset edit modal states
     setEditDayModal(false);
     setShowTriggerSelection(false);
     setSelectedTrigger('');
@@ -435,7 +394,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   };
 
   const cancelEditingNote = () => {
-    // Reset to original note text
     const dayStr = format(selectedDate, 'yyyy-MM-dd');
     const existingNote = userData.notes && userData.notes[dayStr];
     setNoteText(existingNote || '');
@@ -455,7 +413,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       updatedNotes[dayStr] = noteText.trim();
       toast.success('Journal entry saved!');
     } else {
-      // Remove empty notes
       delete updatedNotes[dayStr];
       toast.success('Journal entry removed!');
     }
@@ -563,7 +520,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       updateUserData(updatedUserData);
     }
     
-    // Close all modals and reset states
     setEditDayModal(false);
     setDayInfoModal(false);
     setEditingDate(null);
@@ -626,7 +582,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         <div className="day-content">
           <div className="day-number">{format(day, 'd')}</div>
           
-          {/* Journal icon moved to upper right corner */}
           {dayTracking.hasJournal && (
             <div className="day-journal-indicator-top">
               <FaBook className="journal-icon-top" />
@@ -634,7 +589,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           )}
         </div>
         
-        {/* Bottom indicators now only have status, benefits, and trigger icons */}
         <div className="day-indicators">
           {dayStatus && (
             <div className="day-status-indicator">
@@ -799,7 +753,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="calendar-container">
-      {/* UPDATED: Integrated header design with sliding navigation pills */}
+      {/* FIXED: Integrated header design with Profile-style navigation pills */}
       <div className="integrated-calendar-header">
         <div className="header-title-section">
           <h2>Streak Calendar</h2>
@@ -807,14 +761,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
         
         <div className="header-navigation-section">
-          {/* NEW: Bulletproof sliding navigation pills container */}
+          {/* FIXED: Profile-style sliding navigation pills container */}
           <div 
-            className="navigation-pill-container"
+            className="calendar-navigation-pills"
             ref={navigationRef}
           >
-            {/* NEW: Enhanced sliding indicator with mobile optimizations */}
+            {/* Enhanced sliding indicator with mobile optimizations */}
             <div 
-              className="navigation-pill-slider" 
+              className="calendar-nav-slider" 
               ref={navigationSliderRef}
               style={{ 
                 opacity: 0,
@@ -824,9 +778,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               }}
             />
             
-            {/* UPDATED: Navigation buttons with icons */}
+            {/* Navigation buttons with icons */}
             <button 
-              className={`navigation-section-btn ${viewMode === 'month' ? 'active' : ''}`}
+              className={`calendar-nav-btn ${viewMode === 'month' ? 'active' : ''}`}
               onClick={() => handleViewModeChange('month')}
               data-view="month"
             >
@@ -834,7 +788,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               <span>Month</span>
             </button>
             <button 
-              className={`navigation-section-btn ${viewMode === 'week' ? 'active' : ''}`}
+              className={`calendar-nav-btn ${viewMode === 'week' ? 'active' : ''}`}
               onClick={() => handleViewModeChange('week')}
               data-view="week"
             >
@@ -846,14 +800,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       </div>
 
       <div className="calendar-main-section">
-        {/* BULLETPROOF: Period Navigation with multiple arrow fallbacks */}
+        {/* FIXED: Period Navigation with working Font Awesome icons */}
         <div className="calendar-period-navigation">
           <button className="period-nav-btn" onClick={prevPeriod}>
-            <FaAngleLeft style={{ fontSize: '16px' }} />
+            <FaChevronLeft />
           </button>
           <h3>{getPeriodHeaderText()}</h3>
           <button className="period-nav-btn" onClick={nextPeriod}>
-            <FaAngleRight style={{ fontSize: '16px' }} />
+            <FaChevronRight />
           </button>
         </div>
 
