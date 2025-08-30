@@ -1,4 +1,4 @@
-/* components/Navigation/MobileNavigation.css - UPDATED: Added bulletproof sliding pill animation matching profile tabs */
+/* components/Navigation/MobileNavigation.css - FIXED: Perfect sliding pill alignment */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
@@ -13,7 +13,7 @@
   border-top: 1px solid var(--border);
 }
 
-/* RESTORED: Original container layout with sliding animation support added */
+/* Container layout with sliding animation support */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
@@ -24,13 +24,10 @@
   width: 100%;
   max-width: 500px;
   position: relative;
-  /* RESTORED: Original equal distribution */
   justify-content: space-around;
-  /* MOBILE: Ensure proper 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* MOBILE: Prevent scrollbar issues */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -39,36 +36,34 @@
   display: none;
 }
 
-/* NEW: Mobile navigation slider with proper spacing from container edges */
+/* FIXED: Mobile navigation slider with proper alignment */
 .mobile-nav-slider {
   position: absolute;
-  top: calc(var(--spacing-xs) + 2px);
-  left: calc(var(--spacing-xs) + 2px);
-  height: calc(100% - calc(var(--spacing-xs) * 2) - 4px);
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  height: calc(100% - calc(var(--spacing-xs) * 2));
   background-color: rgba(255, 221, 0, 0.1);
   border: 1px solid rgba(255, 221, 0, 0.2);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 1;
-  /* IMPORTANT: Start hidden but ready to be shown */
   opacity: 0;
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
-  /* MOBILE: Force GPU acceleration */
   transform: translateZ(0) translateX(0px);
   will-change: transform, width;
 }
 
-/* MOBILE: Ultra-fast transitions for very small screens */
+/* Ultra-fast transitions for very small screens */
 @media (max-width: 480px) {
   .mobile-nav-slider {
     transition: transform 0.2s ease-out, width 0.2s ease-out;
   }
 }
 
-/* RESTORED: Original mobile nav items with improved centering */
+/* Mobile nav items with improved centering */
 .mobile-nav-item {
   flex: 1;
   display: flex;
@@ -88,9 +83,7 @@
   outline: none;
   min-height: 60px;
   z-index: 2;
-  /* IMPROVED: Perfect centering for content */
   text-align: center;
-  /* MOBILE: Prevent text selection and ensure proper touch */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -99,23 +92,19 @@
   touch-action: manipulation;
 }
 
-/* MOBILE: Only adjust touch targets on actual mobile, not desktop */
+/* Adjust touch targets on actual mobile */
 @media (max-width: 768px) and (pointer: coarse) {
   .mobile-nav-item {
-    min-height: 64px; /* iOS recommendation for touch targets */
+    min-height: 64px;
     padding: var(--spacing-md) var(--spacing-sm);
   }
 }
 
-/* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
-
-/* CRITICAL: Active mobile nav styling - REMOVE any background that conflicts with slider */
+/* Active mobile nav styling */
 .mobile-nav-item.active {
   color: var(--primary) !important;
-  /* IMPORTANT: No background - let slider handle visual feedback */
   background-color: transparent !important;
   border-color: transparent !important;
-  /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
   font-weight: 600;
 }
 
@@ -123,7 +112,6 @@
   font-size: 1.4rem;
   margin-bottom: var(--spacing-xs);
   flex-shrink: 0;
-  /* IMPROVED: Ensure icon is perfectly centered */
   display: block;
   text-align: center;
 }
@@ -132,7 +120,6 @@
   text-align: center;
   line-height: 1.2;
   font-weight: 500;
-  /* IMPROVED: Ensure text doesn't affect centering */
   width: 100%;
   display: block;
 }
@@ -156,11 +143,11 @@
     padding: 2px;
   }
   
-  /* MOBILE: Enhanced slider for very small screens with proper spacing */
+  /* FIXED: Slider positioning for very small screens */
   .mobile-nav-slider {
-    top: calc(2px + 2px);
-    left: calc(2px + 2px);
-    height: calc(100% - 4px - 4px);
+    top: 2px;
+    left: 2px;
+    height: calc(100% - 4px);
   }
   
   .mobile-nav-item {
