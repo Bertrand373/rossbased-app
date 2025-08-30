@@ -68,7 +68,7 @@
   }
 }
 
-/* RESTORED: Original mobile nav items with proper flex distribution */
+/* RESTORED: Original mobile nav items with improved centering */
 .mobile-nav-item {
   flex: 1;
   display: flex;
@@ -88,6 +88,8 @@
   outline: none;
   min-height: 60px;
   z-index: 2;
+  /* IMPROVED: Perfect centering for content */
+  text-align: center;
   /* MOBILE: Prevent text selection and ensure proper touch */
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -121,12 +123,18 @@
   font-size: 1.4rem;
   margin-bottom: var(--spacing-xs);
   flex-shrink: 0;
+  /* IMPROVED: Ensure icon is perfectly centered */
+  display: block;
+  text-align: center;
 }
 
 .mobile-nav-item span {
   text-align: center;
   line-height: 1.2;
   font-weight: 500;
+  /* IMPROVED: Ensure text doesn't affect centering */
+  width: 100%;
+  display: block;
 }
 
 /* Add padding to the bottom of the app content to account for mobile navigation */
