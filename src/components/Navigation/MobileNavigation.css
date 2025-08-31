@@ -1,69 +1,181 @@
-/* components/Navigation/MobileNavigation.css - FIXED: Perfect sliding pill alignment */
+/* components/Navigation/MobileNavigation.css - GLASSMORPHISM EDITION */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  /* GLASSMORPHISM: Removed solid background, now fully transparent for blur effect */
+  background: transparent;
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
-  border-top: 1px solid var(--border);
+  /* Removed border-top as it conflicts with glass effect */
+  
+  /* Add pseudo-element for gradient fade to help content readability */
+  isolation: isolate;
 }
 
-/* Container layout with sliding animation support */
+/* Optional: Add a subtle gradient fade at the very bottom of the page content */
+.mobile-navigation::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.03) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* GLASSMORPHISM CONTAINER - The Magic Happens Here */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
-  padding: var(--spacing-sm); /* INCREASED from var(--spacing-xs) for more breathing room */
-  background-color: var(--card-background);
+  padding: var(--spacing-sm);
+  
+  /* GLASSMORPHISM CORE STYLES */
+  background: rgba(255, 255, 255, 0.1); /* Light mode base */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%); /* Safari support */
+  
+  /* Subtle gradient overlay for depth */
+  background-image: 
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+  
+  /* Glass edge definition */
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  
   border-radius: var(--radius-full);
-  border: 1px solid var(--border);
   width: 100%;
   max-width: 500px;
   position: relative;
   justify-content: space-around;
+  
+  /* Performance optimizations */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  will-change: backdrop-filter;
+  transform: translateZ(0); /* Force GPU acceleration */
+  
+  /* Ensure smooth rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* Dark mode glassmorphism adjustments */
+@media (prefers-color-scheme: dark) {
+  .mobile-nav-container {
+    background: rgba(20, 20, 20, 0.4);
+    background-image: 
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.02) 50%,
+        rgba(0, 0, 0, 0.2) 100%
+      );
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  }
+  
+  .mobile-navigation::before {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.1) 0%,
+      transparent 100%
+    );
+  }
 }
 
 .mobile-nav-container::-webkit-scrollbar {
   display: none;
 }
 
-/* FIXED: Mobile navigation slider with proper spacing from edges */
+/* ENHANCED SLIDER with glass morphism compatibility */
 .mobile-nav-slider {
   position: absolute;
-  top: var(--spacing-sm); /* MATCHED container padding */
-  left: var(--spacing-sm); /* MATCHED container padding */
-  height: calc(100% - calc(var(--spacing-sm) * 2)); /* MATCHED container padding */
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  top: var(--spacing-sm);
+  left: var(--spacing-sm);
+  height: calc(100% - calc(var(--spacing-sm) * 2));
+  
+  /* Glass-compatible active indicator */
+  background: rgba(255, 221, 0, 0.15);
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 221, 0, 0.3) 0%,
+    rgba(255, 200, 0, 0.1) 100%
+  );
+  
+  /* Softer border for glass effect */
+  border: 1px solid rgba(255, 221, 0, 0.25);
+  box-shadow: 
+    0 0 20px rgba(255, 221, 0, 0.2),
+    inset 0 0 10px rgba(255, 221, 0, 0.1);
+  
   border-radius: var(--radius-full);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: 
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+    width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease;
   pointer-events: none;
   z-index: 1;
   opacity: 0;
   visibility: hidden;
-  transform: translateX(0px);
-  width: 0px;
   transform: translateZ(0) translateX(0px);
-  will-change: transform, width;
+  will-change: transform, width, opacity;
+  
+  /* Subtle backdrop blur for the active pill */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Dark mode slider adjustments */
+@media (prefers-color-scheme: dark) {
+  .mobile-nav-slider {
+    background: rgba(255, 221, 0, 0.1);
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 221, 0, 0.2) 0%,
+      rgba(255, 200, 0, 0.05) 100%
+    );
+    box-shadow: 
+      0 0 25px rgba(255, 221, 0, 0.3),
+      inset 0 0 15px rgba(255, 221, 0, 0.15);
+  }
 }
 
 /* Ultra-fast transitions for very small screens */
 @media (max-width: 480px) {
   .mobile-nav-slider {
-    transition: transform 0.2s ease-out, width 0.2s ease-out;
+    transition: 
+      transform 0.2s ease-out, 
+      width 0.2s ease-out,
+      opacity 0.2s ease;
   }
 }
 
-/* Mobile nav items with improved centering */
+/* Mobile nav items - enhanced for glassmorphism */
 .mobile-nav-item {
   flex: 1;
   display: flex;
@@ -90,6 +202,16 @@
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  
+  /* Text shadow for better readability on glass */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced contrast for dark mode */
+@media (prefers-color-scheme: dark) {
+  .mobile-nav-item {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
 }
 
 /* Adjust touch targets on actual mobile */
@@ -100,12 +222,16 @@
   }
 }
 
-/* Active mobile nav styling */
+/* Active mobile nav styling - enhanced for glass effect */
 .mobile-nav-item.active {
   color: var(--primary) !important;
   background-color: transparent !important;
   border-color: transparent !important;
   font-weight: 600;
+  /* Stronger text shadow for active items */
+  text-shadow: 
+    0 0 10px rgba(255, 221, 0, 0.5),
+    0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .mobile-nav-icon {
@@ -129,6 +255,18 @@
   .app-content {
     padding-bottom: 90px;
   }
+  
+  /* IMPORTANT: Ensure main content can scroll behind the glass nav */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* If your main content container has a background, ensure it extends full height */
+  .main-container,
+  .app-container,
+  main {
+    min-height: 100vh;
+  }
 }
 
 /* Responsive adjustments for smaller screens */
@@ -140,14 +278,17 @@
   .mobile-nav-container {
     max-width: 100%;
     gap: 2px;
-    padding: 6px; /* KEPT: Slightly smaller but still has breathing room */
+    padding: 6px;
+    
+    /* Adjust glass intensity for smaller screens */
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
   }
   
-  /* FIXED: Slider positioning for very small screens with breathing room */
   .mobile-nav-slider {
-    top: 6px; /* MATCHED container padding */
-    left: 6px; /* MATCHED container padding */
-    height: calc(100% - 12px); /* MATCHED container padding */
+    top: 6px;
+    left: 6px;
+    height: calc(100% - 12px);
   }
   
   .mobile-nav-item {
@@ -160,4 +301,57 @@
     font-size: 1.2rem;
     margin-bottom: 2px;
   }
+}
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(20px)) {
+  .mobile-nav-container {
+    background: rgba(245, 245, 245, 0.95);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    .mobile-nav-container {
+      background: rgba(30, 30, 30, 0.95);
+    }
+  }
+  
+  .mobile-nav-slider {
+    background: rgba(255, 221, 0, 0.2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Performance: Reduce blur on low-end devices */
+@media (max-width: 768px) and (hover: none) and (pointer: coarse) {
+  .mobile-nav-container {
+    /* Reduce blur for better performance on mobile */
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+  }
+}
+
+/* Ensure glass effect works with various background colors */
+.mobile-navigation {
+  /* Isolate the navigation from background blend modes */
+  isolation: isolate;
+}
+
+/* Optional: Animation when navigation appears */
+@keyframes slideUpGlass {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.mobile-navigation {
+  animation: slideUpGlass 0.3s ease-out;
 }
