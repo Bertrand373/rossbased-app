@@ -1,64 +1,63 @@
-/* components/Navigation/MobileNavigation.css - GLASSMORPHISM EDITION */
+/* components/Navigation/MobileNavigation.css - REFINED GLASSMORPHISM */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  /* GLASSMORPHISM: Removed solid background, now fully transparent for blur effect */
-  background: transparent;
+  /* REFINED: Subtle glass background for the outer container */
+  background: rgba(250, 250, 250, 0.4);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
   z-index: 1000;
-  /* Removed border-top as it conflicts with glass effect */
+  
+  /* Subtle shadow for depth */
+  box-shadow: 
+    0 -2px 20px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
   
   /* Add pseudo-element for gradient fade to help content readability */
   isolation: isolate;
 }
 
-/* Optional: Add a subtle gradient fade at the very bottom of the page content */
-.mobile-navigation::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 120px;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.03) 0%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: -1;
+/* Dark mode adjustments for outer container */
+@media (prefers-color-scheme: dark) {
+  .mobile-navigation {
+    background: rgba(20, 20, 20, 0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 -2px 20px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
 }
 
-/* GLASSMORPHISM CONTAINER - The Magic Happens Here */
+/* REFINED GLASSMORPHISM CONTAINER - Clean and Minimalistic */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm);
   
-  /* GLASSMORPHISM CORE STYLES */
-  background: rgba(255, 255, 255, 0.1); /* Light mode base */
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%); /* Safari support */
+  /* REFINED: Stronger glass effect for the pill container */
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%); /* Safari support */
   
-  /* Subtle gradient overlay for depth */
+  /* Simplified gradient for cleaner look */
   background-image: 
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      rgba(255, 255, 255, 0.1) 100%
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0) 100%
     );
   
-  /* Glass edge definition */
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  /* Refined border and shadow for subtle depth */
+  border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    0 4px 24px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   
   border-radius: var(--radius-full);
   width: 100%;
@@ -81,30 +80,20 @@
   -ms-overflow-style: none;
 }
 
-/* Dark mode glassmorphism adjustments */
+/* Dark mode glassmorphism adjustments - Refined */
 @media (prefers-color-scheme: dark) {
   .mobile-nav-container {
-    background: rgba(20, 20, 20, 0.4);
+    background: rgba(30, 30, 30, 0.6);
     background-image: 
       linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.02) 50%,
-        rgba(0, 0, 0, 0.2) 100%
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0) 100%
       );
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-  }
-  
-  .mobile-navigation::before {
-    background: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.1) 0%,
-      transparent 100%
-    );
+      0 4px 24px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 }
 
@@ -112,26 +101,26 @@
   display: none;
 }
 
-/* ENHANCED SLIDER with glass morphism compatibility */
+/* REFINED SLIDER - Cleaner and more subtle */
 .mobile-nav-slider {
   position: absolute;
   top: var(--spacing-sm);
   left: var(--spacing-sm);
   height: calc(100% - calc(var(--spacing-sm) * 2));
   
-  /* Glass-compatible active indicator */
-  background: rgba(255, 221, 0, 0.15);
+  /* Refined: Subtler active indicator */
+  background: rgba(255, 221, 0, 0.08);
   background-image: linear-gradient(
     135deg,
-    rgba(255, 221, 0, 0.3) 0%,
-    rgba(255, 200, 0, 0.1) 100%
+    rgba(255, 221, 0, 0.15) 0%,
+    rgba(255, 221, 0, 0) 100%
   );
   
-  /* Softer border for glass effect */
-  border: 1px solid rgba(255, 221, 0, 0.25);
+  /* Softer glow */
+  border: 1px solid rgba(255, 221, 0, 0.2);
   box-shadow: 
-    0 0 20px rgba(255, 221, 0, 0.2),
-    inset 0 0 10px rgba(255, 221, 0, 0.1);
+    0 0 12px rgba(255, 221, 0, 0.15),
+    inset 0 0 6px rgba(255, 221, 0, 0.05);
   
   border-radius: var(--radius-full);
   transition: 
