@@ -22,11 +22,31 @@
   padding: 0;
 }
 
+/* Prevent over-scrolling that reveals black background */
+html {
+  /* Lock the viewport to prevent elastic scrolling */
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
   background-color: var(--background);
   line-height: 1.5;
+  /* Enable scrolling within the fixed viewport */
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: fixed;
+  width: 100%;
+  /* Prevent bounce scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  /* Add safe area padding for devices with notches */
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .app-container {
@@ -35,6 +55,8 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Prevent overscroll within container */
+  overscroll-behavior-y: contain;
 }
 
 /* FIXED: Keep original loading screen structure - just enhance the helmet */
@@ -451,6 +473,10 @@ button:active {
 .main-content-wrapper {
   flex: 1;
   padding: var(--spacing-lg);
+  /* Add extra bottom padding for breathing room without showing black */
+  padding-bottom: calc(var(--spacing-xl) * 3);
+  /* Prevent overscroll behavior */
+  overscroll-behavior-y: contain;
 }
 
 /* Card component */
@@ -747,15 +773,19 @@ input:checked + .toggle-slider:before {
   border: 1px solid var(--border);
 }
 
-/* Mobile responsive styles */
+/* Mobile responsive styles with over-scroll prevention */
 @media (max-width: 768px) {
   .app-content {
     margin: 0 var(--spacing-sm) 90px var(--spacing-sm);
     min-height: calc(100vh - 250px);
+    /* Add extra padding at bottom for breathing room without showing black */
+    padding-bottom: var(--spacing-xl);
   }
   
   .main-content-wrapper {
     padding: var(--spacing-md);
+    /* Add extra bottom padding for mobile */
+    padding-bottom: calc(var(--spacing-xl) * 2);
   }
   
   .card {
