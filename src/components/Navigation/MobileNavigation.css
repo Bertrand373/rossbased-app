@@ -43,32 +43,33 @@
   }
 }
 
-/* GLASSMORPHISM CONTAINER - With Transparent Card Background */
+/* GLASSMORPHISM CONTAINER - With MUCH More Transparent Background */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm);
   
-  /* FIXED: Much more transparent for actual glass effect */
-  background: rgba(44, 44, 44, 0.4);  /* Reduced to 40% opacity - now you can see through! */
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%); /* Safari support */
+  /* CRITICAL FIX: Much more transparent + remove any solid background */
+  background: rgba(255, 255, 255, 0.08) !important;  /* Very light white instead of gray */
+  background-color: transparent !important; /* Override any solid background */
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
   
-  /* Enhanced glass overlay for shimmer effect */
+  /* Strong glass overlay for visibility */
   background-image: 
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.03) 50%,
-      rgba(255, 255, 255, 0.1) 100%
-    );
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.12) 100%
+    ) !important;
   
-  /* Stronger border for better definition when transparent */
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  /* Stronger border for definition */
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
   box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    0 4px 24px rgba(0, 0, 0, 0.12),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1) !important;
   
   border-radius: var(--radius-full);
   width: 100%;
@@ -91,23 +92,24 @@
   -ms-overflow-style: none;
 }
 
-/* Dark mode glassmorphism adjustments - Fixed with transparent grays */
+/* Dark mode glassmorphism adjustments - Ultra transparent for pill */
 @media (prefers-color-scheme: dark) {
   .mobile-nav-container {
-    /* FIXED: Much more transparent for visible glass effect */
-    background: rgba(44, 44, 44, 0.4);  /* 40% opacity - matching light mode */
+    /* CRITICAL: Ultra-transparent dark mode for glass effect */
+    background: rgba(20, 20, 20, 0.25) !important;  /* Only 25% opacity dark */
+    background-color: transparent !important;
     background-image: 
       linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.02) 50%,
-        rgba(255, 255, 255, 0.06) 100%
-      );
-    border: 1px solid rgba(255, 255, 255, 0.15);
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.03) 50%,
+        rgba(255, 255, 255, 0.08) 100%
+      ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
     box-shadow: 
-      0 4px 24px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+      0 4px 24px rgba(0, 0, 0, 0.25),
+      inset 0 2px 0 rgba(255, 255, 255, 0.12),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2) !important;
   }
 }
 
