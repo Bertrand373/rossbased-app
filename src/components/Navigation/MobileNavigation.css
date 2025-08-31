@@ -1,23 +1,27 @@
-/* components/Navigation/MobileNavigation.css - REFINED GLASSMORPHISM WITH ORIGINAL GRAYS */
+/* components/Navigation/MobileNavigation.css - GLASSMORPHISM WITH TRANSPARENT GRAYS */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  /* REFINED: Using original gradient with glass effect overlay */
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  /* FIXED: Transparent versions of your grays for proper glass effect */
+  background: linear-gradient(
+    135deg, 
+    rgba(44, 44, 44, 0.75) 0%,    /* 75% opacity of --card-background (#2c2c2c) */
+    rgba(51, 51, 51, 0.75) 100%   /* 75% opacity of --medium-gray (#333333) */
+  );
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
   z-index: 1000;
   
-  /* Subtle shadow for depth */
+  /* Enhanced shadow for glass depth */
   box-shadow: 
-    0 -2px 20px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 -2px 24px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   
   /* Add pseudo-element for gradient fade to help content readability */
   isolation: isolate;
@@ -26,39 +30,45 @@
 /* Dark mode adjustments for outer container */
 @media (prefers-color-scheme: dark) {
   .mobile-navigation {
-    /* Keep the gradient but adjust for dark mode */
-    background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+    /* Same transparent grays in dark mode */
+    background: linear-gradient(
+      135deg, 
+      rgba(44, 44, 44, 0.75) 0%,
+      rgba(51, 51, 51, 0.75) 100%
+    );
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 
-      0 -2px 20px rgba(0, 0, 0, 0.2),
+      0 -2px 24px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 }
 
-/* REFINED GLASSMORPHISM CONTAINER - With Original Card Background */
+/* GLASSMORPHISM CONTAINER - With Transparent Card Background */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm);
   
-  /* REFINED: Using card-background with glass overlay */
-  background: var(--card-background);
+  /* FIXED: Transparent version of card-background for proper glass effect */
+  background: rgba(44, 44, 44, 0.8);  /* 80% opacity of --card-background (#2c2c2c) */
   backdrop-filter: blur(20px) saturate(140%);
   -webkit-backdrop-filter: blur(20px) saturate(140%); /* Safari support */
   
-  /* Glass overlay on top of the card background */
+  /* Enhanced glass overlay for shimmer effect */
   background-image: 
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0) 100%
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.02) 50%,
+      rgba(255, 255, 255, 0.08) 100%
     );
   
-  /* Refined border and shadow for subtle depth */
-  border: 1px solid var(--border);
+  /* Refined border for glass edge definition */
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 4px 24px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   
   border-radius: var(--radius-full);
   width: 100%;
@@ -81,21 +91,23 @@
   -ms-overflow-style: none;
 }
 
-/* Dark mode glassmorphism adjustments - Refined with original grays */
+/* Dark mode glassmorphism adjustments - Fixed with transparent grays */
 @media (prefers-color-scheme: dark) {
   .mobile-nav-container {
-    /* Use the card background variable which should adapt to dark mode */
-    background: var(--card-background);
+    /* FIXED: Transparent dark mode grays for glass effect */
+    background: rgba(44, 44, 44, 0.8);  /* Matches light mode transparency */
     background-image: 
       linear-gradient(
         135deg,
         rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0) 100%
+        rgba(255, 255, 255, 0.01) 50%,
+        rgba(255, 255, 255, 0.05) 100%
       );
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 
       0 4px 24px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -297,20 +309,29 @@
 /* Fallback for browsers that don't support backdrop-filter */
 @supports not (backdrop-filter: blur(20px)) {
   .mobile-nav-container {
-    background: rgba(245, 245, 245, 0.95);
+    /* Slightly more opaque for browsers without blur support */
+    background: rgba(44, 44, 44, 0.95);
     box-shadow: 
       0 8px 32px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .mobile-navigation {
+    background: linear-gradient(
+      135deg, 
+      rgba(44, 44, 44, 0.95) 0%,
+      rgba(51, 51, 51, 0.95) 100%
+    );
   }
   
   @media (prefers-color-scheme: dark) {
     .mobile-nav-container {
-      background: rgba(30, 30, 30, 0.95);
+      background: rgba(44, 44, 44, 0.95);
     }
   }
   
   .mobile-nav-slider {
-    background: rgba(255, 221, 0, 0.2);
+    background: rgba(255, 221, 0, 0.15);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
