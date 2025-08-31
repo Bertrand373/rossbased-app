@@ -1,4 +1,4 @@
-/* App.css - Main application styles with ONLY scroll limits fixed (header reverted to original) */
+/* App.css - COMPLETELY CLEAN VERSION - Original layout with only scroll fixes */
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -22,7 +22,7 @@
   padding: 0;
 }
 
-/* SCROLL FIXES ONLY: Prevent over-scrolling */
+/* SCROLL FIXES ONLY: Prevent over-scrolling beyond content */
 html {
   overflow-y: scroll;
   overscroll-behavior-y: contain;
@@ -34,12 +34,10 @@ body {
   color: var(--text);
   background-color: var(--background);
   line-height: 1.5;
-  /* SCROLL FIX: Prevent body over-scroll */
   overscroll-behavior: contain;
   overflow-x: hidden;
 }
 
-/* SCROLL FIX: App container with proper scroll containment */
 .app-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -50,7 +48,17 @@ body {
   overflow-x: hidden;
 }
 
-/* ORIGINAL: Keep original loading screen structure - just enhance the helmet */
+/* EXPLICIT: Ensure no sticky positioning anywhere */
+.app-header,
+.header-nav,
+.nav-container,
+.user-controls,
+.mobile-navigation {
+  position: relative !important;
+  position: static !important;
+}
+
+/* Loading screen - unchanged */
 .spartan-loading-screen {
   max-width: 1200px;
   margin: var(--spacing-md) auto;
@@ -65,22 +73,19 @@ body {
   align-items: center;
 }
 
-/* ENHANCED: App loading helmet sizing classes to match upgrade banners */
 .app-loading-helmet-size {
-  width: 100px !important; /* LARGER: Premium loading experience */
+  width: 100px !important;
   height: 100px !important;
   animation: app-helmet-pulse 2s ease-in-out infinite !important;
-  /* ENHANCED: Stronger glow for main loading */
   filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6)) !important;
 }
 
 .app-loading-helmet-fallback-size {
-  font-size: 4rem !important; /* LARGER: Match 100px helmet */
+  font-size: 4rem !important;
   color: var(--primary) !important;
   animation: app-helmet-pulse 2s ease-in-out infinite !important;
 }
 
-/* ENHANCED: Helmet pulse animation for main app loading */
 @keyframes app-helmet-pulse {
   0%, 100% {
     opacity: 1;
@@ -92,7 +97,7 @@ body {
   }
 }
 
-/* ADDED: Additional Toast Overrides in App.css as backup */
+/* Toast overrides */
 .react-hot-toast div[data-hot-toast] > div {
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%) !important;
   color: var(--text) !important;
@@ -104,7 +109,7 @@ body {
   font-size: 0.875rem !important;
 }
 
-/* ORIGINAL: App Header Styles - Navigation truly centered, logo/logout positioned around it */
+/* ORIGINAL HEADER - GUARANTEED NON-STICKY */
 .app-header {
   position: relative;
   display: grid;
@@ -126,11 +131,10 @@ body {
 }
 
 .app-logo {
-  height: 107px; /* 25% bigger than 86px */
+  height: 107px;
   width: auto;
 }
 
-/* ORIGINAL: Header Navigation with bulletproof sliding pill animation - exactly like profile tabs */
 .header-nav {
   justify-self: center;
   position: relative;
@@ -144,17 +148,13 @@ body {
   border: 1px solid var(--border);
   position: relative;
   margin: 0 auto;
-  /* RESPONSIVE: Scale container width based on screen size like profile tabs */
   width: min(90vw, 600px);
   min-width: fit-content;
   max-width: 700px;
-  /* EVEN SPACING: Distribute navigation buttons with consistent gaps */
   justify-content: space-between;
-  /* MOBILE: Ensure proper 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* MOBILE: Handle overflow for very small screens only */
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -164,7 +164,6 @@ body {
   display: none;
 }
 
-/* ORIGINAL: Header navigation slider - identical to profile tab slider */
 .header-nav-slider {
   position: absolute;
   top: var(--spacing-xs);
@@ -176,21 +175,18 @@ body {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 1;
-  /* IMPORTANT: Start hidden but ready to be shown */
   opacity: 0;
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
 }
 
-/* MOBILE: Faster transition on smaller screens */
 @media (max-width: 768px) {
   .header-nav-slider {
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-/* ORIGINAL: Navigation links with consistent natural sizing - identical to profile tabs */
 .header-nav .nav-link {
   display: flex;
   align-items: center;
@@ -207,11 +203,9 @@ body {
   transition: all 0.2s ease;
   white-space: nowrap;
   text-decoration: none;
-  /* CONSISTENT SIZING: Natural width based on content */
   min-width: fit-content;
   position: relative;
   z-index: 2;
-  /* MOBILE: Prevent text selection and ensure proper touch */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -220,28 +214,21 @@ body {
   touch-action: manipulation;
 }
 
-/* MOBILE: Only adjust touch targets on actual mobile, not desktop */
 @media (max-width: 768px) and (pointer: coarse) {
   .header-nav .nav-link {
-    min-height: 44px; /* iOS recommendation for touch targets */
+    min-height: 44px;
     padding: var(--spacing-md) var(--spacing-lg);
   }
 }
 
-/* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
-
-/* CRITICAL: Active nav styling - REMOVE any background that conflicts with slider */
 .header-nav .nav-link.active {
   color: var(--primary) !important;
-  /* IMPORTANT: No background - let slider handle visual feedback */
   background-color: transparent !important;
   border-color: transparent !important;
 }
 
-/* MOBILE: Ensure active state is always visible */
 @media (max-width: 768px) {
   .header-nav .nav-link.active {
-    /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
     font-weight: 600;
   }
 }
@@ -253,7 +240,6 @@ body {
   gap: var(--spacing-md);
 }
 
-/* Profile button styling - matches logout button non-hover state with active state */
 .profile-btn {
   display: flex;
   align-items: center;
@@ -279,7 +265,6 @@ body {
   border-color: rgba(255, 221, 0, 0.2);
 }
 
-/* ORIGINAL: Logout button styling - inactive grey with red hover */
 .logout-btn {
   display: flex;
   align-items: center;
@@ -302,7 +287,7 @@ body {
   transform: scale(1.05);
 }
 
-/* ORIGINAL: Mobile header adjustments - Changed mobile username back to yellow */
+/* Mobile header adjustments */
 @media (max-width: 768px) {
   .app-header {
     display: flex;
@@ -314,7 +299,7 @@ body {
   }
   
   .app-logo {
-    height: 100px; /* Increased from 80px - 25% bigger */
+    height: 100px;
   }
   
   .header-top-row {
@@ -334,14 +319,12 @@ body {
     gap: var(--spacing-md);
   }
   
-  /* Mobile user controls container */
   .mobile-user-controls {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
   }
   
-  /* Mobile profile button - icon only */
   .mobile-user-controls .profile-btn {
     padding: var(--spacing-sm);
     min-width: 36px;
@@ -353,7 +336,6 @@ body {
     display: none;
   }
   
-  /* Mobile logout button - icon only */
   .mobile-user-controls .logout-btn {
     padding: var(--spacing-sm);
     min-width: 36px;
@@ -365,7 +347,6 @@ body {
     display: none;
   }
   
-  /* ORIGINAL: Mobile greeting back to yellow styling */
   .mobile-username {
     font-weight: 500;
     color: var(--text);
@@ -381,18 +362,15 @@ body {
     font-weight: 500;
   }
   
-  /* Make the username itself bold while keeping "Hey there" normal weight */
   .mobile-username {
-    font-weight: 700; /* Make the username bold */
-    color: var(--primary); /* Back to yellow */
+    font-weight: 700;
+    color: var(--primary);
   }
   
-  /* Hide header navigation on mobile */
   .header-nav {
     display: none;
   }
   
-  /* Mobile loading screen adjustments */
   .spartan-loading-screen {
     margin: var(--spacing-sm);
     margin-left: var(--spacing-sm);
@@ -400,9 +378,8 @@ body {
     min-height: calc(100vh - 16px);
   }
 
-  /* Mobile app loading helmet adjustments */
   .app-loading-helmet-size {
-    width: 80px !important; /* SCALED: Mobile main loading */
+    width: 80px !important;
     height: 80px !important;
   }
 
@@ -411,19 +388,17 @@ body {
   }
 }
 
-/* FIXED: Landscape mode specific fixes to prevent overflow */
+/* Landscape mode fixes */
 @media (max-width: 768px) and (orientation: landscape) {
   .app-header {
     padding: var(--spacing-xs) var(--spacing-sm);
     margin: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs);
   }
   
-  /* LANDSCAPE: Significantly reduce logo size */
   .app-logo {
     height: 60px !important;
   }
   
-  /* LANDSCAPE: Make user controls much more compact */
   .mobile-user-controls {
     gap: var(--spacing-xs);
     flex-shrink: 0;
@@ -437,7 +412,6 @@ body {
     font-size: 0.75rem;
   }
   
-  /* LANDSCAPE: Compact username text */
   .mobile-username {
     font-size: 0.8rem;
   }
@@ -447,7 +421,6 @@ body {
   }
 }
 
-/* Very small screens */
 @media (max-width: 480px) {
   .app-loading-helmet-size {
     width: 70px !important;
@@ -483,7 +456,7 @@ button:active {
   background-color: var(--primary-dark);
 }
 
-/* ORIGINAL: App content layout to support footer inside container */
+/* CLEAN APP CONTENT - FLOWS NATURALLY */
 .app-content {
   display: flex;
   flex-direction: column;
@@ -494,24 +467,20 @@ button:active {
   border: 1px solid var(--border);
   border-top: none;
   min-height: calc(100vh - 200px);
-  /* SCROLL FIX: Prevent over-scrolling within app content */
   overscroll-behavior: contain;
   overflow-x: hidden;
 }
 
-/* SCROLL FIX + BREATHING ROOM: Main content wrapper with proper scroll management */
+/* SCROLL FIX: Main content with breathing room */
 .main-content-wrapper {
   flex: 1;
   padding: var(--spacing-lg);
-  /* SCROLL FIX: Proper scroll behavior for individual tabs */
   overscroll-behavior-y: contain;
   overflow-y: auto;
   max-height: calc(100vh - 240px);
-  /* BREATHING ROOM: Bottom padding so content never gets cut off */
   padding-bottom: calc(var(--spacing-lg) + var(--spacing-xl));
 }
 
-/* Card component */
 .card {
   background-color: var(--medium-gray);
   border-radius: var(--radius-md);
@@ -534,7 +503,6 @@ button:active {
   color: var(--text);
 }
 
-/* Form elements */
 input, textarea, select {
   width: 100%;
   padding: var(--spacing-md);
@@ -551,7 +519,6 @@ input:focus, textarea:focus, select:focus {
   border-color: var(--primary);
 }
 
-/* Toggle switch */
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -597,7 +564,6 @@ input:checked + .toggle-slider:before {
   transform: translateX(26px);
 }
 
-/* Range slider */
 .range-slider {
   -webkit-appearance: none;
   width: 100%;
@@ -625,7 +591,6 @@ input:checked + .toggle-slider:before {
   cursor: pointer;
 }
 
-/* Badge */
 .badge {
   display: inline-block;
   padding: var(--spacing-xs) var(--spacing-sm);
@@ -655,7 +620,6 @@ input:checked + .toggle-slider:before {
   color: var(--primary);
 }
 
-/* Subscription Banner */
 .subscription-banner {
   background: linear-gradient(to right, var(--primary-dark), var(--primary));
   color: #000000;
@@ -686,7 +650,6 @@ input:checked + .toggle-slider:before {
   100% { transform: rotate(360deg); }
 }
 
-/* Premium lock overlay */
 .premium-lock {
   position: relative;
   overflow: hidden;
@@ -719,7 +682,6 @@ input:checked + .toggle-slider:before {
   color: var(--text);
 }
 
-/* Form layout */
 .form-group {
   margin-bottom: var(--spacing-md);
 }
@@ -743,7 +705,6 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* Button variations */
 .btn {
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-md);
@@ -779,7 +740,6 @@ input:checked + .toggle-slider:before {
   width: 100%;
 }
 
-/* Modal overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -805,19 +765,16 @@ input:checked + .toggle-slider:before {
   border: 1px solid var(--border);
 }
 
-/* MOBILE RESPONSIVE: Original mobile styles with scroll fixes */
 @media (max-width: 768px) {
   .app-content {
     margin: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
     min-height: calc(100vh - 280px);
-    /* Mobile: Space for mobile navigation */
     margin-bottom: 90px;
   }
   
   .main-content-wrapper {
     padding: var(--spacing-md);
     max-height: calc(100vh - 280px);
-    /* BREATHING ROOM: Extra bottom padding for mobile */
     padding-bottom: calc(var(--spacing-md) + var(--spacing-xl) + 20px);
   }
   
@@ -830,7 +787,7 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* ORIGINAL: Mobile navigation with scroll containment */
+/* MOBILE NAVIGATION - GUARANTEED NON-STICKY (only uses position: fixed at bottom) */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
@@ -843,8 +800,5 @@ input:checked + .toggle-slider:before {
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   border-top: 1px solid var(--border);
-  /* SCROLL FIX: Prevent over-scroll interactions */
   overscroll-behavior: contain;
 }
-
-/* Mobile navigation will use its own slider from MobileNavigation.css */
