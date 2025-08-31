@@ -49,8 +49,8 @@
   gap: var(--spacing-xs);
   padding: var(--spacing-sm);
   
-  /* FIXED: Transparent version of card-background for proper glass effect */
-  background: rgba(44, 44, 44, 0.8);  /* 80% opacity of --card-background (#2c2c2c) */
+  /* FIXED: Much more transparent for actual glass effect */
+  background: rgba(44, 44, 44, 0.4);  /* Reduced to 40% opacity - now you can see through! */
   backdrop-filter: blur(20px) saturate(140%);
   -webkit-backdrop-filter: blur(20px) saturate(140%); /* Safari support */
   
@@ -58,16 +58,16 @@
   background-image: 
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.12) 0%,
-      rgba(255, 255, 255, 0.02) 50%,
-      rgba(255, 255, 255, 0.08) 100%
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      rgba(255, 255, 255, 0.1) 100%
     );
   
-  /* Refined border for glass edge definition */
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  /* Stronger border for better definition when transparent */
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 4px 24px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   
   border-radius: var(--radius-full);
@@ -94,19 +94,19 @@
 /* Dark mode glassmorphism adjustments - Fixed with transparent grays */
 @media (prefers-color-scheme: dark) {
   .mobile-nav-container {
-    /* FIXED: Transparent dark mode grays for glass effect */
-    background: rgba(44, 44, 44, 0.8);  /* Matches light mode transparency */
+    /* FIXED: Much more transparent for visible glass effect */
+    background: rgba(44, 44, 44, 0.4);  /* 40% opacity - matching light mode */
     background-image: 
       linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.01) 50%,
-        rgba(255, 255, 255, 0.05) 100%
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.02) 50%,
+        rgba(255, 255, 255, 0.06) 100%
       );
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 
       0 4px 24px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
       inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   }
 }
@@ -130,10 +130,10 @@
     rgba(255, 221, 0, 0) 100%
   );
   
-  /* Softer glow */
+  /* UPDATED: Tighter, more controlled glow */
   border: 1px solid rgba(255, 221, 0, 0.2);
   box-shadow: 
-    0 0 12px rgba(255, 221, 0, 0.15),
+    0 0 8px rgba(255, 221, 0, 0.12),
     inset 0 0 6px rgba(255, 221, 0, 0.05);
   
   border-radius: var(--radius-full);
@@ -309,8 +309,8 @@
 /* Fallback for browsers that don't support backdrop-filter */
 @supports not (backdrop-filter: blur(20px)) {
   .mobile-nav-container {
-    /* Slightly more opaque for browsers without blur support */
-    background: rgba(44, 44, 44, 0.95);
+    /* More opaque for browsers without blur support - but still some transparency */
+    background: rgba(44, 44, 44, 0.85);
     box-shadow: 
       0 8px 32px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
