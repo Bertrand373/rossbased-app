@@ -1,14 +1,14 @@
-/* components/Navigation/MobileNavigation.css - REFINED GLASSMORPHISM */
+/* components/Navigation/MobileNavigation.css - REFINED GLASSMORPHISM WITH ORIGINAL GRAYS */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  /* REFINED: Subtle glass background for the outer container */
-  background: rgba(250, 250, 250, 0.4);
+  /* REFINED: Using original gradient with glass effect overlay */
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   backdrop-filter: blur(10px) saturate(120%);
   -webkit-backdrop-filter: blur(10px) saturate(120%);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -17,7 +17,7 @@
   /* Subtle shadow for depth */
   box-shadow: 
     0 -2px 20px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   
   /* Add pseudo-element for gradient fade to help content readability */
   isolation: isolate;
@@ -26,7 +26,8 @@
 /* Dark mode adjustments for outer container */
 @media (prefers-color-scheme: dark) {
   .mobile-navigation {
-    background: rgba(20, 20, 20, 0.5);
+    /* Keep the gradient but adjust for dark mode */
+    background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 
       0 -2px 20px rgba(0, 0, 0, 0.2),
@@ -34,30 +35,30 @@
   }
 }
 
-/* REFINED GLASSMORPHISM CONTAINER - Clean and Minimalistic */
+/* REFINED GLASSMORPHISM CONTAINER - With Original Card Background */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm);
   
-  /* REFINED: Stronger glass effect for the pill container */
-  background: rgba(255, 255, 255, 0.6);
+  /* REFINED: Using card-background with glass overlay */
+  background: var(--card-background);
   backdrop-filter: blur(20px) saturate(140%);
   -webkit-backdrop-filter: blur(20px) saturate(140%); /* Safari support */
   
-  /* Simplified gradient for cleaner look */
+  /* Glass overlay on top of the card background */
   background-image: 
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.15) 0%,
       rgba(255, 255, 255, 0) 100%
     );
   
   /* Refined border and shadow for subtle depth */
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--border);
   box-shadow: 
     0 4px 24px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
   
   border-radius: var(--radius-full);
   width: 100%;
@@ -80,17 +81,18 @@
   -ms-overflow-style: none;
 }
 
-/* Dark mode glassmorphism adjustments - Refined */
+/* Dark mode glassmorphism adjustments - Refined with original grays */
 @media (prefers-color-scheme: dark) {
   .mobile-nav-container {
-    background: rgba(30, 30, 30, 0.6);
+    /* Use the card background variable which should adapt to dark mode */
+    background: var(--card-background);
     background-image: 
       linear-gradient(
         135deg,
         rgba(255, 255, 255, 0.08) 0%,
         rgba(255, 255, 255, 0) 100%
       );
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border);
     box-shadow: 
       0 4px 24px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
