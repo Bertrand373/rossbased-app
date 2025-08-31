@@ -1,4 +1,4 @@
-/* App.css - Main application styles with updated header navigation and enhanced loading (KEEP ORIGINAL CONTAINER) */
+/* App.css - Main application styles with FIXED scroll limits to prevent over-scrolling */
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -22,19 +22,33 @@
   padding: 0;
 }
 
+/* FIXED: Prevent over-scrolling on the entire page */
+html {
+  overflow-y: scroll;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
   background-color: var(--background);
   line-height: 1.5;
+  /* FIXED: Prevent body over-scroll */
+  overscroll-behavior: contain;
+  overflow-x: hidden;
 }
 
+/* FIXED: App container with proper scroll containment */
 .app-container {
   max-width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* CRITICAL: Prevent over-scrolling within the app container */
+  overscroll-behavior: contain;
+  overflow-x: hidden;
 }
 
 /* FIXED: Keep original loading screen structure - just enhance the helmet */
@@ -434,7 +448,7 @@ button:active {
   background-color: var(--primary-dark);
 }
 
-/* App content layout to support footer inside container */
+/* FIXED: App content with proper scroll containment */
 .app-content {
   display: flex;
   flex-direction: column;
@@ -445,12 +459,19 @@ button:active {
   border: 1px solid var(--border);
   border-top: none;
   min-height: calc(100vh - 200px);
+  /* CRITICAL: Prevent over-scrolling within app content */
+  overscroll-behavior: contain;
+  overflow-x: hidden;
 }
 
-/* Main content wrapper - takes up available space */
+/* FIXED: Main content wrapper with proper height and scroll management */
 .main-content-wrapper {
   flex: 1;
   padding: var(--spacing-lg);
+  /* CRITICAL: Ensure proper scroll behavior for individual tabs */
+  overscroll-behavior-y: contain;
+  overflow-y: auto;
+  max-height: calc(100vh - 240px); /* Prevent excessive height */
 }
 
 /* Card component */
@@ -747,15 +768,20 @@ input:checked + .toggle-slider:before {
   border: 1px solid var(--border);
 }
 
-/* Mobile responsive styles */
+/* FIXED: Mobile responsive styles with proper scroll management */
 @media (max-width: 768px) {
   .app-content {
-    margin: 0 var(--spacing-sm) 90px var(--spacing-sm);
-    min-height: calc(100vh - 250px);
+    margin: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
+    /* FIXED: Adjusted min-height to account for mobile navigation */
+    min-height: calc(100vh - 280px);
+    /* Mobile: Ensure mobile nav has space */
+    margin-bottom: 90px;
   }
   
   .main-content-wrapper {
     padding: var(--spacing-md);
+    /* FIXED: Adjust max-height for mobile with bottom navigation */
+    max-height: calc(100vh - 280px);
   }
   
   .card {
@@ -767,7 +793,7 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* Mobile navigation - UPDATED: Add sliding pill animation support */
+/* FIXED: Mobile navigation with proper scroll containment */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
@@ -780,6 +806,6 @@ input:checked + .toggle-slider:before {
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   border-top: 1px solid var(--border);
+  /* CRITICAL: Prevent over-scroll interactions with mobile navigation */
+  overscroll-behavior: contain;
 }
-
-/* Mobile navigation will use its own slider from MobileNavigation.css */
