@@ -65,13 +65,9 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
             return;
           }
 
-          // FIXED: Proper calculation for perfect alignment
-          // Get container padding
-          const containerStyle = window.getComputedStyle(navContainer);
-          const containerPaddingLeft = parseFloat(containerStyle.paddingLeft) || 0;
-          
-          // Calculate position relative to container's content box
-          const leftOffset = navRect.left - containerRect.left - containerPaddingLeft;
+          // FIXED: Simplified calculation for perfect alignment
+          // Calculate the left offset from the container's left edge
+          const leftOffset = navRect.left - containerRect.left;
           const navWidth = navRect.width;
           
           // Apply positioning with proper width
