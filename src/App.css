@@ -22,18 +22,11 @@
   padding: 0;
 }
 
-/* Simple overscroll prevention */
-html {
-  overscroll-behavior: none;
-}
-
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
   background-color: var(--background);
   line-height: 1.5;
-  /* Prevent bounce scrolling */
-  overscroll-behavior: none;
 }
 
 .app-container {
@@ -458,8 +451,6 @@ button:active {
 .main-content-wrapper {
   flex: 1;
   padding: var(--spacing-lg);
-  /* Small padding at bottom to ensure last content is visible */
-  padding-bottom: var(--spacing-xl);
 }
 
 /* Card component */
@@ -765,8 +756,6 @@ input:checked + .toggle-slider:before {
   
   .main-content-wrapper {
     padding: var(--spacing-md);
-    /* Small padding at bottom for mobile */
-    padding-bottom: var(--spacing-lg);
   }
   
   .card {
