@@ -472,6 +472,8 @@ button:active {
   overscroll-behavior-y: contain;
   overflow-y: auto;
   max-height: calc(100vh - 240px); /* Prevent excessive height */
+  /* ADDED: Bottom breathing room so content never gets cut off */
+  padding-bottom: calc(var(--spacing-lg) + var(--spacing-xl));
 }
 
 /* Card component */
@@ -782,6 +784,8 @@ input:checked + .toggle-slider:before {
     padding: var(--spacing-md);
     /* FIXED: Adjust max-height for mobile with bottom navigation */
     max-height: calc(100vh - 280px);
+    /* ADDED: Extra bottom breathing room for mobile */
+    padding-bottom: calc(var(--spacing-md) + var(--spacing-xl) + 20px);
   }
   
   .card {
@@ -790,6 +794,50 @@ input:checked + .toggle-slider:before {
   
   .card-title {
     font-size: 1.1rem;
+  }
+}
+
+/* ADDED: Landscape/horizontal mode fixes for mobile devices */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Landscape: Reduce header logo size to fit better */
+  .app-logo {
+    height: 70px !important;
+  }
+  
+  /* Landscape: Compact header spacing */
+  .app-header {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    margin: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs);
+  }
+  
+  /* Landscape: Prevent user controls from overflowing */
+  .mobile-user-controls {
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
+  }
+  
+  .mobile-user-controls .profile-btn,
+  .mobile-user-controls .logout-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: var(--spacing-xs);
+  }
+  
+  /* Landscape: Adjust content for shorter viewport */
+  .app-content {
+    margin: 0 var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+    min-height: calc(100vh - 200px);
+  }
+  
+  .main-content-wrapper {
+    padding: var(--spacing-sm);
+    max-height: calc(100vh - 200px);
+    padding-bottom: calc(var(--spacing-sm) + var(--spacing-lg) + 15px);
+  }
+  
+  /* Landscape: Compact mobile navigation */
+  .mobile-navigation {
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
 }
 
