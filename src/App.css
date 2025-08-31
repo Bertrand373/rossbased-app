@@ -22,39 +22,18 @@
   padding: 0;
 }
 
-/* AGGRESSIVE: Prevent over-scrolling that reveals black background */
+/* Simple overscroll prevention */
 html {
-  /* Change the root background to match app background */
-  background-color: var(--card-background) !important;
-  /* Prevent elastic scrolling */
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  position: fixed;
-  /* iOS specific overscroll prevention */
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
-  /* Match the app's gray background instead of black */
-  background-color: var(--card-background);
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  background-color: var(--background);
   line-height: 1.5;
-  /* Enable scrolling within fixed body */
-  height: 100%;
-  width: 100%;
-  position: fixed;
-  overflow-y: auto;
-  overflow-x: hidden;
-  /* iOS bounce prevention */
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  overscroll-behavior-x: none;
-  /* Safe area padding */
-  padding-bottom: env(safe-area-inset-bottom, 0);
+  /* Prevent bounce scrolling */
+  overscroll-behavior: none;
 }
 
 .app-container {
@@ -63,12 +42,6 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* Aggressive overscroll prevention */
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-  /* Ensure container fills the viewport */
-  position: relative;
-  background-color: var(--card-background);
 }
 
 /* FIXED: Keep original loading screen structure - just enhance the helmet */
@@ -485,27 +458,8 @@ button:active {
 .main-content-wrapper {
   flex: 1;
   padding: var(--spacing-lg);
-  /* Add MASSIVE bottom padding for breathing room */
-  padding-bottom: calc(var(--spacing-xl) * 5);
-  /* Aggressive overscroll prevention */
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-  /* Ensure wrapper background matches app */
-  background-color: var(--card-background);
-  position: relative;
-}
-
-/* Add a pseudo-element to fill any remaining space */
-.main-content-wrapper::after {
-  content: '';
-  display: block;
-  height: 200px;
-  width: 100%;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  position: absolute;
-  bottom: -200px;
-  left: 0;
-  right: 0;
+  /* Small padding at bottom to ensure last content is visible */
+  padding-bottom: var(--spacing-xl);
 }
 
 /* Card component */
@@ -802,52 +756,17 @@ input:checked + .toggle-slider:before {
   border: 1px solid var(--border);
 }
 
-/* Mobile responsive styles with aggressive over-scroll prevention */
+/* Mobile responsive styles */
 @media (max-width: 768px) {
-  /* Override html/body for mobile specifically */
-  html, body {
-    /* Force fixed positioning on mobile */
-    position: fixed !important;
-    height: 100% !important;
-    width: 100% !important;
-    overflow: hidden !important;
-  }
-  
-  body {
-    /* Allow body to scroll internally */
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    /* iOS specific */
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: none !important;
-    /* Extra background gradient for mobile */
-    background: linear-gradient(to bottom, 
-      var(--card-background) 0%, 
-      var(--medium-gray) 50%,
-      var(--card-background) 100%) !important;
-  }
-  
-  .app-container {
-    /* Ensure container has padding at bottom */
-    padding-bottom: 150px;
-    background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  }
-  
   .app-content {
     margin: 0 var(--spacing-sm) 90px var(--spacing-sm);
     min-height: calc(100vh - 250px);
-    /* Add MASSIVE padding at bottom for breathing room */
-    padding-bottom: calc(var(--spacing-xl) * 4);
-    /* Ensure content background */
-    background-color: var(--card-background);
   }
   
   .main-content-wrapper {
     padding: var(--spacing-md);
-    /* Add even more bottom padding for mobile */
-    padding-bottom: calc(var(--spacing-xl) * 6);
-    /* Add bottom margin as well */
-    margin-bottom: 100px;
+    /* Small padding at bottom for mobile */
+    padding-bottom: var(--spacing-lg);
   }
   
   .card {
