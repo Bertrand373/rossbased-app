@@ -94,6 +94,7 @@
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
 
 .navigation-pill-container::-webkit-scrollbar {
   display: none;
@@ -185,34 +186,6 @@
   flex-shrink: 0;
 }
 
-/* Mobile: Responsive icon and text sizing - FIXED for better mobile UX */
-@media (max-width: 480px) {
-  .navigation-pill-container {
-    /* FIXED: Even smaller for very small screens */
-    width: min(98vw, 320px);
-    max-width: 350px;
-    padding: 3px;
-  }
-  
-  .navigation-section-btn svg {
-    font-size: 0.875rem;
-  }
-  
-  .navigation-section-btn {
-    font-size: 0.8rem;
-    gap: var(--spacing-xs);
-    /* FIXED: Tighter padding for small screens */
-    padding: var(--spacing-xs) var(--spacing-md);
-  }
-  
-  .navigation-tab-slider {
-    /* FIXED: Small screen slider positioning */
-    top: 3px;
-    left: 3px;
-    height: calc(100% - 6px);
-  }
-}
-
 /* Mobile navigation scrolling - FIXED for proper mobile behavior */
 @media (max-width: 768px) {
   .navigation-pill-container {
@@ -247,6 +220,34 @@
     top: 4px;
     left: 4px;
     height: calc(100% - 8px);
+  }
+}
+
+/* Mobile: Responsive icon and text sizing - FIXED for better mobile UX */
+@media (max-width: 480px) {
+  .navigation-pill-container {
+    /* FIXED: Even smaller for very small screens */
+    width: min(98vw, 320px);
+    max-width: 350px;
+    padding: 3px;
+  }
+  
+  .navigation-section-btn svg {
+    font-size: 0.875rem;
+  }
+  
+  .navigation-section-btn {
+    font-size: 0.8rem;
+    gap: var(--spacing-xs);
+    /* FIXED: Tighter padding for small screens */
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+  
+  .navigation-tab-slider {
+    /* FIXED: Small screen slider positioning */
+    top: 3px;
+    left: 3px;
+    height: calc(100% - 6px);
   }
 }
 
