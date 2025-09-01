@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - Core Layout & Navigation */
+/* components/EmotionalTimeline/EmotionalTimeline.css - Updated Header & Sliding Menu */
 
 /* Main container */
 .emotional-timeline-container {
@@ -23,7 +23,7 @@
   background: var(--phase-color) !important;
 }
 
-/* NEW: Integrated Header Design */
+/* UPDATED: Integrated Header Design - Matching Tracker/Calendar/Stats pattern */
 .integrated-timeline-header {
   display: flex;
   flex-direction: column;
@@ -36,6 +36,7 @@
 
 .header-title-section {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-bottom: var(--spacing-lg);
@@ -51,6 +52,16 @@
   text-align: center;
 }
 
+/* NEW: Header subtitle matching other tabs */
+.header-subtitle {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
+}
+
+/* UPDATED: Navigation section using Profile's sliding pill system */
 .header-navigation-section {
   display: flex;
   flex-direction: column;
@@ -59,22 +70,71 @@
   align-items: center;
 }
 
+/* BULLETPROOF: Mobile-First Sliding Navigation Pills matching Profile exactly */
 .navigation-pill-container {
   display: flex;
-  gap: var(--spacing-xs);
   padding: var(--spacing-xs);
   background-color: var(--card-background);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
-  width: 100%;
-  max-width: 600px;
-  justify-content: center;
+  position: relative;
+  margin: 0 auto;
+  /* Responsive width scaling */
+  width: min(90vw, 600px);
+  min-width: fit-content;
+  max-width: 700px;
+  /* Even spacing distribution */
+  justify-content: space-between;
+  /* Mobile 3D rendering context */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Handle overflow for very small screens */
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-/* UPDATED: TIMELINE-SPECIFIC navigation pills - RESTORED original padding */
-.integrated-timeline-header .navigation-section-btn {
+.navigation-pill-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* ENHANCED: Bulletproof sliding indicator matching Profile exactly */
+.navigation-tab-slider {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  height: calc(100% - calc(var(--spacing-xs) * 2));
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 1;
+  /* Start hidden but ready to be shown */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(0px);
+  width: 0px;
+  /* Mobile GPU acceleration */
+  will-change: transform, width;
+}
+
+/* Mobile: Faster transition on smaller screens */
+@media (max-width: 768px) {
+  .navigation-tab-slider {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* ENHANCED: Navigation section buttons matching Profile's sliding pill system */
+.navigation-section-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
   flex: 1;
-  padding: var(--spacing-sm) var(--spacing-md) !important; /* RESTORED for Timeline */
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
@@ -84,24 +144,55 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs);
   position: relative;
+  z-index: 2;
   outline: none;
+  /* Mobile touch optimization */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-.integrated-timeline-header .navigation-section-btn:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
+/* Mobile: Enhanced touch targets */
+@media (max-width: 768px) and (pointer: coarse) {
+  .navigation-section-btn {
+    min-height: 44px;
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
 }
 
-.integrated-timeline-header .navigation-section-btn.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
+/* CRITICAL: Active tab styling - no background, let slider handle visual feedback */
+.navigation-section-btn.active {
+  color: var(--primary) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Mobile: Ensure active state is always visible */
+@media (max-width: 768px) {
+  .navigation-section-btn.active {
+    font-weight: 600;
+  }
+}
+
+.navigation-section-btn svg {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* Mobile: Responsive icon and text sizing */
+@media (max-width: 480px) {
+  .navigation-section-btn svg {
+    font-size: 0.875rem;
+  }
+  
+  .navigation-section-btn {
+    font-size: 0.8rem;
+    gap: var(--spacing-xs);
+  }
 }
 
 /* Mobile navigation scrolling */
@@ -111,14 +202,14 @@
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-right: var(--spacing-md);
+    /* Smooth scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    /* Force hardware acceleration */
+    transform: translateZ(0);
   }
   
-  .navigation-pill-container::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .integrated-timeline-header .navigation-section-btn {
+  .navigation-section-btn {
     white-space: nowrap;
     min-width: fit-content;
     flex-shrink: 0;
@@ -681,7 +772,7 @@
   
   .integrated-timeline-header {
     padding: var(--spacing-lg);
-    margin: 0; /* Ensure no additional margins affecting spacing */
+    margin: 0;
   }
   
   .header-title-section {
@@ -690,6 +781,10 @@
   
   .header-title-section h2 {
     font-size: 1.25rem;
+  }
+  
+  .header-subtitle {
+    font-size: 0.8rem;
   }
   
   .phase-icon-section {
@@ -769,7 +864,7 @@
   
   .integrated-timeline-header {
     padding: var(--spacing-lg);
-    margin: 0; /* Ensure no additional margins affecting spacing */
+    margin: 0;
   }
   
   .header-title-section {
@@ -778,6 +873,10 @@
   
   .header-title-section h2 {
     font-size: 1.125rem;
+  }
+  
+  .header-subtitle {
+    font-size: 0.75rem;
   }
   
   .mastery-levels-section h3 {
@@ -820,5 +919,17 @@
     padding: 1px 4px;
     min-width: 40px;
     letter-spacing: 0.1px;
+  }
+}
+
+/* Mobile: Additional support for landscape orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  .navigation-pill-container {
+    max-width: 100vw;
+    overflow-x: auto;
+  }
+  
+  .navigation-tab-slider {
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 }

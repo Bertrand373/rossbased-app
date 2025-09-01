@@ -1,5 +1,5 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Free Version with Integrated Header
-import React, { useState, useEffect, useRef } from 'react';
+// components/EmotionalTimeline/EmotionalTimeline.js - Updated with Sliding Menu & Header Consistency
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -9,7 +9,8 @@ import './EmotionalTimelineSections.css';
 
 // Icons
 import { 
-  FaCheckCircle, FaPen, FaInfoCircle, FaRegLightbulb, FaTimes
+  FaCheckCircle, FaPen, FaInfoCircle, FaRegLightbulb, FaTimes,
+  FaMapSigns, FaHeart, FaBrain, FaBook
 } from 'react-icons/fa';
 
 // Import utility functions and data
@@ -30,7 +31,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showPhaseDetail, setShowPhaseDetail] = useState(false);
   
-  // Pill navigation state
+  // UPDATED: Robust sliding pill navigation state
   const [activeSection, setActiveSection] = useState('journey-map');
   
   // Enhanced emotional tracking states
@@ -42,15 +43,189 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   });
   const [emotionsLogged, setEmotionsLogged] = useState(false);
 
-  // Refs for scroll detection
-  const timelineStartRef = useRef(null);
-  const insightSectionRef = useRef(null);
+  // BULLETPROOF: Mobile-First sliding tab state management matching Profile
+  const tabsRef = useRef(null);
+  const sliderRef = useRef(null);
+  const [isSliderInitialized, setIsSliderInitialized] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const resizeTimeoutRef = useRef(null);
   
   const currentDay = userData.currentStreak || 0;
 
   // Get current phase and mastery level
   const currentPhase = getCurrentPhase(currentDay, emotionalPhases);
   const currentMasteryLevel = getCurrentMasteryLevel(currentDay, masteryLevels);
+
+  // Tab configuration matching design patterns
+  const navigationTabs = [
+    { id: 'journey-map', label: 'Journey Map', icon: FaMapSigns },
+    { id: 'check-in', label: 'Check-in', icon: FaHeart },
+    { id: 'journal', label: 'Journal', icon: FaBook },
+    { id: 'analysis', label: 'Analysis', icon: FaBrain }
+  ];
+
+  // MOBILE DETECTION: Simplified mobile detection matching Profile
+  const detectMobile = useCallback(() => {
+    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
+    setIsMobile(isMobileDevice);
+    return isMobileDevice;
+  }, []);
+
+  // BULLETPROOF: Enhanced slider positioning with perfect edge alignment
+  const updateTabSlider = useCallback(() => {
+    // Guard clauses for safety
+    if (!tabsRef.current || !sliderRef.current) {
+      return false;
+    }
+    
+    try {
+      const tabsContainer = tabsRef.current;
+      const slider = sliderRef.current;
+      const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeSection}"]`);
+      
+      if (!activeTabElement) {
+        console.warn(`Tab element not found: ${activeSection}`);
+        return false;
+      }
+
+      // Wait for next frame to ensure layout is complete
+      requestAnimationFrame(() => {
+        try {
+          // Get measurements relative to container
+          const containerRect = tabsContainer.getBoundingClientRect();
+          const tabRect = activeTabElement.getBoundingClientRect();
+          
+          // Validate measurements
+          if (containerRect.width === 0 || tabRect.width === 0) {
+            console.warn('Invalid measurements, container or tab not rendered');
+            return;
+          }
+
+          // Calculate position based on actual container content bounds
+          const containerStyle = window.getComputedStyle(tabsContainer);
+          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
+          
+          // Calculate exact position relative to container's content area
+          const leftOffset = Math.round(tabRect.left - containerRect.left - paddingLeft);
+          const tabWidth = tabRect.width;
+          
+          // Apply positioning and make visible
+          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
+          slider.style.width = `${Math.round(tabWidth)}px`;
+          slider.style.opacity = '1';
+          slider.style.visibility = 'visible';
+          
+        } catch (innerError) {
+          console.error('Inner slider positioning failed:', innerError);
+        }
+      });
+      
+      return true;
+      
+    } catch (error) {
+      console.error('Slider update failed:', error);
+      return false;
+    }
+  }, [activeSection]);
+
+  // SIMPLIFIED: Clean tab change handler
+  const handleSectionClick = useCallback((newSection) => {
+    if (newSection === activeSection) return;
+    
+    setActiveSection(newSection);
+    
+    // Update slider immediately on mobile for responsiveness
+    if (isMobile) {
+      setTimeout(() => updateTabSlider(), 10);
+    }
+  }, [activeSection, isMobile, updateTabSlider]);
+
+  // ROBUST: Proper slider initialization
+  useEffect(() => {
+    const initializeSlider = () => {
+      detectMobile();
+      
+      if (!tabsRef.current || !sliderRef.current) {
+        return;
+      }
+
+      // Initialize slider immediately
+      requestAnimationFrame(() => {
+        const success = updateTabSlider();
+        
+        if (success) {
+          setIsSliderInitialized(true);
+        } else {
+          // Retry after short delay to ensure DOM is ready
+          setTimeout(() => {
+            if (updateTabSlider()) {
+              setIsSliderInitialized(true);
+            } else {
+              // Final fallback - force slider to be visible
+              if (sliderRef.current) {
+                sliderRef.current.style.opacity = '1';
+                sliderRef.current.style.visibility = 'visible';
+                setIsSliderInitialized(true);
+                // Try to update position one more time
+                setTimeout(updateTabSlider, 50);
+              }
+            }
+          }, 100);
+        }
+      });
+    };
+
+    // Initialize after DOM is ready
+    const timer = setTimeout(initializeSlider, 100);
+    
+    return () => clearTimeout(timer);
+  }, [updateTabSlider, detectMobile]);
+
+  // SIMPLIFIED: Basic resize handling
+  useEffect(() => {
+    const handleResize = () => {
+      detectMobile();
+      
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+      
+      resizeTimeoutRef.current = setTimeout(() => {
+        if (isSliderInitialized) {
+          updateTabSlider();
+        }
+      }, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
+  }, [isSliderInitialized, detectMobile, updateTabSlider]);
+
+  // Update slider when active tab changes
+  useEffect(() => {
+    if (isSliderInitialized) {
+      // Small delay to ensure DOM is updated
+      setTimeout(updateTabSlider, 10);
+    }
+  }, [activeSection, isSliderInitialized, updateTabSlider]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      [resizeTimeoutRef].forEach(ref => {
+        if (ref.current) {
+          clearTimeout(ref.current);
+        }
+      });
+    };
+  }, []);
 
   // Check if emotions are already logged for today
   useEffect(() => {
@@ -128,48 +303,47 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     setShowPhaseDetail(true);
   };
 
-  // Handle section navigation
-  const handleSectionClick = (section) => {
-    setActiveSection(section);
-  };
-
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayNote = userData.notes && userData.notes[todayStr];
 
   return (
     <div className="emotional-timeline-container">
-      {/* NEW: Integrated Header with Navigation */}
+      {/* UPDATED: Integrated Header Design matching Tracker/Calendar/Stats */}
       <div className="integrated-timeline-header">
         <div className="header-title-section">
           <h2>Emotional Timeline</h2>
+          <p className="header-subtitle">Track your emotional journey through the phases of recovery</p>
         </div>
         
         <div className="header-navigation-section">
-          <div className="navigation-pill-container">
-            <button 
-              className={`navigation-section-btn ${activeSection === 'journey-map' ? 'active' : ''}`}
-              onClick={() => handleSectionClick('journey-map')}
-            >
-              Journey Map
-            </button>
-            <button 
-              className={`navigation-section-btn ${activeSection === 'check-in' ? 'active' : ''}`}
-              onClick={() => handleSectionClick('check-in')}
-            >
-              Check-in
-            </button>
-            <button 
-              className={`navigation-section-btn ${activeSection === 'journal' ? 'active' : ''}`}
-              onClick={() => handleSectionClick('journal')}
-            >
-              Journal
-            </button>
-            <button 
-              className={`navigation-section-btn ${activeSection === 'analysis' ? 'active' : ''}`}
-              onClick={() => handleSectionClick('analysis')}
-            >
-              Analysis
-            </button>
+          {/* BULLETPROOF: Mobile-First Sliding Navigation Pills matching Profile */}
+          <div 
+            className="navigation-pill-container" 
+            ref={tabsRef}
+          >
+            {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations */}
+            <div 
+              className="navigation-tab-slider" 
+              ref={sliderRef}
+              style={{ 
+                opacity: 0,
+                visibility: 'hidden',
+                transform: 'translateX(0px)',
+                width: '0px'
+              }}
+            />
+            
+            {navigationTabs.map(tab => (
+              <button 
+                key={tab.id}
+                className={`navigation-section-btn ${activeSection === tab.id ? 'active' : ''}`}
+                onClick={() => handleSectionClick(tab.id)}
+                data-tab={tab.id}
+              >
+                <tab.icon />
+                <span>{tab.label}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -244,7 +418,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       <div className="timeline-content-container">
         {/* Journey Map Section */}
         {activeSection === 'journey-map' && (
-          <div className="timeline-overview" ref={timelineStartRef}>
+          <div className="timeline-overview">
             <h3>Complete Journey Map</h3>
             <div className="phases-timeline">
               {emotionalPhases.map((phase) => {
@@ -448,7 +622,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
         {/* Analysis Section */}
         {activeSection === 'analysis' && (
-          <div className="phase-insight-section" ref={insightSectionRef}>
+          <div className="phase-insight-section">
             <h3>Comprehensive Phase Analysis</h3>
             
             {/* Handle no current phase (reset scenario) */}
@@ -513,7 +687,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                       </div>
                     )}
                     
-                    {/* Analysis Cards Grid - FIXED CONDITIONAL */}
+                    {/* Analysis Cards Grid */}
                     {analysis && currentPhase && currentDay > 0 && (
                       <div className="insights-grid">
                     
