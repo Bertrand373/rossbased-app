@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Modal buttons with check marks to match app pattern
+// components/Stats/Stats.js - UPDATED: Header styling to match Tracker/Calendar tabs
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -79,9 +79,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   // ENHANCED: Defensive programming - ensure userData structure
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
 
-  // REMOVED: Premium restrictions on metric selection
-  // All users can now access all metrics
-
   // ENHANCED: Simulate loading for insights calculation
   const simulateInsightLoading = useCallback((insightType, duration = 800) => {
     setLoadingStates(prev => ({ ...prev, [insightType]: true }));
@@ -92,7 +89,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
   // ENHANCED: Trigger loading when time range or metric changes
   useEffect(() => {
-    // CHANGED: Always load insights since everyone is premium
     simulateInsightLoading('urgeManagement', 600);
     setTimeout(() => simulateInsightLoading('riskPredictor', 700), 200);
     setTimeout(() => simulateInsightLoading('patternRecognition', 800), 400);
@@ -108,7 +104,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   }, [timeRange, selectedMetric, simulateInsightLoading, safeUserData.streakHistory]);
 
-  // Handle metric selection - REMOVED: Premium restrictions
+  // Handle metric selection
   const handleMetricClick = useCallback((metric) => {
     setSelectedMetric(metric);
   }, []);
@@ -127,10 +123,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     if (!safeUserData) return {};
     
     return {
-      riskAnalysis: calculateRelapseRisk(safeUserData, timeRange, true), // Always premium
+      riskAnalysis: calculateRelapseRisk(safeUserData, timeRange, true),
       urgeManagement: generateUrgeManagementGuidance(safeUserData, timeRange),
-      patternInsights: generatePatternRecognition(safeUserData, selectedMetric, true), // Always premium
-      optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, true), // Always premium
+      patternInsights: generatePatternRecognition(safeUserData, selectedMetric, true),
+      optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, true),
       dataQuality: calculateDataQuality(safeUserData),
       phaseEvolution: calculatePhaseEvolutionAnalysis(safeUserData, selectedMetric),
       relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
@@ -149,13 +145,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   }, [safeUserData?.currentStreak, safeUserData?.longestStreak, updateUserData, safeUserData]);
 
-  // Time range options for chart
-  const timeRangeOptions = {
-    week: 7,
-    month: 30,
-    quarter: 90
-  };
-  
   const formatDate = (date) => format(new Date(date), 'MMM d, yyyy');
   
   const handleBadgeClick = useCallback((badge) => {
@@ -350,15 +339,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   return (
     <div className="stats-container">
-      {/* UPDATED: Header with integrated design */}
-      <div className="stats-header">
+      {/* UPDATED: Header styling to match Tracker/Calendar tabs */}
+      <div className="integrated-stats-header">
         <div className="stats-header-title-section">
           <h2>Your Stats</h2>
+          <p className="stats-header-subtitle">Comprehensive analytics and insights from your retention journey</p>
         </div>
         <div className="stats-header-actions-section">
           <div className="stats-header-actions">
             <button 
-              className="reset-stats-btn" 
+              className="action-btn reset-stats-btn" 
               onClick={handleResetStats}
               onKeyDown={(e) => e.key === 'Enter' && handleResetStats()}
               tabIndex={0}
@@ -691,7 +681,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
       
-      {/* Badge Modal - UPDATED: Added check mark to button */}
+      {/* Badge Modal */}
       {showBadgeModal && selectedBadge && (
         <div className="modal-overlay" onClick={() => setShowBadgeModal(false)} role="dialog" aria-modal="true" aria-labelledby="badge-modal-title">
           <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>

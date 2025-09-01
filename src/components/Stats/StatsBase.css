@@ -1,4 +1,4 @@
-/* components/Stats/StatsBase.css - Core Stats Display Components + Stat Card Modals - FIXED: Header spacing */
+/* components/Stats/StatsBase.css - Core Stats Display Components + Stat Card Modals - UPDATED: Congruent header styling only */
 
 /* Container and Layout */
 .stats-container {
@@ -22,7 +22,81 @@
   background: var(--phase-color) !important;
 }
 
-/* FIXED: Header styled like Emotional Timeline - no margins, uses container gap */
+/* UPDATED: Integrated header design matching Tracker/Calendar */
+.integrated-stats-header {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stats-header-title-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+  position: relative;
+}
+
+.stats-header-title-section h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.85;
+  text-align: center;
+}
+
+/* NEW: Header subtitle matching Tracker/Calendar */
+.stats-header-subtitle {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
+}
+
+.stats-header-actions-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.stats-header-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+/* UPDATED: Action button styling matching Tracker/Calendar pattern */
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none !important;
+}
+
+/* UPDATED: Yellow hover effect like navigation pills */
+.action-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* LEGACY: Keep old header styling for backward compatibility */
 .stats-header {
   display: flex;
   flex-direction: column;
@@ -63,7 +137,7 @@
   gap: var(--spacing-md);
 }
 
-/* FIXED: Reset button styled like Edit Date and Reset Calendar buttons - NO YELLOW OUTLINE */
+/* OLD: Reset button styled like Edit Date and Reset Calendar buttons - NO YELLOW OUTLINE */
 .reset-stats-btn {
   display: flex;
   align-items: center;
@@ -526,8 +600,72 @@
   color: var(--text-secondary);
 }
 
+/* Modal "Got It" button styling */
+.modal-got-it-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border: 1px solid rgba(255, 221, 0, 0.2) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: none !important;
+  min-height: auto !important;
+}
+
+.modal-got-it-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 /* MOBILE RESPONSIVE - Basic Components */
 @media (max-width: 768px) {
+  /* UPDATED: Mobile header sizing matching Tracker/Calendar */
+  .integrated-stats-header {
+    padding: var(--spacing-lg);
+    margin: 0;
+  }
+  
+  .stats-header-title-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .stats-header-title-section h2 {
+    font-size: 1.25rem; /* MATCHES: Tracker/Calendar mobile header */
+  }
+  
+  .stats-header-subtitle {
+    font-size: 0.8rem; /* MATCHES: Tracker/Calendar mobile subtitle */
+  }
+  
+  .stats-header-actions-section {
+    width: 100%;
+  }
+  
+  .stats-header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Consistent mobile button sizing */
+  .stats-header-actions .action-btn {
+    flex: 1;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    min-height: auto !important;
+  }
+
+  /* Legacy stats header mobile styles */
   .stats-header {
     padding: var(--spacing-lg);
     margin-bottom: 0;
@@ -649,6 +787,20 @@
     gap: var(--spacing-md);
   }
   
+  /* UPDATED: Very small screen header sizing */
+  .integrated-stats-header {
+    padding: var(--spacing-md);
+  }
+  
+  .stats-header-title-section h2 {
+    font-size: 1.125rem; /* MATCHES: Tracker/Calendar very small screen */
+  }
+  
+  .stats-header-subtitle {
+    font-size: 0.75rem; /* MATCHES: Tracker/Calendar very small screen */
+  }
+
+  /* Legacy stats header very small styles */
   .stats-header {
     padding: var(--spacing-md);
     margin-top: 0;
@@ -721,5 +873,22 @@
     width: 28px;
     height: 28px;
     font-size: 1rem;
+  }
+}
+
+/* DESKTOP RESPONSIVE - Enhanced desktop experience */
+@media (min-width: 1024px) {
+  /* UPDATED: Desktop header sizing matching Tracker/Calendar exactly */
+  .integrated-stats-header .stats-header-title-section h2 {
+    font-size: 1.5rem !important; /* MATCHES: Tracker/Calendar desktop header */
+  }
+  
+  .stats-header-subtitle {
+    font-size: 0.875rem !important; /* MATCHES: Tracker/Calendar desktop subtitle */
+  }
+
+  /* Legacy desktop header sizing */
+  .stats-header-title-section h2 {
+    font-size: 1.5rem !important;
   }
 }
