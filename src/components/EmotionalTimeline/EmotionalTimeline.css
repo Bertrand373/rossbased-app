@@ -70,7 +70,7 @@
   align-items: center;
 }
 
-/* BULLETPROOF: Mobile-First Sliding Navigation Pills matching Profile exactly */
+/* FIXED: Mobile-First Navigation Pills with proper sizing */
 .navigation-pill-container {
   display: flex;
   padding: var(--spacing-xs);
@@ -79,12 +79,13 @@
   border: 1px solid var(--border);
   position: relative;
   margin: 0 auto;
-  /* Responsive width scaling */
-  width: min(90vw, 600px);
+  /* FIXED: Much smaller width like Profile component */
+  width: min(90vw, 400px);
   min-width: fit-content;
-  max-width: 700px;
-  /* Even spacing distribution */
-  justify-content: space-between;
+  max-width: 500px;
+  /* FIXED: Use gap instead of space-between for better control */
+  gap: var(--spacing-xs);
+  justify-content: center;
   /* Mobile 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
@@ -93,7 +94,6 @@
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-}
 
 .navigation-pill-container::-webkit-scrollbar {
   display: none;
@@ -127,13 +127,13 @@
   }
 }
 
-/* ENHANCED: Navigation section buttons matching Profile's sliding pill system */
+/* FIXED: Navigation section buttons with proper mobile sizing */
 .navigation-section-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
-  flex: 1;
+  gap: var(--spacing-xs);
+  /* FIXED: Remove flex: 1 to prevent oversizing */
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: transparent;
   border: 1px solid transparent;
@@ -147,6 +147,8 @@
   position: relative;
   z-index: 2;
   outline: none;
+  /* Natural width based on content */
+  min-width: fit-content;
   /* Mobile touch optimization */
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -183,8 +185,15 @@
   flex-shrink: 0;
 }
 
-/* Mobile: Responsive icon and text sizing */
+/* Mobile: Responsive icon and text sizing - FIXED for better mobile UX */
 @media (max-width: 480px) {
+  .navigation-pill-container {
+    /* FIXED: Even smaller for very small screens */
+    width: min(98vw, 320px);
+    max-width: 350px;
+    padding: 3px;
+  }
+  
   .navigation-section-btn svg {
     font-size: 0.875rem;
   }
@@ -192,12 +201,24 @@
   .navigation-section-btn {
     font-size: 0.8rem;
     gap: var(--spacing-xs);
+    /* FIXED: Tighter padding for small screens */
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+  
+  .navigation-tab-slider {
+    /* FIXED: Small screen slider positioning */
+    top: 3px;
+    left: 3px;
+    height: calc(100% - 6px);
   }
 }
 
-/* Mobile navigation scrolling */
+/* Mobile navigation scrolling - FIXED for proper mobile behavior */
 @media (max-width: 768px) {
   .navigation-pill-container {
+    /* FIXED: Better mobile sizing */
+    width: min(95vw, 350px);
+    max-width: 400px;
     justify-content: flex-start;
     overflow-x: auto;
     scrollbar-width: none;
@@ -207,12 +228,25 @@
     scroll-behavior: smooth;
     /* Force hardware acceleration */
     transform: translateZ(0);
+    /* FIXED: Consistent padding for mobile */
+    padding: 4px;
   }
   
   .navigation-section-btn {
     white-space: nowrap;
     min-width: fit-content;
     flex-shrink: 0;
+    /* FIXED: Better mobile padding */
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: 0.875rem;
+    gap: var(--spacing-sm);
+  }
+  
+  .navigation-tab-slider {
+    /* FIXED: Mobile slider positioning */
+    top: 4px;
+    left: 4px;
+    height: calc(100% - 8px);
   }
 }
 
