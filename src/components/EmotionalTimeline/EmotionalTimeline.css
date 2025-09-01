@@ -70,7 +70,7 @@
   align-items: center;
 }
 
-/* FIXED: Mobile-First Navigation Pills with proper sizing */
+/* FIXED: Mobile-First Navigation Pills with horizontal scrolling */
 .navigation-pill-container {
   display: flex;
   padding: var(--spacing-xs);
@@ -79,25 +79,18 @@
   border: 1px solid var(--border);
   position: relative;
   margin: 0 auto;
-  /* FIXED: Much smaller width like Profile component */
-  width: min(90vw, 400px);
-  min-width: fit-content;
-  max-width: 500px;
-  /* FIXED: Use gap instead of space-between for better control */
-  gap: var(--spacing-xs);
-  justify-content: center;
+  /* Desktop: auto-size to content */
+  width: auto;
+  max-width: 600px;
+  /* Use gap for consistent spacing */
+  gap: 0;
+  justify-content: flex-start;
   /* Mobile 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* Handle overflow for very small screens */
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.navigation-pill-container::-webkit-scrollbar {
-  display: none;
+  /* No overflow on desktop */
+  overflow: visible;
 }
 
 /* ENHANCED: Bulletproof sliding indicator matching Profile exactly */
@@ -121,20 +114,12 @@
   will-change: transform, width;
 }
 
-/* Mobile: Faster transition on smaller screens */
-@media (max-width: 768px) {
-  .navigation-tab-slider {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-/* FIXED: Navigation section buttons with proper mobile sizing */
+/* FIXED: Navigation section buttons with proper sizing */
 .navigation-section-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-xs);
-  /* FIXED: Remove flex: 1 to prevent oversizing */
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: transparent;
   border: 1px solid transparent;
@@ -150,6 +135,7 @@
   outline: none;
   /* Natural width based on content */
   min-width: fit-content;
+  flex-shrink: 0;
   /* Mobile touch optimization */
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -159,14 +145,6 @@
   touch-action: manipulation;
 }
 
-/* Mobile: Enhanced touch targets */
-@media (max-width: 768px) and (pointer: coarse) {
-  .navigation-section-btn {
-    min-height: 44px;
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
-}
-
 /* CRITICAL: Active tab styling - no background, let slider handle visual feedback */
 .navigation-section-btn.active {
   color: var(--primary) !important;
@@ -174,80 +152,108 @@
   border-color: transparent !important;
 }
 
-/* Mobile: Ensure active state is always visible */
-@media (max-width: 768px) {
-  .navigation-section-btn.active {
-    font-weight: 600;
-  }
-}
-
 .navigation-section-btn svg {
   font-size: 1rem;
   flex-shrink: 0;
 }
 
-/* Mobile navigation scrolling - FIXED for proper mobile behavior */
+/* MOBILE STYLES: Horizontal scrolling like Stats benefits */
 @media (max-width: 768px) {
-  .navigation-pill-container {
-    /* FIXED: Better mobile sizing */
-    width: min(95vw, 350px);
-    max-width: 400px;
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    /* Smooth scrolling on mobile */
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    /* Force hardware acceleration */
-    transform: translateZ(0);
-    /* FIXED: Consistent padding for mobile */
-    padding: 4px;
+  /* Container for scrolling wrapper */
+  .header-navigation-section {
+    width: 100%;
+    padding: 0;
+    overflow: visible;
   }
   
+  /* CRITICAL: Mobile navigation with horizontal scroll */
+  .navigation-pill-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 4px;
+    gap: 0;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    transform: translateZ(0);
+    /* Remove centering on mobile */
+    margin: 0;
+  }
+  
+  .navigation-pill-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Mobile button sizing */
   .navigation-section-btn {
-    white-space: nowrap;
-    min-width: fit-content;
     flex-shrink: 0;
-    /* FIXED: Better mobile padding */
     padding: var(--spacing-sm) var(--spacing-lg);
     font-size: 0.875rem;
     gap: var(--spacing-sm);
+    min-width: fit-content;
+    /* Ensure buttons don't get squished */
+    flex: 0 0 auto;
   }
   
+  /* Mobile slider positioning */
   .navigation-tab-slider {
-    /* FIXED: Mobile slider positioning */
     top: 4px;
     left: 4px;
     height: calc(100% - 8px);
+    /* Faster transition on mobile */
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Ensure active state is visible */
+  .navigation-section-btn.active {
+    font-weight: 600;
   }
 }
 
-/* Mobile: Responsive icon and text sizing - FIXED for better mobile UX */
+/* Enhanced touch targets for mobile */
+@media (max-width: 768px) and (pointer: coarse) {
+  .navigation-section-btn {
+    min-height: 44px;
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+}
+
+/* Very small screens */
 @media (max-width: 480px) {
   .navigation-pill-container {
-    /* FIXED: Even smaller for very small screens */
-    width: min(98vw, 320px);
-    max-width: 350px;
     padding: 3px;
+    /* Ensure full width usage */
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .navigation-section-btn {
+    font-size: 0.8rem;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-md);
+    min-height: 36px;
   }
   
   .navigation-section-btn svg {
     font-size: 0.875rem;
   }
   
-  .navigation-section-btn {
-    font-size: 0.8rem;
-    gap: var(--spacing-xs);
-    /* FIXED: Tighter padding for small screens */
-    padding: var(--spacing-xs) var(--spacing-md);
-  }
-  
   .navigation-tab-slider {
-    /* FIXED: Small screen slider positioning */
     top: 3px;
     left: 3px;
     height: calc(100% - 6px);
+  }
+}
+
+/* Landscape mobile support */
+@media (max-width: 768px) and (orientation: landscape) {
+  .navigation-pill-container {
+    max-width: 100vw;
+    width: 100%;
   }
 }
 
@@ -953,18 +959,6 @@
     font-size: 0.5rem;
     padding: 1px 4px;
     min-width: 40px;
-    letter-spacing: 0.1px;
-  }
-}
-
-/* Mobile: Additional support for landscape orientation */
-@media (max-width: 768px) and (orientation: landscape) {
-  .navigation-pill-container {
-    max-width: 100vw;
-    overflow-x: auto;
-  }
-  
-  .navigation-tab-slider {
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
+   letter-spacing: 0.1px;
+ }
 }
