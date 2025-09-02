@@ -188,18 +188,19 @@
     display: none;
   }
   
-  /* Mobile button sizing */
+  /* FIXED: Mobile button sizing to match Calendar exactly - 36px height */
   .navigation-section-btn {
     flex-shrink: 0;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    font-size: 0.875rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.8rem;
     gap: var(--spacing-sm);
     min-width: fit-content;
+    min-height: 36px; /* FIXED: Match Calendar exactly */
     /* Ensure buttons don't get squished */
     flex: 0 0 auto;
   }
   
-  /* Mobile slider positioning */
+  /* FIXED: Mobile slider positioning to match Calendar */
   .navigation-tab-slider {
     top: 4px;
     left: 4px;
@@ -222,30 +223,33 @@
   }
 }
 
-/* Very small screens */
+/* Very small screens - FIXED: Match Calendar exact sizing */
 @media (max-width: 480px) {
   .navigation-pill-container {
-    padding: 3px;
+    padding: 6px; /* FIXED: Match Calendar exactly */
     /* Ensure full width usage */
     width: 100%;
     max-width: 100%;
   }
   
   .navigation-section-btn {
-    font-size: 0.8rem;
+    font-size: 0.875rem; /* FIXED: Match Calendar size */
     gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-md);
-    min-height: 36px;
+    padding: var(--spacing-sm) var(--spacing-md); /* FIXED: Match Calendar padding */
+    min-height: 36px; /* FIXED: Match Calendar exactly */
   }
   
   .navigation-section-btn svg {
     font-size: 0.875rem;
   }
   
+  /* FIXED: Slider positioning for very small screens */
   .navigation-tab-slider {
-    top: 3px;
-    left: 3px;
-    height: calc(100% - 6px);
+    top: 6px; /* FIXED: Match Calendar padding */
+    left: 6px; /* FIXED: Match Calendar padding */
+    height: calc(100% - 12px); /* FIXED: Match Calendar calculation */
+    /* FIXED: Ultra-fast transitions for small screens like Calendar */
+    transition: transform 0.2s ease-out, width 0.2s ease-out;
   }
 }
 
@@ -959,6 +963,6 @@
     font-size: 0.5rem;
     padding: 1px 4px;
     min-width: 40px;
-   letter-spacing: 0.1px;
- }
+    letter-spacing: 0.1px;
+  }
 }
