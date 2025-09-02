@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - Updated Header & Sliding Menu */
+/* components/EmotionalTimeline/EmotionalTimeline.css - Updated with Sliding Menu & Header Consistency */
 
 /* Main container */
 .emotional-timeline-container {
@@ -23,7 +23,7 @@
   background: var(--phase-color) !important;
 }
 
-/* UPDATED: Integrated Header Design - Matching Tracker/Calendar/Stats pattern */
+/* UPDATED: Integrated Header Design matching Tracker/Calendar/Stats pattern */
 .integrated-timeline-header {
   display: flex;
   flex-direction: column;
@@ -499,47 +499,37 @@
   gap: var(--spacing-md);
 }
 
-/* Timeline phases with proper color inheritance and lock states */
+/* Timeline phases with proper color inheritance and lock states - UPDATED */
 .timeline-phase {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-lg);
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.timeline-phase::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .timeline-phase:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.08);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Phase status styling with proper colors */
+/* Phase status styling with proper colors - UPDATED */
 .timeline-phase.completed {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%);
+  background-color: var(--medium-gray);
   border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
 .timeline-phase.current {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
   transform: none;
 }
 
@@ -553,7 +543,7 @@
 
 .timeline-phase.upcoming:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.02);
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 /* Timeline phase icon with color inheritance */
@@ -592,29 +582,19 @@
   flex-shrink: 0;
 }
 
+/* UPDATED: Current pill styling to match sliding pill buttons */
 .timeline-phase-current {
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   flex-shrink: 0;
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--primary) 0%, rgba(255, 221, 0, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #000000 !important;
-  text-shadow: none;
-  box-shadow: 0 0 12px rgba(255, 221, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  animation: current-phase-glow 2s ease-in-out infinite;
-}
-
-@keyframes current-phase-glow {
-  0%, 100% {
-    box-shadow: 0 0 12px rgba(255, 221, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(255, 221, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
+  transition: none;
 }
 
 .timeline-phase-lock {
@@ -644,47 +624,37 @@
   gap: var(--spacing-md);
 }
 
-/* Mastery level cards - same styling as timeline phases */
+/* Mastery level cards - UPDATED styling */
 .mastery-level-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-lg);
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 }
 
-.mastery-level-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.3), transparent);
-}
-
 .mastery-level-card:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.08);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .mastery-level-card.completed {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%);
+  background-color: var(--medium-gray);
   border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
 .mastery-level-card.current {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
   transform: none;
 }
 
@@ -698,7 +668,7 @@
 
 .mastery-level-card.upcoming:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.02);
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 .mastery-level-icon {
@@ -785,19 +755,18 @@
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
+/* UPDATED: Current badge styling to match sliding pill buttons */
 .mastery-level-current-badge {
   font-size: 0.625rem;
-  font-weight: 700;
+  font-weight: 600;
   padding: 4px 8px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--primary) 0%, rgba(255, 221, 0, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #000000 !important;
-  text-shadow: none;
-  box-shadow: 0 0 12px rgba(255, 221, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  animation: current-phase-glow 2s ease-in-out infinite;
+  transition: none;
   white-space: nowrap;
   min-width: 60px;
   text-align: center;
