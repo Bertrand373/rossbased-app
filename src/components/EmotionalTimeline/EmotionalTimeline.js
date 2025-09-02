@@ -60,7 +60,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   // Tab configuration matching design patterns
   const navigationTabs = [
     { id: 'journey-map', label: 'Journey Map', icon: FaMapSigns },
-    { id: 'check-in', label: 'Check-in', icon: FaHeart },
+    { id: 'check-in', label: 'Check-in', icon: FaCheckCircle },
     { id: 'journal', label: 'Journal', icon: FaBook },
     { id: 'analysis', label: 'Analysis', icon: FaBrain }
   ];
@@ -758,7 +758,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     {/* Analysis Cards Grid - Rest remains the same */}
                     {analysis && currentPhase && currentDay > 0 && (
                       <div className="insights-grid">
-                        {/* All analysis cards remain the same... */}
                         {/* Phase Education Card - ALWAYS SHOW */}
                         {analysis?.phaseEducation && (
                           <div className="insight-card">
