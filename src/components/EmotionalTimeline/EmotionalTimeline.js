@@ -10,7 +10,7 @@ import './EmotionalTimelineSections.css';
 // Icons
 import { 
   FaCheckCircle, FaPen, FaInfoCircle, FaRegLightbulb, FaTimes,
-  FaMapSigns, FaHeart, FaBrain, FaBook
+  FaMapSigns, FaHeart, FaBrain, FaBook, FaTrophy
 } from 'react-icons/fa';
 
 // Import utility functions and data

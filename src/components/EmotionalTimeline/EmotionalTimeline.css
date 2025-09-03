@@ -523,7 +523,7 @@
 
 /* Phase status styling with proper colors - UPDATED */
 .timeline-phase.completed {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%);
+  background-color: var(--medium-gray);
   border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
@@ -741,6 +741,37 @@
   background-color: var(--primary);
   transition: width 0.6s ease;
   box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
+}
+
+/* NEW: Integrated progress bar within mastery level cards */
+.mastery-level-integrated-progress {
+  margin-top: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.mastery-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.mastery-progress-bar .mastery-progress-fill {
+  height: 100%;
+  background-color: var(--primary);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 6px rgba(255, 221, 0, 0.3);
+}
+
+.mastery-progress-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: left;
+  font-weight: 500;
 }
 
 .mastery-level-status {
