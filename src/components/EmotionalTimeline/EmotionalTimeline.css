@@ -950,15 +950,6 @@
   
   .mastery-level-card {
     padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
-  }
-  
-  .mastery-level-header {
-    gap: var(--spacing-sm);
-  }
-  
-  .mastery-level-main-content {
-    gap: var(--spacing-sm);
   }
   
   .mastery-level-icon {
@@ -979,8 +970,8 @@
     font-size: 0.75rem;
   }
   
-  .mastery-level-range {
-    font-size: 0.8rem;
+  .mastery-level-time-range {
+    font-size: 0.7rem;
   }
   
   .mastery-level-current-badge {
