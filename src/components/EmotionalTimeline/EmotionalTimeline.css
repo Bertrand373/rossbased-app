@@ -521,9 +521,9 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Phase status styling with proper colors - UPDATED */
+/* Phase status styling with proper colors - UPDATED WITH GREEN BACKGROUND */
 .timeline-phase.completed {
-  background-color: var(--medium-gray);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%);
   border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
@@ -627,7 +627,7 @@
 /* Mastery level cards - UPDATED styling */
 .mastery-level-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: var(--spacing-lg);
   background-color: var(--medium-gray);
@@ -638,6 +638,8 @@
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
 .mastery-level-card:hover {
@@ -671,6 +673,21 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
+/* UPDATED: Mastery level card layout for integrated progress */
+.mastery-level-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.mastery-level-main-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  flex: 1;
+}
+
 .mastery-level-icon {
   font-size: 1.5rem;
   display: flex;
@@ -686,7 +703,6 @@
 
 .mastery-level-info {
   flex: 1;
-  margin-left: var(--spacing-lg);
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -714,8 +730,7 @@
   gap: var(--spacing-xs);
   align-items: flex-end;
   text-align: right;
-  margin-right: var(--spacing-md);
-  min-width: 80px;
+  min-width: 120px;
 }
 
 .mastery-level-range {
@@ -724,54 +739,6 @@
   color: var(--text);
   margin: 0;
   white-space: nowrap;
-}
-
-.mastery-level-progress {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background-color: rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-}
-
-.mastery-progress-fill {
-  height: 100%;
-  background-color: var(--primary);
-  transition: width 0.6s ease;
-  box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
-}
-
-/* NEW: Integrated progress bar within mastery level cards */
-.mastery-level-integrated-progress {
-  margin-top: var(--spacing-sm);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.mastery-progress-bar {
-  width: 100%;
-  height: 6px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-
-.mastery-progress-bar .mastery-progress-fill {
-  height: 100%;
-  background-color: var(--primary);
-  transition: width 0.6s ease;
-  box-shadow: 0 0 6px rgba(255, 221, 0, 0.3);
-}
-
-.mastery-progress-text {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-align: left;
-  font-weight: 500;
 }
 
 .mastery-level-status {
@@ -806,6 +773,45 @@
 .mastery-level-lock {
   font-size: 1.125rem;
   color: var(--text-secondary);
+}
+
+/* NEW: Integrated progress bar within mastery level cards - matching main phase card */
+.mastery-level-integrated-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.mastery-progress-bar {
+  width: 100%;
+  height: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.mastery-progress-bar .mastery-progress-fill {
+  height: 100%;
+  background-color: var(--primary);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
+}
+
+.mastery-progress-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.mastery-progress-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: 500;
 }
 
 /* Mobile Responsiveness for Core Layout */
@@ -865,6 +871,23 @@
   
   .mastery-level-card {
     padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+  
+  .mastery-level-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .mastery-level-main-content {
+    width: 100%;
+  }
+  
+  .mastery-level-details {
+    align-items: flex-start;
+    text-align: left;
+    min-width: auto;
   }
   
   .mastery-level-icon {
@@ -883,10 +906,6 @@
   
   .mastery-level-subtitle {
     font-size: 0.875rem;
-  }
-  
-  .mastery-level-details {
-    margin-right: var(--spacing-md);
   }
   
   .mastery-level-range {
@@ -931,6 +950,15 @@
   
   .mastery-level-card {
     padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+  
+  .mastery-level-header {
+    gap: var(--spacing-sm);
+  }
+  
+  .mastery-level-main-content {
+    gap: var(--spacing-sm);
   }
   
   .mastery-level-icon {
@@ -949,10 +977,6 @@
   
   .mastery-level-subtitle {
     font-size: 0.75rem;
-  }
-  
-  .mastery-level-details {
-    margin-right: var(--spacing-sm);
   }
   
   .mastery-level-range {

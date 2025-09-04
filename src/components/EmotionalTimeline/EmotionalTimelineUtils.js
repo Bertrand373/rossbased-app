@@ -198,7 +198,7 @@ export const emotionalPhases = [
   }
 ];
 
-// Simplified mastery levels for 181+ day practitioners
+// Simplified mastery levels for 181+ day practitioners - ALL USE TROPHY ICON
 export const masteryLevels = [
   { 
     id: 1, 
@@ -209,7 +209,7 @@ export const masteryLevels = [
     startDay: 181, 
     endDay: 365,
     description: "Building the foundation of permanent energy mastery",
-    icon: FaMapSigns
+    icon: FaTrophy
   },
   { 
     id: 2, 
@@ -220,7 +220,7 @@ export const masteryLevels = [
     startDay: 366, 
     endDay: 730,
     description: "Integrating wisdom gained from sustained practice",
-    icon: FaBrain
+    icon: FaTrophy
   },
   { 
     id: 3, 
@@ -379,13 +379,13 @@ const generatePhaseEducationInsight = (currentPhase, currentDay) => {
       earlyPhase: `Days 46-60: Cognitive Emergence - Retained nutrients (lecithin, zinc, B12) rebuild nerve sheaths. Mental fog lifts permanently.`,
       midPhase: `Days 61-90: Intellectual Peak - Brain tissue becomes more densely connected. Pattern recognition and strategic thinking expand dramatically.`,
       keyLearning: "Neuroplasticity advantage: Higher zinc and B-vitamin availability optimizes neurotransmitter synthesis for peak mental performance.",
-      whatToExpect: `Expect enhanced focus and problem-solving abilities. Your brain is operating at higher efficiency.`
+      whatToExpected: `Expect enhanced focus and problem-solving abilities. Your brain is operating at higher efficiency.`
     },
     4: { // Integration & Growth
       earlyPhase: `Days 91-120: Integration Deepens - Complete endocrine rebalancing. Nervous system optimizes for retention, not ejaculation.`,
       midPhase: `Days 121-180: Growth Acceleration - Natural charisma and leadership qualities develop. Others unconsciously sense your increased presence.`,
       keyLearning: "Energy field changes: Practitioners show brighter, more extensive energy fields detectable by sensitive individuals.",
-      whatToExpect: `Expect natural leadership abilities and magnetic presence. You're embodying refined energy.`
+      whatToExpected: `Expect natural leadership abilities and magnetic presence. You're embodying refined energy.`
     },
     5: { // Mastery & Purpose
       earlyPhase: `Day ${currentDay}: Mastery Consciousness - Sexual energy permanently redirected upward. Vital essence accumulation creates sustained expanded awareness.`,
