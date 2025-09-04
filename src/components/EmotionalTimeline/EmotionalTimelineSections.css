@@ -1214,8 +1214,9 @@
     min-width: 40px;
   }
   
+  /* UPDATED: Very small mobile slider adjustments to match Tracker */
   .emotion-range-slider {
-    height: 36px;
+    height: 12px;
   }
   
   .emotion-range-slider::-webkit-slider-thumb {
@@ -1228,6 +1229,7 @@
     height: 32px;
   }
   
+  /* UPDATED: Very small mobile slider labels to match Tracker exactly */
   .slider-labels {
     font-size: 0.75rem !important;
     padding-left: 10px !important;
