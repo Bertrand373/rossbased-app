@@ -3,9 +3,10 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
-// Import CSS files
+// Import CSS files - UPDATED: Now imports both organized CSS files
 import './EmotionalTimeline.css';
 import './EmotionalTimelineSections.css';
+import './EmotionalTimelineModals.css';
 
 // Icons
 import { 
