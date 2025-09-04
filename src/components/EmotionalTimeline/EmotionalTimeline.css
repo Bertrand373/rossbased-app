@@ -624,10 +624,10 @@
   gap: var(--spacing-md);
 }
 
-/* Mastery level cards - UPDATED styling */
+/* UPDATED: Mastery level card layout - match timeline phase layout */
 .mastery-level-card {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   padding: var(--spacing-lg);
   background-color: var(--medium-gray);
@@ -638,8 +638,6 @@
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  flex-direction: column;
-  gap: var(--spacing-lg);
 }
 
 .mastery-level-card:hover {
@@ -673,21 +671,6 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* UPDATED: Mastery level card layout for integrated progress */
-.mastery-level-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.mastery-level-main-content {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  flex: 1;
-}
-
 .mastery-level-icon {
   font-size: 1.5rem;
   display: flex;
@@ -703,6 +686,7 @@
 
 .mastery-level-info {
   flex: 1;
+  margin-left: var(--spacing-lg);
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -724,21 +708,12 @@
   line-height: 1.3;
 }
 
-.mastery-level-details {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  align-items: flex-end;
-  text-align: right;
-  min-width: 120px;
-}
-
-.mastery-level-range {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
+.mastery-level-time-range {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
   margin: 0;
-  white-space: nowrap;
+  line-height: 1.3;
+  margin-top: var(--spacing-xs);
 }
 
 .mastery-level-status {
@@ -755,9 +730,9 @@
 
 /* UPDATED: Current badge styling to match sliding pill buttons */
 .mastery-level-current-badge {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  padding: 4px 8px;
+  padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-full);
   background-color: rgba(255, 221, 0, 0.1);
   border: 1px solid rgba(255, 221, 0, 0.2);
@@ -775,43 +750,50 @@
   color: var(--text-secondary);
 }
 
-/* NEW: Integrated progress bar within mastery level cards - matching main phase card */
-.mastery-level-integrated-progress {
+/* NEW: Check-in Benefits Banner */
+.checkin-benefits-banner {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  width: 100%;
-}
-
-.mastery-progress-bar {
-  width: 100%;
-  height: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  border: 1px solid var(--border);
-  position: relative;
-}
-
-.mastery-progress-bar .mastery-progress-fill {
-  height: 100%;
-  background-color: var(--primary);
-  transition: width 0.6s ease;
-  box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
-}
-
-.mastery-progress-text-container {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xs);
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.4;
 }
 
-.mastery-progress-text {
-  font-size: 0.875rem;
+.checkin-benefits-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.checkin-benefits-icon {
+  font-size: 1rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.checkin-benefits-text {
+  flex: 1;
   color: var(--text-secondary);
-  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.4;
   font-weight: 500;
+  text-align: center;
+}
+
+.checkin-benefits-text strong {
+  color: var(--text);
+  font-weight: 600;
 }
 
 /* Mobile Responsiveness for Core Layout */
@@ -871,23 +853,6 @@
   
   .mastery-level-card {
     padding: var(--spacing-md);
-    gap: var(--spacing-md);
-  }
-  
-  .mastery-level-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-md);
-  }
-  
-  .mastery-level-main-content {
-    width: 100%;
-  }
-  
-  .mastery-level-details {
-    align-items: flex-start;
-    text-align: left;
-    min-width: auto;
   }
   
   .mastery-level-icon {
@@ -908,8 +873,8 @@
     font-size: 0.875rem;
   }
   
-  .mastery-level-range {
-    font-size: 0.875rem;
+  .mastery-level-time-range {
+    font-size: 0.75rem;
   }
   
   .mastery-level-current-badge {
@@ -917,6 +882,26 @@
     padding: 2px 6px;
     min-width: 50px;
     letter-spacing: 0.25px;
+  }
+  
+  .checkin-benefits-banner {
+    padding: var(--spacing-sm);
+  }
+  
+  .checkin-benefits-content {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .checkin-benefits-icon {
+    align-self: center;
+    margin-top: 0;
+  }
+  
+  .checkin-benefits-text {
+    font-size: 0.8rem;
+    text-align: center;
   }
 }
 
@@ -979,5 +964,13 @@
     padding: 1px 4px;
     min-width: 40px;
     letter-spacing: 0.1px;
+  }
+  
+  .checkin-benefits-banner {
+    padding: var(--spacing-xs);
+  }
+  
+  .checkin-benefits-text {
+    font-size: 0.75rem;
   }
 }

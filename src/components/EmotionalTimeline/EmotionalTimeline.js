@@ -522,7 +522,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               })}
             </div>
 
-            {/* Mastery Levels Display - UPDATED WITH INTEGRATED PROGRESS */}
+            {/* UPDATED: Mastery Levels Display - Simple layout matching timeline phases */}
             {currentDay >= 181 && (
               <div className="mastery-levels-section">
                 <h3>Mastery Levels (Days 181+)</h3>
@@ -537,55 +537,29 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         key={level.id}
                         className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                       >
-                        {/* UPDATED: New card layout with header and progress */}
-                        <div className="mastery-level-header">
-                          <div className="mastery-level-main-content">
-                            <div className="mastery-level-icon">
-                              <level.icon />
-                            </div>
-                            
-                            <div className="mastery-level-info">
-                              <div className="mastery-level-name">Level {level.level}: {level.name}</div>
-                              <div className="mastery-level-subtitle">{level.subtitle}</div>
-                            </div>
-                          </div>
-                          
-                          <div className="mastery-level-details">
-                            <div className="mastery-level-range">
-                              {level.timeRange}
-                            </div>
-                            
-                            <div className="mastery-level-status">
-                              {isCompleted && (
-                                <div className="mastery-level-check">
-                                  <FaCheckCircle />
-                                </div>
-                              )}
-                              {isCurrent && (
-                                <div className="mastery-level-current-badge">
-                                  Current Level
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                        {/* UPDATED: Simple layout matching timeline phases */}
+                        <div className="mastery-level-icon">
+                          <level.icon />
                         </div>
                         
-                        {/* UPDATED: Integrated progress bar for current mastery level */}
-                        {isCurrent && (
-                          <div className="mastery-level-integrated-progress">
-                            <div className="mastery-progress-bar">
-                              <div 
-                                className="mastery-progress-fill"
-                                style={{ width: `${getPhaseProgress(currentPhase, currentDay, currentMasteryLevel)}%` }}
-                              ></div>
+                        <div className="mastery-level-info">
+                          <div className="mastery-level-name">Level {level.level}: {level.name}</div>
+                          <div className="mastery-level-subtitle">{level.subtitle}</div>
+                          <div className="mastery-level-time-range">{level.timeRange}</div>
+                        </div>
+                        
+                        <div className="mastery-level-status">
+                          {isCompleted && (
+                            <div className="mastery-level-check">
+                              <FaCheckCircle />
                             </div>
-                            <div className="mastery-progress-text-container">
-                              <div className="mastery-progress-text">
-                                {getPhaseProgressText(currentPhase, currentDay, currentMasteryLevel)}
-                              </div>
+                          )}
+                          {isCurrent && (
+                            <div className="mastery-level-current-badge">
+                              Current
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -599,6 +573,16 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         {activeSection === 'check-in' && (
           <div className="emotional-checkin-section">
             <h3>Daily Emotional Check-in</h3>
+            
+            {/* NEW: Info banner explaining what tracking unlocks */}
+            <div className="checkin-benefits-banner">
+              <div className="checkin-benefits-content">
+                <FaInfoCircle className="checkin-benefits-icon" />
+                <div className="checkin-benefits-text">
+                  <strong>Track to unlock:</strong> Personalized phase analysis, pattern recognition across your emotional metrics, challenge identification with solutions, predictive guidance for upcoming phases, and tailored strategies based on your unique journey data.
+                </div>
+              </div>
+            </div>
             
             <div className="emotion-status-section">
               {emotionsLogged ? (
