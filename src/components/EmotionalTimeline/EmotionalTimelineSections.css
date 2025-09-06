@@ -1,6 +1,6 @@
 /* components/EmotionalTimeline/EmotionalTimelineSections.css - Section Components & Analysis Display */
 
-/* UPDATED: Check-in Benefits Banner with centered icon and clean spacing */
+/* UPDATED: Check-in Benefits Banner with PERFECT icon centering */
 .checkin-benefits-banner {
   display: flex;
   align-items: center;
@@ -10,11 +10,11 @@
   font-weight: 500;
   font-size: 0.875rem;
   text-align: center;
-  padding: var(--spacing-lg) var(--spacing-md); /* UPDATED: Clean top/bottom spacing */
+  padding: var(--spacing-lg) var(--spacing-md);
   background-color: rgba(255, 221, 0, 0.05);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-xl); /* UPDATED: Clean spacing below banner */
+  margin-bottom: var(--spacing-xl);
   line-height: 1.4;
 }
 
@@ -24,14 +24,21 @@
   justify-content: center;
   gap: var(--spacing-sm);
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .checkin-benefits-icon {
   font-size: 1rem;
   color: var(--primary);
   flex-shrink: 0;
-  align-self: center; /* UPDATED: Ensure icon is always centered */
-  margin: 0; /* UPDATED: Remove any default margins */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .checkin-benefits-text {
@@ -41,6 +48,7 @@
   line-height: 1.4;
   font-weight: 500;
   text-align: center;
+  min-width: 0;
 }
 
 .checkin-benefits-text strong {
@@ -576,10 +584,9 @@
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl); /* UPDATED: Clean spacing between all elements */
+  gap: var(--spacing-xl);
 }
 
-/* UPDATED: Header to match Analysis header styling exactly */
 .emotional-checkin-section h3 {
   margin: 0;
   font-size: 1.25rem;
@@ -681,7 +688,7 @@
 .emotion-range-slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 12px; /* UPDATED: Sleek mobile height for all screens */
+  height: 12px;
   border-radius: var(--radius-full);
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.15) 0%, 
@@ -720,8 +727,8 @@
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 32px; /* UPDATED: Larger sleek thumb for all screens */
-  height: 32px; /* UPDATED: Larger sleek thumb for all screens */
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -743,8 +750,8 @@
 }
 
 .emotion-range-slider::-moz-range-thumb {
-  width: 32px; /* UPDATED: Larger sleek thumb for all screens */
-  height: 32px; /* UPDATED: Larger sleek thumb for all screens */
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -763,7 +770,7 @@
 .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
-  font-size: 0.75rem !important; /* UPDATED: Sleek mobile size for all screens */
+  font-size: 0.75rem !important;
   color: var(--text-secondary) !important;
   margin-top: 8px !important;
   margin-bottom: 0px !important;
@@ -771,8 +778,8 @@
   padding-bottom: 0px !important;
   line-height: 1 !important;
   transform: none !important;
-  padding-left: 10px !important; /* UPDATED: Sleek mobile padding for all screens */
-  padding-right: 10px !important; /* UPDATED: Sleek mobile padding for all screens */
+  padding-left: 10px !important;
+  padding-right: 10px !important;
   font-weight: 500 !important;
   letter-spacing: 0.025em !important;
   position: relative !important;
@@ -795,7 +802,6 @@
   margin-top: var(--spacing-lg);
 }
 
-/* UPDATED: Save emotions button to match "Set Date" button styling - static yellow pill */
 .save-emotions-btn {
   background-color: rgba(255, 221, 0, 0.1) !important;
   border: 1px solid rgba(255, 221, 0, 0.2) !important;
@@ -813,7 +819,6 @@
   gap: var(--spacing-sm) !important;
 }
 
-/* REMOVED: All hover effects for save emotions button */
 .save-emotions-btn:hover,
 .save-emotions-btn:focus,
 .save-emotions-btn:active {
@@ -835,7 +840,7 @@
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl); /* UPDATED: Clean spacing between all elements */
+  gap: var(--spacing-xl);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -848,7 +853,7 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* UPDATED: Data quality banner with centered icon and clean spacing */
+/* UPDATED: Data quality banner with PERFECT icon centering */
 .insight-data-banner {
   display: flex;
   align-items: center;
@@ -858,11 +863,11 @@
   font-weight: 500;
   font-size: 0.875rem;
   text-align: center;
-  padding: var(--spacing-lg) var(--spacing-md); /* UPDATED: Clean top/bottom spacing */
+  padding: var(--spacing-lg) var(--spacing-md);
   background-color: rgba(255, 221, 0, 0.05);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-xl); /* UPDATED: Clean spacing below banner */
+  margin-bottom: var(--spacing-xl);
   line-height: 1.4;
 }
 
@@ -872,14 +877,21 @@
   justify-content: center;
   gap: var(--spacing-sm);
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .insight-data-icon {
   font-size: 1rem;
   color: var(--primary);
   flex-shrink: 0;
-  align-self: center; /* UPDATED: Ensure icon is always centered */
-  margin: 0; /* UPDATED: Remove any default margins */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .insight-data-text {
@@ -889,6 +901,7 @@
   line-height: 1.4;
   font-weight: 500;
   text-align: center;
+  min-width: 0;
 }
 
 .insight-data-text strong {
@@ -974,34 +987,37 @@
   color: var(--text-secondary);
 }
 
-/* UPDATED: Mobile Responsiveness for Sections with centered icons */
+/* UPDATED: Mobile Responsiveness for Sections with PERFECT icon centering */
 @media (max-width: 768px) {
-  /* UPDATED: Banner content with centered icons on mobile */
   .checkin-benefits-banner {
-    padding: var(--spacing-md) var(--spacing-sm); /* UPDATED: Clean mobile spacing */
-    margin-bottom: var(--spacing-lg); /* UPDATED: Clean spacing below banner */
+    padding: var(--spacing-md) var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
   }
   
   .checkin-benefits-content {
     flex-direction: column;
-    gap: var(--spacing-sm); /* UPDATED: Clean spacing between icon and text */
+    gap: var(--spacing-sm);
     text-align: center;
+    align-items: center;
   }
   
   .checkin-benefits-icon {
     align-self: center;
-    margin: 0; /* UPDATED: No margins, just clean centering */
+    margin: 0;
+    padding: 0;
+    justify-self: center;
+    place-self: center;
   }
   
   .checkin-benefits-text {
     font-size: 0.8rem;
     text-align: center;
+    width: 100%;
   }
   
-  /* UPDATED: Emotional check-in section with clean spacing */
   .emotional-checkin-section {
     padding: var(--spacing-lg);
-    gap: var(--spacing-lg); /* UPDATED: Clean spacing between all elements */
+    gap: var(--spacing-lg);
   }
   
   .emotion-sliders {
@@ -1041,7 +1057,6 @@
     height: 28px;
   }
   
-  /* Mobile analysis cards */
   .insights-grid {
     gap: var(--spacing-md);
   }
@@ -1050,26 +1065,30 @@
     padding: var(--spacing-md);
   }
   
-  /* UPDATED: Insight data banner with centered icons on mobile */
   .insight-data-banner {
-    padding: var(--spacing-md) var(--spacing-sm); /* UPDATED: Clean mobile spacing */
-    margin-bottom: var(--spacing-lg); /* UPDATED: Clean spacing below banner */
+    padding: var(--spacing-md) var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
   }
   
   .insight-data-banner-content {
     flex-direction: column;
-    gap: var(--spacing-sm); /* UPDATED: Clean spacing between icon and text */
+    gap: var(--spacing-sm);
     text-align: center;
+    align-items: center;
   }
   
   .insight-data-icon {
     align-self: center;
-    margin: 0; /* UPDATED: No margins, just clean centering */
+    margin: 0;
+    padding: 0;
+    justify-self: center;
+    place-self: center;
   }
   
   .insight-data-text {
     font-size: 0.8rem;
     text-align: center;
+    width: 100%;
   }
   
   .data-quality-indicator {
@@ -1078,56 +1097,60 @@
     text-align: center;
   }
   
-  /* UPDATED: Phase insight section with clean spacing */
   .phase-insight-section {
     padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
-    gap: var(--spacing-lg); /* UPDATED: Clean spacing between all elements */
+    gap: var(--spacing-lg);
   }
 }
 
 @media (max-width: 480px) {
-  /* UPDATED: Very small mobile with centered icons and clean spacing */
   .checkin-benefits-banner {
-    padding: var(--spacing-md) var(--spacing-xs); /* UPDATED: Clean very small mobile spacing */
-    margin-bottom: var(--spacing-md); /* UPDATED: Clean spacing below banner */
+    padding: var(--spacing-md) var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
   }
   
   .checkin-benefits-content {
-    gap: var(--spacing-sm); /* UPDATED: Clean spacing between icon and text */
+    gap: var(--spacing-sm);
   }
   
   .checkin-benefits-icon {
     font-size: 1rem;
-    margin: 0; /* UPDATED: No margins */
+    margin: 0;
+    padding: 0;
+    align-self: center;
+    justify-self: center;
+    place-self: center;
   }
   
   .checkin-benefits-text {
     font-size: 0.75rem;
   }
   
-  /* UPDATED: Insight data banner for very small mobile */
   .insight-data-banner {
-    padding: var(--spacing-md) var(--spacing-xs); /* UPDATED: Clean very small mobile spacing */
-    margin-bottom: var(--spacing-md); /* UPDATED: Clean spacing below banner */
+    padding: var(--spacing-md) var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
   }
   
   .insight-data-banner-content {
-    gap: var(--spacing-sm); /* UPDATED: Clean spacing between icon and text */
+    gap: var(--spacing-sm);
   }
   
   .insight-data-icon {
     font-size: 1rem;
-    margin: 0; /* UPDATED: No margins */
+    margin: 0;
+    padding: 0;
+    align-self: center;
+    justify-self: center;
+    place-self: center;
   }
   
   .insight-data-text {
     font-size: 0.75rem;
   }
   
-  /* UPDATED: Emotional check-in section for very small mobile */
   .emotional-checkin-section {
     padding: var(--spacing-md);
-    gap: var(--spacing-md); /* UPDATED: Clean spacing between all elements */
+    gap: var(--spacing-md);
   }
   
   .emotion-label {
@@ -1145,7 +1168,6 @@
     height: 24px;
   }
   
-  /* UPDATED: Very small mobile slider adjustments to match Tracker */
   .emotion-range-slider {
     height: 12px;
   }
@@ -1160,17 +1182,15 @@
     height: 32px;
   }
   
-  /* UPDATED: Very small mobile slider labels to match Tracker exactly */
   .slider-labels {
     font-size: 0.75rem !important;
     padding-left: 10px !important;
     padding-right: 10px !important;
   }
   
-  /* UPDATED: Phase insight section for very small mobile */
   .phase-insight-section {
     padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
-    gap: var(--spacing-md); /* UPDATED: Clean spacing between all elements */
+    gap: var(--spacing-md);
   }
   
   .phase-insight-section h3 {
@@ -1178,7 +1198,6 @@
     padding: var(--spacing-md) 0;
   }
   
-  /* ADDED: Mobile responsive styling for check-in header */
   .emotional-checkin-section h3 {
     font-size: 1.125rem;
     padding: var(--spacing-md) 0;
