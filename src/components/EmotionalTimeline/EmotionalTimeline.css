@@ -812,7 +812,7 @@
   font-weight: 600;
 }
 
-/* UPDATED: Mobile Responsiveness for Core Layout with centered icons */
+/* Mobile Responsiveness for Core Layout */
 @media (max-width: 768px) {
   .emotional-timeline-container {
     gap: var(--spacing-lg);
@@ -954,60 +954,3 @@
     font-size: 1.125rem;
     padding: var(--spacing-md) 0;
   }
-  
-  .mastery-level-card {
-    padding: var(--spacing-sm);
-  }
-  
-  .mastery-level-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 1.125rem;
-  }
-  
-  .mastery-level-info {
-    margin-left: var(--spacing-sm);
-  }
-  
-  .mastery-level-name {
-    font-size: 0.875rem;
-  }
-  
-  .mastery-level-time-range {
-    font-size: 0.7rem;
-  }
-  
-  .mastery-level-description {
-    font-size: 0.7rem;
-  }
-  
-  .mastery-level-current-badge {
-    font-size: 0.5rem;
-    padding: 1px 4px;
-    min-width: 40px;
-    letter-spacing: 0.1px;
-  }
-  
-  /* UPDATED: Very small mobile with centered icons and clean spacing */
-  .checkin-benefits-banner {
-    padding: var(--spacing-md) var(--spacing-xs); /* UPDATED: Clean very small mobile spacing */
-    margin-bottom: var(--spacing-md); /* UPDATED: Clean spacing below banner */
-  }
-  
-  .checkin-benefits-content {
-    gap: var(--spacing-sm); /* UPDATED: Clean spacing between icon and text */
-  }
-  
-  .checkin-benefits-icon {
-    font-size: 1rem;
-    margin: 0; /* UPDATED: No margins */
-  }
-  
-  .checkin-benefits-text {
-    font-size: 0.75rem;
-  }
-  
-  .timeline-phase-description {
-    font-size: 0.7rem;
-  }
-}
