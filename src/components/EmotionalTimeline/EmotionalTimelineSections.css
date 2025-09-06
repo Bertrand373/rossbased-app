@@ -1091,6 +1091,11 @@
     min-width: 40px;
   }
   
+  .emotion-value-clean {
+    font-size: 0.875rem !important;
+    min-width: 20px;
+  }
+  
   /* UPDATED: Very small mobile slider adjustments to match Tracker */
   .emotion-range-slider {
     height: 12px;

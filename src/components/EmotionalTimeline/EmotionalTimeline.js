@@ -588,11 +588,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 <div key={emotion.key} className="emotion-slider-item">
                   <div className="emotion-slider-header">
                     <span className="emotion-label">{emotion.label}</span>
-                    <span className="emotion-value">{emotion.value}/10</span>
+                    <span className="emotion-value-clean">{emotion.value}</span>
                   </div>
                   <input
                     type="range"
-                    min="1"
+                    min="0"
                     max="10"
                     value={emotion.value}
                     onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
