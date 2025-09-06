@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Updated with Sliding Menu & Header Consistency
+// components/EmotionalTimeline/EmotionalTimeline.js - Updated with Phase Descriptions and Removed Journal
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -10,8 +10,8 @@ import './EmotionalTimelineModals.css';
 
 // Icons
 import { 
-  FaCheckCircle, FaPen, FaInfoCircle, FaRegLightbulb, FaTimes,
-  FaMapSigns, FaHeart, FaBrain, FaBook, FaTrophy
+  FaCheckCircle, FaInfoCircle, FaTimes,
+  FaMapSigns, FaHeart, FaBrain
 } from 'react-icons/fa';
 
 // Import utility functions and data
@@ -22,17 +22,14 @@ import {
   getCurrentMasteryLevel,
   getPhaseProgress,
   getPhaseProgressText,
-  getPhaseJournalPrompt,
   generateComprehensivePhaseAnalysis
 } from './EmotionalTimelineUtils';
 
 const EmotionalTimeline = ({ userData, updateUserData }) => {
-  const [showJournalModal, setShowJournalModal] = useState(false);
-  const [currentNote, setCurrentNote] = useState('');
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showPhaseDetail, setShowPhaseDetail] = useState(false);
   
-  // UPDATED: Robust sliding pill navigation state
+  // UPDATED: Robust sliding pill navigation state - REMOVED JOURNAL TAB
   const [activeSection, setActiveSection] = useState('journey-map');
   
   // Enhanced emotional tracking states
@@ -58,11 +55,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   const currentPhase = getCurrentPhase(currentDay, emotionalPhases);
   const currentMasteryLevel = getCurrentMasteryLevel(currentDay, masteryLevels);
 
-  // Tab configuration matching design patterns
+  // Tab configuration matching design patterns - REMOVED JOURNAL TAB
   const navigationTabs = [
     { id: 'journey-map', label: 'Journey Map', icon: FaMapSigns },
     { id: 'check-in', label: 'Check-in', icon: FaCheckCircle },
-    { id: 'journal', label: 'Journal', icon: FaBook },
     { id: 'analysis', label: 'Analysis', icon: FaBrain }
   ];
 
@@ -347,32 +343,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     setEmotionsLogged(false);
   };
 
-  // Handle journal modal
-  const handleJournalPrompt = () => {
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const existingNote = userData.notes && userData.notes[todayStr];
-    
-    setCurrentNote(existingNote || '');
-    setShowJournalModal(true);
-  };
-
-  const saveNote = () => {
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const updatedNotes = { ...userData.notes, [todayStr]: currentNote };
-    
-    updateUserData({ notes: updatedNotes });
-    setShowJournalModal(false);
-    toast.success('Journal entry saved!');
-  };
-
   // Handle phase detail modal
   const showPhaseDetails = (phase) => {
     setSelectedPhase(phase);
     setShowPhaseDetail(true);
   };
-
-  const todayStr = format(new Date(), 'yyyy-MM-dd');
-  const todayNote = userData.notes && userData.notes[todayStr];
 
   return (
     <div className="emotional-timeline-container">
@@ -507,6 +482,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     <div className="timeline-phase-info">
                       <div className="timeline-phase-name">{phase.name}</div>
                       <div className="timeline-phase-range">Days {phase.dayRange}</div>
+                      {/* ADDED: Phase description matching mastery levels */}
+                      <div className="timeline-phase-description">{phase.description}</div>
                     </div>
                     {isCompleted && (
                       <div className="timeline-phase-check">
@@ -575,7 +552,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="emotional-checkin-section">
             <h3>Daily Emotional Check-in</h3>
             
-            {/* NEW: Info banner explaining what tracking unlocks */}
+            {/* INFO BANNER explaining what tracking unlocks */}
             <div className="checkin-benefits-banner">
               <div className="checkin-benefits-content">
                 <FaInfoCircle className="checkin-benefits-icon" />
@@ -594,13 +571,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     className="action-btn edit-emotions-btn"
                     onClick={enableEmotionEditing}
                   >
-                    <FaPen />
                     <span>Edit</span>
                   </button>
                 </div>
               ) : (
                 <div className="emotions-not-logged">
-                  <FaInfoCircle className="info-icon" />
                   <span>Track your emotional state to unlock personalized phase analysis and pattern recognition</span>
                 </div>
               )}
@@ -645,41 +620,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   <FaCheckCircle />
                   <span>Save Emotional Check-in</span>
                 </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Journal Section */}
-        {activeSection === 'journal' && (
-          <div className="timeline-journal-section">
-            <div className="journal-header">
-              <div className="journal-header-spacer"></div>
-              <h3>Phase-Specific Journal</h3>
-              <div className="journal-actions">
-                <button 
-                  className="action-btn"
-                  onClick={handleJournalPrompt}
-                >
-                  <FaPen />
-                  <span>{todayNote ? 'Edit Entry' : 'Add Entry'}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="journal-prompt">
-              <FaRegLightbulb className="prompt-icon" />
-              <p>{getPhaseJournalPrompt(currentPhase)}</p>
-            </div>
-
-            {todayNote ? (
-              <div className="journal-preview">
-                <p>"{todayNote.length > 150 ? `${todayNote.substring(0, 150)}...` : todayNote}"</p>
-              </div>
-            ) : (
-              <div className="empty-journal">
-                <FaInfoCircle className="info-icon" />
-                <p>No journal entry for today. Recording your journey helps track progress through phases.</p>
               </div>
             )}
           </div>
@@ -731,23 +671,17 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                       </div>
                     )}
 
-                    {/* Getting Started Banner - ONLY when very little data */}
+                    {/* UPDATED: Consolidated insufficient data section */}
                     {recentData.length < 3 && (
                       <div className="insufficient-data-section">
                         <div className="optimization-criteria">
                           <div className="optimization-criteria-title">Begin Your Analysis Journey</div>
                           <div className="optimization-criteria-text">
                             You're on day {currentDay - currentPhase.startDay + 1} of the {currentPhase.name} phase (total streak: day {currentDay}). 
-                            Start tracking your emotions daily to unlock personalized insights about your unique journey.
+                            Start tracking your emotions daily to unlock personalized insights including pattern recognition across emotional metrics, 
+                            phase-specific challenge identification, predictive guidance for upcoming phases, personalized strategy recommendations, 
+                            and scientific explanations for your experiences.
                           </div>
-                        </div>
-                        <div className="guidance-list">
-                          <div className="guidance-title">What You'll Unlock</div>
-                          <div className="guidance-item">Pattern recognition across emotional metrics</div>
-                          <div className="guidance-item">Phase-specific challenge identification</div>
-                          <div className="guidance-item">Predictive guidance for upcoming phases</div>
-                          <div className="guidance-item">Personalized strategy recommendations</div>
-                          <div className="guidance-item">Scientific explanations for your experiences</div>
                         </div>
                       </div>
                     )}
@@ -1104,39 +1038,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               >
                 <FaCheckCircle />
                 <span>Got It</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Journal Modal */}
-      {showJournalModal && (
-        <div className="modal-overlay" onClick={() => setShowJournalModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h2>Journal Entry - Day {currentDay}</h2>
-            <div className="journal-modal-prompt">
-              <FaRegLightbulb className="prompt-icon" />
-              <p>{getPhaseJournalPrompt(currentPhase)}</p>
-            </div>
-            
-            <div className="form-group">
-              <textarea
-                value={currentNote}
-                onChange={(e) => setCurrentNote(e.target.value)}
-                rows="6"
-                placeholder="Describe your emotional state, any memories surfacing, insights gained, or experiences you're having..."
-              ></textarea>
-            </div>
-            
-            <div className="form-actions">
-              <button onClick={saveNote} className="action-btn primary-action">
-                <FaCheckCircle />
-                Save Entry
-              </button>
-              <button onClick={() => setShowJournalModal(false)} className="action-btn">
-                <FaTimes />
-                Cancel
               </button>
             </div>
           </div>
