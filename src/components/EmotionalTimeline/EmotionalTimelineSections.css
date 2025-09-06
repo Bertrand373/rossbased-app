@@ -1071,10 +1071,36 @@
 
 @media (max-width: 480px) {
   .checkin-benefits-banner {
-    padding: var(--spacing-xs);
+    padding: var(--spacing-md) var(--spacing-xs) var(--spacing-md) var(--spacing-xs);
+  }
+  
+  .checkin-benefits-content {
+    gap: var(--spacing-xs);
+  }
+  
+  .checkin-benefits-icon {
+    font-size: 1rem;
+    margin-bottom: 2px;
   }
   
   .checkin-benefits-text {
+    font-size: 0.75rem;
+  }
+  
+  .insight-data-banner {
+    padding: var(--spacing-md) var(--spacing-xs) var(--spacing-md) var(--spacing-xs);
+  }
+  
+  .insight-data-banner-content {
+    gap: var(--spacing-xs);
+  }
+  
+  .insight-data-icon {
+    font-size: 1rem;
+    margin-bottom: 2px;
+  }
+  
+  .insight-data-text {
     font-size: 0.75rem;
   }
   
