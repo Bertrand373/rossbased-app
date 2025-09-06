@@ -574,11 +574,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     <span>Edit</span>
                   </button>
                 </div>
-              ) : (
-                <div className="emotions-not-logged">
-                  <span>Track your emotional state to unlock personalized phase analysis and pattern recognition</span>
-                </div>
-              )}
+              ) : null}
             </div>
 
             {/* Emotion sliders */}

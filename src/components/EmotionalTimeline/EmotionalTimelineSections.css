@@ -679,7 +679,7 @@
 .emotion-range-slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 28px;
+  height: 12px; /* UPDATED: Sleek mobile height for all screens */
   border-radius: var(--radius-full);
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.15) 0%, 
@@ -718,8 +718,8 @@
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 32px; /* UPDATED: Larger sleek thumb for all screens */
+  height: 32px; /* UPDATED: Larger sleek thumb for all screens */
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -741,8 +741,8 @@
 }
 
 .emotion-range-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 32px; /* UPDATED: Larger sleek thumb for all screens */
+  height: 32px; /* UPDATED: Larger sleek thumb for all screens */
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -761,7 +761,7 @@
 .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
-  font-size: 0.8125rem !important;
+  font-size: 0.75rem !important; /* UPDATED: Sleek mobile size for all screens */
   color: var(--text-secondary) !important;
   margin-top: 8px !important;
   margin-bottom: 0px !important;
@@ -769,8 +769,8 @@
   padding-bottom: 0px !important;
   line-height: 1 !important;
   transform: none !important;
-  padding-left: 14px !important;
-  padding-right: 14px !important;
+  padding-left: 10px !important; /* UPDATED: Sleek mobile padding for all screens */
+  padding-right: 10px !important; /* UPDATED: Sleek mobile padding for all screens */
   font-weight: 500 !important;
   letter-spacing: 0.025em !important;
   position: relative !important;
