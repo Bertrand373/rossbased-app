@@ -1,6 +1,6 @@
 /* components/EmotionalTimeline/EmotionalTimelineSections.css - Section Components & Analysis Display */
 
-/* NEW: Check-in Benefits Banner */
+/* UPDATED: Check-in Benefits Banner with centered icon and clean spacing */
 .checkin-benefits-banner {
   display: flex;
   align-items: center;
@@ -10,11 +10,11 @@
   font-weight: 500;
   font-size: 0.875rem;
   text-align: center;
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-md); /* UPDATED: Clean top/bottom spacing */
   background-color: rgba(255, 221, 0, 0.05);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl); /* UPDATED: Clean spacing below banner */
   line-height: 1.4;
 }
 
@@ -30,6 +30,8 @@
   font-size: 1rem;
   color: var(--primary);
   flex-shrink: 0;
+  align-self: center; /* UPDATED: Ensure icon is always centered */
+  margin: 0; /* UPDATED: Remove any default margins */
 }
 
 .checkin-benefits-text {
@@ -565,7 +567,7 @@
   gap: var(--spacing-md);
 }
 
-/* Emotional Check-in Section */
+/* UPDATED: Emotional Check-in Section with clean spacing */
 .emotional-checkin-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -574,7 +576,7 @@
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl); /* UPDATED: Clean spacing between all elements */
 }
 
 /* UPDATED: Header to match Analysis header styling exactly */
@@ -825,7 +827,7 @@
   filter: none !important;
 }
 
-/* Phase Analysis Section */
+/* UPDATED: Phase Analysis Section with clean spacing */
 .phase-insight-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -833,7 +835,7 @@
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl); /* UPDATED: Clean spacing between all elements */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -846,7 +848,7 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* Data quality banner */
+/* UPDATED: Data quality banner with centered icon and clean spacing */
 .insight-data-banner {
   display: flex;
   align-items: center;
@@ -856,11 +858,11 @@
   font-weight: 500;
   font-size: 0.875rem;
   text-align: center;
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-md); /* UPDATED: Clean top/bottom spacing */
   background-color: rgba(255, 221, 0, 0.05);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl); /* UPDATED: Clean spacing below banner */
   line-height: 1.4;
 }
 
@@ -876,6 +878,8 @@
   font-size: 1rem;
   color: var(--primary);
   flex-shrink: 0;
+  align-self: center; /* UPDATED: Ensure icon is always centered */
+  margin: 0; /* UPDATED: Remove any default margins */
 }
 
 .insight-data-text {
@@ -970,21 +974,23 @@
   color: var(--text-secondary);
 }
 
-/* Mobile Responsiveness for Sections */
+/* UPDATED: Mobile Responsiveness for Sections with centered icons */
 @media (max-width: 768px) {
+  /* UPDATED: Banner content with centered icons on mobile */
   .checkin-benefits-banner {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-sm); /* UPDATED: Clean mobile spacing */
+    margin-bottom: var(--spacing-lg); /* UPDATED: Clean spacing below banner */
   }
   
   .checkin-benefits-content {
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm); /* UPDATED: Clean spacing between icon and text */
     text-align: center;
   }
   
   .checkin-benefits-icon {
     align-self: center;
-    margin-top: 0;
+    margin: 0; /* UPDATED: No margins, just clean centering */
   }
   
   .checkin-benefits-text {
@@ -992,8 +998,10 @@
     text-align: center;
   }
   
+  /* UPDATED: Emotional check-in section with clean spacing */
   .emotional-checkin-section {
     padding: var(--spacing-lg);
+    gap: var(--spacing-lg); /* UPDATED: Clean spacing between all elements */
   }
   
   .emotion-sliders {
@@ -1042,15 +1050,21 @@
     padding: var(--spacing-md);
   }
   
+  /* UPDATED: Insight data banner with centered icons on mobile */
+  .insight-data-banner {
+    padding: var(--spacing-md) var(--spacing-sm); /* UPDATED: Clean mobile spacing */
+    margin-bottom: var(--spacing-lg); /* UPDATED: Clean spacing below banner */
+  }
+  
   .insight-data-banner-content {
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm); /* UPDATED: Clean spacing between icon and text */
     text-align: center;
   }
   
   .insight-data-icon {
     align-self: center;
-    margin-top: 0;
+    margin: 0; /* UPDATED: No margins, just clean centering */
   }
   
   .insight-data-text {
@@ -1064,48 +1078,56 @@
     text-align: center;
   }
   
+  /* UPDATED: Phase insight section with clean spacing */
   .phase-insight-section {
     padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+    gap: var(--spacing-lg); /* UPDATED: Clean spacing between all elements */
   }
 }
 
 @media (max-width: 480px) {
+  /* UPDATED: Very small mobile with centered icons and clean spacing */
   .checkin-benefits-banner {
-    padding: var(--spacing-md) var(--spacing-xs) var(--spacing-md) var(--spacing-xs);
+    padding: var(--spacing-md) var(--spacing-xs); /* UPDATED: Clean very small mobile spacing */
+    margin-bottom: var(--spacing-md); /* UPDATED: Clean spacing below banner */
   }
   
   .checkin-benefits-content {
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm); /* UPDATED: Clean spacing between icon and text */
   }
   
   .checkin-benefits-icon {
     font-size: 1rem;
-    margin-bottom: 2px;
+    margin: 0; /* UPDATED: No margins */
   }
   
   .checkin-benefits-text {
     font-size: 0.75rem;
   }
   
+  /* UPDATED: Insight data banner for very small mobile */
   .insight-data-banner {
-    padding: var(--spacing-md) var(--spacing-xs) var(--spacing-md) var(--spacing-xs);
+    padding: var(--spacing-md) var(--spacing-xs); /* UPDATED: Clean very small mobile spacing */
+    margin-bottom: var(--spacing-md); /* UPDATED: Clean spacing below banner */
   }
   
   .insight-data-banner-content {
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm); /* UPDATED: Clean spacing between icon and text */
   }
   
   .insight-data-icon {
     font-size: 1rem;
-    margin-bottom: 2px;
+    margin: 0; /* UPDATED: No margins */
   }
   
   .insight-data-text {
     font-size: 0.75rem;
   }
   
+  /* UPDATED: Emotional check-in section for very small mobile */
   .emotional-checkin-section {
     padding: var(--spacing-md);
+    gap: var(--spacing-md); /* UPDATED: Clean spacing between all elements */
   }
   
   .emotion-label {
@@ -1145,8 +1167,10 @@
     padding-right: 10px !important;
   }
   
+  /* UPDATED: Phase insight section for very small mobile */
   .phase-insight-section {
     padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
+    gap: var(--spacing-md); /* UPDATED: Clean spacing between all elements */
   }
   
   .phase-insight-section h3 {
