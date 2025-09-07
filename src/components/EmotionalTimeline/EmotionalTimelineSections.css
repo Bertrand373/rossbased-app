@@ -1,4 +1,768 @@
-/* components/EmotionalTimeline/EmotionalTimelineSections.css - Section Components & Analysis Display */
+/* components/EmotionalTimeline/EmotionalTimeline.css - Updated with Sliding Menu & Header Consistency */
+
+/* Main container */
+.emotional-timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: 0; /* Ensure no padding affecting spacing */
+}
+
+/* Using CSS custom properties for progress bar colors */
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  background-color: #666666;
+}
+
+/* Use CSS custom property for dynamic coloring */
+.progress-fill-colored {
+  background-color: var(--phase-color) !important;
+  background: var(--phase-color) !important;
+}
+
+/* UPDATED: Integrated Header Design matching Tracker/Calendar/Stats pattern */
+.integrated-timeline-header {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-title-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+  position: relative;
+}
+
+.header-title-section h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.85;
+  text-align: center;
+}
+
+/* NEW: Header subtitle matching other tabs */
+.header-subtitle {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
+}
+
+/* UPDATED: Navigation section using Profile's sliding pill system */
+.header-navigation-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+  align-items: center;
+}
+
+/* FIXED: Mobile-First Navigation Pills with horizontal scrolling */
+.navigation-pill-container {
+  display: flex;
+  padding: var(--spacing-xs);
+  background-color: var(--card-background);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  position: relative;
+  margin: 0 auto;
+  /* Desktop: auto-size to content */
+  width: auto;
+  max-width: 600px;
+  /* Use gap for consistent spacing */
+  gap: 0;
+  justify-content: flex-start;
+  /* Mobile 3D rendering context */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* No overflow on desktop */
+  overflow: visible;
+}
+
+/* ENHANCED: Bulletproof sliding indicator matching Profile exactly */
+.navigation-tab-slider {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  height: calc(100% - calc(var(--spacing-xs) * 2));
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-full);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 1;
+  /* Start hidden but ready to be shown */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(0px);
+  width: 0px;
+  /* Mobile GPU acceleration */
+  will-change: transform, width;
+}
+
+/* FIXED: Navigation section buttons with proper sizing */
+.navigation-section-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+  outline: none;
+  /* Natural width based on content */
+  min-width: fit-content;
+  flex-shrink: 0;
+  /* Mobile touch optimization */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* CRITICAL: Active tab styling - no background, let slider handle visual feedback */
+.navigation-section-btn.active {
+  color: var(--primary) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+.navigation-section-btn svg {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* MOBILE STYLES: Horizontal scrolling like Stats benefits */
+@media (max-width: 768px) {
+  /* Container for scrolling wrapper */
+  .header-navigation-section {
+    width: 100%;
+    padding: 0;
+    overflow: visible;
+  }
+  
+  /* CRITICAL: Mobile navigation with horizontal scroll */
+  .navigation-pill-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 4px;
+    gap: 0;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    transform: translateZ(0);
+    /* Remove centering on mobile */
+    margin: 0;
+  }
+  
+  .navigation-pill-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* FIXED: Mobile button sizing to match Calendar exactly - 36px height */
+  .navigation-section-btn {
+    flex-shrink: 0;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.8rem;
+    gap: var(--spacing-sm);
+    min-width: fit-content;
+    min-height: 36px; /* FIXED: Match Calendar exactly */
+    /* Ensure buttons don't get squished */
+    flex: 0 0 auto;
+  }
+  
+  /* FIXED: Mobile slider positioning to match Calendar */
+  .navigation-tab-slider {
+    top: 4px;
+    left: 4px;
+    height: calc(100% - 8px);
+    /* Faster transition on mobile */
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Ensure active state is visible */
+  .navigation-section-btn.active {
+    font-weight: 600;
+  }
+}
+
+/* Enhanced touch targets for mobile */
+@media (max-width: 768px) and (pointer: coarse) {
+  .navigation-section-btn {
+    min-height: 44px;
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+}
+
+/* Very small screens - FIXED: Match Calendar exact sizing */
+@media (max-width: 480px) {
+  .navigation-pill-container {
+    padding: 6px; /* FIXED: Match Calendar exactly */
+    /* Ensure full width usage */
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .navigation-section-btn {
+    font-size: 0.875rem; /* FIXED: Match Calendar size */
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md); /* FIXED: Match Calendar padding */
+    min-height: 36px; /* FIXED: Match Calendar exactly */
+  }
+  
+  .navigation-section-btn svg {
+    font-size: 0.875rem;
+  }
+  
+  /* FIXED: Slider positioning for very small screens */
+  .navigation-tab-slider {
+    top: 6px; /* FIXED: Match Calendar padding */
+    left: 6px; /* FIXED: Match Calendar padding */
+    height: calc(100% - 12px); /* FIXED: Match Calendar calculation */
+    /* FIXED: Ultra-fast transitions for small screens like Calendar */
+    transition: transform 0.2s ease-out, width 0.2s ease-out;
+  }
+}
+
+/* Landscape mobile support */
+@media (max-width: 768px) and (orientation: landscape) {
+  .navigation-pill-container {
+    max-width: 100vw;
+    width: 100%;
+  }
+}
+
+/* Timeline content container */
+.timeline-content-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Current Phase Card */
+.current-phase-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: 0;
+}
+
+.phase-card {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.phase-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+  order: 1;
+}
+
+.phase-icon-section {
+  order: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+}
+
+/* Phase icon with proper color inheritance */
+.phase-icon {
+  font-size: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phase-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.phase-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.phase-range {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.phase-description {
+  order: 3;
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Progress bar with proper background */
+.phase-progress {
+  order: 4;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+/* Progress text with tooltip explanation */
+.progress-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.progress-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: 500;
+}
+
+.progress-explanation {
+  position: relative;
+  display: inline-block;
+}
+
+.progress-info-icon {
+  font-size: 0.75rem;
+  color: var(--primary);
+  cursor: help;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.progress-info-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.progress-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  min-width: 280px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: var(--spacing-xs);
+  pointer-events: none;
+}
+
+.progress-explanation:hover .progress-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.progress-tooltip-header {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 221, 0, 0.2);
+  padding-bottom: var(--spacing-xs);
+}
+
+.progress-tooltip-content {
+  font-size: 0.75rem;
+  color: var(--text);
+  line-height: 1.4;
+  text-align: left;
+}
+
+.progress-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--border);
+}
+
+.progress-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--card-background);
+  margin-top: -1px;
+}
+
+.phase-detail-btn {
+  order: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: none;
+  margin: 0 auto;
+  max-width: 200px;
+}
+
+.phase-detail-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Timeline Overview - styled like Stats milestone section */
+.timeline-overview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.timeline-overview h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text);
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+
+.phases-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Timeline phases with proper color inheritance and lock states - UPDATED */
+.timeline-phase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-phase:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Phase status styling with proper colors - UPDATED WITH GREEN BACKGROUND */
+.timeline-phase.completed {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.timeline-phase.current {
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  transform: none;
+}
+
+.timeline-phase.current:hover {
+  transform: translateY(-1px);
+}
+
+.timeline-phase.upcoming {
+  opacity: 0.6;
+}
+
+.timeline-phase.upcoming:hover {
+  transform: translateY(-1px);
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Timeline phase icon with color inheritance */
+.timeline-phase-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.timeline-phase-info {
+  flex: 1;
+  margin-left: var(--spacing-lg);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.timeline-phase-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.timeline-phase-range {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ADDED: Phase description matching mastery levels */
+.timeline-phase-description {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.3;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.timeline-phase-check {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* UPDATED: Current pill styling to match sliding pill buttons */
+.timeline-phase-current {
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: none;
+}
+
+.timeline-phase-lock {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* Mastery Levels Section */
+.mastery-levels-section {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.mastery-levels-section h3 {
+  margin: 0 0 var(--spacing-xl) 0;
+  font-size: 1.25rem;
+  color: var(--text);
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+
+.mastery-levels-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* UPDATED: Mastery level card layout - match timeline phase layout */
+.mastery-level-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.mastery-level-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.mastery-level-card.completed {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.mastery-level-card.current {
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  transform: none;
+}
+
+.mastery-level-card.current:hover {
+  transform: translateY(-1px);
+}
+
+.mastery-level-card.upcoming {
+  opacity: 0.6;
+}
+
+.mastery-level-card.upcoming:hover {
+  transform: translateY(-1px);
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.mastery-level-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.mastery-level-info {
+  flex: 1;
+  margin-left: var(--spacing-lg);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.mastery-level-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.mastery-level-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.mastery-level-time-range {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.3;
+  margin-top: var(--spacing-xs);
+}
+
+.mastery-level-status {
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mastery-level-check {
+  font-size: 1.25rem;
+  color: var(--success);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* UPDATED: Current badge styling to match sliding pill buttons */
+.mastery-level-current-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: none;
+  white-space: nowrap;
+  min-width: 60px;
+  text-align: center;
+}
+
+.mastery-level-lock {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+}
 
 /* UPDATED: Check-in Benefits Banner with PERFECT icon centering */
 .checkin-benefits-banner {
@@ -56,947 +820,98 @@
   font-weight: 600;
 }
 
-/* ANALYSIS COMPONENTS - Shared styles from Stats */
-
-/* Optimization Display */
-.optimization-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.optimization-criteria {
-  background-color: rgba(255, 221, 0, 0.05);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.optimization-criteria:hover {
-  background-color: rgba(255, 221, 0, 0.08);
-}
-
-.optimization-criteria-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-xs);
-}
-
-.optimization-criteria-text {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-.optimization-metrics {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-md);
-}
-
-.optimization-metric-card {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  justify-content: center;
-  min-height: 80px;
-  transition: all 0.3s ease;
-}
-
-.optimization-metric-card:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-1px);
-}
-
-.optimization-metric-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.optimization-metric-label {
-  font-size: 0.875rem;
-  color: var(--text);
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.optimization-recommendations {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.optimization-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-sm);
-}
-
-.optimization-item {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  font-size: 0.875rem;
-  color: var(--text);
-  line-height: 1.4;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.optimization-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-1px);
-}
-
-/* Pattern Recognition */
-.patterns-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.pattern-item {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  font-size: 0.875rem;
-  color: var(--text);
-  line-height: 1.4;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.pattern-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-1px);
-}
-
-/* Risk Level Indicators */
-.risk-level-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  text-align: center;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.risk-level-indicator::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.risk-level-indicator:hover::before {
-  opacity: 1;
-}
-
-.risk-level-indicator.low {
-  background-color: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.risk-level-indicator.moderate {
-  background-color: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.risk-level-indicator.high {
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.risk-level-indicator.insufficient {
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid rgba(128, 128, 128, 0.3);
-}
-
-.risk-score-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xs);
-}
-
-.risk-score {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: var(--spacing-xs);
-  transition: transform 0.3s ease;
-}
-
-.risk-level-indicator:hover .risk-score {
-  transform: scale(1.05);
-}
-
-.risk-score.low {
-  color: #22c55e;
-}
-
-.risk-score.moderate {
-  color: #f59e0b;
-}
-
-.risk-score.high {
-  color: #ef4444;
-}
-
-.risk-score.insufficient {
-  color: var(--text-secondary);
-}
-
-.risk-level-text {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-/* Analysis Summary Stats */
-.relapse-summary-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-}
-
-.relapse-stat-card {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  justify-content: center;
-  min-height: 100px;
-  transition: all 0.3s ease;
-}
-
-.relapse-stat-card:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-2px);
-}
-
-.relapse-stat-card.conquered-trigger {
-  background-color: rgba(34, 197, 94, 0.05);
-  border-color: rgba(34, 197, 94, 0.2);
-}
-
-.relapse-stat-card.conquered-trigger:hover {
-  background-color: rgba(34, 197, 94, 0.08);
-}
-
-.relapse-stat-card.conquered-trigger .relapse-stat-value {
-  color: #22c55e;
-}
-
-.relapse-stat-card.victory-days {
-  background-color: rgba(255, 221, 0, 0.05);
-  border-color: rgba(255, 221, 0, 0.2);
-}
-
-.relapse-stat-card.victory-days:hover {
-  background-color: rgba(255, 221, 0, 0.08);
-}
-
-.relapse-stat-card.victory-days .relapse-stat-value {
-  color: var(--primary);
-}
-
-.relapse-stat-card.primary-trigger {
-  background-color: rgba(239, 68, 68, 0.05);
-  border-color: rgba(239, 68, 68, 0.2);
-}
-
-.relapse-stat-card.primary-trigger:hover {
-  background-color: rgba(239, 68, 68, 0.08);
-}
-
-.relapse-stat-card.primary-trigger .relapse-stat-value {
-  color: #ef4444;
-}
-
-.relapse-stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: var(--spacing-xs);
-  transition: transform 0.3s ease;
-  text-transform: capitalize;
-}
-
-.relapse-stat-card:hover .relapse-stat-value {
-  transform: scale(1.05);
-}
-
-.relapse-stat-label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.3;
-  font-weight: 500;
-}
-
-.relapse-insights-list {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.relapse-insights-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-md);
-}
-
-.relapse-insight-item {
-  font-size: 0.875rem;
-  color: var(--text);
-  line-height: 1.5;
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  transition: all 0.3s ease;
-}
-
-.relapse-insight-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-1px);
-}
-
-.relapse-insight-item:last-child {
-  margin-bottom: 0;
-}
-
-.relapse-insight-item.victory-reminder {
-  background-color: rgba(34, 197, 94, 0.05);
-  border-color: rgba(34, 197, 94, 0.2);
-  color: #22c55e;
-  font-weight: 600;
-}
-
-.relapse-insight-item.victory-reminder:hover {
-  background-color: rgba(34, 197, 94, 0.08);
-}
-
-/* Guidance List */
-.guidance-list {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.guidance-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-sm);
-}
-
-.guidance-item {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin-bottom: var(--spacing-sm);
-}
-
-.guidance-item:last-child {
-  margin-bottom: 0;
-}
-
-/* Progress Indicator */
-.energy-data-progress-indicator {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-md);
-}
-
-.energy-data-progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.energy-data-progress-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.energy-data-progress-count {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--primary);
-  background-color: rgba(255, 221, 0, 0.1);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  white-space: nowrap;
-}
-
-.energy-data-progress-bar {
-  height: 6px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.energy-data-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary) 0%, rgba(255, 221, 0, 0.8) 100%);
-  border-radius: var(--radius-full);
-  transition: width 0.8s ease-out;
-  box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
-  position: relative;
-}
-
-.energy-data-progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.2) 50%, 
-    transparent 100%);
-  animation: progress-shimmer 2s infinite;
-}
-
-@keyframes progress-shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Data Quality */
-.insight-data-quality {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-}
-
-.insight-data-quality:hover {
-  transform: scale(1.05);
-}
-
-.insight-data-quality.minimal,
-.insight-data-quality.good,
-.insight-data-quality.rich {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.insight-data-quality.insufficient {
-  background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  color: var(--text-secondary);
-}
-
-.insight-data-days {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-/* Data Quality Indicator */
-.data-quality-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-}
-
-/* Analysis Reset State */
-.analysis-reset-state {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-}
-
-/* Insufficient Data Section */
-.insufficient-data-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-}
-
-/* Analysis Footer */
-.analysis-footer {
-  margin-top: var(--spacing-xl);
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-/* UPDATED: Emotional Check-in Section - header padding to match Analysis header EXACTLY */
-.emotional-checkin-section {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-}
-
-/* UPDATED: Header to match Analysis section header spacing EXACTLY */
-.emotional-checkin-section h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  text-align: center;
-  font-weight: 600;
-  padding: var(--spacing-lg) 0;
-}
-
-.emotion-status-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* UPDATED: Success state styled like green benefits pill from Tracker */
-.emotions-logged {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  background-color: rgba(34, 197, 94, 0.05);
-  border: 1px solid rgba(34, 197, 94, 0.1);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-sm) var(--spacing-md);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  flex-wrap: wrap;
-}
-
-.emotions-not-logged {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  text-align: center;
-  line-height: 1.4;
-}
-
-/* UPDATED: Success icon color to match benefits logged styling */
-.check-icon {
-  font-size: 1rem;
-  flex-shrink: 0;
-  color: var(--success);
-}
-
-.edit-emotions-btn {
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  margin-left: var(--spacing-md);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: none;
-}
-
-/* Emotion sliders */
-.emotion-sliders {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.emotion-slider-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  position: relative;
-}
-
-.emotion-slider-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
-}
-
-.emotion-label {
-  font-weight: 600;
-  color: var(--text);
-  flex: 1;
-  text-align: left;
-  font-size: 1rem !important;
-  letter-spacing: 0.025em;
-}
-
-.emotion-value {
-  font-weight: 700;
-  color: var(--text) !important;
-  font-size: 0.9375rem !important;
-  background-color: rgba(255, 221, 0, 0.08);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  min-width: 48px;
-  text-align: center;
-  border: 1px solid rgba(255, 221, 0, 0.15);
-}
-
-.emotion-range-slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 12px;
-  border-radius: var(--radius-full);
-  background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.15) 0%, 
-    rgba(255, 221, 0, 0.08) 50%, 
-    rgba(255, 221, 0, 0.12) 100%
-  );
-  outline: none;
-  transition: all 0.2s ease;
-  margin: 0 !important;
-  padding: 0 !important;
-  position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  margin-bottom: 0px !important;
-}
-
-.emotion-range-slider:hover:not(:disabled) {
-  background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.18) 0%, 
-    rgba(255, 221, 0, 0.1) 50%, 
-    rgba(255, 221, 0, 0.15) 100%
-  );
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
-}
-
-.emotion-range-slider:focus:not(:disabled) {
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
-}
-
-.emotion-range-slider:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background: rgba(128, 128, 128, 0.1);
-}
-
-.emotion-range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  margin: 0 !important;
-  transition: all 0.15s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.05);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
-}
-
-.emotion-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.02);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-}
-
-.emotion-range-slider::-moz-range-thumb {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  margin: 0 !important;
-  transition: all 0.15s ease;
-}
-
-.emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.05);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
-}
-
-.slider-labels {
-  display: flex !important;
-  justify-content: space-between !important;
-  font-size: 0.75rem !important;
-  color: var(--text-secondary) !important;
-  margin-top: 8px !important;
-  margin-bottom: 0px !important;
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  line-height: 1 !important;
-  transform: none !important;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.025em !important;
-  position: relative !important;
-  z-index: 1 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8) !important;
-}
-
-.slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.7) !important;
-}
-
-.emotion-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--spacing-lg);
-}
-
-.save-emotions-btn {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border: 1px solid rgba(255, 221, 0, 0.2) !important;
-  border-radius: var(--radius-full) !important;
-  color: var(--primary) !important;
-  padding: var(--spacing-md) var(--spacing-xl) !important;
-  font-size: 0.9375rem !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: none !important;
-  letter-spacing: 0.025em !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: var(--spacing-sm) !important;
-}
-
-.save-emotions-btn:hover,
-.save-emotions-btn:focus,
-.save-emotions-btn:active {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: none !important;
-  box-shadow: none !important;
-  opacity: 1 !important;
-  outline: none !important;
-  filter: none !important;
-}
-
-/* UPDATED: Phase Analysis Section with matching header padding */
-.phase-insight-section {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* UPDATED: Analysis header with same spacing as emotional check-in */
-.phase-insight-section h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  text-align: center;
-  font-weight: 600;
-  padding: var(--spacing-lg) 0;
-}
-
-/* UPDATED: Data quality banner with PERFECT icon centering */
-.insight-data-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  text-align: center;
-  padding: var(--spacing-lg) var(--spacing-md);
-  background-color: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-xl);
-  line-height: 1.4;
-}
-
-.insight-data-banner-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.insight-data-icon {
-  font-size: 1rem;
-  color: var(--primary);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: center;
-  margin: 0;
-  padding: 0;
-  line-height: 1;
-  vertical-align: middle;
-}
-
-.insight-data-text {
-  flex: 1;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  line-height: 1.4;
-  font-weight: 500;
-  text-align: center;
-  min-width: 0;
-}
-
-.insight-data-text strong {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-/* Analysis Cards Grid */
-.insights-grid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* Insight Cards */
-.insight-card {
-  padding: var(--spacing-xl) var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  justify-content: center;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.insight-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-/* Card Headers */
-.insight-card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-weight: 600;
-  color: var(--text);
-  justify-content: center;
-  text-align: center;
-  margin-bottom: var(--spacing-md);
-}
-
-.insight-card-header .insight-icon {
-  color: var(--primary);
-  font-size: 1.125rem;
-}
-
-.insight-metric {
-  color: var(--text);
-  font-weight: 600;
-}
-
-/* Card Content */
-.insight-text {
-  color: var(--text);
-  font-size: 0.875rem;
-  line-height: 1.4;
-  font-weight: 500;
-  text-align: center;
-  padding: 0 var(--spacing-sm);
-}
-
-/* Trend indicators */
-.trend {
-  font-weight: bold;
-  margin-left: 4px;
-}
-
-.trend.improving {
-  color: #22c55e;
-}
-
-.trend.concerning {
-  color: #ef4444;
-}
-
-.trend.stable {
-  color: var(--text-secondary);
-}
-
-/* UPDATED: Mobile Responsiveness for Sections with PERFECT icon centering */
+/* Mobile Responsiveness for Core Layout */
 @media (max-width: 768px) {
+  .emotional-timeline-container {
+    gap: var(--spacing-lg);
+    padding: 0;
+  }
+  
+  .integrated-timeline-header {
+    padding: var(--spacing-lg);
+    margin: 0;
+  }
+  
+  .header-title-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .header-title-section h2 {
+    font-size: 1.25rem;
+  }
+  
+  .header-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .phase-icon-section {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .phase-icon {
+    font-size: 2.5rem;
+  }
+  
+  .timeline-phase {
+    padding: var(--spacing-md);
+  }
+  
+  .timeline-phase-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+  
+  .timeline-phase-info {
+    margin-left: var(--spacing-md);
+  }
+  
+  .timeline-phase-name {
+    font-size: 1rem;
+  }
+  
+  .timeline-phase-description {
+    font-size: 0.75rem;
+  }
+  
+  .mastery-levels-timeline {
+    gap: var(--spacing-md);
+  }
+  
+  .mastery-level-card {
+    padding: var(--spacing-md);
+  }
+  
+  .mastery-level-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+  
+  .mastery-level-info {
+    margin-left: var(--spacing-md);
+  }
+  
+  .mastery-level-name {
+    font-size: 1rem;
+  }
+  
+  .mastery-level-subtitle {
+    font-size: 0.875rem;
+  }
+  
+  .mastery-level-time-range {
+    font-size: 0.75rem;
+  }
+  
+  .mastery-level-current-badge {
+    font-size: 0.625rem;
+    padding: 2px 6px;
+    min-width: 50px;
+    letter-spacing: 0.25px;
+  }
+  
   .checkin-benefits-banner {
     padding: var(--spacing-md) var(--spacing-sm);
     margin-bottom: var(--spacing-lg);
@@ -1021,309 +936,75 @@
     font-size: 0.8rem;
     text-align: center;
     width: 100%;
-  }
-  
-  .emotional-checkin-section {
-    padding: var(--spacing-lg);
-    gap: var(--spacing-lg);
-  }
-  
-  .emotion-sliders {
-    gap: var(--spacing-md);
-  }
-  
-  .emotions-logged, .emotions-not-logged {
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    text-align: center;
-  }
-  
-  .edit-emotions-btn {
-    margin-left: 0;
-    margin-top: var(--spacing-sm);
-  }
-  
-  .emotion-label {
-    font-size: 0.875rem !important;
-  }
-  
-  .emotion-value {
-    font-size: 0.8rem !important;
-  }
-  
-  .emotion-range-slider {
-    height: 32px;
-  }
-  
-  .emotion-range-slider::-webkit-slider-thumb {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .emotion-range-slider::-moz-range-thumb {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .insights-grid {
-    gap: var(--spacing-md);
-  }
-  
-  .insight-card {
-    padding: var(--spacing-md);
-  }
-  
-  .insight-data-banner {
-    padding: var(--spacing-md) var(--spacing-sm);
-    margin-bottom: var(--spacing-lg);
-  }
-  
-  .insight-data-banner-content {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    text-align: center;
-    align-items: center;
-  }
-  
-  .insight-data-icon {
-    align-self: center;
-    margin: 0;
-    padding: 0;
-    justify-self: center;
-    place-self: center;
-  }
-  
-  .insight-data-text {
-    font-size: 0.8rem;
-    text-align: center;
-    width: 100%;
-  }
-  
-  .data-quality-indicator {
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    text-align: center;
-  }
-  
-  .phase-insight-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
-    gap: var(--spacing-lg);
   }
 }
 
 @media (max-width: 480px) {
-  .checkin-benefits-banner {
-    padding: var(--spacing-md) var(--spacing-xs);
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .checkin-benefits-content {
-    gap: var(--spacing-sm);
-  }
-  
-  .checkin-benefits-icon {
-    font-size: 1rem;
-    margin: 0;
+  .emotional-timeline-container {
+    gap: var(--spacing-lg);
     padding: 0;
-    align-self: center;
-    justify-self: center;
-    place-self: center;
+  }
+  
+  .integrated-timeline-header {
+    padding: var(--spacing-lg);
+    margin: 0;
+  }
+  
+  .header-title-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .header-title-section h2 {
+    font-size: 1.125rem;
+  }
+  
+  .header-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .mastery-levels-section h3 {
+    font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
+  }
+  
+  .mastery-level-card {
+    padding: var(--spacing-sm);
+  }
+  
+  .mastery-level-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.125rem;
+  }
+  
+  .mastery-level-info {
+    margin-left: var(--spacing-sm);
+  }
+  
+  .mastery-level-name {
+    font-size: 0.875rem;
+  }
+  
+  .mastery-level-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .mastery-level-time-range {
+    font-size: 0.7rem;
+  }
+  
+  .mastery-level-current-badge {
+    font-size: 0.5rem;
+    padding: 1px 4px;
+    min-width: 40px;
+    letter-spacing: 0.1px;
+  }
+  
+  .checkin-benefits-banner {
+    padding: var(--spacing-xs);
   }
   
   .checkin-benefits-text {
     font-size: 0.75rem;
-  }
-  
-  .insight-data-banner {
-    padding: var(--spacing-md) var(--spacing-xs);
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .insight-data-banner-content {
-    gap: var(--spacing-sm);
-  }
-  
-  .insight-data-icon {
-    font-size: 1rem;
-    margin: 0;
-    padding: 0;
-    align-self: center;
-    justify-self: center;
-    place-self: center;
-  }
-  
-  .insight-data-text {
-    font-size: 0.75rem;
-  }
-  
-  .emotional-checkin-section {
-    padding: var(--spacing-md);
-    gap: var(--spacing-md);
-  }
-  
-  .emotion-label {
-    font-size: 0.8rem !important;
-  }
-  
-  .emotion-value {
-    font-size: 0.75rem !important;
-    min-width: 40px;
-  }
-  
-  .emotion-value-clean {
-    font-size: 0.875rem !important;
-    min-width: 24px;
-    height: 24px;
-  }
-  
-  .emotion-range-slider {
-    height: 12px;
-  }
-  
-  .emotion-range-slider::-webkit-slider-thumb {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .emotion-range-slider::-moz-range-thumb {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .slider-labels {
-    font-size: 0.75rem !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-  }
-  
-  .phase-insight-section {
-    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
-    gap: var(--spacing-md);
-  }
-  
-  .phase-insight-section h3 {
-    font-size: 1.125rem;
-    padding: var(--spacing-md) 0;
-  }
-  
-  .emotional-checkin-section h3 {
-    font-size: 1.125rem;
-    padding: var(--spacing-md) 0;
-  }
-  
-  .insight-card {
-    padding: var(--spacing-sm);
-    min-height: 100px;
-  }
-  
-  .insight-card-header {
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .insight-card-header .insight-icon {
-    font-size: 1rem;
-  }
-  
-  .insight-text {
-    font-size: 0.8rem;
-    padding: 0;
-  }
-  
-  .optimization-metric-card {
-    min-height: 70px;
-    padding: var(--spacing-sm);
-  }
-  
-  .optimization-metric-value {
-    font-size: 1.25rem;
-  }
-  
-  .optimization-metric-label {
-    font-size: 0.8rem;
-  }
-  
-  .optimization-item {
-    padding: var(--spacing-sm);
-    font-size: 0.8rem;
-  }
-  
-  .pattern-item {
-    padding: var(--spacing-sm);
-    font-size: 0.8rem;
-  }
-  
-  .relapse-summary-stats {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
-  }
-  
-  .relapse-stat-card {
-    padding: var(--spacing-md);
-    min-height: 80px;
-  }
-  
-  .relapse-stat-value {
-    font-size: 1.25rem;
-  }
-  
-  .relapse-stat-label {
-    font-size: 0.8rem;
-  }
-  
-  .risk-level-indicator {
-    padding: var(--spacing-md);
-  }
-  
-  .risk-score {
-    font-size: 1.5rem;
-  }
-  
-  .risk-level-text {
-    font-size: 0.8rem;
-  }
-  
-  .relapse-insights-list {
-    padding: var(--spacing-sm);
-  }
-  
-  .relapse-insight-item {
-    padding: var(--spacing-sm);
-    font-size: 0.8rem;
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .guidance-list {
-    padding: var(--spacing-sm);
-  }
-  
-  .guidance-item {
-    font-size: 0.8rem;
-  }
-  
-  .energy-data-progress-indicator {
-    padding: var(--spacing-sm);
-  }
-  
-  .energy-data-progress-title {
-    font-size: 0.8rem;
-  }
-  
-  .energy-data-progress-count {
-    font-size: 0.7rem;
-    padding: 2px 6px;
-  }
-  
-  .insight-data-quality {
-    font-size: 0.7rem;
-    padding: 2px 6px;
-  }
-  
-  .insight-data-days {
-    font-size: 0.7rem;
-  }
-  
-  .save-emotions-btn {
-    padding: var(--spacing-sm) var(--spacing-lg) !important;
-    font-size: 0.875rem !important;
   }
 }
