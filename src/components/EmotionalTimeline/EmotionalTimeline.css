@@ -975,3 +975,36 @@
     width: 36px;
     height: 36px;
     font-size: 1.125rem;
+  }
+  
+  .mastery-level-info {
+    margin-left: var(--spacing-sm);
+  }
+  
+  .mastery-level-name {
+    font-size: 0.875rem;
+  }
+  
+  .mastery-level-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .mastery-level-time-range {
+    font-size: 0.7rem;
+  }
+  
+  .mastery-level-current-badge {
+    font-size: 0.5rem;
+    padding: 1px 4px;
+    min-width: 40px;
+    letter-spacing: 0.1px;
+  }
+  
+  .checkin-benefits-banner {
+    padding: var(--spacing-xs);
+  }
+  
+  .checkin-benefits-text {
+    font-size: 0.75rem;
+  }
+}
