@@ -8,10 +8,10 @@ import './EmotionalTimeline.css';
 import './EmotionalTimelineSections.css';
 import './EmotionalTimelineModals.css';
 
-// Icons
+// Icons - FIXED: Added missing FaEdit import
 import { 
   FaCheckCircle, FaInfoCircle, FaTimes,
-  FaMapSigns, FaHeart, FaBrain
+  FaMapSigns, FaHeart, FaBrain, FaEdit
 } from 'react-icons/fa';
 
 // Import utility functions and data
