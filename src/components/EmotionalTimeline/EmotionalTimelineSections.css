@@ -1042,32 +1042,33 @@
     gap: var(--spacing-md);
   }
   
-  /* MOBILE: Stack edit button below text on mobile */
+  /* MOBILE: Keep horizontal layout but optimize sizing */
   .emotions-logged {
-    flex-direction: column;
+    font-size: 0.8rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
     gap: var(--spacing-xs);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    text-align: center;
+  }
+  
+  .emotions-logged .check-icon {
+    font-size: 0.875rem;
   }
   
   .edit-emotions-btn {
-    margin-left: 0 !important;
+    margin-left: var(--spacing-xs) !important;
+    padding: 2px 6px !important;
+    font-size: 0.7rem !important;
     margin-top: 0 !important;
-    align-self: center;
   }
   
-  /* MOBILE: Stack info pill content vertically on mobile for better readability */
+  /* MOBILE: Keep horizontal layout for info pill too */
   .emotions-not-logged {
-    flex-direction: column;
+    font-size: 0.8rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
     gap: var(--spacing-xs);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    text-align: center;
   }
   
-  .info-icon {
-    align-self: center;
+  .emotions-not-logged .info-icon {
+    font-size: 0.875rem;
   }
   
   .emotion-label {
