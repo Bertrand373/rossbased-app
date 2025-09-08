@@ -566,7 +566,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     onClick={enableEmotionEditing}
                     title="Edit emotions"
                   >
-                    <FaEdit />
+                    <FaPencilAlt />
                   </button>
                 </div>
               ) : (
