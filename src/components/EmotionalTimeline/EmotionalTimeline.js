@@ -643,14 +643,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 
                 return (
                   <>
-                    {/* Data Quality Banner - EXACT copy of Profile coming-soon-banner structure */}
+                    {/* EXACT COPY: Profile coming-soon-banner HTML structure */}
                     {recentData.length < 7 && (
                       <div className="insight-data-banner">
                         <div className="insight-data-helmet-container">
                           <img 
                             className="insight-data-helmet" 
                             src="/helmet.png" 
-                            alt="Analysis improves with data" 
+                            alt="Coming Soon" 
                             onError={(e) => {
                               e.target.style.display = 'none';
                               e.target.nextElementSibling.style.display = 'block';
@@ -660,6 +660,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                             ⚔️
                           </div>
                         </div>
+                        
                         <div className="insight-data-content">
                           <div className="insight-data-text">
                             <strong>Analysis improves with data:</strong> The more you track emotions, the more personalized and accurate this analysis becomes.
