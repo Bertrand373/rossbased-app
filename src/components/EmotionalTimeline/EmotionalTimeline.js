@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Updated with Phase Descriptions and Removed Journal
+// components/EmotionalTimeline/EmotionalTimeline.js - Updated with checkmark system for all phases
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -485,16 +485,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                       {/* ADDED: Phase description matching mastery levels */}
                       <div className="timeline-phase-description">{phase.description}</div>
                     </div>
-                    {isCompleted && (
-                      <div className="timeline-phase-check">
-                        <FaCheckCircle style={{ color: "#22c55e" }} />
-                      </div>
-                    )}
-                    {isCurrent && (
-                      <div className="timeline-phase-current">
-                        Current
-                      </div>
-                    )}
+                    {/* UPDATED: All phases now show checkmarks with appropriate colors */}
+                    <div className="timeline-phase-check">
+                      <FaCheckCircle />
+                    </div>
                   </div>
                 );
               })}

@@ -591,30 +591,29 @@
   opacity: 0.8;
 }
 
+/* UPDATED: Timeline phase checkmark for all phases */
 .timeline-phase-check {
   font-size: 1.25rem;
   flex-shrink: 0;
 }
 
-/* UPDATED: Current pill styling to match sliding pill buttons */
-.timeline-phase-current {
-  font-size: 0.75rem;
-  font-weight: 600;
-  flex-shrink: 0;
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-full);
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+/* UPDATED: Current phase gets yellow checkmark */
+.timeline-phase.current .timeline-phase-check {
   color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-.timeline-phase-lock {
-  font-size: 1.125rem;
+/* UPDATED: Completed phases get green checkmark */
+.timeline-phase.completed .timeline-phase-check {
+  color: var(--success);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* UPDATED: Upcoming phases get grey checkmark matching app's grey button styling */
+.timeline-phase.upcoming .timeline-phase-check {
   color: var(--text-secondary);
-  flex-shrink: 0;
+  opacity: 0.6;
+  filter: none;
 }
 
 /* Mastery Levels Section */
