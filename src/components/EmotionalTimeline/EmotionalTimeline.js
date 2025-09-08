@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Updated with Spartan helmet icons for informational banners
+// components/EmotionalTimeline/EmotionalTimeline.js - Fixed with all SpartanInfoIcon references removed
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -8,7 +8,7 @@ import './EmotionalTimeline.css';
 import './EmotionalTimelineSections.css';
 import './EmotionalTimelineModals.css';
 
-// Icons - UPDATED: Removed FaInfoCircle, kept FaEdit for functional use
+// Icons - Only keeping necessary functional icons
 import { 
   FaCheckCircle, FaTimes,
   FaMapSigns, FaHeart, FaBrain, FaEdit
@@ -406,7 +406,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   {getPhaseProgressText(currentPhase, currentDay, currentMasteryLevel)}
                 </div>
                 <div className="progress-explanation">
-                  <SpartanInfoIcon size="small" className="progress-info-icon" />
+                  <div className="progress-info-icon">⚔️</div>
                   <div className="progress-tooltip">
                     <div className="progress-tooltip-header">Progress Counter Explanation:</div>
                     <div className="progress-tooltip-content">
@@ -429,7 +429,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               className="phase-detail-btn"
               onClick={() => showPhaseDetails(currentPhase)}
             >
-              <SpartanInfoIcon size="small" />
+              <span style={{ fontSize: '0.875rem' }}>⚔️</span>
               View Phase Details
             </button>
           </div>
@@ -522,10 +522,21 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="emotional-checkin-section">
             <h3>Daily Emotional Check-in</h3>
             
-            {/* UPDATED: Benefits banner with Spartan helmet */}
+            {/* Benefits banner - EXACT copy of Profile coming-soon-banner structure */}
             <div className="checkin-benefits-banner">
               <div className="checkin-benefits-helmet-container">
-                <SpartanInfoIcon size="banner" />
+                <img 
+                  className="checkin-benefits-helmet" 
+                  src="/helmet.png" 
+                  alt="Track to unlock" 
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'block';
+                  }}
+                />
+                <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
+                  ⚔️
+                </div>
               </div>
               <div className="checkin-benefits-content">
                 <div className="checkin-benefits-text">
@@ -549,7 +560,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 </div>
               ) : (
                 <div className="emotions-not-logged">
-                  <SpartanInfoIcon size="default" className="info-icon" />
+                  <div className="info-icon">⚔️</div>
                   <span>Log emotions below</span>
                 </div>
               )}
@@ -632,11 +643,22 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 
                 return (
                   <>
-                    {/* UPDATED: Data Quality Banner with Spartan helmet */}
+                    {/* Data Quality Banner - EXACT copy of Profile coming-soon-banner structure */}
                     {recentData.length < 7 && (
                       <div className="insight-data-banner">
                         <div className="insight-data-helmet-container">
-                          <SpartanInfoIcon size="banner" />
+                          <img 
+                            className="insight-data-helmet" 
+                            src="/helmet.png" 
+                            alt="Analysis improves with data" 
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextElementSibling.style.display = 'block';
+                            }}
+                          />
+                          <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
+                            ⚔️
+                          </div>
                         </div>
                         <div className="insight-data-content">
                           <div className="insight-data-text">
