@@ -289,6 +289,12 @@
   gap: var(--spacing-lg);
 }
 
+/* UPDATED: Current phase card with yellow info banner styling */
+.phase-card.current {
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+}
+
 .phase-date {
   font-size: 0.875rem;
   color: var(--text-secondary);
