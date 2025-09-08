@@ -923,8 +923,8 @@
 }
 
 .insight-data-text strong {
-  color: var(--text-secondary);
-  font-weight: 500;
+  color: var(--text);
+  font-weight: 600;
 }
 
 /* Analysis Cards Grid */

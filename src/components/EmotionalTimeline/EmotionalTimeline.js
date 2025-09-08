@@ -558,16 +558,15 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             
             <div className="emotion-status-section">
               {emotionsLogged ? (
-                <div className="emotions-logged-container">
-                  <div className="emotions-logged">
-                    <FaCheckCircle className="check-icon" />
-                    <span>Emotions logged!</span>
-                  </div>
+                <div className="emotions-logged">
+                  <FaCheckCircle className="check-icon" />
+                  <span>Emotions logged!</span>
                   <button 
-                    className="action-btn edit-emotions-btn"
+                    className="edit-emotions-btn"
                     onClick={enableEmotionEditing}
+                    title="Edit emotions"
                   >
-                    <span>Edit</span>
+                    <FaEdit />
                   </button>
                 </div>
               ) : (
