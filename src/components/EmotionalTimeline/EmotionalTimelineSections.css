@@ -1042,33 +1042,24 @@
     gap: var(--spacing-md);
   }
   
-  /* MOBILE: Keep horizontal layout but optimize sizing */
-  .emotions-logged {
-    font-size: 0.8rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    gap: var(--spacing-xs);
+  /* MOBILE: Stack edit button below pill */
+  .emotion-status-section {
+    gap: var(--spacing-sm);
   }
   
-  .emotions-logged .check-icon {
-    font-size: 0.875rem;
+  .emotions-logged-container {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .emotions-logged {
+    margin: 0;
   }
   
   .edit-emotions-btn {
-    margin-left: var(--spacing-xs) !important;
-    padding: 2px 6px !important;
-    font-size: 0.7rem !important;
-    margin-top: 0 !important;
-  }
-  
-  /* MOBILE: Keep horizontal layout for info pill too */
-  .emotions-not-logged {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     padding: var(--spacing-xs) var(--spacing-sm);
-    gap: var(--spacing-xs);
-  }
-  
-  .emotions-not-logged .info-icon {
-    font-size: 0.875rem;
   }
   
   .emotion-label {

@@ -558,9 +558,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             
             <div className="emotion-status-section">
               {emotionsLogged ? (
-                <div className="emotions-logged">
-                  <FaCheckCircle className="check-icon" />
-                  <span>Emotional check-in completed for today!</span>
+                <div className="emotions-logged-container">
+                  <div className="emotions-logged">
+                    <FaCheckCircle className="check-icon" />
+                    <span>Emotional check-in completed for today!</span>
+                  </div>
                   <button 
                     className="action-btn edit-emotions-btn"
                     onClick={enableEmotionEditing}
@@ -568,7 +570,12 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     <span>Edit</span>
                   </button>
                 </div>
-              ) : null}
+              ) : (
+                <div className="emotions-not-logged">
+                  <FaInfoCircle className="info-icon" />
+                  <span>Complete your daily emotional check-in below to unlock personalized insights</span>
+                </div>
+              )}
             </div>
 
             {/* Emotion sliders */}
