@@ -561,7 +561,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 <div className="emotions-logged-container">
                   <div className="emotions-logged">
                     <FaCheckCircle className="check-icon" />
-                    <span>Emotional check-in completed for today!</span>
+                    <span>Emotions logged!</span>
                   </div>
                   <button 
                     className="action-btn edit-emotions-btn"
@@ -573,7 +573,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               ) : (
                 <div className="emotions-not-logged">
                   <FaInfoCircle className="info-icon" />
-                  <span>Complete your daily emotional check-in below to unlock personalized insights</span>
+                  <span>Log emotions below</span>
                 </div>
               )}
             </div>
