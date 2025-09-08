@@ -624,11 +624,21 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-sm) var(--spacing-md);
   color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.875rem;
   text-align: center;
   line-height: 1.4;
+}
+
+.info-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  color: var(--primary);
 }
 
 /* UPDATED: Success icon color to match benefits logged styling */
@@ -1032,15 +1042,32 @@
     gap: var(--spacing-md);
   }
   
-  .emotions-logged, .emotions-not-logged {
+  /* MOBILE: Stack edit button below text on mobile */
+  .emotions-logged {
     flex-direction: column;
     gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
     text-align: center;
   }
   
   .edit-emotions-btn {
-    margin-left: 0;
-    margin-top: var(--spacing-sm);
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    align-self: center;
+  }
+  
+  /* MOBILE: Stack info pill content vertically on mobile for better readability */
+  .emotions-not-logged {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    text-align: center;
+  }
+  
+  .info-icon {
+    align-self: center;
   }
   
   .emotion-label {
