@@ -1,36 +1,54 @@
 /* components/EmotionalTimeline/EmotionalTimelineSections.css - Section Components & Analysis Display */
 
-/* UPDATED: Check-in Benefits Banner with Spartan helmet layout */
+/* UPDATED: Check-in Benefits Banner with PERFECT icon centering */
 .checkin-benefits-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-lg) var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
   margin-bottom: var(--spacing-xl);
-}
-
-.checkin-benefits-helmet-container {
-  flex-shrink: 0;
+  line-height: 1.4;
 }
 
 .checkin-benefits-content {
-  flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.checkin-benefits-icon {
+  font-size: 1rem;
+  color: var(--primary);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .checkin-benefits-text {
+  flex: 1;
   color: var(--text-secondary);
   font-size: 0.875rem;
   line-height: 1.4;
   font-weight: 500;
-  margin: 0;
+  text-align: center;
+  min-width: 0;
 }
 
 .checkin-benefits-text strong {
@@ -621,9 +639,6 @@
   font-size: 1rem;
   flex-shrink: 0;
   color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* UPDATED: Success icon color to match benefits logged styling */
@@ -856,37 +871,55 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* UPDATED: Data quality banner with Spartan helmet layout */
+/* UPDATED: Data quality banner with PERFECT icon centering */
 .insight-data-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-lg) var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
   margin-bottom: var(--spacing-xl);
+  line-height: 1.4;
 }
 
-.insight-data-helmet-container {
-  flex-shrink: 0;
-}
-
-.insight-data-content {
-  flex: 1;
+.insight-data-banner-content {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.insight-data-icon {
+  font-size: 1rem;
+  color: var(--primary);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .insight-data-text {
+  flex: 1;
   color: var(--text-secondary);
   font-size: 0.875rem;
   line-height: 1.4;
   font-weight: 500;
-  margin: 0;
+  text-align: center;
+  min-width: 0;
 }
 
 .insight-data-text strong {
@@ -972,18 +1005,32 @@
   color: var(--text-secondary);
 }
 
-/* UPDATED: Mobile Responsiveness for Sections with Spartan helmet banner layout */
+/* UPDATED: Mobile Responsiveness for Sections with PERFECT icon centering */
 @media (max-width: 768px) {
   .checkin-benefits-banner {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg) var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-sm);
     margin-bottom: var(--spacing-lg);
   }
   
   .checkin-benefits-content {
+    flex-direction: column;
+    gap: var(--spacing-sm);
     text-align: center;
+    align-items: center;
+  }
+  
+  .checkin-benefits-icon {
+    align-self: center;
+    margin: 0;
+    padding: 0;
+    justify-self: center;
+    place-self: center;
+  }
+  
+  .checkin-benefits-text {
+    font-size: 0.8rem;
+    text-align: center;
+    width: 100%;
   }
   
   .emotional-checkin-section {
@@ -1046,15 +1093,29 @@
   }
   
   .insight-data-banner {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg) var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-sm);
     margin-bottom: var(--spacing-lg);
   }
   
-  .insight-data-content {
+  .insight-data-banner-content {
+    flex-direction: column;
+    gap: var(--spacing-sm);
     text-align: center;
+    align-items: center;
+  }
+  
+  .insight-data-icon {
+    align-self: center;
+    margin: 0;
+    padding: 0;
+    justify-self: center;
+    place-self: center;
+  }
+  
+  .insight-data-text {
+    font-size: 0.8rem;
+    text-align: center;
+    width: 100%;
   }
   
   .data-quality-indicator {
@@ -1075,9 +1136,43 @@
     margin-bottom: var(--spacing-md);
   }
   
+  .checkin-benefits-content {
+    gap: var(--spacing-sm);
+  }
+  
+  .checkin-benefits-icon {
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+    align-self: center;
+    justify-self: center;
+    place-self: center;
+  }
+  
+  .checkin-benefits-text {
+    font-size: 0.75rem;
+  }
+  
   .insight-data-banner {
     padding: var(--spacing-md) var(--spacing-xs);
     margin-bottom: var(--spacing-md);
+  }
+  
+  .insight-data-banner-content {
+    gap: var(--spacing-sm);
+  }
+  
+  .insight-data-icon {
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+    align-self: center;
+    justify-self: center;
+    place-self: center;
+  }
+  
+  .insight-data-text {
+    font-size: 0.75rem;
   }
   
   .emotional-checkin-section {

@@ -1,16 +1,16 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Fixed with all SpartanInfoIcon references removed
+// components/EmotionalTimeline/EmotionalTimeline.js - Updated with checkmark system for all phases
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
-// Import CSS files
+// Import CSS files - UPDATED: Now imports both organized CSS files
 import './EmotionalTimeline.css';
 import './EmotionalTimelineSections.css';
 import './EmotionalTimelineModals.css';
 
-// Icons - Only keeping necessary functional icons
+// Icons - FIXED: Added missing FaEdit import
 import { 
-  FaCheckCircle, FaTimes,
+  FaCheckCircle, FaInfoCircle, FaTimes,
   FaMapSigns, FaHeart, FaBrain, FaEdit
 } from 'react-icons/fa';
 
@@ -29,7 +29,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showPhaseDetail, setShowPhaseDetail] = useState(false);
   
-  // Robust sliding pill navigation state
+  // UPDATED: Robust sliding pill navigation state - REMOVED JOURNAL TAB
   const [activeSection, setActiveSection] = useState('journey-map');
   
   // Enhanced emotional tracking states
@@ -41,7 +41,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   });
   const [emotionsLogged, setEmotionsLogged] = useState(false);
 
-  // Mobile-First sliding tab state management
+  // BULLETPROOF: Mobile-First sliding tab state management matching Profile
   const tabsRef = useRef(null);
   const sliderRef = useRef(null);
   const [isSliderInitialized, setIsSliderInitialized] = useState(false);
@@ -55,22 +55,23 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   const currentPhase = getCurrentPhase(currentDay, emotionalPhases);
   const currentMasteryLevel = getCurrentMasteryLevel(currentDay, masteryLevels);
 
-  // Tab configuration
+  // Tab configuration matching design patterns - REMOVED JOURNAL TAB
   const navigationTabs = [
     { id: 'journey-map', label: 'Journey Map', icon: FaMapSigns },
     { id: 'check-in', label: 'Check-in', icon: FaCheckCircle },
     { id: 'analysis', label: 'Analysis', icon: FaBrain }
   ];
 
-  // Mobile detection
+  // MOBILE DETECTION: Simplified mobile detection matching Profile
   const detectMobile = useCallback(() => {
     const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
     setIsMobile(isMobileDevice);
     return isMobileDevice;
   }, []);
 
-  // Enhanced slider positioning
+  // BULLETPROOF: Enhanced slider positioning with perfect edge alignment
   const updateTabSlider = useCallback(() => {
+    // Guard clauses for safety
     if (!tabsRef.current || !sliderRef.current) {
       return false;
     }
@@ -85,22 +86,31 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         return false;
       }
 
+      // Wait for next frame to ensure layout is complete
       requestAnimationFrame(() => {
         try {
+          // Get measurements relative to container
           const containerRect = tabsContainer.getBoundingClientRect();
           const tabRect = activeTabElement.getBoundingClientRect();
           
+          // Validate measurements
           if (containerRect.width === 0 || tabRect.width === 0) {
             console.warn('Invalid measurements, container or tab not rendered');
             return;
           }
 
+          // Calculate position based on actual container content bounds
           const containerStyle = window.getComputedStyle(tabsContainer);
           const paddingLeft = parseFloat(containerStyle.paddingLeft) || 4;
+          
+          // Account for scroll position on mobile
           const scrollLeft = tabsContainer.scrollLeft || 0;
+          
+          // Calculate exact position relative to container's content area
           const leftOffset = tabRect.left - containerRect.left - paddingLeft + scrollLeft;
           const tabWidth = tabRect.width;
           
+          // Apply positioning and make visible
           slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
           slider.style.width = `${Math.round(tabWidth)}px`;
           slider.style.opacity = '1';
@@ -119,7 +129,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     }
   }, [activeSection]);
 
-  // Scroll active tab into view on mobile
+  // ENHANCED: Scroll active tab into view on mobile
   const scrollToActiveTab = useCallback(() => {
     if (!isMobile || !tabsRef.current) return;
     
@@ -130,7 +140,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       const containerRect = container.getBoundingClientRect();
       const tabRect = activeTabElement.getBoundingClientRect();
       
+      // Check if tab is fully visible
       if (tabRect.left < containerRect.left || tabRect.right > containerRect.right) {
+        // Scroll the tab into view
         activeTabElement.scrollIntoView({
           behavior: 'smooth',
           inline: 'center',
@@ -140,12 +152,13 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     }
   }, [activeSection, isMobile]);
 
-  // Clean tab change handler
+  // SIMPLIFIED: Clean tab change handler
   const handleSectionClick = useCallback((newSection) => {
     if (newSection === activeSection) return;
     
     setActiveSection(newSection);
     
+    // On mobile, scroll to the active tab
     if (isMobile) {
       setTimeout(() => {
         scrollToActiveTab();
@@ -179,7 +192,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     };
   }, [isMobile, updateTabSlider]);
 
-  // Proper slider initialization
+  // ROBUST: Proper slider initialization
   useEffect(() => {
     const initializeSlider = () => {
       detectMobile();
@@ -188,15 +201,18 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         return;
       }
 
+      // Initialize slider immediately
       requestAnimationFrame(() => {
         const success = updateTabSlider();
         
         if (success) {
           setIsSliderInitialized(true);
+          // Scroll to active tab on mobile
           if (isMobile) {
             scrollToActiveTab();
           }
         } else {
+          // Retry after short delay to ensure DOM is ready
           setTimeout(() => {
             if (updateTabSlider()) {
               setIsSliderInitialized(true);
@@ -204,10 +220,12 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 scrollToActiveTab();
               }
             } else {
+              // Final fallback - force slider to be visible
               if (sliderRef.current) {
                 sliderRef.current.style.opacity = '1';
                 sliderRef.current.style.visibility = 'visible';
                 setIsSliderInitialized(true);
+                // Try to update position one more time
                 setTimeout(updateTabSlider, 50);
               }
             }
@@ -216,12 +234,13 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       });
     };
 
+    // Initialize after DOM is ready
     const timer = setTimeout(initializeSlider, 100);
     
     return () => clearTimeout(timer);
   }, [updateTabSlider, detectMobile, isMobile, scrollToActiveTab]);
 
-  // Basic resize handling
+  // SIMPLIFIED: Basic resize handling
   useEffect(() => {
     const handleResize = () => {
       const wasMobile = isMobile;
@@ -234,6 +253,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       resizeTimeoutRef.current = setTimeout(() => {
         if (isSliderInitialized) {
           updateTabSlider();
+          // If switching to mobile, ensure active tab is visible
           if (!wasMobile && isMobile) {
             scrollToActiveTab();
           }
@@ -255,6 +275,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   // Update slider when active tab changes
   useEffect(() => {
     if (isSliderInitialized) {
+      // Small delay to ensure DOM is updated
       setTimeout(updateTabSlider, 10);
     }
   }, [activeSection, isSliderInitialized, updateTabSlider]);
@@ -330,7 +351,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   return (
     <div className="emotional-timeline-container">
-      {/* Integrated Header Design */}
+      {/* UPDATED: Integrated Header Design matching Tracker/Calendar/Stats */}
       <div className="integrated-timeline-header">
         <div className="header-title-section">
           <h2>Emotional Timeline</h2>
@@ -338,12 +359,12 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
         
         <div className="header-navigation-section">
-          {/* Mobile-First Sliding Navigation Pills */}
+          {/* BULLETPROOF: Mobile-First Sliding Navigation Pills matching Profile */}
           <div 
             className="navigation-pill-container" 
             ref={tabsRef}
           >
-            {/* Bulletproof sliding indicator */}
+            {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations */}
             <div 
               className="navigation-tab-slider" 
               ref={sliderRef}
@@ -406,19 +427,19 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   {getPhaseProgressText(currentPhase, currentDay, currentMasteryLevel)}
                 </div>
                 <div className="progress-explanation">
-                  <div className="progress-info-icon">⚔️</div>
+                  <FaInfoCircle className="progress-info-icon" />
                   <div className="progress-tooltip">
                     <div className="progress-tooltip-header">Progress Counter Explanation:</div>
                     <div className="progress-tooltip-content">
-                      • <strong>Current Day:</strong> Your total retention streak (Day {currentDay})
+                      â€¢ <strong>Current Day:</strong> Your total retention streak (Day {currentDay})
                       <br/>
-                      • <strong>Phase Day:</strong> How many days you've been in the "{currentPhase.name}" phase
+                      â€¢ <strong>Phase Day:</strong> How many days you've been in the "{currentPhase.name}" phase
                       <br/>
-                      • <strong>Phase Range:</strong> This phase spans days {currentPhase.dayRange}
+                      â€¢ <strong>Phase Range:</strong> This phase spans days {currentPhase.dayRange}
                       <br/>
-                      • <strong>Days Remaining:</strong> Days left until the next phase begins
+                      â€¢ <strong>Days Remaining:</strong> Days left until the next phase begins
                       <br/>
-                      • <strong>Progress Bar:</strong> Shows completion % of current phase
+                      â€¢ <strong>Progress Bar:</strong> Shows completion % of current phase
                     </div>
                   </div>
                 </div>
@@ -429,7 +450,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               className="phase-detail-btn"
               onClick={() => showPhaseDetails(currentPhase)}
             >
-              <span style={{ fontSize: '0.875rem' }}>⚔️</span>
+              <FaInfoCircle />
               View Phase Details
             </button>
           </div>
@@ -461,8 +482,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     <div className="timeline-phase-info">
                       <div className="timeline-phase-name">{phase.name}</div>
                       <div className="timeline-phase-range">Days {phase.dayRange}</div>
+                      {/* ADDED: Phase description matching mastery levels */}
                       <div className="timeline-phase-description">{phase.description}</div>
                     </div>
+                    {/* UPDATED: All phases now show checkmarks with appropriate colors */}
                     <div className="timeline-phase-check">
                       <FaCheckCircle />
                     </div>
@@ -471,7 +494,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               })}
             </div>
 
-            {/* Mastery Levels Display */}
+            {/* UPDATED: Mastery Levels Display - Simple layout matching timeline phases */}
             {currentDay >= 181 && (
               <div className="mastery-levels-section">
                 <h3>Mastery Levels (Days 181+)</h3>
@@ -486,6 +509,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         key={level.id}
                         className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                       >
+                        {/* UPDATED: Simple layout matching timeline phases */}
                         <div className="mastery-level-icon">
                           <level.icon />
                         </div>
@@ -522,23 +546,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="emotional-checkin-section">
             <h3>Daily Emotional Check-in</h3>
             
-            {/* Benefits banner - EXACT copy of Profile coming-soon-banner structure */}
+            {/* INFO BANNER explaining what tracking unlocks */}
             <div className="checkin-benefits-banner">
-              <div className="checkin-benefits-helmet-container">
-                <img 
-                  className="checkin-benefits-helmet" 
-                  src="/helmet.png" 
-                  alt="Track to unlock" 
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'block';
-                  }}
-                />
-                <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                  ⚔️
-                </div>
-              </div>
               <div className="checkin-benefits-content">
+                <FaInfoCircle className="checkin-benefits-icon" />
                 <div className="checkin-benefits-text">
                   <strong>Track to unlock:</strong> Personalized phase analysis, pattern recognition across your emotional metrics, challenge identification with solutions, predictive guidance for upcoming phases, and tailored strategies based on your unique journey data.
                 </div>
@@ -560,7 +571,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 </div>
               ) : (
                 <div className="emotions-not-logged">
-                  <div className="info-icon">⚔️</div>
+                  <FaInfoCircle className="info-icon" />
                   <span>Log emotions below</span>
                 </div>
               )}
@@ -643,25 +654,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 
                 return (
                   <>
-                    {/* EXACT COPY: Profile coming-soon-banner HTML structure */}
+                    {/* Data Quality Banner */}
                     {recentData.length < 7 && (
                       <div className="insight-data-banner">
-                        <div className="insight-data-helmet-container">
-                          <img 
-                            className="insight-data-helmet" 
-                            src="/helmet.png" 
-                            alt="Coming Soon" 
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextElementSibling.style.display = 'block';
-                            }}
-                          />
-                          <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
-                            ⚔️
-                          </div>
-                        </div>
-                        
-                        <div className="insight-data-content">
+                        <div className="insight-data-banner-content">
+                          <FaInfoCircle className="insight-data-icon" />
                           <div className="insight-data-text">
                             <strong>Analysis improves with data:</strong> The more you track emotions, the more personalized and accurate this analysis becomes.
                             {recentData.length >= 3 && recentData.length < 7 && ` You've logged ${recentData.length} days - track 7+ days to unlock advanced pattern recognition.`}
@@ -670,7 +667,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                       </div>
                     )}
 
-                    {/* Consolidated insufficient data section */}
+                    {/* UPDATED: Consolidated insufficient data section */}
                     {recentData.length < 3 && (
                       <div className="insufficient-data-section">
                         <div className="optimization-criteria">
@@ -755,8 +752,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Anxiety Level
                                       {analysis.dataAnalysis.trends?.anxiety && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
-                                          {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓' : 
-                                           analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑' : ' →'}
+                                          {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' â†“' : 
+                                           analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' â†‘' : ' â†’'}
                                         </span>
                                       )}
                                     </div>
@@ -766,8 +763,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Mood Stability
                                       {analysis.dataAnalysis.trends?.mood && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
-                                          {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑' : 
-                                           analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓' : ' →'}
+                                          {analysis.dataAnalysis.trends.mood === 'improving' ? ' â†‘' : 
+                                           analysis.dataAnalysis.trends.mood === 'concerning' ? ' â†“' : ' â†’'}
                                         </span>
                                       )}
                                     </div>
@@ -777,8 +774,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Mental Clarity
                                       {analysis.dataAnalysis.trends?.clarity && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
-                                          {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑' : 
-                                           analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓' : ' →'}
+                                          {analysis.dataAnalysis.trends.clarity === 'improving' ? ' â†‘' : 
+                                           analysis.dataAnalysis.trends.clarity === 'concerning' ? ' â†“' : ' â†’'}
                                         </span>
                                       )}
                                     </div>
@@ -788,8 +785,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Emotional Processing
                                       {analysis.dataAnalysis.trends?.processing && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.processing}`}>
-                                          {analysis.dataAnalysis.trends.processing === 'improving' ? ' ↑' : 
-                                           analysis.dataAnalysis.trends.processing === 'concerning' ? ' ↓' : ' →'}
+                                          {analysis.dataAnalysis.trends.processing === 'improving' ? ' â†‘' : 
+                                           analysis.dataAnalysis.trends.processing === 'concerning' ? ' â†“' : ' â†’'}
                                         </span>
                                       )}
                                     </div>
@@ -986,7 +983,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
             {/* Warning Signs */}
             <div className="phase-modal-section warning-section">
-              <h4>⚠️ Warning Signs (Seek Support)</h4>
+              <h4>âš ï¸ Warning Signs (Seek Support)</h4>
               <ul>
                 {selectedPhase.warningSigns.map((sign, index) => (
                   <li key={index} className="warning-item">{sign}</li>

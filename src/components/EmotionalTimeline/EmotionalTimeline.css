@@ -1,11 +1,11 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - Updated with Spartan helmet support and tooltip fixes */
+/* components/EmotionalTimeline/EmotionalTimeline.css - Updated with Sliding Menu & Header Consistency */
 
 /* Main container */
 .emotional-timeline-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  padding: 0;
+  padding: 0; /* Ensure no padding affecting spacing */
 }
 
 /* Using CSS custom properties for progress bar colors */
@@ -52,7 +52,7 @@
   text-align: center;
 }
 
-/* Header subtitle matching other tabs */
+/* NEW: Header subtitle matching other tabs */
 .header-subtitle {
   margin: var(--spacing-xs) 0 0 0;
   font-size: 0.875rem;
@@ -79,13 +79,17 @@
   border: 1px solid var(--border);
   position: relative;
   margin: 0 auto;
+  /* Desktop: auto-size to content */
   width: auto;
   max-width: 600px;
+  /* Use gap for consistent spacing */
   gap: 0;
   justify-content: flex-start;
+  /* Mobile 3D rendering context */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  /* No overflow on desktop */
   overflow: visible;
 }
 
@@ -101,10 +105,12 @@
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 1;
+  /* Start hidden but ready to be shown */
   opacity: 0;
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
+  /* Mobile GPU acceleration */
   will-change: transform, width;
 }
 
@@ -127,8 +133,10 @@
   position: relative;
   z-index: 2;
   outline: none;
+  /* Natural width based on content */
   min-width: fit-content;
   flex-shrink: 0;
+  /* Mobile touch optimization */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -151,6 +159,7 @@
 
 /* MOBILE STYLES: Horizontal scrolling like Stats benefits */
 @media (max-width: 768px) {
+  /* Container for scrolling wrapper */
   .header-navigation-section {
     width: 100%;
     padding: 0;
@@ -171,6 +180,7 @@
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     transform: translateZ(0);
+    /* Remove centering on mobile */
     margin: 0;
   }
   
@@ -185,7 +195,8 @@
     font-size: 0.8rem;
     gap: var(--spacing-sm);
     min-width: fit-content;
-    min-height: 36px;
+    min-height: 36px; /* FIXED: Match Calendar exactly */
+    /* Ensure buttons don't get squished */
     flex: 0 0 auto;
   }
   
@@ -194,9 +205,11 @@
     top: 4px;
     left: 4px;
     height: calc(100% - 8px);
+    /* Faster transition on mobile */
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
+  /* Ensure active state is visible */
   .navigation-section-btn.active {
     font-weight: 600;
   }
@@ -213,16 +226,17 @@
 /* Very small screens - FIXED: Match Calendar exact sizing */
 @media (max-width: 480px) {
   .navigation-pill-container {
-    padding: 6px;
+    padding: 6px; /* FIXED: Match Calendar exactly */
+    /* Ensure full width usage */
     width: 100%;
     max-width: 100%;
   }
   
   .navigation-section-btn {
-    font-size: 0.875rem;
+    font-size: 0.875rem; /* FIXED: Match Calendar size */
     gap: var(--spacing-xs);
-    padding: var(--spacing-sm) var(--spacing-md);
-    min-height: 36px;
+    padding: var(--spacing-sm) var(--spacing-md); /* FIXED: Match Calendar padding */
+    min-height: 36px; /* FIXED: Match Calendar exactly */
   }
   
   .navigation-section-btn svg {
@@ -231,9 +245,10 @@
   
   /* FIXED: Slider positioning for very small screens */
   .navigation-tab-slider {
-    top: 6px;
-    left: 6px;
-    height: calc(100% - 12px);
+    top: 6px; /* FIXED: Match Calendar padding */
+    left: 6px; /* FIXED: Match Calendar padding */
+    height: calc(100% - 12px); /* FIXED: Match Calendar calculation */
+    /* FIXED: Ultra-fast transitions for small screens like Calendar */
     transition: transform 0.2s ease-out, width 0.2s ease-out;
   }
 }
@@ -343,7 +358,7 @@
   position: relative;
 }
 
-/* Progress text with tooltip explanation - UPDATED for Spartan helmet */
+/* Progress text with tooltip explanation */
 .progress-text-container {
   display: flex;
   flex-direction: column;
@@ -363,16 +378,12 @@
   display: inline-block;
 }
 
-/* UPDATED: Progress info icon styling for emoji */
 .progress-info-icon {
+  font-size: 0.75rem;
+  color: var(--primary);
   cursor: help;
   opacity: 0.8;
   transition: all 0.3s ease;
-  font-size: 0.875rem;
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .progress-info-icon:hover {
@@ -443,7 +454,6 @@
   margin-top: -1px;
 }
 
-/* UPDATED: Phase detail button with Spartan helmet */
 .phase-detail-btn {
   order: 5;
   display: flex;
@@ -754,6 +764,52 @@
   color: var(--text-secondary);
 }
 
+/* NEW: Check-in Benefits Banner */
+.checkin-benefits-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.4;
+}
+
+.checkin-benefits-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.checkin-benefits-icon {
+  font-size: 1rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.checkin-benefits-text {
+  flex: 1;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-weight: 500;
+  text-align: center;
+}
+
+.checkin-benefits-text strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 /* Mobile Responsiveness for Core Layout */
 @media (max-width: 768px) {
   .emotional-timeline-container {
@@ -845,6 +901,26 @@
     min-width: 50px;
     letter-spacing: 0.25px;
   }
+  
+  .checkin-benefits-banner {
+    padding: var(--spacing-sm);
+  }
+  
+  .checkin-benefits-content {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  
+  .checkin-benefits-icon {
+    align-self: center;
+    margin-top: 0;
+  }
+  
+  .checkin-benefits-text {
+    font-size: 0.8rem;
+    text-align: center;
+  }
 }
 
 @media (max-width: 480px) {
@@ -906,6 +982,14 @@
     padding: 1px 4px;
     min-width: 40px;
     letter-spacing: 0.1px;
+  }
+  
+  .checkin-benefits-banner {
+    padding: var(--spacing-xs);
+  }
+  
+  .checkin-benefits-text {
+    font-size: 0.75rem;
   }
   
   .timeline-phase-description {
