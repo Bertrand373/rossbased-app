@@ -621,6 +621,9 @@
   font-size: 1rem;
   flex-shrink: 0;
   color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* UPDATED: Success icon color to match benefits logged styling */

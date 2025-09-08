@@ -363,11 +363,16 @@
   display: inline-block;
 }
 
-/* UPDATED: Progress info icon styling for Spartan helmet */
+/* UPDATED: Progress info icon styling for emoji */
 .progress-info-icon {
   cursor: help;
   opacity: 0.8;
   transition: all 0.3s ease;
+  font-size: 0.875rem;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .progress-info-icon:hover {
