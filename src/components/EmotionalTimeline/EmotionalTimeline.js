@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Updated with checkmark system for all phases
+// components/EmotionalTimeline/EmotionalTimeline.js - Updated with fixed banner structure
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -431,15 +431,15 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   <div className="progress-tooltip">
                     <div className="progress-tooltip-header">Progress Counter Explanation:</div>
                     <div className="progress-tooltip-content">
-                      â€¢ <strong>Current Day:</strong> Your total retention streak (Day {currentDay})
+                      • <strong>Current Day:</strong> Your total retention streak (Day {currentDay})
                       <br/>
-                      â€¢ <strong>Phase Day:</strong> How many days you've been in the "{currentPhase.name}" phase
+                      • <strong>Phase Day:</strong> How many days you've been in the "{currentPhase.name}" phase
                       <br/>
-                      â€¢ <strong>Phase Range:</strong> This phase spans days {currentPhase.dayRange}
+                      • <strong>Phase Range:</strong> This phase spans days {currentPhase.dayRange}
                       <br/>
-                      â€¢ <strong>Days Remaining:</strong> Days left until the next phase begins
+                      • <strong>Days Remaining:</strong> Days left until the next phase begins
                       <br/>
-                      â€¢ <strong>Progress Bar:</strong> Shows completion % of current phase
+                      • <strong>Progress Bar:</strong> Shows completion % of current phase
                     </div>
                   </div>
                 </div>
@@ -546,13 +546,30 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="emotional-checkin-section">
             <h3>Daily Emotional Check-in</h3>
             
-            {/* INFO BANNER explaining what tracking unlocks */}
+            {/* FIXED: Benefits Banner with proper coming soon structure */}
             <div className="checkin-benefits-banner">
-              <div className="checkin-benefits-content">
-                <FaInfoCircle className="checkin-benefits-icon" />
-                <div className="checkin-benefits-text">
-                  <strong>Track to unlock:</strong> Personalized phase analysis, pattern recognition across your emotional metrics, challenge identification with solutions, predictive guidance for upcoming phases, and tailored strategies based on your unique journey data.
+              <div className="checkin-benefits-helmet-container">
+                <img 
+                  className="checkin-benefits-helmet" 
+                  src="/helmet.png" 
+                  alt="Track to Unlock" 
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'block';
+                  }}
+                />
+                <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
+                  ⚔️
                 </div>
+              </div>
+              
+              <div className="checkin-benefits-content">
+                <h4 className="checkin-benefits-title">
+                  Track to Unlock Advanced Features
+                </h4>
+                <p className="checkin-benefits-description">
+                  Personalized phase analysis, pattern recognition across your emotional metrics, challenge identification with solutions, predictive guidance for upcoming phases, and tailored strategies based on your unique journey data.
+                </p>
               </div>
             </div>
             
@@ -654,15 +671,32 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 
                 return (
                   <>
-                    {/* Data Quality Banner */}
+                    {/* FIXED: Data Analysis Banner with proper coming soon structure */}
                     {recentData.length < 7 && (
                       <div className="insight-data-banner">
-                        <div className="insight-data-banner-content">
-                          <FaInfoCircle className="insight-data-icon" />
-                          <div className="insight-data-text">
-                            <strong>Analysis improves with data:</strong> The more you track emotions, the more personalized and accurate this analysis becomes.
-                            {recentData.length >= 3 && recentData.length < 7 && ` You've logged ${recentData.length} days - track 7+ days to unlock advanced pattern recognition.`}
+                        <div className="insight-data-helmet-container">
+                          <img 
+                            className="insight-data-helmet" 
+                            src="/helmet.png" 
+                            alt="Analysis Improves" 
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextElementSibling.style.display = 'block';
+                            }}
+                          />
+                          <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
+                            ⚔️
                           </div>
+                        </div>
+                        
+                        <div className="insight-data-content">
+                          <h4 className="insight-data-title">
+                            Analysis Improves with Data
+                          </h4>
+                          <p className="insight-data-description">
+                            The more you track emotions, the more personalized and accurate this analysis becomes.
+                            {recentData.length >= 3 && recentData.length < 7 && ` You've logged ${recentData.length} days - track 7+ days to unlock advanced pattern recognition.`}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -752,8 +786,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Anxiety Level
                                       {analysis.dataAnalysis.trends?.anxiety && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
-                                          {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' â†“' : 
-                                           analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' â†‘' : ' â†’'}
+                                          {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓' : 
+                                           analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑' : ' →'}
                                         </span>
                                       )}
                                     </div>
@@ -763,8 +797,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Mood Stability
                                       {analysis.dataAnalysis.trends?.mood && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
-                                          {analysis.dataAnalysis.trends.mood === 'improving' ? ' â†‘' : 
-                                           analysis.dataAnalysis.trends.mood === 'concerning' ? ' â†“' : ' â†’'}
+                                          {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑' : 
+                                           analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓' : ' →'}
                                         </span>
                                       )}
                                     </div>
@@ -774,8 +808,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Mental Clarity
                                       {analysis.dataAnalysis.trends?.clarity && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
-                                          {analysis.dataAnalysis.trends.clarity === 'improving' ? ' â†‘' : 
-                                           analysis.dataAnalysis.trends.clarity === 'concerning' ? ' â†“' : ' â†’'}
+                                          {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑' : 
+                                           analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓' : ' →'}
                                         </span>
                                       )}
                                     </div>
@@ -785,8 +819,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Emotional Processing
                                       {analysis.dataAnalysis.trends?.processing && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.processing}`}>
-                                          {analysis.dataAnalysis.trends.processing === 'improving' ? ' â†‘' : 
-                                           analysis.dataAnalysis.trends.processing === 'concerning' ? ' â†“' : ' â†’'}
+                                          {analysis.dataAnalysis.trends.processing === 'improving' ? ' ↑' : 
+                                           analysis.dataAnalysis.trends.processing === 'concerning' ? ' ↓' : ' →'}
                                         </span>
                                       )}
                                     </div>
@@ -983,7 +1017,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
             {/* Warning Signs */}
             <div className="phase-modal-section warning-section">
-              <h4>âš ï¸ Warning Signs (Seek Support)</h4>
+              <h4>⚠️ Warning Signs (Seek Support)</h4>
               <ul>
                 {selectedPhase.warningSigns.map((sign, index) => (
                   <li key={index} className="warning-item">{sign}</li>

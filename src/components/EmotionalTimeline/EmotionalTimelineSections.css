@@ -1,6 +1,6 @@
 /* components/EmotionalTimeline/EmotionalTimelineSections.css - Section Components & Analysis Display */
 
-/* UPDATED: Check-in Benefits Banner styled like Profile coming soon banner */
+/* FIXED: Check-in Benefits Banner styled EXACTLY like Profile coming soon banner */
 .checkin-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -14,24 +14,21 @@
   margin-bottom: var(--spacing-xl);
 }
 
-.checkin-benefits-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
+.checkin-benefits-helmet-container {
+  flex-shrink: 0;
 }
 
-.checkin-benefits-icon {
+.checkin-benefits-helmet {
   width: 40px;
   height: 40px;
-  font-size: 1.5rem;
-  color: var(--primary);
-  flex-shrink: 0;
   animation: coming-soon-pulse 2s ease-in-out infinite;
   filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
-  display: flex;
-  align-items: center;
-  justify-content: center;
+}
+
+.checkin-benefits-helmet-fallback {
+  font-size: 1.5rem;
+  color: var(--primary);
+  animation: coming-soon-pulse 2s ease-in-out infinite;
 }
 
 @keyframes coming-soon-pulse {
@@ -45,7 +42,14 @@
   }
 }
 
-.checkin-benefits-text {
+.checkin-benefits-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.checkin-benefits-title {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
@@ -53,15 +57,16 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+}
+
+.checkin-benefits-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
   line-height: 1.4;
+  margin: 0;
 }
 
-.checkin-benefits-text strong {
-  color: var(--text);
-  font-weight: 600;
-}
-
-/* UPDATED: Data quality banner styled like Profile coming soon banner */
+/* FIXED: Data quality banner styled EXACTLY like Profile coming soon banner */
 .insight-data-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -75,27 +80,31 @@
   margin-bottom: var(--spacing-xl);
 }
 
-.insight-data-banner-content {
+.insight-data-helmet-container {
+  flex-shrink: 0;
+}
+
+.insight-data-helmet {
+  width: 40px;
+  height: 40px;
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
+}
+
+.insight-data-helmet-fallback {
+  font-size: 1.5rem;
+  color: var(--primary);
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+}
+
+.insight-data-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
 }
 
-.insight-data-icon {
-  width: 40px;
-  height: 40px;
-  font-size: 1.5rem;
-  color: var(--primary);
-  flex-shrink: 0;
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.insight-data-text {
+.insight-data-title {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
@@ -103,12 +112,13 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  line-height: 1.4;
 }
 
-.insight-data-text strong {
-  color: var(--text);
-  font-weight: 600;
+.insight-data-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
 }
 
 /* ANALYSIS COMPONENTS - Shared styles from Stats */
@@ -1004,36 +1014,57 @@
   color: var(--text-secondary);
 }
 
-/* UPDATED: Mobile Responsiveness for Sections with PERFECT icon centering */
+/* FIXED: Mobile Responsiveness with proper coming soon banner layout */
 @media (max-width: 768px) {
+  /* FIXED: Coming soon banner mobile layout - centered title */
   .checkin-benefits-banner {
-    padding: var(--spacing-md) var(--spacing-sm);
-    margin-bottom: var(--spacing-lg);
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
   }
   
   .checkin-benefits-content {
     text-align: center;
   }
   
-  .checkin-benefits-icon {
-    width: 35px;
-    height: 35px;
-    font-size: 1.25rem;
-    align-self: center;
-    margin: 0;
-    padding: 0;
-    justify-self: center;
-    place-self: center;
+  .checkin-benefits-title {
+    justify-content: center;
   }
   
-  .checkin-benefits-text {
-    font-size: 0.875rem;
+  .checkin-benefits-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .checkin-benefits-helmet-fallback {
+    font-size: 1.25rem;
+  }
+  
+  .insight-data-banner {
+    flex-direction: column;
     text-align: center;
-    width: 100%;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .insight-data-content {
+    text-align: center;
+  }
+  
+  .insight-data-title {
     justify-content: center;
+  }
+  
+  .insight-data-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .insight-data-helmet-fallback {
+    font-size: 1.25rem;
   }
   
   .emotional-checkin-section {
@@ -1045,7 +1076,6 @@
     gap: var(--spacing-md);
   }
   
-  /* MOBILE: Stack edit button below pill */
   .emotion-status-section {
     gap: var(--spacing-sm);
   }
@@ -1095,36 +1125,6 @@
     padding: var(--spacing-md);
   }
   
-  .insight-data-banner {
-    padding: var(--spacing-md) var(--spacing-sm);
-    margin-bottom: var(--spacing-lg);
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-md);
-  }
-  
-  .insight-data-banner-content {
-    text-align: center;
-  }
-  
-  .insight-data-icon {
-    width: 35px;
-    height: 35px;
-    font-size: 1.25rem;
-    align-self: center;
-    margin: 0;
-    padding: 0;
-    justify-self: center;
-    place-self: center;
-  }
-  
-  .insight-data-text {
-    font-size: 0.875rem;
-    text-align: center;
-    width: 100%;
-    justify-content: center;
-  }
-  
   .data-quality-indicator {
     flex-direction: column;
     gap: var(--spacing-xs);
@@ -1138,52 +1138,39 @@
 }
 
 @media (max-width: 480px) {
-  .checkin-benefits-banner {
-    padding: var(--spacing-md) var(--spacing-xs);
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .checkin-benefits-content {
-    gap: var(--spacing-sm);
-  }
-  
-  .checkin-benefits-icon {
+  /* FIXED: Very small coming soon banner */
+  .checkin-benefits-helmet {
     width: 30px;
     height: 30px;
-    font-size: 1rem;
-    margin: 0;
-    padding: 0;
-    align-self: center;
-    justify-self: center;
-    place-self: center;
   }
   
-  .checkin-benefits-text {
+  .checkin-benefits-helmet-fallback {
+    font-size: 1rem;
+  }
+  
+  .checkin-benefits-title {
     font-size: 0.875rem;
   }
   
-  .insight-data-banner {
-    padding: var(--spacing-md) var(--spacing-xs);
-    margin-bottom: var(--spacing-md);
+  .checkin-benefits-description {
+    font-size: 0.8rem;
   }
   
-  .insight-data-banner-content {
-    gap: var(--spacing-sm);
-  }
-  
-  .insight-data-icon {
+  .insight-data-helmet {
     width: 30px;
     height: 30px;
-    font-size: 1rem;
-    margin: 0;
-    padding: 0;
-    align-self: center;
-    justify-self: center;
-    place-self: center;
   }
   
-  .insight-data-text {
+  .insight-data-helmet-fallback {
+    font-size: 1rem;
+  }
+  
+  .insight-data-title {
     font-size: 0.875rem;
+  }
+  
+  .insight-data-description {
+    font-size: 0.8rem;
   }
   
   .emotional-checkin-section {
