@@ -112,6 +112,8 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid rgba(255, 221, 0, 0.15);
 }
 
 .insight-data-description {
@@ -119,6 +121,7 @@
   color: var(--text-secondary);
   line-height: 1.4;
   margin: 0;
+  padding-top: var(--spacing-xs);
 }
 
 /* ANALYSIS COMPONENTS - Shared styles from Stats */
