@@ -546,7 +546,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="emotional-checkin-section">
             <h3>Daily Emotional Check-in</h3>
             
-            {/* FIXED: Benefits Banner with proper coming soon structure */}
+            {/* FIXED: Benefits Banner with proper coming soon structure - matches analysis banner */}
             <div className="checkin-benefits-banner">
               <div className="checkin-benefits-helmet-container">
                 <img 
@@ -568,7 +568,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   Track to Unlock Advanced Features
                 </h4>
                 <p className="checkin-benefits-description">
-                  Personalized phase analysis, pattern recognition across your emotional metrics, challenge identification with solutions, predictive guidance for upcoming phases, and tailored strategies based on your unique journey data.
+                  The more you track emotions, the more personalized and accurate analysis becomes. Daily tracking unlocks pattern recognition, challenge identification with solutions, predictive guidance for upcoming phases, and tailored strategies based on your unique journey data.
                 </p>
               </div>
             </div>
