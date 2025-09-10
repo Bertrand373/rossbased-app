@@ -885,6 +885,12 @@
   color: rgba(255, 221, 0, 0.7) !important;
 }
 
+.emotion-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
 .save-emotions-btn {
   background-color: rgba(255, 221, 0, 0.1) !important;
   border: 1px solid rgba(255, 221, 0, 0.2) !important;
@@ -1015,23 +1021,24 @@
   color: var(--text-secondary);
 }
 
-/* FIXED: Mobile Responsiveness with proper coming soon banner layout */
+/* FIXED: Mobile Responsiveness with proper left-aligned check-in banner */
 @media (max-width: 768px) {
-  /* FIXED: Coming soon banner mobile layout - centered title */
+  /* FIXED: Check-in banner mobile layout - LEFT ALIGNED */
   .checkin-benefits-banner {
     flex-direction: column;
-    text-align: center;
+    text-align: left;
     gap: var(--spacing-md);
     padding: var(--spacing-md) var(--spacing-sm);
     margin-bottom: var(--spacing-lg);
   }
   
   .checkin-benefits-content {
-    text-align: center;
+    text-align: left;
   }
   
   .checkin-benefits-title {
-    justify-content: center;
+    justify-content: flex-start;
+    text-align: left;
   }
   
   .checkin-benefits-helmet {
@@ -1139,7 +1146,7 @@
 }
 
 @media (max-width: 480px) {
-  /* FIXED: Very small coming soon banner */
+  /* FIXED: Very small check-in banner - LEFT ALIGNED */
   .checkin-benefits-helmet {
     width: 30px;
     height: 30px;
@@ -1151,10 +1158,17 @@
   
   .checkin-benefits-title {
     font-size: 0.875rem;
+    text-align: left;
+    justify-content: flex-start;
   }
   
   .checkin-benefits-description {
     font-size: 0.8rem;
+    text-align: left;
+  }
+  
+  .checkin-benefits-content {
+    text-align: left;
   }
   
   .insight-data-helmet {
