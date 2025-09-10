@@ -1,4 +1,4 @@
-/* components/EmotionalTimeline/EmotionalTimeline.css - Updated with Sliding Menu & Header Consistency */
+/* components/EmotionalTimeline/EmotionalTimeline.css - Updated with consistent circular icon treatment */
 
 /* Main container */
 .emotional-timeline-container {
@@ -305,12 +305,17 @@
   gap: var(--spacing-lg);
 }
 
-/* Phase icon with proper color inheritance */
+/* UPDATED: Main phase icon with consistent circular background treatment */
 .phase-icon {
   font-size: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .phase-info {
@@ -358,7 +363,7 @@
   position: relative;
 }
 
-/* Progress text with tooltip explanation */
+/* Progress text with banner explanation */
 .progress-text-container {
   display: flex;
   flex-direction: column;
@@ -375,83 +380,67 @@
 
 .progress-explanation {
   position: relative;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .progress-info-icon {
   font-size: 0.75rem;
   color: var(--primary);
-  cursor: help;
+  cursor: pointer;
   opacity: 0.8;
   transition: all 0.3s ease;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
 }
 
 .progress-info-icon:hover {
   opacity: 1;
   transform: scale(1.1);
+  background-color: rgba(255, 221, 0, 0.08);
 }
 
-.progress-tooltip {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+.progress-info-banner {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-md);
-  min-width: 280px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 100;
+  margin-top: var(--spacing-sm);
+  max-width: 320px;
   opacity: 0;
   visibility: hidden;
+  transform: translateY(-8px);
   transition: all 0.3s ease;
-  margin-bottom: var(--spacing-xs);
   pointer-events: none;
 }
 
-.progress-explanation:hover .progress-tooltip {
+.progress-info-banner.visible {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(-4px);
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
-.progress-tooltip-header {
+.progress-info-banner-header {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--text);
   margin-bottom: var(--spacing-sm);
   text-align: center;
-  border-bottom: 1px solid rgba(255, 221, 0, 0.2);
   padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.progress-tooltip-content {
+.progress-info-banner-content {
   font-size: 0.75rem;
-  color: var(--text);
+  color: var(--text-secondary);
   line-height: 1.4;
   text-align: left;
-}
-
-.progress-tooltip::before {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: var(--border);
-}
-
-.progress-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: var(--card-background);
-  margin-top: -1px;
+  padding-top: var(--spacing-xs);
 }
 
 .phase-detail-btn {
@@ -547,7 +536,7 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* Timeline phase icon with color inheritance */
+/* UPDATED: Timeline phase icon with consistent circular background */
 .timeline-phase-icon {
   font-size: 1.5rem;
   display: flex;
@@ -685,6 +674,7 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
+/* UPDATED: Mastery level icon with consistent circular background */
 .mastery-level-icon {
   font-size: 1.5rem;
   display: flex;
@@ -793,8 +783,11 @@
     gap: var(--spacing-md);
   }
   
+  /* UPDATED: Mobile main phase icon sizing */
   .phase-icon {
     font-size: 2.5rem;
+    width: 70px;
+    height: 70px;
   }
   
   .timeline-phase {
@@ -878,6 +871,13 @@
   
   .header-subtitle {
     font-size: 0.75rem;
+  }
+  
+  /* UPDATED: Very small mobile main phase icon sizing */
+  .phase-icon {
+    font-size: 2rem;
+    width: 60px;
+    height: 60px;
   }
   
   .mastery-levels-section h3 {

@@ -24,11 +24,17 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* UPDATED: Phase modal icon with consistent circular background treatment */
 .phase-modal-icon {
   font-size: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .phase-modal-info h3 {
@@ -309,8 +315,11 @@
     gap: var(--spacing-md);
   }
   
+  /* UPDATED: Mobile phase modal icon sizing */
   .phase-modal-icon {
     font-size: 2rem;
+    width: 56px;
+    height: 56px;
   }
   
   .form-actions {
@@ -333,8 +342,11 @@
     gap: var(--spacing-sm);
   }
   
+  /* UPDATED: Very small mobile phase modal icon sizing */
   .phase-modal-icon {
     font-size: 1.75rem;
+    width: 48px;
+    height: 48px;
   }
   
   .phase-modal-info h3 {
