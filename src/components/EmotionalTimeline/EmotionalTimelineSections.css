@@ -1178,11 +1178,14 @@
     font-size: 0.875rem;
     text-align: left;
     justify-content: flex-start;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   .checkin-benefits-description {
     font-size: 0.8rem;
     text-align: left;
+    padding-top: var(--spacing-xs);
   }
   
   .checkin-benefits-content {
