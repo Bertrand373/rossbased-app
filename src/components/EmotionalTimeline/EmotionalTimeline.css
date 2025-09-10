@@ -873,11 +873,11 @@
     font-size: 0.75rem;
   }
   
-  /* UPDATED: Very small mobile main phase icon sizing */
+  /* UPDATED: Very small mobile main phase icon - keep refined sizing */
   .phase-icon {
-    font-size: 2rem;
-    width: 60px;
-    height: 60px;
+    font-size: 1.125rem;
+    width: 40px;
+    height: 40px;
   }
   
   .mastery-levels-section h3 {
