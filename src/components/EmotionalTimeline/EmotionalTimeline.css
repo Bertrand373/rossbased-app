@@ -305,14 +305,14 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Main phase icon with consistent circular background treatment */
+/* UPDATED: Main phase icon with refined, consistent sizing */
 .phase-icon {
-  font-size: 3rem;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
@@ -411,18 +411,17 @@
   padding: var(--spacing-md);
   margin-top: var(--spacing-sm);
   max-width: 320px;
-  opacity: 0;
-  visibility: hidden;
+  display: none;
   transform: translateY(-8px);
   transition: all 0.3s ease;
-  pointer-events: none;
+  position: relative;
+  z-index: 10;
 }
 
 .progress-info-banner.visible {
+  display: block;
   opacity: 1;
-  visibility: visible;
   transform: translateY(0);
-  pointer-events: auto;
 }
 
 .progress-info-banner-header {
@@ -536,7 +535,7 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* UPDATED: Timeline phase icon with consistent circular background */
+/* Timeline phase icon with consistent circular background */
 .timeline-phase-icon {
   font-size: 1.5rem;
   display: flex;
@@ -674,7 +673,7 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* UPDATED: Mastery level icon with consistent circular background */
+/* Mastery level icon with consistent circular background */
 .mastery-level-icon {
   font-size: 1.5rem;
   display: flex;
@@ -783,11 +782,11 @@
     gap: var(--spacing-md);
   }
   
-  /* UPDATED: Mobile main phase icon sizing */
+  /* UPDATED: Mobile main phase icon - keep refined sizing */
   .phase-icon {
-    font-size: 2.5rem;
-    width: 70px;
-    height: 70px;
+    font-size: 1.25rem;
+    width: 44px;
+    height: 44px;
   }
   
   .timeline-phase {
