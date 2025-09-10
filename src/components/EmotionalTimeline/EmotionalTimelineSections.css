@@ -893,31 +893,38 @@
 }
 
 .save-emotions-btn {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border: 1px solid rgba(255, 221, 0, 0.2) !important;
-  border-radius: var(--radius-full) !important;
-  color: var(--primary) !important;
-  padding: var(--spacing-md) var(--spacing-xl) !important;
-  font-size: 0.9375rem !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: none !important;
-  letter-spacing: 0.025em !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
   gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+  justify-content: center !important;
 }
 
-.save-emotions-btn:hover,
-.save-emotions-btn:focus,
-.save-emotions-btn:active {
+.save-emotions-btn:hover {
   background-color: rgba(255, 221, 0, 0.1) !important;
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.save-emotions-btn:focus,
+.save-emotions-btn:active,
+.save-emotions-btn:focus-visible {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
   transform: none !important;
-  box-shadow: none !important;
   opacity: 1 !important;
+  box-shadow: none !important;
   outline: none !important;
   filter: none !important;
 }
