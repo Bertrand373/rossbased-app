@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Updated with fixed banner structure
+// components/EmotionalTimeline/EmotionalTimeline.js - Updated with banner-style progress info
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -28,6 +28,9 @@ import {
 const EmotionalTimeline = ({ userData, updateUserData }) => {
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showPhaseDetail, setShowPhaseDetail] = useState(false);
+  
+  // UPDATED: Add state for progress info banner visibility
+  const [showProgressInfo, setShowProgressInfo] = useState(false);
   
   // UPDATED: Robust sliding pill navigation state - REMOVED JOURNAL TAB
   const [activeSection, setActiveSection] = useState('journey-map');
@@ -349,6 +352,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     setShowPhaseDetail(true);
   };
 
+  // UPDATED: Toggle progress info banner
+  const toggleProgressInfo = () => {
+    setShowProgressInfo(!showProgressInfo);
+  };
+
   return (
     <div className="emotional-timeline-container">
       {/* UPDATED: Integrated Header Design matching Tracker/Calendar/Stats */}
@@ -427,10 +435,13 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   {getPhaseProgressText(currentPhase, currentDay, currentMasteryLevel)}
                 </div>
                 <div className="progress-explanation">
-                  <FaInfoCircle className="progress-info-icon" />
-                  <div className="progress-tooltip">
-                    <div className="progress-tooltip-header">Progress Counter Explanation:</div>
-                    <div className="progress-tooltip-content">
+                  <FaInfoCircle 
+                    className="progress-info-icon" 
+                    onClick={toggleProgressInfo}
+                  />
+                  <div className={`progress-info-banner ${showProgressInfo ? 'visible' : ''}`}>
+                    <div className="progress-info-banner-header">Progress Counter Explanation</div>
+                    <div className="progress-info-banner-content">
                       • <strong>Current Day:</strong> Your total retention streak (Day {currentDay})
                       <br/>
                       • <strong>Phase Day:</strong> How many days you've been in the "{currentPhase.name}" phase
