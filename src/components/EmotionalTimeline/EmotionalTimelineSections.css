@@ -648,11 +648,11 @@
   gap: var(--spacing-md);
 }
 
-/* UPDATED: Emotional Check-in Section - header padding to match Analysis header EXACTLY */
+/* FIXED: Emotional Check-in Section - padding to match Analysis section EXACTLY */
 .emotional-checkin-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
   display: flex;
@@ -660,7 +660,7 @@
   gap: var(--spacing-xl);
 }
 
-/* UPDATED: Header to match Analysis section header spacing EXACTLY */
+/* FIXED: Header with EXACT same spacing as Analysis section header */
 .emotional-checkin-section h3 {
   margin: 0;
   font-size: 1.25rem;
@@ -929,7 +929,7 @@
   filter: none !important;
 }
 
-/* UPDATED: Phase Analysis Section with matching header padding */
+/* FIXED: Phase Analysis Section with EXACT same padding structure as Check-in */
 .phase-insight-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
@@ -941,7 +941,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* UPDATED: Analysis header with same spacing as emotional check-in */
+/* FIXED: Analysis header with EXACT same spacing as Check-in header */
 .phase-insight-section h3 {
   margin: 0;
   font-size: 1.25rem;
@@ -1087,8 +1087,14 @@
     font-size: 1.25rem;
   }
   
+  /* FIXED: Both sections now have EXACT same mobile padding */
   .emotional-checkin-section {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+    gap: var(--spacing-lg);
+  }
+  
+  .phase-insight-section {
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
     gap: var(--spacing-lg);
   }
   
@@ -1150,11 +1156,6 @@
     gap: var(--spacing-xs);
     text-align: center;
   }
-  
-  .phase-insight-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
-    gap: var(--spacing-lg);
-  }
 }
 
 @media (max-width: 480px) {
@@ -1208,9 +1209,26 @@
     font-size: 0.8rem;
   }
   
+  /* FIXED: Both sections have EXACT same very small screen padding */
   .emotional-checkin-section {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
     gap: var(--spacing-md);
+  }
+  
+  .phase-insight-section {
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+  
+  /* FIXED: Both headers have EXACT same very small screen styling */
+  .phase-insight-section h3 {
+    font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
+  }
+  
+  .emotional-checkin-section h3 {
+    font-size: 1.125rem;
+    padding: var(--spacing-md) 0;
   }
   
   .emotion-label {
@@ -1246,21 +1264,6 @@
     font-size: 0.75rem !important;
     padding-left: 10px !important;
     padding-right: 10px !important;
-  }
-  
-  .phase-insight-section {
-    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
-    gap: var(--spacing-md);
-  }
-  
-  .phase-insight-section h3 {
-    font-size: 1.125rem;
-    padding: var(--spacing-md) 0;
-  }
-  
-  .emotional-checkin-section h3 {
-    font-size: 1.125rem;
-    padding: var(--spacing-md) 0;
   }
   
   .insight-card {
