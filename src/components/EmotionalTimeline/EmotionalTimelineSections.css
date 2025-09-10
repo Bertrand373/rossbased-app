@@ -46,7 +46,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 0;
 }
 
 .checkin-benefits-title {
@@ -57,6 +57,8 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .checkin-benefits-description {
@@ -64,6 +66,7 @@
   color: var(--text-secondary);
   line-height: 1.4;
   margin: 0;
+  padding-top: var(--spacing-xs);
 }
 
 /* FIXED: Data quality banner styled EXACTLY like Profile coming soon banner */
@@ -101,7 +104,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 0;
 }
 
 .insight-data-title {
@@ -113,7 +116,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding-bottom: var(--spacing-xs);
-  border-bottom: 1px solid rgba(255, 221, 0, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .insight-data-description {
@@ -879,12 +882,6 @@
 
 .slider-labels span:last-child {
   color: rgba(255, 221, 0, 0.7) !important;
-}
-
-.emotion-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--spacing-lg);
 }
 
 .save-emotions-btn {
