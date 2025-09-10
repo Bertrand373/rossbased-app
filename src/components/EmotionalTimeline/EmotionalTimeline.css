@@ -23,6 +23,36 @@
   background: var(--phase-color) !important;
 }
 
+/* UPDATED: Animated progress bar with shimmer effect */
+.progress-fill-animated {
+  background: linear-gradient(90deg, var(--phase-color) 0%, var(--phase-color-light) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill-animated::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 100%);
+  animation: progress-shimmer 2s infinite;
+}
+
+@keyframes progress-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* UPDATED: Integrated Header Design matching Tracker/Calendar/Stats pattern */
 .integrated-timeline-header {
   display: flex;
@@ -442,6 +472,7 @@
   padding-top: var(--spacing-xs);
 }
 
+/* UPDATED: Phase detail button with hover animation */
 .phase-detail-btn {
   order: 5;
   display: flex;
@@ -456,9 +487,16 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: all 0.2s ease;
   margin: 0 auto;
   max-width: 200px;
+}
+
+.phase-detail-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .phase-detail-btn:disabled {
@@ -535,7 +573,7 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* Timeline phase icon with consistent circular background */
+/* UPDATED: Timeline phase icon with consistent circular background and phase colors */
 .timeline-phase-icon {
   font-size: 1.5rem;
   display: flex;

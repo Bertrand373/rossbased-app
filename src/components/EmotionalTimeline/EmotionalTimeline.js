@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Updated with banner-style progress info
+// components/EmotionalTimeline/EmotionalTimeline.js - Updated with phase-colored icons and animated progress bar
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -64,6 +64,29 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     { id: 'check-in', label: 'Check-in', icon: FaCheckCircle },
     { id: 'analysis', label: 'Analysis', icon: FaBrain }
   ];
+
+  // UPDATED: Helper function to generate phase color variables
+  const getPhaseColorVariables = (phase) => {
+    if (!phase) return {};
+    
+    // Convert hex to RGB for lighter version
+    const hexToRgb = (hex) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    };
+    
+    const rgb = hexToRgb(phase.color);
+    const lighterColor = rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8)` : phase.color;
+    
+    return {
+      '--phase-color': phase.color,
+      '--phase-color-light': lighterColor
+    };
+  };
 
   // MOBILE DETECTION: Simplified mobile detection matching Profile
   const detectMobile = useCallback(() => {
@@ -419,14 +442,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               {currentPhase.description}
             </div>
 
-            {/* Progress bar */}
+            {/* UPDATED: Progress bar with phase-specific animated styling */}
             <div className="phase-progress">
               <div 
                 className="progress-bar"
-                style={{ '--phase-color': currentPhase.color }}
+                style={getPhaseColorVariables(currentPhase)}
               >
                 <div 
-                  className="progress-fill progress-fill-colored"
+                  className="progress-fill progress-fill-colored progress-fill-animated"
                   style={{ width: `${getPhaseProgress(currentPhase, currentDay, currentMasteryLevel)}%` }}
                 ></div>
               </div>
@@ -487,6 +510,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     onClick={() => showPhaseDetails(phase)}
                     style={{ cursor: 'pointer' }}
                   >
+                    {/* UPDATED: Phase icon with proper phase colors */}
                     <div className="timeline-phase-icon">
                       <phase.icon style={{ color: phase.color }} />
                     </div>
@@ -520,9 +544,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         key={level.id}
                         className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                       >
-                        {/* UPDATED: Simple layout matching timeline phases */}
+                        {/* UPDATED: Simple layout matching timeline phases with colored icons */}
                         <div className="mastery-level-icon">
-                          <level.icon />
+                          <level.icon style={{ color: 'var(--primary)' }} />
                         </div>
                         
                         <div className="mastery-level-info">
