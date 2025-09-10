@@ -1,6 +1,6 @@
 /* components/EmotionalTimeline/EmotionalTimelineSections.css - Section Components & Analysis Display */
 
-/* FIXED: Check-in Benefits Banner styled EXACTLY like Profile coming soon banner */
+/* FIXED: Check-in Benefits Banner styled EXACTLY like Analysis banner */
 .checkin-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -55,7 +55,7 @@
   color: var(--text);
   margin: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--spacing-sm);
   padding-bottom: var(--spacing-xs);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -68,6 +68,7 @@
   line-height: 1.4;
   margin: 0;
   padding-top: var(--spacing-xs);
+  text-align: left;
 }
 
 /* FIXED: Data quality banner styled EXACTLY like Profile coming soon banner */
@@ -1028,7 +1029,7 @@
     flex-direction: column;
     text-align: left;
     gap: var(--spacing-md);
-    padding: var(--spacing-md) var(--spacing-sm);
+    padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
   
@@ -1038,6 +1039,10 @@
   
   .checkin-benefits-title {
     justify-content: flex-start;
+    text-align: left;
+  }
+  
+  .checkin-benefits-description {
     text-align: left;
   }
   
@@ -1054,7 +1059,7 @@
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-md);
-    padding: var(--spacing-md) var(--spacing-sm);
+    padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
   
@@ -1147,6 +1152,10 @@
 
 @media (max-width: 480px) {
   /* FIXED: Very small check-in banner - LEFT ALIGNED */
+  .checkin-benefits-banner {
+    padding: var(--spacing-sm);
+  }
+  
   .checkin-benefits-helmet {
     width: 30px;
     height: 30px;
@@ -1169,6 +1178,10 @@
   
   .checkin-benefits-content {
     text-align: left;
+  }
+  
+  .insight-data-banner {
+    padding: var(--spacing-sm);
   }
   
   .insight-data-helmet {
