@@ -335,7 +335,7 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Main phase icon with refined, consistent sizing */
+/* UPDATED: Main phase icon with refined, consistent sizing and phase colors */
 .phase-icon {
   font-size: 1.5rem;
   display: flex;
@@ -346,6 +346,11 @@
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+}
+
+/* UPDATED: Phase icon inherits color from parent or style attribute */
+.phase-icon svg {
+  color: inherit !important;
 }
 
 .phase-info {
