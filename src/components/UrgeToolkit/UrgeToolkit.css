@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css - FINAL: Pill-shaped phase indicator with circular icon + consistent styling */
+/* components/UrgeToolkit/UrgeToolkit.css - FINAL: Clean pill-shaped phase indicator with seamless circular icon */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -54,19 +54,19 @@
   gap: var(--spacing-md);
 }
 
-/* UPDATED: Pill-shaped phase indicator with circular icon */
+/* UPDATED: Pill-shaped phase indicator with seamless circular icon positioning */
 .phase-indicator {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--spacing-md);
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
   background-color: var(--card-background);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .phase-indicator:hover {
@@ -77,11 +77,12 @@
 .phase-indicator-content {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--spacing-md);
+  width: 100%;
+  padding-right: var(--spacing-md);
 }
 
-/* UPDATED: Circular icon container like Emotional Timeline */
+/* UPDATED: Circular icon positioned to align with left rounded edge */
 .phase-indicator-icon {
   width: 48px;
   height: 48px;
@@ -95,14 +96,17 @@
   color: var(--phase-color, var(--primary));
   flex-shrink: 0;
   transition: all 0.2s ease;
+  margin-left: 2px; /* ADDED: Slight offset to align with pill edge */
 }
 
 .phase-indicator-text {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 2px;
   align-items: flex-start;
   text-align: left;
+  flex: 1;
+  min-width: 0; /* ADDED: Allows text to shrink properly */
 }
 
 .phase-name {
@@ -111,6 +115,9 @@
   color: var(--text);
   line-height: 1.2;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .phase-day {
@@ -118,6 +125,9 @@
   color: var(--text-secondary);
   line-height: 1.2;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* UPDATED: Section containers matching other tabs */
@@ -710,17 +720,17 @@
     justify-content: center;
   }
   
-  /* UPDATED: Mobile phase indicator - pill shaped with circular icon */
+  /* UPDATED: Mobile phase indicator with seamless circular icon positioning */
   .phase-indicator {
     width: 100%;
-    max-width: 320px;
-    padding: var(--spacing-sm) var(--spacing-md);
+    max-width: 280px;
+    padding: var(--spacing-xs);
     gap: var(--spacing-sm);
   }
   
   .phase-indicator-content {
     gap: var(--spacing-sm);
-    justify-content: flex-start;
+    padding-right: var(--spacing-sm);
   }
   
   .phase-indicator-icon {
@@ -728,19 +738,22 @@
     height: 44px;
     font-size: 1.25rem; /* MATCHES: Emotional Timeline mobile icon size */
     flex-shrink: 0;
+    margin-left: 2px; /* MAINTAINED: Seamless alignment */
   }
   
   .phase-indicator-text {
     align-items: flex-start;
     text-align: left;
+    flex: 1;
+    min-width: 0;
   }
   
   .phase-name {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
   }
   
   .phase-day {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
   }
   
   /* UPDATED: Mobile section padding */

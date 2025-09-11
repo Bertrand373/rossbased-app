@@ -1,4 +1,4 @@
-// components/UrgeToolkit/UrgeToolkit.js - FINAL: Integrated header design with pill-shaped phase indicator
+// components/UrgeToolkit/UrgeToolkit.js - FINAL: Clean pill-shaped phase indicator with seamless circular icon
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -410,7 +410,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="urge-toolkit-container">
-      {/* UPDATED: Integrated header design with pill-shaped phase indicator */}
+      {/* UPDATED: Integrated header design with clean pill-shaped phase indicator */}
       <div className="integrated-toolkit-header">
         <div className="toolkit-header-title-section">
           <h2>Emergency Toolkit</h2>
