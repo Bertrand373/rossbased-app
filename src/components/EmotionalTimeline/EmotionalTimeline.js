@@ -1002,7 +1002,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             </button>
 
             <div className="phase-modal-header">
-              <div className="timeline-phase-icon" style={{ color: selectedPhase.color }}>
+              <div className="phase-modal-icon" style={{ color: selectedPhase.color }}>
                 <selectedPhase.icon style={{ color: selectedPhase.color }} />
               </div>
               <div className="phase-modal-info">
