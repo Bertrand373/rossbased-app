@@ -1180,6 +1180,11 @@
   /* FIXED: Very small check-in banner matching Profile EXACTLY */
   .checkin-benefits-banner {
     padding: var(--spacing-sm);
+    align-items: center;
+  }
+  
+  .checkin-benefits-helmet-container {
+    align-self: center;
   }
   
   .checkin-benefits-helmet {
@@ -1196,7 +1201,7 @@
     text-align: center;
     justify-content: center;
     padding-bottom: var(--spacing-xs);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
   
   .checkin-benefits-description {
@@ -1212,6 +1217,11 @@
   /* FIXED: Very small analysis banner matching Profile EXACTLY */
   .insight-data-banner {
     padding: var(--spacing-sm);
+    align-items: center;
+  }
+  
+  .insight-data-helmet-container {
+    align-self: center;
   }
   
   .insight-data-helmet {
@@ -1228,7 +1238,7 @@
     text-align: center;
     justify-content: center;
     padding-bottom: var(--spacing-xs);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
   
   .insight-data-description {
