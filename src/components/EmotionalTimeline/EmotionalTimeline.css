@@ -348,7 +348,7 @@
   flex-shrink: 0;
 }
 
-/* UPDATED: Phase icon inherits color from parent or style attribute */
+/* FIXED: Phase icon SVG should inherit color from the parent div's inline style */
 .phase-icon svg {
   color: inherit !important;
 }
