@@ -503,7 +503,7 @@
   margin-bottom: 0;
 }
 
-/* Progress Indicator */
+/* UPDATED: Progress Indicator with yellow shimmer hint */
 .energy-data-progress-indicator {
   display: flex;
   flex-direction: column;
@@ -545,6 +545,24 @@
   border-radius: var(--radius-full);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+/* UPDATED: Yellow shimmer effect on unfilled portion */
+.energy-data-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 221, 0, 0.4) 50%, 
+    transparent 100%);
+  opacity: 0.15;
+  animation: progress-shimmer 2s infinite;
+  z-index: 1;
 }
 
 .energy-data-progress-fill {
@@ -554,20 +572,7 @@
   transition: width 0.8s ease-out;
   box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
   position: relative;
-}
-
-.energy-data-progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.2) 50%, 
-    transparent 100%);
-  animation: progress-shimmer 2s infinite;
+  z-index: 2;
 }
 
 @keyframes progress-shimmer {

@@ -23,7 +23,7 @@
   background: var(--phase-color) !important;
 }
 
-/* UPDATED: New shimmer effect for unfilled portion like analysis comprehensiveness bar */
+/* UPDATED: New shimmer effect for unfilled portion with phase color hint */
 .progress-bar-shimmer {
   position: relative;
   overflow: hidden;
@@ -38,8 +38,9 @@
   bottom: 0;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(255, 255, 255, 0.2) 50%, 
+    var(--phase-color, rgba(255, 255, 255, 0.2)) 50%, 
     transparent 100%);
+  opacity: 0.15;
   animation: progress-shimmer 2s infinite;
   z-index: 1;
 }
