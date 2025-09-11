@@ -429,9 +429,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             <div className="phase-date">Day {currentDay} of your journey</div>
             
             <div className="phase-icon-section">
-              {/* FIXED: Render icon component directly with color */}
               <div className="phase-icon" style={{ color: currentPhase.color }}>
-                {React.createElement(currentPhase.icon)}
+                <currentPhase.icon />
               </div>
               <div className="phase-info">
                 <div className="phase-name">{currentPhase.name}</div>
@@ -466,15 +465,15 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   <div className={`progress-info-banner ${showProgressInfo ? 'visible' : ''}`}>
                     <div className="progress-info-banner-header">Progress Counter Explanation</div>
                     <div className="progress-info-banner-content">
-                      • <strong>Current Day:</strong> Your total retention streak (Day {currentDay})
+                      â€¢ <strong>Current Day:</strong> Your total retention streak (Day {currentDay})
                       <br/>
-                      • <strong>Phase Day:</strong> How many days you've been in the "{currentPhase.name}" phase
+                      â€¢ <strong>Phase Day:</strong> How many days you've been in the "{currentPhase.name}" phase
                       <br/>
-                      • <strong>Phase Range:</strong> This phase spans days {currentPhase.dayRange}
+                      â€¢ <strong>Phase Range:</strong> This phase spans days {currentPhase.dayRange}
                       <br/>
-                      • <strong>Days Remaining:</strong> Days left until the next phase begins
+                      â€¢ <strong>Days Remaining:</strong> Days left until the next phase begins
                       <br/>
-                      • <strong>Progress Bar:</strong> Shows completion % of current phase
+                      â€¢ <strong>Progress Bar:</strong> Shows completion % of current phase
                     </div>
                   </div>
                 </div>
@@ -511,9 +510,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     onClick={() => showPhaseDetails(phase)}
                     style={{ cursor: 'pointer' }}
                   >
-                    {/* FIXED: Render icon component directly with color */}
-                    <div className="timeline-phase-icon" style={{ color: phase.color }}>
-                      {React.createElement(phase.icon)}
+                    {/* UPDATED: Phase icon with proper phase colors */}
+                    <div className="timeline-phase-icon">
+                      <phase.icon style={{ color: phase.color }} />
                     </div>
                     <div className="timeline-phase-info">
                       <div className="timeline-phase-name">{phase.name}</div>
@@ -545,9 +544,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         key={level.id}
                         className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                       >
-                        {/* FIXED: Render icon component directly with color */}
+                        {/* UPDATED: Simple layout matching timeline phases with colored icons */}
                         <div className="mastery-level-icon">
-                          {React.createElement(level.icon)}
+                          <level.icon style={{ color: 'var(--primary)' }} />
                         </div>
                         
                         <div className="mastery-level-info">
@@ -595,7 +594,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   }}
                 />
                 <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                  ⚔️
+                  âš”ï¸
                 </div>
               </div>
               
@@ -721,7 +720,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                             }}
                           />
                           <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
-                            ⚔️
+                            âš”ï¸
                           </div>
                         </div>
                         
@@ -822,8 +821,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Anxiety Level
                                       {analysis.dataAnalysis.trends?.anxiety && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
-                                          {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓' : 
-                                           analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑' : ' →'}
+                                          {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' â†“' : 
+                                           analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' â†‘' : ' â†’'}
                                         </span>
                                       )}
                                     </div>
@@ -833,8 +832,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Mood Stability
                                       {analysis.dataAnalysis.trends?.mood && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
-                                          {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑' : 
-                                           analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓' : ' →'}
+                                          {analysis.dataAnalysis.trends.mood === 'improving' ? ' â†‘' : 
+                                           analysis.dataAnalysis.trends.mood === 'concerning' ? ' â†“' : ' â†’'}
                                         </span>
                                       )}
                                     </div>
@@ -844,8 +843,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Mental Clarity
                                       {analysis.dataAnalysis.trends?.clarity && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
-                                          {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑' : 
-                                           analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓' : ' →'}
+                                          {analysis.dataAnalysis.trends.clarity === 'improving' ? ' â†‘' : 
+                                           analysis.dataAnalysis.trends.clarity === 'concerning' ? ' â†“' : ' â†’'}
                                         </span>
                                       )}
                                     </div>
@@ -855,8 +854,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="relapse-stat-label">Emotional Processing
                                       {analysis.dataAnalysis.trends?.processing && (
                                         <span className={`trend ${analysis.dataAnalysis.trends.processing}`}>
-                                          {analysis.dataAnalysis.trends.processing === 'improving' ? ' ↑' : 
-                                           analysis.dataAnalysis.trends.processing === 'concerning' ? ' ↓' : ' →'}
+                                          {analysis.dataAnalysis.trends.processing === 'improving' ? ' â†‘' : 
+                                           analysis.dataAnalysis.trends.processing === 'concerning' ? ' â†“' : ' â†’'}
                                         </span>
                                       )}
                                     </div>
@@ -1022,7 +1021,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             </button>
 
             <div className="phase-modal-header">
-              {/* UPDATED: Modal phase icon with phase colors */}
               <div className="phase-modal-icon" style={{ color: selectedPhase.color }}>
                 <selectedPhase.icon />
               </div>
@@ -1054,7 +1052,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
             {/* Warning Signs */}
             <div className="phase-modal-section warning-section">
-              <h4>⚠️ Warning Signs (Seek Support)</h4>
+              <h4>âš ï¸ Warning Signs (Seek Support)</h4>
               <ul>
                 {selectedPhase.warningSigns.map((sign, index) => (
                   <li key={index} className="warning-item">{sign}</li>

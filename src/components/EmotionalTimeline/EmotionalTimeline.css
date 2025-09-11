@@ -20,24 +20,7 @@
 /* Use CSS custom property for dynamic coloring */
 .progress-fill-colored {
   background-color: var(--phase-color) !important;
-  background: linear-gradient(90deg, var(--phase-color) 0%, var(--phase-color-light) 100%) !important;
-  position: relative;
-  overflow: hidden;
-}
-
-/* UPDATED: Add shimmer animation to all phase progress bars */
-.progress-fill-colored::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.3) 50%, 
-    transparent 100%);
-  animation: progress-shimmer 2s infinite;
+  background: var(--phase-color) !important;
 }
 
 /* UPDATED: Animated progress bar with shimmer effect */
@@ -595,7 +578,7 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* FIXED: Timeline phase icon with consistent circular background - NO FORCED WHITE COLOR */
+/* UPDATED: Timeline phase icon with consistent circular background and phase colors */
 .timeline-phase-icon {
   font-size: 1.5rem;
   display: flex;
@@ -607,11 +590,6 @@
   background-color: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 }
-
-/* REMOVED: This rule that was forcing white color on timeline icons */
-/* .timeline-phase-icon svg {
-  color: white !important;
-} */
 
 .timeline-phase-info {
   flex: 1;
