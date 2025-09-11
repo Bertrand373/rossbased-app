@@ -458,26 +458,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 <div className="progress-text">
                   {getPhaseProgressText(currentPhase, currentDay, currentMasteryLevel)}
                 </div>
-                <div className="progress-explanation">
-                  <FaInfoCircle 
-                    className="progress-info-icon" 
-                    onClick={toggleProgressInfo}
-                  />
-                  <div className={`progress-info-banner ${showProgressInfo ? 'visible' : ''}`}>
-                    <div className="progress-info-banner-header">Progress Counter Explanation</div>
-                    <div className="progress-info-banner-content">
-                      • <strong>Current Day:</strong> Your total retention streak (Day {currentDay})
-                      <br/>
-                      • <strong>Phase Day:</strong> How many days you've been in the "{currentPhase.name}" phase
-                      <br/>
-                      • <strong>Phase Range:</strong> This phase spans days {currentPhase.dayRange}
-                      <br/>
-                      • <strong>Days Remaining:</strong> Days left until the next phase begins
-                      <br/>
-                      • <strong>Progress Bar:</strong> Shows completion % of current phase
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
