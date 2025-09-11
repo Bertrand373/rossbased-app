@@ -1022,9 +1022,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             </button>
 
             <div className="phase-modal-header">
-              {/* FIXED: Render icon component directly with color */}
+              {/* UPDATED: Modal phase icon with phase colors */}
               <div className="phase-modal-icon" style={{ color: selectedPhase.color }}>
-                {React.createElement(selectedPhase.icon)}
+                <selectedPhase.icon />
               </div>
               <div className="phase-modal-info">
                 <h3>{selectedPhase.name}</h3>
