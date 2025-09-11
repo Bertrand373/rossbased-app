@@ -803,7 +803,7 @@
     padding: var(--spacing-md) var(--spacing-lg);
   }
   
-  /* UPDATED: Mobile action buttons */
+  /* UPDATED: Mobile action buttons matching tracker style */
   .tools-actions,
   .summary-actions {
     flex-direction: column;
@@ -814,6 +814,11 @@
   .secondary-btn {
     width: 100%;
     max-width: 280px;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    min-height: auto;
   }
   
   .action-btn {
@@ -826,34 +831,41 @@
   }
 }
 
-/* Very Small Screens */
+/* Very Small Screens - Match Emotional Timeline exactly */
 @media (max-width: 480px) {
+  .integrated-toolkit-header {
+    padding: var(--spacing-lg);
+    margin: 0;
+  }
+  
+  .toolkit-header-title-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .toolkit-header-title-section h2 {
+    font-size: 1.125rem; /* MATCHES: Emotional Timeline very small mobile */
+  }
+  
+  .toolkit-header-subtitle {
+    font-size: 0.75rem; /* MATCHES: Emotional Timeline very small mobile */
+  }
+  
   .phase-indicator {
     padding: var(--spacing-sm) var(--spacing-md);
     max-width: 100%;
-    justify-content: flex-start;
-    position: relative;
+    gap: var(--spacing-sm);
   }
   
   .phase-indicator-content {
-    gap: 0;
+    gap: var(--spacing-sm);
     justify-content: flex-start;
-    width: 100%;
   }
   
   .phase-indicator-icon {
-    font-size: 1.125rem;
+    width: 40px; /* MATCHES: Emotional Timeline very small mobile */
+    height: 40px;
+    font-size: 1.125rem; /* MATCHES: Emotional Timeline very small mobile */
     flex-shrink: 0;
-  }
-  
-  .phase-indicator-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: auto;
-    margin-right: 0;
-    padding: var(--spacing-xs) 0;
   }
   
   .phase-name {
