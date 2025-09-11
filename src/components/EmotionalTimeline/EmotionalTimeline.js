@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Updated with phase-colored icons and animated progress bar
+// components/EmotionalTimeline/EmotionalTimeline.js - Updated with improved progress bar shimmer effect
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -28,9 +28,6 @@ import {
 const EmotionalTimeline = ({ userData, updateUserData }) => {
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showPhaseDetail, setShowPhaseDetail] = useState(false);
-  
-  // UPDATED: Add state for progress info banner visibility
-  const [showProgressInfo, setShowProgressInfo] = useState(false);
   
   // UPDATED: Robust sliding pill navigation state - REMOVED JOURNAL TAB
   const [activeSection, setActiveSection] = useState('journey-map');
@@ -375,11 +372,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     setShowPhaseDetail(true);
   };
 
-  // UPDATED: Toggle progress info banner
-  const toggleProgressInfo = () => {
-    setShowProgressInfo(!showProgressInfo);
-  };
-
   return (
     <div className="emotional-timeline-container">
       {/* UPDATED: Integrated Header Design matching Tracker/Calendar/Stats */}
@@ -443,40 +435,21 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               {currentPhase.description}
             </div>
 
-            {/* UPDATED: Progress bar with phase-specific animated styling */}
+            {/* UPDATED: Progress bar with shimmer effect on unfilled portion like analysis bar */}
             <div className="phase-progress">
               <div 
-                className="progress-bar"
+                className="progress-bar progress-bar-shimmer"
                 style={getPhaseColorVariables(currentPhase)}
               >
                 <div 
-                  className="progress-fill progress-fill-colored progress-fill-animated"
+                  className="progress-fill progress-fill-colored progress-fill-shimmer"
                   style={{ width: `${getPhaseProgress(currentPhase, currentDay, currentMasteryLevel)}%` }}
                 ></div>
               </div>
+              {/* UPDATED: Progress text container without tooltip functionality */}
               <div className="progress-text-container">
                 <div className="progress-text">
                   {getPhaseProgressText(currentPhase, currentDay, currentMasteryLevel)}
-                </div>
-                <div className="progress-explanation">
-                  <FaInfoCircle 
-                    className="progress-info-icon" 
-                    onClick={toggleProgressInfo}
-                  />
-                  <div className={`progress-info-banner ${showProgressInfo ? 'visible' : ''}`}>
-                    <div className="progress-info-banner-header">Progress Counter Explanation</div>
-                    <div className="progress-info-banner-content">
-                      • <strong>Current Day:</strong> Your total retention streak (Day {currentDay})
-                      <br/>
-                      • <strong>Phase Day:</strong> How many days you've been in the "{currentPhase.name}" phase
-                      <br/>
-                      • <strong>Phase Range:</strong> This phase spans days {currentPhase.dayRange}
-                      <br/>
-                      • <strong>Days Remaining:</strong> Days left until the next phase begins
-                      <br/>
-                      • <strong>Progress Bar:</strong> Shows completion % of current phase
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

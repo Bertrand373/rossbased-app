@@ -23,14 +23,13 @@
   background: var(--phase-color) !important;
 }
 
-/* UPDATED: Animated progress bar with shimmer effect */
-.progress-fill-animated {
-  background: linear-gradient(90deg, var(--phase-color) 0%, var(--phase-color-light) 100%);
+/* UPDATED: New shimmer effect for unfilled portion like analysis comprehensiveness bar */
+.progress-bar-shimmer {
   position: relative;
   overflow: hidden;
 }
 
-.progress-fill-animated::after {
+.progress-bar-shimmer::after {
   content: '';
   position: absolute;
   top: 0;
@@ -39,9 +38,15 @@
   bottom: 0;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(255, 255, 255, 0.3) 50%, 
+    rgba(255, 255, 255, 0.2) 50%, 
     transparent 100%);
   animation: progress-shimmer 2s infinite;
+  z-index: 1;
+}
+
+.progress-fill-shimmer {
+  position: relative;
+  z-index: 2;
 }
 
 @keyframes progress-shimmer {
@@ -393,7 +398,7 @@
   text-align: center;
 }
 
-/* Progress bar with proper background */
+/* UPDATED: Progress bar with shimmer effect on unfilled portion */
 .phase-progress {
   order: 4;
   display: flex;
@@ -411,7 +416,7 @@
   position: relative;
 }
 
-/* Progress text with banner explanation */
+/* UPDATED: Progress text container without tooltip functionality */
 .progress-text-container {
   display: flex;
   flex-direction: column;
@@ -424,70 +429,6 @@
   color: var(--text-secondary);
   text-align: center;
   font-weight: 500;
-}
-
-.progress-explanation {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.progress-info-icon {
-  font-size: 0.75rem;
-  color: var(--primary);
-  cursor: pointer;
-  opacity: 0.8;
-  transition: all 0.3s ease;
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  background-color: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-}
-
-.progress-info-icon:hover {
-  opacity: 1;
-  transform: scale(1.1);
-  background-color: rgba(255, 221, 0, 0.08);
-}
-
-.progress-info-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-md);
-  margin-top: var(--spacing-sm);
-  max-width: 320px;
-  display: none;
-  transform: translateY(-8px);
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 10;
-}
-
-.progress-info-banner.visible {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.progress-info-banner-header {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-sm);
-  text-align: center;
-  padding-bottom: var(--spacing-xs);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.progress-info-banner-content {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  text-align: left;
-  padding-top: var(--spacing-xs);
 }
 
 /* UPDATED: Phase detail button with hover animation */
