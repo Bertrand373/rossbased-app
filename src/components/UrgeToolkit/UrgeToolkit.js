@@ -1,4 +1,4 @@
-// components/UrgeToolkit/UrgeToolkit.js - ENHANCED: Smart protocol selection, advanced breathing, intelligent triggers
+// components/UrgeToolkit/UrgeToolkit.js - UPDATED: Integrated header design and consistent styling
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -410,17 +410,22 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="urge-toolkit-container">
-      {/* UPDATED: Header with phase indicator and experience level */}
-      <div className="toolkit-header">
-        <div className="toolkit-header-spacer"></div>
-        <h2>Emergency Toolkit</h2>
-        <div className="toolkit-header-actions">
-          <div className="phase-indicator" style={{ '--phase-color': currentPhase.color }}>
-            <div className="phase-indicator-content">
-              <currentPhase.icon className="phase-indicator-icon" />
-              <div className="phase-indicator-text">
-                <span className="phase-name">{currentPhase.name}</span>
-                <span className="phase-day">Day {currentDay} • {experienceLevel}</span>
+      {/* UPDATED: Integrated header design matching other tabs */}
+      <div className="integrated-toolkit-header">
+        <div className="toolkit-header-title-section">
+          <h2>Emergency Toolkit</h2>
+          <p className="toolkit-header-subtitle">Smart coping strategies for urge management</p>
+        </div>
+        
+        <div className="toolkit-header-actions-section">
+          <div className="toolkit-header-actions">
+            <div className="phase-indicator" style={{ '--phase-color': currentPhase.color }}>
+              <div className="phase-indicator-content">
+                <currentPhase.icon className="phase-indicator-icon" />
+                <div className="phase-indicator-text">
+                  <span className="phase-name">{currentPhase.name}</span>
+                  <span className="phase-day">Day {currentDay} • {experienceLevel}</span>
+                </div>
               </div>
             </div>
           </div>

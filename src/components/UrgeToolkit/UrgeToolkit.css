@@ -1,41 +1,65 @@
-/* components/UrgeToolkit/UrgeToolkit.css - ENHANCED: Advanced breathing modes, experience levels, new animations */
+/* components/UrgeToolkit/UrgeToolkit.css - UPDATED: Consistent styling with other tabs */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* Header - Consistent with other tabs */
-.toolkit-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+/* UPDATED: Integrated header design matching other tabs */
+.integrated-toolkit-header {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toolkit-header-title-section {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: var(--spacing-xl);
-  margin-top: 0;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+  position: relative;
 }
 
-.toolkit-header-spacer {
-  /* Empty spacer for centering */
-}
-
-.toolkit-header h2 {
-  text-align: center;
+.toolkit-header-title-section h2 {
   margin: 0;
-  justify-self: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.85;
+  text-align: center;
+}
+
+/* NEW: Header subtitle matching other tabs */
+.toolkit-header-subtitle {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
+}
+
+.toolkit-header-actions-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .toolkit-header-actions {
   display: flex;
   gap: var(--spacing-md);
-  justify-self: end;
 }
 
-/* FIXED: Original design with balanced spacing around icon */
+/* UPDATED: Phase indicator with consistent styling */
 .phase-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-lg);
   background: linear-gradient(135deg, 
     color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
     var(--card-background) 100%
@@ -47,18 +71,16 @@
   text-align: center;
 }
 
-/* FIXED: Balanced content with even spacing on both sides of icon */
 .phase-indicator-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-lg); /* FIXED: This creates proper even spacing */
+  gap: var(--spacing-md);
   width: 100%;
 }
 
-/* REVERTED: Original icon styling */
 .phase-indicator-icon {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   color: var(--phase-color, var(--primary));
   flex-shrink: 0;
   display: flex;
@@ -66,7 +88,6 @@
   justify-content: center;
 }
 
-/* REVERTED: Original text styling but centered */
 .phase-indicator-text {
   display: flex;
   flex-direction: column;
@@ -76,7 +97,7 @@
 }
 
 .phase-name {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--phase-color, var(--text));
   line-height: 1.2;
@@ -84,13 +105,13 @@
 }
 
 .phase-day {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   line-height: 1.2;
   margin: 0;
 }
 
-/* Section Container - Consistent styling */
+/* UPDATED: Section containers matching other tabs */
 .assessment-section,
 .protocol-section,
 .tools-section,
@@ -100,10 +121,9 @@
   padding: var(--spacing-xl);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
-  border-top: 3px solid rgba(255, 221, 0, 0.3);
 }
 
-/* Section Headers - Clean and consistent */
+/* UPDATED: Section headers matching other tabs */
 .section-header {
   text-align: center;
   margin-bottom: var(--spacing-xl);
@@ -123,7 +143,7 @@
   font-style: italic;
 }
 
-/* Intensity Scale - Clean minimal design */
+/* UPDATED: Intensity scale with improved button styling */
 .intensity-scale {
   display: flex;
   justify-content: center;
@@ -137,7 +157,7 @@
 .intensity-btn {
   width: 48px;
   height: 48px;
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   background-color: var(--card-background);
   color: var(--text-secondary);
   border-radius: var(--radius-md);
@@ -151,15 +171,16 @@
 }
 
 .intensity-btn:hover {
-  border-color: var(--primary);
+  border-color: rgba(255, 221, 0, 0.3);
   color: var(--text);
+  transform: translateY(-1px);
 }
 
 .intensity-btn.active {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: var(--primary);
   color: var(--primary);
-  transform: scale(1.1);
+  transform: translateY(-1px);
 }
 
 .intensity-labels {
@@ -173,7 +194,7 @@
   margin-right: auto;
 }
 
-/* Protocol Selection - Clean cards */
+/* UPDATED: Protocol cards with consistent styling */
 .protocol-selection {
   display: flex;
   flex-direction: column;
@@ -184,20 +205,23 @@
 .protocol-card {
   background-color: var(--card-background);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .protocol-card:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
+  background-color: rgba(255, 255, 255, 0.02);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .protocol-card.active {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.2);
 }
 
 .protocol-name {
@@ -230,7 +254,7 @@
   font-style: italic;
 }
 
-/* ENHANCED: Breathing Interface with Advanced Mode Selector */
+/* UPDATED: Breathing interface with clean design */
 .breathing-interface {
   display: flex;
   flex-direction: column;
@@ -238,18 +262,19 @@
   gap: var(--spacing-xl);
   padding: var(--spacing-xl);
   background-color: var(--card-background);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
-/* NEW: Breathing Mode Selector */
+/* UPDATED: Breathing mode selector */
 .breathing-mode-selector {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   margin-bottom: var(--spacing-md);
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.02);
   border-radius: var(--radius-full);
   padding: var(--spacing-xs);
+  border: 1px solid var(--border);
 }
 
 .mode-btn {
@@ -297,7 +322,6 @@
   overflow: hidden;
 }
 
-/* ENHANCED: Multiple breathing animation types */
 .breathing-animation {
   width: 60px;
   height: 60px;
@@ -315,7 +339,6 @@
   animation: breathe-out 4s ease-in-out infinite;
 }
 
-/* NEW: Advanced breathing animations */
 .rapid-animation {
   animation: rapid-breathe 0.5s ease-in-out infinite;
 }
@@ -347,7 +370,6 @@
   }
 }
 
-/* NEW: Rapid breathing animation for Bhastrika */
 @keyframes rapid-breathe {
   0%, 100% { 
     transform: scale(1);
@@ -359,7 +381,6 @@
   }
 }
 
-/* NEW: Energy hold animation */
 @keyframes energy-hold {
   0%, 100% { 
     transform: scale(1.5);
@@ -390,7 +411,7 @@
   justify-content: center;
 }
 
-/* Protocol Steps - Clean instructions */
+/* UPDATED: Protocol steps with consistent styling */
 .mental-protocol,
 .physical-protocol,
 .energy-protocol {
@@ -399,7 +420,7 @@
   gap: var(--spacing-lg);
   padding: var(--spacing-xl);
   background-color: var(--card-background);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
@@ -408,6 +429,7 @@
   color: var(--text);
   font-size: 1rem;
   text-align: center;
+  font-weight: 600;
 }
 
 .protocol-steps ol {
@@ -421,7 +443,7 @@
   line-height: 1.5;
 }
 
-/* Phase Tools - Simplified grid */
+/* UPDATED: Phase tools with consistent grid */
 .phase-tools {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -432,7 +454,7 @@
 .tool-card {
   background-color: var(--card-background);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   text-align: center;
   transition: all 0.2s ease;
@@ -467,7 +489,7 @@
   transform: translateY(-1px);
 }
 
-/* Trigger Selection - Pill-shaped, consistent colors, readable text */
+/* UPDATED: Trigger selection with consistent pill styling */
 .trigger-selection {
   margin-bottom: var(--spacing-xl);
 }
@@ -507,7 +529,7 @@
 }
 
 .trigger-option:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.02);
   transform: translateY(-1px);
   border-color: rgba(255, 221, 0, 0.3);
 }
@@ -526,7 +548,7 @@
   color: inherit;
 }
 
-/* Session Stats - Clean summary */
+/* UPDATED: Session stats with consistent card styling */
 .session-stats {
   display: flex;
   flex-direction: column;
@@ -534,7 +556,7 @@
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-lg);
   background-color: var(--card-background);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
@@ -561,7 +583,7 @@
   font-size: 0.875rem;
 }
 
-/* Action Buttons - Consistent styling */
+/* UPDATED: Action buttons matching app-wide button styling */
 .tools-actions,
 .summary-actions {
   display: flex;
@@ -610,57 +632,84 @@
 }
 
 .secondary-btn:hover {
-  background-color: rgba(128, 128, 128, 0.2);
+  background-color: rgba(128, 128, 128, 0.15);
   color: var(--text);
+  transform: translateY(-1px);
+}
+
+/* UPDATED: Action button matching tracker button style */
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-  .toolkit-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-    margin-top: 0;
+  /* UPDATED: Mobile header matching other tabs */
+  .integrated-toolkit-header {
+    padding: var(--spacing-lg);
+    margin: 0;
   }
   
-  .toolkit-header h2 {
-    text-align: center;
-    order: 1;
+  .toolkit-header-title-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .toolkit-header-title-section h2 {
+    font-size: 1.375rem;
+  }
+  
+  .toolkit-header-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .toolkit-header-actions-section {
+    width: 100%;
   }
   
   .toolkit-header-actions {
     width: 100%;
-    order: 2;
-    justify-self: center;
     justify-content: center;
   }
   
-  /* FIXED: Mobile phase indicator with better vertical spacing */
+  /* UPDATED: Mobile phase indicator */
   .phase-indicator {
     width: 100%;
     max-width: 320px;
-    padding: var(--spacing-lg) var(--spacing-lg); /* INCREASED: More vertical padding */
+    padding: var(--spacing-md) var(--spacing-lg);
     justify-content: flex-start;
     text-align: center;
     position: relative;
   }
   
-  /* FIXED: Mobile content - icon on far left */
   .phase-indicator-content {
     justify-content: flex-start;
-    gap: 0; /* REMOVED: No gap needed with absolute positioning */
+    gap: 0;
     width: 100%;
   }
   
   .phase-indicator-icon {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     flex-shrink: 0;
-    /* Icon stays at far left */
   }
   
-  /* FIXED: Mobile text with more breathing room from card borders */
   .phase-indicator-text {
     position: absolute;
     left: 50%;
@@ -670,21 +719,22 @@
     text-align: center;
     width: auto;
     margin-right: 0;
-    padding: var(--spacing-md) 0; /* ADDED: Vertical padding to push text away from borders */
+    padding: var(--spacing-sm) 0;
   }
   
   .phase-name {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     text-align: center;
-    margin-bottom: 2px; /* FIXED: Closer spacing between text elements */
+    margin-bottom: 2px;
   }
   
   .phase-day {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     text-align: center;
-    margin-top: 2px; /* FIXED: Closer spacing between text elements */
+    margin-top: 2px;
   }
   
+  /* UPDATED: Mobile section padding */
   .assessment-section,
   .protocol-section,
   .tools-section,
@@ -692,6 +742,7 @@
     padding: var(--spacing-lg);
   }
   
+  /* UPDATED: Mobile intensity scale */
   .intensity-scale {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -706,6 +757,7 @@
     font-size: 0.875rem;
   }
   
+  /* UPDATED: Mobile breathing interface */
   .breathing-circle {
     width: 140px;
     height: 140px;
@@ -720,7 +772,6 @@
     padding: var(--spacing-lg);
   }
   
-  /* NEW: Mobile breathing mode selector */
   .breathing-mode-selector {
     flex-direction: column;
     width: 100%;
@@ -733,10 +784,12 @@
     padding: var(--spacing-md);
   }
   
+  /* UPDATED: Mobile phase tools */
   .phase-tools {
     grid-template-columns: 1fr;
   }
   
+  /* UPDATED: Mobile trigger options */
   .trigger-options {
     flex-direction: column;
     align-items: center;
@@ -750,6 +803,7 @@
     padding: var(--spacing-md) var(--spacing-lg);
   }
   
+  /* UPDATED: Mobile action buttons */
   .tools-actions,
   .summary-actions {
     flex-direction: column;
@@ -761,31 +815,37 @@
     width: 100%;
     max-width: 280px;
   }
+  
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    min-height: auto;
+  }
 }
 
 /* Very Small Screens */
 @media (max-width: 480px) {
-  /* FIXED: Very small screen with better vertical spacing */
   .phase-indicator {
-    padding: var(--spacing-md) var(--spacing-md); /* INCREASED: More vertical padding */
+    padding: var(--spacing-sm) var(--spacing-md);
     max-width: 100%;
     justify-content: flex-start;
     position: relative;
   }
   
   .phase-indicator-content {
-    gap: 0; /* REMOVED: No gap needed */
+    gap: 0;
     justify-content: flex-start;
     width: 100%;
   }
   
   .phase-indicator-icon {
-    font-size: 1.375rem;
+    font-size: 1.125rem;
     flex-shrink: 0;
-    /* Icon stays at far left */
   }
   
-  /* FIXED: Very small screen text with breathing room from borders */
   .phase-indicator-text {
     position: absolute;
     left: 50%;
@@ -793,15 +853,15 @@
     transform: translate(-50%, -50%);
     width: auto;
     margin-right: 0;
-    padding: var(--spacing-sm) 0; /* ADDED: Smaller padding for very small screens */
+    padding: var(--spacing-xs) 0;
   }
   
   .phase-name {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
   }
   
   .phase-day {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
   
   .assessment-section,
