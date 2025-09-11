@@ -353,6 +353,19 @@
   color: inherit !important;
 }
 
+/* ADDITIONAL FIX: Force React icons to inherit color from parent div */
+.phase-icon > * {
+  color: inherit !important;
+}
+
+/* SPECIFIC FIX: Target React icons directly */
+.phase-icon [data-icon],
+.phase-icon svg,
+.phase-icon i {
+  color: inherit !important;
+  fill: currentColor !important;
+}
+
 .phase-info {
   display: flex;
   flex-direction: column;
