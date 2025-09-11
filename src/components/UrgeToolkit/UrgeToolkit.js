@@ -1,4 +1,4 @@
-// components/UrgeToolkit/UrgeToolkit.js - UPDATED: Integrated header design and consistent styling
+// components/UrgeToolkit/UrgeToolkit.js - FINAL: Integrated header design with pill-shaped phase indicator
 import React, { useState, useEffect, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -410,7 +410,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="urge-toolkit-container">
-      {/* UPDATED: Integrated header design matching other tabs */}
+      {/* UPDATED: Integrated header design with pill-shaped phase indicator */}
       <div className="integrated-toolkit-header">
         <div className="toolkit-header-title-section">
           <h2>Emergency Toolkit</h2>
@@ -421,7 +421,9 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
           <div className="toolkit-header-actions">
             <div className="phase-indicator" style={{ '--phase-color': currentPhase.color }}>
               <div className="phase-indicator-content">
-                <currentPhase.icon className="phase-indicator-icon" />
+                <div className="phase-indicator-icon">
+                  <currentPhase.icon />
+                </div>
                 <div className="phase-indicator-text">
                   <span className="phase-name">{currentPhase.name}</span>
                   <span className="phase-day">Day {currentDay} • {experienceLevel}</span>

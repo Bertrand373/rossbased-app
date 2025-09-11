@@ -1,4 +1,4 @@
-/* components/UrgeToolkit/UrgeToolkit.css - UPDATED: Consistent styling with other tabs */
+/* components/UrgeToolkit/UrgeToolkit.css - FINAL: Pill-shaped phase indicator with circular icon + consistent styling */
 .urge-toolkit-container {
   display: flex;
   flex-direction: column;
@@ -54,21 +54,24 @@
   gap: var(--spacing-md);
 }
 
-/* UPDATED: Phase indicator with consistent styling */
+/* UPDATED: Pill-shaped phase indicator with circular icon */
 .phase-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-md) var(--spacing-lg);
-  background: linear-gradient(135deg, 
-    color-mix(in srgb, var(--phase-color, var(--primary)) 8%, var(--card-background)) 0%, 
-    var(--card-background) 100%
-  );
-  border: 1px solid color-mix(in srgb, var(--phase-color, var(--primary)) 20%, var(--border));
-  border-radius: var(--radius-lg);
-  min-width: 200px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  transition: all 0.2s ease;
+}
+
+.phase-indicator:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .phase-indicator-content {
@@ -76,36 +79,42 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-  width: 100%;
 }
 
+/* UPDATED: Circular icon container like Emotional Timeline */
 .phase-indicator-icon {
-  font-size: 1.5rem;
-  color: var(--phase-color, var(--primary));
-  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid rgba(128, 128, 128, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.25rem;
+  color: var(--phase-color, var(--primary));
+  flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
 .phase-indicator-text {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
 }
 
 .phase-name {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: var(--phase-color, var(--text));
+  color: var(--text);
   line-height: 1.2;
   margin: 0;
 }
 
 .phase-day {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   line-height: 1.2;
   margin: 0;
@@ -406,9 +415,35 @@
   font-size: 0.875rem;
 }
 
+/* UPDATED: Breathing controls matching tracker button style */
 .breathing-controls {
   display: flex;
   justify-content: center;
+}
+
+.breathing-controls .primary-btn,
+.breathing-controls .secondary-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.breathing-controls .primary-btn:hover,
+.breathing-controls .secondary-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* UPDATED: Protocol steps with consistent styling */
@@ -472,21 +507,28 @@
   font-size: 1rem;
 }
 
+/* UPDATED: Tool buttons matching tracker button style */
 .tool-btn {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  color: var(--primary);
+  color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  justify-content: center;
 }
 
 .tool-btn:hover {
-  background-color: rgba(255, 221, 0, 0.2);
-  transform: translateY(-1px);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* UPDATED: Trigger selection with consistent pill styling */
@@ -583,7 +625,7 @@
   font-size: 0.875rem;
 }
 
-/* UPDATED: Action buttons matching app-wide button styling */
+/* UPDATED: Action buttons matching tracker "Edit Start Date" button exactly */
 .tools-actions,
 .summary-actions {
   display: flex;
@@ -591,34 +633,12 @@
   gap: var(--spacing-md);
 }
 
-.primary-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  border-radius: var(--radius-full);
-  color: var(--primary);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 160px;
-  justify-content: center;
-}
-
-.primary-btn:hover {
-  background-color: rgba(255, 221, 0, 0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.2);
-}
-
+.primary-btn,
 .secondary-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
@@ -627,14 +647,15 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 160px;
-  justify-content: center;
+  outline: none;
 }
 
+.primary-btn:hover,
 .secondary-btn:hover {
-  background-color: rgba(128, 128, 128, 0.15);
-  color: var(--text);
-  transform: translateY(-1px);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* UPDATED: Action button matching tracker button style */
@@ -662,7 +683,7 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-  /* UPDATED: Mobile header matching other tabs */
+  /* UPDATED: Mobile header sizing to match Emotional Timeline exactly */
   .integrated-toolkit-header {
     padding: var(--spacing-lg);
     margin: 0;
@@ -673,11 +694,11 @@
   }
   
   .toolkit-header-title-section h2 {
-    font-size: 1.375rem;
+    font-size: 1.25rem; /* MATCHES: Emotional Timeline mobile size */
   }
   
   .toolkit-header-subtitle {
-    font-size: 0.8rem;
+    font-size: 0.8rem; /* MATCHES: Emotional Timeline mobile subtitle */
   }
   
   .toolkit-header-actions-section {
@@ -689,49 +710,37 @@
     justify-content: center;
   }
   
-  /* UPDATED: Mobile phase indicator */
+  /* UPDATED: Mobile phase indicator - pill shaped with circular icon */
   .phase-indicator {
     width: 100%;
     max-width: 320px;
-    padding: var(--spacing-md) var(--spacing-lg);
-    justify-content: flex-start;
-    text-align: center;
-    position: relative;
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-sm);
   }
   
   .phase-indicator-content {
+    gap: var(--spacing-sm);
     justify-content: flex-start;
-    gap: 0;
-    width: 100%;
   }
   
   .phase-indicator-icon {
-    font-size: 1.25rem;
+    width: 44px; /* MATCHES: Emotional Timeline mobile icon size */
+    height: 44px;
+    font-size: 1.25rem; /* MATCHES: Emotional Timeline mobile icon size */
     flex-shrink: 0;
   }
   
   .phase-indicator-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    align-items: center;
-    text-align: center;
-    width: auto;
-    margin-right: 0;
-    padding: var(--spacing-sm) 0;
+    align-items: flex-start;
+    text-align: left;
   }
   
   .phase-name {
     font-size: 0.875rem;
-    text-align: center;
-    margin-bottom: 2px;
   }
   
   .phase-day {
     font-size: 0.75rem;
-    text-align: center;
-    margin-top: 2px;
   }
   
   /* UPDATED: Mobile section padding */
