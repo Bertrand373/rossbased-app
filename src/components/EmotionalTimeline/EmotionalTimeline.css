@@ -348,9 +348,32 @@
   flex-shrink: 0;
 }
 
-/* FIXED: Phase icon SVG should inherit color from the parent div's inline style */
-.phase-icon svg {
+/* NUCLEAR OVERRIDE: Force phase icon colors with maximum specificity */
+.emotional-timeline-container .phase-icon svg,
+.emotional-timeline-container .phase-icon > *,
+.emotional-timeline-container .phase-icon [data-icon],
+body .emotional-timeline-container .phase-icon svg,
+html body .emotional-timeline-container .phase-icon svg {
   color: inherit !important;
+  fill: currentColor !important;
+}
+
+/* NUCLEAR OVERRIDE: Timeline phase icons */
+.emotional-timeline-container .timeline-phase-icon svg,
+.emotional-timeline-container .timeline-phase-icon > *,
+body .emotional-timeline-container .timeline-phase-icon svg,
+html body .emotional-timeline-container .timeline-phase-icon svg {
+  color: inherit !important;
+  fill: currentColor !important;
+}
+
+/* NUCLEAR OVERRIDE: Modal phase icons */
+.emotional-timeline-container .phase-modal-icon svg,
+.emotional-timeline-container .phase-modal-icon > *,
+body .emotional-timeline-container .phase-modal-icon svg,
+html body .emotional-timeline-container .phase-modal-icon svg {
+  color: inherit !important;
+  fill: currentColor !important;
 }
 
 /* ADDITIONAL FIX: Force React icons to inherit color from parent div */
