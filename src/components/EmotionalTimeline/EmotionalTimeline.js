@@ -429,8 +429,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             <div className="phase-date">Day {currentDay} of your journey</div>
             
             <div className="phase-icon-section">
-              {/* FIXED: Explicitly pass color to the React icon component */}
-              <div className="phase-icon" style={{ color: currentPhase.color }}>
+              {/* FIXED: Use same class as working timeline cards */}
+              <div className="timeline-phase-icon" style={{ color: currentPhase.color }}>
                 <currentPhase.icon style={{ color: currentPhase.color }} />
               </div>
               <div className="phase-info">
