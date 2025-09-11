@@ -1035,142 +1035,31 @@
   color: var(--text-secondary);
 }
 
-/* Mobile Responsiveness for Modals */
+/* FIXED: Mobile Responsiveness matching Profile banner exactly */
 @media (max-width: 768px) {
-  .phase-modal-header {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-md);
-  }
-  
-  .phase-modal-icon {
-    font-size: 2rem;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions .action-btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .modal-content {
-    padding: var(--spacing-lg);
-    max-width: 95%;
-  }
-  
-  .phase-modal-header {
-    gap: var(--spacing-sm);
-  }
-  
-  .phase-modal-icon {
-    font-size: 1.75rem;
-  }
-  
-  .phase-modal-info h3 {
-    font-size: 1.25rem;
-  }
-  
-  .phase-modal-range {
-    font-size: 0.8rem;
-  }
-  
-  .phase-modal-description {
-    padding: var(--spacing-sm);
-  }
-  
-  .phase-modal-section {
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .phase-modal-section h4 {
-    font-size: 0.9rem;
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .phase-modal-section li {
-    font-size: 0.8rem;
-    padding-left: var(--spacing-md);
-    margin-bottom: 6px;
-  }
-  
-  .trauma-stage {
-    padding: var(--spacing-sm);
-    font-size: 0.8rem;
-  }
-  
-  .phase-modal-insight {
-    padding: var(--spacing-sm);
-  }
-  
-  .phase-modal-insight h4 {
-    font-size: 0.9rem;
-  }
-  
-  .phase-modal-insight p {
-    font-size: 0.8rem;
-  }
-  
-  .journal-prompt {
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
-  }
-  
-  .journal-prompt p {
-    font-size: 0.8rem;
-  }
-  
-  .journal-preview {
-    padding: var(--spacing-sm);
-    font-size: 0.8rem;
-  }
-  
-  .empty-journal {
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
-    font-size: 0.8rem;
-  }
-  
-  .form-group textarea {
-    padding: var(--spacing-sm);
-    font-size: 0.9rem;
-  }
-  
-  .action-btn {
-    padding: 6px 12px !important;
-    font-size: 0.8rem !important;
-  }
-  
-  .modal-got-it-btn {
-    padding: var(--spacing-xs) var(--spacing-sm) !important;
-    font-size: 0.8rem !important;
-  }
-}
-@media (max-width: 768px) {
-  /* FIXED: Check-in banner mobile layout - LEFT ALIGNED */
+  /* FIXED: Check-in banner mobile layout matching Profile EXACTLY */
   .checkin-benefits-banner {
     flex-direction: column;
-    text-align: left;
+    text-align: center;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
   
   .checkin-benefits-content {
-    text-align: left;
+    text-align: center;
   }
   
   .checkin-benefits-title {
-    justify-content: flex-start;
-    text-align: left;
+    justify-content: center;
+    text-align: center;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   .checkin-benefits-description {
-    text-align: left;
+    text-align: center;
+    padding-top: var(--spacing-xs);
   }
   
   .checkin-benefits-helmet {
@@ -1182,6 +1071,7 @@
     font-size: 1.25rem;
   }
   
+  /* FIXED: Analysis banner mobile layout matching Profile EXACTLY */
   .insight-data-banner {
     flex-direction: column;
     text-align: center;
@@ -1196,6 +1086,14 @@
   
   .insight-data-title {
     justify-content: center;
+    text-align: center;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .insight-data-description {
+    text-align: center;
+    padding-top: var(--spacing-xs);
   }
   
   .insight-data-helmet {
@@ -1279,7 +1177,7 @@
 }
 
 @media (max-width: 480px) {
-  /* FIXED: Very small check-in banner - LEFT ALIGNED */
+  /* FIXED: Very small check-in banner matching Profile EXACTLY */
   .checkin-benefits-banner {
     padding: var(--spacing-sm);
   }
@@ -1295,22 +1193,23 @@
   
   .checkin-benefits-title {
     font-size: 0.875rem;
-    text-align: left;
-    justify-content: flex-start;
+    text-align: center;
+    justify-content: center;
     padding-bottom: var(--spacing-xs);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   .checkin-benefits-description {
     font-size: 0.8rem;
-    text-align: left;
+    text-align: center;
     padding-top: var(--spacing-xs);
   }
   
   .checkin-benefits-content {
-    text-align: left;
+    text-align: center;
   }
   
+  /* FIXED: Very small analysis banner matching Profile EXACTLY */
   .insight-data-banner {
     padding: var(--spacing-sm);
   }
@@ -1326,10 +1225,20 @@
   
   .insight-data-title {
     font-size: 0.875rem;
+    text-align: center;
+    justify-content: center;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   .insight-data-description {
     font-size: 0.8rem;
+    text-align: center;
+    padding-top: var(--spacing-xs);
+  }
+  
+  .insight-data-content {
+    text-align: center;
   }
   
   /* FIXED: Both sections have EXACT same very small screen padding */
