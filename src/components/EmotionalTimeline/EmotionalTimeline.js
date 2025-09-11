@@ -429,8 +429,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             <div className="phase-date">Day {currentDay} of your journey</div>
             
             <div className="phase-icon-section">
+              {/* FIXED: Render icon component directly with color */}
               <div className="phase-icon" style={{ color: currentPhase.color }}>
-                <currentPhase.icon />
+                {React.createElement(currentPhase.icon)}
               </div>
               <div className="phase-info">
                 <div className="phase-name">{currentPhase.name}</div>
@@ -510,9 +511,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     onClick={() => showPhaseDetails(phase)}
                     style={{ cursor: 'pointer' }}
                   >
-                    {/* UPDATED: Phase icon with proper phase colors */}
-                    <div className="timeline-phase-icon">
-                      <phase.icon style={{ color: phase.color }} />
+                    {/* FIXED: Render icon component directly with color */}
+                    <div className="timeline-phase-icon" style={{ color: phase.color }}>
+                      {React.createElement(phase.icon)}
                     </div>
                     <div className="timeline-phase-info">
                       <div className="timeline-phase-name">{phase.name}</div>
@@ -544,9 +545,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                         key={level.id}
                         className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                       >
-                        {/* UPDATED: Simple layout matching timeline phases with colored icons */}
+                        {/* FIXED: Render icon component directly with color */}
                         <div className="mastery-level-icon">
-                          <level.icon style={{ color: 'var(--primary)' }} />
+                          {React.createElement(level.icon)}
                         </div>
                         
                         <div className="mastery-level-info">
@@ -1021,8 +1022,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             </button>
 
             <div className="phase-modal-header">
+              {/* FIXED: Render icon component directly with color */}
               <div className="phase-modal-icon" style={{ color: selectedPhase.color }}>
-                <selectedPhase.icon />
+                {React.createElement(selectedPhase.icon)}
               </div>
               <div className="phase-modal-info">
                 <h3>{selectedPhase.name}</h3>
