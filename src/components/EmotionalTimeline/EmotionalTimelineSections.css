@@ -1033,7 +1033,7 @@
   .checkin-benefits-banner {
     flex-direction: column;
     text-align: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
@@ -1059,7 +1059,7 @@
   .insight-data-banner {
     flex-direction: column;
     text-align: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
