@@ -1322,6 +1322,7 @@
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
   }
   
   .coming-soon-content {
