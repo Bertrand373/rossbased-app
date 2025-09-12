@@ -1035,29 +1035,27 @@
   color: var(--text-secondary);
 }
 
-/* FIXED: Mobile Responsiveness - PERFECT HELMET CENTERING */
+/* CRITICAL FIX: Mobile Responsiveness - Use Profile's EXACT mobile banner pattern */
 @media (max-width: 768px) {
-  /* FIXED: Check-in banner mobile layout - ABSOLUTE CENTERING */
+  /* EXACT COPY: Check-in banner mobile layout matching Profile coming-soon-banner */
   .checkin-benefits-banner {
-    /* Use absolute positioning to center helmet perfectly */
-    position: relative;
-    min-height: 120px;
-    display: flex;
     flex-direction: column;
-    justify-content: center;
     text-align: center;
-    gap: 0;
+    gap: var(--spacing-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
+    /* CRITICAL: Set explicit height to ensure proper centering space */
+    min-height: 140px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
   }
   
-  /* CRITICAL: Helmet positioned EXACTLY in the center of banner */
+  /* EXACT COPY: Helmet container matching Profile structure */
   .checkin-benefits-helmet-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
+    /* NO positioning - just flex-shrink like Profile */
+    flex-shrink: 0;
+    order: 1;
   }
   
   .checkin-benefits-helmet {
@@ -1069,12 +1067,12 @@
     font-size: 1.25rem;
   }
   
-  /* Content positioned to not overlap with centered helmet */
+  /* EXACT COPY: Content section matching Profile structure */
   .checkin-benefits-content {
-    position: relative;
-    z-index: 1;
-    margin-top: 45px; /* Space for helmet above */
     text-align: center;
+    order: 2;
+    /* CRITICAL: Add proper margin to create visual separation */
+    margin-top: var(--spacing-md);
   }
   
   .checkin-benefits-title {
@@ -1089,27 +1087,25 @@
     padding-top: var(--spacing-xs);
   }
   
-  /* FIXED: Analysis banner mobile layout - ABSOLUTE CENTERING */
+  /* EXACT COPY: Analysis banner mobile layout matching Profile coming-soon-banner */
   .insight-data-banner {
-    /* Use absolute positioning to center helmet perfectly */
-    position: relative;
-    min-height: 120px;
-    display: flex;
     flex-direction: column;
-    justify-content: center;
     text-align: center;
-    gap: 0;
+    gap: var(--spacing-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
+    /* CRITICAL: Set explicit height to ensure proper centering space */
+    min-height: 140px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
   }
   
-  /* CRITICAL: Helmet positioned EXACTLY in the center of banner */
+  /* EXACT COPY: Helmet container matching Profile structure */
   .insight-data-helmet-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
+    /* NO positioning - just flex-shrink like Profile */
+    flex-shrink: 0;
+    order: 1;
   }
   
   .insight-data-helmet {
@@ -1121,12 +1117,12 @@
     font-size: 1.25rem;
   }
   
-  /* Content positioned to not overlap with centered helmet */
+  /* EXACT COPY: Content section matching Profile structure */
   .insight-data-content {
-    position: relative;
-    z-index: 1;
-    margin-top: 45px; /* Space for helmet above */
     text-align: center;
+    order: 2;
+    /* CRITICAL: Add proper margin to create visual separation */
+    margin-top: var(--spacing-md);
   }
   
   .insight-data-title {
@@ -1213,10 +1209,11 @@
 }
 
 @media (max-width: 480px) {
-  /* FIXED: Check-in banner very small mobile - PERFECT CENTERING */
+  /* CRITICAL: Very small mobile - maintain Profile pattern but smaller */
   .checkin-benefits-banner {
-    min-height: 110px;
+    min-height: 120px;
     padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
   }
   
   .checkin-benefits-helmet {
@@ -1229,7 +1226,7 @@
   }
   
   .checkin-benefits-content {
-    margin-top: 40px; /* Adjusted for smaller helmet */
+    margin-top: var(--spacing-sm);
   }
   
   .checkin-benefits-title {
@@ -1240,10 +1237,11 @@
     font-size: 0.8rem !important;
   }
   
-  /* FIXED: Analysis banner very small mobile - PERFECT CENTERING */
+  /* CRITICAL: Analysis banner very small mobile */
   .insight-data-banner {
-    min-height: 110px;
+    min-height: 120px;
     padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
   }
   
   .insight-data-helmet {
@@ -1256,7 +1254,7 @@
   }
   
   .insight-data-content {
-    margin-top: 40px; /* Adjusted for smaller helmet */
+    margin-top: var(--spacing-sm);
   }
   
   .insight-data-title {
