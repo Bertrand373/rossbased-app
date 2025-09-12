@@ -1035,18 +1035,45 @@
   color: var(--text-secondary);
 }
 
-/* FIXED: Mobile Responsiveness matching Profile banner exactly */
+/* FIXED: Mobile Responsiveness - PERFECT HELMET CENTERING */
 @media (max-width: 768px) {
-  /* FIXED: Check-in banner mobile layout matching Profile EXACTLY */
+  /* FIXED: Check-in banner mobile layout - ABSOLUTE CENTERING */
   .checkin-benefits-banner {
+    /* Use absolute positioning to center helmet perfectly */
+    position: relative;
+    min-height: 120px;
+    display: flex;
     flex-direction: column;
+    justify-content: center;
     text-align: center;
-    gap: var(--spacing-md);
+    gap: 0;
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
   
+  /* CRITICAL: Helmet positioned EXACTLY in the center of banner */
+  .checkin-benefits-helmet-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+  
+  .checkin-benefits-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .checkin-benefits-helmet-fallback {
+    font-size: 1.25rem;
+  }
+  
+  /* Content positioned to not overlap with centered helmet */
   .checkin-benefits-content {
+    position: relative;
+    z-index: 1;
+    margin-top: 45px; /* Space for helmet above */
     text-align: center;
   }
   
@@ -1062,25 +1089,43 @@
     padding-top: var(--spacing-xs);
   }
   
-  .checkin-benefits-helmet {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .checkin-benefits-helmet-fallback {
-    font-size: 1.25rem;
-  }
-  
-  /* FIXED: Analysis banner mobile layout matching Profile EXACTLY */
+  /* FIXED: Analysis banner mobile layout - ABSOLUTE CENTERING */
   .insight-data-banner {
+    /* Use absolute positioning to center helmet perfectly */
+    position: relative;
+    min-height: 120px;
+    display: flex;
     flex-direction: column;
+    justify-content: center;
     text-align: center;
-    gap: var(--spacing-md);
+    gap: 0;
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
   
+  /* CRITICAL: Helmet positioned EXACTLY in the center of banner */
+  .insight-data-helmet-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+  
+  .insight-data-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .insight-data-helmet-fallback {
+    font-size: 1.25rem;
+  }
+  
+  /* Content positioned to not overlap with centered helmet */
   .insight-data-content {
+    position: relative;
+    z-index: 1;
+    margin-top: 45px; /* Space for helmet above */
     text-align: center;
   }
   
@@ -1096,16 +1141,7 @@
     padding-top: var(--spacing-xs);
   }
   
-  .insight-data-helmet {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .insight-data-helmet-fallback {
-    font-size: 1.25rem;
-  }
-  
-  /* FIXED: Both sections now have EXACT same mobile padding */
+  /* FIXED: Both sections have EXACT same mobile padding */
   .emotional-checkin-section {
     padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
     gap: var(--spacing-lg);
@@ -1177,94 +1213,58 @@
 }
 
 @media (max-width: 480px) {
-  /* CRITICAL: Force proper very small mobile layout for check-in banner */
-  .emotional-checkin-section .checkin-benefits-banner {
-    padding: var(--spacing-sm) !important;
-    align-items: center !important;
-    justify-content: center !important;
+  /* FIXED: Check-in banner very small mobile - PERFECT CENTERING */
+  .checkin-benefits-banner {
+    min-height: 110px;
+    padding: var(--spacing-sm);
   }
   
-  .emotional-checkin-section .checkin-benefits-helmet-container {
-    align-self: center !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 1 !important;
-    width: 100% !important;
-  }
-  
-  .emotional-checkin-section .checkin-benefits-helmet {
+  .checkin-benefits-helmet {
     width: 30px !important;
     height: 30px !important;
   }
   
-  .emotional-checkin-section .checkin-benefits-helmet-fallback {
+  .checkin-benefits-helmet-fallback {
     font-size: 1rem !important;
   }
   
-  .emotional-checkin-section .checkin-benefits-title {
+  .checkin-benefits-content {
+    margin-top: 40px; /* Adjusted for smaller helmet */
+  }
+  
+  .checkin-benefits-title {
     font-size: 0.875rem !important;
-    text-align: center !important;
-    justify-content: center !important;
-    padding-bottom: var(--spacing-xs) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   }
   
-  .emotional-checkin-section .checkin-benefits-description {
+  .checkin-benefits-description {
     font-size: 0.8rem !important;
-    text-align: center !important;
-    padding-top: var(--spacing-xs) !important;
   }
   
-  .emotional-checkin-section .checkin-benefits-content {
-    text-align: center !important;
-    flex: 1 !important;
-    width: 100% !important;
+  /* FIXED: Analysis banner very small mobile - PERFECT CENTERING */
+  .insight-data-banner {
+    min-height: 110px;
+    padding: var(--spacing-sm);
   }
   
-  /* CRITICAL: Force proper very small mobile layout for analysis banner */
-  .phase-insight-section .insight-data-banner {
-    padding: var(--spacing-sm) !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  
-  .phase-insight-section .insight-data-helmet-container {
-    align-self: center !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 1 !important;
-    width: 100% !important;
-  }
-  
-  .phase-insight-section .insight-data-helmet {
+  .insight-data-helmet {
     width: 30px !important;
     height: 30px !important;
   }
   
-  .phase-insight-section .insight-data-helmet-fallback {
+  .insight-data-helmet-fallback {
     font-size: 1rem !important;
   }
   
-  .phase-insight-section .insight-data-title {
+  .insight-data-content {
+    margin-top: 40px; /* Adjusted for smaller helmet */
+  }
+  
+  .insight-data-title {
     font-size: 0.875rem !important;
-    text-align: center !important;
-    justify-content: center !important;
-    padding-bottom: var(--spacing-xs) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   }
   
-  .phase-insight-section .insight-data-description {
+  .insight-data-description {
     font-size: 0.8rem !important;
-    text-align: center !important;
-    padding-top: var(--spacing-xs) !important;
-  }
-  
-  .phase-insight-section .insight-data-content {
-    text-align: center !important;
-    flex: 1 !important;
-    width: 100% !important;
   }
   
   /* FIXED: Both sections have EXACT same very small screen padding */
