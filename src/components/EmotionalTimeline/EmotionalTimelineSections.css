@@ -1,6 +1,6 @@
 /* components/EmotionalTimeline/EmotionalTimelineSections.css - Section Components & Analysis Display */
 
-/* FIXED: Check-in Benefits Banner styled EXACTLY like Analysis banner */
+/* EXACT COPY: Check-in Benefits Banner matching Profile coming-soon-banner */
 .checkin-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -46,7 +46,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: var(--spacing-xs);
 }
 
 .checkin-benefits-title {
@@ -57,9 +57,6 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding-bottom: var(--spacing-xs);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: left;
 }
 
 .checkin-benefits-description {
@@ -67,11 +64,9 @@
   color: var(--text-secondary);
   line-height: 1.4;
   margin: 0;
-  padding-top: var(--spacing-xs);
-  text-align: left;
 }
 
-/* FIXED: Data quality banner styled EXACTLY like Profile coming soon banner */
+/* EXACT COPY: Analysis banner matching Profile coming-soon-banner */
 .insight-data-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -106,7 +101,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: var(--spacing-xs);
 }
 
 .insight-data-title {
@@ -117,8 +112,6 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding-bottom: var(--spacing-xs);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .insight-data-description {
@@ -126,7 +119,6 @@
   color: var(--text-secondary);
   line-height: 1.4;
   margin: 0;
-  padding-top: var(--spacing-xs);
 }
 
 /* ANALYSIS COMPONENTS - Shared styles from Stats */
@@ -1035,27 +1027,23 @@
   color: var(--text-secondary);
 }
 
-/* CRITICAL FIX: Mobile Responsiveness - Use Profile's EXACT mobile banner pattern */
+/* EXACT MOBILE COPY: Mobile Responsiveness matching Profile coming-soon-banner exactly */
 @media (max-width: 768px) {
-  /* EXACT COPY: Check-in banner mobile layout matching Profile coming-soon-banner */
+  /* EXACT COPY of Profile's .coming-soon-banner mobile styles */
   .checkin-benefits-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
-    /* CRITICAL: Set explicit height to ensure proper centering space */
-    min-height: 140px;
-    justify-content: center;
-    align-items: center;
-    position: relative;
   }
   
-  /* EXACT COPY: Helmet container matching Profile structure */
-  .checkin-benefits-helmet-container {
-    /* NO positioning - just flex-shrink like Profile */
-    flex-shrink: 0;
-    order: 1;
+  .checkin-benefits-content {
+    text-align: center;
+  }
+  
+  .checkin-benefits-title {
+    justify-content: center;
   }
   
   .checkin-benefits-helmet {
@@ -1067,45 +1055,21 @@
     font-size: 1.25rem;
   }
   
-  /* EXACT COPY: Content section matching Profile structure */
-  .checkin-benefits-content {
-    text-align: center;
-    order: 2;
-    /* CRITICAL: Add proper margin to create visual separation */
-    margin-top: var(--spacing-md);
-  }
-  
-  .checkin-benefits-title {
-    justify-content: center;
-    text-align: center;
-    padding-bottom: var(--spacing-xs);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .checkin-benefits-description {
-    text-align: center;
-    padding-top: var(--spacing-xs);
-  }
-  
-  /* EXACT COPY: Analysis banner mobile layout matching Profile coming-soon-banner */
+  /* EXACT COPY of Profile's .coming-soon-banner mobile styles */
   .insight-data-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
-    /* CRITICAL: Set explicit height to ensure proper centering space */
-    min-height: 140px;
-    justify-content: center;
-    align-items: center;
-    position: relative;
   }
   
-  /* EXACT COPY: Helmet container matching Profile structure */
-  .insight-data-helmet-container {
-    /* NO positioning - just flex-shrink like Profile */
-    flex-shrink: 0;
-    order: 1;
+  .insight-data-content {
+    text-align: center;
+  }
+  
+  .insight-data-title {
+    justify-content: center;
   }
   
   .insight-data-helmet {
@@ -1115,26 +1079,6 @@
   
   .insight-data-helmet-fallback {
     font-size: 1.25rem;
-  }
-  
-  /* EXACT COPY: Content section matching Profile structure */
-  .insight-data-content {
-    text-align: center;
-    order: 2;
-    /* CRITICAL: Add proper margin to create visual separation */
-    margin-top: var(--spacing-md);
-  }
-  
-  .insight-data-title {
-    justify-content: center;
-    text-align: center;
-    padding-bottom: var(--spacing-xs);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .insight-data-description {
-    text-align: center;
-    padding-top: var(--spacing-xs);
   }
   
   /* FIXED: Both sections have EXACT same mobile padding */
@@ -1209,60 +1153,39 @@
 }
 
 @media (max-width: 480px) {
-  /* CRITICAL: Very small mobile - maintain Profile pattern but smaller */
-  .checkin-benefits-banner {
-    min-height: 120px;
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
-  }
-  
+  /* EXACT COPY of Profile's very small mobile banner styles */
   .checkin-benefits-helmet {
-    width: 30px !important;
-    height: 30px !important;
+    width: 30px;
+    height: 30px;
   }
   
   .checkin-benefits-helmet-fallback {
-    font-size: 1rem !important;
-  }
-  
-  .checkin-benefits-content {
-    margin-top: var(--spacing-sm);
+    font-size: 1rem;
   }
   
   .checkin-benefits-title {
-    font-size: 0.875rem !important;
+    font-size: 0.875rem;
   }
   
   .checkin-benefits-description {
-    font-size: 0.8rem !important;
-  }
-  
-  /* CRITICAL: Analysis banner very small mobile */
-  .insight-data-banner {
-    min-height: 120px;
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
+    font-size: 0.8rem;
   }
   
   .insight-data-helmet {
-    width: 30px !important;
-    height: 30px !important;
+    width: 30px;
+    height: 30px;
   }
   
   .insight-data-helmet-fallback {
-    font-size: 1rem !important;
-  }
-  
-  .insight-data-content {
-    margin-top: var(--spacing-sm);
+    font-size: 1rem;
   }
   
   .insight-data-title {
-    font-size: 0.875rem !important;
+    font-size: 0.875rem;
   }
   
   .insight-data-description {
-    font-size: 0.8rem !important;
+    font-size: 0.8rem;
   }
   
   /* FIXED: Both sections have EXACT same very small screen padding */
