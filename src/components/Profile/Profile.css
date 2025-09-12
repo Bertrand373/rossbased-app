@@ -361,7 +361,7 @@
   transform: translateY(-1px) !important;
 }
 
-/* NEW: Coming Soon Banner for locked features */
+/* UPDATED: Coming Soon Banner matching Timeline banners exactly */
 .coming-soon-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -1316,11 +1316,12 @@
     text-align: center;
   }
   
-  /* FIXED: Coming soon banner mobile layout - centered title */
+  /* UPDATED: Coming soon banner mobile layout matching Timeline banners exactly */
   .coming-soon-banner {
     flex-direction: column;
     text-align: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
   
   .coming-soon-content {
@@ -1448,7 +1449,7 @@
     gap: var(--spacing-sm);
   }
   
-  /* FIXED: Very small coming soon banner */
+  /* UPDATED: Very small coming soon banner matching Timeline exactly */
   .coming-soon-helmet {
     width: 30px;
     height: 30px;
