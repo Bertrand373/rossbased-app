@@ -129,14 +129,15 @@
   overflow: visible;
 }
 
-/* ENHANCED: Bulletproof sliding indicator matching Profile exactly */
+/* UPDATED: Enhanced sliding background indicator - YELLOW background like main nav */
 .navigation-tab-slider {
   position: absolute;
   top: var(--spacing-xs);
   left: var(--spacing-xs);
   height: calc(100% - calc(var(--spacing-xs) * 2));
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  /* CHANGED: Full yellow background instead of subtle yellow */
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: var(--radius-full);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
@@ -181,9 +182,11 @@
   touch-action: manipulation;
 }
 
-/* CRITICAL: Active tab styling - no background, let slider handle visual feedback */
+/* UPDATED: Active tab styling - BLACK text to contrast with yellow slider background */
 .navigation-section-btn.active {
-  color: var(--primary) !important;
+  /* CHANGED: Black text instead of yellow to contrast with yellow slider */
+  color: #000000 !important;
+  font-weight: 600 !important;
   background-color: transparent !important;
   border-color: transparent !important;
 }
@@ -248,6 +251,7 @@
   /* Ensure active state is visible */
   .navigation-section-btn.active {
     font-weight: 600;
+    color: #000000 !important;
   }
 }
 
