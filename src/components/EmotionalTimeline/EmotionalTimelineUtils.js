@@ -1,1076 +1,770 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - FIXED Analysis Logic
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { format, differenceInDays } from 'date-fns';
-import toast from 'react-hot-toast';
+// components/EmotionalTimeline/EmotionalTimelineUtils.js - Simplified Free Version
+import { differenceInDays } from 'date-fns';
+import { FaMapSigns, FaLightbulb, FaHeart, FaBrain, FaLeaf, FaTrophy } from 'react-icons/fa';
 
-// Import CSS files
-import './EmotionalTimeline.css';
-import './EmotionalTimelineSections.css';
-import './EmotionalTimelineModals.css';
+// Enhanced phase definitions with scientific backing
+export const emotionalPhases = [
+  {
+    id: 1,
+    name: "Initial Adaptation",
+    dayRange: "1-14",
+    startDay: 1,
+    endDay: 14,
+    icon: FaLeaf,
+    color: "#22c55e",
+    description: "Your body begins adapting to retention while initial urges peak",
+    scientificMechanism: "Cessation of regular ejaculation triggers hypothalamic-pituitary adjustments. Testosterone begins stabilizing while dopamine receptors start rebalancing from overstimulation.",
+    expectedSymptoms: [
+      "Strong physical urges and restlessness",
+      "Energy fluctuations between high and fatigue", 
+      "Sleep disruption as body adjusts",
+      "Excitement and motivation bursts",
+      "Appetite changes and food cravings shifts",
+      "Mild anxiety about maintaining practice"
+    ],
+    warningSigns: [
+      "Extreme mood swings beyond normal adaptation",
+      "Complete inability to sleep for multiple nights", 
+      "Severe anxiety or panic attacks",
+      "Thoughts of self-harm or extreme despair"
+    ],
+    specificTechniques: [
+      "Cold showers daily (2-5 minutes) to reset nervous system",
+      "Intense physical exercise to channel excess energy",
+      "Establish non-negotiable morning routine",
+      "Remove all triggers from environment",
+      "Practice 4-7-8 breathing during urges"
+    ],
+    insights: {
+      practical: "This phase builds new neural pathways. Your brain is rewiring dopamine pathways away from instant gratification patterns established by regular ejaculation.",
+      scientific: "Neuroplasticity is highest during initial behavior change. The prefrontal cortex strengthens its control over limbic impulses through repeated conscious choice."
+    }
+  },
+  {
+    id: 2,
+    name: "Emotional Processing",
+    dayRange: "15-45",
+    startDay: 15,
+    endDay: 45,
+    icon: FaHeart,
+    color: "#f59e0b",
+    description: "Suppressed emotions surface for healing - this is often the most challenging phase",
+    scientificMechanism: "Without ejaculation's endorphin/prolactin release numbing emotional pain, stored trauma surfaces. Retained sexual energy amplifies all emotions as the psyche heals itself.",
+    expectedSymptoms: [
+      "Intense mood swings and emotional volatility",
+      "Waves of anxiety, depression, and unexplained sadness",
+      "Old memories and relationships surfacing vividly",
+      "Crying episodes without clear triggers",
+      "Anger flashes and irritability",
+      "Feeling emotionally raw and vulnerable",
+      "Sleep disturbances and vivid dreams"
+    ],
+    warningSigns: [
+      "Suicidal thoughts or self-harm ideation",
+      "Complete emotional numbness lasting weeks",
+      "Violent impulses toward others",
+      "Inability to function in daily life",
+      "Substance abuse to cope with emotions"
+    ],
+    specificTechniques: [
+      "Journal extensively - write without censoring",
+      "Accept emotions without resistance or judgment",
+      "Cold water face splash during overwhelming moments",
+      "Vigorous exercise during anger outbursts",
+      "Breathing exercises: breathe into emotional sensations",
+      "Seek therapy for processing severe trauma"
+    ],
+    traumaReleasePattern: {
+      weeks1to4: "Recent frustrations and current life stressors clear first",
+      months2to3: "Past relationship pain, betrayals, and heartbreak surface",
+      months4to6: "Childhood programming and family dysfunction emerge",
+      sixMonthsPlus: "Deeper patterns and generational trauma release"
+    },
+    insights: {
+      practical: "This emotional turbulence is your psyche's natural healing process. Sexual activity was unconsciously numbing emotional pain that must now be processed.",
+      scientific: "Without prolactin and endorphin flooding from ejaculation, the brain can no longer suppress stored emotional content. This purging is necessary for psychological integration."
+    }
+  },
+  {
+    id: 3,
+    name: "Mental Expansion", 
+    dayRange: "46-90",
+    startDay: 46,
+    endDay: 90,
+    icon: FaBrain,
+    color: "#3b82f6",
+    description: "Cognitive abilities enhance as emotional turbulence stabilizes",
+    scientificMechanism: "Retained seminal nutrients (lecithin, zinc, B12) rebuild nerve sheaths. Brain tissue becomes more densely connected as resources redirect from reproduction to cognition.",
+    expectedSymptoms: [
+      "Dramatically improved focus and concentration",
+      "Enhanced creativity and problem-solving abilities",
+      "Clearer, faster decision-making capacity",
+      "Better memory formation and recall",
+      "Increased motivation for learning and growth",
+      "Interest in philosophy and deeper subjects",
+      "Pattern recognition abilities expand"
+    ],
+    warningSigns: [
+      "Intellectual arrogance or superiority complex",
+      "Overthinking leading to analysis paralysis",
+      "Using mental abilities to manipulate others",
+      "Neglecting emotional and physical needs"
+    ],
+    specificTechniques: [
+      "Take on challenging mental projects",
+      "Learn new skills while neuroplasticity peaks",
+      "Practice strategic thinking and planning",
+      "Read complex philosophical or scientific material",
+      "Engage in creative problem-solving activities"
+    ],
+    insights: {
+      practical: "Your brain operates at higher efficiency due to optimized neurotransmitter balance and increased blood flow. This is the ideal time for intellectual achievement.",
+      scientific: "Increased zinc and B-vitamin availability enhances neurotransmitter synthesis. Reduced prolactin levels improve dopamine function and cognitive performance."
+    }
+  },
+  {
+    id: 4,
+    name: "Integration & Growth",
+    dayRange: "91-180",
+    startDay: 91,
+    endDay: 180,
+    icon: FaLightbulb,
+    color: "#8b5cf6",
+    description: "Profound inner transformation as benefits become deeply integrated",
+    scientificMechanism: "Complete endocrine rebalancing occurs. The entire nervous system optimizes for retention rather than ejaculation, creating stable high-performance states.",
+    expectedSymptoms: [
+      "Deep sense of life purpose and direction",
+      "Natural charisma and magnetic presence",
+      "Effortless self-discipline in all areas",
+      "Compassionate wisdom beyond your years",
+      "Natural leadership qualities emerge",
+      "Inner peace despite external circumstances",
+      "Intuitive abilities strengthen significantly"
+    ],
+    warningSigns: [
+      "Avoiding practical responsibilities",
+      "Grandiose thinking or unrealistic goals",
+      "Isolation from human connection",
+      "Judging others as inferior or unenlightened"
+    ],
+    specificTechniques: [
+      "Take on leadership roles in your field",
+      "Mentor others beginning their journey",
+      "Pursue meaningful work aligned with purpose",
+      "Build deeper, authentic relationships",
+      "Practice daily gratitude and service"
+    ],
+    insights: {
+      practical: "You've developed mastery over one of humanity's strongest drives. This discipline transfers to exceptional performance in all life areas.",
+      scientific: "Neuroplastic changes become permanent. The prefrontal cortex maintains dominance over limbic impulses, creating stable self-regulation abilities."
+    }
+  },
+  {
+    id: 5,
+    name: "Mastery & Purpose",
+    dayRange: "181+",
+    startDay: 181,
+    endDay: 999999,
+    icon: FaTrophy,
+    color: "#ffdd00",
+    description: "Complete integration - you've transcended the need for external validation",
+    scientificMechanism: "Sexual energy permanently redirected upward. Vital essence accumulates in brain tissue, creating sustained states of expanded awareness.",
+    expectedSymptoms: [
+      "Effortless self-control without conscious effort",
+      "Natural influence and inspiring presence",
+      "Deep emotional intelligence and empathy",
+      "Visionary thinking and long-term perspective",
+      "Ability to remain calm in any situation",
+      "Others seeking your wisdom and guidance",
+      "Mysterious synchronicities and opportunities"
+    ],
+    warningSigns: [
+      "Using abilities for purely selfish gain",
+      "Losing touch with ordinary human experience",
+      "Developing contempt for 'lower' behaviors",
+      "Becoming isolated from meaningful relationships"
+    ],
+    specificTechniques: [
+      "Focus on legacy creation and impact",
+      "Teach and guide others on the path",
+      "Apply abilities to serve humanity's progress",
+      "Maintain humility despite extraordinary abilities",
+      "Stay connected to beginners' struggles"
+    ],
+    insights: {
+      practical: "You embody peak human potential. Your presence alone inspires others to pursue their highest path. You demonstrate what's possible through disciplined energy management.",
+      scientific: "Permanent neuroplastic changes create self-sustaining high-performance states. Brain imaging would show enhanced connectivity between regions associated with self-control and higher cognition."
+    }
+  }
+];
 
-// Icons
-import { 
-  FaCheckCircle, FaInfoCircle, FaTimes,
-  FaMapSigns, FaHeart, FaBrain, FaEdit
-} from 'react-icons/fa';
+// Simplified mastery levels for 181+ day practitioners - ALL USE TROPHY ICON
+export const masteryLevels = [
+  { 
+    id: 1, 
+    level: "I",
+    name: "Foundation Master", 
+    subtitle: "Establishing Unshakeable Self-Control",
+    timeRange: "Months 6-12", 
+    startDay: 181, 
+    endDay: 365,
+    description: "Building the foundation of permanent energy mastery",
+    icon: FaTrophy
+  },
+  { 
+    id: 2, 
+    level: "II",
+    name: "Wisdom Keeper", 
+    subtitle: "Deep Understanding Through Experience",
+    timeRange: "Year 1-2", 
+    startDay: 366, 
+    endDay: 730,
+    description: "Integrating wisdom gained from sustained practice",
+    icon: FaTrophy
+  },
+  { 
+    id: 3, 
+    level: "III",
+    name: "Guide & Teacher", 
+    subtitle: "Serving Others' Growth",
+    timeRange: "Year 2+", 
+    startDay: 731, 
+    endDay: 999999,
+    description: "Using mastery to elevate and inspire others",
+    icon: FaTrophy
+  }
+];
 
-// Import utility functions and data
-import {
-  emotionalPhases,
-  masteryLevels,
-  getCurrentPhase,
-  getCurrentMasteryLevel,
-  getPhaseProgress,
-  getPhaseProgressText,
-  generateComprehensivePhaseAnalysis
-} from './EmotionalTimelineUtils';
-
-const EmotionalTimeline = ({ userData, updateUserData }) => {
-  const [selectedPhase, setSelectedPhase] = useState(null);
-  const [showPhaseDetail, setShowPhaseDetail] = useState(false);
+// Get current phase based on day
+export const getCurrentPhase = (currentDay, phases = emotionalPhases) => {
+  if (currentDay <= 0) return null;
   
-  // Navigation state
-  const [activeSection, setActiveSection] = useState('journey-map');
+  for (const phase of phases) {
+    if (currentDay >= phase.startDay && (phase.endDay === 999999 || currentDay <= phase.endDay)) {
+      return phase;
+    }
+  }
   
-  // Enhanced emotional tracking states
-  const [todayEmotions, setTodayEmotions] = useState({
-    anxiety: 5,
-    moodStability: 5,
-    mentalClarity: 5,
-    emotionalProcessing: 5
-  });
-  const [emotionsLogged, setEmotionsLogged] = useState(false);
-
-  // Mobile-First sliding tab state management
-  const tabsRef = useRef(null);
-  const sliderRef = useRef(null);
-  const [isSliderInitialized, setIsSliderInitialized] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const resizeTimeoutRef = useRef(null);
-  const scrollTimeoutRef = useRef(null);
-  
-  const currentDay = userData.currentStreak || 0;
-
-  // Get current phase and mastery level
-  const currentPhase = getCurrentPhase(currentDay, emotionalPhases);
-  const currentMasteryLevel = getCurrentMasteryLevel(currentDay, masteryLevels);
-
-  // Tab configuration
-  const navigationTabs = [
-    { id: 'journey-map', label: 'Journey Map', icon: FaMapSigns },
-    { id: 'check-in', label: 'Check-in', icon: FaCheckCircle },
-    { id: 'analysis', label: 'Analysis', icon: FaBrain }
-  ];
-
-  // FIXED: Enhanced data analysis logic
-  const getDataAnalysisState = () => {
-    const emotionalData = userData.emotionalTracking || [];
-    const totalDataPoints = emotionalData.length;
-    const recentData = emotionalData.filter(entry => 
-      differenceInDays(new Date(), new Date(entry.date)) <= 14
-    );
-    const recentDataPoints = recentData.length;
-    
-    // Calculate overall tracking consistency
-    const trackingSpan = totalDataPoints > 1 ? 
-      differenceInDays(new Date(), new Date(emotionalData[0].date)) : 0;
-    const consistencyRate = trackingSpan > 0 ? (totalDataPoints / trackingSpan) * 100 : 0;
-    
-    return {
-      totalDataPoints,
-      recentDataPoints,
-      trackingSpan,
-      consistencyRate,
-      hasGoodData: totalDataPoints >= 7,
-      hasExcellentData: totalDataPoints >= 21 && consistencyRate > 50,
-      hasSufficientRecentData: recentDataPoints >= 3
-    };
-  };
-
-  // FIXED: Smart banner message generation
-  const getBannerMessage = () => {
-    const dataState = getDataAnalysisState();
-    const { totalDataPoints, recentDataPoints, consistencyRate, hasExcellentData, hasGoodData, hasSufficientRecentData } = dataState;
-    
-    // Excellent data - show optimization message
-    if (hasExcellentData) {
-      return {
-        title: "Advanced Analysis Active",
-        description: `Excellent tracking history with ${totalDataPoints} total data points enables comprehensive pattern recognition, predictive guidance, and personalized strategies based on your unique journey data.`
-      };
-    }
-    
-    // Good data but could be better
-    if (hasGoodData) {
-      const recentMessage = recentDataPoints < 7 ? 
-        ` Track more consistently in recent days (${recentDataPoints}/14 recent days logged) for enhanced real-time insights.` : '';
-      
-      return {
-        title: "Analysis Improving with Data", 
-        description: `Good foundation with ${totalDataPoints} data points unlocks pattern recognition and basic insights.${recentMessage} Continue tracking to unlock advanced predictive capabilities.`
-      };
-    }
-    
-    // Minimal data - encouraging but informative
-    if (totalDataPoints > 0) {
-      return {
-        title: "Building Your Analysis Foundation",
-        description: `Started with ${totalDataPoints} data point${totalDataPoints === 1 ? '' : 's'}! Track ${7 - totalDataPoints} more days to unlock pattern recognition, challenge identification, and personalized strategies for your ${currentPhase?.name || 'current'} phase.`
-      };
-    }
-    
-    // No data - comprehensive explanation
-    return {
-      title: "Unlock Comprehensive Analysis", 
-      description: `You're on day ${currentDay} in the ${currentPhase?.name || 'current'} phase. Start daily emotional tracking to unlock scientific phase explanations, personalized challenge identification with solutions, predictive guidance for upcoming phases, pattern recognition across all metrics, and strategic recommendations tailored to your journey.`
-    };
-  };
-
-  // Helper function to generate phase color variables
-  const getPhaseColorVariables = (phase) => {
-    if (!phase) return {};
-    
-    const hexToRgb = (hex) => {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-      } : null;
-    };
-    
-    const rgb = hexToRgb(phase.color);
-    const lighterColor = rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8)` : phase.color;
-    
-    return {
-      '--phase-color': phase.color,
-      '--phase-color-light': lighterColor
-    };
-  };
-
-  // Mobile detection
-  const detectMobile = useCallback(() => {
-    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
-    setIsMobile(isMobileDevice);
-    return isMobileDevice;
-  }, []);
-
-  // Enhanced slider positioning
-  const updateTabSlider = useCallback(() => {
-    if (!tabsRef.current || !sliderRef.current) {
-      return false;
-    }
-    
-    try {
-      const tabsContainer = tabsRef.current;
-      const slider = sliderRef.current;
-      const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeSection}"]`);
-      
-      if (!activeTabElement) {
-        console.warn(`Tab element not found: ${activeSection}`);
-        return false;
-      }
-
-      requestAnimationFrame(() => {
-        try {
-          const containerRect = tabsContainer.getBoundingClientRect();
-          const tabRect = activeTabElement.getBoundingClientRect();
-          
-          if (containerRect.width === 0 || tabRect.width === 0) {
-            console.warn('Invalid measurements, container or tab not rendered');
-            return;
-          }
-
-          const containerStyle = window.getComputedStyle(tabsContainer);
-          const paddingLeft = parseFloat(containerStyle.paddingLeft) || 4;
-          const scrollLeft = tabsContainer.scrollLeft || 0;
-          const leftOffset = tabRect.left - containerRect.left - paddingLeft + scrollLeft;
-          const tabWidth = tabRect.width;
-          
-          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
-          slider.style.width = `${Math.round(tabWidth)}px`;
-          slider.style.opacity = '1';
-          slider.style.visibility = 'visible';
-          
-        } catch (innerError) {
-          console.error('Inner slider positioning failed:', innerError);
-        }
-      });
-      
-      return true;
-      
-    } catch (error) {
-      console.error('Slider update failed:', error);
-      return false;
-    }
-  }, [activeSection]);
-
-  // Scroll active tab into view on mobile
-  const scrollToActiveTab = useCallback(() => {
-    if (!isMobile || !tabsRef.current) return;
-    
-    const container = tabsRef.current;
-    const activeTabElement = container.querySelector(`[data-tab="${activeSection}"]`);
-    
-    if (activeTabElement) {
-      const containerRect = container.getBoundingClientRect();
-      const tabRect = activeTabElement.getBoundingClientRect();
-      
-      if (tabRect.left < containerRect.left || tabRect.right > containerRect.right) {
-        activeTabElement.scrollIntoView({
-          behavior: 'smooth',
-          inline: 'center',
-          block: 'nearest'
-        });
-      }
-    }
-  }, [activeSection, isMobile]);
-
-  // Clean tab change handler
-  const handleSectionClick = useCallback((newSection) => {
-    if (newSection === activeSection) return;
-    
-    setActiveSection(newSection);
-    
-    if (isMobile) {
-      setTimeout(() => {
-        scrollToActiveTab();
-        updateTabSlider();
-      }, 10);
-    }
-  }, [activeSection, isMobile, updateTabSlider, scrollToActiveTab]);
-
-  // Handle scroll events to update slider position
-  useEffect(() => {
-    if (!isMobile || !tabsRef.current) return;
-    
-    const handleScroll = () => {
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-      
-      scrollTimeoutRef.current = setTimeout(() => {
-        updateTabSlider();
-      }, 50);
-    };
-    
-    const container = tabsRef.current;
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    
-    return () => {
-      container.removeEventListener('scroll', handleScroll);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-    };
-  }, [isMobile, updateTabSlider]);
-
-  // Slider initialization
-  useEffect(() => {
-    const initializeSlider = () => {
-      detectMobile();
-      
-      if (!tabsRef.current || !sliderRef.current) {
-        return;
-      }
-
-      requestAnimationFrame(() => {
-        const success = updateTabSlider();
-        
-        if (success) {
-          setIsSliderInitialized(true);
-          if (isMobile) {
-            scrollToActiveTab();
-          }
-        } else {
-          setTimeout(() => {
-            if (updateTabSlider()) {
-              setIsSliderInitialized(true);
-              if (isMobile) {
-                scrollToActiveTab();
-              }
-            } else {
-              if (sliderRef.current) {
-                sliderRef.current.style.opacity = '1';
-                sliderRef.current.style.visibility = 'visible';
-                setIsSliderInitialized(true);
-                setTimeout(updateTabSlider, 50);
-              }
-            }
-          }, 100);
-        }
-      });
-    };
-
-    const timer = setTimeout(initializeSlider, 100);
-    
-    return () => clearTimeout(timer);
-  }, [updateTabSlider, detectMobile, isMobile, scrollToActiveTab]);
-
-  // Resize handling
-  useEffect(() => {
-    const handleResize = () => {
-      const wasMobile = isMobile;
-      detectMobile();
-      
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-      
-      resizeTimeoutRef.current = setTimeout(() => {
-        if (isSliderInitialized) {
-          updateTabSlider();
-          if (!wasMobile && isMobile) {
-            scrollToActiveTab();
-          }
-        }
-      }, 100);
-    };
-
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-    };
-  }, [isSliderInitialized, detectMobile, updateTabSlider, isMobile, scrollToActiveTab]);
-
-  // Update slider when active tab changes
-  useEffect(() => {
-    if (isSliderInitialized) {
-      setTimeout(updateTabSlider, 10);
-    }
-  }, [activeSection, isSliderInitialized, updateTabSlider]);
-
-  // Cleanup timeouts on unmount
-  useEffect(() => {
-    return () => {
-      [resizeTimeoutRef, scrollTimeoutRef].forEach(ref => {
-        if (ref.current) {
-          clearTimeout(ref.current);
-        }
-      });
-    };
-  }, []);
-
-  // Check if emotions are already logged for today
-  useEffect(() => {
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const existingEmotions = userData.emotionalTracking?.find(
-      emotion => format(new Date(emotion.date), 'yyyy-MM-dd') === todayStr
-    );
-    
-    if (existingEmotions) {
-      setTodayEmotions({
-        anxiety: existingEmotions.anxiety || 5,
-        moodStability: existingEmotions.moodStability || 5,
-        mentalClarity: existingEmotions.mentalClarity || 5,
-        emotionalProcessing: existingEmotions.emotionalProcessing || 5
-      });
-      setEmotionsLogged(true);
-    }
-  }, [userData.emotionalTracking]);
-
-  // Handle emotional tracking
-  const handleEmotionChange = (type, value) => {
-    setTodayEmotions(prev => ({
-      ...prev,
-      [type]: value
-    }));
-  };
-
-  const saveEmotions = () => {
-    const today = new Date();
-    const todayStr = format(today, 'yyyy-MM-dd');
-    
-    const updatedEmotionalTracking = (userData.emotionalTracking || []).filter(
-      emotion => format(new Date(emotion.date), 'yyyy-MM-dd') !== todayStr
-    );
-    
-    updatedEmotionalTracking.push({
-      date: today,
-      day: currentDay,
-      phase: currentPhase?.id || 1,
-      ...todayEmotions
-    });
-    
-    updatedEmotionalTracking.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    updateUserData({ emotionalTracking: updatedEmotionalTracking });
-    setEmotionsLogged(true);
-    toast.success('Emotional check-in saved!');
-  };
-
-  const enableEmotionEditing = () => {
-    setEmotionsLogged(false);
-  };
-
-  // Handle phase detail modal
-  const showPhaseDetails = (phase) => {
-    setSelectedPhase(phase);
-    setShowPhaseDetail(true);
-  };
-
-  return (
-    <div className="emotional-timeline-container">
-      {/* Integrated Header Design */}
-      <div className="integrated-timeline-header">
-        <div className="header-title-section">
-          <h2>Emotional Timeline</h2>
-          <p className="header-subtitle">Track your emotional journey through the phases of recovery</p>
-        </div>
-        
-        <div className="header-navigation-section">
-          <div 
-            className="navigation-pill-container" 
-            ref={tabsRef}
-          >
-            <div 
-              className="navigation-tab-slider" 
-              ref={sliderRef}
-              style={{ 
-                opacity: 0,
-                visibility: 'hidden',
-                transform: 'translateX(0px)',
-                width: '0px'
-              }}
-            />
-            
-            {navigationTabs.map(tab => (
-              <button 
-                key={tab.id}
-                className={`navigation-section-btn ${activeSection === tab.id ? 'active' : ''}`}
-                onClick={() => handleSectionClick(tab.id)}
-                data-tab={tab.id}
-              >
-                <tab.icon />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Current Phase Display - ONLY VISIBLE ON JOURNEY MAP TAB */}
-      {currentPhase && currentDay > 0 && activeSection === 'journey-map' && (
-        <div className="current-phase-container">
-          <div className="phase-card current">
-            <div className="phase-date">Day {currentDay} of your journey</div>
-            
-            <div className="phase-icon-section">
-              <div className="timeline-phase-icon" style={{ color: currentPhase.color }}>
-                <currentPhase.icon style={{ color: currentPhase.color }} />
-              </div>
-              <div className="phase-info">
-                <div className="phase-name">{currentPhase.name}</div>
-                <div className="phase-range">Days {currentPhase.dayRange}</div>
-              </div>
-            </div>
-            
-            <div className="phase-description">
-              {currentPhase.description}
-            </div>
-
-            <div className="phase-progress">
-              <div 
-                className="progress-bar progress-bar-shimmer"
-                style={getPhaseColorVariables(currentPhase)}
-              >
-                <div 
-                  className="progress-fill progress-fill-colored progress-fill-shimmer"
-                  style={{ width: `${getPhaseProgress(currentPhase, currentDay, currentMasteryLevel)}%` }}
-                ></div>
-              </div>
-              <div className="progress-text-container">
-                <div className="progress-text">
-                  {getPhaseProgressText(currentPhase, currentDay, currentMasteryLevel)}
-                </div>
-              </div>
-            </div>
-
-            <button 
-              className="phase-detail-btn"
-              onClick={() => showPhaseDetails(currentPhase)}
-            >
-              <FaInfoCircle />
-              View Phase Details
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Section Content */}
-      <div className="timeline-content-container">
-        {/* Journey Map Section */}
-        {activeSection === 'journey-map' && (
-          <div className="timeline-overview">
-            <h3>Complete Journey Map</h3>
-            <div className="phases-timeline">
-              {emotionalPhases.map((phase) => {
-                const isCompleted = currentDay > phase.endDay && phase.endDay !== 999999;
-                const isCurrent = currentPhase?.id === phase.id;
-                const isUpcoming = currentDay < phase.startDay;
-                
-                return (
-                  <div 
-                    key={phase.id} 
-                    className={`timeline-phase ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                    onClick={() => showPhaseDetails(phase)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="timeline-phase-icon">
-                      <phase.icon style={{ color: phase.color }} />
-                    </div>
-                    <div className="timeline-phase-info">
-                      <div className="timeline-phase-name">{phase.name}</div>
-                      <div className="timeline-phase-range">Days {phase.dayRange}</div>
-                      <div className="timeline-phase-description">{phase.description}</div>
-                    </div>
-                    <div className="timeline-phase-check">
-                      <FaCheckCircle />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Mastery Levels Display */}
-            {currentDay >= 181 && (
-              <div className="mastery-levels-section">
-                <h3>Mastery Levels (Days 181+)</h3>
-                <div className="mastery-levels-timeline">
-                  {masteryLevels.map((level) => {
-                    const isCompleted = currentDay > level.endDay && level.endDay !== 999999;
-                    const isCurrent = currentMasteryLevel?.id === level.id;
-                    const isUpcoming = currentDay < level.startDay;
-                    
-                    return (
-                      <div 
-                        key={level.id}
-                        className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                      >
-                        <div className="mastery-level-icon">
-                          <level.icon style={{ color: 'var(--primary)' }} />
-                        </div>
-                        
-                        <div className="mastery-level-info">
-                          <div className="mastery-level-name">Level {level.level}: {level.name}</div>
-                          <div className="mastery-level-subtitle">{level.subtitle}</div>
-                          <div className="mastery-level-time-range">{level.timeRange}</div>
-                        </div>
-                        
-                        <div className="mastery-level-status">
-                          {isCompleted && (
-                            <div className="mastery-level-check">
-                              <FaCheckCircle />
-                            </div>
-                          )}
-                          {isCurrent && (
-                            <div className="mastery-level-current-badge">
-                              Current
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Check-in Section */}
-        {activeSection === 'check-in' && (
-          <div className="emotional-checkin-section">
-            <h3>Daily Emotional Check-in</h3>
-            
-            {/* Handle no active streak - show unavailable banner */}
-            {!currentPhase || currentDay <= 0 ? (
-              <div className="checkin-benefits-banner">
-                <div className="checkin-benefits-helmet-container">
-                  <img 
-                    className="checkin-benefits-helmet" 
-                    src="/helmet.png" 
-                    alt="Check-in Unavailable" 
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'block';
-                    }}
-                  />
-                  <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                    ⚡️
-                  </div>
-                </div>
-                
-                <div className="checkin-benefits-content">
-                  <h4 className="checkin-benefits-title">
-                    Check-in Unavailable - Start Your Journey
-                  </h4>
-                  <p className="checkin-benefits-description">
-                    Emotional tracking requires an active retention streak to provide meaningful phase-based insights. Start your journey to begin daily emotional check-ins that unlock pattern recognition, challenge identification with solutions, and personalized strategies based on your progress through the retention phases.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="checkin-benefits-banner">
-                  <div className="checkin-benefits-helmet-container">
-                    <img 
-                      className="checkin-benefits-helmet" 
-                      src="/helmet.png" 
-                      alt="Track to Unlock" 
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'block';
-                      }}
-                    />
-                    <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                      ⚡️
-                    </div>
-                  </div>
-                  
-                  <div className="checkin-benefits-content">
-                    <h4 className="checkin-benefits-title">
-                      Track to Unlock Advanced Features
-                    </h4>
-                    <p className="checkin-benefits-description">
-                      The more you track emotions, the more personalized and accurate analysis becomes. Daily tracking unlocks pattern recognition, challenge identification with solutions, predictive guidance for upcoming phases, and tailored strategies based on your unique journey data.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="emotion-status-section">
-                  {emotionsLogged ? (
-                    <div className="emotions-logged">
-                      <FaCheckCircle className="check-icon" />
-                      <span>Emotions logged!</span>
-                      <button 
-                        className="edit-emotions-btn"
-                        onClick={enableEmotionEditing}
-                        title="Edit emotions"
-                      >
-                        <FaEdit />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="emotions-not-logged">
-                      <FaInfoCircle className="info-icon" />
-                      <span>Log emotions below</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Emotion sliders - Elegant inline value design */}
-                <div className="emotion-sliders">
-                  {[
-                    { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
-                    { key: 'moodStability', label: 'Mood Stability', value: todayEmotions.moodStability, lowLabel: 'Mood Swings', highLabel: 'Very Stable' },
-                    { key: 'mentalClarity', label: 'Mental Clarity', value: todayEmotions.mentalClarity, lowLabel: 'Foggy', highLabel: 'Crystal Clear' },
-                    { key: 'emotionalProcessing', label: 'Emotional Processing', value: todayEmotions.emotionalProcessing, lowLabel: 'Suppressed', highLabel: 'Flowing' }
-                  ].map((emotion) => (
-                    <div key={emotion.key} className="emotion-slider-item">
-                      <div className="emotion-slider-header">
-                        <span className="emotion-label">{emotion.label}</span>
-                      </div>
-                      <div className="slider-with-inline-value">
-                        <input
-                          type="range"
-                          min="0"
-                          max="10"
-                          value={emotion.value}
-                          onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
-                          className="emotion-range-slider"
-                          disabled={emotionsLogged}
-                        />
-                        <div className="slider-inline-value">{emotion.value}</div>
-                      </div>
-                      <div className="slider-labels">
-                        <span>{emotion.lowLabel}</span>
-                        <span>{emotion.highLabel}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {!emotionsLogged && (
-                  <div className="emotion-actions">
-                    <button 
-                      className="action-btn save-emotions-btn"
-                      onClick={saveEmotions}
-                    >
-                      <FaCheckCircle />
-                      <span>Save Emotional Check-in</span>
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* FIXED: Analysis Section with improved logic */}
-        {activeSection === 'analysis' && (
-          <div className="phase-insight-section">
-            <h3>Comprehensive Phase Analysis</h3>
-            
-            {/* Handle no current phase (reset scenario) - Single consolidated banner */}
-            {!currentPhase || currentDay <= 0 ? (
-              <div className="insight-data-banner">
-                <div className="insight-data-helmet-container">
-                  <img 
-                    className="insight-data-helmet" 
-                    src="/helmet.png" 
-                    alt="Analysis Unavailable" 
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'block';
-                    }}
-                  />
-                  <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
-                    ⚡️
-                  </div>
-                </div>
-                
-                <div className="insight-data-content">
-                  <h4 className="insight-data-title">
-                    Analysis Unavailable - Start Your Journey
-                  </h4>
-                  <p className="insight-data-description">
-                    Phase analysis requires an active retention streak. Start your journey to unlock comprehensive insights including scientific explanations for each phase, personal data analysis with trend recognition, challenge identification with targeted solutions, predictive guidance for upcoming phases, and actionable strategies tailored to your current phase.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              (() => {
-                const analysis = generateComprehensivePhaseAnalysis(currentPhase, currentDay, userData, false, true);
-                const dataState = getDataAnalysisState();
-                const bannerMessage = getBannerMessage();
-                
-                return (
-                  <>
-                    {/* FIXED: Single comprehensive banner based on data state */}
-                    <div className="insight-data-banner">
-                      <div className="insight-data-helmet-container">
-                        <img 
-                          className="insight-data-helmet" 
-                          src="/helmet.png" 
-                          alt="Analysis Status" 
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextElementSibling.style.display = 'block';
-                          }}
-                        />
-                        <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
-                          ⚡️
-                        </div>
-                      </div>
-                      
-                      <div className="insight-data-content">
-                        <h4 className="insight-data-title">
-                          {bannerMessage.title}
-                        </h4>
-                        <p className="insight-data-description">
-                          {bannerMessage.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Analysis Cards Grid - ALWAYS SHOW if we have a valid phase */}
-                    {analysis && currentPhase && currentDay > 0 && (
-                      <div className="insights-grid">
-                        {/* Phase Education Card - ALWAYS SHOW */}
-                        {analysis?.phaseEducation && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Phase Education</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="optimization-display">
-                                <div className="optimization-metric-card">
-                                  <div className="optimization-metric-value">Day {analysis.phaseEducation.dayInPhase}</div>
-                                  <div className="optimization-metric-label">Current Phase Progress</div>
-                                </div>
-                                <div className="optimization-criteria">
-                                  <div className="optimization-criteria-title">Current Focus</div>
-                                  <div className="optimization-criteria-text">{analysis.phaseEducation.phaseOverview}</div>
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>Key Learning:</strong> {analysis.phaseEducation.keyLearning}
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>What to Expect:</strong> {analysis.phaseEducation.expectation}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Scientific Explanation Card - ALWAYS SHOW */}
-                        {analysis?.scientificExplanation && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Scientific Mechanisms</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="patterns-display">
-                                <div className="pattern-item">
-                                  <strong>Neurochemical:</strong> {analysis.scientificExplanation.neurochemical}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>Physiological:</strong> {analysis.scientificExplanation.physiological}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>Behavioral:</strong> {analysis.scientificExplanation.behavioral}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Predictive Guidance Card - ALWAYS SHOW */}
-                        {analysis?.predictiveGuidance && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Predictive Guidance</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="optimization-display">
-                                <div className="optimization-criteria">
-                                  <div className="optimization-criteria-title">Current Focus</div>
-                                  <div className="optimization-criteria-text">{analysis.predictiveGuidance.currentFocus}</div>
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>Upcoming Challenge:</strong> {analysis.predictiveGuidance.upcomingChallenge}
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>Preparation:</strong> {analysis.predictiveGuidance.preparation}
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>Timeline:</strong> {analysis.predictiveGuidance.timeline}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Actionable Strategies Card - ALWAYS SHOW */}
-                        {analysis?.actionableStrategies && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Actionable Strategies</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="patterns-display">
-                                {analysis.actionableStrategies.urgent && analysis.actionableStrategies.urgent.length > 0 && (
-                                  <div className="pattern-item">
-                                    <strong>Urgent Actions:</strong> {analysis.actionableStrategies.urgent.join(' • ')}
-                                  </div>
-                                )}
-                                <div className="pattern-item">
-                                  <strong>Daily Practices:</strong> {analysis.actionableStrategies.daily.join(' • ')}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>Weekly Focus:</strong> {analysis.actionableStrategies.weekly.join(' • ')}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>Long-term Strategy:</strong> {analysis.actionableStrategies.longTerm.join(' • ')}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Data Analysis Card - SHOW ONLY IF SUFFICIENT DATA */}
-                        {dataState.hasSufficientRecentData && analysis?.dataAnalysis && analysis.dataAnalysis.type === 'comprehensive' && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Personal Data Analysis</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="optimization-display">
-                                <div className="optimization-metrics">
-                                  <div className="optimization-metric-card">
-                                    <div className="optimization-metric-value">{analysis.dataAnalysis.wellbeingScore.toFixed(1)}/10</div>
-                                    <div className="optimization-metric-label">Overall Wellbeing Score</div>
-                                  </div>
-                                  <div className="optimization-metric-card">
-                                    <div className="optimization-metric-value">{dataState.totalDataPoints}</div>
-                                    <div className="optimization-metric-label">Total Data Points</div>
-                                  </div>
-                                  <div className="optimization-metric-card">
-                                    <div className="optimization-metric-value">{dataState.recentDataPoints}/14</div>
-                                    <div className="optimization-metric-label">Recent Days Tracked</div>
-                                  </div>
-                                </div>
-                                
-                                {analysis.dataAnalysis.trends && (
-                                  <div className="patterns-display">
-                                    <div className="pattern-item">
-                                      <strong>Anxiety Trend:</strong> 
-                                      <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
-                                        {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓ Improving' : 
-                                         analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑ Concerning' : ' → Stable'}
-                                      </span>
-                                    </div>
-                                    <div className="pattern-item">
-                                      <strong>Mood Stability:</strong>
-                                      <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
-                                        {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑ Improving' : 
-                                         analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
-                                      </span>
-                                    </div>
-                                    <div className="pattern-item">
-                                      <strong>Mental Clarity:</strong>
-                                      <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
-                                        {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑ Improving' : 
-                                         analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
-                                      </span>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Challenge Analysis Card - SHOW ONLY IF CHALLENGES IDENTIFIED */}
-                        {dataState.hasSufficientRecentData && analysis?.challengeIdentification?.challenges && analysis.challengeIdentification.challenges.length > 0 && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Challenge Analysis</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="risk-level-indicator moderate">
-                                <div className="risk-score-container">
-                                  <div className="risk-score moderate">{analysis.challengeIdentification.challenges.length}</div>
-                                  <div className="risk-level-text">Active Challenge{analysis.challengeIdentification.challenges.length > 1 ? 's' : ''}</div>
-                                </div>
-                              </div>
-                              
-                              <div className="patterns-display">
-                                {analysis.challengeIdentification.challenges.map((challenge, index) => (
-                                  <div key={index} className="pattern-item">
-                                    <strong>{challenge.challenge}:</strong> {challenge.explanation}
-                                    <br />
-                                    <em>Solution: {challenge.solution}</em>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </>
-                );
-              })()
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Phase Detail Modal */}
-      {showPhaseDetail && selectedPhase && (
-        <div className="modal-overlay" onClick={() => setShowPhaseDetail(false)}>
-          <div className="modal-content phase-detail-modal" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowPhaseDetail(false)}>
-              <FaTimes />
-            </button>
-
-            <div className="phase-modal-header">
-              <div className="phase-modal-icon" style={{ color: selectedPhase.color }}>
-                <selectedPhase.icon style={{ color: selectedPhase.color }} />
-              </div>
-              <div className="phase-modal-info">
-                <h3>{selectedPhase.name}</h3>
-                <div className="phase-modal-range">Days {selectedPhase.dayRange}</div>
-              </div>
-            </div>
-
-            <div className="phase-modal-description">
-              <p>{selectedPhase.description}</p>
-            </div>
-
-            {/* Scientific Mechanism */}
-            <div className="phase-modal-section">
-              <h4>Scientific Mechanism</h4>
-              <p>{selectedPhase.scientificMechanism}</p>
-            </div>
-
-            {/* Expected Symptoms */}
-            <div className="phase-modal-section">
-              <h4>Expected Symptoms</h4>
-              <ul>
-                {selectedPhase.expectedSymptoms.map((symptom, index) => (
-                  <li key={index}>{symptom}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Warning Signs */}
-            <div className="phase-modal-section warning-section">
-              <h4>⚠️ Warning Signs (Seek Support)</h4>
-              <ul>
-                {selectedPhase.warningSigns.map((sign, index) => (
-                  <li key={index} className="warning-item">{sign}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Specific Techniques */}
-            <div className="phase-modal-section">
-              <h4>Specific Techniques</h4>
-              <ul>
-                {selectedPhase.specificTechniques.map((technique, index) => (
-                  <li key={index}>{technique}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Trauma Release Pattern (for Emotional Processing phase) */}
-            {selectedPhase.traumaReleasePattern && (
-              <div className="phase-modal-section">
-                <h4>Emotional Release Timeline</h4>
-                <div className="trauma-timeline">
-                  <div className="trauma-stage">
-                    <strong>Weeks 1-4:</strong> {selectedPhase.traumaReleasePattern.weeks1to4}
-                  </div>
-                  <div className="trauma-stage">
-                    <strong>Months 2-3:</strong> {selectedPhase.traumaReleasePattern.months2to3}
-                  </div>
-                  <div className="trauma-stage">
-                    <strong>Months 4-6:</strong> {selectedPhase.traumaReleasePattern.months4to6}
-                  </div>
-                  <div className="trauma-stage">
-                    <strong>6+ Months:</strong> {selectedPhase.traumaReleasePattern.sixMonthsPlus}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="phase-modal-insight">
-              <h4>Scientific Understanding</h4>
-              <p>{selectedPhase.insights.scientific}</p>
-            </div>
-
-            <div className="modal-actions">
-              <button 
-                className="modal-got-it-btn"
-                onClick={() => setShowPhaseDetail(false)}
-              >
-                <FaCheckCircle />
-                <span>Got It</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  return phases[0];
 };
 
-export default EmotionalTimeline;
+// Get current mastery level
+export const getCurrentMasteryLevel = (currentDay, levels = masteryLevels) => {
+  if (currentDay < 181) return null;
+  
+  for (const level of levels) {
+    if (currentDay >= level.startDay && currentDay <= level.endDay) {
+      return level;
+    }
+  }
+  
+  return levels[levels.length - 1];
+};
+
+// Calculate progress percentage with mastery level support
+export const getPhaseProgress = (phase, currentDay, masteryLevel = null) => {
+  if (!phase || currentDay <= 0) return 0;
+  
+  if (phase.startDay === 181) {
+    if (!masteryLevel) return 0;
+    
+    const daysIntoLevel = currentDay - masteryLevel.startDay;
+    const totalDaysInLevel = masteryLevel.endDay === 999999 ? 
+      365 : (masteryLevel.endDay - masteryLevel.startDay + 1);
+    
+    const progress = (daysIntoLevel / totalDaysInLevel) * 100;
+    return Math.min(100, Math.max(0, progress));
+  }
+  
+  const daysCompletedInPhase = currentDay - phase.startDay;
+  const totalDaysInPhase = phase.endDay - phase.startDay + 1;
+  const progress = (daysCompletedInPhase / totalDaysInPhase) * 100;
+  
+  return Math.min(100, Math.max(0, progress));
+};
+
+// Get progress text with mastery level support
+export const getPhaseProgressText = (phase, currentDay, masteryLevel = null) => {
+  if (!phase || currentDay <= 0) return "";
+  
+  if (phase.startDay === 181) {
+    if (!masteryLevel) return "";
+    
+    const daysIntoLevel = currentDay - masteryLevel.startDay;
+    const currentDayInLevel = daysIntoLevel + 1;
+    
+    if (masteryLevel.endDay === 999999) {
+      return `Level ${masteryLevel.level} ${masteryLevel.name} - Day ${currentDayInLevel} (Ongoing Journey)`;
+    } else {
+      const totalDaysInLevel = masteryLevel.endDay - masteryLevel.startDay + 1;
+      const daysRemainingInLevel = masteryLevel.endDay - currentDay;
+      return `Level ${masteryLevel.level} ${masteryLevel.name} - Day ${currentDayInLevel} of ${totalDaysInLevel} (${daysRemainingInLevel} days to next level)`;
+    }
+  }
+  
+  const daysCompletedInPhase = currentDay - phase.startDay;
+  const currentDayInPhase = daysCompletedInPhase + 1;
+  const totalDaysInPhase = phase.endDay - phase.startDay + 1;
+  const daysRemainingInPhase = phase.endDay - currentDay;
+  
+  return `Day ${currentDayInPhase} of ${totalDaysInPhase} in this phase (${daysRemainingInPhase} remaining)`;
+};
+
+// Get phase-specific journal prompt
+export const getPhaseJournalPrompt = (currentPhase) => {
+  if (!currentPhase) return "How are you feeling about your journey today?";
+  
+  const prompts = {
+    1: "What urges are you experiencing? How are you channeling this new energy? What triggers have you identified?",
+    2: "What emotions or memories are surfacing? Remember, this emotional processing is healing. How are you working through these feelings?",
+    3: "How has your mental clarity improved? What new insights or creative ideas are emerging? How are you applying enhanced focus?", 
+    4: "What deeper purpose is emerging in your life? How do you want to contribute to others? What leadership opportunities are appearing?",
+    5: "How are you using your mastery to inspire and help others? What legacy are you creating? How do you stay humble while wielding these abilities?"
+  };
+  
+  return prompts[currentPhase.id] || prompts[1];
+};
+
+// Advanced phase analysis system
+export const generateComprehensivePhaseAnalysis = (currentPhase, currentDay, userData, wisdomMode, isEnabled) => {
+  if (!currentPhase || !isEnabled) return null;
+
+  const emotionalData = userData.emotionalTracking || [];
+  const recentData = emotionalData.filter(entry => 
+    differenceInDays(new Date(), new Date(entry.date)) <= 14
+  );
+
+  // Data quality assessment
+  const dataQuality = getDataQuality(recentData.length);
+  
+  // Multi-layered analysis
+  const analysis = {
+    phaseEducation: generatePhaseEducationInsight(currentPhase, currentDay),
+    dataAnalysis: generateDataPatternAnalysis(recentData),
+    challengeIdentification: generateChallengeAnalysis(currentPhase, recentData),
+    predictiveGuidance: generatePredictiveGuidance(currentPhase, currentDay),
+    scientificExplanation: generateScientificExplanation(currentPhase),
+    actionableStrategies: generateActionableStrategies(currentPhase, recentData)
+  };
+
+  return {
+    ...analysis,
+    dataQuality,
+    comprehensivenessScore: calculateComprehensiveness(analysis, recentData.length)
+  };
+};
+
+// Phase-specific education based on scientific knowledge
+const generatePhaseEducationInsight = (currentPhase, currentDay) => {
+  if (!currentPhase) return null;
+
+  const dayInPhase = currentDay - currentPhase.startDay + 1;
+  const phaseProgress = ((currentDay - currentPhase.startDay) / (currentPhase.endDay - currentPhase.startDay + 1)) * 100;
+
+  // Phase-specific educational content
+  const educationalContent = {
+    1: { // Initial Adaptation
+      earlyPhase: `Days 1-7: Foundation Phase - Your hypothalamic-pituitary axis is beginning hormonal rebalancing. Testosterone stabilization causes energy fluctuations.`,
+      midPhase: `Days 8-14: Adjustment Phase - Seminal vesicles reducing overproduction. First strength gains and posture improvements emerge naturally.`,
+      keyLearning: "Understanding urge waves: Sexual thoughts trigger dopamine release expecting ejaculatory reward. Each resistance strengthens prefrontal cortex control.",
+      whatToExpect: `Expect strong urges and restlessness as your body adapts. This is completely normal brain rewiring.`
+    },
+    2: { // Emotional Processing  
+      earlyPhase: `Days 15-30: Emotional Processing Begins - Without ejaculation's endorphin numbing, suppressed emotions MUST surface. This is healing, not pathology.`,
+      midPhase: `Days 31-45: Deep Processing Intensifies - Past relationship trauma and betrayals surface for healing. Your psyche is courageously healing itself.`,
+      keyLearning: "Trauma-energy connection: Sexual activity was unconsciously medicating emotional pain. Retention forces proper emotional processing.",
+      whatToExpected: `Expect intense mood swings and emotional rawness. Years of suppressed content is releasing.`
+    },
+    3: { // Mental Expansion
+      earlyPhase: `Days 46-60: Cognitive Emergence - Retained nutrients (lecithin, zinc, B12) rebuild nerve sheaths. Mental fog lifts permanently.`,
+      midPhase: `Days 61-90: Intellectual Peak - Brain tissue becomes more densely connected. Pattern recognition and strategic thinking expand dramatically.`,
+      keyLearning: "Neuroplasticity advantage: Higher zinc and B-vitamin availability optimizes neurotransmitter synthesis for peak mental performance.",
+      whatToExpected: `Expect enhanced focus and problem-solving abilities. Your brain is operating at higher efficiency.`
+    },
+    4: { // Integration & Growth
+      earlyPhase: `Days 91-120: Integration Deepens - Complete endocrine rebalancing. Nervous system optimizes for retention, not ejaculation.`,
+      midPhase: `Days 121-180: Growth Acceleration - Natural charisma and leadership qualities develop. Others unconsciously sense your increased presence.`,
+      keyLearning: "Energy field changes: Practitioners show brighter, more extensive energy fields detectable by sensitive individuals.",
+      whatToExpected: `Expect natural leadership abilities and magnetic presence. You're embodying refined energy.`
+    },
+    5: { // Mastery & Purpose
+      earlyPhase: `Day ${currentDay}: Mastery Consciousness - Sexual energy permanently redirected upward. Vital essence accumulation creates sustained expanded awareness.`,
+      midPhase: `Advanced Mastery: You demonstrate peak human potential through disciplined energy management. Others seek your wisdom naturally.`,
+      keyLearning: "Permanent neuroplastic changes: Brain imaging would show enhanced connectivity between self-control and higher cognition regions.",
+      whatToExpected: `You now inspire others through your living example of human potential. Your presence teaches.`
+    }
+  };
+
+  const content = educationalContent[currentPhase.id];
+  if (!content) return null;
+
+  return {
+    phaseOverview: dayInPhase <= 7 ? content.earlyPhase : content.midPhase,
+    keyLearning: content.keyLearning,
+    expectation: content.whatToExpect,
+    mechanismExplanation: currentPhase.scientificMechanism,
+    dayInPhase,
+    phaseProgress: Math.min(100, Math.max(0, phaseProgress))
+  };
+};
+
+// Data pattern analysis with challenge identification
+const generateDataPatternAnalysis = (recentData) => {
+  if (recentData.length < 3) {
+    return {
+      type: 'insufficient',
+      message: `Track emotions for ${3 - recentData.length} more days to unlock pattern analysis`,
+      dataPoints: recentData.length
+    };
+  }
+
+  // Calculate averages and trends
+  const avgAnxiety = recentData.reduce((sum, entry) => sum + (entry.anxiety || 5), 0) / recentData.length;
+  const avgMoodStability = recentData.reduce((sum, entry) => sum + (entry.moodStability || 5), 0) / recentData.length;
+  const avgMentalClarity = recentData.reduce((sum, entry) => sum + (entry.mentalClarity || 5), 0) / recentData.length;
+  const avgEmotionalProcessing = recentData.reduce((sum, entry) => sum + (entry.emotionalProcessing || 5), 0) / recentData.length;
+
+  // Calculate wellbeing score
+  const wellbeingScore = (avgMoodStability + avgMentalClarity + avgEmotionalProcessing + (10 - avgAnxiety)) / 4;
+
+  // Trend analysis (if enough data)
+  let trends = null;
+  if (recentData.length >= 7) {
+    const recent = recentData.slice(-3);
+    const earlier = recentData.slice(0, 3);
+    
+    trends = {
+      anxiety: getTrend(recent, earlier, 'anxiety'),
+      mood: getTrend(recent, earlier, 'moodStability'), 
+      clarity: getTrend(recent, earlier, 'mentalClarity'),
+      processing: getTrend(recent, earlier, 'emotionalProcessing')
+    };
+  }
+
+  // Phase-specific pattern evaluation
+  const phaseAlignment = evaluatePhaseAlignment(avgAnxiety, avgMoodStability, avgMentalClarity, avgEmotionalProcessing);
+
+  return {
+    type: 'comprehensive',
+    averages: { avgAnxiety, avgMoodStability, avgMentalClarity, avgEmotionalProcessing },
+    wellbeingScore,
+    trends,
+    phaseAlignment,
+    dataPoints: recentData.length,
+    analysisQuality: recentData.length >= 14 ? 'rich' : recentData.length >= 7 ? 'good' : 'basic'
+  };
+};
+
+// Helper function for trend calculation
+const getTrend = (recent, earlier, metric) => {
+  const recentAvg = recent.reduce((sum, entry) => sum + (entry[metric] || 5), 0) / recent.length;
+  const earlierAvg = earlier.reduce((sum, entry) => sum + (entry[metric] || 5), 0) / earlier.length;
+  
+  if (metric === 'anxiety') {
+    return recentAvg < earlierAvg - 0.5 ? 'improving' : 
+           recentAvg > earlierAvg + 0.5 ? 'concerning' : 'stable';
+  } else {
+    return recentAvg > earlierAvg + 0.5 ? 'improving' : 
+           recentAvg < earlierAvg - 0.5 ? 'concerning' : 'stable';
+  }
+};
+
+// Phase alignment evaluation
+const evaluatePhaseAlignment = (anxiety, mood, clarity, processing) => {
+  const generalExpected = {
+    expectedAnxiety: [3, 7],
+    expectedMood: [4, 8],
+    expectedClarity: [4, 8],
+    expectedProcessing: [4, 8]
+  };
+
+  const isWithinRange = (value, range) => value >= range[0] && value <= range[1];
+
+  const alignment = {
+    anxiety: isWithinRange(anxiety, generalExpected.expectedAnxiety),
+    mood: isWithinRange(mood, generalExpected.expectedMood),
+    clarity: isWithinRange(clarity, generalExpected.expectedClarity),
+    processing: isWithinRange(processing, generalExpected.expectedProcessing)
+  };
+
+  const alignmentScore = Object.values(alignment).filter(Boolean).length / 4;
+
+  return {
+    alignment,
+    score: alignmentScore,
+    interpretation: alignmentScore >= 0.75 ? 'excellent' : 
+                   alignmentScore >= 0.5 ? 'good' : 
+                   alignmentScore >= 0.25 ? 'concerning' : 'misaligned'
+  };
+};
+
+// Challenge identification from scientific knowledge
+const generateChallengeAnalysis = (currentPhase, recentData) => {
+  if (!currentPhase || recentData.length < 3) return null;
+
+  const avgData = {
+    anxiety: recentData.reduce((sum, entry) => sum + (entry.anxiety || 5), 0) / recentData.length,
+    mood: recentData.reduce((sum, entry) => sum + (entry.moodStability || 5), 0) / recentData.length,
+    clarity: recentData.reduce((sum, entry) => sum + (entry.mentalClarity || 5), 0) / recentData.length,
+    processing: recentData.reduce((sum, entry) => sum + (entry.emotionalProcessing || 5), 0) / recentData.length
+  };
+
+  // Phase-specific challenge identification
+  const challengePatterns = {
+    1: { // Initial Adaptation
+      highAnxiety: {
+        condition: avgData.anxiety > 7,
+        challenge: "Intense urge management difficulty",
+        explanation: "High anxiety indicates strong dopamine-seeking from established ejaculation patterns",
+        solution: "Increase cold exposure and physical exercise. Remove all triggers from environment immediately."
+      },
+      lowEnergy: {
+        condition: avgData.mood < 4 && avgData.clarity < 5,
+        challenge: "Energy fluctuation adaptation",
+        explanation: "Body adjusting hormone production from reproductive to retention mode",
+        solution: "Maintain consistent sleep schedule. This energy instability resolves by day 21."
+      }
+    },
+    2: { // Emotional Processing
+      emotionalVolatility: {
+        condition: avgData.mood < 4 || avgData.processing < 4,
+        challenge: "Intense emotional processing phase",
+        explanation: "Suppressed emotions surfacing as sexual numbing mechanism removed",
+        solution: "Journal extensively. Accept emotions without resistance. This is healing, not pathology."
+      },
+      overwhelm: {
+        condition: avgData.anxiety > 7 && avgData.processing < 3,
+        challenge: "Emotional flooding beyond capacity",
+        explanation: "Years of suppressed content releasing faster than processing ability",
+        solution: "Consider professional therapy. Use cold water for emotional regulation."
+      }
+    },
+    3: { // Mental Expansion
+      clarity_plateau: {
+        condition: avgData.clarity < 6,
+        challenge: "Mental benefits not emerging",
+        explanation: "May still be processing emotions or need more time for neuroplastic changes",
+        solution: "Continue consistent practices. Mental expansion follows emotional stability."
+      },
+      ego_inflation: {
+        condition: avgData.clarity > 8 && avgData.processing < 6,
+        challenge: "Intellectual arrogance developing", 
+        explanation: "Enhanced cognitive abilities creating superiority complex",
+        solution: "Practice humility. Use enhanced abilities to serve others, not dominate."
+      }
+    },
+    4: { // Integration & Growth
+      integration_resistance: {
+        condition: avgData.mood < 6 || avgData.processing < 6,
+        challenge: "Integration difficulties",
+        explanation: "Ego resisting identity transformation and expanded responsibilities",
+        solution: "Accept changing relationships. Your evolution naturally shifts social dynamics."
+      }
+    },
+    5: { // Mastery & Purpose
+      service_avoidance: {
+        condition: avgData.processing < 7,
+        challenge: "Avoiding service responsibilities",
+        explanation: "Using mastery for purely personal gain rather than collective elevation",
+        solution: "Remember your responsibility to guide others. Mastery comes with service obligations."
+      }
+    }
+  };
+
+  const phasePatterns = challengePatterns[currentPhase.id];
+  if (!phasePatterns) return null;
+
+  const identifiedChallenges = [];
+  
+  Object.entries(phasePatterns).forEach(([key, pattern]) => {
+    if (pattern.condition) {
+      identifiedChallenges.push({
+        type: key,
+        challenge: pattern.challenge,
+        explanation: pattern.explanation,
+        solution: pattern.solution,
+        severity: getSeverity(avgData, key)
+      });
+    }
+  });
+
+  return {
+    challenges: identifiedChallenges,
+    riskLevel: identifiedChallenges.length === 0 ? 'low' : 
+              identifiedChallenges.some(c => c.severity === 'high') ? 'high' :
+              identifiedChallenges.length > 2 ? 'moderate' : 'low',
+    phaseAlignment: evaluatePhaseAlignment(avgData.anxiety, avgData.mood, avgData.clarity, avgData.processing)
+  };
+};
+
+// Helper function for challenge severity assessment
+const getSeverity = (avgData, challengeType) => {
+  const severityThresholds = {
+    highAnxiety: avgData.anxiety > 8.5 ? 'high' : 'moderate',
+    emotionalVolatility: avgData.mood < 3 ? 'high' : 'moderate',
+    overwhelm: (avgData.anxiety > 8 && avgData.processing < 2) ? 'high' : 'moderate',
+    clarity_plateau: avgData.clarity < 4 ? 'high' : 'moderate'
+  };
+  
+  return severityThresholds[challengeType] || 'moderate';
+};
+
+// Predictive guidance based on scientific timeline knowledge
+const generatePredictiveGuidance = (currentPhase, currentDay) => {
+  if (!currentPhase) return null;
+
+  const daysRemaining = currentPhase.endDay === 999999 ? null : currentPhase.endDay - currentDay;
+  const dayInPhase = currentDay - currentPhase.startDay + 1;
+
+  // Predictive insights based on detailed timelines
+  const predictiveInsights = {
+    1: { // Initial Adaptation
+      currentFocus: dayInPhase <= 7 ? 
+        "Focus on establishing unbreakable morning routine and removing all triggers" :
+        "Build urge management skills - this phase tests your foundational commitment",
+      upcomingChallenge: "Days 15-45 bring emotional processing. Prepare for mood swings and old memories surfacing.",
+      preparation: "Start journaling now. Emotional turbulence ahead requires processing tools.",
+      timeline: `${daysRemaining} days until Emotional Processing phase begins`
+    },
+    2: { // Emotional Processing
+      currentFocus: dayInPhase <= 15 ?
+        "Accept emotional flooding as healing, not pathology. Journal extensively." :
+        "Deep trauma processing intensifies. Maintain practices even when motivation dips.",
+      upcomingChallenge: "Days 46-90 bring mental expansion if emotional processing succeeds.",
+      preparation: "Consider therapy for severe trauma. Build support systems now.",
+      timeline: `${daysRemaining} days until Mental Expansion phase begins`
+    },
+    3: { // Mental Expansion
+      currentFocus: dayInPhase <= 22 ?
+        "Apply enhanced focus to important goals. Channel mental energy productively." :
+        "Guard against intellectual arrogance. Use abilities to serve, not dominate.",
+      upcomingChallenge: "Days 91-180 bring integration and identity transformation.",
+      preparation: "Prepare for changing relationships as you transform.",
+      timeline: `${daysRemaining} days until Integration & Growth phase begins`
+    },
+    4: { // Integration & Growth
+      currentFocus: dayInPhase <= 45 ?
+        "Accept increased responsibility gracefully. Others will seek your guidance." :
+        "Prepare for mastery phase. Consider how you'll serve others with your abilities.",
+      upcomingChallenge: "Day 181+ begins mastery phase with service opportunities.",
+      preparation: "Develop teaching and mentoring skills. Your wisdom will be needed.",
+      timeline: `${daysRemaining} days until Mastery phase begins`
+    },
+    5: { // Mastery & Purpose
+      currentFocus: "Focus on legacy creation and serving humanity's progress.",
+      upcomingChallenge: "Maintaining humility while wielding extraordinary abilities.",
+      preparation: "Connect with other masters. Share wisdom while staying grounded.",
+      timeline: "Ongoing journey of service and consciousness expansion"
+    }
+  };
+
+  return predictiveInsights[currentPhase.id];
+};
+
+// Scientific explanation system
+const generateScientificExplanation = (currentPhase) => {
+  if (!currentPhase) return null;
+
+  const explanations = {
+    1: {
+      neurochemical: "Dopamine receptors begin rebalancing from overstimulation. Testosterone stabilizes as reproductive focus shifts to retention mode.",
+      physiological: "Hypothalamic-pituitary axis adjusts hormone production. Seminal vesicles reduce overproduction as body adapts to retention.",
+      behavioral: "Prefrontal cortex strengthens control over limbic impulses through repeated conscious choice during urges."
+    },
+    2: {
+      neurochemical: "Without ejaculation's endorphin/prolactin release, stored emotional content can no longer be suppressed and must surface for processing.",
+      physiological: "Retained sexual energy amplifies all emotions while removing the neurochemical numbing mechanism of regular ejaculation.",
+      behavioral: "Brain reorganizes emotional processing patterns, requiring conscious integration of previously avoided psychological content."
+    },
+    3: {
+      neurochemical: "Increased zinc, lecithin, and B-vitamin availability optimizes neurotransmitter synthesis for enhanced cognitive performance.",
+      physiological: "Retained seminal nutrients rebuild nerve sheaths and increase brain tissue connectivity, improving information processing speed.",
+      behavioral: "Neuroplasticity peaks during behavior change, allowing rapid acquisition of new cognitive abilities and thinking patterns."
+    },
+    4: {
+      neurochemical: "Complete endocrine rebalancing creates sustained high-performance neurotransmitter states without external stimulation requirements.",
+      physiological: "Nervous system optimizes for retention rather than ejaculation, establishing stable electromagnetic field patterns others unconsciously detect.",
+      behavioral: "Permanent neuroplastic changes establish automatic self-regulation, freeing cognitive resources for higher-order thinking and creativity."
+    },
+    5: {
+      neurochemical: "Refined sexual energy accumulates in brain tissue, creating sustained expanded awareness and enhanced intuitive capabilities.",
+      physiological: "Sexual energy permanently redirected upward through spinal channels, maintaining constant high-coherence brainwave states.",
+      behavioral: "Complete integration allows effortless expression of peak human potential while maintaining connection to universal intelligence."
+    }
+  };
+
+  return explanations[currentPhase.id];
+};
+
+// Actionable strategies from scientific knowledge
+const generateActionableStrategies = (currentPhase, recentData) => {
+  if (!currentPhase) return null;
+
+  const avgData = recentData.length > 0 ? {
+    anxiety: recentData.reduce((sum, entry) => sum + (entry.anxiety || 5), 0) / recentData.length,
+    mood: recentData.reduce((sum, entry) => sum + (entry.moodStability || 5), 0) / recentData.length,
+    clarity: recentData.reduce((sum, entry) => sum + (entry.mentalClarity || 5), 0) / recentData.length,
+    processing: recentData.reduce((sum, entry) => sum + (entry.emotionalProcessing || 5), 0) / recentData.length
+  } : null;
+
+  // Phase-specific strategies
+  const strategies = {
+    1: {
+      urgent: avgData?.anxiety > 7 ? ["Immediate cold shower protocol: 2-5 minutes daily", "Remove ALL triggers from environment NOW"] : [],
+      daily: ["Establish non-negotiable morning routine", "Practice 4-7-8 breathing during urges", "Intense physical exercise to channel energy"],
+      weekly: ["Track urge patterns and triggers", "Build support system connections", "Study retention science and benefits"],
+      longTerm: ["Commit to 90-day minimum trial", "Prepare for emotional processing phase", "Develop urge management toolkit"]
+    },
+    2: {
+      urgent: avgData?.mood < 3 ? ["Seek professional therapy consultation", "Emergency emotional regulation: cold water on face"] : [],
+      daily: ["Journal extensively without censoring", "Accept emotions without resistance", "Cold exposure for nervous system reset"],
+      weekly: ["Process memories with support", "Practice emotional healing techniques", "Connect with understanding community"],
+      longTerm: ["Understand this is healing, not pathology", "Prepare for mental expansion phase", "Build emotional intelligence skills"]
+    },
+    3: {
+      urgent: avgData?.clarity < 4 ? ["Reduce mental stimulation", "Increase meditation time for brain optimization"] : [],
+      daily: ["Take on challenging mental projects", "Learn new skills while neuroplasticity peaks", "Practice strategic thinking"],
+      weekly: ["Read complex philosophical material", "Engage in creative problem-solving", "Avoid intellectual arrogance traps"],
+      longTerm: ["Apply abilities to meaningful goals", "Prepare for integration phase", "Develop teaching capabilities"]
+    },
+    4: {
+      urgent: avgData?.processing < 6 ? ["Address integration resistance", "Accept changing relationships as natural"] : [],
+      daily: ["Practice compassionate leadership", "Mentor others beginning journey", "Maintain humble confidence"],
+      weekly: ["Take on meaningful service projects", "Build authentic relationships", "Practice daily gratitude"],
+      longTerm: ["Prepare for mastery phase responsibilities", "Develop legacy vision", "Connect with other advanced practitioners"]
+    },
+    5: {
+      urgent: ["Avoid using abilities for purely selfish gain", "Stay connected to beginners' struggles"],
+      daily: ["Focus on legacy creation", "Serve humanity's progress", "Maintain beginner's mind"],
+      weekly: ["Teach and guide others", "Practice radical humility", "Connect with other masters"],
+      longTerm: ["Establish lasting positive impact", "Prepare successors", "Transcend personal achievement for universal service"]
+    }
+  };
+
+  return strategies[currentPhase.id];
+};
+
+// Data quality assessment
+const getDataQuality = (dataPoints) => {
+  if (dataPoints >= 14) return { level: 'rich', description: 'Comprehensive Analysis Available' };
+  if (dataPoints >= 7) return { level: 'good', description: 'Pattern Recognition Active' };
+  if (dataPoints >= 3) return { level: 'basic', description: 'Initial Patterns Detected' };
+  return { level: 'insufficient', description: 'More Data Needed' };
+};
+
+// Comprehensiveness score calculation
+const calculateComprehensiveness = (analysis, dataPoints) => {
+  let score = 0;
+  if (analysis.phaseEducation) score += 20;
+  if (analysis.dataAnalysis?.type === 'comprehensive') score += 25;
+  if (analysis.challengeIdentification?.challenges?.length > 0) score += 20;
+  if (analysis.predictiveGuidance) score += 15;
+  if (analysis.scientificExplanation) score += 10;
+  if (analysis.actionableStrategies) score += 10;
+  
+  // Bonus for data richness
+  if (dataPoints >= 14) score += 10;
+  else if (dataPoints >= 7) score += 5;
+  
+  return Math.min(100, score);
+};
