@@ -664,7 +664,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   )}
                 </div>
 
-                {/* Emotion sliders - Updated design */}
+                {/* Emotion sliders - Elegant inline value design */}
                 <div className="emotion-sliders">
                   {[
                     { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
@@ -675,17 +675,19 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     <div key={emotion.key} className="emotion-slider-item">
                       <div className="emotion-slider-header">
                         <span className="emotion-label">{emotion.label}</span>
-                        <div className="emotion-value-display">{emotion.value}</div>
                       </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        value={emotion.value}
-                        onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
-                        className="emotion-range-slider"
-                        disabled={emotionsLogged}
-                      />
+                      <div className="slider-with-inline-value">
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          value={emotion.value}
+                          onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
+                          className="emotion-range-slider"
+                          disabled={emotionsLogged}
+                        />
+                        <div className="slider-inline-value">{emotion.value}</div>
+                      </div>
                       <div className="slider-labels">
                         <span>{emotion.lowLabel}</span>
                         <span>{emotion.highLabel}</span>
