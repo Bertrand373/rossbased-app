@@ -664,7 +664,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   )}
                 </div>
 
-                {/* Emotion sliders */}
+                {/* Emotion sliders - Updated design */}
                 <div className="emotion-sliders">
                   {[
                     { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
@@ -675,7 +675,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     <div key={emotion.key} className="emotion-slider-item">
                       <div className="emotion-slider-header">
                         <span className="emotion-label">{emotion.label}</span>
-                        <span className="emotion-value-clean">{emotion.value}</span>
+                        <div className="emotion-value-display">{emotion.value}</div>
                       </div>
                       <input
                         type="range"
