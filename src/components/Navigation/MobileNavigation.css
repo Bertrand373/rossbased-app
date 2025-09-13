@@ -1,4 +1,4 @@
-/* components/Navigation/MobileNavigation.css - FIXED: Perfect sliding pill alignment */
+/* components/Navigation/MobileNavigation.css - UPDATED: Yellow main navigation background */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
@@ -36,14 +36,15 @@
   display: none;
 }
 
-/* FIXED: Mobile navigation slider with proper spacing from edges */
+/* UPDATED: Mobile navigation slider with YELLOW background instead of subtle yellow */
 .mobile-nav-slider {
   position: absolute;
   top: var(--spacing-sm); /* MATCHED container padding */
   left: var(--spacing-sm); /* MATCHED container padding */
   height: calc(100% - calc(var(--spacing-sm) * 2)); /* MATCHED container padding */
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  /* CHANGED: Full yellow background like desktop */
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: var(--radius-full);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
@@ -100,12 +101,13 @@
   }
 }
 
-/* Active mobile nav styling */
+/* UPDATED: Active mobile nav styling with BLACK text to contrast with yellow background */
 .mobile-nav-item.active {
-  color: var(--primary) !important;
+  /* CHANGED: Black text instead of yellow to contrast with yellow slider */
+  color: #000000 !important;
+  font-weight: 600 !important;
   background-color: transparent !important;
   border-color: transparent !important;
-  font-weight: 600;
 }
 
 .mobile-nav-icon {

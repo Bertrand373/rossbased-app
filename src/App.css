@@ -1,4 +1,4 @@
-/* App.css - Main application styles with updated header navigation and enhanced loading (KEEP ORIGINAL CONTAINER) */
+/* App.css - Main application styles with YELLOW main navigation buttons */
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -151,14 +151,15 @@ body {
   display: none;
 }
 
-/* NEW: Header navigation slider - identical to profile tab slider */
+/* UPDATED: Header navigation slider - YELLOW background like main buttons */
 .header-nav-slider {
   position: absolute;
   top: var(--spacing-xs);
   left: var(--spacing-xs);
   height: calc(100% - calc(var(--spacing-xs) * 2));
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  /* CHANGED: Full yellow background instead of subtle yellow */
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: var(--radius-full);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
@@ -177,7 +178,7 @@ body {
   }
 }
 
-/* ENHANCED: Navigation links with consistent natural sizing - identical to profile tabs */
+/* UPDATED: Navigation links with YELLOW background and BLACK text when active */
 .header-nav .nav-link {
   display: flex;
   align-items: center;
@@ -217,9 +218,11 @@ body {
 
 /* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
 
-/* CRITICAL: Active nav styling - REMOVE any background that conflicts with slider */
+/* UPDATED: Active nav styling - BLACK text to contrast with yellow slider background */
 .header-nav .nav-link.active {
-  color: var(--primary) !important;
+  /* CHANGED: Black text instead of yellow to contrast with yellow background */
+  color: #000000 !important;
+  font-weight: 600 !important;
   /* IMPORTANT: No background - let slider handle visual feedback */
   background-color: transparent !important;
   border-color: transparent !important;
@@ -230,6 +233,7 @@ body {
   .header-nav .nav-link.active {
     /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
     font-weight: 600;
+    color: #000000 !important;
   }
 }
 
