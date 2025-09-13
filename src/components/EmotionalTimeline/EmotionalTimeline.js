@@ -684,22 +684,31 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="phase-insight-section">
             <h3>Comprehensive Phase Analysis</h3>
             
-            {/* Handle no current phase (reset scenario) */}
+            {/* Handle no current phase (reset scenario) - Single consolidated banner */}
             {!currentPhase || currentDay <= 0 ? (
-              <div className="analysis-reset-state">
-                <div className="optimization-criteria">
-                  <div className="optimization-criteria-title">Analysis Unavailable</div>
-                  <div className="optimization-criteria-text">
-                    Phase analysis requires an active retention streak. Start your journey to unlock comprehensive insights about your emotional progression through the phases.
+              <div className="insight-data-banner">
+                <div className="insight-data-helmet-container">
+                  <img 
+                    className="insight-data-helmet" 
+                    src="/helmet.png" 
+                    alt="Analysis Unavailable" 
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
+                    ⚡️
                   </div>
                 </div>
-                <div className="guidance-list">
-                  <div className="guidance-title">What Analysis Provides</div>
-                  <div className="guidance-item">Scientific explanations for each phase you experience</div>
-                  <div className="guidance-item">Personal data analysis with trend recognition</div>
-                  <div className="guidance-item">Challenge identification and solutions</div>
-                  <div className="guidance-item">Predictive guidance for upcoming phases</div>
-                  <div className="guidance-item">Actionable strategies based on your current phase</div>
+                
+                <div className="insight-data-content">
+                  <h4 className="insight-data-title">
+                    Analysis Unavailable - Start Your Journey
+                  </h4>
+                  <p className="insight-data-description">
+                    Phase analysis requires an active retention streak. Start your journey to unlock comprehensive insights including scientific explanations for each phase, personal data analysis with trend recognition, challenge identification with targeted solutions, predictive guidance for upcoming phases, and actionable strategies tailored to your current phase.
+                  </p>
                 </div>
               </div>
             ) : (
