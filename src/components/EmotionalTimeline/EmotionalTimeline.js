@@ -588,93 +588,124 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="emotional-checkin-section">
             <h3>Daily Emotional Check-in</h3>
             
-            <div className="checkin-benefits-banner">
-              <div className="checkin-benefits-helmet-container">
-                <img 
-                  className="checkin-benefits-helmet" 
-                  src="/helmet.png" 
-                  alt="Track to Unlock" 
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'block';
-                  }}
-                />
-                <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                  ⚡️
-                </div>
-              </div>
-              
-              <div className="checkin-benefits-content">
-                <h4 className="checkin-benefits-title">
-                  Track to Unlock Advanced Features
-                </h4>
-                <p className="checkin-benefits-description">
-                  The more you track emotions, the more personalized and accurate analysis becomes. Daily tracking unlocks pattern recognition, challenge identification with solutions, predictive guidance for upcoming phases, and tailored strategies based on your unique journey data.
-                </p>
-              </div>
-            </div>
-            
-            <div className="emotion-status-section">
-              {emotionsLogged ? (
-                <div className="emotions-logged">
-                  <FaCheckCircle className="check-icon" />
-                  <span>Emotions logged!</span>
-                  <button 
-                    className="edit-emotions-btn"
-                    onClick={enableEmotionEditing}
-                    title="Edit emotions"
-                  >
-                    <FaEdit />
-                  </button>
-                </div>
-              ) : (
-                <div className="emotions-not-logged">
-                  <FaInfoCircle className="info-icon" />
-                  <span>Log emotions below</span>
-                </div>
-              )}
-            </div>
-
-            {/* Emotion sliders */}
-            <div className="emotion-sliders">
-              {[
-                { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
-                { key: 'moodStability', label: 'Mood Stability', value: todayEmotions.moodStability, lowLabel: 'Mood Swings', highLabel: 'Very Stable' },
-                { key: 'mentalClarity', label: 'Mental Clarity', value: todayEmotions.mentalClarity, lowLabel: 'Foggy', highLabel: 'Crystal Clear' },
-                { key: 'emotionalProcessing', label: 'Emotional Processing', value: todayEmotions.emotionalProcessing, lowLabel: 'Suppressed', highLabel: 'Flowing' }
-              ].map((emotion) => (
-                <div key={emotion.key} className="emotion-slider-item">
-                  <div className="emotion-slider-header">
-                    <span className="emotion-label">{emotion.label}</span>
-                    <span className="emotion-value-clean">{emotion.value}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    value={emotion.value}
-                    onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
-                    className="emotion-range-slider"
-                    disabled={emotionsLogged}
+            {/* Handle no active streak - show unavailable banner */}
+            {!currentPhase || currentDay <= 0 ? (
+              <div className="checkin-benefits-banner">
+                <div className="checkin-benefits-helmet-container">
+                  <img 
+                    className="checkin-benefits-helmet" 
+                    src="/helmet.png" 
+                    alt="Check-in Unavailable" 
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'block';
+                    }}
                   />
-                  <div className="slider-labels">
-                    <span>{emotion.lowLabel}</span>
-                    <span>{emotion.highLabel}</span>
+                  <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
+                    ⚡️
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {!emotionsLogged && (
-              <div className="emotion-actions">
-                <button 
-                  className="action-btn save-emotions-btn"
-                  onClick={saveEmotions}
-                >
-                  <FaCheckCircle />
-                  <span>Save Emotional Check-in</span>
-                </button>
+                
+                <div className="checkin-benefits-content">
+                  <h4 className="checkin-benefits-title">
+                    Check-in Unavailable - Start Your Journey
+                  </h4>
+                  <p className="checkin-benefits-description">
+                    Emotional tracking requires an active retention streak to provide meaningful phase-based insights. Start your journey to begin daily emotional check-ins that unlock pattern recognition, challenge identification with solutions, and personalized strategies based on your progress through the retention phases.
+                  </p>
+                </div>
               </div>
+            ) : (
+              <>
+                <div className="checkin-benefits-banner">
+                  <div className="checkin-benefits-helmet-container">
+                    <img 
+                      className="checkin-benefits-helmet" 
+                      src="/helmet.png" 
+                      alt="Track to Unlock" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'block';
+                      }}
+                    />
+                    <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
+                      ⚡️
+                    </div>
+                  </div>
+                  
+                  <div className="checkin-benefits-content">
+                    <h4 className="checkin-benefits-title">
+                      Track to Unlock Advanced Features
+                    </h4>
+                    <p className="checkin-benefits-description">
+                      The more you track emotions, the more personalized and accurate analysis becomes. Daily tracking unlocks pattern recognition, challenge identification with solutions, predictive guidance for upcoming phases, and tailored strategies based on your unique journey data.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="emotion-status-section">
+                  {emotionsLogged ? (
+                    <div className="emotions-logged">
+                      <FaCheckCircle className="check-icon" />
+                      <span>Emotions logged!</span>
+                      <button 
+                        className="edit-emotions-btn"
+                        onClick={enableEmotionEditing}
+                        title="Edit emotions"
+                      >
+                        <FaEdit />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="emotions-not-logged">
+                      <FaInfoCircle className="info-icon" />
+                      <span>Log emotions below</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Emotion sliders */}
+                <div className="emotion-sliders">
+                  {[
+                    { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
+                    { key: 'moodStability', label: 'Mood Stability', value: todayEmotions.moodStability, lowLabel: 'Mood Swings', highLabel: 'Very Stable' },
+                    { key: 'mentalClarity', label: 'Mental Clarity', value: todayEmotions.mentalClarity, lowLabel: 'Foggy', highLabel: 'Crystal Clear' },
+                    { key: 'emotionalProcessing', label: 'Emotional Processing', value: todayEmotions.emotionalProcessing, lowLabel: 'Suppressed', highLabel: 'Flowing' }
+                  ].map((emotion) => (
+                    <div key={emotion.key} className="emotion-slider-item">
+                      <div className="emotion-slider-header">
+                        <span className="emotion-label">{emotion.label}</span>
+                        <span className="emotion-value-clean">{emotion.value}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={emotion.value}
+                        onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
+                        className="emotion-range-slider"
+                        disabled={emotionsLogged}
+                      />
+                      <div className="slider-labels">
+                        <span>{emotion.lowLabel}</span>
+                        <span>{emotion.highLabel}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {!emotionsLogged && (
+                  <div className="emotion-actions">
+                    <button 
+                      className="action-btn save-emotions-btn"
+                      onClick={saveEmotions}
+                    >
+                      <FaCheckCircle />
+                      <span>Save Emotional Check-in</span>
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
