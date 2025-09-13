@@ -732,7 +732,7 @@
   transition: none;
 }
 
-/* UPDATED: Emotion sliders with refined value display */
+/* Emotion sliders */
 .emotion-sliders {
   display: flex;
   flex-direction: column;
@@ -762,21 +762,16 @@
   letter-spacing: 0.025em;
 }
 
-/* UPDATED: Elegant value display positioned to the right */
-.emotion-value-display {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  height: 24px;
+.emotion-value {
+  font-weight: 700;
+  color: var(--text) !important;
+  font-size: 0.9375rem !important;
   background-color: rgba(255, 221, 0, 0.08);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  min-width: 48px;
+  text-align: center;
   border: 1px solid rgba(255, 221, 0, 0.15);
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: var(--text);
-  transition: all 0.2s ease;
-  flex-shrink: 0;
 }
 
 .emotion-range-slider {
@@ -818,12 +813,11 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* Clean 28px thumb - no clutter */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -845,8 +839,8 @@
 }
 
 .emotion-range-slider::-moz-range-thumb {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
@@ -1126,24 +1120,22 @@
     font-size: 0.875rem !important;
   }
   
-  .emotion-value-display {
-    min-width: 28px;
-    height: 22px;
-    font-size: 0.8125rem;
+  .emotion-value {
+    font-size: 0.8rem !important;
   }
   
   .emotion-range-slider {
-    height: 12px;
+    height: 32px;
   }
   
   .emotion-range-slider::-webkit-slider-thumb {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
   }
   
   .emotion-range-slider::-moz-range-thumb {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
   }
   
   .insights-grid {
@@ -1238,13 +1230,18 @@
   }
   
   .emotion-label {
-    font-size: 0.8125rem !important;
+    font-size: 0.8rem !important;
   }
   
-  .emotion-value-display {
-    min-width: 26px;
-    height: 20px;
-    font-size: 0.75rem;
+  .emotion-value {
+    font-size: 0.75rem !important;
+    min-width: 40px;
+  }
+  
+  .emotion-value-clean {
+    font-size: 0.875rem !important;
+    min-width: 24px;
+    height: 24px;
   }
   
   .emotion-range-slider {
@@ -1252,20 +1249,19 @@
   }
   
   .emotion-range-slider::-webkit-slider-thumb {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
   }
   
   .emotion-range-slider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
   }
   
   .slider-labels {
-    font-size: 0.7rem !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    margin-top: 6px !important;
+    font-size: 0.75rem !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
   }
   
   .insight-card {

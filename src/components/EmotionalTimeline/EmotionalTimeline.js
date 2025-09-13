@@ -602,7 +602,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     }}
                   />
                   <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                    ⚡️
+                    âš¡ï¸
                   </div>
                 </div>
                 
@@ -629,7 +629,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                       }}
                     />
                     <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                      ⚡️
+                      âš¡ï¸
                     </div>
                   </div>
                   
@@ -664,7 +664,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   )}
                 </div>
 
-                {/* Emotion sliders - Elegant inline value design */}
+                {/* Emotion sliders */}
                 <div className="emotion-sliders">
                   {[
                     { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
@@ -675,19 +675,17 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     <div key={emotion.key} className="emotion-slider-item">
                       <div className="emotion-slider-header">
                         <span className="emotion-label">{emotion.label}</span>
+                        <span className="emotion-value-clean">{emotion.value}</span>
                       </div>
-                      <div className="slider-with-inline-value">
-                        <input
-                          type="range"
-                          min="0"
-                          max="10"
-                          value={emotion.value}
-                          onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
-                          className="emotion-range-slider"
-                          disabled={emotionsLogged}
-                        />
-                        <div className="slider-inline-value">{emotion.value}</div>
-                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={emotion.value}
+                        onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
+                        className="emotion-range-slider"
+                        disabled={emotionsLogged}
+                      />
                       <div className="slider-labels">
                         <span>{emotion.lowLabel}</span>
                         <span>{emotion.highLabel}</span>
@@ -731,7 +729,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     }}
                   />
                   <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
-                    ⚡️
+                    âš¡ï¸
                   </div>
                 </div>
                 
@@ -765,7 +763,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           }}
                         />
                         <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
-                          ⚡️
+                          âš¡ï¸
                         </div>
                       </div>
                       
@@ -867,17 +865,17 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                               <div className="patterns-display">
                                 {analysis.actionableStrategies.urgent && analysis.actionableStrategies.urgent.length > 0 && (
                                   <div className="pattern-item">
-                                    <strong>Urgent Actions:</strong> {analysis.actionableStrategies.urgent.join(' • ')}
+                                    <strong>Urgent Actions:</strong> {analysis.actionableStrategies.urgent.join(' â€¢ ')}
                                   </div>
                                 )}
                                 <div className="pattern-item">
-                                  <strong>Daily Practices:</strong> {analysis.actionableStrategies.daily.join(' • ')}
+                                  <strong>Daily Practices:</strong> {analysis.actionableStrategies.daily.join(' â€¢ ')}
                                 </div>
                                 <div className="pattern-item">
-                                  <strong>Weekly Focus:</strong> {analysis.actionableStrategies.weekly.join(' • ')}
+                                  <strong>Weekly Focus:</strong> {analysis.actionableStrategies.weekly.join(' â€¢ ')}
                                 </div>
                                 <div className="pattern-item">
-                                  <strong>Long-term Strategy:</strong> {analysis.actionableStrategies.longTerm.join(' • ')}
+                                  <strong>Long-term Strategy:</strong> {analysis.actionableStrategies.longTerm.join(' â€¢ ')}
                                 </div>
                               </div>
                             </div>
@@ -912,22 +910,22 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="pattern-item">
                                       <strong>Anxiety Trend:</strong> 
                                       <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
-                                        {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓ Improving' : 
-                                         analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑ Concerning' : ' → Stable'}
+                                        {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' â†“ Improving' : 
+                                         analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' â†‘ Concerning' : ' â†’ Stable'}
                                       </span>
                                     </div>
                                     <div className="pattern-item">
                                       <strong>Mood Stability:</strong>
                                       <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
-                                        {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑ Improving' : 
-                                         analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
+                                        {analysis.dataAnalysis.trends.mood === 'improving' ? ' â†‘ Improving' : 
+                                         analysis.dataAnalysis.trends.mood === 'concerning' ? ' â†“ Concerning' : ' â†’ Stable'}
                                       </span>
                                     </div>
                                     <div className="pattern-item">
                                       <strong>Mental Clarity:</strong>
                                       <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
-                                        {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑ Improving' : 
-                                         analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
+                                        {analysis.dataAnalysis.trends.clarity === 'improving' ? ' â†‘ Improving' : 
+                                         analysis.dataAnalysis.trends.clarity === 'concerning' ? ' â†“ Concerning' : ' â†’ Stable'}
                                       </span>
                                     </div>
                                   </div>
@@ -1013,7 +1011,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
             {/* Warning Signs */}
             <div className="phase-modal-section warning-section">
-              <h4>⚠️ Warning Signs (Seek Support)</h4>
+              <h4>âš ï¸ Warning Signs (Seek Support)</h4>
               <ul>
                 {selectedPhase.warningSigns.map((sign, index) => (
                   <li key={index} className="warning-item">{sign}</li>
