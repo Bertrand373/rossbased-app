@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - FIXED: Profile-style navigation pills + working arrows */
+/* components/Calendar/CalendarBase.css - UPDATED: Yellow navigation pills like main nav */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -80,14 +80,15 @@
   display: none;
 }
 
-/* FIXED: Enhanced sliding background indicator matching Profile exactly */
+/* UPDATED: Enhanced sliding background indicator - YELLOW background like main nav */
 .calendar-nav-slider {
   position: absolute;
   top: var(--spacing-xs);
   left: var(--spacing-xs);
   height: calc(100% - calc(var(--spacing-xs) * 2));
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  /* CHANGED: Full yellow background instead of subtle yellow */
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: var(--radius-full);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
@@ -136,9 +137,11 @@
   touch-action: manipulation;
 }
 
-/* Active navigation button styling matching Profile */
+/* UPDATED: Active navigation button styling - BLACK text to contrast with yellow background */
 .calendar-nav-btn.active {
-  color: var(--primary) !important;
+  /* CHANGED: Black text instead of yellow to contrast with yellow slider */
+  color: #000000 !important;
+  font-weight: 600 !important;
   background-color: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -148,6 +151,7 @@
 @media (max-width: 768px) {
   .calendar-nav-btn.active {
     font-weight: 600;
+    color: #000000 !important;
   }
 }
 
