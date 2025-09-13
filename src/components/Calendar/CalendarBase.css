@@ -192,23 +192,20 @@
   opacity: 0.9;
 }
 
-/* UPDATED: Navigation arrow buttons with YELLOW background and BLACK text */
+/* FIXED: Navigation arrow buttons with Font Awesome icons - REVERTED to grey */
 .period-nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  /* CHANGED: Yellow background instead of grey */
-  background-color: var(--primary);
-  border: 1px solid var(--primary);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
   border-radius: 50%;
-  /* CHANGED: Black text instead of grey for contrast */
-  color: #000000;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 1rem;
-  font-weight: 600;
   line-height: 1;
   padding: 0;
   margin: 0;
@@ -225,10 +222,9 @@
 }
 
 .period-nav-btn:hover {
-  /* CHANGED: Slightly darker yellow on hover */
-  background-color: var(--primary-dark);
-  border-color: var(--primary-dark);
-  color: #000000;
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
   transform: translateY(-1px);
 }
 
