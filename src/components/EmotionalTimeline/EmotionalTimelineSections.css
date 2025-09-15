@@ -838,7 +838,7 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* FIXED: Unified slider thumbs - all sliders use same style */
+/* UNIFIED: All slider thumbs use same yellow circular style */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -864,7 +864,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
-/* FIXED: Unified Firefox thumbs - all sliders use same style */
+/* UNIFIED: Firefox thumbs use same yellow circular style */
 .emotion-range-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
@@ -1156,7 +1156,7 @@
     height: 6px;
   }
   
-  /* FIXED: Mobile slider thumbs - all unified at 18px */
+  /* UNIFIED: Mobile slider thumbs - all 18px */
   .emotion-range-slider::-webkit-slider-thumb {
     width: 18px;
     height: 18px;
@@ -1271,7 +1271,7 @@
     height: 6px;
   }
   
-  /* FIXED: Very small mobile slider thumbs - all unified at 16px */
+  /* UNIFIED: Very small mobile slider thumbs - all 16px */
   .emotion-range-slider::-webkit-slider-thumb {
     width: 16px;
     height: 16px;
