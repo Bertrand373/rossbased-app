@@ -893,24 +893,30 @@
   transition: all 0.15s ease;
 }
 
-/* UPDATED: Custom helmet thumb for anxiety slider - Firefox */
+/* UPDATED: Custom helmet thumb for anxiety slider - Firefox - Complete override */
 .emotion-range-slider[data-emotion="anxiety"]::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 0;
-  background: url('./helmet.png') no-repeat center center, transparent;
-  background-size: contain;
-  border: none;
-  box-shadow: none;
-  filter: none;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 0 !important;
+  background: url('./helmet.png') no-repeat center center !important;
+  background-color: transparent !important;
+  background-size: contain !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+  transition: all 0.15s ease !important;
 }
 
 .emotion-range-slider[data-emotion="anxiety"]:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.1);
-  background: url('./helmet.png') no-repeat center center, transparent;
-  background-size: contain;
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.8));
-  box-shadow: none;
+  transform: scale(1.1) !important;
+  background: url('./helmet.png') no-repeat center center !important;
+  background-color: transparent !important;
+  background-size: contain !important;
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.8)) !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
