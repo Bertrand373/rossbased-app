@@ -732,7 +732,7 @@
   transition: none;
 }
 
-/* UPDATED: Emotion sliders with smaller thumbs and inline value display */
+/* UPDATED: Emotion sliders with smaller thumbs, inline value display, helmet thumb, and value dots */
 .emotion-sliders {
   display: flex;
   flex-direction: column;
@@ -853,6 +853,8 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+
+
 .emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
   transform: scale(1.1);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
@@ -875,6 +877,8 @@
   margin: 0 !important;
   transition: all 0.15s ease;
 }
+
+
 
 .emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
   transform: scale(1.1);
