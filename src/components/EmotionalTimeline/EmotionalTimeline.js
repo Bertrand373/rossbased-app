@@ -686,6 +686,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           className="emotion-range-slider"
                           disabled={emotionsLogged}
                           style={{ '--slider-value': (emotion.value / 10) * 100 }}
+                          data-emotion={emotion.key}
                         />
                         <span className="emotion-value-clean">{emotion.value}</span>
                       </div>
