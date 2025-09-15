@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Complete with unified thumbs and fixed value dots
+// components/EmotionalTimeline/EmotionalTimeline.js - FIXED Analysis Logic
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -62,7 +62,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     { id: 'analysis', label: 'Analysis', icon: FaBrain }
   ];
 
-  // Enhanced data analysis logic
+  // FIXED: Enhanced data analysis logic
   const getDataAnalysisState = () => {
     const emotionalData = userData.emotionalTracking || [];
     const totalDataPoints = emotionalData.length;
@@ -87,7 +87,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     };
   };
 
-  // Smart banner message generation
+  // FIXED: Smart banner message generation
   const getBannerMessage = () => {
     const dataState = getDataAnalysisState();
     const { totalDataPoints, recentDataPoints, consistencyRate, hasExcellentData, hasGoodData, hasSufficientRecentData } = dataState;
@@ -592,7 +592,16 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             {!currentPhase || currentDay <= 0 ? (
               <div className="checkin-benefits-banner">
                 <div className="checkin-benefits-helmet-container">
-                  <div className="checkin-benefits-helmet-fallback">
+                  <img 
+                    className="checkin-benefits-helmet" 
+                    src="/helmet.png" 
+                    alt="Check-in Unavailable" 
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
                     🛡️
                   </div>
                 </div>
@@ -610,7 +619,16 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               <>
                 <div className="checkin-benefits-banner">
                   <div className="checkin-benefits-helmet-container">
-                    <div className="checkin-benefits-helmet-fallback">
+                    <img 
+                      className="checkin-benefits-helmet" 
+                      src="/helmet.png" 
+                      alt="Track to Unlock" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'block';
+                      }}
+                    />
+                    <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
                       🛡️
                     </div>
                   </div>
@@ -646,7 +664,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   )}
                 </div>
 
-                {/* FIXED: Emotion sliders with unified thumbs, inline values, and corrected value dots */}
+                {/* UPDATED: Emotion sliders with new inline structure and value dots */}
                 <div className="emotion-sliders">
                   {[
                     { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
@@ -695,16 +713,25 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           </div>
         )}
 
-        {/* Analysis Section */}
+        {/* FIXED: Analysis Section with improved logic */}
         {activeSection === 'analysis' && (
           <div className="phase-insight-section">
             <h3>Comprehensive Phase Analysis</h3>
             
-            {/* Handle no current phase (reset scenario) */}
+            {/* Handle no current phase (reset scenario) - Single consolidated banner */}
             {!currentPhase || currentDay <= 0 ? (
               <div className="insight-data-banner">
                 <div className="insight-data-helmet-container">
-                  <div className="insight-data-helmet-fallback">
+                  <img 
+                    className="insight-data-helmet" 
+                    src="/helmet.png" 
+                    alt="Analysis Unavailable" 
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
                     🛡️
                   </div>
                 </div>
@@ -726,9 +753,19 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 
                 return (
                   <>
+                    {/* FIXED: Single comprehensive banner based on data state */}
                     <div className="insight-data-banner">
                       <div className="insight-data-helmet-container">
-                        <div className="insight-data-helmet-fallback">
+                        <img 
+                          className="insight-data-helmet" 
+                          src="/helmet.png" 
+                          alt="Analysis Status" 
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextElementSibling.style.display = 'block';
+                          }}
+                        />
+                        <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
                           🛡️
                         </div>
                       </div>
@@ -743,8 +780,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                       </div>
                     </div>
 
+                    {/* Analysis Cards Grid - ALWAYS SHOW if we have a valid phase */}
                     {analysis && currentPhase && currentDay > 0 && (
                       <div className="insights-grid">
+                        {/* Phase Education Card - ALWAYS SHOW */}
                         {analysis?.phaseEducation && (
                           <div className="insight-card">
                             <div className="insight-card-header">
@@ -771,6 +810,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           </div>
                         )}
 
+                        {/* Scientific Explanation Card - ALWAYS SHOW */}
                         {analysis?.scientificExplanation && (
                           <div className="insight-card">
                             <div className="insight-card-header">
@@ -792,6 +832,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           </div>
                         )}
 
+                        {/* Predictive Guidance Card - ALWAYS SHOW */}
                         {analysis?.predictiveGuidance && (
                           <div className="insight-card">
                             <div className="insight-card-header">
@@ -817,6 +858,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           </div>
                         )}
 
+                        {/* Actionable Strategies Card - ALWAYS SHOW */}
                         {analysis?.actionableStrategies && (
                           <div className="insight-card">
                             <div className="insight-card-header">
@@ -843,6 +885,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           </div>
                         )}
 
+                        {/* Data Analysis Card - SHOW ONLY IF SUFFICIENT DATA */}
                         {dataState.hasSufficientRecentData && analysis?.dataAnalysis && analysis.dataAnalysis.type === 'comprehensive' && (
                           <div className="insight-card">
                             <div className="insight-card-header">
@@ -895,6 +938,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           </div>
                         )}
 
+                        {/* Challenge Analysis Card - SHOW ONLY IF CHALLENGES IDENTIFIED */}
                         {dataState.hasSufficientRecentData && analysis?.challengeIdentification?.challenges && analysis.challengeIdentification.challenges.length > 0 && (
                           <div className="insight-card">
                             <div className="insight-card-header">
@@ -952,11 +996,13 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               <p>{selectedPhase.description}</p>
             </div>
 
+            {/* Scientific Mechanism */}
             <div className="phase-modal-section">
               <h4>Scientific Mechanism</h4>
               <p>{selectedPhase.scientificMechanism}</p>
             </div>
 
+            {/* Expected Symptoms */}
             <div className="phase-modal-section">
               <h4>Expected Symptoms</h4>
               <ul>
@@ -966,6 +1012,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               </ul>
             </div>
 
+            {/* Warning Signs */}
             <div className="phase-modal-section warning-section">
               <h4>⚠️ Warning Signs (Seek Support)</h4>
               <ul>
@@ -975,6 +1022,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               </ul>
             </div>
 
+            {/* Specific Techniques */}
             <div className="phase-modal-section">
               <h4>Specific Techniques</h4>
               <ul>
@@ -984,6 +1032,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               </ul>
             </div>
 
+            {/* Trauma Release Pattern (for Emotional Processing phase) */}
             {selectedPhase.traumaReleasePattern && (
               <div className="phase-modal-section">
                 <h4>Emotional Release Timeline</h4>

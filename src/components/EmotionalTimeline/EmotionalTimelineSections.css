@@ -732,7 +732,7 @@
   transition: none;
 }
 
-/* UPDATED: Emotion sliders with unified thumbs, inline value display, and fixed value dots */
+/* UPDATED: Emotion sliders with smaller thumbs and inline value display */
 .emotion-sliders {
   display: flex;
   flex-direction: column;
@@ -802,12 +802,12 @@
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* FIXED: Value position indicator dot - exact browser thumb positioning formula */
+/* UPDATED: Add value position indicator dot */
 .emotion-range-slider::before {
   content: '';
   position: absolute;
   top: 50%;
-  left: calc(var(--slider-value, 50) * (100% - 20px) / 100 + 10px);
+  left: calc(var(--slider-value, 50) * 1%);
   transform: translate(-50%, -50%);
   width: 4px;
   height: 4px;
@@ -838,7 +838,7 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* UNIFIED: All slider thumbs use same yellow circular style */
+/* UPDATED: Smaller slider thumbs */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -864,7 +864,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
-/* UNIFIED: Firefox thumbs use same yellow circular style */
 .emotion-range-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
@@ -1156,7 +1155,6 @@
     height: 6px;
   }
   
-  /* UNIFIED: Mobile slider thumbs - all 18px */
   .emotion-range-slider::-webkit-slider-thumb {
     width: 18px;
     height: 18px;
@@ -1271,7 +1269,6 @@
     height: 6px;
   }
   
-  /* UNIFIED: Very small mobile slider thumbs - all 16px */
   .emotion-range-slider::-webkit-slider-thumb {
     width: 16px;
     height: 16px;
