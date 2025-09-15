@@ -732,7 +732,7 @@
   transition: none;
 }
 
-/* UPDATED: Emotion sliders with smaller thumbs, inline value display, helmet thumb, and value dots */
+/* UPDATED: Emotion sliders with unified thumbs, inline value display, and fixed value dots */
 .emotion-sliders {
   display: flex;
   flex-direction: column;
@@ -802,12 +802,12 @@
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* UPDATED: Add value position indicator dot */
+/* FIXED: Value position indicator dot - properly positioned for 0-10 scale */
 .emotion-range-slider::before {
   content: '';
   position: absolute;
   top: 50%;
-  left: calc(var(--slider-value, 50) * 1%);
+  left: calc(var(--slider-value, 50) * 10%);
   transform: translate(-50%, -50%);
   width: 4px;
   height: 4px;
@@ -838,7 +838,7 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* UPDATED: Smaller slider thumbs */
+/* FIXED: Unified slider thumbs - all sliders use same style */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -853,23 +853,6 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* UPDATED: Custom helmet thumb for anxiety slider */
-.emotion-range-slider[data-emotion="anxiety"]::-webkit-slider-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 0;
-  background: url('./helmet.png') no-repeat center center;
-  background-size: contain;
-  border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.6));
-}
-
-.emotion-range-slider[data-emotion="anxiety"]:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.8));
-}
-
 .emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
   transform: scale(1.1);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
@@ -881,6 +864,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
+/* FIXED: Unified Firefox thumbs - all sliders use same style */
 .emotion-range-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
@@ -891,32 +875,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
   transition: all 0.15s ease;
-}
-
-/* UPDATED: Custom helmet thumb for anxiety slider - Firefox - Complete override */
-.emotion-range-slider[data-emotion="anxiety"]::-moz-range-thumb {
-  width: 24px !important;
-  height: 24px !important;
-  border-radius: 0 !important;
-  background: url('./helmet.png') no-repeat center center !important;
-  background-color: transparent !important;
-  background-size: contain !important;
-  border: none !important;
-  box-shadow: none !important;
-  filter: none !important;
-  cursor: pointer !important;
-  margin: 0 !important;
-  transition: all 0.15s ease !important;
-}
-
-.emotion-range-slider[data-emotion="anxiety"]:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.1) !important;
-  background: url('./helmet.png') no-repeat center center !important;
-  background-color: transparent !important;
-  background-size: contain !important;
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.8)) !important;
-  box-shadow: none !important;
-  border: none !important;
 }
 
 .emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
@@ -1198,24 +1156,15 @@
     height: 6px;
   }
   
+  /* FIXED: Mobile slider thumbs - all unified at 18px */
   .emotion-range-slider::-webkit-slider-thumb {
     width: 18px;
     height: 18px;
   }
   
-  .emotion-range-slider[data-emotion="anxiety"]::-webkit-slider-thumb {
-    width: 20px;
-    height: 20px;
-  }
-  
   .emotion-range-slider::-moz-range-thumb {
     width: 18px;
     height: 18px;
-  }
-  
-  .emotion-range-slider[data-emotion="anxiety"]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
   }
   
   .insights-grid {
@@ -1322,24 +1271,15 @@
     height: 6px;
   }
   
+  /* FIXED: Very small mobile slider thumbs - all unified at 16px */
   .emotion-range-slider::-webkit-slider-thumb {
     width: 16px;
     height: 16px;
   }
   
-  .emotion-range-slider[data-emotion="anxiety"]::-webkit-slider-thumb {
-    width: 18px;
-    height: 18px;
-  }
-  
   .emotion-range-slider::-moz-range-thumb {
     width: 16px;
     height: 16px;
-  }
-  
-  .emotion-range-slider[data-emotion="anxiety"]::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
   }
   
   .slider-labels {

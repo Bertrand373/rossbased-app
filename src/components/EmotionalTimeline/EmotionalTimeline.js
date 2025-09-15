@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - Complete with helmet thumb and value dots
+// components/EmotionalTimeline/EmotionalTimeline.js - Complete with unified thumbs and fixed value dots
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -664,7 +664,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   )}
                 </div>
 
-                {/* UPDATED: Emotion sliders with helmet thumb for anxiety, inline values, and value dots */}
+                {/* FIXED: Emotion sliders with unified thumbs, inline values, and corrected value dots */}
                 <div className="emotion-sliders">
                   {[
                     { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
@@ -685,8 +685,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
                           className="emotion-range-slider"
                           disabled={emotionsLogged}
-                          style={{ '--slider-value': (emotion.value / 10) * 100 }}
-                          data-emotion={emotion.key}
+                          style={{ '--slider-value': emotion.value }}
                         />
                         <span className="emotion-value-clean">{emotion.value}</span>
                       </div>
