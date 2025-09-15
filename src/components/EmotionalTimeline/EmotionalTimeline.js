@@ -592,16 +592,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             {!currentPhase || currentDay <= 0 ? (
               <div className="checkin-benefits-banner">
                 <div className="checkin-benefits-helmet-container">
-                  <img 
-                    className="checkin-benefits-helmet" 
-                    src="/helmet.png" 
-                    alt="Check-in Unavailable" 
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'block';
-                    }}
-                  />
-                  <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
+                  <div className="checkin-benefits-helmet-fallback">
                     🛡️
                   </div>
                 </div>
@@ -619,16 +610,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               <>
                 <div className="checkin-benefits-banner">
                   <div className="checkin-benefits-helmet-container">
-                    <img 
-                      className="checkin-benefits-helmet" 
-                      src="/helmet.png" 
-                      alt="Track to Unlock" 
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'block';
-                      }}
-                    />
-                    <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
+                    <div className="checkin-benefits-helmet-fallback">
                       🛡️
                     </div>
                   </div>
@@ -722,16 +704,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             {!currentPhase || currentDay <= 0 ? (
               <div className="insight-data-banner">
                 <div className="insight-data-helmet-container">
-                  <img 
-                    className="insight-data-helmet" 
-                    src="/helmet.png" 
-                    alt="Analysis Unavailable" 
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'block';
-                    }}
-                  />
-                  <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
+                  <div className="insight-data-helmet-fallback">
                     🛡️
                   </div>
                 </div>
@@ -755,16 +728,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   <>
                     <div className="insight-data-banner">
                       <div className="insight-data-helmet-container">
-                        <img 
-                          className="insight-data-helmet" 
-                          src="/helmet.png" 
-                          alt="Analysis Status" 
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextElementSibling.style.display = 'block';
-                          }}
-                        />
-                        <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
+                        <div className="insight-data-helmet-fallback">
                           🛡️
                         </div>
                       </div>
