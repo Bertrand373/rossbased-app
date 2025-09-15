@@ -802,13 +802,15 @@
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* FIXED: Properly aligned dot indicator for all values 0-10 */
+/* FIXED: Properly aligned dot indicator accounting for thumb positioning */
 .emotion-range-slider::before {
   content: '';
   position: absolute;
   top: 50%;
-  /* FIXED: Proper calculation for 0-10 range alignment */
-  left: calc(var(--slider-value, 50) * 10%);
+  /* FIXED: Account for thumb positioning at extremes - thumb center is at track edges */
+  /* At 0%, thumb center is at 0% (left edge), at 100% thumb center is at 100% (right edge) */
+  /* This matches the native browser thumb positioning */
+  left: calc(var(--slider-value, 50) * 1%);
   transform: translate(-50%, -50%);
   width: 4px;
   height: 4px;
