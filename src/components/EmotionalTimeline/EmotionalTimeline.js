@@ -85,6 +85,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       hasExcellentData: totalDataPoints >= 21 && consistencyRate > 50,
       hasSufficientRecentData: recentDataPoints >= 3
     };
+
+export default EmotionalTimeline;
   };
 
   // FIXED: Smart banner message generation
@@ -602,7 +604,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     }}
                   />
                   <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                    âš¡ï¸
+                    🛡️
                   </div>
                 </div>
                 
@@ -629,7 +631,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                       }}
                     />
                     <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                      âš¡ï¸
+                      🛡️
                     </div>
                   </div>
                   
@@ -664,7 +666,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   )}
                 </div>
 
-                {/* Emotion sliders */}
+                {/* UPDATED: Emotion sliders with new inline structure */}
                 <div className="emotion-sliders">
                   {[
                     { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
@@ -675,17 +677,19 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     <div key={emotion.key} className="emotion-slider-item">
                       <div className="emotion-slider-header">
                         <span className="emotion-label">{emotion.label}</span>
+                      </div>
+                      <div className="emotion-slider-with-value">
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          value={emotion.value}
+                          onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
+                          className="emotion-range-slider"
+                          disabled={emotionsLogged}
+                        />
                         <span className="emotion-value-clean">{emotion.value}</span>
                       </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        value={emotion.value}
-                        onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
-                        className="emotion-range-slider"
-                        disabled={emotionsLogged}
-                      />
                       <div className="slider-labels">
                         <span>{emotion.lowLabel}</span>
                         <span>{emotion.highLabel}</span>
@@ -729,7 +733,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     }}
                   />
                   <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
-                    âš¡ï¸
+                    🛡️
                   </div>
                 </div>
                 
@@ -763,7 +767,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           }}
                         />
                         <div className="insight-data-helmet-fallback" style={{ display: 'none' }}>
-                          âš¡ï¸
+                          🛡️
                         </div>
                       </div>
                       
@@ -865,17 +869,17 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                               <div className="patterns-display">
                                 {analysis.actionableStrategies.urgent && analysis.actionableStrategies.urgent.length > 0 && (
                                   <div className="pattern-item">
-                                    <strong>Urgent Actions:</strong> {analysis.actionableStrategies.urgent.join(' â€¢ ')}
+                                    <strong>Urgent Actions:</strong> {analysis.actionableStrategies.urgent.join(' • ')}
                                   </div>
                                 )}
                                 <div className="pattern-item">
-                                  <strong>Daily Practices:</strong> {analysis.actionableStrategies.daily.join(' â€¢ ')}
+                                  <strong>Daily Practices:</strong> {analysis.actionableStrategies.daily.join(' • ')}
                                 </div>
                                 <div className="pattern-item">
-                                  <strong>Weekly Focus:</strong> {analysis.actionableStrategies.weekly.join(' â€¢ ')}
+                                  <strong>Weekly Focus:</strong> {analysis.actionableStrategies.weekly.join(' • ')}
                                 </div>
                                 <div className="pattern-item">
-                                  <strong>Long-term Strategy:</strong> {analysis.actionableStrategies.longTerm.join(' â€¢ ')}
+                                  <strong>Long-term Strategy:</strong> {analysis.actionableStrategies.longTerm.join(' • ')}
                                 </div>
                               </div>
                             </div>
@@ -910,22 +914,22 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                                     <div className="pattern-item">
                                       <strong>Anxiety Trend:</strong> 
                                       <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
-                                        {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' â†“ Improving' : 
-                                         analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' â†‘ Concerning' : ' â†’ Stable'}
+                                        {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓ Improving' : 
+                                         analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑ Concerning' : ' → Stable'}
                                       </span>
                                     </div>
                                     <div className="pattern-item">
                                       <strong>Mood Stability:</strong>
                                       <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
-                                        {analysis.dataAnalysis.trends.mood === 'improving' ? ' â†‘ Improving' : 
-                                         analysis.dataAnalysis.trends.mood === 'concerning' ? ' â†“ Concerning' : ' â†’ Stable'}
+                                        {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑ Improving' : 
+                                         analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
                                       </span>
                                     </div>
                                     <div className="pattern-item">
                                       <strong>Mental Clarity:</strong>
                                       <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
-                                        {analysis.dataAnalysis.trends.clarity === 'improving' ? ' â†‘ Improving' : 
-                                         analysis.dataAnalysis.trends.clarity === 'concerning' ? ' â†“ Concerning' : ' â†’ Stable'}
+                                        {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑ Improving' : 
+                                         analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
                                       </span>
                                     </div>
                                   </div>
@@ -1011,7 +1015,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
             {/* Warning Signs */}
             <div className="phase-modal-section warning-section">
-              <h4>âš ï¸ Warning Signs (Seek Support)</h4>
+              <h4>⚠️ Warning Signs (Seek Support)</h4>
               <ul>
                 {selectedPhase.warningSigns.map((sign, index) => (
                   <li key={index} className="warning-item">{sign}</li>
