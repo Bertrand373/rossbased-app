@@ -802,12 +802,12 @@
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* FIXED: Value position indicator dot - properly centered with thumb */
+/* FIXED: Value position indicator dot - perfectly aligned with thumb at all positions */
 .emotion-range-slider::before {
   content: '';
   position: absolute;
   top: 50%;
-  left: calc((var(--slider-value, 50) / 10) * 100%);
+  left: calc(10px + (var(--slider-value, 50) / 100) * (100% - 20px));
   transform: translate(-50%, -50%);
   width: 4px;
   height: 4px;
