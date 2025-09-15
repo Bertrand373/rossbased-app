@@ -732,7 +732,7 @@
   transition: none;
 }
 
-/* UPDATED: Emotion sliders with smaller thumbs, inline value display, helmet thumb, and value dots */
+/* UPDATED: Emotion sliders with smaller thumbs and inline value display */
 .emotion-sliders {
   display: flex;
   flex-direction: column;
@@ -838,7 +838,7 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* UPDATED: Smaller slider thumbs */
+/* UPDATED: Standard slider thumbs - no custom helmet styling */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -852,8 +852,6 @@
   transition: all 0.15s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
-
 
 .emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
   transform: scale(1.1);
@@ -877,8 +875,6 @@
   margin: 0 !important;
   transition: all 0.15s ease;
 }
-
-
 
 .emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
   transform: scale(1.1);
@@ -1058,9 +1054,8 @@
   color: var(--text-secondary);
 }
 
-/* EXACT MOBILE COPY: Mobile Responsiveness matching Profile coming-soon-banner exactly */
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
-  /* EXACT COPY of Profile's .coming-soon-banner mobile styles */
   .checkin-benefits-banner {
     flex-direction: column;
     text-align: center;
@@ -1086,7 +1081,6 @@
     font-size: 1.25rem;
   }
   
-  /* EXACT COPY of Profile's .coming-soon-banner mobile styles */
   .insight-data-banner {
     flex-direction: column;
     text-align: center;
@@ -1112,7 +1106,6 @@
     font-size: 1.25rem;
   }
   
-  /* FIXED: Both sections have EXACT same mobile padding */
   .emotional-checkin-section {
     padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
     gap: var(--spacing-lg);
@@ -1203,7 +1196,6 @@
 }
 
 @media (max-width: 480px) {
-  /* EXACT COPY of Profile's very small mobile banner styles */
   .checkin-benefits-helmet {
     width: 30px;
     height: 30px;
@@ -1238,7 +1230,6 @@
     font-size: 0.8rem;
   }
   
-  /* FIXED: Both sections have EXACT same very small screen padding */
   .emotional-checkin-section {
     padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
     gap: var(--spacing-md);
@@ -1249,7 +1240,6 @@
     gap: var(--spacing-md);
   }
   
-  /* FIXED: Both headers have EXACT same very small screen styling */
   .phase-insight-section h3 {
     font-size: 1.125rem;
     padding: var(--spacing-md) 0;
