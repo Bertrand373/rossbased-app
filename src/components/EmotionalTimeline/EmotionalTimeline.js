@@ -85,8 +85,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       hasExcellentData: totalDataPoints >= 21 && consistencyRate > 50,
       hasSufficientRecentData: recentDataPoints >= 3
     };
-
-export default EmotionalTimeline;
   };
 
   // FIXED: Smart banner message generation
