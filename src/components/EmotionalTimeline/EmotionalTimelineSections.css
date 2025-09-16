@@ -768,6 +768,9 @@
   align-items: center;
   gap: var(--spacing-md);
   position: relative;
+  /* FIXED: Add padding to allow thumb overflow */
+  padding: 0 10px;
+  margin: 0 -10px;
 }
 
 .emotion-value-clean {
@@ -802,14 +805,13 @@
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* FIXED: Properly aligned dot indicator accounting for thumb positioning */
+/* FIXED: Dot indicator that matches actual thumb center position */
 .emotion-range-slider::before {
   content: '';
   position: absolute;
   top: 50%;
-  /* FIXED: Account for thumb positioning at extremes - thumb center is at track edges */
-  /* At 0%, thumb center is at 0% (left edge), at 100% thumb center is at 100% (right edge) */
-  /* This matches the native browser thumb positioning */
+  /* FIXED: The thumb center moves from 0% to 100% of track width */
+  /* Standard browser behavior: thumb center IS at track edges */
   left: calc(var(--slider-value, 50) * 1%);
   transform: translate(-50%, -50%);
   width: 4px;
