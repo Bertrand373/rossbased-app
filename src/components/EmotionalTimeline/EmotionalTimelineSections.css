@@ -1234,21 +1234,30 @@
     height: 22px;
   }
   
-  /* Mobile tick marks adjustments */
+  /* Mobile tick marks adjustments - FIXED positioning */
   .slider-tick-marks {
     top: 50%;
     transform: translateY(-50%);
     height: 0;
+    z-index: 0; /* Ensure ticks stay behind slider */
   }
   
   .slider-tick {
     top: 0;
     transform: translateY(-50%);
     height: 2px;
+    z-index: 0; /* Ensure individual ticks stay behind */
   }
   
   .slider-tick.key-tick {
     height: 3px;
+    z-index: 0; /* Ensure key ticks stay behind */
+  }
+  
+  /* Ensure mobile slider track stays above ticks */
+  .emotion-range-slider {
+    position: relative;
+    z-index: 1;
   }
   
   .insights-grid {
