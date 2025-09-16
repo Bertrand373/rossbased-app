@@ -32,12 +32,12 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   // Navigation state
   const [activeSection, setActiveSection] = useState('journey-map');
   
-  // Enhanced emotional tracking states - UPDATED: Changed to 1-10 scale with 5.5 as middle
+  // Enhanced emotional tracking states - UPDATED: Changed to 1-10 scale with 5 as middle
   const [todayEmotions, setTodayEmotions] = useState({
-    anxiety: 5.5,
-    moodStability: 5.5,
-    mentalClarity: 5.5,
-    emotionalProcessing: 5.5
+    anxiety: 5,
+    moodStability: 5,
+    mentalClarity: 5,
+    emotionalProcessing: 5
   });
   const [emotionsLogged, setEmotionsLogged] = useState(false);
 
@@ -367,8 +367,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       // MIGRATION: Convert old 0-10 scale to 1-10 scale if needed
       const convertValue = (value) => {
         if (value === 0) return 1; // Convert 0 to 1
-        if (value === undefined || value === null) return 5.5; // Default middle
-        return value;
+        if (value === undefined || value === null) return 5; // Default middle
+        return Math.round(value); // Ensure whole numbers only
       };
       
       setTodayEmotions({
@@ -381,11 +381,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     }
   }, [userData.emotionalTracking]);
 
-  // UPDATED: Handle emotional tracking with 1-10 scale
+  // UPDATED: Handle emotional tracking with 1-10 scale (whole numbers only)
   const handleEmotionChange = (type, value) => {
     setTodayEmotions(prev => ({
       ...prev,
-      [type]: parseFloat(value)
+      [type]: parseInt(value)
     }));
   };
 
@@ -421,11 +421,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     setShowPhaseDetail(true);
   };
 
-  // NEW: Render slider tick marks
+  // NEW: Render slider tick marks for values 1-10
   const renderSliderTickMarks = () => {
     const ticks = [];
     for (let i = 1; i <= 10; i++) {
-      const isKeyTick = i === 1 || i === 5.5 || i === 10;
+      const isKeyTick = i === 1 || i === 5 || i === 10;
       ticks.push(
         <div 
           key={i} 
@@ -708,9 +708,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                             type="range"
                             min="1"
                             max="10"
-                            step="0.5"
+                            step="1"
                             value={emotion.value}
-                            onChange={(e) => handleEmotionChange(emotion.key, parseFloat(e.target.value))}
+                            onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
                             className="emotion-range-slider"
                             disabled={emotionsLogged}
                             style={{ '--slider-value': ((emotion.value - 1) / 9) * 100 }}

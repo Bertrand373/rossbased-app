@@ -795,48 +795,46 @@
   flex: 1;
 }
 
-/* NEW: Tick marks container */
+/* NEW: Tick marks container - positioned directly on track */
 .slider-tick-marks {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
   right: 0;
   height: 8px;
+  transform: translateY(-50%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* NEW: Individual tick mark styling */
+/* NEW: Individual tick mark styling - more subtle and on track */
 .slider-tick {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 2px;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 1px;
+  width: 1px;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.15);
   pointer-events: none;
 }
 
-/* NEW: Key tick marks (0, 5, 10) are slightly more prominent */
+/* NEW: Key tick marks (1, 5, 10) are slightly more visible */
 .slider-tick.key-tick {
-  height: 6px;
-  width: 2px;
-  background-color: rgba(255, 221, 0, 0.3);
-  box-shadow: 0 0 2px rgba(255, 221, 0, 0.2);
+  height: 4px;
+  width: 1px;
+  background-color: rgba(255, 221, 0, 0.25);
 }
 
-/* NEW: Position tick marks at correct intervals */
-.slider-tick[data-value="0"] { left: calc(12px); }
-.slider-tick[data-value="1"] { left: calc(12px + (calc(100% - 24px) * 0.1)); }
-.slider-tick[data-value="2"] { left: calc(12px + (calc(100% - 24px) * 0.2)); }
-.slider-tick[data-value="3"] { left: calc(12px + (calc(100% - 24px) * 0.3)); }
-.slider-tick[data-value="4"] { left: calc(12px + (calc(100% - 24px) * 0.4)); }
-.slider-tick[data-value="5"] { left: calc(12px + (calc(100% - 24px) * 0.5)); }
-.slider-tick[data-value="6"] { left: calc(12px + (calc(100% - 24px) * 0.6)); }
-.slider-tick[data-value="7"] { left: calc(12px + (calc(100% - 24px) * 0.7)); }
-.slider-tick[data-value="8"] { left: calc(12px + (calc(100% - 24px) * 0.8)); }
-.slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 0.9)); }
+/* NEW: Perfect alignment - tick positions match thumb center positions for 1-10 scale */
+.slider-tick[data-value="1"] { left: calc(12px); }
+.slider-tick[data-value="2"] { left: calc(12px + (calc(100% - 24px) * 1/9)); }
+.slider-tick[data-value="3"] { left: calc(12px + (calc(100% - 24px) * 2/9)); }
+.slider-tick[data-value="4"] { left: calc(12px + (calc(100% - 24px) * 3/9)); }
+.slider-tick[data-value="5"] { left: calc(12px + (calc(100% - 24px) * 4/9)); }
+.slider-tick[data-value="6"] { left: calc(12px + (calc(100% - 24px) * 5/9)); }
+.slider-tick[data-value="7"] { left: calc(12px + (calc(100% - 24px) * 6/9)); }
+.slider-tick[data-value="8"] { left: calc(12px + (calc(100% - 24px) * 7/9)); }
+.slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 8/9)); }
 .slider-tick[data-value="10"] { left: calc(100% - 12px); }
 
 .emotion-range-slider {
@@ -1242,11 +1240,11 @@
   }
   
   .slider-tick {
-    height: 3px;
+    height: 2px;
   }
   
   .slider-tick.key-tick {
-    height: 4px;
+    height: 3px;
   }
   
   .insights-grid {
