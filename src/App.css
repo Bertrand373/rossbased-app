@@ -438,7 +438,7 @@ button:active {
   background-color: var(--primary-dark);
 }
 
-/* App content layout to support footer inside container */
+/* UPDATED: App content layout - MOBILE HEIGHT FIX */
 .app-content {
   display: flex;
   flex-direction: column;
@@ -751,15 +751,21 @@ input:checked + .toggle-slider:before {
   border: 1px solid var(--border);
 }
 
-/* Mobile responsive styles */
+/* UPDATED: Mobile responsive styles - HEIGHT FIX */
 @media (max-width: 768px) {
   .app-content {
-    margin: 0 var(--spacing-sm) 90px var(--spacing-sm);
-    min-height: calc(100vh - 250px);
+    /* FIXED: Remove fixed bottom margin that creates empty space */
+    margin: 0 var(--spacing-sm) 0 var(--spacing-sm);
+    /* FIXED: Remove min-height that forces extra space */
+    min-height: auto;
+    /* FIXED: Add padding bottom only for mobile nav clearance */
+    padding-bottom: 100px; /* Space for mobile nav + small buffer */
   }
   
   .main-content-wrapper {
     padding: var(--spacing-md);
+    /* FIXED: Ensure wrapper doesn't force extra height */
+    min-height: auto;
   }
   
   .card {
