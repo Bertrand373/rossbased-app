@@ -1236,10 +1236,14 @@
   
   /* Mobile tick marks adjustments */
   .slider-tick-marks {
-    height: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 0;
   }
   
   .slider-tick {
+    top: 0;
+    transform: translateY(-50%);
     height: 2px;
   }
   
