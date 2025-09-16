@@ -807,11 +807,11 @@
   content: '';
   position: absolute;
   top: 50%;
-  /* FIXED: The thumb is constrained within track, so its center moves from ~10px to ~calc(100% - 10px) */
-  /* At value 0, thumb center is at 10px (half thumb width from left edge) */
-  /* At value 10, thumb center is at calc(100% - 10px) (half thumb width from right edge) */
-  /* So the thumb travels across (100% - 20px) of the track width */
-  left: calc(10px + (calc(100% - 20px) * var(--slider-value, 50) / 100));
+  /* FIXED: Updated for 24px thumb - thumb center moves from 12px to calc(100% - 12px) */
+  /* At value 0, thumb center is at 12px (half of 24px thumb width from left edge) */
+  /* At value 10, thumb center is at calc(100% - 12px) (half thumb width from right edge) */
+  /* So the thumb travels across (100% - 24px) of the track width */
+  left: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
   transform: translateY(-50%);
   width: 4px;
   height: 4px;
@@ -842,19 +842,22 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* UPDATED: Smaller slider thumbs */
+/* UPDATED: Bigger, fully opaque slider thumbs */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
   transition: all 0.15s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 2;
+  opacity: 1;
 }
 
 .emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
@@ -869,15 +872,18 @@
 }
 
 .emotion-range-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
   transition: all 0.15s ease;
+  position: relative;
+  z-index: 2;
+  opacity: 1;
 }
 
 .emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
@@ -1160,13 +1166,13 @@
   }
   
   .emotion-range-slider::-webkit-slider-thumb {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
   }
   
   .emotion-range-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
   }
   
   .insights-grid {
@@ -1274,13 +1280,13 @@
   }
   
   .emotion-range-slider::-webkit-slider-thumb {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
   
   .emotion-range-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
   
   .slider-labels {
