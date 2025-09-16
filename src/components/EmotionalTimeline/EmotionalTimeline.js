@@ -32,12 +32,12 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   // Navigation state
   const [activeSection, setActiveSection] = useState('journey-map');
   
-  // Enhanced emotional tracking states
+  // Enhanced emotional tracking states - UPDATED: Changed to 1-10 scale with 5.5 as middle
   const [todayEmotions, setTodayEmotions] = useState({
-    anxiety: 5,
-    moodStability: 5,
-    mentalClarity: 5,
-    emotionalProcessing: 5
+    anxiety: 5.5,
+    moodStability: 5.5,
+    mentalClarity: 5.5,
+    emotionalProcessing: 5.5
   });
   const [emotionsLogged, setEmotionsLogged] = useState(false);
 
@@ -356,7 +356,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     };
   }, []);
 
-  // Check if emotions are already logged for today
+  // UPDATED: Check if emotions are already logged for today - handle both 0-10 and 1-10 scales
   useEffect(() => {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const existingEmotions = userData.emotionalTracking?.find(
@@ -364,21 +364,28 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     );
     
     if (existingEmotions) {
+      // MIGRATION: Convert old 0-10 scale to 1-10 scale if needed
+      const convertValue = (value) => {
+        if (value === 0) return 1; // Convert 0 to 1
+        if (value === undefined || value === null) return 5.5; // Default middle
+        return value;
+      };
+      
       setTodayEmotions({
-        anxiety: existingEmotions.anxiety || 5,
-        moodStability: existingEmotions.moodStability || 5,
-        mentalClarity: existingEmotions.mentalClarity || 5,
-        emotionalProcessing: existingEmotions.emotionalProcessing || 5
+        anxiety: convertValue(existingEmotions.anxiety),
+        moodStability: convertValue(existingEmotions.moodStability),
+        mentalClarity: convertValue(existingEmotions.mentalClarity),
+        emotionalProcessing: convertValue(existingEmotions.emotionalProcessing)
       });
       setEmotionsLogged(true);
     }
   }, [userData.emotionalTracking]);
 
-  // Handle emotional tracking
+  // UPDATED: Handle emotional tracking with 1-10 scale
   const handleEmotionChange = (type, value) => {
     setTodayEmotions(prev => ({
       ...prev,
-      [type]: value
+      [type]: parseFloat(value)
     }));
   };
 
@@ -412,6 +419,22 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   const showPhaseDetails = (phase) => {
     setSelectedPhase(phase);
     setShowPhaseDetail(true);
+  };
+
+  // NEW: Render slider tick marks
+  const renderSliderTickMarks = () => {
+    const ticks = [];
+    for (let i = 1; i <= 10; i++) {
+      const isKeyTick = i === 1 || i === 5.5 || i === 10;
+      ticks.push(
+        <div 
+          key={i} 
+          className={`slider-tick ${isKeyTick ? 'key-tick' : ''}`}
+          data-value={i}
+        />
+      );
+    }
+    return ticks;
   };
 
   return (
@@ -664,29 +687,35 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   )}
                 </div>
 
-                {/* UPDATED: Emotion sliders with new inline structure and value dots */}
+                {/* UPDATED: Emotion sliders with 1-10 scale and tick marks */}
                 <div className="emotion-sliders">
                   {[
-                    { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Calm', highLabel: 'High Anxiety' },
+                    { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Very Calm', highLabel: 'High Anxiety' },
                     { key: 'moodStability', label: 'Mood Stability', value: todayEmotions.moodStability, lowLabel: 'Mood Swings', highLabel: 'Very Stable' },
-                    { key: 'mentalClarity', label: 'Mental Clarity', value: todayEmotions.mentalClarity, lowLabel: 'Foggy', highLabel: 'Crystal Clear' },
-                    { key: 'emotionalProcessing', label: 'Emotional Processing', value: todayEmotions.emotionalProcessing, lowLabel: 'Suppressed', highLabel: 'Flowing' }
+                    { key: 'mentalClarity', label: 'Mental Clarity', value: todayEmotions.mentalClarity, lowLabel: 'Quite Foggy', highLabel: 'Crystal Clear' },
+                    { key: 'emotionalProcessing', label: 'Emotional Processing', value: todayEmotions.emotionalProcessing, lowLabel: 'Very Suppressed', highLabel: 'Flowing Freely' }
                   ].map((emotion) => (
                     <div key={emotion.key} className="emotion-slider-item">
                       <div className="emotion-slider-header">
                         <span className="emotion-label">{emotion.label}</span>
                       </div>
                       <div className="emotion-slider-with-value">
-                        <input
-                          type="range"
-                          min="0"
-                          max="10"
-                          value={emotion.value}
-                          onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
-                          className="emotion-range-slider"
-                          disabled={emotionsLogged}
-                          style={{ '--slider-value': (emotion.value / 10) * 100 }}
-                        />
+                        <div className="emotion-slider-track-container">
+                          <div className="slider-tick-marks">
+                            {renderSliderTickMarks()}
+                          </div>
+                          <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            step="0.5"
+                            value={emotion.value}
+                            onChange={(e) => handleEmotionChange(emotion.key, parseFloat(e.target.value))}
+                            className="emotion-range-slider"
+                            disabled={emotionsLogged}
+                            style={{ '--slider-value': ((emotion.value - 1) / 9) * 100 }}
+                          />
+                        </div>
                         <span className="emotion-value-clean">{emotion.value}</span>
                       </div>
                       <div className="slider-labels">
