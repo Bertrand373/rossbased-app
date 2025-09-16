@@ -43,7 +43,7 @@
   }
 }
 
-/* EXACT COPY: Close button from tracker benefits modal - positioned properly from edges */
+/* EXACT COPY: Close button from tracker benefits modal with grey circle background */
 .modal-close {
   position: absolute;
   top: var(--spacing-md);
@@ -76,17 +76,20 @@
   max-width: 650px;
 }
 
-/* UPDATED: Phase modal header with icon in grey circle like main phase card */
+/* UPDATED: Phase modal header - vertically stacked and centered */
 .phase-modal-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-xl);
   padding-bottom: var(--spacing-lg);
   border-bottom: 1px solid var(--border);
+  text-align: center;
 }
 
+/* FIXED: Phase modal icon using working timeline-phase-icon class structure */
 .phase-modal-icon {
   font-size: 1.5rem;
   display: flex;
@@ -99,10 +102,11 @@
   flex-shrink: 0;
 }
 
-/* FIXED: Ensure phase icon color inheritance in modal */
+/* FIXED: Ensure phase icon color inheritance in modal using working classes */
 .phase-modal-icon svg,
 .phase-modal-icon [data-icon],
-.phase-modal-icon i {
+.phase-modal-icon i,
+.phase-modal-icon > * {
   color: inherit !important;
   fill: currentColor !important;
 }
@@ -112,10 +116,11 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  gap: var(--spacing-xs);
 }
 
 .phase-modal-info h3 {
-  margin: 0 0 var(--spacing-xs) 0;
+  margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text);
@@ -229,7 +234,7 @@
   margin-bottom: var(--spacing-xs);
 }
 
-/* Scientific insight section */
+/* COMBINED: Scientific insight section - combines Scientific Mechanism and Scientific Understanding */
 .phase-modal-insight {
   background-color: rgba(255, 221, 0, 0.05);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -300,9 +305,9 @@
   }
   
   .phase-modal-header {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    text-align: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
   }
   
   .phase-modal-icon {

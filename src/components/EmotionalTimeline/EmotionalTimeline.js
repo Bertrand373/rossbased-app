@@ -1003,7 +1003,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         )}
       </div>
 
-      {/* Phase Detail Modal */}
+      {/* FIXED: Phase Detail Modal with combined scientific sections and proper layout */}
       {showPhaseDetail && selectedPhase && (
         <div className="modal-overlay" onClick={() => setShowPhaseDetail(false)}>
           <div className="modal-content phase-detail-modal" onClick={e => e.stopPropagation()}>
@@ -1011,8 +1011,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               <FaTimes />
             </button>
 
+            {/* UPDATED: Fixed modal header - vertically stacked and centered */}
             <div className="phase-modal-header">
-              <div className="phase-modal-icon" style={{ color: selectedPhase.color }}>
+              {/* FIXED: Using timeline-phase-icon class for proper color inheritance */}
+              <div className="timeline-phase-icon phase-modal-icon" style={{ color: selectedPhase.color }}>
                 <selectedPhase.icon style={{ color: selectedPhase.color }} />
               </div>
               <div className="phase-modal-info">
@@ -1025,10 +1027,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               <p>{selectedPhase.description}</p>
             </div>
 
-            {/* Scientific Mechanism */}
-            <div className="phase-modal-section">
-              <h4>Scientific Mechanism</h4>
-              <p>{selectedPhase.scientificMechanism}</p>
+            {/* COMBINED: Scientific Understanding - combining mechanism and insights.scientific */}
+            <div className="phase-modal-insight">
+              <h4>Scientific Understanding</h4>
+              <p><strong>Mechanism:</strong> {selectedPhase.scientificMechanism}</p>
+              <p><strong>Research Insight:</strong> {selectedPhase.insights.scientific}</p>
             </div>
 
             {/* Expected Symptoms */}
@@ -1081,11 +1084,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 </div>
               </div>
             )}
-
-            <div className="phase-modal-insight">
-              <h4>Scientific Understanding</h4>
-              <p>{selectedPhase.insights.scientific}</p>
-            </div>
 
             <div className="modal-actions">
               <button 
