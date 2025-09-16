@@ -1,4 +1,4 @@
-/* App.css - Main application styles with YELLOW main navigation buttons */
+/* App.css - Main application styles with YELLOW main navigation buttons + MOBILE SCROLL BOUNDARIES */
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -751,15 +751,27 @@ input:checked + .toggle-slider:before {
   border: 1px solid var(--border);
 }
 
-/* Mobile responsive styles */
+/* UPDATED: Mobile responsive styles with SCROLL BOUNDARIES */
 @media (max-width: 768px) {
   .app-content {
     margin: 0 var(--spacing-sm) 90px var(--spacing-sm);
+    /* CRITICAL: Set exact height to prevent over-scrolling */
     min-height: calc(100vh - 250px);
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* ENHANCED: Smooth scrolling with momentum */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
   
   .main-content-wrapper {
     padding: var(--spacing-md);
+    /* CRITICAL: Ensure content fills available space without overflow */
+    min-height: calc(100vh - 320px);
+    max-height: none;
+    display: flex;
+    flex-direction: column;
   }
   
   .card {
@@ -787,3 +799,25 @@ input:checked + .toggle-slider:before {
 }
 
 /* Mobile navigation will use its own slider from MobileNavigation.css */
+
+/* CRITICAL: Prevent over-scrolling on mobile by ensuring content never extends beyond viewport */
+@media (max-width: 768px) {
+  /* Individual tab content containers should also respect boundaries */
+  .tracker-container,
+  .calendar-container,
+  .emotional-timeline-container,
+  .profile-container {
+    min-height: auto;
+    max-height: calc(100vh - 320px);
+    overflow-y: visible;
+    padding-bottom: var(--spacing-xl);
+  }
+  
+  /* Specific handling for scrollable sections within tabs */
+  .tracker-main-content,
+  .calendar-main-section,
+  .timeline-content-container {
+    max-height: none;
+    overflow: visible;
+  }
+}

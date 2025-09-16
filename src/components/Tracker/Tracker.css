@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Header sizing to match Calendar + Enhanced benefits modal with smooth scrolling sliders */
+/* components/Tracker/Tracker.css - UPDATED: Header sizing to match Calendar + Enhanced benefits modal with smooth scrolling sliders + MOBILE SCROLL BOUNDARIES */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -1093,7 +1093,7 @@ button.action-btn:hover {
   }
 }
 
-/* Mobile responsiveness */
+/* UPDATED: Mobile responsiveness with SCROLL BOUNDARIES */
 @media (max-width: 768px) {
   /* UPDATED: Mobile header sizing to match Calendar exactly */
   .tracker-header-title-section h2 {
@@ -1104,10 +1104,28 @@ button.action-btn:hover {
     font-size: 0.8rem !important; /* MATCHES: Calendar mobile subtitle */
   }
 
+  /* CRITICAL: Mobile scroll boundaries for tracker content */
+  .tracker-container {
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+    /* ENHANCED: Add bottom padding to ensure content never gets cut off */
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .tracker-main-content {
+    max-height: none;
+    overflow: visible;
+    /* CRITICAL: Ensure content fits within mobile viewport */
+    min-height: auto;
+  }
+
   /* Integrated header mobile styles */
   .integrated-tracker-header {
     padding: var(--spacing-lg);
     margin: 0;
+    /* MOBILE: Flexible height based on content */
+    min-height: auto;
   }
   
   .tracker-header-title-section {
@@ -1303,6 +1321,11 @@ button.action-btn:hover {
   
   .tracker-header-subtitle {
     font-size: 0.75rem !important; /* MATCHES: Calendar very small mobile subtitle */
+  }
+
+  /* CRITICAL: Very small screen scroll boundaries */
+  .tracker-container {
+    padding-bottom: var(--spacing-lg);
   }
 
   .discord-community-stats {
