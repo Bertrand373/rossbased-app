@@ -64,6 +64,27 @@
   z-index: 1;
 }
 
+/* ALSO SUPPORT: Alternative modal-close-btn class from tracker */
+.modal-close-btn {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
 .modal-close:hover {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);

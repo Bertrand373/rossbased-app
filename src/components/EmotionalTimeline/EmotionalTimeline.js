@@ -1013,7 +1013,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
             {/* UPDATED: Fixed modal header - vertically stacked and centered */}
             <div className="phase-modal-header">
-              {/* FIXED: Using timeline-phase-icon class for proper color inheritance */}
+              {/* FIXED: Using timeline-phase-icon class AND applying color to both container and icon */}
               <div className="timeline-phase-icon phase-modal-icon" style={{ color: selectedPhase.color }}>
                 <selectedPhase.icon style={{ color: selectedPhase.color }} />
               </div>
