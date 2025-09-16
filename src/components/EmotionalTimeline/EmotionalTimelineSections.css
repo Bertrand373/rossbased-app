@@ -795,19 +795,18 @@
   flex: 1;
 }
 
-/* NEW: Tick marks container - positioned directly on track */
+/* NEW: Tick marks container - positioned directly on track center */
 .slider-tick-marks {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 0;
   right: 0;
   height: 8px;
-  transform: translateY(-50%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* NEW: Individual tick mark styling - more subtle and on track */
+/* NEW: Individual tick mark styling - centered in track */
 .slider-tick {
   position: absolute;
   top: 50%;
