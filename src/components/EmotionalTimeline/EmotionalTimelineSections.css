@@ -1378,17 +1378,30 @@
     height: 20px;
   }
   
-  /* Very small screen tick marks adjustments */
+  /* Very small screen tick marks adjustments - FIXED positioning */
   .slider-tick-marks {
-    height: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 0;
+    z-index: 0;
   }
   
   .slider-tick {
+    top: 0;
+    transform: translateY(-50%);
     height: 2px;
+    z-index: 0;
   }
   
   .slider-tick.key-tick {
     height: 3px;
+    z-index: 0;
+  }
+  
+  /* Ensure very small screen slider track stays above ticks */
+  .emotion-range-slider {
+    position: relative;
+    z-index: 1;
   }
   
   .slider-labels {
