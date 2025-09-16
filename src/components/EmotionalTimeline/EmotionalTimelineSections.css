@@ -1234,7 +1234,7 @@
     height: 22px;
   }
   
-  /* Mobile tick marks adjustments - FIXED positioning */
+  /* Mobile tick marks adjustments - FIXED positioning with contained height */
   .slider-tick-marks {
     top: 50%;
     transform: translateY(-50%);
@@ -1245,12 +1245,12 @@
   .slider-tick {
     top: 0;
     transform: translateY(-50%);
-    height: 2px;
+    height: 1.5px; /* Smaller to fit within 6px mobile track */
     z-index: 0; /* Ensure individual ticks stay behind */
   }
   
   .slider-tick.key-tick {
-    height: 3px;
+    height: 2px; /* Smaller key ticks for mobile */
     z-index: 0; /* Ensure key ticks stay behind */
   }
   
@@ -1378,7 +1378,7 @@
     height: 20px;
   }
   
-  /* Very small screen tick marks adjustments - FIXED positioning */
+  /* Very small screen tick marks adjustments - FIXED positioning with contained height */
   .slider-tick-marks {
     top: 50%;
     transform: translateY(-50%);
@@ -1389,12 +1389,12 @@
   .slider-tick {
     top: 0;
     transform: translateY(-50%);
-    height: 2px;
+    height: 1.5px; /* Smaller to fit within 6px track */
     z-index: 0;
   }
   
   .slider-tick.key-tick {
-    height: 3px;
+    height: 2px; /* Smaller key ticks for very small screens */
     z-index: 0;
   }
   
