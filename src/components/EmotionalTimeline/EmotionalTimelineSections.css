@@ -768,9 +768,6 @@
   align-items: center;
   gap: var(--spacing-md);
   position: relative;
-  /* FIXED: Add padding to allow thumb overflow */
-  padding: 0 10px;
-  margin: 0 -10px;
 }
 
 .emotion-value-clean {
@@ -805,15 +802,17 @@
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* FIXED: Dot indicator that matches actual thumb center position */
+/* FIXED: Dot indicator that matches actual constrained thumb position */
 .emotion-range-slider::before {
   content: '';
   position: absolute;
   top: 50%;
-  /* FIXED: The thumb center moves from 0% to 100% of track width */
-  /* Standard browser behavior: thumb center IS at track edges */
-  left: calc(var(--slider-value, 50) * 1%);
-  transform: translate(-50%, -50%);
+  /* FIXED: The thumb is constrained within track, so its center moves from ~10px to ~calc(100% - 10px) */
+  /* At value 0, thumb center is at 10px (half thumb width from left edge) */
+  /* At value 10, thumb center is at calc(100% - 10px) (half thumb width from right edge) */
+  /* So the thumb travels across (100% - 20px) of the track width */
+  left: calc(10px + (calc(100% - 20px) * var(--slider-value, 50) / 100));
+  transform: translateY(-50%);
   width: 4px;
   height: 4px;
   background-color: rgba(255, 221, 0, 0.8);
