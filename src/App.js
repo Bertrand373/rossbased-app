@@ -1,4 +1,4 @@
-// App.js - UPDATED: Added bulletproof sliding pill animation to header navigation
+// App.js - UPDATED: Added bulletproof sliding pill animation to header navigation + scroll-to-top fix
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -286,6 +286,22 @@ const HeaderNavigation = () => {
   );
 };
 
+// SCROLL TO TOP COMPONENT: Handles scrolling to top on route changes
+const ScrollToTop = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Scroll to top instantly when route changes
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant' // Use 'instant' for immediate scroll without animation
+    });
+  }, [location.pathname]);
+
+  return null; // This component doesn't render anything
+};
+
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
@@ -362,6 +378,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop /> {/* Add the scroll to top component */}
       <div className="app-container">
         <Toaster 
           position="top-center"
