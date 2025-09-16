@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Header sizing to match Calendar + Enhanced benefits modal with smooth scrolling sliders + MOBILE HEIGHT FIX */
+/* components/Tracker/Tracker.css - UPDATED: Header sizing to match Calendar + Enhanced benefits modal with smooth scrolling sliders */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -92,7 +92,7 @@
   justify-self: end;
 }
 
-/* UPDATED: Consistent grey → yellow hover pattern for ALL secondary buttons */
+/* UPDATED: Consistent grey Ã¢â€ â€™ yellow hover pattern for ALL secondary buttons */
 .action-btn {
   display: flex;
   align-items: center;
@@ -774,7 +774,7 @@ button.action-btn:hover {
   margin-top: var(--spacing-lg);
 }
 
-/* Save benefits button - grey → yellow hover pattern */
+/* Save benefits button - grey Ã¢â€ â€™ yellow hover pattern */
 .save-benefits-btn {
   display: flex;
   align-items: center;
@@ -900,7 +900,7 @@ button.action-btn:hover {
   transform: translateY(-1px) !important;
 }
 
-/* DESKTOP LAYOUT: Two-column grid for screens ≥1024px with ENHANCED styling */
+/* DESKTOP LAYOUT: Two-column grid for screens Ã¢â€°Â¥1024px with ENHANCED styling */
 @media (min-width: 1024px) {
   /* UPDATED: Desktop header sizing to match Calendar exactly */
   .tracker-header-title-section h2 {
@@ -1093,7 +1093,7 @@ button.action-btn:hover {
   }
 }
 
-/* UPDATED: Mobile responsiveness - HEIGHT FIX */
+/* Mobile responsiveness */
 @media (max-width: 768px) {
   /* UPDATED: Mobile header sizing to match Calendar exactly */
   .tracker-header-title-section h2 {
@@ -1293,27 +1293,6 @@ button.action-btn:hover {
     padding-right: 14px !important;
     font-size: 0.75rem !important;
   }
-
-  /* MOBILE HEIGHT FIX: Remove bottom margin/padding from container */
-  .tracker-container {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  /* MOBILE HEIGHT FIX: Ensure last section doesn't add extra space */
-  .discord-youtube-column {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  .discord-youtube-column > *:last-child {
-    margin-bottom: 0 !important;
-  }
-
-  /* MOBILE HEIGHT FIX: Remove extra spacing from YouTube section */
-  .youtube-channel-section {
-    margin-bottom: 0 !important;
-  }
 }
 
 /* UPDATED: Very small mobile sizing to match Calendar exactly */
@@ -1336,11 +1315,5 @@ button.action-btn:hover {
     flex-direction: column;
     gap: var(--spacing-md);
     align-items: center;
-  }
-
-  /* MOBILE HEIGHT FIX: Ensure very small screens also don't have extra space */
-  .tracker-container {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
   }
 }
