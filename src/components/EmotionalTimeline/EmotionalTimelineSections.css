@@ -775,13 +775,69 @@
   color: var(--text) !important;
   font-size: 0.875rem !important;
   background-color: rgba(255, 221, 0, 0.08);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  /* FIXED: Set fixed width and height for perfect circle */
+  width: 32px;
+  height: 32px;
   min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   border: 1px solid rgba(255, 221, 0, 0.15);
   flex-shrink: 0;
 }
+
+/* NEW: Slider track container with tick marks */
+.emotion-slider-track-container {
+  position: relative;
+  flex: 1;
+}
+
+/* NEW: Tick marks container */
+.slider-tick-marks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NEW: Individual tick mark styling */
+.slider-tick {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+/* NEW: Key tick marks (0, 5, 10) are slightly more prominent */
+.slider-tick.key-tick {
+  height: 6px;
+  width: 2px;
+  background-color: rgba(255, 221, 0, 0.3);
+  box-shadow: 0 0 2px rgba(255, 221, 0, 0.2);
+}
+
+/* NEW: Position tick marks at correct intervals */
+.slider-tick[data-value="0"] { left: calc(12px); }
+.slider-tick[data-value="1"] { left: calc(12px + (calc(100% - 24px) * 0.1)); }
+.slider-tick[data-value="2"] { left: calc(12px + (calc(100% - 24px) * 0.2)); }
+.slider-tick[data-value="3"] { left: calc(12px + (calc(100% - 24px) * 0.3)); }
+.slider-tick[data-value="4"] { left: calc(12px + (calc(100% - 24px) * 0.4)); }
+.slider-tick[data-value="5"] { left: calc(12px + (calc(100% - 24px) * 0.5)); }
+.slider-tick[data-value="6"] { left: calc(12px + (calc(100% - 24px) * 0.6)); }
+.slider-tick[data-value="7"] { left: calc(12px + (calc(100% - 24px) * 0.7)); }
+.slider-tick[data-value="8"] { left: calc(12px + (calc(100% - 24px) * 0.8)); }
+.slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 0.9)); }
+.slider-tick[data-value="10"] { left: calc(100% - 12px); }
 
 .emotion-range-slider {
   -webkit-appearance: none;
@@ -800,6 +856,7 @@
   position: relative;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.03);
+  z-index: 1;
 }
 
 /* FIXED: Dot indicator that matches actual constrained thumb position */
@@ -1158,7 +1215,11 @@
   
   .emotion-value-clean {
     font-size: 0.8rem !important;
+    /* FIXED: Maintain perfect circle on mobile */
+    width: 28px;
+    height: 28px;
     min-width: 28px;
+    padding: 0;
   }
   
   .emotion-range-slider {
@@ -1173,6 +1234,19 @@
   .emotion-range-slider::-moz-range-thumb {
     width: 22px;
     height: 22px;
+  }
+  
+  /* Mobile tick marks adjustments */
+  .slider-tick-marks {
+    height: 6px;
+  }
+  
+  .slider-tick {
+    height: 3px;
+  }
+  
+  .slider-tick.key-tick {
+    height: 4px;
   }
   
   .insights-grid {
@@ -1272,7 +1346,11 @@
   
   .emotion-value-clean {
     font-size: 0.75rem !important;
+    /* FIXED: Maintain perfect circle on very small screens */
+    width: 24px;
+    height: 24px;
     min-width: 24px;
+    padding: 0;
   }
   
   .emotion-range-slider {
@@ -1287,6 +1365,19 @@
   .emotion-range-slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
+  }
+  
+  /* Very small screen tick marks adjustments */
+  .slider-tick-marks {
+    height: 6px;
+  }
+  
+  .slider-tick {
+    height: 2px;
+  }
+  
+  .slider-tick.key-tick {
+    height: 3px;
   }
   
   .slider-labels {
