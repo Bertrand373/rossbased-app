@@ -240,6 +240,15 @@ button.modal-close-btn:hover {
 
 .warning-section h4 {
   color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.warning-section h4 svg {
+  font-size: 1rem;
+  color: #ef4444;
 }
 
 .warning-item::before {

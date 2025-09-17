@@ -11,7 +11,8 @@ import './EmotionalTimelineModals.css';
 // Icons
 import { 
   FaCheckCircle, FaInfoCircle, FaTimes,
-  FaMapSigns, FaHeart, FaBrain, FaEdit
+  FaMapSigns, FaHeart, FaBrain, FaEdit,
+  FaExclamationTriangle
 } from 'react-icons/fa';
 
 // Import utility functions and data
@@ -1046,7 +1047,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
             {/* Warning Signs */}
             <div className="phase-modal-section warning-section">
-              <h4>⚠️ Warning Signs (Seek Support)</h4>
+              <h4><FaExclamationTriangle /> Warning Signs (Seek Support)</h4>
               <ul>
                 {selectedPhase.warningSigns.map((sign, index) => (
                   <li key={index} className="warning-item">{sign}</li>
