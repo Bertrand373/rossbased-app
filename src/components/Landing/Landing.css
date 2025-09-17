@@ -133,7 +133,7 @@
   background-color: var(--background);
 }
 
-/* Mobile responsiveness - CRITICAL for no-scroll experience */
+/* Mobile responsiveness - CRITICAL for matching app styling */
 @media (max-width: 768px) {
   .landing-container {
     padding: var(--spacing-md);
@@ -148,8 +148,10 @@
     max-height: none;
   }
   
+  /* FIXED: Match the app header logo size exactly */
   .landing-logo {
-    height: 100px; /* MATCHED: Same size as mobile app header logo */
+    height: 100px !important;
+    width: auto;
     margin-bottom: var(--spacing-md);
   }
   
@@ -177,12 +179,12 @@
     display: block;
   }
   
-  /* UPDATED: Perfectly centered icons with minimal, equal spacing */
+  /* FIXED: Perfectly centered icons with minimal, equal spacing */
   .feature-icon {
     font-size: 1.75rem;
-    height: 32px; /* REDUCED: Fixed height for consistent spacing */
-    margin-top: 0; /* REMOVED: No top margin */
-    margin-bottom: var(--spacing-sm); /* MINIMAL: Small bottom margin only */
+    height: 36px !important; /* REDUCED: Minimal fixed height */
+    margin: 0 !important; /* REMOVED: All margins */
+    margin-bottom: 8px !important; /* MINIMAL: Just 8px bottom spacing */
     display: flex;
     align-items: center; /* CENTER: Vertically center the icon */
     justify-content: center; /* CENTER: Horizontally center the icon */
@@ -190,6 +192,7 @@
   
   .feature-item h3 {
     font-size: 1rem;
+    margin-top: 0; /* ENSURE: No extra top spacing on h3 */
     margin-bottom: var(--spacing-xs);
   }
   
@@ -225,8 +228,10 @@
     padding: var(--spacing-md) var(--spacing-sm);
   }
   
+  /* FIXED: Smaller but still matching app proportions */
   .landing-logo {
-    height: 85px;
+    height: 85px !important;
+    width: auto;
     margin-bottom: var(--spacing-sm);
   }
   
@@ -243,15 +248,20 @@
     padding: var(--spacing-sm);
   }
   
-  /* UPDATED: Even smaller screens maintain centered icons */
+  /* FIXED: Even smaller screens maintain centered icons */
   .feature-icon {
     font-size: 1.5rem;
-    height: 28px;
-    margin-bottom: var(--spacing-xs);
+    height: 30px !important;
+    margin: 0 !important;
+    margin-bottom: 6px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .feature-item h3 {
     font-size: 0.875rem;
+    margin-top: 0;
   }
   
   .feature-item p {

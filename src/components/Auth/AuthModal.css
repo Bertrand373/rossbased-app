@@ -37,7 +37,7 @@
   font-weight: 600;
 }
 
-/* UPDATED: Close button matching emotional timeline modal styling exactly */
+/* UPDATED: Close button matching emotional timeline and benefits modal exactly */
 .close-modal-btn {
   position: absolute;
   top: var(--spacing-md);
@@ -64,7 +64,7 @@
   background-color: rgba(255, 221, 0, 0.1) !important;
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
-  transform: translateY(-1px) !important;
+  transform: scale(1.1);
 }
 
 /* ENHANCED: Auth Loading State - Match upgrade banner helmet */
@@ -386,11 +386,11 @@
     margin-bottom: var(--spacing-md);
   }
   
-  /* Mobile close button - slightly smaller */
+  /* FIXED: Mobile close button - same as benefits modal (28px) */
   .close-modal-btn {
     width: 28px;
     height: 28px;
-    font-size: 0.875rem;
+    font-size: 1rem;
   }
 
   /* Mobile auth loading helmet adjustments */
@@ -444,13 +444,13 @@
     font-size: 1.25rem;
   }
   
-  /* Very small screens - even smaller close button */
+  /* FIXED: Very small screens - slightly smaller (24px) */
   .close-modal-btn {
     top: var(--spacing-sm);
     right: var(--spacing-sm);
     width: 24px;
     height: 24px;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
 
   .auth-loading-helmet {
