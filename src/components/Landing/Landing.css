@@ -14,7 +14,7 @@
   max-width: 800px;
   width: 100%;
   margin: 0 auto;
-  padding: var(--spacing-lg) var(--spacing-lg); /* REDUCED: from spacing-xl to spacing-lg for tighter desktop spacing */
+  padding: var(--spacing-lg) var(--spacing-lg);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -26,9 +26,9 @@
 }
 
 .landing-logo {
-  height: 140px; /* SLIGHTLY INCREASED: from 120px to 140px */
+  height: 140px;
   width: auto;
-  margin-bottom: var(--spacing-md); /* REDUCED: from spacing-lg to spacing-md for tighter desktop spacing */
+  margin-bottom: var(--spacing-md);
 }
 
 .landing-subtitle {
@@ -177,11 +177,15 @@
     display: block;
   }
   
+  /* UPDATED: Perfectly centered icons with minimal, equal spacing */
   .feature-icon {
-    font-size: 1.75rem; /* REDUCED: for smaller mobile icons */
-    margin: 0; /* REMOVED: All margin above and below for tighter spacing */
-    height: 40px; /* REDUCED: Minimal container height */
-    align-items: center; /* CENTER: Icons perfectly between top and heading */
+    font-size: 1.75rem;
+    height: 32px; /* REDUCED: Fixed height for consistent spacing */
+    margin-top: 0; /* REMOVED: No top margin */
+    margin-bottom: var(--spacing-sm); /* MINIMAL: Small bottom margin only */
+    display: flex;
+    align-items: center; /* CENTER: Vertically center the icon */
+    justify-content: center; /* CENTER: Horizontally center the icon */
   }
   
   .feature-item h3 {
@@ -222,7 +226,7 @@
   }
   
   .landing-logo {
-    height: 85px; /* SLIGHTLY INCREASED: from 75px to 85px */
+    height: 85px;
     margin-bottom: var(--spacing-sm);
   }
   
@@ -239,10 +243,11 @@
     padding: var(--spacing-sm);
   }
   
+  /* UPDATED: Even smaller screens maintain centered icons */
   .feature-icon {
     font-size: 1.5rem;
+    height: 28px;
     margin-bottom: var(--spacing-xs);
-    height: 50px;
   }
   
   .feature-item h3 {
