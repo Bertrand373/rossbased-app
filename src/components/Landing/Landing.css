@@ -48,12 +48,11 @@
 }
 
 .feature-item {
-  background-color: var(--medium-gray);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   text-align: center;
-  border: 1px solid var(--border);
   transition: none;
+  /* REMOVED: No background, no border for cleaner look */
 }
 
 .feature-icon {
@@ -171,6 +170,7 @@
   
   .feature-item {
     padding: var(--spacing-md);
+    /* CLEAN: No background or border on mobile either */
   }
   
   /* Switch to mobile icons */
@@ -259,6 +259,7 @@
   
   .feature-item {
     padding: var(--spacing-sm);
+    /* CLEAN: Borderless on small screens too */
   }
   
   /* FIXED: Even smaller screens maintain centered icons */
