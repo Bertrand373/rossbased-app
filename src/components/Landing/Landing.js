@@ -40,7 +40,7 @@ const Landing = ({ onLogin }) => {
           <div className="landing-features">
             <div className="feature-item">
               <div className="feature-icon">
-                <FaChartLine size={40} />
+                <FaChartLine size={28} /> {/* REDUCED: from 40 to 28 for smaller mobile icons */}
               </div>
               <h3>Track Progress</h3>
               <p>Monitor streaks and visualize your journey</p>
@@ -48,7 +48,7 @@ const Landing = ({ onLogin }) => {
             
             <div className="feature-item">
               <div className="feature-icon">
-                <FaShieldAlt size={40} />
+                <FaShieldAlt size={28} /> {/* REDUCED: from 40 to 28 for smaller mobile icons */}
               </div>
               <h3>Manage Urges</h3>
               <p>Access tools for challenging moments</p>
@@ -56,7 +56,7 @@ const Landing = ({ onLogin }) => {
             
             <div className="feature-item">
               <div className="feature-icon">
-                <FaChartBar size={40} />
+                <FaChartBar size={28} /> {/* REDUCED: from 40 to 28 for smaller mobile icons */}
               </div>
               <h3>Track Benefits</h3>
               <p>Record benefits you experience over time</p>
