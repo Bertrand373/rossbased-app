@@ -140,7 +140,7 @@
   }
   
   .landing-logo {
-    height: 125px; /* INCREASED: from 110px to 125px for bigger mobile logo */
+    height: 100px; /* MATCHED: Same size as mobile app header logo */
     margin-bottom: var(--spacing-md);
   }
   
@@ -160,9 +160,10 @@
   }
   
   .feature-icon {
-    font-size: 1.75rem; /* REDUCED: from 2rem for smaller mobile icons */
-    margin-bottom: var(--spacing-xs); /* REDUCED: for better centering between section top and heading */
-    height: 50px; /* REDUCED: from 60px for better vertical centering */
+    font-size: 1.75rem; /* REDUCED: for smaller mobile icons */
+    margin: 0; /* REMOVED: All margin above and below for tighter spacing */
+    height: 40px; /* REDUCED: Minimal container height */
+    align-items: center; /* CENTER: Icons perfectly between top and heading */
   }
   
   .feature-item h3 {
