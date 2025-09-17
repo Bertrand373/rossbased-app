@@ -148,11 +148,14 @@
     max-height: none;
   }
   
-  /* FIXED: Match the app header logo size exactly */
+  /* FIXED: Match the app header logo size exactly - FORCE OVERRIDE */
   .landing-logo {
     height: 100px !important;
-    width: auto;
-    margin-bottom: var(--spacing-md);
+    max-height: 100px !important;
+    min-height: 100px !important;
+    width: auto !important;
+    margin-bottom: var(--spacing-md) !important;
+    object-fit: contain !important;
   }
   
   .landing-subtitle {
@@ -215,6 +218,13 @@
     font-size: 0.7rem;
     margin-top: var(--spacing-md);
   }
+  
+  /* FORCE LOGO SIZE - Most specific selector possible */
+  .landing-container .landing-content .landing-logo {
+    height: 100px !important;
+    max-height: 100px !important;
+    min-height: 100px !important;
+  }
 }
 
 /* Very small screens - ensure no scroll needed */
@@ -228,11 +238,14 @@
     padding: var(--spacing-md) var(--spacing-sm);
   }
   
-  /* FIXED: Smaller but still matching app proportions */
+  /* FIXED: Smaller but still matching app proportions - FORCE OVERRIDE */
   .landing-logo {
     height: 85px !important;
-    width: auto;
-    margin-bottom: var(--spacing-sm);
+    max-height: 85px !important;
+    min-height: 85px !important;
+    width: auto !important;
+    margin-bottom: var(--spacing-sm) !important;
+    object-fit: contain !important;
   }
   
   .landing-subtitle {
