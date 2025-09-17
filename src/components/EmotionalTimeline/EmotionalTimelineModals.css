@@ -43,7 +43,7 @@
   }
 }
 
-/* EXACT COPY: Close button from tracker benefits modal with grey circle background - FIXED */
+/* EXACT COPY: Close button from tracker benefits modal with grey circle background */
 .modal-close {
   position: absolute;
   top: var(--spacing-md);
@@ -64,7 +64,14 @@
   z-index: 1;
 }
 
-/* ALSO SUPPORT: Alternative modal-close-btn class from tracker - FIXED */
+.modal-close:hover {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+/* Alternative modal-close-btn class support */
 .modal-close-btn {
   position: absolute;
   top: var(--spacing-md);
@@ -85,7 +92,7 @@
   z-index: 1;
 }
 
-.modal-close:hover {
+.modal-close-btn:hover {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
@@ -359,7 +366,8 @@
     font-size: 0.8rem;
   }
   
-  .modal-close {
+  .modal-close,
+  .modal-close-btn {
     width: 28px;
     height: 28px;
     font-size: 0.875rem;
@@ -411,7 +419,8 @@
     min-width: 100px;
   }
   
-  .modal-close {
+  .modal-close,
+  .modal-close-btn {
     width: 24px;
     height: 24px;
     font-size: 0.75rem;
