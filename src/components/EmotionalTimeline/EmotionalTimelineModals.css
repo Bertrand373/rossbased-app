@@ -43,7 +43,7 @@
   }
 }
 
-/* EXACT COPY: Close button from tracker benefits modal with grey circle background */
+/* EXACT COPY: Close button from tracker benefits modal with grey circle background - FIXED */
 .modal-close {
   position: absolute;
   top: var(--spacing-md);
@@ -64,7 +64,7 @@
   z-index: 1;
 }
 
-/* ALSO SUPPORT: Alternative modal-close-btn class from tracker */
+/* ALSO SUPPORT: Alternative modal-close-btn class from tracker - FIXED */
 .modal-close-btn {
   position: absolute;
   top: var(--spacing-md);
