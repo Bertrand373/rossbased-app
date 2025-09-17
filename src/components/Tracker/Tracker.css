@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Header sizing to match Calendar + Enhanced benefits modal with smooth scrolling sliders */
+/* components/Tracker/Tracker.css - UPDATED: Benefit sliders matching Emotional Timeline exactly */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -92,7 +92,7 @@
   justify-self: end;
 }
 
-/* UPDATED: Consistent grey Ã¢â€ â€™ yellow hover pattern for ALL secondary buttons */
+/* UPDATED: Consistent grey → yellow hover pattern for ALL secondary buttons */
 .action-btn {
   display: flex;
   align-items: center;
@@ -354,7 +354,7 @@ button.action-btn:hover {
   transform: scale(1.05);
 }
 
-/* UPDATED: Benefits Modal Styling - ENHANCED with smooth scrolling sliders and profile-style close button */
+/* ENHANCED: Benefits Modal Styling - EXACTLY MATCHING Emotional Timeline Check-in */
 .benefits-modal {
   max-width: 600px;
   max-height: 85vh;
@@ -390,11 +390,11 @@ button.action-btn:hover {
   -webkit-overflow-scrolling: touch;
 }
 
-/* ENHANCED: Benefit Sliders - Smooth Interactive Sliders with 5/10 default and perfect center alignment */
+/* EXACT COPY FROM EMOTIONAL TIMELINE: Benefit Sliders with inline value display and tick marks */
 .benefit-slider-item {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   position: relative;
 }
 
@@ -402,7 +402,7 @@ button.action-btn:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
 .benefit-label {
@@ -410,47 +410,136 @@ button.action-btn:hover {
   color: var(--text);
   flex: 1;
   text-align: left;
-  font-size: 1rem;
+  font-size: 1rem !important;
   letter-spacing: 0.025em;
 }
 
-.benefit-value {
-  font-weight: 700;
-  color: var(--primary);
-  font-size: 0.9375rem;
-  background-color: rgba(255, 221, 0, 0.08);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  min-width: 48px;
-  text-align: center;
-  border: 1px solid rgba(255, 221, 0, 0.15);
+/* EXACT MATCH: Slider container for inline value display */
+.benefit-slider-with-value {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  position: relative;
 }
 
-/* ENHANCED: Smooth Interactive Range Slider */
+/* EXACT MATCH: Value display as clean circle like Emotional Timeline */
+.benefit-value-clean {
+  font-weight: 700;
+  color: var(--text) !important;
+  font-size: 0.875rem !important;
+  background-color: rgba(255, 221, 0, 0.08);
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  /* FIXED: Set fixed width and height for perfect circle */
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid rgba(255, 221, 0, 0.15);
+  flex-shrink: 0;
+}
+
+/* NEW: Slider track container with tick marks */
+.benefit-slider-track-container {
+  position: relative;
+  flex: 1;
+}
+
+/* NEW: Tick marks container - overlays the slider track exactly */
+.slider-tick-marks {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NEW: Individual tick mark styling - positioned in track center */
+.slider-tick {
+  position: absolute;
+  top: 0;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+/* NEW: Key tick marks (1, 5, 10) are slightly more visible */
+.slider-tick.key-tick {
+  height: 4px;
+  width: 1px;
+  background-color: rgba(255, 221, 0, 0.25);
+}
+
+/* NEW: Perfect alignment - tick positions match thumb center positions for 1-10 scale */
+.slider-tick[data-value="1"] { left: calc(12px); }
+.slider-tick[data-value="2"] { left: calc(12px + (calc(100% - 24px) * 1/9)); }
+.slider-tick[data-value="3"] { left: calc(12px + (calc(100% - 24px) * 2/9)); }
+.slider-tick[data-value="4"] { left: calc(12px + (calc(100% - 24px) * 3/9)); }
+.slider-tick[data-value="5"] { left: calc(12px + (calc(100% - 24px) * 4/9)); }
+.slider-tick[data-value="6"] { left: calc(12px + (calc(100% - 24px) * 5/9)); }
+.slider-tick[data-value="7"] { left: calc(12px + (calc(100% - 24px) * 6/9)); }
+.slider-tick[data-value="8"] { left: calc(12px + (calc(100% - 24px) * 7/9)); }
+.slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 8/9)); }
+.slider-tick[data-value="10"] { left: calc(100% - 12px); }
+
+/* EXACT MATCH: Range slider track from Emotional Timeline */
 .benefit-range-slider {
   -webkit-appearance: none;
-  width: 100%;
-  height: 10px;
+  flex: 1;
+  height: 8px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.15) 0%, 
+    rgba(255, 221, 0, 0.08) 50%, 
+    rgba(255, 221, 0, 0.12) 100%
+  );
   outline: none;
   transition: all 0.2s ease;
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  margin-bottom: 0px !important;
-  cursor: pointer;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  z-index: 1;
+}
+
+/* FIXED: Dot indicator that matches actual constrained thumb position */
+.benefit-range-slider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  /* FIXED: Updated for 24px thumb - thumb center moves from 12px to calc(100% - 12px) */
+  left: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: rgba(255, 221, 0, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(255, 221, 0, 0.6);
+  transition: left 0.2s ease;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .benefit-range-slider:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.18) 0%, 
+    rgba(255, 221, 0, 0.1) 50%, 
+    rgba(255, 221, 0, 0.15) 100%
+  );
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
 }
 
 .benefit-range-slider:focus:not(:disabled) {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
 }
 
 .benefit-range-slider:disabled {
@@ -459,7 +548,7 @@ button.action-btn:hover {
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* ENHANCED: Large, Smooth Handle - WebKit */
+/* EXACT MATCH: Bigger, fully opaque slider thumbs from Emotional Timeline */
 .benefit-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -468,25 +557,26 @@ button.action-btn:hover {
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
   transition: all 0.15s ease;
   border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 2;
+  opacity: 1;
 }
 
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
   transform: scale(1.1);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
-  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .benefit-range-slider:active::-webkit-slider-thumb {
   transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
-/* ENHANCED: Large, Smooth Handle - Firefox */
 .benefit-range-slider::-moz-range-thumb {
   width: 24px;
   height: 24px;
@@ -494,32 +584,34 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
   border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
   transition: all 0.15s ease;
+  position: relative;
+  z-index: 2;
+  opacity: 1;
 }
 
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
   transform: scale(1.1);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
-  border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* ENHANCED: Slider Labels with Perfect Center Alignment for 5/10 */
+/* EXACT MATCH: Slider labels from Emotional Timeline */
 .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
-  font-size: 0.8125rem !important;
+  font-size: 0.75rem !important;
   color: var(--text-secondary) !important;
-  margin-top: 12px !important;
+  margin-top: 8px !important;
   margin-bottom: 0px !important;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   line-height: 1 !important;
   transform: none !important;
-  padding-left: 12px !important; /* PERFECT: Aligns with 5/10 center position */
-  padding-right: 12px !important; /* PERFECT: Aligns with 5/10 center position */
+  padding-left: 10px !important;
+  padding-right: 10px !important;
   font-weight: 500 !important;
   letter-spacing: 0.025em !important;
   position: relative !important;
@@ -548,8 +640,8 @@ button.action-btn:hover {
 .modal-benefit-item .slider-labels {
   margin-top: 8px !important;
   font-size: 0.75rem !important;
-  padding-left: 12px !important;
-  padding-right: 12px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
 }
 
 .benefits-modal-actions {
@@ -638,190 +730,11 @@ button.action-btn:hover {
   color: var(--primary);
 }
 
-/* Premium Benefits Container */
+/* Premium Benefits Container - NOT USED IN MODAL */
 .premium-benefits-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-}
-
-/* Professional slider styling */
-.benefit-slider-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  position: relative;
-}
-
-.benefit-slider-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
-}
-
-/* Benefit labels */
-.benefit-label {
-  font-weight: 600;
-  color: var(--text);
-  flex: 1;
-  text-align: left;
-  font-size: 1rem;
-  letter-spacing: 0.025em;
-}
-
-/* Enhanced value display */
-.benefit-value {
-  font-weight: 700;
-  color: var(--primary);
-  font-size: 0.9375rem;
-  background-color: rgba(255, 221, 0, 0.08);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  min-width: 48px;
-  text-align: center;
-  border: 1px solid rgba(255, 221, 0, 0.15);
-}
-
-/* Professional slider track */
-.benefit-range-slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 28px;
-  border-radius: var(--radius-full);
-  background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.15) 0%, 
-    rgba(255, 221, 0, 0.08) 50%, 
-    rgba(255, 221, 0, 0.12) 100%
-  );
-  outline: none;
-  transition: all 0.2s ease;
-  margin: 0 !important;
-  padding: 0 !important;
-  position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  margin-bottom: 0px !important;
-}
-
-.benefit-range-slider:hover:not(:disabled) {
-  background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.18) 0%, 
-    rgba(255, 221, 0, 0.1) 50%, 
-    rgba(255, 221, 0, 0.15) 100%
-  );
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
-}
-
-.benefit-range-slider:focus:not(:disabled) {
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
-}
-
-.benefit-range-slider:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background: rgba(128, 128, 128, 0.1);
-}
-
-/* WebKit thumb */
-.benefit-range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  margin: 0 !important;
-  transition: all 0.15s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.05);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
-}
-
-.benefit-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.02);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-}
-
-/* Firefox thumb */
-.benefit-range-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  margin: 0 !important;
-  transition: all 0.15s ease;
-}
-
-.benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.05);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
-}
-
-.benefit-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--spacing-lg);
-}
-
-/* Save benefits button - grey Ã¢â€ â€™ yellow hover pattern */
-.save-benefits-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  letter-spacing: 0.025em;
-}
-
-.save-benefits-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* Professional slider labels with perfect spacing */
-.benefit-logging-section .premium-benefits-container .slider-labels,
-.premium-benefits-container .benefit-slider-item .slider-labels,
-.tracker-container .premium-benefits-container .slider-labels,
-.tracker-container .benefit-logging-section .slider-labels,
-.benefit-logging-container .premium-benefits-container .slider-labels {
-  display: flex !important;
-  justify-content: space-between !important;
-  font-size: 0.8125rem !important;
-  color: var(--text-secondary) !important;
-  margin-top: 8px !important;
-  margin-bottom: 0px !important;
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  line-height: 1 !important;
-  transform: none !important;
-  padding-left: 14px !important;
-  padding-right: 14px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.025em !important;
-  position: relative !important;
-  z-index: 1 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
 }
 
 /* Modal overlay and base */
@@ -900,7 +813,7 @@ button.action-btn:hover {
   transform: translateY(-1px) !important;
 }
 
-/* DESKTOP LAYOUT: Two-column grid for screens Ã¢â€°Â¥1024px with ENHANCED styling */
+/* DESKTOP LAYOUT: Two-column grid for screens ≥1024px with ENHANCED styling */
 @media (min-width: 1024px) {
   /* UPDATED: Desktop header sizing to match Calendar exactly */
   .tracker-header-title-section h2 {
@@ -1070,9 +983,9 @@ button.action-btn:hover {
     max-height: 60vh;
   }
 
-  /* Desktop slider adjustments */
+  /* Desktop slider adjustments - KEEP EMOTIONAL TIMELINE STYLE */
   .benefit-range-slider {
-    height: 10px;
+    height: 8px;
   }
   
   .benefit-range-slider::-webkit-slider-thumb {
@@ -1086,10 +999,10 @@ button.action-btn:hover {
   }
   
   .slider-labels {
-    margin-top: 12px !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    font-size: 0.8125rem !important;
+    margin-top: 8px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    font-size: 0.75rem !important;
   }
 }
 
@@ -1272,26 +1185,65 @@ button.action-btn:hover {
     min-height: auto !important;
   }
 
-  /* Mobile slider adjustments - thin design */
+  /* Mobile slider adjustments - MATCHING EMOTIONAL TIMELINE */
+  .benefit-label {
+    font-size: 0.875rem !important;
+  }
+  
+  .benefit-value-clean {
+    font-size: 0.8rem !important;
+    /* FIXED: Maintain perfect circle on mobile */
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    padding: 0;
+  }
+  
   .benefit-range-slider {
-    height: 12px;
+    height: 6px;
   }
   
   .benefit-range-slider::-webkit-slider-thumb {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
   }
   
   .benefit-range-slider::-moz-range-thumb {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
+  }
+  
+  /* Mobile tick marks adjustments - FIXED positioning with contained height */
+  .slider-tick-marks {
+    top: 50%;
+    transform: translateY(-50%);
+    height: 0;
+    z-index: 0; /* Ensure ticks stay behind slider */
+  }
+  
+  .slider-tick {
+    top: 0;
+    transform: translateY(-50%);
+    height: 1.5px; /* Smaller to fit within 6px mobile track */
+    z-index: 0; /* Ensure individual ticks stay behind */
+  }
+  
+  .slider-tick.key-tick {
+    height: 2px; /* Smaller key ticks for mobile */
+    z-index: 0; /* Ensure key ticks stay behind */
+  }
+  
+  /* Ensure mobile slider track stays above ticks */
+  .benefit-range-slider {
+    position: relative;
+    z-index: 1;
   }
   
   .slider-labels {
-    margin-top: 14px !important;
-    padding-left: 14px !important;
-    padding-right: 14px !important;
-    font-size: 0.75rem !important;
+    margin-top: 8px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 0.7rem !important;
   }
 }
 
@@ -1315,5 +1267,65 @@ button.action-btn:hover {
     flex-direction: column;
     gap: var(--spacing-md);
     align-items: center;
+  }
+  
+  /* Very small screen benefit slider adjustments */
+  .benefit-label {
+    font-size: 0.8rem !important;
+  }
+  
+  .benefit-value-clean {
+    font-size: 0.75rem !important;
+    /* FIXED: Maintain perfect circle on very small screens */
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    padding: 0;
+  }
+  
+  .benefit-range-slider {
+    height: 6px;
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Very small screen tick marks adjustments - FIXED positioning with contained height */
+  .slider-tick-marks {
+    top: 50%;
+    transform: translateY(-50%);
+    height: 0;
+    z-index: 0;
+  }
+  
+  .slider-tick {
+    top: 0;
+    transform: translateY(-50%);
+    height: 1.5px; /* Smaller to fit within 6px track */
+    z-index: 0;
+  }
+  
+  .slider-tick.key-tick {
+    height: 2px; /* Smaller key ticks for very small screens */
+    z-index: 0;
+  }
+  
+  /* Ensure very small screen slider track stays above ticks */
+  .benefit-range-slider {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .slider-labels {
+    font-size: 0.7rem !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
   }
 }

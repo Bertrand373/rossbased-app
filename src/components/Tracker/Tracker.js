@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Enhanced benefits modal with default 5/10 values and smooth scrolling
+// components/Tracker/Tracker.js - UPDATED: Enhanced benefits modal with Emotional Timeline slider styling
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -296,6 +296,22 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     setShowVideo(false);
   };
 
+  // NEW: Render slider tick marks for values 1-10
+  const renderSliderTickMarks = () => {
+    const ticks = [];
+    for (let i = 1; i <= 10; i++) {
+      const isKeyTick = i === 1 || i === 5 || i === 10;
+      ticks.push(
+        <div 
+          key={i} 
+          className={`slider-tick ${isKeyTick ? 'key-tick' : ''}`}
+          data-value={i}
+        />
+      );
+    }
+    return ticks;
+  };
+
   return (
     <div className="tracker-container">
       {/* React DatePicker Modal */}
@@ -318,7 +334,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* ENHANCED: Benefits Logging Modal with Profile-style close button and smooth scrolling */}
+      {/* ENHANCED: Benefits Logging Modal with Emotional Timeline slider structure */}
       {showBenefitsModal && (
         <div className="modal-overlay">
           <div className="modal-content benefits-modal">
@@ -342,16 +358,25 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 <div key={slider.key} className="benefit-slider-item modal-benefit-item">
                   <div className="benefit-slider-header">
                     <span className="benefit-label">{slider.label}</span>
-                    <span className="benefit-value">{slider.value}/10</span>
                   </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={slider.value}
-                    onChange={(e) => handleModalBenefitChange(slider.key, parseInt(e.target.value))}
-                    className="benefit-range-slider"
-                  />
+                  <div className="benefit-slider-with-value">
+                    <div className="benefit-slider-track-container">
+                      <div className="slider-tick-marks">
+                        {renderSliderTickMarks()}
+                      </div>
+                      <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        step="1"
+                        value={slider.value}
+                        onChange={(e) => handleModalBenefitChange(slider.key, parseInt(e.target.value))}
+                        className="benefit-range-slider"
+                        style={{ '--slider-value': ((slider.value - 1) / 9) * 100 }}
+                      />
+                    </div>
+                    <span className="benefit-value-clean">{slider.value}</span>
+                  </div>
                   <div className="slider-labels">
                     <span>{slider.lowLabel}</span>
                     <span>{slider.highLabel}</span>
