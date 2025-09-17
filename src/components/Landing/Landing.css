@@ -48,11 +48,15 @@
 }
 
 .feature-item {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: none;
-  /* REMOVED: No background, no border for cleaner look */
+  position: relative;
+  /* Subtle inner glow for depth */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .feature-icon {
@@ -170,7 +174,6 @@
   
   .feature-item {
     padding: var(--spacing-md);
-    /* CLEAN: No background or border on mobile either */
   }
   
   /* Switch to mobile icons */
@@ -259,7 +262,6 @@
   
   .feature-item {
     padding: var(--spacing-sm);
-    /* CLEAN: Borderless on small screens too */
   }
   
   /* FIXED: Even smaller screens maintain centered icons */
