@@ -1,4 +1,4 @@
-/* components/Landing/Landing.css - Updated to match app styling */
+/* components/Landing/Landing.css - Updated with prominent logo and tightened mobile spacing */
 .landing-container {
   display: flex;
   flex-direction: column;
@@ -26,7 +26,7 @@
 }
 
 .landing-logo {
-  height: 120px; /* Increased from 86px - much more prominent */
+  height: 180px; /* INCREASED: Much more prominent - from 120px to 180px */
   width: auto;
   margin-bottom: var(--spacing-lg);
 }
@@ -57,13 +57,13 @@
 }
 
 .feature-icon {
-  font-size: 2.5rem;
+  font-size: 2rem; /* REDUCED: From 2.5rem to 2rem for tighter spacing */
   margin-bottom: var(--spacing-md);
   color: var(--primary);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 80px;
+  height: 60px; /* REDUCED: From 80px to 60px */
 }
 
 .feature-item h3 {
@@ -127,42 +127,50 @@
 /* Mobile responsiveness - CRITICAL for no-scroll experience */
 @media (max-width: 768px) {
   .landing-container {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm); /* REDUCED: From spacing-md to spacing-sm */
     min-height: 100vh;
     justify-content: flex-start;
-    padding-top: var(--spacing-lg);
+    padding-top: var(--spacing-md); /* REDUCED: From spacing-lg to spacing-md */
   }
   
   .landing-content {
-    padding: var(--spacing-lg) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-sm); /* REDUCED: From lg/md to md/sm */
     min-height: auto;
     max-height: none;
   }
   
   .landing-logo {
-    height: 90px; /* Increased from 64px - bigger on mobile too */
-    margin-bottom: var(--spacing-md);
+    height: 130px; /* INCREASED: From 90px to 130px - much more prominent on mobile */
+    margin-bottom: var(--spacing-sm); /* REDUCED: From spacing-md to spacing-sm */
   }
   
   .landing-subtitle {
     font-size: 1.125rem;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-md); /* REDUCED: From spacing-lg to spacing-md */
+    line-height: 1.3; /* TIGHTENED: From 1.4 to 1.3 */
   }
   
   .landing-features {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
+    grid-template-columns: repeat(2, 1fr); /* CHANGED: 2x1 layout instead of single column */
+    gap: var(--spacing-sm); /* REDUCED: From spacing-md to spacing-sm */
+    margin-bottom: var(--spacing-md); /* REDUCED: From spacing-lg to spacing-md */
+  }
+  
+  /* Make the third feature span both columns for balanced layout */
+  .feature-item:nth-child(3) {
+    grid-column: 1 / -1;
+    max-width: 250px;
+    margin: 0 auto;
   }
   
   .feature-item {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm); /* REDUCED: From spacing-md to spacing-sm */
   }
   
   .feature-icon {
-    font-size: 2rem;
-    margin-bottom: var(--spacing-sm);
-    height: 60px;
+    font-size: 1.5rem; /* REDUCED: From 2rem to 1.5rem */
+    margin-bottom: var(--spacing-xs); /* REDUCED: From spacing-sm to spacing-xs */
+    height: 40px; /* REDUCED: From 60px to 40px */
   }
   
   .feature-item h3 {
@@ -172,10 +180,11 @@
   
   .feature-item p {
     font-size: 0.8rem;
+    line-height: 1.3; /* TIGHTENED: From default to 1.3 */
   }
   
   .landing-cta {
-    margin: var(--spacing-md) 0;
+    margin: var(--spacing-sm) 0; /* REDUCED: From spacing-md to spacing-sm */
     width: 100%;
   }
   
@@ -187,54 +196,59 @@
   
   .privacy-notice {
     font-size: 0.7rem;
-    margin-top: var(--spacing-md);
+    margin-top: var(--spacing-sm); /* REDUCED: From spacing-md to spacing-sm */
+    line-height: 1.3; /* TIGHTENED: For more compact text */
   }
 }
 
-/* Very small screens - ensure no scroll needed */
+/* Very small screens - UPDATED: Less aggressive size reductions */
 @media (max-width: 480px) and (max-height: 700px) {
   .landing-container {
-    padding: var(--spacing-sm);
-    padding-top: var(--spacing-md);
+    padding: var(--spacing-xs);
+    padding-top: var(--spacing-sm); /* REDUCED: From spacing-md to spacing-sm */
   }
   
   .landing-content {
-    padding: var(--spacing-md) var(--spacing-sm);
+    padding: var(--spacing-sm); /* REDUCED: All padding to spacing-sm */
   }
   
   .landing-logo {
-    height: 75px; /* Increased from 52px - bigger even on very small screens */
-    margin-bottom: var(--spacing-sm);
+    height: 110px; /* INCREASED: From 75px to 110px - still prominent on tiny screens */
+    margin-bottom: var(--spacing-xs);
   }
   
   .landing-subtitle {
     font-size: 1rem;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm); /* REDUCED: From spacing-md to spacing-sm */
   }
   
   .landing-features {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    gap: var(--spacing-xs); /* TIGHTENED: Minimal gap for very small screens */
   }
   
   .feature-item {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs); /* MINIMAL: Smallest padding */
   }
   
   .feature-icon {
-    font-size: 1.5rem;
-    margin-bottom: var(--spacing-xs);
-    height: 50px;
+    font-size: 1.25rem; /* REDUCED: From 1.5rem to 1.25rem */
+    margin-bottom: 2px; /* MINIMAL: Almost no margin */
+    height: 35px; /* REDUCED: From 50px to 35px */
   }
   
   .feature-item h3 {
     font-size: 0.875rem;
+    margin-bottom: 2px; /* MINIMAL: Almost no margin */
   }
   
   .feature-item p {
     font-size: 0.75rem;
+    line-height: 1.2; /* VERY TIGHT: Maximum compression */
   }
   
   .privacy-notice {
-    margin-top: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+    font-size: 0.65rem; /* SMALLER: For very constrained spaces */
   }
 }
