@@ -1,4 +1,4 @@
-// components/Landing/Landing.js - Updated with optimized mobile layout
+// components/Landing/Landing.js - Updated with SpartanLoader and fixed loading flow
 import React, { useState } from 'react';
 import { FaChartLine, FaShieldAlt, FaChartBar } from 'react-icons/fa';
 import './Landing.css';
@@ -40,7 +40,7 @@ const Landing = ({ onLogin }) => {
           <div className="landing-features">
             <div className="feature-item">
               <div className="feature-icon">
-                <FaChartLine size={32} /> {/* REDUCED: From 40 to 32 for tighter mobile spacing */}
+                <FaChartLine size={40} />
               </div>
               <h3>Track Progress</h3>
               <p>Monitor streaks and visualize your journey</p>
@@ -48,7 +48,7 @@ const Landing = ({ onLogin }) => {
             
             <div className="feature-item">
               <div className="feature-icon">
-                <FaShieldAlt size={32} /> {/* REDUCED: From 40 to 32 for tighter mobile spacing */}
+                <FaShieldAlt size={40} />
               </div>
               <h3>Manage Urges</h3>
               <p>Access tools for challenging moments</p>
@@ -56,7 +56,7 @@ const Landing = ({ onLogin }) => {
             
             <div className="feature-item">
               <div className="feature-icon">
-                <FaChartBar size={32} /> {/* REDUCED: From 40 to 32 for tighter mobile spacing */}
+                <FaChartBar size={40} />
               </div>
               <h3>Track Benefits</h3>
               <p>Record benefits you experience over time</p>
