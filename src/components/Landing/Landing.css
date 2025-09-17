@@ -114,6 +114,15 @@
   font-weight: 500;
 }
 
+/* Desktop icons - show by default */
+.desktop-icon {
+  display: block;
+}
+
+.mobile-icon {
+  display: none;
+}
+
 /* Loading Animation - uses SpartanLoader component */
 .loading-screen {
   display: flex;
@@ -157,6 +166,15 @@
   
   .feature-item {
     padding: var(--spacing-md);
+  }
+  
+  /* Switch to mobile icons */
+  .desktop-icon {
+    display: none;
+  }
+  
+  .mobile-icon {
+    display: block;
   }
   
   .feature-icon {
