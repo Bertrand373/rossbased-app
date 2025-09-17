@@ -1011,10 +1011,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               <FaTimes />
             </button>
 
-            {/* UPDATED: Fixed modal header - vertically stacked and centered */}
+            {/* FIXED: Modal header using EXACT working main phase card implementation */}
             <div className="phase-modal-header">
-              {/* FIXED: Remove timeline-phase-icon class, use only phase-modal-icon */}
-              <div className="phase-modal-icon" style={{ color: selectedPhase.color }}>
+              {/* COPY EXACT working main phase card pattern: timeline-phase-icon class */}
+              <div className="timeline-phase-icon" style={{ color: selectedPhase.color }}>
                 <selectedPhase.icon style={{ color: selectedPhase.color }} />
               </div>
               <div className="phase-modal-info">
