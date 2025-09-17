@@ -43,14 +43,16 @@
   }
 }
 
-/* EXACT COPY: Close button from tracker benefits modal with grey circle background */
-.modal-close {
+/* EXACT COPY: Close button from tracker benefits modal with grey circle background - FIXED */
+.modal-close,
+button.modal-close {
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  background: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: 50%;
+  background: rgba(128, 128, 128, 0.1) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
   width: 32px;
   height: 32px;
   font-size: 1rem;
@@ -62,23 +64,27 @@
   justify-content: center;
   transition: all 0.2s ease;
   z-index: 1;
+  outline: none;
 }
 
-.modal-close:hover {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
+.modal-close:hover,
+button.modal-close:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary);
   transform: scale(1.1);
 }
 
 /* Alternative modal-close-btn class support */
-.modal-close-btn {
+.modal-close-btn,
+button.modal-close-btn {
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  background: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: 50%;
+  background: rgba(128, 128, 128, 0.1) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
   width: 32px;
   height: 32px;
   font-size: 1rem;
@@ -90,11 +96,13 @@
   justify-content: center;
   transition: all 0.2s ease;
   z-index: 1;
+  outline: none;
 }
 
-.modal-close-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
+.modal-close-btn:hover,
+button.modal-close-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary);
   transform: scale(1.1);
 }
