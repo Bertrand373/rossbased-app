@@ -31,18 +31,8 @@
   margin-bottom: var(--spacing-md);
 }
 
-.landing-header {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin: 0 0 var(--spacing-sm) 0;
-  text-align: center;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
 .landing-subtitle {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   color: var(--text-secondary);
   margin-bottom: var(--spacing-xl);
   font-weight: 500;
@@ -75,7 +65,7 @@
 .feature-icon {
   font-size: 2.5rem;
   margin-bottom: var(--spacing-md);
-  color: var(--primary);
+  color: var(--text-secondary);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -260,17 +250,12 @@
     max-height: 85px !important;
     min-height: 85px !important;
     width: auto !important;
-    margin-bottom: var(--spacing-xs) !important;
+    margin-bottom: var(--spacing-sm) !important;
     object-fit: contain !important;
   }
   
-  .landing-header {
-    font-size: 1.5rem;
-    margin-bottom: var(--spacing-xs);
-  }
-  
   .landing-subtitle {
-    font-size: 0.875rem;
+    font-size: 1rem;
     margin-bottom: var(--spacing-md);
     padding: 0 var(--spacing-sm);
     max-width: 85%;
