@@ -37,7 +37,7 @@
   font-weight: 600;
 }
 
-/* UPDATED: Close button matching emotional timeline and benefits modal exactly */
+/* UPDATED: Close button matching benefits modal exactly - 32px on desktop, responsive sizing on mobile */
 .close-modal-btn {
   position: absolute;
   top: var(--spacing-md);
@@ -386,10 +386,10 @@
     margin-bottom: var(--spacing-md);
   }
   
-  /* FIXED: Mobile close button - same as benefits modal (28px) */
+  /* FIXED: Mobile close button - keep desktop size 32px on tablets to match benefits modal exactly */
   .close-modal-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     font-size: 1rem;
   }
 
@@ -428,7 +428,7 @@
   }
 }
 
-/* Very small screens */
+/* Very small screens - only here do we reduce to 28px like benefits modal */
 @media (max-width: 480px) {
   .modal-overlay {
     padding: var(--spacing-xs);
@@ -444,12 +444,12 @@
     font-size: 1.25rem;
   }
   
-  /* FIXED: Very small screens - slightly smaller (24px) */
+  /* FIXED: Very small screens - match benefits modal 28px size */
   .close-modal-btn {
     top: var(--spacing-sm);
     right: var(--spacing-sm);
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     font-size: 0.875rem;
   }
 
