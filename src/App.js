@@ -332,20 +332,11 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // FIXED: Brief helmet animation only for initial page load
+  // FIXED: No initial animation - landing page loads immediately
   useEffect(() => {
-    // Only show brief animation if user is NOT logged in (first visit)
-    if (!isLoggedIn && !isLoading) {
-      const timer = setTimeout(() => {
-        setIsInitialLoading(false);
-      }, 800); // Brief 0.8 second animation
-
-      return () => clearTimeout(timer);
-    } else {
-      // If user is logged in or checking auth, skip initial animation
-      setIsInitialLoading(false);
-    }
-  }, [isLoggedIn, isLoading]);
+    // Skip any initial loading animation entirely
+    setIsInitialLoading(false);
+  }, []);
 
   // Handle login
   const handleLogin = async (username, password) => {
@@ -356,26 +347,7 @@ function App() {
     return success;
   };
 
-  // FIXED: Show landing-sized container for initial load, app-sized for logged-in loading
-  if (isInitialLoading && !isLoggedIn) {
-    // Initial page load animation - landing page sized container
-    return (
-      <div className="landing-initial-loader">
-        <img 
-          src={helmetImage} 
-          alt="" 
-          className="landing-initial-helmet"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            e.target.nextElementSibling.style.display = 'block';
-          }}
-        />
-        <div className="landing-initial-helmet-fallback" style={{display: 'none'}}>⚡</div>
-      </div>
-    );
-  }
-  
-  // Show app-sized loading screen when logging in or already logged in
+  // FIXED: Remove the initial loading animation entirely
   if (isLoading) {
     return (
       <div className="spartan-loading-screen">
