@@ -35,7 +35,8 @@ const Landing = ({ onLogin }) => {
       ) : (
         <div className="landing-content">
           <img src={trackerLogo} alt="Tracker App Logo" className="landing-logo" />
-          <p className="landing-subtitle">Hold the flame. Track your journey. Reclaim your power.</p>
+          <h1 className="landing-header">Hold the flame</h1>
+          <p className="landing-subtitle">Track your streak, manage urges, and unlock your potential</p>
           
           <div className="landing-features">
             <div className="feature-item">

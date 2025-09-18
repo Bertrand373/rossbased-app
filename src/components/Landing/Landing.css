@@ -31,12 +31,25 @@
   margin-bottom: var(--spacing-md);
 }
 
+.landing-header {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm) 0;
+  text-align: center;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .landing-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: var(--text-secondary);
   margin-bottom: var(--spacing-xl);
   font-weight: 500;
   line-height: 1.4;
+  max-width: 85%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .landing-features {
@@ -247,13 +260,20 @@
     max-height: 85px !important;
     min-height: 85px !important;
     width: auto !important;
-    margin-bottom: var(--spacing-sm) !important;
+    margin-bottom: var(--spacing-xs) !important;
     object-fit: contain !important;
   }
   
+  .landing-header {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
   .landing-subtitle {
-    font-size: 1rem;
+    font-size: 0.875rem;
     margin-bottom: var(--spacing-md);
+    padding: 0 var(--spacing-sm);
+    max-width: 85%;
   }
   
   .landing-features {
