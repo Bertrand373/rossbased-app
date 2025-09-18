@@ -1,4 +1,4 @@
-// App.js - UPDATED: Added bulletproof sliding pill animation to header navigation + scroll-to-top fix
+// App.js - FIXED: Initial loading uses landing container size, brief helmet animation
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -332,15 +332,20 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Handle initial app loading (for page refreshes)
+  // FIXED: Brief helmet animation only for initial page load
   useEffect(() => {
-    // Simulate checking authentication state
-    const timer = setTimeout(() => {
-      setIsInitialLoading(false);
-    }, 1500); // Show helmet for 1.5 seconds on page load/refresh
+    // Only show brief animation if user is NOT logged in (first visit)
+    if (!isLoggedIn && !isLoading) {
+      const timer = setTimeout(() => {
+        setIsInitialLoading(false);
+      }, 800); // Brief 0.8 second animation
 
-    return () => clearTimeout(timer);
-  }, []);
+      return () => clearTimeout(timer);
+    } else {
+      // If user is logged in or checking auth, skip initial animation
+      setIsInitialLoading(false);
+    }
+  }, [isLoggedIn, isLoading]);
 
   // Handle login
   const handleLogin = async (username, password) => {
@@ -351,8 +356,27 @@ function App() {
     return success;
   };
 
-  // FIXED: Keep original SpartanLoader within grey container - just update the helmet
-  if (isLoading || isInitialLoading) {
+  // FIXED: Show landing-sized container for initial load, app-sized for logged-in loading
+  if (isInitialLoading && !isLoggedIn) {
+    // Initial page load animation - landing page sized container
+    return (
+      <div className="landing-initial-loader">
+        <img 
+          src={helmetImage} 
+          alt="" 
+          className="landing-initial-helmet"
+          onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.nextElementSibling.style.display = 'block';
+          }}
+        />
+        <div className="landing-initial-helmet-fallback" style={{display: 'none'}}>⚡</div>
+      </div>
+    );
+  }
+  
+  // Show app-sized loading screen when logging in or already logged in
+  if (isLoading) {
     return (
       <div className="spartan-loading-screen">
         <div className="spartan-loader-container">
@@ -369,7 +393,7 @@ function App() {
             <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>⚡</div>
           </div>
           <div className="spartan-loader-message">
-            {isLoading ? "Logging you in..." : "Loading your dashboard..."}
+            Loading your dashboard...
           </div>
         </div>
       </div>

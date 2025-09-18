@@ -1,4 +1,4 @@
-/* App.css - Main application styles with YELLOW main navigation buttons */
+/* App.css - Main application styles with YELLOW main navigation buttons + landing-sized initial loader */
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -35,6 +35,45 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* ADDED: Landing page initial loader - matches landing container size */
+.landing-initial-loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background);
+  padding: var(--spacing-lg);
+}
+
+.landing-initial-helmet {
+  width: 100px;
+  height: 100px;
+  animation: initial-helmet-pulse 0.8s ease-in-out;
+  filter: drop-shadow(0 0 20px rgba(255, 221, 0, 0.8));
+}
+
+.landing-initial-helmet-fallback {
+  font-size: 4rem;
+  color: var(--primary);
+  animation: initial-helmet-pulse 0.8s ease-in-out;
+}
+
+@keyframes initial-helmet-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 
 /* FIXED: Keep original loading screen structure - just enhance the helmet */
@@ -295,6 +334,20 @@ body {
 
 /* Mobile header adjustments - REVERTED: Changed mobile username back to yellow */
 @media (max-width: 768px) {
+  /* ADDED: Mobile adjustments for initial loader */
+  .landing-initial-loader {
+    padding: var(--spacing-md);
+  }
+  
+  .landing-initial-helmet {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .landing-initial-helmet-fallback {
+    font-size: 3.2rem;
+  }
+
   .app-header {
     display: flex;
     flex-direction: column;
@@ -404,6 +457,15 @@ body {
 
 /* Very small screens */
 @media (max-width: 480px) {
+  .landing-initial-helmet {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .landing-initial-helmet-fallback {
+    font-size: 2.8rem;
+  }
+
   .app-loading-helmet-size {
     width: 70px !important;
     height: 70px !important;
