@@ -65,16 +65,11 @@
 .feature-icon {
   font-size: 2.5rem;
   margin-bottom: var(--spacing-md);
-  color: var(--text-secondary) !important;
+  color: var(--primary);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 80px;
-}
-
-.feature-icon svg {
-  color: var(--text-secondary) !important;
-  fill: var(--text-secondary) !important;
 }
 
 .feature-item h3 {
@@ -128,12 +123,10 @@
 /* Desktop icons - show by default */
 .desktop-icon {
   display: block;
-  color: var(--text-secondary) !important;
 }
 
 .mobile-icon {
   display: none;
-  color: var(--text-secondary) !important;
 }
 
 /* Loading Animation - uses SpartanLoader component */
@@ -193,7 +186,6 @@
   
   .mobile-icon {
     display: block;
-    color: var(--text-secondary) !important;
   }
   
   /* FIXED: Perfectly centered icons with minimal, equal spacing */
