@@ -56,10 +56,18 @@
   border-radius: var(--radius-md);
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: none;
+  transition: all 0.2s ease; /* ADDED: Smooth transition for hover */
   position: relative;
   /* Subtle inner glow for depth */
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* ADDED: Desktop hover effect for feature cards */
+.feature-item:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-color: rgba(255, 221, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .feature-icon {
@@ -88,6 +96,8 @@
 
 .landing-cta {
   margin: var(--spacing-lg) 0;
+  width: 100%;
+  max-width: 280px; /* ADDED: Constrain CTA container width */
 }
 
 .login-cta-btn {
@@ -95,7 +105,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-xxl); /* INCREASED: From spacing-xl to spacing-xxl for wider button */
   font-size: 1.125rem;
   background-color: var(--primary);
   color: #000000;
@@ -105,6 +115,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 48px;
+  width: 100%; /* ADDED: Full width of container */
 }
 
 .login-cta-btn:hover {
