@@ -37,25 +37,26 @@
   font-weight: 600;
 }
 
-/* EXACT COPY: Close button from tracker benefits modal - matching exactly */
+/* EXACT COPY: Close button matching benefits modal and emotional timeline exactly */
 .close-modal-btn {
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  background: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
+  background: rgba(128, 128, 128, 0.1) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+  width: 32px;
+  height: 32px;
   font-size: 1rem;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: var(--radius-full);
-  transition: all 0.2s ease;
-  width: 32px;
-  height: 32px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  transition: all 0.2s ease;
+  z-index: 1;
   outline: none;
 }
 
@@ -63,7 +64,7 @@
   background-color: rgba(255, 221, 0, 0.1) !important;
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
-  transform: translateY(-1px) !important;
+  transform: scale(1.1);
 }
 
 /* ENHANCED: Auth Loading State - Match upgrade banner helmet */
@@ -385,7 +386,12 @@
     margin-bottom: var(--spacing-md);
   }
   
-  /* FIXED: NO MOBILE OVERRIDE - keep same size as desktop like benefits modal */
+  /* EXACT COPY: Mobile close button matching benefits modal exactly */
+  .close-modal-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
 
   /* Mobile auth loading helmet adjustments */
   .auth-loading-helmet {
@@ -438,13 +444,13 @@
     font-size: 1.25rem;
   }
   
-  /* EXACT COPY: Very small screens matching benefits modal and emotional timeline exactly */
+  /* EXACT COPY: Very small screens matching benefits modal exactly */
   .close-modal-btn {
-    width: 24px;
-    height: 24px;
-    font-size: 0.75rem;
     top: var(--spacing-sm);
     right: var(--spacing-sm);
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
   }
 
   .auth-loading-helmet {
