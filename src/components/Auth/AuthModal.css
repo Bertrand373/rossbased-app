@@ -386,13 +386,13 @@
     margin-bottom: var(--spacing-md);
   }
   
-  /* EXACT COPY: Mobile close button matching benefits modal exactly - keep md spacing */
+  /* EXACT COPY: Mobile close button matching benefits modal and emotional timeline exactly */
   .close-modal-btn {
-    top: var(--spacing-md);
-    right: var(--spacing-md);
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
   }
 
   /* Mobile auth loading helmet adjustments */
@@ -446,13 +446,13 @@
     font-size: 1.25rem;
   }
   
-  /* EXACT COPY: Very small screens matching benefits modal exactly */
+  /* EXACT COPY: Very small screens matching benefits modal and emotional timeline exactly */
   .close-modal-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
     top: var(--spacing-sm);
     right: var(--spacing-sm);
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
   }
 
   .auth-loading-helmet {
