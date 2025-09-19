@@ -97,7 +97,7 @@
 .landing-cta {
   margin: var(--spacing-lg) 0;
   width: 100%;
-  max-width: 280px; /* ADDED: Constrain CTA container width */
+  max-width: 360px; /* INCREASED: From 280px to 360px for more noticeable width */
 }
 
 .login-cta-btn {
@@ -105,7 +105,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xxl); /* INCREASED: From spacing-xl to spacing-xxl for wider button */
+  padding: var(--spacing-md) var(--spacing-xxl); /* Wider padding */
   font-size: 1.125rem;
   background-color: var(--primary);
   color: #000000;
@@ -115,7 +115,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 48px;
-  width: 100%; /* ADDED: Full width of container */
+  width: 100%; /* Full width of container */
 }
 
 .login-cta-btn:hover {
