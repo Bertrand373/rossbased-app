@@ -386,8 +386,10 @@
     margin-bottom: var(--spacing-md);
   }
   
-  /* EXACT COPY: Mobile close button matching benefits modal exactly */
+  /* EXACT COPY: Mobile close button matching benefits modal exactly - keep md spacing */
   .close-modal-btn {
+    top: var(--spacing-md);
+    right: var(--spacing-md);
     width: 32px;
     height: 32px;
     font-size: 1rem;
