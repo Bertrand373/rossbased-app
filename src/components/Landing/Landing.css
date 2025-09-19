@@ -1,4 +1,4 @@
-/* components/Landing/Landing.css - Updated to match app container width for seamless transition */
+/* components/Landing/Landing.css - Updated to match app styling */
 .landing-container {
   display: flex;
   flex-direction: column;
@@ -14,7 +14,7 @@
   max-width: 1200px; /* CHANGED: From 800px to match app container width */
   width: 100%;
   margin: 0 auto;
-  padding: var(--spacing-xl) var(--spacing-xl); /* ENHANCED: Increased padding for better proportion */
+  padding: var(--spacing-lg) var(--spacing-lg);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -26,18 +26,18 @@
 }
 
 .landing-logo {
-  height: 160px; /* INCREASED: Slightly larger for better desktop proportion */
+  height: 140px;
   width: auto;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
 }
 
 .landing-subtitle {
-  font-size: 1.375rem; /* INCREASED: Slightly larger for wider container */
+  font-size: 1.25rem;
   color: var(--text-secondary);
   margin-bottom: var(--spacing-xl);
   font-weight: 500;
   line-height: 1.4;
-  max-width: 600px; /* FIXED: Set absolute max-width instead of percentage */
+  max-width: 85%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -45,58 +45,49 @@
 .landing-features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-xl); /* INCREASED: More spacing for wider container */
+  gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
   width: 100%;
-  max-width: 900px; /* ADDED: Constrain features width for better proportion */
 }
 
 .feature-item {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
-  padding: var(--spacing-xl); /* INCREASED: More padding for desktop */
+  padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.2s ease; /* ADDED: Smooth transition */
+  transition: none;
   position: relative;
   /* Subtle inner glow for depth */
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* ADDED: Desktop hover effect */
-.feature-item:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border-color: rgba(255, 221, 0, 0.1);
-  transform: translateY(-2px);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
 .feature-icon {
-  font-size: 3rem; /* INCREASED: Larger icons for desktop */
-  margin-bottom: var(--spacing-lg);
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-md);
   color: var(--primary);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 90px; /* INCREASED: Taller icon area */
+  height: 80px;
 }
 
 .feature-item h3 {
-  margin-bottom: var(--spacing-md);
-  font-size: 1.25rem; /* INCREASED: Larger headings */
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.125rem;
   color: var(--text);
   font-weight: 600;
 }
 
 .feature-item p {
   color: var(--text-secondary);
-  font-size: 0.9375rem; /* INCREASED: Slightly larger text */
+  font-size: 0.875rem;
   font-weight: 500;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .landing-cta {
-  margin: var(--spacing-xl) 0;
+  margin: var(--spacing-lg) 0;
 }
 
 .login-cta-btn {
@@ -104,8 +95,8 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xxl); /* INCREASED: Wider button */
-  font-size: 1.25rem; /* INCREASED: Larger button text */
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1.125rem;
   background-color: var(--primary);
   color: #000000;
   font-weight: 600;
@@ -113,7 +104,7 @@
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 52px; /* INCREASED: Taller button */
+  min-height: 48px;
 }
 
 .login-cta-btn:hover {
@@ -123,9 +114,9 @@
 }
 
 .privacy-notice {
-  font-size: 0.8125rem; /* SLIGHTLY INCREASED */
+  font-size: 0.75rem;
   color: var(--text-secondary);
-  margin-top: var(--spacing-xl);
+  margin-top: var(--spacing-lg);
   font-weight: 500;
 }
 
