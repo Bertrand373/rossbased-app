@@ -37,11 +37,11 @@
   font-weight: 600;
 }
 
-/* EXACT COPY: Close button matching benefits modal and emotional timeline exactly */
+/* FIXED: Close button positioning to match benefits modal exactly */
 .close-modal-btn {
   position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
+  top: var(--spacing-xl);  /* CHANGED: From var(--spacing-md) to var(--spacing-xl) to account for modal padding */
+  right: var(--spacing-xl);  /* CHANGED: From var(--spacing-md) to var(--spacing-xl) to account for modal padding */
   background: rgba(128, 128, 128, 0.1) !important;
   background-color: rgba(128, 128, 128, 0.1) !important;
   border: 1px solid var(--border) !important;
@@ -386,8 +386,10 @@
     margin-bottom: var(--spacing-md);
   }
   
-  /* EXACT COPY: Mobile close button matching benefits modal exactly */
+  /* FIXED: Mobile close button positioning */
   .close-modal-btn {
+    top: var(--spacing-lg);  /* CHANGED: Adjusted for mobile padding */
+    right: var(--spacing-lg);  /* CHANGED: Adjusted for mobile padding */
     width: 32px;
     height: 32px;
     font-size: 1rem;
@@ -444,10 +446,10 @@
     font-size: 1.25rem;
   }
   
-  /* EXACT COPY: Very small screens matching benefits modal exactly */
+  /* FIXED: Very small screens positioning */
   .close-modal-btn {
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
+    top: var(--spacing-md);  /* CHANGED: Adjusted for very small screen padding */
+    right: var(--spacing-md);  /* CHANGED: Adjusted for very small screen padding */
     width: 32px;
     height: 32px;
     font-size: 1rem;
