@@ -386,14 +386,7 @@
     margin-bottom: var(--spacing-md);
   }
   
-  /* EXACT COPY: Mobile close button matching benefits modal and emotional timeline exactly */
-  .close-modal-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 0.875rem;
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
-  }
+  /* FIXED: NO MOBILE OVERRIDE - keep same size as desktop like benefits modal */
 
   /* Mobile auth loading helmet adjustments */
   .auth-loading-helmet {
