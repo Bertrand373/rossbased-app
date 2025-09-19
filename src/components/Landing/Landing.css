@@ -1,4 +1,4 @@
-/* components/Landing/Landing.css - Updated to match app styling */
+/* components/Landing/Landing.css - Updated to match app container width for seamless transition */
 .landing-container {
   display: flex;
   flex-direction: column;
@@ -11,10 +11,10 @@
 }
 
 .landing-content {
-  max-width: 800px;
+  max-width: 1200px; /* CHANGED: From 800px to match app container width */
   width: 100%;
   margin: 0 auto;
-  padding: var(--spacing-lg) var(--spacing-lg);
+  padding: var(--spacing-xl) var(--spacing-xl); /* ENHANCED: Increased padding for better proportion */
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -26,18 +26,18 @@
 }
 
 .landing-logo {
-  height: 140px;
+  height: 160px; /* INCREASED: Slightly larger for better desktop proportion */
   width: auto;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .landing-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.375rem; /* INCREASED: Slightly larger for wider container */
   color: var(--text-secondary);
   margin-bottom: var(--spacing-xl);
   font-weight: 500;
   line-height: 1.4;
-  max-width: 85%;
+  max-width: 600px; /* FIXED: Set absolute max-width instead of percentage */
   margin-left: auto;
   margin-right: auto;
 }
@@ -45,49 +45,58 @@
 .landing-features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl); /* INCREASED: More spacing for wider container */
   margin-bottom: var(--spacing-xl);
   width: 100%;
+  max-width: 900px; /* ADDED: Constrain features width for better proportion */
 }
 
 .feature-item {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl); /* INCREASED: More padding for desktop */
   border-radius: var(--radius-md);
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: none;
+  transition: all 0.2s ease; /* ADDED: Smooth transition */
   position: relative;
   /* Subtle inner glow for depth */
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
+/* ADDED: Desktop hover effect */
+.feature-item:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-color: rgba(255, 221, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .feature-icon {
-  font-size: 2.5rem;
-  margin-bottom: var(--spacing-md);
+  font-size: 3rem; /* INCREASED: Larger icons for desktop */
+  margin-bottom: var(--spacing-lg);
   color: var(--primary);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 80px;
+  height: 90px; /* INCREASED: Taller icon area */
 }
 
 .feature-item h3 {
-  margin-bottom: var(--spacing-sm);
-  font-size: 1.125rem;
+  margin-bottom: var(--spacing-md);
+  font-size: 1.25rem; /* INCREASED: Larger headings */
   color: var(--text);
   font-weight: 600;
 }
 
 .feature-item p {
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.9375rem; /* INCREASED: Slightly larger text */
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .landing-cta {
-  margin: var(--spacing-lg) 0;
+  margin: var(--spacing-xl) 0;
 }
 
 .login-cta-btn {
@@ -95,8 +104,8 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
-  font-size: 1.125rem;
+  padding: var(--spacing-md) var(--spacing-xxl); /* INCREASED: Wider button */
+  font-size: 1.25rem; /* INCREASED: Larger button text */
   background-color: var(--primary);
   color: #000000;
   font-weight: 600;
@@ -104,7 +113,7 @@
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 48px;
+  min-height: 52px; /* INCREASED: Taller button */
 }
 
 .login-cta-btn:hover {
@@ -114,9 +123,9 @@
 }
 
 .privacy-notice {
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* SLIGHTLY INCREASED */
   color: var(--text-secondary);
-  margin-top: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
   font-weight: 500;
 }
 
@@ -139,6 +148,40 @@
   background-color: var(--background);
 }
 
+/* Tablet - intermediate sizing */
+@media (max-width: 1024px) {
+  .landing-content {
+    max-width: 900px; /* INTERMEDIATE: Between mobile and desktop */
+    padding: var(--spacing-lg) var(--spacing-lg);
+  }
+  
+  .landing-logo {
+    height: 140px;
+  }
+  
+  .landing-subtitle {
+    font-size: 1.25rem;
+  }
+  
+  .feature-icon {
+    font-size: 2.5rem;
+    height: 80px;
+  }
+  
+  .feature-item h3 {
+    font-size: 1.125rem;
+  }
+  
+  .feature-item p {
+    font-size: 0.875rem;
+  }
+  
+  .login-cta-btn {
+    font-size: 1.125rem;
+    min-height: 48px;
+  }
+}
+
 /* Mobile responsiveness - CRITICAL for matching app styling */
 @media (max-width: 768px) {
   .landing-container {
@@ -149,6 +192,7 @@
   }
   
   .landing-content {
+    max-width: 100%; /* MOBILE: Full width */
     padding: var(--spacing-lg) var(--spacing-md);
     min-height: auto;
     max-height: none;
@@ -167,16 +211,22 @@
   .landing-subtitle {
     font-size: 1.125rem;
     margin-bottom: var(--spacing-lg);
+    max-width: 85%;
   }
   
   .landing-features {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
+    max-width: 100%;
   }
   
   .feature-item {
     padding: var(--spacing-md);
+  }
+  
+  .feature-item:hover {
+    transform: none; /* DISABLE: Hover on mobile */
   }
   
   /* Switch to mobile icons */
