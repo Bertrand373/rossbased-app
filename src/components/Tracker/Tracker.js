@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Refined modal headers matching Emotional Timeline styling
+// components/Tracker/Tracker.js - UPDATED: Enhanced benefits modal with Emotional Timeline slider styling
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -321,23 +321,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <button className="modal-close-btn" onClick={handleDateCancel}>
               <FaTimes />
             </button>
-            {/* REFINED: Modal header matching Emotional Timeline proportions */}
-            <h2 style={{ 
-              margin: '0 0 var(--spacing-sm) 0',
-              fontSize: '1.125rem',
-              fontWeight: '600',
-              color: 'var(--text)',
-              textAlign: 'center',
-              lineHeight: '1.3'
-            }}>Set Your Start Date</h2>
-            <p style={{
-              margin: '0 0 var(--spacing-xl) 0',
-              fontSize: '0.8125rem',
-              color: 'var(--text-secondary)',
-              textAlign: 'center',
-              lineHeight: '1.4',
-              fontWeight: '500'
-            }}>When did you begin your current streak?</p>
+            <h2>Set Your Start Date</h2>
+            <p>When did you begin your current streak?</p>
             
             <DatePicker
               currentDate={startDate}
@@ -349,14 +334,13 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* ENHANCED: Benefits Logging Modal with refined headers */}
+      {/* ENHANCED: Benefits Logging Modal with Emotional Timeline slider structure */}
       {showBenefitsModal && (
         <div className="modal-overlay">
           <div className="modal-content benefits-modal">
             <button className="modal-close-btn" onClick={cancelBenefitsModal}>
               <FaTimes />
             </button>
-            {/* REFINED: Header matching Emotional Timeline styling */}
             <h3 className="benefits-modal-header">Daily Benefits Check-In</h3>
             <p className="benefits-modal-subtitle">
               {benefitsLogged ? "Update how you're feeling today" : "How are you feeling today?"}

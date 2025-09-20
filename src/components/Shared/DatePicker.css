@@ -1,4 +1,4 @@
-/* components/Shared/DatePicker.css - UPDATED: Refined modal headers matching Emotional Timeline styling */
+/* components/Shared/DatePicker.css - UPDATED: Greyâ†’yellow hover effects, yellow info icon, fixed mobile inputs */
 
 .date-picker-container {
   display: flex;
@@ -132,14 +132,14 @@
   flex-shrink: 0;
 }
 
-/* IMPROVED: Button styling with grey→yellow hover effects */
+/* IMPROVED: Button styling with greyâ†’yellow hover effects */
 .date-picker-actions {
   display: flex;
   gap: var(--spacing-md);
   margin-top: var(--spacing-md);
 }
 
-/* UPDATED: Primary action button - grey → yellow hover */
+/* UPDATED: Primary action button - grey â†’ yellow hover */
 .date-picker-container .primary-action {
   display: flex !important;
   align-items: center !important;
@@ -165,7 +165,7 @@
   transform: translateY(-1px) !important;
 }
 
-/* UPDATED: Cancel button - grey → yellow hover */
+/* UPDATED: Cancel button - grey â†’ yellow hover */
 .date-picker-container .cancel-action {
   display: flex !important;
   align-items: center !important;
@@ -253,7 +253,7 @@
     gap: var(--spacing-sm);
   }
   
-  /* UPDATED: Mobile buttons with grey→yellow hover */
+  /* UPDATED: Mobile buttons with greyâ†’yellow hover */
   .date-picker-container .primary-action,
   .date-picker-container .cancel-action {
     padding: var(--spacing-sm) var(--spacing-md) !important;
