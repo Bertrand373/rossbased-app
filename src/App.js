@@ -1,4 +1,4 @@
-// App.js - FIXED: Initial loading uses landing container size, brief helmet animation
+// App.js - ENHANCED: App refresh loading and login phase transitions
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -305,14 +305,15 @@ const ScrollToTop = () => {
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
   
-  // UPDATED: Destructure goal functions from useUserData hook
+  // ENHANCED: Destructure new loading states from useUserData hook
   const { 
     userData, 
     isLoggedIn, 
     isPremium, 
-    isLoading, 
+    isLoading, // App refresh loading
+    isLoginLoading, // Login specific loading
+    loginPhase, // Login phase for different messages
     login, 
     logout, 
     updateUserData,
@@ -332,12 +333,6 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // FIXED: No initial animation - landing page loads immediately
-  useEffect(() => {
-    // Skip any initial loading animation entirely
-    setIsInitialLoading(false);
-  }, []);
-
   // Handle login
   const handleLogin = async (username, password) => {
     const success = await login(username, password);
@@ -347,7 +342,7 @@ function App() {
     return success;
   };
 
-  // FIXED: Remove the initial loading animation entirely
+  // ENHANCED: App refresh loading screen with "Loading your dashboard..." message
   if (isLoading) {
     return (
       <div className="spartan-loading-screen">
@@ -355,7 +350,7 @@ function App() {
           <div className="spartan-loader-animation">
             <img 
               src={helmetImage} 
-              alt="Loading" 
+              alt="Loading your dashboard" 
               className="spartan-helmet-image app-loading-helmet-size"
               onError={(e) => {
                 e.target.style.display = 'none';
@@ -431,6 +426,8 @@ function App() {
           <AuthModal 
             onClose={() => setShowAuthModal(false)} 
             onLogin={handleLogin}
+            isLoginLoading={isLoginLoading}
+            loginPhase={loginPhase}
           />
         )}
         

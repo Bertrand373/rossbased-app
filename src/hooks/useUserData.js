@@ -1,4 +1,4 @@
-// src/hooks/useUserData.js - UPDATED: Added goal system to userData structure
+// src/hooks/useUserData.js - UPDATED: Enhanced loading states with login transition
 import { useState, useEffect } from 'react';
 import { addDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -58,7 +58,11 @@ export const useUserData = () => {
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isPremium, setIsPremium] = useState(true); // CHANGED: Default to premium
-  const [isLoading, setIsLoading] = useState(false);
+  
+  // ENHANCED: Multiple loading states for different phases
+  const [isLoading, setIsLoading] = useState(true); // CHANGED: Start with true for app refresh
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const [loginPhase, setLoginPhase] = useState(''); // 'authenticating' or 'loading-dashboard'
 
   // NEW: Helper function to calculate goal target date
   const calculateGoalTargetDate = (startDate, targetDays) => {
@@ -71,14 +75,22 @@ export const useUserData = () => {
     return currentStreak >= targetDays;
   };
 
-  // UPDATED: Login function - all users get premium features
+  // UPDATED: Enhanced login function with phase transitions
   const login = async (username, password = 'demo') => {
     try {
-      setIsLoading(true);
+      // PHASE 1: "Logging you in..." (authenticating)
+      setIsLoginLoading(true);
+      setLoginPhase('authenticating');
       console.log('Logging in with:', username);
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate authentication delay
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      // PHASE 2: "Loading your dashboard..." (loading-dashboard)
+      setLoginPhase('loading-dashboard');
+      
+      // Simulate dashboard loading delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // CHOOSE MOCK DATA BASED ON USERNAME:
       let mockUserData;
@@ -176,7 +188,9 @@ export const useUserData = () => {
       localStorage.setItem('userData', JSON.stringify(mockUserData));
       localStorage.setItem('isLoggedIn', 'true');
       
-      setIsLoading(false);
+      // Clear all loading states
+      setIsLoginLoading(false);
+      setLoginPhase('');
       
       // Show success toast with scenario info
       const scenarioInfo = getScenarioInfo(username);
@@ -185,7 +199,8 @@ export const useUserData = () => {
       return true;
     } catch (err) {
       console.error('Login error:', err);
-      setIsLoading(false);
+      setIsLoginLoading(false);
+      setLoginPhase('');
       toast.error('Login failed. Please try again.');
       return false;
     }
@@ -387,111 +402,123 @@ export const useUserData = () => {
     }
   };
 
-  // Load data from localStorage on mount
+  // ENHANCED: Load data from localStorage on mount with app refresh loading
   useEffect(() => {
-    const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
-    const storedUserData = localStorage.getItem('userData');
-    
-    if (storedIsLoggedIn === 'true' && storedUserData) {
-      try {
-        const parsedUserData = JSON.parse(storedUserData);
-        
-        // Convert string dates back to Date objects
-        if (parsedUserData.startDate) {
-          parsedUserData.startDate = new Date(parsedUserData.startDate);
-        }
+    const initializeApp = async () => {
+      // Show loading for app refresh (minimum 800ms for smooth experience)
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
+      const storedUserData = localStorage.getItem('userData');
+      
+      if (storedIsLoggedIn === 'true' && storedUserData) {
+        try {
+          const parsedUserData = JSON.parse(storedUserData);
+          
+          // Convert string dates back to Date objects
+          if (parsedUserData.startDate) {
+            parsedUserData.startDate = new Date(parsedUserData.startDate);
+          }
 
-        // NEW: Handle goal data conversion
-        if (parsedUserData.goal) {
-          if (parsedUserData.goal.targetDate) {
-            parsedUserData.goal.targetDate = new Date(parsedUserData.goal.targetDate);
+          // NEW: Handle goal data conversion
+          if (parsedUserData.goal) {
+            if (parsedUserData.goal.targetDate) {
+              parsedUserData.goal.targetDate = new Date(parsedUserData.goal.targetDate);
+            }
+            if (parsedUserData.goal.achievementDate) {
+              parsedUserData.goal.achievementDate = new Date(parsedUserData.goal.achievementDate);
+            }
+          } else {
+            // Initialize goal if not present
+            parsedUserData.goal = {
+              targetDays: null,
+              isActive: false,
+              targetDate: null,
+              achieved: false,
+              achievementDate: null
+            };
           }
-          if (parsedUserData.goal.achievementDate) {
-            parsedUserData.goal.achievementDate = new Date(parsedUserData.goal.achievementDate);
+          
+          if (parsedUserData.badges) {
+            parsedUserData.badges = parsedUserData.badges.map(badge => ({
+              ...badge,
+              date: badge.date ? new Date(badge.date) : null
+            }));
           }
-        } else {
-          // Initialize goal if not present
-          parsedUserData.goal = {
-            targetDays: null,
-            isActive: false,
-            targetDate: null,
-            achieved: false,
-            achievementDate: null
-          };
+          
+          if (parsedUserData.benefitTracking) {
+            parsedUserData.benefitTracking = parsedUserData.benefitTracking.map(item => ({
+              ...item,
+              date: new Date(item.date),
+              aura: item.aura || 5,
+              sleep: item.sleep || item.attraction || 5,
+              workout: item.workout || item.gymPerformance || 5
+            }));
+          }
+          
+          if (parsedUserData.emotionalTracking) {
+            parsedUserData.emotionalTracking = parsedUserData.emotionalTracking.map(item => ({
+              ...item,
+              date: new Date(item.date)
+            }));
+          } else {
+            parsedUserData.emotionalTracking = [];
+          }
+          
+          if (parsedUserData.urgeLog) {
+            parsedUserData.urgeLog = parsedUserData.urgeLog.map(item => ({
+              ...item,
+              date: new Date(item.date)
+            }));
+          } else {
+            parsedUserData.urgeLog = [];
+          }
+          
+          if (parsedUserData.streakHistory) {
+            parsedUserData.streakHistory = parsedUserData.streakHistory.map(streak => ({
+              ...streak,
+              start: new Date(streak.start),
+              end: streak.end ? new Date(streak.end) : null
+            }));
+          }
+          
+          // Set default values for profile fields if they don't exist
+          parsedUserData.email = parsedUserData.email || '';
+          parsedUserData.dataSharing = parsedUserData.dataSharing || false;
+          parsedUserData.analyticsOptIn = parsedUserData.analyticsOptIn !== false;
+          parsedUserData.marketingEmails = parsedUserData.marketingEmails || false;
+          parsedUserData.darkMode = parsedUserData.darkMode !== false;
+          parsedUserData.notifications = parsedUserData.notifications !== false;
+          parsedUserData.language = parsedUserData.language || 'en';
+          parsedUserData.wisdomMode = parsedUserData.wisdomMode || false;
+          
+          // CHANGED: Force premium to true
+          parsedUserData.isPremium = true;
+          
+          setUserData(parsedUserData);
+          setIsLoggedIn(true);
+          setIsPremium(true); // CHANGED: Always premium
+        } catch (err) {
+          console.error('Error parsing stored user data:', err);
+          localStorage.removeItem('userData');
+          localStorage.removeItem('isLoggedIn');
         }
-        
-        if (parsedUserData.badges) {
-          parsedUserData.badges = parsedUserData.badges.map(badge => ({
-            ...badge,
-            date: badge.date ? new Date(badge.date) : null
-          }));
-        }
-        
-        if (parsedUserData.benefitTracking) {
-          parsedUserData.benefitTracking = parsedUserData.benefitTracking.map(item => ({
-            ...item,
-            date: new Date(item.date),
-            aura: item.aura || 5,
-            sleep: item.sleep || item.attraction || 5,
-            workout: item.workout || item.gymPerformance || 5
-          }));
-        }
-        
-        if (parsedUserData.emotionalTracking) {
-          parsedUserData.emotionalTracking = parsedUserData.emotionalTracking.map(item => ({
-            ...item,
-            date: new Date(item.date)
-          }));
-        } else {
-          parsedUserData.emotionalTracking = [];
-        }
-        
-        if (parsedUserData.urgeLog) {
-          parsedUserData.urgeLog = parsedUserData.urgeLog.map(item => ({
-            ...item,
-            date: new Date(item.date)
-          }));
-        } else {
-          parsedUserData.urgeLog = [];
-        }
-        
-        if (parsedUserData.streakHistory) {
-          parsedUserData.streakHistory = parsedUserData.streakHistory.map(streak => ({
-            ...streak,
-            start: new Date(streak.start),
-            end: streak.end ? new Date(streak.end) : null
-          }));
-        }
-        
-        // Set default values for profile fields if they don't exist
-        parsedUserData.email = parsedUserData.email || '';
-        parsedUserData.dataSharing = parsedUserData.dataSharing || false;
-        parsedUserData.analyticsOptIn = parsedUserData.analyticsOptIn !== false;
-        parsedUserData.marketingEmails = parsedUserData.marketingEmails || false;
-        parsedUserData.darkMode = parsedUserData.darkMode !== false;
-        parsedUserData.notifications = parsedUserData.notifications !== false;
-        parsedUserData.language = parsedUserData.language || 'en';
-        parsedUserData.wisdomMode = parsedUserData.wisdomMode || false;
-        
-        // CHANGED: Force premium to true
-        parsedUserData.isPremium = true;
-        
-        setUserData(parsedUserData);
-        setIsLoggedIn(true);
-        setIsPremium(true); // CHANGED: Always premium
-      } catch (err) {
-        console.error('Error parsing stored user data:', err);
-        localStorage.removeItem('userData');
-        localStorage.removeItem('isLoggedIn');
       }
-    }
+      
+      // Finish loading regardless of login status
+      setIsLoading(false);
+    };
+
+    initializeApp();
   }, []);
 
   return { 
     userData, 
     isLoggedIn, 
     isPremium: true, // CHANGED: Always return true
-    isLoading,
+    isLoading, // App refresh loading
+    isLoginLoading, // Login specific loading
+    loginPhase, // Login phase for different messages
     login, 
     logout, 
     updateUserData,
