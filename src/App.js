@@ -307,8 +307,12 @@ function App() {
   const [activeTab, setActiveTab] = useState('tracker');
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   
-  // NEW: Add refresh loading state
-  const [isRefreshLoading, setIsRefreshLoading] = useState(false);
+  // NEW: Add refresh loading state - check for existing session on mount
+  const [isRefreshLoading, setIsRefreshLoading] = useState(() => {
+    // Check if user was logged in before refresh
+    const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
+    return storedIsLoggedIn === 'true';
+  });
   const [loadingMessage, setLoadingMessage] = useState('Loading your dashboard...');
   
   // UPDATED: Destructure goal functions from useUserData hook
@@ -341,23 +345,15 @@ function App() {
     setIsInitialLoading(false);
   }, []);
 
-  // NEW: Handle refresh loading when user is logged in
+  // NEW: Handle refresh loading animation
   useEffect(() => {
-    // Check if this is a page refresh (not initial load)
-    const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore');
-    
-    if (!hasLoadedBefore) {
-      // First visit in this session
-      sessionStorage.setItem('hasLoadedBefore', 'true');
-    } else if (isLoggedIn && !isLoading) {
-      // This is a refresh and user is logged in
-      setIsRefreshLoading(true);
-      setLoadingMessage('Loading your dashboard...');
-      
-      // Show loading animation for 1.2 seconds
-      setTimeout(() => {
+    if (isRefreshLoading) {
+      // Show loading for 1.2 seconds on refresh
+      const timer = setTimeout(() => {
         setIsRefreshLoading(false);
       }, 1200);
+      
+      return () => clearTimeout(timer);
     }
   }, []);
 
