@@ -40,8 +40,8 @@
 /* FIXED: Close button positioning to match benefits modal exactly */
 .close-modal-btn {
   position: absolute;
-  top: var(--spacing-xl);  /* CHANGED: From var(--spacing-md) to var(--spacing-xl) to account for modal padding */
-  right: var(--spacing-xl);  /* CHANGED: From var(--spacing-md) to var(--spacing-xl) to account for modal padding */
+  top: var(--spacing-md);  /* MATCHED: Same as benefits modal in Tracker.css */
+  right: var(--spacing-md);  /* MATCHED: Same as benefits modal in Tracker.css */
   background: rgba(128, 128, 128, 0.1) !important;
   background-color: rgba(128, 128, 128, 0.1) !important;
   border: 1px solid var(--border) !important;
