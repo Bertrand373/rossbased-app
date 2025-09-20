@@ -1,4 +1,4 @@
-// App.js - FIXED: Initial loading uses landing container size, brief helmet animation
+// App.js - UPDATED: Added refresh loading animation and improved login flow
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -307,6 +307,10 @@ function App() {
   const [activeTab, setActiveTab] = useState('tracker');
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   
+  // NEW: Add refresh loading state
+  const [isRefreshLoading, setIsRefreshLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Loading your dashboard...');
+  
   // UPDATED: Destructure goal functions from useUserData hook
   const { 
     userData, 
@@ -332,23 +336,54 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // FIXED: No initial animation - landing page loads immediately
+  // Skip initial loading animation on first load
   useEffect(() => {
-    // Skip any initial loading animation entirely
     setIsInitialLoading(false);
   }, []);
 
-  // Handle login
+  // NEW: Handle refresh loading when user is logged in
+  useEffect(() => {
+    // Check if this is a page refresh (not initial load)
+    const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore');
+    
+    if (!hasLoadedBefore) {
+      // First visit in this session
+      sessionStorage.setItem('hasLoadedBefore', 'true');
+    } else if (isLoggedIn && !isLoading) {
+      // This is a refresh and user is logged in
+      setIsRefreshLoading(true);
+      setLoadingMessage('Loading your dashboard...');
+      
+      // Show loading animation for 1.2 seconds
+      setTimeout(() => {
+        setIsRefreshLoading(false);
+      }, 1200);
+    }
+  }, []);
+
+  // UPDATED: Handle login with improved flow
   const handleLogin = async (username, password) => {
-    const success = await login(username, password);
+    // Set initial loading message
+    setLoadingMessage('Logging you in...');
+    
+    // Start login process
+    const loginPromise = login(username, password);
+    
+    // Change message after 800ms
+    setTimeout(() => {
+      setLoadingMessage('Loading your dashboard...');
+    }, 800);
+    
+    const success = await loginPromise;
+    
     if (success) {
       setShowAuthModal(false);
     }
     return success;
   };
 
-  // FIXED: Remove the initial loading animation entirely
-  if (isLoading) {
+  // Show loading screen for login or refresh
+  if (isLoading || isRefreshLoading) {
     return (
       <div className="spartan-loading-screen">
         <div className="spartan-loader-container">
@@ -362,10 +397,10 @@ function App() {
                 e.target.nextElementSibling.style.display = 'block';
               }}
             />
-            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>âš¡</div>
+            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>⚡</div>
           </div>
           <div className="spartan-loader-message">
-            Loading your dashboard...
+            {loadingMessage}
           </div>
         </div>
       </div>
@@ -431,6 +466,7 @@ function App() {
           <AuthModal 
             onClose={() => setShowAuthModal(false)} 
             onLogin={handleLogin}
+            loadingMessage={loadingMessage}
           />
         )}
         

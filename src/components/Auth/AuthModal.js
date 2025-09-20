@@ -1,4 +1,4 @@
-// components/Auth/AuthModal.js - Fixed username validation and styling with helmet loading
+// components/Auth/AuthModal.js - UPDATED: Improved login flow with dynamic loading messages
 import React, { useState, useEffect } from 'react';
 import './AuthModal.css';
 import helmetImage from '../../assets/helmet.png';
@@ -6,7 +6,7 @@ import helmetImage from '../../assets/helmet.png';
 // Icons
 import { FaTimes, FaUser, FaLock, FaGoogle, FaDiscord, FaEnvelope, FaSpinner } from 'react-icons/fa';
 
-const AuthModal = ({ onClose, onLogin }) => {
+const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -139,7 +139,7 @@ const AuthModal = ({ onClose, onLogin }) => {
     onClose();
   };
 
-  // ENHANCED: Loading State with Helmet Animation
+  // ENHANCED: Loading State with dynamic loading message
   if (isLoading) {
     return (
       <div className="modal-overlay">
@@ -147,17 +147,18 @@ const AuthModal = ({ onClose, onLogin }) => {
           <div className="auth-loading-state">
             <img 
               src={helmetImage} 
-              alt="Logging you in" 
+              alt="Loading" 
               className="auth-loading-helmet"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextElementSibling.style.display = 'block';
               }}
             />
-            <div className="auth-loading-helmet-fallback" style={{display: 'none'}}>âš¡</div>
+            <div className="auth-loading-helmet-fallback" style={{display: 'none'}}>⚡</div>
             
             <div className="auth-loading-text">
-              {isLogin ? 'Logging you in...' : 'Creating your account...'}
+              {/* Use the dynamic loading message passed from App.js */}
+              {loadingMessage || (isLogin ? 'Logging you in...' : 'Creating your account...')}
             </div>
             
             <div className="auth-loading-dots">
