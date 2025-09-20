@@ -1,4 +1,4 @@
-// App.js - ENHANCED: App refresh loading and login phase transitions
+// App.js - FIXED: Initial loading uses landing container size, brief helmet animation
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -305,15 +305,14 @@ const ScrollToTop = () => {
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   
-  // ENHANCED: Destructure new loading states from useUserData hook
+  // UPDATED: Destructure goal functions from useUserData hook
   const { 
     userData, 
     isLoggedIn, 
     isPremium, 
-    isLoading, // App refresh loading
-    isLoginLoading, // Login specific loading
-    loginPhase, // Login phase for different messages
+    isLoading, 
     login, 
     logout, 
     updateUserData,
@@ -333,6 +332,12 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // FIXED: No initial animation - landing page loads immediately
+  useEffect(() => {
+    // Skip any initial loading animation entirely
+    setIsInitialLoading(false);
+  }, []);
+
   // Handle login
   const handleLogin = async (username, password) => {
     const success = await login(username, password);
@@ -342,7 +347,7 @@ function App() {
     return success;
   };
 
-  // ENHANCED: App refresh loading screen with "Loading your dashboard..." message
+  // FIXED: Remove the initial loading animation entirely
   if (isLoading) {
     return (
       <div className="spartan-loading-screen">
@@ -350,14 +355,14 @@ function App() {
           <div className="spartan-loader-animation">
             <img 
               src={helmetImage} 
-              alt="Loading your dashboard" 
+              alt="Loading" 
               className="spartan-helmet-image app-loading-helmet-size"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextElementSibling.style.display = 'block';
               }}
             />
-            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>⚡</div>
+            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>âš¡</div>
           </div>
           <div className="spartan-loader-message">
             Loading your dashboard...
@@ -426,8 +431,6 @@ function App() {
           <AuthModal 
             onClose={() => setShowAuthModal(false)} 
             onLogin={handleLogin}
-            isLoginLoading={isLoginLoading}
-            loginPhase={loginPhase}
           />
         )}
         

@@ -1,4 +1,4 @@
-// components/Auth/AuthModal.js - ENHANCED: Login phase transitions with dynamic messages
+// components/Auth/AuthModal.js - Fixed username validation and styling with helmet loading
 import React, { useState, useEffect } from 'react';
 import './AuthModal.css';
 import helmetImage from '../../assets/helmet.png';
@@ -6,7 +6,7 @@ import helmetImage from '../../assets/helmet.png';
 // Icons
 import { FaTimes, FaUser, FaLock, FaGoogle, FaDiscord, FaEnvelope, FaSpinner } from 'react-icons/fa';
 
-const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
+const AuthModal = ({ onClose, onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -14,6 +14,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [discordUsername, setDiscordUsername] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
   // Clear error when switching between login/signup
   useEffect(() => {
@@ -96,74 +97,67 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
       }
     }
     
+    setIsLoading(true);
     setError('');
     
     try {
-      const success = await onLogin(username.trim(), password);
+      // Ensure minimum loading time for better UX
+      const [success] = await Promise.all([
+        onLogin(username.trim(), password),
+        new Promise(resolve => setTimeout(resolve, 800)) // Minimum 800ms loading
+      ]);
       
-      if (!success) {
+      if (success) {
+        // Success - modal will be closed by parent component
+        // Don't set loading to false here, let the parent handle it
+      } else {
         setError('Login failed. Please check your credentials and try again.');
+        setIsLoading(false);
       }
-      // If success, modal will be closed by parent component after login phases complete
     } catch (error) {
       console.error('Authentication error:', error);
       setError('Something went wrong. Please try again.');
+      setIsLoading(false);
     }
   };
   
   const handleSocialLogin = (provider) => {
-    if (isLoginLoading) return;
+    if (isLoading) return;
     
     // In a real app, this would initiate OAuth flow
     setError(`${provider} login is not available in demo mode`);
   };
   
   const switchMode = () => {
-    if (isLoginLoading) return;
+    if (isLoading) return;
     setIsLogin(!isLogin);
     setError('');
   };
   
   const handleClose = () => {
-    if (isLoginLoading) return;
+    if (isLoading) return;
     onClose();
   };
 
-  // ENHANCED: Dynamic loading message based on login phase
-  const getLoadingMessage = () => {
-    if (!isLogin) {
-      return 'Creating your account...';
-    }
-    
-    switch (loginPhase) {
-      case 'authenticating':
-        return 'Logging you in...';
-      case 'loading-dashboard':
-        return 'Loading your dashboard...';
-      default:
-        return 'Logging you in...';
-    }
-  };
-
-  // ENHANCED: Loading State with Dynamic Messages
-  if (isLoginLoading) {
+  // ENHANCED: Loading State with Helmet Animation
+  if (isLoading) {
     return (
       <div className="modal-overlay">
         <div className="modal-content auth-modal">
           <div className="auth-loading-state">
             <img 
               src={helmetImage} 
-              alt="Loading" 
+              alt="Logging you in" 
               className="auth-loading-helmet"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextElementSibling.style.display = 'block';
               }}
             />
-            <div className="auth-loading-helmet-fallback" style={{display: 'none'}}>⚡</div>
+            <div className="auth-loading-helmet-fallback" style={{display: 'none'}}>âš¡</div>
             
             <div className="auth-loading-text">
-              {getLoadingMessage()}
+              {isLogin ? 'Logging you in...' : 'Creating your account...'}
             </div>
             
             <div className="auth-loading-dots">
@@ -180,7 +174,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content auth-modal" onClick={e => e.stopPropagation()}>
-        <button className="close-modal-btn" onClick={handleClose} disabled={isLoginLoading}>
+        <button className="close-modal-btn" onClick={handleClose} disabled={isLoading}>
           <FaTimes />
         </button>
         
@@ -189,7 +183,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
         <div className="auth-social-buttons">
           <button 
             className="social-btn google-btn" 
-            disabled={isLoginLoading}
+            disabled={isLoading}
             onClick={() => handleSocialLogin('Google')}
           >
             <FaGoogle />
@@ -198,7 +192,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
           
           <button 
             className="social-btn discord-btn" 
-            disabled={isLoginLoading}
+            disabled={isLoading}
             onClick={() => handleSocialLogin('Discord')}
           >
             <FaDiscord />
@@ -225,7 +219,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
               onChange={(e) => setUsername(e.target.value)}
               placeholder={isLogin ? "Enter your username" : "Choose a username (3-20 characters)"}
               required
-              disabled={isLoginLoading}
+              disabled={isLoading}
               autoComplete="username"
               maxLength={20}
             />
@@ -249,7 +243,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                disabled={isLoginLoading}
+                disabled={isLoading}
                 autoComplete="email"
               />
             </div>
@@ -267,7 +261,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
-              disabled={isLoginLoading}
+              disabled={isLoading}
               autoComplete={isLogin ? "current-password" : "new-password"}
             />
           </div>
@@ -286,7 +280,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your password"
                   required
-                  disabled={isLoginLoading}
+                  disabled={isLoading}
                   autoComplete="new-password"
                 />
               </div>
@@ -302,17 +296,17 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
                   value={discordUsername}
                   onChange={(e) => setDiscordUsername(e.target.value)}
                   placeholder="For leaderboard integration"
-                  disabled={isLoginLoading}
+                  disabled={isLoading}
                 />
               </div>
             </>
           )}
           
-          <button type="submit" className="auth-submit-btn" disabled={isLoginLoading}>
-            {isLoginLoading ? (
+          <button type="submit" className="auth-submit-btn" disabled={isLoading}>
+            {isLoading ? (
               <>
                 <FaSpinner className="spinner" /> 
-                {getLoadingMessage()}
+                {isLogin ? 'Logging in...' : 'Creating Account...'}
               </>
             ) : (
               isLogin ? 'Login' : 'Create Account'
@@ -327,7 +321,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
               <button 
                 className="switch-btn"
                 onClick={switchMode}
-                disabled={isLoginLoading}
+                disabled={isLoading}
               >
                 Sign Up
               </button>
@@ -338,7 +332,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
               <button 
                 className="switch-btn"
                 onClick={switchMode}
-                disabled={isLoginLoading}
+                disabled={isLoading}
               >
                 Login
               </button>
@@ -348,7 +342,7 @@ const AuthModal = ({ onClose, onLogin, isLoginLoading, loginPhase }) => {
         
         {isLogin && (
           <div className="forgot-password">
-            <button className="forgot-btn" disabled={isLoginLoading}>
+            <button className="forgot-btn" disabled={isLoading}>
               Forgot password?
             </button>
           </div>
