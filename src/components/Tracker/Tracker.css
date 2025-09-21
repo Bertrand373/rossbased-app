@@ -466,7 +466,7 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
   position: relative;
   overflow: hidden;
-  margin-bottom: var(--spacing-xl);
+  margin: var(--spacing-lg) 0; /* FIXED: Equal top and bottom spacing */
 }
 
 .benefits-tracking-helmet-container {
@@ -1036,7 +1036,7 @@ button.action-btn:hover {
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
+    margin: var(--spacing-md) 0; /* FIXED: Equal top and bottom spacing on mobile */
   }
   
   .benefits-tracking-content {
