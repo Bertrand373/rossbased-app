@@ -45,7 +45,7 @@
   gap: var(--spacing-md); /* INCREASED: More reasonable spacing */
   align-items: center; /* CHANGED: Center align for proper separator positioning */
   justify-content: center;
-  padding: var(--spacing-sm) 0; /* REDUCED: Less vertical padding */
+  padding: var(--spacing-sm) 0; /* FIXED: Match bottom spacing */
 }
 
 .input-group {
@@ -269,7 +269,7 @@
   
   .date-inputs-row {
     gap: var(--spacing-sm); /* REDUCED: Tighter spacing on mobile */
-    padding: var(--spacing-xs) 0; /* REDUCED: Less padding on mobile */
+    padding: var(--spacing-xs) 0; /* RESTORED: Back to original mobile padding */
   }
   
   /* FIXED: Better mobile input sizes - even larger for readability */
