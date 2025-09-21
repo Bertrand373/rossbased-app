@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Refined modal styling to match Emotional Timeline */
+/* components/Tracker/Tracker.css - FIXED: Removed global modal styles affecting other components */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -406,8 +406,8 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
 }
 
-/* REFINED MODAL STYLES - Matching Emotional Timeline's clean look */
-.modal-overlay {
+/* TRACKER-SPECIFIC MODAL STYLES - Only affecting Tracker modals */
+.tracker-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -421,7 +421,7 @@ button.action-btn:hover {
   padding: var(--spacing-md);
 }
 
-.modal-content {
+.tracker-modal-content {
   background-color: var(--card-background);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
@@ -449,26 +449,17 @@ button.action-btn:hover {
   }
 }
 
-/* REFINED: Tracker-specific modal headers - only for date picker modal */
-.modal-content h2:has(+ p:contains("When did you begin")) {
+/* SPECIFIC: Date picker modal styling within Tracker */
+.date-picker-modal h2 {
   margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1.25rem;  /* REDUCED from 1.5rem to match ET modals */
+  font-size: 1.25rem;
   color: var(--text);
   text-align: center;
   font-weight: 600;
 }
 
-/* Better approach - target by proximity to DatePicker component */
-.modal-content:has(.date-picker-container) h2 {
-  margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1.25rem;  /* REDUCED from 1.5rem to match ET modals */
-  color: var(--text);
-  text-align: center;
-  font-weight: 600;
-}
-
-.modal-content:has(.date-picker-container) > p {
-  font-size: 0.875rem;  /* MATCHES ET modal text */
+.date-picker-modal > p {
+  font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.4;
   margin: 0 0 var(--spacing-lg) 0;
@@ -504,7 +495,7 @@ button.action-btn:hover {
   transform: scale(1.1);
 }
 
-/* REFINED: Benefits Modal Styling - Clean header and subtitle like ET */
+/* SPECIFIC: Benefits Modal Styling - Clean header and subtitle like ET */
 .benefits-modal {
   max-width: 600px;
   max-height: 85vh;
@@ -1068,18 +1059,6 @@ button.action-btn:hover {
     min-height: auto !important;
   }
   
-  /* REFINED: Mobile modal headers */
-  .modal-content h2,
-  .modal-content h3,
-  .benefits-modal-header {
-    font-size: 1.125rem !important;
-  }
-  
-  .modal-content > p,
-  .benefits-modal-subtitle {
-    font-size: 0.8rem !important;
-  }
-  
   /* ENHANCED: Mobile gradient streak number to match desktop */
   .streak-number {
     font-size: 3.5rem !important;
@@ -1288,18 +1267,6 @@ button.action-btn:hover {
   
   .tracker-header-subtitle {
     font-size: 0.75rem !important; /* MATCHES: Calendar very small mobile subtitle */
-  }
-  
-  /* REFINED: Very small screen modal headers */
-  .modal-content h2,
-  .modal-content h3,
-  .benefits-modal-header {
-    font-size: 1rem !important;
-  }
-  
-  .modal-content > p,
-  .benefits-modal-subtitle {
-    font-size: 0.75rem !important;
   }
 
   .discord-community-stats {
