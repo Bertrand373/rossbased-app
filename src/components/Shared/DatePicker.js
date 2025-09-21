@@ -1,7 +1,7 @@
-// components/Shared/DatePicker.js - UPDATED: Yellow info icon, fixed mobile, consistent hover effects
+// components/Shared/DatePicker.js - UPDATED: Helmet banner branding, grey→yellow hover effects, fixed mobile
 import React, { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
-import { FaCheckCircle, FaTimes, FaInfoCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaTimes } from 'react-icons/fa';
 import './DatePicker.css';
 
 const DatePicker = ({ currentDate, onSubmit, onCancel, hasExistingDate = false }) => {
@@ -150,6 +150,33 @@ const DatePicker = ({ currentDate, onSubmit, onCancel, hasExistingDate = false }
         <div className="current-date-value">{format(currentDate, 'MMMM d, yyyy')}</div>
       </div>
       
+      {/* NEW: Helmet Info Banner - EXACT COPY from Emotional Timeline */}
+      <div className="date-picker-info-banner">
+        <div className="date-picker-helmet-container">
+          <img 
+            className="date-picker-helmet" 
+            src="/helmet.png" 
+            alt="Date Format Instructions" 
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextElementSibling.style.display = 'block';
+            }}
+          />
+          <div className="date-picker-helmet-fallback" style={{ display: 'none' }}>
+            🛡️
+          </div>
+        </div>
+        
+        <div className="date-picker-info-content">
+          <h4 className="date-picker-info-title">
+            Smart Date Entry System
+          </h4>
+          <p className="date-picker-info-description">
+            Enter MM/DD/YYYY format - cursor automatically advances between fields as you type. Start with the month, then day, then year for fastest entry.
+          </p>
+        </div>
+      </div>
+      
       <form onSubmit={handleSubmit} className="date-picker-form">
         <div className="date-inputs-row">
           <div className="input-group">
@@ -197,11 +224,6 @@ const DatePicker = ({ currentDate, onSubmit, onCancel, hasExistingDate = false }
               onChange={handleYearChange}
             />
           </div>
-        </div>
-        
-        <div className="helper-text">
-          <FaInfoCircle className="helper-icon" />
-          Enter MM/DD/YYYY format - cursor will automatically advance between fields
         </div>
         
         <div className="date-picker-actions">

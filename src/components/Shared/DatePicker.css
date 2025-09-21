@@ -1,4 +1,4 @@
-/* components/Shared/DatePicker.css - UPDATED: Greyâ†’yellow hover effects, yellow info icon, fixed mobile inputs */
+/* components/Shared/DatePicker.css - UPDATED: Helmet banner branding, grey→yellow hover effects, fixed mobile inputs */
 
 .date-picker-container {
   display: flex;
@@ -109,37 +109,82 @@
   font-weight: 600;
 }
 
-/* UPDATED: Helper text with yellow info icon */
-.helper-text {
-  background-color: var(--card-background);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  font-size: 0.875rem; /* INCREASED: Larger text */
-  color: var(--text-secondary);
-  text-align: center;
-  border-left: 3px solid var(--primary);
-  font-weight: 500;
-  border: 1px solid var(--border);
+/* NEW: Helmet Info Banner - EXACT COPY from Emotional Timeline */
+.date-picker-info-banner {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
 }
 
-.helper-icon {
-  color: var(--primary);
-  font-size: 1rem;
+.date-picker-helmet-container {
   flex-shrink: 0;
 }
 
-/* IMPROVED: Button styling with greyâ†’yellow hover effects */
+.date-picker-helmet {
+  width: 40px;
+  height: 40px;
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
+}
+
+.date-picker-helmet-fallback {
+  font-size: 1.5rem;
+  color: var(--primary);
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes coming-soon-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.96);
+  }
+}
+
+.date-picker-info-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.date-picker-info-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.date-picker-info-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* REMOVED: Old helper-text styles - replaced with helmet banner */
+
+/* IMPROVED: Button styling with grey→yellow hover effects */
 .date-picker-actions {
   display: flex;
   gap: var(--spacing-md);
   margin-top: var(--spacing-md);
 }
 
-/* UPDATED: Primary action button - grey â†’ yellow hover */
+/* UPDATED: Primary action button - grey → yellow hover */
 .date-picker-container .primary-action {
   display: flex !important;
   align-items: center !important;
@@ -165,7 +210,7 @@
   transform: translateY(-1px) !important;
 }
 
-/* UPDATED: Cancel button - grey â†’ yellow hover */
+/* UPDATED: Cancel button - grey → yellow hover */
 .date-picker-container .cancel-action {
   display: flex !important;
   align-items: center !important;
@@ -195,6 +240,32 @@
 @media (max-width: 768px) {
   .date-picker-container {
     gap: var(--spacing-md); /* REDUCED: Less gap on mobile */
+  }
+  
+  /* NEW: Mobile helmet banner styles - EXACT COPY from Emotional Timeline */
+  .date-picker-info-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .date-picker-info-content {
+    text-align: center;
+  }
+  
+  .date-picker-info-title {
+    justify-content: center;
+  }
+  
+  .date-picker-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .date-picker-helmet-fallback {
+    font-size: 1.25rem;
   }
   
   .date-inputs-row {
@@ -228,14 +299,6 @@
     padding-bottom: var(--spacing-sm);
   }
   
-  .helper-text {
-    font-size: 0.8125rem;
-    padding: var(--spacing-sm) var(--spacing-md);
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    text-align: center;
-  }
-  
   .current-date-display {
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: 0.8125rem;
@@ -253,7 +316,7 @@
     gap: var(--spacing-sm);
   }
   
-  /* UPDATED: Mobile buttons with greyâ†’yellow hover */
+  /* UPDATED: Mobile buttons with grey→yellow hover */
   .date-picker-container .primary-action,
   .date-picker-container .cancel-action {
     padding: var(--spacing-sm) var(--spacing-md) !important;
@@ -264,6 +327,24 @@
 
 /* Very small screens - more compact */
 @media (max-width: 480px) {
+  /* NEW: Very small mobile helmet banner styles - EXACT COPY from Emotional Timeline */
+  .date-picker-helmet {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .date-picker-helmet-fallback {
+    font-size: 1rem;
+  }
+  
+  .date-picker-info-title {
+    font-size: 0.875rem;
+  }
+  
+  .date-picker-info-description {
+    font-size: 0.8rem;
+  }
+  
   .date-inputs-row {
     gap: var(--spacing-xs);
     justify-content: space-evenly; /* CHANGED: Better distribution */
@@ -282,10 +363,5 @@
   .date-separator {
     font-size: 1.125rem;
     margin: 0 2px;
-  }
-  
-  .helper-text {
-    font-size: 0.75rem;
-    padding: var(--spacing-sm);
   }
 }
