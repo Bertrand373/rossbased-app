@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Benefit sliders matching Emotional Timeline exactly */
+/* components/Tracker/Tracker.css - UPDATED: Refined modal styling to match Emotional Timeline */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -92,7 +92,7 @@
   justify-self: end;
 }
 
-/* UPDATED: Consistent grey â†’ yellow hover pattern for ALL secondary buttons */
+/* UPDATED: Consistent grey → yellow hover pattern for ALL secondary buttons */
 .action-btn {
   display: flex;
   align-items: center;
@@ -354,16 +354,165 @@ button.action-btn:hover {
   transform: scale(1.05);
 }
 
-/* ENHANCED: Benefits Modal Styling - EXACTLY MATCHING Emotional Timeline Check-in */
+/* NEW: Benefits Status Indicator in Streak Card */
+.benefits-status-indicator {
+  order: 5.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: var(--spacing-sm) 0;
+}
+
+.benefits-logged-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.1);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.benefits-logged-status .check-icon {
+  color: var(--success);
+}
+
+.benefits-not-logged-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.benefits-not-logged-status .info-icon {
+  color: var(--primary);
+}
+
+/* Premium Benefits Container - NOT USED IN MODAL */
+.premium-benefits-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* REFINED MODAL STYLES - Matching Emotional Timeline's clean look */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: modal-appear 0.3s ease-out;
+  /* ADDED: Smooth scrolling */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* REFINED: Modal headers - cleaner, smaller, centered like Emotional Timeline */
+.modal-content h2 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.25rem;  /* REDUCED from 1.5rem to match ET modals */
+  color: var(--text);
+  text-align: center;
+  font-weight: 600;
+}
+
+.modal-content h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.25rem;  /* MATCHES ET modal headers */
+  color: var(--text);
+  text-align: center;
+  font-weight: 600;
+}
+
+/* REFINED: Modal paragraph text - centered and sized like ET modals */
+.modal-content > p {
+  font-size: 0.875rem;  /* MATCHES ET modal text */
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0 0 var(--spacing-lg) 0;
+  text-align: center;
+}
+
+/* UPDATED: Close button - matching ET modal close button exactly */
+.modal-close-btn {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  outline: none;
+}
+
+.modal-close-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: scale(1.1);
+}
+
+/* REFINED: Benefits Modal Styling - Clean header and subtitle like ET */
 .benefits-modal {
   max-width: 600px;
   max-height: 85vh;
 }
 
 .benefits-modal-header {
-  margin-top: 0;
-  margin-bottom: var(--spacing-sm);
-  font-size: 1.25rem;
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.25rem;  /* MATCHES ET modal headers */
   color: var(--text);
   text-align: center;
   font-weight: 600;
@@ -371,7 +520,7 @@ button.action-btn:hover {
 
 .benefits-modal-subtitle {
   margin: 0 0 var(--spacing-lg) 0;
-  font-size: 0.875rem;
+  font-size: 0.875rem;  /* MATCHES ET modal subtitles */
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.4;
@@ -685,135 +834,7 @@ button.action-btn:hover {
   transform: translateY(-1px);
 }
 
-/* NEW: Benefits Status Indicator in Streak Card */
-.benefits-status-indicator {
-  order: 5.5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: var(--spacing-sm) 0;
-}
-
-.benefits-logged-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  background-color: rgba(34, 197, 94, 0.05);
-  border: 1px solid rgba(34, 197, 94, 0.1);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-sm) var(--spacing-md);
-}
-
-.benefits-logged-status .check-icon {
-  color: var(--success);
-}
-
-.benefits-not-logged-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  background-color: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-sm) var(--spacing-md);
-}
-
-.benefits-not-logged-status .info-icon {
-  color: var(--primary);
-}
-
-/* Premium Benefits Container - NOT USED IN MODAL */
-.premium-benefits-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* Modal overlay and base */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: var(--spacing-md);
-}
-
-.modal-content {
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  border: 1px solid var(--border);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  animation: modal-appear 0.3s ease-out;
-}
-
-@keyframes modal-appear {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.modal-content h3 {
-  margin-top: 0;
-  margin-bottom: var(--spacing-lg);
-  font-size: 1.25rem;
-  color: var(--text);
-  text-align: center;
-}
-
-/* UPDATED: Close button positioned properly from edges - MATCHING Profile feedback modal exactly */
-.modal-close-btn {
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  background: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  font-size: 1rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: var(--radius-full);
-  transition: all 0.2s ease;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-
-.modal-close-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* DESKTOP LAYOUT: Two-column grid for screens â‰¥1024px with ENHANCED styling */
+/* DESKTOP LAYOUT: Two-column grid for screens ≥1024px with ENHANCED styling */
 @media (min-width: 1024px) {
   /* UPDATED: Desktop header sizing to match Calendar exactly */
   .tracker-header-title-section h2 {
@@ -1047,6 +1068,18 @@ button.action-btn:hover {
     min-height: auto !important;
   }
   
+  /* REFINED: Mobile modal headers */
+  .modal-content h2,
+  .modal-content h3,
+  .benefits-modal-header {
+    font-size: 1.125rem !important;
+  }
+  
+  .modal-content > p,
+  .benefits-modal-subtitle {
+    font-size: 0.8rem !important;
+  }
+  
   /* ENHANCED: Mobile gradient streak number to match desktop */
   .streak-number {
     font-size: 3.5rem !important;
@@ -1255,6 +1288,18 @@ button.action-btn:hover {
   
   .tracker-header-subtitle {
     font-size: 0.75rem !important; /* MATCHES: Calendar very small mobile subtitle */
+  }
+  
+  /* REFINED: Very small screen modal headers */
+  .modal-content h2,
+  .modal-content h3,
+  .benefits-modal-header {
+    font-size: 1rem !important;
+  }
+  
+  .modal-content > p,
+  .benefits-modal-subtitle {
+    font-size: 0.75rem !important;
   }
 
   .discord-community-stats {
