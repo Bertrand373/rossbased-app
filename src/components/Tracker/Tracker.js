@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Enhanced benefits modal with Emotional Timeline slider styling
+// components/Tracker/Tracker.js - UPDATED: Added date-picker-modal class for specific styling
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -314,10 +314,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   return (
     <div className="tracker-container">
-      {/* React DatePicker Modal */}
+      {/* React DatePicker Modal - UPDATED: Added date-picker-modal class */}
       {showSetStartDate && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content date-picker-modal">
             <button className="modal-close-btn" onClick={handleDateCancel}>
               <FaTimes />
             </button>

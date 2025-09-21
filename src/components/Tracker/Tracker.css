@@ -449,8 +449,8 @@ button.action-btn:hover {
   }
 }
 
-/* REFINED: Modal headers - cleaner, smaller, centered like Emotional Timeline */
-.modal-content h2 {
+/* REFINED: Tracker-specific modal headers - only for date picker modal */
+.modal-content h2:has(+ p:contains("When did you begin")) {
   margin: 0 0 var(--spacing-sm) 0;
   font-size: 1.25rem;  /* REDUCED from 1.5rem to match ET modals */
   color: var(--text);
@@ -458,16 +458,16 @@ button.action-btn:hover {
   font-weight: 600;
 }
 
-.modal-content h3 {
+/* Better approach - target by proximity to DatePicker component */
+.modal-content:has(.date-picker-container) h2 {
   margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1.25rem;  /* MATCHES ET modal headers */
+  font-size: 1.25rem;  /* REDUCED from 1.5rem to match ET modals */
   color: var(--text);
   text-align: center;
   font-weight: 600;
 }
 
-/* REFINED: Modal paragraph text - centered and sized like ET modals */
-.modal-content > p {
+.modal-content:has(.date-picker-container) > p {
   font-size: 0.875rem;  /* MATCHES ET modal text */
   color: var(--text-secondary);
   line-height: 1.4;
