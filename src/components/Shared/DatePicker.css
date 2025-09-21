@@ -1,115 +1,462 @@
-/* components/Shared/DatePicker.css - UPDATED: Helmet banner branding, grey→yellow hover effects, fixed mobile inputs */
-
-.date-picker-container {
+/* components/Tracker/Tracker.css - UPDATED: Added benefits modal banner styling */
+.tracker-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  padding: 0; /* REMOVED: No padding around container */
-  background-color: transparent; /* REMOVED: No background */
-  border: none; /* REMOVED: No border */
-  border-radius: 0; /* REMOVED: No border radius */
 }
 
-.current-date-display {
-  background-color: var(--medium-gray);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  text-align: center;
-  font-size: 0.875rem;
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-
-.current-date-label {
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  margin-bottom: var(--spacing-xs);
-  font-weight: 500;
-}
-
-.current-date-value {
-  color: var(--text);
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.date-picker-form {
+/* UPDATED: Integrated header design with subtitle and Calendar-matching sizing */
+.integrated-tracker-header {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md); /* REDUCED: Less gap between sections */
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* IMPROVED: Better spacing and layout for date inputs */
-.date-inputs-row {
+.tracker-header-title-section {
   display: flex;
-  gap: var(--spacing-md); /* INCREASED: More reasonable spacing */
-  align-items: center; /* CHANGED: Center align for proper separator positioning */
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding: var(--spacing-sm) 0; /* FIXED: Match bottom spacing */
+  margin-bottom: var(--spacing-lg);
+  position: relative;
 }
 
-.input-group {
+.tracker-header-title-section h2 {
+  margin: 0;
+  font-size: 1.5rem; /* UPDATED: Match Calendar desktop size (was 1.25rem) */
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.85;
+  text-align: center;
+}
+
+/* NEW: Header subtitle */
+.tracker-header-subtitle {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: 0.875rem; /* MATCHES: Calendar desktop subtitle size */
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
+}
+
+.tracker-header-actions-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.tracker-header-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+/* NEW: Desktop main content grid container */
+.tracker-main-content {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* NEW: Discord and YouTube column container */
+.discord-youtube-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* LEGACY: Keep old header styling for backward compatibility if needed */
+.tracker-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 0;
+}
+
+.tracker-header-spacer {
+  /* Empty spacer for centering */
+}
+
+.tracker-header h2 {
+  text-align: center;
+  margin: 0;
+}
+
+.tracker-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-self: end;
+}
+
+/* UPDATED: Consistent grey → yellow hover pattern for ALL secondary buttons */
+.action-btn {
+  display: flex;
+  align-items: center;
   gap: var(--spacing-sm);
-  align-items: center; /* ADDED: Center the inputs */
-}
-
-.input-group label {
-  font-size: 0.875rem; /* INCREASED: Larger labels */
-  color: var(--text);
-  font-weight: 600;
-  text-align: center;
-}
-
-/* IMPROVED: Better input styling matching other form elements */
-.date-inputs-row input {
-  padding: var(--spacing-md); /* INCREASED: More padding like other inputs */
-  background-color: var(--medium-gray);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none !important;
+}
+
+/* UPDATED: Yellow hover effect like navigation pills */
+.action-btn:hover,
+.tracker-actions .action-btn:hover,
+.tracker-header-actions .action-btn:hover,
+button.action-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.action-btn:focus,
+.action-btn:active,
+.action-btn:focus-visible {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  filter: none !important;
+}
+
+/* Current Streak Section */
+.current-streak-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: 0;
+}
+
+.streak-card {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.streak-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+  order: 1;
+}
+
+.streak-content {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.streak-number {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
   color: var(--text);
-  font-size: 1rem; /* INCREASED: Larger font size */
+  margin: 0;
+}
+
+.streak-label {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+.streak-divider {
+  order: 3;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0;
+}
+
+/* REFINED: Better spacing for milestone stats */
+.streak-milestones {
+  order: 4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin: 0;
+  padding: 0 var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.milestone-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 80px;
+}
+
+.milestone-icon {
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.milestone-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+  line-height: 1;
+}
+
+.milestone-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+.streak-actions-divider {
+  order: 5;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0;
+}
+
+.streak-actions {
+  order: 6;
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin: 0;
+}
+
+.streak-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+/* KEEP: Main action buttons unchanged - these are the primary actions */
+.relapse-btn-grey {
+  background-color: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+.relapse-btn-grey:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+  transform: scale(1.05);
+}
+
+.wetdream-btn {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border-color: var(--warning);
+}
+
+.wetdream-btn:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+  border-color: var(--warning);
+  color: var(--warning);
+  transform: scale(1.05);
+}
+
+.urge-btn {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.urge-btn:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+/* NEW: Benefits button styling - PRIMARY YELLOW like login button */
+.benefits-btn-primary {
+  background-color: rgba(255, 221, 0, 0.1);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.benefits-btn-primary:hover {
+  background-color: rgba(255, 221, 0, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+/* UPDATED: Discord and YouTube buttons use scale transform */
+.discord-join-btn:hover {
+  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+  border-color: #7289da;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.youtube-subscribe-btn:hover {
+  background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
+  border-color: #ff0000;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+/* NEW: Benefits Status Indicator in Streak Card */
+.benefits-status-indicator {
+  order: 5.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: var(--spacing-sm) 0;
+}
+
+.benefits-logged-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.1);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.benefits-logged-status .check-icon {
+  color: var(--success);
+}
+
+.benefits-not-logged-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.benefits-not-logged-status .info-icon {
+  color: var(--primary);
+}
+
+/* Premium Benefits Container - NOT USED IN MODAL */
+.premium-benefits-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* TRACKER SPECIFIC MODAL STYLES - Using existing modal structure but with specific headers only */
+/* NO GLOBAL .modal-overlay or .modal-content styling - let other components define their own */
+
+/* SPECIFIC: Only style the date picker modal header when it has the date-picker-modal class */
+.date-picker-modal h2 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.25rem;
+  color: var(--text);
   text-align: center;
   font-weight: 600;
-  transition: border-color 0.2s, background-color 0.2s;
-  min-height: 44px; /* ADDED: Minimum height for better touch targets */
 }
 
-.date-inputs-row input:focus {
+.date-picker-modal > p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0 0 var(--spacing-lg) 0;
+  text-align: center;
+}
+
+/* SPECIFIC: Close button - only for tracker modals */
+.modal-close-btn {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
   outline: none;
-  border-color: var(--primary);
-  background-color: rgba(255, 255, 255, 0.05);
 }
 
-.date-inputs-row input::placeholder {
-  color: var(--text-secondary);
-  font-weight: 400;
+.modal-close-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: scale(1.1);
 }
 
-/* FIXED: Better input widths for mobile - significantly increased */
-.month-input { 
-  width: 72px; /* INCREASED: From 64px to 72px for mobile numbers */
+/* SPECIFIC: Benefits Modal Styling - using specific class names */
+.benefits-modal {
+  max-width: 600px;
+  max-height: 85vh;
 }
 
-.day-input { 
-  width: 72px; /* INCREASED: From 64px to 72px for mobile numbers */
-}
-
-.year-input { 
-  width: 88px; /* INCREASED: From 80px to 88px for mobile numbers */
-}
-
-.date-separator {
-  font-size: 1.5rem; /* INCREASED: Bigger separator */
-  color: var(--text-secondary);
-  margin: 0 var(--spacing-xs); /* INCREASED: More margin */
+.benefits-modal-header {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.25rem;
+  color: var(--text);
+  text-align: center;
   font-weight: 600;
-  line-height: 1; /* ADDED: Ensure proper line height for centering */
 }
 
-/* NEW: Helmet Info Banner - EXACT COPY from Emotional Timeline */
-.date-picker-info-banner {
+.benefits-modal-subtitle {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* NEW: Benefits Tracking Banner - EXACT COPY from Emotional Timeline */
+.benefits-tracking-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-lg);
@@ -119,21 +466,21 @@
   gap: var(--spacing-lg);
   position: relative;
   overflow: hidden;
-  margin-bottom: var(--spacing-lg); /* RESTORED: Original external spacing */
+  margin-bottom: var(--spacing-xl); /* RESTORED: Original external spacing */
 }
 
-.date-picker-helmet-container {
+.benefits-tracking-helmet-container {
   flex-shrink: 0;
 }
 
-.date-picker-helmet {
+.benefits-tracking-helmet {
   width: 40px;
   height: 40px;
   animation: coming-soon-pulse 2s ease-in-out infinite;
   filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
 }
 
-.date-picker-helmet-fallback {
+.benefits-tracking-helmet-fallback {
   font-size: 1.5rem;
   color: var(--primary);
   animation: coming-soon-pulse 2s ease-in-out infinite;
@@ -150,7 +497,7 @@
   }
 }
 
-.date-picker-info-content {
+.benefits-tracking-content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -158,7 +505,7 @@
   justify-content: center; /* ADDED: Center content vertically */
 }
 
-.date-picker-info-title {
+.benefits-tracking-title {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
@@ -168,82 +515,524 @@
   gap: var(--spacing-sm);
 }
 
-.date-picker-info-description {
+.benefits-tracking-description {
   font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.4;
   margin: 0; /* REMOVED: Any default margins */
 }
 
-/* REMOVED: Old helper-text styles - replaced with helmet banner */
+.benefits-modal-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: var(--spacing-xs);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
 
-/* IMPROVED: Button styling with grey→yellow hover effects */
-.date-picker-actions {
+/* EXACT COPY FROM EMOTIONAL TIMELINE: Benefit Sliders with inline value display and tick marks */
+.benefit-slider-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  position: relative;
+}
+
+.benefit-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+
+.benefit-label {
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  text-align: left;
+  font-size: 1rem !important;
+  letter-spacing: 0.025em;
+}
+
+/* EXACT MATCH: Slider container for inline value display */
+.benefit-slider-with-value {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  position: relative;
+}
+
+/* EXACT MATCH: Value display as clean circle like Emotional Timeline */
+.benefit-value-clean {
+  font-weight: 700;
+  color: var(--text) !important;
+  font-size: 0.875rem !important;
+  background-color: rgba(255, 221, 0, 0.08);
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid rgba(255, 221, 0, 0.15);
+  flex-shrink: 0;
+}
+
+/* NEW: Slider track container with tick marks */
+.benefit-slider-track-container {
+  position: relative;
+  flex: 1;
+}
+
+/* NEW: Tick marks container - overlays the slider track exactly */
+.slider-tick-marks {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NEW: Individual tick mark styling - positioned in track center */
+.slider-tick {
+  position: absolute;
+  top: 0;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+/* NEW: Key tick marks (1, 5, 10) are slightly more visible */
+.slider-tick.key-tick {
+  height: 4px;
+  width: 1px;
+  background-color: rgba(255, 221, 0, 0.25);
+}
+
+/* NEW: Perfect alignment - tick positions match thumb center positions for 1-10 scale */
+.slider-tick[data-value="1"] { left: calc(12px); }
+.slider-tick[data-value="2"] { left: calc(12px + (calc(100% - 24px) * 1/9)); }
+.slider-tick[data-value="3"] { left: calc(12px + (calc(100% - 24px) * 2/9)); }
+.slider-tick[data-value="4"] { left: calc(12px + (calc(100% - 24px) * 3/9)); }
+.slider-tick[data-value="5"] { left: calc(12px + (calc(100% - 24px) * 4/9)); }
+.slider-tick[data-value="6"] { left: calc(12px + (calc(100% - 24px) * 5/9)); }
+.slider-tick[data-value="7"] { left: calc(12px + (calc(100% - 24px) * 6/9)); }
+.slider-tick[data-value="8"] { left: calc(12px + (calc(100% - 24px) * 7/9)); }
+.slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 8/9)); }
+.slider-tick[data-value="10"] { left: calc(100% - 12px); }
+
+/* EXACT MATCH: Range slider track from Emotional Timeline */
+.benefit-range-slider {
+  -webkit-appearance: none;
+  flex: 1;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.15) 0%, 
+    rgba(255, 221, 0, 0.08) 50%, 
+    rgba(255, 221, 0, 0.12) 100%
+  );
+  outline: none;
+  transition: all 0.2s ease;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  z-index: 1;
+}
+
+/* FIXED: Dot indicator that matches actual constrained thumb position */
+.benefit-range-slider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: rgba(255, 221, 0, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(255, 221, 0, 0.6);
+  transition: left 0.2s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.benefit-range-slider:hover:not(:disabled) {
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.18) 0%, 
+    rgba(255, 221, 0, 0.1) 50%, 
+    rgba(255, 221, 0, 0.15) 100%
+  );
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
+}
+
+.benefit-range-slider:focus:not(:disabled) {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
+}
+
+.benefit-range-slider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(128, 128, 128, 0.1);
+}
+
+/* EXACT MATCH: Bigger, fully opaque slider thumbs from Emotional Timeline */
+.benefit-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  margin: 0 !important;
+  transition: all 0.15s ease;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 2;
+  opacity: 1;
+}
+
+.benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+}
+
+.benefit-range-slider:active::-webkit-slider-thumb {
+  transform: scale(1.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.benefit-range-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  margin: 0 !important;
+  transition: all 0.15s ease;
+  position: relative;
+  z-index: 2;
+  opacity: 1;
+}
+
+.benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+}
+
+/* EXACT MATCH: Slider labels from Emotional Timeline */
+.slider-labels {
+  display: flex !important;
+  justify-content: space-between !important;
+  font-size: 0.75rem !important;
+  color: var(--text-secondary) !important;
+  margin-top: 8px !important;
+  margin-bottom: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  line-height: 1 !important;
+  transform: none !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em !important;
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.slider-labels span:first-child {
+  color: rgba(156, 163, 175, 0.8) !important;
+}
+
+.slider-labels span:last-child {
+  color: rgba(255, 221, 0, 0.7) !important;
+}
+
+/* Modal benefit items - slightly more compact than full section */
+.modal-benefit-item {
+  gap: var(--spacing-sm);
+}
+
+.modal-benefit-item .benefit-slider-header {
+  margin-bottom: var(--spacing-xs);
+}
+
+.modal-benefit-item .slider-labels {
+  margin-top: 8px !important;
+  font-size: 0.75rem !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.benefits-modal-actions {
   display: flex;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-sm); /* REDUCED: Less margin above buttons */
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-/* UPDATED: Primary action button - grey → yellow hover */
-.date-picker-container .primary-action {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-sm) !important;
+/* UPDATED: Modal buttons same height as edit date button */
+.modal-save-btn {
+  flex: 1;
+  min-width: 180px;
+  justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-full) !important;
-  color: var(--text-secondary) !important;
   font-size: 0.875rem !important;
   font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  flex: 1 !important;
-  justify-content: center !important;
   min-height: auto !important;
 }
 
-.date-picker-container .primary-action:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
+.cancel-benefits-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  min-width: 120px;
+  justify-content: center;
+  min-height: auto;
 }
 
-/* UPDATED: Cancel button - grey → yellow hover */
-.date-picker-container .cancel-action {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-full) !important;
-  color: var(--text-secondary) !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  flex: 1 !important;
-  justify-content: center !important;
-  min-height: auto !important;
+.cancel-benefits-btn:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+  transform: translateY(-1px);
 }
 
-.date-picker-container .cancel-action:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* IMPROVED: Mobile responsiveness with better spacing */
-@media (max-width: 768px) {
-  .date-picker-container {
-    gap: var(--spacing-md); /* REDUCED: Less gap on mobile */
+/* DESKTOP LAYOUT: Two-column grid for screens ≥1024px with ENHANCED styling */
+@media (min-width: 1024px) {
+  /* UPDATED: Desktop header sizing to match Calendar exactly */
+  .tracker-header-title-section h2 {
+    font-size: 1.5rem !important;
   }
   
-  /* NEW: Mobile helmet banner styles - EXACT COPY from Emotional Timeline */
-  .date-picker-info-banner {
+  .tracker-header-subtitle {
+    font-size: 0.875rem !important;
+  }
+
+  /* Desktop hover effects for cards */
+  .discord-community-section:hover,
+  .youtube-channel-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Main content grid container */
+  .tracker-main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    align-items: stretch;
+  }
+  
+  /* Discord and YouTube column */
+  .discord-youtube-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    height: fit-content;
+  }
+  
+  /* ENHANCED: Better streak section for desktop */
+  .streak-number {
+    font-size: 5rem !important;
+    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+  }
+  
+  /* REFINED: Better milestone spacing and uniform heights */
+  .streak-milestones {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-xl);
+    gap: var(--spacing-xl);
+    justify-content: space-evenly;
+  }
+  
+  .milestone-item {
+    min-width: 100px;
+    padding: var(--spacing-md);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .milestone-item:hover {
+    background-color: rgba(255, 221, 0, 0.05);
+    border-color: rgba(255, 221, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .milestone-icon {
+    font-size: 1.6rem;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .milestone-value {
+    font-size: 1.75rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .milestone-label {
+    font-size: 0.875rem;
+    line-height: 1.2;
+    height: 2.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* ENHANCED: Updated action buttons for 4-button layout */
+  .streak-actions {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    max-width: 600px !important;
+    width: 100% !important;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+  }
+  
+  .streak-action-btn {
+    width: 100% !important;
+    justify-content: center;
+    padding: var(--spacing-md) var(--spacing-xl) !important;
+    font-size: 1rem !important;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    min-height: 52px !important;
+    position: relative;
+    overflow: hidden;
+    max-width: none !important;
+  }
+  
+  .streak-action-btn::before {
+    display: none;
+  }
+  
+  /* Desktop benefits button styling - SOLID YELLOW with black text */
+  .benefits-btn-primary {
+    background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+    border: 1px solid #f0cc00;
+    color: #000000;
+  }
+  
+  .benefits-btn-primary:hover {
+    background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+    border-color: #f0cc00;
+    color: #000000;
+    transform: translateY(-1px);
+  }
+
+  /* Desktop Discord and YouTube button translateY transforms */
+  .discord-join-btn:hover {
+    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+    border-color: #7289da;
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+
+  .youtube-subscribe-btn:hover {
+    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
+    border-color: #ff0000;
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+  
+  /* Benefits section: 2-column slider grid on desktop */
+  .premium-benefits-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg) var(--spacing-xl);
+  }
+  
+  .benefit-slider-item {
+    gap: var(--spacing-md);
+  }
+
+  /* Benefits modal desktop sizing */
+  .benefits-modal {
+    max-width: 650px;
+  }
+
+  .benefits-modal-sliders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    max-height: 60vh;
+  }
+
+  /* Desktop slider adjustments - KEEP EMOTIONAL TIMELINE STYLE */
+  .benefit-range-slider {
+    height: 8px;
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .slider-labels {
+    margin-top: 8px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  /* UPDATED: Mobile header sizing to match Calendar exactly */
+  .tracker-header-title-section h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  .tracker-header-subtitle {
+    font-size: 0.8rem !important;
+  }
+
+  /* NEW: Mobile benefits tracking banner styles - EXACT COPY from Emotional Timeline */
+  .benefits-tracking-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
@@ -251,117 +1040,348 @@
     margin-bottom: var(--spacing-lg); /* RESTORED: Original mobile external spacing */
   }
   
-  .date-picker-info-content {
+  .benefits-tracking-content {
     text-align: center;
   }
   
-  .date-picker-info-title {
+  .benefits-tracking-title {
     justify-content: center;
   }
   
-  .date-picker-helmet {
+  .benefits-tracking-helmet {
     width: 35px;
     height: 35px;
   }
   
-  .date-picker-helmet-fallback {
+  .benefits-tracking-helmet-fallback {
     font-size: 1.25rem;
   }
-  
-  .date-inputs-row {
-    gap: var(--spacing-sm); /* REDUCED: Tighter spacing on mobile */
-    padding: var(--spacing-xs) 0; /* RESTORED: Back to original mobile padding */
+
+  /* Integrated header mobile styles */
+  .integrated-tracker-header {
+    padding: var(--spacing-lg);
+    margin: 0;
   }
   
-  /* FIXED: Better mobile input sizes - even larger for readability */
-  .month-input,
-  .day-input {
-    width: 68px; /* INCREASED: From 56px to 68px for better mobile display */
+  .tracker-header-title-section {
+    margin-bottom: var(--spacing-lg);
   }
   
-  .year-input {
-    width: 84px; /* INCREASED: From 72px to 84px for better mobile display */
+  .tracker-header-actions-section {
+    width: 100%;
   }
   
-  .date-inputs-row input {
-    padding: var(--spacing-sm) var(--spacing-md); /* INCREASED: Better mobile padding */
-    font-size: 1rem; /* MAINTAINED: Good size for mobile */
-    min-height: 48px; /* INCREASED: Better touch target on mobile */
+  .tracker-header-actions {
+    width: 100%;
+    justify-content: center;
   }
   
-  .input-group label {
-    font-size: 0.8125rem;
+  /* Consistent mobile button sizing */
+  .tracker-header-actions .action-btn,
+  .integrated-tracker-header .action-btn {
+    flex: 1;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    min-height: auto !important;
   }
   
-  .date-separator {
+  /* ENHANCED: Mobile gradient streak number to match desktop */
+  .streak-number {
+    font-size: 3.5rem !important;
+    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+  }
+  
+  /* MOBILE: Better milestone spacing */
+  .streak-milestones {
+    flex-wrap: nowrap;
+    gap: var(--spacing-sm);
+    justify-content: space-between;
+    margin: 0;
+    padding: 0 var(--spacing-sm);
+  }
+  
+  /* ENHANCED: Mobile milestone cards to match desktop styling */
+  .milestone-item {
+    flex: 1;
+    min-width: 70px;
+    padding: var(--spacing-sm);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .milestone-item:active {
+    background-color: rgba(255, 221, 0, 0.05);
+    border-color: rgba(255, 221, 0, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  .milestone-icon {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .milestone-value {
     font-size: 1.25rem;
-    margin: 0 var(--spacing-xs);
-    line-height: 1; /* MAINTAINED: Consistent line height */
+    margin-bottom: var(--spacing-xs);
   }
   
-  .current-date-display {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.8125rem;
-  }
-  
-  .current-date-label {
+  .milestone-label {
     font-size: 0.75rem;
   }
   
-  .current-date-value {
-    font-size: 0.9375rem;
+  /* ENHANCED: Mobile action buttons - enhanced styling like desktop with 4 buttons */
+  .streak-actions {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
   }
   
-  .date-picker-actions {
+  .streak-action-btn {
+    width: 100%;
+    justify-content: center;
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    min-height: 46px !important;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Mobile benefits button active state - SOLID YELLOW with black text */
+  .benefits-btn-primary:active {
+    background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+    border-color: #f0cc00;
+    color: #000000;
+    transform: translateY(-1px);
+  }
+
+  /* Mobile Discord and YouTube button translateY transforms */
+  .discord-join-btn:active {
+    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+    border-color: #7289da;
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+  
+  .youtube-subscribe-btn:active {
+    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
+    border-color: #ff0000;
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+  
+  /* Mobile benefits status indicator adjustments */
+  .benefits-status-indicator {
+    margin: var(--spacing-md) 0;
+  }
+
+  .benefits-logged-status,
+  .benefits-not-logged-status {
+    flex-direction: row;
+    gap: var(--spacing-xs);
+    text-align: center;
+    font-size: 0.8125rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  /* Benefits modal mobile adjustments */
+  .benefits-modal {
+    max-width: calc(100vw - 2rem);
+    margin: var(--spacing-sm);
+  }
+
+  .benefits-modal-sliders {
+    max-height: 45vh;
+  }
+
+  .benefits-modal-actions {
+    flex-direction: column;
     gap: var(--spacing-sm);
   }
-  
-  /* UPDATED: Mobile buttons with grey→yellow hover */
-  .date-picker-container .primary-action,
-  .date-picker-container .cancel-action {
+
+  .modal-save-btn,
+  .cancel-benefits-btn {
+    width: 100%;
+    min-width: auto;
     padding: var(--spacing-sm) var(--spacing-md) !important;
     font-size: 0.875rem !important;
+    font-weight: 500 !important;
     min-height: auto !important;
+  }
+
+  /* Mobile slider adjustments - MATCHING EMOTIONAL TIMELINE */
+  .benefit-label {
+    font-size: 0.875rem !important;
+  }
+  
+  .benefit-value-clean {
+    font-size: 0.8rem !important;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    padding: 0;
+  }
+  
+  .benefit-range-slider {
+    height: 6px;
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+  }
+  
+  /* Mobile tick marks adjustments - FIXED positioning with contained height */
+  .slider-tick-marks {
+    top: 50%;
+    transform: translateY(-50%);
+    height: 0;
+    z-index: 0;
+  }
+  
+  .slider-tick {
+    top: 0;
+    transform: translateY(-50%);
+    height: 1.5px;
+    z-index: 0;
+  }
+  
+  .slider-tick.key-tick {
+    height: 2px;
+    z-index: 0;
+  }
+  
+  /* Ensure mobile slider track stays above ticks */
+  .benefit-range-slider {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .slider-labels {
+    margin-top: 8px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 0.7rem !important;
   }
 }
 
-/* Very small screens - more compact */
+/* UPDATED: Very small mobile sizing to match Calendar exactly */
 @media (max-width: 480px) {
-  /* NEW: Very small mobile helmet banner styles - EXACT COPY from Emotional Timeline */
-  .date-picker-helmet {
+  .tracker-header-title-section h2 {
+    font-size: 1.125rem !important;
+  }
+  
+  .tracker-header-subtitle {
+    font-size: 0.75rem !important;
+  }
+
+  /* NEW: Very small mobile benefits tracking banner styles - EXACT COPY from Emotional Timeline */
+  .benefits-tracking-helmet {
     width: 30px;
     height: 30px;
   }
   
-  .date-picker-helmet-fallback {
+  .benefits-tracking-helmet-fallback {
     font-size: 1rem;
   }
   
-  .date-picker-info-title {
+  .benefits-tracking-title {
     font-size: 0.875rem;
   }
   
-  .date-picker-info-description {
+  .benefits-tracking-description {
     font-size: 0.8rem;
   }
-  
-  .date-inputs-row {
-    gap: var(--spacing-xs);
-    justify-content: space-evenly; /* CHANGED: Better distribution */
+
+  .discord-community-stats {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: center;
   }
   
-  /* FIXED: Larger inputs for very small screens to prevent cutoff */
-  .month-input,
-  .day-input {
-    width: 64px; /* INCREASED: From 52px to 64px */
+  .youtube-channel-stats {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: center;
   }
   
-  .year-input {
-    width: 80px; /* INCREASED: From 68px to 80px */
+  /* Very small screen benefit slider adjustments */
+  .benefit-label {
+    font-size: 0.8rem !important;
   }
   
-  .date-separator {
-    font-size: 1.125rem;
-    margin: 0 2px;
+  .benefit-value-clean {
+    font-size: 0.75rem !important;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    padding: 0;
+  }
+  
+  .benefit-range-slider {
+    height: 6px;
+  }
+  
+  .benefit-range-slider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .benefit-range-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Very small screen tick marks adjustments - FIXED positioning with contained height */
+  .slider-tick-marks {
+    top: 50%;
+    transform: translateY(-50%);
+    height: 0;
+    z-index: 0;
+  }
+  
+  .slider-tick {
+    top: 0;
+    transform: translateY(-50%);
+    height: 1.5px;
+    z-index: 0;
+  }
+  
+  .slider-tick.key-tick {
+    height: 2px;
+    z-index: 0;
+  }
+  
+  /* Ensure very small screen slider track stays above ticks */
+  .benefit-range-slider {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .slider-labels {
+    font-size: 0.7rem !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
   }
 }
