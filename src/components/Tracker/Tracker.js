@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Added date-picker-modal class for specific styling
+// components/Tracker/Tracker.js - UPDATED: Added benefits modal banner
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -334,7 +334,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* ENHANCED: Benefits Logging Modal with Emotional Timeline slider structure */}
+      {/* ENHANCED: Benefits Logging Modal with Banner */}
       {showBenefitsModal && (
         <div className="modal-overlay">
           <div className="modal-content benefits-modal">
@@ -345,6 +345,33 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <p className="benefits-modal-subtitle">
               {benefitsLogged ? "Update how you're feeling today" : "How are you feeling today?"}
             </p>
+            
+            {/* NEW: Benefits Tracking Banner */}
+            <div className="benefits-tracking-banner">
+              <div className="benefits-tracking-helmet-container">
+                <img 
+                  className="benefits-tracking-helmet" 
+                  src="/helmet.png" 
+                  alt="Benefits Tracking System" 
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'block';
+                  }}
+                />
+                <div className="benefits-tracking-helmet-fallback" style={{ display: 'none' }}>
+                  🛡️
+                </div>
+              </div>
+              
+              <div className="benefits-tracking-content">
+                <h4 className="benefits-tracking-title">
+                  Unlock Advanced Insights
+                </h4>
+                <p className="benefits-tracking-description">
+                  Track daily benefits to unlock pattern recognition, challenge identification with targeted solutions, trend analysis across all metrics, and personalized strategies based on your unique journey data.
+                </p>
+              </div>
+            </div>
             
             <div className="benefits-modal-sliders">
               {[

@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - COMPLETELY FIXED: Removed ALL global modal styles */
+/* components/Tracker/Tracker.css - UPDATED: Added benefits modal banner styling */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -453,6 +453,72 @@ button.action-btn:hover {
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.4;
+}
+
+/* NEW: Benefits Tracking Banner - EXACT COPY from Emotional Timeline */
+.benefits-tracking-banner {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--spacing-xl);
+}
+
+.benefits-tracking-helmet-container {
+  flex-shrink: 0;
+}
+
+.benefits-tracking-helmet {
+  width: 40px;
+  height: 40px;
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
+}
+
+.benefits-tracking-helmet-fallback {
+  font-size: 1.5rem;
+  color: var(--primary);
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes coming-soon-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.96);
+  }
+}
+
+.benefits-tracking-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.benefits-tracking-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.benefits-tracking-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
 }
 
 .benefits-modal-sliders {
@@ -964,6 +1030,32 @@ button.action-btn:hover {
     font-size: 0.8rem !important;
   }
 
+  /* NEW: Mobile benefits tracking banner styles - EXACT COPY from Emotional Timeline */
+  .benefits-tracking-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .benefits-tracking-content {
+    text-align: center;
+  }
+  
+  .benefits-tracking-title {
+    justify-content: center;
+  }
+  
+  .benefits-tracking-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .benefits-tracking-helmet-fallback {
+    font-size: 1.25rem;
+  }
+
   /* Integrated header mobile styles */
   .integrated-tracker-header {
     padding: var(--spacing-lg);
@@ -1201,6 +1293,24 @@ button.action-btn:hover {
   
   .tracker-header-subtitle {
     font-size: 0.75rem !important;
+  }
+
+  /* NEW: Very small mobile benefits tracking banner styles - EXACT COPY from Emotional Timeline */
+  .benefits-tracking-helmet {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .benefits-tracking-helmet-fallback {
+    font-size: 1rem;
+  }
+  
+  .benefits-tracking-title {
+    font-size: 0.875rem;
+  }
+  
+  .benefits-tracking-description {
+    font-size: 0.8rem;
   }
 
   .discord-community-stats {
