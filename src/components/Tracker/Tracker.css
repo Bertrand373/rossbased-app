@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - FIXED: Removed global modal styles affecting other components */
+/* components/Tracker/Tracker.css - COMPLETELY FIXED: Removed ALL global modal styles */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -317,28 +317,6 @@ button.action-btn:hover {
   transform: scale(1.05);
 }
 
-/* UPDATED: All streak action buttons use scale transform */
-.relapse-btn-grey:hover {
-  background-color: rgba(128, 128, 128, 0.2);
-  border-color: var(--text-secondary);
-  color: var(--text-secondary);
-  transform: scale(1.05);
-}
-
-.wetdream-btn:hover {
-  background-color: rgba(245, 158, 11, 0.2);
-  border-color: var(--warning);
-  color: var(--warning);
-  transform: scale(1.05);
-}
-
-.urge-btn:hover {
-  background-color: rgba(37, 99, 235, 0.2);
-  border-color: var(--primary);
-  color: var(--primary);
-  transform: scale(1.05);
-}
-
 /* UPDATED: Discord and YouTube buttons use scale transform */
 .discord-join-btn:hover {
   background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
@@ -406,50 +384,10 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
 }
 
-/* TRACKER-SPECIFIC MODAL STYLES - Only affecting Tracker modals */
-.tracker-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: var(--spacing-md);
-}
+/* TRACKER SPECIFIC MODAL STYLES - Using existing modal structure but with specific headers only */
+/* NO GLOBAL .modal-overlay or .modal-content styling - let other components define their own */
 
-.tracker-modal-content {
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  border: 1px solid var(--border);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  animation: modal-appear 0.3s ease-out;
-  /* ADDED: Smooth scrolling */
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-@keyframes modal-appear {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* SPECIFIC: Date picker modal styling within Tracker */
+/* SPECIFIC: Only style the date picker modal header when it has the date-picker-modal class */
 .date-picker-modal h2 {
   margin: 0 0 var(--spacing-sm) 0;
   font-size: 1.25rem;
@@ -466,7 +404,7 @@ button.action-btn:hover {
   text-align: center;
 }
 
-/* UPDATED: Close button - matching ET modal close button exactly */
+/* SPECIFIC: Close button - only for tracker modals */
 .modal-close-btn {
   position: absolute;
   top: var(--spacing-md);
@@ -495,7 +433,7 @@ button.action-btn:hover {
   transform: scale(1.1);
 }
 
-/* SPECIFIC: Benefits Modal Styling - Clean header and subtitle like ET */
+/* SPECIFIC: Benefits Modal Styling - using specific class names */
 .benefits-modal {
   max-width: 600px;
   max-height: 85vh;
@@ -503,7 +441,7 @@ button.action-btn:hover {
 
 .benefits-modal-header {
   margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1.25rem;  /* MATCHES ET modal headers */
+  font-size: 1.25rem;
   color: var(--text);
   text-align: center;
   font-weight: 600;
@@ -511,7 +449,7 @@ button.action-btn:hover {
 
 .benefits-modal-subtitle {
   margin: 0 0 var(--spacing-lg) 0;
-  font-size: 0.875rem;  /* MATCHES ET modal subtitles */
+  font-size: 0.875rem;
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.4;
@@ -525,7 +463,6 @@ button.action-btn:hover {
   max-height: 50vh;
   overflow-y: auto;
   padding-right: var(--spacing-xs);
-  /* ADDED: Smooth scrolling */
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
@@ -570,7 +507,6 @@ button.action-btn:hover {
   background-color: rgba(255, 221, 0, 0.08);
   padding: var(--spacing-xs);
   border-radius: 50%;
-  /* FIXED: Set fixed width and height for perfect circle */
   width: 32px;
   height: 32px;
   min-width: 32px;
@@ -656,7 +592,6 @@ button.action-btn:hover {
   content: '';
   position: absolute;
   top: 50%;
-  /* FIXED: Updated for 24px thumb - thumb center moves from 12px to calc(100% - 12px) */
   left: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
   transform: translateY(-50%);
   width: 4px;
@@ -829,11 +764,11 @@ button.action-btn:hover {
 @media (min-width: 1024px) {
   /* UPDATED: Desktop header sizing to match Calendar exactly */
   .tracker-header-title-section h2 {
-    font-size: 1.5rem !important; /* MATCHES: Calendar desktop header */
+    font-size: 1.5rem !important;
   }
   
   .tracker-header-subtitle {
-    font-size: 0.875rem !important; /* MATCHES: Calendar desktop subtitle */
+    font-size: 0.875rem !important;
   }
 
   /* Desktop hover effects for cards */
@@ -1022,11 +957,11 @@ button.action-btn:hover {
 @media (max-width: 768px) {
   /* UPDATED: Mobile header sizing to match Calendar exactly */
   .tracker-header-title-section h2 {
-    font-size: 1.25rem !important; /* MATCHES: Calendar mobile header */
+    font-size: 1.25rem !important;
   }
   
   .tracker-header-subtitle {
-    font-size: 0.8rem !important; /* MATCHES: Calendar mobile subtitle */
+    font-size: 0.8rem !important;
   }
 
   /* Integrated header mobile styles */
@@ -1204,7 +1139,6 @@ button.action-btn:hover {
   
   .benefit-value-clean {
     font-size: 0.8rem !important;
-    /* FIXED: Maintain perfect circle on mobile */
     width: 28px;
     height: 28px;
     min-width: 28px;
@@ -1230,19 +1164,19 @@ button.action-btn:hover {
     top: 50%;
     transform: translateY(-50%);
     height: 0;
-    z-index: 0; /* Ensure ticks stay behind slider */
+    z-index: 0;
   }
   
   .slider-tick {
     top: 0;
     transform: translateY(-50%);
-    height: 1.5px; /* Smaller to fit within 6px mobile track */
-    z-index: 0; /* Ensure individual ticks stay behind */
+    height: 1.5px;
+    z-index: 0;
   }
   
   .slider-tick.key-tick {
-    height: 2px; /* Smaller key ticks for mobile */
-    z-index: 0; /* Ensure key ticks stay behind */
+    height: 2px;
+    z-index: 0;
   }
   
   /* Ensure mobile slider track stays above ticks */
@@ -1262,11 +1196,11 @@ button.action-btn:hover {
 /* UPDATED: Very small mobile sizing to match Calendar exactly */
 @media (max-width: 480px) {
   .tracker-header-title-section h2 {
-    font-size: 1.125rem !important; /* MATCHES: Calendar very small mobile header */
+    font-size: 1.125rem !important;
   }
   
   .tracker-header-subtitle {
-    font-size: 0.75rem !important; /* MATCHES: Calendar very small mobile subtitle */
+    font-size: 0.75rem !important;
   }
 
   .discord-community-stats {
@@ -1288,7 +1222,6 @@ button.action-btn:hover {
   
   .benefit-value-clean {
     font-size: 0.75rem !important;
-    /* FIXED: Maintain perfect circle on very small screens */
     width: 24px;
     height: 24px;
     min-width: 24px;
@@ -1320,12 +1253,12 @@ button.action-btn:hover {
   .slider-tick {
     top: 0;
     transform: translateY(-50%);
-    height: 1.5px; /* Smaller to fit within 6px track */
+    height: 1.5px;
     z-index: 0;
   }
   
   .slider-tick.key-tick {
-    height: 2px; /* Smaller key ticks for very small screens */
+    height: 2px;
     z-index: 0;
   }
   
