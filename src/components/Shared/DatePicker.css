@@ -119,7 +119,7 @@
   gap: var(--spacing-lg);
   position: relative;
   overflow: hidden;
-  margin: var(--spacing-md) 0; /* FIXED: Equal top and bottom spacing */
+  margin-bottom: var(--spacing-lg); /* RESTORED: Original external spacing */
 }
 
 .date-picker-helmet-container {
@@ -155,13 +155,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  justify-content: center; /* ADDED: Center content vertically */
 }
 
 .date-picker-info-title {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
-  margin: 0;
+  margin: 0; /* REMOVED: Any default margins */
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -171,7 +172,7 @@
   font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.4;
-  margin: 0;
+  margin: 0; /* REMOVED: Any default margins */
 }
 
 /* REMOVED: Old helper-text styles - replaced with helmet banner */
@@ -247,7 +248,7 @@
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
-    margin: var(--spacing-md) 0; /* FIXED: Equal top and bottom spacing on mobile */
+    margin-bottom: var(--spacing-lg); /* RESTORED: Original mobile external spacing */
   }
   
   .date-picker-info-content {
