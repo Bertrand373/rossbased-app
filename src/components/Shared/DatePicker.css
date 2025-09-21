@@ -36,16 +36,16 @@
 .date-picker-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md); /* REDUCED: Less gap between sections */
 }
 
 /* IMPROVED: Better spacing and layout for date inputs */
 .date-inputs-row {
   display: flex;
   gap: var(--spacing-md); /* INCREASED: More reasonable spacing */
-  align-items: flex-end;
+  align-items: center; /* CHANGED: Center align for proper separator positioning */
   justify-content: center;
-  padding: var(--spacing-md) 0; /* ADDED: Vertical padding for better spacing */
+  padding: var(--spacing-sm) 0; /* REDUCED: Less vertical padding */
 }
 
 .input-group {
@@ -104,9 +104,8 @@
   font-size: 1.5rem; /* INCREASED: Bigger separator */
   color: var(--text-secondary);
   margin: 0 var(--spacing-xs); /* INCREASED: More margin */
-  align-self: flex-end;
-  padding-bottom: var(--spacing-md); /* INCREASED: Match input padding */
   font-weight: 600;
+  line-height: 1; /* ADDED: Ensure proper line height for centering */
 }
 
 /* NEW: Helmet Info Banner - EXACT COPY from Emotional Timeline */
@@ -181,7 +180,7 @@
 .date-picker-actions {
   display: flex;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-md);
+  margin-top: var(--spacing-sm); /* REDUCED: Less margin above buttons */
 }
 
 /* UPDATED: Primary action button - grey → yellow hover */
@@ -270,7 +269,7 @@
   
   .date-inputs-row {
     gap: var(--spacing-sm); /* REDUCED: Tighter spacing on mobile */
-    padding: var(--spacing-sm) 0;
+    padding: var(--spacing-xs) 0; /* REDUCED: Less padding on mobile */
   }
   
   /* FIXED: Better mobile input sizes - even larger for readability */
@@ -296,7 +295,7 @@
   .date-separator {
     font-size: 1.25rem;
     margin: 0 var(--spacing-xs);
-    padding-bottom: var(--spacing-sm);
+    line-height: 1; /* MAINTAINED: Consistent line height */
   }
   
   .current-date-display {
