@@ -455,12 +455,13 @@ button.action-btn:hover {
   line-height: 1.4;
 }
 
-/* EXACT COPY: Benefits Tracking Banner matching Emotional Timeline exactly */
+/* FIXED: Benefits Tracking Banner - Equal vertical spacing above and below content */
 .benefits-tracking-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  /* KEY FIX: Explicit vertical padding to ensure equal spacing */
+  padding: calc(var(--spacing-lg) * 1.25) var(--spacing-lg);
   display: flex;
   align-items: center;
   gap: var(--spacing-lg);
@@ -1031,12 +1032,13 @@ button.action-btn:hover {
     font-size: 0.8rem !important;
   }
 
-  /* FIXED: Mobile benefits tracking banner styles - CONSISTENT PADDING matching Emotional Timeline */
+  /* FIXED: Mobile benefits tracking banner styles - Equal vertical padding */
   .benefits-tracking-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-md);
+    /* KEY FIX: Slightly more vertical padding for balanced mobile appearance */
+    padding: calc(var(--spacing-md) * 1.25) var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
   
