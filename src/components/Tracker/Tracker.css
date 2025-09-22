@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Consistent banner padding matching Emotional Timeline */
+/* components/Tracker/Tracker.css - UPDATED: Added benefits modal banner styling */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -455,13 +455,12 @@ button.action-btn:hover {
   line-height: 1.4;
 }
 
-/* FIXED: Benefits Tracking Banner - Equal vertical spacing above and below content */
+/* NEW: Benefits Tracking Banner - EXACT COPY from Emotional Timeline */
 .benefits-tracking-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-lg);
-  /* KEY FIX: Explicit vertical padding to ensure equal spacing */
-  padding: calc(var(--spacing-lg) * 1.25) var(--spacing-lg);
+  padding: var(--spacing-lg);
   display: flex;
   align-items: center;
   gap: var(--spacing-lg);
@@ -503,7 +502,6 @@ button.action-btn:hover {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  /* DO NOT add justify-content: center - this is the key difference */
 }
 
 .benefits-tracking-title {
@@ -1032,13 +1030,12 @@ button.action-btn:hover {
     font-size: 0.8rem !important;
   }
 
-  /* FIXED: Mobile benefits tracking banner styles - Equal vertical padding */
+  /* NEW: Mobile benefits tracking banner styles - EXACT COPY from Emotional Timeline */
   .benefits-tracking-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
-    /* KEY FIX: Slightly more vertical padding for balanced mobile appearance */
-    padding: calc(var(--spacing-md) * 1.25) var(--spacing-md);
+    padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
   
@@ -1298,7 +1295,7 @@ button.action-btn:hover {
     font-size: 0.75rem !important;
   }
 
-  /* FIXED: Very small mobile benefits tracking banner styles - CONSISTENT PADDING */
+  /* NEW: Very small mobile benefits tracking banner styles - EXACT COPY from Emotional Timeline */
   .benefits-tracking-helmet {
     width: 30px;
     height: 30px;

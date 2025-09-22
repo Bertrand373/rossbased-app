@@ -1,4 +1,4 @@
-/* components/Shared/DatePicker.css - UPDATED: Consistent banner padding matching Emotional Timeline */
+/* components/Shared/DatePicker.css - UPDATED: Helmet banner branding, grey→yellow hover effects, fixed mobile inputs */
 
 .date-picker-container {
   display: flex;
@@ -108,13 +108,12 @@
   line-height: 1; /* ADDED: Ensure proper line height for centering */
 }
 
-/* FIXED: Helmet Info Banner - Equal vertical spacing above and below content */
+/* NEW: Helmet Info Banner - EXACT COPY from Emotional Timeline */
 .date-picker-info-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-lg);
-  /* KEY FIX: Explicit vertical padding to ensure equal spacing */
-  padding: calc(var(--spacing-lg) * 1.25) var(--spacing-lg);
+  padding: var(--spacing-lg);
   display: flex;
   align-items: center;
   gap: var(--spacing-lg);
@@ -125,9 +124,6 @@
 
 .date-picker-helmet-container {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .date-picker-helmet {
@@ -135,18 +131,12 @@
   height: 40px;
   animation: coming-soon-pulse 2s ease-in-out infinite;
   filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
-  display: block;
 }
 
 .date-picker-helmet-fallback {
   font-size: 1.5rem;
   color: var(--primary);
   animation: coming-soon-pulse 2s ease-in-out infinite;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 @keyframes coming-soon-pulse {
@@ -165,7 +155,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  /* NO justify-content: center - this allows natural spacing */
 }
 
 .date-picker-info-title {
@@ -252,13 +241,12 @@
     gap: var(--spacing-md); /* REDUCED: Less gap on mobile */
   }
   
-  /* FIXED: Mobile helmet banner styles - Equal vertical padding */
+  /* NEW: Mobile helmet banner styles - EXACT COPY from Emotional Timeline */
   .date-picker-info-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
-    /* KEY FIX: Slightly more vertical padding for balanced mobile appearance */
-    padding: calc(var(--spacing-md) * 1.25) var(--spacing-md);
+    padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
   
@@ -338,7 +326,7 @@
 
 /* Very small screens - more compact */
 @media (max-width: 480px) {
-  /* FIXED: Very small mobile helmet banner styles - CONSISTENT PADDING */
+  /* NEW: Very small mobile helmet banner styles - EXACT COPY from Emotional Timeline */
   .date-picker-helmet {
     width: 30px;
     height: 30px;
