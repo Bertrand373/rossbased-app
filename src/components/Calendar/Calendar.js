@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - FIXED: Profile-style navigation pills + working arrows
+// components/Calendar/Calendar.js - FIXED: Profile-style navigation pills + working arrows + compact date format
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -868,7 +868,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               <FaTimes />
             </button>
             
-            <h3>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
+            <h3>{format(selectedDate, 'EEE, MMM d, yyyy')}</h3>
             
             {/* Day Status */}
             <div className="day-status-info">

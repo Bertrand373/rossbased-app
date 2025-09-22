@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarModals.css - UPDATED: Complete file with Emotional Timeline modal styling incorporated */
+/* components/Calendar/CalendarModals.css - UPDATED: Complete file with pill-shaped trigger info */
 
 /* EXACT COPY: Modal overlay and base from emotional timeline modal */
 .modal-overlay {
@@ -395,12 +395,12 @@ button.modal-close-btn:hover {
   }
 }
 
-/* UPDATED: Enhanced trigger info display */
+/* UPDATED: Enhanced trigger info display - NOW PILL-SHAPED */
 .trigger-info {
   margin-top: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full); /* CHANGED: From var(--radius-md) to pill shape */
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
