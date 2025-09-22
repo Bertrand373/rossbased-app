@@ -501,7 +501,8 @@ button.action-btn:hover {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs); /* RESTORED: Exact match to Emotional Timeline */
+  gap: var(--spacing-xs);
+  justify-content: center; /* ADDED: Center content to balance spacing */
 }
 
 .benefits-tracking-title {
