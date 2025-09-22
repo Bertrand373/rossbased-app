@@ -732,6 +732,79 @@ button.modal-close-btn:hover {
   flex-shrink: 0;
 }
 
+/* NEW: Journal benefits banner - EXACT COPY from Emotional Timeline */
+.journal-benefits-banner {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+.journal-benefits-helmet-container {
+  flex-shrink: 0;
+}
+
+.journal-benefits-helmet {
+  width: 40px;
+  height: 40px;
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
+}
+
+.journal-benefits-helmet-fallback {
+  font-size: 1.5rem;
+  color: var(--primary);
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes coming-soon-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.96);
+  }
+}
+
+.journal-benefits-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.journal-benefits-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.journal-benefits-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Journal start section */
+.journal-start-section {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
+
 .premium-teaser {
   margin-top: var(--spacing-xl);
   background-color: rgba(255, 255, 255, 0.02);
@@ -1078,6 +1151,48 @@ button.back-to-info-btn:active,
     font-size: 0.875rem;
   }
   
+  .journal-edit-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .journal-save-btn,
+  .journal-cancel-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Mobile journal benefits banner */
+  .journal-benefits-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .journal-benefits-content {
+    text-align: center;
+  }
+  
+  .journal-benefits-title {
+    justify-content: center;
+    font-size: 0.875rem;
+  }
+  
+  .journal-benefits-description {
+    font-size: 0.8rem;
+  }
+  
+  .journal-benefits-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .journal-benefits-helmet-fallback {
+    font-size: 1.25rem;
+  }
+  
   .empty-journal-day {
     flex-direction: column;
     text-align: center;
@@ -1225,6 +1340,35 @@ button.back-to-info-btn:active,
   .journal-cancel-btn {
     width: 100%;
     justify-content: center;
+  }
+  
+  .journal-save-btn,
+  .journal-cancel-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Very small screen journal benefits banner */
+  .journal-benefits-banner {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-xs);
+  }
+  
+  .journal-benefits-title {
+    font-size: 0.8rem;
+  }
+  
+  .journal-benefits-description {
+    font-size: 0.75rem;
+  }
+  
+  .journal-benefits-helmet {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .journal-benefits-helmet-fallback {
+    font-size: 1rem;
   }
   
   /* UPDATED: Very small screen h4 section headers matching emotional timeline */

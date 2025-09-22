@@ -951,20 +951,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               </div>
             )}
 
-            {/* Tracking Info */}
-            {(() => {
-              const dayTracking = getDayTracking(selectedDate);
-              if (dayTracking.hasBenefits || dayTracking.hasJournal) {
-                return (
-                  <div className="day-tracking-info">
-                    <h4>Logged Data</h4>
-                    {dayTracking.hasBenefits && <p>✓ Benefits tracked for this day</p>}
-                    {dayTracking.hasJournal && <p>✓ Journal entry recorded</p>}
-                  </div>
-                );
-              }
-              return null;
-            })()}
+
 
             {/* Benefits Details */}
             {(() => {
@@ -1062,13 +1049,13 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             <div className="day-journal">
               <div className="journal-header-with-actions">
                 <h4>Journal Entry</h4>
-                {!isEditingNote && (
+                {!isEditingNote && noteText && (
                   <button 
                     className="action-btn journal-edit-btn"
                     onClick={startEditingNote}
                   >
                     <FaPen />
-                    <span>{noteText ? 'Edit' : 'Add Note'}</span>
+                    <span>Edit</span>
                   </button>
                 )}
               </div>
@@ -1106,10 +1093,44 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                       {noteText}
                     </div>
                   ) : (
-                    <div className="empty-journal-day">
-                      <FaInfoCircle className="info-icon" />
-                      <span>No journal entry for this day. Click "Add Note" to record your thoughts.</span>
-                    </div>
+                    <>
+                      {/* Journal benefits banner when no entry exists */}
+                      <div className="journal-benefits-banner">
+                        <div className="journal-benefits-helmet-container">
+                          <img 
+                            className="journal-benefits-helmet" 
+                            src="/helmet.png" 
+                            alt="Start Journaling" 
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextElementSibling.style.display = 'block';
+                            }}
+                          />
+                          <div className="journal-benefits-helmet-fallback" style={{ display: 'none' }}>
+                            🛡️
+                          </div>
+                        </div>
+                        
+                        <div className="journal-benefits-content">
+                          <h4 className="journal-benefits-title">
+                            Start Daily Journaling for Better Results
+                          </h4>
+                          <p className="journal-benefits-description">
+                            Regular journaling helps track emotional patterns, identify triggers, celebrate victories, and maintain accountability. Users who journal consistently report better streak maintenance and deeper self-understanding throughout their journey.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="journal-start-section">
+                        <button 
+                          className="action-btn journal-edit-btn"
+                          onClick={startEditingNote}
+                        >
+                          <FaPen />
+                          <span>Add Journal Entry</span>
+                        </button>
+                      </div>
+                    </>
                   )}
                 </>
               )}
