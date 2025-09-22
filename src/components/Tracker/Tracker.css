@@ -455,7 +455,7 @@ button.action-btn:hover {
   line-height: 1.4;
 }
 
-/* FIXED: Benefits Tracking Banner - CONSISTENT PADDING matching Emotional Timeline */
+/* EXACT COPY: Benefits Tracking Banner matching Emotional Timeline exactly */
 .benefits-tracking-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -502,6 +502,7 @@ button.action-btn:hover {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  /* DO NOT add justify-content: center - this is the key difference */
 }
 
 .benefits-tracking-title {

@@ -108,7 +108,7 @@
   line-height: 1; /* ADDED: Ensure proper line height for centering */
 }
 
-/* FIXED: Helmet Info Banner - CONSISTENT PADDING matching Emotional Timeline */
+/* FIXED: Helmet Info Banner - TRULY BALANCED INTERNAL SPACING */
 .date-picker-info-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -120,10 +120,15 @@
   position: relative;
   overflow: hidden;
   margin-bottom: var(--spacing-lg);
+  /* Ensure minimum height for balanced appearance */
+  min-height: 88px;
 }
 
 .date-picker-helmet-container {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .date-picker-helmet {
@@ -131,12 +136,18 @@
   height: 40px;
   animation: coming-soon-pulse 2s ease-in-out infinite;
   filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
+  display: block;
 }
 
 .date-picker-helmet-fallback {
   font-size: 1.5rem;
   color: var(--primary);
   animation: coming-soon-pulse 2s ease-in-out infinite;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes coming-soon-pulse {
@@ -155,6 +166,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  /* NO justify-content: center - this allows natural spacing */
 }
 
 .date-picker-info-title {
