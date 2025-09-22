@@ -939,7 +939,7 @@ button.back-to-info-btn:active,
   transform: translateY(-1px) !important;
 }
 
-/* Mobile responsiveness for modals with EXACT emotional timeline modal text hierarchy */
+/* Mobile responsiveness for modals with calendar date header matching emotional timeline phase header */
 @media (max-width: 768px) {
   .edit-day-modal, .day-info-modal {
     max-width: 95%;
@@ -959,7 +959,12 @@ button.back-to-info-btn:active,
   }
   
   .modal-header-simple h3 {
-    font-size: 1.25rem;
+    font-size: 1.25rem; /* MATCHES: Emotional timeline phase header on mobile */
+  }
+  
+  /* UPDATED: Calendar date header specifically matching emotional timeline phase header */
+  .day-info-modal h3 {
+    font-size: 1.25rem; /* MATCHES: Emotional timeline .phase-modal-info h3 */
   }
   
   .day-status-info {
@@ -1159,7 +1164,7 @@ button.back-to-info-btn:active,
   }
 }
 
-/* Very small screens with EXACT emotional timeline modal text hierarchy */
+/* Very small screens with calendar date header matching emotional timeline phase header */
 @media (max-width: 480px) {
   .trigger-options {
     flex-direction: column;
@@ -1197,7 +1202,12 @@ button.back-to-info-btn:active,
   }
   
   .modal-header-simple h3 {
-    font-size: 1.125rem;
+    font-size: 1.125rem; /* MATCHES: Emotional timeline phase header on very small mobile */
+  }
+  
+  /* UPDATED: Calendar date header specifically matching emotional timeline phase header on very small mobile */
+  .day-info-modal h3 {
+    font-size: 1.125rem; /* MATCHES: Emotional timeline .phase-modal-info h3 on 480px */
   }
   
   .journal-textarea {
