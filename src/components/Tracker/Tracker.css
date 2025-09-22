@@ -501,26 +501,24 @@ button.action-btn:hover {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0; /* REMOVED: Gap to fix internal spacing */
-  justify-content: center; /* Center content vertically */
+  gap: var(--spacing-xs); /* RESTORED: Exact match to Emotional Timeline */
 }
 
 .benefits-tracking-title {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
-  margin: 0 0 2px 0; /* MINIMAL: Just enough separation */
+  margin: 0;
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  line-height: 1.2; /* TIGHT: Line height for balance */
 }
 
 .benefits-tracking-description {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  line-height: 1.3; /* COMPACT: Line height for balance */
-  margin: 0; /* REMOVED: Any default margins */
+  line-height: 1.4;
+  margin: 0;
 }
 
 .benefits-modal-sliders {
