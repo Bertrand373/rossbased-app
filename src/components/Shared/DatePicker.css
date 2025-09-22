@@ -1,4 +1,4 @@
-/* components/Shared/DatePicker.css - UPDATED: Helmet banner branding, grey→yellow hover effects, fixed mobile inputs */
+/* components/Shared/DatePicker.css - UPDATED: Consistent banner padding matching Emotional Timeline */
 
 .date-picker-container {
   display: flex;
@@ -108,7 +108,7 @@
   line-height: 1; /* ADDED: Ensure proper line height for centering */
 }
 
-/* NEW: Helmet Info Banner - EXACT COPY from Emotional Timeline */
+/* FIXED: Helmet Info Banner - CONSISTENT PADDING matching Emotional Timeline */
 .date-picker-info-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -119,7 +119,7 @@
   gap: var(--spacing-lg);
   position: relative;
   overflow: hidden;
-  margin-bottom: var(--spacing-lg); /* RESTORED: Original external spacing */
+  margin-bottom: var(--spacing-lg);
 }
 
 .date-picker-helmet-container {
@@ -155,7 +155,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  justify-content: center; /* ADDED: Center content to balance spacing */
 }
 
 .date-picker-info-title {
@@ -242,13 +241,13 @@
     gap: var(--spacing-md); /* REDUCED: Less gap on mobile */
   }
   
-  /* NEW: Mobile helmet banner styles - EXACT COPY from Emotional Timeline */
+  /* FIXED: Mobile helmet banner styles - CONSISTENT PADDING matching Emotional Timeline */
   .date-picker-info-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg); /* RESTORED: Original mobile external spacing */
+    margin-bottom: var(--spacing-lg);
   }
   
   .date-picker-info-content {
@@ -327,7 +326,7 @@
 
 /* Very small screens - more compact */
 @media (max-width: 480px) {
-  /* NEW: Very small mobile helmet banner styles - EXACT COPY from Emotional Timeline */
+  /* FIXED: Very small mobile helmet banner styles - CONSISTENT PADDING */
   .date-picker-helmet {
     width: 30px;
     height: 30px;
