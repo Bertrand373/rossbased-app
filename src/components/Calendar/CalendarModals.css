@@ -117,7 +117,7 @@ button.modal-close-btn:hover {
   max-width: 500px;
 }
 
-/* UPDATED: Simplified modal header using emotional timeline modal structure */
+/* UPDATED: Simplified modal header using emotional timeline modal text hierarchy */
 .modal-header-simple {
   display: flex;
   flex-direction: column;
@@ -939,7 +939,7 @@ button.back-to-info-btn:active,
   transform: translateY(-1px) !important;
 }
 
-/* Mobile responsiveness for modals */
+/* Mobile responsiveness for modals with EXACT emotional timeline modal text hierarchy */
 @media (max-width: 768px) {
   .edit-day-modal, .day-info-modal {
     max-width: 95%;
@@ -1039,7 +1039,7 @@ button.back-to-info-btn:active,
     width: 100%;
   }
   
-  /* NEW: Mobile journal editing styles */
+  /* NEW: Mobile journal editing styles with correct text hierarchy */
   .journal-header-with-actions {
     flex-direction: column;
     align-items: stretch;
@@ -1048,6 +1048,7 @@ button.back-to-info-btn:active,
   
   .journal-header-with-actions h4 {
     text-align: center;
+    font-size: 1rem;
   }
   
   .journal-edit-btn {
@@ -1076,6 +1077,15 @@ button.back-to-info-btn:active,
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
+  }
+  
+  /* UPDATED: All h4 section headers mobile sizing matching emotional timeline */
+  .day-benefits h4,
+  .day-journal h4,
+  .day-tracking-info h4,
+  .trigger-selection h4,
+  .premium-teaser h4 {
+    font-size: 1rem;
   }
   
   /* Mobile modal actions with grey→yellow hover */
@@ -1149,7 +1159,7 @@ button.back-to-info-btn:active,
   }
 }
 
-/* Very small screens */
+/* Very small screens with EXACT emotional timeline modal text hierarchy */
 @media (max-width: 480px) {
   .trigger-options {
     flex-direction: column;
@@ -1187,7 +1197,7 @@ button.back-to-info-btn:active,
   }
   
   .modal-header-simple h3 {
-    font-size: 0.9rem;
+    font-size: 1.125rem;
   }
   
   .journal-textarea {
@@ -1205,6 +1215,15 @@ button.back-to-info-btn:active,
   .journal-cancel-btn {
     width: 100%;
     justify-content: center;
+  }
+  
+  /* UPDATED: Very small screen h4 section headers matching emotional timeline */
+  .day-benefits h4,
+  .day-journal h4,
+  .day-tracking-info h4,
+  .trigger-selection h4,
+  .premium-teaser h4 {
+    font-size: 0.9375rem;
   }
   
   .modal-close,
