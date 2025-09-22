@@ -1113,10 +1113,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                         
                         <div className="journal-benefits-content">
                           <h4 className="journal-benefits-title">
-                            Start Daily Journaling for Better Results
+                            Track Your Journey
                           </h4>
                           <p className="journal-benefits-description">
-                            Regular journaling helps track emotional patterns, identify triggers, celebrate victories, and maintain accountability. Users who journal consistently report better streak maintenance and deeper self-understanding throughout their journey.
+                            Daily notes help identify patterns and maintain accountability.
                           </p>
                         </div>
                       </div>
