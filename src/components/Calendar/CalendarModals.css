@@ -778,7 +778,7 @@ button.modal-close-btn:hover {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-xs); /* FIXED: Match Emotional Timeline exactly */
 }
 
 .journal-benefits-title {

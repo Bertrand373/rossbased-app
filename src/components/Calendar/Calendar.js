@@ -1113,7 +1113,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                         
                         <div className="journal-benefits-content">
                           <h4 className="journal-benefits-title">
-                            Journal Your Journey
+                            How was this day?
                           </h4>
                           <p className="journal-benefits-description">
                             Daily notes help identify patterns and maintain accountability.
