@@ -1,27 +1,147 @@
-/* components/Calendar/CalendarModals.css - UPDATED: Close button styling to match Tracker modals exactly + existing styles */
+/* components/Calendar/CalendarModals.css - UPDATED: Complete file with Emotional Timeline modal styling incorporated */
 
-/* UPDATED: Edit day modal with better back button placement */
+/* EXACT COPY: Modal overlay and base from emotional timeline modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: modal-appear 0.3s ease-out;
+  /* ADDED: Smooth scrolling like emotional timeline modal */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* EXACT COPY: Close button from emotional timeline modal with grey circle background */
+.modal-close,
+button.modal-close,
+.modal-close-x,
+button.modal-close-x {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(128, 128, 128, 0.1) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 1;
+  outline: none;
+}
+
+.modal-close:hover,
+button.modal-close:hover,
+.modal-close-x:hover,
+button.modal-close-x:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+/* Alternative modal-close-btn class support */
+.modal-close-btn,
+button.modal-close-btn {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(128, 128, 128, 0.1) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 1;
+  outline: none;
+}
+
+.modal-close-btn:hover,
+button.modal-close-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+/* UPDATED: Edit day modal with emotional timeline modal structure */
 .edit-day-modal {
   width: 90%;
   max-width: 500px;
 }
 
-/* CHANGED: Simplified modal header - no back button at top */
+/* UPDATED: Simplified modal header using emotional timeline modal structure */
 .modal-header-simple {
-  margin-bottom: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
   text-align: center;
 }
 
 .modal-header-simple h3 {
-  text-align: center;
   margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: var(--text);
-  font-size: 1.25rem;
 }
 
 .edit-day-modal p {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.5;
   margin-bottom: var(--spacing-lg);
-  color: var(--text-secondary);
   text-align: center;
 }
 
@@ -85,13 +205,21 @@
   box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
 }
 
-/* UPDATED: Trigger selection styling with PILL-SHAPED buttons */
+/* UPDATED: Trigger selection styling with emotional timeline modal structure */
 .trigger-selection {
-  background-color: var(--light-gray);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-lg);
+  background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.trigger-selection h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 var(--spacing-lg) 0;
+  text-align: center;
 }
 
 .trigger-options {
@@ -144,7 +272,7 @@
   margin-top: var(--spacing-lg);
 }
 
-/* UPDATED: Trigger action buttons with greyâ†’yellow hover */
+/* UPDATED: Trigger action buttons with emotional timeline modal button styling */
 .trigger-actions .btn {
   display: flex;
   align-items: center;
@@ -159,6 +287,8 @@
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
   color: var(--text-secondary);
+  min-width: 120px;
+  justify-content: center;
 }
 
 .trigger-actions .btn:hover {
@@ -175,21 +305,24 @@
   color: var(--primary);
 }
 
-/* UPDATED: Enhanced Day Info Modal with proper spacing */
+/* UPDATED: Enhanced Day Info Modal with emotional timeline modal structure */
 .day-info-modal {
   width: 90%;
   max-width: 600px;
 }
 
 .day-info-modal h3 {
-  margin-bottom: var(--spacing-md);
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: var(--text);
   text-align: center;
+  margin-bottom: var(--spacing-lg);
 }
 
-/* FIXED: Day status info section with proper spacing between badges */
+/* UPDATED: Day status info section with emotional timeline modal styling */
 .day-status-info {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -284,19 +417,17 @@
   color: var(--text-secondary);
 }
 
-/* ULTRA FIXED: Journey counter card styled EXACTLY like DatePicker "Currently Set" card */
+/* UPDATED: Journey counter card styled like emotional timeline modal sections */
 .day-streak-info {
-  background-color: var(--medium-gray);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  text-align: center;
-  font-size: 0.875rem;
-  color: var(--text);
+  background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
-  margin-bottom: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
 }
 
-/* ULTRA FIXED: All text white like DatePicker */
+/* UPDATED: All text using emotional timeline modal styling */
 .streak-day-number {
   font-size: 2rem;
   font-weight: 700;
@@ -308,21 +439,23 @@
 .streak-context {
   font-size: 0.875rem;
   color: var(--text) !important; /* FIXED: White text instead of mixed colors */
-  font-weight: 500; /* MATCHED: Same weight as DatePicker */
+  font-weight: 500; /* MATCHED: Same weight as emotional timeline */
 }
 
 .day-tracking-info {
-  background-color: var(--card-background);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
-  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
 }
 
 .day-tracking-info h4 {
-  margin-bottom: var(--spacing-sm);
+  margin: 0 0 var(--spacing-md) 0;
   color: var(--text);
-  font-size: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
 }
 
 .day-tracking-info p {
@@ -332,21 +465,23 @@
 }
 
 .day-benefits {
-  margin-top: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
 }
 
 .day-benefits h4, .day-journal h4 {
-  margin-bottom: var(--spacing-md);
-  font-size: 1rem;
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 1.125rem;
+  font-weight: 600;
   color: var(--text);
+  text-align: center;
 }
 
 /* Enhanced yellow sliders for ALL 6 benefits */
 .benefits-details-enhanced {
-  background-color: var(--card-background);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xl);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
@@ -396,10 +531,10 @@
 
 /* OLD benefit styling - keep for backwards compatibility */
 .benefits-details {
-  background-color: var(--card-background);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
 }
 
 .benefit-item {
@@ -441,28 +576,30 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  background-color: var(--card-background);
-  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  border: 1px solid var(--border);
+  font-size: 0.875rem;
 }
 
 /* NEW: Journal editing styles */
 .day-journal {
-  margin-top: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
 }
 
 .journal-header-with-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .journal-header-with-actions h4 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
   color: var(--text);
 }
 
@@ -498,7 +635,7 @@
   width: 100%;
   min-height: 80px;
   padding: var(--spacing-md);
-  background-color: var(--card-background);
+  background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--text);
@@ -566,13 +703,13 @@
 }
 
 .journal-entry {
-  background-color: var(--card-background);
-  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
   font-style: italic;
   max-height: 150px;
   overflow-y: auto;
-  border: 1px solid var(--border);
   color: var(--text);
   line-height: 1.5;
 }
@@ -581,11 +718,11 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background-color: var(--light-gray);
-  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  border: 1px solid var(--border);
   font-size: 0.875rem;
 }
 
@@ -596,21 +733,23 @@
 }
 
 .premium-teaser {
-  margin-top: var(--spacing-lg);
-  background-color: var(--card-background);
-  padding: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   text-align: center;
-  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
 }
 
 .premium-teaser h4 {
   color: var(--text);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.125rem;
+  font-weight: 600;
 }
 
 .premium-teaser p {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   color: var(--text-secondary);
 }
 
@@ -629,7 +768,7 @@
   background-color: var(--primary-dark);
 }
 
-/* UPDATED: Back to Info Button with greyâ†’yellow hover effects */
+/* UPDATED: Back to Info Button with emotional timeline modal button styling */
 .back-to-info-btn,
 button.back-to-info-btn,
 .modal-actions .back-to-info-btn,
@@ -649,14 +788,14 @@ button.back-to-info-btn,
   transition: all 0.2s ease !important;
   flex: 1 !important;
   justify-content: center !important;
-  min-height: auto !important;
+  min-width: 120px !important;
   transform: none !important;
   box-shadow: none !important;
   text-decoration: none !important;
   outline: none !important;
 }
 
-/* UPDATED: Greyâ†’yellow hover effects for back button */
+/* UPDATED: Grey→yellow hover effects for back button */
 .back-to-info-btn:hover,
 .back-to-info-btn:focus,
 .back-to-info-btn:active,
@@ -687,17 +826,19 @@ button.back-to-info-btn:active,
   transition: all 0.2s ease !important;
 }
 
-/* STEP 3: Modal actions container - side-by-side layout like DatePicker */
+/* EXACT COPY: Modal actions from emotional timeline modal */
 .modal-actions {
-  margin-top: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
   display: flex !important;
   gap: var(--spacing-md) !important;
   width: 100% !important;
   align-items: center !important;
   justify-content: center !important;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
 }
 
-/* UPDATED: Modal action buttons with greyâ†’yellow hover effects */
+/* UPDATED: Modal action buttons using emotional timeline modal styling */
 .modal-actions button,
 .modal-actions .btn-primary,
 .modal-actions .edit-day-btn,
@@ -714,6 +855,7 @@ button.back-to-info-btn:active,
   border: 1px solid !important;
   flex: 1 !important;
   justify-content: center !important;
+  min-width: 120px !important;
   min-height: auto !important;
   transform: none !important;
   box-shadow: none !important;
@@ -722,7 +864,7 @@ button.back-to-info-btn:active,
   color: var(--text-secondary) !important;
 }
 
-/* UPDATED: Greyâ†’yellow hover effects for all modal buttons */
+/* UPDATED: Grey→yellow hover effects for all modal buttons */
 .modal-actions button:hover,
 .modal-actions button:focus,
 .modal-actions button:active,
@@ -747,11 +889,13 @@ button.back-to-info-btn:active,
   transition: all 0.2s ease !important;
 }
 
-/* UPDATED: Form actions with greyâ†’yellow hover effects */
+/* UPDATED: Form actions with emotional timeline modal button styling */
 .form-actions {
   display: flex;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
 }
 
 .form-actions button {
@@ -767,6 +911,7 @@ button.back-to-info-btn:active,
   transition: all 0.2s ease;
   border: 1px solid;
   flex: 1;
+  min-width: 120px;
   min-height: auto;
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
@@ -802,6 +947,21 @@ button.back-to-info-btn:active,
     margin: var(--spacing-md);
   }
   
+  .modal-content {
+    padding: var(--spacing-lg);
+    max-height: 90vh;
+  }
+  
+  .modal-header-simple {
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+  }
+  
+  .modal-header-simple h3 {
+    font-size: 1.25rem;
+  }
+  
   .day-status-info {
     gap: var(--spacing-sm);
   }
@@ -809,10 +969,6 @@ button.back-to-info-btn:active,
   .status-badge {
     font-size: 0.8rem;
     padding: var(--spacing-xs) var(--spacing-sm);
-  }
-  
-  .modal-header-simple h3 {
-    font-size: 1rem;
   }
   
   .edit-day-options {
@@ -922,7 +1078,7 @@ button.back-to-info-btn:active,
     gap: var(--spacing-sm);
   }
   
-  /* Mobile modal actions with greyâ†’yellow hover */
+  /* Mobile modal actions with grey→yellow hover */
   .modal-actions {
     flex-direction: row !important;
     width: 100% !important;
@@ -980,6 +1136,16 @@ button.back-to-info-btn:active,
     justify-content: center !important;
     padding: var(--spacing-sm) var(--spacing-md) !important;
     min-height: auto !important;
+  }
+  
+  .modal-close,
+  .modal-close-x,
+  .modal-close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
   }
 }
 
@@ -1039,5 +1205,13 @@ button.back-to-info-btn:active,
   .journal-cancel-btn {
     width: 100%;
     justify-content: center;
+  }
+  
+  .modal-close,
+  .modal-close-x,
+  .modal-close-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
   }
 }
