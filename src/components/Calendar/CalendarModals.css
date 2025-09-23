@@ -737,10 +737,10 @@ button.modal-close-btn:hover {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-md); /* FIXED: Changed from spacing-lg to spacing-md to match Emotional Timeline exactly */
+  padding: var(--spacing-lg);
   display: flex;
   align-items: center;
-  gap: var(--spacing-md); /* FIXED: Changed from spacing-lg to spacing-md to match Emotional Timeline exactly */
+  gap: var(--spacing-lg);
   position: relative;
   overflow: hidden;
   margin-bottom: var(--spacing-lg);
@@ -778,7 +778,7 @@ button.modal-close-btn:hover {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px; /* FIXED: Use exact 4px gap like Emotional Timeline banners instead of spacing-xs */
+  gap: var(--spacing-xs); /* FIXED: Match Emotional Timeline exactly */
 }
 
 .journal-benefits-title {
@@ -789,7 +789,6 @@ button.modal-close-btn:hover {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  line-height: 1.2; /* FIXED: Add line-height for exact spacing match */
 }
 
 .journal-benefits-description {
@@ -869,7 +868,7 @@ button.back-to-info-btn,
   outline: none !important;
 }
 
-/* UPDATED: Grey→yellow hover effects for back button */
+/* UPDATED: Greyâ†’yellow hover effects for back button */
 .back-to-info-btn:hover,
 .back-to-info-btn:focus,
 .back-to-info-btn:active,
@@ -938,7 +937,7 @@ button.back-to-info-btn:active,
   color: var(--text-secondary) !important;
 }
 
-/* UPDATED: Grey→yellow hover effects for all modal buttons */
+/* UPDATED: Greyâ†’yellow hover effects for all modal buttons */
 .modal-actions button:hover,
 .modal-actions button:focus,
 .modal-actions button:active,
@@ -1168,19 +1167,17 @@ button.back-to-info-btn:active,
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-sm); /* FIXED: Changed from spacing-md to spacing-sm to match Emotional Timeline mobile */
+    padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
   }
   
   .journal-benefits-content {
     text-align: center;
-    gap: 2px; /* FIXED: Use exact 2px gap on mobile like Emotional Timeline */
   }
   
   .journal-benefits-title {
     justify-content: center;
     font-size: 0.875rem;
-    line-height: 1.2; /* FIXED: Add line-height for exact spacing match */
   }
   
   .journal-benefits-description {
@@ -1211,7 +1208,7 @@ button.back-to-info-btn:active,
     font-size: 1rem;
   }
   
-  /* Mobile modal actions with grey→yellow hover */
+  /* Mobile modal actions with greyâ†’yellow hover */
   .modal-actions {
     flex-direction: row !important;
     width: 100% !important;
@@ -1353,17 +1350,12 @@ button.back-to-info-btn:active,
   
   /* Very small screen journal benefits banner */
   .journal-benefits-banner {
-    padding: var(--spacing-xs); /* FIXED: Use spacing-xs on very small screens to match Emotional Timeline */
+    padding: var(--spacing-sm);
     gap: var(--spacing-xs);
-  }
-  
-  .journal-benefits-content {
-    gap: 2px; /* FIXED: Keep exact 2px gap on very small screens */
   }
   
   .journal-benefits-title {
     font-size: 0.8rem;
-    line-height: 1.2; /* FIXED: Maintain line-height for exact spacing match */
   }
   
   .journal-benefits-description {
