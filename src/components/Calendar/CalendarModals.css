@@ -778,14 +778,14 @@ button.modal-close-btn:hover {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs); /* FIXED: Match Emotional Timeline exactly */
+  gap: var(--spacing-xs);
 }
 
 .journal-benefits-title {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
-  margin: 0; /* FIXED: Add explicit margin: 0 like working banners */
+  margin: 0;
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -795,7 +795,7 @@ button.modal-close-btn:hover {
   font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.4;
-  margin: 0; /* FIXED: Add explicit margin: 0 like working banners */
+  margin: 0;
 }
 
 /* Journal start section */
@@ -868,7 +868,7 @@ button.back-to-info-btn,
   outline: none !important;
 }
 
-/* UPDATED: GreyÃ¢â€ â€™yellow hover effects for back button */
+/* UPDATED: Grey→yellow hover effects for back button */
 .back-to-info-btn:hover,
 .back-to-info-btn:focus,
 .back-to-info-btn:active,
@@ -937,7 +937,7 @@ button.back-to-info-btn:active,
   color: var(--text-secondary) !important;
 }
 
-/* UPDATED: GreyÃ¢â€ â€™yellow hover effects for all modal buttons */
+/* UPDATED: Grey→yellow hover effects for all modal buttons */
 .modal-actions button:hover,
 .modal-actions button:focus,
 .modal-actions button:active,
@@ -1208,7 +1208,7 @@ button.back-to-info-btn:active,
     font-size: 1rem;
   }
   
-  /* Mobile modal actions with greyÃ¢â€ â€™yellow hover */
+  /* Mobile modal actions with grey→yellow hover */
   .modal-actions {
     flex-direction: row !important;
     width: 100% !important;
