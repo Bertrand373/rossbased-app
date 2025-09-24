@@ -982,21 +982,3 @@
     font-size: 0.9375rem;
   }
 }
-
-/* NUCLEAR FIX: Reset all inherited styles */
-.modal-content.day-info-modal .journal-benefits-banner {
-  margin-left: calc(-1 * var(--spacing-xl));
-  margin-right: calc(-1 * var(--spacing-xl));
-  padding-left: var(--spacing-xl);
-  padding-right: var(--spacing-xl);
-  padding-top: var(--spacing-lg);
-  padding-bottom: var(--spacing-lg);
-}
-
-@media (max-width: 768px) {
-  .modal-content.day-info-modal .journal-benefits-banner {
-    margin-left: calc(-1 * var(--spacing-lg));
-    margin-right: calc(-1 * var(--spacing-lg));
-    padding: var(--spacing-md);
-  }
-}
