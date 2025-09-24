@@ -983,19 +983,20 @@
   }
 }
 
-/* FORCE FIX: Override any inherited padding issues */
-.day-info-modal .journal-benefits-banner {
-  padding: var(--spacing-lg) !important;
+/* NUCLEAR FIX: Reset all inherited styles */
+.modal-content.day-info-modal .journal-benefits-banner {
+  margin-left: calc(-1 * var(--spacing-xl));
+  margin-right: calc(-1 * var(--spacing-xl));
+  padding-left: var(--spacing-xl);
+  padding-right: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
 }
 
 @media (max-width: 768px) {
-  .day-info-modal .journal-benefits-banner {
-    padding: var(--spacing-md) !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .day-info-modal .journal-benefits-banner {
-    padding: var(--spacing-sm) !important;
+  .modal-content.day-info-modal .journal-benefits-banner {
+    margin-left: calc(-1 * var(--spacing-lg));
+    margin-right: calc(-1 * var(--spacing-lg));
+    padding: var(--spacing-md);
   }
 }
