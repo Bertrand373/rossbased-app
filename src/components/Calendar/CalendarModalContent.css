@@ -1,0 +1,985 @@
+/* components/Calendar/CalendarModalContent.css - Modal content and functionality */
+
+/* UPDATED: Edit day modal with emotional timeline modal structure */
+.edit-day-modal {
+  width: 90%;
+  max-width: 500px;
+}
+
+.edit-day-modal p {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.edit-day-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* KEEP: Status buttons unchanged - these are the colored action buttons */
+.edit-option-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.current-streak-btn {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.current-streak-btn:hover {
+  background-color: rgba(34, 197, 94, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.2);
+}
+
+.wet-dream-btn {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border-color: var(--warning);
+}
+
+.wet-dream-btn:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.2);
+}
+
+.relapse-btn {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.relapse-btn:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+}
+
+/* UPDATED: Trigger selection styling with emotional timeline modal structure */
+.trigger-selection {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.trigger-selection h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 var(--spacing-lg) 0;
+  text-align: center;
+}
+
+.trigger-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
+/* UPDATED: Pill-shaped trigger buttons */
+.trigger-option-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full); /* CHANGED: Full pill shape */
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  white-space: nowrap;
+  min-width: fit-content;
+  flex-shrink: 0;
+}
+
+.trigger-option-pill:hover:not(.selected) {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.trigger-option-pill.selected {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2);
+}
+
+.trigger-option-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.trigger-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+/* UPDATED: Trigger action buttons with emotional timeline modal button styling */
+.trigger-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  min-width: 120px;
+  justify-content: center;
+}
+
+.trigger-actions .btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* KEEP: Primary button styling for specific use cases */
+.trigger-actions .btn-primary {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* UPDATED: Enhanced Day Info Modal with emotional timeline modal structure */
+.day-info-modal {
+  width: 90%;
+  max-width: 600px;
+}
+
+.day-info-modal h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* UPDATED: Day status info section with emotional timeline modal styling */
+.day-status-info {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  max-width: fit-content;
+}
+
+.status-badge.current-streak {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+/* UPDATED: Former streak status badge - now BLUE */
+.status-badge.former-streak {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+}
+
+.status-badge.relapse {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.status-badge.wet-dream {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border: 1px solid var(--warning);
+}
+
+.status-badge.badge-earned {
+  background-color: rgba(255, 221, 0, 0.1);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+/* NEW: Goal status badges */
+.status-badge.goal-target {
+  background-color: rgba(128, 128, 128, 0.1);
+  color: rgba(128, 128, 128, 0.9);
+  border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.status-badge.goal-achievement {
+  background-color: rgba(255, 215, 0, 0.1);
+  color: #FFD700;
+  border: 1px solid #FFD700;
+  animation: modal-goal-achievement-glow 2s ease-in-out infinite;
+}
+
+@keyframes modal-goal-achievement-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
+  }
+}
+
+/* UPDATED: Enhanced trigger info display - NOW PILL-SHAPED */
+.trigger-info {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-full); /* CHANGED: From var(--radius-md) to pill shape */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trigger-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.trigger-display-icon {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* UPDATED: Journey counter card styled like emotional timeline modal sections */
+.day-streak-info {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* UPDATED: All text using emotional timeline modal styling */
+.streak-day-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text) !important; /* FIXED: White text instead of yellow */
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+}
+
+.streak-context {
+  font-size: 0.875rem;
+  color: var(--text) !important; /* FIXED: White text instead of mixed colors */
+  font-weight: 500; /* MATCHED: Same weight as emotional timeline */
+}
+
+.day-tracking-info {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.day-tracking-info h4 {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--text);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.day-tracking-info p {
+  margin: 0;
+  color: var(--success);
+  font-size: 0.875rem;
+}
+
+.day-benefits {
+  margin-top: var(--spacing-xl);
+}
+
+.day-benefits h4, .day-journal h4 {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+/* Enhanced yellow sliders for ALL 6 benefits */
+.benefits-details-enhanced {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.benefit-slider-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.benefit-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.benefit-label {
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  text-align: left;
+}
+
+.benefit-value {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+/* Enhanced benefit meter - EXACTLY like the tracker sliders */
+.benefit-meter-enhanced {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 221, 0, 0.2);
+  outline: none;
+  overflow: hidden;
+}
+
+.benefit-level-enhanced {
+  height: 100%;
+  background: #ffdd00;
+  border-radius: var(--radius-full);
+  transition: width 0.2s ease;
+}
+
+/* OLD benefit styling - keep for backwards compatibility */
+.benefits-details {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.benefit-item:last-child {
+  margin-bottom: 0;
+}
+
+.benefit-item span:first-child {
+  color: var(--text);
+  min-width: 80px;
+}
+
+.benefit-item span:last-child {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.benefit-meter {
+  flex: 1;
+  height: 8px;
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.benefit-level {
+  height: 100%;
+  background-color: var(--primary);
+  border-radius: var(--radius-full);
+}
+
+.no-benefits {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* NEW: Journal editing styles */
+.day-journal {
+  margin-top: var(--spacing-xl);
+}
+
+.journal-header-with-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+}
+
+.journal-header-with-actions h4 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.journal-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.journal-edit-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.journal-editing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.journal-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.journal-textarea:focus {
+  border-color: rgba(255, 221, 0, 0.3);
+  box-shadow: 0 0 0 2px rgba(255, 221, 0, 0.1);
+}
+
+.journal-textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.journal-edit-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+}
+
+.journal-save-btn,
+.journal-cancel-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+}
+
+.journal-save-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.journal-save-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.journal-cancel-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.journal-cancel-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.journal-entry {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  font-style: italic;
+  max-height: 150px;
+  overflow-y: auto;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.empty-journal-day {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.empty-journal-day .info-icon {
+  color: var(--primary);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* UPDATED: Journal benefits banner - EXACT COPY from Profile coming-soon-banner with PRECISE spacing */
+.journal-benefits-banner {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+.journal-benefits-helmet-container {
+  flex-shrink: 0;
+}
+
+.journal-benefits-helmet {
+  width: 40px;
+  height: 40px;
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
+}
+
+.journal-benefits-helmet-fallback {
+  font-size: 1.5rem;
+  color: var(--primary);
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes coming-soon-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.96);
+  }
+}
+
+.journal-benefits-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.journal-benefits-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.journal-benefits-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Journal start section */
+.journal-start-section {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
+
+.premium-teaser {
+  margin-top: var(--spacing-xl);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  padding: var(--spacing-lg);
+}
+
+.premium-teaser h4 {
+  color: var(--text);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.premium-teaser p {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+.premium-teaser button {
+  background-color: var(--primary);
+  color: #000;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.premium-teaser button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Mobile responsiveness for modal content */
+@media (max-width: 768px) {
+  .edit-day-modal, .day-info-modal {
+    max-width: 95%;
+    padding: var(--spacing-md);
+    margin: var(--spacing-md);
+  }
+  
+  /* UPDATED: Calendar date header specifically matching emotional timeline phase header */
+  .day-info-modal h3 {
+    font-size: 1.25rem; /* MATCHES: Emotional timeline .phase-modal-info h3 */
+  }
+  
+  .day-status-info {
+    gap: var(--spacing-sm);
+  }
+  
+  .status-badge {
+    font-size: 0.8rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .edit-day-options {
+    gap: var(--spacing-sm);
+  }
+  
+  .edit-option-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.8rem;
+  }
+  
+  .trigger-options {
+    justify-content: center;
+    gap: var(--spacing-xs);
+  }
+  
+  .trigger-option-pill {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-width: auto;
+    flex: 0 1 auto;
+  }
+  
+  .trigger-option-icon {
+    font-size: 0.875rem;
+  }
+  
+  .benefits-details-enhanced {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .benefit-slider-item {
+    gap: var(--spacing-xs);
+  }
+  
+  .benefit-slider-header {
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .benefit-label {
+    font-size: 0.875rem;
+  }
+  
+  .benefit-value {
+    font-size: 0.8rem;
+  }
+  
+  .benefit-meter-enhanced {
+    height: 6px;
+  }
+  
+  .streak-day-number {
+    font-size: 1.5rem;
+  }
+  
+  .streak-context {
+    font-size: 0.8rem;
+  }
+  
+  .benefit-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .benefit-item span:first-child {
+    width: 100%;
+  }
+  
+  /* NEW: Mobile journal editing styles with correct text hierarchy */
+  .journal-header-with-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+  
+  .journal-header-with-actions h4 {
+    text-align: center;
+    font-size: 1rem;
+  }
+  
+  .journal-edit-btn {
+    align-self: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+  }
+  
+  .journal-textarea {
+    min-height: 100px;
+    font-size: 0.875rem;
+  }
+  
+  .journal-edit-actions {
+    justify-content: center;
+    gap: var(--spacing-md);
+  }
+  
+  .journal-save-btn,
+  .journal-cancel-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+  }
+  
+  .journal-edit-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .journal-save-btn,
+  .journal-cancel-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* UPDATED: Mobile journal benefits banner - EXACT COPY from Profile coming-soon-banner mobile styles */
+  .journal-benefits-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .journal-benefits-content {
+    text-align: center;
+  }
+  
+  .journal-benefits-title {
+    justify-content: center;
+    font-size: 0.875rem;
+  }
+  
+  .journal-benefits-description {
+    font-size: 0.8rem;
+  }
+  
+  .journal-benefits-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .journal-benefits-helmet-fallback {
+    font-size: 1.25rem;
+  }
+  
+  .empty-journal-day {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+  
+  /* UPDATED: All h4 section headers mobile sizing matching emotional timeline */
+  .day-benefits h4,
+  .day-journal h4,
+  .day-tracking-info h4,
+  .trigger-selection h4,
+  .premium-teaser h4 {
+    font-size: 1rem;
+  }
+}
+
+/* Very small screens with calendar date header matching emotional timeline phase header */
+@media (max-width: 480px) {
+  .trigger-options {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .trigger-option-pill {
+    width: 100%;
+    max-width: 200px;
+    justify-content: center;
+  }
+  
+  .benefits-details-enhanced {
+    padding: var(--spacing-sm);
+  }
+  
+  .benefit-label {
+    font-size: 0.8rem;
+  }
+  
+  .benefit-value {
+    font-size: 0.75rem;
+  }
+  
+  .benefit-meter-enhanced {
+    height: 5px;
+  }
+  
+  .streak-day-number {
+    font-size: 1.25rem;
+  }
+  
+  .streak-context {
+    font-size: 0.75rem;
+  }
+  
+  /* UPDATED: Calendar date header specifically matching emotional timeline phase header on very small mobile */
+  .day-info-modal h3 {
+    font-size: 1.125rem; /* MATCHES: Emotional timeline .phase-modal-info h3 on 480px */
+  }
+  
+  .journal-textarea {
+    min-height: 80px;
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+  
+  .journal-edit-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .journal-save-btn,
+  .journal-cancel-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* UPDATED: Very small screen journal benefits banner - EXACT COPY from Profile coming-soon-banner */
+  .journal-benefits-banner {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-xs);
+  }
+  
+  .journal-benefits-title {
+    font-size: 0.8rem;
+  }
+  
+  .journal-benefits-description {
+    font-size: 0.75rem;
+  }
+  
+  .journal-benefits-helmet {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .journal-benefits-helmet-fallback {
+    font-size: 1rem;
+  }
+  
+  /* UPDATED: Very small screen h4 section headers matching emotional timeline */
+  .day-benefits h4,
+  .day-journal h4,
+  .day-tracking-info h4,
+  .trigger-selection h4,
+  .premium-teaser h4 {
+    font-size: 0.9375rem;
+  }
+}

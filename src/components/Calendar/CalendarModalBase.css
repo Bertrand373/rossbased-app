@@ -1,0 +1,406 @@
+/* components/Calendar/CalendarModalBase.css - Basic modal structure and foundation */
+
+/* EXACT COPY: Modal overlay and base from emotional timeline modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: modal-appear 0.3s ease-out;
+  /* ADDED: Smooth scrolling like emotional timeline modal */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* EXACT COPY: Close button from emotional timeline modal with grey circle background */
+.modal-close,
+button.modal-close,
+.modal-close-x,
+button.modal-close-x {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(128, 128, 128, 0.1) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 1;
+  outline: none;
+}
+
+.modal-close:hover,
+button.modal-close:hover,
+.modal-close-x:hover,
+button.modal-close-x:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+/* Alternative modal-close-btn class support */
+.modal-close-btn,
+button.modal-close-btn {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(128, 128, 128, 0.1) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 1;
+  outline: none;
+}
+
+.modal-close-btn:hover,
+button.modal-close-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+/* UPDATED: Simplified modal header using emotional timeline modal text hierarchy */
+.modal-header-simple {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.modal-header-simple h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* EXACT COPY: Modal actions from emotional timeline modal */
+.modal-actions {
+  margin-top: var(--spacing-xl);
+  display: flex !important;
+  gap: var(--spacing-md) !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+}
+
+/* UPDATED: Modal action buttons using emotional timeline modal styling */
+.modal-actions button,
+.modal-actions .btn-primary,
+.modal-actions .edit-day-btn,
+.modal-actions .btn-outline {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  border-radius: var(--radius-full) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: 1px solid !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  min-width: 120px !important;
+  min-height: auto !important;
+  transform: none !important;
+  box-shadow: none !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* UPDATED: Grey→yellow hover effects for all modal buttons */
+.modal-actions button:hover,
+.modal-actions button:focus,
+.modal-actions button:active,
+.modal-actions .btn-primary:hover,
+.modal-actions .btn-primary:focus,
+.modal-actions .btn-primary:active,
+.modal-actions .edit-day-btn:hover,
+.modal-actions .edit-day-btn:focus,
+.modal-actions .edit-day-btn:active,
+.modal-actions .btn-outline:hover,
+.modal-actions .btn-outline:focus,
+.modal-actions .btn-outline:active {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  outline: none !important;
+  filter: none !important;
+  animation: none !important;
+  transition: all 0.2s ease !important;
+}
+
+/* UPDATED: Back to Info Button with emotional timeline modal button styling */
+.back-to-info-btn,
+button.back-to-info-btn,
+.modal-actions .back-to-info-btn,
+.calendar-container .back-to-info-btn,
+.edit-day-modal .back-to-info-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  min-width: 120px !important;
+  transform: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  outline: none !important;
+}
+
+/* UPDATED: Grey→yellow hover effects for back button */
+.back-to-info-btn:hover,
+.back-to-info-btn:focus,
+.back-to-info-btn:active,
+button.back-to-info-btn:hover,
+button.back-to-info-btn:focus,
+button.back-to-info-btn:active,
+.modal-actions .back-to-info-btn:hover,
+.modal-actions .back-to-info-btn:focus,
+.modal-actions .back-to-info-btn:active,
+.calendar-container .back-to-info-btn:hover,
+.calendar-container .back-to-info-btn:focus,
+.calendar-container .back-to-info-btn:active,
+.edit-day-modal .back-to-info-btn:hover,
+.edit-day-modal .back-to-info-btn:focus,
+.edit-day-modal .back-to-info-btn:active {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  outline: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  background-image: none !important;
+  background-size: auto !important;
+  animation: none !important;
+  transition: all 0.2s ease !important;
+}
+
+/* UPDATED: Form actions with emotional timeline modal button styling */
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+}
+
+.form-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+  flex: 1;
+  min-width: 120px;
+  min-height: auto;
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.form-actions button:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* KEEP: Danger button styling unchanged */
+.form-actions .btn-danger {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+.form-actions .btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Mobile responsiveness for modals with calendar date header matching emotional timeline phase header */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: var(--spacing-lg);
+    max-height: 90vh;
+  }
+  
+  .modal-header-simple {
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+  }
+  
+  .modal-header-simple h3 {
+    font-size: 1.25rem; /* MATCHES: Emotional timeline phase header on mobile */
+  }
+  
+  /* Mobile modal actions with grey→yellow hover */
+  .modal-actions {
+    flex-direction: row !important;
+    width: 100% !important;
+    gap: var(--spacing-sm) !important;
+    align-items: center !important;
+  }
+  
+  .modal-actions .back-to-info-btn,
+  .modal-actions button.back-to-info-btn,
+  .calendar-container .modal-actions .back-to-info-btn,
+  .edit-day-modal .modal-actions .back-to-info-btn {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    min-height: auto !important;
+    background-color: rgba(128, 128, 128, 0.1) !important;
+    border-color: var(--border) !important;
+    color: var(--text-secondary) !important;
+    transform: none !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .modal-actions .back-to-info-btn:hover,
+  .modal-actions .back-to-info-btn:focus,
+  .modal-actions .back-to-info-btn:active,
+  .modal-actions button.back-to-info-btn:hover,
+  .modal-actions button.back-to-info-btn:focus,
+  .modal-actions button.back-to-info-btn:active {
+    background-color: rgba(255, 221, 0, 0.1) !important;
+    border-color: rgba(255, 221, 0, 0.2) !important;
+    color: var(--primary) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .modal-actions button {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    min-height: auto !important;
+  }
+  
+  .form-actions {
+    flex-direction: row !important;
+    gap: var(--spacing-sm);
+    align-items: center;
+  }
+  
+  .form-actions button {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    min-height: auto !important;
+  }
+  
+  .modal-close,
+  .modal-close-x,
+  .modal-close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .modal-header-simple h3 {
+    font-size: 1.125rem; /* MATCHES: Emotional timeline phase header on very small mobile */
+  }
+  
+  .modal-close,
+  .modal-close-x,
+  .modal-close-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+}
