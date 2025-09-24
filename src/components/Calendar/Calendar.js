@@ -5,7 +5,8 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSa
   startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
 import toast from 'react-hot-toast';
 import './CalendarBase.css';
-import './CalendarModals.css';
+import './CalendarModalBase.css';
+import './CalendarModalContent.css';
 
 // Icons - Fixed imports
 import { FaCheckCircle, FaTimesCircle, FaMoon, 
@@ -950,8 +951,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 </div>
               </div>
             )}
-
-
 
             {/* Benefits Details */}
             {(() => {
