@@ -982,3 +982,20 @@
     font-size: 0.9375rem;
   }
 }
+
+/* FORCE FIX: Override any inherited padding issues */
+.day-info-modal .journal-benefits-banner {
+  padding: var(--spacing-lg) !important;
+}
+
+@media (max-width: 768px) {
+  .day-info-modal .journal-benefits-banner {
+    padding: var(--spacing-md) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .day-info-modal .journal-benefits-banner {
+    padding: var(--spacing-sm) !important;
+  }
+}
