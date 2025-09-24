@@ -732,7 +732,7 @@ button.modal-close-btn:hover {
   flex-shrink: 0;
 }
 
-/* UPDATED: Journal benefits banner - EXACT COPY from Emotional Timeline checkin-benefits-banner */
+/* UPDATED: Journal benefits banner - EXACT COPY from Profile coming-soon-banner with PRECISE spacing */
 .journal-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -1162,13 +1162,13 @@ button.back-to-info-btn:active,
     justify-content: center;
   }
   
-  /* UPDATED: Mobile journal benefits banner - EXACT COPY from Emotional Timeline */
+  /* UPDATED: Mobile journal benefits banner - EXACT COPY from Profile coming-soon-banner mobile styles */
   .journal-benefits-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
   }
   
   .journal-benefits-content {
@@ -1342,7 +1342,7 @@ button.back-to-info-btn:active,
     justify-content: center;
   }
   
-  /* UPDATED: Very small screen journal benefits banner - EXACT COPY from Emotional Timeline */
+  /* UPDATED: Very small screen journal benefits banner - EXACT COPY from Profile coming-soon-banner */
   .journal-benefits-banner {
     padding: var(--spacing-sm);
     gap: var(--spacing-xs);
