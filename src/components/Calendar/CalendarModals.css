@@ -732,7 +732,7 @@ button.modal-close-btn:hover {
   flex-shrink: 0;
 }
 
-/* NEW: Journal benefits banner - EXACT COPY from Emotional Timeline */
+/* UPDATED: Journal benefits banner - EXACT COPY from Emotional Timeline checkin-benefits-banner */
 .journal-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -1162,7 +1162,7 @@ button.back-to-info-btn:active,
     justify-content: center;
   }
   
-  /* Mobile journal benefits banner */
+  /* UPDATED: Mobile journal benefits banner - EXACT COPY from Emotional Timeline */
   .journal-benefits-banner {
     flex-direction: column;
     text-align: center;
@@ -1342,13 +1342,7 @@ button.back-to-info-btn:active,
     justify-content: center;
   }
   
-  .journal-save-btn,
-  .journal-cancel-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  /* Very small screen journal benefits banner */
+  /* UPDATED: Very small screen journal benefits banner - EXACT COPY from Emotional Timeline */
   .journal-benefits-banner {
     padding: var(--spacing-sm);
     gap: var(--spacing-xs);
