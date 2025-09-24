@@ -601,7 +601,7 @@
   flex-shrink: 0;
 }
 
-/* UPDATED: Journal benefits banner - EXACT COPY from Profile coming-soon-banner with PRECISE spacing */
+/* FIXED: Journal benefits banner - EXACT COPY from Profile/Timeline with PRECISE spacing */
 .journal-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -845,7 +845,7 @@
     justify-content: center;
   }
   
-  /* UPDATED: Mobile journal benefits banner - EXACT COPY from Profile coming-soon-banner mobile styles */
+  /* FIXED: Mobile journal benefits banner - EXACT COPY from Profile/Timeline */
   .journal-benefits-banner {
     flex-direction: column;
     text-align: center;
@@ -951,7 +951,7 @@
     justify-content: center;
   }
   
-  /* UPDATED: Very small screen journal benefits banner - EXACT COPY from Profile coming-soon-banner */
+  /* FIXED: Very small screen journal benefits banner - EXACT COPY from Profile/Timeline */
   .journal-benefits-banner {
     padding: var(--spacing-sm);
     gap: var(--spacing-xs);
@@ -964,7 +964,6 @@
   .journal-benefits-description {
     font-size: 0.75rem;
   }
-  
   .journal-benefits-helmet {
     width: 30px;
     height: 30px;
