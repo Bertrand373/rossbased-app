@@ -634,7 +634,7 @@
   line-height: 1.4;
 }
 
-/* FIXED: PULSING HELMET BANNER with proper spacing */
+/* FIXED: PULSING HELMET BANNER with EmotionalTimeline spacing */
 .journal-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -645,7 +645,7 @@
   gap: var(--spacing-lg);
   position: relative;
   overflow: hidden;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
 }
 
 .journal-benefits-helmet-container {
@@ -700,11 +700,11 @@
   margin: 0;
 }
 
-/* FIXED: Journal start section with reduced spacing */
+/* FIXED: Journal start section with no extra spacing to match EmotionalTimeline */
 .journal-start-section {
   display: flex;
   justify-content: center;
-  margin-top: var(--spacing-sm);
+  margin-top: 0;
 }
 
 .premium-teaser {
@@ -822,12 +822,13 @@
     font-size: 0.8rem;
   }
   
-  /* Mobile pulsing helmet banner */
+  /* Mobile pulsing helmet banner - matches EmotionalTimeline */
   .journal-benefits-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
   }
   
   .journal-benefits-content {
@@ -966,8 +967,8 @@
   .day-info-modal h3 {
     font-size: 1.125rem;
   }
-  
-  /* Very small mobile pulsing helmet banner */
+
+/* Very small mobile pulsing helmet banner - matches EmotionalTimeline */
   .journal-benefits-helmet {
     width: 30px;
     height: 30px;
