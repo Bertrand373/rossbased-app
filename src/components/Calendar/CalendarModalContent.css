@@ -601,18 +601,53 @@
   flex-shrink: 0;
 }
 
-/* FIXED: Journal benefits banner - EXACT COPY from Profile/Timeline with PRECISE spacing */
-.journal-benefits-banner {
+/* CRITICAL FIX: Journal benefits banner with modal compensation */
+/* The modal has internal padding that we need to account for */
+.day-info-modal .journal-benefits-banner {
+  /* Compensate for modal's internal padding by extending to edges */
+  margin-left: calc(-1 * var(--spacing-xl));
+  margin-right: calc(-1 * var(--spacing-xl));
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  
+  /* Now add back the correct internal padding */
+  padding-left: calc(var(--spacing-xl) + var(--spacing-lg));
+  padding-right: calc(var(--spacing-xl) + var(--spacing-lg));
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  border-top: 1px solid rgba(255, 221, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 221, 0, 0.1);
   display: flex;
   align-items: center;
   gap: var(--spacing-lg);
   position: relative;
   overflow: hidden;
   margin-bottom: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+  .day-info-modal .journal-benefits-banner {
+    margin-left: calc(-1 * var(--spacing-lg));
+    margin-right: calc(-1 * var(--spacing-lg));
+    padding-left: calc(var(--spacing-lg) + var(--spacing-md));
+    padding-right: calc(var(--spacing-lg) + var(--spacing-md));
+    padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .day-info-modal .journal-benefits-banner {
+    margin-left: calc(-1 * var(--spacing-md));
+    margin-right: calc(-1 * var(--spacing-md));
+    padding-left: calc(var(--spacing-md) + var(--spacing-sm));
+    padding-right: calc(var(--spacing-md) + var(--spacing-sm));
+    padding-top: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+  }
 }
 
 .journal-benefits-helmet-container {
@@ -845,15 +880,7 @@
     justify-content: center;
   }
   
-  /* FIXED: Mobile journal benefits banner - EXACT COPY from Profile/Timeline */
-  .journal-benefits-banner {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-  }
-  
+  /* Mobile journal benefits banner adjustments - already handled above */
   .journal-benefits-content {
     text-align: center;
   }
@@ -951,12 +978,7 @@
     justify-content: center;
   }
   
-  /* FIXED: Very small screen journal benefits banner - EXACT COPY from Profile/Timeline */
-  .journal-benefits-banner {
-    padding: var(--spacing-sm);
-    gap: var(--spacing-xs);
-  }
-  
+  /* Very small screen journal benefits banner - handled above */
   .journal-benefits-title {
     font-size: 0.8rem;
   }
@@ -964,6 +986,7 @@
   .journal-benefits-description {
     font-size: 0.75rem;
   }
+  
   .journal-benefits-helmet {
     width: 30px;
     height: 30px;
