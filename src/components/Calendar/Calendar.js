@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Compact legend + pulsing helmet banner
+// components/Calendar/Calendar.js - FIXED: Banner structure moved outside journal section
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -1039,7 +1039,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               return null;
             })()}
 
-            {/* UPDATED: Journal Entry Section with PULSING HELMET BANNER */}
+            {/* FIXED: Journal Entry Section - simplified structure */}
             <div className="day-journal">
               <div className="journal-header-with-actions">
                 <h4>Journal Entry</h4>
@@ -1082,53 +1082,55 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 </div>
               ) : (
                 <>
-                  {noteText ? (
+                  {noteText && (
                     <div className="journal-entry">
                       {noteText}
                     </div>
-                  ) : (
-                    <>
-                      {/* UPDATED: Pulsing helmet banner - EXACT COPY from other components */}
-                      <div className="journal-benefits-banner">
-                        <div className="journal-benefits-helmet-container">
-                          <img 
-                            className="journal-benefits-helmet" 
-                            src="/helmet.png" 
-                            alt="Start Journaling" 
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextElementSibling.style.display = 'block';
-                            }}
-                          />
-                          <div className="journal-benefits-helmet-fallback" style={{ display: 'none' }}>
-                            🛡️
-                          </div>
-                        </div>
-                        
-                        <div className="journal-benefits-content">
-                          <h4 className="journal-benefits-title">
-                            Start Daily Journaling for Better Results
-                          </h4>
-                          <p className="journal-benefits-description">
-                            Regular journaling helps track emotional patterns, identify triggers, celebrate victories, and maintain accountability. Users who journal consistently report better streak maintenance and deeper self-understanding throughout their journey.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="journal-start-section">
-                        <button 
-                          className="action-btn journal-edit-btn"
-                          onClick={startEditingNote}
-                        >
-                          <FaPen />
-                          <span>Add Journal Entry</span>
-                        </button>
-                      </div>
-                    </>
                   )}
                 </>
               )}
             </div>
+
+            {/* FIXED: Banner OUTSIDE journal section when no text - proper structure */}
+            {!isEditingNote && !noteText && (
+              <>
+                <div className="journal-benefits-banner">
+                  <div className="journal-benefits-helmet-container">
+                    <img 
+                      className="journal-benefits-helmet" 
+                      src="/helmet.png" 
+                      alt="Start Journaling" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'block';
+                      }}
+                    />
+                    <div className="journal-benefits-helmet-fallback" style={{ display: 'none' }}>
+                      🛡️
+                    </div>
+                  </div>
+                  
+                  <div className="journal-benefits-content">
+                    <h4 className="journal-benefits-title">
+                      Start Daily Journaling for Better Results
+                    </h4>
+                    <p className="journal-benefits-description">
+                      Regular journaling helps track emotional patterns, identify triggers, celebrate victories, and maintain accountability. Users who journal consistently report better streak maintenance and deeper self-understanding throughout their journey.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="journal-start-section">
+                  <button 
+                    className="action-btn journal-edit-btn"
+                    onClick={startEditingNote}
+                  >
+                    <FaPen />
+                    <span>Add Journal Entry</span>
+                  </button>
+                </div>
+              </>
+            )}
 
             <div className="modal-actions">
               <button className="btn-primary edit-day-btn" onClick={showEditFromInfo}>
