@@ -106,7 +106,7 @@
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: var(--card-background);
   border: 1px solid var(--border);
-  border-radius: var(--radius-full); /* CHANGED: Full pill shape */
+  border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.2s;
   font-size: 0.875rem;
@@ -269,7 +269,7 @@
   margin-top: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-full); /* CHANGED: From var(--radius-md) to pill shape */
+  border-radius: var(--radius-full);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -300,15 +300,15 @@
 .streak-day-number {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--text) !important; /* FIXED: White text instead of yellow */
+  color: var(--text) !important;
   line-height: 1;
   margin-bottom: var(--spacing-xs);
 }
 
 .streak-context {
   font-size: 0.875rem;
-  color: var(--text) !important; /* FIXED: White text instead of mixed colors */
-  font-weight: 500; /* MATCHED: Same weight as emotional timeline */
+  color: var(--text) !important;
+  font-weight: 500;
 }
 
 .day-tracking-info {
@@ -685,9 +685,8 @@
     margin: var(--spacing-md);
   }
   
-  /* UPDATED: Calendar date header specifically matching emotional timeline phase header */
   .day-info-modal h3 {
-    font-size: 1.25rem; /* MATCHES: Emotional timeline .phase-modal-info h3 */
+    font-size: 1.25rem;
   }
   
   .day-status-info {
@@ -767,7 +766,6 @@
     width: 100%;
   }
   
-  /* NEW: Mobile journal editing styles with correct text hierarchy */
   .journal-header-with-actions {
     flex-direction: column;
     align-items: stretch;
@@ -812,27 +810,14 @@
     justify-content: center;
   }
   
-  /* Mobile journal benefits banner adjustments - already handled above */
-  .journal-benefits-content {
+  .empty-journal-info {
+    flex-direction: column;
     text-align: center;
+    gap: var(--spacing-sm);
   }
   
-  .journal-benefits-title {
-    justify-content: center;
-    font-size: 0.875rem;
-  }
-  
-  .journal-benefits-description {
-    font-size: 0.8rem;
-  }
-  
-  .journal-benefits-helmet {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .journal-benefits-helmet-fallback {
-    font-size: 1.25rem;
+  .empty-journal-info .info-icon {
+    align-self: center;
   }
   
   .empty-journal-day {
@@ -841,7 +826,6 @@
     gap: var(--spacing-sm);
   }
   
-  /* UPDATED: All h4 section headers mobile sizing matching emotional timeline */
   .day-benefits h4,
   .day-journal h4,
   .day-tracking-info h4,
@@ -851,7 +835,7 @@
   }
 }
 
-/* Very small screens with calendar date header matching emotional timeline phase header */
+/* Very small screens */
 @media (max-width: 480px) {
   .trigger-options {
     flex-direction: column;
@@ -888,9 +872,8 @@
     font-size: 0.75rem;
   }
   
-  /* UPDATED: Calendar date header specifically matching emotional timeline phase header on very small mobile */
   .day-info-modal h3 {
-    font-size: 1.125rem; /* MATCHES: Emotional timeline .phase-modal-info h3 on 480px */
+    font-size: 1.125rem;
   }
   
   .journal-textarea {
@@ -910,25 +893,6 @@
     justify-content: center;
   }
   
-  /* Very small screen journal benefits banner - handled above */
-  .journal-benefits-title {
-    font-size: 0.8rem;
-  }
-  
-  .journal-benefits-description {
-    font-size: 0.75rem;
-  }
-  
-  .journal-benefits-helmet {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .journal-benefits-helmet-fallback {
-    font-size: 1rem;
-  }
-  
-  /* UPDATED: Very small screen h4 section headers matching emotional timeline */
   .day-benefits h4,
   .day-journal h4,
   .day-tracking-info h4,
