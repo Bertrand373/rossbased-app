@@ -823,35 +823,7 @@
   }
   
   /* Mobile pulsing helmet banner */
-  .journal-benefits-description {
-    font-size: 0.8rem;
-  }
-  
-  .journal-textarea {
-    min-height: 80px;
-    padding: var(--spacing-sm);
-    font-size: 0.8rem;
-  }
-  
-  .journal-edit-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .journal-save-btn,
-  .journal-cancel-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .day-benefits h4,
-  .day-journal h4,
-  .day-tracking-info h4,
-  .trigger-selection h4,
-  .premium-teaser h4 {
-    font-size: 0.9375rem;
-  }
-}-banner {
+  .journal-benefits-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
