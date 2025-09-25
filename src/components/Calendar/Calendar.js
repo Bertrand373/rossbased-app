@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - FIXED: Profile-style navigation pills + working arrows + compact date format
+// components/Calendar/Calendar.js - UPDATED: Compact legend + pulsing helmet banner
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -812,37 +812,32 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </button>
         </div>
 
-        {/* Calendar legend with journal entry added */}
-        <div className="calendar-legend">
-          <div className="legend-item">
-            <div className="legend-indicator current-streak"></div>
-            <span>Current Streak</span>
+        {/* UPDATED: Compact legend - much smaller and subtle */}
+        <div className="calendar-legend-compact">
+          <div className="compact-legend-item">
+            <div className="compact-legend-dot current-streak"></div>
+            <span>Current</span>
           </div>
-          <div className="legend-item">
-            <div className="legend-indicator former-streak"></div>
-            <span>Former Streak</span>
+          <div className="compact-legend-item">
+            <div className="compact-legend-dot former-streak"></div>
+            <span>Former</span>
           </div>
-          <div className="legend-item">
-            <div className="legend-indicator relapse"></div>
+          <div className="compact-legend-item">
+            <div className="compact-legend-dot relapse"></div>
             <span>Relapse</span>
           </div>
-          <div className="legend-item">
-            <div className="legend-indicator wet-dream"></div>
+          <div className="compact-legend-item">
+            <div className="compact-legend-dot wet-dream"></div>
             <span>Wet Dream</span>
           </div>
-          <div className="legend-item legend-has-data">
-            <FaInfoCircle className="legend-info-icon" />
-            <span>Has Data</span>
+          <div className="compact-legend-item">
+            <FaInfoCircle className="compact-legend-icon" />
+            <span>Data</span>
           </div>
-          <div className="legend-item legend-has-journal">
-            <FaBook className="legend-journal-icon" />
-            <span>Journal Entry</span>
+          <div className="compact-legend-item">
+            <FaBook className="compact-legend-icon" />
+            <span>Journal</span>
           </div>
-        </div>
-
-        {/* Calendar Instructions */}
-        <div className="calendar-instructions">
-          Click on any day to view details, edit status, and add journal notes. Different colors show your streak history and journey milestones.
         </div>
 
         {/* Calendar Display */}
@@ -1044,7 +1039,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               return null;
             })()}
 
-            {/* Journal Entry Section with inline editing */}
+            {/* UPDATED: Journal Entry Section with PULSING HELMET BANNER */}
             <div className="day-journal">
               <div className="journal-header-with-actions">
                 <h4>Journal Entry</h4>
@@ -1093,7 +1088,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     </div>
                   ) : (
                     <>
-                      {/* Journal benefits banner when no entry exists */}
+                      {/* UPDATED: Pulsing helmet banner - EXACT COPY from other components */}
                       <div className="journal-benefits-banner">
                         <div className="journal-benefits-helmet-container">
                           <img 

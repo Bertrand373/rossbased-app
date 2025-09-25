@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarModalContent.css - Modal content and functionality */
+/* components/Calendar/CalendarModalContent.css - Modal content with pulsing helmet banner */
 
 /* UPDATED: Edit day modal with emotional timeline modal structure */
 .edit-day-modal {
@@ -634,6 +634,72 @@
   line-height: 1.4;
 }
 
+/* NEW: PULSING HELMET BANNER - EXACT COPY from other components */
+.journal-benefits-banner {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+.journal-benefits-helmet-container {
+  flex-shrink: 0;
+}
+
+.journal-benefits-helmet {
+  width: 40px;
+  height: 40px;
+  animation: journal-benefits-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
+}
+
+.journal-benefits-helmet-fallback {
+  font-size: 1.5rem;
+  color: var(--primary);
+  animation: journal-benefits-pulse 2s ease-in-out infinite;
+}
+
+@keyframes journal-benefits-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.96);
+  }
+}
+
+.journal-benefits-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.journal-benefits-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.journal-benefits-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
 /* Journal start section */
 .journal-start-section {
   display: flex;
@@ -756,6 +822,31 @@
     font-size: 0.8rem;
   }
   
+  /* Mobile pulsing helmet banner */
+  .journal-benefits-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+  
+  .journal-benefits-content {
+    text-align: center;
+  }
+  
+  .journal-benefits-title {
+    justify-content: center;
+  }
+  
+  .journal-benefits-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .journal-benefits-helmet-fallback {
+    font-size: 1.25rem;
+  }
+  
   .benefit-item {
     flex-direction: column;
     align-items: flex-start;
@@ -874,6 +965,24 @@
   
   .day-info-modal h3 {
     font-size: 1.125rem;
+  }
+  
+  /* Very small mobile pulsing helmet banner */
+  .journal-benefits-helmet {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .journal-benefits-helmet-fallback {
+    font-size: 1rem;
+  }
+  
+  .journal-benefits-title {
+    font-size: 0.875rem;
+  }
+  
+  .journal-benefits-description {
+    font-size: 0.8rem;
   }
   
   .journal-textarea {
