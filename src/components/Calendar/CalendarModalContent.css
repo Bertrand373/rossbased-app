@@ -634,7 +634,7 @@
   line-height: 1.4;
 }
 
-/* NEW: PULSING HELMET BANNER - EXACT COPY from other components */
+/* FIXED: PULSING HELMET BANNER with proper spacing */
 .journal-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -700,7 +700,7 @@
   margin: 0;
 }
 
-/* Journal start section */
+/* FIXED: Journal start section with reduced spacing */
 .journal-start-section {
   display: flex;
   justify-content: center;
@@ -823,7 +823,35 @@
   }
   
   /* Mobile pulsing helmet banner */
-  .journal-benefits-banner {
+  .journal-benefits-description {
+    font-size: 0.8rem;
+  }
+  
+  .journal-textarea {
+    min-height: 80px;
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+  
+  .journal-edit-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .journal-save-btn,
+  .journal-cancel-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .day-benefits h4,
+  .day-journal h4,
+  .day-tracking-info h4,
+  .trigger-selection h4,
+  .premium-teaser h4 {
+    font-size: 0.9375rem;
+  }
+}-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
