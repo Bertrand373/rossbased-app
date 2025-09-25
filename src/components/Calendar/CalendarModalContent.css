@@ -645,7 +645,7 @@
   gap: var(--spacing-lg);
   position: relative;
   overflow: hidden;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
 }
 
 .journal-benefits-helmet-container {
@@ -704,7 +704,7 @@
 .journal-start-section {
   display: flex;
   justify-content: center;
-  margin-top: var(--spacing-md);
+  margin-top: var(--spacing-sm);
 }
 
 .premium-teaser {
