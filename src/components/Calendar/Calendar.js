@@ -624,7 +624,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     );
   };
 
-  // UPDATED: Week view with wet dream background priority and icon order
+  // UPDATED: Week view with reorganized icon placement matching monthly view
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
     const days = [];
@@ -656,30 +656,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          {/* REMOVED: Status badges from top section - moved to bottom right */}
-          
+          {/* Benefits section - keep in main body area */}
           {dayBenefits && isPremium && (
             <div className="week-benefits">
-              <div className="week-benefit-item">
-                <span className="benefit-mini-label">Energy</span>
-                <div className="benefit-mini-slider">
-                  <div 
-                    className="benefit-mini-fill" 
-                    style={{ width: `${dayBenefits.energy * 10}%` }}
-                  ></div>
-                </div>
-                <span className="benefit-mini-value">{dayBenefits.energy}/10</span>
-              </div>
-              <div className="week-benefit-item">
-                <span className="benefit-mini-label">Focus</span>
-                <div className="benefit-mini-slider">
-                  <div 
-                    className="benefit-mini-fill" 
-                    style={{ width: `${dayBenefits.focus * 10}%` }}
-                  ></div>
-                </div>
-                <span className="benefit-mini-value">{dayBenefits.focus}/10</span>
-              </div>
               <div className="week-benefit-item">
                 <span className="benefit-mini-label">Sleep</span>
                 <div className="benefit-mini-slider">
@@ -693,19 +672,33 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </div>
           )}
           
-          <div className="week-tracking-indicators">
-            {/* Keep journal and info icons in current location */}
-            {dayTracking.hasBenefits && <FaInfoCircle className="week-benefits-icon" />}
-            {dayTracking.hasJournal && <FaBook className="week-journal-icon" />}
-            {dayStatus?.trigger && renderTriggerIcon(dayStatus.trigger)}
-          </div>
-          
-          {/* NEW: Status icons positioned in bottom right like monthly view */}
+          {/* UPDATED: All icons positioned in bottom right corner matching monthly view */}
           <div className="week-status-indicators">
+            {/* Info icon - leftmost, lowest priority */}
+            {dayTracking.hasBenefits && (
+              <div className="week-tracking-indicator">
+                <FaInfoCircle className="week-benefits-icon" />
+              </div>
+            )}
+            
             {/* Wet dream icon - middle priority */}
             {wetDream && (
               <div className="week-wet-dream-indicator">
                 <FaMoon className="week-wet-dream-icon" />
+              </div>
+            )}
+            
+            {/* Trigger icons - middle priority */}
+            {dayStatus?.trigger && (
+              <div className="week-trigger-indicator">
+                {renderTriggerIcon(dayStatus.trigger)}
+              </div>
+            )}
+            
+            {/* Journal icon - second highest priority */}
+            {dayTracking.hasJournal && (
+              <div className="week-journal-indicator">
+                <FaBook className="week-journal-icon" />
               </div>
             )}
             
@@ -1271,4 +1264,23 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Calendar;
+export default Calendar;<span className="benefit-mini-label">Energy</span>
+                <div className="benefit-mini-slider">
+                  <div 
+                    className="benefit-mini-fill" 
+                    style={{ width: `${dayBenefits.energy * 10}%` }}
+                  ></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.energy}/10</span>
+              </div>
+              <div className="week-benefit-item">
+                <span className="benefit-mini-label">Focus</span>
+                <div className="benefit-mini-slider">
+                  <div 
+                    className="benefit-mini-fill" 
+                    style={{ width: `${dayBenefits.focus * 10}%` }}
+                  ></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.focus}/10</span>
+              </div>
+              <div className="week-benefit-item">

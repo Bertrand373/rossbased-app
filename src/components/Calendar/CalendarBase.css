@@ -626,7 +626,7 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* NEW: Week status indicators positioned like monthly view */
+/* NEW: Week status indicators positioned like monthly view - COMPLETE icon ordering */
 .week-status-indicators {
   position: absolute;
   bottom: var(--spacing-xs);
@@ -638,7 +638,7 @@
   pointer-events: none;
 }
 
-.week-wet-dream-indicator, .week-status-indicator {
+.week-tracking-indicator, .week-wet-dream-indicator, .week-trigger-indicator, .week-journal-indicator, .week-status-indicator {
   font-size: 0.875rem;
   line-height: 1;
   display: flex;
@@ -648,12 +648,25 @@
   pointer-events: auto;
 }
 
+/* UPDATED: Complete icon ordering matching monthly view */
+.week-tracking-indicator {
+  order: 1; /* Info "i" icon - leftmost, lowest priority */
+}
+
 .week-wet-dream-indicator {
-  order: 1; /* Wet dream icon first */
+  order: 2; /* Wet dream moon - middle priority */
+}
+
+.week-trigger-indicator {
+  order: 3; /* Trigger icons - middle priority */
+}
+
+.week-journal-indicator {
+  order: 4; /* Journal book icon - second highest priority */
 }
 
 .week-status-indicator {
-  order: 2; /* Check mark/X second */
+  order: 5; /* Check marks/relapse X - rightmost, highest priority */
 }
 
 /* Week status icon colors matching monthly view */
