@@ -268,30 +268,38 @@
   display: none;
 }
 
-/* UPDATED: Mobile fade edges for scroll indication */
+/* UPDATED: Mobile fade edges for scroll indication using pseudo-elements */
 @media (max-width: 768px) {
   .calendar-legend-compact {
-    /* Add fade edges when content overflows */
-    mask: linear-gradient(
-      90deg,
-      transparent 0px,
-      black 12px,
-      black calc(100% - 12px),
-      transparent 100%
-    );
-    -webkit-mask: linear-gradient(
-      90deg,
-      transparent 0px,
-      black 12px,
-      black calc(100% - 12px),
-      transparent 100%
-    );
+    position: relative;
   }
   
-  /* Show full content when not overflowing */
-  .calendar-legend-compact:not([data-overflow="true"]) {
-    mask: none;
-    -webkit-mask: none;
+  /* Left fade edge */
+  .calendar-legend-compact::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 100%;
+    background: linear-gradient(to right, var(--card-background) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+    border-radius: var(--radius-full) 0 0 var(--radius-full);
+  }
+  
+  /* Right fade edge */
+  .calendar-legend-compact::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 100%;
+    background: linear-gradient(to left, var(--card-background) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+    border-radius: 0 var(--radius-full) var(--radius-full) 0;
   }
 }
 
@@ -981,25 +989,22 @@
     height: 12px;
   }
   
-  /* UPDATED: Very small mobile pill legend with prominent fade edges */
+  /* UPDATED: Very small mobile pill legend with prominent fade edges using pseudo-elements */
   .calendar-legend-compact {
     padding: var(--spacing-sm) var(--spacing-md);
     gap: var(--spacing-lg);
-    /* Enhanced fade for better scroll indication */
-    mask: linear-gradient(
-      90deg,
-      transparent 0px,
-      black 16px,
-      black calc(100% - 16px),
-      transparent 100%
-    );
-    -webkit-mask: linear-gradient(
-      90deg,
-      transparent 0px,
-      black 16px,
-      black calc(100% - 16px),
-      transparent 100%
-    );
+    position: relative;
+  }
+  
+  /* Enhanced fade edges for very small screens */
+  .calendar-legend-compact::before {
+    width: 20px;
+    background: linear-gradient(to right, var(--card-background) 0%, var(--card-background) 40%, transparent 100%);
+  }
+  
+  .calendar-legend-compact::after {
+    width: 20px;
+    background: linear-gradient(to left, var(--card-background) 0%, var(--card-background) 40%, transparent 100%);
   }
   
   .compact-legend-item {
