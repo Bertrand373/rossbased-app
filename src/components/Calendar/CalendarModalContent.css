@@ -634,7 +634,7 @@
   line-height: 1.4;
 }
 
-/* FIXED: EXACT COPY of Emotional Timeline pulsing helmet banner with matching spacing */
+/* FIXED: EXACT COPY of Emotional Timeline pulsing helmet banner - NO bottom margin */
 .journal-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -645,7 +645,7 @@
   gap: var(--spacing-lg);
   position: relative;
   overflow: hidden;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: 0;
 }
 
 .journal-benefits-helmet-container {
