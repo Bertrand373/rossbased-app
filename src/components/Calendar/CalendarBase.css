@@ -533,14 +533,23 @@
   font-size: 0.875rem; /* FIXED: Explicit size for consistency */
 }
 
-/* FIXED: Blue check marks for former streak days - highly specific selectors */
-.former-streak-day .success-icon,
-.wet-dream-day .former-streak-day .success-icon,
-.day-cell.wet-dream-day .day-status-indicator .success-icon {
+/* FIXED: Check mark colors for wet dream + streak combinations */
+/* Current streak wet dreams should stay GREEN */
+.current-streak-day.wet-dream-day .success-icon {
+  color: var(--success) !important;
+}
+
+/* Former streak wet dreams should be BLUE */
+.former-streak-day.wet-dream-day .success-icon {
   color: #3b82f6 !important;
 }
 
-/* Ensure current streak stays green */
+/* Fallback for any other former streak days */
+.former-streak-day .success-icon {
+  color: #3b82f6 !important;
+}
+
+/* Ensure current streak days without wet dreams stay green */
 .current-streak-day .success-icon {
   color: var(--success) !important;
 }
@@ -658,9 +667,25 @@
   font-size: 0.875rem;
 }
 
-/* Former streak blue check marks in week view */
+/* FIXED: Week view check mark colors for wet dream + streak combinations */
+/* Current streak wet dreams should stay GREEN */
+.week-day-cell.current-streak-day.wet-dream-day .week-success-icon {
+  color: var(--success) !important;
+}
+
+/* Former streak wet dreams should be BLUE */
+.week-day-cell.former-streak-day.wet-dream-day .week-success-icon {
+  color: #3b82f6 !important;
+}
+
+/* Fallback for any other former streak days */
 .week-day-cell.former-streak-day .week-success-icon {
   color: #3b82f6 !important;
+}
+
+/* Ensure current streak days without wet dreams stay green */
+.week-day-cell.current-streak-day .week-success-icon {
+  color: var(--success) !important;
 }
 
 .week-relapse-icon {
