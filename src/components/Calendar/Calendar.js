@@ -551,7 +551,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return <IconComponent className="trigger-icon" />;
   };
 
-  // UPDATED: Render day cell with wet dream priority for background colors
+  // UPDATED: Render day cell with proper class combination for wet dreams + streak types
   const renderDayCell = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
     const isSelected = selectedDate && isSameDay(day, selectedDate);
@@ -565,12 +565,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       !isCurrentMonth ? 'other-month' : '',
       isToday ? 'today' : '',
       isSelected ? 'selected' : '',
-      // FIXED: Wet dream background takes priority over streak backgrounds
-      wetDream ? 'wet-dream-day' : (
-        dayStatus?.type === 'current-streak' ? 'current-streak-day' : 
-        dayStatus?.type === 'former-streak' ? 'former-streak-day' : 
-        dayStatus?.type === 'relapse' ? 'relapse-day' : ''
-      )
+      // FIXED: Always include streak type class, then add wet dream class
+      dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
+      dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
+      dayStatus?.type === 'relapse' ? 'relapse-day' : '',
+      // Add wet dream class in addition to streak class, not instead of
+      wetDream ? 'wet-dream-day' : ''
     ].filter(Boolean).join(' ');
 
     return (
@@ -590,31 +590,33 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
         
         <div className="day-indicators">
-          {/* FIXED: Wet dream indicator comes first (order: 1) */}
-          {wetDream && (
-            <div className="day-wet-dream-indicator">
-              <FaMoon className="wet-dream-icon" />
-            </div>
-          )}
-          
-          {/* Streak status indicators come after wet dream (order: 2) */}
-          {dayStatus && (
-            <div className="day-status-indicator">
-              {(dayStatus.type === 'current-streak' || dayStatus.type === 'former-streak') && 
-                <FaCheckCircle className="success-icon" />}
-              {dayStatus.type === 'relapse' && <FaTimesCircle className="relapse-icon" />}
-            </div>
-          )}
-          
+          {/* Info icon - leftmost, lowest priority */}
           {dayTracking.hasBenefits && (
             <div className="day-tracking-indicator">
               <FaInfoCircle className="tracking-icon" />
             </div>
           )}
           
+          {/* Wet dream indicator - middle priority */}
+          {wetDream && (
+            <div className="day-wet-dream-indicator">
+              <FaMoon className="wet-dream-icon" />
+            </div>
+          )}
+          
+          {/* Trigger indicators - middle priority */}
           {dayStatus?.trigger && (
             <div className="day-trigger-indicator">
               {renderTriggerIcon(dayStatus.trigger)}
+            </div>
+          )}
+          
+          {/* Status indicators - rightmost, highest priority */}
+          {dayStatus && (
+            <div className="day-status-indicator">
+              {(dayStatus.type === 'current-streak' || dayStatus.type === 'former-streak') && 
+                <FaCheckCircle className="success-icon" />}
+              {dayStatus.type === 'relapse' && <FaTimesCircle className="relapse-icon" />}
             </div>
           )}
         </div>
@@ -654,22 +656,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          <div className="week-day-status">
-            {/* FIXED: Wet dream badge comes first */}
-            {wetDream && (
-              <div className="week-status-badge wet-dream">
-                <FaMoon />
-              </div>
-            )}
-            {/* Then streak status */}
-            {dayStatus && (
-              <div className={`week-status-badge ${dayStatus.type}`}>
-                {dayStatus.type === 'current-streak' && <FaCheckCircle />}
-                {dayStatus.type === 'former-streak' && <FaCheckCircle />}
-                {dayStatus.type === 'relapse' && <FaTimesCircle />}
-              </div>
-            )}
-          </div>
+          {/* REMOVED: Status badges from top section - moved to bottom right */}
           
           {dayBenefits && isPremium && (
             <div className="week-benefits">
@@ -707,11 +694,29 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           )}
           
           <div className="week-tracking-indicators">
-            {/* FIXED: Icon order - wet dream first, then benefits, then journal, then triggers */}
-            {wetDream && <FaMoon className="week-wet-dream-icon" />}
+            {/* Keep journal and info icons in current location */}
             {dayTracking.hasBenefits && <FaInfoCircle className="week-benefits-icon" />}
             {dayTracking.hasJournal && <FaBook className="week-journal-icon" />}
             {dayStatus?.trigger && renderTriggerIcon(dayStatus.trigger)}
+          </div>
+          
+          {/* NEW: Status icons positioned in bottom right like monthly view */}
+          <div className="week-status-indicators">
+            {/* Wet dream icon - middle priority */}
+            {wetDream && (
+              <div className="week-wet-dream-indicator">
+                <FaMoon className="week-wet-dream-icon" />
+              </div>
+            )}
+            
+            {/* Status check marks/relapse X - highest priority, rightmost */}
+            {dayStatus && (
+              <div className="week-status-indicator">
+                {(dayStatus.type === 'current-streak' || dayStatus.type === 'former-streak') && 
+                  <FaCheckCircle className="week-success-icon" />}
+                {dayStatus.type === 'relapse' && <FaTimesCircle className="week-relapse-icon" />}
+              </div>
+            )}
           </div>
         </div>
       );
