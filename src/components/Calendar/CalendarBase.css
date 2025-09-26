@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - FINAL: Icon-based legend with consistent colors */
+/* components/Calendar/CalendarBase.css - FINAL: Pill-shaped legend with fade edges */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -240,20 +240,59 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Icon-based legend design - using actual calendar symbols */
+/* UPDATED: PILL-SHAPED legend container matching navigation pills */
 .calendar-legend-compact {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: var(--spacing-lg);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.06) 100%);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  /* CHANGED: Match navigation pills background exactly */
+  background-color: var(--card-background);
+  /* CHANGED: Full pill shape like navigation */
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
   flex-wrap: wrap;
   margin-bottom: var(--spacing-lg);
+  /* Enhanced shadow and backdrop matching navigation pills */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(2px);
+  /* Mobile scrolling setup */
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.calendar-legend-compact::-webkit-scrollbar {
+  display: none;
+}
+
+/* UPDATED: Mobile fade edges for scroll indication */
+@media (max-width: 768px) {
+  .calendar-legend-compact {
+    /* Add fade edges when content overflows */
+    mask: linear-gradient(
+      90deg,
+      transparent 0px,
+      black 12px,
+      black calc(100% - 12px),
+      transparent 100%
+    );
+    -webkit-mask: linear-gradient(
+      90deg,
+      transparent 0px,
+      black 12px,
+      black calc(100% - 12px),
+      transparent 100%
+    );
+  }
+  
+  /* Show full content when not overflowing */
+  .calendar-legend-compact:not([data-overflow="true"]) {
+    mask: none;
+    -webkit-mask: none;
+  }
 }
 
 .compact-legend-item {
@@ -264,15 +303,20 @@
   color: var(--text);
   white-space: nowrap;
   font-weight: 500;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-md);
+  /* CHANGED: Pill-shaped padding and radius */
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
   transition: all 0.2s ease;
   cursor: pointer;
+  /* Prevent shrinking on mobile scroll */
+  flex-shrink: 0;
 }
 
+/* UPDATED: Pill-shaped hover animation */
 .compact-legend-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.08);
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* UPDATED: Using actual icons instead of dots */
@@ -780,18 +824,24 @@
     padding: var(--spacing-md);
   }
   
-  /* UPDATED: Mobile elegant legend with icons */
+  /* UPDATED: Mobile pill legend with enhanced scrolling */
   .calendar-legend-compact {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     gap: var(--spacing-md);
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-lg);
     margin-bottom: var(--spacing-md);
-    backdrop-filter: blur(1px);
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
   
   .compact-legend-item {
     font-size: 0.75rem;
     gap: var(--spacing-xs);
-    padding: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    /* Ensure items don't shrink */
+    flex-shrink: 0;
+    min-width: fit-content;
   }
   
   .compact-legend-icon {
@@ -931,26 +981,32 @@
     height: 12px;
   }
   
-  /* UPDATED: Very small mobile legend with icons - elegant horizontal scroll */
+  /* UPDATED: Very small mobile pill legend with prominent fade edges */
   .calendar-legend-compact {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    padding: var(--spacing-sm) var(--spacing-md);
     gap: var(--spacing-lg);
-    padding: var(--spacing-sm);
-    justify-content: flex-start;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.07) 100%);
-  }
-  
-  .calendar-legend-compact::-webkit-scrollbar {
-    display: none;
+    /* Enhanced fade for better scroll indication */
+    mask: linear-gradient(
+      90deg,
+      transparent 0px,
+      black 16px,
+      black calc(100% - 16px),
+      transparent 100%
+    );
+    -webkit-mask: linear-gradient(
+      90deg,
+      transparent 0px,
+      black 16px,
+      black calc(100% - 16px),
+      transparent 100%
+    );
   }
   
   .compact-legend-item {
     flex-shrink: 0;
     font-size: 0.7rem;
     padding: var(--spacing-xs) var(--spacing-sm);
+    min-width: fit-content;
   }
   
   .compact-legend-icon {
