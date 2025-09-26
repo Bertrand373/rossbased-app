@@ -489,7 +489,7 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* FIXED: Day indicators positioning with consistent icon sizing */
+/* FIXED: Day indicators positioning with wet dream icon first */
 .day-indicators {
   position: absolute;
   bottom: var(--spacing-xs);
@@ -511,20 +511,20 @@
   pointer-events: auto;
 }
 
-.day-status-indicator {
-  order: 3;
-}
-
-.day-tracking-indicator {
-  order: 2;
-}
-
-.day-trigger-indicator {
+/* FIXED: Icon order - wet dream first, then status, then tracking, then triggers */
+.day-wet-dream-indicator {
   order: 1;
 }
 
-/* FIXED: Wet dream indicator with consistent sizing */
-.day-wet-dream-indicator {
+.day-status-indicator {
+  order: 2;
+}
+
+.day-tracking-indicator {
+  order: 3;
+}
+
+.day-trigger-indicator {
   order: 4;
 }
 
