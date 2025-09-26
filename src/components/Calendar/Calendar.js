@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - FINAL: Icon-based legend matching calendar symbols
+// components/Calendar/Calendar.js - CLEANUP: Removed redundant journey section, integrated day count into status badge
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -296,8 +296,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return { hasBenefits, hasJournal };
   };
 
-  // Get streak journey info for any streak day (current or former)
-  const getStreakJourneyInfo = (day) => {
+  // CLEANUP: Get day count for status badge integration
+  const getDayCount = (day) => {
     const dayStatus = getDayStatus(day);
     
     if (!dayStatus || (dayStatus.type !== 'current-streak' && dayStatus.type !== 'former-streak')) {
@@ -312,11 +312,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       if (currentStreak) {
         const streakStart = new Date(currentStreak.start);
         const dayNumber = differenceInDays(day, streakStart) + 1;
-        return {
-          dayNumber: dayNumber > 0 ? dayNumber : 0,
-          text: "Day of your retention journey",
-          type: 'current'
-        };
+        return dayNumber > 0 ? dayNumber : 0;
       }
     }
     
@@ -335,23 +331,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       if (formerStreak) {
         const streakStart = new Date(formerStreak.start);
         const dayNumber = differenceInDays(day, streakStart) + 1;
-        const totalDays = formerStreak.days;
-        
-        return {
-          dayNumber: dayNumber > 0 ? dayNumber : 0,
-          text: `Day of your ${totalDays}-day streak`,
-          type: 'former',
-          totalDays
-        };
+        return dayNumber > 0 ? dayNumber : 0;
       }
     }
     
     return null;
-  };
-
-  // Check if day is part of streak journey
-  const isDayPartOfJourney = (day) => {
-    return getStreakJourneyInfo(day) !== null;
   };
 
   // Show day details with edit option
@@ -875,10 +859,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             
             <h3>{format(selectedDate, 'EEE, MMM d, yyyy')}</h3>
             
-            {/* Day Status */}
+            {/* Day Status with integrated day count */}
             <div className="day-status-info">
               {(() => {
                 const dayStatus = getDayStatus(selectedDate);
+                const dayCount = getDayCount(selectedDate);
                 
                 if (dayStatus) {
                   return (
@@ -886,13 +871,21 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                       {dayStatus.type === 'current-streak' && (
                         <>
                           <FaCheckCircle />
-                          <span>Current Streak Day</span>
+                          <span>
+                            Current Streak Day
+                            {dayCount && <span className="day-count"> • Day {dayCount}</span>}
+                          </span>
                         </>
                       )}
                       {dayStatus.type === 'former-streak' && (
                         <>
                           <FaCheckCircle />
-                          <span>Former Streak Day</span>
+                          <span>
+                            Former Streak Day
+                            {dayCount && (
+                              <span className="day-count"> • Day {dayCount}</span>
+                            )}
+                          </span>
                         </>
                       )}
                       {dayStatus.type === 'relapse' && (
@@ -938,23 +931,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               })()}
             </div>
 
-            {/* Journey Day Counter */}
-            {isDayPartOfJourney(selectedDate) && (
-              <div className="day-streak-info">
-                <div className="streak-day-number">
-                  {(() => {
-                    const journeyInfo = getStreakJourneyInfo(selectedDate);
-                    return journeyInfo ? journeyInfo.dayNumber : 0;
-                  })()}
-                </div>
-                <div className="streak-context">
-                  {(() => {
-                    const journeyInfo = getStreakJourneyInfo(selectedDate);
-                    return journeyInfo ? journeyInfo.text : "Day of your retention journey";
-                  })()}
-                </div>
-              </div>
-            )}
+            {/* Journey Day Counter - REMOVED: Redundant section eliminated */}
+            {/* This large journey card has been removed to save space and eliminate redundancy. 
+                 Day counts are now integrated into the status badge above. */}
 
             {/* Benefits Details */}
             {(() => {
