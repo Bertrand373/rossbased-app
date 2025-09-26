@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarModalContent.css - Modal content with pulsing helmet banner */
+/* components/Calendar/CalendarModalContent.css - Modal content with updated banner text */
 
 /* UPDATED: Edit day modal with emotional timeline modal structure */
 .edit-day-modal {
@@ -634,7 +634,7 @@
   line-height: 1.4;
 }
 
-/* FIXED: PULSING HELMET BANNER with proper spacing */
+/* UPDATED: PULSING HELMET BANNER with "What's on your mind?" heading */
 .journal-benefits-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -700,7 +700,7 @@
   margin: 0;
 }
 
-/* FIXED: Journal start section with reduced spacing */
+/* Journal start section */
 .journal-start-section {
   display: flex;
   justify-content: center;
@@ -966,7 +966,7 @@
   .day-info-modal h3 {
     font-size: 1.125rem;
   }
-  
+
   /* Very small mobile pulsing helmet banner */
   .journal-benefits-helmet {
     width: 30px;

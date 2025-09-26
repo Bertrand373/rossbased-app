@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - FIXED: Banner structure moved outside journal section
+// components/Calendar/Calendar.js - UPDATED: Changed banner text and refined legend with Journal item
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -812,7 +812,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </button>
         </div>
 
-        {/* UPDATED: Compact legend - much smaller and subtle */}
+        {/* UPDATED: Refined elegant legend - includes Journal item for mobile */}
         <div className="calendar-legend-compact">
           <div className="compact-legend-item">
             <div className="compact-legend-dot current-streak"></div>
@@ -832,7 +832,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </div>
           <div className="compact-legend-item">
             <FaInfoCircle className="compact-legend-icon" />
-            <span>Data</span>
+            <span>Logged Benefits</span>
           </div>
           <div className="compact-legend-item">
             <FaBook className="compact-legend-icon" />
@@ -1039,7 +1039,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               return null;
             })()}
 
-            {/* FIXED: Journal Entry Section - simplified structure */}
+            {/* UPDATED: Journal Entry Section with changed banner text */}
             <div className="day-journal">
               <div className="journal-header-with-actions">
                 <h4>Journal Entry</h4>
@@ -1091,7 +1091,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               )}
             </div>
 
-            {/* FIXED: Banner OUTSIDE journal section when no text - proper structure */}
+            {/* UPDATED: Banner with changed heading text */}
             {!isEditingNote && !noteText && (
               <>
                 <div className="journal-benefits-banner">
@@ -1112,7 +1112,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                   
                   <div className="journal-benefits-content">
                     <h4 className="journal-benefits-title">
-                      Start Daily Journaling for Better Results
+                      What's on your mind?
                     </h4>
                     <p className="journal-benefits-description">
                       Regular journaling helps track emotional patterns, identify triggers, celebrate victories, and maintain accountability. Users who journal consistently report better streak maintenance and deeper self-understanding throughout their journey.
