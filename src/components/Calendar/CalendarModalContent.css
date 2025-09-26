@@ -700,11 +700,11 @@
   margin: 0;
 }
 
-/* FIXED: Journal start section with NO extra margin to match EmotionalTimeline exactly */
+/* FIXED: Journal start section with NEGATIVE top margin to compensate for banner's bottom margin */
 .journal-start-section {
   display: flex;
   justify-content: center;
-  margin-top: 0;
+  margin-top: calc(-1 * var(--spacing-md));
   margin-bottom: 0;
 }
 
