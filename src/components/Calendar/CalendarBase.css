@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - CLEAN: Pill-shaped legend without edge effects */
+/* components/Calendar/CalendarBase.css - UPDATED: Sleek improvements with shadows, hover effects, and today pulsing */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -367,22 +367,28 @@
   font-weight: 600;
 }
 
+/* SLEEK UPDATE 1: Added subtle drop shadow to day cells */
 .day-cell {
   position: relative;
   height: 80px;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease; /* SLEEK UPDATE 3: Smoother transition for hover */
   background-color: var(--card-background);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: var(--spacing-sm);
+  /* SLEEK UPDATE 1: Subtle drop shadow for depth */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* SLEEK UPDATE 3: Enhanced hover effect with micro-scale */
 .day-cell:hover {
   background-color: rgba(255, 255, 255, 0.05);
+  transform: scale(1.02);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .day-cell:last-child {
@@ -419,7 +425,7 @@
 }
 
 .day-number {
-  font-weight: 500;
+  font-weight: 600; /* SLEEK UPDATE: Bolder day numbers for better hierarchy */
   color: var(--text);
   font-size: 0.875rem;
 }
@@ -433,6 +439,7 @@
   color: var(--text-secondary);
 }
 
+/* SLEEK UPDATE 2: Enhanced today's date with subtle pulsing animation */
 .today .day-number {
   display: inline-block;
   background-color: var(--primary);
@@ -444,6 +451,19 @@
   line-height: 24px;
   font-weight: 600;
   font-size: 0.75rem;
+  /* SLEEK UPDATE 2: Soft glow and subtle pulse animation */
+  box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.2);
+  animation: today-pulse 3s ease-in-out infinite;
+}
+
+/* SLEEK UPDATE 2: Subtle pulsing animation for today's date */
+@keyframes today-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(255, 221, 0, 0.3);
+  }
 }
 
 .selected {
@@ -538,21 +558,27 @@
   padding: var(--spacing-md);
 }
 
+/* SLEEK UPDATE 1 & 3: Added shadow and hover effects to week view cells */
 .week-day-cell {
   background-color: var(--card-background);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease; /* SLEEK UPDATE 3: Smoother transition */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
   min-height: 120px;
+  /* SLEEK UPDATE 1: Subtle drop shadow for depth */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* SLEEK UPDATE 3: Enhanced hover effect with micro-scale for week view */
 .week-day-cell:hover {
   background-color: rgba(255, 255, 255, 0.05);
+  transform: scale(1.02);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* ADDED: Week view day background colors - matching month view */
@@ -595,6 +621,7 @@
   color: var(--text);
 }
 
+/* SLEEK UPDATE 2: Enhanced today's date in week view with glow and pulse */
 .week-day-number.today {
   background-color: var(--primary);
   color: #000;
@@ -605,6 +632,9 @@
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
+  /* SLEEK UPDATE 2: Soft glow and subtle pulse animation */
+  box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.2);
+  animation: today-pulse 3s ease-in-out infinite;
 }
 
 .week-day-status {
@@ -823,6 +853,12 @@
   .day-cell {
     height: 60px;
     padding: var(--spacing-xs);
+    /* SLEEK UPDATE 3: Reduced scale on mobile for better touch */
+    transform: scale(1);
+  }
+  
+  .day-cell:hover {
+    transform: scale(1.01); /* Smaller scale on mobile */
   }
   
   .day-number {
@@ -838,6 +874,8 @@
     height: 20px;
     line-height: 20px;
     font-size: 0.65rem;
+    /* SLEEK UPDATE 2: Smaller glow on mobile */
+    box-shadow: 0 0 0 2px rgba(255, 221, 0, 0.2);
   }
   
   .day-indicators {
@@ -863,6 +901,12 @@
   .week-day-cell {
     min-height: 100px;
     padding: var(--spacing-sm);
+    /* SLEEK UPDATE 3: Reduced scale on mobile for better touch */
+    transform: scale(1);
+  }
+  
+  .week-day-cell:hover {
+    transform: scale(1.01); /* Smaller scale on mobile */
   }
   
   .week-day-header {
@@ -988,6 +1032,10 @@
     padding: 2px;
   }
   
+  .day-cell:hover {
+    transform: scale(1.005); /* Even smaller scale on very small mobile */
+  }
+  
   .day-number {
     font-size: 0.7rem;
   }
@@ -1001,6 +1049,8 @@
     height: 18px;
     line-height: 18px;
     font-size: 0.6rem;
+    /* SLEEK UPDATE 2: Even smaller glow on very small mobile */
+    box-shadow: 0 0 0 1px rgba(255, 221, 0, 0.2);
   }
   
   .day-indicators {
