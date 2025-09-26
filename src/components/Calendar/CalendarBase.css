@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - FINAL: Pill-shaped legend with fade edges */
+/* components/Calendar/CalendarBase.css - CLEAN: Pill-shaped legend without edge effects */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -60,17 +60,13 @@
   border: 1px solid var(--border);
   position: relative;
   margin: 0 auto;
-  /* FIXED: Match Profile component's width scaling */
-  width: min(90vw, 250px); /* Narrower than before, matches Profile's compact style */
+  width: min(90vw, 250px);
   min-width: fit-content;
   max-width: 300px;
-  /* FIXED: Remove justify-content to prevent gap - buttons will be naturally spaced */
-  gap: var(--spacing-xs); /* Add consistent gap instead of space-between */
-  /* Mobile 3D rendering context */
+  gap: var(--spacing-xs);
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* Handle overflow for very small screens only */
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -86,14 +82,12 @@
   top: var(--spacing-xs);
   left: var(--spacing-xs);
   height: calc(100% - calc(var(--spacing-xs) * 2));
-  /* CHANGED: Full yellow background instead of subtle yellow */
   background-color: var(--primary);
   border: 1px solid var(--primary);
   border-radius: var(--radius-full);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 1;
-  /* Start hidden but ready to be shown */
   opacity: 0;
   visibility: hidden;
   transform: translateX(0px);
@@ -123,12 +117,10 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  /* FIXED: Equal width for both buttons to prevent gap */
   flex: 1;
   min-width: fit-content;
   position: relative;
   z-index: 2;
-  /* Mobile: Prevent text selection and ensure proper touch */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -139,7 +131,6 @@
 
 /* UPDATED: Active navigation button styling - BLACK text to contrast with yellow background */
 .calendar-nav-btn.active {
-  /* CHANGED: Black text instead of yellow to contrast with yellow slider */
   color: #000000 !important;
   font-weight: 600 !important;
   background-color: transparent !important;
@@ -173,11 +164,9 @@
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   padding: 0 0 var(--spacing-md) 0;
-  /* REMOVED: Background and border for cleaner look */
   background-color: transparent;
   border-radius: 0;
   border: none;
-  /* ADDED: Subtle bottom divider */
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -188,11 +177,10 @@
   font-weight: 600;
   min-width: 220px;
   text-align: center;
-  /* ADDED: Slightly reduced opacity for subtlety */
   opacity: 0.9;
 }
 
-/* FIXED: Navigation arrow buttons with Font Awesome icons - REVERTED to grey */
+/* FIXED: Navigation arrow buttons with Font Awesome icons */
 .period-nav-btn {
   display: flex;
   align-items: center;
@@ -212,7 +200,6 @@
   outline: none;
 }
 
-/* Ensure Font Awesome icons render properly */
 .period-nav-btn svg {
   width: 16px;
   height: 16px;
@@ -242,23 +229,18 @@
 
 /* UPDATED: PILL-SHAPED legend container matching navigation pills */
 .calendar-legend-compact {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: var(--spacing-lg);
   padding: var(--spacing-sm) var(--spacing-lg);
-  /* CHANGED: Match navigation pills background exactly */
   background-color: var(--card-background);
-  /* CHANGED: Full pill shape like navigation */
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   flex-wrap: wrap;
   margin-bottom: var(--spacing-lg);
-  /* Enhanced shadow and backdrop matching navigation pills */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(2px);
-  /* Mobile scrolling setup */
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -266,41 +248,6 @@
 
 .calendar-legend-compact::-webkit-scrollbar {
   display: none;
-}
-
-/* UPDATED: Mobile fade edges for scroll indication using pseudo-elements */
-@media (max-width: 768px) {
-  .calendar-legend-compact {
-    position: relative;
-  }
-  
-  /* Left fade edge */
-  .calendar-legend-compact::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 16px;
-    height: 100%;
-    background: linear-gradient(to right, var(--card-background) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 2;
-    border-radius: var(--radius-full) 0 0 var(--radius-full);
-  }
-  
-  /* Right fade edge */
-  .calendar-legend-compact::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 16px;
-    height: 100%;
-    background: linear-gradient(to left, var(--card-background) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 2;
-    border-radius: 0 var(--radius-full) var(--radius-full) 0;
-  }
 }
 
 .compact-legend-item {
@@ -311,12 +258,10 @@
   color: var(--text);
   white-space: nowrap;
   font-weight: 500;
-  /* CHANGED: Pill-shaped padding and radius */
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-full);
   transition: all 0.2s ease;
   cursor: pointer;
-  /* Prevent shrinking on mobile scroll */
   flex-shrink: 0;
 }
 
@@ -761,7 +706,6 @@
     gap: var(--spacing-md);
   }
   
-  /* FIXED: Mobile navigation pills compact like other internal menus */
   .calendar-navigation-pills {
     overflow-x: auto;
     scrollbar-width: none;
@@ -772,7 +716,6 @@
     transform: translateZ(0);
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
-    /* FIXED: Smaller padding for compact mobile size */
     padding: 6px;
     gap: 4px;
   }
@@ -781,23 +724,20 @@
     display: none;
   }
   
-  /* Mobile: Enhanced slider with adjusted positioning */
   .calendar-nav-slider {
     transition: transform 0.25s ease-out, width 0.25s ease-out;
     transform: translateZ(0) translateX(0px);
     will-change: transform, width;
-    /* Adjust for smaller padding */
     top: 6px;
     left: 6px;
     height: calc(100% - 12px);
   }
   
   .calendar-nav-btn {
-    /* FIXED: Much more compact sizing to match internal navigation */
     font-size: 0.8rem;
     padding: var(--spacing-xs) var(--spacing-sm);
     min-width: auto;
-    min-height: 36px; /* Reduced from 44px */
+    min-height: 36px;
   }
   
   .calendar-nav-btn svg {
@@ -817,7 +757,6 @@
     min-width: 160px;
   }
   
-  /* Mobile: Responsive navigation buttons */
   .period-nav-btn {
     width: 36px;
     height: 36px;
@@ -832,7 +771,6 @@
     padding: var(--spacing-md);
   }
   
-  /* UPDATED: Mobile pill legend with enhanced scrolling */
   .calendar-legend-compact {
     flex-wrap: nowrap;
     justify-content: flex-start;
@@ -847,7 +785,6 @@
     font-size: 0.75rem;
     gap: var(--spacing-xs);
     padding: var(--spacing-xs) var(--spacing-sm);
-    /* Ensure items don't shrink */
     flex-shrink: 0;
     min-width: fit-content;
   }
@@ -989,22 +926,9 @@
     height: 12px;
   }
   
-  /* UPDATED: Very small mobile pill legend with prominent fade edges using pseudo-elements */
   .calendar-legend-compact {
     padding: var(--spacing-sm) var(--spacing-md);
     gap: var(--spacing-lg);
-    position: relative;
-  }
-  
-  /* Enhanced fade edges for very small screens */
-  .calendar-legend-compact::before {
-    width: 20px;
-    background: linear-gradient(to right, var(--card-background) 0%, var(--card-background) 40%, transparent 100%);
-  }
-  
-  .calendar-legend-compact::after {
-    width: 20px;
-    background: linear-gradient(to left, var(--card-background) 0%, var(--card-background) 40%, transparent 100%);
   }
   
   .compact-legend-item {
