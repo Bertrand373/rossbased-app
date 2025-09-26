@@ -384,11 +384,10 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* SLEEK UPDATE 3: Enhanced hover effect with micro-scale */
+/* SLEEK UPDATE 3: Refined hover effect without layout shift */
 .day-cell:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: scale(1.02);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
 .day-cell:last-child {
@@ -439,7 +438,7 @@
   color: var(--text-secondary);
 }
 
-/* SLEEK UPDATE 2: Enhanced today's date with subtle pulsing animation */
+/* SLEEK UPDATE 2: Enhanced today's date with subtle scaling pulse animation */
 .today .day-number {
   display: inline-block;
   background-color: var(--primary);
@@ -451,18 +450,17 @@
   line-height: 24px;
   font-weight: 600;
   font-size: 0.75rem;
-  /* SLEEK UPDATE 2: Soft glow and subtle pulse animation */
-  box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.2);
-  animation: today-pulse 3s ease-in-out infinite;
+  /* SLEEK UPDATE 2: Refined pulse animation - the circle itself scales subtly */
+  animation: today-scale-pulse 2.5s ease-in-out infinite;
 }
 
-/* SLEEK UPDATE 2: Subtle pulsing animation for today's date */
-@keyframes today-pulse {
+/* SLEEK UPDATE 2: Refined scaling pulse animation for today's date */
+@keyframes today-scale-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.2);
+    transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 0 5px rgba(255, 221, 0, 0.3);
+    transform: scale(1.08);
   }
 }
 
@@ -574,11 +572,10 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* SLEEK UPDATE 3: Enhanced hover effect with micro-scale for week view */
+/* SLEEK UPDATE 3: Refined hover effect without layout shift for week view */
 .week-day-cell:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: scale(1.02);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
 /* ADDED: Week view day background colors - matching month view */
@@ -621,7 +618,7 @@
   color: var(--text);
 }
 
-/* SLEEK UPDATE 2: Enhanced today's date in week view with glow and pulse */
+/* SLEEK UPDATE 2: Enhanced today's date in week view with scaling pulse */
 .week-day-number.today {
   background-color: var(--primary);
   color: #000;
@@ -632,9 +629,8 @@
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
-  /* SLEEK UPDATE 2: Soft glow and subtle pulse animation */
-  box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.2);
-  animation: today-pulse 3s ease-in-out infinite;
+  /* SLEEK UPDATE 2: Refined pulse animation - the circle itself scales subtly */
+  animation: today-scale-pulse 2.5s ease-in-out infinite;
 }
 
 .week-day-status {
@@ -858,7 +854,8 @@
   }
   
   .day-cell:hover {
-    transform: scale(1.01); /* Smaller scale on mobile */
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   }
   
   .day-number {
@@ -874,8 +871,8 @@
     height: 20px;
     line-height: 20px;
     font-size: 0.65rem;
-    /* SLEEK UPDATE 2: Smaller glow on mobile */
-    box-shadow: 0 0 0 2px rgba(255, 221, 0, 0.2);
+    /* SLEEK UPDATE 2: Maintain scaling animation on mobile */
+    animation: today-scale-pulse 2.5s ease-in-out infinite;
   }
   
   .day-indicators {
@@ -906,7 +903,8 @@
   }
   
   .week-day-cell:hover {
-    transform: scale(1.01); /* Smaller scale on mobile */
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   }
   
   .week-day-header {
@@ -1033,7 +1031,8 @@
   }
   
   .day-cell:hover {
-    transform: scale(1.005); /* Even smaller scale on very small mobile */
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   }
   
   .day-number {
@@ -1049,8 +1048,8 @@
     height: 18px;
     line-height: 18px;
     font-size: 0.6rem;
-    /* SLEEK UPDATE 2: Even smaller glow on very small mobile */
-    box-shadow: 0 0 0 1px rgba(255, 221, 0, 0.2);
+    /* SLEEK UPDATE 2: Maintain scaling animation on very small mobile */
+    animation: today-scale-pulse 2.5s ease-in-out infinite;
   }
   
   .day-indicators {
