@@ -660,6 +660,26 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           {dayBenefits && isPremium && (
             <div className="week-benefits">
               <div className="week-benefit-item">
+                <span className="benefit-mini-label">Energy</span>
+                <div className="benefit-mini-slider">
+                  <div 
+                    className="benefit-mini-fill" 
+                    style={{ width: `${dayBenefits.energy * 10}%` }}
+                  ></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.energy}/10</span>
+              </div>
+              <div className="week-benefit-item">
+                <span className="benefit-mini-label">Focus</span>
+                <div className="benefit-mini-slider">
+                  <div 
+                    className="benefit-mini-fill" 
+                    style={{ width: `${dayBenefits.focus * 10}%` }}
+                  ></div>
+                </div>
+                <span className="benefit-mini-value">{dayBenefits.focus}/10</span>
+              </div>
+              <div className="week-benefit-item">
                 <span className="benefit-mini-label">Sleep</span>
                 <div className="benefit-mini-slider">
                   <div 
@@ -936,7 +956,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     </div>
                   );
                 } else if (wetDream) {
-                  // Wet dream on a non-streak day (shouldn't normally happen, but handle gracefully)
                   return (
                     <div className="status-badge wet-dream">
                       <FaMoon />
@@ -971,10 +990,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 return null;
               })()}
             </div>
-
-            {/* Journey Day Counter - REMOVED: Redundant section eliminated */}
-            {/* This large journey card has been removed to save space and eliminate redundancy. 
-                 Day counts are now integrated into the status badge above. */}
 
             {/* Benefits Details */}
             {(() => {
@@ -1068,7 +1083,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               return null;
             })()}
 
-            {/* UPDATED: Journal Entry Section with changed banner text */}
+            {/* Journal Entry Section */}
             <div className="day-journal">
               <div className="journal-header-with-actions">
                 <h4>Journal Entry</h4>
@@ -1110,17 +1125,15 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                   </div>
                 </div>
               ) : (
-                <>
-                  {noteText && (
-                    <div className="journal-entry">
-                      {noteText}
-                    </div>
-                  )}
-                </>
+                noteText && (
+                  <div className="journal-entry">
+                    {noteText}
+                  </div>
+                )
               )}
             </div>
 
-            {/* UPDATED: Banner with changed heading text */}
+            {/* Banner for empty journal */}
             {!isEditingNote && !noteText && (
               <>
                 <div className="journal-benefits-banner">
@@ -1264,23 +1277,4 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   );
 };
 
-export default Calendar;<span className="benefit-mini-label">Energy</span>
-                <div className="benefit-mini-slider">
-                  <div 
-                    className="benefit-mini-fill" 
-                    style={{ width: `${dayBenefits.energy * 10}%` }}
-                  ></div>
-                </div>
-                <span className="benefit-mini-value">{dayBenefits.energy}/10</span>
-              </div>
-              <div className="week-benefit-item">
-                <span className="benefit-mini-label">Focus</span>
-                <div className="benefit-mini-slider">
-                  <div 
-                    className="benefit-mini-fill" 
-                    style={{ width: `${dayBenefits.focus * 10}%` }}
-                  ></div>
-                </div>
-                <span className="benefit-mini-value">{dayBenefits.focus}/10</span>
-              </div>
-              <div className="week-benefit-item">
+export default Calendar;
