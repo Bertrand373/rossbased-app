@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Changed banner text and refined legend with Journal item
+// components/Calendar/Calendar.js - FINAL: Icon-based legend matching calendar symbols
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -812,30 +812,30 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </button>
         </div>
 
-        {/* UPDATED: Refined elegant legend - includes Journal item for mobile */}
+        {/* UPDATED: Icon-based legend using actual calendar symbols */}
         <div className="calendar-legend-compact">
           <div className="compact-legend-item">
-            <div className="compact-legend-dot current-streak"></div>
+            <FaCheckCircle className="compact-legend-icon current-streak" />
             <span>Current</span>
           </div>
           <div className="compact-legend-item">
-            <div className="compact-legend-dot former-streak"></div>
+            <FaCheckCircle className="compact-legend-icon former-streak" />
             <span>Former</span>
           </div>
           <div className="compact-legend-item">
-            <div className="compact-legend-dot relapse"></div>
+            <FaTimesCircle className="compact-legend-icon relapse" />
             <span>Relapse</span>
           </div>
           <div className="compact-legend-item">
-            <div className="compact-legend-dot wet-dream"></div>
+            <FaMoon className="compact-legend-icon wet-dream" />
             <span>Wet Dream</span>
           </div>
           <div className="compact-legend-item">
-            <FaInfoCircle className="compact-legend-icon" />
+            <FaInfoCircle className="compact-legend-icon logged-benefits" />
             <span>Logged Benefits</span>
           </div>
           <div className="compact-legend-item">
-            <FaBook className="compact-legend-icon" />
+            <FaBook className="compact-legend-icon journal" />
             <span>Journal</span>
           </div>
         </div>
