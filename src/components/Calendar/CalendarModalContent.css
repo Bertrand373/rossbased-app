@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarModalContent.css - Modal content with updated banner text */
+/* components/Calendar/CalendarModalContent.css - CLEANUP: Day count integration and removed journey section */
 
 /* UPDATED: Edit day modal with emotional timeline modal structure */
 .edit-day-modal {
@@ -189,7 +189,7 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* UPDATED: Day status info section with emotional timeline modal styling */
+/* UPDATED: Day status info section with integrated day count */
 .day-status-info {
   margin-bottom: var(--spacing-xl);
   text-align: center;
@@ -208,6 +208,35 @@
   font-size: 0.875rem;
   font-weight: 500;
   max-width: fit-content;
+}
+
+/* NEW: Day count styling within status badge */
+.status-badge .day-count {
+  color: inherit;
+  font-weight: 600;
+  opacity: 0.8;
+  font-size: 0.8rem;
+}
+
+/* NEW: Wet dream overlay styling within status badge */
+.status-badge .wet-dream-overlay {
+  color: var(--warning);
+  font-weight: 500;
+  opacity: 0.9;
+  font-size: 0.8rem;
+}
+
+/* Mobile wet dream overlay styling */
+@media (max-width: 768px) {
+  .status-badge .wet-dream-overlay {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .status-badge .wet-dream-overlay {
+    font-size: 0.7rem;
+  }
 }
 
 .status-badge.current-streak {
@@ -286,29 +315,17 @@
   color: var(--text-secondary);
 }
 
-/* UPDATED: Journey counter card styled like emotional timeline modal sections */
+/* REMOVED: Journey counter card - this entire section has been eliminated */
 .day-streak-info {
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
+  display: none; /* Hidden - functionality moved to status badge */
 }
 
-/* UPDATED: All text using emotional timeline modal styling */
 .streak-day-number {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--text) !important;
-  line-height: 1;
-  margin-bottom: var(--spacing-xs);
+  display: none; /* Hidden - functionality moved to status badge */
 }
 
 .streak-context {
-  font-size: 0.875rem;
-  color: var(--text) !important;
-  font-weight: 500;
+  display: none; /* Hidden - functionality moved to status badge */
 }
 
 .day-tracking-info {
@@ -764,6 +781,11 @@
     padding: var(--spacing-xs) var(--spacing-sm);
   }
   
+  /* Mobile day count styling */
+  .status-badge .day-count {
+    font-size: 0.75rem;
+  }
+  
   .edit-day-options {
     gap: var(--spacing-sm);
   }
@@ -812,14 +834,6 @@
   
   .benefit-meter-enhanced {
     height: 6px;
-  }
-  
-  .streak-day-number {
-    font-size: 1.5rem;
-  }
-  
-  .streak-context {
-    font-size: 0.8rem;
   }
   
   /* Mobile pulsing helmet banner */
@@ -955,16 +969,17 @@
     height: 5px;
   }
   
-  .streak-day-number {
-    font-size: 1.25rem;
-  }
-  
-  .streak-context {
-    font-size: 0.75rem;
-  }
-  
   .day-info-modal h3 {
     font-size: 1.125rem;
+  }
+  
+  .status-badge {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .status-badge .day-count {
+    font-size: 0.7rem;
   }
 
   /* Very small mobile pulsing helmet banner */

@@ -222,7 +222,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return { weekStart, weekEnd };
   };
 
-  // Helper function to determine day status
+  // UPDATED: Helper function to determine day status (wet dreams no longer break streaks)
   const getDayStatus = (day) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -232,6 +232,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return null;
     }
     
+    // Check for relapse days (these still break streaks)
     const relapseDay = userData.streakHistory?.find(streak => 
       streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), day)
     );
@@ -240,21 +241,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return { type: 'relapse', trigger: relapseDay.trigger };
     }
     
-    const wetDreamDates = userData.streakHistory?.reduce((dates, streak) => {
-      if (streak.start && streak.days > 7) {
-        const wetDreamDay = new Date(streak.start);
-        wetDreamDay.setDate(wetDreamDay.getDate() + 5);
-        if (wetDreamDay <= today && isSameDay(wetDreamDay, day)) {
-          dates.push(wetDreamDay);
-        }
-      }
-      return dates;
-    }, []) || [];
-    
-    if (wetDreamDates.length > 0) {
-      return { type: 'wet-dream' };
-    }
-    
+    // Check for former streak days (completed streaks)
     const formerStreak = userData.streakHistory?.find(streak => {
       if (!streak.start || !streak.end) return false;
       const streakStart = new Date(streak.start);
@@ -269,6 +256,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return { type: 'former-streak' };
     }
     
+    // Check for current streak days
     const currentStreak = userData.streakHistory?.find(streak => 
       streak.start && !streak.end
     );
@@ -296,7 +284,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return { hasBenefits, hasJournal };
   };
 
-  // CLEANUP: Get day count for status badge integration
+  // UPDATED: Get day count with total streak context for former streaks
   const getDayCount = (day) => {
     const dayStatus = getDayStatus(day);
     
@@ -312,7 +300,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       if (currentStreak) {
         const streakStart = new Date(currentStreak.start);
         const dayNumber = differenceInDays(day, streakStart) + 1;
-        return dayNumber > 0 ? dayNumber : 0;
+        return { 
+          dayNumber: dayNumber > 0 ? dayNumber : 0,
+          totalDays: null // Current streak has no total yet
+        };
       }
     }
     
@@ -331,11 +322,32 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       if (formerStreak) {
         const streakStart = new Date(formerStreak.start);
         const dayNumber = differenceInDays(day, streakStart) + 1;
-        return dayNumber > 0 ? dayNumber : 0;
+        return { 
+          dayNumber: dayNumber > 0 ? dayNumber : 0,
+          totalDays: formerStreak.days
+        };
       }
     }
     
     return null;
+  };
+
+  // NEW: Check if day has wet dream (separate from status to allow overlay)
+  const hasWetDream = (day) => {
+    const wetDreamDates = userData.streakHistory?.reduce((dates, streak) => {
+      if (streak.start && streak.days > 7) {
+        const wetDreamDay = new Date(streak.start);
+        wetDreamDay.setDate(wetDreamDay.getDate() + 5);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (wetDreamDay <= today && isSameDay(wetDreamDay, day)) {
+          dates.push(wetDreamDay);
+        }
+      }
+      return dates;
+    }, []) || [];
+    
+    return wetDreamDates.length > 0;
   };
 
   // Show day details with edit option
@@ -539,13 +551,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return <IconComponent className="trigger-icon" />;
   };
 
-  // Render clean day cell with journal icon moved to upper right corner
+  // UPDATED: Render day cell with wet dream overlay logic
   const renderDayCell = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
     const isSelected = selectedDate && isSameDay(day, selectedDate);
     const isToday = isSameDay(day, new Date());
     const dayTracking = getDayTracking(day);
     const isCurrentMonth = isSameMonth(day, currentDate);
+    const wetDream = hasWetDream(day);
     
     const dayClasses = [
       'day-cell',
@@ -555,7 +568,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
       dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
       dayStatus?.type === 'relapse' ? 'relapse-day' : '',
-      dayStatus?.type === 'wet-dream' ? 'wet-dream-day' : ''
+      wetDream && !dayStatus ? 'wet-dream-day' : '' // Only standalone wet dreams get background
     ].filter(Boolean).join(' ');
 
     return (
@@ -580,7 +593,13 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               {(dayStatus.type === 'current-streak' || dayStatus.type === 'former-streak') && 
                 <FaCheckCircle className="success-icon" />}
               {dayStatus.type === 'relapse' && <FaTimesCircle className="relapse-icon" />}
-              {dayStatus.type === 'wet-dream' && <FaMoon className="wet-dream-icon" />}
+            </div>
+          )}
+          
+          {/* Wet dream indicator - shows regardless of streak status */}
+          {wetDream && (
+            <div className="day-wet-dream-indicator">
+              <FaMoon className="wet-dream-icon" />
             </div>
           )}
           
@@ -859,11 +878,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             
             <h3>{format(selectedDate, 'EEE, MMM d, yyyy')}</h3>
             
-            {/* Day Status with integrated day count */}
+            {/* UPDATED: Day Status with enhanced day count and wet dream overlay */}
             <div className="day-status-info">
               {(() => {
                 const dayStatus = getDayStatus(selectedDate);
                 const dayCount = getDayCount(selectedDate);
+                const wetDream = hasWetDream(selectedDate);
                 
                 if (dayStatus) {
                   return (
@@ -873,7 +893,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                           <FaCheckCircle />
                           <span>
                             Current Streak Day
-                            {dayCount && <span className="day-count"> • Day {dayCount}</span>}
+                            {dayCount && <span className="day-count"> • Day {dayCount.dayNumber}</span>}
+                            {wetDream && <span className="wet-dream-overlay"> + Wet Dream</span>}
                           </span>
                         </>
                       )}
@@ -883,8 +904,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                           <span>
                             Former Streak Day
                             {dayCount && (
-                              <span className="day-count"> • Day {dayCount}</span>
+                              <span className="day-count">
+                                {dayCount.totalDays ? 
+                                  ` • Day ${dayCount.dayNumber} of ${dayCount.totalDays}` : 
+                                  ` • Day ${dayCount.dayNumber}`
+                                }
+                              </span>
                             )}
+                            {wetDream && <span className="wet-dream-overlay"> + Wet Dream</span>}
                           </span>
                         </>
                       )}
@@ -894,12 +921,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                           <span>Relapse Day</span>
                         </>
                       )}
-                      {dayStatus.type === 'wet-dream' && (
-                        <>
-                          <FaMoon />
-                          <span>Wet Dream</span>
-                        </>
-                      )}
+                    </div>
+                  );
+                } else if (wetDream) {
+                  // Wet dream on a non-streak day (shouldn't normally happen, but handle gracefully)
+                  return (
+                    <div className="status-badge wet-dream">
+                      <FaMoon />
+                      <span>Wet Dream</span>
                     </div>
                   );
                 }
