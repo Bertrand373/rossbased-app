@@ -533,7 +533,9 @@
   font-size: 0.875rem; /* FIXED: Explicit size for consistency */
 }
 
-.former-streak-day .success-icon {
+/* FIXED: Blue check marks for former streak days - more specific selector */
+.former-streak-day .success-icon,
+.wet-dream-day.former-streak-day .success-icon {
   color: #3b82f6 !important;
 }
 
