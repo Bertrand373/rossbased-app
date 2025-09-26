@@ -489,7 +489,7 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* FIXED: Day indicators positioning with wet dream icon first */
+/* FIXED: Day indicators positioning with CORRECT icon ordering */
 .day-indicators {
   position: absolute;
   bottom: var(--spacing-xs);
@@ -511,21 +511,21 @@
   pointer-events: auto;
 }
 
-/* FIXED: Icon order - wet dream first, then status, then tracking, then triggers */
-.day-wet-dream-indicator {
-  order: 1;
-}
-
-.day-status-indicator {
-  order: 2;
-}
-
+/* CORRECTED: Icon order from left to right - Info "i", wet dream/triggers, status check/X */
 .day-tracking-indicator {
-  order: 3;
+  order: 1; /* Info "i" icon - leftmost, lowest priority */
+}
+
+.day-wet-dream-indicator {
+  order: 2; /* Wet dream moon - middle priority */
 }
 
 .day-trigger-indicator {
-  order: 4;
+  order: 3; /* Trigger icons - middle priority */
+}
+
+.day-status-indicator {
+  order: 4; /* Check marks/relapse X - rightmost, highest priority */
 }
 
 .success-icon {
