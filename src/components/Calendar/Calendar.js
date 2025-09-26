@@ -616,7 +616,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     );
   };
 
-  // Clean week view
+  // UPDATED: Week view with background colors matching month view
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
     const days = [];
@@ -627,8 +627,17 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       const dayBenefits = getDayBenefits(day);
       const dayTracking = getDayTracking(day);
       
+      // ADDED: Week view day classes matching month view
+      const dayClasses = [
+        'week-day-cell',
+        dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
+        dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
+        dayStatus?.type === 'relapse' ? 'relapse-day' : '',
+        dayStatus?.type === 'wet-dream' ? 'wet-dream-day' : ''
+      ].filter(Boolean).join(' ');
+      
       days.push(
-        <div key={i} className="week-day-cell" onClick={() => showDayDetails(day)}>
+        <div key={i} className={dayClasses} onClick={() => showDayDetails(day)}>
           <div className="week-day-header">
             <div className="week-day-name">{format(day, 'EEE')}</div>
             <div className={`week-day-number ${isSameDay(day, new Date()) ? 'today' : ''}`}>
