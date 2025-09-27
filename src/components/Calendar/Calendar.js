@@ -636,7 +636,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       const dayTracking = getDayTracking(day);
       const wetDream = hasWetDream(day);
       
-      // FIXED: Week view day classes with wet dream priority
+      // FIXED: Week view day classes with wet dream priority and benefits detection
       const dayClasses = [
         'week-day-cell',
         // Wet dream background takes priority over streak backgrounds
@@ -644,7 +644,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           dayStatus?.type === 'current-streak' ? 'current-streak-day' : 
           dayStatus?.type === 'former-streak' ? 'former-streak-day' : 
           dayStatus?.type === 'relapse' ? 'relapse-day' : ''
-        )
+        ),
+        // Add benefits class for smart icon positioning
+        dayBenefits && isPremium ? 'has-benefits' : ''
       ].filter(Boolean).join(' ');
       
       days.push(
