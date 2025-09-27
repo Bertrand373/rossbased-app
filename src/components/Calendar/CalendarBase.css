@@ -629,13 +629,57 @@
 /* NEW: Week status indicators positioned like monthly view - COMPLETE icon ordering */
 .week-status-indicators {
   position: absolute;
-  bottom: var(--spacing-xs);
   right: var(--spacing-xs);
   display: flex;
   align-items: center;
   gap: 3px;
   min-height: 16px;
   pointer-events: none;
+  z-index: 10; /* Ensure icons appear above everything */
+}
+
+/* Default positioning when no benefits are present */
+.week-day-cell .week-status-indicators {
+  bottom: var(--spacing-xs);
+}
+
+/* UNIVERSAL: Add class-based positioning for cells with benefits */
+.week-day-cell.has-benefits .week-status-indicators {
+  bottom: calc(var(--spacing-xs) + 65px); /* Space above benefit sliders */
+}
+
+/* Desktop: Adequate spacing above benefit sliders */
+@media (min-width: 769px) {
+  .week-day-cell.has-benefits .week-status-indicators {
+    bottom: calc(var(--spacing-xs) + 70px); /* More space on desktop */
+  }
+}
+
+/* Mobile: Adjusted positioning for smaller screens */
+@media (max-width: 768px) {
+  .week-day-cell.has-benefits .week-status-indicators {
+    bottom: calc(var(--spacing-xs) + 55px); /* Reduced space for mobile */
+  }
+  
+  /* Single column layout on mobile - more vertical space available */
+  .week-view-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .week-day-cell {
+    min-height: 120px; /* Ensure enough height for all content */
+  }
+}
+
+/* Very small mobile: Further optimized spacing */
+@media (max-width: 480px) {
+  .week-day-cell.has-benefits .week-status-indicators {
+    bottom: calc(var(--spacing-xs) + 50px); /* Minimal space for very small screens */
+  }
+  
+  .week-day-cell {
+    min-height: 110px; /* Slightly reduced for very small screens */
+  }
 }
 
 .week-tracking-indicator, .week-wet-dream-indicator, .week-trigger-indicator, .week-journal-indicator, .week-status-indicator {
