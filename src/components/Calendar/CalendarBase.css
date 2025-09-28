@@ -703,10 +703,10 @@
 }
 
 .week-benefit-content {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  width: 120px; /* FIXED: Set consistent width instead of flex: 1 */
 }
 
 .week-benefit-label {
@@ -721,6 +721,7 @@
   background: rgba(255, 221, 0, 0.15);
   border-radius: var(--radius-full);
   overflow: hidden;
+  width: 100%; /* FIXED: Ensure full width of container */
 }
 
 .week-benefit-fill {
@@ -730,16 +731,14 @@
   transition: width 0.4s ease;
 }
 
-/* FIXED: Proper value alignment - centered with progress bar */
+/* FIXED: Proper value alignment and positioning */
 .week-benefit-value {
   font-size: 0.7rem;
   color: var(--text);
   font-weight: 600;
-  min-width: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: var(--spacing-xs);
+  width: 24px; /* FIXED: Set consistent width instead of min-width */
+  text-align: center; /* FIXED: Center text within fixed width */
+  flex-shrink: 0; /* FIXED: Prevent shrinking */
 }
 
 /* REDESIGNED: Footer with clean icon layout */
@@ -1022,13 +1021,17 @@
     gap: var(--spacing-xs);
   }
   
+  .week-benefit-content {
+    width: 100px; /* MOBILE: Smaller consistent width */
+  }
+  
   .week-benefit-label {
     font-size: 0.7rem;
   }
   
   .week-benefit-value {
     font-size: 0.65rem;
-    min-width: 28px;
+    width: 20px; /* MOBILE: Smaller consistent width */
   }
 }
 
