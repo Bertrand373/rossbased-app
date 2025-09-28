@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Option 1 Card-Based Weekly Layout
+// components/Calendar/Calendar.js - UPDATED: Enhanced card-based monthly view
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -551,26 +551,27 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return <IconComponent className="trigger-icon" />;
   };
 
-  // UPDATED: Render day cell with proper class combination for wet dreams + streak types
+  // ENHANCED: Card-based month view day cell with benefits preview
   const renderDayCell = (day, dayIndex) => {
     const dayStatus = getDayStatus(day);
+    const dayBenefits = getDayBenefits(day);
+    const dayTracking = getDayTracking(day);
     const isSelected = selectedDate && isSameDay(day, selectedDate);
     const isToday = isSameDay(day, new Date());
-    const dayTracking = getDayTracking(day);
     const isCurrentMonth = isSameMonth(day, currentDate);
     const wetDream = hasWetDream(day);
+    const dayCount = getDayCount(day);
     
     const dayClasses = [
       'day-cell',
       !isCurrentMonth ? 'other-month' : '',
       isToday ? 'today' : '',
       isSelected ? 'selected' : '',
-      // FIXED: Always include streak type class, then add wet dream class
       dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
       dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
       dayStatus?.type === 'relapse' ? 'relapse-day' : '',
-      // Add wet dream class in addition to streak class, not instead of
-      wetDream ? 'wet-dream-day' : ''
+      wetDream ? 'wet-dream-day' : '',
+      !dayStatus && !dayBenefits && !dayTracking.hasJournal ? 'empty-day' : ''
     ].filter(Boolean).join(' ');
 
     return (
@@ -579,6 +580,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         className={dayClasses}
         onClick={() => showDayDetails(day)}
       >
+        {dayCount && (
+          <div className="day-count-display">
+            Day {dayCount.dayNumber}
+          </div>
+        )}
+        
         <div className="day-content">
           <div className="day-number">{format(day, 'd')}</div>
           
@@ -589,36 +596,74 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           )}
         </div>
         
-        <div className="day-indicators">
-          {/* Info icon - leftmost, lowest priority */}
-          {dayTracking.hasBenefits && (
-            <div className="day-tracking-indicator">
-              <FaInfoCircle className="tracking-icon" />
+        {dayBenefits && isPremium ? (
+          <div className="day-benefits-preview">
+            <div className="monthly-benefit-mini">
+              <div className="monthly-benefit-label">Energy</div>
+              <div className="monthly-benefit-bar">
+                <div 
+                  className="monthly-benefit-fill" 
+                  style={{ width: `${dayBenefits.energy * 10}%` }}
+                ></div>
+              </div>
+              <div className="monthly-benefit-value">{dayBenefits.energy}</div>
             </div>
-          )}
+            
+            <div className="monthly-benefit-mini">
+              <div className="monthly-benefit-label">Focus</div>
+              <div className="monthly-benefit-bar">
+                <div 
+                  className="monthly-benefit-fill" 
+                  style={{ width: `${dayBenefits.focus * 10}%` }}
+                ></div>
+              </div>
+              <div className="monthly-benefit-value">{dayBenefits.focus}</div>
+            </div>
+            
+            <div className="monthly-benefit-mini">
+              <div className="monthly-benefit-label">Confidence</div>
+              <div className="monthly-benefit-bar">
+                <div 
+                  className="monthly-benefit-fill" 
+                  style={{ width: `${dayBenefits.confidence * 10}%` }}
+                ></div>
+              </div>
+              <div className="monthly-benefit-value">{dayBenefits.confidence}</div>
+            </div>
+          </div>
+        ) : !dayStatus && !dayTracking.hasJournal ? (
+          <div className="empty-day-content">
+            No data
+          </div>
+        ) : null}
+        
+        <div className="day-card-footer">
+          <div className="monthly-secondary-icons">
+            {dayStatus?.trigger && (
+              <div className="monthly-secondary-icon">
+                {renderTriggerIcon(dayStatus.trigger)}
+              </div>
+            )}
+          </div>
           
-          {/* Wet dream indicator - middle priority */}
-          {wetDream && (
-            <div className="day-wet-dream-indicator">
-              <FaMoon className="wet-dream-icon" />
-            </div>
-          )}
-          
-          {/* Trigger indicators - middle priority */}
-          {dayStatus?.trigger && (
-            <div className="day-trigger-indicator">
-              {renderTriggerIcon(dayStatus.trigger)}
-            </div>
-          )}
-          
-          {/* Status indicators - rightmost, highest priority */}
-          {dayStatus && (
-            <div className="day-status-indicator">
-              {(dayStatus.type === 'current-streak' || dayStatus.type === 'former-streak') && 
-                <FaCheckCircle className="success-icon" />}
-              {dayStatus.type === 'relapse' && <FaTimesCircle className="relapse-icon" />}
-            </div>
-          )}
+          <div className="day-indicators">
+            {wetDream && (
+              <div className="monthly-status-icon wet-dream">
+                <FaMoon />
+              </div>
+            )}
+            {dayStatus && (
+              <div className={`monthly-status-icon ${
+                dayStatus.type === 'current-streak' ? 'success' :
+                dayStatus.type === 'former-streak' ? 'former-success' :
+                dayStatus.type === 'relapse' ? 'relapse' : ''
+              }`}>
+                {(dayStatus.type === 'current-streak' || dayStatus.type === 'former-streak') && 
+                  <FaCheckCircle />}
+                {dayStatus.type === 'relapse' && <FaTimesCircle />}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
