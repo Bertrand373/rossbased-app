@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - CLEANUP: Removed redundant journey section, integrated day count into status badge
+// components/Calendar/Calendar.js - UPDATED: Option 1 Card-Based Weekly Layout
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -624,7 +624,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     );
   };
 
-  // REDESIGNED: Week view with professional flexbox layout
+  // NEW: Option 1 - Card-Based Week View with Premium Benefits Display
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
     const days = [];
@@ -636,17 +636,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       const dayTracking = getDayTracking(day);
       const wetDream = hasWetDream(day);
       
-      // CLEAN: Week view day classes without complex positioning logic
       const dayClasses = [
         'week-day-cell',
-        // Add has-benefits class for proper icon positioning
-        dayBenefits ? 'has-benefits' : '',
-        // Wet dream background takes priority over streak backgrounds
-        wetDream ? 'wet-dream-day' : (
-          dayStatus?.type === 'current-streak' ? 'current-streak-day' : 
-          dayStatus?.type === 'former-streak' ? 'former-streak-day' : 
-          dayStatus?.type === 'relapse' ? 'relapse-day' : ''
-        )
+        dayStatus?.type === 'current-streak' ? 'current-streak-day' : '',
+        dayStatus?.type === 'former-streak' ? 'former-streak-day' : '',
+        dayStatus?.type === 'relapse' ? 'relapse-day' : '',
+        wetDream ? 'wet-dream-day' : ''
       ].filter(Boolean).join(' ');
       
       days.push(
@@ -658,82 +653,84 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          {/* RESTRUCTURED: Main content area with proper flexbox layout */}
-          <div className="week-day-content">
-            {/* Benefits section - grows to fill available space */}
-            {dayBenefits && isPremium && (
-              <div className="week-benefits">
-                <div className="week-benefit-item">
-                  <span className="benefit-mini-label">Energy</span>
-                  <div className="benefit-mini-slider">
+          {/* Premium Benefits Section */}
+          {dayBenefits && isPremium ? (
+            <div className="week-benefits-prominent">
+              <div className="week-benefit-row">
+                <div className="week-benefit-content">
+                  <div className="week-benefit-label">Energy</div>
+                  <div className="week-benefit-bar">
                     <div 
-                      className="benefit-mini-fill" 
+                      className="week-benefit-fill" 
                       style={{ width: `${dayBenefits.energy * 10}%` }}
                     ></div>
                   </div>
-                  <span className="benefit-mini-value">{dayBenefits.energy}/10</span>
                 </div>
-                <div className="week-benefit-item">
-                  <span className="benefit-mini-label">Focus</span>
-                  <div className="benefit-mini-slider">
+                <div className="week-benefit-value">{dayBenefits.energy}</div>
+              </div>
+              
+              <div className="week-benefit-row">
+                <div className="week-benefit-content">
+                  <div className="week-benefit-label">Focus</div>
+                  <div className="week-benefit-bar">
                     <div 
-                      className="benefit-mini-fill" 
+                      className="week-benefit-fill" 
                       style={{ width: `${dayBenefits.focus * 10}%` }}
                     ></div>
                   </div>
-                  <span className="benefit-mini-value">{dayBenefits.focus}/10</span>
                 </div>
-                <div className="week-benefit-item">
-                  <span className="benefit-mini-label">Sleep</span>
-                  <div className="benefit-mini-slider">
+                <div className="week-benefit-value">{dayBenefits.focus}</div>
+              </div>
+              
+              <div className="week-benefit-row">
+                <div className="week-benefit-content">
+                  <div className="week-benefit-label">Confidence</div>
+                  <div className="week-benefit-bar">
                     <div 
-                      className="benefit-mini-fill" 
-                      style={{ width: `${(dayBenefits.sleep || dayBenefits.confidence) * 10}%` }}
+                      className="week-benefit-fill" 
+                      style={{ width: `${dayBenefits.confidence * 10}%` }}
                     ></div>
                   </div>
-                  <span className="benefit-mini-value">{dayBenefits.sleep || dayBenefits.confidence}/10</span>
                 </div>
+                <div className="week-benefit-value">{dayBenefits.confidence}</div>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="week-empty-benefits">
+              No benefits logged
+            </div>
+          )}
           
-          {/* CLEAN: Footer area with proper icon positioning */}
+          {/* Clean Footer */}
           <div className="week-day-footer">
-            <div className="week-status-indicators">
-              {/* Info icon - leftmost, lowest priority */}
-              {dayTracking.hasBenefits && (
-                <div className="week-tracking-indicator">
-                  <FaInfoCircle className="week-benefits-icon" />
+            <div className="week-secondary-icons">
+              {dayTracking.hasJournal && (
+                <div className="week-secondary-icon has-journal">
+                  <FaBook />
                 </div>
               )}
-              
-              {/* Wet dream icon - middle priority */}
-              {wetDream && (
-                <div className="week-wet-dream-indicator">
-                  <FaMoon className="week-wet-dream-icon" />
-                </div>
-              )}
-              
-              {/* Trigger icons - middle priority */}
               {dayStatus?.trigger && (
-                <div className="week-trigger-indicator">
+                <div className="week-secondary-icon has-trigger">
                   {renderTriggerIcon(dayStatus.trigger)}
                 </div>
               )}
-              
-              {/* Journal icon - second highest priority */}
-              {dayTracking.hasJournal && (
-                <div className="week-journal-indicator">
-                  <FaBook className="week-journal-icon" />
+            </div>
+            
+            <div className="week-primary-status">
+              {wetDream && (
+                <div className="week-status-icon wet-dream">
+                  <FaMoon />
                 </div>
               )}
-              
-              {/* Status check marks/relapse X - highest priority, rightmost */}
               {dayStatus && (
-                <div className="week-status-indicator">
+                <div className={`week-status-icon ${
+                  dayStatus.type === 'current-streak' ? 'success' :
+                  dayStatus.type === 'former-streak' ? 'former-success' :
+                  dayStatus.type === 'relapse' ? 'relapse' : ''
+                }`}>
                   {(dayStatus.type === 'current-streak' || dayStatus.type === 'former-streak') && 
-                    <FaCheckCircle className="week-success-icon" />}
-                  {dayStatus.type === 'relapse' && <FaTimesCircle className="week-relapse-icon" />}
+                    <FaCheckCircle />}
+                  {dayStatus.type === 'relapse' && <FaTimesCircle />}
                 </div>
               )}
             </div>
