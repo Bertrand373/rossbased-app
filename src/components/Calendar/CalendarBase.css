@@ -626,60 +626,66 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* NEW: Week status indicators positioned like monthly view - COMPLETE icon ordering */
+/* FIXED: Week status indicators - simple lower right corner positioning */
 .week-status-indicators {
   position: absolute;
-  bottom: var(--spacing-xs);
-  right: var(--spacing-xs);
+  bottom: var(--spacing-sm);
+  right: var(--spacing-sm);
   display: flex;
   align-items: center;
   gap: 3px;
   min-height: 16px;
   pointer-events: none;
-  z-index: 10; /* Ensure icons appear above everything */
+  z-index: 10;
 }
 
-/* Default positioning when no benefits are present */
-.week-day-cell .week-status-indicators {
-  bottom: var(--spacing-xs);
-}
-
-/* UNIVERSAL: Add class-based positioning for cells with benefits */
+/* Remove all complex conditional positioning - keep it simple */
+.week-day-cell .week-status-indicators,
 .week-day-cell.has-benefits .week-status-indicators {
-  bottom: calc(var(--spacing-xs) + 65px); /* Space above benefit sliders */
+  bottom: var(--spacing-sm);
+  right: var(--spacing-sm);
 }
 
-/* Desktop: Adequate spacing above benefit sliders */
+/* Desktop: Consistent positioning */
 @media (min-width: 769px) {
+  .week-status-indicators,
+  .week-day-cell .week-status-indicators,
   .week-day-cell.has-benefits .week-status-indicators {
-    bottom: calc(var(--spacing-xs) + 70px); /* More space on desktop */
+    bottom: var(--spacing-md);
+    right: var(--spacing-md);
   }
 }
 
-/* Mobile: Adjusted positioning for smaller screens */
+/* Mobile: Consistent positioning */
 @media (max-width: 768px) {
+  .week-status-indicators,
+  .week-day-cell .week-status-indicators,
   .week-day-cell.has-benefits .week-status-indicators {
-    bottom: calc(var(--spacing-xs) + 55px); /* Reduced space for mobile */
+    bottom: var(--spacing-sm);
+    right: var(--spacing-sm);
   }
   
-  /* Single column layout on mobile - more vertical space available */
   .week-view-grid {
     grid-template-columns: 1fr;
   }
   
   .week-day-cell {
-    min-height: 120px; /* Ensure enough height for all content */
+    min-height: 140px; /* Increased height to ensure content doesn't overlap */
   }
 }
 
-/* Very small mobile: Further optimized spacing */
+/* Very small mobile: Consistent positioning */
 @media (max-width: 480px) {
+  .week-status-indicators,
+  .week-day-cell .week-status-indicators,
   .week-day-cell.has-benefits .week-status-indicators {
-    bottom: calc(var(--spacing-xs) + 50px); /* Minimal space for very small screens */
+    bottom: var(--spacing-xs);
+    right: var(--spacing-xs);
+    gap: 2px;
   }
   
   .week-day-cell {
-    min-height: 110px; /* Slightly reduced for very small screens */
+    min-height: 130px;
   }
 }
 
