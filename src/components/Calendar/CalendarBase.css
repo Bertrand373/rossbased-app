@@ -699,7 +699,7 @@
 .week-benefit-row {
   display: grid;
   grid-template-columns: 60px 1fr 24px; /* Fixed label, flexible bar, fixed value */
-  align-items: center;
+  grid-template-rows: auto auto; /* Two rows: label row, bar+value row */
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) 0;
 }
@@ -708,7 +708,9 @@
   font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 500;
-  grid-column: 1;
+  grid-column: 1 / span 3; /* Span across all columns */
+  grid-row: 1;
+  margin-bottom: 2px;
 }
 
 .week-benefit-bar {
@@ -716,7 +718,9 @@
   background: rgba(255, 221, 0, 0.15);
   border-radius: var(--radius-full);
   overflow: hidden;
-  grid-column: 2;
+  grid-column: 1 / span 2; /* Span label and bar columns */
+  grid-row: 2;
+  align-self: center;
 }
 
 .week-benefit-fill {
@@ -732,6 +736,8 @@
   font-weight: 600;
   text-align: center;
   grid-column: 3;
+  grid-row: 2;
+  align-self: center; /* Aligns with progress bar, not centered between label and bar */
 }
 
 /* REDESIGNED: Footer with clean icon layout */
