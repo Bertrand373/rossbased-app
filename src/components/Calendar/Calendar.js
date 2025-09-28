@@ -639,6 +639,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       // CLEAN: Week view day classes without complex positioning logic
       const dayClasses = [
         'week-day-cell',
+        // Add has-benefits class for proper icon positioning
+        dayBenefits ? 'has-benefits' : '',
         // Wet dream background takes priority over streak backgrounds
         wetDream ? 'wet-dream-day' : (
           dayStatus?.type === 'current-streak' ? 'current-streak-day' : 
@@ -861,19 +863,19 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </button>
         </div>
 
-        {/* UPDATED: Icon-based legend using actual calendar symbols */}
+        {/* UPDATED: Icon-based legend using actual calendar symbols with refined labels */}
         <div className="calendar-legend-compact">
           <div className="compact-legend-item">
             <FaCheckCircle className="compact-legend-icon current-streak" />
-            <span>Current</span>
+            <span>Current Streak</span>
           </div>
           <div className="compact-legend-item">
             <FaCheckCircle className="compact-legend-icon former-streak" />
-            <span>Former</span>
+            <span>Former Streak</span>
           </div>
           <div className="compact-legend-item">
             <FaTimesCircle className="compact-legend-icon relapse" />
-            <span>Relapse</span>
+            <span>Relapse Day</span>
           </div>
           <div className="compact-legend-item">
             <FaMoon className="compact-legend-icon wet-dream" />
@@ -885,7 +887,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           </div>
           <div className="compact-legend-item">
             <FaBook className="compact-legend-icon journal" />
-            <span>Journal</span>
+            <span>Journal Entry</span>
           </div>
         </div>
 
