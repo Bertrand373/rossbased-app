@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - UPDATED: Option 1 Card-Based Weekly Layout */
+/* components/Calendar/CalendarBase.css - UPDATED: Fixed animation and alignment issues */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -715,12 +715,12 @@
   font-weight: 500;
 }
 
+/* FIXED: Removed unnecessary loading animation */
 .week-benefit-bar {
   height: 6px;
   background: rgba(255, 221, 0, 0.15);
   border-radius: var(--radius-full);
   overflow: hidden;
-  position: relative;
 }
 
 .week-benefit-fill {
@@ -728,34 +728,18 @@
   background: linear-gradient(90deg, var(--primary) 0%, #e6c200 100%);
   border-radius: var(--radius-full);
   transition: width 0.4s ease;
-  position: relative;
 }
 
-.week-benefit-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.3) 50%, 
-    transparent 100%);
-  animation: benefit-shimmer 2s ease-in-out infinite;
-}
-
-@keyframes benefit-shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
+/* FIXED: Proper value alignment - centered with progress bar */
 .week-benefit-value {
   font-size: 0.7rem;
   color: var(--text);
   font-weight: 600;
   min-width: 32px;
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--spacing-xs);
 }
 
 /* REDESIGNED: Footer with clean icon layout */
@@ -948,266 +932,3 @@
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
   }
-  
-  .compact-legend-item {
-    font-size: 0.75rem;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    flex-shrink: 0;
-    min-width: fit-content;
-  }
-  
-  .compact-legend-icon {
-    font-size: 0.8125rem;
-  }
-  
-  .day-header {
-    padding: var(--spacing-sm);
-    font-size: 0.75rem;
-    line-height: 1;
-  }
-  
-  .day-cell {
-    height: 60px;
-    padding: var(--spacing-xs);
-    transform: scale(1);
-  }
-  
-  .day-cell:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  }
-  
-  .day-number {
-    font-size: 0.75rem;
-  }
-  
-  .day-journal-indicator-top {
-    font-size: 0.75rem;
-  }
-  
-  .today .day-number {
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    font-size: 0.65rem;
-    animation: today-scale-pulse 2.5s ease-in-out infinite;
-  }
-  
-  .day-indicators {
-    bottom: 2px;
-    right: 2px;
-    gap: 2px;
-    min-height: 14px;
-  }
-  
-  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator, .day-wet-dream-indicator {
-    font-size: 0.75rem !important;
-  }
-  
-  .success-icon, .relapse-icon, .wet-dream-icon, .tracking-icon {
-    font-size: 0.75rem !important;
-  }
-  
-  .trigger-icon {
-    font-size: 0.65rem !important;
-  }
-  
-  /* Mobile week view adjustments */
-  .week-view-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-  }
-  
-  .week-day-cell {
-    min-height: 140px;
-    padding: var(--spacing-md);
-  }
-  
-  .week-day-number {
-    font-size: 1.2rem;
-  }
-  
-  .week-day-number.today {
-    width: 32px;
-    height: 32px;
-    font-size: 0.9rem;
-  }
-  
-  .week-benefit-row {
-    gap: var(--spacing-xs);
-  }
-  
-  .week-benefit-label {
-    font-size: 0.7rem;
-  }
-  
-  .week-benefit-value {
-    font-size: 0.65rem;
-    min-width: 28px;
-  }
-}
-
-/* Very small screens */
-@media (max-width: 480px) {
-  .integrated-calendar-header {
-    padding: var(--spacing-lg);
-  }
-  
-  .header-title-section h2 {
-    font-size: 1.125rem;
-  }
-  
-  .header-subtitle {
-    font-size: 0.75rem;
-  }
-  
-  .calendar-navigation-pills {
-    width: fit-content;
-    padding: 6px;
-    gap: 4px;
-  }
-  
-  .calendar-nav-slider {
-    top: 6px;
-    left: 6px;
-    height: calc(100% - 12px);
-    transition: transform 0.2s ease-out, width 0.2s ease-out;
-  }
-  
-  .calendar-nav-btn {
-    font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-  
-  .calendar-period-navigation {
-    margin-bottom: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-xs);
-    gap: var(--spacing-md);
-  }
-  
-  .calendar-period-navigation h3 {
-    font-size: 1rem;
-    min-width: 140px;
-  }
-  
-  .period-nav-btn {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .period-nav-btn svg {
-    width: 12px;
-    height: 12px;
-  }
-  
-  .calendar-legend-compact {
-    padding: var(--spacing-sm) var(--spacing-md);
-    gap: var(--spacing-lg);
-  }
-  
-  .compact-legend-item {
-    flex-shrink: 0;
-    font-size: 0.7rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    min-width: fit-content;
-  }
-  
-  .compact-legend-icon {
-    font-size: 0.75rem;
-  }
-  
-  .modal-close-x {
-    top: var(--spacing-xs);
-    right: var(--spacing-xs);
-    width: 24px;
-    height: 24px;
-    font-size: 0.875rem;
-  }
-  
-  .calendar-main-section {
-    padding: var(--spacing-sm);
-  }
-  
-  .day-header {
-    padding: 4px 2px;
-    font-size: 0.65rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  .day-cell {
-    height: 50px;
-    padding: 2px;
-  }
-  
-  .day-cell:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  }
-  
-  .day-number {
-    font-size: 0.7rem;
-  }
-  
-  .day-journal-indicator-top {
-    font-size: 0.7rem;
-  }
-  
-  .today .day-number {
-    width: 18px;
-    height: 18px;
-    line-height: 18px;
-    font-size: 0.6rem;
-    animation: today-scale-pulse 2.5s ease-in-out infinite;
-  }
-  
-  .day-indicators {
-    bottom: 1px;
-    right: 1px;
-    gap: 1px;
-    min-height: 12px;
-  }
-  
-  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator, .day-wet-dream-indicator {
-    font-size: 0.7rem !important;
-  }
-  
-  .success-icon, .relapse-icon, .wet-dream-icon, .tracking-icon {
-    font-size: 0.7rem !important;
-  }
-  
-  .trigger-icon {
-    font-size: 0.6rem !important;
-  }
-  
-  /* Very small week view adjustments */
-  .week-view-grid {
-    padding: var(--spacing-md);
-  }
-  
-  .week-day-cell {
-    min-height: 120px;
-    padding: var(--spacing-sm);
-  }
-  
-  .week-benefits-prominent {
-    gap: var(--spacing-xs);
-  }
-  
-  .week-benefit-row {
-    padding: 2px 0;
-  }
-  
-  .week-day-number {
-    font-size: 1.1rem;
-  }
-  
-  .week-day-number.today {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
-  }
-}
