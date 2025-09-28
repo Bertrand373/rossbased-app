@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - ENHANCED: Card-based monthly view matching weekly design */
+/* components/Calendar/CalendarBase.css - UPDATED: Fixed animation and alignment issues */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -306,6 +306,11 @@
   color: var(--text-secondary);
 }
 
+/* Remove old dot styles - no longer needed */
+.compact-legend-dot {
+  display: none;
+}
+
 /* Modal close button - matching Tracker modals exactly */
 .modal-close-x {
   position: absolute;
@@ -334,341 +339,243 @@
   transform: translateY(-1px) !important;
 }
 
-/* ENHANCED: Calendar display container for card layout */
+/* Calendar display */
 .calendar-display {
-  background-color: transparent; /* Remove background to let cards breathe */
-  border-radius: 0;
-  overflow: visible; /* Allow card shadows to show */
-  border: none;
-  padding: var(--spacing-lg);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
 }
 
-/* ENHANCED: Calendar grid with card spacing */
-.calendar-grid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
+/* Month view styling */
 .calendar-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: var(--spacing-md); /* Add spacing between day cards */
 }
 
-/* ENHANCED: Header row with card styling */
 .header-row {
-  background-color: transparent;
+  background-color: var(--light-gray);
   font-weight: 600;
-  border-bottom: none;
-  margin-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border);
 }
 
 .day-header {
-  padding: var(--spacing-sm);
+  padding: var(--spacing-md);
   text-align: center;
   color: var(--text);
   font-size: 0.875rem;
   font-weight: 600;
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* COMPLETELY REDESIGNED: Day cells as premium cards */
+/* SLEEK UPDATE 1: Added subtle drop shadow to day cells */
 .day-cell {
   position: relative;
-  min-height: 120px; /* Increased from 80px for card design */
+  height: 80px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.3s ease; /* Smoother transitions like weekly view */
+  transition: all 0.2s ease; /* SLEEK UPDATE 3: Smoother transition for hover */
   background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg); /* Rounded corners like weekly cards */
-  padding: var(--spacing-md); /* Better padding for card design */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Enhanced shadow matching weekly */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden; /* For gradient overlays */
+  padding: var(--spacing-sm);
+  /* SLEEK UPDATE 1: Subtle drop shadow for depth */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* ENHANCED: Card hover effects matching weekly view */
+/* SLEEK UPDATE 3: Refined hover effect without layout shift */
 .day-cell:hover {
-  transform: translateY(-2px); /* Subtle lift effect like weekly cards */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  border-color: rgba(255, 221, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
-/* ENHANCED: Background gradients matching weekly view */
-.day-cell.current-streak-day {
-  background: linear-gradient(135deg, 
-    rgba(34, 197, 94, 0.15) 0%, 
-    rgba(34, 197, 94, 0.05) 100%);
-  border-left: 4px solid var(--success);
+.day-cell:last-child {
+  border-right: none;
 }
 
-.day-cell.former-streak-day {
-  background: linear-gradient(135deg, 
-    rgba(59, 130, 246, 0.15) 0%, 
-    rgba(59, 130, 246, 0.05) 100%);
-  border-left: 4px solid #3b82f6;
+.calendar-row:last-child .day-cell {
+  border-bottom: none;
 }
 
-.day-cell.relapse-day {
-  background: linear-gradient(135deg, 
-    rgba(239, 68, 68, 0.15) 0%, 
-    rgba(239, 68, 68, 0.05) 100%);
-  border-left: 4px solid var(--danger);
+.day-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
 }
 
-.day-cell.wet-dream-day {
-  background: linear-gradient(135deg, 
-    rgba(245, 158, 11, 0.15) 0%, 
-    rgba(245, 158, 11, 0.05) 100%);
-  border-left: 4px solid var(--warning);
+/* Journal indicator in upper right corner */
+.day-journal-indicator-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.875rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
 }
 
-/* ENHANCED: Other month styling */
+.journal-icon-top {
+  color: var(--text-secondary);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.day-number {
+  font-weight: 600; /* SLEEK UPDATE: Bolder day numbers for better hierarchy */
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
 .other-month {
-  opacity: 0.6;
-  background: linear-gradient(135deg, 
-    rgba(128, 128, 128, 0.08) 0%, 
-    rgba(128, 128, 128, 0.03) 100%);
+  color: var(--text-secondary);
+  background-color: var(--light-gray);
 }
 
 .other-month .day-number {
   color: var(--text-secondary);
 }
 
+/* SLEEK UPDATE 2: Enhanced today's date with subtle scaling pulse animation */
+.today .day-number {
+  display: inline-block;
+  background-color: var(--primary);
+  color: #000;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  /* SLEEK UPDATE 2: Refined pulse animation - the circle itself scales subtly */
+  animation: today-scale-pulse 2.5s ease-in-out infinite;
+}
+
+/* SLEEK UPDATE 2: Refined scaling pulse animation for today's date */
+@keyframes today-scale-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
 .selected {
   border: 2px solid var(--primary) !important;
 }
 
-/* ENHANCED: Day content layout with better hierarchy */
-.day-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  position: relative;
-  margin-bottom: var(--spacing-sm);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+/* Calendar day background colors */
+.current-streak-day {
+  background-color: rgba(34, 197, 94, 0.2) !important;
+  border-left: 4px solid var(--success) !important;
 }
 
-/* ENHANCED: Day number styling with today indicator */
-.day-number {
-  font-weight: 700; /* Bolder for card design */
-  color: var(--text);
-  font-size: 1rem; /* Larger for card layout */
+.former-streak-day {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+  border-left: 4px solid #3b82f6 !important;
 }
 
-/* ENHANCED: Today's date with glow effect like weekly view */
-.today .day-number {
-  background: linear-gradient(135deg, var(--primary) 0%, #e6c200 100%);
-  color: #000;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 700;
-  animation: today-glow-pulse 3s ease-in-out infinite;
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.4);
+.relapse-day {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  border-left: 4px solid var(--danger) !important;
 }
 
-@keyframes today-glow-pulse {
-  0%, 100% {
-    box-shadow: 0 4px 12px rgba(255, 221, 0, 0.4);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 6px 20px rgba(255, 221, 0, 0.6);
-    transform: scale(1.05);
-  }
+.wet-dream-day {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  border-left: 4px solid var(--warning) !important;
 }
 
-/* ENHANCED: Journal indicator repositioned for card layout */
-.day-journal-indicator-top {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  font-size: 0.875rem;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 50%;
-  transition: all 0.2s ease;
-}
-
-.day-journal-indicator-top:hover {
-  background: rgba(255, 221, 0, 0.1);
-  color: var(--primary);
-  transform: scale(1.1);
-}
-
-.journal-icon-top {
-  color: var(--text-secondary);
-}
-
-/* ENHANCED: Day count display in card layout */
-.day-count-display {
-  position: absolute;
-  top: var(--spacing-sm);
-  left: var(--spacing-sm);
-  background: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  border-radius: var(--radius-full);
-  padding: 2px 6px;
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--primary);
-}
-
-/* NEW: Benefits preview section for monthly cards */
-.day-benefits-preview {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  margin: var(--spacing-xs) 0;
-  flex: 1;
-}
-
-.monthly-benefit-mini {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  opacity: 0.8;
-}
-
-.monthly-benefit-label {
-  font-size: 0.7rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-  min-width: 40px;
-  flex-shrink: 0;
-}
-
-.monthly-benefit-bar {
-  height: 3px;
-  background: rgba(255, 221, 0, 0.15);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  flex: 1;
-}
-
-.monthly-benefit-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary) 0%, #e6c200 100%);
-  border-radius: var(--radius-full);
-  transition: width 0.4s ease;
-}
-
-.monthly-benefit-value {
-  font-size: 0.65rem;
-  color: var(--text);
-  font-weight: 600;
-  min-width: 16px;
-  text-align: center;
-}
-
-/* ENHANCED: Empty state styling for days without content */
-.day-cell.empty-day {
-  background: linear-gradient(135deg, 
-    rgba(128, 128, 128, 0.05) 0%, 
-    rgba(128, 128, 128, 0.02) 100%);
-}
-
-.empty-day-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-  font-style: italic;
-  opacity: 0.6;
-}
-
-/* ENHANCED: Card footer with clean icon layout matching weekly */
-.day-card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  padding-top: var(--spacing-xs);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.monthly-secondary-icons {
-  display: flex;
-  gap: var(--spacing-xs);
-  align-items: center;
-}
-
-.monthly-secondary-icon {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 50%;
-  font-size: 0.7rem;
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
-}
-
-.monthly-secondary-icon:hover {
-  background: rgba(255, 221, 0, 0.1);
-  color: var(--primary);
-  transform: scale(1.1);
-}
-
-/* ENHANCED: Status indicators repositioned for card layout */
+/* FIXED: Day indicators positioning with CORRECT icon ordering */
 .day-indicators {
+  position: absolute;
+  bottom: var(--spacing-xs);
+  right: var(--spacing-xs);
   display: flex;
-  gap: var(--spacing-xs);
   align-items: center;
+  gap: 3px;
+  min-height: 16px;
+  pointer-events: none;
 }
 
-.monthly-status-icon {
-  width: 24px;
-  height: 24px;
+.day-status-indicator, .day-tracking-indicator, .day-trigger-indicator, .day-wet-dream-indicator {
+  font-size: 0.875rem;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  font-size: 0.875rem;
-  font-weight: 600;
+  flex-shrink: 0;
+  pointer-events: auto;
 }
 
-.monthly-status-icon.success {
-  background: rgba(34, 197, 94, 0.15);
+/* CORRECTED: Icon order from left to right - Info "i", wet dream/triggers, status check/X */
+.day-tracking-indicator {
+  order: 1; /* Info "i" icon - leftmost, lowest priority */
+}
+
+.day-wet-dream-indicator {
+  order: 2; /* Wet dream moon - middle priority */
+}
+
+.day-trigger-indicator {
+  order: 3; /* Trigger icons - middle priority */
+}
+
+.day-status-indicator {
+  order: 4; /* Check marks/relapse X - rightmost, highest priority */
+}
+
+.success-icon {
   color: var(--success);
+  font-size: 0.875rem; /* FIXED: Explicit size for consistency */
 }
 
-.monthly-status-icon.former-success {
-  background: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
+/* FIXED: Check mark colors for wet dream + streak combinations */
+/* Current streak wet dreams should stay GREEN */
+.current-streak-day.wet-dream-day .success-icon {
+  color: var(--success) !important;
 }
 
-.monthly-status-icon.relapse {
-  background: rgba(239, 68, 68, 0.15);
+/* Former streak wet dreams should be BLUE */
+.former-streak-day.wet-dream-day .success-icon {
+  color: #3b82f6 !important;
+}
+
+/* Fallback for any other former streak days */
+.former-streak-day .success-icon {
+  color: #3b82f6 !important;
+}
+
+/* Ensure current streak days without wet dreams stay green */
+.current-streak-day .success-icon {
+  color: var(--success) !important;
+}
+
+.relapse-icon {
   color: var(--danger);
+  font-size: 0.875rem; /* FIXED: Match check mark size */
 }
 
-.monthly-status-icon.wet-dream {
-  background: rgba(245, 158, 11, 0.15);
+/* FIXED: Wet dream icon sizing - now matches check marks exactly */
+.wet-dream-icon {
   color: var(--warning);
+  font-size: 0.875rem; /* FIXED: Same as success-icon and relapse-icon */
 }
 
-/* LEGACY: Week view styling - UNCHANGED */
+.tracking-icon {
+  color: var(--primary);
+  font-size: 0.875rem; /* FIXED: Consistent sizing */
+}
+
+.trigger-icon {
+  color: var(--text-secondary);
+  font-size: 0.75rem; /* Slightly smaller for triggers */
+}
+
+/* NEW: Option 1 - Card-Based Week View Styling */
 .week-view-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -676,6 +583,7 @@
   padding: var(--spacing-lg);
 }
 
+/* REDESIGNED: Week day cell as premium card */
 .week-day-cell {
   background-color: var(--card-background);
   border: 1px solid var(--border);
@@ -691,12 +599,14 @@
   overflow: hidden;
 }
 
+/* Enhanced hover effect */
 .week-day-cell:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   border-color: rgba(255, 221, 0, 0.3);
 }
 
+/* Background colors with subtle gradient overlay */
 .week-day-cell.current-streak-day {
   background: linear-gradient(135deg, 
     rgba(34, 197, 94, 0.15) 0%, 
@@ -725,6 +635,7 @@
   border-left: 4px solid var(--warning);
 }
 
+/* REDESIGNED: Header section with better typography hierarchy */
 .week-day-header {
   display: flex;
   justify-content: space-between;
@@ -748,6 +659,7 @@
   color: var(--text);
 }
 
+/* Enhanced today indicator */
 .week-day-number.today {
   background: linear-gradient(135deg, var(--primary) 0%, #e6c200 100%);
   color: #000;
@@ -763,6 +675,18 @@
   box-shadow: 0 4px 12px rgba(255, 221, 0, 0.4);
 }
 
+@keyframes today-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(255, 221, 0, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 6px 20px rgba(255, 221, 0, 0.6);
+    transform: scale(1.05);
+  }
+}
+
+/* REDESIGNED: Benefits section as primary content */
 .week-benefits-prominent {
   flex: 1;
   display: flex;
@@ -771,10 +695,11 @@
   margin: var(--spacing-md) 0;
 }
 
+/* COMPLETELY RESTRUCTURED: Week benefit layout for consistent widths */
 .week-benefit-row {
   display: grid;
-  grid-template-columns: 60px 1fr 24px;
-  grid-template-rows: auto auto;
+  grid-template-columns: 60px 1fr 24px; /* Fixed label, flexible bar, fixed value */
+  grid-template-rows: auto auto; /* Two rows: label row, bar+value row */
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) 0;
 }
@@ -783,7 +708,7 @@
   font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 500;
-  grid-column: 1 / span 3;
+  grid-column: 1 / span 3; /* Span across all columns */
   grid-row: 1;
   margin-bottom: 2px;
 }
@@ -793,7 +718,7 @@
   background: rgba(255, 221, 0, 0.15);
   border-radius: var(--radius-full);
   overflow: hidden;
-  grid-column: 1 / span 2;
+  grid-column: 1 / span 2; /* Span label and bar columns */
   grid-row: 2;
   align-self: center;
 }
@@ -812,9 +737,10 @@
   text-align: center;
   grid-column: 3;
   grid-row: 2;
-  align-self: center;
+  align-self: center; /* Aligns with progress bar, not centered between label and bar */
 }
 
+/* REDESIGNED: Footer with clean icon layout */
 .week-day-footer {
   display: flex;
   justify-content: space-between;
@@ -857,6 +783,7 @@
   color: var(--text-secondary);
 }
 
+/* Primary status indicators */
 .week-primary-status {
   display: flex;
   gap: var(--spacing-xs);
@@ -894,6 +821,7 @@
   color: var(--warning);
 }
 
+/* Empty state for days without benefits */
 .week-empty-benefits {
   flex: 1;
   display: flex;
@@ -1015,60 +943,56 @@
     font-size: 0.8125rem;
   }
   
-  .calendar-display {
-    padding: var(--spacing-md);
-  }
-  
-  .calendar-row {
-    gap: var(--spacing-sm);
+  .day-header {
+    padding: var(--spacing-sm);
+    font-size: 0.75rem;
+    line-height: 1;
   }
   
   .day-cell {
-    min-height: 100px;
-    padding: var(--spacing-sm);
+    height: 60px;
+    padding: var(--spacing-xs);
+    transform: scale(1);
+  }
+  
+  .day-cell:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   }
   
   .day-number {
-    font-size: 0.875rem;
-  }
-  
-  .today .day-number {
-    width: 28px;
-    height: 28px;
     font-size: 0.75rem;
   }
   
   .day-journal-indicator-top {
-    top: var(--spacing-xs);
-    right: var(--spacing-xs);
-    width: 20px;
-    height: 20px;
     font-size: 0.75rem;
   }
   
-  .monthly-benefit-mini {
+  .today .day-number {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 0.65rem;
+    animation: today-scale-pulse 2.5s ease-in-out infinite;
+  }
+  
+  .day-indicators {
+    bottom: 2px;
+    right: 2px;
     gap: 2px;
+    min-height: 14px;
   }
   
-  .monthly-benefit-label {
-    font-size: 0.6rem;
-    min-width: 32px;
+  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator, .day-wet-dream-indicator {
+    font-size: 0.75rem !important;
   }
   
-  .monthly-benefit-bar {
-    height: 2px;
+  .success-icon, .relapse-icon, .wet-dream-icon, .tracking-icon {
+    font-size: 0.75rem !important;
   }
   
-  .monthly-benefit-value {
-    font-size: 0.6rem;
-    min-width: 14px;
-  }
-  
-  .monthly-secondary-icon,
-  .monthly-status-icon {
-    width: 18px;
-    height: 18px;
-    font-size: 0.7rem;
+  .trigger-icon {
+    font-size: 0.65rem !important;
   }
   
   .week-view-grid {
@@ -1093,7 +1017,7 @@
   }
   
   .week-benefit-row {
-    grid-template-columns: 50px 1fr 20px;
+    grid-template-columns: 50px 1fr 20px; /* Smaller on mobile */
     gap: var(--spacing-xs);
   }
   
@@ -1187,47 +1111,57 @@
     padding: var(--spacing-sm);
   }
   
-  .calendar-display {
-    padding: var(--spacing-sm);
-  }
-  
-  .calendar-row {
-    gap: 3px;
+  .day-header {
+    padding: 4px 2px;
+    font-size: 0.65rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   
   .day-cell {
-    min-height: 80px;
-    padding: var(--spacing-xs);
+    height: 50px;
+    padding: 2px;
   }
   
-  .day-content {
-    margin-bottom: var(--spacing-xs);
-    padding-bottom: var(--spacing-xs);
+  .day-cell:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   }
   
   .day-number {
-    font-size: 0.75rem;
-  }
-  
-  .today .day-number {
-    width: 24px;
-    height: 24px;
     font-size: 0.7rem;
   }
   
-  .day-benefits-preview {
-    display: none;
+  .day-journal-indicator-top {
+    font-size: 0.7rem;
   }
   
-  .monthly-secondary-icon,
-  .monthly-status-icon {
-    width: 16px;
-    height: 16px;
-    font-size: 0.65rem;
+  .today .day-number {
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    font-size: 0.6rem;
+    animation: today-scale-pulse 2.5s ease-in-out infinite;
   }
   
-  .day-card-footer {
-    padding-top: 2px;
+  .day-indicators {
+    bottom: 1px;
+    right: 1px;
+    gap: 1px;
+    min-height: 12px;
+  }
+  
+  .day-status-indicator, .day-tracking-indicator, .day-trigger-indicator, .day-wet-dream-indicator {
+    font-size: 0.7rem !important;
+  }
+  
+  .success-icon, .relapse-icon, .wet-dream-icon, .tracking-icon {
+    font-size: 0.7rem !important;
+  }
+  
+  .trigger-icon {
+    font-size: 0.6rem !important;
   }
   
   .week-view-grid {
@@ -1244,7 +1178,7 @@
   }
   
   .week-benefit-row {
-    grid-template-columns: 45px 1fr 18px;
+    grid-template-columns: 45px 1fr 18px; /* Even smaller on very small screens */
     padding: 2px 0;
   }
   
