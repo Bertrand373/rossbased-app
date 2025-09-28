@@ -695,33 +695,28 @@
   margin: var(--spacing-md) 0;
 }
 
+/* COMPLETELY RESTRUCTURED: Week benefit layout for consistent widths */
 .week-benefit-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 60px 1fr 24px; /* Fixed label, flexible bar, fixed value */
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   padding: var(--spacing-xs) 0;
-}
-
-.week-benefit-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  width: 120px; /* FIXED: Set consistent width instead of flex: 1 */
 }
 
 .week-benefit-label {
   font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 500;
+  grid-column: 1;
 }
 
-/* FIXED: Removed unnecessary loading animation */
 .week-benefit-bar {
   height: 6px;
   background: rgba(255, 221, 0, 0.15);
   border-radius: var(--radius-full);
   overflow: hidden;
-  width: 100%; /* FIXED: Ensure full width of container */
+  grid-column: 2;
 }
 
 .week-benefit-fill {
@@ -731,14 +726,12 @@
   transition: width 0.4s ease;
 }
 
-/* FIXED: Proper value alignment and positioning */
 .week-benefit-value {
   font-size: 0.7rem;
   color: var(--text);
   font-weight: 600;
-  width: 24px; /* FIXED: Set consistent width instead of min-width */
-  text-align: center; /* FIXED: Center text within fixed width */
-  flex-shrink: 0; /* FIXED: Prevent shrinking */
+  text-align: center;
+  grid-column: 3;
 }
 
 /* REDESIGNED: Footer with clean icon layout */
@@ -1018,11 +1011,8 @@
   }
   
   .week-benefit-row {
+    grid-template-columns: 50px 1fr 20px; /* Smaller on mobile */
     gap: var(--spacing-xs);
-  }
-  
-  .week-benefit-content {
-    width: 100px; /* MOBILE: Smaller consistent width */
   }
   
   .week-benefit-label {
@@ -1031,7 +1021,6 @@
   
   .week-benefit-value {
     font-size: 0.65rem;
-    width: 20px; /* MOBILE: Smaller consistent width */
   }
 }
 
@@ -1183,6 +1172,7 @@
   }
   
   .week-benefit-row {
+    grid-template-columns: 45px 1fr 18px; /* Even smaller on very small screens */
     padding: 2px 0;
   }
   
