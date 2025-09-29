@@ -666,40 +666,35 @@
   }
 }
 
-/* UPDATED: MAXIMUM WIDTH benefits section */
+/* UPDATED: Benefits section with labels above bars for consistent width */
 .week-benefits-prominent {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   margin: var(--spacing-sm) 0;
 }
 
-/* UPDATED: Full-width benefit layout */
-.week-benefit-row {
+/* NEW: Benefit item with stacked label and bar */
+.week-benefit-item {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 4px;
   width: 100%;
 }
 
-/* NEW: Full width content wrapper */
-.week-benefit-content-full {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  width: 100%;
-}
-
-/* UPDATED: Minimal label width for maximum bar space */
-.week-benefit-label {
-  font-size: 0.7rem;
+/* NEW: Label positioned above bar */
+.week-benefit-label-top {
+  font-size: 0.65rem;
   color: var(--text-secondary);
   font-weight: 500;
-  min-width: 45px;
-  flex-shrink: 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  opacity: 0.9;
 }
 
-/* UPDATED: Maximum width bar */
+/* UPDATED: Full width bar without side label */
 .week-benefit-bar {
   flex: 1;
   height: 6px;
@@ -716,7 +711,19 @@
   transition: width 0.4s ease;
 }
 
-/* Value display - hidden */
+/* REMOVED: Old side-by-side layout classes */
+.week-benefit-row {
+  display: none;
+}
+
+.week-benefit-content-full {
+  display: none;
+}
+
+.week-benefit-label {
+  display: none;
+}
+
 .week-benefit-value {
   display: none;
 }
