@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarModalContent.css - CLEANUP: Day count integration and removed journey section */
+/* components/Calendar/CalendarModalContent.css - UPDATED: Circular value badges and enhanced benefit display */
 
 /* UPDATED: Edit day modal with emotional timeline modal structure */
 .edit-day-modal {
@@ -178,6 +178,18 @@
 .day-info-modal {
   width: 90%;
   max-width: 600px;
+  animation: modal-benefits-appear 0.4s ease-out;
+}
+
+@keyframes modal-benefits-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .day-info-modal h3 {
@@ -362,7 +374,7 @@
   text-align: center;
 }
 
-/* Enhanced yellow sliders for ALL 6 benefits */
+/* UPDATED: Enhanced benefits section with circular badges and animations */
 .benefits-details-enhanced {
   background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
@@ -370,52 +382,155 @@
   padding: var(--spacing-xl);
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* UPDATED: Each benefit item with subtle background */
+.benefit-slider-item {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s ease;
+  animation: benefit-fade-in 0.5s ease-out;
+}
+
+.benefit-slider-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Animation for staggered fade-in effect */
+@keyframes benefit-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger the animations */
+.benefit-slider-item:nth-child(1) { animation-delay: 0.05s; }
+.benefit-slider-item:nth-child(2) { animation-delay: 0.1s; }
+.benefit-slider-item:nth-child(3) { animation-delay: 0.15s; }
+.benefit-slider-item:nth-child(4) { animation-delay: 0.2s; }
+.benefit-slider-item:nth-child(5) { animation-delay: 0.25s; }
+.benefit-slider-item:nth-child(6) { animation-delay: 0.3s; }
+
+/* UPDATED: New row layout with circular badge */
+.benefit-slider-row {
+  display: flex;
+  align-items: center;
   gap: var(--spacing-md);
 }
 
-.benefit-slider-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.benefit-slider-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
+/* UPDATED: Label styling */
 .benefit-label {
   font-weight: 500;
   color: var(--text);
-  flex: 1;
+  min-width: 100px;
   text-align: left;
 }
 
-.benefit-value {
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
-}
-
-/* Enhanced benefit meter - EXACTLY like the tracker sliders */
+/* UPDATED: Enhanced benefit meter - taller and animated */
 .benefit-meter-enhanced {
-  width: 100%;
-  height: 8px;
+  flex: 1;
+  height: 10px;
   border-radius: var(--radius-full);
   background: rgba(255, 221, 0, 0.2);
   outline: none;
   overflow: hidden;
+  position: relative;
 }
 
 .benefit-level-enhanced {
   height: 100%;
-  background: #ffdd00;
+  background: linear-gradient(90deg, #ffdd00 0%, #e6c200 100%);
   border-radius: var(--radius-full);
-  transition: width 0.2s ease;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: benefit-bar-grow 0.8s ease-out;
+  position: relative;
 }
 
-/* OLD benefit styling - keep for backwards compatibility */
+/* Shimmer effect on the bars */
+.benefit-level-enhanced::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 2s infinite;
+  animation-delay: 1s;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes benefit-bar-grow {
+  from {
+    width: 0 !important;
+  }
+}
+
+/* NEW: Circular value badge matching tracker style */
+.benefit-value-circle {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  background-color: rgba(255, 221, 0, 0.15);
+  border: 1.5px solid var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  animation: circle-pop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.benefit-value-circle:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 221, 0, 0.25);
+}
+
+@keyframes circle-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Remove old header and value styles */
+.benefit-slider-header {
+  display: none;
+}
+
+.benefit-value {
+  display: none;
+}
+
+/* OLD benefit styling - keep for backwards compatibility but hidden */
 .benefits-details {
   background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
@@ -811,29 +926,34 @@
     font-size: 0.875rem;
   }
   
+  /* UPDATED: Mobile benefits with circular badges */
   .benefits-details-enhanced {
     padding: var(--spacing-md);
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
   }
   
   .benefit-slider-item {
-    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
   
-  .benefit-slider-header {
-    margin-bottom: var(--spacing-xs);
+  .benefit-slider-row {
+    gap: var(--spacing-sm);
   }
   
   .benefit-label {
     font-size: 0.875rem;
-  }
-  
-  .benefit-value {
-    font-size: 0.8rem;
+    min-width: 75px;
   }
   
   .benefit-meter-enhanced {
-    height: 6px;
+    height: 8px;
+  }
+  
+  .benefit-value-circle {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    font-size: 0.7rem;
   }
   
   /* Mobile pulsing helmet banner */
@@ -953,20 +1073,35 @@
     justify-content: center;
   }
   
+  /* UPDATED: Very small mobile benefits */
   .benefits-details-enhanced {
     padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+  
+  .benefit-slider-item {
+    padding: 6px var(--spacing-xs);
+  }
+  
+  .benefit-slider-row {
+    gap: var(--spacing-xs);
   }
   
   .benefit-label {
     font-size: 0.8rem;
-  }
-  
-  .benefit-value {
-    font-size: 0.75rem;
+    min-width: 65px;
   }
   
   .benefit-meter-enhanced {
-    height: 5px;
+    height: 7px;
+  }
+  
+  .benefit-value-circle {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    font-size: 0.65rem;
+    border-width: 1px;
   }
   
   .day-info-modal h3 {

@@ -1001,80 +1001,80 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     <h4>Benefits Tracked</h4>
                     <div className="benefits-details-enhanced">
                       <div className="benefit-slider-item">
-                        <div className="benefit-slider-header">
+                        <div className="benefit-slider-row">
                           <span className="benefit-label">Energy</span>
-                          <span className="benefit-value">{dayBenefits.energy}/10</span>
-                        </div>
-                        <div className="benefit-meter-enhanced">
-                          <div 
-                            className="benefit-level-enhanced" 
-                            style={{ width: `${dayBenefits.energy * 10}%` }}
-                          ></div>
+                          <div className="benefit-meter-enhanced">
+                            <div 
+                              className="benefit-level-enhanced" 
+                              style={{ width: `${dayBenefits.energy * 10}%` }}
+                            ></div>
+                          </div>
+                          <div className="benefit-value-circle">{dayBenefits.energy}</div>
                         </div>
                       </div>
                       
                       <div className="benefit-slider-item">
-                        <div className="benefit-slider-header">
+                        <div className="benefit-slider-row">
                           <span className="benefit-label">Focus</span>
-                          <span className="benefit-value">{dayBenefits.focus}/10</span>
-                        </div>
-                        <div className="benefit-meter-enhanced">
-                          <div 
-                            className="benefit-level-enhanced" 
-                            style={{ width: `${dayBenefits.focus * 10}%` }}
-                          ></div>
+                          <div className="benefit-meter-enhanced">
+                            <div 
+                              className="benefit-level-enhanced" 
+                              style={{ width: `${dayBenefits.focus * 10}%` }}
+                            ></div>
+                          </div>
+                          <div className="benefit-value-circle">{dayBenefits.focus}</div>
                         </div>
                       </div>
                       
                       <div className="benefit-slider-item">
-                        <div className="benefit-slider-header">
+                        <div className="benefit-slider-row">
                           <span className="benefit-label">Confidence</span>
-                          <span className="benefit-value">{dayBenefits.confidence}/10</span>
-                        </div>
-                        <div className="benefit-meter-enhanced">
-                          <div 
-                            className="benefit-level-enhanced" 
-                            style={{ width: `${dayBenefits.confidence * 10}%` }}
-                          ></div>
+                          <div className="benefit-meter-enhanced">
+                            <div 
+                              className="benefit-level-enhanced" 
+                              style={{ width: `${dayBenefits.confidence * 10}%` }}
+                            ></div>
+                          </div>
+                          <div className="benefit-value-circle">{dayBenefits.confidence}</div>
                         </div>
                       </div>
                       
                       <div className="benefit-slider-item">
-                        <div className="benefit-slider-header">
+                        <div className="benefit-slider-row">
                           <span className="benefit-label">Aura</span>
-                          <span className="benefit-value">{dayBenefits.aura || 5}/10</span>
-                        </div>
-                        <div className="benefit-meter-enhanced">
-                          <div 
-                            className="benefit-level-enhanced" 
-                            style={{ width: `${(dayBenefits.aura || 5) * 10}%` }}
-                          ></div>
+                          <div className="benefit-meter-enhanced">
+                            <div 
+                              className="benefit-level-enhanced" 
+                              style={{ width: `${(dayBenefits.aura || 5) * 10}%` }}
+                            ></div>
+                          </div>
+                          <div className="benefit-value-circle">{dayBenefits.aura || 5}</div>
                         </div>
                       </div>
                       
                       <div className="benefit-slider-item">
-                        <div className="benefit-slider-header">
+                        <div className="benefit-slider-row">
                           <span className="benefit-label">Sleep Quality</span>
-                          <span className="benefit-value">{dayBenefits.sleep || dayBenefits.attraction || 5}/10</span>
-                        </div>
-                        <div className="benefit-meter-enhanced">
-                          <div 
-                            className="benefit-level-enhanced" 
-                            style={{ width: `${(dayBenefits.sleep || dayBenefits.attraction || 5) * 10}%` }}
-                          ></div>
+                          <div className="benefit-meter-enhanced">
+                            <div 
+                              className="benefit-level-enhanced" 
+                              style={{ width: `${(dayBenefits.sleep || dayBenefits.attraction || 5) * 10}%` }}
+                            ></div>
+                          </div>
+                          <div className="benefit-value-circle">{dayBenefits.sleep || dayBenefits.attraction || 5}</div>
                         </div>
                       </div>
                       
                       <div className="benefit-slider-item">
-                        <div className="benefit-slider-header">
+                        <div className="benefit-slider-row">
                           <span className="benefit-label">Workout</span>
-                          <span className="benefit-value">{dayBenefits.workout || dayBenefits.gymPerformance || 5}/10</span>
-                        </div>
-                        <div className="benefit-meter-enhanced">
-                          <div 
-                            className="benefit-level-enhanced" 
-                            style={{ width: `${(dayBenefits.workout || dayBenefits.gymPerformance || 5) * 10}%` }}
-                          ></div>
+                          <div className="benefit-meter-enhanced">
+                            <div 
+                              className="benefit-level-enhanced" 
+                              style={{ width: `${(dayBenefits.workout || dayBenefits.gymPerformance || 5) * 10}%` }}
+                            ></div>
+                          </div>
+                          <div className="benefit-value-circle">{dayBenefits.workout || dayBenefits.gymPerformance || 5}</div>
                         </div>
                       </div>
                     </div>
