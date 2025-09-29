@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - REFINED: Cleaned up weekly view with inline values */
+/* components/Calendar/CalendarBase.css - REFINED: Cleaned up weekly view with inline values removed */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -51,7 +51,7 @@
   align-items: center;
 }
 
-/* FIXED: Profile-style Navigation Pills with proper height and width */
+/* Profile-style Navigation Pills */
 .calendar-navigation-pills {
   display: flex;
   padding: var(--spacing-xs);
@@ -76,7 +76,7 @@
   display: none;
 }
 
-/* UPDATED: Enhanced sliding background indicator - YELLOW background like main nav */
+/* Enhanced sliding background indicator - YELLOW background */
 .calendar-nav-slider {
   position: absolute;
   top: var(--spacing-xs);
@@ -101,7 +101,7 @@
   }
 }
 
-/* FIXED: Navigation buttons matching Profile tab style exactly */
+/* Navigation buttons matching Profile tab style */
 .calendar-nav-btn {
   display: flex;
   align-items: center;
@@ -129,21 +129,13 @@
   touch-action: manipulation;
 }
 
-/* UPDATED: Active navigation button styling - BLACK text to contrast with yellow background */
+/* Active navigation button - BLACK text to contrast with yellow background */
 .calendar-nav-btn.active {
   color: #000000 !important;
   font-weight: 600 !important;
   background-color: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
-}
-
-/* Mobile: Ensure active state is always visible */
-@media (max-width: 768px) {
-  .calendar-nav-btn.active {
-    font-weight: 600;
-    color: #000000 !important;
-  }
 }
 
 .calendar-nav-btn svg {
@@ -156,7 +148,7 @@
   font-weight: 500;
 }
 
-/* FIXED: Period navigation integrated into main section */
+/* Period navigation */
 .calendar-period-navigation {
   display: flex;
   align-items: center;
@@ -180,7 +172,7 @@
   opacity: 0.9;
 }
 
-/* FIXED: Navigation arrow buttons with Font Awesome icons */
+/* Navigation arrow buttons */
 .period-nav-btn {
   display: flex;
   align-items: center;
@@ -227,7 +219,7 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: PILL-SHAPED legend container matching navigation pills */
+/* PILL-SHAPED legend container */
 .calendar-legend-compact {
   display: flex;
   justify-content: center;
@@ -265,14 +257,13 @@
   flex-shrink: 0;
 }
 
-/* UPDATED: Pill-shaped hover animation */
 .compact-legend-item:hover {
   background-color: rgba(255, 255, 255, 0.08);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* UPDATED: Using actual icons instead of dots */
+/* Using actual icons instead of dots */
 .compact-legend-icon {
   font-size: 0.875rem;
   display: flex;
@@ -306,12 +297,12 @@
   color: var(--text-secondary);
 }
 
-/* Remove old dot styles - no longer needed */
+/* Remove old dot styles */
 .compact-legend-dot {
   display: none;
 }
 
-/* Modal close button - matching Tracker modals exactly */
+/* Modal close button */
 .modal-close-x {
   position: absolute;
   top: var(--spacing-md);
@@ -367,24 +358,22 @@
   font-weight: 600;
 }
 
-/* SLEEK UPDATE 1: Added subtle drop shadow to day cells */
+/* Day cells with subtle drop shadow */
 .day-cell {
   position: relative;
   height: 80px;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.2s ease; /* SLEEK UPDATE 3: Smoother transition for hover */
+  transition: all 0.2s ease;
   background-color: var(--card-background);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: var(--spacing-sm);
-  /* SLEEK UPDATE 1: Subtle drop shadow for depth */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* SLEEK UPDATE 3: Refined hover effect without layout shift */
 .day-cell:hover {
   background-color: rgba(255, 255, 255, 0.08);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
@@ -424,7 +413,7 @@
 }
 
 .day-number {
-  font-weight: 600; /* SLEEK UPDATE: Bolder day numbers for better hierarchy */
+  font-weight: 600;
   color: var(--text);
   font-size: 0.875rem;
 }
@@ -438,7 +427,7 @@
   color: var(--text-secondary);
 }
 
-/* SLEEK UPDATE 2: Enhanced today's date with subtle scaling pulse animation */
+/* Today's date with subtle scaling pulse animation */
 .today .day-number {
   display: inline-block;
   background-color: var(--primary);
@@ -450,11 +439,9 @@
   line-height: 24px;
   font-weight: 600;
   font-size: 0.75rem;
-  /* SLEEK UPDATE 2: Refined pulse animation - the circle itself scales subtly */
   animation: today-scale-pulse 2.5s ease-in-out infinite;
 }
 
-/* SLEEK UPDATE 2: Refined scaling pulse animation for today's date */
 @keyframes today-scale-pulse {
   0%, 100% {
     transform: scale(1);
@@ -489,7 +476,7 @@
   border-left: 4px solid var(--warning) !important;
 }
 
-/* FIXED: Day indicators positioning with CORRECT icon ordering */
+/* Day indicators positioning with correct icon ordering */
 .day-indicators {
   position: absolute;
   bottom: var(--spacing-xs);
@@ -511,68 +498,63 @@
   pointer-events: auto;
 }
 
-/* CORRECTED: Icon order from left to right - Info "i", wet dream/triggers, status check/X */
+/* Icon order from left to right */
 .day-tracking-indicator {
-  order: 1; /* Info "i" icon - leftmost, lowest priority */
+  order: 1;
 }
 
 .day-wet-dream-indicator {
-  order: 2; /* Wet dream moon - middle priority */
+  order: 2;
 }
 
 .day-trigger-indicator {
-  order: 3; /* Trigger icons - middle priority */
+  order: 3;
 }
 
 .day-status-indicator {
-  order: 4; /* Check marks/relapse X - rightmost, highest priority */
+  order: 4;
 }
 
 .success-icon {
   color: var(--success);
-  font-size: 0.875rem; /* FIXED: Explicit size for consistency */
+  font-size: 0.875rem;
 }
 
-/* FIXED: Check mark colors for wet dream + streak combinations */
-/* Current streak wet dreams should stay GREEN */
+/* Check mark colors for wet dream + streak combinations */
 .current-streak-day.wet-dream-day .success-icon {
   color: var(--success) !important;
 }
 
-/* Former streak wet dreams should be BLUE */
 .former-streak-day.wet-dream-day .success-icon {
   color: #3b82f6 !important;
 }
 
-/* Fallback for any other former streak days */
 .former-streak-day .success-icon {
   color: #3b82f6 !important;
 }
 
-/* Ensure current streak days without wet dreams stay green */
 .current-streak-day .success-icon {
   color: var(--success) !important;
 }
 
 .relapse-icon {
   color: var(--danger);
-  font-size: 0.875rem; /* FIXED: Match check mark size */
+  font-size: 0.875rem;
 }
 
-/* FIXED: Wet dream icon sizing - now matches check marks exactly */
 .wet-dream-icon {
   color: var(--warning);
-  font-size: 0.875rem; /* FIXED: Same as success-icon and relapse-icon */
+  font-size: 0.875rem;
 }
 
 .tracking-icon {
   color: var(--primary);
-  font-size: 0.875rem; /* FIXED: Consistent sizing */
+  font-size: 0.875rem;
 }
 
 .trigger-icon {
   color: var(--text-secondary);
-  font-size: 0.75rem; /* Slightly smaller for triggers */
+  font-size: 0.75rem;
 }
 
 /* REFINED: Week View with Clean, Professional Card Layout */
@@ -599,7 +581,6 @@
   overflow: hidden;
 }
 
-/* Enhanced hover effect */
 .week-day-cell:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -659,7 +640,6 @@
   color: var(--text);
 }
 
-/* Enhanced today indicator */
 .week-day-number.today {
   background: linear-gradient(135deg, var(--primary) 0%, #e6c200 100%);
   color: #000;
@@ -686,7 +666,7 @@
   }
 }
 
-/* REFINED: Compact benefits section with inline values */
+/* REFINED: Compact benefits section - visual bars only, no values */
 .week-benefits-prominent {
   flex: 1;
   display: flex;
@@ -695,7 +675,7 @@
   margin: var(--spacing-sm) 0;
 }
 
-/* REFINED: Single-row layout with inline value */
+/* REFINED: Simple two-column layout - label and bar side by side */
 .week-benefit-row {
   display: flex;
   align-items: center;
@@ -706,7 +686,7 @@
   font-size: 0.7rem;
   color: var(--text-secondary);
   font-weight: 500;
-  min-width: 55px;
+  min-width: 52px;
   flex-shrink: 0;
 }
 
@@ -725,13 +705,9 @@
   transition: width 0.4s ease;
 }
 
+/* Value display - hidden but kept for potential future use */
 .week-benefit-value {
-  font-size: 0.7rem;
-  color: var(--text);
-  font-weight: 600;
-  min-width: 20px;
-  text-align: right;
-  flex-shrink: 0;
+  display: none;
 }
 
 /* REFINED: Compact footer */
@@ -893,6 +869,11 @@
     font-size: 0.8rem;
   }
   
+  .calendar-nav-btn.active {
+    font-weight: 600;
+    color: #000000 !important;
+  }
+  
   .calendar-period-navigation {
     gap: var(--spacing-lg);
   }
@@ -990,7 +971,7 @@
     font-size: 0.65rem !important;
   }
   
-  /* REFINED: Mobile week view with full-width bars */
+  /* REFINED: Mobile week view with maximum bar width */
   .week-view-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
@@ -1014,24 +995,20 @@
   
   .week-benefits-prominent {
     gap: var(--spacing-xs);
+    margin: var(--spacing-sm) 0;
   }
   
   .week-benefit-row {
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
   }
   
   .week-benefit-label {
     font-size: 0.65rem;
-    min-width: 48px;
+    min-width: 45px;
   }
   
   .week-benefit-bar {
-    height: 6px;
-  }
-  
-  .week-benefit-value {
-    font-size: 0.65rem;
-    min-width: 18px;
+    height: 7px;
   }
 }
 
@@ -1169,7 +1146,7 @@
     font-size: 0.6rem !important;
   }
   
-  /* REFINED: Very small mobile week view */
+  /* REFINED: Very small mobile week view - maximum bar width */
   .week-view-grid {
     padding: var(--spacing-md);
   }
@@ -1181,24 +1158,20 @@
   
   .week-benefits-prominent {
     gap: 6px;
+    margin: var(--spacing-xs) 0;
   }
   
   .week-benefit-row {
-    gap: var(--spacing-xs);
+    gap: 6px;
   }
   
   .week-benefit-label {
     font-size: 0.6rem;
-    min-width: 42px;
+    min-width: 40px;
   }
   
   .week-benefit-bar {
-    height: 6px;
-  }
-  
-  .week-benefit-value {
-    font-size: 0.6rem;
-    min-width: 16px;
+    height: 7px;
   }
   
   .week-day-number {
