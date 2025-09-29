@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - REFINED: Cleaned up weekly view with inline values removed */
+/* components/Calendar/CalendarBase.css - UPDATED: Maximum width benefit bars and yellow info icon */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -557,7 +557,7 @@
   font-size: 0.75rem;
 }
 
-/* REFINED: Week View with Clean, Professional Card Layout */
+/* UPDATED: Week View with MAXIMUM width benefit bars */
 .week-view-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -666,7 +666,7 @@
   }
 }
 
-/* REFINED: Compact benefits section - visual bars only, no values */
+/* UPDATED: MAXIMUM WIDTH benefits section */
 .week-benefits-prominent {
   flex: 1;
   display: flex;
@@ -675,27 +675,38 @@
   margin: var(--spacing-sm) 0;
 }
 
-/* REFINED: Simple two-column layout - label and bar side by side */
+/* UPDATED: Full-width benefit layout */
 .week-benefit-row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  width: 100%;
 }
 
+/* NEW: Full width content wrapper */
+.week-benefit-content-full {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+/* UPDATED: Minimal label width for maximum bar space */
 .week-benefit-label {
   font-size: 0.7rem;
   color: var(--text-secondary);
   font-weight: 500;
-  min-width: 52px;
+  min-width: 45px;
   flex-shrink: 0;
 }
 
+/* UPDATED: Maximum width bar */
 .week-benefit-bar {
   flex: 1;
   height: 6px;
   background: rgba(255, 221, 0, 0.15);
   border-radius: var(--radius-full);
   overflow: hidden;
+  width: 100%;
 }
 
 .week-benefit-fill {
@@ -705,7 +716,7 @@
   transition: width 0.4s ease;
 }
 
-/* Value display - hidden but kept for potential future use */
+/* Value display - hidden */
 .week-benefit-value {
   display: none;
 }
@@ -743,6 +754,12 @@
   background: rgba(255, 221, 0, 0.1);
   color: var(--primary);
   transform: scale(1.1);
+}
+
+/* ADDED: Yellow info icon for benefits */
+.week-secondary-icon.has-benefits {
+  color: var(--primary);
+  background: rgba(255, 221, 0, 0.1);
 }
 
 .week-secondary-icon.has-journal {
@@ -971,7 +988,7 @@
     font-size: 0.65rem !important;
   }
   
-  /* REFINED: Mobile week view with maximum bar width */
+  /* UPDATED: Mobile week view with MAXIMUM width bars */
   .week-view-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
@@ -999,16 +1016,24 @@
   }
   
   .week-benefit-row {
+    width: 100%;
+  }
+  
+  .week-benefit-content-full {
+    width: 100%;
     gap: var(--spacing-xs);
   }
   
+  /* UPDATED: Even smaller label for more bar space on mobile */
   .week-benefit-label {
     font-size: 0.65rem;
-    min-width: 45px;
+    min-width: 38px;
   }
   
   .week-benefit-bar {
     height: 7px;
+    flex: 1;
+    width: 100%;
   }
 }
 
@@ -1146,7 +1171,7 @@
     font-size: 0.6rem !important;
   }
   
-  /* REFINED: Very small mobile week view - maximum bar width */
+  /* UPDATED: Very small mobile week view - MAXIMUM width bars */
   .week-view-grid {
     padding: var(--spacing-md);
   }
@@ -1162,16 +1187,24 @@
   }
   
   .week-benefit-row {
+    width: 100%;
+  }
+  
+  .week-benefit-content-full {
+    width: 100%;
     gap: 6px;
   }
   
+  /* UPDATED: Minimal label for maximum bar on small screens */
   .week-benefit-label {
     font-size: 0.6rem;
-    min-width: 40px;
+    min-width: 35px;
   }
   
   .week-benefit-bar {
     height: 7px;
+    flex: 1;
+    width: 100%;
   }
   
   .week-day-number {

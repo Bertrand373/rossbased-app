@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Option 1 Card-Based Weekly Layout
+// components/Calendar/Calendar.js - UPDATED: Wider benefit bars and info icon in weekly view
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -624,7 +624,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     );
   };
 
-  // NEW: Option 1 - Card-Based Week View with Premium Benefits Display
+  // UPDATED: Week View with wider benefit bars and info icon
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
     const days = [];
@@ -653,11 +653,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          {/* Premium Benefits Section */}
+          {/* UPDATED: Premium Benefits Section with wider bars */}
           {dayBenefits && isPremium ? (
             <div className="week-benefits-prominent">
               <div className="week-benefit-row">
-                <div className="week-benefit-content">
+                <div className="week-benefit-content-full">
                   <div className="week-benefit-label">Energy</div>
                   <div className="week-benefit-bar">
                     <div 
@@ -666,11 +666,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     ></div>
                   </div>
                 </div>
-                <div className="week-benefit-value">{dayBenefits.energy}</div>
               </div>
               
               <div className="week-benefit-row">
-                <div className="week-benefit-content">
+                <div className="week-benefit-content-full">
                   <div className="week-benefit-label">Focus</div>
                   <div className="week-benefit-bar">
                     <div 
@@ -679,11 +678,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     ></div>
                   </div>
                 </div>
-                <div className="week-benefit-value">{dayBenefits.focus}</div>
               </div>
               
               <div className="week-benefit-row">
-                <div className="week-benefit-content">
+                <div className="week-benefit-content-full">
                   <div className="week-benefit-label">Confidence</div>
                   <div className="week-benefit-bar">
                     <div 
@@ -692,7 +690,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     ></div>
                   </div>
                 </div>
-                <div className="week-benefit-value">{dayBenefits.confidence}</div>
               </div>
             </div>
           ) : (
@@ -701,9 +698,15 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </div>
           )}
           
-          {/* Clean Footer */}
+          {/* UPDATED: Footer with info icon for benefits */}
           <div className="week-day-footer">
             <div className="week-secondary-icons">
+              {/* ADDED: Yellow info icon when benefits are logged */}
+              {dayBenefits && (
+                <div className="week-secondary-icon has-benefits">
+                  <FaInfoCircle />
+                </div>
+              )}
               {dayTracking.hasJournal && (
                 <div className="week-secondary-icon has-journal">
                   <FaBook />
@@ -929,7 +932,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                           <FaCheckCircle />
                           <span>
                             Current Streak Day
-                            {dayCount && <span className="day-count"> â€¢ Day {dayCount.dayNumber}</span>}
+                            {dayCount && <span className="day-count"> • Day {dayCount.dayNumber}</span>}
                             {wetDream && <span className="wet-dream-overlay"> + Wet Dream</span>}
                           </span>
                         </>
@@ -942,8 +945,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                             {dayCount && (
                               <span className="day-count">
                                 {dayCount.totalDays ? 
-                                  ` â€¢ Day ${dayCount.dayNumber} of ${dayCount.totalDays}` : 
-                                  ` â€¢ Day ${dayCount.dayNumber}`
+                                  ` • Day ${dayCount.dayNumber} of ${dayCount.totalDays}` : 
+                                  ` • Day ${dayCount.dayNumber}`
                                 }
                               </span>
                             )}
@@ -1152,7 +1155,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                       }}
                     />
                     <div className="journal-benefits-helmet-fallback" style={{ display: 'none' }}>
-                      ðŸ›¡ï¸
+                      🛡️
                     </div>
                   </div>
                   
