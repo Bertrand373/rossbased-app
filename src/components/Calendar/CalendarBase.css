@@ -1,4 +1,4 @@
-/* components/Calendar/CalendarBase.css - UPDATED: Fixed animation and alignment issues */
+/* components/Calendar/CalendarBase.css - REFINED: Cleaned up weekly view with inline values */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -575,7 +575,7 @@
   font-size: 0.75rem; /* Slightly smaller for triggers */
 }
 
-/* NEW: Option 1 - Card-Based Week View Styling */
+/* REFINED: Week View with Clean, Professional Card Layout */
 .week-view-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -583,17 +583,17 @@
   padding: var(--spacing-lg);
 }
 
-/* REDESIGNED: Week day cell as premium card */
+/* REFINED: Compact and professional week day cards */
 .week-day-cell {
   background-color: var(--card-background);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  min-height: 160px;
+  min-height: 140px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   position: relative;
   overflow: hidden;
@@ -635,18 +635,18 @@
   border-left: 4px solid var(--warning);
 }
 
-/* REDESIGNED: Header section with better typography hierarchy */
+/* REFINED: Compact header section */
 .week-day-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .week-day-name {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 600;
   text-transform: uppercase;
@@ -654,7 +654,7 @@
 }
 
 .week-day-number {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text);
 }
@@ -663,13 +663,13 @@
 .week-day-number.today {
   background: linear-gradient(135deg, var(--primary) 0%, #e6c200 100%);
   color: #000;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   animation: today-glow-pulse 3s ease-in-out infinite;
   box-shadow: 0 4px 12px rgba(255, 221, 0, 0.4);
@@ -686,41 +686,36 @@
   }
 }
 
-/* REDESIGNED: Benefits section as primary content */
+/* REFINED: Compact benefits section with inline values */
 .week-benefits-prominent {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px; /* MINIMAL FIX: Reduced spacing between benefit rows */
-  margin: var(--spacing-md) 0;
+  gap: var(--spacing-xs);
+  margin: var(--spacing-sm) 0;
 }
 
-/* MINIMAL FIX: Original grid structure with slight adjustments */
+/* REFINED: Single-row layout with inline value */
 .week-benefit-row {
-  display: grid;
-  grid-template-columns: 60px 1fr 24px; /* Keep original grid */
-  grid-template-rows: auto auto; /* Keep original two-row layout */
-  gap: 2px; /* MINIMAL FIX: Slightly tighter gaps */
-  padding: 2px 0; /* MINIMAL FIX: Reduced vertical padding */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .week-benefit-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
   font-weight: 500;
-  grid-column: 1 / span 3; /* Span across all columns */
-  grid-row: 1;
-  margin-bottom: 1px; /* MINIMAL FIX: Reduced margin */
+  min-width: 55px;
+  flex-shrink: 0;
 }
 
 .week-benefit-bar {
+  flex: 1;
   height: 6px;
   background: rgba(255, 221, 0, 0.15);
   border-radius: var(--radius-full);
   overflow: hidden;
-  grid-column: 1 / span 2; /* Span label and bar columns */
-  grid-row: 2;
-  align-self: center;
 }
 
 .week-benefit-fill {
@@ -734,37 +729,36 @@
   font-size: 0.7rem;
   color: var(--text);
   font-weight: 600;
-  text-align: center;
-  grid-column: 3;
-  grid-row: 2;
-  align-self: center; /* KEEPS: Aligns with progress bar vertically */
+  min-width: 20px;
+  text-align: right;
+  flex-shrink: 0;
 }
 
-/* REDESIGNED: Footer with clean icon layout */
+/* REFINED: Compact footer */
 .week-day-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding-top: var(--spacing-sm);
+  padding-top: var(--spacing-xs);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .week-secondary-icons {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   align-items: center;
 }
 
 .week-secondary-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
   transition: all 0.2s ease;
 }
@@ -791,13 +785,13 @@
 }
 
 .week-status-icon {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
@@ -828,9 +822,10 @@
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-style: italic;
   opacity: 0.6;
+  padding: var(--spacing-sm) 0;
 }
 
 /* Mobile responsiveness */
@@ -995,6 +990,7 @@
     font-size: 0.65rem !important;
   }
   
+  /* REFINED: Mobile week view with full-width bars */
   .week-view-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
@@ -1002,42 +998,40 @@
   }
   
   .week-day-cell {
-    min-height: 140px;
+    min-height: 120px;
     padding: var(--spacing-md);
   }
   
   .week-day-number {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
   
   .week-day-number.today {
-    width: 32px;
-    height: 32px;
-    font-size: 0.9rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
   }
   
-  /* MOBILE FIX: Better spacing and longer bars */
   .week-benefits-prominent {
-    gap: 2px; /* Tighter spacing on mobile */
+    gap: var(--spacing-xs);
   }
   
   .week-benefit-row {
-    grid-template-columns: 45px 1fr 18px; /* MOBILE FIX: Longer bars by reducing label width */
-    gap: 1px; /* Tighter gaps */
-    padding: 1px 0;
+    gap: var(--spacing-sm);
   }
   
   .week-benefit-label {
-    font-size: 0.7rem;
-    margin-bottom: 1px;
+    font-size: 0.65rem;
+    min-width: 48px;
   }
   
   .week-benefit-bar {
-    height: 8px; /* MOBILE FIX: Thicker bars for better visibility */
+    height: 6px;
   }
   
   .week-benefit-value {
     font-size: 0.65rem;
+    min-width: 18px;
   }
 }
 
@@ -1175,46 +1169,45 @@
     font-size: 0.6rem !important;
   }
   
+  /* REFINED: Very small mobile week view */
   .week-view-grid {
     padding: var(--spacing-md);
   }
   
   .week-day-cell {
-    min-height: 120px;
+    min-height: 110px;
     padding: var(--spacing-sm);
   }
   
-  /* VERY SMALL MOBILE FIX: Even longer bars and tighter spacing */
   .week-benefits-prominent {
-    gap: 1px; /* Minimal spacing */
+    gap: 6px;
   }
   
   .week-benefit-row {
-    grid-template-columns: 40px 1fr 16px; /* MOBILE FIX: Even longer bars */
-    gap: 1px;
-    padding: 1px 0;
+    gap: var(--spacing-xs);
   }
   
   .week-benefit-label {
-    font-size: 0.65rem;
-    margin-bottom: 1px;
+    font-size: 0.6rem;
+    min-width: 42px;
   }
   
   .week-benefit-bar {
-    height: 10px; /* MOBILE FIX: Even thicker bars */
+    height: 6px;
   }
   
   .week-benefit-value {
     font-size: 0.6rem;
+    min-width: 16px;
   }
   
   .week-day-number {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   
   .week-day-number.today {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     font-size: 0.8rem;
   }
 }
