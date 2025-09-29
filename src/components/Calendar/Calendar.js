@@ -653,42 +653,36 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          {/* UPDATED: Premium Benefits Section with wider bars */}
+          {/* UPDATED: Premium Benefits Section with labels above bars */}
           {dayBenefits && isPremium ? (
             <div className="week-benefits-prominent">
-              <div className="week-benefit-row">
-                <div className="week-benefit-content-full">
-                  <div className="week-benefit-label">Energy</div>
-                  <div className="week-benefit-bar">
-                    <div 
-                      className="week-benefit-fill" 
-                      style={{ width: `${dayBenefits.energy * 10}%` }}
-                    ></div>
-                  </div>
+              <div className="week-benefit-item">
+                <div className="week-benefit-label-top">Energy</div>
+                <div className="week-benefit-bar">
+                  <div 
+                    className="week-benefit-fill" 
+                    style={{ width: `${dayBenefits.energy * 10}%` }}
+                  ></div>
                 </div>
               </div>
               
-              <div className="week-benefit-row">
-                <div className="week-benefit-content-full">
-                  <div className="week-benefit-label">Focus</div>
-                  <div className="week-benefit-bar">
-                    <div 
-                      className="week-benefit-fill" 
-                      style={{ width: `${dayBenefits.focus * 10}%` }}
-                    ></div>
-                  </div>
+              <div className="week-benefit-item">
+                <div className="week-benefit-label-top">Focus</div>
+                <div className="week-benefit-bar">
+                  <div 
+                    className="week-benefit-fill" 
+                    style={{ width: `${dayBenefits.focus * 10}%` }}
+                  ></div>
                 </div>
               </div>
               
-              <div className="week-benefit-row">
-                <div className="week-benefit-content-full">
-                  <div className="week-benefit-label">Confidence</div>
-                  <div className="week-benefit-bar">
-                    <div 
-                      className="week-benefit-fill" 
-                      style={{ width: `${dayBenefits.confidence * 10}%` }}
-                    ></div>
-                  </div>
+              <div className="week-benefit-item">
+                <div className="week-benefit-label-top">Confidence</div>
+                <div className="week-benefit-bar">
+                  <div 
+                    className="week-benefit-fill" 
+                    style={{ width: `${dayBenefits.confidence * 10}%` }}
+                  ></div>
                 </div>
               </div>
             </div>
