@@ -6,8 +6,8 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png" />
-    <!-- ENHANCED: Strong zoom prevention without breaking loader -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <!-- ENHANCED: Maximum zoom prevention -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#0f0f0f" />
     <meta
       name="description"
@@ -182,7 +182,41 @@
     <div id="root"></div>
     
     <script>
-      // ENHANCED: Prevent zoom via touch gestures
+      // AGGRESSIVE ZOOM PREVENTION: Multiple layers of defense
+      
+      // Layer 1: Prevent all touch gestures that could zoom
+      let lastTouchEnd = 0;
+      let touchStartDistance = 0;
+      
+      document.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+          // Calculate initial distance for pinch detection
+          const touch1 = event.touches[0];
+          const touch2 = event.touches[1];
+          touchStartDistance = Math.hypot(
+            touch2.pageX - touch1.pageX,
+            touch2.pageY - touch1.pageY
+          );
+        }
+      }, { passive: false });
+      
+      document.addEventListener('touchmove', function(event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+      
+      document.addEventListener('touchend', function(event) {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+        touchStartDistance = 0;
+      }, { passive: false });
+      
+      // Layer 2: Prevent gesture events
       document.addEventListener('gesturestart', function(event) {
         event.preventDefault();
       }, { passive: false });
@@ -195,7 +229,7 @@
         event.preventDefault();
       }, { passive: false });
       
-      // Prevent keyboard zoom shortcuts
+      // Layer 3: Prevent keyboard zoom shortcuts
       document.addEventListener('keydown', function(event) {
         if ((event.ctrlKey || event.metaKey) && 
             (event.key === '+' || event.key === '-' || event.key === '0' || 
@@ -205,20 +239,37 @@
         }
       }, { passive: false });
       
-      // SIMPLIFIED: Zoom reset without breaking loader
-      function resetZoom() {
-        try {
-          const viewport = document.querySelector('meta[name="viewport"]');
-          if (viewport) {
-            viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
+      // Layer 4: Prevent mouse wheel zoom
+      document.addEventListener('wheel', function(event) {
+        if (event.ctrlKey || event.metaKey) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+      
+      // Layer 5: Aggressive viewport monitoring
+      function enforceZoom() {
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          const currentContent = viewport.getAttribute('content');
+          const correctContent = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+          if (currentContent !== correctContent) {
+            viewport.setAttribute('content', correctContent);
           }
-        } catch (error) {
-          // Silent fail
+        }
+        
+        // Reset visual viewport if zoomed
+        if (window.visualViewport && window.visualViewport.scale !== 1) {
+          window.scrollTo(0, 0);
         }
       }
       
-      // Monitor zoom occasionally (not aggressively)
-      setInterval(resetZoom, 1000);
+      // Monitor aggressively - every 100ms instead of 1000ms
+      setInterval(enforceZoom, 100);
+      
+      // Also monitor on these events
+      window.addEventListener('resize', enforceZoom);
+      window.addEventListener('scroll', enforceZoom);
+      document.addEventListener('visibilitychange', enforceZoom);
       
       /* IMMEDIATE LOADER REMOVAL: Remove as soon as React content appears */
       window.addEventListener('DOMContentLoaded', function() {
