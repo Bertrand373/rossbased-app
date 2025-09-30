@@ -374,8 +374,8 @@
   text-align: center;
 }
 
-/* UPDATED: Enhanced benefits section with circular badges - NO ANIMATIONS for historical data */
-.benefits-details-enhanced {
+/* CALENDAR-SPECIFIC: Enhanced benefits section with circular badges - NO ANIMATIONS for historical data */
+.day-info-modal .benefits-details-enhanced {
   background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -385,35 +385,35 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Each benefit item with subtle background */
-.benefit-slider-item {
+/* CALENDAR-SPECIFIC: Each benefit item with subtle background */
+.day-info-modal .benefit-slider-item {
   background-color: rgba(255, 255, 255, 0.02);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   transition: background-color 0.2s ease;
 }
 
-.benefit-slider-item:hover {
+.day-info-modal .benefit-slider-item:hover {
   background-color: rgba(255, 255, 255, 0.04);
 }
 
-/* UPDATED: New row layout with circular badge */
-.benefit-slider-row {
+/* CALENDAR-SPECIFIC: New row layout with circular badge */
+.day-info-modal .benefit-slider-row {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
 }
 
-/* UPDATED: Label styling */
-.benefit-label {
+/* CALENDAR-SPECIFIC: Label styling */
+.day-info-modal .benefit-label {
   font-weight: 500;
   color: var(--text);
   min-width: 100px;
   text-align: left;
 }
 
-/* UPDATED: Enhanced benefit meter - taller, no animation */
-.benefit-meter-enhanced {
+/* CALENDAR-SPECIFIC: Enhanced benefit meter - taller, no animation */
+.day-info-modal .benefit-meter-enhanced {
   flex: 1;
   height: 10px;
   border-radius: var(--radius-full);
@@ -423,7 +423,7 @@
   position: relative;
 }
 
-.benefit-level-enhanced {
+.day-info-modal .benefit-level-enhanced {
   height: 100%;
   background: linear-gradient(90deg, #ffdd00 0%, #e6c200 100%);
   border-radius: var(--radius-full);
@@ -431,8 +431,8 @@
   position: relative;
 }
 
-/* NEW: Circular value badge - distinct from tracker style for read-only context */
-.benefit-value-circle {
+/* CALENDAR-SPECIFIC: Circular value badge - distinct from tracker style for read-only context */
+.day-info-modal .benefit-value-circle {
   width: 24px;
   height: 24px;
   min-width: 24px;
@@ -449,7 +449,7 @@
   transition: transform 0.2s ease;
 }
 
-.benefit-value-circle:hover {
+.day-info-modal .benefit-value-circle:hover {
   transform: scale(1.1);
   background-color: rgba(255, 221, 0, 0.25);
 }
