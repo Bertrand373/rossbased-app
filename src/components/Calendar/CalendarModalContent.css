@@ -405,8 +405,8 @@
   gap: var(--spacing-md);
 }
 
-/* GENERIC: Basic benefit label for tracker (restoring original functionality) */
-.benefit-label {
+/* CALENDAR-SPECIFIC: Basic benefit label - scoped to calendar only */
+.day-info-modal .benefits-details-enhanced .benefit-label {
   display: inline-block;
   font-weight: 500;
   color: var(--text);
