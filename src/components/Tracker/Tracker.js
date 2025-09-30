@@ -542,16 +542,16 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <div className="streak-milestones">
               {/* Next Milestone Card */}
               <div className="milestone-item">
-                <FaTrophy className="milestone-icon" />
+                <FaFire className="milestone-icon" />
                 <div className="milestone-value">{nextMilestone.daysRemaining}</div>
-                <div className="milestone-label">Days to {nextMilestone.target}</div>
+                <div className="milestone-label">Days to {nextMilestone.target}-Day Milestone</div>
               </div>
               
               {/* Days This Month Card */}
               <div className="milestone-item">
-                <FaCalendarAlt className="milestone-icon" />
+                <FaClipboardCheck className="milestone-icon" />
                 <div className="milestone-value">{monthProgress.logged}/{monthProgress.total}</div>
-                <div className="milestone-label">Days This Month</div>
+                <div className="milestone-label">Benefits Logged This Month</div>
               </div>
             </div>
             
