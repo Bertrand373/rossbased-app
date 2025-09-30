@@ -201,7 +201,7 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* UPDATED: Day status info section with integrated day count */
+/* UPDATED: Day status info section with integrated day count and trigger */
 .day-status-info {
   margin-bottom: var(--spacing-xl);
   text-align: center;
@@ -238,15 +238,25 @@
   font-size: 0.8rem;
 }
 
-/* Mobile wet dream overlay styling */
+/* NEW: Inline trigger text styling */
+.status-badge .trigger-inline {
+  color: inherit;
+  font-weight: 500;
+  opacity: 0.85;
+  font-size: 0.8rem;
+}
+
+/* Mobile wet dream and trigger styling */
 @media (max-width: 768px) {
-  .status-badge .wet-dream-overlay {
+  .status-badge .wet-dream-overlay,
+  .status-badge .trigger-inline {
     font-size: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
-  .status-badge .wet-dream-overlay {
+  .status-badge .wet-dream-overlay,
+  .status-badge .trigger-inline {
     font-size: 0.7rem;
   }
 }
@@ -305,26 +315,17 @@
   }
 }
 
-/* UPDATED: Enhanced trigger info display - NOW PILL-SHAPED */
+/* REMOVED: Separate trigger info display - now inline with relapse badge */
 .trigger-info {
-  margin-top: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-full);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: none;
 }
 
 .trigger-display {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+  display: none;
 }
 
 .trigger-display-icon {
-  font-size: 1rem;
-  color: var(--text-secondary);
+  display: none;
 }
 
 /* REMOVED: Journey counter card - this entire section has been eliminated */
@@ -402,6 +403,14 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+}
+
+/* GENERIC: Basic benefit label for tracker (restoring original functionality) */
+.benefit-label {
+  display: inline-block;
+  font-weight: 500;
+  color: var(--text);
+  flex-shrink: 0;
 }
 
 /* CALENDAR-SPECIFIC: Label styling */
@@ -859,30 +868,30 @@
     font-size: 0.875rem;
   }
   
-  /* UPDATED: Mobile benefits with circular badges */
-  .benefits-details-enhanced {
+  /* CALENDAR-SPECIFIC: Mobile benefits with circular badges */
+  .day-info-modal .benefits-details-enhanced {
     padding: var(--spacing-md);
     gap: var(--spacing-md);
   }
   
-  .benefit-slider-item {
+  .day-info-modal .benefit-slider-item {
     padding: var(--spacing-xs) var(--spacing-sm);
   }
   
-  .benefit-slider-row {
+  .day-info-modal .benefit-slider-row {
     gap: var(--spacing-sm);
   }
   
-  .benefit-label {
+  .day-info-modal .benefit-label {
     font-size: 0.875rem;
     min-width: 75px;
   }
   
-  .benefit-meter-enhanced {
+  .day-info-modal .benefit-meter-enhanced {
     height: 8px;
   }
   
-  .benefit-value-circle {
+  .day-info-modal .benefit-value-circle {
     width: 22px;
     height: 22px;
     min-width: 22px;
@@ -1006,30 +1015,30 @@
     justify-content: center;
   }
   
-  /* UPDATED: Very small mobile benefits */
-  .benefits-details-enhanced {
+  /* CALENDAR-SPECIFIC: Very small mobile benefits */
+  .day-info-modal .benefits-details-enhanced {
     padding: var(--spacing-sm);
     gap: var(--spacing-sm);
   }
   
-  .benefit-slider-item {
+  .day-info-modal .benefit-slider-item {
     padding: 6px var(--spacing-xs);
   }
   
-  .benefit-slider-row {
+  .day-info-modal .benefit-slider-row {
     gap: var(--spacing-xs);
   }
   
-  .benefit-label {
+  .day-info-modal .benefit-label {
     font-size: 0.8rem;
     min-width: 65px;
   }
   
-  .benefit-meter-enhanced {
+  .day-info-modal .benefit-meter-enhanced {
     height: 7px;
   }
   
-  .benefit-value-circle {
+  .day-info-modal .benefit-value-circle {
     width: 20px;
     height: 20px;
     min-width: 20px;

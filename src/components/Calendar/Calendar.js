@@ -951,7 +951,29 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                       {dayStatus.type === 'relapse' && (
                         <>
                           <FaTimesCircle />
-                          <span>Relapse Day</span>
+                          <span>
+                            Relapse Day
+                            {dayStatus.trigger && (() => {
+                              const trigger = triggerOptions.find(t => t.id === dayStatus.trigger);
+                              const triggerAbbrev = {
+                                'lustful_thoughts': 'Lustful',
+                                'stress': 'Stress',
+                                'boredom': 'Boredom',
+                                'social_media': 'Social Media',
+                                'loneliness': 'Loneliness',
+                                'relationship': 'Relationship',
+                                'home_alone': 'Home Alone',
+                                'explicit_content': 'Explicit',
+                                'alcohol_substances': 'Alcohol',
+                                'sleep_deprivation': 'Sleep Issues'
+                              };
+                              return (
+                                <span className="trigger-inline">
+                                  {' • '}{triggerAbbrev[dayStatus.trigger] || trigger?.label || 'Unknown'}
+                                </span>
+                              );
+                            })()}
+                          </span>
                         </>
                       )}
                     </div>
@@ -970,25 +992,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     <span>No specific status</span>
                   </div>
                 );
-              })()}
-
-              {/* Trigger Info */}
-              {(() => {
-                const dayStatus = getDayStatus(selectedDate);
-                if (dayStatus?.trigger) {
-                  const trigger = triggerOptions.find(t => t.id === dayStatus.trigger);
-                  return (
-                    <div className="trigger-info">
-                      <div className="trigger-display">
-                        <div className="trigger-display-icon">
-                          {renderTriggerIcon(dayStatus.trigger)}
-                        </div>
-                        <span>Trigger: {trigger?.label || 'Unknown'}</span>
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
               })()}
             </div>
 
