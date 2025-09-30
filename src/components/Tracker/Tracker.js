@@ -29,7 +29,7 @@ import {
   FaPlay,
   FaCalendarAlt,
   FaChartLine,
-  FaTrophy
+  FaClipboardCheck
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
