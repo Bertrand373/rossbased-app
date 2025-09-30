@@ -1,4 +1,4 @@
-// App.js - UPDATED: Added refresh loading animation and improved login flow
+// App.js - UPDATED: Fixed mobile breakpoint to 1024px for landscape device support
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -99,9 +99,9 @@ const HeaderNavigation = () => {
     { path: '/urge-toolkit', icon: FaShieldAlt, label: 'Urge Toolkit' }
   ];
 
-  // MOBILE DETECTION: Simplified mobile detection - identical to Profile
+  // FIXED: Mobile detection changed to 1024px breakpoint
   const detectMobile = useCallback(() => {
-    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
+    const isMobileDevice = window.innerWidth <= 1024 || 'ontouchstart' in window;
     setIsMobile(isMobileDevice);
     return isMobileDevice;
   }, []);
@@ -328,12 +328,12 @@ function App() {
     cancelGoal
   } = useUserData();
 
-  // Monitor screen size for responsive design
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  // FIXED: Monitor screen size for responsive design - changed breakpoint to 1024px
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1024);
     };
     
     window.addEventListener('resize', handleResize);
@@ -405,12 +405,11 @@ function App() {
 
   return (
     <Router>
-      <ScrollToTop /> {/* Add the scroll to top component */}
+      <ScrollToTop />
       <div className="app-container">
         <Toaster 
           position="top-center"
           toastOptions={{
-            // Default options for all toasts
             duration: 4000,
             style: {
               background: 'linear-gradient(135deg, #2c2c2c 0%, #333333 100%)',
@@ -425,7 +424,6 @@ function App() {
               maxWidth: '400px',
               fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             },
-            // Success toasts
             success: {
               style: {
                 borderLeft: '4px solid #22c55e',
@@ -435,7 +433,6 @@ function App() {
                 secondary: '#ffffff',
               },
             },
-            // Error toasts
             error: {
               style: {
                 borderLeft: '4px solid #ef4444',
@@ -445,7 +442,6 @@ function App() {
                 secondary: '#ffffff',
               },
             },
-            // Loading toasts
             loading: {
               style: {
                 borderLeft: '4px solid #ffdd00',
@@ -467,11 +463,9 @@ function App() {
         )}
         
         {isLoggedIn ? (
-          // Show main app UI if logged in
           <>
             <header className="app-header">
               {!isMobile ? (
-                // Desktop Layout - Logo, Navigation with Sliding Animation, User Controls
                 <>
                   <div className="logo-container">
                     <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
@@ -488,7 +482,6 @@ function App() {
                   </div>
                 </>
               ) : (
-                // Mobile Layout - Two rows
                 <>
                   <div className="header-top-row">
                     <div className="logo-container">
@@ -508,10 +501,6 @@ function App() {
               )}
             </header>
             
-            {/* Banner hidden while all features are free */}
-            {/* {!isPremium && <SubscriptionBanner />} */}
-            
-            {/* Mobile Navigation with Sliding Animation */}
             {isMobile && (
               <MobileNavigation 
                 activeTab={activeTab} 
@@ -523,7 +512,6 @@ function App() {
             <main className="app-content">
               <div className="main-content-wrapper">
                 <Routes>
-                  {/* UPDATED: Pass goal functions to Tracker component */}
                   <Route path="/" element={
                     <Tracker 
                       userData={userData} 
@@ -544,7 +532,6 @@ function App() {
             </main>
           </>
         ) : (
-          // Show landing page if not logged in
           <Routes>
             <Route path="*" element={<Landing onLogin={handleLogin} />} />
           </Routes>

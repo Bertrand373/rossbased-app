@@ -210,8 +210,8 @@ body {
   width: 0px;
 }
 
-/* MOBILE: Faster transition on smaller screens */
-@media (max-width: 768px) {
+/* FIXED: Increased breakpoint to 1024px so landscape mobile stays in mobile mode */
+@media (max-width: 1024px) {
   .header-nav-slider {
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -247,8 +247,8 @@ body {
   touch-action: manipulation;
 }
 
-/* MOBILE: Only adjust touch targets on actual mobile, not desktop */
-@media (max-width: 768px) and (pointer: coarse) {
+/* FIXED: Increased breakpoint to 1024px for touch targets */
+@media (max-width: 1024px) and (pointer: coarse) {
   .header-nav .nav-link {
     min-height: 44px; /* iOS recommendation for touch targets */
     padding: var(--spacing-md) var(--spacing-lg);
@@ -267,8 +267,8 @@ body {
   border-color: transparent !important;
 }
 
-/* MOBILE: Ensure active state is always visible */
-@media (max-width: 768px) {
+/* FIXED: Increased breakpoint to 1024px to ensure active state is always visible */
+@media (max-width: 1024px) {
   .header-nav .nav-link.active {
     /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
     font-weight: 600;
@@ -332,8 +332,8 @@ body {
   transform: scale(1.05);
 }
 
-/* Mobile header adjustments - REVERTED: Changed mobile username back to yellow */
-@media (max-width: 768px) {
+/* FIXED: Increased mobile header breakpoint to 1024px */
+@media (max-width: 1024px) {
   /* ADDED: Mobile adjustments for initial loader */
   .landing-initial-loader {
     padding: var(--spacing-md);
@@ -745,7 +745,7 @@ input:checked + .toggle-slider:before {
   margin-bottom: var(--spacing-md);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .form-row {
     flex-direction: column;
   }
@@ -813,8 +813,8 @@ input:checked + .toggle-slider:before {
   border: 1px solid var(--border);
 }
 
-/* UPDATED: Mobile responsive styles - HEIGHT FIX */
-@media (max-width: 768px) {
+/* UPDATED: Mobile responsive styles - HEIGHT FIX - Changed breakpoint to 1024px */
+@media (max-width: 1024px) {
   .app-content {
     /* FIXED: Remove fixed bottom margin that creates empty space */
     margin: 0 var(--spacing-sm) 0 var(--spacing-sm);
