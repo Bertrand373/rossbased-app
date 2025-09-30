@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Wider benefit bars and info icon in weekly view
+// components/Calendar/Calendar.js - UPDATED: Full trigger names in modal badge
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -911,7 +911,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             
             <h3>{format(selectedDate, 'EEE, MMM d, yyyy')}</h3>
             
-            {/* UPDATED: Day Status with enhanced day count and wet dream overlay */}
+            {/* UPDATED: Day Status with full trigger names in grey */}
             <div className="day-status-info">
               {(() => {
                 const dayStatus = getDayStatus(selectedDate);
@@ -955,21 +955,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                             Relapse Day
                             {dayStatus.trigger && (() => {
                               const trigger = triggerOptions.find(t => t.id === dayStatus.trigger);
-                              const triggerAbbrev = {
-                                'lustful_thoughts': 'Lustful',
-                                'stress': 'Stress',
-                                'boredom': 'Boredom',
-                                'social_media': 'Social Media',
-                                'loneliness': 'Loneliness',
-                                'relationship': 'Relationship',
-                                'home_alone': 'Home Alone',
-                                'explicit_content': 'Explicit',
-                                'alcohol_substances': 'Alcohol',
-                                'sleep_deprivation': 'Sleep Issues'
-                              };
                               return (
                                 <span className="trigger-inline">
-                                  {' • '}{triggerAbbrev[dayStatus.trigger] || trigger?.label || 'Unknown'}
+                                  {' • '}{trigger?.label || 'Unknown Trigger'}
                                 </span>
                               );
                             })()}
