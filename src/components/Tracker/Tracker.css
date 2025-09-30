@@ -548,13 +548,17 @@ button.action-btn:hover {
   margin-bottom: var(--spacing-xs);
 }
 
-.benefit-label {
-  font-weight: 600;
-  color: var(--text);
-  flex: 1;
-  text-align: left;
+/* UPDATED: More specific selector to prevent Calendar CSS from overriding */
+.benefits-modal .benefit-label,
+.premium-benefits-container .benefit-label,
+.benefit-slider-item .benefit-label {
+  font-weight: 600 !important;
+  color: var(--text) !important;
+  flex: 1 !important;
+  text-align: left !important;
   font-size: 1rem !important;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.025em !important;
+  display: block !important;
 }
 
 /* EXACT MATCH: Slider container for inline value display */
@@ -1225,7 +1229,9 @@ button.action-btn:hover {
   }
 
   /* Mobile slider adjustments - MATCHING EMOTIONAL TIMELINE */
-  .benefit-label {
+  .benefits-modal .benefit-label,
+  .premium-benefits-container .benefit-label,
+  .benefit-slider-item .benefit-label {
     font-size: 0.875rem !important;
   }
   
@@ -1326,7 +1332,9 @@ button.action-btn:hover {
   }
   
   /* Very small screen benefit slider adjustments */
-  .benefit-label {
+  .benefits-modal .benefit-label,
+  .premium-benefits-container .benefit-label,
+  .benefit-slider-item .benefit-label {
     font-size: 0.8rem !important;
   }
   
