@@ -204,6 +204,7 @@ button.action-btn:hover {
 .milestone-pill {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-md);
   padding: var(--spacing-md) var(--spacing-xl);
   background-color: rgba(255, 255, 255, 0.02);
@@ -230,6 +231,7 @@ button.action-btn:hover {
   font-weight: 500;
   letter-spacing: 0.025em;
   line-height: 1.3;
+  text-align: center;
 }
 
 .streak-actions-divider {
@@ -1108,10 +1110,10 @@ button.action-btn:hover {
   .benefits-logged-status,
   .benefits-not-logged-status {
     flex-direction: row;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
     text-align: center;
-    font-size: 0.8125rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
   .benefits-modal {

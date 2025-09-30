@@ -552,7 +552,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               <div className="milestone-pill">
                 <FaClipboardCheck className="milestone-pill-icon" />
                 <span className="milestone-pill-text">
-                  {monthProgress.logged} of {monthProgress.total} benefits logged this month
+                  {monthProgress.logged} of {monthProgress.total} days tracked this month
                 </span>
               </div>
             </div>
