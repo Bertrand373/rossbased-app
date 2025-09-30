@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: 2 milestone boxes + matched pill sizes */
+/* components/Tracker/Tracker.css - UPDATED: Pill-shaped horizontal milestone indicators */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -191,53 +191,42 @@ button.action-btn:hover {
   margin: 0;
 }
 
-/* UPDATED: 2-column milestone layout optimized for new metrics */
-.streak-milestones {
+/* NEW: Pill-shaped horizontal milestone indicators */
+.streak-milestone-pills {
   order: 4;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-lg);
-  margin: 0;
-  padding: 0 var(--spacing-lg);
-}
-
-.milestone-item {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: var(--spacing-md);
-  background-color: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.2s ease;
-  min-height: 110px;
-  justify-content: center;
+  gap: var(--spacing-sm);
+  margin: 0;
+  padding: 0 var(--spacing-md);
 }
 
-.milestone-item:hover {
+.milestone-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+}
+
+.milestone-pill:hover {
   background-color: rgba(255, 221, 0, 0.05);
   border-color: rgba(255, 221, 0, 0.1);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
-.milestone-icon {
-  font-size: 1.4rem;
+.milestone-pill-icon {
+  font-size: 1.25rem;
   color: var(--primary);
-  margin-bottom: var(--spacing-sm);
+  flex-shrink: 0;
 }
 
-.milestone-value {
-  font-size: 1.5rem;
-  font-weight: 700;
+.milestone-pill-text {
+  font-size: 0.9375rem;
   color: var(--text);
-  margin-bottom: var(--spacing-xs);
-  line-height: 1;
-}
-
-.milestone-label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
   font-weight: 500;
   letter-spacing: 0.025em;
   line-height: 1.3;
@@ -864,32 +853,22 @@ button.action-btn:hover {
     text-shadow: none;
   }
   
-  /* UPDATED: Desktop milestone cards optimized for 2-column layout */
-  .streak-milestones {
-    max-width: 500px;
-    margin: 0 auto;
+  /* Desktop pill styling - slightly larger */
+  .streak-milestone-pills {
     padding: 0 var(--spacing-lg);
-    gap: var(--spacing-xl);
+    gap: var(--spacing-md);
   }
   
-  .milestone-item {
-    min-height: 130px;
-    padding: var(--spacing-lg);
+  .milestone-pill {
+    padding: var(--spacing-lg) var(--spacing-xl);
   }
   
-  .milestone-icon {
-    font-size: 1.75rem;
-    margin-bottom: var(--spacing-md);
+  .milestone-pill-icon {
+    font-size: 1.5rem;
   }
   
-  .milestone-value {
-    font-size: 1.75rem;
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .milestone-label {
-    font-size: 0.9rem;
-    line-height: 1.3;
+  .milestone-pill-text {
+    font-size: 1rem;
   }
   
   .streak-actions {
@@ -1056,36 +1035,28 @@ button.action-btn:hover {
     text-shadow: none;
   }
   
-  /* UPDATED: Mobile milestone cards - 2 column grid maintained */
-  .streak-milestones {
-    gap: var(--spacing-sm);
+  /* Mobile pill styling - compact */
+  .streak-milestone-pills {
     padding: 0 var(--spacing-sm);
+    gap: var(--spacing-xs);
   }
   
-  .milestone-item {
-    min-height: 95px;
-    padding: var(--spacing-sm);
+  .milestone-pill {
+    padding: var(--spacing-sm) var(--spacing-md);
   }
   
-  .milestone-item:active {
-    background-color: rgba(255, 221, 0, 0.05);
-    border-color: rgba(255, 221, 0, 0.1);
-    transform: translateY(-1px);
+  .milestone-pill:active {
+    background-color: rgba(255, 221, 0, 0.08);
+    border-color: rgba(255, 221, 0, 0.15);
+    transform: scale(0.98);
   }
   
-  .milestone-icon {
-    font-size: 1.25rem;
-    margin-bottom: var(--spacing-xs);
+  .milestone-pill-icon {
+    font-size: 1.125rem;
   }
   
-  .milestone-value {
-    font-size: 1.375rem;
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .milestone-label {
-    font-size: 0.75rem;
-    line-height: 1.2;
+  .milestone-pill-text {
+    font-size: 0.8125rem;
   }
   
   .streak-actions {
@@ -1263,6 +1234,11 @@ button.action-btn:hover {
     flex-direction: column;
     gap: var(--spacing-md);
     align-items: center;
+  }
+  
+  /* Very small screen pill adjustments */
+  .milestone-pill-text {
+    font-size: 0.75rem;
   }
   
   .benefits-modal .benefit-label,

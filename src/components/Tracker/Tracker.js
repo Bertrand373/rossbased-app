@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Next Milestone & Days This Month metrics
+// components/Tracker/Tracker.js - UPDATED: Pill-shaped horizontal milestone indicators
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -538,20 +538,22 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             <div className="streak-divider"></div>
             
-            {/* UPDATED: New milestone metrics replacing old 3-box layout */}
-            <div className="streak-milestones">
-              {/* Next Milestone Card */}
-              <div className="milestone-item">
-                <FaFire className="milestone-icon" />
-                <div className="milestone-value">{nextMilestone.daysRemaining}</div>
-                <div className="milestone-label">Days to {nextMilestone.target}-Day Milestone</div>
+            {/* UPDATED: Pill-shaped horizontal milestone indicators */}
+            <div className="streak-milestone-pills">
+              {/* Next Milestone Pill */}
+              <div className="milestone-pill">
+                <FaFire className="milestone-pill-icon" />
+                <span className="milestone-pill-text">
+                  {nextMilestone.daysRemaining} days until {nextMilestone.target}-day milestone
+                </span>
               </div>
               
-              {/* Days This Month Card */}
-              <div className="milestone-item">
-                <FaClipboardCheck className="milestone-icon" />
-                <div className="milestone-value">{monthProgress.logged}/{monthProgress.total}</div>
-                <div className="milestone-label">Benefits Logged This Month</div>
+              {/* Benefits Logged Pill */}
+              <div className="milestone-pill">
+                <FaClipboardCheck className="milestone-pill-icon" />
+                <span className="milestone-pill-text">
+                  {monthProgress.logged} of {monthProgress.total} benefits logged this month
+                </span>
               </div>
             </div>
             
