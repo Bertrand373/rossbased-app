@@ -1,6 +1,6 @@
-// components/Tracker/Tracker.js - UPDATED: Show banner only when benefits haven't been logged
+// components/Tracker/Tracker.js - UPDATED: Next Milestone & Days This Month metrics
 import React, { useState, useEffect } from 'react';
-import { format, differenceInDays } from 'date-fns';
+import { format, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -14,7 +14,7 @@ import DatePicker from '../Shared/DatePicker';
 
 // Icons
 import { 
-  FaCrown, 
+  FaFire, 
   FaExclamationTriangle,
   FaInfoCircle, 
   FaEdit,
@@ -28,7 +28,8 @@ import {
   FaYoutube,
   FaPlay,
   FaCalendarAlt,
-  FaChartLine
+  FaChartLine,
+  FaTrophy
 } from 'react-icons/fa';
 
 const Tracker = ({ userData, updateUserData, isPremium }) => {
@@ -61,6 +62,51 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [benefitsLogged, setBenefitsLogged] = useState(false);
   
   const today = new Date();
+
+  // NEW: Calculate next milestone
+  const calculateNextMilestone = (streak) => {
+    const milestones = [7, 30, 90, 180, 365, 730, 1095]; // 7 days, 30 days, 90 days, 6 months, 1 year, 2 years, 3 years
+    
+    for (let milestone of milestones) {
+      if (streak < milestone) {
+        return {
+          target: milestone,
+          daysRemaining: milestone - streak,
+          progress: (streak / milestone) * 100
+        };
+      }
+    }
+    
+    // If past all milestones, show next year milestone
+    const nextYearMilestone = Math.ceil(streak / 365) * 365;
+    return {
+      target: nextYearMilestone,
+      daysRemaining: nextYearMilestone - streak,
+      progress: ((streak % 365) / 365) * 100
+    };
+  };
+
+  // NEW: Calculate days this month with benefits logged
+  const calculateDaysThisMonth = () => {
+    const monthStart = startOfMonth(today);
+    const monthEnd = endOfMonth(today);
+    const totalDaysInMonth = differenceInDays(monthEnd, monthStart) + 1;
+    
+    if (!userData.benefitTracking || userData.benefitTracking.length === 0) {
+      return { logged: 0, total: totalDaysInMonth };
+    }
+    
+    // Count how many days this month have benefit entries
+    const daysLogged = userData.benefitTracking.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= monthStart && entryDate <= monthEnd;
+    }).length;
+    
+    return { logged: daysLogged, total: totalDaysInMonth };
+  };
+
+  const nextMilestone = calculateNextMilestone(currentStreak);
+  const monthProgress = calculateDaysThisMonth();
 
   // Check if benefits are already logged for today and update modal state
   useEffect(() => {
@@ -492,29 +538,26 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             <div className="streak-divider"></div>
             
+            {/* UPDATED: New milestone metrics replacing old 3-box layout */}
             <div className="streak-milestones">
+              {/* Next Milestone Card */}
               <div className="milestone-item">
-                <FaCrown className="milestone-icon" />
-                <div className="milestone-value">{userData.longestStreak || 0}</div>
-                <div className="milestone-label">Longest</div>
+                <FaTrophy className="milestone-icon" />
+                <div className="milestone-value">{nextMilestone.daysRemaining}</div>
+                <div className="milestone-label">Days to {nextMilestone.target}</div>
               </div>
               
+              {/* Days This Month Card */}
               <div className="milestone-item">
-                <FaMoon className="milestone-icon" />
-                <div className="milestone-value">{userData.wetDreamCount || 0}</div>
-                <div className="milestone-label">Wet Dreams</div>
-              </div>
-              
-              <div className="milestone-item">
-                <FaExclamationTriangle className="milestone-icon" />
-                <div className="milestone-value">{userData.relapseCount || 0}</div>
-                <div className="milestone-label">Relapses</div>
+                <FaCalendarAlt className="milestone-icon" />
+                <div className="milestone-value">{monthProgress.logged}/{monthProgress.total}</div>
+                <div className="milestone-label">Days This Month</div>
               </div>
             </div>
             
             <div className="streak-actions-divider"></div>
             
-            {/* Benefits status above buttons */}
+            {/* UPDATED: Benefits status - matching emotional timeline pill size */}
             <div className="benefits-status-indicator">
               {benefitsLogged ? (
                 <div className="benefits-logged-status">

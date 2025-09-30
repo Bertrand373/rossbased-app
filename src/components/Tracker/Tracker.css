@@ -1,4 +1,4 @@
-/* components/Tracker/Tracker.css - UPDATED: Added benefits modal banner styling */
+/* components/Tracker/Tracker.css - UPDATED: 2 milestone boxes + matched pill sizes */
 .tracker-container {
   display: flex;
   flex-direction: column;
@@ -27,17 +27,16 @@
 
 .tracker-header-title-section h2 {
   margin: 0;
-  font-size: 1.5rem; /* UPDATED: Match Calendar desktop size (was 1.25rem) */
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--text);
   opacity: 0.85;
   text-align: center;
 }
 
-/* NEW: Header subtitle */
 .tracker-header-subtitle {
   margin: var(--spacing-xs) 0 0 0;
-  font-size: 0.875rem; /* MATCHES: Calendar desktop subtitle size */
+  font-size: 0.875rem;
   color: var(--text-secondary);
   text-align: center;
   font-style: italic;
@@ -192,16 +191,14 @@ button.action-btn:hover {
   margin: 0;
 }
 
-/* REFINED: Better spacing for milestone stats */
+/* UPDATED: 2-column milestone layout optimized for new metrics */
 .streak-milestones {
   order: 4;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-md);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
   margin: 0;
   padding: 0 var(--spacing-lg);
-  flex-wrap: wrap;
 }
 
 .milestone-item {
@@ -209,8 +206,19 @@ button.action-btn:hover {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  flex: 1;
-  min-width: 80px;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+  min-height: 110px;
+  justify-content: center;
+}
+
+.milestone-item:hover {
+  background-color: rgba(255, 221, 0, 0.05);
+  border-color: rgba(255, 221, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .milestone-icon {
@@ -232,6 +240,7 @@ button.action-btn:hover {
   color: var(--text-secondary);
   font-weight: 500;
   letter-spacing: 0.025em;
+  line-height: 1.3;
 }
 
 .streak-actions-divider {
@@ -332,7 +341,7 @@ button.action-btn:hover {
   transform: scale(1.05);
 }
 
-/* NEW: Benefits Status Indicator in Streak Card */
+/* UPDATED: Benefits Status Indicator - MATCHES emotional timeline pill sizing */
 .benefits-status-indicator {
   order: 5.5;
   display: flex;
@@ -346,13 +355,14 @@ button.action-btn:hover {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
   background-color: rgba(34, 197, 94, 0.05);
   border: 1px solid rgba(34, 197, 94, 0.1);
   border-radius: var(--radius-full);
   padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
 }
 
 .benefits-logged-status .check-icon {
@@ -364,17 +374,20 @@ button.action-btn:hover {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
   background-color: rgba(255, 221, 0, 0.05);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-full);
   padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  line-height: 1.4;
 }
 
 .benefits-not-logged-status .info-icon {
   color: var(--primary);
+  flex-shrink: 0;
 }
 
 /* Premium Benefits Container - NOT USED IN MODAL */
@@ -384,10 +397,7 @@ button.action-btn:hover {
   gap: var(--spacing-lg);
 }
 
-/* TRACKER SPECIFIC MODAL STYLES - Using existing modal structure but with specific headers only */
-/* NO GLOBAL .modal-overlay or .modal-content styling - let other components define their own */
-
-/* SPECIFIC: Only style the date picker modal header when it has the date-picker-modal class */
+/* TRACKER SPECIFIC MODAL STYLES */
 .date-picker-modal h2 {
   margin: 0 0 var(--spacing-sm) 0;
   font-size: 1.25rem;
@@ -404,7 +414,6 @@ button.action-btn:hover {
   text-align: center;
 }
 
-/* SPECIFIC: Close button - only for tracker modals */
 .modal-close-btn {
   position: absolute;
   top: var(--spacing-md);
@@ -433,7 +442,7 @@ button.action-btn:hover {
   transform: scale(1.1);
 }
 
-/* SPECIFIC: Benefits Modal Styling - using specific class names */
+/* Benefits Modal Styling */
 .benefits-modal {
   max-width: 600px;
   max-height: 85vh;
@@ -455,7 +464,7 @@ button.action-btn:hover {
   line-height: 1.4;
 }
 
-/* NEW: Benefits Tracking Banner - EXACT COPY from Emotional Timeline */
+/* Benefits Tracking Banner */
 .benefits-tracking-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -533,7 +542,7 @@ button.action-btn:hover {
   -webkit-overflow-scrolling: touch;
 }
 
-/* EXACT COPY FROM EMOTIONAL TIMELINE: Benefit Sliders with inline value display and tick marks */
+/* Benefit Sliders */
 .benefit-slider-item {
   display: flex;
   flex-direction: column;
@@ -548,7 +557,6 @@ button.action-btn:hover {
   margin-bottom: var(--spacing-xs);
 }
 
-/* UPDATED: More specific selector to prevent Calendar CSS from overriding */
 .benefits-modal .benefit-label,
 .premium-benefits-container .benefit-label,
 .benefit-slider-item .benefit-label {
@@ -561,7 +569,6 @@ button.action-btn:hover {
   display: block !important;
 }
 
-/* EXACT MATCH: Slider container for inline value display */
 .benefit-slider-with-value {
   display: flex;
   align-items: center;
@@ -569,7 +576,6 @@ button.action-btn:hover {
   position: relative;
 }
 
-/* EXACT MATCH: Value display as clean circle like Emotional Timeline */
 .benefit-value-clean {
   font-weight: 700;
   color: var(--text) !important;
@@ -588,13 +594,11 @@ button.action-btn:hover {
   flex-shrink: 0;
 }
 
-/* NEW: Slider track container with tick marks */
 .benefit-slider-track-container {
   position: relative;
   flex: 1;
 }
 
-/* NEW: Tick marks container - overlays the slider track exactly */
 .slider-tick-marks {
   position: absolute;
   top: 50%;
@@ -606,7 +610,6 @@ button.action-btn:hover {
   z-index: 0;
 }
 
-/* NEW: Individual tick mark styling - positioned in track center */
 .slider-tick {
   position: absolute;
   top: 0;
@@ -617,14 +620,12 @@ button.action-btn:hover {
   pointer-events: none;
 }
 
-/* NEW: Key tick marks (1, 5, 10) are slightly more visible */
 .slider-tick.key-tick {
   height: 4px;
   width: 1px;
   background-color: rgba(255, 221, 0, 0.25);
 }
 
-/* NEW: Perfect alignment - tick positions match thumb center positions for 1-10 scale */
 .slider-tick[data-value="1"] { left: calc(12px); }
 .slider-tick[data-value="2"] { left: calc(12px + (calc(100% - 24px) * 1/9)); }
 .slider-tick[data-value="3"] { left: calc(12px + (calc(100% - 24px) * 2/9)); }
@@ -636,7 +637,6 @@ button.action-btn:hover {
 .slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 8/9)); }
 .slider-tick[data-value="10"] { left: calc(100% - 12px); }
 
-/* EXACT MATCH: Range slider track from Emotional Timeline */
 .benefit-range-slider {
   -webkit-appearance: none;
   flex: 1;
@@ -657,7 +657,6 @@ button.action-btn:hover {
   z-index: 1;
 }
 
-/* FIXED: Dot indicator that matches actual constrained thumb position */
 .benefit-range-slider::before {
   content: '';
   position: absolute;
@@ -693,7 +692,6 @@ button.action-btn:hover {
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* EXACT MATCH: Bigger, fully opaque slider thumbs from Emotional Timeline */
 .benefit-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -743,7 +741,6 @@ button.action-btn:hover {
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
-/* EXACT MATCH: Slider labels from Emotional Timeline */
 .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
@@ -773,7 +770,6 @@ button.action-btn:hover {
   color: rgba(255, 221, 0, 0.7) !important;
 }
 
-/* Modal benefit items - slightly more compact than full section */
 .modal-benefit-item {
   gap: var(--spacing-sm);
 }
@@ -796,7 +792,6 @@ button.action-btn:hover {
   flex-wrap: wrap;
 }
 
-/* UPDATED: Modal buttons same height as edit date button */
 .modal-save-btn {
   flex: 1;
   min-width: 180px;
@@ -830,9 +825,8 @@ button.action-btn:hover {
   transform: translateY(-1px);
 }
 
-/* DESKTOP LAYOUT: Two-column grid for screens ≥1024px with ENHANCED styling */
+/* DESKTOP LAYOUT */
 @media (min-width: 1024px) {
-  /* UPDATED: Desktop header sizing to match Calendar exactly */
   .tracker-header-title-section h2 {
     font-size: 1.5rem !important;
   }
@@ -841,14 +835,12 @@ button.action-btn:hover {
     font-size: 0.875rem !important;
   }
 
-  /* Desktop hover effects for cards */
   .discord-community-section:hover,
   .youtube-channel-section:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   }
   
-  /* Main content grid container */
   .tracker-main-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -856,7 +848,6 @@ button.action-btn:hover {
     align-items: stretch;
   }
   
-  /* Discord and YouTube column */
   .discord-youtube-column {
     display: flex;
     flex-direction: column;
@@ -864,7 +855,6 @@ button.action-btn:hover {
     height: fit-content;
   }
   
-  /* ENHANCED: Better streak section for desktop */
   .streak-number {
     font-size: 5rem !important;
     background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
@@ -874,36 +864,21 @@ button.action-btn:hover {
     text-shadow: none;
   }
   
-  /* REFINED: Better milestone spacing and uniform heights */
+  /* UPDATED: Desktop milestone cards optimized for 2-column layout */
   .streak-milestones {
     max-width: 500px;
     margin: 0 auto;
-    padding: 0 var(--spacing-xl);
+    padding: 0 var(--spacing-lg);
     gap: var(--spacing-xl);
-    justify-content: space-evenly;
   }
   
   .milestone-item {
-    min-width: 100px;
-    padding: var(--spacing-md);
-    background-color: rgba(255, 255, 255, 0.02);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.2s ease;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
-  .milestone-item:hover {
-    background-color: rgba(255, 221, 0, 0.05);
-    border-color: rgba(255, 221, 0, 0.1);
-    transform: translateY(-2px);
+    min-height: 130px;
+    padding: var(--spacing-lg);
   }
   
   .milestone-icon {
-    font-size: 1.6rem;
+    font-size: 1.75rem;
     margin-bottom: var(--spacing-md);
   }
   
@@ -913,15 +888,10 @@ button.action-btn:hover {
   }
   
   .milestone-label {
-    font-size: 0.875rem;
-    line-height: 1.2;
-    height: 2.4em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 0.9rem;
+    line-height: 1.3;
   }
   
-  /* ENHANCED: Updated action buttons for 4-button layout */
   .streak-actions {
     flex-direction: column;
     gap: var(--spacing-md);
@@ -944,11 +914,6 @@ button.action-btn:hover {
     max-width: none !important;
   }
   
-  .streak-action-btn::before {
-    display: none;
-  }
-  
-  /* Desktop benefits button styling - SOLID YELLOW with black text */
   .benefits-btn-primary {
     background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
     border: 1px solid #f0cc00;
@@ -962,7 +927,6 @@ button.action-btn:hover {
     transform: translateY(-1px);
   }
 
-  /* Desktop Discord and YouTube button translateY transforms */
   .discord-join-btn:hover {
     background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
     border-color: #7289da;
@@ -977,7 +941,6 @@ button.action-btn:hover {
     transform: translateY(-1px);
   }
   
-  /* Benefits section: 2-column slider grid on desktop */
   .premium-benefits-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -988,7 +951,6 @@ button.action-btn:hover {
     gap: var(--spacing-md);
   }
 
-  /* Benefits modal desktop sizing */
   .benefits-modal {
     max-width: 650px;
   }
@@ -1000,7 +962,6 @@ button.action-btn:hover {
     max-height: 60vh;
   }
 
-  /* Desktop slider adjustments - KEEP EMOTIONAL TIMELINE STYLE */
   .benefit-range-slider {
     height: 8px;
   }
@@ -1023,9 +984,8 @@ button.action-btn:hover {
   }
 }
 
-/* Mobile responsiveness */
+/* MOBILE LAYOUT */
 @media (max-width: 768px) {
-  /* UPDATED: Mobile header sizing to match Calendar exactly */
   .tracker-header-title-section h2 {
     font-size: 1.25rem !important;
   }
@@ -1034,7 +994,6 @@ button.action-btn:hover {
     font-size: 0.8rem !important;
   }
 
-  /* NEW: Mobile benefits tracking banner styles - EXACT COPY from Emotional Timeline */
   .benefits-tracking-banner {
     flex-direction: column;
     text-align: center;
@@ -1060,7 +1019,6 @@ button.action-btn:hover {
     font-size: 1.25rem;
   }
 
-  /* Integrated header mobile styles */
   .integrated-tracker-header {
     padding: var(--spacing-lg);
     margin: 0;
@@ -1079,7 +1037,6 @@ button.action-btn:hover {
     justify-content: center;
   }
   
-  /* Consistent mobile button sizing */
   .tracker-header-actions .action-btn,
   .integrated-tracker-header .action-btn {
     flex: 1;
@@ -1090,7 +1047,6 @@ button.action-btn:hover {
     min-height: auto !important;
   }
   
-  /* ENHANCED: Mobile gradient streak number to match desktop */
   .streak-number {
     font-size: 3.5rem !important;
     background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
@@ -1100,28 +1056,15 @@ button.action-btn:hover {
     text-shadow: none;
   }
   
-  /* MOBILE: Better milestone spacing */
+  /* UPDATED: Mobile milestone cards - 2 column grid maintained */
   .streak-milestones {
-    flex-wrap: nowrap;
     gap: var(--spacing-sm);
-    justify-content: space-between;
-    margin: 0;
     padding: 0 var(--spacing-sm);
   }
   
-  /* ENHANCED: Mobile milestone cards to match desktop styling */
   .milestone-item {
-    flex: 1;
-    min-width: 70px;
+    min-height: 95px;
     padding: var(--spacing-sm);
-    background-color: rgba(255, 255, 255, 0.02);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.2s ease;
-    min-height: 90px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
   
   .milestone-item:active {
@@ -1131,20 +1074,20 @@ button.action-btn:hover {
   }
   
   .milestone-icon {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     margin-bottom: var(--spacing-xs);
   }
   
   .milestone-value {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
     margin-bottom: var(--spacing-xs);
   }
   
   .milestone-label {
     font-size: 0.75rem;
+    line-height: 1.2;
   }
   
-  /* ENHANCED: Mobile action buttons - enhanced styling like desktop with 4 buttons */
   .streak-actions {
     flex-direction: column;
     gap: var(--spacing-md);
@@ -1166,7 +1109,6 @@ button.action-btn:hover {
     overflow: hidden;
   }
   
-  /* Mobile benefits button active state - SOLID YELLOW with black text */
   .benefits-btn-primary:active {
     background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
     border-color: #f0cc00;
@@ -1174,7 +1116,6 @@ button.action-btn:hover {
     transform: translateY(-1px);
   }
 
-  /* Mobile Discord and YouTube button translateY transforms */
   .discord-join-btn:active {
     background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
     border-color: #7289da;
@@ -1189,7 +1130,6 @@ button.action-btn:hover {
     transform: translateY(-1px);
   }
   
-  /* Mobile benefits status indicator adjustments */
   .benefits-status-indicator {
     margin: var(--spacing-md) 0;
   }
@@ -1203,7 +1143,6 @@ button.action-btn:hover {
     padding: var(--spacing-xs) var(--spacing-sm);
   }
 
-  /* Benefits modal mobile adjustments */
   .benefits-modal {
     max-width: calc(100vw - 2rem);
     margin: var(--spacing-sm);
@@ -1228,7 +1167,6 @@ button.action-btn:hover {
     min-height: auto !important;
   }
 
-  /* Mobile slider adjustments - MATCHING EMOTIONAL TIMELINE */
   .benefits-modal .benefit-label,
   .premium-benefits-container .benefit-label,
   .benefit-slider-item .benefit-label {
@@ -1257,7 +1195,6 @@ button.action-btn:hover {
     height: 22px;
   }
   
-  /* Mobile tick marks adjustments - FIXED positioning with contained height */
   .slider-tick-marks {
     top: 50%;
     transform: translateY(-50%);
@@ -1277,7 +1214,6 @@ button.action-btn:hover {
     z-index: 0;
   }
   
-  /* Ensure mobile slider track stays above ticks */
   .benefit-range-slider {
     position: relative;
     z-index: 1;
@@ -1291,7 +1227,6 @@ button.action-btn:hover {
   }
 }
 
-/* UPDATED: Very small mobile sizing to match Calendar exactly */
 @media (max-width: 480px) {
   .tracker-header-title-section h2 {
     font-size: 1.125rem !important;
@@ -1301,7 +1236,6 @@ button.action-btn:hover {
     font-size: 0.75rem !important;
   }
 
-  /* NEW: Very small mobile benefits tracking banner styles - EXACT COPY from Emotional Timeline */
   .benefits-tracking-helmet {
     width: 30px;
     height: 30px;
@@ -1331,7 +1265,6 @@ button.action-btn:hover {
     align-items: center;
   }
   
-  /* Very small screen benefit slider adjustments */
   .benefits-modal .benefit-label,
   .premium-benefits-container .benefit-label,
   .benefit-slider-item .benefit-label {
@@ -1360,7 +1293,6 @@ button.action-btn:hover {
     height: 20px;
   }
   
-  /* Very small screen tick marks adjustments - FIXED positioning with contained height */
   .slider-tick-marks {
     top: 50%;
     transform: translateY(-50%);
@@ -1380,7 +1312,6 @@ button.action-btn:hover {
     z-index: 0;
   }
   
-  /* Ensure very small screen slider track stays above ticks */
   .benefit-range-slider {
     position: relative;
     z-index: 1;
