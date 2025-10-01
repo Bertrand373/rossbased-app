@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Pill-shaped horizontal milestone indicators
+// components/Tracker/Tracker.js - UPDATED: Added PredictionWidget
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,7 @@ import './TrackerButtons.css';
 
 // Components
 import DatePicker from '../Shared/DatePicker';
+import PredictionWidget from '../PredictionWidget/PredictionWidget';
 
 // Icons
 import { 
@@ -40,7 +41,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const [showVideo, setShowVideo] = useState(false);
   const [featuredVideoId] = useState('_1CcOqHD57E');
   
-  // Benefits modal state - ENHANCED: Default to 5/10 for all values
+  // Benefits modal state
   const [showBenefitsModal, setShowBenefitsModal] = useState(false);
   const [modalBenefits, setModalBenefits] = useState({ 
     energy: 5, 
@@ -63,9 +64,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   
   const today = new Date();
 
-  // NEW: Calculate next milestone
+  // Calculate next milestone
   const calculateNextMilestone = (streak) => {
-    const milestones = [7, 30, 90, 180, 365, 730, 1095]; // 7 days, 30 days, 90 days, 6 months, 1 year, 2 years, 3 years
+    const milestones = [7, 30, 90, 180, 365, 730, 1095];
     
     for (let milestone of milestones) {
       if (streak < milestone) {
@@ -77,7 +78,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       }
     }
     
-    // If past all milestones, show next year milestone
     const nextYearMilestone = Math.ceil(streak / 365) * 365;
     return {
       target: nextYearMilestone,
@@ -86,7 +86,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     };
   };
 
-  // NEW: Calculate days this month with benefits logged
+  // Calculate days this month with benefits logged
   const calculateDaysThisMonth = () => {
     const monthStart = startOfMonth(today);
     const monthEnd = endOfMonth(today);
@@ -96,7 +96,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       return { logged: 0, total: totalDaysInMonth };
     }
     
-    // Count how many days this month have benefit entries
     const daysLogged = userData.benefitTracking.filter(entry => {
       const entryDate = new Date(entry.date);
       return entryDate >= monthStart && entryDate <= monthEnd;
@@ -108,7 +107,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const nextMilestone = calculateNextMilestone(currentStreak);
   const monthProgress = calculateDaysThisMonth();
 
-  // Check if benefits are already logged for today and update modal state
+  // Check if benefits are already logged for today
   useEffect(() => {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const existingBenefits = userData.benefitTracking?.find(
@@ -116,7 +115,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     );
     
     if (existingBenefits) {
-      // Use existing values if they exist, otherwise default to 5
       const benefits = {
         energy: existingBenefits.energy || 5,
         focus: existingBenefits.focus || 5,
@@ -128,7 +126,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       setModalBenefits(benefits);
       setBenefitsLogged(true);
     } else {
-      // Reset to defaults (5/10 for all) if no existing benefits
       setModalBenefits({ 
         energy: 5, 
         focus: 5, 
@@ -141,7 +138,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [userData.benefitTracking]);
 
-  // React DatePicker handlers
   const handleDateSubmit = (newDate) => {
     try {
       const calculatedStreak = differenceInDays(today, newDate) + 1;
@@ -168,7 +164,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     setShowSetStartDate(false);
   };
   
-  // Update UI when userData changes
   useEffect(() => {
     if (userData.startDate) {
       const startDateObj = new Date(userData.startDate);
@@ -185,7 +180,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [userData, today]);
 
-  // Calculate days since start
   const daysSinceStart = userData.startDate 
     ? differenceInDays(today, new Date(userData.startDate)) + 1 
     : 0;
@@ -246,12 +240,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     navigate('/urge-toolkit');
   };
 
-  // Benefits modal handlers
   const handleBenefitsLog = () => {
     setShowBenefitsModal(true);
   };
 
-  // Handle modal benefit changes with smooth scrolling support
   const handleModalBenefitChange = (type, value) => {
     setModalBenefits(prev => ({
       ...prev,
@@ -259,17 +251,14 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }));
   };
 
-  // Save benefits from modal
   const saveBenefitsFromModal = () => {
     const today = new Date();
     const todayStr = format(today, 'yyyy-MM-dd');
     
-    // Remove existing entry for today if it exists
     const updatedBenefitTracking = (userData.benefitTracking || []).filter(
       benefit => format(new Date(benefit.date), 'yyyy-MM-dd') !== todayStr
     );
     
-    // Add new entry
     updatedBenefitTracking.push({
       date: today,
       energy: modalBenefits.energy,
@@ -280,7 +269,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       workout: modalBenefits.workout
     });
     
-    // Sort by date
     updatedBenefitTracking.sort((a, b) => new Date(a.date) - new Date(b.date));
     
     updateUserData({ benefitTracking: updatedBenefitTracking });
@@ -291,11 +279,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     toast.success('Benefits logged for today!');
   };
 
-  // Cancel modal and reset to existing values or defaults
   const cancelBenefitsModal = () => {
     setShowBenefitsModal(false);
     
-    // Reset to existing values if they exist, otherwise keep defaults (5/10)
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const existingBenefits = userData.benefitTracking?.find(
       benefit => format(new Date(benefit.date), 'yyyy-MM-dd') === todayStr
@@ -311,7 +297,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         workout: existingBenefits.workout || existingBenefits.gymPerformance || 5
       });
     } else {
-      // Reset to defaults (5/10 for all)
       setModalBenefits({ 
         energy: 5, 
         focus: 5, 
@@ -323,17 +308,14 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   };
 
-  // Handle Discord link
   const handleDiscordJoin = () => {
     window.open('https://discord.gg/RDFC5eUtuA', '_blank', 'noopener,noreferrer');
   };
 
-  // Handle YouTube link
   const handleYouTubeSubscribe = () => {
     window.open('https://www.youtube.com/@RossBased', '_blank', 'noopener,noreferrer');
   };
 
-  // Video handlers
   const handleWatchVideo = () => {
     setShowVideo(true);
   };
@@ -342,7 +324,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     setShowVideo(false);
   };
 
-  // NEW: Render slider tick marks for values 1-10
   const renderSliderTickMarks = () => {
     const ticks = [];
     for (let i = 1; i <= 10; i++) {
@@ -360,7 +341,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
 
   return (
     <div className="tracker-container">
-      {/* React DatePicker Modal - UPDATED: Added date-picker-modal class */}
       {showSetStartDate && (
         <div className="modal-overlay">
           <div className="modal-content date-picker-modal">
@@ -380,7 +360,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* UPDATED: Benefits Logging Modal - Banner only shown when benefits NOT logged */}
       {showBenefitsModal && (
         <div className="modal-overlay">
           <div className="modal-content benefits-modal">
@@ -392,7 +371,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               {benefitsLogged ? "Update how you're feeling today" : "How are you feeling today?"}
             </p>
             
-            {/* UPDATED: Benefits Tracking Banner - Only show when benefits NOT logged */}
             {!benefitsLogged && (
               <div className="benefits-tracking-banner">
                 <div className="benefits-tracking-helmet-container">
@@ -480,7 +458,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
-      {/* Video Modal */}
       {showVideo && (
         <div className="video-modal-overlay" onClick={handleCloseVideo}>
           <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -502,7 +479,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
       
-      {/* Header Section with Calendar-matching sizing */}
       <div className="integrated-tracker-header">
         <div className="tracker-header-title-section">
           <h2>Daily Dashboard</h2>
@@ -524,9 +500,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       </div>
       
-      {/* Main content container */}
       <div className="tracker-main-content">
-        {/* Current Streak Display */}
         <div className="current-streak-container">
           <div className="streak-card">
             <div className="streak-date">Today, {format(new Date(), 'MMMM d, yyyy')}</div>
@@ -538,9 +512,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             <div className="streak-divider"></div>
             
-            {/* UPDATED: Pill-shaped horizontal milestone indicators */}
             <div className="streak-milestone-pills">
-              {/* Next Milestone Pill */}
               <div className="milestone-pill">
                 <FaFire className="milestone-pill-icon" />
                 <span className="milestone-pill-text">
@@ -548,7 +520,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 </span>
               </div>
               
-              {/* Benefits Logged Pill */}
               <div className="milestone-pill">
                 <FaClipboardCheck className="milestone-pill-icon" />
                 <span className="milestone-pill-text">
@@ -559,7 +530,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             <div className="streak-actions-divider"></div>
             
-            {/* UPDATED: Benefits status - matching emotional timeline pill size */}
             <div className="benefits-status-indicator">
               {benefitsLogged ? (
                 <div className="benefits-logged-status">
@@ -575,7 +545,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
             
             <div className="streak-actions">
-              {/* Benefits logging button - FIRST POSITION */}
               <button 
                 className="streak-action-btn benefits-btn-primary"
                 onClick={handleBenefitsLog}
@@ -611,9 +580,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           </div>
         </div>
         
-        {/* Discord and YouTube Column */}
         <div className="discord-youtube-column">
-          {/* Discord Community Section */}
+          <PredictionWidget userData={userData} />
+          
           <div className="discord-community-section">
             <div className="discord-community-header">
               <div className="section-icon-header">
@@ -662,7 +631,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             )}
           </div>
           
-          {/* YouTube Channel Section */}
           <div className="youtube-channel-section">
             <div className="youtube-channel-header">
               <div className="section-icon-header">
@@ -674,7 +642,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               </div>
             </div>
             
-            {/* Featured Video Preview */}
             <div className="featured-video-preview">
               <div className="video-thumbnail-container" onClick={handleWatchVideo}>
                 <img 
