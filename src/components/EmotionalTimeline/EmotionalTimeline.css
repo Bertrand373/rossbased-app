@@ -135,19 +135,18 @@
   top: var(--spacing-xs);
   left: var(--spacing-xs);
   height: calc(100% - calc(var(--spacing-xs) * 2));
-  /* CHANGED: Full yellow background instead of subtle yellow */
   background-color: var(--primary);
   border: 1px solid var(--primary);
   border-radius: var(--radius-full);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 1;
-  /* Start hidden but ready to be shown */
   opacity: 0;
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
-  /* Mobile GPU acceleration */
   will-change: transform, width;
 }
 

@@ -156,7 +156,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     return isMobileDevice;
   }, []);
 
-  // Enhanced slider positioning
+  // FIXED: Enhanced slider positioning with smooth bidirectional animation
   const updateTabSlider = useCallback(() => {
     if (!tabsRef.current || !sliderRef.current) {
       return false;
@@ -188,10 +188,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           const leftOffset = tabRect.left - containerRect.left - paddingLeft + scrollLeft;
           const tabWidth = tabRect.width;
           
-          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
+          // FIXED: Set width FIRST, then transform in next frame
           slider.style.width = `${Math.round(tabWidth)}px`;
-          slider.style.opacity = '1';
-          slider.style.visibility = 'visible';
+          
+          requestAnimationFrame(() => {
+            slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
+            slider.style.opacity = '1';
+            slider.style.visibility = 'visible';
+          });
           
         } catch (innerError) {
           console.error('Inner slider positioning failed:', innerError);

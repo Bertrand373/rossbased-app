@@ -25,11 +25,11 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   
   // Privacy Settings States
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
-  const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false); // Default true
+  const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
-  const [notifications, setNotifications] = useState(userData.notifications !== false); // Default true
+  const [notifications, setNotifications] = useState(userData.notifications !== false);
   
-  // Feedback States - SIMPLIFIED: Removed email and priority
+  // Feedback States
   const [feedbackType, setFeedbackType] = useState('general');
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -48,7 +48,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'general', label: 'General', icon: FaCommentAlt }
   ];
 
-  // Tab configuration
   const tabs = [
     { id: 'account', label: 'Account', icon: FaUser },
     { id: 'privacy', label: 'Privacy', icon: FaLock },
@@ -56,16 +55,14 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'data', label: 'Data', icon: FaDownload }
   ];
 
-  // MOBILE DETECTION: Simplified mobile detection
   const detectMobile = useCallback(() => {
     const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
     setIsMobile(isMobileDevice);
     return isMobileDevice;
   }, []);
 
-  // FIXED: Enhanced slider positioning with perfect edge alignment
+  // FIXED: Enhanced slider positioning with smooth bidirectional animation
   const updateTabSlider = useCallback(() => {
-    // Guard clauses for safety
     if (!tabsRef.current || !sliderRef.current) {
       return false;
     }
@@ -80,37 +77,29 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         return false;
       }
 
-      // Wait for next frame to ensure layout is complete
       requestAnimationFrame(() => {
         try {
-          // Get measurements relative to container
           const containerRect = tabsContainer.getBoundingClientRect();
           const tabRect = activeTabElement.getBoundingClientRect();
           
-          // Validate measurements
           if (containerRect.width === 0 || tabRect.width === 0) {
             console.warn('Invalid measurements, container or tab not rendered');
             return;
           }
 
-          // FIXED: Calculate position based on actual container content bounds
-          // Get the computed padding from CSS and round to avoid sub-pixel issues
           const containerStyle = window.getComputedStyle(tabsContainer);
           const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
-          
-          // Calculate exact position relative to container's content area
-          // Round all measurements to avoid sub-pixel positioning issues
           const leftOffset = Math.round(tabRect.left - containerRect.left - paddingLeft);
-          const tabWidth = tabRect.width;
+          const tabWidth = Math.round(tabRect.width);
           
-          // FIXED: Ensure slider matches container's dynamic sizing perfectly
-          // No boundary clamping needed - trust the container's fit-content sizing
+          // FIXED: Set width FIRST, then transform in next frame
+          slider.style.width = `${tabWidth}px`;
           
-          // Apply positioning and make visible
-          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
-          slider.style.width = `${Math.round(tabWidth)}px`;
-          slider.style.opacity = '1';
-          slider.style.visibility = 'visible';
+          requestAnimationFrame(() => {
+            slider.style.transform = `translateX(${leftOffset}px)`;
+            slider.style.opacity = '1';
+            slider.style.visibility = 'visible';
+          });
           
         } catch (innerError) {
           console.error('Inner slider positioning failed:', innerError);
@@ -125,19 +114,14 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   }, [activeTab]);
 
-  // SIMPLIFIED: Clean tab change handler
   const handleTabChange = useCallback((newTab) => {
     if (newTab === activeTab) return;
-    
     setActiveTab(newTab);
-    
-    // Update slider immediately on mobile for responsiveness
     if (isMobile) {
       setTimeout(() => updateTabSlider(), 10);
     }
   }, [activeTab, isMobile, updateTabSlider]);
 
-  // FIXED: Proper slider initialization
   useEffect(() => {
     const initializeSlider = () => {
       detectMobile();
@@ -146,24 +130,20 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         return;
       }
 
-      // Initialize slider immediately
       requestAnimationFrame(() => {
         const success = updateTabSlider();
         
         if (success) {
           setIsSliderInitialized(true);
         } else {
-          // Retry after short delay to ensure DOM is ready
           setTimeout(() => {
             if (updateTabSlider()) {
               setIsSliderInitialized(true);
             } else {
-              // Final fallback - force slider to be visible
               if (sliderRef.current) {
                 sliderRef.current.style.opacity = '1';
                 sliderRef.current.style.visibility = 'visible';
                 setIsSliderInitialized(true);
-                // Try to update position one more time
                 setTimeout(updateTabSlider, 50);
               }
             }
@@ -172,13 +152,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       });
     };
 
-    // Initialize after DOM is ready
     const timer = setTimeout(initializeSlider, 100);
-    
     return () => clearTimeout(timer);
   }, [updateTabSlider, detectMobile]);
 
-  // SIMPLIFIED: Basic resize handling
   useEffect(() => {
     const handleResize = () => {
       detectMobile();
@@ -198,22 +175,18 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     
     return () => {
       window.removeEventListener('resize', handleResize);
-      
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
     };
   }, [isSliderInitialized, detectMobile, updateTabSlider]);
 
-  // Update slider when active tab changes
   useEffect(() => {
     if (isSliderInitialized) {
-      // Small delay to ensure DOM is updated
       setTimeout(updateTabSlider, 10);
     }
   }, [activeTab, isSliderInitialized, updateTabSlider]);
 
-  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       [resizeTimeoutRef].forEach(ref => {
@@ -224,12 +197,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     };
   }, []);
 
-  // Calculate basic user info for display
   const userStats = {
     memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown'
   };
 
-  // Handle profile updates
   const handleProfileUpdate = () => {
     const updates = {
       username: username.trim(),
@@ -247,14 +218,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     toast.success('Profile updated successfully!');
   };
 
-  // Handle feedback submission
   const handleFeedbackSubmit = () => {
     if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
       toast.error('Please fill in both subject and message');
       return;
     }
     
-    // In a real app, this would send to your feedback API
     const feedbackData = {
       type: feedbackType,
       subject: feedbackSubject.trim(),
@@ -267,7 +236,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     
     console.log('Feedback submitted:', feedbackData);
     
-    // Reset form
     setFeedbackSubject('');
     setFeedbackMessage('');
     setFeedbackType('general');
@@ -276,13 +244,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     toast.success('Thank you! Your feedback has been submitted.');
   };
 
-  // Handle data export
   const handleDataExport = () => {
     const exportData = {
       profile: {
         username: userData.username,
         memberSince: userData.startDate,
-        isPremium: true, // Everyone is premium now
+        isPremium: true,
         discordUsername: userData.discordUsername
       },
       streakData: {
@@ -316,9 +283,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     toast.success('Your data has been exported successfully!');
   };
 
-  // Handle account deletion
   const handleAccountDeletion = () => {
-    // In a real app, this would call your deletion API
     localStorage.clear();
     toast.success('Account deleted successfully');
     onLogout();
@@ -326,7 +291,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   return (
     <div className="profile-container">
-      {/* UPDATED: Integrated header design matching tracker/calendar */}
       <div className="integrated-profile-header">
         <div className="profile-header-title-section">
           <h2>Profile & Settings</h2>
@@ -346,7 +310,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       </div>
 
-      {/* Profile Overview Card - Simplified since all features are free */}
       <div className="profile-overview-card">
         <div className="profile-avatar-section">
           <div className="profile-avatar">
@@ -366,12 +329,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       </div>
 
-      {/* BULLETPROOF: Mobile-First Tab Navigation with Ultra-Robust Sliding Animation */}
       <div 
         className="profile-tabs" 
         ref={tabsRef}
       >
-        {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations */}
         <div 
           className="profile-tab-slider" 
           ref={sliderRef}
@@ -396,9 +357,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         ))}
       </div>
 
-      {/* Tab Content */}
       <div className="profile-tab-content">
-        {/* Account Tab */}
         {activeTab === 'account' && (
           <div className="account-section">
             <div className="section-header">
@@ -477,7 +436,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Privacy Tab */}
         {activeTab === 'privacy' && (
           <div className="privacy-section">
             <h3>Privacy Settings</h3>
@@ -553,7 +511,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Settings Tab - UPDATED: Coming Soon banner for language settings */}
         {activeTab === 'settings' && (
           <div className="settings-section">
             <h3>App Settings</h3>
@@ -562,7 +519,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               <div className="settings-group">
                 <h4>Language & Localization</h4>
                 
-                {/* NEW: Coming Soon Banner */}
                 <div className="coming-soon-banner">
                   <div className="coming-soon-helmet-container">
                     <img 
@@ -593,7 +549,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* Data Tab */}
         {activeTab === 'data' && (
           <div className="data-section">
             <h3>Data Management</h3>
@@ -632,7 +587,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         )}
       </div>
 
-      {/* Feedback Modal */}
       {showFeedbackModal && (
         <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
           <div className="modal-content feedback-modal" onClick={e => e.stopPropagation()}>
@@ -700,7 +654,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       )}
 
-      {/* Export Confirmation Modal */}
       {showExportModal && (
         <div className="modal-overlay" onClick={() => setShowExportModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -727,7 +680,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       )}
 
-      {/* Delete Account Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
