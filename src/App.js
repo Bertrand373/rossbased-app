@@ -1,4 +1,4 @@
-// App.js - UPDATED: Fixed mobile breakpoint to 1024px for landscape device support
+// App.js - UPDATED: Added UrgePrediction integration
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -25,6 +25,9 @@ import EmotionalTimeline from './components/EmotionalTimeline/EmotionalTimeline'
 import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
+
+// NEW: Import UrgePrediction component
+import UrgePrediction from './components/UrgePrediction/UrgePrediction';
 
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
@@ -302,6 +305,24 @@ const ScrollToTop = () => {
   return null; // This component doesn't render anything
 };
 
+// NEW: Service Worker Message Listener - handles notification clicks
+const ServiceWorkerListener = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'NAVIGATE_TO_PREDICTION') {
+          // Navigate to prediction page when notification is clicked
+          navigate('/urge-prediction');
+        }
+      });
+    }
+  }, [navigate]);
+
+  return null;
+};
+
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
@@ -406,6 +427,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
+      <ServiceWorkerListener />
       <div className="app-container">
         <Toaster 
           position="top-center"
@@ -526,6 +548,8 @@ function App() {
                   <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                   <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                   <Route path="/profile" element={<Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />} />
+                  {/* NEW: Add UrgePrediction route */}
+                  <Route path="/urge-prediction" element={<UrgePrediction userData={userData} updateUserData={updateUserData} />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>
