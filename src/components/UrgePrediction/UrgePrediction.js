@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UrgePrediction.css';
 import predictionService from '../../services/PredictionService';
-import notificationService from '../../services/NotificationService';
 
 function UrgePrediction() {
   const navigate = useNavigate();
@@ -96,7 +95,7 @@ function UrgePrediction() {
     return (
       <div className="urge-prediction-container">
         <div className="low-risk-message">
-          <div className="success-icon">✅</div>
+          <div className="success-icon">✓</div>
           <h2>You're in the Clear</h2>
           <p>Current urge risk: <strong>{prediction ? prediction.riskScore : 0}%</strong></p>
           <p className="subtext">No interventions needed right now. Keep up the great work!</p>
@@ -121,7 +120,7 @@ function UrgePrediction() {
     <div className="urge-prediction-container">
       {feedbackSubmitted ? (
         <div className="feedback-success">
-          <div className="success-icon">🙏</div>
+          <div className="success-icon">✓</div>
           <h2>Thank You!</h2>
           <p>Your feedback helps make predictions more accurate.</p>
           <p className="subtext">Redirecting to dashboard...</p>
@@ -129,7 +128,7 @@ function UrgePrediction() {
       ) : (
         <div className="prediction-card">
           <div className="prediction-header">
-            <div className="warning-icon">⚠️</div>
+            <div className="warning-icon">⚠</div>
             <h1>{riskLevel.label} URGE RISK DETECTED</h1>
           </div>
 
@@ -170,7 +169,7 @@ function UrgePrediction() {
               className="intervention-button breathing"
               onClick={() => handleInterventionClick('breathing')}
             >
-              <span className="intervention-icon">🫁</span>
+              <span className="intervention-icon">💨</span>
               <div className="intervention-text">
                 <div className="intervention-title">Start Breathing Exercise</div>
                 <div className="intervention-subtitle">2 minutes • Proven to reduce urges</div>
