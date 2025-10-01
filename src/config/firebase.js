@@ -32,5 +32,6 @@ try {
   console.warn('Firebase messaging not supported in this browser:', error);
 }
 
-export { messaging, getToken, onMessage };
+// Export app as both named and default export
+export { app, messaging, getToken, onMessage };
 export default app;
