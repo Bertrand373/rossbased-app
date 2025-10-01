@@ -10,7 +10,14 @@ function PredictionWidget({ userData }) {
   const navigate = useNavigate();
   const [prediction, setPrediction] = useState(null);
   const [nextCheckTime, setNextCheckTime] = useState(null);
-  const [notificationPermission, setNotificationPermission] = useState(Notification.permission);
+  
+  // FIXED: Check if Notification exists before accessing it
+  const [notificationPermission, setNotificationPermission] = useState(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      return Notification.permission;
+    }
+    return 'unsupported';
+  });
 
   // Run prediction check
   useEffect(() => {
@@ -39,7 +46,9 @@ function PredictionWidget({ userData }) {
   // Update permission status
   useEffect(() => {
     const checkPermission = () => {
-      setNotificationPermission(Notification.permission);
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        setNotificationPermission(Notification.permission);
+      }
     };
 
     // Check periodically
@@ -128,7 +137,15 @@ function PredictionWidget({ userData }) {
         )}
 
         <div className="widget-actions">
-          {notificationPermission !== 'granted' ? (
+          {notificationPermission === 'unsupported' ? (
+            <button 
+              className="widget-btn view-details"
+              onClick={handleViewDetails}
+            >
+              <span>📊</span>
+              <span>View Full Analysis</span>
+            </button>
+          ) : notificationPermission !== 'granted' ? (
             <button 
               className="widget-btn enable-notifications"
               onClick={handleEnableNotifications}
