@@ -691,10 +691,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <div className="youtube-channel-stats">
               <div className="youtube-stat-item">
                 <FaUsers className="youtube-stat-icon" />
-                <span>5.4k Subscribers</span>
+                <span>10.0k Subscribers</span>
               </div>
               <div className="youtube-stat-item">
-                <FaCalendarAlt className="youtube-stat-icon" />
+                <FaCalendarWeek className="youtube-stat-icon" />
                 <span>Weekly Content</span>
               </div>
               <div className="youtube-stat-item">
