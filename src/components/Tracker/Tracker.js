@@ -27,7 +27,7 @@ import {
   FaUsers,
   FaYoutube,
   FaPlay,
-  FaCalendarAlt,
+  FaCalendarWeek,
   FaChartLine,
   FaClipboardCheck
 } from 'react-icons/fa';

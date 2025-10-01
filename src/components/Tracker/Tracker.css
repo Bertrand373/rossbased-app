@@ -855,22 +855,22 @@ button.action-btn:hover {
     text-shadow: none;
   }
   
-  /* Desktop pill styling - slightly larger */
+  /* Desktop pill styling - matching status pill size */
   .streak-milestone-pills {
     padding: 0 var(--spacing-lg);
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
   }
   
   .milestone-pill {
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: var(--spacing-sm) var(--spacing-md);
   }
   
   .milestone-pill-icon {
-    font-size: 1.5rem;
+    font-size: 1rem;
   }
   
   .milestone-pill-text {
-    font-size: 1rem;
+    font-size: 0.875rem;
   }
   
   .streak-actions {
