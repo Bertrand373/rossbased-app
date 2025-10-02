@@ -42,7 +42,7 @@ function TrainingStatusWidget({ userData }) {
   };
 
   if (isLoading || !dataQuality) {
-    return null; // Don't show widget while loading
+    return null;
   }
 
   // Don't show if user has very little data
@@ -88,7 +88,34 @@ function TrainingStatusWidget({ userData }) {
     );
   }
 
-  // User has enough data but model not trained
+  // NEW: User has enough data but no relapses - can't train effectively
+  if (dataQuality.benefitDays >= 20 && !dataQuality.hasRelapseData) {
+    return (
+      <div className="training-status-widget success">
+        <div className="widget-header">
+          <div className="widget-icon">🛡️</div>
+          <div className="widget-title">
+            <h3>Excellent Streak - No Training Needed</h3>
+            <p className="widget-subtitle">
+              {dataQuality.benefitDays} days tracked with no relapses
+            </p>
+          </div>
+        </div>
+
+        <div className="widget-info-box">
+          <p>
+            The ML prediction system learns from past relapse patterns to identify risk factors. 
+            Since you haven't experienced any relapses, there's no pattern data to train on.
+          </p>
+          <p className="success-message">
+            Keep up the incredible work! You're already succeeding without needing predictions.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // User has enough data and relapses - ready to train
   if (dataQuality.canTrain) {
     return (
       <div className="training-status-widget ready">
