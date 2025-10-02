@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UrgePrediction.css';
 import mlPredictionService from '../../services/MLPredictionService';
-import modelTrainer from '../../utils/ModelTrainer';
 
 function UrgePrediction() {
   const navigate = useNavigate();
@@ -69,17 +68,12 @@ function UrgePrediction() {
         usedML: prediction.usedML
       };
 
-      // Save to localStorage for ML retraining
+      // Save to localStorage for future ML retraining
       const existingFeedback = JSON.parse(localStorage.getItem('prediction_feedback') || '[]');
       existingFeedback.push(feedback);
       localStorage.setItem('prediction_feedback', JSON.stringify(existingFeedback));
 
-      // Process feedback with ModelTrainer
-      const feedbackResult = modelTrainer.processFeedback(feedback);
-      
-      if (feedbackResult.shouldRetrain) {
-        console.log('⚠️ Model should be retrained:', feedbackResult.reason);
-      }
+      console.log('✅ Feedback recorded for ML improvement');
 
       setFeedbackSubmitted(true);
 
