@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Added PredictionWidget
+// components/Tracker/Tracker.js - UPDATED: Added TrainingStatusWidget
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,7 @@ import './TrackerButtons.css';
 // Components
 import DatePicker from '../Shared/DatePicker';
 import PredictionWidget from '../PredictionWidget/PredictionWidget';
+import TrainingStatusWidget from '../TrainingStatusWidget/TrainingStatusWidget';  // NEW
 
 // Icons
 import { 
@@ -581,6 +582,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
         
         <div className="discord-youtube-column">
+          {/* NEW: Training Status Widget */}
+          <TrainingStatusWidget userData={userData} />
+          
           <PredictionWidget userData={userData} />
           
           <div className="discord-community-section">

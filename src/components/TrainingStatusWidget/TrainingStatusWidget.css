@@ -1,0 +1,217 @@
+/* src/components/TrainingStatusWidget/TrainingStatusWidget.css */
+
+.training-status-widget {
+  background: linear-gradient(135deg, var(--medium-gray) 0%, rgba(45, 45, 45, 0.9) 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  margin-bottom: var(--spacing-lg);
+}
+
+.training-status-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Trained state */
+.training-status-widget.trained {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--medium-gray) 100%);
+}
+
+/* Ready to train state */
+.training-status-widget.ready {
+  border-color: rgba(255, 221, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--medium-gray) 100%);
+}
+
+/* Progress state */
+.training-status-widget.progress {
+  border-color: rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, var(--medium-gray) 100%);
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.widget-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.widget-title h3 {
+  color: var(--text);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.widget-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Widget Stats */
+.widget-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  color: var(--primary);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Widget Info */
+.widget-info {
+  margin-bottom: var(--spacing-md);
+}
+
+.widget-info p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-md);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, #e6c200 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-message {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 0;
+}
+
+/* Action Button */
+.widget-action-btn {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.widget-action-btn.primary {
+  background: linear-gradient(135deg, var(--primary) 0%, #e6c200 100%);
+  color: #000;
+}
+
+.widget-action-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+}
+
+.widget-action-btn:not(.primary) {
+  background: rgba(128, 128, 128, 0.1);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.widget-action-btn:not(.primary):hover {
+  background: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .training-status-widget {
+    padding: var(--spacing-md);
+  }
+
+  .widget-icon {
+    font-size: 2rem;
+  }
+
+  .widget-title h3 {
+    font-size: 1rem;
+  }
+
+  .widget-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+  }
+
+  .stat-label {
+    font-size: 0.6875rem;
+  }
+
+  .stat-value {
+    font-size: 1rem;
+  }
+
+  .widget-action-btn {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .widget-header {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .widget-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-item {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: var(--spacing-xs);
+  }
+}

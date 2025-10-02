@@ -1,4 +1,4 @@
-// App.js - UPDATED: Added UrgePrediction integration
+// App.js - UPDATED: Added MLTraining route (no navigation changes)
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -26,8 +26,9 @@ import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
-// NEW: Import UrgePrediction component
+// Import UrgePrediction and MLTraining
 import UrgePrediction from './components/UrgePrediction/UrgePrediction';
+import MLTraining from './components/MLTraining/MLTraining';  // NEW
 
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
@@ -83,11 +84,10 @@ const MobileProfileButton = () => {
   );
 };
 
-// ENHANCED: Header Navigation with Ultra-Robust Sliding Animation Component - Matching Profile Tabs Exactly
+// UNCHANGED: Header Navigation (still 5 items)
 const HeaderNavigation = () => {
   const location = useLocation();
   
-  // BULLETPROOF: Enhanced slider with mobile-first state management - identical to Profile
   const navContainerRef = useRef(null);
   const sliderRef = useRef(null);
   const [isSliderInitialized, setIsSliderInitialized] = useState(false);
@@ -102,16 +102,13 @@ const HeaderNavigation = () => {
     { path: '/urge-toolkit', icon: FaShieldAlt, label: 'Urge Toolkit' }
   ];
 
-  // FIXED: Mobile detection changed to 1024px breakpoint
   const detectMobile = useCallback(() => {
     const isMobileDevice = window.innerWidth <= 1024 || 'ontouchstart' in window;
     setIsMobile(isMobileDevice);
     return isMobileDevice;
   }, []);
 
-  // FIXED: Enhanced slider positioning with perfect edge alignment - identical to Profile
   const updateNavSlider = useCallback(() => {
-    // Guard clauses for safety
     if (!navContainerRef.current || !sliderRef.current) {
       return false;
     }
@@ -123,36 +120,27 @@ const HeaderNavigation = () => {
       
       if (!activeNavElement) {
         console.warn(`Active nav element not found`);
-        // Hide slider if no active element
         slider.style.opacity = '0';
         slider.style.visibility = 'hidden';
         return false;
       }
 
-      // Wait for next frame to ensure layout is complete
       requestAnimationFrame(() => {
         try {
-          // Get measurements relative to container
           const containerRect = navContainer.getBoundingClientRect();
           const navRect = activeNavElement.getBoundingClientRect();
           
-          // Validate measurements
           if (containerRect.width === 0 || navRect.width === 0) {
             console.warn('Invalid measurements, container or nav not rendered');
             return;
           }
 
-          // FIXED: Calculate position based on actual container content bounds
-          // Get the computed padding from CSS and round to avoid sub-pixel issues
           const containerStyle = window.getComputedStyle(navContainer);
           const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
           
-          // Calculate exact position relative to container's content area
-          // Round all measurements to avoid sub-pixel positioning issues
           const leftOffset = Math.round(navRect.left - containerRect.left - paddingLeft);
           const navWidth = navRect.width;
           
-          // Apply positioning and make visible
           slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
           slider.style.width = `${Math.round(navWidth)}px`;
           slider.style.opacity = '1';
@@ -171,7 +159,6 @@ const HeaderNavigation = () => {
     }
   }, []);
 
-  // FIXED: Proper slider initialization - identical to Profile
   useEffect(() => {
     const initializeSlider = () => {
       detectMobile();
@@ -180,24 +167,20 @@ const HeaderNavigation = () => {
         return;
       }
 
-      // Initialize slider immediately
       requestAnimationFrame(() => {
         const success = updateNavSlider();
         
         if (success) {
           setIsSliderInitialized(true);
         } else {
-          // Retry after short delay to ensure DOM is ready
           setTimeout(() => {
             if (updateNavSlider()) {
               setIsSliderInitialized(true);
             } else {
-              // Final fallback - force slider to be visible
               if (sliderRef.current) {
                 sliderRef.current.style.opacity = '1';
                 sliderRef.current.style.visibility = 'visible';
                 setIsSliderInitialized(true);
-                // Try to update position one more time
                 setTimeout(updateNavSlider, 50);
               }
             }
@@ -206,13 +189,11 @@ const HeaderNavigation = () => {
       });
     };
 
-    // Initialize after DOM is ready
     const timer = setTimeout(initializeSlider, 100);
     
     return () => clearTimeout(timer);
   }, [updateNavSlider, detectMobile]);
 
-  // SIMPLIFIED: Basic resize handling - identical to Profile
   useEffect(() => {
     const handleResize = () => {
       detectMobile();
@@ -239,15 +220,12 @@ const HeaderNavigation = () => {
     };
   }, [isSliderInitialized, detectMobile, updateNavSlider]);
 
-  // Update slider when location changes - identical to Profile
   useEffect(() => {
     if (isSliderInitialized) {
-      // Small delay to ensure DOM is updated
       setTimeout(updateNavSlider, 10);
     }
   }, [location.pathname, isSliderInitialized, updateNavSlider]);
 
-  // Cleanup timeouts on unmount - identical to Profile
   useEffect(() => {
     return () => {
       if (resizeTimeoutRef.current) {
@@ -262,7 +240,6 @@ const HeaderNavigation = () => {
         className="nav-container"
         ref={navContainerRef}
       >
-        {/* ENHANCED: Bulletproof sliding indicator with mobile optimizations - identical to Profile */}
         <div 
           className="header-nav-slider" 
           ref={sliderRef}
@@ -289,23 +266,20 @@ const HeaderNavigation = () => {
   );
 };
 
-// SCROLL TO TOP COMPONENT: Handles scrolling to top on route changes
 const ScrollToTop = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Scroll to top instantly when route changes
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: 'instant' // Use 'instant' for immediate scroll without animation
+      behavior: 'instant'
     });
   }, [location.pathname]);
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
-// NEW: Service Worker Message Listener - handles notification clicks
 const ServiceWorkerListener = () => {
   const navigate = useNavigate();
 
@@ -313,7 +287,6 @@ const ServiceWorkerListener = () => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'NAVIGATE_TO_PREDICTION') {
-          // Navigate to prediction page when notification is clicked
           navigate('/urge-prediction');
         }
       });
@@ -328,15 +301,12 @@ function App() {
   const [activeTab, setActiveTab] = useState('tracker');
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   
-  // NEW: Add refresh loading state - check for existing session on mount
   const [isRefreshLoading, setIsRefreshLoading] = useState(() => {
-    // Check if user was logged in before refresh
     const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
     return storedIsLoggedIn === 'true';
   });
   const [loadingMessage, setLoadingMessage] = useState('Loading your dashboard...');
   
-  // UPDATED: Destructure goal functions from useUserData hook
   const { 
     userData, 
     isLoggedIn, 
@@ -349,7 +319,6 @@ function App() {
     cancelGoal
   } = useUserData();
 
-  // FIXED: Monitor screen size for responsive design - changed breakpoint to 1024px
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
   useEffect(() => {
@@ -361,15 +330,12 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Skip initial loading animation on first load
   useEffect(() => {
     setIsInitialLoading(false);
   }, []);
 
-  // NEW: Handle refresh loading animation
   useEffect(() => {
     if (isRefreshLoading) {
-      // Show loading for 1.2 seconds on refresh
       const timer = setTimeout(() => {
         setIsRefreshLoading(false);
       }, 1200);
@@ -378,15 +344,11 @@ function App() {
     }
   }, []);
 
-  // UPDATED: Handle login with improved flow
   const handleLogin = async (username, password) => {
-    // Set initial loading message
     setLoadingMessage('Logging you in...');
     
-    // Start login process
     const loginPromise = login(username, password);
     
-    // Change message after 800ms
     setTimeout(() => {
       setLoadingMessage('Loading your dashboard...');
     }, 800);
@@ -399,7 +361,6 @@ function App() {
     return success;
   };
 
-  // Show loading screen for login or refresh
   if (isLoading || isRefreshLoading) {
     return (
       <div className="spartan-loading-screen">
@@ -548,8 +509,8 @@ function App() {
                   <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                   <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                   <Route path="/profile" element={<Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />} />
-                  {/* NEW: Add UrgePrediction route */}
                   <Route path="/urge-prediction" element={<UrgePrediction userData={userData} updateUserData={updateUserData} />} />
+                  <Route path="/ml-training" element={<MLTraining />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>
