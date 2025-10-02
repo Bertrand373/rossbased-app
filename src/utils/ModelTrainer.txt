@@ -1,0 +1,675 @@
+// src/utils/ModelTrainer.js
+// Model Training Pipeline and Management
+// Handles automated training, retraining, and performance tracking
+
+import * as tf from '@tensorflow/tfjs';
+import dataPreprocessor from './DataPreprocessor';
+
+/**
+ * ModelTrainer - Manages the lifecycle of ML model training
+ * 
+ * SIMPLE EXPLANATION:
+ * This is like a personal trainer for your neural network. It:
+ * - Decides when the model needs training
+ * - Prepares the data properly
+ * - Trains the model and tracks progress
+ * - Saves results and learns from feedback
+ * - Tells you how well the model is performing
+ * 
+ * WHY IT'S SEPARATE FROM MLPredictionService:
+ * Keeps training logic separate from prediction logic for cleaner code
+ */
+class ModelTrainer {
+  constructor() {
+    // Training configuration
+    this.config = {
+      minDataPoints: 20,        // Need at least 20 days of data
+      defaultEpochs: 50,        // Train for 50 rounds
+      batchSize: 8,             // Process 8 examples at a time
+      validationSplit: 0.2,     // Use 20% of data for validation
+      learningRate: 0.001,      // How fast the model learns
+      retrainingInterval: 7     // Retrain every 7 days
+    };
+    
+    // Training state
+    this.isTraining = false;
+    this.trainingProgress = null;
+    
+    // Performance tracking
+    this.performanceHistory = this.loadPerformanceHistory();
+    
+    console.log('🏋️ ModelTrainer initialized');
+  }
+
+  /**
+   * Check if model should be trained or retrained
+   * 
+   * @param {Object} userData - User data
+   * @param {Object} currentModel - Current model (if exists)
+   * @returns {Object} { shouldTrain, reason }
+   */
+  shouldTrain(userData, currentModel = null) {
+    // Validate data quality
+    const dataQuality = dataPreprocessor.validateTrainingData(userData);
+    
+    if (!dataQuality.isValid) {
+      return {
+        shouldTrain: false,
+        reason: dataQuality.message,
+        canTrain: false
+      };
+    }
+    
+    // No model exists - definitely train
+    if (!currentModel) {
+      return {
+        shouldTrain: true,
+        reason: 'No trained model exists',
+        canTrain: true
+      };
+    }
+    
+    // Check if model needs retraining
+    const lastTrainedDate = this.getLastTrainedDate();
+    
+    if (!lastTrainedDate) {
+      return {
+        shouldTrain: true,
+        reason: 'Model training date unknown',
+        canTrain: true
+      };
+    }
+    
+    // Calculate days since last training
+    const daysSinceTraining = this.getDaysSince(lastTrainedDate);
+    
+    if (daysSinceTraining >= this.config.retrainingInterval) {
+      return {
+        shouldTrain: true,
+        reason: `Model last trained ${daysSinceTraining} days ago`,
+        canTrain: true
+      };
+    }
+    
+    // Check if significant new data has been added
+    const trainingDataCount = this.getTrainingDataCount();
+    const currentDataCount = userData.benefitTracking?.length || 0;
+    const newDataPoints = currentDataCount - trainingDataCount;
+    
+    if (newDataPoints >= 10) {
+      return {
+        shouldTrain: true,
+        reason: `${newDataPoints} new data points available`,
+        canTrain: true
+      };
+    }
+    
+    return {
+      shouldTrain: false,
+      reason: 'Model is up to date',
+      canTrain: true
+    };
+  }
+
+  /**
+   * Train model with user data
+   * Main training function with progress callbacks
+   * 
+   * @param {Object} model - TensorFlow model to train
+   * @param {Object} userData - User's historical data
+   * @param {Function} onProgress - Callback for progress updates
+   * @param {Function} onComplete - Callback when training completes
+   * @returns {Promise<Object>} Training results
+   */
+  async trainModel(model, userData, onProgress = null, onComplete = null) {
+    if (this.isTraining) {
+      console.log('⏳ Training already in progress');
+      return { success: false, message: 'Training already in progress' };
+    }
+    
+    try {
+      this.isTraining = true;
+      const startTime = Date.now();
+      
+      console.log('🎓 Starting model training...');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      
+      // STEP 1: Validate data
+      console.log('📋 Step 1/5: Validating data quality...');
+      const dataQuality = dataPreprocessor.validateTrainingData(userData);
+      
+      if (!dataQuality.isValid) {
+        this.isTraining = false;
+        return {
+          success: false,
+          message: dataQuality.message,
+          issues: dataQuality.issues
+        };
+      }
+      
+      this.reportProgress(onProgress, { step: 1, total: 5, message: 'Data validated' });
+      
+      // STEP 2: Generate training data
+      console.log('🔨 Step 2/5: Generating training dataset...');
+      const { features, labels, count } = dataPreprocessor.generateTrainingData(userData);
+      
+      if (count < this.config.minDataPoints) {
+        this.isTraining = false;
+        return {
+          success: false,
+          message: `Insufficient training data. Need ${this.config.minDataPoints}, have ${count}`
+        };
+      }
+      
+      console.log(`   ✅ Generated ${count} training examples`);
+      this.reportProgress(onProgress, { step: 2, total: 5, message: `${count} examples ready` });
+      
+      // STEP 3: Normalize features
+      console.log('📏 Step 3/5: Normalizing features...');
+      const stats = dataPreprocessor.calculateNormalizationStats(features);
+      const normalizedFeatures = features.map(f => 
+        dataPreprocessor.normalizeFeatures(f, stats)
+      );
+      
+      this.saveNormalizationStats(stats);
+      console.log('   ✅ Features normalized to 0-1 range');
+      this.reportProgress(onProgress, { step: 3, total: 5, message: 'Features normalized' });
+      
+      // STEP 4: Prepare tensors
+      console.log('🔧 Step 4/5: Creating TensorFlow tensors...');
+      const xs = tf.tensor2d(normalizedFeatures);
+      const ys = tf.tensor2d(labels);
+      
+      console.log('   ✅ Tensors created');
+      this.reportProgress(onProgress, { step: 4, total: 5, message: 'Ready for training' });
+      
+      // STEP 5: Train the model
+      console.log('🏋️ Step 5/5: Training neural network...');
+      console.log(`   Epochs: ${this.config.defaultEpochs}`);
+      console.log(`   Batch size: ${this.config.batchSize}`);
+      console.log(`   Validation split: ${this.config.validationSplit * 100}%`);
+      console.log('');
+      
+      const history = await model.fit(xs, ys, {
+        epochs: this.config.defaultEpochs,
+        batchSize: this.config.batchSize,
+        validationSplit: this.config.validationSplit,
+        shuffle: true,
+        verbose: 0, // We'll handle our own logging
+        callbacks: {
+          onEpochEnd: async (epoch, logs) => {
+            // Log every 10 epochs
+            if ((epoch + 1) % 10 === 0 || epoch === 0) {
+              const progress = Math.round(((epoch + 1) / this.config.defaultEpochs) * 100);
+              console.log(
+                `   Epoch ${epoch + 1}/${this.config.defaultEpochs} [${progress}%] - ` +
+                `Loss: ${logs.loss.toFixed(4)}, Accuracy: ${(logs.acc * 100).toFixed(1)}%`
+              );
+            }
+            
+            // Update progress
+            this.reportProgress(onProgress, {
+              step: 5,
+              total: 5,
+              epoch: epoch + 1,
+              totalEpochs: this.config.defaultEpochs,
+              loss: logs.loss,
+              accuracy: logs.acc * 100,
+              valLoss: logs.val_loss,
+              valAccuracy: logs.val_acc * 100,
+              message: `Training... ${Math.round(((epoch + 1) / this.config.defaultEpochs) * 100)}%`
+            });
+          }
+        }
+      });
+      
+      // Clean up tensors
+      xs.dispose();
+      ys.dispose();
+      
+      // Extract final metrics
+      const finalLoss = history.history.loss[history.history.loss.length - 1];
+      const finalAccuracy = history.history.acc[history.history.acc.length - 1];
+      const finalValLoss = history.history.val_loss[history.history.val_loss.length - 1];
+      const finalValAccuracy = history.history.val_acc[history.history.val_acc.length - 1];
+      
+      const trainingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      console.log('');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('🎉 Training Complete!');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`   Training Time: ${trainingTime}s`);
+      console.log(`   Training Loss: ${finalLoss.toFixed(4)}`);
+      console.log(`   Training Accuracy: ${(finalAccuracy * 100).toFixed(1)}%`);
+      console.log(`   Validation Loss: ${finalValLoss.toFixed(4)}`);
+      console.log(`   Validation Accuracy: ${(finalValAccuracy * 100).toFixed(1)}%`);
+      console.log(`   Training Examples: ${count}`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      
+      // Save performance metrics
+      this.savePerformanceMetrics({
+        date: new Date().toISOString(),
+        trainingTime: parseFloat(trainingTime),
+        finalLoss,
+        finalAccuracy: finalAccuracy * 100,
+        finalValLoss,
+        finalValAccuracy: finalValAccuracy * 100,
+        trainingExamples: count,
+        epochs: this.config.defaultEpochs
+      });
+      
+      // Save training metadata
+      this.saveTrainingMetadata({
+        lastTrained: new Date().toISOString(),
+        trainingDataCount: count,
+        normalizationStats: stats
+      });
+      
+      this.isTraining = false;
+      
+      // Call completion callback
+      if (onComplete) {
+        onComplete({
+          success: true,
+          accuracy: finalAccuracy * 100,
+          valAccuracy: finalValAccuracy * 100,
+          loss: finalLoss,
+          trainingTime: parseFloat(trainingTime)
+        });
+      }
+      
+      return {
+        success: true,
+        accuracy: finalAccuracy * 100,
+        valAccuracy: finalValAccuracy * 100,
+        loss: finalLoss,
+        valLoss: finalValLoss,
+        trainingTime: parseFloat(trainingTime),
+        trainingExamples: count,
+        epochs: this.config.defaultEpochs,
+        message: 'Model trained successfully!'
+      };
+      
+    } catch (error) {
+      console.error('❌ Training error:', error);
+      this.isTraining = false;
+      
+      if (onComplete) {
+        onComplete({ success: false, error: error.message });
+      }
+      
+      return {
+        success: false,
+        message: `Training failed: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Evaluate model performance on test data
+   * 
+   * @param {Object} model - Trained model
+   * @param {Object} userData - User data for testing
+   * @returns {Object} Evaluation metrics
+   */
+  async evaluateModel(model, userData) {
+    try {
+      console.log('📊 Evaluating model performance...');
+      
+      // Generate test data
+      const { features, labels, count } = dataPreprocessor.generateTrainingData(userData);
+      
+      if (count === 0) {
+        return { success: false, message: 'No test data available' };
+      }
+      
+      // Load normalization stats
+      const stats = this.loadNormalizationStats();
+      if (!stats) {
+        return { success: false, message: 'Normalization stats not found' };
+      }
+      
+      // Normalize features
+      const normalizedFeatures = features.map(f => 
+        dataPreprocessor.normalizeFeatures(f, stats)
+      );
+      
+      // Create tensors
+      const xs = tf.tensor2d(normalizedFeatures);
+      const ys = tf.tensor2d(labels);
+      
+      // Evaluate
+      const result = model.evaluate(xs, ys);
+      const loss = await result[0].data();
+      const accuracy = await result[1].data();
+      
+      // Clean up
+      xs.dispose();
+      ys.dispose();
+      result[0].dispose();
+      result[1].dispose();
+      
+      console.log(`   Loss: ${loss[0].toFixed(4)}`);
+      console.log(`   Accuracy: ${(accuracy[0] * 100).toFixed(1)}%`);
+      
+      return {
+        success: true,
+        loss: loss[0],
+        accuracy: accuracy[0] * 100,
+        testExamples: count
+      };
+      
+    } catch (error) {
+      console.error('❌ Evaluation error:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Process user feedback to improve model
+   * Feedback helps identify when predictions were wrong
+   * 
+   * @param {Object} feedback - User feedback object
+   */
+  processFeedback(feedback) {
+    try {
+      // Load existing feedback
+      const allFeedback = this.loadFeedback();
+      
+      // Add new feedback
+      allFeedback.push({
+        ...feedback,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Save updated feedback
+      this.saveFeedback(allFeedback);
+      
+      console.log('✅ Feedback recorded:', feedback.userFeedback);
+      
+      // Check if we should retrain based on feedback
+      const recentFeedback = this.getRecentFeedback(7); // Last 7 days
+      const negativeCount = recentFeedback.filter(f => f.userFeedback === 'false_alarm').length;
+      
+      if (negativeCount >= 5) {
+        console.log('⚠️  Multiple false alarms detected. Consider retraining.');
+        return {
+          shouldRetrain: true,
+          reason: `${negativeCount} false alarms in last 7 days`
+        };
+      }
+      
+      return { shouldRetrain: false };
+      
+    } catch (error) {
+      console.error('❌ Error processing feedback:', error);
+      return { shouldRetrain: false };
+    }
+  }
+
+  /**
+   * Get training status and information
+   * 
+   * @returns {Object} Training status
+   */
+  getTrainingStatus() {
+    const lastTrained = this.getLastTrainedDate();
+    const daysSinceTraining = lastTrained ? this.getDaysSince(lastTrained) : null;
+    const latestMetrics = this.getLatestMetrics();
+    
+    return {
+      isTraining: this.isTraining,
+      lastTrained,
+      daysSinceTraining,
+      needsRetraining: daysSinceTraining >= this.config.retrainingInterval,
+      latestAccuracy: latestMetrics?.finalAccuracy || null,
+      latestLoss: latestMetrics?.finalLoss || null,
+      trainingExamples: latestMetrics?.trainingExamples || null,
+      progress: this.trainingProgress
+    };
+  }
+
+  /**
+   * Get performance history
+   * Shows how model has improved over time
+   * 
+   * @returns {Array} Array of performance metrics
+   */
+  getPerformanceHistory() {
+    return this.performanceHistory;
+  }
+
+  /**
+   * Get latest performance metrics
+   * 
+   * @returns {Object|null} Latest metrics
+   */
+  getLatestMetrics() {
+    if (this.performanceHistory.length === 0) return null;
+    return this.performanceHistory[this.performanceHistory.length - 1];
+  }
+
+  /**
+   * Get model accuracy trend
+   * 
+   * @returns {Object} Trend information
+   */
+  getAccuracyTrend() {
+    if (this.performanceHistory.length < 2) {
+      return { trend: 'insufficient_data', change: 0 };
+    }
+    
+    const latest = this.performanceHistory[this.performanceHistory.length - 1];
+    const previous = this.performanceHistory[this.performanceHistory.length - 2];
+    
+    const change = latest.finalAccuracy - previous.finalAccuracy;
+    
+    return {
+      trend: change > 0 ? 'improving' : change < 0 ? 'declining' : 'stable',
+      change: change.toFixed(2),
+      latest: latest.finalAccuracy.toFixed(1),
+      previous: previous.finalAccuracy.toFixed(1)
+    };
+  }
+
+  /**
+   * Report training progress via callback
+   * 
+   * @param {Function} callback - Progress callback
+   * @param {Object} progress - Progress data
+   */
+  reportProgress(callback, progress) {
+    this.trainingProgress = progress;
+    if (callback && typeof callback === 'function') {
+      callback(progress);
+    }
+  }
+
+  /**
+   * Calculate days since a date
+   * 
+   * @param {string|Date} date - Date to calculate from
+   * @returns {number} Days since date
+   */
+  getDaysSince(date) {
+    const then = new Date(date);
+    const now = new Date();
+    const diffMs = now - then;
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  }
+
+  // ============================================
+  // STORAGE METHODS
+  // ============================================
+
+  /**
+   * Save performance metrics to localStorage
+   */
+  savePerformanceMetrics(metrics) {
+    try {
+      this.performanceHistory.push(metrics);
+      
+      // Keep only last 20 training sessions
+      if (this.performanceHistory.length > 20) {
+        this.performanceHistory = this.performanceHistory.slice(-20);
+      }
+      
+      localStorage.setItem('ml_performance_history', JSON.stringify(this.performanceHistory));
+    } catch (error) {
+      console.error('Error saving performance metrics:', error);
+    }
+  }
+
+  /**
+   * Load performance history from localStorage
+   */
+  loadPerformanceHistory() {
+    try {
+      const saved = localStorage.getItem('ml_performance_history');
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.error('Error loading performance history:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Save training metadata
+   */
+  saveTrainingMetadata(metadata) {
+    try {
+      localStorage.setItem('ml_training_metadata', JSON.stringify(metadata));
+    } catch (error) {
+      console.error('Error saving training metadata:', error);
+    }
+  }
+
+  /**
+   * Load training metadata
+   */
+  loadTrainingMetadata() {
+    try {
+      const saved = localStorage.getItem('ml_training_metadata');
+      return saved ? JSON.parse(saved) : null;
+    } catch (error) {
+      console.error('Error loading training metadata:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get last trained date
+   */
+  getLastTrainedDate() {
+    const metadata = this.loadTrainingMetadata();
+    return metadata?.lastTrained || null;
+  }
+
+  /**
+   * Get training data count from last training
+   */
+  getTrainingDataCount() {
+    const metadata = this.loadTrainingMetadata();
+    return metadata?.trainingDataCount || 0;
+  }
+
+  /**
+   * Save normalization stats
+   */
+  saveNormalizationStats(stats) {
+    try {
+      localStorage.setItem('ml_normalization_stats', JSON.stringify(stats));
+    } catch (error) {
+      console.error('Error saving normalization stats:', error);
+    }
+  }
+
+  /**
+   * Load normalization stats
+   */
+  loadNormalizationStats() {
+    try {
+      const saved = localStorage.getItem('ml_normalization_stats');
+      return saved ? JSON.parse(saved) : null;
+    } catch (error) {
+      console.error('Error loading normalization stats:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Save user feedback
+   */
+  saveFeedback(feedback) {
+    try {
+      localStorage.setItem('ml_user_feedback', JSON.stringify(feedback));
+    } catch (error) {
+      console.error('Error saving feedback:', error);
+    }
+  }
+
+  /**
+   * Load user feedback
+   */
+  loadFeedback() {
+    try {
+      const saved = localStorage.getItem('ml_user_feedback');
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.error('Error loading feedback:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get recent feedback within days
+   */
+  getRecentFeedback(days = 7) {
+    const allFeedback = this.loadFeedback();
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    
+    return allFeedback.filter(f => {
+      const feedbackDate = new Date(f.timestamp);
+      return feedbackDate >= cutoffDate;
+    });
+  }
+
+  /**
+   * Clear all training data (for reset/debugging)
+   */
+  clearTrainingData() {
+    try {
+      localStorage.removeItem('ml_performance_history');
+      localStorage.removeItem('ml_training_metadata');
+      localStorage.removeItem('ml_normalization_stats');
+      localStorage.removeItem('ml_user_feedback');
+      this.performanceHistory = [];
+      console.log('✅ Training data cleared');
+      return true;
+    } catch (error) {
+      console.error('Error clearing training data:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Export training data for analysis
+   */
+  exportTrainingData() {
+    return {
+      performanceHistory: this.performanceHistory,
+      trainingMetadata: this.loadTrainingMetadata(),
+      normalizationStats: this.loadNormalizationStats(),
+      feedback: this.loadFeedback(),
+      exportDate: new Date().toISOString()
+    };
+  }
+}
+
+// Export singleton instance
+const modelTrainer = new ModelTrainer();
+
+export default modelTrainer;
