@@ -1,17 +1,19 @@
 // src/components/PredictionWidget/PredictionWidget.js
+// UPDATED: Now uses MLPredictionService with TensorFlow.js
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PredictionWidget.css';
-import predictionService from '../../services/PredictionService';
+import mlPredictionService from '../../services/MLPredictionService';
 import notificationService from '../../services/NotificationService';
 
 function PredictionWidget({ userData }) {
   const navigate = useNavigate();
   const [prediction, setPrediction] = useState(null);
   const [nextCheckTime, setNextCheckTime] = useState(null);
+  const [isMLReady, setIsMLReady] = useState(false);
   
-  // FIXED: Check if Notification exists before accessing it
+  // Check if Notification exists before accessing it
   const [notificationPermission, setNotificationPermission] = useState(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       return Notification.permission;
@@ -19,29 +21,63 @@ function PredictionWidget({ userData }) {
     return 'unsupported';
   });
 
+  // Initialize ML service on mount
+  useEffect(() => {
+    const initializeML = async () => {
+      try {
+        await mlPredictionService.initialize();
+        setIsMLReady(true);
+        console.log('✅ ML Prediction Service ready in PredictionWidget');
+      } catch (error) {
+        console.error('❌ Error initializing ML service:', error);
+        setIsMLReady(false);
+      }
+    };
+
+    initializeML();
+  }, []);
+
   // Run prediction check
   useEffect(() => {
     if (!userData || !userData.currentStreak) {
       return;
     }
 
-    // Run prediction
-    const result = predictionService.predict(userData);
-    setPrediction(result);
+    const runPrediction = async () => {
+      try {
+        // Use ML prediction service
+        const result = await mlPredictionService.predict(userData);
+        setPrediction(result);
 
-    // Calculate next check time (1 hour from now)
-    const nextCheck = new Date();
-    nextCheck.setHours(nextCheck.getHours() + 1);
-    setNextCheckTime(nextCheck);
+        // Calculate next check time (1 hour from now)
+        const nextCheck = new Date();
+        nextCheck.setHours(nextCheck.getHours() + 1);
+        setNextCheckTime(nextCheck);
 
-    // If high risk, send notification
-    if (result.riskScore >= 70) {
-      notificationService.sendUrgePredictionNotification(
-        result.riskScore,
-        result.reason
-      );
+        // If high risk, send notification
+        if (result.riskScore >= 70) {
+          notificationService.sendUrgePredictionNotification(
+            result.riskScore,
+            result.reason
+          );
+        }
+      } catch (error) {
+        console.error('❌ Prediction error:', error);
+        // Set a safe default prediction
+        setPrediction({
+          riskScore: 30,
+          confidence: 0,
+          reason: 'Prediction unavailable',
+          usedML: false
+        });
+      }
+    };
+
+    // Only run prediction if ML is ready or userData changes
+    if (isMLReady) {
+      runPrediction();
     }
-  }, [userData]);
+  }, [userData, isMLReady]);
 
   // Update permission status
   useEffect(() => {
@@ -94,7 +130,7 @@ function PredictionWidget({ userData }) {
       <div className="prediction-widget-header">
         <div className="widget-title">
           <span className="widget-icon">🧠</span>
-          <span>AI Urge Prediction</span>
+          <span>{prediction.usedML ? 'ML' : 'AI'} Urge Prediction</span>
         </div>
         {notificationPermission === 'granted' && (
           <span className="notification-status active">🔔 Active</span>
@@ -127,6 +163,12 @@ function PredictionWidget({ userData }) {
             <span className="info-label">Confidence:</span>
             <span className="info-value">{prediction.confidence}%</span>
           </div>
+          {prediction.usedML && (
+            <div className="info-row">
+              <span className="info-label">Model:</span>
+              <span className="info-value" style={{ color: '#22c55e' }}>Neural Network ✓</span>
+            </div>
+          )}
         </div>
 
         {prediction.riskScore >= 50 && (

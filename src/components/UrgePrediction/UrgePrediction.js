@@ -1,61 +1,97 @@
 // src/components/UrgePrediction/UrgePrediction.js
+// UPDATED: Now uses MLPredictionService with TensorFlow.js
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UrgePrediction.css';
-import predictionService from '../../services/PredictionService';
+import mlPredictionService from '../../services/MLPredictionService';
+import modelTrainer from '../../utils/ModelTrainer';
 
 function UrgePrediction() {
   const navigate = useNavigate();
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [modelInfo, setModelInfo] = useState(null);
 
   useEffect(() => {
-    loadCurrentPrediction();
+    initializeAndPredict();
   }, []);
 
-  const loadCurrentPrediction = () => {
-    // Get user data from localStorage
-    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    
-    if (!userData.currentStreak) {
+  const initializeAndPredict = async () => {
+    try {
+      // Initialize ML service
+      await mlPredictionService.initialize();
+      
+      // Get model info
+      const info = mlPredictionService.getModelInfo();
+      setModelInfo(info);
+      
+      // Load current prediction
+      await loadCurrentPrediction();
+    } catch (error) {
+      console.error('❌ Error initializing:', error);
       setLoading(false);
-      return;
     }
+  };
 
-    // Run prediction
-    const result = predictionService.predict(userData);
-    setPrediction(result);
-    setLoading(false);
+  const loadCurrentPrediction = async () => {
+    try {
+      // Get user data from localStorage
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      
+      if (!userData.currentStreak) {
+        setLoading(false);
+        return;
+      }
+
+      // Run ML prediction
+      const result = await mlPredictionService.predict(userData);
+      setPrediction(result);
+      setLoading(false);
+    } catch (error) {
+      console.error('❌ Prediction error:', error);
+      setLoading(false);
+    }
   };
 
   const handleFeedback = async (wasHelpful) => {
     if (!prediction) return;
 
-    // Record feedback
-    const feedback = {
-      timestamp: new Date().toISOString(),
-      predictedRisk: prediction.riskScore,
-      userFeedback: wasHelpful ? 'helpful' : 'false_alarm',
-      factors: prediction.factors,
-      reason: prediction.reason
-    };
+    try {
+      // Record feedback for ML training
+      const feedback = {
+        timestamp: new Date().toISOString(),
+        predictedRisk: prediction.riskScore,
+        userFeedback: wasHelpful ? 'helpful' : 'false_alarm',
+        factors: prediction.factors,
+        reason: prediction.reason,
+        usedML: prediction.usedML
+      };
 
-    // Save to localStorage
-    const existingFeedback = JSON.parse(localStorage.getItem('prediction_feedback') || '[]');
-    existingFeedback.push(feedback);
-    localStorage.setItem('prediction_feedback', JSON.stringify(existingFeedback));
+      // Save to localStorage for ML retraining
+      const existingFeedback = JSON.parse(localStorage.getItem('prediction_feedback') || '[]');
+      existingFeedback.push(feedback);
+      localStorage.setItem('prediction_feedback', JSON.stringify(existingFeedback));
 
-    // Update prediction weights based on feedback
-    predictionService.updateWeights(feedback);
+      // Process feedback with ModelTrainer
+      const feedbackResult = modelTrainer.processFeedback(feedback);
+      
+      if (feedbackResult.shouldRetrain) {
+        console.log('⚠️ Model should be retrained:', feedbackResult.reason);
+      }
 
-    setFeedbackSubmitted(true);
+      setFeedbackSubmitted(true);
 
-    // Show thank you message
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
+      // Show thank you message then redirect
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
+    } catch (error) {
+      console.error('❌ Error processing feedback:', error);
+      setFeedbackSubmitted(true);
+      setTimeout(() => navigate('/'), 2000);
+    }
   };
 
   const handleInterventionClick = (interventionType) => {
@@ -64,7 +100,8 @@ function UrgePrediction() {
       timestamp: new Date().toISOString(),
       type: interventionType,
       riskScore: prediction.riskScore,
-      reason: prediction.reason
+      reason: prediction.reason,
+      usedML: prediction.usedML
     };
 
     const existingLogs = JSON.parse(localStorage.getItem('intervention_logs') || '[]');
@@ -76,8 +113,39 @@ function UrgePrediction() {
   };
 
   const handleViewDetails = () => {
+    // Create detailed analysis
+    const details = {
+      riskScore: prediction.riskScore,
+      confidence: prediction.confidence,
+      usedML: prediction.usedML,
+      factors: prediction.factors,
+      reason: prediction.reason,
+      modelInfo: prediction.modelInfo
+    };
+
     // Show detailed breakdown
-    alert(`Detailed Risk Analysis:\n\n${JSON.stringify(prediction.factors, null, 2)}`);
+    const detailsText = `
+🧠 RISK ANALYSIS DETAILS
+━━━━━━━━━━━━━━━━━━━━━━
+
+Risk Score: ${prediction.riskScore}%
+Confidence: ${prediction.confidence}%
+Prediction Type: ${prediction.usedML ? 'Neural Network' : 'Rule-Based'}
+
+📊 FACTORS ANALYZED:
+${JSON.stringify(prediction.factors, null, 2)}
+
+💡 REASON:
+${prediction.reason}
+
+${prediction.modelInfo ? `
+🤖 MODEL INFO:
+Last Trained: ${new Date(prediction.modelInfo.lastTrained).toLocaleString()}
+Training Epochs: ${prediction.modelInfo.totalEpochs}
+` : ''}
+    `;
+
+    alert(detailsText);
   };
 
   if (loading) {
@@ -85,7 +153,7 @@ function UrgePrediction() {
       <div className="urge-prediction-container">
         <div className="loading-spinner">
           <div className="spinner"></div>
-          <p>Analyzing risk factors...</p>
+          <p>Analyzing risk factors with neural network...</p>
         </div>
       </div>
     );
@@ -98,7 +166,11 @@ function UrgePrediction() {
           <div className="success-icon">✓</div>
           <h2>You're in the Clear</h2>
           <p>Current urge risk: <strong>{prediction ? prediction.riskScore : 0}%</strong></p>
-          <p className="subtext">No interventions needed right now. Keep up the great work!</p>
+          <p className="subtext">
+            {prediction?.usedML 
+              ? 'Neural network analysis shows low risk' 
+              : 'No interventions needed right now'}
+          </p>
           <button onClick={() => navigate('/')} className="back-button">
             Back to Dashboard
           </button>
@@ -122,13 +194,13 @@ function UrgePrediction() {
         <div className="feedback-success">
           <div className="success-icon">✓</div>
           <h2>Thank You!</h2>
-          <p>Your feedback helps make predictions more accurate.</p>
+          <p>Your feedback helps improve the neural network.</p>
           <p className="subtext">Redirecting to dashboard...</p>
         </div>
       ) : (
         <div className="prediction-card">
           <div className="prediction-header">
-            <div className="warning-icon">⚠</div>
+            <div className="warning-icon">⚠️</div>
             <h1>{riskLevel.label} URGE RISK DETECTED</h1>
           </div>
 
@@ -208,7 +280,9 @@ function UrgePrediction() {
               <span className="intervention-icon">📊</span>
               <div className="intervention-text">
                 <div className="intervention-title">View Risk Details</div>
-                <div className="intervention-subtitle">See what triggered this alert</div>
+                <div className="intervention-subtitle">
+                  {prediction.usedML ? 'Neural network analysis' : 'See what triggered this alert'}
+                </div>
               </div>
               <span className="arrow">→</span>
             </button>
@@ -216,7 +290,11 @@ function UrgePrediction() {
 
           <div className="feedback-section">
             <h4>Was this prediction accurate?</h4>
-            <p className="feedback-subtext">Your feedback helps improve future predictions</p>
+            <p className="feedback-subtext">
+              {prediction.usedML 
+                ? 'Your feedback helps train the neural network' 
+                : 'Your feedback helps improve future predictions'}
+            </p>
             <div className="feedback-buttons">
               <button 
                 className="feedback-button helpful"
@@ -236,9 +314,15 @@ function UrgePrediction() {
           <div className="confidence-footer">
             <span className="confidence-label">Confidence:</span>
             <span className="confidence-value">{prediction.confidence}%</span>
-            <span className="accuracy-note">
-              Based on {prediction.dataPoints} data points
-            </span>
+            {prediction.usedML ? (
+              <span className="accuracy-note">
+                Neural Network ({modelInfo?.totalEpochs || 0} epochs trained)
+              </span>
+            ) : (
+              <span className="accuracy-note">
+                Based on {prediction.dataPoints || 0} data points
+              </span>
+            )}
           </div>
         </div>
       )}
