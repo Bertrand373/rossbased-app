@@ -1,4 +1,4 @@
-// App.js - UPDATED: Added MLTraining route (no navigation changes)
+// App.js - UPDATED: Using unified PredictionDisplay component
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -26,9 +26,9 @@ import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
-// Import UrgePrediction and MLTraining
-import UrgePrediction from './components/UrgePrediction/UrgePrediction';
-import MLTraining from './components/MLTraining/MLTraining';  // NEW
+// Import UNIFIED PredictionDisplay (replaces UrgePrediction)
+import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay';
+import MLTraining from './components/MLTraining/MLTraining';
 
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
@@ -84,7 +84,7 @@ const MobileProfileButton = () => {
   );
 };
 
-// UNCHANGED: Header Navigation (still 5 items)
+// Header Navigation
 const HeaderNavigation = () => {
   const location = useLocation();
   
@@ -119,7 +119,6 @@ const HeaderNavigation = () => {
       const activeNavElement = navContainer.querySelector('.nav-link.active');
       
       if (!activeNavElement) {
-        console.warn(`Active nav element not found`);
         slider.style.opacity = '0';
         slider.style.visibility = 'hidden';
         return false;
@@ -131,7 +130,6 @@ const HeaderNavigation = () => {
           const navRect = activeNavElement.getBoundingClientRect();
           
           if (containerRect.width === 0 || navRect.width === 0) {
-            console.warn('Invalid measurements, container or nav not rendered');
             return;
           }
 
@@ -509,7 +507,8 @@ function App() {
                   <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                   <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                   <Route path="/profile" element={<Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />} />
-                  <Route path="/urge-prediction" element={<UrgePrediction userData={userData} updateUserData={updateUserData} />} />
+                  {/* UPDATED: Using unified PredictionDisplay in full mode */}
+                  <Route path="/urge-prediction" element={<PredictionDisplay mode="full" userData={userData} />} />
                   <Route path="/ml-training" element={<MLTraining />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
