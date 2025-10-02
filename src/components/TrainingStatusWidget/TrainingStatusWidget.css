@@ -1,4 +1,5 @@
 /* src/components/TrainingStatusWidget/TrainingStatusWidget.css */
+/* FIXED: All selectors scoped to .training-status-widget to prevent conflicts */
 
 .training-status-widget {
   background: linear-gradient(135deg, var(--medium-gray) 0%, rgba(45, 45, 45, 0.9) 100%);
@@ -33,33 +34,33 @@
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, var(--medium-gray) 100%);
 }
 
-.widget-header {
+.training-status-widget .widget-header {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
 }
 
-.widget-icon {
+.training-status-widget .widget-icon {
   font-size: 2.5rem;
   flex-shrink: 0;
 }
 
-.widget-title h3 {
+.training-status-widget .widget-title h3 {
   color: var(--text);
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 4px 0;
 }
 
-.widget-subtitle {
+.training-status-widget .widget-subtitle {
   color: var(--text-secondary);
   font-size: 0.875rem;
   margin: 0;
 }
 
 /* Widget Stats */
-.widget-stats {
+.training-status-widget .widget-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-md);
@@ -69,14 +70,14 @@
   border-radius: var(--radius-md);
 }
 
-.stat-item {
+.training-status-widget .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
 
-.stat-label {
+.training-status-widget .stat-label {
   color: var(--text-secondary);
   font-size: 0.75rem;
   margin-bottom: 4px;
@@ -84,18 +85,18 @@
   letter-spacing: 0.5px;
 }
 
-.stat-value {
+.training-status-widget .stat-value {
   color: var(--primary);
   font-size: 1.25rem;
   font-weight: 700;
 }
 
 /* Widget Info */
-.widget-info {
+.training-status-widget .widget-info {
   margin-bottom: var(--spacing-md);
 }
 
-.widget-info p {
+.training-status-widget .widget-info p {
   color: var(--text-secondary);
   font-size: 0.875rem;
   line-height: 1.5;
@@ -103,7 +104,7 @@
 }
 
 /* Progress Bar */
-.progress-bar-container {
+.training-status-widget .progress-bar-container {
   width: 100%;
   height: 8px;
   background: rgba(0, 0, 0, 0.3);
@@ -112,14 +113,14 @@
   margin-bottom: var(--spacing-md);
 }
 
-.progress-bar-fill {
+.training-status-widget .progress-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--primary) 0%, #e6c200 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
 
-.progress-message {
+.training-status-widget .progress-message {
   color: var(--text-secondary);
   font-size: 0.875rem;
   text-align: center;
@@ -127,7 +128,7 @@
 }
 
 /* Action Button */
-.widget-action-btn {
+.training-status-widget .widget-action-btn {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
   border: none;
@@ -142,23 +143,23 @@
   gap: var(--spacing-xs);
 }
 
-.widget-action-btn.primary {
+.training-status-widget .widget-action-btn.primary {
   background: linear-gradient(135deg, var(--primary) 0%, #e6c200 100%);
   color: #000;
 }
 
-.widget-action-btn.primary:hover {
+.training-status-widget .widget-action-btn.primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
 }
 
-.widget-action-btn:not(.primary) {
+.training-status-widget .widget-action-btn:not(.primary) {
   background: rgba(128, 128, 128, 0.1);
   color: var(--text);
   border: 1px solid var(--border);
 }
 
-.widget-action-btn:not(.primary):hover {
+.training-status-widget .widget-action-btn:not(.primary):hover {
   background: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
@@ -171,45 +172,45 @@
     padding: var(--spacing-md);
   }
 
-  .widget-icon {
+  .training-status-widget .widget-icon {
     font-size: 2rem;
   }
 
-  .widget-title h3 {
+  .training-status-widget .widget-title h3 {
     font-size: 1rem;
   }
 
-  .widget-stats {
+  .training-status-widget .widget-stats {
     grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-sm);
     padding: var(--spacing-sm);
   }
 
-  .stat-label {
+  .training-status-widget .stat-label {
     font-size: 0.6875rem;
   }
 
-  .stat-value {
+  .training-status-widget .stat-value {
     font-size: 1rem;
   }
 
-  .widget-action-btn {
+  .training-status-widget .widget-action-btn {
     font-size: 0.875rem;
   }
 }
 
 @media (max-width: 480px) {
-  .widget-header {
+  .training-status-widget .widget-header {
     flex-direction: column;
     text-align: center;
     align-items: center;
   }
 
-  .widget-stats {
+  .training-status-widget .widget-stats {
     grid-template-columns: 1fr;
   }
 
-  .stat-item {
+  .training-status-widget .stat-item {
     flex-direction: row;
     justify-content: space-between;
     padding: var(--spacing-xs);
