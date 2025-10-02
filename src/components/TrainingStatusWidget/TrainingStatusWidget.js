@@ -116,7 +116,7 @@ function TrainingStatusWidget({ userData }) {
     );
   }
 
-  // User needs more data
+  // User needs more data (10-19 days)
   return (
     <div className="training-status-widget progress">
       <div className="widget-header">
@@ -132,7 +132,7 @@ function TrainingStatusWidget({ userData }) {
       <div className="progress-bar-container">
         <div 
           className="progress-bar-fill"
-          style={{ width: `${(dataQuality.benefitDays / 20) * 100}%` }}
+          style={{ width: `${Math.min((dataQuality.benefitDays / 20) * 100, 100)}%` }}
         ></div>
       </div>
 
