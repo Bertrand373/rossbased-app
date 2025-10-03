@@ -1,9 +1,9 @@
-// src/hooks/useUserData.js - UPDATED: Added goal system to userData structure + AI TEST USERS
+// src/hooks/useUserData.js - UPDATED: Added all 6 AI test users
 import { useState, useEffect } from 'react';
 import { addDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
-// IMPORT: The comprehensive mock data including new personality users + AI TEST USERS
+// IMPORT: All mock data including 6 AI test users
 import comprehensiveMockData, { 
   newUserMockData, 
   veteranUserMockData, 
@@ -13,7 +13,10 @@ import comprehensiveMockData, {
   enfpMockData,
   aiTestUser1,
   aiTestUser2,
-  aiTestUser3
+  aiTestUser3,
+  aiTestUser4,
+  aiTestUser5,
+  aiTestUser6
 } from '../mockData';
 
 // Custom hook to manage user data
@@ -26,14 +29,13 @@ export const useUserData = () => {
     longestStreak: 0,
     wetDreamCount: 0,
     relapseCount: 0,
-    isPremium: true, // CHANGED: All users are premium now
-    // NEW: Goal system addition
+    isPremium: true,
     goal: {
-      targetDays: null,         // 30, 60, 90, 180, or 365
-      isActive: false,          // whether goal is set
-      targetDate: null,         // startDate + targetDays
-      achieved: false,          // whether current goal achieved
-      achievementDate: null     // when goal was achieved
+      targetDays: null,
+      isActive: false,
+      targetDate: null,
+      achieved: false,
+      achievementDate: null
     },
     badges: [
       { id: 1, name: '7-Day Warrior', earned: false, date: null },
@@ -60,44 +62,37 @@ export const useUserData = () => {
     wisdomMode: false
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isPremium, setIsPremium] = useState(true); // CHANGED: Default to premium
+  const [isPremium, setIsPremium] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  // NEW: Helper function to calculate goal target date
   const calculateGoalTargetDate = (startDate, targetDays) => {
     if (!startDate || !targetDays) return null;
-    return addDays(new Date(startDate), targetDays - 1); // -1 because day 1 is the start date
+    return addDays(new Date(startDate), targetDays - 1);
   };
 
-  // NEW: Helper function to check if goal is achieved
   const checkGoalAchievement = (currentStreak, targetDays) => {
     return currentStreak >= targetDays;
   };
 
-  // UPDATED: Login function - all users get premium features
   const login = async (username, password = 'demo') => {
     try {
       setIsLoading(true);
       console.log('Logging in with:', username);
       
-      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // CHOOSE MOCK DATA BASED ON USERNAME:
       let mockUserData;
       
       switch(username.toLowerCase()) {
         case 'testuser':
         case 'test':
         case 'demo':
-          // MAIN SCENARIO: 25-day streak with rich history
           mockUserData = comprehensiveMockData;
           break;
           
         case 'newbie':
         case 'new':
         case 'beginner':
-          // NEW USER: Day 0, clean slate
           mockUserData = newUserMockData;
           break;
           
@@ -105,59 +100,58 @@ export const useUserData = () => {
         case 'vet':
         case 'master':
         case 'king':
-          // VETERAN: 127-day streak, all badges
           mockUserData = veteranUserMockData;
           break;
           
         case 'struggling':
         case 'struggle':
         case 'hard':
-          // STRUGGLING: Multiple relapses, day 3
           mockUserData = strugglingUserMockData;
           break;
           
-        // NEW PERSONALITY-BASED USERS
         case 'intj':
-          // INTJ: Long-term retainer (425 days) with religious benefit tracking
           mockUserData = intjMockData;
           break;
           
         case 'intp':
-          // INTP: 9 months retainer with good tracking history
           mockUserData = intpMockData;
           break;
           
         case 'enfp':
-          // ENFP: Long SR streaks with some relapses, moderate tracking (can be lazy)
           mockUserData = enfpMockData;
           break;
           
-        // NEW AI TEST USERS
         case 'aitest1':
-          // AI TEST 1: 15 days - Building data, not ready for AI yet
           mockUserData = aiTestUser1;
           break;
           
         case 'aitest2':
-          // AI TEST 2: 23 days - Ready to train AI model
           mockUserData = aiTestUser2;
           break;
           
         case 'aitest3':
-          // AI TEST 3: 45 days - AI model active and making predictions
           mockUserData = aiTestUser3;
           break;
           
+        case 'aitest4':
+          mockUserData = aiTestUser4;
+          break;
+          
+        case 'aitest5':
+          mockUserData = aiTestUser5;
+          break;
+          
+        case 'aitest6':
+          mockUserData = aiTestUser6;
+          break;
+          
         default:
-          // DEFAULT: Use main comprehensive data for any other username
           mockUserData = comprehensiveMockData;
           break;
       }
       
-      // CHANGED: Force all users to have premium features
       mockUserData.isPremium = true;
 
-      // NEW: Initialize goal if not present
       if (!mockUserData.goal) {
         mockUserData.goal = {
           targetDays: null,
@@ -168,14 +162,12 @@ export const useUserData = () => {
         };
       }
 
-      // NEW: Calculate goal target date if goal is active
       if (mockUserData.goal.isActive && mockUserData.goal.targetDays && mockUserData.startDate) {
         mockUserData.goal.targetDate = calculateGoalTargetDate(
           mockUserData.startDate, 
           mockUserData.goal.targetDays
         );
         
-        // Check if goal is achieved
         if (checkGoalAchievement(mockUserData.currentStreak, mockUserData.goal.targetDays)) {
           if (!mockUserData.goal.achieved) {
             mockUserData.goal.achieved = true;
@@ -189,15 +181,13 @@ export const useUserData = () => {
       
       setUserData(mockUserData);
       setIsLoggedIn(true);
-      setIsPremium(true); // CHANGED: Always set to premium
+      setIsPremium(true);
       
-      // Save to localStorage to persist
       localStorage.setItem('userData', JSON.stringify(mockUserData));
       localStorage.setItem('isLoggedIn', 'true');
       
       setIsLoading(false);
       
-      // Show success toast with scenario info
       const scenarioInfo = getScenarioInfo(username);
       toast.success(`Welcome, ${username}! ${scenarioInfo} - All features unlocked!`);
       
@@ -210,7 +200,6 @@ export const useUserData = () => {
     }
   };
 
-  // Helper function to show which scenario is loaded
   const getScenarioInfo = (username) => {
     switch(username.toLowerCase()) {
       case 'newbie':
@@ -233,11 +222,17 @@ export const useUserData = () => {
       case 'enfp':
         return '(ENFP - 89 days, Previous 423 day streak)';
       case 'aitest1':
-        return '(AI Test 1 - Day 15, Building Data)';
+        return '(AI Test 1 - Day 12, Building Data)';
       case 'aitest2':
-        return '(AI Test 2 - Day 23, Ready to Train)';
+        return '(AI Test 2 - Day 21, Ready to Train)';
       case 'aitest3':
-        return '(AI Test 3 - Day 45, AI Active)';
+        return '(AI Test 3 - Day 38, Low Risk 35%)';
+      case 'aitest4':
+        return '(AI Test 4 - Day 18, MODERATE RISK 55%)';
+      case 'aitest5':
+        return '(AI Test 5 - Day 19, HIGH RISK 72%)';
+      case 'aitest6':
+        return '(AI Test 6 - Day 45, AI Active 42%)';
       default:
         return '(Main Demo - Day 25)';
     }
@@ -252,8 +247,7 @@ export const useUserData = () => {
       longestStreak: 0,
       wetDreamCount: 0,
       relapseCount: 0,
-      isPremium: true, // CHANGED: Keep premium even for empty state
-      // NEW: Reset goal on logout
+      isPremium: true,
       goal: {
         targetDays: null,
         isActive: false,
@@ -286,34 +280,27 @@ export const useUserData = () => {
       wisdomMode: false
     });
     setIsLoggedIn(false);
-    setIsPremium(true); // CHANGED: Keep premium even when logged out
+    setIsPremium(true);
     
-    // Clear localStorage
     localStorage.removeItem('userData');
     localStorage.removeItem('isLoggedIn');
     
     toast.success('Logged out successfully');
   };
 
-  // UPDATED: updateUserData to handle goal recalculation
   const updateUserData = (newData) => {
     try {
-      // CHANGED: Ensure isPremium stays true
       const updatedData = { ...userData, ...newData, isPremium: true };
 
-      // NEW: Auto-recalculate goal when startDate changes (handles relapses)
       if (newData.startDate && updatedData.goal && updatedData.goal.isActive) {
-        // Recalculate target date based on new start date
         updatedData.goal.targetDate = calculateGoalTargetDate(
           newData.startDate, 
           updatedData.goal.targetDays
         );
         
-        // Reset achievement status since we have a new start date
         updatedData.goal.achieved = false;
         updatedData.goal.achievementDate = null;
         
-        // Check if goal is immediately achieved (for cases where user sets goal after already having streak)
         if (updatedData.currentStreak >= updatedData.goal.targetDays) {
           updatedData.goal.achieved = true;
           updatedData.goal.achievementDate = addDays(
@@ -323,7 +310,6 @@ export const useUserData = () => {
         }
       }
 
-      // NEW: Check goal achievement when currentStreak updates
       if (newData.currentStreak !== undefined && updatedData.goal && updatedData.goal.isActive) {
         if (!updatedData.goal.achieved && checkGoalAchievement(newData.currentStreak, updatedData.goal.targetDays)) {
           updatedData.goal.achieved = true;
@@ -332,17 +318,13 @@ export const useUserData = () => {
             updatedData.goal.targetDays - 1
           );
           
-          // Show achievement toast
-          toast.success(`🎯 Goal achieved! You reached ${updatedData.goal.targetDays} days!`);
+          toast.success(`Goal achieved! You reached ${updatedData.goal.targetDays} days!`);
         }
       }
 
       setUserData(updatedData);
-      
-      // Always keep premium status
       setIsPremium(true);
       
-      // Save to localStorage
       localStorage.setItem('userData', JSON.stringify(updatedData));
       
       return true;
@@ -353,7 +335,6 @@ export const useUserData = () => {
     }
   };
 
-  // NEW: Goal management functions
   const setGoal = (targetDays) => {
     try {
       if (!userData.startDate) {
@@ -377,7 +358,7 @@ export const useUserData = () => {
       updateUserData(goalData);
       
       if (isAchieved) {
-        toast.success(`🎯 Goal set and already achieved! You've reached ${targetDays} days!`);
+        toast.success(`Goal set and already achieved! You've reached ${targetDays} days!`);
       } else {
         toast.success(`Goal set: Reach ${targetDays} days!`);
       }
@@ -412,7 +393,6 @@ export const useUserData = () => {
     }
   };
 
-  // Load data from localStorage on mount
   useEffect(() => {
     const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
     const storedUserData = localStorage.getItem('userData');
@@ -421,12 +401,10 @@ export const useUserData = () => {
       try {
         const parsedUserData = JSON.parse(storedUserData);
         
-        // Convert string dates back to Date objects
         if (parsedUserData.startDate) {
           parsedUserData.startDate = new Date(parsedUserData.startDate);
         }
 
-        // NEW: Handle goal data conversion
         if (parsedUserData.goal) {
           if (parsedUserData.goal.targetDate) {
             parsedUserData.goal.targetDate = new Date(parsedUserData.goal.targetDate);
@@ -435,7 +413,6 @@ export const useUserData = () => {
             parsedUserData.goal.achievementDate = new Date(parsedUserData.goal.achievementDate);
           }
         } else {
-          // Initialize goal if not present
           parsedUserData.goal = {
             targetDays: null,
             isActive: false,
@@ -488,7 +465,6 @@ export const useUserData = () => {
           }));
         }
         
-        // Set default values for profile fields if they don't exist
         parsedUserData.email = parsedUserData.email || '';
         parsedUserData.dataSharing = parsedUserData.dataSharing || false;
         parsedUserData.analyticsOptIn = parsedUserData.analyticsOptIn !== false;
@@ -497,13 +473,11 @@ export const useUserData = () => {
         parsedUserData.notifications = parsedUserData.notifications !== false;
         parsedUserData.language = parsedUserData.language || 'en';
         parsedUserData.wisdomMode = parsedUserData.wisdomMode || false;
-        
-        // CHANGED: Force premium to true
         parsedUserData.isPremium = true;
         
         setUserData(parsedUserData);
         setIsLoggedIn(true);
-        setIsPremium(true); // CHANGED: Always premium
+        setIsPremium(true);
       } catch (err) {
         console.error('Error parsing stored user data:', err);
         localStorage.removeItem('userData');
@@ -515,12 +489,11 @@ export const useUserData = () => {
   return { 
     userData, 
     isLoggedIn, 
-    isPremium: true, // CHANGED: Always return true
+    isPremium: true,
     isLoading,
     login, 
     logout, 
     updateUserData,
-    // NEW: Goal management functions
     setGoal,
     cancelGoal
   };
