@@ -467,5 +467,4 @@ export const allAITestUsers = {
   aiTestUser7BuildingData // 18 days - should show building data widget (18/20)
 };
 
-// Keep your existing default export at the very bottom
-// export default comprehensiveMockData;
+export default comprehensiveMockData;
