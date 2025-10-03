@@ -1,5 +1,5 @@
 // src/services/MLPredictionService.js
-// UPDATED: Fixed retraining bug + added notification trigger
+// FIXED: Typo in loadNormalizationStats (setItem -> getItem)
 import * as tf from '@tensorflow/tfjs';
 import notificationService from './NotificationService';
 
@@ -489,7 +489,7 @@ class MLPredictionService {
 
   loadNormalizationStats() {
     try {
-      const saved = localStorage.setItem('ml_normalization_stats');
+      const saved = localStorage.getItem('ml_normalization_stats');
       if (saved) {
         this.normalizationStats = JSON.parse(saved);
       }

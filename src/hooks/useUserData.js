@@ -1,4 +1,4 @@
-// src/hooks/useUserData.js - UPDATED: Added all 6 AI test users
+// src/hooks/useUserData.js - FIXED: Clears ML data when switching users
 import { useState, useEffect } from 'react';
 import { addDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -74,12 +74,35 @@ export const useUserData = () => {
     return currentStreak >= targetDays;
   };
 
+  const clearMLData = async () => {
+    // Clear localStorage ML data
+    localStorage.removeItem('ml_normalization_stats');
+    localStorage.removeItem('ml_training_history');
+    localStorage.removeItem('prediction_feedback');
+    
+    // Clear IndexedDB TensorFlow model
+    try {
+      const databases = await window.indexedDB.databases();
+      for (const db of databases) {
+        if (db.name && (db.name.includes('tensorflowjs') || db.name.includes('titantrack'))) {
+          window.indexedDB.deleteDatabase(db.name);
+          console.log('Cleared IndexedDB:', db.name);
+        }
+      }
+    } catch (e) {
+      console.log('Could not clear IndexedDB:', e);
+    }
+  };
+
   const login = async (username, password = 'demo') => {
     try {
       setIsLoading(true);
       console.log('Logging in with:', username);
       
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Clear ML data when switching users
+      await clearMLData();
       
       let mockUserData;
       
@@ -238,7 +261,10 @@ export const useUserData = () => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // Clear ML data on logout
+    await clearMLData();
+    
     setUserData({
       username: '',
       email: '',
