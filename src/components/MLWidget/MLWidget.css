@@ -1,0 +1,313 @@
+=/* src/components/MLWidget/MLWidget.css */
+/* Unified ML widget - elegant, professional design */
+
+.ml-widget {
+  background: linear-gradient(135deg, var(--medium-gray) 0%, rgba(45, 45, 45, 0.9) 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  margin-bottom: var(--spacing-lg);
+}
+
+.ml-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* State-specific styling */
+.ml-widget.ready-to-train {
+  border-color: rgba(255, 221, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, var(--medium-gray) 100%);
+}
+
+.ml-widget.model-active {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--medium-gray) 100%);
+}
+
+.ml-widget.building-data {
+  border-color: rgba(255, 221, 0, 0.2);
+}
+
+/* Header */
+.ml-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.widget-title-section {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+}
+
+.ml-widget .widget-icon {
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin-top: 2px;
+}
+
+.widget-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.widget-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Stats Grid */
+.widget-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.widget-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+}
+
+.widget-stat-item .stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.widget-stat-item .stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Info Text */
+.widget-info-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 var(--spacing-lg) 0;
+  text-align: center;
+}
+
+/* Risk Display Section */
+.risk-display-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-lg);
+}
+
+.risk-score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.risk-score-large {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+}
+
+.risk-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.risk-badge {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Model Stats Grid */
+.model-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.model-stat {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.model-stat .stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.model-stat .stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Progress Bar */
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, #d4b000 100%);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+/* Widget Actions */
+.widget-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+/* Buttons */
+.ml-widget-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+  flex: 1;
+}
+
+.ml-widget-btn.primary {
+  background: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--border);
+  width: 100%;
+}
+
+.ml-widget-btn.primary:hover {
+  background: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.ml-widget-btn.secondary {
+  background: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.ml-widget-btn.secondary:hover {
+  background: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.ml-widget-btn.tertiary {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+  flex: 0 0 auto;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.ml-widget-btn.tertiary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ml-widget {
+    padding: var(--spacing-md);
+  }
+
+  .widget-title {
+    font-size: 0.9375rem;
+  }
+
+  .widget-subtitle {
+    font-size: 0.8125rem;
+  }
+
+  .widget-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .risk-score-large {
+    font-size: 2.5rem;
+  }
+
+  .model-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .widget-actions {
+    flex-direction: column;
+  }
+
+  .ml-widget-btn {
+    width: 100%;
+  }
+
+  .ml-widget-btn.tertiary {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .risk-display-section {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+
+  .risk-score-container {
+    align-items: center;
+  }
+}

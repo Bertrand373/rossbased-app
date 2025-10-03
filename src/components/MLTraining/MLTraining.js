@@ -1,9 +1,20 @@
 // src/components/MLTraining/MLTraining.js
-// REDESIGNED: Font Awesome icons + proper button sizing
+// REFINED: Font Awesome icons, elegant design, no emojis
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaBrain, FaCheckCircle, FaExclamationTriangle, FaChartLine, FaDatabase, FaRocket, FaArrowLeft, FaRedo } from 'react-icons/fa';
+import { 
+  FaBrain, 
+  FaCheckCircle, 
+  FaExclamationTriangle, 
+  FaChartLine, 
+  FaDatabase, 
+  FaRocket, 
+  FaArrowLeft, 
+  FaRedo,
+  FaTimes,
+  FaCheck
+} from 'react-icons/fa';
 import './MLTraining.css';
 import mlPredictionService from '../../services/MLPredictionService';
 import dataPreprocessor from '../../utils/DataPreprocessor';
@@ -111,7 +122,7 @@ function MLTraining() {
           </div>
 
           <div className="insufficient-data-section">
-            <FaExclamationTriangle style={{ fontSize: '4rem', color: 'var(--warning)', marginBottom: 'var(--spacing-lg)' }} />
+            <FaExclamationTriangle className="section-icon warning" />
             <h2>Not Enough Data Yet</h2>
             <p className="message">
               The neural network needs at least 20 days of benefit tracking data to learn patterns.
@@ -133,19 +144,19 @@ function MLTraining() {
               <h3>Training Requirements:</h3>
               <div className="requirement-item">
                 <span className={dataQuality.benefitDays >= 20 ? 'check' : 'cross'}>
-                  {dataQuality.benefitDays >= 20 ? '✓' : '✗'}
+                  {dataQuality.benefitDays >= 20 ? <FaCheck /> : <FaTimes />}
                 </span>
                 <span>20+ days of benefit tracking</span>
               </div>
               <div className="requirement-item">
                 <span className={dataQuality.hasRelapseData ? 'check' : 'cross'}>
-                  {dataQuality.hasRelapseData ? '✓' : '✗'}
+                  {dataQuality.hasRelapseData ? <FaCheck /> : <FaTimes />}
                 </span>
                 <span>At least 1 relapse in history (for learning)</span>
               </div>
               <div className="requirement-item">
                 <span className={dataQuality.hasEmotionalData ? 'check' : 'cross'}>
-                  {dataQuality.hasEmotionalData ? '✓' : '✗'}
+                  {dataQuality.hasEmotionalData ? <FaCheck /> : <FaTimes />}
                 </span>
                 <span>Emotional tracking data (optional)</span>
               </div>
@@ -169,7 +180,7 @@ function MLTraining() {
       <div className="ml-training-container">
         <div className="training-card">
           <div className="training-complete-section">
-            <FaCheckCircle style={{ fontSize: '5rem', color: 'var(--success)', marginBottom: 'var(--spacing-lg)' }} />
+            <FaCheckCircle className="section-icon success" />
             <h1>Training Complete!</h1>
             <p className="success-message">
               Your neural network has been trained successfully
@@ -178,14 +189,14 @@ function MLTraining() {
             <div className="results-grid">
               <div className="result-card">
                 <div className="result-label">Accuracy</div>
-                <div className="result-value" style={{ color: '#22c55e' }}>
+                <div className="result-value success">
                   {trainingResults.accuracy.toFixed(1)}%
                 </div>
               </div>
 
               <div className="result-card">
                 <div className="result-label">Validation Accuracy</div>
-                <div className="result-value" style={{ color: '#3b82f6' }}>
+                <div className="result-value primary">
                   {trainingResults.valAccuracy?.toFixed(1) || 'N/A'}%
                 </div>
               </div>
@@ -238,7 +249,7 @@ function MLTraining() {
       <div className="ml-training-container">
         <div className="training-card">
           <div className="training-in-progress">
-            <FaBrain style={{ fontSize: '4.5rem', color: 'var(--primary)', marginBottom: 'var(--spacing-lg)', animation: 'pulse 2s ease-in-out infinite' }} />
+            <FaBrain className="section-icon primary pulse" />
             <h1>Training Neural Network...</h1>
             <p className="training-subtitle">
               {trainingProgress.message || 'Processing data...'}
@@ -317,10 +328,11 @@ function MLTraining() {
         <div className="data-quality-section">
           <h2>Your Data Quality</h2>
           <div className="quality-score-container">
-            <div className="quality-score" style={{
-              color: dataQuality.qualityScore >= 80 ? '#22c55e' : 
-                     dataQuality.qualityScore >= 60 ? '#eab308' : '#ef4444'
-            }}>
+            <div className={`quality-score ${
+              dataQuality.qualityScore >= 80 ? 'success' : 
+              dataQuality.qualityScore >= 60 ? 'warning' : 
+              'danger'
+            }`}>
               {dataQuality.qualityScore}
             </div>
             <div className="quality-label">Quality Score</div>
@@ -350,12 +362,15 @@ function MLTraining() {
 
         {modelInfo?.isReady && (
           <div className="existing-model-section">
-            <h3>Existing Model</h3>
+            <h3>
+              <FaCheckCircle style={{ fontSize: '0.875rem', marginRight: '8px', color: 'var(--success)' }} />
+              Existing Model
+            </h3>
             <div className="model-info-grid">
               <div className="info-item">
                 <span className="info-label">Status:</span>
-                <span className="info-value" style={{ color: '#22c55e' }}>
-                  Trained <FaCheckCircle style={{ fontSize: '0.875rem', marginLeft: '4px' }} />
+                <span className="info-value" style={{ color: 'var(--success)' }}>
+                  Trained
                 </span>
               </div>
               {modelInfo.lastTrained && (
@@ -383,7 +398,10 @@ function MLTraining() {
         )}
 
         <div className="training-info-section">
-          <h3>What happens during training?</h3>
+          <h3>
+            <FaDatabase style={{ fontSize: '0.875rem', marginRight: '8px' }} />
+            What happens during training?
+          </h3>
           <ul className="info-list">
             <li>Analyzes your benefit tracking and relapse history</li>
             <li>Trains a neural network to recognize risk patterns</li>

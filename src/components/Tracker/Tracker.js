@@ -1,4 +1,4 @@
-// components/Tracker/Tracker.js - UPDATED: Using unified PredictionDisplay
+// components/Tracker/Tracker.js - UPDATED: Using unified MLWidget
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -11,8 +11,7 @@ import './TrackerButtons.css';
 
 // Components
 import DatePicker from '../Shared/DatePicker';
-import PredictionDisplay from '../PredictionDisplay/PredictionDisplay';  // UPDATED: Unified component
-import TrainingStatusWidget from '../TrainingStatusWidget/TrainingStatusWidget';
+import MLWidget from '../MLWidget/MLWidget';  // NEW: Unified ML widget
 
 // Icons
 import { 
@@ -582,10 +581,8 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
         
         <div className="discord-youtube-column">
-          <TrainingStatusWidget userData={userData} />
-          
-          {/* UPDATED: Using unified PredictionDisplay in compact mode */}
-          <PredictionDisplay mode="compact" userData={userData} />
+          {/* NEW: Unified ML Widget replaces TrainingStatusWidget and PredictionDisplay */}
+          <MLWidget userData={userData} />
           
           <div className="discord-community-section">
             <div className="discord-community-header">

@@ -1,5 +1,5 @@
 /* src/components/MLTraining/MLTraining.css */
-/* REDESIGNED: Fully congruent with app design system */
+/* REFINED: Elegant design, no emojis, Font Awesome icons only */
 
 .ml-training-container {
   max-width: 1200px;
@@ -41,14 +41,39 @@
   font-size: 1.5rem;
   margin: 0 0 var(--spacing-xs) 0;
   font-weight: 600;
-  opacity: 0.85;
 }
 
 .ml-training-container .subtitle {
   color: var(--text-secondary);
   font-size: 0.875rem;
   margin: 0;
-  font-style: italic;
+}
+
+/* Section Icons */
+.ml-training-container .section-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.ml-training-container .section-icon.warning {
+  color: var(--warning);
+}
+
+.ml-training-container .section-icon.success {
+  color: var(--success);
+}
+
+.ml-training-container .section-icon.primary {
+  color: var(--primary);
+}
+
+.ml-training-container .section-icon.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 /* Loading State */
@@ -86,24 +111,20 @@
   color: var(--danger);
 }
 
-.ml-training-container .error-icon {
-  font-size: 1.25rem;
-}
-
 /* Insufficient Data Section */
 .ml-training-container .insufficient-data-section {
   text-align: center;
 }
 
 .ml-training-container .insufficient-data-section h2 {
-  color: var(--warning);
+  color: var(--text);
   font-size: 1.25rem;
   margin-bottom: var(--spacing-md);
   font-weight: 600;
 }
 
 .ml-training-container .message {
-  color: var(--text);
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   line-height: 1.6;
   margin-bottom: var(--spacing-xl);
@@ -130,7 +151,7 @@
 
 .ml-training-container .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(90deg, var(--primary) 0%, #d4b000 100%);
   transition: width 0.3s ease;
   border-radius: var(--radius-md);
 }
@@ -169,7 +190,7 @@
 }
 
 .ml-training-container .requirements-list h3 {
-  color: var(--primary);
+  color: var(--text);
   font-size: 1rem;
   margin: 0 0 var(--spacing-md) 0;
   font-weight: 600;
@@ -184,16 +205,21 @@
   font-size: 0.9375rem;
 }
 
+.ml-training-container .requirement-item .check,
+.ml-training-container .requirement-item .cross {
+  font-size: 1rem;
+  min-width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .ml-training-container .requirement-item .check {
   color: var(--success);
-  font-size: 1.25rem;
-  font-weight: bold;
 }
 
 .ml-training-container .requirement-item .cross {
   color: var(--danger);
-  font-size: 1.25rem;
-  font-weight: bold;
 }
 
 .ml-training-container .recommendation {
@@ -213,7 +239,7 @@
 }
 
 .ml-training-container .data-quality-section h2 {
-  color: var(--primary);
+  color: var(--text);
   font-size: 1.125rem;
   margin: 0 0 var(--spacing-lg) 0;
   text-align: center;
@@ -230,6 +256,18 @@
   font-weight: 700;
   line-height: 1;
   margin-bottom: var(--spacing-sm);
+}
+
+.ml-training-container .quality-score.success {
+  color: var(--success);
+}
+
+.ml-training-container .quality-score.warning {
+  color: var(--warning);
+}
+
+.ml-training-container .quality-score.danger {
+  color: var(--danger);
 }
 
 .ml-training-container .quality-label {
@@ -278,18 +316,20 @@
 
 /* Existing Model Section */
 .ml-training-container .existing-model-section {
-  background: rgba(34, 197, 94, 0.05);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: var(--card-background);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
 }
 
 .ml-training-container .existing-model-section h3 {
-  color: var(--success);
+  color: var(--text);
   font-size: 1rem;
   margin: 0 0 var(--spacing-md) 0;
   font-weight: 600;
+  display: flex;
+  align-items: center;
 }
 
 .ml-training-container .model-info-grid {
@@ -328,10 +368,12 @@
 }
 
 .ml-training-container .training-info-section h3 {
-  color: var(--primary);
+  color: var(--text);
   font-size: 1rem;
   margin: 0 0 var(--spacing-md) 0;
   font-weight: 600;
+  display: flex;
+  align-items: center;
 }
 
 .ml-training-container .info-list {
@@ -341,10 +383,20 @@
 }
 
 .ml-training-container .info-list li {
-  color: var(--text);
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   padding: var(--spacing-sm) 0;
   line-height: 1.5;
+  padding-left: var(--spacing-lg);
+  position: relative;
+}
+
+.ml-training-container .info-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: bold;
 }
 
 /* Training In Progress */
@@ -354,7 +406,7 @@
 }
 
 .ml-training-container .training-in-progress h1 {
-  color: var(--primary);
+  color: var(--text);
   font-size: 1.5rem;
   margin-bottom: var(--spacing-sm);
   font-weight: 600;
@@ -404,14 +456,14 @@
 }
 
 .ml-training-container .training-complete-section h1 {
-  color: var(--success);
+  color: var(--text);
   font-size: 1.75rem;
   margin-bottom: var(--spacing-sm);
   font-weight: 600;
 }
 
 .ml-training-container .success-message {
-  color: var(--text);
+  color: var(--text-secondary);
   font-size: 1rem;
   margin-bottom: var(--spacing-xl);
 }
@@ -446,34 +498,37 @@
 }
 
 .ml-training-container .result-value {
-  color: var(--primary);
   font-size: 2rem;
   font-weight: 700;
+  color: var(--primary);
+}
+
+.ml-training-container .result-value.success {
+  color: var(--success);
+}
+
+.ml-training-container .result-value.primary {
+  color: var(--primary);
 }
 
 /* Info Box */
 .ml-training-container .info-box {
-  background: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.2);
+  background: var(--card-background);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-xl);
   text-align: center;
 }
 
-.ml-training-container .info-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-
 .ml-training-container .info-box p {
-  color: var(--text);
+  color: var(--text-secondary);
   font-size: 0.875rem;
   line-height: 1.6;
   margin: 0;
 }
 
-/* Buttons - Match app pill button style */
+/* Buttons */
 .ml-training-container .action-buttons {
   display: flex;
   gap: var(--spacing-md);
@@ -575,6 +630,10 @@
   .ml-training-container .result-value {
     font-size: 1.5rem;
   }
+
+  .ml-training-container .section-icon {
+    font-size: 3rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -592,5 +651,9 @@
 
   .ml-training-container .stat-value {
     font-size: 1.5rem;
+  }
+
+  .ml-training-container .section-icon {
+    font-size: 2.5rem;
   }
 }
