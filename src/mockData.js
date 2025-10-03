@@ -78,18 +78,18 @@ const getEarnedBadges = (streakDays) => {
 };
 
 // ========================================
-// AI PROGRESSION TEST USERS (UPDATED & EXPANDED)
+// AI PROGRESSION TEST USERS
 // ========================================
 
-// AI Test User 1: BUILDING DATA (12 days with relapse history - should show "Building Training Data")
+// AI Test User 1: BUILDING DATA (12 days with relapse history)
 export const aiTestUser1 = {
   username: 'aitest1',
   email: 'aitest1@example.com',
-  startDate: subDays(new Date(), 12), // 12 days
+  startDate: subDays(new Date(), 12),
   currentStreak: 12,
   longestStreak: 15,
   wetDreamCount: 0,
-  relapseCount: 2, // Has relapse history for AI training
+  relapseCount: 2,
   isPremium: true,
   badges: getEarnedBadges(12),
   benefitTracking: createBenefitTracking(subDays(new Date(), 12), 12, 'good'),
@@ -113,7 +113,7 @@ export const aiTestUser1 = {
     {
       id: 3,
       start: subDays(new Date(), 12),
-      end: null, // Current streak
+      end: null,
       days: 12,
       reason: null,
       trigger: null
@@ -132,7 +132,7 @@ export const aiTestUser1 = {
   ],
   urgeLog: [],
   notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 12 - Widget says I'm building training data. Need 20 days to unlock AI!"
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 12 - Building training data widget showing!"
   },
   discordUsername: 'AITester1#0001',
   showOnLeaderboard: false,
@@ -146,11 +146,11 @@ export const aiTestUser1 = {
   urgeToolUsage: []
 };
 
-// AI Test User 2: READY TO TRAIN (21 days, can train but hasn't yet)
+// AI Test User 2: READY TO TRAIN (21 days)
 export const aiTestUser2 = {
   username: 'aitest2',
   email: 'aitest2@example.com',
-  startDate: subDays(new Date(), 21), // 21 days
+  startDate: subDays(new Date(), 21),
   currentStreak: 21,
   longestStreak: 21,
   wetDreamCount: 1,
@@ -214,7 +214,7 @@ export const aiTestUser2 = {
     }
   ],
   notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 21! Widget shows 'AI Model Ready' - should I train it now?"
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 21! AI Model Ready widget showing!"
   },
   discordUsername: 'AITester2#0002',
   showOnLeaderboard: false,
@@ -228,11 +228,11 @@ export const aiTestUser2 = {
   urgeToolUsage: []
 };
 
-// AI Test User 3: MODEL TRAINED, LOW RISK (35% risk - should show in full page but not widget)
+// AI Test User 3: MODEL TRAINED, LOW RISK (35%)
 export const aiTestUser3 = {
   username: 'aitest3',
   email: 'aitest3@example.com',
-  startDate: subDays(new Date(), 38), // 38 days
+  startDate: subDays(new Date(), 38),
   currentStreak: 38,
   longestStreak: 38,
   wetDreamCount: 2,
@@ -287,7 +287,7 @@ export const aiTestUser3 = {
   ],
   urgeLog: [],
   notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 38 - AI trained! Current risk is low (35%). No widget showing, which is correct."
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 38 - Low risk (35%), no widget showing"
   },
   discordUsername: 'AITester3#0003',
   showOnLeaderboard: true,
@@ -301,15 +301,15 @@ export const aiTestUser3 = {
   urgeToolUsage: []
 };
 
-// AI Test User 4: MODEL TRAINED, MODERATE RISK (55% - should show widget)
+// AI Test User 4: MODEL TRAINED, MODERATE RISK (55%)
 export const aiTestUser4 = {
   username: 'aitest4',
   email: 'aitest4@example.com',
-  startDate: subDays(new Date(), 18), // 18 days - in purging phase
+  startDate: subDays(new Date(), 18),
   currentStreak: 18,
   longestStreak: 28,
   wetDreamCount: 1,
-  relapseCount: 5, // More relapses = better training data
+  relapseCount: 5,
   isPremium: true,
   badges: getEarnedBadges(18),
   benefitTracking: createBenefitTracking(subDays(new Date(), 18), 18, 'good'),
@@ -334,7 +334,7 @@ export const aiTestUser4 = {
       id: 3,
       start: subDays(new Date(), 96),
       end: subDays(new Date(), 68),
-      days: 28, // Best streak
+      days: 28,
       reason: 'relapse',
       trigger: 'social_media'
     },
@@ -367,8 +367,8 @@ export const aiTestUser4 = {
     {
       date: new Date(),
       day: 18,
-      phase: 2, // Purging phase
-      anxiety: 6, // Higher anxiety
+      phase: 2,
+      anxiety: 6,
       moodStability: 5,
       mentalClarity: 6,
       emotionalProcessing: 5
@@ -385,7 +385,7 @@ export const aiTestUser4 = {
     }
   ],
   notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 18 - AI showing 55% MODERATE risk. Widget is visible. Evening hours are tough for me."
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 18 - MODERATE risk (55%) widget showing!"
   },
   discordUsername: 'AITester4#0004',
   showOnLeaderboard: false,
@@ -405,15 +405,15 @@ export const aiTestUser4 = {
   ]
 };
 
-// AI Test User 5: MODEL TRAINED, HIGH RISK (72% - evening, purging phase, pattern match)
+// AI Test User 5: MODEL TRAINED, HIGH RISK (72%)
 export const aiTestUser5 = {
   username: 'aitest5',
   email: 'aitest5@example.com',
-  startDate: subDays(new Date(), 19), // 19 days - dangerous zone
+  startDate: subDays(new Date(), 19),
   currentStreak: 19,
   longestStreak: 22,
   wetDreamCount: 0,
-  relapseCount: 6, // Lots of relapses around day 18-22
+  relapseCount: 6,
   isPremium: true,
   badges: getEarnedBadges(19),
   benefitTracking: createBenefitTracking(subDays(new Date(), 19), 19, 'moderate'),
@@ -430,7 +430,7 @@ export const aiTestUser5 = {
       id: 2,
       start: subDays(new Date(), 139),
       end: subDays(new Date(), 121),
-      days: 18, // Relapsed at day 18
+      days: 18,
       reason: 'relapse',
       trigger: 'evening'
     },
@@ -438,7 +438,7 @@ export const aiTestUser5 = {
       id: 3,
       start: subDays(new Date(), 120),
       end: subDays(new Date(), 100),
-      days: 20, // Relapsed at day 20
+      days: 20,
       reason: 'relapse',
       trigger: 'social_media'
     },
@@ -446,7 +446,7 @@ export const aiTestUser5 = {
       id: 4,
       start: subDays(new Date(), 99),
       end: subDays(new Date(), 77),
-      days: 22, // Best streak, relapsed at day 22
+      days: 22,
       reason: 'relapse',
       trigger: 'evening'
     },
@@ -454,7 +454,7 @@ export const aiTestUser5 = {
       id: 5,
       start: subDays(new Date(), 76),
       end: subDays(new Date(), 58),
-      days: 18, // Pattern: relapses around days 18-22
+      days: 18,
       reason: 'relapse',
       trigger: 'stress'
     },
@@ -462,7 +462,7 @@ export const aiTestUser5 = {
       id: 6,
       start: subDays(new Date(), 57),
       end: subDays(new Date(), 38),
-      days: 19, // Another day 19 relapse
+      days: 19,
       reason: 'relapse',
       trigger: 'evening'
     },
@@ -470,7 +470,7 @@ export const aiTestUser5 = {
       id: 7,
       start: subDays(new Date(), 19),
       end: null,
-      days: 19, // Current - at risk!
+      days: 19,
       reason: null,
       trigger: null
     }
@@ -479,8 +479,8 @@ export const aiTestUser5 = {
     {
       date: new Date(),
       day: 19,
-      phase: 2, // Purging phase
-      anxiety: 8, // Very high anxiety
+      phase: 2,
+      anxiety: 8,
       moodStability: 3,
       mentalClarity: 5,
       emotionalProcessing: 4
@@ -505,7 +505,7 @@ export const aiTestUser5 = {
     }
   ],
   notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 19 - AI showing 72% HIGH RISK! It detected I always relapse around days 18-22. It's 9PM and I'm struggling. Urge is intense."
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 19 - HIGH RISK (72%)! Pattern detected!"
   },
   discordUsername: 'AITester5#0005',
   showOnLeaderboard: false,
@@ -530,7 +530,7 @@ export const aiTestUser5 = {
   ]
 };
 
-// AI Test User 6: MODEL TRAINED, ACTIVE WITH STATS (45 days, for full experience testing)
+// AI Test User 6: MODEL TRAINED, ACTIVE (45 days, 42% risk)
 export const aiTestUser6 = {
   username: 'aitest6',
   email: 'aitest6@example.com',
@@ -606,7 +606,7 @@ export const aiTestUser6 = {
     }
   ],
   notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 45! AI has been incredibly accurate. Currently showing 42% moderate risk due to weekend + evening time."
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 45! AI showing 42% moderate risk"
   },
   discordUsername: 'AITester6#0006',
   showOnLeaderboard: true,
@@ -626,7 +626,7 @@ export const aiTestUser6 = {
   ]
 };
 
-// ORIGINAL COMPREHENSIVE MOCK DATA (keeping existing for compatibility)
+// ORIGINAL COMPREHENSIVE MOCK DATA (default export)
 const comprehensiveMockData = {
   username: 'testuser',
   email: 'testuser@example.com',
@@ -695,15 +695,6 @@ const comprehensiveMockData = {
       aura: 7,
       sleep: 8,
       workout: 7
-    },
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 1)),
-      energy: 7,
-      focus: 7,
-      confidence: 7,
-      aura: 7,
-      sleep: 7,
-      workout: 8
     }
   ],
   emotionalTracking: [
@@ -717,19 +708,8 @@ const comprehensiveMockData = {
       emotionalProcessing: 7
     }
   ],
-  urgeLog: [
-    {
-      date: new Date(new Date().setDate(new Date().getDate() - 3)),
-      intensity: 6,
-      trigger: 'stress',
-      protocol: 'breathing',
-      phase: 'Mental Expansion Phase',
-      day: 22
-    }
-  ],
-  notes: {
-    [new Date().toISOString().split('T')[0]]: "Day 25! Feeling really good. Energy is up, confidence is growing."
-  },
+  urgeLog: [],
+  notes: {},
   discordUsername: 'TestWarrior#1234',
   showOnLeaderboard: true,
   dataSharing: false,
@@ -740,16 +720,6 @@ const comprehensiveMockData = {
   language: 'en',
   wisdomMode: false,
   urgeToolUsage: []
-};
-
-// Additional personality-based users (keeping originals for compatibility)
-export { 
-  aiTestUser1,
-  aiTestUser2, 
-  aiTestUser3,
-  aiTestUser4,
-  aiTestUser5,
-  aiTestUser6
 };
 
 export default comprehensiveMockData;
