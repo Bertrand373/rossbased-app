@@ -1,5 +1,5 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// REDESIGNED: Font Awesome icons + proper button sizing
+// UPDATED: Wired feedback to model improvement
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { FaCheckCircle, FaBrain, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell
 import './PredictionDisplay.css';
 import { usePrediction } from '../../hooks/usePrediction';
 import notificationService from '../../services/NotificationService';
+import mlPredictionService from '../../services/MLPredictionService';
 import { getRiskLevel, formatTime } from '../../utils/predictionUtils';
 
 function PredictionDisplay({ 
@@ -69,11 +70,17 @@ function PredictionDisplay({
     try {
       const feedback = {
         timestamp: new Date().toISOString(),
+        riskScore: prediction.riskScore,
         userFeedback: wasHelpful ? 'helpful' : 'false_alarm',
         factors: prediction.factors,
         reason: prediction.reason,
         usedML: prediction.usedML
       };
+
+      // NEW: Send feedback to ML service for model improvement
+      if (prediction.usedML) {
+        mlPredictionService.processFeedback(feedback);
+      }
 
       const existingFeedback = JSON.parse(localStorage.getItem('prediction_feedback') || '[]');
       existingFeedback.push(feedback);
@@ -108,7 +115,7 @@ function PredictionDisplay({
         <div className="prediction-widget-header">
           <div className="widget-title">
             {prediction.usedML ? <FaBrain style={{ fontSize: '1rem' }} /> : <FaChartLine style={{ fontSize: '1rem' }} />}
-            <span>{prediction.usedML ? 'Neural Network' : 'Pattern Analysis'}</span>
+            <span>{prediction.usedML ? 'AI Predictions' : 'Pattern Analysis'}</span>
           </div>
           {notificationPermission === 'granted' && (
             <span className="notification-status active">
@@ -214,7 +221,7 @@ function PredictionDisplay({
           <p>Current urge risk: <strong>{prediction ? prediction.riskScore : 0}%</strong></p>
           <p className="subtext">
             {prediction?.usedML 
-              ? 'Neural network shows low risk' 
+              ? 'AI shows low risk' 
               : 'No interventions needed'}
           </p>
           <button onClick={() => navigate('/')} className="back-button">
@@ -233,7 +240,7 @@ function PredictionDisplay({
         <div className="feedback-success">
           <FaCheckCircle style={{ fontSize: '4rem', color: 'var(--success)', marginBottom: 'var(--spacing-lg)' }} />
           <h2>Thank You!</h2>
-          <p>Your feedback helps improve the system.</p>
+          <p>Your feedback helps improve the AI system.</p>
           <p className="subtext">Redirecting to dashboard...</p>
         </div>
       ) : (
@@ -332,7 +339,7 @@ function PredictionDisplay({
             <h4>Was this prediction accurate?</h4>
             <p className="feedback-subtext">
               {prediction.usedML 
-                ? 'Your feedback helps train the neural network' 
+                ? 'Your feedback helps train the AI' 
                 : 'Your feedback improves future predictions'}
             </p>
             <div className="feedback-buttons">
@@ -358,7 +365,7 @@ function PredictionDisplay({
             <span className="confidence-value">{prediction.confidence}%</span>
             {prediction.usedML ? (
               <span className="accuracy-note">
-                Neural Network ({prediction.modelInfo?.totalEpochs || 0} epochs)
+                AI Model ({prediction.modelInfo?.totalEpochs || 0} epochs)
               </span>
             ) : (
               <span className="accuracy-note">Pattern analysis</span>

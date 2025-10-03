@@ -1,5 +1,6 @@
 // src/components/MLWidget/MLWidget.js
-// Unified ML widget - combines training status and predictions
+// Unified AI widget - combines training status and predictions
+// UPDATED: Changed "ML" to "AI" terminology
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -68,8 +69,8 @@ function MLWidget({ userData }) {
           <div className="widget-title-section">
             <FaBrain className="widget-icon" />
             <div>
-              <h3 className="widget-title">Neural Network Ready</h3>
-              <p className="widget-subtitle">Train your personalized ML model</p>
+              <h3 className="widget-title">AI Model Ready</h3>
+              <p className="widget-subtitle">Train your personalized AI</p>
             </div>
           </div>
         </div>
@@ -88,12 +89,12 @@ function MLWidget({ userData }) {
         </div>
 
         <p className="widget-info-text">
-          You have enough data to train a neural network that learns your personal patterns.
+          You have enough data to train an AI that learns your personal patterns.
         </p>
 
         <button className="ml-widget-btn primary" onClick={handleNavigateToTraining}>
           <FaRocket style={{ fontSize: '0.875rem' }} />
-          Train Neural Network
+          Train AI Model
         </button>
       </div>
     );
@@ -118,7 +119,7 @@ function MLWidget({ userData }) {
           <div className="widget-title-section">
             <FaChartLine className="widget-icon" style={{ color: 'var(--success)' }} />
             <div>
-              <h3 className="widget-title">ML Predictions Active</h3>
+              <h3 className="widget-title">AI Predictions Active</h3>
               <p className="widget-subtitle">Neural network trained</p>
             </div>
           </div>
@@ -188,7 +189,7 @@ function MLWidget({ userData }) {
         </div>
 
         <p className="widget-info-text">
-          Keep tracking daily to unlock ML predictions at 20 days.
+          Keep tracking daily to unlock AI predictions at 20 days.
         </p>
       </div>
     );
