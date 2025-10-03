@@ -1,9 +1,9 @@
 // src/components/MLTraining/MLTraining.js
-// Machine Learning Training Interface
-// Allows users to train the neural network with their data
+// REDESIGNED: Font Awesome icons + proper button sizing
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaBrain, FaCheckCircle, FaExclamationTriangle, FaChartLine, FaDatabase, FaRocket, FaArrowLeft, FaRedo } from 'react-icons/fa';
 import './MLTraining.css';
 import mlPredictionService from '../../services/MLPredictionService';
 import dataPreprocessor from '../../utils/DataPreprocessor';
@@ -11,7 +11,6 @@ import dataPreprocessor from '../../utils/DataPreprocessor';
 function MLTraining() {
   const navigate = useNavigate();
   
-  // State management
   const [userData, setUserData] = useState(null);
   const [dataQuality, setDataQuality] = useState(null);
   const [isTraining, setIsTraining] = useState(false);
@@ -21,31 +20,26 @@ function MLTraining() {
   const [modelInfo, setModelInfo] = useState(null);
   const [error, setError] = useState(null);
 
-  // Load user data and check quality on mount
   useEffect(() => {
     loadUserDataAndCheck();
   }, []);
 
   const loadUserDataAndCheck = async () => {
     try {
-      // Load user data from localStorage
       const data = JSON.parse(localStorage.getItem('userData') || '{}');
       setUserData(data);
 
-      // Initialize ML service
       await mlPredictionService.initialize();
 
-      // Get model info
       const info = mlPredictionService.getModelInfo();
       setModelInfo(info);
 
-      // Check data quality
       const quality = dataPreprocessor.getDataQualityReport(data);
       setDataQuality(quality);
 
-      console.log('📊 Data Quality Report:', quality);
+      console.log('Data Quality Report:', quality);
     } catch (err) {
-      console.error('❌ Error loading data:', err);
+      console.error('Error loading data:', err);
       setError('Failed to load data. Please try again.');
     }
   };
@@ -61,7 +55,6 @@ function MLTraining() {
     setTrainingComplete(false);
 
     try {
-      // Start training with progress callback
       const result = await mlPredictionService.train(userData, (progress) => {
         setTrainingProgress(progress);
       });
@@ -70,16 +63,15 @@ function MLTraining() {
         setTrainingResults(result);
         setTrainingComplete(true);
         
-        // Refresh model info
         const info = mlPredictionService.getModelInfo();
         setModelInfo(info);
 
-        console.log('🎉 Training completed successfully!');
+        console.log('Training completed successfully!');
       } else {
         setError(result.message || 'Training failed');
       }
     } catch (err) {
-      console.error('❌ Training error:', err);
+      console.error('Training error:', err);
       setError('Training failed: ' + err.message);
     } finally {
       setIsTraining(false);
@@ -96,7 +88,7 @@ function MLTraining() {
     navigate('/');
   };
 
-  // Render loading state
+  // Loading state
   if (!userData || !dataQuality) {
     return (
       <div className="ml-training-container">
@@ -108,19 +100,18 @@ function MLTraining() {
     );
   }
 
-  // Render insufficient data state
+  // Insufficient data state
   if (!dataQuality.canTrain) {
     return (
       <div className="ml-training-container">
         <div className="training-card">
           <div className="header">
-            <div className="icon">📊</div>
             <h1>ML Training Center</h1>
             <p className="subtitle">Train your personalized neural network</p>
           </div>
 
           <div className="insufficient-data-section">
-            <div className="warning-icon">⚠️</div>
+            <FaExclamationTriangle style={{ fontSize: '4rem', color: 'var(--warning)', marginBottom: 'var(--spacing-lg)' }} />
             <h2>Not Enough Data Yet</h2>
             <p className="message">
               The neural network needs at least 20 days of benefit tracking data to learn patterns.
@@ -163,6 +154,7 @@ function MLTraining() {
             <p className="recommendation">{dataQuality.recommendation}</p>
 
             <button className="back-button" onClick={handleBackToDashboard}>
+              <FaArrowLeft style={{ fontSize: '0.875rem' }} />
               Back to Dashboard
             </button>
           </div>
@@ -171,13 +163,13 @@ function MLTraining() {
     );
   }
 
-  // Render training complete state
+  // Training complete state
   if (trainingComplete && trainingResults) {
     return (
       <div className="ml-training-container">
         <div className="training-card">
           <div className="training-complete-section">
-            <div className="success-icon">✓</div>
+            <FaCheckCircle style={{ fontSize: '5rem', color: 'var(--success)', marginBottom: 'var(--spacing-lg)' }} />
             <h1>Training Complete!</h1>
             <p className="success-message">
               Your neural network has been trained successfully
@@ -214,7 +206,6 @@ function MLTraining() {
             </div>
 
             <div className="info-box">
-              <div className="info-icon">💡</div>
               <p>
                 Your model is now active and will be used for all urge predictions. 
                 The neural network will automatically improve as you provide feedback.
@@ -223,9 +214,11 @@ function MLTraining() {
 
             <div className="action-buttons">
               <button className="primary-button" onClick={handleBackToDashboard}>
+                <FaCheckCircle style={{ fontSize: '0.875rem' }} />
                 Start Using Model
               </button>
               <button className="secondary-button" onClick={handleRetrain}>
+                <FaRedo style={{ fontSize: '0.875rem' }} />
                 Retrain Model
               </button>
             </div>
@@ -235,7 +228,7 @@ function MLTraining() {
     );
   }
 
-  // Render training in progress state
+  // Training in progress state
   if (isTraining && trainingProgress) {
     const progressPercent = trainingProgress.epoch 
       ? (trainingProgress.epoch / trainingProgress.totalEpochs) * 100 
@@ -245,7 +238,7 @@ function MLTraining() {
       <div className="ml-training-container">
         <div className="training-card">
           <div className="training-in-progress">
-            <div className="training-icon">🧠</div>
+            <FaBrain style={{ fontSize: '4.5rem', color: 'var(--primary)', marginBottom: 'var(--spacing-lg)', animation: 'pulse 2s ease-in-out infinite' }} />
             <h1>Training Neural Network...</h1>
             <p className="training-subtitle">
               {trainingProgress.message || 'Processing data...'}
@@ -297,7 +290,7 @@ function MLTraining() {
             )}
 
             <div className="info-box">
-              <p>⏳ This usually takes 30-60 seconds. Please don't close this page.</p>
+              <p>This usually takes 30-60 seconds. Please don't close this page.</p>
             </div>
           </div>
         </div>
@@ -305,19 +298,18 @@ function MLTraining() {
     );
   }
 
-  // Render ready to train state
+  // Ready to train state
   return (
     <div className="ml-training-container">
       <div className="training-card">
         <div className="header">
-          <div className="icon">🧠</div>
           <h1>ML Training Center</h1>
           <p className="subtitle">Train your personalized neural network</p>
         </div>
 
         {error && (
           <div className="error-box">
-            <span className="error-icon">⚠️</span>
+            <FaExclamationTriangle style={{ fontSize: '1.25rem' }} />
             <span>{error}</span>
           </div>
         )}
@@ -362,7 +354,9 @@ function MLTraining() {
             <div className="model-info-grid">
               <div className="info-item">
                 <span className="info-label">Status:</span>
-                <span className="info-value" style={{ color: '#22c55e' }}>Trained ✓</span>
+                <span className="info-value" style={{ color: '#22c55e' }}>
+                  Trained <FaCheckCircle style={{ fontSize: '0.875rem', marginLeft: '4px' }} />
+                </span>
               </div>
               {modelInfo.lastTrained && (
                 <div className="info-item">
@@ -391,11 +385,11 @@ function MLTraining() {
         <div className="training-info-section">
           <h3>What happens during training?</h3>
           <ul className="info-list">
-            <li>🔍 Analyzes your benefit tracking and relapse history</li>
-            <li>🧠 Trains a neural network to recognize risk patterns</li>
-            <li>📊 Validates model accuracy on test data</li>
-            <li>💾 Saves trained model to your browser</li>
-            <li>⚡ Takes approximately 30-60 seconds</li>
+            <li>Analyzes your benefit tracking and relapse history</li>
+            <li>Trains a neural network to recognize risk patterns</li>
+            <li>Validates model accuracy on test data</li>
+            <li>Saves trained model to your browser</li>
+            <li>Takes approximately 30-60 seconds</li>
           </ul>
         </div>
 
@@ -405,9 +399,20 @@ function MLTraining() {
             onClick={handleStartTraining}
             disabled={isTraining}
           >
-            {modelInfo?.isReady ? '🔄 Retrain Model' : '🚀 Start Training'}
+            {modelInfo?.isReady ? (
+              <>
+                <FaRedo style={{ fontSize: '1rem' }} />
+                Retrain Model
+              </>
+            ) : (
+              <>
+                <FaRocket style={{ fontSize: '1rem' }} />
+                Start Training
+              </>
+            )}
           </button>
           <button className="secondary-button" onClick={handleBackToDashboard}>
+            <FaArrowLeft style={{ fontSize: '0.875rem' }} />
             Back to Dashboard
           </button>
         </div>
