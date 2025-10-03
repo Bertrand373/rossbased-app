@@ -54,26 +54,30 @@ export function usePrediction(userData) {
         // Model is trained - get prediction
         const result = await mlPredictionService.predict(userData);
         
-        // Only set prediction if it actually used ML
-        if (result && result.usedML) {
-          setPrediction(result);
-
-          // Calculate next check time (1 hour from now)
-          const nextCheck = new Date();
-          nextCheck.setHours(nextCheck.getHours() + 1);
-          setNextCheckTime(nextCheck);
-
-          // If high risk, send notification
-          if (result.riskScore >= 70) {
-            await notificationService.sendUrgePredictionNotification(
-              result.riskScore,
-              result.reason
-            );
-          }
-        } else {
-          // Model returned fallback prediction - don't use it
-          console.log('⚠️ Prediction did not use ML - not displaying');
+        // CRITICAL: Only set prediction if it actually used ML
+        // Reject fallback predictions even if model is "ready"
+        if (!result || !result.usedML) {
+          console.log('⚠️ Prediction did not use ML (fallback) - rejecting');
           setPrediction(null);
+          setIsLoading(false);
+          return;
+        }
+
+        // Valid ML prediction - use it
+        console.log('✅ Valid ML prediction received');
+        setPrediction(result);
+
+        // Calculate next check time (1 hour from now)
+        const nextCheck = new Date();
+        nextCheck.setHours(nextCheck.getHours() + 1);
+        setNextCheckTime(nextCheck);
+
+        // If high risk, send notification
+        if (result.riskScore >= 70) {
+          await notificationService.sendUrgePredictionNotification(
+            result.riskScore,
+            result.reason
+          );
         }
 
         setIsLoading(false);
