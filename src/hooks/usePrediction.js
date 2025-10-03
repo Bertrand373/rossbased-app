@@ -1,5 +1,6 @@
 // src/hooks/usePrediction.js
 // Custom hook for prediction logic - shared across all components
+// FIXED: Only returns predictions when model is actually trained
 
 import { useState, useEffect } from 'react';
 import mlPredictionService from '../services/MLPredictionService';
@@ -30,6 +31,7 @@ export function usePrediction(userData) {
   // Run prediction whenever userData changes or ML becomes ready
   useEffect(() => {
     if (!userData || !userData.currentStreak) {
+      setPrediction(null);
       setIsLoading(false);
       return;
     }
@@ -38,41 +40,57 @@ export function usePrediction(userData) {
       try {
         setIsLoading(true);
 
-        // Use ML prediction service
+        // Check if model is trained before making predictions
+        const modelInfo = mlPredictionService.getModelInfo();
+        
+        // If model is NOT trained, return null - no predictions
+        if (!modelInfo || !modelInfo.isReady) {
+          console.log('⚠️ Model not trained - no predictions available');
+          setPrediction(null);
+          setIsLoading(false);
+          return;
+        }
+
+        // Model is trained - get prediction
         const result = await mlPredictionService.predict(userData);
-        setPrediction(result);
+        
+        // Only set prediction if it actually used ML
+        if (result && result.usedML) {
+          setPrediction(result);
 
-        // Calculate next check time (1 hour from now)
-        const nextCheck = new Date();
-        nextCheck.setHours(nextCheck.getHours() + 1);
-        setNextCheckTime(nextCheck);
+          // Calculate next check time (1 hour from now)
+          const nextCheck = new Date();
+          nextCheck.setHours(nextCheck.getHours() + 1);
+          setNextCheckTime(nextCheck);
 
-        // If high risk, send notification
-        if (result.riskScore >= 70) {
-          await notificationService.sendUrgePredictionNotification(
-            result.riskScore,
-            result.reason
-          );
+          // If high risk, send notification
+          if (result.riskScore >= 70) {
+            await notificationService.sendUrgePredictionNotification(
+              result.riskScore,
+              result.reason
+            );
+          }
+        } else {
+          // Model returned fallback prediction - don't use it
+          console.log('⚠️ Prediction did not use ML - not displaying');
+          setPrediction(null);
         }
 
         setIsLoading(false);
       } catch (error) {
         console.error('❌ Prediction error:', error);
-        // Set a safe default prediction
-        setPrediction({
-          riskScore: 30,
-          confidence: 0,
-          reason: 'Prediction unavailable',
-          usedML: false,
-          factors: {}
-        });
+        // Don't set fallback prediction - return null
+        setPrediction(null);
         setIsLoading(false);
       }
     };
 
-    // Only run prediction if ML is ready or if userData changes
+    // Only run prediction if ML is ready
     if (isMLReady) {
       runPrediction();
+    } else {
+      setPrediction(null);
+      setIsLoading(false);
     }
   }, [userData, isMLReady]);
 
