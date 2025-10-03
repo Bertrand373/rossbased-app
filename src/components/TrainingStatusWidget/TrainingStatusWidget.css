@@ -1,5 +1,5 @@
 /* src/components/TrainingStatusWidget/TrainingStatusWidget.css */
-/* FIXED: All selectors scoped to .training-status-widget to prevent conflicts */
+/* REDESIGNED: Fully congruent with app design system - matches Stats/Calendar widget styling */
 
 .training-status-widget {
   background: linear-gradient(135deg, var(--medium-gray) 0%, rgba(45, 45, 45, 0.9) 100%);
@@ -34,29 +34,37 @@
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, var(--medium-gray) 100%);
 }
 
-.training-status-widget .widget-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
+/* Success state (no relapses) */
+.training-status-widget.success {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--medium-gray) 100%);
 }
 
-.training-status-widget .widget-icon {
-  font-size: 2.5rem;
-  flex-shrink: 0;
+.training-status-widget .widget-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.training-status-widget .widget-title {
+  flex: 1;
 }
 
 .training-status-widget .widget-title h3 {
   color: var(--text);
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
-  margin: 0 0 4px 0;
+  margin: 0 0 var(--spacing-xs) 0;
 }
 
 .training-status-widget .widget-subtitle {
   color: var(--text-secondary);
   font-size: 0.875rem;
   margin: 0;
+  line-height: 1.4;
 }
 
 /* Widget Stats */
@@ -64,10 +72,11 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   padding: var(--spacing-md);
   background: rgba(0, 0, 0, 0.2);
   border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
 .training-status-widget .stat-item {
@@ -80,7 +89,7 @@
 .training-status-widget .stat-label {
   color: var(--text-secondary);
   font-size: 0.75rem;
-  margin-bottom: 4px;
+  margin-bottom: var(--spacing-xs);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -93,14 +102,43 @@
 
 /* Widget Info */
 .training-status-widget .widget-info {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .training-status-widget .widget-info p {
   color: var(--text-secondary);
   font-size: 0.875rem;
   line-height: 1.5;
-  margin: 0;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.training-status-widget .widget-info p:last-child {
+  margin-bottom: 0;
+}
+
+/* Info Box for Success State */
+.training-status-widget .widget-info-box {
+  background: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.training-status-widget .widget-info-box p {
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.training-status-widget .widget-info-box p:last-child {
+  margin-bottom: 0;
+}
+
+.training-status-widget .success-message {
+  color: var(--success);
+  font-weight: 600;
 }
 
 /* Progress Bar */
@@ -108,15 +146,16 @@
   width: 100%;
   height: 8px;
   background: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
+  border-radius: var(--radius-full);
   overflow: hidden;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--border);
 }
 
 .training-status-widget .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary) 0%, #e6c200 100%);
-  border-radius: 4px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: var(--radius-full);
   transition: width 0.3s ease;
 }
 
@@ -127,13 +166,12 @@
   margin: 0;
 }
 
-/* Action Button */
+/* Action Button - Match app pill button style */
 .training-status-widget .widget-action-btn {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 0.9375rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -141,22 +179,26 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-xs);
+  border: 1px solid;
 }
 
 .training-status-widget .widget-action-btn.primary {
-  background: linear-gradient(135deg, var(--primary) 0%, #e6c200 100%);
-  color: #000;
+  background: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--border);
 }
 
 .training-status-widget .widget-action-btn.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+  background: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .training-status-widget .widget-action-btn:not(.primary) {
   background: rgba(128, 128, 128, 0.1);
-  color: var(--text);
-  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-color: var(--border);
 }
 
 .training-status-widget .widget-action-btn:not(.primary):hover {
@@ -172,12 +214,12 @@
     padding: var(--spacing-md);
   }
 
-  .training-status-widget .widget-icon {
-    font-size: 2rem;
+  .training-status-widget .widget-title h3 {
+    font-size: 0.9375rem;
   }
 
-  .training-status-widget .widget-title h3 {
-    font-size: 1rem;
+  .training-status-widget .widget-subtitle {
+    font-size: 0.8125rem;
   }
 
   .training-status-widget .widget-stats {
@@ -195,15 +237,13 @@
   }
 
   .training-status-widget .widget-action-btn {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
   }
 }
 
 @media (max-width: 480px) {
   .training-status-widget .widget-header {
     flex-direction: column;
-    text-align: center;
-    align-items: center;
   }
 
   .training-status-widget .widget-stats {
