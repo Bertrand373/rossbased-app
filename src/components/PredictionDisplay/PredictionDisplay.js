@@ -104,7 +104,8 @@ function PredictionDisplay({
 
   // COMPACT MODE
   if (mode === 'compact') {
-    if (!prediction) {
+    // Only show if prediction exists AND model is trained (usedML = true)
+    if (!prediction || !prediction.usedML) {
       return null;
     }
 
