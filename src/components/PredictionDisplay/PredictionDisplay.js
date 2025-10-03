@@ -1,9 +1,9 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// UPDATED: Wired feedback to model improvement
+// UPDATED: Changed to "AI Relapse Prediction" with static green icon
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCheckCircle, FaBrain, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb } from 'react-icons/fa';
+import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb } from 'react-icons/fa';
 import './PredictionDisplay.css';
 import { usePrediction } from '../../hooks/usePrediction';
 import notificationService from '../../services/NotificationService';
@@ -114,8 +114,9 @@ function PredictionDisplay({
       <div className="prediction-widget">
         <div className="prediction-widget-header">
           <div className="widget-title">
-            {prediction.usedML ? <FaBrain style={{ fontSize: '1rem' }} /> : <FaChartLine style={{ fontSize: '1rem' }} />}
-            <span>{prediction.usedML ? 'AI Predictions' : 'Pattern Analysis'}</span>
+            {/* UPDATED: Static green AI chip icon matching Discord/YouTube style */}
+            <FaMicrochip style={{ fontSize: '1rem', color: 'var(--success)' }} />
+            <span>AI Relapse Prediction</span>
           </div>
           {notificationPermission === 'granted' && (
             <span className="notification-status active">
