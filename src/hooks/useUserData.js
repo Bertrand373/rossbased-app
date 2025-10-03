@@ -1,16 +1,19 @@
-// src/hooks/useUserData.js - UPDATED: Added goal system to userData structure
+// src/hooks/useUserData.js - UPDATED: Added goal system to userData structure + AI TEST USERS
 import { useState, useEffect } from 'react';
 import { addDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
-// IMPORT: The comprehensive mock data including new personality users
+// IMPORT: The comprehensive mock data including new personality users + AI TEST USERS
 import comprehensiveMockData, { 
   newUserMockData, 
   veteranUserMockData, 
   strugglingUserMockData,
   intjMockData,
   intpMockData,
-  enfpMockData
+  enfpMockData,
+  aiTestUser1,
+  aiTestUser2,
+  aiTestUser3
 } from '../mockData';
 
 // Custom hook to manage user data
@@ -129,6 +132,22 @@ export const useUserData = () => {
           mockUserData = enfpMockData;
           break;
           
+        // NEW AI TEST USERS
+        case 'aitest1':
+          // AI TEST 1: 15 days - Building data, not ready for AI yet
+          mockUserData = aiTestUser1;
+          break;
+          
+        case 'aitest2':
+          // AI TEST 2: 23 days - Ready to train AI model
+          mockUserData = aiTestUser2;
+          break;
+          
+        case 'aitest3':
+          // AI TEST 3: 45 days - AI model active and making predictions
+          mockUserData = aiTestUser3;
+          break;
+          
         default:
           // DEFAULT: Use main comprehensive data for any other username
           mockUserData = comprehensiveMockData;
@@ -213,6 +232,12 @@ export const useUserData = () => {
         return '(INTP - 275 days, Good Tracker)';
       case 'enfp':
         return '(ENFP - 89 days, Previous 423 day streak)';
+      case 'aitest1':
+        return '(AI Test 1 - Day 15, Building Data)';
+      case 'aitest2':
+        return '(AI Test 2 - Day 23, Ready to Train)';
+      case 'aitest3':
+        return '(AI Test 3 - Day 45, AI Active)';
       default:
         return '(Main Demo - Day 25)';
     }
@@ -308,7 +333,7 @@ export const useUserData = () => {
           );
           
           // Show achievement toast
-          toast.success(`ðŸŽ‰ Goal achieved! You reached ${updatedData.goal.targetDays} days!`);
+          toast.success(`🎯 Goal achieved! You reached ${updatedData.goal.targetDays} days!`);
         }
       }
 
@@ -352,7 +377,7 @@ export const useUserData = () => {
       updateUserData(goalData);
       
       if (isAchieved) {
-        toast.success(`ðŸŽ‰ Goal set and already achieved! You've reached ${targetDays} days!`);
+        toast.success(`🎯 Goal set and already achieved! You've reached ${targetDays} days!`);
       } else {
         toast.success(`Goal set: Reach ${targetDays} days!`);
       }
