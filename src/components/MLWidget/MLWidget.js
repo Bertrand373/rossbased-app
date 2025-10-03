@@ -1,10 +1,10 @@
 // src/components/MLWidget/MLWidget.js
-// Unified AI widget - combines training status and predictions
-// UPDATED: Changed "ML" to "AI" terminology
+// OPTION 3: Shows training status ONLY - hides when model is active
+// PredictionDisplay handles all prediction display when model is trained
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaBrain, FaRocket, FaChartLine, FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa';
+import { FaBrain, FaRocket, FaExclamationTriangle } from 'react-icons/fa';
 import './MLWidget.css';
 import mlPredictionService from '../../services/MLPredictionService';
 import dataPreprocessor from '../../utils/DataPreprocessor';
@@ -13,7 +13,6 @@ function MLWidget({ userData }) {
   const navigate = useNavigate();
   const [modelInfo, setModelInfo] = useState(null);
   const [dataQuality, setDataQuality] = useState(null);
-  const [prediction, setPrediction] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -30,12 +29,6 @@ function MLWidget({ userData }) {
       const quality = dataPreprocessor.getDataQualityReport(userData);
       setDataQuality(quality);
       
-      // If model is trained, get current prediction
-      if (info?.isReady) {
-        const pred = await mlPredictionService.predict(userData);
-        setPrediction(pred);
-      }
-      
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading widget data:', error);
@@ -45,10 +38,6 @@ function MLWidget({ userData }) {
 
   const handleNavigateToTraining = () => {
     navigate('/ml-training');
-  };
-
-  const handleNavigateToPrediction = () => {
-    navigate('/urge-prediction');
   };
 
   // Don't show widget if insufficient data
@@ -61,8 +50,13 @@ function MLWidget({ userData }) {
     return null;
   }
 
+  // OPTION 3: Hide when model is active (PredictionDisplay handles it)
+  if (modelInfo?.isReady) {
+    return null;
+  }
+
   // STATE 1: Ready to Train (20+ days, has relapse data, model not trained)
-  if (dataQuality.canTrain && !modelInfo?.isReady) {
+  if (dataQuality.canTrain) {
     return (
       <div className="ml-widget ready-to-train">
         <div className="ml-widget-header">
@@ -100,102 +94,31 @@ function MLWidget({ userData }) {
     );
   }
 
-  // STATE 2: Model Active (trained and making predictions)
-  if (modelInfo?.isReady && prediction) {
-    const getRiskLevel = (score) => {
-      if (score >= 70) return 'high';
-      if (score >= 40) return 'moderate';
-      return 'low';
-    };
-
-    const riskLevel = getRiskLevel(prediction.riskScore);
-    const riskColor = riskLevel === 'high' ? 'var(--danger)' : 
-                      riskLevel === 'moderate' ? 'var(--warning)' : 
-                      'var(--success)';
-
-    return (
-      <div className="ml-widget model-active">
-        <div className="ml-widget-header">
-          <div className="widget-title-section">
-            <FaChartLine className="widget-icon" style={{ color: 'var(--success)' }} />
-            <div>
-              <h3 className="widget-title">AI Predictions Active</h3>
-              <p className="widget-subtitle">Neural network trained</p>
-            </div>
+  // STATE 2: Building Data (10-19 days with relapse history)
+  return (
+    <div className="ml-widget building-data">
+      <div className="ml-widget-header">
+        <div className="widget-title-section">
+          <FaExclamationTriangle className="widget-icon" style={{ color: 'var(--primary)' }} />
+          <div>
+            <h3 className="widget-title">Building Training Data</h3>
+            <p className="widget-subtitle">{dataQuality.benefitDays} / 20 days tracked</p>
           </div>
-        </div>
-
-        <div className="risk-display-section">
-          <div className="risk-score-container">
-            <div className="risk-score-large" style={{ color: riskColor }}>
-              {prediction.riskScore}%
-            </div>
-            <div className="risk-label">Current Risk</div>
-          </div>
-          <div className="risk-badge" style={{ 
-            backgroundColor: `${riskColor}15`,
-            color: riskColor,
-            border: `1px solid ${riskColor}40`
-          }}>
-            {riskLevel.toUpperCase()}
-          </div>
-        </div>
-
-        <div className="model-stats-grid">
-          <div className="model-stat">
-            <span className="stat-label">Accuracy</span>
-            <span className="stat-value">{modelInfo.latestAccuracy}%</span>
-          </div>
-          <div className="model-stat">
-            <span className="stat-label">Last Trained</span>
-            <span className="stat-value">
-              {new Date(modelInfo.lastTrained).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </span>
-          </div>
-        </div>
-
-        <div className="widget-actions">
-          <button className="ml-widget-btn secondary" onClick={handleNavigateToPrediction}>
-            <FaChartLine style={{ fontSize: '0.875rem' }} />
-            View Details
-          </button>
-          <button className="ml-widget-btn tertiary" onClick={handleNavigateToTraining}>
-            Retrain
-          </button>
         </div>
       </div>
-    );
-  }
 
-  // STATE 3: Building Data (10-19 days with relapse history)
-  if (dataQuality.benefitDays >= 10 && dataQuality.benefitDays < 20 && dataQuality.hasRelapseData) {
-    return (
-      <div className="ml-widget building-data">
-        <div className="ml-widget-header">
-          <div className="widget-title-section">
-            <FaExclamationTriangle className="widget-icon" style={{ color: 'var(--primary)' }} />
-            <div>
-              <h3 className="widget-title">Building Training Data</h3>
-              <p className="widget-subtitle">{dataQuality.benefitDays} / 20 days tracked</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="progress-bar-container">
-          <div 
-            className="progress-bar-fill"
-            style={{ width: `${(dataQuality.benefitDays / 20) * 100}%` }}
-          />
-        </div>
-
-        <p className="widget-info-text">
-          Keep tracking daily to unlock AI predictions at 20 days.
-        </p>
+      <div className="progress-bar-container">
+        <div 
+          className="progress-bar-fill"
+          style={{ width: `${(dataQuality.benefitDays / 20) * 100}%` }}
+        />
       </div>
-    );
-  }
 
-  return null;
+      <p className="widget-info-text">
+        Keep tracking daily to unlock AI predictions at 20 days.
+      </p>
+    </div>
+  );
 }
 
 export default MLWidget;

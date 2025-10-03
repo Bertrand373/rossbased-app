@@ -1,9 +1,9 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// UPDATED: Changed to "AI Relapse Prediction" with static green microchip icon
+// OPTION 3: Enhanced to show model info and retrain access
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb } from 'react-icons/fa';
+import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb, FaRocket } from 'react-icons/fa';
 import './PredictionDisplay.css';
 import { usePrediction } from '../../hooks/usePrediction';
 import notificationService from '../../services/NotificationService';
@@ -77,7 +77,7 @@ function PredictionDisplay({
         usedML: prediction.usedML
       };
 
-      // NEW: Send feedback to ML service for model improvement
+      // Send feedback to ML service for model improvement
       if (prediction.usedML) {
         mlPredictionService.processFeedback(feedback);
       }
@@ -151,13 +151,21 @@ function PredictionDisplay({
               <span className="info-label">Confidence:</span>
               <span className="info-value">{prediction.confidence}%</span>
             </div>
-            {prediction.usedML && (
-              <div className="info-row">
-                <span className="info-label">Model:</span>
-                <span className="info-value" style={{ color: '#22c55e' }}>
-                  Trained <FaCheckCircle style={{ fontSize: '0.875rem', marginLeft: '4px' }} />
-                </span>
-              </div>
+            {prediction.usedML && prediction.modelInfo && (
+              <>
+                <div className="info-row">
+                  <span className="info-label">Model Accuracy:</span>
+                  <span className="info-value" style={{ color: '#22c55e' }}>
+                    {prediction.modelInfo.latestAccuracy}%
+                  </span>
+                </div>
+                <div className="info-row">
+                  <span className="info-label">Last Trained:</span>
+                  <span className="info-value">
+                    {new Date(prediction.modelInfo.lastTrained).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                </div>
+              </>
             )}
           </div>
 
@@ -178,21 +186,40 @@ function PredictionDisplay({
                 <span>View Analysis</span>
               </button>
             ) : notificationPermission !== 'granted' ? (
-              <button 
-                className="widget-btn enable-notifications"
-                onClick={handleEnableNotifications}
-              >
-                <FaBell style={{ fontSize: '0.875rem' }} />
-                <span>Enable Alerts</span>
-              </button>
+              <>
+                <button 
+                  className="widget-btn enable-notifications"
+                  onClick={handleEnableNotifications}
+                >
+                  <FaBell style={{ fontSize: '0.875rem' }} />
+                  <span>Enable Alerts</span>
+                </button>
+                <button 
+                  className="widget-btn view-details"
+                  onClick={handleViewDetails}
+                >
+                  <FaChartLine style={{ fontSize: '0.875rem' }} />
+                  <span>Details</span>
+                </button>
+              </>
             ) : (
-              <button 
-                className="widget-btn view-details"
-                onClick={handleViewDetails}
-              >
-                <FaChartLine style={{ fontSize: '0.875rem' }} />
-                <span>View Analysis</span>
-              </button>
+              <>
+                <button 
+                  className="widget-btn view-details"
+                  onClick={handleViewDetails}
+                >
+                  <FaChartLine style={{ fontSize: '0.875rem' }} />
+                  <span>View Analysis</span>
+                </button>
+                {prediction.usedML && (
+                  <button 
+                    className="widget-btn retrain-btn"
+                    onClick={() => navigate('/ml-training')}
+                  >
+                    <span>Retrain</span>
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -361,14 +388,25 @@ function PredictionDisplay({
           </div>
 
           <div className="confidence-footer">
-            <span className="confidence-label">Confidence:</span>
-            <span className="confidence-value">{prediction.confidence}%</span>
-            {prediction.usedML ? (
-              <span className="accuracy-note">
-                AI Model ({prediction.modelInfo?.totalEpochs || 0} epochs)
-              </span>
-            ) : (
-              <span className="accuracy-note">Pattern analysis</span>
+            <div className="confidence-info">
+              <span className="confidence-label">Confidence:</span>
+              <span className="confidence-value">{prediction.confidence}%</span>
+              {prediction.usedML && prediction.modelInfo ? (
+                <span className="accuracy-note">
+                  AI Model ({prediction.modelInfo.totalEpochs || 0} epochs, {prediction.modelInfo.latestAccuracy}% accuracy)
+                </span>
+              ) : (
+                <span className="accuracy-note">Pattern analysis</span>
+              )}
+            </div>
+            {prediction.usedML && (
+              <button 
+                className="retrain-model-btn"
+                onClick={() => navigate('/ml-training')}
+              >
+                <FaRocket style={{ fontSize: '0.875rem' }} />
+                <span>Retrain Model</span>
+              </button>
             )}
           </div>
         </div>
