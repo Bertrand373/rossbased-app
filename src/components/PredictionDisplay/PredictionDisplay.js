@@ -1,5 +1,5 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// UPDATED: Changed to "AI Relapse Prediction" with static green icon
+// UPDATED: Changed to "AI Relapse Prediction" with static green microchip icon
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -114,7 +114,6 @@ function PredictionDisplay({
       <div className="prediction-widget">
         <div className="prediction-widget-header">
           <div className="widget-title">
-            {/* UPDATED: Static green AI chip icon matching Discord/YouTube style */}
             <FaMicrochip style={{ fontSize: '1rem', color: 'var(--success)' }} />
             <span>AI Relapse Prediction</span>
           </div>
