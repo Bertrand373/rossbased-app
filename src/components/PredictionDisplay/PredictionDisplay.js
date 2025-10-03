@@ -104,8 +104,8 @@ function PredictionDisplay({
 
   // COMPACT MODE
   if (mode === 'compact') {
-    // CRITICAL: Only show if user has enough data AND model is trained
-    if (!hasEnoughData() || !prediction || !prediction.usedML) {
+    // usePrediction hook returns null if model isn't trained
+    if (!prediction) {
       return null;
     }
 
