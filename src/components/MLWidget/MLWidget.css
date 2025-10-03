@@ -1,4 +1,4 @@
-=/* src/components/MLWidget/MLWidget.css */
+/* src/components/MLWidget/MLWidget.css */
 /* Unified ML widget - elegant, professional design */
 
 .ml-widget {
@@ -36,7 +36,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-md);
   border-bottom: 1px solid var(--border);
 }
@@ -71,7 +71,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
   padding: var(--spacing-md);
   background: rgba(0, 0, 0, 0.2);
   border-radius: var(--radius-md);
@@ -104,7 +104,7 @@
   font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.5;
-  margin: 0 0 var(--spacing-lg) 0;
+  margin: 0 0 var(--spacing-md) 0;
   text-align: center;
 }
 
