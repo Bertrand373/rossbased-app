@@ -66,6 +66,21 @@
   margin: 0;
 }
 
+/* Notification Badge (for Model Active state) */
+.notification-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.75rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  flex-shrink: 0;
+}
+
 /* Stats Grid */
 .widget-stats-grid {
   display: grid;
