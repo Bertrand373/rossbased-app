@@ -1,435 +1,128 @@
-// APPEND TO THE END OF YOUR EXISTING mockData.js file
-// (Keep all your existing users, just add these new ones at the bottom)
+// src/mockData.js - COMPREHENSIVE test data covering ALL scenarios + AI TEST USERS
+import { format, subDays, addDays } from 'date-fns';
+
+// Helper function to generate realistic benefit data with some variability
+const generateBenefitValue = (baseValue, variability = 1.5) => {
+  const variation = (Math.random() - 0.5) * variability;
+  return Math.max(1, Math.min(10, Math.round(baseValue + variation)));
+};
+
+// Helper function to create benefit tracking data
+const createBenefitTracking = (startDate, streakDays, consistency = 'high') => {
+  const benefits = [];
+  
+  const patterns = {
+    high: { 
+      frequency: 0.95,
+      baseValues: { energy: 7, focus: 7.5, confidence: 7, aura: 6.5, sleep: 7, workout: 6 },
+      variability: 1.2
+    },
+    good: { 
+      frequency: 0.75,
+      baseValues: { energy: 6.5, focus: 6.8, confidence: 6.5, aura: 6, sleep: 6.5, workout: 5.5 },
+      variability: 1.8
+    },
+    moderate: {
+      frequency: 0.55,
+      baseValues: { energy: 6, focus: 6.2, confidence: 6.2, aura: 6.8, sleep: 6, workout: 5 },
+      variability: 2.2
+    }
+  };
+  
+  const pattern = patterns[consistency];
+  
+  for (let i = 0; i < streakDays; i++) {
+    const date = addDays(startDate, i);
+    
+    if (Math.random() > pattern.frequency) continue;
+    
+    const dayProgress = i / streakDays;
+    const progressBonus = dayProgress * 0.8;
+    
+    benefits.push({
+      date: date,
+      energy: generateBenefitValue(pattern.baseValues.energy + progressBonus, pattern.variability),
+      focus: generateBenefitValue(pattern.baseValues.focus + progressBonus, pattern.variability),
+      confidence: generateBenefitValue(pattern.baseValues.confidence + progressBonus, pattern.variability),
+      aura: generateBenefitValue(pattern.baseValues.aura + progressBonus, pattern.variability),
+      sleep: generateBenefitValue(pattern.baseValues.sleep + progressBonus * 0.5, pattern.variability),
+      workout: generateBenefitValue(pattern.baseValues.workout + progressBonus * 0.7, pattern.variability)
+    });
+  }
+  
+  return benefits;
+};
+
+// Helper function to determine earned badges
+const getEarnedBadges = (streakDays) => {
+  const allBadges = [
+    { id: 1, name: '7-Day Warrior', earned: false, date: null },
+    { id: 2, name: '14-Day Monk', earned: false, date: null },
+    { id: 3, name: '30-Day Master', earned: false, date: null },
+    { id: 4, name: '90-Day King', earned: false, date: null },
+    { id: 5, name: '180-Day Emperor', earned: false, date: null },
+    { id: 6, name: '365-Day Sage', earned: false, date: null }
+  ];
+  
+  const badgeThresholds = [7, 14, 30, 90, 180, 365];
+  const startDate = subDays(new Date(), streakDays);
+  
+  badgeThresholds.forEach((threshold, index) => {
+    if (streakDays >= threshold) {
+      allBadges[index].earned = true;
+      allBadges[index].date = addDays(startDate, threshold);
+    }
+  });
+  
+  return allBadges;
+};
 
 // ========================================
-// ENHANCED AI TEST USERS - Complete Coverage
+// AI PROGRESSION TEST USERS (UPDATED & EXPANDED)
 // ========================================
 
-// AI Test User 4: HIGH RISK PREDICTION (65% - Moderate Risk in evening)
-export const aiTestUser4HighRisk = {
-  username: 'aitest4_highrisk',
-  email: 'aitest4@example.com',
-  startDate: subDays(new Date(), 52), // 52 days - good streak
-  currentStreak: 52,
-  longestStreak: 52,
-  wetDreamCount: 2,
-  relapseCount: 5, // Multiple relapses for AI pattern learning
-  isPremium: true,
-  badges: getEarnedBadges(52),
-  
-  // High-risk factors: Evening time + Low energy + In purge phase + Anxiety
-  benefitTracking: createBenefitTracking(subDays(new Date(), 52), 52, 'high').map((benefit, index) => {
-    // Simulate energy drop in last 2 days
-    if (index >= 50) {
-      return {
-        ...benefit,
-        energy: 3, // Low energy (high risk factor)
-        focus: 4,
-        confidence: 5,
-        anxiety: 8, // High anxiety
-        moodStability: 3
-      };
-    }
-    return benefit;
-  }),
-  
-  streakHistory: [
-    {
-      id: 1,
-      start: subDays(new Date(), 200),
-      end: subDays(new Date(), 188),
-      days: 12,
-      reason: 'relapse',
-      trigger: 'stress'
-    },
-    {
-      id: 2,
-      start: subDays(new Date(), 187),
-      end: subDays(new Date(), 165),
-      days: 22,
-      reason: 'relapse',
-      trigger: 'loneliness'
-    },
-    {
-      id: 3,
-      start: subDays(new Date(), 164),
-      end: subDays(new Date(), 135),
-      days: 29,
-      reason: 'relapse',
-      trigger: 'boredom'
-    },
-    {
-      id: 4,
-      start: subDays(new Date(), 134),
-      end: subDays(new Date(), 90),
-      days: 44,
-      reason: 'relapse',
-      trigger: 'social_media'
-    },
-    {
-      id: 5,
-      start: subDays(new Date(), 89),
-      end: subDays(new Date(), 53),
-      days: 36,
-      reason: 'relapse',
-      trigger: 'home_environment'
-    },
-    {
-      id: 6,
-      start: subDays(new Date(), 52),
-      end: null, // Current streak
-      days: 52,
-      reason: null,
-      trigger: null
-    }
-  ],
-  
-  emotionalTracking: [
-    {
-      date: new Date(),
-      day: 52,
-      phase: 4,
-      anxiety: 8, // High anxiety - risk factor
-      moodStability: 3, // Low mood stability - risk factor
-      mentalClarity: 5,
-      emotionalProcessing: 6
-    }
-  ],
-  
-  urgeLog: [
-    {
-      date: subDays(new Date(), 2),
-      intensity: 7,
-      trigger: 'stress',
-      protocol: 'breathing',
-      phase: 'Spiritual Awakening Phase',
-      day: 50
-    }
-  ],
-  
-  notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 52. AI showing 65% risk tonight. Energy has been low last couple days and anxiety is up. Good thing I have the predictions!"
-  },
-  
-  discordUsername: 'AITest4_HighRisk#0004',
-  showOnLeaderboard: true,
-  dataSharing: true,
-  analyticsOptIn: true,
-  marketingEmails: false,
-  darkMode: true,
-  notifications: true,
-  language: 'en',
-  wisdomMode: false,
-  urgeToolUsage: [
-    {
-      date: subDays(new Date(), 2),
-      tool: 'breathing',
-      effective: true
-    }
-  ]
-};
-
-// AI Test User 5: EXTREME HIGH RISK (85% - High Risk in purge phase)
-export const aiTestUser5ExtremeRisk = {
-  username: 'aitest5_extremerisk',
-  email: 'aitest5@example.com',
-  startDate: subDays(new Date(), 38), // 38 days - smack in the middle of purge phase
-  currentStreak: 38,
-  longestStreak: 38,
-  wetDreamCount: 1,
-  relapseCount: 6, // Lots of relapses for AI learning
-  isPremium: true,
-  badges: getEarnedBadges(38),
-  
-  // Extreme risk factors: Purge phase + Low energy + High anxiety + Weekend + Evening
-  benefitTracking: createBenefitTracking(subDays(new Date(), 38), 38, 'high').map((benefit, index) => {
-    // Simulate purge phase symptoms
-    if (index >= 35) {
-      return {
-        ...benefit,
-        energy: 2, // Very low energy
-        focus: 3,
-        confidence: 4,
-        anxiety: 9, // Very high anxiety
-        moodStability: 2 // Very low mood stability
-      };
-    }
-    return benefit;
-  }),
-  
-  streakHistory: [
-    // Pattern: User always relapses around day 30-45 (purge phase)
-    {
-      id: 1,
-      start: subDays(new Date(), 250),
-      end: subDays(new Date(), 218),
-      days: 32, // Relapsed at day 32
-      reason: 'relapse',
-      trigger: 'stress'
-    },
-    {
-      id: 2,
-      start: subDays(new Date(), 217),
-      end: subDays(new Date(), 178),
-      days: 39, // Relapsed at day 39
-      reason: 'relapse',
-      trigger: 'anxiety'
-    },
-    {
-      id: 3,
-      start: subDays(new Date(), 177),
-      end: subDays(new Date(), 145),
-      days: 32, // Relapsed at day 32 again
-      reason: 'relapse',
-      trigger: 'mood_swings'
-    },
-    {
-      id: 4,
-      start: subDays(new Date(), 144),
-      end: subDays(new Date(), 109),
-      days: 35, // Relapsed at day 35
-      reason: 'relapse',
-      trigger: 'emotional_overwhelm'
-    },
-    {
-      id: 5,
-      start: subDays(new Date(), 108),
-      end: subDays(new Date(), 67),
-      days: 41, // Relapsed at day 41
-      reason: 'relapse',
-      trigger: 'loneliness'
-    },
-    {
-      id: 6,
-      start: subDays(new Date(), 66),
-      end: subDays(new Date(), 39),
-      days: 27, // Relapsed earlier this time
-      reason: 'relapse',
-      trigger: 'stress'
-    },
-    {
-      id: 7,
-      start: subDays(new Date(), 38),
-      end: null, // Current streak - day 38, DANGER ZONE!
-      days: 38,
-      reason: null,
-      trigger: null
-    }
-  ],
-  
-  emotionalTracking: [
-    {
-      date: new Date(),
-      day: 38,
-      phase: 2, // Emotional purging phase - HIGH RISK
-      anxiety: 9, // Extreme anxiety
-      moodStability: 2, // Very unstable
-      mentalClarity: 4,
-      emotionalProcessing: 3
-    }
-  ],
-  
-  urgeLog: [
-    {
-      date: new Date(),
-      intensity: 9,
-      trigger: 'emotional_overwhelm',
-      protocol: 'breathing',
-      phase: 'Emotional Purging Phase',
-      day: 38
-    },
-    {
-      date: subDays(new Date(), 1),
-      intensity: 8,
-      trigger: 'anxiety',
-      protocol: 'coldshower',
-      phase: 'Emotional Purging Phase',
-      day: 37
-    }
-  ],
-  
-  notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 38 - AI showing 85% EXTREME RISK! This is my danger zone - I've relapsed around day 30-40 every single time. The purge phase is brutal. But this time I'm aware thanks to AI. Using all the tools!"
-  },
-  
-  discordUsername: 'AITest5_ExtremeRisk#0005',
-  showOnLeaderboard: true,
-  dataSharing: true,
-  analyticsOptIn: true,
-  marketingEmails: false,
-  darkMode: true,
-  notifications: true,
-  language: 'en',
-  wisdomMode: false,
-  urgeToolUsage: [
-    {
-      date: new Date(),
-      tool: 'breathing',
-      effective: true
-    },
-    {
-      date: subDays(new Date(), 1),
-      tool: 'coldshower',
-      effective: true
-    }
-  ]
-};
-
-// AI Test User 6: LOW RISK (25% - Safe zone)
-export const aiTestUser6LowRisk = {
-  username: 'aitest6_lowrisk',
-  email: 'aitest6@example.com',
-  startDate: subDays(new Date(), 95), // 95 days - well past danger zones
-  currentStreak: 95,
-  longestStreak: 95,
-  wetDreamCount: 4,
-  relapseCount: 3,
-  isPremium: true,
-  badges: getEarnedBadges(95),
-  
-  // Low risk: Good energy, stable mood, past danger zones
-  benefitTracking: createBenefitTracking(subDays(new Date(), 95), 95, 'high').map((benefit, index) => {
-    // Great benefits in mastery phase
-    if (index >= 90) {
-      return {
-        ...benefit,
-        energy: 9,
-        focus: 9,
-        confidence: 9,
-        anxiety: 2,
-        moodStability: 9
-      };
-    }
-    return benefit;
-  }),
-  
-  streakHistory: [
-    {
-      id: 1,
-      start: subDays(new Date(), 200),
-      end: subDays(new Date(), 165),
-      days: 35,
-      reason: 'relapse',
-      trigger: 'stress'
-    },
-    {
-      id: 2,
-      start: subDays(new Date(), 164),
-      end: subDays(new Date(), 122),
-      days: 42,
-      reason: 'relapse',
-      trigger: 'social_media'
-    },
-    {
-      id: 3,
-      start: subDays(new Date(), 121),
-      end: subDays(new Date(), 96),
-      days: 25,
-      reason: 'relapse',
-      trigger: 'boredom'
-    },
-    {
-      id: 4,
-      start: subDays(new Date(), 95),
-      end: null, // Current streak - crushing it!
-      days: 95,
-      reason: null,
-      trigger: null
-    }
-  ],
-  
-  emotionalTracking: [
-    {
-      date: new Date(),
-      day: 95,
-      phase: 4, // Mastery phase
-      anxiety: 2,
-      moodStability: 9,
-      mentalClarity: 10,
-      emotionalProcessing: 9
-    }
-  ],
-  
-  urgeLog: [], // No recent urges
-  
-  notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 95! AI showing only 25% risk. Life is good. Energy is high, mind is clear. The AI has been incredibly accurate - it warned me during my danger periods and now confirms I'm in a safe zone."
-  },
-  
-  discordUsername: 'AITest6_LowRisk#0006',
-  showOnLeaderboard: true,
-  dataSharing: true,
-  analyticsOptIn: true,
-  marketingEmails: false,
-  darkMode: true,
-  notifications: true,
-  language: 'en',
-  wisdomMode: false,
-  urgeToolUsage: []
-};
-
-// AI Test User 7: BUILDING DATA - 18 days (should show progress bar)
-export const aiTestUser7BuildingData = {
-  username: 'aitest7_building',
-  email: 'aitest7@example.com',
-  startDate: subDays(new Date(), 18), // 18 days - in building phase
-  currentStreak: 18,
-  longestStreak: 18,
+// AI Test User 1: BUILDING DATA (12 days with relapse history - should show "Building Training Data")
+export const aiTestUser1 = {
+  username: 'aitest1',
+  email: 'aitest1@example.com',
+  startDate: subDays(new Date(), 12), // 12 days
+  currentStreak: 12,
+  longestStreak: 15,
   wetDreamCount: 0,
-  relapseCount: 4, // HAS relapse history (required for widget to show)
+  relapseCount: 2, // Has relapse history for AI training
   isPremium: true,
-  badges: getEarnedBadges(18),
-  
-  // Good tracking consistency (required for benefitDays calculation)
-  benefitTracking: createBenefitTracking(subDays(new Date(), 18), 18, 'high'), // High consistency = 17-18 days logged
-  
+  badges: getEarnedBadges(12),
+  benefitTracking: createBenefitTracking(subDays(new Date(), 12), 12, 'good'),
   streakHistory: [
     {
       id: 1,
-      start: subDays(new Date(), 60),
-      end: subDays(new Date(), 52),
-      days: 8,
+      start: subDays(new Date(), 35),
+      end: subDays(new Date(), 28),
+      days: 7,
       reason: 'relapse',
       trigger: 'stress'
     },
     {
       id: 2,
-      start: subDays(new Date(), 51),
-      end: subDays(new Date(), 40),
-      days: 11,
+      start: subDays(new Date(), 27),
+      end: subDays(new Date(), 13),
+      days: 14,
       reason: 'relapse',
       trigger: 'social_media'
     },
     {
       id: 3,
-      start: subDays(new Date(), 39),
-      end: subDays(new Date(), 33),
-      days: 6,
-      reason: 'relapse',
-      trigger: 'boredom'
-    },
-    {
-      id: 4,
-      start: subDays(new Date(), 32),
-      end: subDays(new Date(), 19),
-      days: 13,
-      reason: 'relapse',
-      trigger: 'loneliness'
-    },
-    {
-      id: 5,
-      start: subDays(new Date(), 18),
+      start: subDays(new Date(), 12),
       end: null, // Current streak
-      days: 18,
+      days: 12,
       reason: null,
       trigger: null
     }
   ],
-  
   emotionalTracking: [
     {
       date: new Date(),
-      day: 18,
+      day: 12,
       phase: 2,
       anxiety: 5,
       moodStability: 6,
@@ -437,14 +130,11 @@ export const aiTestUser7BuildingData = {
       emotionalProcessing: 6
     }
   ],
-  
   urgeLog: [],
-  
   notes: {
-    [format(new Date(), 'yyyy-MM-dd')]: "Day 18! Widget says 18/20 days tracked. Almost there! Can't wait to train the AI and see my patterns."
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 12 - Widget says I'm building training data. Need 20 days to unlock AI!"
   },
-  
-  discordUsername: 'AITest7_Building#0007',
+  discordUsername: 'AITester1#0001',
   showOnLeaderboard: false,
   dataSharing: false,
   analyticsOptIn: true,
@@ -456,15 +146,610 @@ export const aiTestUser7BuildingData = {
   urgeToolUsage: []
 };
 
-// Export all AI test users
-export const allAITestUsers = {
-  aiTestUser1, // 15 days - should show building data widget
-  aiTestUser2, // 23 days - should show "ready to train" widget
-  aiTestUser3, // 45 days - should show "model active" widget
-  aiTestUser4HighRisk, // 52 days - should show 65% moderate risk prediction
-  aiTestUser5ExtremeRisk, // 38 days - should show 85% high risk prediction
-  aiTestUser6LowRisk, // 95 days - should show 25% low risk prediction
-  aiTestUser7BuildingData // 18 days - should show building data widget (18/20)
+// AI Test User 2: READY TO TRAIN (21 days, can train but hasn't yet)
+export const aiTestUser2 = {
+  username: 'aitest2',
+  email: 'aitest2@example.com',
+  startDate: subDays(new Date(), 21), // 21 days
+  currentStreak: 21,
+  longestStreak: 21,
+  wetDreamCount: 1,
+  relapseCount: 3,
+  isPremium: true,
+  badges: getEarnedBadges(21),
+  benefitTracking: createBenefitTracking(subDays(new Date(), 21), 21, 'high'),
+  streakHistory: [
+    {
+      id: 1,
+      start: subDays(new Date(), 50),
+      end: subDays(new Date(), 42),
+      days: 8,
+      reason: 'relapse',
+      trigger: 'boredom'
+    },
+    {
+      id: 2,
+      start: subDays(new Date(), 41),
+      end: subDays(new Date(), 30),
+      days: 11,
+      reason: 'relapse',
+      trigger: 'stress'
+    },
+    {
+      id: 3,
+      start: subDays(new Date(), 29),
+      end: subDays(new Date(), 22),
+      days: 7,
+      reason: 'relapse',
+      trigger: 'social_media'
+    },
+    {
+      id: 4,
+      start: subDays(new Date(), 21),
+      end: null,
+      days: 21,
+      reason: null,
+      trigger: null
+    }
+  ],
+  emotionalTracking: [
+    {
+      date: new Date(),
+      day: 21,
+      phase: 2,
+      anxiety: 4,
+      moodStability: 7,
+      mentalClarity: 7,
+      emotionalProcessing: 7
+    }
+  ],
+  urgeLog: [
+    {
+      date: subDays(new Date(), 10),
+      intensity: 6,
+      trigger: 'stress',
+      protocol: 'breathing',
+      phase: 'Emotional Purging Phase',
+      day: 11
+    }
+  ],
+  notes: {
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 21! Widget shows 'AI Model Ready' - should I train it now?"
+  },
+  discordUsername: 'AITester2#0002',
+  showOnLeaderboard: false,
+  dataSharing: false,
+  analyticsOptIn: true,
+  marketingEmails: false,
+  darkMode: true,
+  notifications: true,
+  language: 'en',
+  wisdomMode: false,
+  urgeToolUsage: []
+};
+
+// AI Test User 3: MODEL TRAINED, LOW RISK (35% risk - should show in full page but not widget)
+export const aiTestUser3 = {
+  username: 'aitest3',
+  email: 'aitest3@example.com',
+  startDate: subDays(new Date(), 38), // 38 days
+  currentStreak: 38,
+  longestStreak: 38,
+  wetDreamCount: 2,
+  relapseCount: 3,
+  isPremium: true,
+  badges: getEarnedBadges(38),
+  benefitTracking: createBenefitTracking(subDays(new Date(), 38), 38, 'high'),
+  streakHistory: [
+    {
+      id: 1,
+      start: subDays(new Date(), 100),
+      end: subDays(new Date(), 90),
+      days: 10,
+      reason: 'relapse',
+      trigger: 'stress'
+    },
+    {
+      id: 2,
+      start: subDays(new Date(), 89),
+      end: subDays(new Date(), 75),
+      days: 14,
+      reason: 'relapse',
+      trigger: 'loneliness'
+    },
+    {
+      id: 3,
+      start: subDays(new Date(), 74),
+      end: subDays(new Date(), 39),
+      days: 35,
+      reason: 'relapse',
+      trigger: 'social_media'
+    },
+    {
+      id: 4,
+      start: subDays(new Date(), 38),
+      end: null,
+      days: 38,
+      reason: null,
+      trigger: null
+    }
+  ],
+  emotionalTracking: [
+    {
+      date: new Date(),
+      day: 38,
+      phase: 3,
+      anxiety: 2,
+      moodStability: 9,
+      mentalClarity: 9,
+      emotionalProcessing: 8
+    }
+  ],
+  urgeLog: [],
+  notes: {
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 38 - AI trained! Current risk is low (35%). No widget showing, which is correct."
+  },
+  discordUsername: 'AITester3#0003',
+  showOnLeaderboard: true,
+  dataSharing: true,
+  analyticsOptIn: true,
+  marketingEmails: false,
+  darkMode: true,
+  notifications: true,
+  language: 'en',
+  wisdomMode: false,
+  urgeToolUsage: []
+};
+
+// AI Test User 4: MODEL TRAINED, MODERATE RISK (55% - should show widget)
+export const aiTestUser4 = {
+  username: 'aitest4',
+  email: 'aitest4@example.com',
+  startDate: subDays(new Date(), 18), // 18 days - in purging phase
+  currentStreak: 18,
+  longestStreak: 28,
+  wetDreamCount: 1,
+  relapseCount: 5, // More relapses = better training data
+  isPremium: true,
+  badges: getEarnedBadges(18),
+  benefitTracking: createBenefitTracking(subDays(new Date(), 18), 18, 'good'),
+  streakHistory: [
+    {
+      id: 1,
+      start: subDays(new Date(), 120),
+      end: subDays(new Date(), 112),
+      days: 8,
+      reason: 'relapse',
+      trigger: 'stress'
+    },
+    {
+      id: 2,
+      start: subDays(new Date(), 111),
+      end: subDays(new Date(), 97),
+      days: 14,
+      reason: 'relapse',
+      trigger: 'loneliness'
+    },
+    {
+      id: 3,
+      start: subDays(new Date(), 96),
+      end: subDays(new Date(), 68),
+      days: 28, // Best streak
+      reason: 'relapse',
+      trigger: 'social_media'
+    },
+    {
+      id: 4,
+      start: subDays(new Date(), 67),
+      end: subDays(new Date(), 56),
+      days: 11,
+      reason: 'relapse',
+      trigger: 'boredom'
+    },
+    {
+      id: 5,
+      start: subDays(new Date(), 55),
+      end: subDays(new Date(), 19),
+      days: 36,
+      reason: 'relapse',
+      trigger: 'evening'
+    },
+    {
+      id: 6,
+      start: subDays(new Date(), 18),
+      end: null,
+      days: 18,
+      reason: null,
+      trigger: null
+    }
+  ],
+  emotionalTracking: [
+    {
+      date: new Date(),
+      day: 18,
+      phase: 2, // Purging phase
+      anxiety: 6, // Higher anxiety
+      moodStability: 5,
+      mentalClarity: 6,
+      emotionalProcessing: 5
+    }
+  ],
+  urgeLog: [
+    {
+      date: subDays(new Date(), 2),
+      intensity: 7,
+      trigger: 'stress',
+      protocol: 'breathing',
+      phase: 'Emotional Purging Phase',
+      day: 16
+    }
+  ],
+  notes: {
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 18 - AI showing 55% MODERATE risk. Widget is visible. Evening hours are tough for me."
+  },
+  discordUsername: 'AITester4#0004',
+  showOnLeaderboard: false,
+  dataSharing: false,
+  analyticsOptIn: true,
+  marketingEmails: false,
+  darkMode: true,
+  notifications: true,
+  language: 'en',
+  wisdomMode: false,
+  urgeToolUsage: [
+    {
+      date: subDays(new Date(), 2),
+      tool: 'breathing',
+      effective: true
+    }
+  ]
+};
+
+// AI Test User 5: MODEL TRAINED, HIGH RISK (72% - evening, purging phase, pattern match)
+export const aiTestUser5 = {
+  username: 'aitest5',
+  email: 'aitest5@example.com',
+  startDate: subDays(new Date(), 19), // 19 days - dangerous zone
+  currentStreak: 19,
+  longestStreak: 22,
+  wetDreamCount: 0,
+  relapseCount: 6, // Lots of relapses around day 18-22
+  isPremium: true,
+  badges: getEarnedBadges(19),
+  benefitTracking: createBenefitTracking(subDays(new Date(), 19), 19, 'moderate'),
+  streakHistory: [
+    {
+      id: 1,
+      start: subDays(new Date(), 150),
+      end: subDays(new Date(), 140),
+      days: 10,
+      reason: 'relapse',
+      trigger: 'stress'
+    },
+    {
+      id: 2,
+      start: subDays(new Date(), 139),
+      end: subDays(new Date(), 121),
+      days: 18, // Relapsed at day 18
+      reason: 'relapse',
+      trigger: 'evening'
+    },
+    {
+      id: 3,
+      start: subDays(new Date(), 120),
+      end: subDays(new Date(), 100),
+      days: 20, // Relapsed at day 20
+      reason: 'relapse',
+      trigger: 'social_media'
+    },
+    {
+      id: 4,
+      start: subDays(new Date(), 99),
+      end: subDays(new Date(), 77),
+      days: 22, // Best streak, relapsed at day 22
+      reason: 'relapse',
+      trigger: 'evening'
+    },
+    {
+      id: 5,
+      start: subDays(new Date(), 76),
+      end: subDays(new Date(), 58),
+      days: 18, // Pattern: relapses around days 18-22
+      reason: 'relapse',
+      trigger: 'stress'
+    },
+    {
+      id: 6,
+      start: subDays(new Date(), 57),
+      end: subDays(new Date(), 38),
+      days: 19, // Another day 19 relapse
+      reason: 'relapse',
+      trigger: 'evening'
+    },
+    {
+      id: 7,
+      start: subDays(new Date(), 19),
+      end: null,
+      days: 19, // Current - at risk!
+      reason: null,
+      trigger: null
+    }
+  ],
+  emotionalTracking: [
+    {
+      date: new Date(),
+      day: 19,
+      phase: 2, // Purging phase
+      anxiety: 8, // Very high anxiety
+      moodStability: 3,
+      mentalClarity: 5,
+      emotionalProcessing: 4
+    }
+  ],
+  urgeLog: [
+    {
+      date: new Date(),
+      intensity: 8,
+      trigger: 'evening',
+      protocol: 'breathing',
+      phase: 'Emotional Purging Phase',
+      day: 19
+    },
+    {
+      date: subDays(new Date(), 1),
+      intensity: 7,
+      trigger: 'stress',
+      protocol: 'cold_shower',
+      phase: 'Emotional Purging Phase',
+      day: 18
+    }
+  ],
+  notes: {
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 19 - AI showing 72% HIGH RISK! It detected I always relapse around days 18-22. It's 9PM and I'm struggling. Urge is intense."
+  },
+  discordUsername: 'AITester5#0005',
+  showOnLeaderboard: false,
+  dataSharing: true,
+  analyticsOptIn: true,
+  marketingEmails: false,
+  darkMode: true,
+  notifications: true,
+  language: 'en',
+  wisdomMode: false,
+  urgeToolUsage: [
+    {
+      date: new Date(),
+      tool: 'breathing',
+      effective: true
+    },
+    {
+      date: subDays(new Date(), 1),
+      tool: 'cold_shower',
+      effective: true
+    }
+  ]
+};
+
+// AI Test User 6: MODEL TRAINED, ACTIVE WITH STATS (45 days, for full experience testing)
+export const aiTestUser6 = {
+  username: 'aitest6',
+  email: 'aitest6@example.com',
+  startDate: subDays(new Date(), 45),
+  currentStreak: 45,
+  longestStreak: 45,
+  wetDreamCount: 2,
+  relapseCount: 4,
+  isPremium: true,
+  badges: getEarnedBadges(45),
+  benefitTracking: createBenefitTracking(subDays(new Date(), 45), 45, 'high'),
+  streakHistory: [
+    {
+      id: 1,
+      start: subDays(new Date(), 120),
+      end: subDays(new Date(), 110),
+      days: 10,
+      reason: 'relapse',
+      trigger: 'stress'
+    },
+    {
+      id: 2,
+      start: subDays(new Date(), 109),
+      end: subDays(new Date(), 95),
+      days: 14,
+      reason: 'relapse',
+      trigger: 'loneliness'
+    },
+    {
+      id: 3,
+      start: subDays(new Date(), 94),
+      end: subDays(new Date(), 70),
+      days: 24,
+      reason: 'relapse',
+      trigger: 'social_media'
+    },
+    {
+      id: 4,
+      start: subDays(new Date(), 69),
+      end: subDays(new Date(), 46),
+      days: 23,
+      reason: 'relapse',
+      trigger: 'home_environment'
+    },
+    {
+      id: 5,
+      start: subDays(new Date(), 45),
+      end: null,
+      days: 45,
+      reason: null,
+      trigger: null
+    }
+  ],
+  emotionalTracking: [
+    {
+      date: new Date(),
+      day: 45,
+      phase: 4,
+      anxiety: 2,
+      moodStability: 9,
+      mentalClarity: 9,
+      emotionalProcessing: 9
+    }
+  ],
+  urgeLog: [
+    {
+      date: subDays(new Date(), 20),
+      intensity: 5,
+      trigger: 'stress',
+      protocol: 'breathing',
+      phase: 'Mental Expansion Phase',
+      day: 25
+    }
+  ],
+  notes: {
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 45! AI has been incredibly accurate. Currently showing 42% moderate risk due to weekend + evening time."
+  },
+  discordUsername: 'AITester6#0006',
+  showOnLeaderboard: true,
+  dataSharing: true,
+  analyticsOptIn: true,
+  marketingEmails: false,
+  darkMode: true,
+  notifications: true,
+  language: 'en',
+  wisdomMode: false,
+  urgeToolUsage: [
+    {
+      date: subDays(new Date(), 20),
+      tool: 'breathing',
+      effective: true
+    }
+  ]
+};
+
+// ORIGINAL COMPREHENSIVE MOCK DATA (keeping existing for compatibility)
+const comprehensiveMockData = {
+  username: 'testuser',
+  email: 'testuser@example.com',
+  startDate: new Date(new Date().setDate(new Date().getDate() - 25)),
+  currentStreak: 25,
+  longestStreak: 47,
+  wetDreamCount: 3,
+  relapseCount: 4,
+  isPremium: true,
+  streakHistory: [
+    {
+      id: 1,
+      start: new Date(new Date().setDate(new Date().getDate() - 120)),
+      end: new Date(new Date().setDate(new Date().getDate() - 106)),
+      days: 14,
+      reason: 'relapse',
+      trigger: 'stress'
+    },
+    {
+      id: 2,
+      start: new Date(new Date().setDate(new Date().getDate() - 105)),
+      end: new Date(new Date().setDate(new Date().getDate() - 58)),
+      days: 47,
+      reason: 'relapse',
+      trigger: 'loneliness'
+    },
+    {
+      id: 3,
+      start: new Date(new Date().setDate(new Date().getDate() - 57)),
+      end: new Date(new Date().setDate(new Date().getDate() - 36)),
+      days: 21,
+      reason: 'relapse',
+      trigger: 'boredom'
+    },
+    {
+      id: 4,
+      start: new Date(new Date().setDate(new Date().getDate() - 35)),
+      end: new Date(new Date().setDate(new Date().getDate() - 25)),
+      days: 10,
+      reason: 'relapse',
+      trigger: 'social_media'
+    },
+    {
+      id: 5,
+      start: new Date(new Date().setDate(new Date().getDate() - 25)),
+      end: null,
+      days: 25,
+      reason: null,
+      trigger: null
+    }
+  ],
+  badges: [
+    { id: 1, name: '7-Day Warrior', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 18)) },
+    { id: 2, name: '14-Day Monk', earned: true, date: new Date(new Date().setDate(new Date().getDate() - 11)) },
+    { id: 3, name: '30-Day Master', earned: false, date: null },
+    { id: 4, name: '90-Day King', earned: false, date: null },
+    { id: 5, name: '180-Day Emperor', earned: false, date: null },
+    { id: 6, name: '365-Day Sage', earned: false, date: null }
+  ],
+  benefitTracking: [
+    {
+      date: new Date(),
+      energy: 8,
+      focus: 7,
+      confidence: 8,
+      aura: 7,
+      sleep: 8,
+      workout: 7
+    },
+    {
+      date: new Date(new Date().setDate(new Date().getDate() - 1)),
+      energy: 7,
+      focus: 7,
+      confidence: 7,
+      aura: 7,
+      sleep: 7,
+      workout: 8
+    }
+  ],
+  emotionalTracking: [
+    {
+      date: new Date(),
+      day: 25,
+      phase: 3,
+      anxiety: 4,
+      moodStability: 7,
+      mentalClarity: 8,
+      emotionalProcessing: 7
+    }
+  ],
+  urgeLog: [
+    {
+      date: new Date(new Date().setDate(new Date().getDate() - 3)),
+      intensity: 6,
+      trigger: 'stress',
+      protocol: 'breathing',
+      phase: 'Mental Expansion Phase',
+      day: 22
+    }
+  ],
+  notes: {
+    [new Date().toISOString().split('T')[0]]: "Day 25! Feeling really good. Energy is up, confidence is growing."
+  },
+  discordUsername: 'TestWarrior#1234',
+  showOnLeaderboard: true,
+  dataSharing: false,
+  analyticsOptIn: true,
+  marketingEmails: false,
+  darkMode: true,
+  notifications: true,
+  language: 'en',
+  wisdomMode: false,
+  urgeToolUsage: []
+};
+
+// Additional personality-based users (keeping originals for compatibility)
+export { 
+  aiTestUser1,
+  aiTestUser2, 
+  aiTestUser3,
+  aiTestUser4,
+  aiTestUser5,
+  aiTestUser6
 };
 
 export default comprehensiveMockData;
