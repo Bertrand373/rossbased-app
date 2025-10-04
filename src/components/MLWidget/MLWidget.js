@@ -66,7 +66,7 @@ function MLWidget({ userData }) {
               <p className="widget-subtitle">Learn your personal relapse patterns</p>
             </div>
           </div>
-          <div className="ready-badge">
+          <div className="notification-badge ready">
             <FaCheckCircle style={{ fontSize: '0.75rem' }} />
             <span>Ready</span>
           </div>
