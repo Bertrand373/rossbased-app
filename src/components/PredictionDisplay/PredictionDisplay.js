@@ -1,5 +1,5 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// OPTION 3: Enhanced to show model info and retrain access
+// UPDATED: Changed from "urge" to "relapse risk" terminology throughout
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -234,7 +234,7 @@ function PredictionDisplay({
       <div className="urge-prediction-container">
         <div className="loading-spinner">
           <div className="spinner"></div>
-          <p>Analyzing risk factors...</p>
+          <p>Analyzing relapse risk factors...</p>
         </div>
       </div>
     );
@@ -245,12 +245,12 @@ function PredictionDisplay({
       <div className="urge-prediction-container">
         <div className="low-risk-message">
           <FaCheckCircle style={{ fontSize: '4rem', color: 'var(--success)', marginBottom: 'var(--spacing-lg)' }} />
-          <h2>You're in the Clear</h2>
-          <p>Current urge risk: <strong>{prediction ? prediction.riskScore : 0}%</strong></p>
+          <h2>Low Relapse Risk</h2>
+          <p>Current risk level: <strong>{prediction ? prediction.riskScore : 0}%</strong></p>
           <p className="subtext">
             {prediction?.usedML 
-              ? 'AI shows low risk' 
-              : 'No interventions needed'}
+              ? 'AI shows low relapse risk based on your patterns' 
+              : 'Conditions look stable - keep up the good work'}
           </p>
           <button onClick={() => navigate('/')} className="back-button">
             Back to Dashboard
@@ -268,14 +268,14 @@ function PredictionDisplay({
         <div className="feedback-success">
           <FaCheckCircle style={{ fontSize: '4rem', color: 'var(--success)', marginBottom: 'var(--spacing-lg)' }} />
           <h2>Thank You!</h2>
-          <p>Your feedback helps improve the AI system.</p>
+          <p>Your feedback helps improve the AI predictor.</p>
           <p className="subtext">Redirecting to dashboard...</p>
         </div>
       ) : (
         <div className="prediction-card">
           <div className="prediction-header">
             <FaExclamationTriangle style={{ fontSize: '3rem', color: riskLevel.color, marginBottom: 'var(--spacing-sm)' }} />
-            <h1>{riskLevel.label} URGE RISK DETECTED</h1>
+            <h1>{riskLevel.label} RELAPSE RISK DETECTED</h1>
           </div>
 
           <div className="risk-meter-section">
@@ -298,13 +298,17 @@ function PredictionDisplay({
 
           <div className="reason-section">
             <h3>Why this alert?</h3>
-            <p className="reason-text">{prediction.reason}</p>
+            <p className="reason-text">
+              {prediction.usedML 
+                ? `AI detected: ${prediction.reason}` 
+                : prediction.reason}
+            </p>
             
             {prediction.factors?.similarPastRelapse && (
               <div className="past-relapse-warning">
                 <FaExclamationTriangle style={{ fontSize: '1.25rem' }} />
                 <div>
-                  <strong>Pattern Match:</strong> Similar to past relapse on day {prediction.factors.similarPastRelapse.days}
+                  <strong>Pattern Match:</strong> Current conditions similar to day {prediction.factors.similarPastRelapse.days} before past relapse
                 </div>
               </div>
             )}
@@ -367,8 +371,8 @@ function PredictionDisplay({
             <h4>Was this prediction accurate?</h4>
             <p className="feedback-subtext">
               {prediction.usedML 
-                ? 'Your feedback helps train the AI' 
-                : 'Your feedback improves future predictions'}
+                ? 'Your feedback trains the AI to predict your patterns better' 
+                : 'Your feedback helps improve future risk detection'}
             </p>
             <div className="feedback-buttons">
               <button 
@@ -394,10 +398,10 @@ function PredictionDisplay({
               <span className="confidence-value">{prediction.confidence}%</span>
               {prediction.usedML && prediction.modelInfo ? (
                 <span className="accuracy-note">
-                  AI Model ({prediction.modelInfo.totalEpochs || 0} epochs, {prediction.modelInfo.latestAccuracy}% accuracy)
+                  AI Model ({prediction.modelInfo.totalEpochs || 0} training cycles, {prediction.modelInfo.latestAccuracy}% accuracy)
                 </span>
               ) : (
-                <span className="accuracy-note">Pattern analysis</span>
+                <span className="accuracy-note">Pattern-based analysis</span>
               )}
             </div>
             {prediction.usedML && (

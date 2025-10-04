@@ -1,5 +1,5 @@
 /* src/components/MLTraining/MLTraining.css */
-/* REFINED: Elegant design, no emojis, Font Awesome icons only */
+/* UPDATED: Added new sections for explanations, privacy, and 20-day requirement */
 
 .ml-training-container {
   max-width: 1200px;
@@ -227,6 +227,100 @@
   font-size: 0.875rem;
   font-style: italic;
   margin-bottom: var(--spacing-lg);
+}
+
+/* What Is This Section */
+.ml-training-container .what-is-this-section {
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  border: 1px solid var(--border);
+}
+
+.ml-training-container .what-is-this-section h2 {
+  color: var(--text);
+  font-size: 1.125rem;
+  margin: 0 0 var(--spacing-md) 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.ml-training-container .explanation-text {
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin-bottom: var(--spacing-lg);
+}
+
+.ml-training-container .how-it-works-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.ml-training-container .how-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.ml-training-container .how-item strong {
+  color: var(--text);
+  font-size: 0.875rem;
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.ml-training-container .how-item p {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Why 20 Days Box */
+.ml-training-container .why-20-days-box {
+  background: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.ml-training-container .why-20-days-box h4 {
+  color: var(--primary);
+  font-size: 1rem;
+  margin: 0 0 var(--spacing-sm) 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.ml-training-container .why-20-days-box p {
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Privacy Note */
+.ml-training-container .privacy-note {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
 }
 
 /* Data Quality Section */
@@ -633,6 +727,10 @@
 
   .ml-training-container .section-icon {
     font-size: 3rem;
+  }
+
+  .ml-training-container .how-it-works-grid {
+    grid-template-columns: 1fr;
   }
 }
 

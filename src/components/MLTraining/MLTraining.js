@@ -1,5 +1,5 @@
 // src/components/MLTraining/MLTraining.js
-// REFINED: Font Awesome icons, elegant design, no emojis
+// UPDATED: Clear explanations about relapse risk prediction and 20-day requirement
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +13,9 @@ import {
   FaArrowLeft, 
   FaRedo,
   FaTimes,
-  FaCheck
+  FaCheck,
+  FaShieldAlt,
+  FaBell
 } from 'react-icons/fa';
 import './MLTraining.css';
 import mlPredictionService from '../../services/MLPredictionService';
@@ -117,15 +119,15 @@ function MLTraining() {
       <div className="ml-training-container">
         <div className="training-card">
           <div className="header">
-            <h1>ML Training Center</h1>
-            <p className="subtitle">Train your personalized neural network</p>
+            <h1>AI Relapse Risk Predictor</h1>
+            <p className="subtitle">Train AI to predict your personal relapse patterns</p>
           </div>
 
           <div className="insufficient-data-section">
             <FaExclamationTriangle className="section-icon warning" />
             <h2>Not Enough Data Yet</h2>
             <p className="message">
-              The neural network needs at least 20 days of benefit tracking data to learn patterns.
+              The AI needs at least 20 days of tracking data with relapse history to learn your personal patterns and predict when you're at high risk of relapse.
             </p>
 
             <div className="data-progress">
@@ -146,20 +148,27 @@ function MLTraining() {
                 <span className={dataQuality.benefitDays >= 20 ? 'check' : 'cross'}>
                   {dataQuality.benefitDays >= 20 ? <FaCheck /> : <FaTimes />}
                 </span>
-                <span>20+ days of benefit tracking</span>
+                <span>20+ days of benefit tracking (AI needs enough data to find patterns)</span>
               </div>
               <div className="requirement-item">
                 <span className={dataQuality.hasRelapseData ? 'check' : 'cross'}>
                   {dataQuality.hasRelapseData ? <FaCheck /> : <FaTimes />}
                 </span>
-                <span>At least 1 relapse in history (for learning)</span>
+                <span>At least 1 relapse in history (AI learns from your past relapses)</span>
               </div>
               <div className="requirement-item">
                 <span className={dataQuality.hasEmotionalData ? 'check' : 'cross'}>
                   {dataQuality.hasEmotionalData ? <FaCheck /> : <FaTimes />}
                 </span>
-                <span>Emotional tracking data (optional)</span>
+                <span>Emotional tracking data (improves prediction accuracy)</span>
               </div>
+            </div>
+
+            <div className="why-20-days-box">
+              <h4><FaChartLine style={{ fontSize: '1rem', marginRight: '8px' }} />Why 20 days?</h4>
+              <p>
+                The AI analyzes patterns leading up to your past relapses. With 20+ days of data, it can identify conditions that preceded relapses and warn you when similar patterns emerge.
+              </p>
             </div>
 
             <p className="recommendation">{dataQuality.recommendation}</p>
@@ -181,14 +190,14 @@ function MLTraining() {
         <div className="training-card">
           <div className="training-complete-section">
             <FaCheckCircle className="section-icon success" />
-            <h1>Training Complete!</h1>
+            <h1>Relapse Predictor Active!</h1>
             <p className="success-message">
-              Your neural network has been trained successfully
+              Your AI model is now monitoring for relapse risk patterns
             </p>
 
             <div className="results-grid">
               <div className="result-card">
-                <div className="result-label">Accuracy</div>
+                <div className="result-label">Model Accuracy</div>
                 <div className="result-value success">
                   {trainingResults.accuracy.toFixed(1)}%
                 </div>
@@ -218,15 +227,19 @@ function MLTraining() {
 
             <div className="info-box">
               <p>
-                Your model is now active and will be used for all urge predictions. 
-                The neural network will automatically improve as you provide feedback.
+                <strong>What happens now:</strong> The AI continuously monitors your benefit tracking data. When it detects patterns similar to those before past relapses, you'll get an early warning alert so you can take action before a high-risk moment.
               </p>
+            </div>
+
+            <div className="privacy-note">
+              <FaShieldAlt style={{ fontSize: '1rem', color: 'var(--success)' }} />
+              <span>Your data stays private on your device. Nothing is sent to any server.</span>
             </div>
 
             <div className="action-buttons">
               <button className="primary-button" onClick={handleBackToDashboard}>
                 <FaCheckCircle style={{ fontSize: '0.875rem' }} />
-                Start Using Model
+                Start Using Predictor
               </button>
               <button className="secondary-button" onClick={handleRetrain}>
                 <FaRedo style={{ fontSize: '0.875rem' }} />
@@ -250,9 +263,9 @@ function MLTraining() {
         <div className="training-card">
           <div className="training-in-progress">
             <FaBrain className="section-icon primary pulse" />
-            <h1>Training Neural Network...</h1>
+            <h1>Training Relapse Predictor...</h1>
             <p className="training-subtitle">
-              {trainingProgress.message || 'Processing data...'}
+              {trainingProgress.message || 'Analyzing your relapse patterns...'}
             </p>
 
             <div className="progress-section">
@@ -314,8 +327,8 @@ function MLTraining() {
     <div className="ml-training-container">
       <div className="training-card">
         <div className="header">
-          <h1>ML Training Center</h1>
-          <p className="subtitle">Train your personalized neural network</p>
+          <h1>AI Relapse Risk Predictor</h1>
+          <p className="subtitle">Train AI on your personal relapse patterns</p>
         </div>
 
         {error && (
@@ -324,6 +337,36 @@ function MLTraining() {
             <span>{error}</span>
           </div>
         )}
+
+        <div className="what-is-this-section">
+          <h2><FaBrain style={{ fontSize: '1.25rem', marginRight: '8px' }} />What Does This Do?</h2>
+          <p className="explanation-text">
+            This AI analyzes your benefit tracking data and past relapses to learn <strong>your personal patterns</strong>. When trained, it monitors your daily data and alerts you when conditions match patterns that preceded past relapses—giving you early warning to take action.
+          </p>
+          <div className="how-it-works-grid">
+            <div className="how-item">
+              <FaChartLine style={{ fontSize: '1.5rem', color: 'var(--primary)' }} />
+              <div>
+                <strong>Learns Your Patterns</strong>
+                <p>AI identifies conditions before your past relapses</p>
+              </div>
+            </div>
+            <div className="how-item">
+              <FaBell style={{ fontSize: '1.5rem', color: 'var(--primary)' }} />
+              <div>
+                <strong>Early Warnings</strong>
+                <p>Get alerts when similar patterns emerge</p>
+              </div>
+            </div>
+            <div className="how-item">
+              <FaShieldAlt style={{ fontSize: '1.5rem', color: 'var(--success)' }} />
+              <div>
+                <strong>100% Private</strong>
+                <p>All data stays on your device</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="data-quality-section">
           <h2>Your Data Quality</h2>
@@ -345,7 +388,7 @@ function MLTraining() {
             </div>
             <div className="stat-item">
               <span className="stat-value">{dataQuality.relapseCount}</span>
-              <span className="stat-label">Relapse History</span>
+              <span className="stat-label">Past Relapses</span>
             </div>
             <div className="stat-item">
               <span className="stat-value">{dataQuality.emotionalDays}</span>
@@ -370,7 +413,7 @@ function MLTraining() {
               <div className="info-item">
                 <span className="info-label">Status:</span>
                 <span className="info-value" style={{ color: 'var(--success)' }}>
-                  Trained
+                  Active
                 </span>
               </div>
               {modelInfo.lastTrained && (
@@ -404,9 +447,10 @@ function MLTraining() {
           </h3>
           <ul className="info-list">
             <li>Analyzes your benefit tracking and relapse history</li>
-            <li>Trains a neural network to recognize risk patterns</li>
+            <li>Identifies patterns that preceded past relapses</li>
+            <li>Trains neural network to recognize high-risk conditions</li>
             <li>Validates model accuracy on test data</li>
-            <li>Saves trained model to your browser</li>
+            <li>Saves trained model to your browser (locally, privately)</li>
             <li>Takes approximately 30-60 seconds</li>
           </ul>
         </div>
@@ -425,7 +469,7 @@ function MLTraining() {
             ) : (
               <>
                 <FaRocket style={{ fontSize: '1rem' }} />
-                Start Training
+                Train Relapse Predictor
               </>
             )}
           </button>

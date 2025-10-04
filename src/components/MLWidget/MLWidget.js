@@ -1,10 +1,9 @@
 // src/components/MLWidget/MLWidget.js
-// OPTION 3: Shows training status ONLY - hides when model is active
-// PredictionDisplay handles all prediction display when model is trained
+// UPDATED: Clear "Relapse Risk Prediction" messaging throughout
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaBrain, FaRocket, FaExclamationTriangle } from 'react-icons/fa';
+import { FaMicrochip, FaRocket, FaCheckCircle } from 'react-icons/fa';
 import './MLWidget.css';
 import mlPredictionService from '../../services/MLPredictionService';
 import dataPreprocessor from '../../utils/DataPreprocessor';
@@ -50,7 +49,7 @@ function MLWidget({ userData }) {
     return null;
   }
 
-  // OPTION 3: Hide when model is active (PredictionDisplay handles it)
+  // Hide when model is active (PredictionDisplay handles it)
   if (modelInfo?.isReady) {
     return null;
   }
@@ -61,11 +60,15 @@ function MLWidget({ userData }) {
       <div className="ml-widget ready-to-train">
         <div className="ml-widget-header">
           <div className="widget-title-section">
-            <FaBrain className="widget-icon" />
+            <FaMicrochip className="widget-icon" />
             <div>
-              <h3 className="widget-title">AI Model Ready</h3>
-              <p className="widget-subtitle">Train your personalized AI</p>
+              <h3 className="widget-title">AI Relapse Risk Predictor Ready</h3>
+              <p className="widget-subtitle">Learn your personal relapse patterns</p>
             </div>
+          </div>
+          <div className="ready-badge">
+            <FaCheckCircle style={{ fontSize: '0.75rem' }} />
+            <span>Ready</span>
           </div>
         </div>
 
@@ -77,18 +80,18 @@ function MLWidget({ userData }) {
             </span>
           </div>
           <div className="widget-stat-item">
-            <span className="stat-label">Training Days</span>
+            <span className="stat-label">Days Tracked</span>
             <span className="stat-value">{dataQuality.benefitDays}</span>
           </div>
         </div>
 
         <p className="widget-info-text">
-          You have enough data to train an AI that learns your personal patterns.
+          Train AI on your personal relapse patterns to get early warning alerts before high-risk moments. Your data stays private on your device.
         </p>
 
         <button className="ml-widget-btn primary" onClick={handleNavigateToTraining}>
           <FaRocket style={{ fontSize: '0.875rem' }} />
-          Train AI Model
+          Train Relapse Predictor
         </button>
       </div>
     );
@@ -99,10 +102,10 @@ function MLWidget({ userData }) {
     <div className="ml-widget building-data">
       <div className="ml-widget-header">
         <div className="widget-title-section">
-          <FaExclamationTriangle className="widget-icon" style={{ color: 'var(--primary)' }} />
+          <FaMicrochip className="widget-icon" style={{ color: 'var(--primary)' }} />
           <div>
-            <h3 className="widget-title">Building Training Data</h3>
-            <p className="widget-subtitle">{dataQuality.benefitDays} / 20 days tracked</p>
+            <h3 className="widget-title">Building AI Training Data</h3>
+            <p className="widget-subtitle">AI learns from your relapse patterns</p>
           </div>
         </div>
       </div>
@@ -115,7 +118,7 @@ function MLWidget({ userData }) {
       </div>
 
       <p className="widget-info-text">
-        Keep tracking daily to unlock AI predictions at 20 days.
+        {dataQuality.benefitDays} / 20 days tracked. At 20 days, train AI to predict your relapse risk and get early warnings.
       </p>
     </div>
   );
