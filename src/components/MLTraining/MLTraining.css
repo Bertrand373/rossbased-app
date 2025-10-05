@@ -2,7 +2,7 @@
 /* COMPLETE UPDATE: Helmet banner, wider container, simplified sections */
 
 .ml-training-container {
-  max-width: 100%; /* WIDENED: From 1200px to match tracker sections */
+  max-width: 100%;
   margin: var(--spacing-md) auto;
   padding: 0 var(--spacing-lg);
   min-height: calc(100vh - 200px);
@@ -15,6 +15,7 @@
   border: 1px solid var(--border);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   animation: mlTrainingSlideIn 0.3s ease-out;
+  max-width: none; /* ADDED: Remove any width restrictions */
 }
 
 @keyframes mlTrainingSlideIn {
@@ -271,7 +272,7 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* NEW: What Does This Do Section - Simplified */
+/* NEW: What Does This Do Section - Simplified with centered header */
 .ml-training-container .what-does-this-do-section {
   background: var(--card-background);
   border-radius: var(--radius-md);
@@ -280,23 +281,12 @@
   border: 1px solid var(--border);
 }
 
-.ml-training-container .microchip-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-}
-
-.ml-training-container .microchip-icon {
-  font-size: 1.5rem;
-  color: var(--primary);
-}
-
-.ml-training-container .microchip-header h2 {
+.ml-training-container .what-does-this-do-section h2 {
   color: var(--text);
   font-size: 1.125rem;
-  margin: 0;
+  margin: 0 0 var(--spacing-md) 0;
   font-weight: 600;
+  text-align: center;
 }
 
 .ml-training-container .explanation-text {
@@ -684,11 +674,11 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .ml-training-container {
-    padding: 0 var(--spacing-md);
+    padding: 0 var(--spacing-md); /* UPDATED: Match tracker mobile padding */
   }
 
   .ml-training-container .training-card {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-lg); /* UPDATED: More generous mobile padding */
   }
 
   .ml-training-banner {

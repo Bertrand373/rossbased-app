@@ -8,7 +8,6 @@ import {
   FaCheckCircle, 
   FaExclamationTriangle, 
   FaChartLine, 
-  FaMicrochip,
   FaRocket, 
   FaArrowLeft, 
   FaRedo,
@@ -371,10 +370,7 @@ function MLTraining() {
         </div>
 
         <div className="what-does-this-do-section">
-          <div className="microchip-header">
-            <FaMicrochip className="microchip-icon" />
-            <h2>What Does This Do?</h2>
-          </div>
+          <h2>What Does This Do?</h2>
           <p className="explanation-text">
             This AI learns your unique relapse patterns by analyzing your benefit tracking data and past relapses. Once trained, it continuously monitors for warning signs and alerts you before high-risk moments—giving you time to take action.
           </p>
