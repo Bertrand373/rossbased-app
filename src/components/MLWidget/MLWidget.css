@@ -113,7 +113,6 @@
 .widget-stat-item .stat-label {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
@@ -160,7 +159,6 @@
 .risk-label {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
@@ -195,7 +193,6 @@
   font-size: 0.75rem;
   color: var(--text-secondary);
   margin-bottom: var(--spacing-xs);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 

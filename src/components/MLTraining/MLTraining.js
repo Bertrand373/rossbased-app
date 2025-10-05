@@ -331,13 +331,6 @@ function MLTraining() {
           <p className="subtitle">Train AI on your personal relapse patterns</p>
         </div>
 
-        {error && (
-          <div className="error-box">
-            <FaExclamationTriangle style={{ fontSize: '1.25rem' }} />
-            <span>{error}</span>
-          </div>
-        )}
-
         <div className="what-is-this-section">
           <h2><FaBrain style={{ fontSize: '1.25rem', marginRight: '8px' }} />What Does This Do?</h2>
           <p className="explanation-text">
@@ -455,9 +448,16 @@ function MLTraining() {
           </ul>
         </div>
 
+        {error && (
+          <div className="error-box">
+            <FaExclamationTriangle style={{ fontSize: '1.25rem' }} />
+            <span>{error}</span>
+          </div>
+        )}
+
         <div className="action-buttons">
           <button 
-            className="primary-button large"
+            className="primary-button"
             onClick={handleStartTraining}
             disabled={isTraining}
           >
