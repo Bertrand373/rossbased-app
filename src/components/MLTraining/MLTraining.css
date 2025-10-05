@@ -1,5 +1,5 @@
 /* src/components/MLTraining/MLTraining.css */
-/* COMPLETE UPDATE: Helmet banner, wider container, simplified sections */
+/* UPDATED: Standalone header, explanation in banner, compact stats like Stats tab */
 
 .ml-training-container {
   max-width: 100%;
@@ -15,7 +15,7 @@
   border: 1px solid var(--border);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   animation: mlTrainingSlideIn 0.3s ease-out;
-  max-width: none; /* ADDED: Remove any width restrictions */
+  max-width: none;
 }
 
 @keyframes mlTrainingSlideIn {
@@ -29,7 +29,22 @@
   }
 }
 
-/* NEW: Helmet Banner - Matching Benefits/DatePicker pattern */
+/* NEW: Standalone centered header */
+.ml-training-container .standalone-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.ml-training-container .standalone-header h1 {
+  color: var(--text);
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Helmet Banner with explanation */
 .ml-training-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -79,7 +94,7 @@
 }
 
 .ml-training-title {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
   margin: 0;
@@ -90,6 +105,53 @@
   color: var(--text-secondary);
   line-height: 1.4;
   margin: 0;
+}
+
+/* NEW: Compact Stats Grid - Stats tab style */
+.ml-training-container .compact-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.ml-training-container .compact-stat-card {
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: all 0.3s ease;
+}
+
+.ml-training-container .compact-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.ml-training-container .compact-stat-value {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.ml-training-container .compact-stat-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.ml-training-container .recommendation-text {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-style: italic;
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
 }
 
 /* Section Icons */
@@ -272,53 +334,6 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* NEW: What Does This Do Section - Simplified with centered header */
-.ml-training-container .what-does-this-do-section {
-  background: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
-  border: 1px solid var(--border);
-}
-
-.ml-training-container .what-does-this-do-section h2 {
-  color: var(--text);
-  font-size: 1.125rem;
-  margin: 0 0 var(--spacing-md) 0;
-  font-weight: 600;
-  text-align: center;
-}
-
-.ml-training-container .explanation-text {
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  margin-bottom: var(--spacing-md);
-}
-
-.ml-training-container .explanation-bullets {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.ml-training-container .explanation-bullets li {
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
-  padding: var(--spacing-sm) 0;
-  line-height: 1.5;
-  padding-left: var(--spacing-lg);
-  position: relative;
-}
-
-.ml-training-container .explanation-bullets li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: var(--primary);
-  font-weight: bold;
-}
-
 /* Why 20 Days Box */
 .ml-training-container .why-20-days-box {
   background: rgba(255, 221, 0, 0.05);
@@ -356,89 +371,6 @@
   margin-bottom: var(--spacing-lg);
   color: var(--text-secondary);
   font-size: 0.875rem;
-}
-
-/* Data Quality Section */
-.ml-training-container .data-quality-section {
-  background: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
-  border: 1px solid var(--border);
-}
-
-.ml-training-container .data-quality-section h2 {
-  color: var(--text);
-  font-size: 1.125rem;
-  margin: 0 0 var(--spacing-lg) 0;
-  text-align: center;
-  font-weight: 600;
-}
-
-.ml-training-container .quality-score-container {
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
-}
-
-.ml-training-container .quality-score {
-  font-size: 4rem;
-  font-weight: 700;
-  line-height: 1;
-  margin-bottom: var(--spacing-sm);
-}
-
-.ml-training-container .quality-score.success {
-  color: var(--success);
-}
-
-.ml-training-container .quality-score.warning {
-  color: var(--warning);
-}
-
-.ml-training-container .quality-score.danger {
-  color: var(--danger);
-}
-
-.ml-training-container .quality-label {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  letter-spacing: 1px;
-}
-
-.ml-training-container .data-stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-}
-
-.ml-training-container .stat-item {
-  text-align: center;
-  padding: var(--spacing-lg);
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  transition: all 0.3s ease;
-}
-
-.ml-training-container .stat-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  transform: translateY(-2px);
-}
-
-.ml-training-container .stat-value {
-  display: block;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.ml-training-container .stat-label {
-  display: block;
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.5px;
 }
 
 /* Existing Model Section */
@@ -674,11 +606,15 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .ml-training-container {
-    padding: 0 var(--spacing-md); /* UPDATED: Match tracker mobile padding */
+    padding: 0 var(--spacing-md);
   }
 
   .ml-training-container .training-card {
-    padding: var(--spacing-lg); /* UPDATED: More generous mobile padding */
+    padding: var(--spacing-lg);
+  }
+
+  .ml-training-container .standalone-header h1 {
+    font-size: 1.25rem;
   }
 
   .ml-training-banner {
@@ -703,14 +639,21 @@
   }
 
   .ml-training-title {
-    font-size: 1.125rem;
+    font-size: 0.9375rem;
   }
 
   .ml-training-description {
     font-size: 0.8125rem;
   }
 
-  .ml-training-container .data-stats,
+  .ml-training-container .compact-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ml-training-container .compact-stat-value {
+    font-size: 2.5rem;
+  }
+
   .ml-training-container .results-grid,
   .ml-training-container .metrics-grid,
   .ml-training-container .model-info-grid {
@@ -728,10 +671,6 @@
     min-width: unset;
   }
 
-  .ml-training-container .quality-score {
-    font-size: 3rem;
-  }
-
   .ml-training-container .result-value {
     font-size: 1.5rem;
   }
@@ -746,6 +685,10 @@
     padding: var(--spacing-md);
   }
 
+  .ml-training-container .standalone-header h1 {
+    font-size: 1.125rem;
+  }
+
   .ml-training-helmet {
     width: 30px;
     height: 30px;
@@ -756,19 +699,19 @@
   }
 
   .ml-training-title {
-    font-size: 1rem;
+    font-size: 0.875rem;
   }
 
   .ml-training-description {
     font-size: 0.75rem;
   }
 
-  .ml-training-container .quality-score {
-    font-size: 2.5rem;
+  .ml-training-container .compact-stats-grid {
+    grid-template-columns: 1fr;
   }
 
-  .ml-training-container .stat-value {
-    font-size: 1.5rem;
+  .ml-training-container .compact-stat-value {
+    font-size: 2rem;
   }
 
   .ml-training-container .section-icon {

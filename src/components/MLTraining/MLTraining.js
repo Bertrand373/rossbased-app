@@ -1,5 +1,5 @@
 // src/components/MLTraining/MLTraining.js
-// COMPLETE UPDATE: Helmet banner, wider layout, simplified explanation, no technical section
+// UPDATED: Standalone header, explanation in banner, compact stats
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -116,13 +116,17 @@ function MLTraining() {
     return (
       <div className="ml-training-container">
         <div className="training-card">
-          {/* Helmet Banner Header */}
+          <div className="standalone-header">
+            <h1>AI Relapse Risk Predictor</h1>
+          </div>
+
+          {/* Banner with explanation */}
           <div className="ml-training-banner">
             <div className="ml-training-helmet-container">
               <img 
                 className="ml-training-helmet" 
                 src="/helmet.png" 
-                alt="AI Relapse Risk Predictor" 
+                alt="What Does This Do" 
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.nextElementSibling.style.display = 'block';
@@ -134,9 +138,9 @@ function MLTraining() {
             </div>
             
             <div className="ml-training-content">
-              <h1 className="ml-training-title">AI Relapse Risk Predictor</h1>
+              <h4 className="ml-training-title">What Does This Do?</h4>
               <p className="ml-training-description">
-                Train AI on your personal relapse patterns for early warning alerts
+                This AI learns your unique relapse patterns by analyzing your benefit tracking data and past relapses. Once trained, it continuously monitors for warning signs and alerts you before high-risk moments—giving you time to take action.
               </p>
             </div>
           </div>
@@ -344,13 +348,18 @@ function MLTraining() {
   return (
     <div className="ml-training-container">
       <div className="training-card">
-        {/* Helmet Banner Header */}
+        {/* Standalone centered header */}
+        <div className="standalone-header">
+          <h1>AI Relapse Risk Predictor</h1>
+        </div>
+
+        {/* Banner with explanation */}
         <div className="ml-training-banner">
           <div className="ml-training-helmet-container">
             <img 
               className="ml-training-helmet" 
               src="/helmet.png" 
-              alt="AI Relapse Risk Predictor" 
+              alt="What Does This Do" 
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextElementSibling.style.display = 'block';
@@ -362,60 +371,43 @@ function MLTraining() {
           </div>
           
           <div className="ml-training-content">
-            <h1 className="ml-training-title">AI Relapse Risk Predictor</h1>
+            <h4 className="ml-training-title">What Does This Do?</h4>
             <p className="ml-training-description">
-              Train AI on your personal relapse patterns for early warning alerts
+              This AI learns your unique relapse patterns by analyzing your benefit tracking data and past relapses. Once trained, it continuously monitors for warning signs and alerts you before high-risk moments—giving you time to take action.
             </p>
           </div>
         </div>
 
-        <div className="what-does-this-do-section">
-          <h2>What Does This Do?</h2>
-          <p className="explanation-text">
-            This AI learns your unique relapse patterns by analyzing your benefit tracking data and past relapses. Once trained, it continuously monitors for warning signs and alerts you before high-risk moments—giving you time to take action.
-          </p>
-          <ul className="explanation-bullets">
-            <li>Learns patterns from your personal relapse history</li>
-            <li>Monitors daily data for early warning signs</li>
-            <li>Sends alerts when risk patterns emerge</li>
-            <li>All data stays private on your device</li>
-          </ul>
-        </div>
-
-        <div className="data-quality-section">
-          <h2>Your Data Quality</h2>
-          <div className="quality-score-container">
-            <div className={`quality-score ${
-              dataQuality.qualityScore >= 80 ? 'success' : 
-              dataQuality.qualityScore >= 60 ? 'warning' : 
-              'danger'
-            }`}>
+        {/* Compact stats grid - Stats tab style */}
+        <div className="compact-stats-grid">
+          <div className="compact-stat-card">
+            <div className="compact-stat-value" style={{ 
+              color: dataQuality.qualityScore >= 80 ? 'var(--success)' : 
+                     dataQuality.qualityScore >= 60 ? 'var(--warning)' : 
+                     'var(--danger)'
+            }}>
               {dataQuality.qualityScore}
             </div>
-            <div className="quality-label">Quality Score</div>
+            <div className="compact-stat-label">Quality Score</div>
           </div>
 
-          <div className="data-stats">
-            <div className="stat-item">
-              <span className="stat-value">{dataQuality.benefitDays}</span>
-              <span className="stat-label">Benefit Days</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-value">{dataQuality.relapseCount}</span>
-              <span className="stat-label">Past Relapses</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-value">{dataQuality.emotionalDays}</span>
-              <span className="stat-label">Emotional Days</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-value">{dataQuality.currentStreak}</span>
-              <span className="stat-label">Current Streak</span>
-            </div>
+          <div className="compact-stat-card">
+            <div className="compact-stat-value">{dataQuality.benefitDays}</div>
+            <div className="compact-stat-label">Benefit Days</div>
           </div>
 
-          <p className="recommendation">{dataQuality.recommendation}</p>
+          <div className="compact-stat-card">
+            <div className="compact-stat-value">{dataQuality.relapseCount}</div>
+            <div className="compact-stat-label">Past Relapses</div>
+          </div>
+
+          <div className="compact-stat-card">
+            <div className="compact-stat-value">{dataQuality.currentStreak}</div>
+            <div className="compact-stat-label">Current Streak</div>
+          </div>
         </div>
+
+        <p className="recommendation-text">{dataQuality.recommendation}</p>
 
         {modelInfo?.isReady && (
           <div className="existing-model-section">
