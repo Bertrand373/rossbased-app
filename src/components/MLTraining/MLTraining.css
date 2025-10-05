@@ -1,8 +1,8 @@
 /* src/components/MLTraining/MLTraining.css */
-/* UPDATED: Added new sections for explanations, privacy, and 20-day requirement */
+/* COMPLETE UPDATE: Helmet banner, wider container, simplified sections */
 
 .ml-training-container {
-  max-width: 1200px;
+  max-width: 100%; /* WIDENED: From 1200px to match tracker sections */
   margin: var(--spacing-md) auto;
   padding: 0 var(--spacing-lg);
   min-height: calc(100vh - 200px);
@@ -28,24 +28,66 @@
   }
 }
 
-/* Header Section */
-.ml-training-container .header {
-  text-align: center;
+/* NEW: Helmet Banner - Matching Benefits/DatePicker pattern */
+.ml-training-banner {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
   margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-lg);
-  border-bottom: 1px solid var(--border);
 }
 
-.ml-training-container .header h1 {
-  color: var(--text);
+.ml-training-helmet-container {
+  flex-shrink: 0;
+}
+
+.ml-training-helmet {
+  width: 40px;
+  height: 40px;
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
+}
+
+.ml-training-helmet-fallback {
   font-size: 1.5rem;
-  margin: 0 0 var(--spacing-xs) 0;
-  font-weight: 600;
+  color: var(--primary);
+  animation: coming-soon-pulse 2s ease-in-out infinite;
 }
 
-.ml-training-container .subtitle {
-  color: var(--text-secondary);
+@keyframes coming-soon-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.96);
+  }
+}
+
+.ml-training-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ml-training-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.ml-training-description {
   font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
   margin: 0;
 }
 
@@ -229,8 +271,8 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* What Is This Section */
-.ml-training-container .what-is-this-section {
+/* NEW: What Does This Do Section - Simplified */
+.ml-training-container .what-does-this-do-section {
   background: var(--card-background);
   border-radius: var(--radius-md);
   padding: var(--spacing-xl);
@@ -238,50 +280,53 @@
   border: 1px solid var(--border);
 }
 
-.ml-training-container .what-is-this-section h2 {
-  color: var(--text);
-  font-size: 1.125rem;
-  margin: 0 0 var(--spacing-md) 0;
-  font-weight: 600;
+.ml-training-container .microchip-header {
   display: flex;
   align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.ml-training-container .microchip-icon {
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+.ml-training-container .microchip-header h2 {
+  color: var(--text);
+  font-size: 1.125rem;
+  margin: 0;
+  font-weight: 600;
 }
 
 .ml-training-container .explanation-text {
   color: var(--text-secondary);
   font-size: 0.9375rem;
   line-height: 1.6;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
 }
 
-.ml-training-container .how-it-works-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-md);
-}
-
-.ml-training-container .how-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md);
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-}
-
-.ml-training-container .how-item strong {
-  color: var(--text);
-  font-size: 0.875rem;
-  display: block;
-  margin-bottom: var(--spacing-xs);
-}
-
-.ml-training-container .how-item p {
-  color: var(--text-secondary);
-  font-size: 0.8125rem;
+.ml-training-container .explanation-bullets {
+  list-style: none;
+  padding: 0;
   margin: 0;
-  line-height: 1.4;
+}
+
+.ml-training-container .explanation-bullets li {
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  padding: var(--spacing-sm) 0;
+  line-height: 1.5;
+  padding-left: var(--spacing-lg);
+  position: relative;
+}
+
+.ml-training-container .explanation-bullets li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: bold;
 }
 
 /* Why 20 Days Box */
@@ -448,47 +493,6 @@
   color: var(--text);
   font-size: 0.875rem;
   font-weight: 600;
-}
-
-/* Training Info Section */
-.ml-training-container .training-info-section {
-  background: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-  border: 1px solid var(--border);
-}
-
-.ml-training-container .training-info-section h3 {
-  color: var(--text);
-  font-size: 1rem;
-  margin: 0 0 var(--spacing-md) 0;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-}
-
-.ml-training-container .info-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.ml-training-container .info-list li {
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
-  padding: var(--spacing-sm) 0;
-  line-height: 1.5;
-  padding-left: var(--spacing-lg);
-  position: relative;
-}
-
-.ml-training-container .info-list li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: var(--primary);
-  font-weight: bold;
 }
 
 /* Training In Progress */
@@ -687,8 +691,33 @@
     padding: var(--spacing-lg);
   }
 
-  .ml-training-container .header h1 {
+  .ml-training-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .ml-training-content {
+    text-align: center;
+  }
+  
+  .ml-training-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .ml-training-helmet-fallback {
     font-size: 1.25rem;
+  }
+
+  .ml-training-title {
+    font-size: 1.125rem;
+  }
+
+  .ml-training-description {
+    font-size: 0.8125rem;
   }
 
   .ml-training-container .data-stats,
@@ -720,10 +749,6 @@
   .ml-training-container .section-icon {
     font-size: 3rem;
   }
-
-  .ml-training-container .how-it-works-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 480px) {
@@ -731,8 +756,21 @@
     padding: var(--spacing-md);
   }
 
-  .ml-training-container .header h1 {
-    font-size: 1.125rem;
+  .ml-training-helmet {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .ml-training-helmet-fallback {
+    font-size: 1rem;
+  }
+
+  .ml-training-title {
+    font-size: 1rem;
+  }
+
+  .ml-training-description {
+    font-size: 0.75rem;
   }
 
   .ml-training-container .quality-score {

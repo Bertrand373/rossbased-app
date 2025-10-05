@@ -1,5 +1,5 @@
 // src/components/MLTraining/MLTraining.js
-// UPDATED: Clear explanations about relapse risk prediction and 20-day requirement
+// COMPLETE UPDATE: Helmet banner, wider layout, simplified explanation, no technical section
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,14 +8,13 @@ import {
   FaCheckCircle, 
   FaExclamationTriangle, 
   FaChartLine, 
-  FaDatabase, 
+  FaMicrochip,
   FaRocket, 
   FaArrowLeft, 
   FaRedo,
   FaTimes,
   FaCheck,
-  FaShieldAlt,
-  FaBell
+  FaShieldAlt
 } from 'react-icons/fa';
 import './MLTraining.css';
 import mlPredictionService from '../../services/MLPredictionService';
@@ -118,9 +117,29 @@ function MLTraining() {
     return (
       <div className="ml-training-container">
         <div className="training-card">
-          <div className="header">
-            <h1>AI Relapse Risk Predictor</h1>
-            <p className="subtitle">Train AI to predict your personal relapse patterns</p>
+          {/* Helmet Banner Header */}
+          <div className="ml-training-banner">
+            <div className="ml-training-helmet-container">
+              <img 
+                className="ml-training-helmet" 
+                src="/helmet.png" 
+                alt="AI Relapse Risk Predictor" 
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextElementSibling.style.display = 'block';
+                }}
+              />
+              <div className="ml-training-helmet-fallback" style={{ display: 'none' }}>
+                🛡️
+              </div>
+            </div>
+            
+            <div className="ml-training-content">
+              <h1 className="ml-training-title">AI Relapse Risk Predictor</h1>
+              <p className="ml-training-description">
+                Train AI on your personal relapse patterns for early warning alerts
+              </p>
+            </div>
           </div>
 
           <div className="insufficient-data-section">
@@ -326,39 +345,45 @@ function MLTraining() {
   return (
     <div className="ml-training-container">
       <div className="training-card">
-        <div className="header">
-          <h1>AI Relapse Risk Predictor</h1>
-          <p className="subtitle">Train AI on your personal relapse patterns</p>
-        </div>
-
-        <div className="what-is-this-section">
-          <h2><FaBrain style={{ fontSize: '1.25rem', marginRight: '8px' }} />What Does This Do?</h2>
-          <p className="explanation-text">
-            This AI analyzes your benefit tracking data and past relapses to learn <strong>your personal patterns</strong>. When trained, it monitors your daily data and alerts you when conditions match patterns that preceded past relapses—giving you early warning to take action.
-          </p>
-          <div className="how-it-works-grid">
-            <div className="how-item">
-              <FaChartLine style={{ fontSize: '1.5rem', color: 'var(--primary)' }} />
-              <div>
-                <strong>Learns Your Patterns</strong>
-                <p>AI identifies conditions before your past relapses</p>
-              </div>
-            </div>
-            <div className="how-item">
-              <FaBell style={{ fontSize: '1.5rem', color: 'var(--primary)' }} />
-              <div>
-                <strong>Early Warnings</strong>
-                <p>Get alerts when similar patterns emerge</p>
-              </div>
-            </div>
-            <div className="how-item">
-              <FaShieldAlt style={{ fontSize: '1.5rem', color: 'var(--success)' }} />
-              <div>
-                <strong>100% Private</strong>
-                <p>All data stays on your device</p>
-              </div>
+        {/* Helmet Banner Header */}
+        <div className="ml-training-banner">
+          <div className="ml-training-helmet-container">
+            <img 
+              className="ml-training-helmet" 
+              src="/helmet.png" 
+              alt="AI Relapse Risk Predictor" 
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'block';
+              }}
+            />
+            <div className="ml-training-helmet-fallback" style={{ display: 'none' }}>
+              🛡️
             </div>
           </div>
+          
+          <div className="ml-training-content">
+            <h1 className="ml-training-title">AI Relapse Risk Predictor</h1>
+            <p className="ml-training-description">
+              Train AI on your personal relapse patterns for early warning alerts
+            </p>
+          </div>
+        </div>
+
+        <div className="what-does-this-do-section">
+          <div className="microchip-header">
+            <FaMicrochip className="microchip-icon" />
+            <h2>What Does This Do?</h2>
+          </div>
+          <p className="explanation-text">
+            This AI learns your unique relapse patterns by analyzing your benefit tracking data and past relapses. Once trained, it continuously monitors for warning signs and alerts you before high-risk moments—giving you time to take action.
+          </p>
+          <ul className="explanation-bullets">
+            <li>Learns patterns from your personal relapse history</li>
+            <li>Monitors daily data for early warning signs</li>
+            <li>Sends alerts when risk patterns emerge</li>
+            <li>All data stays private on your device</li>
+          </ul>
         </div>
 
         <div className="data-quality-section">
@@ -433,21 +458,6 @@ function MLTraining() {
           </div>
         )}
 
-        <div className="training-info-section">
-          <h3>
-            <FaDatabase style={{ fontSize: '0.875rem', marginRight: '8px' }} />
-            What happens during training?
-          </h3>
-          <ul className="info-list">
-            <li>Analyzes your benefit tracking and relapse history</li>
-            <li>Identifies patterns that preceded past relapses</li>
-            <li>Trains neural network to recognize high-risk conditions</li>
-            <li>Validates model accuracy on test data</li>
-            <li>Saves trained model to your browser (locally, privately)</li>
-            <li>Takes approximately 30-60 seconds</li>
-          </ul>
-        </div>
-
         {error && (
           <div className="error-box">
             <FaExclamationTriangle style={{ fontSize: '1.25rem' }} />
@@ -463,12 +473,12 @@ function MLTraining() {
           >
             {modelInfo?.isReady ? (
               <>
-                <FaRedo style={{ fontSize: '1rem' }} />
+                <FaRedo style={{ fontSize: '0.875rem' }} />
                 Retrain Model
               </>
             ) : (
               <>
-                <FaRocket style={{ fontSize: '1rem' }} />
+                <FaRocket style={{ fontSize: '0.875rem' }} />
                 Train Relapse Predictor
               </>
             )}
