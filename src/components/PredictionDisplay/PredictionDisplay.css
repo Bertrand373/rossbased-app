@@ -1,5 +1,5 @@
 /* src/components/PredictionDisplay/PredictionDisplay.css */
-/* UPDATED: Mobile button fix + Data warning styling + Reliability metrics */
+/* COMPLETE FIX: Mobile buttons, notification badge, and reliability system */
 
 /* ============================================
    COMPACT MODE - Widget Styles
@@ -112,7 +112,7 @@
   font-weight: 600;
 }
 
-/* NEW: Data warning styling */
+/* Data warning styling */
 .data-warning {
   display: flex;
   align-items: center;
@@ -153,7 +153,7 @@
 }
 
 .widget-btn {
-  flex: 1;
+  flex: 1; /* FIXED: Equal width for all buttons */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,7 +198,8 @@
   background: transparent;
   color: var(--text-secondary);
   border-color: var(--border);
-  /* REMOVED flex: 0 0 auto to make buttons equal width */
+  /* REMOVED: flex: 0 0 auto - this was preventing mobile display */
+  /* REMOVED: white-space: nowrap - this was preventing text wrapping */
 }
 
 .widget-btn.retrain-btn:hover {
@@ -643,19 +644,24 @@
     gap: var(--spacing-sm);
   }
 
+  /* FIXED: Stack buttons vertically on mobile */
   .widget-actions {
     flex-direction: column;
   }
 
+  /* FIXED: All buttons full width on mobile */
   .widget-btn {
     width: 100%;
   }
 
-  /* FIXED: Ensure retrain button shows on mobile with full width and icon */
+  /* FIXED: Retrain button shows on mobile */
   .widget-btn.retrain-btn {
-    display: flex !important; /* Force display */
     width: 100%;
-    flex: 1;
+  }
+
+  /* FIXED: Notification status badge shows on mobile */
+  .notification-status {
+    font-size: 0.75rem;
   }
 
   .intervention-grid {

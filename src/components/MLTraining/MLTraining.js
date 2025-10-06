@@ -1,5 +1,5 @@
 // src/components/MLTraining/MLTraining.js
-// UPDATED: Standalone header, explanation in banner, compact stats
+// UPDATED: Replaced technical "epoch" language with user-friendly terms
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -120,7 +120,6 @@ function MLTraining() {
             <h1>AI Relapse Risk Predictor</h1>
           </div>
 
-          {/* Banner with explanation */}
           <div className="ml-training-banner">
             <div className="ml-training-helmet-container">
               <img 
@@ -298,7 +297,7 @@ function MLTraining() {
                 ></div>
               </div>
               <p className="progress-label">
-                Epoch {trainingProgress.epoch || 0} / {trainingProgress.totalEpochs || 50}
+                Learning cycle {trainingProgress.epoch || 0} of {trainingProgress.totalEpochs || 50}
               </p>
             </div>
 
@@ -318,7 +317,7 @@ function MLTraining() {
                 </div>
                 {trainingProgress.valLoss && (
                   <div className="metric-item">
-                    <span className="metric-label">Val Loss:</span>
+                    <span className="metric-label">Validation Loss:</span>
                     <span className="metric-value">
                       {trainingProgress.valLoss?.toFixed(4)}
                     </span>
@@ -326,7 +325,7 @@ function MLTraining() {
                 )}
                 {trainingProgress.valAccuracy && (
                   <div className="metric-item">
-                    <span className="metric-label">Val Accuracy:</span>
+                    <span className="metric-label">Validation Accuracy:</span>
                     <span className="metric-value">
                       {trainingProgress.valAccuracy?.toFixed(1)}%
                     </span>
@@ -348,12 +347,10 @@ function MLTraining() {
   return (
     <div className="ml-training-container">
       <div className="training-card">
-        {/* Standalone centered header */}
         <div className="standalone-header">
           <h1>AI Relapse Risk Predictor</h1>
         </div>
 
-        {/* Banner with explanation */}
         <div className="ml-training-banner">
           <div className="ml-training-helmet-container">
             <img 
@@ -378,7 +375,6 @@ function MLTraining() {
           </div>
         </div>
 
-        {/* Compact stats grid - Stats tab style */}
         <div className="compact-stats-grid">
           <div className="compact-stat-card">
             <div className="compact-stat-value" style={{ 
@@ -432,14 +428,14 @@ function MLTraining() {
               )}
               {modelInfo.totalEpochs > 0 && (
                 <div className="info-item">
-                  <span className="info-label">Total Epochs:</span>
+                  <span className="info-label">Learning Cycles:</span>
                   <span className="info-value">{modelInfo.totalEpochs}</span>
                 </div>
               )}
-              {modelInfo.latestAccuracy && (
+              {modelInfo.trainingAccuracy && (
                 <div className="info-item">
-                  <span className="info-label">Accuracy:</span>
-                  <span className="info-value">{modelInfo.latestAccuracy}%</span>
+                  <span className="info-label">Training Accuracy:</span>
+                  <span className="info-value">{modelInfo.trainingAccuracy}%</span>
                 </div>
               )}
             </div>
