@@ -200,7 +200,7 @@ function PredictionDisplay({
                   className="widget-btn view-details"
                   onClick={handleViewDetails}
                 >
-                  <FaChartLine style={{ fontSize: '0.875rem' }} />
+                  <FaSearch style={{ fontSize: '0.875rem' }} />
                   <span>Details</span>
                 </button>
               </>
@@ -210,7 +210,7 @@ function PredictionDisplay({
                   className="widget-btn view-details"
                   onClick={handleViewDetails}
                 >
-                  <FaChartLine style={{ fontSize: '0.875rem' }} />
+                  <FaSearch style={{ fontSize: '0.875rem' }} />
                   <span>View Analysis</span>
                 </button>
                 {prediction.usedML && (
@@ -218,6 +218,7 @@ function PredictionDisplay({
                     className="widget-btn retrain-btn"
                     onClick={() => navigate('/ml-training')}
                   >
+                    <FaSyncAlt style={{ fontSize: '0.875rem' }} />
                     <span>Retrain</span>
                   </button>
                 )}

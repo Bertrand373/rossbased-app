@@ -1,5 +1,5 @@
 /* src/components/PredictionDisplay/PredictionDisplay.css */
-/* UPDATED: Renamed urge-prediction-container to relapse-prediction-container */
+/* UPDATED: Both View Analysis and Retrain buttons show on mobile with icons */
 
 /* ============================================
    COMPACT MODE - Widget Styles
@@ -26,8 +26,8 @@
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 1px solid var(--border);
-  gap: var(--spacing-sm); /* ADDED: Gap to prevent squeezing */
-  flex-wrap: wrap; /* ADDED: Allow wrapping on very small screens */
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 .widget-title {
@@ -47,13 +47,7 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
   font-weight: 500;
-  flex-shrink: 0; /* ADDED: Prevent shrinking on mobile */
-}
-
-.notification-status.active {
-  background-color: rgba(34, 197, 94, 0.1);
-  color: var(--success);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  flex-shrink: 0;
 }
 
 .notification-status.active {
@@ -186,9 +180,9 @@
   background: transparent;
   color: var(--text-secondary);
   border-color: var(--border);
-  flex: 0 0 auto;
-  padding: var(--spacing-sm) var(--spacing-md);
-  white-space: nowrap; /* ADDED: Prevent text wrapping */
+  /* REMOVED: flex: 0 0 auto; to allow equal width with view-details button */
+  /* REMOVED: padding override */
+  /* REMOVED: white-space: nowrap; */
 }
 
 .widget-btn.retrain-btn:hover {
@@ -290,7 +284,7 @@
   width: 100%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   animation: slideIn 0.3s ease-out;
-  margin: 0 auto; /* ADDED: Center the card */
+  margin: 0 auto;
 }
 
 @keyframes slideIn {
@@ -613,8 +607,8 @@
     padding: 0 var(--spacing-md);
     overflow-x: hidden;
     max-width: 100vw;
-    overscroll-behavior: contain; /* ADDED: Prevent overscroll bounce */
-    -webkit-overflow-scrolling: touch; /* ADDED: Smooth iOS scrolling */
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   .prediction-widget {
@@ -642,10 +636,11 @@
     width: 100%;
   }
 
-  /* FIXED: Show retrain button on mobile */
+  /* FIXED: Ensure retrain button shows on mobile with full width */
   .widget-btn.retrain-btn {
-    display: flex;
+    display: flex !important;
     width: 100%;
+    flex: 1;
   }
 
   .intervention-grid {
@@ -656,7 +651,7 @@
     padding: var(--spacing-lg);
     max-width: 100%;
     overflow-x: hidden;
-    overscroll-behavior: contain; /* ADDED: Prevent card overscroll */
+    overscroll-behavior: contain;
   }
 
   .risk-percentage {
