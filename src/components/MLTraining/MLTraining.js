@@ -297,7 +297,7 @@ function MLTraining() {
                 ></div>
               </div>
               <p className="progress-label">
-                Learning cycle {trainingProgress.epoch || 0} of {trainingProgress.totalEpochs || 50}
+                Training round {trainingProgress.epoch || 0} of {trainingProgress.totalEpochs || 50}
               </p>
             </div>
 

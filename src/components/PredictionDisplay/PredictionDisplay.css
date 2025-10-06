@@ -1,5 +1,5 @@
 /* src/components/PredictionDisplay/PredictionDisplay.css */
-/* COMPLETE FIX: Mobile buttons, notification badge, and reliability system */
+/* COMPLETE FILE - All mobile fixes included */
 
 /* ============================================
    COMPACT MODE - Widget Styles
@@ -112,7 +112,6 @@
   font-weight: 600;
 }
 
-/* Data warning styling */
 .data-warning {
   display: flex;
   align-items: center;
@@ -153,7 +152,7 @@
 }
 
 .widget-btn {
-  flex: 1; /* FIXED: Equal width for all buttons */
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,12 +193,11 @@
   transform: translateY(-1px);
 }
 
+/* FIXED: Removed flex: 0 0 auto that was preventing mobile display */
 .widget-btn.retrain-btn {
   background: transparent;
   color: var(--text-secondary);
   border-color: var(--border);
-  /* REMOVED: flex: 0 0 auto - this was preventing mobile display */
-  /* REMOVED: white-space: nowrap - this was preventing text wrapping */
 }
 
 .widget-btn.retrain-btn:hover {
@@ -221,7 +219,6 @@
   justify-content: center;
 }
 
-/* Loading State */
 .loading-spinner {
   text-align: center;
   color: var(--primary);
@@ -242,7 +239,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Low Risk Message */
 .low-risk-message {
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--medium-gray) 100%);
   border: 1px solid rgba(34, 197, 94, 0.3);
@@ -291,7 +287,6 @@
   transform: translateY(-1px);
 }
 
-/* Main Prediction Card */
 .prediction-card {
   background: var(--medium-gray);
   border: 1px solid var(--border);
@@ -315,7 +310,6 @@
   }
 }
 
-/* Header */
 .prediction-header {
   text-align: center;
   margin-bottom: var(--spacing-xl);
@@ -338,7 +332,6 @@
   font-style: italic;
 }
 
-/* Risk Meter */
 .risk-meter-section {
   margin-bottom: var(--spacing-xl);
   text-align: center;
@@ -372,7 +365,6 @@
   letter-spacing: 1px;
 }
 
-/* Reason Section */
 .reason-section {
   background: var(--card-background);
   border-left: 4px solid var(--primary);
@@ -404,12 +396,11 @@
   padding: var(--spacing-md);
   background: rgba(239, 68, 68, 0.05);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--spacing-sm);
   color: var(--text);
   font-size: 0.875rem;
 }
 
-/* Interventions Section */
 .interventions-section {
   margin-bottom: var(--spacing-xl);
 }
@@ -470,7 +461,6 @@
   font-size: 0.75rem;
 }
 
-/* Feedback Section */
 .feedback-section {
   background: var(--card-background);
   border-radius: var(--radius-md);
@@ -528,7 +518,6 @@
   transform: translateY(-1px);
 }
 
-/* Confidence Footer */
 .confidence-footer {
   display: flex;
   justify-content: space-between;
@@ -585,7 +574,6 @@
   transform: translateY(-1px);
 }
 
-/* Feedback Success */
 .feedback-success {
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--medium-gray) 100%);
   border: 1px solid rgba(34, 197, 94, 0.3);
@@ -644,24 +632,14 @@
     gap: var(--spacing-sm);
   }
 
-  /* FIXED: Stack buttons vertically on mobile */
+  /* FIXED: Stack buttons vertically */
   .widget-actions {
     flex-direction: column;
   }
 
-  /* FIXED: All buttons full width on mobile */
+  /* FIXED: All buttons full width */
   .widget-btn {
     width: 100%;
-  }
-
-  /* FIXED: Retrain button shows on mobile */
-  .widget-btn.retrain-btn {
-    width: 100%;
-  }
-
-  /* FIXED: Notification status badge shows on mobile */
-  .notification-status {
-    font-size: 0.75rem;
   }
 
   .intervention-grid {
