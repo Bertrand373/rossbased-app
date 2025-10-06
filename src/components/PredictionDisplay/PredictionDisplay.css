@@ -1,5 +1,5 @@
 /* src/components/PredictionDisplay/PredictionDisplay.css */
-/* COMPLETE FILE - Mobile button display FIXED */
+/* COMPLETE FILE - Retrain button now matches View Analysis styling */
 
 /* ============================================
    COMPACT MODE - Widget Styles
@@ -194,14 +194,16 @@
 }
 
 .widget-btn.retrain-btn {
-  background: transparent;
+  background: rgba(128, 128, 128, 0.1);
   color: var(--text-secondary);
   border-color: var(--border);
 }
 
 .widget-btn.retrain-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text);
+  background: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
 /* ============================================
