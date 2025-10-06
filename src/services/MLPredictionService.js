@@ -1,5 +1,6 @@
 // src/services/MLPredictionService.js
-// FIXED: Added latestAccuracy to modelInfo in predict() method
+// UPDATED: Added calculateReliability() for honest prediction metrics
+
 import * as tf from '@tensorflow/tfjs';
 import notificationService from './NotificationService';
 
@@ -115,7 +116,7 @@ class MLPredictionService {
       
       console.log(`✅ Prepared ${features.length} training examples`);
       
-      // STEP 2: Create fresh model for retraining (FIX for retraining bug)
+      // STEP 2: Create fresh model for retraining
       console.log('🔧 Step 2/4: Preparing model...');
       await this.createModel();
       
@@ -304,6 +305,39 @@ class MLPredictionService {
     });
   }
 
+  // NEW: Calculate honest prediction reliability based on data quality
+  calculateReliability(userData) {
+    // Start with base model accuracy (if trained)
+    let reliability = this.trainingHistory.accuracy.length > 0
+      ? this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1] * 100
+      : 50; // Default for untrained model
+    
+    // Factor 1: Penalize for insufficient tracking data
+    const dataPoints = userData.benefitTracking?.length || 0;
+    if (dataPoints < 30) {
+      reliability *= 0.7; // Reduce by 30% for minimal data
+    } else if (dataPoints < 50) {
+      reliability *= 0.85; // Reduce by 15% for limited data
+    }
+    
+    // Factor 2: Penalize for few relapses (can't learn patterns from 1-2 relapses)
+    const relapseCount = userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0;
+    if (relapseCount < 2) {
+      reliability *= 0.75; // Reduce by 25% for insufficient relapse history
+    } else if (relapseCount < 4) {
+      reliability *= 0.9; // Reduce by 10% for limited relapse history
+    }
+    
+    // Factor 3: Penalize for missing emotional data (reduces pattern detection)
+    const hasEmotionalData = userData.emotionalTracking && userData.emotionalTracking.length > 0;
+    if (!hasEmotionalData) {
+      reliability *= 0.9; // Reduce by 10% for missing emotional context
+    }
+    
+    // Cap at 85% - never claim perfect reliability
+    return Math.min(Math.round(reliability), 85);
+  }
+
   async predict(userData) {
     try {
       if (!this.isModelReady || !this.model) {
@@ -314,10 +348,14 @@ class MLPredictionService {
       if (!userData.benefitTracking || userData.benefitTracking.length < 2) {
         return {
           riskScore: 30,
-          confidence: 20,
+          reliability: 20,
           reason: 'Insufficient data for AI prediction',
           usedML: false,
-          factors: {}
+          factors: {},
+          dataContext: {
+            trackingDays: 0,
+            relapseCount: 0
+          }
         };
       }
       
@@ -343,24 +381,19 @@ class MLPredictionService {
       prediction.dispose();
       
       const riskScore = Math.round(predictionArray[0] * 100);
-      const confidence = this.calculateConfidence();
+      const reliability = this.calculateReliability(userData); // NEW: Use honest reliability calculation
       const reason = this.generateReason(rawFeatures, riskScore);
       
-      console.log(`🤖 AI Prediction: ${riskScore}% risk (${confidence}% confidence)`);
+      console.log(`🤖 AI Prediction: ${riskScore}% risk (${reliability}% reliable)`);
       
-      // NEW: Auto-send notification if high risk
+      // Auto-send notification if high risk
       if (riskScore >= 70) {
         await notificationService.sendUrgePredictionNotification(riskScore, reason);
       }
       
-      // FIXED: Include latestAccuracy in modelInfo
-      const latestAccuracy = this.trainingHistory.accuracy.length > 0
-        ? Math.round(this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1] * 100)
-        : null;
-      
       return {
         riskScore,
-        confidence,
+        reliability, // NEW: Changed from 'confidence' to 'reliability'
         reason,
         usedML: true,
         factors: {
@@ -375,10 +408,17 @@ class MLPredictionService {
           anxiety: rawFeatures[8],
           moodStability: rawFeatures[9]
         },
+        dataContext: { // NEW: Added data context for transparency
+          trackingDays: userData.benefitTracking?.length || 0,
+          relapseCount: userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0,
+          hasEmotionalData: userData.emotionalTracking && userData.emotionalTracking.length > 0
+        },
         modelInfo: {
           lastTrained: this.trainingHistory.lastTrained,
           totalEpochs: this.trainingHistory.totalEpochs,
-          latestAccuracy: latestAccuracy  // FIXED: Added this
+          trainingAccuracy: this.trainingHistory.accuracy.length > 0
+            ? Math.round(this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1] * 100)
+            : null
         }
       };
       
@@ -386,15 +426,6 @@ class MLPredictionService {
       console.error('❌ Prediction error:', error);
       return this.fallbackPrediction(userData);
     }
-  }
-
-  calculateConfidence() {
-    if (this.trainingHistory.accuracy.length === 0) {
-      return 60;
-    }
-    
-    const latestAccuracy = this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1];
-    return Math.round(latestAccuracy * 100);
   }
 
   generateReason(features, riskScore) {
@@ -449,12 +480,18 @@ class MLPredictionService {
       riskScore += 20;
     }
     
+    const reliability = this.calculateReliability(userData); // NEW: Use honest reliability
+    
     return {
       riskScore: Math.min(riskScore, 100),
-      confidence: 40,
+      reliability,
       reason: 'Using basic prediction (model not trained yet)',
       usedML: false,
-      factors: {}
+      factors: {},
+      dataContext: {
+        trackingDays: userData.benefitTracking?.length || 0,
+        relapseCount: userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0
+      }
     };
   }
 
@@ -540,14 +577,13 @@ class MLPredictionService {
       isTraining: this.isTraining,
       lastTrained: this.trainingHistory.lastTrained,
       totalEpochs: this.trainingHistory.totalEpochs,
-      latestAccuracy: this.trainingHistory.accuracy.length > 0
+      trainingAccuracy: this.trainingHistory.accuracy.length > 0
         ? Math.round(this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1] * 100)
         : null,
       needsRetraining: this.needsRetraining()
     };
   }
 
-  // NEW: Process user feedback to improve future predictions
   processFeedback(feedback) {
     try {
       const allFeedback = JSON.parse(localStorage.getItem('prediction_feedback') || '[]');
@@ -559,7 +595,6 @@ class MLPredictionService {
       
       console.log('✅ Feedback recorded:', feedback.userFeedback);
       
-      // Check if multiple false alarms suggest retraining needed
       const recentFeedback = allFeedback.filter(f => {
         const feedbackDate = new Date(f.timestamp);
         const cutoffDate = new Date();

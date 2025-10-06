@@ -1,5 +1,5 @@
 /* src/components/PredictionDisplay/PredictionDisplay.css */
-/* UPDATED: Both View Analysis and Retrain buttons show on mobile with icons */
+/* UPDATED: Mobile button fix + Data warning styling + Reliability metrics */
 
 /* ============================================
    COMPACT MODE - Widget Styles
@@ -112,6 +112,24 @@
   font-weight: 600;
 }
 
+/* NEW: Data warning styling */
+.data-warning {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.warning-text {
+  font-size: 0.75rem;
+  color: #ef4444;
+  line-height: 1.4;
+}
+
 .quick-reason {
   display: flex;
   align-items: flex-start;
@@ -180,9 +198,7 @@
   background: transparent;
   color: var(--text-secondary);
   border-color: var(--border);
-  /* REMOVED: flex: 0 0 auto; to allow equal width with view-details button */
-  /* REMOVED: padding override */
-  /* REMOVED: white-space: nowrap; */
+  /* REMOVED flex: 0 0 auto to make buttons equal width */
 }
 
 .widget-btn.retrain-btn:hover {
@@ -537,7 +553,6 @@
 }
 
 .confidence-value {
-  color: var(--primary);
   font-weight: 600;
 }
 
@@ -636,9 +651,9 @@
     width: 100%;
   }
 
-  /* FIXED: Ensure retrain button shows on mobile with full width */
+  /* FIXED: Ensure retrain button shows on mobile with full width and icon */
   .widget-btn.retrain-btn {
-    display: flex !important;
+    display: flex !important; /* Force display */
     width: 100%;
     flex: 1;
   }

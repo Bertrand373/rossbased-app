@@ -1,9 +1,10 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// FIXED: View Analysis button now navigates to correct route
+// UPDATED: Uses "Prediction Reliability" instead of separate confidence/accuracy metrics
+// FIXED: Mobile button display
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb, FaRocket, FaSearch, FaArrowLeft, FaSyncAlt } from 'react-icons/fa';
+import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb, FaRocket, FaSearch, FaArrowLeft, FaSyncAlt, FaInfoCircle } from 'react-icons/fa';
 import './PredictionDisplay.css';
 import { usePrediction } from '../../hooks/usePrediction';
 import notificationService from '../../services/NotificationService';
@@ -46,7 +47,6 @@ function PredictionDisplay({
     }
   };
 
-  // FIXED: Changed from '/relapse-prediction' to '/urge-prediction' to match App.js route
   const handleViewDetails = () => {
     navigate('/urge-prediction');
   };
@@ -78,7 +78,6 @@ function PredictionDisplay({
         usedML: prediction.usedML
       };
 
-      // Send feedback to ML service for model improvement
       if (prediction.usedML) {
         mlPredictionService.processFeedback(feedback);
       }
@@ -103,14 +102,21 @@ function PredictionDisplay({
     }
   };
 
+  // Helper function to get reliability color
+  const getReliabilityColor = (reliability) => {
+    if (reliability >= 70) return '#22c55e'; // Green
+    if (reliability >= 50) return '#ffdd00'; // Yellow
+    return '#ef4444'; // Red
+  };
+
   // COMPACT MODE
   if (mode === 'compact') {
-    // usePrediction hook returns null if model isn't trained
     if (!prediction) {
       return null;
     }
 
     const riskLevel = getRiskLevel(prediction.riskScore);
+    const reliabilityColor = getReliabilityColor(prediction.reliability);
 
     return (
       <div className="prediction-widget">
@@ -146,30 +152,41 @@ function PredictionDisplay({
 
           <div className="prediction-info">
             <div className="info-row">
-              <span className="info-label">Next Check:</span>
-              <span className="info-value">{formatTime(nextCheckTime)}</span>
+              <span className="info-label">Prediction Reliability:</span>
+              <span className="info-value" style={{ color: reliabilityColor }}>
+                {prediction.reliability}%
+              </span>
             </div>
-            <div className="info-row">
-              <span className="info-label">Confidence:</span>
-              <span className="info-value">{prediction.confidence}%</span>
-            </div>
-            {prediction.usedML && prediction.modelInfo && (
+            {prediction.dataContext && (
               <>
                 <div className="info-row">
-                  <span className="info-label">Model Accuracy:</span>
-                  <span className="info-value" style={{ color: '#22c55e' }}>
-                    {prediction.modelInfo.latestAccuracy || 'N/A'}%
+                  <span className="info-label">Based on:</span>
+                  <span className="info-value">
+                    {prediction.dataContext.trackingDays} days
                   </span>
                 </div>
                 <div className="info-row">
-                  <span className="info-label">Last Trained:</span>
+                  <span className="info-label">Relapses analyzed:</span>
                   <span className="info-value">
-                    {new Date(prediction.modelInfo.lastTrained).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {prediction.dataContext.relapseCount}
                   </span>
                 </div>
               </>
             )}
+            <div className="info-row">
+              <span className="info-label">Next Check:</span>
+              <span className="info-value">{formatTime(nextCheckTime)}</span>
+            </div>
           </div>
+
+          {prediction.reliability < 60 && (
+            <div className="data-warning">
+              <FaInfoCircle style={{ fontSize: '0.875rem', color: '#ef4444' }} />
+              <span className="warning-text">
+                Limited data - predictions will improve as you track more
+              </span>
+            </div>
+          )}
 
           {prediction.riskScore >= 50 && (
             <div className="quick-reason">
@@ -264,6 +281,7 @@ function PredictionDisplay({
   }
 
   const riskLevel = getRiskLevel(prediction.riskScore);
+  const reliabilityColor = getReliabilityColor(prediction.reliability);
 
   return (
     <div className="relapse-prediction-container">
@@ -400,14 +418,14 @@ function PredictionDisplay({
 
           <div className="confidence-footer">
             <div className="confidence-info">
-              <span className="confidence-label">Confidence:</span>
-              <span className="confidence-value">{prediction.confidence}%</span>
-              {prediction.usedML && prediction.modelInfo ? (
+              <span className="confidence-label">Prediction Reliability:</span>
+              <span className="confidence-value" style={{ color: reliabilityColor }}>
+                {prediction.reliability}%
+              </span>
+              {prediction.dataContext && (
                 <span className="accuracy-note">
-                  AI Model ({prediction.modelInfo.totalEpochs || 0} training cycles, {prediction.modelInfo.latestAccuracy}% accuracy)
+                  Based on {prediction.dataContext.trackingDays} days, {prediction.dataContext.relapseCount} relapses
                 </span>
-              ) : (
-                <span className="accuracy-note">Pattern-based analysis</span>
               )}
             </div>
             {prediction.usedML && (
