@@ -1,5 +1,5 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// FIXED: Retrain button and Active pill now show on mobile
+// FIXED: Permission state now updates correctly on mobile
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,23 +21,30 @@ function PredictionDisplay({
   
   const [notificationPermission, setNotificationPermission] = useState(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
+      console.log('Initial notification permission:', Notification.permission);
       return Notification.permission;
     }
+    console.log('Notification API not supported');
     return 'unsupported';
   });
 
   React.useEffect(() => {
-    if (mode !== 'compact') return;
-    
+    // Always check permission, regardless of mode
     const checkPermission = () => {
       if (typeof window !== 'undefined' && 'Notification' in window) {
-        setNotificationPermission(Notification.permission);
+        const currentPermission = Notification.permission;
+        console.log('Permission check:', currentPermission);
+        setNotificationPermission(currentPermission);
       }
     };
 
-    const interval = setInterval(checkPermission, 5000);
+    // Check immediately on mount
+    checkPermission();
+
+    // Then check every 3 seconds
+    const interval = setInterval(checkPermission, 3000);
     return () => clearInterval(interval);
-  }, [mode]);
+  }, []); // No dependencies - always run
 
   const handleEnableNotifications = async () => {
     const granted = await notificationService.requestPermission();
@@ -110,6 +117,14 @@ function PredictionDisplay({
 
   // COMPACT MODE
   if (mode === 'compact') {
+    // Debug logging
+    console.log('=== PREDICTION DISPLAY DEBUG ===');
+    console.log('Has prediction:', !!prediction);
+    console.log('Notification permission state:', notificationPermission);
+    console.log('Notification API exists:', 'Notification' in window);
+    console.log('Actual Notification.permission:', typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'N/A');
+    console.log('================================');
+
     if (!prediction) {
       return null;
     }
@@ -124,7 +139,7 @@ function PredictionDisplay({
             <FaMicrochip style={{ fontSize: '1rem', color: 'var(--success)' }} />
             <span>AI Relapse Risk Prediction</span>
           </div>
-          {/* FIXED: Always show Active badge when notification permission is granted */}
+          {/* Show Active badge when notification permission is granted */}
           {notificationPermission === 'granted' && (
             <span className="notification-status active">
               <FaCheckCircle style={{ fontSize: '0.75rem' }} />
@@ -195,7 +210,7 @@ function PredictionDisplay({
             </div>
           )}
 
-          {/* FIXED: Simplified button logic - always show both buttons when granted */}
+          {/* Button logic */}
           <div className="widget-actions">
             {notificationPermission === 'unsupported' ? (
               // No notification support - show only view button
@@ -225,7 +240,7 @@ function PredictionDisplay({
                 </button>
               </>
             ) : (
-              // Granted - show view + retrain (always, no ML check)
+              // Granted - show view + retrain
               <>
                 <button 
                   className="widget-btn view-details"
