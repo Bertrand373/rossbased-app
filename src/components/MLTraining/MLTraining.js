@@ -388,12 +388,12 @@ function MLTraining() {
             }}>
               {dataQuality.qualityScore}
             </div>
-            <div className="compact-stat-label">Quality Score</div>
+            <div className="compact-stat-label">Data Quality Score</div>
           </div>
 
           <div className="compact-stat-card">
             <div className="compact-stat-value">{dataQuality.benefitDays}</div>
-            <div className="compact-stat-label">Benefit Days</div>
+            <div className="compact-stat-label">Benefit Days Tracked</div>
           </div>
 
           <div className="compact-stat-card">
