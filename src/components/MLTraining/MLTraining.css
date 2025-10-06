@@ -606,14 +606,15 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .ml-training-container {
-    padding: 0 var(--spacing-md); /* FIXED: Add padding back for borders to show */
-    margin: var(--spacing-md) 0;
+    padding: 0; /* FIXED: Remove padding for full-width */
+    margin: 0; /* FIXED: Remove margin */
   }
 
   .ml-training-container .training-card {
     padding: var(--spacing-md);
-    border-radius: var(--radius-lg); /* FIXED: Restore rounded corners */
-    /* Keep all borders intact */
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-md); /* FIXED: Margin on card instead of container */
+    /* All borders intact */
   }
 
   .ml-training-container .standalone-header h1 {

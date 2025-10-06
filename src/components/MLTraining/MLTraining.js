@@ -264,7 +264,7 @@ function MLTraining() {
                 Start Using Predictor
               </button>
               <button className="secondary-button" onClick={handleRetrain}>
-                <FaRedo style={{ fontSize: '0.875rem' }} />
+                <FaSyncAlt style={{ fontSize: '0.875rem' }} />
                 Retrain Model
               </button>
             </div>
@@ -461,7 +461,7 @@ function MLTraining() {
           >
             {modelInfo?.isReady ? (
               <>
-                <FaRedo style={{ fontSize: '0.875rem' }} />
+                <FaSyncAlt style={{ fontSize: '0.875rem' }} />
                 Retrain Model
               </>
             ) : (
