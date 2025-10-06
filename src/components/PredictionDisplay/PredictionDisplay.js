@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb, FaRocket, FaSearch, FaArrowLeft } from 'react-icons/fa';
+import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb, FaRocket, FaSearch, FaArrowLeft, FaSyncAlt } from 'react-icons/fa';
 import './PredictionDisplay.css';
 import { usePrediction } from '../../hooks/usePrediction';
 import notificationService from '../../services/NotificationService';

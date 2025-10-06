@@ -10,7 +10,7 @@ import {
   FaChartLine, 
   FaRocket, 
   FaArrowLeft, 
-  FaRedo,
+  FaSyncAlt,
   FaTimes,
   FaCheck,
   FaShieldAlt
