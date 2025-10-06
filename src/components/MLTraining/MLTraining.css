@@ -606,15 +606,14 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .ml-training-container {
-    padding: 0; /* FIXED: Remove side padding to match tracker full-width on mobile */
-    margin: var(--spacing-md) 0; /* FIXED: Remove auto margin */
+    padding: 0 var(--spacing-md); /* FIXED: Add padding back for borders to show */
+    margin: var(--spacing-md) 0;
   }
 
   .ml-training-container .training-card {
-    padding: var(--spacing-md); /* FIXED: Reduced padding to match mobile sections */
-    border-radius: 0; /* FIXED: Remove border radius for full-width mobile */
-    border-left: none; /* FIXED: Remove side borders on mobile */
-    border-right: none; /* FIXED: Remove side borders on mobile */
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg); /* FIXED: Restore rounded corners */
+    /* Keep all borders intact */
   }
 
   .ml-training-container .standalone-header h1 {

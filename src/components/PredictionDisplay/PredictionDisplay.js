@@ -1,9 +1,9 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// UPDATED: Changed from "urge" to "relapse risk" terminology throughout
+// UPDATED: Clear "Relapse Risk" terminology and explanations
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb, FaRocket } from 'react-icons/fa';
+import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb, FaRocket, FaSearch, FaArrowLeft } from 'react-icons/fa';
 import './PredictionDisplay.css';
 import { usePrediction } from '../../hooks/usePrediction';
 import notificationService from '../../services/NotificationService';
@@ -47,7 +47,7 @@ function PredictionDisplay({
   };
 
   const handleViewDetails = () => {
-    navigate('/urge-prediction');
+    navigate('/relapse-prediction');
   };
 
   const handleInterventionClick = (interventionType) => {
@@ -116,7 +116,7 @@ function PredictionDisplay({
         <div className="prediction-widget-header">
           <div className="widget-title">
             <FaMicrochip style={{ fontSize: '1rem', color: 'var(--success)' }} />
-            <span>AI Relapse Prediction</span>
+            <span>AI Relapse Risk Prediction</span>
           </div>
           {notificationPermission === 'granted' && (
             <span className="notification-status active">
@@ -157,7 +157,7 @@ function PredictionDisplay({
                 <div className="info-row">
                   <span className="info-label">Model Accuracy:</span>
                   <span className="info-value" style={{ color: '#22c55e' }}>
-                    {prediction.modelInfo.latestAccuracy}%
+                    {prediction.modelInfo.latestAccuracy || 'N/A'}%
                   </span>
                 </div>
                 <div className="info-row">
@@ -183,7 +183,7 @@ function PredictionDisplay({
                 className="widget-btn view-details"
                 onClick={handleViewDetails}
               >
-                <FaChartLine style={{ fontSize: '0.875rem' }} />
+                <FaSearch style={{ fontSize: '0.875rem' }} />
                 <span>View Analysis</span>
               </button>
             ) : notificationPermission !== 'granted' ? (
@@ -231,7 +231,7 @@ function PredictionDisplay({
   // FULL MODE
   if (isLoading) {
     return (
-      <div className="urge-prediction-container">
+      <div className="relapse-prediction-container">
         <div className="loading-spinner">
           <div className="spinner"></div>
           <p>Analyzing relapse risk factors...</p>
@@ -242,17 +242,18 @@ function PredictionDisplay({
 
   if (!prediction || prediction.riskScore < 40) {
     return (
-      <div className="urge-prediction-container">
+      <div className="relapse-prediction-container">
         <div className="low-risk-message">
           <FaCheckCircle style={{ fontSize: '4rem', color: 'var(--success)', marginBottom: 'var(--spacing-lg)' }} />
           <h2>Low Relapse Risk</h2>
           <p>Current risk level: <strong>{prediction ? prediction.riskScore : 0}%</strong></p>
           <p className="subtext">
             {prediction?.usedML 
-              ? 'AI shows low relapse risk based on your patterns' 
+              ? 'AI shows low relapse risk based on your personal patterns' 
               : 'Conditions look stable - keep up the good work'}
           </p>
           <button onClick={() => navigate('/')} className="back-button">
+            <FaArrowLeft style={{ fontSize: '0.875rem' }} />
             Back to Dashboard
           </button>
         </div>
@@ -263,7 +264,7 @@ function PredictionDisplay({
   const riskLevel = getRiskLevel(prediction.riskScore);
 
   return (
-    <div className="urge-prediction-container">
+    <div className="relapse-prediction-container">
       {feedbackSubmitted ? (
         <div className="feedback-success">
           <FaCheckCircle style={{ fontSize: '4rem', color: 'var(--success)', marginBottom: 'var(--spacing-lg)' }} />
@@ -276,6 +277,9 @@ function PredictionDisplay({
           <div className="prediction-header">
             <FaExclamationTriangle style={{ fontSize: '3rem', color: riskLevel.color, marginBottom: 'var(--spacing-sm)' }} />
             <h1>{riskLevel.label} RELAPSE RISK DETECTED</h1>
+            <p className="prediction-context">
+              Based on patterns from your past relapses
+            </p>
           </div>
 
           <div className="risk-meter-section">
@@ -292,7 +296,7 @@ function PredictionDisplay({
               ></div>
             </div>
             <div className="risk-label" style={{ color: riskLevel.color }}>
-              {riskLevel.label} RISK
+              {riskLevel.label} RELAPSE RISK
             </div>
           </div>
 
@@ -371,7 +375,7 @@ function PredictionDisplay({
             <h4>Was this prediction accurate?</h4>
             <p className="feedback-subtext">
               {prediction.usedML 
-                ? 'Your feedback trains the AI to predict your patterns better' 
+                ? 'Your feedback trains the AI to predict your relapse patterns better' 
                 : 'Your feedback helps improve future risk detection'}
             </p>
             <div className="feedback-buttons">
