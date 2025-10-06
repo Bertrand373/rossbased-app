@@ -1,5 +1,5 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// FIXED: Permission state now updates correctly on mobile
+// FIXED: Show Active pill and Retrain button based on trained model status
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,10 +21,8 @@ function PredictionDisplay({
   
   const [notificationPermission, setNotificationPermission] = useState(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
-      console.log('Initial notification permission:', Notification.permission);
       return Notification.permission;
     }
-    console.log('Notification API not supported');
     return 'unsupported';
   });
 
@@ -33,7 +31,6 @@ function PredictionDisplay({
     const checkPermission = () => {
       if (typeof window !== 'undefined' && 'Notification' in window) {
         const currentPermission = Notification.permission;
-        console.log('Permission check:', currentPermission);
         setNotificationPermission(currentPermission);
       }
     };
@@ -117,20 +114,15 @@ function PredictionDisplay({
 
   // COMPACT MODE
   if (mode === 'compact') {
-    // Debug logging
-    console.log('=== PREDICTION DISPLAY DEBUG ===');
-    console.log('Has prediction:', !!prediction);
-    console.log('Notification permission state:', notificationPermission);
-    console.log('Notification API exists:', 'Notification' in window);
-    console.log('Actual Notification.permission:', typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'N/A');
-    console.log('================================');
-
     if (!prediction) {
       return null;
     }
 
     const riskLevel = getRiskLevel(prediction.riskScore);
     const reliabilityColor = getReliabilityColor(prediction.reliability);
+    
+    // Check if model is trained (usedML means AI model was used for prediction)
+    const hasTrainedModel = prediction.usedML === true;
 
     return (
       <div className="prediction-widget">
@@ -139,8 +131,8 @@ function PredictionDisplay({
             <FaMicrochip style={{ fontSize: '1rem', color: 'var(--success)' }} />
             <span>AI Relapse Risk Prediction</span>
           </div>
-          {/* Show Active badge when notification permission is granted */}
-          {notificationPermission === 'granted' && (
+          {/* Show Active badge if model is trained OR notifications granted */}
+          {(hasTrainedModel || notificationPermission === 'granted') && (
             <span className="notification-status active">
               <FaCheckCircle style={{ fontSize: '0.75rem' }} />
               Active
@@ -210,10 +202,28 @@ function PredictionDisplay({
             </div>
           )}
 
-          {/* Button logic */}
+          {/* Button logic - prioritize showing trained model features */}
           <div className="widget-actions">
-            {notificationPermission === 'unsupported' ? (
-              // No notification support - show only view button
+            {hasTrainedModel ? (
+              // Model is trained - always show View + Retrain
+              <>
+                <button 
+                  className="widget-btn view-details"
+                  onClick={handleViewDetails}
+                >
+                  <FaSearch style={{ fontSize: '0.875rem' }} />
+                  <span>View Analysis</span>
+                </button>
+                <button 
+                  className="widget-btn retrain-btn"
+                  onClick={() => navigate('/ml-training')}
+                >
+                  <FaSyncAlt style={{ fontSize: '0.875rem' }} />
+                  <span>Retrain</span>
+                </button>
+              </>
+            ) : notificationPermission === 'unsupported' ? (
+              // No notification support and no model - show only view button
               <button 
                 className="widget-btn view-details"
                 onClick={handleViewDetails}
@@ -222,7 +232,7 @@ function PredictionDisplay({
                 <span>View Analysis</span>
               </button>
             ) : notificationPermission !== 'granted' ? (
-              // Not granted - show enable + details
+              // Notifications available but not granted - show enable + details
               <>
                 <button 
                   className="widget-btn enable-notifications"
@@ -240,23 +250,14 @@ function PredictionDisplay({
                 </button>
               </>
             ) : (
-              // Granted - show view + retrain
-              <>
-                <button 
-                  className="widget-btn view-details"
-                  onClick={handleViewDetails}
-                >
-                  <FaSearch style={{ fontSize: '0.875rem' }} />
-                  <span>View Analysis</span>
-                </button>
-                <button 
-                  className="widget-btn retrain-btn"
-                  onClick={() => navigate('/ml-training')}
-                >
-                  <FaSyncAlt style={{ fontSize: '0.875rem' }} />
-                  <span>Retrain</span>
-                </button>
-              </>
+              // Notifications granted but no model - show view + enable would be redundant, so just view
+              <button 
+                className="widget-btn view-details"
+                onClick={handleViewDetails}
+              >
+                <FaSearch style={{ fontSize: '0.875rem' }} />
+                <span>View Analysis</span>
+              </button>
             )}
           </div>
         </div>
