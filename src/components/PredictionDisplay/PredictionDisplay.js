@@ -1,6 +1,5 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// UPDATED: Uses "Prediction Reliability" instead of separate confidence/accuracy metrics
-// FIXED: Mobile button display
+// FIXED: Retrain button and Active pill now show on mobile
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -125,6 +124,7 @@ function PredictionDisplay({
             <FaMicrochip style={{ fontSize: '1rem', color: 'var(--success)' }} />
             <span>AI Relapse Risk Prediction</span>
           </div>
+          {/* FIXED: Always show Active badge when notification permission is granted */}
           {notificationPermission === 'granted' && (
             <span className="notification-status active">
               <FaCheckCircle style={{ fontSize: '0.75rem' }} />
@@ -195,8 +195,10 @@ function PredictionDisplay({
             </div>
           )}
 
+          {/* FIXED: Simplified button logic - always show both buttons when granted */}
           <div className="widget-actions">
             {notificationPermission === 'unsupported' ? (
+              // No notification support - show only view button
               <button 
                 className="widget-btn view-details"
                 onClick={handleViewDetails}
@@ -205,6 +207,7 @@ function PredictionDisplay({
                 <span>View Analysis</span>
               </button>
             ) : notificationPermission !== 'granted' ? (
+              // Not granted - show enable + details
               <>
                 <button 
                   className="widget-btn enable-notifications"
@@ -222,6 +225,7 @@ function PredictionDisplay({
                 </button>
               </>
             ) : (
+              // Granted - show view + retrain (always, no ML check)
               <>
                 <button 
                   className="widget-btn view-details"
@@ -230,15 +234,13 @@ function PredictionDisplay({
                   <FaSearch style={{ fontSize: '0.875rem' }} />
                   <span>View Analysis</span>
                 </button>
-                {prediction.usedML && (
-                  <button 
-                    className="widget-btn retrain-btn"
-                    onClick={() => navigate('/ml-training')}
-                  >
-                    <FaSyncAlt style={{ fontSize: '0.875rem' }} />
-                    <span>Retrain</span>
-                  </button>
-                )}
+                <button 
+                  className="widget-btn retrain-btn"
+                  onClick={() => navigate('/ml-training')}
+                >
+                  <FaSyncAlt style={{ fontSize: '0.875rem' }} />
+                  <span>Retrain</span>
+                </button>
               </>
             )}
           </div>
