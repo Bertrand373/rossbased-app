@@ -1,5 +1,5 @@
 /* src/components/PredictionDisplay/PredictionDisplay.css */
-/* COMPLETE FILE - All mobile fixes included */
+/* COMPLETE FILE - Mobile button display FIXED */
 
 /* ============================================
    COMPACT MODE - Widget Styles
@@ -193,7 +193,6 @@
   transform: translateY(-1px);
 }
 
-/* FIXED: Removed flex: 0 0 auto that was preventing mobile display */
 .widget-btn.retrain-btn {
   background: transparent;
   color: var(--text-secondary);
@@ -632,14 +631,15 @@
     gap: var(--spacing-sm);
   }
 
-  /* FIXED: Stack buttons vertically */
+  /* FIXED: Keep buttons in row layout on mobile, allow wrapping if needed */
   .widget-actions {
-    flex-direction: column;
+    flex-wrap: wrap;
   }
 
-  /* FIXED: All buttons full width */
+  /* FIXED: All buttons take equal space, minimum 45% width to fit 2 per row */
   .widget-btn {
-    width: 100%;
+    flex: 1 1 45%;
+    min-width: 45%;
   }
 
   .intervention-grid {
@@ -709,5 +709,16 @@
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-xs);
+  }
+
+  /* FIXED: On very small screens, stack buttons vertically */
+  .widget-actions {
+    flex-direction: column;
+  }
+
+  .widget-btn {
+    width: 100%;
+    min-width: 100%;
+    flex: 1 1 100%;
   }
 }
