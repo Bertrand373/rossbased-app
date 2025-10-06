@@ -26,6 +26,8 @@
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 1px solid var(--border);
+  gap: var(--spacing-sm); /* ADDED: Gap to prevent squeezing */
+  flex-wrap: wrap; /* ADDED: Allow wrapping on very small screens */
 }
 
 .widget-title {
@@ -609,8 +611,10 @@
 @media (max-width: 768px) {
   .relapse-prediction-container {
     padding: 0 var(--spacing-md);
-    overflow-x: hidden; /* ADDED: Prevent horizontal scroll */
-    max-width: 100vw; /* ADDED: Prevent overflow */
+    overflow-x: hidden;
+    max-width: 100vw;
+    overscroll-behavior: contain; /* ADDED: Prevent overscroll bounce */
+    -webkit-overflow-scrolling: touch; /* ADDED: Smooth iOS scrolling */
   }
 
   .prediction-widget {
@@ -640,7 +644,7 @@
 
   /* FIXED: Show retrain button on mobile */
   .widget-btn.retrain-btn {
-    display: flex; /* Override any display:none */
+    display: flex;
     width: 100%;
   }
 
@@ -650,8 +654,9 @@
 
   .prediction-card {
     padding: var(--spacing-lg);
-    max-width: 100%; /* ADDED: Full width on mobile */
-    overflow-x: hidden; /* ADDED: Prevent internal horizontal scroll */
+    max-width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior: contain; /* ADDED: Prevent card overscroll */
   }
 
   .risk-percentage {

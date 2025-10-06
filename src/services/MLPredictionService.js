@@ -1,5 +1,5 @@
 // src/services/MLPredictionService.js
-// FIXED: Typo in loadNormalizationStats (setItem -> getItem)
+// FIXED: Added latestAccuracy to modelInfo in predict() method
 import * as tf from '@tensorflow/tfjs';
 import notificationService from './NotificationService';
 
@@ -307,7 +307,7 @@ class MLPredictionService {
   async predict(userData) {
     try {
       if (!this.isModelReady || !this.model) {
-        console.log('⚠️  Model not ready, using fallback prediction');
+        console.log('⚠️ Model not ready, using fallback prediction');
         return this.fallbackPrediction(userData);
       }
       
@@ -353,6 +353,11 @@ class MLPredictionService {
         await notificationService.sendUrgePredictionNotification(riskScore, reason);
       }
       
+      // FIXED: Include latestAccuracy in modelInfo
+      const latestAccuracy = this.trainingHistory.accuracy.length > 0
+        ? Math.round(this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1] * 100)
+        : null;
+      
       return {
         riskScore,
         confidence,
@@ -372,7 +377,8 @@ class MLPredictionService {
         },
         modelInfo: {
           lastTrained: this.trainingHistory.lastTrained,
-          totalEpochs: this.trainingHistory.totalEpochs
+          totalEpochs: this.trainingHistory.totalEpochs,
+          latestAccuracy: latestAccuracy  // FIXED: Added this
         }
       };
       
@@ -455,7 +461,7 @@ class MLPredictionService {
   async saveModel() {
     try {
       if (!this.model) {
-        console.log('⚠️  No model to save');
+        console.log('⚠️ No model to save');
         return false;
       }
       
@@ -474,7 +480,7 @@ class MLPredictionService {
       console.log('✅ Model loaded from IndexedDB');
       return true;
     } catch (error) {
-      console.log('ℹ️  No saved model found (this is normal for first-time use)');
+      console.log('ℹ️ No saved model found (this is normal for first-time use)');
       return false;
     }
   }
@@ -564,7 +570,7 @@ class MLPredictionService {
       const falseAlarms = recentFeedback.filter(f => f.userFeedback === 'false_alarm').length;
       
       if (falseAlarms >= 5) {
-        console.log('⚠️  Multiple false alarms detected. Consider retraining.');
+        console.log('⚠️ Multiple false alarms detected. Consider retraining.');
       }
       
       return true;
