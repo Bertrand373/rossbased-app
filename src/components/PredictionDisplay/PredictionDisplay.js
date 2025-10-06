@@ -1,5 +1,5 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// UPDATED: Clear "Relapse Risk" terminology and explanations
+// FIXED: View Analysis button now navigates to correct route
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -46,8 +46,9 @@ function PredictionDisplay({
     }
   };
 
+  // FIXED: Changed from '/relapse-prediction' to '/urge-prediction' to match App.js route
   const handleViewDetails = () => {
-    navigate('/relapse-prediction');
+    navigate('/urge-prediction');
   };
 
   const handleInterventionClick = (interventionType) => {
