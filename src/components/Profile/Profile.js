@@ -1,8 +1,10 @@
-// components/Profile/Profile.js - BULLETPROOF SLIDING TAB ANIMATION - Mobile-First with Enhanced Touch Support
+// components/Profile/Profile.js - WITH FIREBASE PUSH NOTIFICATIONS AND TEST BUTTON
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
+import { useNotifications } from '../../hooks/useNotifications';
+import { testLocalNotification } from '../../utils/testNotification';
 
 // Icons
 import { FaUser, FaEdit, FaCrown, FaDiscord, FaCog, FaCommentAlt, FaBug, 
@@ -27,14 +29,29 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
   const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
-  const [notifications, setNotifications] = useState(userData.notifications !== false);
+  const [browserNotifications, setBrowserNotifications] = useState(userData.notifications !== false);
+  
+  // NOTIFICATION HOOK
+  const {
+    permission,
+    isSupported,
+    subscription,
+    fcmToken,
+    requestPermission,
+    subscribeToPush,
+    unsubscribeFromPush,
+    checkExistingSubscription
+  } = useNotifications();
+  
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
   
   // Feedback States
   const [feedbackType, setFeedbackType] = useState('general');
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
   
-  // MOBILE-FIRST: Enhanced tab slider with better state management
+  // Tab slider refs
   const tabsRef = useRef(null);
   const sliderRef = useRef(null);
   const [isSliderInitialized, setIsSliderInitialized] = useState(false);
@@ -55,13 +72,69 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'data', label: 'Data', icon: FaDownload }
   ];
 
+  // CHECK EXISTING NOTIFICATION SUBSCRIPTION ON MOUNT
+  useEffect(() => {
+    if (isSupported) {
+      checkExistingSubscription().then((sub) => {
+        setNotificationsEnabled(!!sub);
+      });
+    }
+  }, [isSupported, checkExistingSubscription]);
+
+  // HANDLE NOTIFICATION TOGGLE
+  const handleNotificationToggle = async () => {
+    setIsTogglingNotifications(true);
+    try {
+      if (notificationsEnabled) {
+        // Disable notifications
+        await unsubscribeFromPush();
+        setNotificationsEnabled(false);
+        setBrowserNotifications(false);
+        toast.success('Push notifications disabled');
+      } else {
+        // Enable notifications
+        if (permission !== 'granted') {
+          const granted = await requestPermission();
+          if (!granted) {
+            toast.error('Please enable notifications in your browser settings');
+            setIsTogglingNotifications(false);
+            return;
+          }
+        }
+        
+        await subscribeToPush();
+        setNotificationsEnabled(true);
+        setBrowserNotifications(true);
+        toast.success('Push notifications enabled!');
+      }
+    } catch (error) {
+      console.error('Failed to toggle notifications:', error);
+      toast.error('Failed to update notification settings');
+    }
+    setIsTogglingNotifications(false);
+  };
+
+  // HANDLE TEST NOTIFICATION
+  const handleTestNotification = async () => {
+    try {
+      const success = await testLocalNotification();
+      if (success) {
+        toast.success('Test notification sent! Check your notifications.');
+      } else {
+        toast.error('Failed to send test notification');
+      }
+    } catch (error) {
+      console.error('Test notification error:', error);
+      toast.error('Error sending test notification');
+    }
+  };
+
   const detectMobile = useCallback(() => {
     const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
     setIsMobile(isMobileDevice);
     return isMobileDevice;
   }, []);
 
-  // FIXED: Enhanced slider positioning with smooth bidirectional animation
   const updateTabSlider = useCallback(() => {
     if (!tabsRef.current || !sliderRef.current) {
       return false;
@@ -73,7 +146,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeTab}"]`);
       
       if (!activeTabElement) {
-        console.warn(`Tab element not found: ${activeTab}`);
         return false;
       }
 
@@ -83,7 +155,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           const tabRect = activeTabElement.getBoundingClientRect();
           
           if (containerRect.width === 0 || tabRect.width === 0) {
-            console.warn('Invalid measurements, container or tab not rendered');
             return;
           }
 
@@ -92,7 +163,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           const leftOffset = Math.round(tabRect.left - containerRect.left - paddingLeft);
           const tabWidth = Math.round(tabRect.width);
           
-          // FIXED: Set width FIRST, then transform in next frame
           slider.style.width = `${tabWidth}px`;
           
           requestAnimationFrame(() => {
@@ -187,16 +257,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   }, [activeTab, isSliderInitialized, updateTabSlider]);
 
-  useEffect(() => {
-    return () => {
-      [resizeTimeoutRef].forEach(ref => {
-        if (ref.current) {
-          clearTimeout(ref.current);
-        }
-      });
-    };
-  }, []);
-
   const userStats = {
     memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown'
   };
@@ -210,7 +270,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       dataSharing,
       analyticsOptIn,
       marketingEmails,
-      notifications
+      notifications: browserNotifications
     };
     
     updateUserData(updates);
@@ -288,6 +348,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     toast.success('Account deleted successfully');
     onLogout();
   };
+
+  // CHECK IF PWA IS INSTALLED
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches;
 
   return (
     <div className="profile-container">
@@ -487,18 +550,69 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   </div>
                 </div>
 
-                <div className="toggle-setting">
-                  <div className="toggle-info">
-                    <span className="toggle-label">Push Notifications</span>
-                    <span className="toggle-description">Receive reminders and encouragement</span>
+                {/* PUSH NOTIFICATIONS TOGGLE */}
+                {isSupported && (
+                  <div className="toggle-setting">
+                    <div className="toggle-info">
+                      <span className="toggle-label">Push Notifications</span>
+                      <span className="toggle-description">
+                        Get alerts when streak milestones are reached
+                      </span>
+                      {permission === 'denied' && (
+                        <span className="toggle-description" style={{ color: '#ef4444', marginTop: '4px' }}>
+                          ⚠️ Blocked in browser settings
+                        </span>
+                      )}
+                      {!isPWA && notificationsEnabled && (
+                        <span className="toggle-description" style={{ color: '#f59e0b', marginTop: '4px' }}>
+                          💡 Add to home screen for best experience
+                        </span>
+                      )}
+                      {fcmToken && (
+                        <span className="toggle-description" style={{ color: '#22c55e', marginTop: '4px', fontSize: '0.7rem' }}>
+                          ✅ Connected to Firebase
+                        </span>
+                      )}
+                    </div>
+                    <div 
+                      className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
+                      onClick={handleNotificationToggle}
+                      style={{ opacity: isTogglingNotifications || permission === 'denied' ? 0.5 : 1, cursor: isTogglingNotifications || permission === 'denied' ? 'not-allowed' : 'pointer' }}
+                    >
+                      <div className="toggle-slider"></div>
+                    </div>
                   </div>
-                  <div 
-                    className={`toggle-switch ${notifications ? 'active' : ''}`}
-                    onClick={() => setNotifications(!notifications)}
-                  >
-                    <div className="toggle-slider"></div>
+                )}
+
+                {/* TEST NOTIFICATION BUTTON - NEW */}
+                {isSupported && notificationsEnabled && (
+                  <div className="toggle-setting">
+                    <div className="toggle-info">
+                      <span className="toggle-label">Test Notifications</span>
+                      <span className="toggle-description">
+                        Send a test notification to verify everything works
+                      </span>
+                    </div>
+                    <button 
+                      className="action-btn"
+                      onClick={handleTestNotification}
+                    >
+                      <FaBell />
+                      Send Test
+                    </button>
                   </div>
-                </div>
+                )}
+
+                {!isSupported && (
+                  <div className="toggle-setting">
+                    <div className="toggle-info">
+                      <span className="toggle-label">Push Notifications</span>
+                      <span className="toggle-description" style={{ color: '#f59e0b' }}>
+                        ⚠️ Not supported in this browser
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
