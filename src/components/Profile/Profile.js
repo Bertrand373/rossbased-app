@@ -1,10 +1,9 @@
-// components/Profile/Profile.js - WITH FIREBASE PUSH NOTIFICATIONS AND TEST BUTTON
+// components/Profile/Profile.js - WITH BACKEND NOTIFICATION INTEGRATION
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
 import { useNotifications } from '../../hooks/useNotifications';
-import { testLocalNotification } from '../../utils/testNotification';
 
 // Icons
 import { FaUser, FaEdit, FaCrown, FaDiscord, FaCog, FaCommentAlt, FaBug, 
@@ -29,9 +28,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
   const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
-  const [browserNotifications, setBrowserNotifications] = useState(userData.notifications !== false);
   
-  // NOTIFICATION HOOK
+  // NOTIFICATION HOOK WITH BACKEND
   const {
     permission,
     isSupported,
@@ -40,7 +38,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     requestPermission,
     subscribeToPush,
     unsubscribeFromPush,
-    checkExistingSubscription
+    checkExistingSubscription,
+    sendLocalNotification
   } = useNotifications();
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -74,23 +73,24 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   // CHECK EXISTING NOTIFICATION SUBSCRIPTION ON MOUNT
   useEffect(() => {
-    if (isSupported) {
+    if (isSupported && userData?.username) {
       checkExistingSubscription().then((sub) => {
         setNotificationsEnabled(!!sub);
       });
     }
-  }, [isSupported, checkExistingSubscription]);
+  }, [isSupported, userData?.username, checkExistingSubscription]);
 
-  // HANDLE NOTIFICATION TOGGLE
+  // HANDLE NOTIFICATION TOGGLE WITH BACKEND
   const handleNotificationToggle = async () => {
+    if (isTogglingNotifications) return;
+    
     setIsTogglingNotifications(true);
     try {
       if (notificationsEnabled) {
         // Disable notifications
         await unsubscribeFromPush();
         setNotificationsEnabled(false);
-        setBrowserNotifications(false);
-        toast.success('Push notifications disabled');
+        toast.success('✅ Push notifications disabled');
       } else {
         // Enable notifications
         if (permission !== 'granted') {
@@ -102,10 +102,23 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           }
         }
         
+        // Subscribe to push and send to backend
         await subscribeToPush();
         setNotificationsEnabled(true);
-        setBrowserNotifications(true);
-        toast.success('Push notifications enabled!');
+        toast.success('✅ Push notifications enabled!');
+        
+        // Send test notification after 1 second
+        setTimeout(async () => {
+          try {
+            await sendLocalNotification('🎉 Notifications Activated!', {
+              body: 'You\'ll now receive milestone alerts and motivational messages',
+              icon: '/icon-192.png',
+              badge: '/icon-192.png'
+            });
+          } catch (error) {
+            console.error('Failed to send welcome notification:', error);
+          }
+        }, 1000);
       }
     } catch (error) {
       console.error('Failed to toggle notifications:', error);
@@ -117,7 +130,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   // HANDLE TEST NOTIFICATION
   const handleTestNotification = async () => {
     try {
-      const success = await testLocalNotification();
+      const success = await sendLocalNotification('🔔 Test Notification', {
+        body: 'If you can see this, notifications are working perfectly!',
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+        requireInteraction: true
+      });
+      
       if (success) {
         toast.success('Test notification sent! Check your notifications.');
       } else {
@@ -269,8 +288,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       showOnLeaderboard,
       dataSharing,
       analyticsOptIn,
-      marketingEmails,
-      notifications: browserNotifications
+      marketingEmails
     };
     
     updateUserData(updates);
@@ -550,13 +568,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   </div>
                 </div>
 
-                {/* PUSH NOTIFICATIONS TOGGLE */}
+                {/* PUSH NOTIFICATIONS TOGGLE WITH BACKEND */}
                 {isSupported && (
                   <div className="toggle-setting">
                     <div className="toggle-info">
                       <span className="toggle-label">Push Notifications</span>
                       <span className="toggle-description">
-                        Get alerts when streak milestones are reached
+                        Get milestone alerts and motivational messages
                       </span>
                       {permission === 'denied' && (
                         <span className="toggle-description" style={{ color: '#ef4444', marginTop: '4px' }}>
@@ -570,21 +588,24 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                       )}
                       {fcmToken && (
                         <span className="toggle-description" style={{ color: '#22c55e', marginTop: '4px', fontSize: '0.7rem' }}>
-                          ✅ Connected to Firebase
+                          ✅ Connected to backend server
                         </span>
                       )}
                     </div>
                     <div 
                       className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
                       onClick={handleNotificationToggle}
-                      style={{ opacity: isTogglingNotifications || permission === 'denied' ? 0.5 : 1, cursor: isTogglingNotifications || permission === 'denied' ? 'not-allowed' : 'pointer' }}
+                      style={{ 
+                        opacity: isTogglingNotifications || permission === 'denied' ? 0.5 : 1, 
+                        cursor: isTogglingNotifications || permission === 'denied' ? 'not-allowed' : 'pointer' 
+                      }}
                     >
                       <div className="toggle-slider"></div>
                     </div>
                   </div>
                 )}
 
-                {/* TEST NOTIFICATION BUTTON - NEW */}
+                {/* TEST NOTIFICATION BUTTON */}
                 {isSupported && notificationsEnabled && (
                   <div className="toggle-setting">
                     <div className="toggle-info">
