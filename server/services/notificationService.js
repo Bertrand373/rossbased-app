@@ -11,11 +11,24 @@ function initializeFirebase() {
   if (firebaseInitialized) return;
   
   try {
-    const serviceAccount = require('../firebase-service-account.json');
+    // Get Firebase credentials from environment variables
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
     
+    // Validate that all required environment variables are present
+    if (!projectId || !privateKey || !clientEmail) {
+      throw new Error('Missing required Firebase environment variables');
+    }
+    
+    // Initialize Firebase Admin with environment variables
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      projectId: serviceAccount.project_id
+      credential: admin.credential.cert({
+        projectId: projectId,
+        privateKey: privateKey.replace(/\\n/g, '\n'), // Handle escaped newlines
+        clientEmail: clientEmail
+      }),
+      projectId: projectId
     });
     
     firebaseInitialized = true;
@@ -88,146 +101,166 @@ const notificationTemplates = {
     body: 'ONE YEAR! You\'ve achieved what few ever do. Legendary status!',
     data: { url: '/stats', type: 'milestone', days: '365' }
   },
-  daily_reminder: {
-    title: '💪 Daily Check-In',
-    body: 'How are you feeling today? Log your progress and stay strong!',
-    data: { url: '/', type: 'reminder' }
+  encouragement_morning: {
+    title: '☀️ New Day, New Strength',
+    body: 'Good morning, King! Today is another opportunity to prove your power!',
+    data: { url: '/', type: 'encouragement' }
   },
-  motivational: {
-    title: '🛡️ Weekly Motivation',
-    body: 'Every day you resist is a victory. Keep building your legacy!',
-    data: { url: '/urge-toolkit', type: 'motivational' }
+  encouragement_evening: {
+    title: '🌙 Stay Strong Tonight',
+    body: 'Evening is here. Remember your commitment. You\'ve got this!',
+    data: { url: '/', type: 'encouragement' }
   },
-  relapse_support: {
-    title: '🌅 Fresh Start',
-    body: 'One setback doesn\'t define you. You\'ve got this. Start fresh today!',
-    data: { url: '/urge-toolkit', type: 'support' }
+  urge_high_risk: {
+    title: '🚨 Danger Zone Detected',
+    body: 'Your patterns suggest high risk. Remember your goals. Stay strong!',
+    data: { url: '/emergency', type: 'urge_warning' }
+  },
+  urge_medium_risk: {
+    title: '⚠️ Stay Alert',
+    body: 'Detected some risky patterns. Take a moment to refocus.',
+    data: { url: '/emergency', type: 'urge_warning' }
+  },
+  streak_save: {
+    title: '💎 Your Streak Matters',
+    body: 'Don\'t throw away all your progress. You\'ve worked too hard!',
+    data: { url: '/stats', type: 'streak_reminder' }
   }
 };
 
-// Send notification to a specific user
-async function sendNotificationToUser(username, templateKey, customData = {}) {
+// Send notification to a single device
+async function sendNotification(fcmToken, notificationType, customData = {}) {
   try {
-    // Find user's subscription
-    const subscription = await NotificationSubscription.findOne({
-      username,
-      notificationsEnabled: true
-    });
-    
-    if (!subscription) {
-      console.log(`⚠️ No active subscription found for user: ${username}`);
-      return { success: false, reason: 'no_subscription' };
+    if (!firebaseInitialized) {
+      throw new Error('Firebase Admin SDK not initialized');
     }
-    
-    // Check quiet hours
-    if (isInQuietHours(subscription)) {
-      console.log(`🌙 User ${username} is in quiet hours, skipping notification`);
-      return { success: false, reason: 'quiet_hours' };
-    }
-    
+
     // Get notification template
-    const template = notificationTemplates[templateKey];
+    const template = notificationTemplates[notificationType];
     if (!template) {
-      console.error(`❌ Invalid template key: ${templateKey}`);
-      return { success: false, reason: 'invalid_template' };
+      throw new Error(`Unknown notification type: ${notificationType}`);
     }
-    
-    // Check if user wants this notification type
-    const notificationType = template.data.type;
-    if (subscription.notificationTypes[notificationType] === false) {
-      console.log(`⚠️ User ${username} has disabled ${notificationType} notifications`);
-      return { success: false, reason: 'notification_type_disabled' };
-    }
-    
-    // Prepare FCM message
+
+    // Prepare message
     const message = {
-      token: subscription.fcmToken,
+      token: fcmToken,
       notification: {
         title: template.title,
-        body: template.body,
-        icon: '/icon-192.png',
-        badge: '/icon-192.png'
+        body: template.body
       },
       data: {
         ...template.data,
         ...customData,
-        timestamp: new Date().toISOString()
+        timestamp: Date.now().toString()
       },
       webpush: {
         fcmOptions: {
-          link: `https://app.rossbased.com${template.data.url}`
+          link: template.data.url
+        },
+        notification: {
+          icon: '/icon-192.png',
+          badge: '/icon-192.png',
+          vibrate: [200, 100, 200],
+          requireInteraction: false
         }
       }
     };
-    
-    // Send the notification
+
+    // Send message
     const response = await admin.messaging().send(message);
-    
-    // Update last notification sent time
-    subscription.lastNotificationSent = new Date();
-    subscription.failedAttempts = 0;
-    await subscription.save();
-    
-    console.log(`✅ Notification sent successfully to ${username}:`, response);
+    console.log('✅ Notification sent successfully:', response);
     return { success: true, messageId: response };
-    
   } catch (error) {
-    console.error(`❌ Error sending notification to ${username}:`, error);
-    
-    // Handle invalid token errors
-    if (error.code === 'messaging/invalid-registration-token' || 
-        error.code === 'messaging/registration-token-not-registered') {
-      // Remove invalid token
-      await NotificationSubscription.deleteOne({ username });
-      console.log(`🗑️ Removed invalid token for user: ${username}`);
-    } else {
-      // Increment failed attempts
-      const subscription = await NotificationSubscription.findOne({ username });
-      if (subscription) {
-        subscription.failedAttempts += 1;
-        await subscription.save();
-      }
-    }
-    
+    console.error('❌ Error sending notification:', error);
     return { success: false, error: error.message };
   }
 }
 
-// Send notification to multiple users
-async function sendBulkNotifications(usernames, templateKey, customData = {}) {
-  const results = await Promise.allSettled(
-    usernames.map(username => sendNotificationToUser(username, templateKey, customData))
-  );
-  
-  const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-  const failed = results.length - successful;
-  
-  console.log(`📊 Bulk send complete: ${successful} successful, ${failed} failed`);
-  
-  return {
-    total: results.length,
-    successful,
-    failed,
-    results
-  };
+// Send notification to a user (looks up their subscriptions)
+async function sendNotificationToUser(username, notificationType, customData = {}) {
+  try {
+    // Find user's active subscriptions
+    const subscriptions = await NotificationSubscription.find({
+      username: username,
+      isActive: true
+    });
+
+    if (subscriptions.length === 0) {
+      console.log(`No active subscriptions found for user: ${username}`);
+      return { success: false, error: 'No active subscriptions' };
+    }
+
+    const results = [];
+    
+    for (const subscription of subscriptions) {
+      // Check if user is in quiet hours
+      if (isInQuietHours(subscription)) {
+        console.log(`User ${username} is in quiet hours, skipping notification`);
+        continue;
+      }
+
+      // Check if notification type is enabled
+      const notificationCategory = notificationType.split('_')[0]; // e.g., 'milestone', 'urge', 'encouragement'
+      if (!subscription.preferences[notificationCategory]) {
+        console.log(`User ${username} has disabled ${notificationCategory} notifications`);
+        continue;
+      }
+
+      // Send notification
+      const result = await sendNotification(subscription.fcmToken, notificationType, customData);
+      results.push({ subscription: subscription._id, ...result });
+    }
+
+    return {
+      success: results.some(r => r.success),
+      results: results
+    };
+  } catch (error) {
+    console.error('❌ Error sending notification to user:', error);
+    return { success: false, error: error.message };
+  }
 }
 
-// Check and send milestone notifications for a user
-async function checkAndSendMilestoneNotification(username, currentStreak) {
-  const milestones = [7, 14, 30, 60, 90, 180, 365];
-  
-  if (milestones.includes(currentStreak)) {
-    const templateKey = `milestone_${currentStreak}`;
-    console.log(`🎉 Milestone detected for ${username}: ${currentStreak} days`);
-    return await sendNotificationToUser(username, templateKey);
+// Send bulk notifications (e.g., for daily encouragement)
+async function sendBulkNotifications(notificationType, customData = {}) {
+  try {
+    const subscriptions = await NotificationSubscription.find({ isActive: true });
+    console.log(`Sending ${notificationType} to ${subscriptions.length} active subscriptions`);
+
+    const results = [];
+    
+    for (const subscription of subscriptions) {
+      // Check quiet hours and preferences
+      if (isInQuietHours(subscription)) continue;
+      
+      const notificationCategory = notificationType.split('_')[0];
+      if (!subscription.preferences[notificationCategory]) continue;
+
+      const result = await sendNotification(subscription.fcmToken, notificationType, customData);
+      results.push({ username: subscription.username, ...result });
+      
+      // Add small delay to avoid rate limits
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    const successCount = results.filter(r => r.success).length;
+    console.log(`✅ Sent ${successCount}/${results.length} notifications successfully`);
+
+    return {
+      success: true,
+      totalSent: successCount,
+      totalFailed: results.length - successCount,
+      results: results
+    };
+  } catch (error) {
+    console.error('❌ Error sending bulk notifications:', error);
+    return { success: false, error: error.message };
   }
-  
-  return { success: false, reason: 'not_a_milestone' };
 }
 
 module.exports = {
+  sendNotification,
   sendNotificationToUser,
   sendBulkNotifications,
-  checkAndSendMilestoneNotification,
   notificationTemplates
 };
