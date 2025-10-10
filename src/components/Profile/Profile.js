@@ -568,7 +568,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   </div>
                 </div>
 
-                {/* PUSH NOTIFICATIONS TOGGLE WITH BACKEND */}
+                {/* PUSH NOTIFICATIONS TOGGLE WITH BACKEND - FIXED */}
                 {isSupported && (
                   <div className="toggle-setting">
                     <div className="toggle-info">
@@ -591,14 +591,15 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                           ✅ Connected to backend server
                         </span>
                       )}
+                      {isTogglingNotifications && (
+                        <span className="toggle-description" style={{ color: '#f59e0b', marginTop: '4px' }}>
+                          ⏳ Updating...
+                        </span>
+                      )}
                     </div>
                     <div 
-                      className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
-                      onClick={handleNotificationToggle}
-                      style={{ 
-                        opacity: isTogglingNotifications || permission === 'denied' ? 0.5 : 1, 
-                        cursor: isTogglingNotifications || permission === 'denied' ? 'not-allowed' : 'pointer' 
-                      }}
+                      className={`toggle-switch ${notificationsEnabled ? 'active' : ''} ${isTogglingNotifications || permission === 'denied' ? 'disabled' : ''}`}
+                      onClick={permission === 'denied' || isTogglingNotifications ? undefined : handleNotificationToggle}
                     >
                       <div className="toggle-slider"></div>
                     </div>

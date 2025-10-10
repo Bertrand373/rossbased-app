@@ -575,6 +575,13 @@
   background-color: var(--primary) !important;
 }
 
+/* NEW: Disabled state for notification toggle - doesn't break animation */
+.profile-container .toggle-switch.disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
 .select-setting {
   background-color: var(--card-background);
   border-radius: var(--radius-md);
