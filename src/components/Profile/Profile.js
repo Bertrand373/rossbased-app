@@ -80,34 +80,47 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   }, [isSupported, userData?.username, checkExistingSubscription]);
 
-  // HANDLE NOTIFICATION TOGGLE WITH BACKEND - FIXED FOR PWA
+  // HANDLE NOTIFICATION TOGGLE WITH BACKEND - DEBUG VERSION
   const handleNotificationToggle = async () => {
     if (isTogglingNotifications) return;
     
+    console.log('🔔 Toggle clicked! Current state:', notificationsEnabled);
     setIsTogglingNotifications(true);
     
     try {
       if (notificationsEnabled) {
-        // Disable notifications - update state FIRST for immediate visual feedback
-        setNotificationsEnabled(false);
+        // Disable notifications
+        console.log('❌ Disabling notifications...');
         await unsubscribeFromPush();
+        setNotificationsEnabled(false);
+        console.log('✅ State set to false');
         toast.success('✅ Push notifications disabled');
       } else {
         // Enable notifications
+        console.log('✅ Enabling notifications...');
+        
         if (permission !== 'granted') {
+          console.log('🔐 Requesting permission...');
           const granted = await requestPermission();
           if (!granted) {
+            console.log('❌ Permission denied');
             toast.error('Please enable notifications in your browser settings');
             setIsTogglingNotifications(false);
             return;
           }
         }
         
-        // Update state FIRST for immediate visual feedback
-        setNotificationsEnabled(true);
-        
-        // Then subscribe to push in background
+        // Subscribe to push
+        console.log('📡 Subscribing to push...');
         await subscribeToPush();
+        
+        // CRITICAL: Set state and force re-render
+        setNotificationsEnabled(true);
+        console.log('✅ State set to true');
+        
+        // Force a small delay to ensure React processes the state change
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         toast.success('✅ Push notifications enabled!');
         
         // Send test notification after 1 second
@@ -124,14 +137,20 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         }, 1000);
       }
     } catch (error) {
-      console.error('Failed to toggle notifications:', error);
+      console.error('❌ Toggle error:', error);
       // Revert state on error
-      setNotificationsEnabled(!notificationsEnabled);
+      setNotificationsEnabled(prev => !prev);
       toast.error('Failed to update notification settings');
     } finally {
       setIsTogglingNotifications(false);
+      console.log('🏁 Toggle complete. Final state:', notificationsEnabled);
     }
   };
+
+  // Monitor notification state changes for debugging
+  useEffect(() => {
+    console.log('🔄 notificationsEnabled changed to:', notificationsEnabled);
+  }, [notificationsEnabled]);
 
   // HANDLE TEST NOTIFICATION
   const handleTestNotification = async () => {
