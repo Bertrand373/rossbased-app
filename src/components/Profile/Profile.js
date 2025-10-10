@@ -1,4 +1,4 @@
-// components/Profile/Profile.js - WITH BACKEND NOTIFICATION INTEGRATION
+// components/Profile/Profile.js - WITH BACKEND NOTIFICATION INTEGRATION - FIXED TOGGLE
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -80,16 +80,17 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   }, [isSupported, userData?.username, checkExistingSubscription]);
 
-  // HANDLE NOTIFICATION TOGGLE WITH BACKEND
+  // HANDLE NOTIFICATION TOGGLE WITH BACKEND - FIXED FOR PWA
   const handleNotificationToggle = async () => {
     if (isTogglingNotifications) return;
     
     setIsTogglingNotifications(true);
+    
     try {
       if (notificationsEnabled) {
-        // Disable notifications
-        await unsubscribeFromPush();
+        // Disable notifications - update state FIRST for immediate visual feedback
         setNotificationsEnabled(false);
+        await unsubscribeFromPush();
         toast.success('✅ Push notifications disabled');
       } else {
         // Enable notifications
@@ -102,9 +103,11 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           }
         }
         
-        // Subscribe to push and send to backend
-        await subscribeToPush();
+        // Update state FIRST for immediate visual feedback
         setNotificationsEnabled(true);
+        
+        // Then subscribe to push in background
+        await subscribeToPush();
         toast.success('✅ Push notifications enabled!');
         
         // Send test notification after 1 second
@@ -122,9 +125,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       }
     } catch (error) {
       console.error('Failed to toggle notifications:', error);
+      // Revert state on error
+      setNotificationsEnabled(!notificationsEnabled);
       toast.error('Failed to update notification settings');
+    } finally {
+      setIsTogglingNotifications(false);
     }
-    setIsTogglingNotifications(false);
   };
 
   // HANDLE TEST NOTIFICATION
@@ -568,7 +574,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   </div>
                 </div>
 
-                {/* PUSH NOTIFICATIONS TOGGLE WITH BACKEND - FIXED */}
+                {/* PUSH NOTIFICATIONS TOGGLE WITH BACKEND - CLEAN VERSION */}
                 {isSupported && (
                   <div className="toggle-setting">
                     <div className="toggle-info">
@@ -599,7 +605,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                     </div>
                     <div 
                       className={`toggle-switch ${notificationsEnabled ? 'active' : ''} ${isTogglingNotifications || permission === 'denied' ? 'disabled' : ''}`}
-                      onClick={permission === 'denied' || isTogglingNotifications ? undefined : handleNotificationToggle}
+                      onClick={permission === 'denied' || isTogglingNotifications ? null : handleNotificationToggle}
                     >
                       <div className="toggle-slider"></div>
                     </div>
