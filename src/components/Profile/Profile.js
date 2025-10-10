@@ -44,6 +44,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
+  const [toggleKey, setToggleKey] = useState(0); // Force re-render key
   
   // Feedback States
   const [feedbackType, setFeedbackType] = useState('general');
@@ -71,14 +72,16 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'data', label: 'Data', icon: FaDownload }
   ];
 
-  // CHECK EXISTING NOTIFICATION SUBSCRIPTION ON MOUNT
+  // CHECK EXISTING NOTIFICATION SUBSCRIPTION ON MOUNT ONLY
   useEffect(() => {
     if (isSupported && userData?.username) {
       checkExistingSubscription().then((sub) => {
+        console.log('📋 Initial subscription check:', sub);
         setNotificationsEnabled(!!sub);
       });
     }
-  }, [isSupported, userData?.username, checkExistingSubscription]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSupported, userData?.username]); // Removed checkExistingSubscription to prevent re-checking
 
   // HANDLE NOTIFICATION TOGGLE WITH BACKEND - DEBUG VERSION
   const handleNotificationToggle = async () => {
@@ -93,6 +96,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         console.log('❌ Disabling notifications...');
         await unsubscribeFromPush();
         setNotificationsEnabled(false);
+        setToggleKey(prev => prev + 1); // Force re-render
         console.log('✅ State set to false');
         toast.success('✅ Push notifications disabled');
       } else {
@@ -116,6 +120,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         
         // CRITICAL: Set state and force re-render
         setNotificationsEnabled(true);
+        setToggleKey(prev => prev + 1); // Force re-render
         console.log('✅ State set to true');
         
         // Force a small delay to ensure React processes the state change
@@ -140,6 +145,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       console.error('❌ Toggle error:', error);
       // Revert state on error
       setNotificationsEnabled(prev => !prev);
+      setToggleKey(prev => prev + 1); // Force re-render
       toast.error('Failed to update notification settings');
     } finally {
       setIsTogglingNotifications(false);
@@ -150,7 +156,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   // Monitor notification state changes for debugging
   useEffect(() => {
     console.log('🔄 notificationsEnabled changed to:', notificationsEnabled);
-  }, [notificationsEnabled]);
+    console.log('🔑 toggleKey:', toggleKey);
+  }, [notificationsEnabled, toggleKey]);
 
   // HANDLE TEST NOTIFICATION
   const handleTestNotification = async () => {
@@ -593,34 +600,17 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   </div>
                 </div>
 
-                {/* PUSH NOTIFICATIONS TOGGLE WITH BACKEND - CLEAN VERSION */}
+                {/* PUSH NOTIFICATIONS TOGGLE - SIMPLIFIED UI */}
                 {isSupported && (
-                  <div className="toggle-setting">
+                  <div className="toggle-setting" key={`notification-${toggleKey}`}>
                     <div className="toggle-info">
                       <span className="toggle-label">Push Notifications</span>
                       <span className="toggle-description">
-                        Get milestone alerts and motivational messages
+                        {permission === 'denied' 
+                          ? '⚠️ Blocked in browser settings - please enable in your device settings'
+                          : 'Get milestone alerts and motivational messages'
+                        }
                       </span>
-                      {permission === 'denied' && (
-                        <span className="toggle-description" style={{ color: '#ef4444', marginTop: '4px' }}>
-                          ⚠️ Blocked in browser settings
-                        </span>
-                      )}
-                      {!isPWA && notificationsEnabled && (
-                        <span className="toggle-description" style={{ color: '#f59e0b', marginTop: '4px' }}>
-                          💡 Add to home screen for best experience
-                        </span>
-                      )}
-                      {fcmToken && (
-                        <span className="toggle-description" style={{ color: '#22c55e', marginTop: '4px', fontSize: '0.7rem' }}>
-                          ✅ Connected to backend server
-                        </span>
-                      )}
-                      {isTogglingNotifications && (
-                        <span className="toggle-description" style={{ color: '#f59e0b', marginTop: '4px' }}>
-                          ⏳ Updating...
-                        </span>
-                      )}
                     </div>
                     <div 
                       className={`toggle-switch ${notificationsEnabled ? 'active' : ''} ${isTogglingNotifications || permission === 'denied' ? 'disabled' : ''}`}
