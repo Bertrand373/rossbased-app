@@ -5,6 +5,13 @@ const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const { format, addDays } = require('date-fns');
 
+// Import User model
+const User = require('./models/User');
+
+// Import notification modules
+const notificationRoutes = require('./routes/notifications');
+const { initializeSchedulers } = require('./services/notificationScheduler');
+
 dotenv.config();
 const app = express();
 
@@ -30,29 +37,16 @@ app.use((err, req, res, next) => {
 // MongoDB connection
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/rossbased';
 mongoose.connect(mongoUri)
-  .then(() => console.log('MongoDB connected'))
+  .then(() => {
+    console.log('MongoDB connected');
+    // Initialize notification schedulers after DB connection
+    try {
+      initializeSchedulers();
+    } catch (error) {
+      console.error('Failed to initialize schedulers:', error);
+    }
+  })
   .catch(err => console.error('MongoDB connection error:', err));
-
-// User schema
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  password: String, // In production, hash passwords
-  startDate: Date,
-  currentStreak: Number,
-  longestStreak: Number,
-  wetDreamCount: Number,
-  relapseCount: Number,
-  isPremium: Boolean,
-  badges: [{ id: Number, name: String, earned: Boolean, date: Date }],
-  benefitTracking: [{ date: Date, energy: Number, focus: Number, confidence: Number }],
-  streakHistory: [{ id: Number, start: Date, end: Date, days: Number, reason: String }],
-  urgeToolUsage: [{ date: Date, tool: String, effective: Boolean }],
-  discordUsername: String,
-  showOnLeaderboard: Boolean,
-  notes: Object
-});
-
-const User = mongoose.model('User', userSchema);
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
@@ -68,7 +62,6 @@ const authenticate = (req, res, next) => {
     return res.status(401).json({ error: 'Unauthorized - No token provided' });
   }
   
-  // Check if the authorization header is properly formatted
   const tokenParts = authHeader.split(' ');
   if (tokenParts.length !== 2 || tokenParts[0] !== 'Bearer') {
     console.log('Authorization header malformed:', authHeader);
@@ -78,7 +71,6 @@ const authenticate = (req, res, next) => {
   const token = tokenParts[1];
   
   try {
-    // Use a consistent JWT_SECRET
     const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
     console.log('Verifying token with secret:', jwtSecret.substring(0, 3) + '...');
     
@@ -88,7 +80,6 @@ const authenticate = (req, res, next) => {
     next();
   } catch (err) {
     console.error('JWT verification error:', err);
-    // Return a more descriptive error message
     return res.status(401).json({ 
       error: 'Unauthorized - Token invalid',
       details: err.message 
@@ -106,7 +97,7 @@ app.post('/api/login', async (req, res) => {
       console.log('Creating new user:', username);
       user = new User({
         username,
-        password, // In production, hash this
+        password,
         startDate: new Date(),
         currentStreak: 0,
         longestStreak: 0,
@@ -141,11 +132,10 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    // Use a consistent JWT_SECRET
     const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
     console.log('Generating token with secret:', jwtSecret.substring(0, 3) + '...');
     
-    const token = jwt.sign({ username }, jwtSecret, { expiresIn: '7d' }); // Extended expiration to 7 days
+    const token = jwt.sign({ username }, jwtSecret, { expiresIn: '7d' });
     console.log('Login successful, token generated for:', username);
     
     res.json({ token, ...user.toObject() });
@@ -172,23 +162,20 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
   }
 });
 
-// Update user data - Using PUT method
+// Update user data
 app.put('/api/user/:username', authenticate, async (req, res) => {
   console.log('Received update user request for:', req.params.username);
   console.log('Update data:', req.body);
   
   try {
-    // Check if user exists first
     const existingUser = await User.findOne({ username: req.params.username });
     if (!existingUser) {
       console.log('User not found:', req.params.username);
       return res.status(404).json({ error: 'User not found' });
     }
     
-    // Process dates if needed
     const updateData = { ...req.body };
     
-    // Update the user
     const user = await User.findOneAndUpdate(
       { username: req.params.username },
       { $set: updateData },
@@ -203,7 +190,7 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
   }
 });
 
-// Just for testing: Get all users
+// Get all users
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find({});
@@ -213,6 +200,9 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+// Mount notification routes
+app.use('/api/notifications', notificationRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

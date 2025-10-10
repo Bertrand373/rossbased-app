@@ -1,7 +1,9 @@
-// src/hooks/useNotifications.js - WITH FIREBASE INTEGRATION
+// src/hooks/useNotifications.js - WITH BACKEND INTEGRATION
 import { useState, useEffect } from 'react';
 import { messaging, getToken, onMessage } from '../config/firebase';
 import { VAPID_KEY } from '../config/firebase';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 export const useNotifications = () => {
   const [permission, setPermission] = useState('default');
@@ -80,18 +82,26 @@ export const useNotifications = () => {
       });
 
       if (token) {
-        console.log('FCM Token:', token);
-        setFcmToken(token);
+        console.log('✅ FCM Token obtained:', token);
         
-        // Save token to localStorage
+        // Save token to state and localStorage
+        setFcmToken(token);
         localStorage.setItem('fcmToken', token);
         
-        // TODO: Send token to your backend server
-        // await fetch('/api/notifications/subscribe', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ token })
-        // });
+        // Send token to backend
+        const username = localStorage.getItem('username');
+        if (username) {
+          await fetch(`${API_URL}/api/notifications/subscribe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username,
+              fcmToken: token,
+              notificationsEnabled: true
+            })
+          });
+          console.log('✅ Subscribed to backend notifications');
+        }
         
         setSubscription({ endpoint: token });
         return token;
@@ -106,17 +116,19 @@ export const useNotifications = () => {
 
   const unsubscribeFromPush = async () => {
     try {
-      if (fcmToken) {
-        // TODO: Remove token from backend
-        // await fetch('/api/notifications/unsubscribe', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ token: fcmToken })
-        // });
-        
-        localStorage.removeItem('fcmToken');
-        setFcmToken(null);
+      const username = localStorage.getItem('username');
+      
+      if (username) {
+        await fetch(`${API_URL}/api/notifications/unsubscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+        console.log('✅ Unsubscribed from backend notifications');
       }
+      
+      localStorage.removeItem('fcmToken');
+      setFcmToken(null);
       setSubscription(null);
     } catch (error) {
       console.error('Failed to unsubscribe:', error);
@@ -129,10 +141,20 @@ export const useNotifications = () => {
       if (!isSupported) return null;
       
       const savedToken = localStorage.getItem('fcmToken');
-      if (savedToken) {
-        setFcmToken(savedToken);
-        setSubscription({ endpoint: savedToken });
-        return { endpoint: savedToken };
+      const username = localStorage.getItem('username');
+      
+      if (savedToken && username) {
+        // Check with backend if subscription is still active
+        const response = await fetch(`${API_URL}/api/notifications/preferences/${username}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.subscription && data.subscription.notificationsEnabled) {
+            setFcmToken(savedToken);
+            setSubscription({ endpoint: savedToken });
+            return { endpoint: savedToken };
+          }
+        }
       }
       
       return null;
