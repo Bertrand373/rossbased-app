@@ -3,6 +3,7 @@
 
 const admin = require('firebase-admin');
 const NotificationSubscription = require('../models/NotificationSubscription');
+const User = require('../models/User');
 
 // Initialize Firebase Admin SDK
 let firebaseInitialized = false;
@@ -42,7 +43,73 @@ function initializeFirebase() {
 // Initialize on module load
 initializeFirebase();
 
-// Check if user is in quiet hours
+// NEW: Check if user preferences allow this notification
+async function shouldSendNotification(username, notificationType) {
+  try {
+    // Fetch user's notification preferences from User model
+    const user = await User.findOne({ username });
+    
+    if (!user) {
+      console.log(`❌ User not found: ${username}`);
+      return false;
+    }
+    
+    const prefs = user.notificationPreferences;
+    
+    // If no preferences set, allow all notifications (default behavior)
+    if (!prefs) {
+      return true;
+    }
+    
+    // Check if this notification type is enabled
+    const typeCategory = notificationType.split('_')[0]; // e.g., 'milestone', 'urge', 'weekly'
+    
+    // Map notification types to preference keys
+    const typeMapping = {
+      'milestone': 'milestones',
+      'urge': 'urgeSupport',
+      'weekly': 'weeklyProgress',
+      'encouragement': 'weeklyProgress', // Use weekly progress for general encouragement
+      'streak': 'milestones' // Streak reminders use milestone setting
+    };
+    
+    const prefKey = typeMapping[typeCategory];
+    
+    if (prefKey && prefs.types && prefs.types[prefKey] === false) {
+      console.log(`⏸️ ${notificationType} notifications disabled for ${username}`);
+      return false;
+    }
+    
+    // Check quiet hours
+    if (prefs.quietHoursEnabled) {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      
+      const [startH, startM] = prefs.quietHoursStart.split(':').map(Number);
+      const [endH, endM] = prefs.quietHoursEnd.split(':').map(Number);
+      
+      const quietStart = startH * 60 + startM;
+      const quietEnd = endH * 60 + endM;
+      
+      // Handle overnight quiet hours (e.g., 22:00 to 08:00)
+      const isQuietTime = quietStart > quietEnd
+        ? (currentMinutes >= quietStart || currentMinutes < quietEnd)
+        : (currentMinutes >= quietStart && currentMinutes < quietEnd);
+      
+      if (isQuietTime) {
+        console.log(`🌙 Quiet hours active for ${username} - notification postponed`);
+        return false;
+      }
+    }
+    
+    return true; // All checks passed
+  } catch (error) {
+    console.error('Error checking notification preferences:', error);
+    return true; // Default to allowing notification on error
+  }
+}
+
+// Check if user is in quiet hours (legacy function for NotificationSubscription model)
 function isInQuietHours(subscription) {
   if (!subscription.quietHours.enabled) return false;
   
@@ -176,9 +243,17 @@ async function sendNotification(fcmToken, notificationType, customData = {}) {
   }
 }
 
-// Send notification to a user (looks up their subscriptions)
+// Send notification to a user (looks up their subscriptions and checks preferences)
 async function sendNotificationToUser(username, notificationType, customData = {}) {
   try {
+    // NEW: Check user preferences first
+    const shouldSend = await shouldSendNotification(username, notificationType);
+    
+    if (!shouldSend) {
+      console.log(`⏸️ Skipping ${notificationType} notification for ${username} (user preferences)`);
+      return { success: false, reason: 'blocked_by_preferences' };
+    }
+    
     // Find user's active subscriptions
     const subscriptions = await NotificationSubscription.find({
       username: username,
@@ -193,16 +268,16 @@ async function sendNotificationToUser(username, notificationType, customData = {
     const results = [];
     
     for (const subscription of subscriptions) {
-      // Check if user is in quiet hours
+      // Legacy check for NotificationSubscription model quiet hours
       if (isInQuietHours(subscription)) {
-        console.log(`User ${username} is in quiet hours, skipping notification`);
+        console.log(`User ${username} is in quiet hours (subscription model), skipping notification`);
         continue;
       }
 
-      // Check if notification type is enabled
-      const notificationCategory = notificationType.split('_')[0]; // e.g., 'milestone', 'urge', 'encouragement'
+      // Legacy check for NotificationSubscription preferences
+      const notificationCategory = notificationType.split('_')[0];
       if (!subscription.preferences[notificationCategory]) {
-        console.log(`User ${username} has disabled ${notificationCategory} notifications`);
+        console.log(`User ${username} has disabled ${notificationCategory} notifications (subscription model)`);
         continue;
       }
 
@@ -230,7 +305,11 @@ async function sendBulkNotifications(notificationType, customData = {}) {
     const results = [];
     
     for (const subscription of subscriptions) {
-      // Check quiet hours and preferences
+      // NEW: Check user preferences
+      const shouldSend = await shouldSendNotification(subscription.username, notificationType);
+      if (!shouldSend) continue;
+      
+      // Check quiet hours and preferences (legacy)
       if (isInQuietHours(subscription)) continue;
       
       const notificationCategory = notificationType.split('_')[0];
@@ -262,5 +341,6 @@ module.exports = {
   sendNotification,
   sendNotificationToUser,
   sendBulkNotifications,
-  notificationTemplates
+  notificationTemplates,
+  shouldSendNotification
 };

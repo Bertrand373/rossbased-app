@@ -16,7 +16,24 @@ const userSchema = new mongoose.Schema({
   urgeToolUsage: [{ date: Date, tool: String, effective: Boolean }],
   discordUsername: String,
   showOnLeaderboard: Boolean,
-  notes: Object
+  notes: Object,
+  
+  // NEW: Notification preferences field
+  notificationPreferences: {
+    type: Object,
+    default: {
+      quietHoursEnabled: false,
+      quietHoursStart: '22:00',
+      quietHoursEnd: '08:00',
+      types: {
+        milestones: true,
+        urgeSupport: true,
+        weeklyProgress: true
+      },
+      dailyReminderEnabled: false,
+      dailyReminderTime: '09:00'
+    }
+  }
 });
 
 const User = mongoose.model('User', userSchema);

@@ -1,4 +1,4 @@
-// components/Profile/Profile.js - WITH BACKEND NOTIFICATION INTEGRATION - FIXED TOGGLE
+// components/Profile/Profile.js - WITH NOTIFICATION PREFERENCES UI
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -10,6 +10,8 @@ import { FaUser, FaEdit, FaCrown, FaDiscord, FaCog, FaCommentAlt, FaBug,
   FaLightbulb, FaStar, FaPaperPlane, FaTimes, FaCheckCircle, 
   FaTrash, FaDownload, FaSignOutAlt, FaCreditCard, 
   FaBell, FaGlobe, FaLock, FaClock } from 'react-icons/fa';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('account');
@@ -44,7 +46,19 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
-  const [toggleKey, setToggleKey] = useState(0); // Force re-render key
+  const [toggleKey, setToggleKey] = useState(0);
+  
+  // NEW: Notification Preferences States
+  const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
+  const [quietHoursStart, setQuietHoursStart] = useState('22:00');
+  const [quietHoursEnd, setQuietHoursEnd] = useState('08:00');
+  const [notifTypes, setNotifTypes] = useState({
+    milestones: true,
+    urgeSupport: true,
+    weeklyProgress: true
+  });
+  const [dailyReminderEnabled, setDailyReminderEnabled] = useState(false);
+  const [dailyReminderTime, setDailyReminderTime] = useState('09:00');
   
   // Feedback States
   const [feedbackType, setFeedbackType] = useState('general');
@@ -72,7 +86,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'data', label: 'Data', icon: FaDownload }
   ];
 
-  // CHECK EXISTING NOTIFICATION SUBSCRIPTION ON MOUNT ONLY
+  // CHECK EXISTING NOTIFICATION SUBSCRIPTION ON MOUNT
   useEffect(() => {
     if (isSupported && userData?.username) {
       checkExistingSubscription().then((sub) => {
@@ -81,9 +95,82 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSupported, userData?.username]); // Removed checkExistingSubscription to prevent re-checking
+  }, [isSupported, userData?.username]);
 
-  // HANDLE NOTIFICATION TOGGLE WITH BACKEND - DEBUG VERSION
+  // NEW: Load notification preferences when notifications are enabled
+  useEffect(() => {
+    if (notificationsEnabled && userData?.username) {
+      loadNotificationPreferences();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notificationsEnabled, userData?.username]);
+
+  // NEW: Load notification preferences from API
+  const loadNotificationPreferences = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`);
+      if (response.ok) {
+        const prefs = await response.json();
+        setQuietHoursEnabled(prefs.quietHoursEnabled || false);
+        setQuietHoursStart(prefs.quietHoursStart || '22:00');
+        setQuietHoursEnd(prefs.quietHoursEnd || '08:00');
+        setNotifTypes(prefs.types || { milestones: true, urgeSupport: true, weeklyProgress: true });
+        setDailyReminderEnabled(prefs.dailyReminderEnabled || false);
+        setDailyReminderTime(prefs.dailyReminderTime || '09:00');
+        console.log('✅ Loaded notification preferences:', prefs);
+      }
+    } catch (error) {
+      console.error('Failed to load notification preferences:', error);
+    }
+  };
+
+  // NEW: Update notification type
+  const updateNotifType = (type) => {
+    setNotifTypes(prev => ({
+      ...prev,
+      [type]: !prev[type]
+    }));
+  };
+
+  // NEW: Save notification preferences
+  const handleSaveNotificationPreferences = async () => {
+    const preferences = {
+      quietHoursEnabled,
+      quietHoursStart,
+      quietHoursEnd,
+      types: notifTypes,
+      dailyReminderEnabled,
+      dailyReminderTime,
+      fcmToken
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(preferences)
+      });
+
+      if (response.ok) {
+        localStorage.setItem(
+          `notificationPrefs_${userData.username}`,
+          JSON.stringify(preferences)
+        );
+        toast.success('✅ Notification preferences saved!');
+      } else {
+        throw new Error('Failed to save preferences');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      localStorage.setItem(
+        `notificationPrefs_${userData.username}`,
+        JSON.stringify(preferences)
+      );
+      toast.success('✅ Preferences saved locally');
+    }
+  };
+
+  // HANDLE NOTIFICATION TOGGLE WITH BACKEND
   const handleNotificationToggle = async () => {
     if (isTogglingNotifications) return;
     
@@ -92,43 +179,26 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     
     try {
       if (notificationsEnabled) {
-        // Disable notifications
-        console.log('❌ Disabling notifications...');
         await unsubscribeFromPush();
         setNotificationsEnabled(false);
-        setToggleKey(prev => prev + 1); // Force re-render
-        console.log('✅ State set to false');
+        setToggleKey(prev => prev + 1);
         toast.success('✅ Push notifications disabled');
       } else {
-        // Enable notifications
-        console.log('✅ Enabling notifications...');
-        
         if (permission !== 'granted') {
-          console.log('🔐 Requesting permission...');
           const granted = await requestPermission();
           if (!granted) {
-            console.log('❌ Permission denied');
             toast.error('Please enable notifications in your browser settings');
             setIsTogglingNotifications(false);
             return;
           }
         }
         
-        // Subscribe to push
-        console.log('📡 Subscribing to push...');
         await subscribeToPush();
-        
-        // CRITICAL: Set state and force re-render
         setNotificationsEnabled(true);
-        setToggleKey(prev => prev + 1); // Force re-render
-        console.log('✅ State set to true');
-        
-        // Force a small delay to ensure React processes the state change
+        setToggleKey(prev => prev + 1);
         await new Promise(resolve => setTimeout(resolve, 100));
-        
         toast.success('✅ Push notifications enabled!');
         
-        // Send test notification after 1 second
         setTimeout(async () => {
           try {
             await sendLocalNotification('🎉 Notifications Activated!', {
@@ -143,21 +213,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       }
     } catch (error) {
       console.error('❌ Toggle error:', error);
-      // Revert state on error
       setNotificationsEnabled(prev => !prev);
-      setToggleKey(prev => prev + 1); // Force re-render
+      setToggleKey(prev => prev + 1);
       toast.error('Failed to update notification settings');
     } finally {
       setIsTogglingNotifications(false);
-      console.log('🏁 Toggle complete. Final state:', notificationsEnabled);
     }
   };
-
-  // Monitor notification state changes for debugging
-  useEffect(() => {
-    console.log('🔄 notificationsEnabled changed to:', notificationsEnabled);
-    console.log('🔑 toggleKey:', toggleKey);
-  }, [notificationsEnabled, toggleKey]);
 
   // HANDLE TEST NOTIFICATION
   const handleTestNotification = async () => {
@@ -399,9 +461,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     onLogout();
   };
 
-  // CHECK IF PWA IS INSTALLED
-  const isPWA = window.matchMedia('(display-mode: standalone)').matches;
-
   return (
     <div className="profile-container">
       <div className="integrated-profile-header">
@@ -600,7 +659,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   </div>
                 </div>
 
-                {/* PUSH NOTIFICATIONS TOGGLE - SIMPLIFIED UI */}
+                {/* PUSH NOTIFICATIONS TOGGLE */}
                 {isSupported && (
                   <div className="toggle-setting" key={`notification-${toggleKey}`}>
                     <div className="toggle-info">
@@ -619,6 +678,141 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                       <div className="toggle-slider"></div>
                     </div>
                   </div>
+                )}
+
+                {/* NEW: NOTIFICATION PREFERENCES - Only show when notifications enabled */}
+                {isSupported && notificationsEnabled && (
+                  <>
+                    <div className="privacy-group">
+                      <h4>Notification Preferences</h4>
+                      
+                      {/* Quiet Hours Toggle */}
+                      <div className="toggle-setting">
+                        <div className="toggle-info">
+                          <span className="toggle-label">Quiet Hours</span>
+                          <span className="toggle-description">
+                            Don't send notifications during sleep hours
+                          </span>
+                        </div>
+                        <div 
+                          className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
+                          onClick={() => setQuietHoursEnabled(!quietHoursEnabled)}
+                        >
+                          <div className="toggle-slider"></div>
+                        </div>
+                      </div>
+
+                      {/* Time Pickers - only show when quiet hours enabled */}
+                      {quietHoursEnabled && (
+                        <div className="select-setting">
+                          <label>Sleep Schedule</label>
+                          <div style={{ 
+                            display: 'flex', 
+                            gap: 'var(--spacing-md)', 
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <input
+                              type="time"
+                              value={quietHoursStart}
+                              onChange={(e) => setQuietHoursStart(e.target.value)}
+                            />
+                            <span style={{ color: 'var(--text-secondary)' }}>to</span>
+                            <input
+                              type="time"
+                              value={quietHoursEnd}
+                              onChange={(e) => setQuietHoursEnd(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Notification Types */}
+                      <div className="toggle-setting">
+                        <div className="toggle-info">
+                          <span className="toggle-label">Milestone Alerts</span>
+                          <span className="toggle-description">
+                            Celebrate major milestones (Day 7, 30, 90, 100, etc.)
+                          </span>
+                        </div>
+                        <div 
+                          className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
+                          onClick={() => updateNotifType('milestones')}
+                        >
+                          <div className="toggle-slider"></div>
+                        </div>
+                      </div>
+
+                      <div className="toggle-setting">
+                        <div className="toggle-info">
+                          <span className="toggle-label">Urge Support</span>
+                          <span className="toggle-description">
+                            Get encouragement when you log urges
+                          </span>
+                        </div>
+                        <div 
+                          className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
+                          onClick={() => updateNotifType('urgeSupport')}
+                        >
+                          <div className="toggle-slider"></div>
+                        </div>
+                      </div>
+
+                      <div className="toggle-setting">
+                        <div className="toggle-info">
+                          <span className="toggle-label">Weekly Progress</span>
+                          <span className="toggle-description">
+                            Sunday summary of your achievements
+                          </span>
+                        </div>
+                        <div 
+                          className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
+                          onClick={() => updateNotifType('weeklyProgress')}
+                        >
+                          <div className="toggle-slider"></div>
+                        </div>
+                      </div>
+
+                      <div className="toggle-setting">
+                        <div className="toggle-info">
+                          <span className="toggle-label">Daily Check-In</span>
+                          <span className="toggle-description">
+                            Optional daily reminder at a time you choose
+                          </span>
+                        </div>
+                        <div 
+                          className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
+                          onClick={() => setDailyReminderEnabled(!dailyReminderEnabled)}
+                        >
+                          <div className="toggle-slider"></div>
+                        </div>
+                      </div>
+
+                      {/* Daily reminder time picker */}
+                      {dailyReminderEnabled && (
+                        <div className="select-setting">
+                          <label>Daily Reminder Time</label>
+                          <input
+                            type="time"
+                            value={dailyReminderTime}
+                            onChange={(e) => setDailyReminderTime(e.target.value)}
+                            style={{ width: '100%' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Save Button */}
+                    <div className="privacy-actions">
+                      <button 
+                        className="action-btn" 
+                        onClick={handleSaveNotificationPreferences}
+                      >
+                        <FaCheckCircle />
+                        Save Notification Preferences
+                      </button>
+                    </div>
+                  </>
                 )}
 
                 {/* TEST NOTIFICATION BUTTON */}

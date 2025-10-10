@@ -4,6 +4,7 @@
 const express = require('express');
 const router = express.Router();
 const NotificationSubscription = require('../models/NotificationSubscription');
+const User = require('../models/User');
 const { 
   sendNotificationToUser, 
   sendBulkNotifications,
@@ -96,83 +97,95 @@ router.post('/unsubscribe', async (req, res) => {
   }
 });
 
-// Update notification preferences
-router.put('/preferences', async (req, res) => {
-  try {
-    const { 
-      username, 
-      notificationTypes, 
-      reminderTime, 
-      quietHours 
-    } = req.body;
-    
-    if (!username) {
-      return res.status(400).json({ error: 'Username is required' });
-    }
-    
-    const subscription = await NotificationSubscription.findOne({ username });
-    
-    if (!subscription) {
-      return res.status(404).json({ error: 'Subscription not found' });
-    }
-    
-    // Update preferences
-    if (notificationTypes) {
-      subscription.notificationTypes = {
-        ...subscription.notificationTypes,
-        ...notificationTypes
-      };
-    }
-    
-    if (reminderTime) {
-      subscription.reminderTime = reminderTime;
-    }
-    
-    if (quietHours) {
-      subscription.quietHours = {
-        ...subscription.quietHours,
-        ...quietHours
-      };
-    }
-    
-    await subscription.save();
-    
-    console.log(`✅ Updated notification preferences for: ${username}`);
-    res.json({ 
-      success: true, 
-      message: 'Preferences updated successfully',
-      subscription 
-    });
-    
-  } catch (error) {
-    console.error('❌ Error updating notification preferences:', error);
-    res.status(500).json({ 
-      error: 'Failed to update preferences',
-      details: error.message 
-    });
-  }
-});
-
-// Get user's notification preferences
+// UPDATED: Get user's notification preferences from User model
 router.get('/preferences/:username', async (req, res) => {
   try {
     const { username } = req.params;
     
-    const subscription = await NotificationSubscription.findOne({ username });
+    // Get preferences from User model instead of NotificationSubscription
+    const user = await User.findOne({ username });
     
-    if (!subscription) {
-      return res.status(404).json({ error: 'Subscription not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
+    
+    // Also get subscription info for backward compatibility
+    const subscription = await NotificationSubscription.findOne({ username });
     
     res.json({ 
       success: true, 
-      subscription 
+      preferences: user.notificationPreferences || {
+        quietHoursEnabled: false,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00',
+        types: {
+          milestones: true,
+          urgeSupport: true,
+          weeklyProgress: true
+        },
+        dailyReminderEnabled: false,
+        dailyReminderTime: '09:00'
+      },
+      subscription: subscription || null
     });
     
   } catch (error) {
     console.error('❌ Error fetching notification preferences:', error);
     res.status(500).json({ 
       error: 'Failed to fetch preferences',
+      details: error.message 
+    });
+  }
+});
+
+// UPDATED: Update notification preferences in User model
+router.put('/preferences', async (req, res) => {
+  try {
+    const { 
+      username, 
+      quietHoursEnabled,
+      quietHoursStart,
+      quietHoursEnd,
+      types,
+      dailyReminderEnabled,
+      dailyReminderTime
+    } = req.body;
+    
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+    
+    // Update preferences in User model
+    const user = await User.findOne({ username });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Build preferences object
+    const preferences = {
+      quietHoursEnabled: quietHoursEnabled || false,
+      quietHoursStart: quietHoursStart || '22:00',
+      quietHoursEnd: quietHoursEnd || '08:00',
+      types: types || { milestones: true, urgeSupport: true, weeklyProgress: true },
+      dailyReminderEnabled: dailyReminderEnabled || false,
+      dailyReminderTime: dailyReminderTime || '09:00'
+    };
+    
+    user.notificationPreferences = preferences;
+    await user.save();
+    
+    console.log(`✅ Updated notification preferences for: ${username}`);
+    res.json({ 
+      success: true, 
+      message: 'Preferences updated successfully',
+      preferences: user.notificationPreferences
+    });
+    
+  } catch (error) {
+    console.error('❌ Error updating notification preferences:', error);
+    res.status(500).json({ 
+      error: 'Failed to update preferences',
       details: error.message 
     });
   }

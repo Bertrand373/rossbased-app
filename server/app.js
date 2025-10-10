@@ -124,7 +124,20 @@ app.post('/api/login', async (req, res) => {
         urgeToolUsage: [],
         discordUsername: '',
         showOnLeaderboard: false,
-        notes: {}
+        notes: {},
+        // Initialize notification preferences for new users
+        notificationPreferences: {
+          quietHoursEnabled: false,
+          quietHoursStart: '22:00',
+          quietHoursEnd: '08:00',
+          types: {
+            milestones: true,
+            urgeSupport: true,
+            weeklyProgress: true
+          },
+          dailyReminderEnabled: false,
+          dailyReminderTime: '09:00'
+        }
       });
       await user.save();
       console.log('User created:', username);
@@ -198,6 +211,67 @@ app.get('/api/users', async (req, res) => {
   } catch (err) {
     console.error('Get users error:', err);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// NEW: Get notification preferences
+app.get('/api/notification-preferences/:username', async (req, res) => {
+  const { username } = req.params;
+  
+  try {
+    const user = await User.findOne({ username });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Return preferences or defaults
+    const prefs = user.notificationPreferences || {
+      quietHoursEnabled: false,
+      quietHoursStart: '22:00',
+      quietHoursEnd: '08:00',
+      types: {
+        milestones: true,
+        urgeSupport: true,
+        weeklyProgress: true
+      },
+      dailyReminderEnabled: false,
+      dailyReminderTime: '09:00'
+    };
+    
+    console.log('✅ Fetched notification preferences for:', username);
+    res.json(prefs);
+  } catch (err) {
+    console.error('❌ Error fetching notification preferences:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// NEW: Save/Update notification preferences
+app.post('/api/notification-preferences/:username', async (req, res) => {
+  const { username } = req.params;
+  const preferences = req.body;
+  
+  try {
+    const user = await User.findOneAndUpdate(
+      { username },
+      { $set: { notificationPreferences: preferences } },
+      { new: true }
+    );
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    console.log('✅ Updated notification preferences for:', username);
+    res.json({ 
+      success: true, 
+      message: 'Preferences saved successfully',
+      preferences: user.notificationPreferences
+    });
+  } catch (err) {
+    console.error('❌ Failed to save preferences:', err);
+    res.status(500).json({ error: 'Failed to save preferences' });
   }
 });
 

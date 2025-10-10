@@ -597,6 +597,23 @@
   margin-bottom: var(--spacing-sm);
 }
 
+/* NEW: Time input styling for notification preferences */
+.select-setting input[type="time"] {
+  padding: var(--spacing-md);
+  background-color: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.select-setting input[type="time"]:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
 /* Subscription Section */
 .current-plan-card {
   background-color: var(--card-background);
@@ -1325,6 +1342,12 @@
   .toggle-setting {
     flex-direction: column;
     gap: var(--spacing-md);
+    text-align: center;
+  }
+  
+  /* NEW: Mobile time picker styling */
+  .select-setting input[type="time"] {
+    width: 100%;
     text-align: center;
   }
   
