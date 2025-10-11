@@ -494,6 +494,13 @@
   border: 1px solid var(--border);
 }
 
+/* When toggle-setting contains time picker, center everything */
+.toggle-setting:has(.time-picker-wrapper) {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 .toggle-info {
   display: flex;
   flex-direction: column;
@@ -582,36 +589,46 @@
   pointer-events: none !important;
 }
 
-/* NEW: Time picker wrapper and inputs - SIMPLE AND CLEAN */
+/* NEW: Time picker wrapper and inputs - CLEAN AND PROPERLY SPACED */
 .time-picker-wrapper {
   display: flex;
   gap: var(--spacing-md);
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   flex-wrap: wrap;
-  margin-top: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
 }
 
 .time-input {
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--background);
+  padding: var(--spacing-md);
+  background-color: var(--card-background);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--text);
   font-size: 0.875rem;
   font-family: inherit;
-  width: 130px;
+  width: 140px;
+  text-align: center;
+  transition: all 0.2s ease;
 }
 
 .time-input:focus {
   outline: none;
   border-color: var(--primary);
+  background-color: var(--card-background);
+}
+
+.time-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .time-separator {
-  color: var(--text-secondary);
-  font-weight: 500;
+  color: var(--text);
+  font-weight: 600;
   font-size: 0.875rem;
+  padding: 0 var(--spacing-xs);
 }
 
 .select-setting {
@@ -1432,26 +1449,21 @@
     text-align: center;
   }
   
-  /* NEW: Mobile time picker styling */
-  .time-picker-container .toggle-info {
-    align-items: center;
-    text-align: center;
-  }
-  
-  .time-picker-inputs {
+  /* NEW: Mobile time picker styling - clean and centered */
+  .time-picker-wrapper {
     flex-direction: column;
+    align-items: center;
     gap: var(--spacing-sm);
-    width: 100%;
   }
   
-  .time-picker-inputs input[type="time"] {
+  .time-input {
     width: 100%;
-    max-width: 200px;
-    text-align: center;
+    max-width: 220px;
   }
   
   .time-separator {
-    display: none;
+    display: block;
+    margin: var(--spacing-xs) 0;
   }
   
   .select-setting input[type="time"] {
