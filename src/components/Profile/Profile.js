@@ -726,20 +726,22 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
                       {/* Time Pickers - only show when quiet hours enabled */}
                       {quietHoursEnabled && (
-                        <div className="time-picker-setting">
-                          <label>Sleep Schedule</label>
-                          <div className="time-picker-inputs">
-                            <input
-                              type="time"
-                              value={quietHoursStart}
-                              onChange={(e) => setQuietHoursStart(e.target.value)}
-                            />
-                            <span className="time-separator">to</span>
-                            <input
-                              type="time"
-                              value={quietHoursEnd}
-                              onChange={(e) => setQuietHoursEnd(e.target.value)}
-                            />
+                        <div className="toggle-setting time-picker-container">
+                          <div className="toggle-info">
+                            <span className="toggle-label">Sleep Schedule</span>
+                            <div className="time-picker-inputs">
+                              <input
+                                type="time"
+                                value={quietHoursStart}
+                                onChange={(e) => setQuietHoursStart(e.target.value)}
+                              />
+                              <span className="time-separator">to</span>
+                              <input
+                                type="time"
+                                value={quietHoursEnd}
+                                onChange={(e) => setQuietHoursEnd(e.target.value)}
+                              />
+                            </div>
                           </div>
                         </div>
                       )}
