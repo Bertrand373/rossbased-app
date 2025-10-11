@@ -726,18 +726,20 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
                       {/* Time Pickers - only show when quiet hours enabled */}
                       {quietHoursEnabled && (
-                        <div className="toggle-setting time-picker-container">
-                          <div className="toggle-info">
+                        <div className="toggle-setting">
+                          <div className="toggle-info" style={{ width: '100%' }}>
                             <span className="toggle-label">Sleep Schedule</span>
-                            <div className="time-picker-inputs">
+                            <div className="time-picker-wrapper">
                               <input
                                 type="time"
+                                className="time-input"
                                 value={quietHoursStart}
                                 onChange={(e) => setQuietHoursStart(e.target.value)}
                               />
                               <span className="time-separator">to</span>
                               <input
                                 type="time"
+                                className="time-input"
                                 value={quietHoursEnd}
                                 onChange={(e) => setQuietHoursEnd(e.target.value)}
                               />
@@ -809,14 +811,16 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
                       {/* Daily reminder time picker */}
                       {dailyReminderEnabled && (
-                        <div className="time-picker-setting">
-                          <label>Daily Reminder Time</label>
-                          <div className="time-picker-inputs">
-                            <input
-                              type="time"
-                              value={dailyReminderTime}
-                              onChange={(e) => setDailyReminderTime(e.target.value)}
-                            />
+                        <div className="toggle-setting time-picker-container">
+                          <div className="toggle-info">
+                            <span className="toggle-label">Daily Reminder Time</span>
+                            <div className="time-picker-inputs">
+                              <input
+                                type="time"
+                                value={dailyReminderTime}
+                                onChange={(e) => setDailyReminderTime(e.target.value)}
+                              />
+                            </div>
                           </div>
                         </div>
                       )}
