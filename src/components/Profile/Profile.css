@@ -582,13 +582,13 @@
   pointer-events: none !important;
 }
 
-/* NEW: Time picker setting container */
+/* NEW: Time picker setting container - FIXED spacing */
 .time-picker-setting {
   background-color: var(--card-background);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   border: 1px solid var(--border);
-  margin-top: var(--spacing-md);
+  /* Remove margin-top - let parent handle spacing */
 }
 
 .time-picker-setting label {
@@ -610,7 +610,7 @@
 
 .time-picker-inputs input[type="time"] {
   padding: var(--spacing-md);
-  background-color: var(--card-background);
+  background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--text);
@@ -619,6 +619,7 @@
   font-family: inherit;
   min-width: 120px;
   max-width: 150px;
+  flex: 0 1 auto;
 }
 
 .time-picker-inputs input[type="time"]:focus {
@@ -630,6 +631,7 @@
   color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.875rem;
+  flex-shrink: 0;
 }
 
 .select-setting {
@@ -824,6 +826,31 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
+}
+
+/* FIXED: Privacy section header styling - matching Account section */
+.privacy-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.privacy-section .section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+  gap: var(--spacing-md);
+}
+
+.privacy-section .section-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.privacy-section .section-header .edit-profile-btn {
+  align-self: center;
 }
 
 .privacy-section h3,
@@ -1024,11 +1051,42 @@
   transform: translateY(-1px) !important;
 }
 
+/* UPDATED: Privacy settings save button - grey with yellow hover */
+.privacy-actions .save-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.privacy-actions .save-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
 .form-actions {
   display: flex;
   gap: var(--spacing-md);
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: var(--spacing-lg);
+}
+
+/* UPDATED: Privacy actions styling - centered with proper spacing */
+.privacy-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  margin-top: var(--spacing-xl);
 }
 
 /* Feedback Modal */
