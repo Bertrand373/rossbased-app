@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 
-const CACHE_NAME = 'titantrack-v1';
+const CACHE_NAME = 'titantrack-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -8,7 +8,11 @@ const urlsToCache = [
   '/static/js/main.js',
   '/helmet.png',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  '/apple-touch-icon.png',  // ADDED: iOS PWA icon
+  '/favicon.ico',
+  '/favicon-16x16.png',
+  '/favicon-32x32.png'
 ];
 
 // Install event - cache essential files
@@ -47,6 +51,21 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  // IMPORTANT: Let icon requests pass through directly
+  if (event.request.url.includes('apple-touch-icon') || 
+      event.request.url.includes('favicon') ||
+      event.request.url.includes('.png') ||
+      event.request.url.includes('.ico')) {
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => {
+          return response || fetch(event.request);
+        })
+        .catch(() => fetch(event.request))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
