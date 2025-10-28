@@ -7,6 +7,7 @@
   "background_color": "#0f0f0f",
   "theme_color": "#0f0f0f",
   "orientation": "portrait-primary",
+  "scope": "/",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -22,5 +23,20 @@
     }
   ],
   "categories": ["health", "lifestyle", "productivity"],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "display_override": ["standalone", "fullscreen"],
+  "shortcuts": [
+    {
+      "name": "Track Progress",
+      "short_name": "Track",
+      "description": "Quick access to tracker dashboard",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }

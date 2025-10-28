@@ -1,4 +1,6 @@
-/* components/Navigation/MobileNavigation.css - UPDATED: Yellow main navigation background */
+/* components/Navigation/MobileNavigation.css - UPDATED: Sticky nav with iOS safe area support */
+
+/* CRITICAL: Mobile navigation with sticky positioning and safe area padding */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
@@ -7,17 +9,22 @@
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   display: flex;
   justify-content: center;
+  /* CRITICAL: Add safe area padding to the bottom for iOS home indicator */
   padding: var(--spacing-sm) var(--spacing-md);
+  padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom, 0px));
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   border-top: 1px solid var(--border);
+  /* CRITICAL: Ensure nav stays visible when scrolling */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 /* Container layout with sliding animation support */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
-  padding: var(--spacing-sm); /* INCREASED from var(--spacing-xs) for more breathing room */
+  padding: var(--spacing-sm);
   background-color: var(--card-background);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
@@ -36,13 +43,12 @@
   display: none;
 }
 
-/* UPDATED: Mobile navigation slider with YELLOW background instead of subtle yellow */
+/* Mobile navigation slider with YELLOW background */
 .mobile-nav-slider {
   position: absolute;
-  top: var(--spacing-sm); /* MATCHED container padding */
-  left: var(--spacing-sm); /* MATCHED container padding */
-  height: calc(100% - calc(var(--spacing-sm) * 2)); /* MATCHED container padding */
-  /* CHANGED: Full yellow background like desktop */
+  top: var(--spacing-sm);
+  left: var(--spacing-sm);
+  height: calc(100% - calc(var(--spacing-sm) * 2));
   background-color: var(--primary);
   border: 1px solid var(--primary);
   border-radius: var(--radius-full);
@@ -101,9 +107,8 @@
   }
 }
 
-/* UPDATED: Active mobile nav styling with BLACK text to contrast with yellow background */
+/* Active mobile nav styling with BLACK text to contrast with yellow background */
 .mobile-nav-item.active {
-  /* CHANGED: Black text instead of yellow to contrast with yellow slider */
   color: #000000 !important;
   font-weight: 600 !important;
   background-color: transparent !important;
@@ -126,10 +131,11 @@
   display: block;
 }
 
-/* Add padding to the bottom of the app content to account for mobile navigation */
+/* CRITICAL: Add padding to the bottom of the app content to account for mobile navigation + safe area */
 @media (max-width: 768px) {
   .app-content {
-    padding-bottom: 90px;
+    /* 90px for nav + safe area bottom inset */
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
@@ -137,19 +143,21 @@
 @media (max-width: 480px) {
   .mobile-navigation {
     padding: var(--spacing-xs) var(--spacing-sm);
+    /* CRITICAL: Maintain safe area padding on small screens */
+    padding-bottom: calc(var(--spacing-xs) + env(safe-area-inset-bottom, 0px));
   }
   
   .mobile-nav-container {
     max-width: 100%;
     gap: 2px;
-    padding: 6px; /* KEPT: Slightly smaller but still has breathing room */
+    padding: 6px;
   }
   
-  /* FIXED: Slider positioning for very small screens with breathing room */
+  /* Slider positioning for very small screens */
   .mobile-nav-slider {
-    top: 6px; /* MATCHED container padding */
-    left: 6px; /* MATCHED container padding */
-    height: calc(100% - 12px); /* MATCHED container padding */
+    top: 6px;
+    left: 6px;
+    height: calc(100% - 12px);
   }
   
   .mobile-nav-item {
@@ -161,5 +169,46 @@
   .mobile-nav-icon {
     font-size: 1.2rem;
     margin-bottom: 2px;
+  }
+}
+
+/* CRITICAL: iPhone X and newer devices with notch/home indicator */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .mobile-navigation {
+    /* Ensure the gradient extends fully to the bottom edge */
+    padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom));
+  }
+  
+  @media (max-width: 480px) {
+    .mobile-navigation {
+      padding-bottom: calc(var(--spacing-xs) + env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* CRITICAL: Landscape orientation adjustments for safe areas */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-navigation {
+    /* Add safe area padding to left and right in landscape */
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
+  }
+  
+  .mobile-nav-container {
+    max-width: 600px;
+  }
+}
+
+/* CRITICAL: Ensure navigation doesn't interfere with content scrolling */
+body {
+  /* Reserve space at bottom for mobile nav */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* CRITICAL: Fix for iOS Safari's bottom bar behavior */
+@supports (-webkit-touch-callout: none) {
+  .mobile-navigation {
+    /* iOS-specific fix for Safari's bottom bar */
+    padding-bottom: calc(var(--spacing-sm) + max(env(safe-area-inset-bottom), 0px));
   }
 }
