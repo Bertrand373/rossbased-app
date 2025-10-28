@@ -1,4 +1,4 @@
-/* components/Navigation/MobileNavigation.css - MINIMAL FIX: Subtle safe area support */
+/* components/Navigation/MobileNavigation.css - UPDATED: Tighter safe area spacing */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
@@ -8,8 +8,8 @@
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
-  /* MINIMAL FIX: Add small safe area offset - max 8px extra on iPhone with home indicator */
-  padding-bottom: calc(var(--spacing-sm) + max(env(safe-area-inset-bottom, 0px), 0px));
+  /* TIGHTER FIX: Use max() instead of calc() to avoid double padding */
+  padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 4px));
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   border-top: 1px solid var(--border);
@@ -137,8 +137,8 @@
 @media (max-width: 480px) {
   .mobile-navigation {
     padding: var(--spacing-xs) var(--spacing-sm);
-    /* MINIMAL FIX: Keep same approach for consistency */
-    padding-bottom: calc(var(--spacing-xs) + max(env(safe-area-inset-bottom, 0px), 0px));
+    /* TIGHTER FIX: Keep same approach for consistency */
+    padding-bottom: max(var(--spacing-xs), env(safe-area-inset-bottom, 4px));
   }
   
   .mobile-nav-container {
