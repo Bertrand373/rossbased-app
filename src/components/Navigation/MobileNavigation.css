@@ -1,6 +1,4 @@
-/* components/Navigation/MobileNavigation.css - UPDATED: Sticky nav with iOS safe area support */
-
-/* CRITICAL: Mobile navigation with sticky positioning and safe area padding */
+/* components/Navigation/MobileNavigation.css - MINIMAL FIX: Subtle safe area support */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
@@ -9,15 +7,12 @@
   background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   display: flex;
   justify-content: center;
-  /* CRITICAL: Add safe area padding to the bottom for iOS home indicator */
   padding: var(--spacing-sm) var(--spacing-md);
-  padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom, 0px));
+  /* MINIMAL FIX: Add small safe area offset - max 8px extra on iPhone with home indicator */
+  padding-bottom: calc(var(--spacing-sm) + max(env(safe-area-inset-bottom, 0px), 0px));
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   border-top: 1px solid var(--border);
-  /* CRITICAL: Ensure nav stays visible when scrolling */
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
 }
 
 /* Container layout with sliding animation support */
@@ -131,11 +126,10 @@
   display: block;
 }
 
-/* CRITICAL: Add padding to the bottom of the app content to account for mobile navigation + safe area */
+/* Add padding to the bottom of the app content to account for mobile navigation */
 @media (max-width: 768px) {
   .app-content {
-    /* 90px for nav + safe area bottom inset */
-    padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: 90px;
   }
 }
 
@@ -143,8 +137,8 @@
 @media (max-width: 480px) {
   .mobile-navigation {
     padding: var(--spacing-xs) var(--spacing-sm);
-    /* CRITICAL: Maintain safe area padding on small screens */
-    padding-bottom: calc(var(--spacing-xs) + env(safe-area-inset-bottom, 0px));
+    /* MINIMAL FIX: Keep same approach for consistency */
+    padding-bottom: calc(var(--spacing-xs) + max(env(safe-area-inset-bottom, 0px), 0px));
   }
   
   .mobile-nav-container {
@@ -169,46 +163,5 @@
   .mobile-nav-icon {
     font-size: 1.2rem;
     margin-bottom: 2px;
-  }
-}
-
-/* CRITICAL: iPhone X and newer devices with notch/home indicator */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .mobile-navigation {
-    /* Ensure the gradient extends fully to the bottom edge */
-    padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom));
-  }
-  
-  @media (max-width: 480px) {
-    .mobile-navigation {
-      padding-bottom: calc(var(--spacing-xs) + env(safe-area-inset-bottom));
-    }
-  }
-}
-
-/* CRITICAL: Landscape orientation adjustments for safe areas */
-@media (max-width: 768px) and (orientation: landscape) {
-  .mobile-navigation {
-    /* Add safe area padding to left and right in landscape */
-    padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
-    padding-right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
-  }
-  
-  .mobile-nav-container {
-    max-width: 600px;
-  }
-}
-
-/* CRITICAL: Ensure navigation doesn't interfere with content scrolling */
-body {
-  /* Reserve space at bottom for mobile nav */
-  -webkit-overflow-scrolling: touch;
-}
-
-/* CRITICAL: Fix for iOS Safari's bottom bar behavior */
-@supports (-webkit-touch-callout: none) {
-  .mobile-navigation {
-    /* iOS-specific fix for Safari's bottom bar */
-    padding-bottom: calc(var(--spacing-sm) + max(env(safe-area-inset-bottom), 0px));
   }
 }

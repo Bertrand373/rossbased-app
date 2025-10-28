@@ -1,21 +1,6 @@
-/* App.css - UPDATED: iOS Safe Area Support for PWA */
-
-/* ===================================
-   CSS VARIABLES
-   =================================== */
+/* App.css - Main application styles with YELLOW main navigation buttons + landing-sized initial loader */
 :root {
-  /* Colors */
-  --background: #0f0f0f;
-  --card-background: #1a1a1a;
-  --medium-gray: #2a2a2a;
-  --border: #333333;
-  --primary: #ffdd00;
-  --primary-dark: #e6c700;
-  --text: #f9fafb;
-  --text-secondary: #9ca3af;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
+  /* Color scheme is now defined in index.css */
   
   /* Spacing */
   --spacing-xs: 4px;
@@ -23,140 +8,179 @@
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
-  --spacing-xxl: 48px;
   
   /* Border radius */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-xl: 16px;
   --radius-full: 9999px;
-  
-  /* iOS Safe Area Variables - CRITICAL FOR PWA */
-  --safe-area-inset-top: env(safe-area-inset-top, 0px);
-  --safe-area-inset-right: env(safe-area-inset-right, 0px);
-  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-inset-left: env(safe-area-inset-left, 0px);
 }
 
-/* ===================================
-   GLOBAL RESETS & BASE STYLES
-   =================================== */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  height: 100%;
 }
 
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: var(--background);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
-  overflow-x: hidden;
-  min-height: 100vh;
-  /* CRITICAL: Account for iOS safe areas on body */
-  padding-top: var(--safe-area-inset-top);
-  padding-right: var(--safe-area-inset-right);
-  padding-bottom: var(--safe-area-inset-bottom);
-  padding-left: var(--safe-area-inset-left);
+  background-color: var(--background);
+  line-height: 1.5;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-/* ===================================
-   APP CONTAINER
-   =================================== */
-.App {
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* ADDED: Landing page initial loader - matches landing container size */
+.landing-initial-loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
   background-color: var(--background);
-  position: relative;
+  padding: var(--spacing-lg);
 }
 
-/* Main content area */
-.app-content {
-  flex: 1;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: var(--spacing-md);
-  /* CRITICAL: Add bottom padding for mobile nav + safe area */
-  padding-bottom: calc(90px + var(--safe-area-inset-bottom));
+.landing-initial-helmet {
+  width: 100px;
+  height: 100px;
+  animation: initial-helmet-pulse 0.8s ease-in-out;
+  filter: drop-shadow(0 0 20px rgba(255, 221, 0, 0.8));
 }
 
-/* Desktop layout - no bottom padding needed */
-@media (min-width: 769px) {
-  .app-content {
-    padding-bottom: var(--spacing-md);
+.landing-initial-helmet-fallback {
+  font-size: 4rem;
+  color: var(--primary);
+  animation: initial-helmet-pulse 0.8s ease-in-out;
+}
+
+@keyframes initial-helmet-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
   }
 }
 
-/* ===================================
-   HEADER NAVIGATION
-   =================================== */
-.header-nav {
-  background-color: var(--card-background);
-  border-bottom: 1px solid var(--border);
+/* FIXED: Keep original loading screen structure - just enhance the helmet */
+.spartan-loading-screen {
+  max-width: 1200px;
+  margin: var(--spacing-md) auto;
+  min-height: calc(100vh - 48px);
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ENHANCED: App loading helmet sizing classes to match upgrade banners */
+.app-loading-helmet-size {
+  width: 100px !important; /* LARGER: Premium loading experience */
+  height: 100px !important;
+  animation: app-helmet-pulse 2s ease-in-out infinite !important;
+  /* ENHANCED: Stronger glow for main loading */
+  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6)) !important;
+}
+
+.app-loading-helmet-fallback-size {
+  font-size: 4rem !important; /* LARGER: Match 100px helmet */
+  color: var(--primary) !important;
+  animation: app-helmet-pulse 2s ease-in-out infinite !important;
+}
+
+/* ENHANCED: Helmet pulse animation for main app loading */
+@keyframes app-helmet-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(0.96);
+  }
+}
+
+/* ADDED: Additional Toast Overrides in App.css as backup */
+.react-hot-toast div[data-hot-toast] > div {
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  padding: var(--spacing-md) var(--spacing-lg) !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+}
+
+/* App Header Styles - Navigation truly centered, logo/logout positioned around it */
+.app-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   padding: var(--spacing-md) var(--spacing-lg);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  /* CRITICAL: Account for notch on top */
-  padding-top: calc(var(--spacing-md) + var(--safe-area-inset-top));
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  margin: var(--spacing-md) var(--spacing-lg) 0 var(--spacing-lg);
+  gap: var(--spacing-lg);
 }
 
-.nav-wrapper {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-logo-section {
+.logo-container {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  justify-self: start;
 }
 
-.nav-logo {
-  height: 40px;
+.app-logo {
+  height: 107px; /* 25% bigger than 86px */
   width: auto;
 }
 
-.nav-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
-  letter-spacing: -0.5px;
+/* UPDATED: Header Navigation with bulletproof sliding pill animation - exactly like profile tabs */
+.header-nav {
+  justify-self: center;
+  position: relative;
 }
 
-/* Navigation container with pill slider */
-.nav-container {
+.header-nav .nav-container {
   display: flex;
-  gap: var(--spacing-xs);
   padding: var(--spacing-xs);
-  background-color: var(--medium-gray);
+  background-color: var(--card-background);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   position: relative;
-  /* MOBILE FIX: Allow horizontal scrolling on smaller screens only */
+  margin: 0 auto;
+  /* RESPONSIVE: Scale container width based on screen size like profile tabs */
+  width: min(90vw, 600px);
+  min-width: fit-content;
+  max-width: 700px;
+  /* EVEN SPACING: Distribute navigation buttons with consistent gaps */
+  justify-content: space-between;
+  /* MOBILE: Ensure proper 3D rendering context */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* MOBILE: Handle overflow for very small screens only */
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -236,89 +260,324 @@ code {
 /* UPDATED: Active nav styling - BLACK text to contrast with yellow slider background */
 .header-nav .nav-link.active {
   /* CHANGED: Black text instead of yellow to contrast with yellow background */
-  color: #000000;
-  font-weight: 600;
-  background-color: transparent;
-  border-color: transparent;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  /* IMPORTANT: No background - let slider handle visual feedback */
+  background-color: transparent !important;
+  border-color: transparent !important;
 }
 
-.nav-icon {
-  font-size: 1.25rem;
+/* FIXED: Increased breakpoint to 1024px to ensure active state is always visible */
+@media (max-width: 1024px) {
+  .header-nav .nav-link.active {
+    /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
+    font-weight: 600;
+    color: #000000 !important;
+  }
 }
 
-/* User controls section */
 .user-controls {
   display: flex;
   align-items: center;
+  justify-self: end;
   gap: var(--spacing-md);
 }
 
-.icon-btn {
+/* Profile button styling - matches logout button non-hover state with active state */
+.profile-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  background-color: var(--medium-gray);
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1.25rem;
+  transition: all 0.2s;
 }
 
-.icon-btn:hover {
-  background-color: var(--card-background);
-  color: var(--text);
-  transform: translateY(-2px);
+.profile-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
-.icon-btn:active {
-  transform: translateY(0);
+.profile-btn.active {
+  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
 }
 
-/* ===================================
-   MOBILE NAVIGATION STYLES
-   =================================== */
-/* Hide header nav on mobile */
-@media (max-width: 768px) {
+/* FIXED: Logout button styling - inactive grey with red hover */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--danger);
+  color: var(--danger);
+  transform: scale(1.05);
+}
+
+/* FIXED: Increased mobile header breakpoint to 1024px */
+@media (max-width: 1024px) {
+  /* ADDED: Mobile adjustments for initial loader */
+  .landing-initial-loader {
+    padding: var(--spacing-md);
+  }
+  
+  .landing-initial-helmet {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .landing-initial-helmet-fallback {
+    font-size: 3.2rem;
+  }
+
+  .app-header {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-sm);
+    align-items: stretch;
+    margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
+  }
+  
+  .app-logo {
+    height: 100px; /* Increased from 80px - 25% bigger */
+  }
+  
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-bottom-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: var(--spacing-xs);
+  }
+  
+  .user-controls {
+    gap: var(--spacing-md);
+  }
+  
+  /* Mobile user controls container */
+  .mobile-user-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  /* Mobile profile button - icon only */
+  .mobile-user-controls .profile-btn {
+    padding: var(--spacing-sm);
+    min-width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+  
+  .mobile-user-controls .profile-btn span {
+    display: none;
+  }
+  
+  /* Mobile logout button - icon only */
+  .mobile-user-controls .logout-btn {
+    padding: var(--spacing-sm);
+    min-width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+  
+  .mobile-user-controls .logout-btn span {
+    display: none;
+  }
+  
+  /* REVERTED: Mobile greeting back to yellow styling */
+  .mobile-username {
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.9375rem;
+    text-align: center;
+    letter-spacing: 0.025em;
+  }
+  
+  .mobile-username::before {
+    content: "Hey there, ";
+    color: var(--primary);
+    opacity: 0.8;
+    font-weight: 500;
+  }
+  
+  /* Make the username itself bold while keeping "Hey there" normal weight */
+  .mobile-username {
+    font-weight: 700; /* Make the username bold */
+    color: var(--primary); /* Back to yellow */
+  }
+  
+  /* Hide header navigation on mobile */
   .header-nav {
     display: none;
   }
-}
+  
+  /* Mobile loading screen adjustments */
+  .spartan-loading-screen {
+    margin: var(--spacing-sm);
+    margin-left: var(--spacing-sm);
+    margin-right: var(--spacing-sm);
+    min-height: calc(100vh - 16px);
+  }
 
-/* Show header nav only on desktop */
-@media (min-width: 769px) {
-  .mobile-navigation {
-    display: none;
+  /* Mobile app loading helmet adjustments */
+  .app-loading-helmet-size {
+    width: 80px !important; /* SCALED: Mobile main loading */
+    height: 80px !important;
+  }
+
+  .app-loading-helmet-fallback-size {
+    font-size: 3.2rem !important;
   }
 }
 
-/* ===================================
-   BUTTON STYLES
-   =================================== */
+/* Very small screens */
+@media (max-width: 480px) {
+  .landing-initial-helmet {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .landing-initial-helmet-fallback {
+    font-size: 2.8rem;
+  }
+
+  .app-loading-helmet-size {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .app-loading-helmet-fallback-size {
+    font-size: 2.8rem !important;
+  }
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  margin: 0 var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  border: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    margin: 0 var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+}
+
+/* Toggle Switch Styles */
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background-color: var(--light-gray);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border: 1px solid var(--border);
+}
+
+.toggle-switch.active {
+  background-color: rgba(255, 221, 0, 0.2);
+  border-color: var(--primary);
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: var(--text-secondary);
+  border-radius: 50%;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.toggle-switch.active .toggle-slider {
+  transform: translateX(24px);
+  background-color: var(--primary);
+}
+
+/* Form Input Styles */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Button Styles */
+button {
+  font-family: inherit;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: 0.875rem;
-  font-weight: 600;
   border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
   border: none;
-  outline: none;
   text-decoration: none;
-  min-height: 40px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
 }
 
 .btn-primary {
@@ -333,14 +592,13 @@ code {
 }
 
 .btn-secondary {
-  background-color: var(--medium-gray);
+  background-color: var(--card-background);
   color: var(--text);
   border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background-color: var(--card-background);
-  border-color: var(--text-secondary);
+  background-color: var(--medium-gray);
 }
 
 .btn-danger {
@@ -353,66 +611,72 @@ code {
   transform: translateY(-2px);
 }
 
-.btn:active {
-  transform: translateY(0);
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
-/* ===================================
-   CARD STYLES
-   =================================== */
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--radius-full);
+}
+
+/* Card Styles */
 .card {
-  background-color: var(--card-background);
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
 }
 
 .card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-md);
-  color: var(--text);
-}
-
-/* ===================================
-   FORM STYLES
-   =================================== */
-.form-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.form-label {
-  display: block;
-  margin-bottom: var(--spacing-sm);
-  font-size: 0.875rem;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--text);
 }
 
-.form-input {
-  width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--medium-gray);
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+}
+
+.modal-content {
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text);
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-.form-input:focus {
-  outline: none;
-  border-color: var(--primary);
-  background-color: var(--card-background);
-}
-
-.form-input::placeholder {
-  color: var(--text-secondary);
-}
-
-/* ===================================
-   UTILITY CLASSES
-   =================================== */
+/* Utility Classes */
 .text-center {
   text-align: center;
 }
@@ -445,90 +709,30 @@ code {
 .p-md { padding: var(--spacing-md); }
 .p-lg { padding: var(--spacing-lg); }
 
-/* ===================================
-   RESPONSIVE TYPOGRAPHY
-   =================================== */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--text);
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
-h4 { font-size: 1rem; }
-h5 { font-size: 0.875rem; }
-h6 { font-size: 0.75rem; }
-
-p {
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-/* ===================================
-   MOBILE OPTIMIZATIONS
-   =================================== */
-@media (max-width: 768px) {
-  .app-content {
-    padding: var(--spacing-sm);
-    /* CRITICAL: Mobile nav height + safe area bottom */
-    padding-bottom: calc(90px + var(--safe-area-inset-bottom));
-  }
-  
-  h1 { font-size: 1.75rem; }
-  h2 { font-size: 1.25rem; }
-  h3 { font-size: 1.125rem; }
-}
-
-/* ===================================
-   ACCESSIBILITY
-   =================================== */
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* Focus styles for keyboard navigation */
-*:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* ===================================
-   LOADING STATES
-   =================================== */
+/* Loading Animation */
 .loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
+  padding: var(--spacing-xl);
 }
 
 .spinner {
-  border: 3px solid var(--border);
-  border-top: 3px solid var(--primary);
-  border-radius: 50%;
   width: 40px;
   height: 40px;
-  animation: spin 1s linear infinite;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* ===================================
-   SCROLLBAR STYLES
-   =================================== */
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -547,18 +751,9 @@ p {
   background: var(--text-secondary);
 }
 
-/* ===================================
-   PRINT STYLES
-   =================================== */
-@media print {
-  .header-nav,
-  .mobile-navigation,
-  .icon-btn,
-  .btn {
-    display: none;
-  }
-  
-  .app-content {
-    padding-bottom: 0;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: var(--spacing-lg);
   }
 }
