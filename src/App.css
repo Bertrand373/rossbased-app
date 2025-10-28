@@ -357,6 +357,8 @@ body {
     display: flex;
     flex-direction: column;
     padding: var(--spacing-sm) var(--spacing-md);
+    /* MINIMAL FIX: Just a tiny bit of top padding for PWA */
+    padding-top: calc(var(--spacing-xs) + env(safe-area-inset-top, 0px));
     gap: var(--spacing-sm);
     align-items: stretch;
     margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
