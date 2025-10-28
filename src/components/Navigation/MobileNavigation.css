@@ -1,4 +1,6 @@
-/* components/Navigation/MobileNavigation.css - UPDATED: Tighter safe area spacing */
+/* components/Navigation/MobileNavigation.css - FIXED: Always sticky with tighter safe area */
+
+/* CRITICAL: Mobile navigation must ALWAYS be sticky - use position fixed with transform hack */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
@@ -8,11 +10,17 @@
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
-  /* TIGHTER FIX: Use max() instead of calc() to avoid double padding */
+  /* TIGHTER FIX: Use max() to avoid double padding */
   padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 4px));
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   border-top: 1px solid var(--border);
+  /* CRITICAL: Force hardware acceleration to keep nav sticky */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Container layout with sliding animation support */
