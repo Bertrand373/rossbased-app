@@ -1,8 +1,10 @@
 // src/services/MLPredictionService.js
-// UPDATED: Added calculateReliability() for honest prediction metrics
+// UPDATED: Added Firebase notification integration for AI predictions
 
 import * as tf from '@tensorflow/tfjs';
 import notificationService from './NotificationService';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 class MLPredictionService {
   constructor() {
@@ -259,7 +261,6 @@ class MLPredictionService {
     
     let anxiety = 5;
     let moodStability = 5;
-    
     if (userData.emotionalTracking && userData.emotionalTracking.length > 0) {
       const latestEmotion = userData.emotionalTracking[userData.emotionalTracking.length - 1];
       anxiety = latestEmotion.anxiety || 5;
@@ -280,34 +281,32 @@ class MLPredictionService {
     ];
   }
 
-  calculateNormalizationStats(rawFeatures) {
-    if (rawFeatures.length === 0) return null;
+  calculateNormalizationStats(features) {
+    if (features.length === 0) return null;
     
-    const numFeatures = rawFeatures[0].length;
-    const stats = [];
+    const numFeatures = features[0].length;
+    const means = new Array(numFeatures).fill(0);
+    const stds = new Array(numFeatures).fill(0);
     
     for (let i = 0; i < numFeatures; i++) {
-      const values = rawFeatures.map(f => f[i]);
-      stats.push({
-        min: Math.min(...values),
-        max: Math.max(...values)
-      });
+      const values = features.map(f => f[i]);
+      const mean = values.reduce((a, b) => a + b, 0) / values.length;
+      means[i] = mean;
+      
+      const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+      stds[i] = Math.sqrt(variance) || 1;
     }
     
-    return stats;
+    return { means, stds };
   }
 
   normalizeFeatures(features, stats) {
-    return features.map((value, i) => {
-      const { min, max } = stats[i];
-      if (max === min) return 0.5;
-      return (value - min) / (max - min);
-    });
+    return features.map((f, i) => (f - stats.means[i]) / stats.stds[i]);
   }
 
-  // NEW: Calculate honest prediction reliability based on data quality
+  // NEW: Calculate honest reliability based on data quality
   calculateReliability(userData) {
-    // Start with base model accuracy (if trained)
+    // Base reliability on model's training accuracy
     let reliability = this.trainingHistory.accuracy.length > 0
       ? this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1] * 100
       : 50; // Default for untrained model
@@ -381,19 +380,26 @@ class MLPredictionService {
       prediction.dispose();
       
       const riskScore = Math.round(predictionArray[0] * 100);
-      const reliability = this.calculateReliability(userData); // NEW: Use honest reliability calculation
+      const reliability = this.calculateReliability(userData);
       const reason = this.generateReason(rawFeatures, riskScore);
       
       console.log(`🤖 AI Prediction: ${riskScore}% risk (${reliability}% reliable)`);
       
-      // Auto-send notification if high risk
+      // NEW: Send Firebase notification through backend if high risk
       if (riskScore >= 70) {
-        await notificationService.sendUrgePredictionNotification(riskScore, reason);
+        const username = localStorage.getItem('username');
+        if (username) {
+          await this.sendAIPredictionNotification(username, riskScore, reason);
+        } else {
+          console.warn('⚠️ No username found - cannot send AI notification');
+          // Fallback to local notification
+          await notificationService.sendUrgePredictionNotification(riskScore, reason);
+        }
       }
       
       return {
         riskScore,
-        reliability, // NEW: Changed from 'confidence' to 'reliability'
+        reliability,
         reason,
         usedML: true,
         factors: {
@@ -408,7 +414,7 @@ class MLPredictionService {
           anxiety: rawFeatures[8],
           moodStability: rawFeatures[9]
         },
-        dataContext: { // NEW: Added data context for transparency
+        dataContext: {
           trackingDays: userData.benefitTracking?.length || 0,
           relapseCount: userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0,
           hasEmotionalData: userData.emotionalTracking && userData.emotionalTracking.length > 0
@@ -425,6 +431,132 @@ class MLPredictionService {
     } catch (error) {
       console.error('❌ Prediction error:', error);
       return this.fallbackPrediction(userData);
+    }
+  }
+
+  // NEW: Send Firebase Cloud Messaging notification through backend
+  async sendAIPredictionNotification(username, riskScore, reason) {
+    try {
+      // Get FCM token from localStorage
+      const fcmToken = localStorage.getItem('fcmToken');
+      
+      if (!fcmToken) {
+        console.warn('⚠️ No FCM token available - user may not have enabled notifications');
+        // Fallback to local notification
+        await notificationService.sendUrgePredictionNotification(riskScore, reason);
+        return false;
+      }
+
+      // Determine notification type based on risk level
+      let notificationType;
+      if (riskScore >= 80) {
+        notificationType = 'urge_high_risk';
+      } else if (riskScore >= 70) {
+        notificationType = 'urge_medium_risk';
+      } else {
+        notificationType = 'urge_alert';
+      }
+
+      console.log(`🔔 Sending AI prediction notification: ${notificationType} (${riskScore}%)`);
+
+      // Send notification through backend
+      const response = await fetch(`${API_URL}/api/notifications/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          notificationType,
+          customData: {
+            riskScore: riskScore.toString(),
+            reason: reason,
+            source: 'ai_prediction',
+            timestamp: Date.now().toString()
+          }
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log('✅ AI prediction notification sent successfully via Firebase');
+        
+        // Also show local browser notification as backup for immediate visibility
+        await this.showLocalNotification(riskScore, reason);
+        
+        return true;
+      } else {
+        console.error('❌ Failed to send Firebase notification:', result.reason || result.error);
+        
+        // Fallback to local notification only
+        await notificationService.sendUrgePredictionNotification(riskScore, reason);
+        
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Error sending AI prediction notification:', error);
+      
+      // Fallback to local notification
+      await notificationService.sendUrgePredictionNotification(riskScore, reason);
+      
+      return false;
+    }
+  }
+
+  // NEW: Show local browser notification as immediate feedback
+  async showLocalNotification(riskScore, reason) {
+    try {
+      if (!('Notification' in window)) {
+        return;
+      }
+
+      if (Notification.permission !== 'granted') {
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+
+      let title, body;
+      if (riskScore >= 80) {
+        title = '🚨 CRITICAL: High Relapse Risk';
+        body = 'AI detected critical risk patterns. Take action now!';
+      } else if (riskScore >= 70) {
+        title = '⚠️ WARNING: Elevated Relapse Risk';
+        body = 'AI detected concerning patterns. Stay vigilant!';
+      } else {
+        title = '⚡ AI Alert: Risk Detected';
+        body = 'Your patterns suggest increased risk.';
+      }
+
+      await registration.showNotification(title, {
+        body: body,
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+        tag: 'ai-prediction',
+        requireInteraction: true,
+        vibrate: [200, 100, 200, 100, 200],
+        data: {
+          type: 'ai_prediction',
+          riskScore: riskScore.toString(),
+          reason: reason,
+          url: '/urge-prediction'
+        },
+        actions: [
+          {
+            action: 'view',
+            title: 'View Details'
+          },
+          {
+            action: 'emergency',
+            title: 'Emergency Help'
+          }
+        ]
+      });
+
+      console.log('✅ Local notification shown');
+    } catch (error) {
+      console.error('Error showing local notification:', error);
     }
   }
 
@@ -480,7 +612,7 @@ class MLPredictionService {
       riskScore += 20;
     }
     
-    const reliability = this.calculateReliability(userData); // NEW: Use honest reliability
+    const reliability = this.calculateReliability(userData);
     
     return {
       riskScore: Math.min(riskScore, 100),
