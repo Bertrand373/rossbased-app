@@ -5,14 +5,16 @@ const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const { format, addDays } = require('date-fns');
 
+// CRITICAL: Load environment variables FIRST, before any other imports that need them
+dotenv.config();
+
 // Import User model
 const User = require('./models/User');
 
-// Import notification modules
+// Import notification modules (these need env vars to be loaded first!)
 const notificationRoutes = require('./routes/notifications');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 
-dotenv.config();
 const app = express();
 
 // Configure CORS
