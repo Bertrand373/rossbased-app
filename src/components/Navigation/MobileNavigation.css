@@ -1,6 +1,6 @@
-/* components/Navigation/MobileNavigation.css - FIXED: Always sticky with tighter safe area */
+/* components/Navigation/MobileNavigation.css - FIXED: Prevent nav movement during iOS scroll */
 
-/* CRITICAL: Mobile navigation must ALWAYS be sticky - use position fixed with transform hack */
+/* CRITICAL: Mobile navigation must ALWAYS be sticky - enhanced for iOS */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
@@ -13,14 +13,35 @@
   /* TIGHTER FIX: Use max() to avoid double padding */
   padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 4px));
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
+  z-index: 9999;
   border-top: 1px solid var(--border);
   /* CRITICAL: Force hardware acceleration to keep nav sticky */
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  /* ENHANCED FIX: Prevent iOS rubber band/momentum scrolling from affecting nav */
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: auto;
+  /* Lock it down completely */
+  pointer-events: auto;
+}
+
+/* IOS SPECIFIC: Absolutely lock position during momentum scrolling */
+@supports (-webkit-touch-callout: none) {
+  .mobile-navigation {
+    /* Override any iOS positioning quirks */
+    position: fixed !important;
+    bottom: 0 !important;
+    /* Ensure it stays above iOS safe area */
+    padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 12px)) !important;
+    /* Force strongest GPU layer */
+    -webkit-transform: translate3d(0, 0, 9999px);
+    transform: translate3d(0, 0, 9999px);
+    -webkit-perspective: 1000;
+    perspective: 1000;
+  }
 }
 
 /* Container layout with sliding animation support */
@@ -146,7 +167,7 @@
   .mobile-navigation {
     padding: var(--spacing-xs) var(--spacing-sm);
     /* TIGHTER FIX: Keep same approach for consistency */
-    padding-bottom: max(var(--spacing-xs), env(safe-area-inset-bottom, 4px));
+    padding-bottom: max(var(--spacing-xs), env(safe-area-inset-bottom, 12px));
   }
   
   .mobile-nav-container {
