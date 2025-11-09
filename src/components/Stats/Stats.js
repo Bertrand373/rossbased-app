@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Header styling to match Tracker/Calendar tabs
+// components/Stats/Stats.js - UPDATED: Removed redundant AI sections, added Progress & Trends
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -13,8 +13,7 @@ import SmartResetDialog from './SmartResetDialog';
 // Import extracted components
 import { StatCardModal } from './StatsComponents';
 import { 
-  SmartUrgeManagement, 
-  RelapseRiskPredictor, 
+  ProgressTrendsAnalysis,
   RelapsePatternAnalytics, 
   PatternRecognition, 
   OptimizationGuidance,
@@ -39,12 +38,11 @@ import {
 
 // Import analytics functions
 import {
-  generateUrgeManagementGuidance,
   generatePatternRecognition,
   generateOptimizationGuidance,
   calculatePhaseEvolutionAnalysis,
-  calculateRelapseRisk,
-  generateRelapsePatternAnalysis
+  generateRelapsePatternAnalysis,
+  calculateProgressTrends
 } from './StatsAnalyticsUtils';
 
 // NEW: Import Energy Intelligence System
@@ -64,10 +62,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   
-  // ENHANCED: Loading states for insights
+  // UPDATED: Loading states - removed redundant AI sections
   const [loadingStates, setLoadingStates] = useState({
-    urgeManagement: false,
-    riskPredictor: false,
+    progressTrends: false,
     patternRecognition: false,
     optimization: false,
     relapsePatterns: false,
@@ -87,20 +84,19 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }, duration);
   }, []);
 
-  // ENHANCED: Trigger loading when time range or metric changes
+  // UPDATED: Trigger loading when time range or metric changes - removed redundant sections
   useEffect(() => {
-    simulateInsightLoading('urgeManagement', 600);
-    setTimeout(() => simulateInsightLoading('riskPredictor', 700), 200);
-    setTimeout(() => simulateInsightLoading('patternRecognition', 800), 400);
-    setTimeout(() => simulateInsightLoading('optimization', 600), 600);
-    setTimeout(() => simulateInsightLoading('phaseEvolution', 900), 800);
+    simulateInsightLoading('progressTrends', 600);
+    setTimeout(() => simulateInsightLoading('patternRecognition', 800), 200);
+    setTimeout(() => simulateInsightLoading('optimization', 600), 400);
+    setTimeout(() => simulateInsightLoading('phaseEvolution', 900), 600);
     
     // Only load relapse patterns if user has actual relapse data
     const hasRelapseData = safeUserData.streakHistory?.some(streak => 
       streak && streak.reason === 'relapse' && streak.trigger
     );
     if (hasRelapseData) {
-      setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 1000);
+      setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 800);
     }
   }, [timeRange, selectedMetric, simulateInsightLoading, safeUserData.streakHistory]);
 
@@ -118,13 +114,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowStatModal(true);
   }, []);
 
-  // ENHANCED: Memoized calculations for performance
+  // UPDATED: Memoized calculations - removed redundant AI calculations, added Progress Trends
   const memoizedInsights = useMemo(() => {
     if (!safeUserData) return {};
     
     return {
-      riskAnalysis: calculateRelapseRisk(safeUserData, timeRange, true),
-      urgeManagement: generateUrgeManagementGuidance(safeUserData, timeRange),
+      progressTrends: calculateProgressTrends(safeUserData, timeRange),
       patternInsights: generatePatternRecognition(safeUserData, selectedMetric, true),
       optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, true),
       dataQuality: calculateDataQuality(safeUserData),
@@ -200,53 +195,45 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             start: today,
             end: null,
             days: 0,
-            reason: 'major_reset'
+            reason: 'manual_reset'
           }],
-          benefitTracking: [],
-          notes: {},
           badges: safeUserData.badges?.map(badge => ({
             ...badge,
-            earned: (badge.name === '90-Day King' && (safeUserData.longestStreak || 0) >= 90) ||
-                   (badge.name === '180-Day Emperor' && (safeUserData.longestStreak || 0) >= 180) ||
-                   (badge.name === '365-Day Sage' && (safeUserData.longestStreak || 0) >= 365) ? badge.earned : false,
-            date: ((badge.name === '90-Day King' && (safeUserData.longestStreak || 0) >= 90) ||
-                  (badge.name === '180-Day Emperor' && (safeUserData.longestStreak || 0) >= 180) ||
-                  (badge.name === '365-Day Sage' && (safeUserData.longestStreak || 0) >= 365)) ? badge.date : null
+            earned: false,
+            date: null
           })) || []
         };
-        toast.success(`All progress reset. Longest streak record (${safeUserData.longestStreak || 0} days) preserved.`);
+        toast.success('All progress reset. History preserved.');
         break;
 
       case 'everything':
         resetUserData = {
+          ...safeUserData,
           startDate: today,
           currentStreak: 0,
           longestStreak: 0,
           wetDreamCount: 0,
           relapseCount: 0,
-          badges: [
-            { id: 1, name: '7-Day Warrior', earned: false, date: null },
-            { id: 2, name: '14-Day Monk', earned: false, date: null },
-            { id: 3, name: '30-Day Master', earned: false, date: null },
-            { id: 4, name: '90-Day King', earned: false, date: null },
-            { id: 5, name: '180-Day Emperor', earned: false, date: null },
-            { id: 6, name: '365-Day Sage', earned: false, date: null }
-          ],
+          badges: safeUserData.badges?.map(badge => ({
+            ...badge,
+            earned: false,
+            date: null
+          })) || [],
           benefitTracking: [],
           streakHistory: [{
             id: 1,
             start: today,
             end: null,
             days: 0,
-            reason: 'complete_reset'
+            reason: 'manual_reset'
           }],
           notes: {}
         };
-        toast.success('Complete reset successful. All data has been cleared.');
+        toast.success('Complete reset performed. Fresh start!');
         break;
 
       default:
-        toast.error('Invalid reset option selected');
+        toast.error('Invalid reset option');
         return;
     }
     
@@ -254,122 +241,99 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setShowSmartResetDialog(false);
   }, [safeUserData, updateUserData]);
 
-  const handleUpgradeClick = useCallback(() => {
-    toast.success('All features are now free! 🎉');
-  }, []);
-
-  // ENHANCED: Memoized chart options
-  const chartOptions = useMemo(() => ({
+  // ADDED: Premium upgrade handler
+  const handleUpgradeClick = () => {
+    toast.success('Premium upgrade coming soon!');
+  };
+  
+  // Get current insight for preview
+  const getCurrentInsight = () => {
+    const insights = memoizedInsights.patternInsights;
+    if (!insights || insights.length === 0) {
+      return `Track your ${selectedMetric} daily to unlock personalized insights and pattern analysis.`;
+    }
+    return insights[0];
+  };
+  
+  // Calculate if user has insufficient data for insights
+  const hasInsufficientData = useMemo(() => {
+    const trackedDays = safeUserData.benefitTracking?.length || 0;
+    return trackedDays < 7;
+  }, [safeUserData.benefitTracking]);
+  
+  const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        enabled: true,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        borderColor: 'var(--primary)',
+        borderWidth: 1,
+        padding: 12,
+        displayColors: false,
+        callbacks: {
+          title: (context) => {
+            return format(new Date(context[0].label), 'MMM d, yyyy');
+          },
+          label: (context) => {
+            return `${selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}: ${context.parsed.y}/10`;
+          }
+        }
+      }
+    },
     scales: {
+      x: {
+        grid: {
+          color: 'rgba(255, 255, 255, 0.05)',
+          borderColor: 'rgba(255, 255, 255, 0.1)'
+        },
+        ticks: {
+          color: 'var(--text-secondary)',
+          maxRotation: 45,
+          minRotation: 45,
+          font: {
+            size: 11
+          }
+        }
+      },
       y: {
         min: 0,
         max: 10,
+        grid: {
+          color: 'rgba(255, 255, 255, 0.05)',
+          borderColor: 'rgba(255, 255, 255, 0.1)'
+        },
         ticks: {
+          color: 'var(--text-secondary)',
           stepSize: 2,
-          color: '#aaaaaa',
-          font: { size: 12 }
-        },
-        grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-          drawBorder: false
-        }
-      },
-      x: {
-        ticks: {
-          color: '#aaaaaa',
-          font: { size: 12 },
-          maxTicksLimit: timeRange === 'quarter' ? 12 : timeRange === 'month' ? 15 : 7,
-          maxRotation: timeRange === 'quarter' ? 45 : 0
-        },
-        grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-          drawBorder: false
-        }
-      }
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        filter: (tooltipItem) => {
-          return tooltipItem.parsed.y !== null;
-        },
-        callbacks: {
-          title: (items) => {
-            if (!items.length) return '';
-            const idx = items[0].dataIndex;
-            const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
-            if (!chartData.timeRangeArray[idx]) return '';
-            return formatDate(chartData.timeRangeArray[idx].date);
-          },
-          label: (context) => {
-            const value = context.parsed.y;
-            if (value === null) return '';
-            const metricName = selectedMetric === 'sleep' ? 'Sleep Quality' : 
-                             selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1);
-            return `${metricName}: ${value}/10`;
+          font: {
+            size: 11
           }
-        },
-        backgroundColor: 'rgba(44, 44, 44, 0.95)',
-        titleColor: '#ffffff',
-        bodyColor: '#ffffff',
-        borderColor: '#ffdd00',
-        borderWidth: 1,
-        cornerRadius: 8,
-        displayColors: false,
-        padding: 12,
-        titleFont: { size: 14, weight: 'bold' },
-        bodyFont: { size: 13 }
+        }
       }
-    },
-    interaction: {
-      mode: 'index',
-      intersect: false,
-    },
-    onHover: (event, activeElements) => {
-      event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
     }
-  }), [timeRange, safeUserData, selectedMetric]);
+  };
 
-  // ENHANCED: Check if user has sufficient data for insights
-  const hasInsufficientData = useMemo(() => {
-    return (safeUserData.benefitTracking?.length || 0) < 3;
-  }, [safeUserData.benefitTracking]);
-  
   return (
     <div className="stats-container">
-      {/* UPDATED: Header styling to match Tracker/Calendar tabs */}
-      <div className="integrated-stats-header">
-        <div className="stats-header-title-section">
-          <h2>Your Stats</h2>
-          <p className="stats-header-subtitle">Comprehensive analytics and insights from your retention journey</p>
-        </div>
-        <div className="stats-header-actions-section">
-          <div className="stats-header-actions">
-            <button 
-              className="action-btn reset-stats-btn" 
-              onClick={handleResetStats}
-              onKeyDown={(e) => e.key === 'Enter' && handleResetStats()}
-              tabIndex={0}
-            >
-              <FaRedo />
-              <span>Reset Progress</span>
-            </button>
-          </div>
+      {/* Header */}
+      <div className="stats-header-section">
+        <div className="stats-header-content">
+          <h2>Performance Analytics</h2>
+          <p className="stats-subtitle">
+            Track your journey and optimize your results
+          </p>
         </div>
       </div>
-      
-      {/* Smart Reset Dialog */}
-      <SmartResetDialog
-        isOpen={showSmartResetDialog}
-        onClose={() => setShowSmartResetDialog(false)}
-        onConfirm={confirmResetStats}
-        userData={safeUserData}
-      />
-      
-      {/* Streak Statistics */}
-      <div className="streak-stats">
+
+      {/* Quick Stats Grid */}
+      <div className="quick-stats-grid">
         <div className="stat-card current-streak">
           <div className="stat-value">{safeUserData.currentStreak || 0}</div>
           <div className="stat-label">Current Streak</div>
@@ -388,12 +352,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
         
         <div 
-          className="stat-card total-wetdreams clickable-stat" 
+          className="stat-card wet-dreams clickable-stat" 
           onClick={() => handleStatCardClick('wetDreams')}
           onKeyDown={(e) => e.key === 'Enter' && handleStatCardClick('wetDreams')}
           tabIndex={0}
           role="button"
-          aria-label="View wet dreams analysis"
+          aria-label="View wet dream analysis"
         >
           <div className="stat-value">{safeUserData.wetDreamCount || 0}</div>
           <div className="stat-label">Wet Dreams</div>
@@ -511,7 +475,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 tabIndex={0}
                 aria-pressed={selectedMetric === 'sleep'}
               >
-                Sleep Quality
+                Sleep
               </button>
               <button 
                 className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
@@ -525,160 +489,175 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          <div className="time-range-selector-container">
-            <div className="time-range-selector" role="radiogroup" aria-label="Time range selection">
-              <button 
-                className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
-                onClick={() => setTimeRange('week')}
-                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('week')}
-                tabIndex={0}
-                role="radio"
-                aria-checked={timeRange === 'week'}
-              >
-                Week
-              </button>
-              <button 
-                className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
-                onClick={() => setTimeRange('month')}
-                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('month')}
-                tabIndex={0}
-                role="radio"
-                aria-checked={timeRange === 'month'}
-              >
-                Month
-              </button>
-              <button 
-                className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
-                onClick={() => setTimeRange('quarter')}
-                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('quarter')}
-                tabIndex={0}
-                role="radio"
-                aria-checked={timeRange === 'quarter'}
-              >
-                3 Months
-              </button>
-            </div>
+          <div className="time-range-selector">
+            <button 
+              className={`time-range-btn ${timeRange === 'week' ? 'active' : ''}`}
+              onClick={() => setTimeRange('week')}
+            >
+              7 Days
+            </button>
+            <button 
+              className={`time-range-btn ${timeRange === 'month' ? 'active' : ''}`}
+              onClick={() => setTimeRange('month')}
+            >
+              30 Days
+            </button>
+            <button 
+              className={`time-range-btn ${timeRange === 'quarter' ? 'active' : ''}`}
+              onClick={() => setTimeRange('quarter')}
+            >
+              3 Months
+            </button>
           </div>
         </div>
         
-        <div className="chart-and-insight-container" ref={insightsStartRef}>
-          <div className="chart-container">
-            {(() => {
-              const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
-              const hasAnyData = chartData.datasets[0].data.some(val => val !== null);
-              
-              if (!hasAnyData) {
-                return (
-                  <div className="no-chart-data">
-                    <div className="no-data-icon">
-                      <FaChartLine />
-                    </div>
-                    <div className="no-data-text">
-                      <h4>No Chart Data Available</h4>
-                      <p>Start logging your {selectedMetric} benefits to see your progress visualization.</p>
-                    </div>
-                  </div>
-                );
-              }
-              
-              return <Line data={chartData} options={chartOptions} height={300} />;
-            })()}
-          </div>
-          
-          <div className="current-insight-sidebar">
-            <div className="current-metric-average">
-              <div className="current-metric-label">
-                Your {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} {getTimeRangeDisplayText(timeRange)}
-              </div>
-              <div className="current-metric-value">
-                {calculateAverage(safeUserData, selectedMetric, timeRange, true) === 'N/A' ? 'N/A' : `${calculateAverage(safeUserData, selectedMetric, timeRange, true)}/10`}
+        {/* FREE USER CONTENT: Average + One Insight */}
+        {!isPremium && (
+          <div className="free-benefit-preview">
+            {/* Average Display */}
+            <div className="free-average-display">
+              <div className="current-metric-average">
+                <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</div>
+                <div className="current-metric-value">{calculateAverage(safeUserData, selectedMetric, timeRange, true)}/10</div>
               </div>
             </div>
             
-            <div className="current-insight-card">
-              <div className="current-insight-header">
-                <span>Current Status</span>
+            {/* Single Insight Preview */}
+            <div className="free-insight-preview">
+              <div className="current-insight-card">
+                <div className="current-insight-header">
+                  <FaRegLightbulb className="insight-icon" />
+                  <span>Sample Insight</span>
+                </div>
+                <div className="current-insight-text">
+                  {getCurrentInsight()}
+                </div>
               </div>
-              <div className="current-insight-text">
-                {(() => {
-                  const avg = calculateAverage(safeUserData, selectedMetric, timeRange, true);
-                  const phase = getCurrentPhase(safeUserData);
-                  
-                  if (avg === 'N/A') {
-                    return `No ${selectedMetric} data for the selected ${timeRange} period. Start logging benefits to see your progress.`;
-                  }
-                  
-                  const avgValue = parseFloat(avg);
-                  
-                  if (avgValue >= 7) {
-                    return `Your ${selectedMetric} is excellent at ${avg}/10. You're in the ${phase} phase - maintain current strategies and channel this energy into growth.`;
-                  } else {
-                    return `Your ${selectedMetric} averaged ${avg}/10 during ${phase} phase. Check personalized insights below for optimization strategies.`;
-                  }
-                })()}
+            </div>
+            
+            {/* PREMIUM UPGRADE CTA */}
+            <div className="benefit-upgrade-cta">
+              <div className="upgrade-helmet-section">
+                <img 
+                  src={helmetImage} 
+                  alt="Premium Benefits" 
+                  className="upgrade-helmet-icon"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+                <div className="upgrade-helmet-fallback" style={{display: 'none'}}>⚡</div>
+              </div>
+              
+              <div className="upgrade-text-section">
+                <h4>Unlock Full Benefit Analysis</h4>
+                <p>Get detailed charts, advanced insights, pattern analysis, and personalized recommendations to optimize your journey.</p>
+                
+                <button className="benefit-upgrade-btn" onClick={handleUpgradeClick}>
+                  <FaStar />
+                  Upgrade to Premium
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        )}
         
-        {/* Personalized Insights Section */}
-        <div className="personalized-insights-section">
-          <div className="personalized-insights-header">
-            <h3>Personalized Insights</h3>
-          </div>
-          
-          {/* Smart Urge Management */}
-          <SmartUrgeManagement
-            isLoading={loadingStates.urgeManagement}
-            hasInsufficientData={hasInsufficientData}
-            userData={safeUserData}
-            urgeManagement={memoizedInsights.urgeManagement}
-            dataQuality={memoizedInsights.dataQuality}
-          />
-          
-          {/* Relapse Risk Predictor */}
-          <RelapseRiskPredictor
-            isLoading={loadingStates.riskPredictor}
-            hasInsufficientData={hasInsufficientData}
-            userData={safeUserData}
-            riskAnalysis={memoizedInsights.riskAnalysis}
-            dataQuality={memoizedInsights.dataQuality}
-          />
-          
-          {/* Relapse Pattern Analytics */}
-          <RelapsePatternAnalytics
-            isLoading={loadingStates.relapsePatterns}
-            relapsePatterns={memoizedInsights.relapsePatterns}
-            daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
-          />
-          
-          {/* Pattern Recognition */}
-          <PatternRecognition
-            isLoading={loadingStates.patternRecognition}
-            hasInsufficientData={hasInsufficientData}
-            userData={safeUserData}
-            patternInsights={memoizedInsights.patternInsights}
-            dataQuality={memoizedInsights.dataQuality}
-          />
-          
-          {/* Optimization Guidance */}
-          <OptimizationGuidance
-            isLoading={loadingStates.optimization}
-            hasInsufficientData={hasInsufficientData}
-            userData={safeUserData}
-            optimizationGuidance={memoizedInsights.optimizationGuidance}
-            dataQuality={memoizedInsights.dataQuality}
-          />
-          
-          {/* Phase Evolution Analysis */}
-          <PhaseEvolutionAnalysis
-            isLoading={loadingStates.phaseEvolution}
-            phaseEvolution={memoizedInsights.phaseEvolution}
-            selectedMetric={selectedMetric}
-            dataQuality={memoizedInsights.dataQuality}
-            currentStreak={safeUserData.currentStreak}
-          />
-        </div>
+        {/* PREMIUM USER CONTENT: Full Analysis */}
+        {isPremium && (
+          <>
+            {/* Chart and Current Insight Container - REF MARKER for scroll detection */}
+            <div className="chart-and-insight-container" ref={insightsStartRef}>
+              <div className="chart-container">
+                <Line data={generateChartData(safeUserData, selectedMetric, timeRange)} options={chartOptions} height={300} />
+              </div>
+              
+              <div className="current-insight-sidebar">
+                <div className="current-metric-average">
+                  <div className="current-metric-label">Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} {getTimeRangeDisplayText(timeRange)}</div>
+                  <div className="current-metric-value">
+                    {calculateAverage(safeUserData, selectedMetric, timeRange, true) === 'N/A' ? 'N/A' : `${calculateAverage(safeUserData, selectedMetric, timeRange, true)}/10`}
+                  </div>
+                </div>
+                
+                <div className="current-insight-card">
+                  <div className="current-insight-header">
+                    <span>Current Status</span>
+                  </div>
+                  <div className="current-insight-text">
+                    {(() => {
+                      const avg = calculateAverage(safeUserData, selectedMetric, timeRange, true);
+                      const phase = getCurrentPhase(safeUserData);
+                      
+                      if (avg === 'N/A') {
+                        return `No ${selectedMetric} data for the selected ${timeRange} period. Start logging benefits to see your progress.`;
+                      }
+                      
+                      const avgValue = parseFloat(avg);
+                      
+                      if (avgValue >= 7) {
+                        return `Your ${selectedMetric} is excellent at ${avg}/10. You're in the ${phase} phase - maintain current strategies and channel this energy into growth.`;
+                      } else {
+                        return `Your ${selectedMetric} averaged ${avg}/10 during ${phase} phase. Check personalized insights below for optimization strategies.`;
+                      }
+                    })()}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* UPDATED: Personalized Insights Section - Removed redundant AI sections */}
+            <div className="personalized-insights-section">
+              <div className="personalized-insights-header">
+                <h3>Personalized Insights</h3>
+              </div>
+              
+              {/* NEW: Progress & Trends Analysis - Historical trajectory */}
+              <ProgressTrendsAnalysis
+                isLoading={loadingStates.progressTrends}
+                hasInsufficientData={hasInsufficientData}
+                userData={safeUserData}
+                progressTrends={memoizedInsights.progressTrends}
+                dataQuality={memoizedInsights.dataQuality}
+                selectedMetric={selectedMetric}
+              />
+              
+              {/* Relapse Pattern Analytics */}
+              <RelapsePatternAnalytics
+                isLoading={loadingStates.relapsePatterns}
+                relapsePatterns={memoizedInsights.relapsePatterns}
+                daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
+              />
+              
+              {/* Pattern Recognition */}
+              <PatternRecognition
+                isLoading={loadingStates.patternRecognition}
+                hasInsufficientData={hasInsufficientData}
+                userData={safeUserData}
+                patternInsights={memoizedInsights.patternInsights}
+                dataQuality={memoizedInsights.dataQuality}
+              />
+              
+              {/* Optimization Guidance */}
+              <OptimizationGuidance
+                isLoading={loadingStates.optimization}
+                hasInsufficientData={hasInsufficientData}
+                userData={safeUserData}
+                optimizationGuidance={memoizedInsights.optimizationGuidance}
+                dataQuality={memoizedInsights.dataQuality}
+              />
+              
+              {/* Phase Evolution Analysis */}
+              <PhaseEvolutionAnalysis
+                isLoading={loadingStates.phaseEvolution}
+                phaseEvolution={memoizedInsights.phaseEvolution}
+                selectedMetric={selectedMetric}
+                dataQuality={memoizedInsights.dataQuality}
+                currentStreak={safeUserData.currentStreak}
+              />
+            </div>
+          </>
+        )}
       </div>
       
       {/* Badge Modal */}
@@ -698,98 +677,32 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             <div className="badge-description">
               <p>
                 {selectedBadge.name === '7-Day Warrior' ? 
-                  'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your foundation phase is complete - energy fluctuations are stabilizing and mental clarity is emerging!' :
-                selectedBadge.name === '14-Day Monk' ? 
-                  'Two weeks of dedication! You\'re in the adjustment phase with noticeable strength gains, improved posture, and enhanced focus. Your transformation is becoming visible!' :
-                selectedBadge.name === '30-Day Master' ? 
-                  'A full month of commitment! You\'ve entered the momentum phase with natural body composition changes, sustained energy, and mental clarity. True mastery developing!' :
-                selectedBadge.name === '90-Day King' ? 
-                  'Incredible achievement! 90 days represents complete physical and mental transformation. You\'ve reached royal status with emotional mastery and magnetic presence!' :
-                selectedBadge.name === '180-Day Emperor' ? 
-                  'Extraordinary dedication! Six months of practice has brought spiritual integration and identity transformation. You embody the divine masculine archetype!' :
-                selectedBadge.name === '365-Day Sage' ? 
-                  'Ultimate mastery achieved! One full year represents complete energy transmutation and service-oriented consciousness. You are now a teacher and healer for others!' :
-                  'Congratulations on earning this achievement!'
-                }
+                  'You completed your first week! This is where the journey truly begins. Keep the momentum strong.' :
+                selectedBadge.name === '14-Day Monk' ?
+                  'Two full weeks of discipline! You\'re building unshakable willpower. The benefits are compounding.' :
+                selectedBadge.name === '30-Day Master' ?
+                  'A full month conquered! You\'ve proven your commitment to growth. The path ahead is yours to shape.' :
+                selectedBadge.name === '90-Day King' ?
+                  'Ninety days of transformation! You\'ve reached elite status. Your dedication is an inspiration to all who follow.' :
+                  'Milestone achieved through dedication and perseverance.'}
               </p>
             </div>
             
-            <div className="badge-benefits">
-              <h4>Benefits Unlocked:</h4>
-              <ul>
-                {selectedBadge.name === '7-Day Warrior' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Energy fluctuations stabilizing</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Brief periods of mental sharpness</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Growing sense of possibility</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Motivation to improve life areas</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '14-Day Monk' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Noticeable strength gains</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Improved posture and presence</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Enhanced memory and focus</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Mood stabilization beginning</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '30-Day Master' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Natural muscle gain and fat loss</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Sustained high energy levels</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Sleep optimization and better rest</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Mental clarity and pattern recognition</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '90-Day King' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Complete emotional regulation</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Natural magnetism and charisma</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Exceptional mental performance</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Physical transformation complete</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '180-Day Emperor' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Spiritual integration and wisdom</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Natural leadership presence</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Identity transformation complete</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Conscious energy mastery</span></li>
-                  </>
-                )}
-                {selectedBadge.name === '365-Day Sage' && (
-                  <>
-                    <li><FaCheckCircle className="check-icon" /><span>Mastery of sexual energy transmutation</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Service-oriented consciousness</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Generational pattern breaking</span></li>
-                    <li><FaCheckCircle className="check-icon" /><span>Teaching and healing abilities</span></li>
-                  </>
-                )}
-              </ul>
-            </div>
-            
-            <button 
-              className="modal-close-x"
-              onClick={() => setShowBadgeModal(false)}
-              aria-label="Close modal"
-            >
+            <button className="badge-modal-close-btn" onClick={() => setShowBadgeModal(false)}>
               <FaTimes />
+              Close
             </button>
-            
-            <div className="modal-actions">
-              <button 
-                className="modal-got-it-btn" 
-                onClick={() => setShowBadgeModal(false)}
-                onKeyDown={(e) => e.key === 'Enter' && setShowBadgeModal(false)}
-                autoFocus
-              >
-                <FaCheckCircle />
-                Continue Journey
-              </button>
-            </div>
           </div>
         </div>
       )}
+      
+      {/* Smart Reset Dialog */}
+      <SmartResetDialog
+        isOpen={showSmartResetDialog}
+        onClose={() => setShowSmartResetDialog(false)}
+        onConfirm={confirmResetStats}
+        userData={safeUserData}
+      />
     </div>
   );
 };

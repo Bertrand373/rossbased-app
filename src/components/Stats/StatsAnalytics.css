@@ -1571,3 +1571,219 @@
     min-height: 110px;
   }
 }
+
+/* =================================================================
+   NEW: PROGRESS & TRENDS ANALYSIS COMPONENT STYLES
+   ================================================================= */
+
+/* Progress Trends Display Container */
+.progress-trends-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Trend Section */
+.trend-section {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.trend-section:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Trend Header */
+.trend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.trend-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Trend Badges */
+.trend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.trend-badge.improving {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.trend-badge.stable {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.trend-badge.worsening {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Trend Content */
+.trend-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Trend Stats Grid */
+.trend-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.trend-stat-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  justify-content: center;
+  min-height: 80px;
+  transition: all 0.3s ease;
+}
+
+.trend-stat-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
+}
+
+.trend-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.trend-stat-label {
+  font-size: 0.875rem;
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* Trend Insight */
+.trend-insight {
+  background-color: rgba(255, 221, 0, 0.05);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Trajectory Section Specific Styles */
+.trajectory-section {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.03) 0%, rgba(255, 221, 0, 0.01) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+}
+
+.trajectory-summary {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 0.9375rem;
+  color: var(--text);
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Trajectory Milestones */
+.trajectory-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.milestones-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.milestone-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+.milestone-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateX(4px);
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .trend-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .trend-badge {
+    align-self: flex-start;
+  }
+  
+  .trend-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .milestone-item {
+    padding: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .trend-section {
+    padding: var(--spacing-md);
+  }
+  
+  .trend-stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .trend-stat-card {
+    min-height: 70px;
+  }
+}

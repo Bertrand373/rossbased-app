@@ -81,6 +81,153 @@ export const generateUrgeManagementGuidance = (userData, timeRange) => {
   }
 };
 
+// NEW: Progress & Trends Analysis - Historical trajectory calculation
+export const calculateProgressTrends = (userData, timeRange) => {
+  try {
+    const safeData = validateUserData(userData);
+    const allBenefitData = safeData.benefitTracking || [];
+    const streakHistory = safeData.streakHistory || [];
+    
+    // Need at least 14 days of data for meaningful trends
+    if (allBenefitData.length < 14) {
+      return null;
+    }
+    
+    const trends = {};
+    
+    // 1. RELAPSE FREQUENCY TREND
+    const relapsesWithDates = streakHistory.filter(s => s.reason === 'relapse' && s.end);
+    
+    if (relapsesWithDates.length >= 2) {
+      // Calculate overall relapse rate (relapses per month)
+      const firstRelapse = new Date(relapsesWithDates[0].end);
+      const lastRelapse = new Date(relapsesWithDates[relapsesWithDates.length - 1].end);
+      const monthsTracking = Math.max(1, (lastRelapse - firstRelapse) / (1000 * 60 * 60 * 24 * 30));
+      const overallRate = (relapsesWithDates.length / monthsTracking).toFixed(1);
+      
+      // Calculate recent relapse rate (last 90 days)
+      const ninetyDaysAgo = new Date();
+      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+      const recentRelapses = relapsesWithDates.filter(r => new Date(r.end) >= ninetyDaysAgo);
+      const recentMonths = 3; // 90 days = 3 months
+      const recentRate = (recentRelapses.length / recentMonths).toFixed(1);
+      
+      // Determine trend
+      let trend = 'stable';
+      let insight = '';
+      
+      if (parseFloat(recentRate) < parseFloat(overallRate) * 0.7) {
+        trend = 'improving';
+        insight = `**Excellent Progress**: Your recent relapse rate (${recentRate}/month) is significantly better than your overall average (${overallRate}/month). You're developing stronger self-control and pattern awareness.`;
+      } else if (parseFloat(recentRate) > parseFloat(overallRate) * 1.3) {
+        trend = 'worsening';
+        insight = `**Needs Attention**: Recent relapse frequency (${recentRate}/month) exceeds your baseline (${overallRate}/month). Review your triggers and strengthen your defense strategies.`;
+      } else {
+        trend = 'stable';
+        insight = `**Maintaining Course**: Your relapse frequency (${recentRate}/month) is consistent with your overall pattern (${overallRate}/month). Focus on identifying and eliminating your primary triggers for breakthrough improvement.`;
+      }
+      
+      trends.relapseFrequency = {
+        trend,
+        recentRate: `${recentRate}/mo`,
+        overallRate: `${overallRate}/mo`,
+        insight
+      };
+    }
+    
+    // 2. BENEFIT PERFORMANCE TREND (for selected metric)
+    if (allBenefitData.length >= 14) {
+      // Get last 7 days average
+      const last7Days = allBenefitData.slice(-7);
+      const recentAvg = calculateAverage({ benefitTracking: last7Days }, 'energy', 'week', true);
+      
+      // Get overall average
+      const overallAvg = calculateAverage(safeData, 'energy', 'quarter', true);
+      
+      if (recentAvg !== 'N/A' && overallAvg !== 'N/A') {
+        const recentNum = parseFloat(recentAvg);
+        const overallNum = parseFloat(overallAvg);
+        
+        let trend = 'stable';
+        let insight = '';
+        
+        if (recentNum > overallNum + 0.5) {
+          trend = 'improving';
+          insight = `**Rising Performance**: Your recent average (${recentAvg}/10) surpasses your all-time average (${overallAvg}/10). The benefits of retention are compounding - your discipline is paying dividends.`;
+        } else if (recentNum < overallNum - 0.5) {
+          trend = 'declining';
+          insight = `**Performance Dip**: Recent scores (${recentAvg}/10) are below your baseline (${overallAvg}/10). Review your habits: sleep quality, exercise consistency, and stress management may need attention.`;
+        } else {
+          trend = 'stable';
+          insight = `**Consistent Performance**: Maintaining ${recentAvg}/10 in line with your ${overallAvg}/10 average. You're in a stable zone - consider introducing new challenges or optimization strategies to level up.`;
+        }
+        
+        trends.benefitPerformance = {
+          trend,
+          recentAvg: parseFloat(recentAvg).toFixed(1),
+          overallAvg: parseFloat(overallAvg).toFixed(1),
+          insight
+        };
+      }
+    }
+    
+    // 3. OVERALL TRAJECTORY
+    const currentStreak = safeData.currentStreak || 0;
+    const longestStreak = safeData.longestStreak || 0;
+    
+    let direction = 'neutral';
+    let summary = '';
+    const milestones = [];
+    
+    // Determine trajectory based on multiple factors
+    const improvingRelapses = trends.relapseFrequency?.trend === 'improving';
+    const improvingBenefits = trends.benefitPerformance?.trend === 'improving';
+    const decliningBenefits = trends.benefitPerformance?.trend === 'declining';
+    const worseningRelapses = trends.relapseFrequency?.trend === 'worsening';
+    
+    if ((improvingRelapses || improvingBenefits) && !decliningBenefits && !worseningRelapses) {
+      direction = 'positive';
+      summary = `**Positive Momentum**: Your journey shows clear progress. ${improvingRelapses ? 'Relapse frequency is decreasing.' : ''} ${improvingBenefits ? 'Benefit scores are rising.' : ''} You're building the life you want - stay the course and keep raising the bar.`;
+    } else if (worseningRelapses || decliningBenefits) {
+      direction = 'needs_focus';
+      summary = `**Needs Strategic Focus**: Some metrics show room for improvement. ${worseningRelapses ? 'Relapse patterns need attention.' : ''} ${decliningBenefits ? 'Benefit performance is declining.' : ''} Time to double down on fundamentals: identify triggers, strengthen routines, and recommit to your why.`;
+    } else {
+      direction = 'neutral';
+      summary = `**Maintaining Stability**: You're holding steady. Current streak: ${currentStreak} days. While stability is good, greatness requires growth. Consider setting new challenges or exploring deeper optimization strategies.`;
+    }
+    
+    // Add milestones
+    if (currentStreak >= 90) {
+      milestones.push(`90+ day streak active - Elite territory`);
+    } else if (currentStreak >= 30) {
+      milestones.push(`30+ day streak active - Master level`);
+    } else if (currentStreak >= 7) {
+      milestones.push(`7+ day streak active - Foundation solid`);
+    }
+    
+    if (longestStreak >= 90) {
+      milestones.push(`Achieved 90-day mastery milestone`);
+    } else if (longestStreak >= 30) {
+      milestones.push(`Reached 30-day master status`);
+    }
+    
+    if (allBenefitData.length >= 30) {
+      milestones.push(`${allBenefitData.length} days of benefit tracking logged`);
+    }
+    
+    trends.overallTrajectory = {
+      direction,
+      summary,
+      milestones: milestones.length > 0 ? milestones : null
+    };
+    
+    return trends;
+  } catch (error) {
+    console.error('Progress trends calculation error:', error);
+    return null;
+  }
+};
+
 // ENHANCED: Pattern Recognition with caching and better error handling
 export const generatePatternRecognition = (userData, selectedMetric, isPremium) => {
   try {

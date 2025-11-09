@@ -1,127 +1,154 @@
-// components/Stats/StatsInsights.js - Analytics and Insights Components - COMPLETE UPDATED FILE
+// components/Stats/StatsInsights.js - UPDATED: Removed redundant AI components, added Progress & Trends
 import React from 'react';
-import { FaChartLine, FaShieldAlt, FaTrophy, FaFire, FaArrowUp, FaArrowDown, FaEquals, FaBrain, FaInfoCircle } from 'react-icons/fa';
+import { FaChartLine, FaShieldAlt, FaTrophy, FaFire, FaArrowUp, FaArrowDown, FaEquals, FaBrain, FaInfoCircle, FaTrendingUp, FaTrendingDown, FaCheckCircle } from 'react-icons/fa';
 import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
 import { renderTextWithBold } from './StatsUtils';
 
-// Smart Urge Management Component
-export const SmartUrgeManagement = ({ 
+// NEW: Progress & Trends Analysis Component - HISTORICAL TRAJECTORY, NOT REAL-TIME
+export const ProgressTrendsAnalysis = ({ 
   isLoading, 
   hasInsufficientData, 
   userData, 
-  urgeManagement, 
-  dataQuality 
+  progressTrends,
+  dataQuality,
+  selectedMetric
 }) => {
   return (
     <div className="insight-card">
       <div className="insight-card-header">
-        <span>Smart Urge Management</span>
+        <span>Progress & Trends</span>
       </div>
       <div className="insight-info-banner">
         <FaInfoCircle className="info-icon" />
-        <span>Real-time vulnerability assessment based on your current streak phase, time of day, and recent benefit patterns.</span>
+        <span>Historical trajectory analysis showing how your performance and relapse patterns have evolved over time.</span>
       </div>
       <div className="insight-card-content">
         {isLoading ? (
-          <InsightLoadingState insight="Smart Urge Management" isVisible={true} />
+          <InsightLoadingState insight="Progress Analysis" isVisible={true} />
         ) : hasInsufficientData ? (
-          <InsightEmptyState insight="Smart Urge Management" userData={userData} />
+          <InsightEmptyState insight="Progress & Trends" userData={userData} />
         ) : (
-          <div className="urge-management-display">
-            {urgeManagement?.riskLevel === 'N/A' ? (
-              <div className="risk-level-indicator insufficient">
-                <div>
-                  <div className="risk-score insufficient">N/A</div>
-                  <div className="risk-level-text">Insufficient Data</div>
+          <div className="progress-trends-display">
+            {/* Relapse Frequency Trend */}
+            {progressTrends?.relapseFrequency && (
+              <div className="trend-section">
+                <div className="trend-header">
+                  <span className="trend-title">Relapse Frequency Trend</span>
+                  {progressTrends.relapseFrequency.trend === 'improving' && (
+                    <span className="trend-badge improving">
+                      <FaTrendingDown style={{ fontSize: '0.75rem' }} />
+                      Improving
+                    </span>
+                  )}
+                  {progressTrends.relapseFrequency.trend === 'stable' && (
+                    <span className="trend-badge stable">
+                      <FaEquals style={{ fontSize: '0.75rem' }} />
+                      Stable
+                    </span>
+                  )}
+                  {progressTrends.relapseFrequency.trend === 'worsening' && (
+                    <span className="trend-badge worsening">
+                      <FaTrendingUp style={{ fontSize: '0.75rem' }} />
+                      Needs Attention
+                    </span>
+                  )}
                 </div>
-              </div>
-            ) : (
-              <div className={`risk-level-indicator ${urgeManagement?.riskLevel?.toLowerCase() || 'low'}`}>
-                <div>
-                  <div className={`risk-score ${urgeManagement?.riskLevel?.toLowerCase() || 'low'}`}>
-                    {urgeManagement?.riskLevel || 'Low'}
+                <div className="trend-content">
+                  <div className="trend-stats-grid">
+                    <div className="trend-stat-card">
+                      <div className="trend-stat-value">{progressTrends.relapseFrequency.recentRate}</div>
+                      <div className="trend-stat-label">Recent Frequency</div>
+                    </div>
+                    <div className="trend-stat-card">
+                      <div className="trend-stat-value">{progressTrends.relapseFrequency.overallRate}</div>
+                      <div className="trend-stat-label">Overall Average</div>
+                    </div>
                   </div>
-                  <div className="risk-level-text">Current Risk Level</div>
+                  <div className="trend-insight" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.relapseFrequency.insight)}></div>
                 </div>
               </div>
             )}
-            <div className="guidance-list">
-              <div className="guidance-title">
-                {urgeManagement?.riskLevel === 'N/A' ? 'Data Requirements:' : 'Current Guidance:'}
-              </div>
-              {(urgeManagement?.guidance || []).map((guide, index) => (
-                <div key={index} className="guidance-item" dangerouslySetInnerHTML={renderTextWithBold(guide)}></div>
-              ))}
-            </div>
-          </div>
-        )}
-        {dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
-          <div className="insight-data-status">
-            <div className="insight-data-status-indicator">
-              <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
-                <FaChartLine />
-                {dataQuality?.label || 'Basic Analysis'}
-              </span>
-              <span className="insight-data-days">
-                Based on {dataQuality?.days || 0} days of tracking
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
-// Relapse Risk Predictor Component
-export const RelapseRiskPredictor = ({ 
-  isLoading, 
-  hasInsufficientData, 
-  userData, 
-  riskAnalysis, 
-  dataQuality 
-}) => {
-  return (
-    <div className="insight-card">
-      <div className="insight-card-header">
-        <span>Relapse Risk Predictor</span>
-      </div>
-      <div className="insight-info-banner">
-        <FaInfoCircle className="info-icon" />
-        <span>Analyzes your recent benefit trends to predict vulnerability periods and provide specific mitigation strategies.</span>
-      </div>
-      <div className="insight-card-content">
-        {isLoading ? (
-          <InsightLoadingState insight="Risk Analysis" isVisible={true} />
-        ) : hasInsufficientData ? (
-          <InsightEmptyState insight="Relapse Risk Predictor" userData={userData} />
-        ) : (
-          <div className="risk-predictor-display">
-            {riskAnalysis?.score === 'N/A' ? (
-              <div className="risk-level-indicator insufficient">
-                <div>
-                  <div className="risk-score insufficient">N/A</div>
-                  <div className="risk-level-text">Insufficient Data</div>
+            {/* Benefit Performance Trend */}
+            {progressTrends?.benefitPerformance && (
+              <div className="trend-section">
+                <div className="trend-header">
+                  <span className="trend-title">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Performance Trend</span>
+                  {progressTrends.benefitPerformance.trend === 'improving' && (
+                    <span className="trend-badge improving">
+                      <FaTrendingUp style={{ fontSize: '0.75rem' }} />
+                      Improving
+                    </span>
+                  )}
+                  {progressTrends.benefitPerformance.trend === 'stable' && (
+                    <span className="trend-badge stable">
+                      <FaEquals style={{ fontSize: '0.75rem' }} />
+                      Stable
+                    </span>
+                  )}
+                  {progressTrends.benefitPerformance.trend === 'declining' && (
+                    <span className="trend-badge worsening">
+                      <FaTrendingDown style={{ fontSize: '0.75rem' }} />
+                      Declining
+                    </span>
+                  )}
                 </div>
-              </div>
-            ) : (
-              <div className={`risk-level-indicator ${riskAnalysis?.level?.toLowerCase() || 'low'}`}>
-                <div>
-                  <div className={`risk-score ${riskAnalysis?.level?.toLowerCase() || 'low'}`}>
-                    {riskAnalysis?.score || 0}%
+                <div className="trend-content">
+                  <div className="trend-stats-grid">
+                    <div className="trend-stat-card">
+                      <div className="trend-stat-value">{progressTrends.benefitPerformance.recentAvg}/10</div>
+                      <div className="trend-stat-label">Last 7 Days</div>
+                    </div>
+                    <div className="trend-stat-card">
+                      <div className="trend-stat-value">{progressTrends.benefitPerformance.overallAvg}/10</div>
+                      <div className="trend-stat-label">All-Time Average</div>
+                    </div>
                   </div>
-                  <div className="risk-level-text">{riskAnalysis?.level || 'Low'} Risk Level</div>
+                  <div className="trend-insight" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.benefitPerformance.insight)}></div>
                 </div>
               </div>
             )}
-            <div className="risk-factors-list">
-              <div className="risk-factors-title">
-                {riskAnalysis?.score === 'N/A' ? 'Data Requirements:' : 'Risk Factors & Actions:'}
+
+            {/* Overall Trajectory */}
+            {progressTrends?.overallTrajectory && (
+              <div className="trend-section trajectory-section">
+                <div className="trend-header">
+                  <span className="trend-title">Overall Trajectory</span>
+                  {progressTrends.overallTrajectory.direction === 'positive' && (
+                    <span className="trend-badge improving">
+                      <FaCheckCircle style={{ fontSize: '0.75rem' }} />
+                      Positive Momentum
+                    </span>
+                  )}
+                  {progressTrends.overallTrajectory.direction === 'neutral' && (
+                    <span className="trend-badge stable">
+                      <FaEquals style={{ fontSize: '0.75rem' }} />
+                      Maintaining
+                    </span>
+                  )}
+                  {progressTrends.overallTrajectory.direction === 'needs_focus' && (
+                    <span className="trend-badge worsening">
+                      <FaFire style={{ fontSize: '0.75rem' }} />
+                      Needs Focus
+                    </span>
+                  )}
+                </div>
+                <div className="trend-content">
+                  <div className="trajectory-summary" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.overallTrajectory.summary)}></div>
+                  {progressTrends.overallTrajectory.milestones && progressTrends.overallTrajectory.milestones.length > 0 && (
+                    <div className="trajectory-milestones">
+                      <div className="milestones-title">Recent Milestones:</div>
+                      {progressTrends.overallTrajectory.milestones.map((milestone, index) => (
+                        <div key={index} className="milestone-item">
+                          <FaTrophy style={{ fontSize: '0.875rem', color: 'var(--primary)' }} />
+                          <span>{milestone}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              {(riskAnalysis?.factors || []).map((factor, index) => (
-                <div key={index} className="risk-factor-item" dangerouslySetInnerHTML={renderTextWithBold(factor)}></div>
-              ))}
-            </div>
+            )}
           </div>
         )}
         {dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
@@ -129,7 +156,7 @@ export const RelapseRiskPredictor = ({
             <div className="insight-data-status-indicator">
               <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
                 <FaChartLine />
-                {dataQuality?.label || 'Basic Analysis'}
+                Historical Analysis
               </span>
               <span className="insight-data-days">
                 Based on {dataQuality?.days || 0} days of tracking
@@ -186,13 +213,18 @@ export const RelapsePatternAnalytics = ({
                   </div>
                 </div>
                 {relapsePatterns.primaryTrigger && (
-                  <div className={`relapse-stat-card ${daysSinceLastRelapse >= 90 ? 'conquered-trigger' : 'primary-trigger'}`}>
+                  <div className={`relapse-stat-card ${daysSinceLastRelapse >= 90 ? 'conquered-trigger' : ''}`}>
                     <div className="relapse-stat-value">{relapsePatterns.primaryTrigger}</div>
                     <div className="relapse-stat-label">
-                      {daysSinceLastRelapse >= 90 
-                        ? 'Mastered Weakness' 
-                        : 'Primary Vulnerability'
-                      }
+                      {daysSinceLastRelapse >= 90 ? 'Conquered Trigger' : 'Primary Trigger'}
+                    </div>
+                  </div>
+                )}
+                {relapsePatterns.vulnerablePhase && (
+                  <div className="relapse-stat-card">
+                    <div className="relapse-stat-value">{relapsePatterns.vulnerablePhase}</div>
+                    <div className="relapse-stat-label">
+                      {daysSinceLastRelapse >= 90 ? 'Previously Vulnerable Phase' : 'Most Vulnerable Phase'}
                     </div>
                   </div>
                 )}
