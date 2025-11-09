@@ -672,6 +672,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       {showBadgeModal && selectedBadge && (
         <div className="modal-overlay" onClick={() => setShowBadgeModal(false)} role="dialog" aria-modal="true" aria-labelledby="badge-modal-title">
           <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
+            <button 
+              className="badge-modal-close"
+              onClick={() => setShowBadgeModal(false)}
+              aria-label="Close modal"
+            >
+              <FaTimes />
+            </button>
+            
             <div className="badge-trophy">
               <FaMedal className="badge-trophy-icon" />
             </div>
