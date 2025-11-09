@@ -1,6 +1,6 @@
 // components/Stats/StatsInsights.js - UPDATED: Removed redundant AI components, added Progress & Trends
 import React from 'react';
-import { FaChartLine, FaShieldAlt, FaTrophy, FaFire, FaArrowUp, FaArrowDown, FaEquals, FaBrain, FaInfoCircle, FaTrendingUp, FaTrendingDown, FaCheckCircle } from 'react-icons/fa';
+import { FaChartLine, FaShieldAlt, FaTrophy, FaFire, FaArrowUp, FaArrowDown, FaEquals, FaBrain, FaInfoCircle, FaCheckCircle, FaChartBar } from 'react-icons/fa';
 import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
 import { renderTextWithBold } from './StatsUtils';
 
@@ -36,7 +36,7 @@ export const ProgressTrendsAnalysis = ({
                   <span className="trend-title">Relapse Frequency Trend</span>
                   {progressTrends.relapseFrequency.trend === 'improving' && (
                     <span className="trend-badge improving">
-                      <FaTrendingDown style={{ fontSize: '0.75rem' }} />
+                      <FaArrowDown style={{ fontSize: '0.75rem' }} />
                       Improving
                     </span>
                   )}
@@ -48,7 +48,7 @@ export const ProgressTrendsAnalysis = ({
                   )}
                   {progressTrends.relapseFrequency.trend === 'worsening' && (
                     <span className="trend-badge worsening">
-                      <FaTrendingUp style={{ fontSize: '0.75rem' }} />
+                      <FaArrowUp style={{ fontSize: '0.75rem' }} />
                       Needs Attention
                     </span>
                   )}
@@ -76,7 +76,7 @@ export const ProgressTrendsAnalysis = ({
                   <span className="trend-title">{selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Performance Trend</span>
                   {progressTrends.benefitPerformance.trend === 'improving' && (
                     <span className="trend-badge improving">
-                      <FaTrendingUp style={{ fontSize: '0.75rem' }} />
+                      <FaArrowUp style={{ fontSize: '0.75rem' }} />
                       Improving
                     </span>
                   )}
@@ -88,7 +88,7 @@ export const ProgressTrendsAnalysis = ({
                   )}
                   {progressTrends.benefitPerformance.trend === 'declining' && (
                     <span className="trend-badge worsening">
-                      <FaTrendingDown style={{ fontSize: '0.75rem' }} />
+                      <FaArrowDown style={{ fontSize: '0.75rem' }} />
                       Declining
                     </span>
                   )}
