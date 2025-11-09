@@ -466,6 +466,7 @@
 .badge-modal {
   text-align: center;
   max-width: 450px;
+  position: relative;
 }
 
 .badge-trophy {
@@ -482,6 +483,32 @@
 
 .badge-trophy-icon {
   font-size: 3rem;
+}
+
+/* Badge modal close button */
+.badge-modal-close {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.badge-modal-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text);
 }
 
 .badge-earned-date {
@@ -584,14 +611,26 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: none;
+  transition: all 0.2s ease;
   border: 1px solid;
 }
 
+/* FIXED: Grey by default, yellow on hover */
 .modal-actions .btn-primary {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.modal-actions .btn-primary:hover {
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
+}
+
+.modal-actions .btn-primary:active {
+  background-color: rgba(255, 221, 0, 0.15);
+  border-color: rgba(255, 221, 0, 0.3);
 }
 
 .modal-actions .btn-outline {
@@ -600,21 +639,26 @@
   color: var(--text-secondary);
 }
 
-/* Modal "Got It" button styling */
+.modal-actions .btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+/* FIXED: Modal "Got It" button - grey by default, yellow on hover */
 .modal-got-it-btn {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: var(--spacing-sm) !important;
   padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border: 1px solid rgba(255, 221, 0, 0.2) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
   border-radius: var(--radius-full) !important;
-  color: var(--primary) !important;
+  color: var(--text-secondary) !important;
   font-size: 0.875rem !important;
   font-weight: 500 !important;
   cursor: pointer !important;
-  transition: none !important;
+  transition: all 0.2s ease !important;
   min-height: auto !important;
 }
 
@@ -622,8 +666,11 @@
   background-color: rgba(255, 221, 0, 0.1) !important;
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
-  transform: none !important;
-  box-shadow: none !important;
+}
+
+.modal-got-it-btn:active {
+  background-color: rgba(255, 221, 0, 0.15) !important;
+  border-color: rgba(255, 221, 0, 0.3) !important;
 }
 
 /* MOBILE RESPONSIVE - Basic Components */
