@@ -1,4 +1,4 @@
-/* components/Stats/StatsModals.css - Modal Components Styling - UPDATED: X button matching Emotional Timeline sizing */
+/* components/Stats/StatsModals.css - Modal Components Styling - FIXED: Unified X button and focus states */
 
 /* Modal styles */
 .modal-overlay {
@@ -48,8 +48,10 @@
   }
 }
 
-/* UPDATED: Universal X button matching Emotional Timeline sizing */
-.modal-close-x {
+/* UNIFIED: Universal X button for ALL modals */
+.modal-close-x,
+.stat-modal-close,
+.badge-modal-close {
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
@@ -67,11 +69,23 @@
   justify-content: center;
   transition: all 0.2s ease;
   z-index: 10;
+  outline: none;
 }
 
-.modal-close-x:hover {
+.modal-close-x:hover,
+.stat-modal-close:hover,
+.badge-modal-close:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: var(--text);
+}
+
+/* FIXED: Explicit focus states for X buttons */
+.modal-close-x:focus,
+.stat-modal-close:focus,
+.badge-modal-close:focus {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  outline: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-content h3 {
@@ -102,13 +116,22 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid;
+  outline: none;
 }
 
-/* FIXED: Grey by default, yellow on hover/active */
+/* FIXED: Grey by default, yellow ONLY on hover (not focus) */
 .modal-actions .btn-primary {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
   color: var(--text-secondary);
+}
+
+/* FIXED: Focus state stays grey with subtle outline */
+.modal-actions .btn-primary:focus {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-secondary);
+  outline: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-actions .btn-primary:hover {
@@ -128,12 +151,20 @@
   color: var(--text-secondary);
 }
 
+/* FIXED: Focus state for outline buttons */
+.modal-actions .btn-outline:focus {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-secondary);
+  outline: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .modal-actions .btn-outline:hover {
   background-color: rgba(255, 255, 255, 0.05);
   color: var(--text);
 }
 
-/* ADDED: Specific "Got It" button styling matching Emotional Timeline pattern */
+/* FIXED: Specific "Got It" button styling with proper focus state */
 .modal-got-it-btn {
   display: flex;
   align-items: center;
@@ -149,6 +180,15 @@
   transition: all 0.2s ease;
   min-width: 120px;
   justify-content: center;
+  outline: none;
+}
+
+/* FIXED: Focus state stays grey with subtle outline */
+.modal-got-it-btn:focus {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-secondary);
+  outline: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-got-it-btn:hover {
@@ -185,30 +225,6 @@
   margin: 0 auto var(--spacing-md);
   color: #000;
   font-size: 2.5rem;
-}
-
-.stat-modal-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1rem;
-  cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.stat-modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text);
 }
 
 .stat-details-modal h3 {
@@ -271,31 +287,6 @@
   font-size: 3rem;
 }
 
-.badge-modal-close {
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1rem;
-  cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.badge-modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text);
-}
-
 .badge-earned-date {
   margin-bottom: var(--spacing-md);
   color: var(--text-secondary);
@@ -348,7 +339,8 @@
 /* MOBILE RESPONSIVE - Modal Components */
 @media (max-width: 768px) {
   .modal-close-x,
-  .stat-modal-close {
+  .stat-modal-close,
+  .badge-modal-close {
     top: var(--spacing-sm);
     right: var(--spacing-sm);
     width: 28px;
@@ -394,7 +386,8 @@
 /* VERY SMALL SCREENS - Modal Components */
 @media (max-width: 480px) {
   .modal-close-x,
-  .stat-modal-close {
+  .stat-modal-close,
+  .badge-modal-close {
     top: var(--spacing-xs);
     right: var(--spacing-xs);
     width: 24px;

@@ -763,20 +763,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </ul>
             </div>
             
-            <button 
-              className="modal-close-x"
-              onClick={() => setShowBadgeModal(false)}
-              aria-label="Close modal"
-            >
-              <FaTimes />
-            </button>
-            
             <div className="modal-actions">
               <button 
                 className="modal-got-it-btn" 
                 onClick={() => setShowBadgeModal(false)}
                 onKeyDown={(e) => e.key === 'Enter' && setShowBadgeModal(false)}
-                autoFocus
               >
                 <FaCheckCircle />
                 Continue Journey
