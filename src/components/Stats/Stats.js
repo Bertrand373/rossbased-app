@@ -1,51 +1,115 @@
-/* components/Stats/Stats.js - Statistics Dashboard with Analytics and Achievements */
-
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+// components/Stats/Stats.js - UPDATED: Header styling to match Tracker/Calendar tabs
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { FaRegLightbulb, FaLock, FaMedal, FaTrophy, FaCheckCircle, FaRedo, FaInfoCircle, 
+  FaExclamationTriangle, FaFrown, FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaEye, FaStar, FaChartLine, FaShieldAlt, FaFire, FaTimes, FaMoon, FaRocket } from 'react-icons/fa';
 import './Stats.css';
-import useUserData from '../../hooks/useUserData';
-import { formatDistanceToNow, differenceInDays, format, startOfWeek, endOfWeek, parseISO, isWithinInterval, startOfDay, startOfMonth, endOfMonth, isSameDay, addDays, subDays, isAfter } from 'date-fns';
 import toast from 'react-hot-toast';
-import helmetIcon from '../../assets/trackerapplogo.png';
+import helmetImage from '../../assets/helmet.png';
+import SmartResetDialog from './SmartResetDialog';
 
-const Stats = ({ userData, setUserData, isAuthenticated, user, isLoading, subscriptionStatus }) => {
-  // ===== STATE MANAGEMENT =====
+// Import extracted components
+import { StatCardModal } from './StatsComponents';
+import { 
+  ProgressTrendsAnalysis,
+  RelapsePatternAnalytics, 
+  PatternRecognition, 
+  OptimizationGuidance,
+  PhaseEvolutionAnalysis
+} from './StatsInsights';
+
+// Import utility functions
+import {
+  renderTextWithBold,
+  getTimeRangeDisplayText,
+  checkAndUpdateBadges,
+  getCurrentPhase,
+  getPhaseGuidance,
+  getFilteredBenefitData,
+  generateChartData,
+  calculateAverage,
+  shouldShowInfoBanner,
+  calculateDataQuality,
+  calculateDaysSinceLastRelapse,
+  validateUserData
+} from './StatsUtils';
+
+// Import analytics functions
+import {
+  generatePatternRecognition,
+  generateOptimizationGuidance,
+  calculatePhaseEvolutionAnalysis,
+  generateRelapsePatternAnalysis,
+  calculateProgressTrends
+} from './StatsAnalyticsUtils';
+
+// NEW: Import Energy Intelligence System
+import EnergyIntelligenceSection from './EnergyIntelligenceSection';
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+const Stats = ({ userData, isPremium, updateUserData }) => {
   const [selectedMetric, setSelectedMetric] = useState('energy');
-  const [selectedTimeRange, setSelectedTimeRange] = useState('7days');
-  const [showResetModal, setShowResetModal] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
-  const [showDataInsightModal, setShowDataInsightModal] = useState(false);
-  const [showRoadmapModal, setShowRoadmapModal] = useState(false);
-  const [showDetailedInsight, setShowDetailedInsight] = useState(false);
-  const [expandedEmotional, setExpandedEmotional] = useState(false);
-  const [showEnergySystem, setShowEnergySystem] = useState(false);
-  const [selectedEnergyInsight, setSelectedEnergyInsight] = useState('patterns');
+  const [timeRange, setTimeRange] = useState('week');
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [showSmartResetDialog, setShowSmartResetDialog] = useState(false);
+  
+  // NEW: Stat card modal states
+  const [showStatModal, setShowStatModal] = useState(false);
+  const [selectedStatCard, setSelectedStatCard] = useState(null);
+  
+  // NEW: Slider animation states and refs
   const [metricSliderPosition, setMetricSliderPosition] = useState({ transform: 'translateX(0px)', width: '0px' });
   const [timeSliderPosition, setTimeSliderPosition] = useState({ transform: 'translateX(0px)', width: '0px' });
-  
-  // Refs for slider animation
   const metricContainerRef = useRef(null);
   const timeContainerRef = useRef(null);
   const metricButtonRefs = useRef({});
   const timeButtonRefs = useRef({});
+  
+  // ENHANCED: Loading states for insights
+  const [loadingStates, setLoadingStates] = useState({
+    progressTrends: false,
+    patternRecognition: false,
+    optimization: false,
+    relapsePatterns: false,
+    phaseEvolution: false
+  });
+  
+  const insightsStartRef = useRef(null);
 
-  const { 
-    streakCount, 
-    longestStreak, 
-    emotionalCheckIns, 
-    dailyMetrics,
-    lastRelapse,
-    startDate,
-    benefits,
-    phaseHistory,
-    updateUserData 
-  } = useUserData(userData, setUserData, isAuthenticated, user);
+  // ENHANCED: Defensive programming - ensure userData structure
+  const safeUserData = useMemo(() => validateUserData(userData), [userData]);
 
-  const today = format(new Date(), 'yyyy-MM-dd');
-  const hasLoggedToday = benefits?.[today] && Object.keys(benefits[today]).length > 0;
+  // ENHANCED: Simulate loading for insights calculation
+  const simulateInsightLoading = useCallback((insightType, duration = 800) => {
+    setLoadingStates(prev => ({ ...prev, [insightType]: true }));
+    setTimeout(() => {
+      setLoadingStates(prev => ({ ...prev, [insightType]: false }));
+    }, duration);
+  }, []);
 
-  // ===== NEW: Update slider positions =====
+  // ENHANCED: Trigger loading when time range or metric changes
   useEffect(() => {
-    // Update metric slider
+    simulateInsightLoading('progressTrends', 600);
+    setTimeout(() => simulateInsightLoading('patternRecognition', 800), 200);
+    setTimeout(() => simulateInsightLoading('optimization', 600), 400);
+    setTimeout(() => simulateInsightLoading('phaseEvolution', 900), 600);
+    
+    // Only load relapse patterns if user has actual relapse data
+    const hasRelapseData = safeUserData.streakHistory?.some(streak => 
+      streak && streak.reason === 'relapse' && streak.trigger
+    );
+    if (hasRelapseData) {
+      setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 800);
+    }
+  }, [timeRange, selectedMetric, simulateInsightLoading, safeUserData.streakHistory]);
+
+  // NEW: Update slider positions
+  useEffect(() => {
     const metricButton = metricButtonRefs.current[selectedMetric];
     const metricContainer = metricContainerRef.current;
     
@@ -64,8 +128,7 @@ const Stats = ({ userData, setUserData, isAuthenticated, user, isLoading, subscr
   }, [selectedMetric]);
 
   useEffect(() => {
-    // Update time range slider
-    const timeButton = timeButtonRefs.current[selectedTimeRange];
+    const timeButton = timeButtonRefs.current[timeRange];
     const timeContainer = timeContainerRef.current;
     
     if (timeButton && timeContainer) {
@@ -80,902 +143,730 @@ const Stats = ({ userData, setUserData, isAuthenticated, user, isLoading, subscr
         visibility: 'visible'
       });
     }
-  }, [selectedTimeRange]);
+  }, [timeRange]);
 
-  // ===== COMPUTED VALUES & DATA =====
-  const hasMinimumData = useMemo(() => {
-    if (!benefits) return false;
-    const benefitDates = Object.keys(benefits);
-    return benefitDates.length >= 7;
-  }, [benefits]);
+  // Handle metric selection
+  const handleMetricClick = useCallback((metric) => {
+    setSelectedMetric(metric);
+  }, []);
 
-  const dataProgress = useMemo(() => {
-    if (!benefits) return 0;
-    const benefitDates = Object.keys(benefits);
-    const percentage = Math.min((benefitDates.length / 7) * 100, 100);
-    return Math.round(percentage);
-  }, [benefits]);
-
-  // Check if user is building their profile (less than 7 days of data)
-  const isBuildingProfile = dataProgress < 100;
-
-  // Calculate streaks
-  const calculateStreaks = useCallback(() => {
-    let current = streakCount || 0;
-    let longest = longestStreak || current;
-    let totalDays = 0;
-    let relapseFree = 0;
-
-    if (startDate) {
-      const start = parseISO(startDate);
-      totalDays = differenceInDays(new Date(), start);
-    }
-
-    if (lastRelapse) {
-      const lastRelapseDate = parseISO(lastRelapse);
-      relapseFree = differenceInDays(new Date(), lastRelapseDate);
-    } else if (startDate) {
-      relapseFree = totalDays;
-    }
-
-    return { current, longest, totalDays, relapseFree };
-  }, [streakCount, longestStreak, startDate, lastRelapse]);
-
-  const streakData = useMemo(() => calculateStreaks(), [calculateStreaks]);
-
-  // Calculate weekly averages
-  const calculateWeeklyAverages = useCallback(() => {
-    if (!benefits) return {};
+  // NEW: Handle stat card click
+  const handleStatCardClick = useCallback((statType) => {
+    // Only show modals for the clickable cards (not current streak)
+    if (statType === 'currentStreak') return;
     
-    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
+    setSelectedStatCard(statType);
+    setShowStatModal(true);
+  }, []);
+
+  // ENHANCED: Memoized calculations for performance
+  const memoizedInsights = useMemo(() => {
+    if (!safeUserData) return {};
     
-    const weekData = Object.entries(benefits).filter(([date]) => {
-      const dateObj = parseISO(date);
-      return isWithinInterval(dateObj, { start: weekStart, end: weekEnd });
-    });
-
-    if (weekData.length === 0) return {};
-
-    const totals = weekData.reduce((acc, [_, dayBenefits]) => {
-      Object.entries(dayBenefits).forEach(([metric, value]) => {
-        if (!acc[metric]) acc[metric] = [];
-        acc[metric].push(parseInt(value) || 0);
-      });
-      return acc;
-    }, {});
-
-    const averages = {};
-    Object.entries(totals).forEach(([metric, values]) => {
-      averages[metric] = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
-    });
-
-    return averages;
-  }, [benefits]);
-
-  const weeklyAverages = useMemo(() => calculateWeeklyAverages(), [calculateWeeklyAverages]);
-
-  // Get metric data for charts
-  const getMetricData = useCallback(() => {
-    if (!benefits || !selectedMetric) return [];
-    
-    let dateRange = [];
-    const now = new Date();
-    
-    if (selectedTimeRange === '7days') {
-      for (let i = 6; i >= 0; i--) {
-        dateRange.push(format(subDays(now, i), 'yyyy-MM-dd'));
-      }
-    } else if (selectedTimeRange === '30days') {
-      for (let i = 29; i >= 0; i--) {
-        dateRange.push(format(subDays(now, i), 'yyyy-MM-dd'));
-      }
-    } else {
-      dateRange = Object.keys(benefits).sort();
-    }
-
-    return dateRange.map(date => ({
-      date,
-      value: benefits[date]?.[selectedMetric] || 0,
-      label: format(parseISO(date), 'MMM d')
-    }));
-  }, [benefits, selectedMetric, selectedTimeRange]);
-
-  const metricData = useMemo(() => getMetricData(), [getMetricData]);
-
-  // Achievement badges calculation
-  const badges = useMemo(() => {
-    const achievements = [];
-    
-    if (streakData.current >= 7) {
-      achievements.push({
-        id: 'week-warrior',
-        title: 'Week Warrior',
-        description: '7 day streak',
-        icon: '🛡️',
-        unlocked: true,
-        unlockedDate: format(subDays(new Date(), 7), 'MMM d, yyyy')
-      });
-    }
-    
-    if (streakData.current >= 30) {
-      achievements.push({
-        id: 'monthly-master',
-        title: 'Monthly Master',
-        description: '30 day streak',
-        icon: '⚔️',
-        unlocked: true,
-        unlockedDate: format(subDays(new Date(), 30), 'MMM d, yyyy')
-      });
-    }
-    
-    if (streakData.current >= 90) {
-      achievements.push({
-        id: 'quarterly-champion',
-        title: 'Quarterly Champion',
-        description: '90 day streak',
-        icon: '🏆',
-        unlocked: true,
-        unlockedDate: format(subDays(new Date(), 90), 'MMM d, yyyy')
-      });
-    }
-    
-    if (streakData.totalDays >= 100) {
-      achievements.push({
-        id: 'centurion',
-        title: 'Centurion',
-        description: '100 total days',
-        icon: '👑',
-        unlocked: true,
-        unlockedDate: 'Lifetime Achievement'
-      });
-    }
-
-    // Add locked badge hints
-    const nextMilestone = streakData.current < 7 ? 7 : 
-                         streakData.current < 30 ? 30 : 
-                         streakData.current < 90 ? 90 : 180;
-    
-    if (nextMilestone <= 180) {
-      achievements.push({
-        id: 'next-milestone',
-        title: 'Next Milestone',
-        description: `${nextMilestone} day streak`,
-        icon: '🔒',
-        unlocked: false,
-        daysRemaining: nextMilestone - streakData.current
-      });
-    }
-
-    return achievements;
-  }, [streakData]);
-
-  // Calculate emotional check-in stats
-  const emotionalStats = useMemo(() => {
-    if (!emotionalCheckIns || emotionalCheckIns.length === 0) {
-      return {
-        totalCheckIns: 0,
-        recentMood: 'Not tracked',
-        averageMood: 0,
-        moodTrend: 'neutral'
-      };
-    }
-
-    const recentCheckIns = emotionalCheckIns.slice(-7);
-    const recentMoodMap = {
-      'amazing': 5,
-      'good': 4,
-      'neutral': 3,
-      'struggling': 2,
-      'crisis': 1
-    };
-
-    const moodValues = recentCheckIns.map(c => recentMoodMap[c.mood] || 3);
-    const avgMood = moodValues.reduce((a, b) => a + b, 0) / moodValues.length;
-    
-    let trend = 'neutral';
-    if (moodValues.length >= 3) {
-      const firstHalf = moodValues.slice(0, Math.floor(moodValues.length / 2));
-      const secondHalf = moodValues.slice(Math.floor(moodValues.length / 2));
-      const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
-      const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
-      
-      if (secondAvg > firstAvg + 0.5) trend = 'improving';
-      else if (secondAvg < firstAvg - 0.5) trend = 'declining';
-    }
-
     return {
-      totalCheckIns: emotionalCheckIns.length,
-      recentMood: recentCheckIns[recentCheckIns.length - 1]?.mood || 'Not tracked',
-      averageMood: avgMood.toFixed(1),
-      moodTrend: trend
+      progressTrends: calculateProgressTrends(safeUserData, timeRange),
+      patternInsights: generatePatternRecognition(safeUserData, selectedMetric, true),
+      optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, true),
+      dataQuality: calculateDataQuality(safeUserData),
+      phaseEvolution: calculatePhaseEvolutionAnalysis(safeUserData, selectedMetric),
+      relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
+      daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData)
     };
-  }, [emotionalCheckIns]);
+  }, [safeUserData, timeRange, selectedMetric]);
 
-  // Calculate risk level
-  const calculateRiskLevel = useCallback(() => {
-    const daysSinceStart = streakData.totalDays;
-    const currentStreak = streakData.current;
-    
-    if (currentStreak < 7) return 'High Risk';
-    if (currentStreak < 14) return 'Moderate Risk';
-    if (currentStreak < 30) return 'Low Risk';
-    if (currentStreak < 90) return 'Very Low Risk';
-    return 'Minimal Risk';
-  }, [streakData]);
-
-  const riskLevel = useMemo(() => calculateRiskLevel(), [calculateRiskLevel]);
-
-  // Get current phase
-  const getCurrentPhase = useCallback(() => {
-    const current = streakData.current;
-    
-    if (current >= 0 && current < 7) return { name: 'Withdrawal', color: '#FF6B6B', description: 'Initial recovery phase' };
-    if (current >= 7 && current < 14) return { name: 'Buildup', color: '#4DABF7', description: 'Energy returning' };
-    if (current >= 14 && current < 30) return { name: 'Acceleration', color: '#69DB7C', description: 'Momentum building' };
-    if (current >= 30 && current < 90) return { name: 'Refinement', color: '#9775FA', description: 'Habits solidifying' };
-    if (current >= 90) return { name: 'Mastery', color: '#FFD43B', description: 'Peak performance' };
-    
-    return { name: 'Starting', color: '#666666', description: 'Begin your journey' };
-  }, [streakData]);
-
-  const currentPhase = useMemo(() => getCurrentPhase(), [getCurrentPhase]);
-
-  // ===== EVENT HANDLERS =====
-  const handleResetStats = async () => {
-    setIsResetting(true);
-    try {
-      const resetData = {
-        ...userData,
-        startDate: format(new Date(), 'yyyy-MM-dd'),
-        lastRelapse: null,
-        streakCount: 0,
-        longestStreak: 0,
-        benefits: {},
-        emotionalCheckIns: [],
-        urges: [],
-        phaseHistory: []
-      };
+  // Auto-check badges when streak changes
+  useEffect(() => {
+    if (safeUserData && safeUserData.currentStreak !== undefined) {
+      const updatedData = checkAndUpdateBadges(safeUserData);
       
-      await updateUserData(resetData);
-      setShowResetModal(false);
-      toast.success('Statistics reset successfully', {
-        style: {
-          background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
-          color: '#FFD700',
-          border: '1px solid rgba(255, 215, 0, 0.2)',
-        }
-      });
-    } catch (error) {
-      console.error('Error resetting stats:', error);
-      toast.error('Failed to reset statistics');
-    } finally {
-      setIsResetting(false);
+      if (JSON.stringify(updatedData.badges) !== JSON.stringify(safeUserData.badges)) {
+        updateUserData?.(updatedData);
+      }
     }
-  };
+  }, [safeUserData?.currentStreak, safeUserData?.longestStreak, updateUserData, safeUserData]);
 
-  const metricLabels = {
-    energy: 'Energy',
-    focus: 'Focus',
-    confidence: 'Confidence',
-    aura: 'Aura',
-    sleep: 'Sleep',
-    workout: 'Workout'
-  };
+  const formatDate = (date) => format(new Date(date), 'MMM d, yyyy');
+  
+  const handleBadgeClick = useCallback((badge) => {
+    setSelectedBadge(badge);
+    setShowBadgeModal(true);
+  }, []);
 
-  const timeRangeLabels = {
-    '7days': '7 Days',
-    '30days': '30 Days',
-    'alltime': 'All Time'
-  };
+  const handleResetStats = useCallback(() => {
+    setShowSmartResetDialog(true);
+  }, []);
 
-  // ===== RENDER =====
+  // Enhanced reset function with different levels
+  const confirmResetStats = useCallback((resetLevel) => {
+    if (!updateUserData) {
+      console.error('updateUserData function is not available');
+      toast.error('Unable to reset data - please refresh the page');
+      return;
+    }
+
+    let resetUserData = { ...safeUserData };
+    const today = new Date();
+
+    switch (resetLevel) {
+      case 'currentStreak':
+        resetUserData = {
+          ...safeUserData,
+          currentStreak: 0,
+          startDate: today,
+          streakHistory: [
+            ...(safeUserData.streakHistory || []),
+            {
+              id: (safeUserData.streakHistory?.length || 0) + 1,
+              start: today,
+              end: null,
+              days: 0,
+              reason: 'manual_reset'
+            }
+          ]
+        };
+        toast.success('Current streak reset to 0. All history and achievements preserved.');
+        break;
+
+      case 'allProgress':
+        resetUserData = {
+          ...safeUserData,
+          startDate: today,
+          currentStreak: 0,
+          relapseCount: 0,
+          wetDreamCount: 0,
+          longestStreak: safeUserData.longestStreak || 0,
+          streakHistory: [{
+            id: 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: 'major_reset'
+          }],
+          benefitTracking: [],
+          notes: {},
+          badges: safeUserData.badges?.map(badge => ({
+            ...badge,
+            earned: (badge.name === '90-Day King' && (safeUserData.longestStreak || 0) >= 90) ||
+                   (badge.name === '180-Day Emperor' && (safeUserData.longestStreak || 0) >= 180) ||
+                   (badge.name === '365-Day Sage' && (safeUserData.longestStreak || 0) >= 365) ? badge.earned : false,
+            date: ((badge.name === '90-Day King' && (safeUserData.longestStreak || 0) >= 90) ||
+                  (badge.name === '180-Day Emperor' && (safeUserData.longestStreak || 0) >= 180) ||
+                  (badge.name === '365-Day Sage' && (safeUserData.longestStreak || 0) >= 365)) ? badge.date : null
+          })) || []
+        };
+        toast.success(`All progress reset. Longest streak record (${safeUserData.longestStreak || 0} days) preserved.`);
+        break;
+
+      case 'everything':
+        resetUserData = {
+          startDate: today,
+          currentStreak: 0,
+          longestStreak: 0,
+          wetDreamCount: 0,
+          relapseCount: 0,
+          badges: [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null },
+            { id: 5, name: '180-Day Emperor', earned: false, date: null },
+            { id: 6, name: '365-Day Sage', earned: false, date: null }
+          ],
+          benefitTracking: [],
+          streakHistory: [{
+            id: 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: 'complete_reset'
+          }],
+          notes: {}
+        };
+        toast.success('Complete reset successful. All data has been cleared.');
+        break;
+
+      default:
+        toast.error('Invalid reset option selected');
+        return;
+    }
+    
+    updateUserData(resetUserData);
+    setShowSmartResetDialog(false);
+  }, [safeUserData, updateUserData]);
+
+  const handleUpgradeClick = useCallback(() => {
+    toast.success('All features are now free! 🎉');
+  }, []);
+
+  // ENHANCED: Memoized chart options
+  const chartOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        min: 0,
+        max: 10,
+        ticks: {
+          stepSize: 2,
+          color: '#aaaaaa',
+          font: { size: 12 }
+        },
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)',
+          drawBorder: false
+        }
+      },
+      x: {
+        ticks: {
+          color: '#aaaaaa',
+          font: { size: 12 },
+          maxTicksLimit: timeRange === 'quarter' ? 12 : timeRange === 'month' ? 15 : 7,
+          maxRotation: timeRange === 'quarter' ? 45 : 0
+        },
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)',
+          drawBorder: false
+        }
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        filter: (tooltipItem) => {
+          return tooltipItem.parsed.y !== null;
+        },
+        callbacks: {
+          title: (items) => {
+            if (!items.length) return '';
+            const idx = items[0].dataIndex;
+            const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
+            if (!chartData.timeRangeArray[idx]) return '';
+            return formatDate(chartData.timeRangeArray[idx].date);
+          },
+          label: (context) => {
+            const value = context.parsed.y;
+            if (value === null) return '';
+            const metricName = selectedMetric === 'sleep' ? 'Sleep Quality' : 
+                             selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1);
+            return `${metricName}: ${value}/10`;
+          }
+        },
+        backgroundColor: 'rgba(44, 44, 44, 0.95)',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        borderColor: '#ffdd00',
+        borderWidth: 1,
+        cornerRadius: 8,
+        displayColors: false,
+        padding: 12,
+        titleFont: { size: 14, weight: 'bold' },
+        bodyFont: { size: 13 }
+      }
+    },
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    onHover: (event, activeElements) => {
+      event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+    }
+  }), [timeRange, safeUserData, selectedMetric]);
+
+  // ENHANCED: Check if user has sufficient data for insights
+  const hasInsufficientData = useMemo(() => {
+    return (safeUserData.benefitTracking?.length || 0) < 3;
+  }, [safeUserData.benefitTracking]);
+  
   return (
     <div className="stats-container">
-      {/* Building Profile Banner - Only show when less than 7 days of data */}
-      {isBuildingProfile && (
-        <div className="stats-building-banner">
-          <div className="stats-building-helmet-container">
-            {helmetIcon ? (
-              <img 
-                src={helmetIcon} 
-                alt="Building" 
-                className="stats-building-helmet"
-              />
-            ) : (
-              <span className="stats-building-helmet-fallback">⚔️</span>
-            )}
-          </div>
-          <div className="stats-building-content">
-            <h3 className="stats-building-title">
-              Building Your Profile
-              <span className="stats-building-progress">{dataProgress}%</span>
-            </h3>
-            <p className="stats-building-description">
-              Track your benefits for {7 - Math.floor(dataProgress / 14.3)} more days to unlock personalized insights and analytics.
-            </p>
-            <div className="stats-building-progress-bar">
-              <div 
-                className="stats-building-progress-fill"
-                style={{ width: `${dataProgress}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* UPDATED: Header styling to match Tracker/Calendar tabs */}
       <div className="integrated-stats-header">
-        <div className="header-title-section">
-          <h2>Statistics</h2>
-          <p className="header-subtitle">Track your progress and achievements</p>
+        <div className="stats-header-title-section">
+          <h2>Your Stats</h2>
+          <p className="stats-header-subtitle">Comprehensive analytics and insights from your retention journey</p>
         </div>
-
-        {hasLoggedToday && (
-          <div className="header-logged-banner">
-            <span className="check-icon">✓</span>
-            <span>Today's benefits logged</span>
-          </div>
-        )}
-      </div>
-
-      {/* Streak Overview */}
-      <div className="streak-overview">
-        <div className="streak-card main-streak">
-          <div className="streak-icon">🔥</div>
-          <div className="streak-info">
-            <div className="streak-label">Current Streak</div>
-            <div className="streak-value">{streakData.current} days</div>
-            <div className="phase-indicator" style={{ color: currentPhase.color }}>
-              {currentPhase.name} Phase
-            </div>
-          </div>
-        </div>
-
-        <div className="streak-card">
-          <div className="streak-icon">🏆</div>
-          <div className="streak-info">
-            <div className="streak-label">Longest Streak</div>
-            <div className="streak-value">{streakData.longest} days</div>
-          </div>
-        </div>
-
-        <div className="streak-card">
-          <div className="streak-icon">📅</div>
-          <div className="streak-info">
-            <div className="streak-label">Total Journey</div>
-            <div className="streak-value">{streakData.totalDays} days</div>
+        <div className="stats-header-actions-section">
+          <div className="stats-header-actions">
+            <button 
+              className="action-btn reset-stats-btn" 
+              onClick={handleResetStats}
+              onKeyDown={(e) => e.key === 'Enter' && handleResetStats()}
+              tabIndex={0}
+            >
+              <FaRedo />
+              <span>Reset Progress</span>
+            </button>
           </div>
         </div>
       </div>
-
-      {/* Achievement Badges */}
-      <div className="achievement-section">
-        <h3>Achievements</h3>
+      
+      {/* Smart Reset Dialog */}
+      <SmartResetDialog
+        isOpen={showSmartResetDialog}
+        onClose={() => setShowSmartResetDialog(false)}
+        onConfirm={confirmResetStats}
+        userData={safeUserData}
+      />
+      
+      {/* Streak Statistics */}
+      <div className="streak-stats">
+        <div className="stat-card current-streak">
+          <div className="stat-value">{safeUserData.currentStreak || 0}</div>
+          <div className="stat-label">Current Streak</div>
+        </div>
+        
+        <div 
+          className="stat-card longest-streak clickable-stat" 
+          onClick={() => handleStatCardClick('longestStreak')}
+          onKeyDown={(e) => e.key === 'Enter' && handleStatCardClick('longestStreak')}
+          tabIndex={0}
+          role="button"
+          aria-label="View longest streak details"
+        >
+          <div className="stat-value">{safeUserData.longestStreak || 0}</div>
+          <div className="stat-label">Longest Streak</div>
+        </div>
+        
+        <div 
+          className="stat-card total-wetdreams clickable-stat" 
+          onClick={() => handleStatCardClick('wetDreams')}
+          onKeyDown={(e) => e.key === 'Enter' && handleStatCardClick('wetDreams')}
+          tabIndex={0}
+          role="button"
+          aria-label="View wet dreams analysis"
+        >
+          <div className="stat-value">{safeUserData.wetDreamCount || 0}</div>
+          <div className="stat-label">Wet Dreams</div>
+        </div>
+        
+        <div 
+          className="stat-card total-relapses clickable-stat" 
+          onClick={() => handleStatCardClick('relapses')}
+          onKeyDown={(e) => e.key === 'Enter' && handleStatCardClick('relapses')}
+          tabIndex={0}
+          role="button"
+          aria-label="View relapse analysis"
+        >
+          <div className="stat-value">{safeUserData.relapseCount || 0}</div>
+          <div className="stat-label">Relapses</div>
+        </div>
+      </div>
+      
+      {/* Stat Card Details Modal */}
+      <StatCardModal
+        showModal={showStatModal}
+        selectedStatCard={selectedStatCard}
+        onClose={() => setShowStatModal(false)}
+        userData={safeUserData}
+      />
+      
+      {/* Milestone Badges */}
+      <div className="milestone-section">
+        <h3>Your Achievements</h3>
+        
         <div className="badges-grid">
-          {badges.map(badge => (
+          {safeUserData.badges && safeUserData.badges.map(badge => (
             <div 
               key={badge.id} 
-              className={`badge-card ${!badge.unlocked ? 'locked' : ''}`}
+              className={`badge-card ${badge.earned ? 'earned' : 'locked'}`}
+              onClick={() => badge.earned && handleBadgeClick(badge)}
+              onKeyDown={(e) => e.key === 'Enter' && badge.earned && handleBadgeClick(badge)}
+              tabIndex={badge.earned ? 0 : -1}
+              role={badge.earned ? "button" : "presentation"}
+              aria-label={badge.earned ? `View ${badge.name} achievement details` : `${badge.name} - Not earned yet`}
             >
-              <div className="badge-icon">{badge.icon}</div>
-              <div className="badge-info">
-                <div className="badge-title">{badge.title}</div>
-                <div className="badge-description">{badge.description}</div>
-                {badge.unlocked && badge.unlockedDate && (
-                  <div className="badge-date">{badge.unlockedDate}</div>
-                )}
-                {!badge.unlocked && badge.daysRemaining && (
-                  <div className="badge-progress">{badge.daysRemaining} days to go</div>
+              <div className="badge-icon">
+                {badge.earned ? (
+                  <FaTrophy className="badge-earned-icon" />
+                ) : (
+                  <FaLock className="badge-locked-icon" />
                 )}
               </div>
+              <div className="badge-name">{badge.name}</div>
+              {badge.earned && badge.date && (
+                <div className="badge-date">
+                  Earned {format(new Date(badge.date), 'MMM d')}
+                </div>
+              )}
             </div>
           ))}
         </div>
       </div>
-
-      {/* Benefit Tracker with Sliding Pills */}
+      
+      {/* Benefit Tracker */}
       <div className="benefit-tracker-section">
         <h3>Benefit Tracker</h3>
         
-        {/* Metric Selection Pills with Slider */}
-        <div className="benefit-tracker-controls">
-          <div className="metric-pill-container" ref={metricContainerRef}>
-            <div 
-              className="metric-pill-slider"
-              style={metricSliderPosition}
-            />
-            {Object.entries(metricLabels).map(([key, label]) => (
-              <button
-                key={key}
-                ref={el => metricButtonRefs.current[key] = el}
-                className={`metric-btn ${selectedMetric === key ? 'active' : ''}`}
-                onClick={() => setSelectedMetric(key)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Time Range Pills with Slider */}
-        <div className="time-range-controls">
-          <div className="time-pill-container" ref={timeContainerRef}>
-            <div 
-              className="time-pill-slider"
-              style={timeSliderPosition}
-            />
-            {Object.entries(timeRangeLabels).map(([key, label]) => (
-              <button
-                key={key}
-                ref={el => timeButtonRefs.current[key] = el}
-                className={`time-btn ${selectedTimeRange === key ? 'active' : ''}`}
-                onClick={() => setSelectedTimeRange(key)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Chart Display */}
-        <div className="chart-container">
-          <div className="simple-chart">
-            {metricData.map((item, index) => (
-              <div 
-                key={index} 
-                className="chart-bar-container"
-                style={{ height: '100%' }}
-              >
+        {/* NEW: Building Profile Banner */}
+        {(safeUserData.benefitTracking?.length || 0) < 7 && (
+          <div className="stats-building-banner">
+            <div className="stats-building-helmet-container">
+              <img 
+                src={helmetImage} 
+                alt="Building" 
+                className="stats-building-helmet"
+              />
+            </div>
+            <div className="stats-building-content">
+              <h3 className="stats-building-title">
+                Building Your Profile
+                <span className="stats-building-progress">
+                  {Math.round(((safeUserData.benefitTracking?.length || 0) / 7) * 100)}%
+                </span>
+              </h3>
+              <p className="stats-building-description">
+                Track your benefits for {7 - (safeUserData.benefitTracking?.length || 0)} more days to unlock personalized insights and analytics.
+              </p>
+              <div className="stats-building-progress-bar">
                 <div 
-                  className="chart-bar"
-                  style={{ 
-                    height: `${(item.value / 10) * 100}%`,
-                    minHeight: item.value > 0 ? '4px' : '0',
-                    backgroundColor: currentPhase.color
-                  }}
-                >
-                  {item.value > 0 && (
-                    <span className="chart-value">{item.value}</span>
-                  )}
-                </div>
-                <span className="chart-label">{item.label}</span>
+                  className="stats-building-progress-fill"
+                  style={{ width: `${Math.round(((safeUserData.benefitTracking?.length || 0) / 7) * 100)}%` }}
+                />
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Weekly Average */}
-        {weeklyAverages[selectedMetric] && (
-          <div className="weekly-average">
-            <span className="average-label">This Week's Average:</span>
-            <span className="average-value" style={{ color: currentPhase.color }}>
-              {weeklyAverages[selectedMetric]}/10
-            </span>
+            </div>
           </div>
         )}
-      </div>
-
-      {/* Free User Features */}
-      {subscriptionStatus === 'free' && (
-        <>
-          {/* Energy Intelligence System */}
-          {showEnergySystem && (
-            <div className="energy-intelligence-section">
-              <div className="energy-header">
-                <h3>Energy Intelligence™</h3>
-                <button 
-                  className="energy-close-btn"
-                  onClick={() => setShowEnergySystem(false)}
-                >
-                  ✕
-                </button>
-              </div>
-
-              {!hasMinimumData ? (
-                <div className="energy-data-banner">
-                  <div className="energy-data-helmet-container">
-                    {helmetIcon ? (
-                      <img 
-                        src={helmetIcon} 
-                        alt="Data Collection" 
-                        className="energy-data-helmet"
-                      />
-                    ) : (
-                      <span className="energy-data-helmet-fallback">⚔️</span>
-                    )}
-                  </div>
-                  <div className="energy-data-content">
-                    <h4 className="energy-data-title">
-                      Gathering Energy Data
-                      <span className="energy-data-percentage">{dataProgress}%</span>
-                    </h4>
-                    <p className="energy-data-description">
-                      Track your energy levels for {7 - Math.floor(dataProgress / 14.3)} more days to unlock personalized energy insights and predictions.
-                    </p>
-                    <div className="energy-data-progress">
-                      <div 
-                        className="energy-data-progress-fill"
-                        style={{ width: `${dataProgress}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="energy-info-banner">
-                    <span className="info-icon">ℹ️</span>
-                    <span>Energy patterns help predict your peak performance times and recovery needs</span>
-                  </div>
-
-                  <div className="current-energy-display">
-                    <div className="energy-average-card">
-                      <div className="energy-average-label">Current Energy Average</div>
-                      <div className="energy-average-value">
-                        {weeklyAverages.energy || 0}/10
-                      </div>
-                      <div className="energy-phase-context">
-                        {currentPhase.name} Phase · {currentPhase.description}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="insight-selector-tabs">
-                    <div className="insight-pill-container">
-                      <button
-                        className={`insight-tab ${selectedEnergyInsight === 'patterns' ? 'active' : ''}`}
-                        onClick={() => setSelectedEnergyInsight('patterns')}
-                      >
-                        Patterns
-                      </button>
-                      <button
-                        className={`insight-tab ${selectedEnergyInsight === 'factors' ? 'active' : ''}`}
-                        onClick={() => setSelectedEnergyInsight('factors')}
-                      >
-                        Key Factors
-                      </button>
-                      <button
-                        className={`insight-tab ${selectedEnergyInsight === 'optimization' ? 'active' : ''}`}
-                        onClick={() => setSelectedEnergyInsight('optimization')}
-                      >
-                        Optimization
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="energy-insight-content">
-                    {selectedEnergyInsight === 'patterns' && (
-                      <div className="insight-panel">
-                        <h4>Your Energy Patterns</h4>
-                        <ul className="energy-insights-list">
-                          <li>Energy typically peaks after day 7 of retention</li>
-                          <li>Morning energy scores average {Math.round((weeklyAverages.energy || 5) * 1.1)}/10</li>
-                          <li>Strongest energy correlation with sleep quality</li>
-                          <li>{streakData.current > 14 ? 'Stable' : 'Building'} energy baseline detected</li>
-                        </ul>
-                      </div>
-                    )}
-
-                    {selectedEnergyInsight === 'factors' && (
-                      <div className="insight-panel">
-                        <h4>Key Energy Factors</h4>
-                        <div className="factor-cards">
-                          <div className="factor-card">
-                            <span className="factor-icon">💤</span>
-                            <span className="factor-label">Sleep Quality</span>
-                            <span className="factor-impact">High Impact</span>
-                          </div>
-                          <div className="factor-card">
-                            <span className="factor-icon">🏃</span>
-                            <span className="factor-label">Physical Activity</span>
-                            <span className="factor-impact">Medium Impact</span>
-                          </div>
-                          <div className="factor-card">
-                            <span className="factor-icon">🧘</span>
-                            <span className="factor-label">Stress Management</span>
-                            <span className="factor-impact">Medium Impact</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {selectedEnergyInsight === 'optimization' && (
-                      <div className="insight-panel">
-                        <h4>Energy Optimization Tips</h4>
-                        <div className="optimization-tips">
-                          <div className="tip-item">
-                            <span className="tip-number">1</span>
-                            <p>Schedule important tasks during your peak energy window (typically mornings)</p>
-                          </div>
-                          <div className="tip-item">
-                            <span className="tip-number">2</span>
-                            <p>Maintain consistent sleep schedule to stabilize energy levels</p>
-                          </div>
-                          <div className="tip-item">
-                            <span className="tip-number">3</span>
-                            <p>Use cold exposure in the morning to boost natural energy</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <button className="energy-upgrade-btn">
-                    <span>Unlock Premium Energy Analytics</span>
-                    <span className="upgrade-arrow">→</span>
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Quick Risk Overview */}
-          <div className="quick-risk-overview">
-            <div className="quick-risk-card">
-              <div className="quick-risk-header">
-                <span className="risk-overview-icon">⚠️</span>
-                <span>Relapse Risk Assessment</span>
-              </div>
-              <div className="quick-risk-content">
-                <div className="quick-risk-level">{riskLevel}</div>
-                <div className="quick-risk-description">
-                  Based on your {streakData.current} day streak and recent activity patterns
-                </div>
-              </div>
+        
+        {shouldShowInfoBanner(safeUserData, timeRange) && (
+          <div className="stats-info-banner">
+            <FaInfoCircle className="info-icon" />
+            <span><strong>Building your profile...</strong> Your insights become more detailed as you log daily benefits and track progress over time.</span>
+          </div>
+        )}
+        
+        {/* Controls */}
+        <div className="benefit-tracker-controls">
+          <div className="metric-selector">
+            <div className="metric-pill-container" ref={metricContainerRef}>
+              {/* NEW: Slider div */}
+              <div 
+                className="metric-pill-slider"
+                style={metricSliderPosition}
+              />
+              <button 
+                ref={el => metricButtonRefs.current['energy'] = el}
+                className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
+                onClick={() => handleMetricClick('energy')}
+                onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('energy')}
+                tabIndex={0}
+                aria-pressed={selectedMetric === 'energy'}
+              >
+                Energy
+              </button>
+              <button 
+                ref={el => metricButtonRefs.current['focus'] = el}
+                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
+                onClick={() => handleMetricClick('focus')}
+                onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('focus')}
+                tabIndex={0}
+                aria-pressed={selectedMetric === 'focus'}
+              >
+                Focus
+              </button>
+              <button 
+                ref={el => metricButtonRefs.current['confidence'] = el}
+                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
+                onClick={() => handleMetricClick('confidence')}
+                onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('confidence')}
+                tabIndex={0}
+                aria-pressed={selectedMetric === 'confidence'}
+              >
+                Confidence
+              </button>
+              <button 
+                ref={el => metricButtonRefs.current['aura'] = el}
+                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
+                onClick={() => handleMetricClick('aura')}
+                onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('aura')}
+                tabIndex={0}
+                aria-pressed={selectedMetric === 'aura'}
+              >
+                Aura
+              </button>
+              <button 
+                ref={el => metricButtonRefs.current['sleep'] = el}
+                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
+                onClick={() => handleMetricClick('sleep')}
+                onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('sleep')}
+                tabIndex={0}
+                aria-pressed={selectedMetric === 'sleep'}
+              >
+                Sleep Quality
+              </button>
+              <button 
+                ref={el => metricButtonRefs.current['workout'] = el}
+                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
+                onClick={() => handleMetricClick('workout')}
+                onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('workout')}
+                tabIndex={0}
+                aria-pressed={selectedMetric === 'workout'}
+              >
+                Workout
+              </button>
             </div>
           </div>
-
-          {/* Premium Features Teaser */}
-          <div className="premium-features-teaser">
-            <div className="teaser-header">
-              {helmetIcon ? (
-                <img 
-                  src={helmetIcon} 
-                  alt="Premium Features" 
-                  className="teaser-helmet-icon"
-                />
-              ) : (
-                <span className="teaser-helmet-fallback">⚔️</span>
-              )}
-              <div className="teaser-content">
-                <h4>Unlock Premium Analytics</h4>
-                <p>Get deeper insights into your journey with advanced tracking and predictions</p>
-              </div>
+          
+          <div className="time-range-selector-container">
+            <div className="time-range-selector" ref={timeContainerRef} role="radiogroup" aria-label="Time range selection">
+              {/* NEW: Time range slider */}
+              <div 
+                className="time-pill-slider"
+                style={timeSliderPosition}
+              />
+              <button 
+                ref={el => timeButtonRefs.current['week'] = el}
+                className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
+                onClick={() => setTimeRange('week')}
+                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('week')}
+                tabIndex={0}
+                role="radio"
+                aria-checked={timeRange === 'week'}
+              >
+                Week
+              </button>
+              <button 
+                ref={el => timeButtonRefs.current['month'] = el}
+                className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
+                onClick={() => setTimeRange('month')}
+                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('month')}
+                tabIndex={0}
+                role="radio"
+                aria-checked={timeRange === 'month'}
+              >
+                Month
+              </button>
+              <button 
+                ref={el => timeButtonRefs.current['quarter'] = el}
+                className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
+                onClick={() => setTimeRange('quarter')}
+                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('quarter')}
+                tabIndex={0}
+                role="radio"
+                aria-checked={timeRange === 'quarter'}
+              >
+                3 Months
+              </button>
             </div>
-
-            <div className="premium-features-grid">
-              <div className="premium-feature-item">
-                <span className="feature-icon">📊</span>
-                <div className="feature-text">
-                  <div className="feature-title">Detailed Analytics</div>
-                  <div className="feature-desc">30+ day trends and pattern analysis</div>
-                </div>
-                <span className="feature-lock">🔒</span>
-              </div>
-
-              <div className="premium-feature-item">
-                <span className="feature-icon">🎯</span>
-                <div className="feature-text">
-                  <div className="feature-title">AI Predictions</div>
-                  <div className="feature-desc">Urge forecasting with 85% accuracy</div>
-                </div>
-                <span className="feature-lock">🔒</span>
-              </div>
-
-              <div className="premium-feature-item">
-                <span className="feature-icon">⚡</span>
-                <div className="feature-text">
-                  <div className="feature-title">Energy Intelligence</div>
-                  <div className="feature-desc">Personalized energy optimization</div>
-                </div>
-                <span className="feature-lock">🔒</span>
-              </div>
-
-              <div className="premium-feature-item">
-                <span className="feature-icon">🛡️</span>
-                <div className="feature-text">
-                  <div className="feature-title">Risk Prevention</div>
-                  <div className="feature-desc">Advanced relapse risk monitoring</div>
-                </div>
-                <span className="feature-lock">🔒</span>
-              </div>
-            </div>
-
-            <button 
-              className="main-upgrade-btn"
-              onClick={() => {
-                toast('Premium features coming soon!', {
-                  icon: '⚔️',
-                  style: {
-                    background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
-                    color: '#FFD700',
-                    border: '1px solid rgba(255, 215, 0, 0.2)',
-                  }
-                });
-              }}
-            >
-              <span>Upgrade to Premium</span>
-              <span className="upgrade-arrow">→</span>
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* Energy System Toggle Button */}
-      {subscriptionStatus === 'free' && !showEnergySystem && (
-        <button 
-          className="energy-system-toggle"
-          onClick={() => setShowEnergySystem(true)}
-        >
-          <span>⚡</span>
-          <span>Open Energy Intelligence™</span>
-        </button>
-      )}
-
-      {/* Emotional Well-being */}
-      <div className="emotional-wellbeing-section">
-        <h3>Emotional Well-being</h3>
-        <div className="wellbeing-stats">
-          <div className="stat-item">
-            <span className="stat-label">Total Check-ins</span>
-            <span className="stat-value">{emotionalStats.totalCheckIns}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Recent Mood</span>
-            <span className="stat-value mood-indicator">
-              {emotionalStats.recentMood}
-            </span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Mood Trend</span>
-            <span className={`stat-value trend-${emotionalStats.moodTrend}`}>
-              {emotionalStats.moodTrend === 'improving' ? '↗️ Improving' :
-               emotionalStats.moodTrend === 'declining' ? '↘️ Declining' :
-               '→ Stable'}
-            </span>
           </div>
         </div>
+        
+        <div className="chart-and-insight-container" ref={insightsStartRef}>
+          <div className="chart-container">
+            {(() => {
+              const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
+              const hasAnyData = chartData.datasets[0].data.some(val => val !== null);
+              
+              if (!hasAnyData) {
+                return (
+                  <div className="no-chart-data">
+                    <div className="no-data-icon">
+                      <FaChartLine />
+                    </div>
+                    <div className="no-data-text">
+                      <h4>No Chart Data Available</h4>
+                      <p>Start logging your {selectedMetric} benefits to see your progress visualization.</p>
+                    </div>
+                  </div>
+                );
+              }
+              
+              return <Line data={chartData} options={chartOptions} height={300} />;
+            })()}
+          </div>
+          
+          <div className="current-insight-sidebar">
+            <div className="current-metric-average">
+              <div className="current-metric-label">
+                Your {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} {getTimeRangeDisplayText(timeRange)}
+              </div>
+              <div className="current-metric-value">
+                {calculateAverage(safeUserData, selectedMetric, timeRange, true) === 'N/A' ? 'N/A' : `${calculateAverage(safeUserData, selectedMetric, timeRange, true)}/10`}
+              </div>
+            </div>
+            
+            <div className="current-insight-card">
+              <div className="current-insight-header">
+                <span>Current Status</span>
+              </div>
+              <div className="current-insight-text">
+                {(() => {
+                  const avg = calculateAverage(safeUserData, selectedMetric, timeRange, true);
+                  const phase = getCurrentPhase(safeUserData);
+                  
+                  if (avg === 'N/A') {
+                    return `No ${selectedMetric} data for the selected ${timeRange} period. Start logging benefits to see your progress.`;
+                  }
+                  
+                  const avgValue = parseFloat(avg);
+                  
+                  if (avgValue >= 7) {
+                    return `Your ${selectedMetric} is excellent at ${avg}/10. You're in the ${phase} phase - maintain current strategies and channel this energy into growth.`;
+                  } else {
+                    return `Your ${selectedMetric} averaged ${avg}/10 during ${phase} phase. Check personalized insights below for optimization strategies.`;
+                  }
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Personalized Insights Section */}
+        <div className="personalized-insights-section">
+          <div className="personalized-insights-header">
+            <h3>Personalized Insights</h3>
+          </div>
+          
+          {/* Progress & Trends Analysis */}
+          <ProgressTrendsAnalysis
+            isLoading={loadingStates.progressTrends}
+            hasInsufficientData={hasInsufficientData}
+            userData={safeUserData}
+            progressTrends={memoizedInsights.progressTrends}
+            dataQuality={memoizedInsights.dataQuality}
+            selectedMetric={selectedMetric}
+          />
+          
+          {/* Relapse Pattern Analytics */}
+          <RelapsePatternAnalytics
+            isLoading={loadingStates.relapsePatterns}
+            relapsePatterns={memoizedInsights.relapsePatterns}
+            daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
+          />
+          
+          {/* Pattern Recognition */}
+          <PatternRecognition
+            isLoading={loadingStates.patternRecognition}
+            hasInsufficientData={hasInsufficientData}
+            userData={safeUserData}
+            patternInsights={memoizedInsights.patternInsights}
+            dataQuality={memoizedInsights.dataQuality}
+          />
+          
+          {/* Optimization Guidance */}
+          <OptimizationGuidance
+            isLoading={loadingStates.optimization}
+            hasInsufficientData={hasInsufficientData}
+            userData={safeUserData}
+            optimizationGuidance={memoizedInsights.optimizationGuidance}
+            dataQuality={memoizedInsights.dataQuality}
+          />
+          
+          {/* Phase Evolution Analysis */}
+          <PhaseEvolutionAnalysis
+            isLoading={loadingStates.phaseEvolution}
+            phaseEvolution={memoizedInsights.phaseEvolution}
+            selectedMetric={selectedMetric}
+            dataQuality={memoizedInsights.dataQuality}
+            currentStreak={safeUserData.currentStreak}
+          />
+        </div>
       </div>
-
-      {/* Action Buttons */}
-      <div className="stats-actions">
-        <button 
-          className="btn btn-outline"
-          onClick={() => setShowDataInsightModal(true)}
-        >
-          <span>📊</span>
-          Data Insights
-        </button>
-        <button 
-          className="btn btn-outline"
-          onClick={() => setShowRoadmapModal(true)}
-        >
-          <span>🗺️</span>
-          Recovery Roadmap
-        </button>
-        <button 
-          className="btn btn-danger"
-          onClick={() => setShowResetModal(true)}
-        >
-          <span>🔄</span>
-          Reset Stats
-        </button>
-      </div>
-
-      {/* Reset Confirmation Modal */}
-      {showResetModal && (
-        <div className="modal-overlay" onClick={() => setShowResetModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3>Reset All Statistics?</h3>
-            <p>This will permanently delete all your tracking data including:</p>
-            <ul style={{ textAlign: 'left', margin: '20px 0' }}>
-              <li>Streak counts and history</li>
-              <li>Benefit tracking data</li>
-              <li>Emotional check-ins</li>
-              <li>Achievement progress</li>
-            </ul>
-            <p style={{ color: '#ff6b6b', fontWeight: 'bold' }}>
-              This action cannot be undone!
-            </p>
+      
+      {/* Badge Modal */}
+      {showBadgeModal && selectedBadge && (
+        <div className="modal-overlay" onClick={() => setShowBadgeModal(false)} role="dialog" aria-modal="true" aria-labelledby="badge-modal-title">
+          <div className="modal-content badge-modal" onClick={e => e.stopPropagation()}>
+            <button 
+              className="badge-modal-close"
+              onClick={() => setShowBadgeModal(false)}
+              aria-label="Close modal"
+            >
+              <FaTimes />
+            </button>
+            
+            <div className="badge-trophy">
+              <FaMedal className="badge-trophy-icon" />
+            </div>
+            
+            <h3 id="badge-modal-title">{selectedBadge.name}</h3>
+            
+            <div className="badge-earned-date">
+              Earned on {selectedBadge.date ? format(new Date(selectedBadge.date), 'MMMM d, yyyy') : 'Unknown'}
+            </div>
+            
+            <div className="badge-description">
+              <p>
+                {selectedBadge.name === '7-Day Warrior' ? 
+                  'You\'ve shown tremendous discipline by maintaining a 7-day streak. Your foundation phase is complete - energy fluctuations are stabilizing and mental clarity is emerging!' :
+                selectedBadge.name === '14-Day Monk' ? 
+                  'Two weeks of dedication! You\'re in the adjustment phase with noticeable strength gains, improved posture, and enhanced focus. Your transformation is becoming visible!' :
+                selectedBadge.name === '30-Day Master' ? 
+                  'A full month of commitment! You\'ve entered the momentum phase with natural body composition changes, sustained energy, and mental clarity. True mastery developing!' :
+                selectedBadge.name === '90-Day King' ? 
+                  'Incredible achievement! 90 days represents complete physical and mental transformation. You\'ve reached royal status with emotional mastery and magnetic presence!' :
+                selectedBadge.name === '180-Day Emperor' ? 
+                  'Extraordinary dedication! Six months of practice has brought spiritual integration and identity transformation. You embody the divine masculine archetype!' :
+                selectedBadge.name === '365-Day Sage' ? 
+                  'Ultimate mastery achieved! One full year represents complete energy transmutation and service-oriented consciousness. You are now a teacher and healer for others!' :
+                  'Congratulations on earning this achievement!'
+                }
+              </p>
+            </div>
+            
+            <div className="badge-benefits">
+              <h4>Benefits Unlocked:</h4>
+              <ul>
+                {selectedBadge.name === '7-Day Warrior' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Energy fluctuations stabilizing</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Brief periods of mental sharpness</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Growing sense of possibility</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Motivation to improve life areas</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '14-Day Monk' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Noticeable strength gains</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Improved posture and presence</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Enhanced memory and focus</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Mood stabilization beginning</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '30-Day Master' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Natural muscle gain and fat loss</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Sustained high energy levels</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Sleep optimization and better rest</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Mental clarity and pattern recognition</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '90-Day King' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Complete emotional regulation</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Natural magnetism and charisma</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Exceptional mental performance</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Physical transformation complete</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '180-Day Emperor' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Spiritual integration and wisdom</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Natural leadership presence</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Identity transformation complete</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Conscious energy mastery</span></li>
+                  </>
+                )}
+                {selectedBadge.name === '365-Day Sage' && (
+                  <>
+                    <li><FaCheckCircle className="check-icon" /><span>Mastery of sexual energy transmutation</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Service-oriented consciousness</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Generational pattern breaking</span></li>
+                    <li><FaCheckCircle className="check-icon" /><span>Teaching and healing abilities</span></li>
+                  </>
+                )}
+              </ul>
+            </div>
+            
             <div className="modal-actions">
               <button 
-                className="btn btn-outline"
-                onClick={() => setShowResetModal(false)}
+                className="modal-got-it-btn" 
+                onClick={() => setShowBadgeModal(false)}
+                onKeyDown={(e) => e.key === 'Enter' && setShowBadgeModal(false)}
               >
-                Cancel
-              </button>
-              <button 
-                className="btn btn-danger"
-                onClick={handleResetStats}
-                disabled={isResetting}
-              >
-                {isResetting ? 'Resetting...' : 'Reset Everything'}
+                <FaCheckCircle />
+                Continue Journey
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Data Insights Modal */}
-      {showDataInsightModal && (
-        <div className="modal-overlay" onClick={() => setShowDataInsightModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3>Your Data Insights</h3>
-            <div className="insights-summary">
-              <div className="insight-item">
-                <span className="insight-label">Best Performing Metric:</span>
-                <span className="insight-value">
-                  {Object.entries(weeklyAverages).reduce((a, b) => 
-                    (weeklyAverages[a[0]] > weeklyAverages[b[0]] ? a : b), ['None', 0]
-                  )[0]}
-                </span>
-              </div>
-              <div className="insight-item">
-                <span className="insight-label">Consistency Score:</span>
-                <span className="insight-value">
-                  {Math.round((Object.keys(benefits || {}).length / Math.max(streakData.totalDays, 1)) * 100)}%
-                </span>
-              </div>
-              <div className="insight-item">
-                <span className="insight-label">Phase Progress:</span>
-                <span className="insight-value" style={{ color: currentPhase.color }}>
-                  {currentPhase.name}
-                </span>
-              </div>
-            </div>
-            <button 
-              className="btn btn-primary btn-full"
-              onClick={() => setShowDataInsightModal(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Recovery Roadmap Modal */}
-      {showRoadmapModal && (
-        <div className="modal-overlay" onClick={() => setShowRoadmapModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3>Your Recovery Roadmap</h3>
-            <div className="roadmap-phases">
-              <div className={`phase-item ${currentPhase.name === 'Withdrawal' ? 'current' : ''}`}>
-                <span className="phase-days">Days 0-7</span>
-                <span className="phase-name">Withdrawal</span>
-                <span className="phase-desc">Breaking free from the cycle</span>
-              </div>
-              <div className={`phase-item ${currentPhase.name === 'Buildup' ? 'current' : ''}`}>
-                <span className="phase-days">Days 7-14</span>
-                <span className="phase-name">Buildup</span>
-                <span className="phase-desc">Energy and focus returning</span>
-              </div>
-              <div className={`phase-item ${currentPhase.name === 'Acceleration' ? 'current' : ''}`}>
-                <span className="phase-days">Days 14-30</span>
-                <span className="phase-name">Acceleration</span>
-                <span className="phase-desc">Momentum and confidence building</span>
-              </div>
-              <div className={`phase-item ${currentPhase.name === 'Refinement' ? 'current' : ''}`}>
-                <span className="phase-days">Days 30-90</span>
-                <span className="phase-name">Refinement</span>
-                <span className="phase-desc">Deep healing and growth</span>
-              </div>
-              <div className={`phase-item ${currentPhase.name === 'Mastery' ? 'current' : ''}`}>
-                <span className="phase-days">Days 90+</span>
-                <span className="phase-name">Mastery</span>
-                <span className="phase-desc">Living your potential</span>
-              </div>
-            </div>
-            <div className="current-position">
-              <span>You are here:</span>
-              <span style={{ color: currentPhase.color, fontWeight: 'bold' }}>
-                Day {streakData.current} - {currentPhase.name} Phase
-              </span>
-            </div>
-            <button 
-              className="btn btn-primary btn-full"
-              onClick={() => setShowRoadmapModal(false)}
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
