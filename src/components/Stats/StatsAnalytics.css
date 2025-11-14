@@ -1,6 +1,6 @@
-/* components/Stats/StatsAnalytics.css - Sliding Pills and Building Profile Banner ONLY */
+/* components/Stats/StatsAnalytics.css - Sliding Pills and Building Profile Banner Additions */
 
-/* ===== BUILDING PROFILE BANNER ===== */
+/* ===== BUILDING PROFILE BANNER (NEW) ===== */
 .stats-building-banner {
   background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
@@ -106,9 +106,14 @@
   }
 }
 
-/* ===== SLIDING PILL ANIMATIONS ===== */
+/* ===== SLIDING PILL ANIMATIONS (ADDITIONS ONLY) ===== */
 
-/* Metric Pills Slider */
+/* Update existing metric-pill-container to have position relative */
+.metric-pill-container {
+  position: relative !important;
+}
+
+/* Metric Pills Slider (NEW) */
 .metric-pill-slider {
   position: absolute;
   top: var(--spacing-xs);
@@ -126,13 +131,28 @@
   width: 0px;
 }
 
-/* Active metric button - black text on yellow */
+/* Update active metric button to have black text */
 .metric-btn.active {
   color: #000000 !important;
   font-weight: 600 !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  position: relative !important;
+  z-index: 2 !important;
 }
 
-/* Time Range Pills Slider */
+/* Ensure all metric buttons have proper z-index */
+.metric-btn {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Update existing time-range-selector to have position relative */
+.time-range-selector {
+  position: relative !important;
+}
+
+/* Time Range Pills Slider (NEW) */
 .time-pill-slider {
   position: absolute;
   top: var(--spacing-xs);
@@ -150,19 +170,20 @@
   width: 0px;
 }
 
-/* Active time button - black text on yellow */
+/* Update active time button to have black text */
 .time-btn.active {
   color: #000000 !important;
   font-weight: 600 !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  position: relative !important;
+  z-index: 2 !important;
 }
 
-/* Ensure pill containers have position relative for sliders */
-.metric-pill-container {
-  position: relative;
-}
-
-.time-range-selector {
-  position: relative;
+/* Ensure all time buttons have proper z-index */
+.time-btn {
+  position: relative !important;
+  z-index: 2 !important;
 }
 
 /* Faster transition on mobile */
@@ -172,3 +193,5 @@
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
+
+/* ===== END OF NEW ADDITIONS ===== */
