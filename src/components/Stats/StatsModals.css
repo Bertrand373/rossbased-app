@@ -1,4 +1,4 @@
-/* components/Stats/StatsModals.css - Modal Components Styling - FIXED: Unified X button and focus states */
+/* components/Stats/StatsModals.css - Modal Components Styling - FIXED: X buttons EXACTLY matching EmotionalTimeline */
 
 /* Modal styles */
 .modal-overlay {
@@ -48,22 +48,23 @@
   }
 }
 
-/* UNIFIED: Universal X button for ALL modals */
+/* EXACT COPY: X button from EmotionalTimeline modal with grey circle background */
 .modal-close-x,
 .stat-modal-close,
 .badge-modal-close {
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  background: none;
-  border: none;
-  color: var(--text-secondary);
+  background: rgba(128, 128, 128, 0.1) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+  width: 32px;
+  height: 32px;
   font-size: 1rem;
+  color: var(--text-secondary);
   cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,15 +76,18 @@
 .modal-close-x:hover,
 .stat-modal-close:hover,
 .badge-modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary);
+  transform: scale(1.1);
 }
 
-/* FIXED: Explicit focus states for X buttons */
+/* Focus state - keeps grey with subtle outline */
 .modal-close-x:focus,
 .stat-modal-close:focus,
 .badge-modal-close:focus {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
   color: var(--text-secondary);
   outline: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -126,7 +130,7 @@
   color: var(--text-secondary);
 }
 
-/* FIXED: Focus state stays grey with subtle outline */
+/* Focus state stays grey with subtle outline */
 .modal-actions .btn-primary:focus {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
@@ -151,7 +155,7 @@
   color: var(--text-secondary);
 }
 
-/* FIXED: Focus state for outline buttons */
+/* Focus state for outline buttons */
 .modal-actions .btn-outline:focus {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
@@ -183,7 +187,7 @@
   outline: none;
 }
 
-/* FIXED: Focus state stays grey with subtle outline */
+/* Focus state stays grey with subtle outline */
 .modal-got-it-btn:focus {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
@@ -343,8 +347,8 @@
   .badge-modal-close {
     top: var(--spacing-sm);
     right: var(--spacing-sm);
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     font-size: 1rem;
   }
   
@@ -390,8 +394,8 @@
   .badge-modal-close {
     top: var(--spacing-xs);
     right: var(--spacing-xs);
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     font-size: 0.875rem;
   }
   
