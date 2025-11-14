@@ -62,14 +62,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   
-  // NEW: Slider animation states and refs
-  const [metricSliderPosition, setMetricSliderPosition] = useState({ transform: 'translateX(0px)', width: '0px' });
-  const [timeSliderPosition, setTimeSliderPosition] = useState({ transform: 'translateX(0px)', width: '0px' });
-  const metricContainerRef = useRef(null);
-  const timeContainerRef = useRef(null);
-  const metricButtonRefs = useRef({});
-  const timeButtonRefs = useRef({});
-  
   // ENHANCED: Loading states for insights
   const [loadingStates, setLoadingStates] = useState({
     progressTrends: false,
@@ -107,43 +99,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 800);
     }
   }, [timeRange, selectedMetric, simulateInsightLoading, safeUserData.streakHistory]);
-
-  // NEW: Update slider positions
-  useEffect(() => {
-    const metricButton = metricButtonRefs.current[selectedMetric];
-    const metricContainer = metricContainerRef.current;
-    
-    if (metricButton && metricContainer) {
-      const containerRect = metricContainer.getBoundingClientRect();
-      const buttonRect = metricButton.getBoundingClientRect();
-      const relativeLeft = buttonRect.left - containerRect.left;
-      
-      setMetricSliderPosition({
-        transform: `translateX(${relativeLeft}px)`,
-        width: `${buttonRect.width}px`,
-        opacity: 1,
-        visibility: 'visible'
-      });
-    }
-  }, [selectedMetric]);
-
-  useEffect(() => {
-    const timeButton = timeButtonRefs.current[timeRange];
-    const timeContainer = timeContainerRef.current;
-    
-    if (timeButton && timeContainer) {
-      const containerRect = timeContainer.getBoundingClientRect();
-      const buttonRect = timeButton.getBoundingClientRect();
-      const relativeLeft = buttonRect.left - containerRect.left;
-      
-      setTimeSliderPosition({
-        transform: `translateX(${relativeLeft}px)`,
-        width: `${buttonRect.width}px`,
-        opacity: 1,
-        visibility: 'visible'
-      });
-    }
-  }, [timeRange]);
 
   // Handle metric selection
   const handleMetricClick = useCallback((metric) => {
@@ -497,36 +452,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       <div className="benefit-tracker-section">
         <h3>Benefit Tracker</h3>
         
-        {/* NEW: Building Profile Banner */}
-        {(safeUserData.benefitTracking?.length || 0) < 7 && (
-          <div className="stats-building-banner">
-            <div className="stats-building-helmet-container">
-              <img 
-                src={helmetImage} 
-                alt="Building" 
-                className="stats-building-helmet"
-              />
-            </div>
-            <div className="stats-building-content">
-              <h3 className="stats-building-title">
-                Building Your Profile
-                <span className="stats-building-progress">
-                  {Math.round(((safeUserData.benefitTracking?.length || 0) / 7) * 100)}%
-                </span>
-              </h3>
-              <p className="stats-building-description">
-                Track your benefits for {7 - (safeUserData.benefitTracking?.length || 0)} more days to unlock personalized insights and analytics.
-              </p>
-              <div className="stats-building-progress-bar">
-                <div 
-                  className="stats-building-progress-fill"
-                  style={{ width: `${Math.round(((safeUserData.benefitTracking?.length || 0) / 7) * 100)}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-        
         {shouldShowInfoBanner(safeUserData, timeRange) && (
           <div className="stats-info-banner">
             <FaInfoCircle className="info-icon" />
@@ -537,14 +462,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         {/* Controls */}
         <div className="benefit-tracker-controls">
           <div className="metric-selector">
-            <div className="metric-pill-container" ref={metricContainerRef}>
-              {/* NEW: Slider div */}
-              <div 
-                className="metric-pill-slider"
-                style={metricSliderPosition}
-              />
+            <div className="metric-pill-container">
               <button 
-                ref={el => metricButtonRefs.current['energy'] = el}
                 className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('energy')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('energy')}
@@ -554,7 +473,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Energy
               </button>
               <button 
-                ref={el => metricButtonRefs.current['focus'] = el}
                 className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('focus')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('focus')}
@@ -564,7 +482,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Focus
               </button>
               <button 
-                ref={el => metricButtonRefs.current['confidence'] = el}
                 className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('confidence')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('confidence')}
@@ -574,7 +491,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Confidence
               </button>
               <button 
-                ref={el => metricButtonRefs.current['aura'] = el}
                 className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('aura')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('aura')}
@@ -584,7 +500,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Aura
               </button>
               <button 
-                ref={el => metricButtonRefs.current['sleep'] = el}
                 className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('sleep')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('sleep')}
@@ -594,7 +509,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Sleep Quality
               </button>
               <button 
-                ref={el => metricButtonRefs.current['workout'] = el}
                 className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('workout')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('workout')}
@@ -607,14 +521,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           </div>
           
           <div className="time-range-selector-container">
-            <div className="time-range-selector" ref={timeContainerRef} role="radiogroup" aria-label="Time range selection">
-              {/* NEW: Time range slider */}
-              <div 
-                className="time-pill-slider"
-                style={timeSliderPosition}
-              />
+            <div className="time-range-selector" role="radiogroup" aria-label="Time range selection">
               <button 
-                ref={el => timeButtonRefs.current['week'] = el}
                 className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
                 onClick={() => setTimeRange('week')}
                 onKeyDown={(e) => e.key === 'Enter' && setTimeRange('week')}
@@ -625,7 +533,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Week
               </button>
               <button 
-                ref={el => timeButtonRefs.current['month'] = el}
                 className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
                 onClick={() => setTimeRange('month')}
                 onKeyDown={(e) => e.key === 'Enter' && setTimeRange('month')}
@@ -636,7 +543,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Month
               </button>
               <button 
-                ref={el => timeButtonRefs.current['quarter'] = el}
                 className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
                 onClick={() => setTimeRange('quarter')}
                 onKeyDown={(e) => e.key === 'Enter' && setTimeRange('quarter')}
