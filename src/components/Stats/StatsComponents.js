@@ -1,153 +1,235 @@
-// components/Stats/StatsComponents.js - FIXED: Modal autoFocus and X button positioning
+// components/Stats/StatsComponents.js - FIXED: X button positioning and autoFocus removed
 import React from 'react';
-import { format, differenceInDays } from 'date-fns';
-import { FaFire, FaTrophy, FaRedo, FaCheckCircle, FaTimes, FaInfoCircle } from 'react-icons/fa';
+import { FaChartLine, FaTrophy, FaInfoCircle, FaTimes, FaExclamationTriangle, FaMoon, FaCheckCircle } from 'react-icons/fa';
+import { format } from 'date-fns';
+import helmetImage from '../../assets/helmet.png';
 
-// Helper function to format trigger names
-const formatTriggerName = (trigger) => {
-  return trigger
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+// ENHANCED: Loading states component with helmet animation
+export const InsightLoadingState = ({ insight, isVisible }) => {
+  if (!isVisible) return null;
+  
+  return (
+    <div className="insight-loading-state">
+      <div className="insight-loading-content">
+        <img 
+          src={helmetImage} 
+          alt="Analyzing" 
+          className="insight-loading-helmet"
+          onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.nextSibling.style.display = 'block';
+          }}
+        />
+        <div className="insight-loading-helmet-fallback" style={{display: 'none'}}>🧠</div>
+        <div className="insight-loading-text">
+          <div className="insight-loading-title">Calculating {insight}...</div>
+          <div className="insight-loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-// StatCardModal Component
-export function StatCardModal({ showModal, selectedStatCard, onClose, userData }) {
-  if (!showModal) return null;
+// ENHANCED: Progress indicator component with mobile optimizations
+export const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
+  const trackedDays = userData.benefitTracking?.length || 0;
+  const progressPercentage = Math.min((trackedDays / targetDays) * 100, 100);
+  const isComplete = trackedDays >= targetDays;
+  
+  return (
+    <div className="data-progress-indicator">
+      <div className="data-progress-header">
+        <div className="data-progress-title">
+          {isComplete ? 'Analytics Ready' : 'Building Your Profile'}
+        </div>
+        <div className="data-progress-count">
+          {trackedDays}/{targetDays} days
+        </div>
+      </div>
+      <div className="data-progress-bar">
+        <div 
+          className="data-progress-fill"
+          style={{ width: `${progressPercentage}%` }}
+        />
+      </div>
+      {!isComplete && (
+        <div className="data-progress-message">
+          Track {targetDays - trackedDays} more days for detailed insights
+        </div>
+      )}
+    </div>
+  );
+};
 
-  const generateStatCardContent = (cardType) => {
-    const currentStreak = userData.currentStreak || 0;
-    const longestStreak = userData.longestStreak || 0;
-    const relapseCount = userData.relapseCount || 0;
-    
-    // Calculate additional stats for relapse analysis
+// ENHANCED: Empty state component with encouragement
+export const InsightEmptyState = ({ insight, userData }) => {
+  const suggestions = {
+    'Smart Urge Management': 'Track your daily benefits to receive personalized vulnerability assessments and timing-based guidance.',
+    'Relapse Risk Predictor': 'Build a benefit tracking history to unlock predictive analytics and risk mitigation strategies.',
+    'Pattern Recognition': 'Continue logging daily benefits to identify correlations and trends in your retention journey.',
+    'Optimization Guidance': 'Track benefits consistently to discover your peak performance zones and optimization opportunities.'
+  };
+
+  return (
+    <div className="insight-empty-state">
+      <div className="insight-empty-icon">
+        <FaChartLine />
+      </div>
+      <div className="insight-empty-content">
+        <div className="insight-empty-title">Building Your {insight}</div>
+        <div className="insight-empty-description">
+          {suggestions[insight] || 'Continue tracking to unlock personalized insights.'}
+        </div>
+        <DataProgressIndicator userData={userData} />
+      </div>
+    </div>
+  );
+};
+
+// FIXED: Helper function to format trigger names - handles invalid triggers
+const formatTriggerName = (trigger) => {
+  if (!trigger || typeof trigger !== 'string') return 'not recorded';
+  
+  const triggerMap = {
+    'lustful_thoughts': 'lustful thoughts',
+    'stress': 'stress',
+    'boredom': 'boredom',
+    'social_media': 'social media',
+    'loneliness': 'loneliness',
+    'relationship': 'relationship issues',
+    'home_environment': 'being home alone',
+    'home_alone': 'being home alone',
+    'explicit_content': 'explicit content',
+    'alcohol_substances': 'alcohol/substances',
+    'sleep_deprivation': 'sleep deprivation'
+  };
+  
+  // Return mapped name or sanitized version of unknown trigger
+  return triggerMap[trigger] || trigger.replace(/_/g, ' ').replace(/[^a-zA-Z0-9\s]/g, '');
+};
+
+// FIXED: Stat Card Modal with X button at modal level and no autoFocus
+export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }) => {
+  if (!showModal || !selectedStatCard) return null;
+
+  const generateStatCardContent = (statType) => {
     const streakHistory = userData.streakHistory || [];
-    const relapses = streakHistory.filter(streak => streak && streak.reason === 'relapse');
+    const startDate = userData.startDate ? new Date(userData.startDate) : new Date();
     
-    // Get trigger counts
-    const triggerCounts = {};
-    relapses.forEach(relapse => {
-      if (relapse.trigger) {
-        triggerCounts[relapse.trigger] = (triggerCounts[relapse.trigger] || 0) + 1;
-      }
-    });
-    
-    const mostRecordedTrigger = Object.keys(triggerCounts).length > 0 ? 
-      Object.keys(triggerCounts).reduce((a, b) => triggerCounts[a] > triggerCounts[b] ? a : b) :
-      null;
-    
-    switch(cardType) {
-      case 'current':
-        return {
-          title: 'Current Streak Analysis',
-          icon: <FaFire />,
-          mainValue: `${currentStreak} ${currentStreak === 1 ? 'day' : 'days'}`,
-          content: [
-            currentStreak === 0 ? 
-              'Your journey starts today. Every master was once a beginner.' :
-            currentStreak < 7 ? 
-              `You're in the Foundation Phase. Energy fluctuations are normal. Stay committed!` :
-            currentStreak < 14 ? 
-              `Great progress! You're building momentum. Noticeable benefits emerging.` :
-            currentStreak < 30 ? 
-              `Excellent work! You're in the Adjustment Phase. Strength and clarity increasing.` :
-            currentStreak < 90 ? 
-              `Outstanding! You're in the Momentum Phase. Natural body composition changes occurring.` :
-              `Legendary status! You've achieved mastery level. Complete transformation manifesting.`,
-              
-            currentStreak > 0 && longestStreak > 0 ?
-              currentStreak >= longestStreak ? 
-                'This is your best streak ever! Keep pushing forward!' :
-                `${longestStreak - currentStreak} days to beat your record.` :
-              '',
-              
-            currentStreak >= 30 ? 
-              'Your self-control and pattern awareness have significantly improved.' :
-            currentStreak >= 14 ? 
-              'Physical and mental benefits are becoming more pronounced.' :
-            currentStreak >= 7 ? 
-              'Foundation phase complete. Prepare for increased benefits.' :
-              'Focus on getting through the first 24 hours. Then the first 3 days.'
-          ].filter(text => text !== '')
-        };
+    switch (statType) {
+      case 'longestStreak':
+        const longestStreak = userData.longestStreak || 0;
+        
+        // Find the longest streak record from history
+        const longestStreakRecord = streakHistory
+          .filter(streak => streak && streak.days)
+          .reduce((longest, current) => {
+            return (current.days || 0) > (longest?.days || 0) ? current : longest;
+          }, null);
 
-      case 'longest':
-        const daysAgo = userData.longestStreakDate ? 
-          differenceInDays(new Date(), new Date(userData.longestStreakDate)) : null;
-          
+        const longestStreakStart = longestStreakRecord?.start ? 
+          format(new Date(longestStreakRecord.start), 'MMMM d, yyyy') : 'Not recorded';
+        const longestStreakEnd = longestStreakRecord?.end ? 
+          format(new Date(longestStreakRecord.end), 'MMMM d, yyyy') : format(new Date(), 'MMMM d, yyyy');
+        
+        // Determine if this longest streak is still active (no end date)
+        const isStillActive = !longestStreakRecord?.end;
+        const durationText = longestStreakRecord ? 
+          `Duration: ${longestStreakStart} to ${longestStreakEnd}${isStillActive ? ' (still active)' : ''}` : 
+          'Date records not available for this streak.';
+
         return {
           title: 'Longest Streak Record',
           icon: <FaTrophy />,
-          mainValue: `${longestStreak} ${longestStreak === 1 ? 'day' : 'days'}`,
+          mainValue: `${longestStreak} days`,
           content: [
             longestStreak === 0 ? 
-              'No streak recorded yet. Start your journey today!' :
-            longestStreak < 7 ? 
-              'Foundation phase reached. Next target: 7-Day Warrior badge.' :
-            longestStreak < 14 ? 
-              'Impressive start! Push for the 14-Day Monk achievement.' :
-            longestStreak < 30 ? 
-              'Strong progress! The 30-Day Master badge is within reach.' :
-            longestStreak < 90 ? 
-              'Exceptional dedication! You're approaching elite status.' :
-            longestStreak < 180 ? 
-              'King-level achievement! You've mastered self-control.' :
-            longestStreak < 365 ? 
-              'Emperor status! Spiritual integration achieved.' :
-              'Sage level! Complete mastery and transformation achieved.',
-              
-            userData.longestStreakDate && daysAgo !== null ? 
-              daysAgo === 0 ? 
-                'This record was set today!' :
-              daysAgo === 1 ? 
-                'This record was set yesterday.' :
-              daysAgo < 7 ? 
-                `This record was set ${daysAgo} days ago.` :
-              daysAgo < 30 ? 
-                `This record was set ${Math.floor(daysAgo / 7)} weeks ago.` :
-                `This record was set ${format(new Date(userData.longestStreakDate), 'MMMM d, yyyy')}.` :
-              '',
-              
-            currentStreak > 0 && currentStreak >= longestStreak * 0.8 ? 
-              'You're approaching your record! Stay focused and surpass it!' :
-            longestStreak > 30 ? 
-              'This achievement represents significant personal growth.' :
-              'Every day you persist, you're building stronger neural pathways.'
-          ].filter(text => text !== '')
+              'No streak longer than 1 day recorded yet.' :
+              `Personal best streak: ${longestStreak} consecutive days.`,
+            
+            durationText,
+            
+            longestStreakRecord?.reason ? 
+              `Ended due to: ${longestStreakRecord.reason.replace(/_/g, ' ')}` :
+              isStillActive ? 'Currently ongoing - keep up the great work!' : 'End reason not recorded.'
+          ]
+        };
+
+      case 'wetDreams':
+        const wetDreamCount = userData.wetDreamCount || 0;
+        
+        // Calculate tracking period
+        const daysSinceStart = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
+        const frequency = daysSinceStart > 30 && wetDreamCount > 0 ? 
+          Math.round(daysSinceStart / wetDreamCount) : null;
+
+        return {
+          title: 'Wet Dream Record',
+          icon: <FaMoon />,
+          mainValue: `${wetDreamCount} total`,
+          content: [
+            `Total occurrences: ${wetDreamCount} wet dreams recorded.`,
+            
+            `Tracking period: ${daysSinceStart} days since ${format(startDate, 'MMMM d, yyyy')}.`,
+            
+            frequency ? 
+              `Average frequency: approximately every ${frequency} days.` : 
+              wetDreamCount === 0 ? 
+                'No wet dreams recorded during tracking period.' :
+                'Frequency calculation requires longer tracking period.'
+          ]
         };
 
       case 'relapses':
-        const avgStreakLength = relapseCount > 0 && streakHistory.length > 0 ? 
-          Math.round(streakHistory.reduce((sum, streak) => sum + (streak?.days || 0), 0) / streakHistory.length) :
-          0;
-          
+        const relapseCount = userData.relapseCount || 0;
+        
+        // Find most recent relapse
+        const relapses = streakHistory.filter(streak => 
+          streak && streak.reason === 'relapse'
+        );
+        
+        const mostRecentRelapse = relapses.length > 0 ? 
+          relapses.reduce((latest, current) => {
+            try {
+              const currentDate = new Date(current.end || current.start);
+              const latestDate = new Date(latest.end || latest.start);
+              return currentDate > latestDate ? current : latest;
+            } catch (error) {
+              return latest;
+            }
+          }) : null;
+
+        const daysSinceLastRelapse = mostRecentRelapse ? 
+          Math.floor((new Date() - new Date(mostRecentRelapse.end || mostRecentRelapse.start)) / (1000 * 60 * 60 * 24)) : null;
+
+        // FIXED: Find most recorded trigger with proper validation
+        const triggerCounts = {};
+        relapses.forEach(relapse => {
+          const trigger = relapse.trigger || 'not recorded';
+          // Only count valid triggers, skip invalid ones like 'celebration'
+          if (trigger !== 'celebration' && trigger !== 'not recorded') {
+            triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
+          }
+        });
+        
+        const mostRecordedTrigger = Object.keys(triggerCounts).length > 0 ? 
+          Object.entries(triggerCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0] : null;
+
         return {
-          title: 'Relapse Pattern Analysis',
-          icon: <FaRedo />,
-          mainValue: `${relapseCount} ${relapseCount === 1 ? 'relapse' : 'relapses'}`,
+          title: 'Relapse Record',
+          icon: <FaExclamationTriangle />,
+          mainValue: `${relapseCount} total`,
           content: [
-            relapseCount === 0 ? 
-              'Perfect record! No relapses recorded. Exceptional self-control!' :
-            relapseCount === 1 ? 
-              'Single setback only. Excellent resilience and recovery!' :
-            relapseCount < 5 ? 
-              'Minimal relapses. You're developing strong pattern awareness.' :
-            relapseCount < 10 ? 
-              'Learning from each experience. Progress over perfection.' :
-              'Each relapse teaches valuable lessons. Focus on extending streaks.',
-              
-            avgStreakLength > 0 ? 
-              `Average streak length: ${avgStreakLength} days.` :
-              '',
-              
-            relapseCount > 0 && avgStreakLength > 14 ? 
-              'Your average streak shows strong commitment and recovery ability.' :
-            relapseCount > 0 && avgStreakLength > 7 ? 
-              'You're consistently reaching the foundation phase between relapses.' :
-            relapseCount > 0 && avgStreakLength > 0 ? 
-              'Focus on identifying patterns and extending each streak.' :
+            `Total relapses: ${relapseCount} recorded since starting.`,
+            
+            daysSinceLastRelapse !== null ? 
+              `Most recent: ${daysSinceLastRelapse} days ago (${format(new Date(mostRecentRelapse.end || mostRecentRelapse.start), 'MMMM d, yyyy')})` :
               relapseCount > 0 ? 
-                'Track your triggers to identify patterns and prevent future relapses.' :
+                'Most recent relapse date not recorded.' :
                 'No relapses recorded.',
             
             mostRecordedTrigger ? 
@@ -155,7 +237,7 @@ export function StatCardModal({ showModal, selectedStatCard, onClose, userData }
               relapseCount > 0 ? 
                 'Trigger information not available.' :
                 'No trigger data to display.'
-          ].filter(text => text !== '')
+          ]
         };
 
       default:
@@ -173,6 +255,7 @@ export function StatCardModal({ showModal, selectedStatCard, onClose, userData }
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="stat-modal-title">
       <div className="modal-content stat-details-modal" onClick={e => e.stopPropagation()}>
+        {/* FIXED: X button moved to modal level (outside header) */}
         <button 
           className="stat-modal-close"
           onClick={onClose}
@@ -199,6 +282,7 @@ export function StatCardModal({ showModal, selectedStatCard, onClose, userData }
         </div>
         
         <div className="modal-actions">
+          {/* FIXED: Removed autoFocus to prevent yellow appearance on modal open */}
           <button 
             className="modal-got-it-btn" 
             onClick={onClose}
