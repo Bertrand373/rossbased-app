@@ -1,4 +1,4 @@
-/* components/Stats/StatsAnalytics.css - ENHANCED: Added sliding pill menu animations - COMPLETE FILE */
+/* components/Stats/StatsAnalytics.css - ENHANCED: Professional UX Polish with Loading States + Core Analytics Components - COMPLETE FILE */
 
 /* ENHANCED: Loading States for Insights */
 .insight-loading-state {
@@ -198,45 +198,53 @@
   flex-direction: column;
   gap: var(--spacing-md);
   align-items: center;
-  max-width: 600px;
+  max-width: 400px;
+  width: 100%;
 }
 
 .insight-empty-title {
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text);
+  margin: 0;
 }
 
 .insight-empty-description {
   font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.5;
+  margin: 0;
 }
 
-/* ENHANCED: Focus State Management */
+/* ENHANCED: Focus States and Accessibility - REFINED */
 .metric-btn:focus-visible,
 .time-btn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
-  z-index: 1;
+  box-shadow: 0 0 0 4px rgba(255, 221, 0, 0.1);
 }
 
-/* Remove default focus styles when not using keyboard */
+/* Remove focus outline on mouse click, keep for keyboard navigation */
 .metric-btn:focus:not(:focus-visible),
 .time-btn:focus:not(:focus-visible) {
   outline: none;
+  box-shadow: none;
 }
 
-/* Benefit Tracker Section */
+.reset-stats-btn:focus,
+.benefit-upgrade-btn:focus,
+.badge-card:focus,
+.btn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 221, 0, 0.1);
+}
+
+/* REFINED: Benefit Tracker Section */
 .benefit-tracker-section {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  gap: var(--spacing-lg);
 }
 
 .benefit-tracker-section h3 {
@@ -247,13 +255,16 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* ENHANCED: Tracker controls with improved spacing */
-.tracker-controls {
+/* Controls with single-row pill layout */
+.benefit-tracker-controls {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
   align-items: center;
-  width: 100%;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background-color: var(--medium-gray);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
 }
 
 .metric-selector {
@@ -265,7 +276,7 @@
   align-items: center;
 }
 
-/* UPDATED: Sliding pill container for metrics */
+/* Single row: All 6 benefit items in one container */
 .metric-pill-container {
   display: flex;
   gap: var(--spacing-xs);
@@ -275,7 +286,6 @@
   border: 1px solid var(--border);
   width: 100%;
   justify-content: center;
-  position: relative;
 }
 
 /* Time range selector */
@@ -286,7 +296,6 @@
   justify-content: center;
 }
 
-/* UPDATED: Sliding pill container for time range */
 .time-range-selector {
   display: flex;
   gap: var(--spacing-xs);
@@ -295,43 +304,6 @@
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   width: 100%;
-  position: relative;
-}
-
-/* NEW: Sliding pill indicator animation */
-.sliding-pill-indicator {
-  position: absolute;
-  top: var(--spacing-xs);
-  bottom: var(--spacing-xs);
-  background-color: rgba(255, 221, 0, 0.1);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  border-radius: var(--radius-full);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Add subtle glow to sliding indicator */
-.sliding-pill-indicator::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 221, 0, 0.1) 0%,
-    transparent 70%
-  );
-  animation: pill-glow 2s ease-in-out infinite;
-}
-
-@keyframes pill-glow {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.8;
-  }
 }
 
 /* ENHANCED: Metric buttons with improved interactions */
@@ -353,17 +325,18 @@
   gap: var(--spacing-xs);
   position: relative;
   outline: none;
-  z-index: 1;
 }
 
 .metric-btn:hover:not(:disabled), .time-btn:hover:not(:disabled) {
-  color: var(--text);
+  background-color: rgba(255, 255, 255, 0.05);
   transform: translateY(-1px);
 }
 
 .metric-btn.active, .time-btn.active {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
   color: var(--primary);
-  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
 }
 
 /* Locked metric button styles */
@@ -386,22 +359,44 @@
 /* Lock icon styling */
 .metric-lock-icon {
   font-size: 0.75rem;
-  opacity: 0.7;
+  color: var(--text-secondary);
+  margin-left: var(--spacing-xs);
 }
 
-/* ENHANCED: Info banner below selectors */
-.benefit-upgrade-cta-text {
+/* FREE USER BENEFIT PREVIEW SECTION */
+.free-benefit-preview {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* FREE: Average Display */
+.free-average-display {
+  display: flex;
   justify-content: center;
+}
+
+.free-average-display .current-metric-average {
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md);
-  background-color: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.1);
+  align-items: center;
+  padding: var(--spacing-lg);
+  background-color: var(--card-background);
   border-radius: var(--radius-md);
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin-top: var(--spacing-sm);
+  border: 1px solid var(--border);
+  min-height: 80px;
+  justify-content: center;
+  max-width: 300px;
+  width: 100%;
+}
+
+/* FREE: Intelligence Preview Grid */
+.intelligence-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
   width: 100%;
 }
 
@@ -803,49 +798,823 @@
 
 .guidance-list {
   background-color: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-md);
   padding: var(--spacing-md);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
 }
 
-.guidance-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-}
-
-.guidance-item:hover {
-  background-color: rgba(255, 255, 255, 0.02);
-}
-
-.guidance-icon {
-  font-size: 1rem;
-  color: var(--primary);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.guidance-text {
-  flex: 1;
-}
-
 .guidance-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.guidance-item {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: var(--spacing-sm);
+}
+
+.guidance-item:last-child {
+  margin-bottom: 0;
+}
+
+/* ENHANCED: Risk level indicators with subtle animations */
+.risk-level-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.risk-level-indicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.risk-level-indicator:hover::before {
+  opacity: 1;
+}
+
+.risk-level-indicator.low {
+  background-color: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.risk-level-indicator.medium {
+  background-color: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.risk-level-indicator.high {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.risk-level-indicator.insufficient {
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.risk-score {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+  transition: transform 0.3s ease;
+}
+
+.risk-level-indicator:hover .risk-score {
+  transform: scale(1.05);
+}
+
+.risk-score.low {
+  color: #22c55e;
+}
+
+.risk-score.medium {
+  color: #f59e0b;
+}
+
+.risk-score.high {
+  color: #ef4444;
+}
+
+.risk-score.insufficient {
+  color: var(--text-secondary);
+}
+
+.risk-level-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.risk-factors-list {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.risk-factors-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.risk-factor-item {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: var(--spacing-xs);
+}
+
+.risk-factor-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Risk predictor display */
+.risk-predictor-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* NEW: Relapse Pattern Analytics Styles */
+.relapse-patterns-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.relapse-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.relapse-stat-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  min-height: 100px;
+  transition: all 0.3s ease;
+}
+
+.relapse-stat-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
+}
+
+/* NEW: Victory-themed styles for long-term clean users */
+.relapse-stat-card.conquered-trigger {
+  background-color: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.relapse-stat-card.conquered-trigger:hover {
+  background-color: rgba(34, 197, 94, 0.08);
+}
+
+.relapse-stat-card.conquered-trigger .relapse-stat-value {
+  color: #22c55e;
+}
+
+.relapse-stat-card.victory-days {
+  background-color: rgba(255, 221, 0, 0.05);
+  border-color: rgba(255, 221, 0, 0.2);
+}
+
+.relapse-stat-card.victory-days:hover {
+  background-color: rgba(255, 221, 0, 0.08);
+}
+
+.relapse-stat-card.victory-days .relapse-stat-value {
+  color: var(--primary);
+}
+
+.relapse-insight-item.victory-reminder {
+  background-color: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.relapse-insight-item.victory-reminder:hover {
+  background-color: rgba(34, 197, 94, 0.08);
+}
+
+.insight-data-quality.conquered {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.relapse-stat-card.primary-trigger {
+  background-color: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.relapse-stat-card.primary-trigger:hover {
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+.relapse-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+  transition: transform 0.3s ease;
+  text-transform: capitalize;
+}
+
+.relapse-stat-card:hover .relapse-stat-value {
+  transform: scale(1.05);
+}
+
+.relapse-stat-card.primary-trigger .relapse-stat-value {
+  color: #ef4444;
+}
+
+.relapse-stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.relapse-insights-list {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.relapse-insights-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-md);
+}
+
+.relapse-insight-item {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.relapse-insight-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.relapse-insight-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Pattern Recognition */
+.patterns-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.pattern-item {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.4;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.pattern-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Optimization Guidance */
+.optimization-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.optimization-criteria {
+  background-color: rgba(255, 221, 0, 0.05);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.optimization-criteria:hover {
+  background-color: rgba(255, 221, 0, 0.08);
+}
+
+.optimization-criteria-title {
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
   margin-bottom: var(--spacing-xs);
 }
 
-.guidance-description {
+.optimization-criteria-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.optimization-metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.optimization-metric-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  justify-content: center;
+  min-height: 80px;
+  transition: all 0.3s ease;
+}
+
+.optimization-metric-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.optimization-metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.optimization-metric-label {
+  font-size: 0.875rem;
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.optimization-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.optimization-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.optimization-item {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.4;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.optimization-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+/* FIXED: Phase Evolution Analysis Styles - Better contained layout */
+.phase-evolution-section {
+  background-color: var(--card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  /* FIXED: Ensure it stays contained within personalized insights */
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.phase-evolution-section:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* FIXED: Phase Evolution Header - Removed brain icon */
+.phase-evolution-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.phase-evolution-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-lg);
+  min-height: 120px;
+}
+
+.phase-evolution-empty-content {
+  text-align: center;
+}
+
+.phase-evolution-empty-text {
   font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.4;
 }
 
-/* Risk indicators with color coding */
-.risk-indicator {
+/* FIXED: Phase Comparison Grid - Responsive and contained */
+.phase-evolution-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+}
+
+.phase-evolution-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  justify-content: center;
+  min-height: 130px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.phase-evolution-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
+}
+
+/* FIXED: Current phase highlighting */
+.phase-evolution-card.current-phase {
+  background-color: rgba(255, 221, 0, 0.05);
+  border-color: rgba(255, 221, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
+}
+
+.phase-evolution-card.current-phase:hover {
+  background-color: rgba(255, 221, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.2);
+}
+
+.phase-evolution-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.phase-evolution-card.current-phase .phase-evolution-name {
+  color: var(--primary);
+}
+
+/* FIXED: Current phase indicator */
+.current-phase-indicator {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+.phase-evolution-range {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* FIXED: Phase averages with proper decimal formatting */
+.phase-evolution-average {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: var(--spacing-xs) 0;
+  transition: transform 0.3s ease;
+}
+
+.phase-evolution-card:hover .phase-evolution-average {
+  transform: scale(1.05);
+}
+
+/* FIXED: Added clear label for phase average */
+.phase-evolution-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: var(--spacing-xs);
+}
+
+.phase-evolution-data-points {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+/* Evolution Insights */
+.phase-evolution-insights {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-lg);
+}
+
+.phase-evolution-insights-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-md);
+}
+
+.phase-evolution-insight-item {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.phase-evolution-insight-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.phase-evolution-insight-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Progress Summary */
+.phase-evolution-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.evolution-summary-stat {
+  text-align: center;
+  padding: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.evolution-summary-stat:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.evolution-summary-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.evolution-summary-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Insight data status indicator */
+.insight-data-status {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.insight-data-status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.insight-data-quality {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  transition: all 0.3s ease;
+}
+
+.insight-data-quality:hover {
+  transform: scale(1.05);
+}
+
+/* All data quality indicators yellow */
+.insight-data-quality.minimal,
+.insight-data-quality.good,
+.insight-data-quality.rich {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+  color: var(--primary);
+}
+
+.insight-data-quality.insufficient {
+  background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  color: var(--text-secondary);
+}
+
+.insight-data-days {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* DESKTOP RESPONSIVE - Analytics Components */
+@media (min-width: 769px) {
+  .chart-and-insight-container {
+    flex-direction: row;
+    gap: var(--spacing-lg);
+  }
+  
+  .chart-container {
+    flex: 2;
+    min-width: 0;
+  }
+  
+  .current-insight-sidebar {
+    flex: 1;
+    min-width: 280px;
+    max-width: 320px;
+  }
+  
+  .current-metric-average {
+    min-height: 100px;
+    justify-content: center;
+    padding: var(--spacing-xl);
+  }
+  
+  .current-insight-card {
+    min-height: 180px;
+    justify-content: center;
+    padding: var(--spacing-xl);
+  }
+  
+  .optimization-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .relapse-summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* FIXED: Desktop phase evolution grid */
+  .phase-evolution-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .phase-evolution-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* ENHANCED: Desktop hover effects - KEEP ZOOM, REMOVE YELLOW */
+  .insight-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .chart-container:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* DESKTOP: Better spacing for insight card headers and info banners */
+  .insight-card-header {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .insight-info-banner {
+    margin-top: var(--spacing-md);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .insight-info-banner .info-icon {
+    margin-top: 0;
+  }
+}
+
+/* Mobile responsive updates for new phase label */
+@media (max-width: 768px) {
+  .phase-evolution-label {
+    font-size: 0.65rem;
+  }
+  
+  .phase-evolution-card {
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .phase-evolution-label {
+    font-size: 0.6rem;
+  }
+  
+  .phase-evolution-card {
+    min-height: 110px;
+  }
+}
+
+/* =================================================================
+   NEW: PROGRESS & TRENDS ANALYSIS COMPONENT STYLES
+   ================================================================= */
+
+/* Progress Trends Display Container */
+.progress-trends-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Trend Section */
+.trend-section {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.trend-section:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Trend Header */
+.trend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.trend-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Trend Badges */
+.trend-badge {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
@@ -853,464 +1622,168 @@
   border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 600;
-  margin-left: var(--spacing-sm);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
 }
 
-.risk-high {
+.trend-badge.improving {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.trend-badge.stable {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.trend-badge.worsening {
   background-color: rgba(239, 68, 68, 0.1);
   color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-.risk-medium {
-  background-color: rgba(251, 191, 36, 0.1);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.2);
-}
-
-.risk-low {
-  background-color: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-/* Vulnerability Periods Display */
-.vulnerability-periods {
-  background-color: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  border: 1px solid var(--border);
-}
-
-.period-item {
+/* Trend Content */
+.trend-content {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Trend Stats Grid */
+.trend-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.trend-stat-card {
+  background-color: rgba(255, 255, 255, 0.02);
   padding: var(--spacing-md);
-  border-radius: var(--radius-sm);
-  margin-bottom: var(--spacing-sm);
-  transition: all 0.2s ease;
-  background-color: var(--card-background);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
-}
-
-.period-item:hover {
-  background-color: rgba(255, 255, 255, 0.03);
-  transform: translateX(2px);
-}
-
-.period-info {
+  text-align: center;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-}
-
-.period-time {
-  font-weight: 600;
-  color: var(--text);
-}
-
-.period-reason {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-/* Relapse Risk Predictor */
-.relapse-risk-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.risk-score {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: var(--spacing-xl);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.risk-score-value {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: var(--spacing-sm);
-}
-
-.risk-score-label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.risk-factors {
-  background-color: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  border: 1px solid var(--border);
-}
-
-.risk-factor {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-sm);
-  border-bottom: 1px solid var(--border);
-}
-
-.risk-factor:last-child {
-  border-bottom: none;
-}
-
-.factor-name {
-  font-size: 0.875rem;
-  color: var(--text);
-}
-
-.factor-impact {
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-/* Pattern Recognition Display */
-.pattern-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.pattern-item {
-  padding: var(--spacing-md);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  transition: all 0.2s ease;
-}
-
-.pattern-item:hover {
-  background-color: rgba(255, 255, 255, 0.03);
-}
-
-.pattern-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
-  font-weight: 600;
-  color: var(--text);
-}
-
-.pattern-icon {
-  color: var(--primary);
-  font-size: 1rem;
-}
-
-.pattern-description {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-/* Optimization Guidance Display */
-.optimization-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.optimization-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  transition: all 0.2s ease;
-}
-
-.optimization-item:hover {
-  background-color: rgba(255, 255, 255, 0.03);
-  transform: translateX(2px);
-}
-
-.optimization-priority {
-  display: flex;
-  align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: var(--primary);
-  color: #000;
+  min-height: 80px;
+  transition: all 0.3s ease;
+}
+
+.trend-stat-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
+}
+
+.trend-stat-value {
+  font-size: 1.5rem;
   font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.trend-stat-label {
   font-size: 0.875rem;
-  flex-shrink: 0;
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.3;
 }
 
-.optimization-content {
-  flex: 1;
+/* Trend Insight */
+.trend-insight {
+  background-color: rgba(255, 221, 0, 0.05);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  text-align: center;
 }
 
-.optimization-title {
+/* Trajectory Section Specific Styles */
+.trajectory-section {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.03) 0%, rgba(255, 221, 0, 0.01) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.2);
+}
+
+.trajectory-summary {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 0.9375rem;
+  color: var(--text);
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Trajectory Milestones */
+.trajectory-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.milestones-title {
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
   margin-bottom: var(--spacing-xs);
 }
 
-.optimization-text {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-/* Action Items with Checkboxes */
-.action-items {
-  background-color: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  border: 1px solid var(--border);
-  margin-top: var(--spacing-md);
-}
-
-.action-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  padding: var(--spacing-sm);
-  transition: all 0.2s ease;
-}
-
-.action-item:hover {
-  background-color: rgba(255, 255, 255, 0.02);
-}
-
-.action-checkbox {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
+.milestone-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.action-checkbox:hover {
-  border-color: var(--primary);
-  background-color: rgba(255, 221, 0, 0.05);
-}
-
-.action-checkbox.checked {
-  background-color: var(--primary);
-  border-color: var(--primary);
-}
-
-.action-checkbox.checked::after {
-  content: '✓';
-  color: #000;
-  font-weight: 700;
-}
-
-.action-text {
-  flex: 1;
+  gap: var(--spacing-sm);
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
   font-size: 0.875rem;
   color: var(--text);
-  line-height: 1.4;
+  transition: all 0.3s ease;
 }
 
-/* MOBILE RESPONSIVE - Analytics Components */
+.milestone-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateX(4px);
+}
+
+/* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
-  /* Update metric pills for mobile */
-  .metric-pill-container {
-    flex-wrap: wrap;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm);
-  }
-
-  .metric-btn {
-    min-width: calc(33.333% - var(--spacing-xs));
-    font-size: 0.8rem;
-    padding: var(--spacing-sm) var(--spacing-xs);
-  }
-
-  /* Hide sliding indicator on mobile due to wrapping */
-  .metric-pill-container .sliding-pill-indicator {
-    display: none;
-  }
-
-  /* Update time range selector for mobile */
-  .time-range-selector {
-    gap: 2px;
-    padding: var(--spacing-xs);
-  }
-
-  .time-btn {
-    font-size: 0.75rem;
-    padding: var(--spacing-sm) var(--spacing-xs);
-  }
-
-  /* Chart container mobile adjustments */
-  .chart-container {
-    height: 250px;
-    padding: var(--spacing-md);
-  }
-
-  /* Insights section mobile layout */
-  .chart-and-insight-container {
-    flex-direction: column;
-    padding: var(--spacing-md);
-  }
-
-  .current-insight-sidebar {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-
-  /* Upgrade CTA mobile layout */
-  .benefit-upgrade-cta {
-    flex-direction: column;
-    text-align: center;
-    padding: var(--spacing-lg);
-  }
-
-  .upgrade-text-section {
-    text-align: center;
-  }
-
-  .benefit-upgrade-btn {
-    width: 100%;
-    align-self: center;
-  }
-
-  /* Pattern and optimization mobile adjustments */
-  .pattern-item,
-  .optimization-item {
-    padding: var(--spacing-sm);
-  }
-
-  .optimization-priority {
-    width: 28px;
-    height: 28px;
-    font-size: 0.75rem;
-  }
-
-  /* Risk indicators mobile size */
-  .risk-indicator {
-    font-size: 0.7rem;
-    padding: 2px var(--spacing-xs);
-  }
-
-  /* Period items mobile layout */
-  .period-item {
+  .trend-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--spacing-sm);
-  }
-
-  /* Insight cards mobile padding */
-  .insight-card {
-    padding: var(--spacing-md);
-  }
-
-  .personalized-insights-section {
-    padding: var(--spacing-md);
-    gap: var(--spacing-md);
-  }
-}
-
-/* VERY SMALL SCREENS - Analytics Components */
-@media (max-width: 480px) {
-  /* Metric pills for very small screens */
-  .metric-btn {
-    min-width: calc(50% - var(--spacing-xs));
-    font-size: 0.75rem;
-  }
-
-  /* Time buttons even smaller */
-  .time-btn {
-    font-size: 0.7rem;
-    padding: var(--spacing-xs);
-  }
-
-  /* Chart container height reduction */
-  .chart-container {
-    height: 200px;
-  }
-
-  /* Risk score mobile adjustments */
-  .risk-score-value {
-    font-size: 2.5rem;
-  }
-
-  /* Optimization content text size */
-  .optimization-text,
-  .pattern-description,
-  .guidance-description {
-    font-size: 0.8rem;
-  }
-
-  /* Action items mobile text */
-  .action-text {
-    font-size: 0.8rem;
-  }
-
-  /* Empty state adjustments */
-  .insight-empty-icon {
-    font-size: 2.5rem;
-  }
-
-  .insight-empty-title {
-    font-size: 1rem;
-  }
-
-  .insight-empty-description {
-    font-size: 0.8rem;
-  }
-}
-
-/* Smooth transitions for all interactive elements */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Ensure proper stacking context */
-.stats-container {
-  position: relative;
-  z-index: 1;
-}
-
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
   }
   
-  .sliding-pill-indicator {
-    transition: none !important;
+  .trend-badge {
+    align-self: flex-start;
+  }
+  
+  .trend-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .milestone-item {
+    padding: var(--spacing-sm);
   }
 }
 
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .metric-btn.active,
-  .time-btn.active {
-    outline: 2px solid var(--primary);
-    outline-offset: 1px;
+@media (max-width: 480px) {
+  .trend-section {
+    padding: var(--spacing-md);
   }
-
-  .sliding-pill-indicator {
-    border-width: 2px;
+  
+  .trend-stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .trend-stat-card {
+    min-height: 70px;
   }
 }

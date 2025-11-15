@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Added sliding pill menu for benefit tracker
+// components/Stats/Stats.js - UPDATED: Header styling to match Tracker/Calendar tabs
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -71,12 +71,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     phaseEvolution: false
   });
   
-  // NEW: States for sliding pill animations
-  const [metricIndicatorStyle, setMetricIndicatorStyle] = useState({});
-  const [timeIndicatorStyle, setTimeIndicatorStyle] = useState({});
-  const metricButtonRefs = useRef({});
-  const timeButtonRefs = useRef({});
-  
   const insightsStartRef = useRef(null);
 
   // ENHANCED: Defensive programming - ensure userData structure
@@ -105,56 +99,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       setTimeout(() => simulateInsightLoading('relapsePatterns', 900), 800);
     }
   }, [timeRange, selectedMetric, simulateInsightLoading, safeUserData.streakHistory]);
-
-  // NEW: Update indicator position for metric pills
-  const updateMetricIndicator = useCallback((metric) => {
-    const button = metricButtonRefs.current[metric];
-    if (button) {
-      const { offsetLeft, offsetWidth } = button;
-      setMetricIndicatorStyle({
-        width: `${offsetWidth}px`,
-        transform: `translateX(${offsetLeft}px)`
-      });
-    }
-  }, []);
-
-  // NEW: Update indicator position for time range pills
-  const updateTimeIndicator = useCallback((range) => {
-    const button = timeButtonRefs.current[range];
-    if (button) {
-      const { offsetLeft, offsetWidth } = button;
-      setTimeIndicatorStyle({
-        width: `${offsetWidth}px`,
-        transform: `translateX(${offsetLeft}px)`
-      });
-    }
-  }, []);
-
-  // NEW: Initialize indicators on mount and when selections change
-  useEffect(() => {
-    updateMetricIndicator(selectedMetric);
-  }, [selectedMetric, updateMetricIndicator]);
-
-  useEffect(() => {
-    updateTimeIndicator(timeRange);
-  }, [timeRange, updateTimeIndicator]);
-
-  // NEW: Handle window resize to update indicator positions
-  useEffect(() => {
-    const handleResize = () => {
-      updateMetricIndicator(selectedMetric);
-      updateTimeIndicator(timeRange);
-    };
-
-    window.addEventListener('resize', handleResize);
-    // Initial position setting after a brief delay to ensure DOM is ready
-    setTimeout(() => {
-      updateMetricIndicator(selectedMetric);
-      updateTimeIndicator(timeRange);
-    }, 100);
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, [selectedMetric, timeRange, updateMetricIndicator, updateTimeIndicator]);
 
   // Handle metric selection
   const handleMetricClick = useCallback((metric) => {
@@ -235,183 +179,192 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             }
           ]
         };
-        toast.success('Current streak reset to Day 0');
+        toast.success('Current streak reset to 0. All history and achievements preserved.');
         break;
-      
-      case 'benefitData':
+
+      case 'allProgress':
         resetUserData = {
           ...safeUserData,
-          benefitTracking: []
-        };
-        toast.success('Benefit tracking data cleared');
-        break;
-        
-      case 'wetDreams':
-        resetUserData = {
-          ...safeUserData,
+          startDate: today,
+          currentStreak: 0,
+          relapseCount: 0,
           wetDreamCount: 0,
-          wetDreamDates: []
+          longestStreak: safeUserData.longestStreak || 0,
+          streakHistory: [{
+            id: 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: 'major_reset'
+          }],
+          benefitTracking: [],
+          notes: {},
+          badges: safeUserData.badges?.map(badge => ({
+            ...badge,
+            earned: (badge.name === '90-Day King' && (safeUserData.longestStreak || 0) >= 90) ||
+                   (badge.name === '180-Day Emperor' && (safeUserData.longestStreak || 0) >= 180) ||
+                   (badge.name === '365-Day Sage' && (safeUserData.longestStreak || 0) >= 365) ? badge.earned : false,
+            date: ((badge.name === '90-Day King' && (safeUserData.longestStreak || 0) >= 90) ||
+                  (badge.name === '180-Day Emperor' && (safeUserData.longestStreak || 0) >= 180) ||
+                  (badge.name === '365-Day Sage' && (safeUserData.longestStreak || 0) >= 365)) ? badge.date : null
+          })) || []
         };
-        toast.success('Wet dream count reset');
+        toast.success(`All progress reset. Longest streak record (${safeUserData.longestStreak || 0} days) preserved.`);
         break;
-        
-      case 'badges':
+
+      case 'everything':
         resetUserData = {
-          ...safeUserData,
-          badges: []
-        };
-        toast.success('All badges reset');
-        break;
-        
-      case 'all':
-      default:
-        resetUserData = {
-          ...safeUserData,
+          startDate: today,
           currentStreak: 0,
           longestStreak: 0,
           wetDreamCount: 0,
           relapseCount: 0,
+          badges: [
+            { id: 1, name: '7-Day Warrior', earned: false, date: null },
+            { id: 2, name: '14-Day Monk', earned: false, date: null },
+            { id: 3, name: '30-Day Master', earned: false, date: null },
+            { id: 4, name: '90-Day King', earned: false, date: null },
+            { id: 5, name: '180-Day Emperor', earned: false, date: null },
+            { id: 6, name: '365-Day Sage', earned: false, date: null }
+          ],
           benefitTracking: [],
-          streakHistory: [],
-          badges: [],
-          startDate: today,
-          wetDreamDates: []
+          streakHistory: [{
+            id: 1,
+            start: today,
+            end: null,
+            days: 0,
+            reason: 'complete_reset'
+          }],
+          notes: {}
         };
-        toast.success('All stats have been reset');
+        toast.success('Complete reset successful. All data has been cleared.');
         break;
-    }
 
+      default:
+        toast.error('Invalid reset option selected');
+        return;
+    }
+    
     updateUserData(resetUserData);
     setShowSmartResetDialog(false);
   }, [safeUserData, updateUserData]);
 
-  // ENHANCED: Calculate graph data with safe defaults
-  const filteredData = useMemo(() => 
-    getFilteredBenefitData(safeUserData, selectedMetric, timeRange),
-    [safeUserData, selectedMetric, timeRange]
-  );
+  const handleUpgradeClick = useCallback(() => {
+    toast.success('All features are now free! 🎉');
+  }, []);
 
-  const avgValue = useMemo(() => 
-    calculateAverage(filteredData),
-    [filteredData]
-  );
-
-  const data = useMemo(() => 
-    generateChartData(filteredData, selectedMetric),
-    [filteredData, selectedMetric]
-  );
-
-  const options = useMemo(() => ({
+  // ENHANCED: Memoized chart options
+  const chartOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
-    animation: {
-      duration: 750,
-      easing: 'easeInOutQuart'
-    },
-    plugins: {
-      legend: { display: false },
-      title: { display: false },
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: '#fff',
-        bodyColor: '#fff',
-        borderColor: '#ffdd00',
-        borderWidth: 1,
-        cornerRadius: 8,
-        padding: 12,
-        displayColors: false,
-        callbacks: {
-          label: function(context) {
-            return `${selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}: ${context.parsed.y}/10`;
-          }
-        }
-      }
-    },
     scales: {
-      y: { 
-        beginAtZero: true, 
+      y: {
+        min: 0,
         max: 10,
-        ticks: { 
-          color: '#999',
+        ticks: {
+          stepSize: 2,
+          color: '#aaaaaa',
           font: { size: 12 }
         },
         grid: {
-          color: 'rgba(255, 255, 255, 0.05)',
+          color: 'rgba(255, 255, 255, 0.1)',
           drawBorder: false
         }
       },
       x: {
-        ticks: { 
-          color: '#999',
-          font: { size: 11 }
+        ticks: {
+          color: '#aaaaaa',
+          font: { size: 12 },
+          maxTicksLimit: timeRange === 'quarter' ? 12 : timeRange === 'month' ? 15 : 7,
+          maxRotation: timeRange === 'quarter' ? 45 : 0
         },
-        grid: { 
-          display: false,
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)',
           drawBorder: false
         }
       }
     },
-    interaction: {
-      intersect: false,
-      mode: 'index'
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        filter: (tooltipItem) => {
+          return tooltipItem.parsed.y !== null;
+        },
+        callbacks: {
+          title: (items) => {
+            if (!items.length) return '';
+            const idx = items[0].dataIndex;
+            const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
+            if (!chartData.timeRangeArray[idx]) return '';
+            return formatDate(chartData.timeRangeArray[idx].date);
+          },
+          label: (context) => {
+            const value = context.parsed.y;
+            if (value === null) return '';
+            const metricName = selectedMetric === 'sleep' ? 'Sleep Quality' : 
+                             selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1);
+            return `${metricName}: ${value}/10`;
+          }
+        },
+        backgroundColor: 'rgba(44, 44, 44, 0.95)',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        borderColor: '#ffdd00',
+        borderWidth: 1,
+        cornerRadius: 8,
+        displayColors: false,
+        padding: 12,
+        titleFont: { size: 14, weight: 'bold' },
+        bodyFont: { size: 13 }
+      }
     },
-    hover: {
-      mode: 'nearest',
-      animationDuration: 200
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    onHover: (event, activeElements) => {
+      event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
     }
-  }), [selectedMetric]);
+  }), [timeRange, safeUserData, selectedMetric]);
 
-  const hasInsufficientData = useMemo(() => 
-    shouldShowInfoBanner(safeUserData),
-    [safeUserData]
-  );
-
-  const currentPhase = getCurrentPhase(safeUserData.currentStreak);
-  const phaseColor = {
-    Foundation: '#666666',
-    Adjustment: '#888888',
-    Momentum: '#aaaaaa',
-    Transformation: '#cccccc',
-    Enlightenment: '#dddddd',
-    Transcendence: '#ffdd00'
-  }[currentPhase] || '#666666';
-
-  const phaseGuidance = getPhaseGuidance(currentPhase);
-
+  // ENHANCED: Check if user has sufficient data for insights
+  const hasInsufficientData = useMemo(() => {
+    return (safeUserData.benefitTracking?.length || 0) < 3;
+  }, [safeUserData.benefitTracking]);
+  
   return (
     <div className="stats-container">
-      {/* Header */}
+      {/* UPDATED: Header styling to match Tracker/Calendar tabs */}
       <div className="integrated-stats-header">
         <div className="stats-header-title-section">
-          <h2>Analytics & Insights</h2>
-          <div className="stats-header-subtitle">
-            Track your journey • Understand patterns • Optimize growth
-          </div>
+          <h2>Your Stats</h2>
+          <p className="stats-header-subtitle">Comprehensive analytics and insights from your retention journey</p>
         </div>
         <div className="stats-header-actions-section">
           <div className="stats-header-actions">
             <button 
-              className="action-btn"
+              className="action-btn reset-stats-btn" 
               onClick={handleResetStats}
               onKeyDown={(e) => e.key === 'Enter' && handleResetStats()}
               tabIndex={0}
-              aria-label="Reset statistics"
             >
               <FaRedo />
-              Reset Data
+              <span>Reset Progress</span>
             </button>
           </div>
         </div>
       </div>
-
+      
+      {/* Smart Reset Dialog */}
       <SmartResetDialog
         isOpen={showSmartResetDialog}
         onClose={() => setShowSmartResetDialog(false)}
         onConfirm={confirmResetStats}
+        userData={safeUserData}
       />
-
-      {/* Statistics Cards */}
-      <div className="stats-cards">
+      
+      {/* Streak Statistics */}
+      <div className="streak-stats">
         <div className="stat-card current-streak">
           <div className="stat-value">{safeUserData.currentStreak || 0}</div>
           <div className="stat-label">Current Streak</div>
@@ -470,53 +423,47 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           {safeUserData.badges && safeUserData.badges.map(badge => (
             <div 
               key={badge.id} 
-              className="badge-card earned"
-              onClick={() => handleBadgeClick(badge)}
-              onKeyDown={(e) => e.key === 'Enter' && handleBadgeClick(badge)}
-              tabIndex={0}
-              role="button"
-              aria-label={`View ${badge.name} badge details`}
+              className={`badge-card ${badge.earned ? 'earned' : 'locked'}`}
+              onClick={() => badge.earned && handleBadgeClick(badge)}
+              onKeyDown={(e) => e.key === 'Enter' && badge.earned && handleBadgeClick(badge)}
+              tabIndex={badge.earned ? 0 : -1}
+              role={badge.earned ? "button" : "presentation"}
+              aria-label={badge.earned ? `View ${badge.name} achievement details` : `${badge.name} - Not earned yet`}
             >
               <div className="badge-icon">
-                <FaMedal />
+                {badge.earned ? (
+                  <FaTrophy className="badge-earned-icon" />
+                ) : (
+                  <FaLock className="badge-locked-icon" />
+                )}
               </div>
               <div className="badge-name">{badge.name}</div>
-              <div className="badge-date">
-                {badge.date ? formatDate(badge.date) : 'Earned'}
-              </div>
-            </div>
-          ))}
-          
-          {/* Empty badges */}
-          {Array.from({ length: Math.max(0, 4 - (safeUserData.badges?.length || 0)) }).map((_, index) => (
-            <div key={`empty-${index}`} className="badge-card">
-              <div className="badge-icon locked">
-                <FaLock />
-              </div>
-              <div className="badge-name">Locked</div>
-              <div className="badge-date">—</div>
+              {badge.earned && badge.date && (
+                <div className="badge-date">
+                  Earned {format(new Date(badge.date), 'MMM d')}
+                </div>
+              )}
             </div>
           ))}
         </div>
       </div>
-
-      {/* NEW: Energy Intelligence Section */}
-      <EnergyIntelligenceSection userData={safeUserData} />
-
+      
       {/* Benefit Tracker */}
       <div className="benefit-tracker-section">
-        <h3 ref={insightsStartRef}>Benefit Tracker</h3>
+        <h3>Benefit Tracker</h3>
         
-        <div className="tracker-controls">
+        {shouldShowInfoBanner(safeUserData, timeRange) && (
+          <div className="stats-info-banner">
+            <FaInfoCircle className="info-icon" />
+            <span><strong>Building your profile...</strong> Your insights become more detailed as you log daily benefits and track progress over time.</span>
+          </div>
+        )}
+        
+        {/* Controls */}
+        <div className="benefit-tracker-controls">
           <div className="metric-selector">
-            {/* UPDATED: Sliding pill container for metrics */}
             <div className="metric-pill-container">
-              <div 
-                className="sliding-pill-indicator"
-                style={metricIndicatorStyle}
-              />
               <button 
-                ref={el => metricButtonRefs.current['energy'] = el}
                 className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('energy')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('energy')}
@@ -526,7 +473,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Energy
               </button>
               <button 
-                ref={el => metricButtonRefs.current['focus'] = el}
                 className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('focus')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('focus')}
@@ -536,7 +482,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Focus
               </button>
               <button 
-                ref={el => metricButtonRefs.current['confidence'] = el}
                 className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('confidence')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('confidence')}
@@ -546,7 +491,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Confidence
               </button>
               <button 
-                ref={el => metricButtonRefs.current['aura'] = el}
                 className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('aura')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('aura')}
@@ -556,7 +500,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Aura
               </button>
               <button 
-                ref={el => metricButtonRefs.current['sleep'] = el}
                 className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('sleep')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('sleep')}
@@ -566,7 +509,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Sleep Quality
               </button>
               <button 
-                ref={el => metricButtonRefs.current['workout'] = el}
                 className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('workout')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('workout')}
@@ -578,15 +520,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             </div>
           </div>
           
-          {/* UPDATED: Sliding pill container for time range */}
           <div className="time-range-selector-container">
             <div className="time-range-selector" role="radiogroup" aria-label="Time range selection">
-              <div 
-                className="sliding-pill-indicator"
-                style={timeIndicatorStyle}
-              />
               <button 
-                ref={el => timeButtonRefs.current['week'] = el}
                 className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
                 onClick={() => setTimeRange('week')}
                 onKeyDown={(e) => e.key === 'Enter' && setTimeRange('week')}
@@ -597,7 +533,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Week
               </button>
               <button 
-                ref={el => timeButtonRefs.current['month'] = el}
                 className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
                 onClick={() => setTimeRange('month')}
                 onKeyDown={(e) => e.key === 'Enter' && setTimeRange('month')}
@@ -608,7 +543,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 Month
               </button>
               <button 
-                ref={el => timeButtonRefs.current['quarter'] = el}
                 className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
                 onClick={() => setTimeRange('quarter')}
                 onKeyDown={(e) => e.key === 'Enter' && setTimeRange('quarter')}
@@ -618,76 +552,55 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               >
                 3 Months
               </button>
-              <button 
-                ref={el => timeButtonRefs.current['all'] = el}
-                className={`time-btn ${timeRange === 'all' ? 'active' : ''}`}
-                onClick={() => setTimeRange('all')}
-                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('all')}
-                tabIndex={0}
-                role="radio"
-                aria-checked={timeRange === 'all'}
-              >
-                All Time
-              </button>
             </div>
           </div>
         </div>
-
-        {/* Chart and Current Insight Section */}
-        <div className="chart-and-insight-container">
-          {/* Chart */}
+        
+        <div className="chart-and-insight-container" ref={insightsStartRef}>
           <div className="chart-container">
-            {filteredData.length > 0 ? (
-              <Line data={data} options={options} />
-            ) : (
-              <div className="no-chart-data">
-                <div className="no-data-icon">
-                  <FaChartLine />
-                </div>
-                <div className="no-data-text">
-                  <h4>No Data Available</h4>
-                  <p>Track your daily benefits to see your progress here</p>
-                </div>
-              </div>
-            )}
+            {(() => {
+              const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
+              const hasAnyData = chartData.datasets[0].data.some(val => val !== null);
+              
+              if (!hasAnyData) {
+                return (
+                  <div className="no-chart-data">
+                    <div className="no-data-icon">
+                      <FaChartLine />
+                    </div>
+                    <div className="no-data-text">
+                      <h4>No Chart Data Available</h4>
+                      <p>Start logging your {selectedMetric} benefits to see your progress visualization.</p>
+                    </div>
+                  </div>
+                );
+              }
+              
+              return <Line data={chartData} options={chartOptions} height={300} />;
+            })()}
           </div>
-
-          {/* Current Insight Sidebar */}
+          
           <div className="current-insight-sidebar">
-            <div 
-              className="current-metric-average"
-              style={{ '--phase-color': phaseColor }}
-            >
+            <div className="current-metric-average">
               <div className="current-metric-label">
-                {getTimeRangeDisplayText(timeRange)} Average
+                Your {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} {getTimeRangeDisplayText(timeRange)}
               </div>
               <div className="current-metric-value">
-                {avgValue || 'N/A'}
+                {calculateAverage(safeUserData, selectedMetric, timeRange, true) === 'N/A' ? 'N/A' : `${calculateAverage(safeUserData, selectedMetric, timeRange, true)}/10`}
               </div>
             </div>
             
             <div className="current-insight-card">
               <div className="current-insight-header">
-                <FaShieldAlt className="insight-icon" />
-                Current Phase
-              </div>
-              <div className="current-insight-text">
-                <strong>{currentPhase} Phase</strong> - {phaseGuidance}
-              </div>
-            </div>
-            
-            <div className="current-insight-card">
-              <div className="current-insight-header">
-                <FaRegLightbulb className="insight-icon" />
-                Quick Insight
+                <span>Current Status</span>
               </div>
               <div className="current-insight-text">
                 {(() => {
-                  const avg = avgValue || 'N/A';
-                  const phase = currentPhase.toLowerCase();
+                  const avg = calculateAverage(safeUserData, selectedMetric, timeRange, true);
+                  const phase = getCurrentPhase(safeUserData);
                   
                   if (avg === 'N/A') {
-                    return 'Start tracking your benefits to receive personalized insights about your journey.';
+                    return `No ${selectedMetric} data for the selected ${timeRange} period. Start logging benefits to see your progress.`;
                   }
                   
                   const avgValue = parseFloat(avg);
