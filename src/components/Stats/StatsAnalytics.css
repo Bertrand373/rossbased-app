@@ -161,11 +161,15 @@
 
 .mini-info-helmet-container {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .mini-info-helmet {
   width: 24px;
   height: 24px;
+  display: block;
   animation: coming-soon-pulse 2s ease-in-out infinite;
   filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.2));
 }
@@ -173,6 +177,9 @@
 .mini-info-helmet-fallback {
   font-size: 1rem;
   color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: coming-soon-pulse 2s ease-in-out infinite;
 }
 
