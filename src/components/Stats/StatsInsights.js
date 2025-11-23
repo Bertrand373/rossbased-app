@@ -407,15 +407,17 @@ export const OptimizationGuidance = ({
   );
 };
 
-// FIXED: Phase Evolution Analysis Component - Current Phase Detection Fixed
+// UPDATED: Phase Evolution Analysis Component - EXACT CONGRUENCE with other insight sections
 export const PhaseEvolutionAnalysis = ({ 
   isLoading, 
+  hasInsufficientData,
+  userData,
   phaseEvolution, 
   selectedMetric, 
   dataQuality,
-  currentStreak // FIXED: Now properly using this prop
+  currentStreak
 }) => {
-  // FIXED: Function to determine current phase based on streak - MATCHING EXACT LOGIC
+  // Function to determine current phase based on streak - MATCHING EXACT LOGIC
   const getCurrentPhaseKey = (streak) => {
     if (streak <= 14) return 'foundation';
     if (streak <= 45) return 'purification';
@@ -424,93 +426,89 @@ export const PhaseEvolutionAnalysis = ({
     return 'mastery';
   };
 
-  // FIXED: Use the passed currentStreak prop instead of calculating from data
+  // Use the passed currentStreak prop
   const currentPhaseKey = getCurrentPhaseKey(currentStreak || 0);
 
   return (
-    <div className="phase-evolution-section">
-      <div className="phase-evolution-header">
+    <div className="insight-card">
+      <div className="insight-card-header">
         <span>Phase Evolution Analysis</span>
       </div>
       <div className="insight-info-banner">
         <FaInfoCircle className="info-icon" />
         <span>Tracks how your {selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} develops through the retention phases and identifies phase-specific patterns and challenges.</span>
       </div>
-      
-      {isLoading ? (
-        <InsightLoadingState insight="Phase Analysis" isVisible={true} />
-      ) : !phaseEvolution?.hasData ? (
-        <div className="phase-evolution-empty">
-          <div className="phase-evolution-empty-content">
-            <div className="phase-evolution-empty-text">
-              {phaseEvolution?.message || 'Building phase evolution data...'}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* FIXED: Phase Comparison Grid with CORRECT current phase detection */}
-          <div className="phase-evolution-grid">
-            {Object.entries(phaseEvolution.phaseAverages).map(([phaseKey, phaseData]) => {
-              // FIXED: Now correctly comparing phase keys
-              const isCurrentPhase = phaseKey === currentPhaseKey;
-              
-              return (
-                <div 
-                  key={phaseKey} 
-                  className={`phase-evolution-card ${isCurrentPhase ? 'current-phase' : ''}`}
-                >
-                  <div className="phase-evolution-name">
-                    {phaseData.displayName}
-                    {isCurrentPhase && <span className="current-phase-indicator"> (Current)</span>}
+      <div className="insight-card-content">
+        {isLoading ? (
+          <InsightLoadingState insight="Phase Analysis" isVisible={true} />
+        ) : hasInsufficientData ? (
+          <InsightEmptyState insight="Phase Evolution" userData={userData} />
+        ) : !phaseEvolution?.hasData ? (
+          <InsightEmptyState insight="Phase Evolution" userData={userData} />
+        ) : (
+          <>
+            {/* FIXED: Phase Comparison Grid with CORRECT current phase detection */}
+            <div className="phase-evolution-grid">
+              {Object.entries(phaseEvolution.phaseAverages).map(([phaseKey, phaseData]) => {
+                // FIXED: Now correctly comparing phase keys
+                const isCurrentPhase = phaseKey === currentPhaseKey;
+                
+                return (
+                  <div 
+                    key={phaseKey} 
+                    className={`phase-evolution-card ${isCurrentPhase ? 'current-phase' : ''}`}
+                  >
+                    <div className="phase-evolution-name">
+                      {phaseData.displayName}
+                      {isCurrentPhase && <span className="current-phase-indicator"> (Current)</span>}
+                    </div>
+                    <div className="phase-evolution-range">{phaseData.range}</div>
+                    <div className="phase-evolution-average">{phaseData.average}/10</div>
+                    <div className="phase-evolution-label">Phase Average</div>
+                    <div className="phase-evolution-data-points">{phaseData.dataPoints} days tracked</div>
                   </div>
-                  <div className="phase-evolution-range">{phaseData.range}</div>
-                  <div className="phase-evolution-average">{phaseData.average}/10</div>
-                  <div className="phase-evolution-label">Phase Average</div>
-                  <div className="phase-evolution-data-points">{phaseData.dataPoints} days tracked</div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Evolution Insights */}
-          <div className="phase-evolution-insights">
-            <div className="phase-evolution-insights-title">Phase Evolution Insights:</div>
-            {phaseEvolution.insights.map((insight, index) => (
-              <div 
-                key={index} 
-                className="phase-evolution-insight-item" 
-                dangerouslySetInnerHTML={renderTextWithBold(insight)}
-              />
-            ))}
-          </div>
-
-          {/* FIXED: Updated summary labels to be clearer */}
-          <div className="phase-evolution-summary">
-            <div className="evolution-summary-stat">
-              <div className="evolution-summary-value">{phaseEvolution.completedPhases}</div>
-              <div className="evolution-summary-label">Phases with Analysis (met data minimum for insights)</div>
+                );
+              })}
             </div>
-            <div className="evolution-summary-stat">
-              <div className="evolution-summary-value">{phaseEvolution.totalPhases}</div>
-              <div className="evolution-summary-label">Total Phases Experienced (your complete journey)</div>
-            </div>
-          </div>
 
-          {dataQuality?.level !== 'insufficient' && (
-            <div className="insight-data-status">
-              <div className="insight-data-status-indicator">
-                <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
-                  <FaBrain />
-                  Phase Intelligence
-                </span>
-                <span className="insight-data-days">
-                  Tracking {selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} evolution through retention phases
-                </span>
+            {/* Evolution Insights */}
+            <div className="phase-evolution-insights">
+              <div className="phase-evolution-insights-title">Phase Evolution Insights:</div>
+              {phaseEvolution.insights.map((insight, index) => (
+                <div 
+                  key={index} 
+                  className="phase-evolution-insight-item" 
+                  dangerouslySetInnerHTML={renderTextWithBold(insight)}
+                />
+              ))}
+            </div>
+
+            {/* FIXED: Updated summary labels to be clearer */}
+            <div className="phase-evolution-summary">
+              <div className="evolution-summary-stat">
+                <div className="evolution-summary-value">{phaseEvolution.completedPhases}</div>
+                <div className="evolution-summary-label">Phases with Analysis (met data minimum for insights)</div>
+              </div>
+              <div className="evolution-summary-stat">
+                <div className="evolution-summary-value">{phaseEvolution.totalPhases}</div>
+                <div className="evolution-summary-label">Total Phases Experienced (your complete journey)</div>
               </div>
             </div>
-          )}
-        </>
+          </>
+        )}
+      </div>
+      {dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
+        <div className="insight-data-status">
+          <div className="insight-data-status-indicator">
+            <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
+              <FaBrain />
+              Phase Intelligence
+            </span>
+            <span className="insight-data-days">
+              Tracking {selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} evolution through retention phases
+            </span>
+          </div>
+        </div>
       )}
     </div>
   );
