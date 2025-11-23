@@ -157,6 +157,7 @@ export const ProgressTrendsAnalysis = ({
               </div>
             )}
           </div>
+          </>
         )}
         {dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
           <div className="insight-data-status">
@@ -405,6 +406,7 @@ export const OptimizationGuidance = ({
               ))}
             </div>
           </div>
+          </>
         )}
         {dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
           <div className="insight-data-status">
