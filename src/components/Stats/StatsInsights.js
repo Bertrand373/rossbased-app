@@ -1,7 +1,7 @@
 // components/Stats/StatsInsights.js - UPDATED: Removed redundant AI components, added Progress & Trends
 import React from 'react';
 import { FaChartLine, FaShieldAlt, FaTrophy, FaFire, FaArrowUp, FaArrowDown, FaEquals, FaBrain, FaInfoCircle, FaCheckCircle, FaChartBar } from 'react-icons/fa';
-import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
+import { InsightLoadingState, InsightEmptyState, MiniInfoBanner } from './StatsComponents';
 import { renderTextWithBold } from './StatsUtils';
 
 // NEW: Progress & Trends Analysis Component - HISTORICAL TRAJECTORY, NOT REAL-TIME
@@ -13,22 +13,29 @@ export const ProgressTrendsAnalysis = ({
   dataQuality,
   selectedMetric
 }) => {
+  const sectionDescription = "Historical trajectory analysis showing how your performance and relapse patterns have evolved over time.";
+  
   return (
     <div className="insight-card">
       <div className="insight-card-header">
         <span>Progress & Trends</span>
       </div>
-      <div className="insight-info-banner">
-        <FaInfoCircle className="info-icon" />
-        <span>Historical trajectory analysis showing how your performance and relapse patterns have evolved over time.</span>
-      </div>
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Progress Analysis" isVisible={true} />
         ) : hasInsufficientData ? (
-          <InsightEmptyState insight="Progress & Trends" userData={userData} />
+          <InsightEmptyState 
+            insight="Progress & Trends" 
+            userData={userData}
+            sectionTitle="Progress Analysis"
+            sectionDescription={sectionDescription}
+          />
         ) : (
-          <div className="progress-trends-display">
+          <>
+            {/* NEW: Mini info banner shown when data exists */}
+            <MiniInfoBanner description={sectionDescription} />
+            
+            <div className="progress-trends-display">
             {/* Relapse Frequency Trend */}
             {progressTrends?.relapseFrequency && (
               <div className="trend-section">
@@ -285,22 +292,28 @@ export const PatternRecognition = ({
   patternInsights, 
   dataQuality 
 }) => {
+  const sectionDescription = "Identifies correlations between your metrics and predicts trends based on your unique retention journey patterns.";
+  
   return (
     <div className="insight-card">
       <div className="insight-card-header">
         <span>Pattern Recognition</span>
       </div>
-      <div className="insight-info-banner">
-        <FaInfoCircle className="info-icon" />
-        <span>Identifies correlations between your metrics and predicts trends based on your unique retention journey patterns.</span>
-      </div>
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
         ) : hasInsufficientData ? (
-          <InsightEmptyState insight="Pattern Recognition" userData={userData} />
+          <InsightEmptyState 
+            insight="Pattern Recognition" 
+            userData={userData}
+            sectionTitle="Pattern Recognition"
+            sectionDescription={sectionDescription}
+          />
         ) : (
           <>
+            {/* NEW: Mini info banner shown when data exists */}
+            <MiniInfoBanner description={sectionDescription} />
+            
             {(!patternInsights || patternInsights.length === 0 || 
               (patternInsights.length === 1 && patternInsights[0].includes('Need 14+'))) ? (
               <div className="insufficient-data-message">
@@ -343,22 +356,29 @@ export const OptimizationGuidance = ({
   optimizationGuidance, 
   dataQuality 
 }) => {
+  const sectionDescription = "Analyzes your personal performance patterns to identify your optimal windows and provides phase-aware optimization strategies.";
+  
   return (
     <div className="insight-card">
       <div className="insight-card-header">
         <span>Performance Optimization</span>
       </div>
-      <div className="insight-info-banner">
-        <FaInfoCircle className="info-icon" />
-        <span>Analyzes your personal performance patterns to identify your optimal windows and provides phase-aware optimization strategies.</span>
-      </div>
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Optimization Analysis" isVisible={true} />
         ) : hasInsufficientData ? (
-          <InsightEmptyState insight="Performance Optimization" userData={userData} />
+          <InsightEmptyState 
+            insight="Performance Optimization" 
+            userData={userData}
+            sectionTitle="Optimization Profile"
+            sectionDescription={sectionDescription}
+          />
         ) : (
-          <div className="optimization-display">
+          <>
+            {/* NEW: Mini info banner shown when data exists */}
+            <MiniInfoBanner description={sectionDescription} />
+            
+            <div className="optimization-display">
             <div className="optimization-criteria">
               <div className="optimization-criteria-title">
                 {optimizationGuidance?.phase ? `${optimizationGuidance.phase} Phase - High Performance Criteria:` : 'Your High Performance Criteria:'}
@@ -417,6 +437,8 @@ export const PhaseEvolutionAnalysis = ({
   dataQuality,
   currentStreak
 }) => {
+  const sectionDescription = `Tracks how your ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} develops through the retention phases and identifies phase-specific patterns and challenges.`;
+  
   // Function to determine current phase based on streak - MATCHING EXACT LOGIC
   const getCurrentPhaseKey = (streak) => {
     if (streak <= 14) return 'foundation';
@@ -434,19 +456,28 @@ export const PhaseEvolutionAnalysis = ({
       <div className="insight-card-header">
         <span>Phase Evolution Analysis</span>
       </div>
-      <div className="insight-info-banner">
-        <FaInfoCircle className="info-icon" />
-        <span>Tracks how your {selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} develops through the retention phases and identifies phase-specific patterns and challenges.</span>
-      </div>
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Phase Analysis" isVisible={true} />
         ) : hasInsufficientData ? (
-          <InsightEmptyState insight="Phase Evolution" userData={userData} />
+          <InsightEmptyState 
+            insight="Phase Evolution" 
+            userData={userData}
+            sectionTitle="Phase Evolution"
+            sectionDescription={sectionDescription}
+          />
         ) : !phaseEvolution?.hasData ? (
-          <InsightEmptyState insight="Phase Evolution" userData={userData} />
+          <InsightEmptyState 
+            insight="Phase Evolution" 
+            userData={userData}
+            sectionTitle="Phase Evolution"
+            sectionDescription={sectionDescription}
+          />
         ) : (
           <>
+            {/* NEW: Mini info banner shown when data exists */}
+            <MiniInfoBanner description={sectionDescription} />
+            
             {/* FIXED: Phase Comparison Grid with CORRECT current phase detection */}
             <div className="phase-evolution-grid">
               {Object.entries(phaseEvolution.phaseAverages).map(([phaseKey, phaseData]) => {

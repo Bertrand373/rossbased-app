@@ -147,6 +147,42 @@
   margin: 0;
 }
 
+/* NEW: Mini horizontal info banner with helmet - shown when data exists */
+.mini-info-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.03) 0%, rgba(255, 221, 0, 0.05) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.08);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.mini-info-helmet-container {
+  flex-shrink: 0;
+}
+
+.mini-info-helmet {
+  width: 24px;
+  height: 24px;
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(255, 221, 0, 0.2));
+}
+
+.mini-info-helmet-fallback {
+  font-size: 1rem;
+  color: var(--primary);
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+}
+
+.mini-info-text {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
 /* ENHANCED: Empty State Improvements */
 .insight-empty-state {
   display: flex;

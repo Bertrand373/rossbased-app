@@ -34,8 +34,8 @@ export const InsightLoadingState = ({ insight, isVisible }) => {
   );
 };
 
-// ENHANCED: Progress indicator component - Banner structure matching EmotionalTimeline
-export const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
+// ENHANCED: Progress indicator component - Banner structure with custom messaging per section
+export const DataProgressIndicator = ({ userData, targetDays = 14, sectionTitle, sectionDescription }) => {
   // Safety check for userData
   if (!userData) {
     return null;
@@ -60,26 +60,51 @@ export const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
       </div>
       <div className="data-progress-content">
         <div className="data-progress-title">
-          {isComplete ? 'Analytics Ready' : 'Building Your Profile'}
+          {isComplete ? sectionTitle : `Building Your ${sectionTitle}`}
           <div className="data-progress-count">
             {trackedDays}/{targetDays} days
           </div>
         </div>
         <div className="data-progress-message">
           {isComplete 
-            ? 'Your analytics profile is ready for detailed insights' 
-            : `Track ${targetDays - trackedDays} more days for detailed insights`}
+            ? sectionDescription
+            : `${sectionDescription} Track ${targetDays - trackedDays} more days to unlock.`}
         </div>
       </div>
     </div>
   );
 };
 
-// ENHANCED: Empty state component - shows only the helmet banner for congruence
-export const InsightEmptyState = ({ insight, userData }) => {
+// NEW: Mini horizontal info banner with helmet - shows when data exists
+export const MiniInfoBanner = ({ description }) => {
+  return (
+    <div className="mini-info-banner">
+      <div className="mini-info-helmet-container">
+        <img 
+          src={helmetImage} 
+          alt="Info" 
+          className="mini-info-helmet"
+          onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.nextSibling.style.display = 'block';
+          }}
+        />
+        <div className="mini-info-helmet-fallback" style={{display: 'none'}}>🪖</div>
+      </div>
+      <div className="mini-info-text">{description}</div>
+    </div>
+  );
+};
+
+// ENHANCED: Empty state component - passes custom section details to banner
+export const InsightEmptyState = ({ insight, userData, sectionTitle, sectionDescription }) => {
   return (
     <div className="insight-empty-state">
-      <DataProgressIndicator userData={userData} />
+      <DataProgressIndicator 
+        userData={userData} 
+        sectionTitle={sectionTitle}
+        sectionDescription={sectionDescription}
+      />
     </div>
   );
 };
