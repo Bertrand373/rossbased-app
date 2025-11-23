@@ -34,33 +34,40 @@ export const InsightLoadingState = ({ insight, isVisible }) => {
   );
 };
 
-// ENHANCED: Progress indicator component with mobile optimizations
+// ENHANCED: Progress indicator component - EXACT COPY structure from EmotionalTimeline banner
 export const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
   const trackedDays = userData.benefitTracking?.length || 0;
-  const progressPercentage = Math.min((trackedDays / targetDays) * 100, 100);
   const isComplete = trackedDays >= targetDays;
   
   return (
     <div className="data-progress-indicator">
-      <div className="data-progress-header">
-        <div className="data-progress-title">
-          {isComplete ? 'Analytics Ready' : 'Building Your Profile'}
-        </div>
-        <div className="data-progress-count">
-          {trackedDays}/{targetDays} days
-        </div>
-      </div>
-      <div className="data-progress-bar">
-        <div 
-          className="data-progress-fill"
-          style={{ width: `${progressPercentage}%` }}
+      <div className="data-progress-helmet-container">
+        <img 
+          src={helmetImage} 
+          alt="Building Profile" 
+          className="data-progress-helmet"
+          onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.nextSibling.style.display = 'block';
+          }}
         />
+        <div className="data-progress-helmet-fallback" style={{display: 'none'}}>🪖</div>
       </div>
-      {!isComplete && (
-        <div className="data-progress-message">
-          Track {targetDays - trackedDays} more days for detailed insights
+      <div className="data-progress-content">
+        <div className="data-progress-title">
+          <div className="data-progress-header">
+            {isComplete ? 'Analytics Ready' : 'Building Your Profile'}
+            <div className="data-progress-count">
+              {trackedDays}/{targetDays} days
+            </div>
+          </div>
         </div>
-      )}
+        <div className="data-progress-message">
+          {isComplete 
+            ? 'Your analytics profile is ready for detailed insights' 
+            : `Track ${targetDays - trackedDays} more days for detailed insights`}
+        </div>
+      </div>
     </div>
   );
 };

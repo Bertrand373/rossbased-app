@@ -65,6 +65,32 @@
     align-self: center;
   }
   
+  /* EXACT COPY: Mobile data progress banner from EmotionalTimeline */
+  .data-progress-indicator {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-md);
+  }
+  
+  .data-progress-content {
+    text-align: center;
+  }
+  
+  .data-progress-title {
+    justify-content: center;
+  }
+  
+  .data-progress-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .data-progress-helmet-fallback {
+    font-size: 1.25rem;
+  }
+  
   .free-average-display {
     justify-content: center;
   }
@@ -373,6 +399,24 @@
   
   .benefit-upgrade-cta {
     padding: var(--spacing-lg) var(--spacing-md);
+  }
+  
+  /* EXACT COPY: Very small screen data progress banner from EmotionalTimeline */
+  .data-progress-helmet {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .data-progress-helmet-fallback {
+    font-size: 1rem;
+  }
+  
+  .data-progress-title {
+    font-size: 0.875rem;
+  }
+  
+  .data-progress-message {
+    font-size: 0.8rem;
   }
 
   .benefit-tracker-controls {
