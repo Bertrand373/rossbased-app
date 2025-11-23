@@ -65,6 +65,33 @@
     align-self: center;
   }
   
+  /* NEW: Mobile styling for benefit tracker profile banner */
+  .benefit-tracker-profile-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .benefit-tracker-banner-content {
+    text-align: center;
+  }
+  
+  .benefit-tracker-banner-title {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .benefit-tracker-helmet {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .benefit-tracker-helmet-fallback {
+    font-size: 1.25rem;
+  }
+  
   /* EXACT COPY: Mobile data progress banner from EmotionalTimeline */
   .data-progress-indicator {
     flex-direction: column;
@@ -400,6 +427,24 @@
   
   .benefit-upgrade-cta {
     padding: var(--spacing-lg) var(--spacing-md);
+  }
+  
+  /* NEW: Very small screen styling for benefit tracker profile banner */
+  .benefit-tracker-helmet {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .benefit-tracker-helmet-fallback {
+    font-size: 1rem;
+  }
+  
+  .benefit-tracker-banner-title {
+    font-size: 0.875rem;
+  }
+  
+  .benefit-tracker-banner-message {
+    font-size: 0.8rem;
   }
   
   /* EXACT COPY: Very small screen data progress banner from EmotionalTimeline */
