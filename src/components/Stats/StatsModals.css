@@ -346,9 +346,9 @@
   .badge-modal-close {
     top: var(--spacing-sm);
     right: var(--spacing-sm);
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
   }
   
   .modal-actions {
@@ -391,11 +391,11 @@
   .modal-close-x,
   .stat-modal-close,
   .badge-modal-close {
-    top: var(--spacing-xs);
-    right: var(--spacing-xs);
-    width: 28px;
-    height: 28px;
-    font-size: 0.875rem;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
   }
   
   .stat-details-modal {
