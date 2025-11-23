@@ -46,7 +46,7 @@ export const ProgressTrendsAnalysis = ({
                   <span className="trend-title">Relapse Frequency Trend</span>
                   {progressTrends.relapseFrequency.trend === 'improving' && (
                     <span className="trend-badge improving">
-                      <FaArrowDown style={{ fontSize: '0.75rem' }} />
+                      <FaArrowUp style={{ fontSize: '0.75rem' }} />
                       Improving
                     </span>
                   )}
@@ -58,7 +58,7 @@ export const ProgressTrendsAnalysis = ({
                   )}
                   {progressTrends.relapseFrequency.trend === 'worsening' && (
                     <span className="trend-badge worsening">
-                      <FaArrowUp style={{ fontSize: '0.75rem' }} />
+                      <FaArrowDown style={{ fontSize: '0.75rem' }} />
                       Needs Attention
                     </span>
                   )}

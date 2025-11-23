@@ -1187,9 +1187,9 @@
 }
 
 .insight-data-quality.conquered {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
-  border: 1px solid rgba(34, 197, 94, 0.2);
-  color: #22c55e;
+  background: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  color: rgba(34, 197, 94, 0.7);
 }
 
 .relapse-stat-card.primary-trigger {
@@ -1618,41 +1618,42 @@
 }
 
 .insight-data-quality {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 500;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  opacity: 0.8;
 }
 
 .insight-data-quality:hover {
-  transform: scale(1.05);
+  opacity: 1;
 }
 
-/* All data quality indicators yellow */
+/* Classy subtle grey tones for all data quality indicators */
 .insight-data-quality.minimal,
 .insight-data-quality.good,
 .insight-data-quality.rich {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  color: var(--primary);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .insight-data-quality.insufficient {
-  background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  color: var(--text-secondary);
+  background: rgba(128, 128, 128, 0.05);
+  border: 1px solid rgba(128, 128, 128, 0.1);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .insight-data-days {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
 }
 
 /* DESKTOP RESPONSIVE - Analytics Components */
