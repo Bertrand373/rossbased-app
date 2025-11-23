@@ -1,4 +1,4 @@
-// components/Stats/Stats.js - UPDATED: Header styling to match Tracker/Calendar tabs
+// components/Stats/Stats.js - UPDATED: Yellow sliding pill menus matching Profile tab styling
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -73,6 +73,19 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   const insightsStartRef = useRef(null);
 
+  // NEW: Sliding pill refs and state for metric selector
+  const metricContainerRef = useRef(null);
+  const metricSliderRef = useRef(null);
+  const [isMetricSliderInitialized, setIsMetricSliderInitialized] = useState(false);
+
+  // NEW: Sliding pill refs and state for time range selector
+  const timeRangeContainerRef = useRef(null);
+  const timeRangeSliderRef = useRef(null);
+  const [isTimeRangeSliderInitialized, setIsTimeRangeSliderInitialized] = useState(false);
+
+  // Resize timeout ref
+  const resizeTimeoutRef = useRef(null);
+
   // ENHANCED: Defensive programming - ensure userData structure
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
 
@@ -100,10 +113,225 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   }, [timeRange, selectedMetric, simulateInsightLoading, safeUserData.streakHistory]);
 
-  // Handle metric selection
+  // NEW: Update metric slider position
+  const updateMetricSlider = useCallback(() => {
+    if (!metricContainerRef.current || !metricSliderRef.current) {
+      return false;
+    }
+    
+    try {
+      const container = metricContainerRef.current;
+      const slider = metricSliderRef.current;
+      const activeButton = container.querySelector(`[data-metric="${selectedMetric}"]`);
+      
+      if (!activeButton) {
+        return false;
+      }
+
+      requestAnimationFrame(() => {
+        try {
+          const containerRect = container.getBoundingClientRect();
+          const buttonRect = activeButton.getBoundingClientRect();
+          
+          if (containerRect.width === 0 || buttonRect.width === 0) {
+            return;
+          }
+
+          const containerStyle = window.getComputedStyle(container);
+          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
+          const leftOffset = Math.round(buttonRect.left - containerRect.left - paddingLeft);
+          const buttonWidth = Math.round(buttonRect.width);
+          
+          slider.style.width = `${buttonWidth}px`;
+          
+          requestAnimationFrame(() => {
+            slider.style.transform = `translateX(${leftOffset}px)`;
+            slider.style.opacity = '1';
+            slider.style.visibility = 'visible';
+          });
+          
+        } catch (innerError) {
+          console.error('Inner metric slider positioning failed:', innerError);
+        }
+      });
+      
+      return true;
+      
+    } catch (error) {
+      console.error('Metric slider update failed:', error);
+      return false;
+    }
+  }, [selectedMetric]);
+
+  // NEW: Update time range slider position
+  const updateTimeRangeSlider = useCallback(() => {
+    if (!timeRangeContainerRef.current || !timeRangeSliderRef.current) {
+      return false;
+    }
+    
+    try {
+      const container = timeRangeContainerRef.current;
+      const slider = timeRangeSliderRef.current;
+      const activeButton = container.querySelector(`[data-timerange="${timeRange}"]`);
+      
+      if (!activeButton) {
+        return false;
+      }
+
+      requestAnimationFrame(() => {
+        try {
+          const containerRect = container.getBoundingClientRect();
+          const buttonRect = activeButton.getBoundingClientRect();
+          
+          if (containerRect.width === 0 || buttonRect.width === 0) {
+            return;
+          }
+
+          const containerStyle = window.getComputedStyle(container);
+          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
+          const leftOffset = Math.round(buttonRect.left - containerRect.left - paddingLeft);
+          const buttonWidth = Math.round(buttonRect.width);
+          
+          slider.style.width = `${buttonWidth}px`;
+          
+          requestAnimationFrame(() => {
+            slider.style.transform = `translateX(${leftOffset}px)`;
+            slider.style.opacity = '1';
+            slider.style.visibility = 'visible';
+          });
+          
+        } catch (innerError) {
+          console.error('Inner time range slider positioning failed:', innerError);
+        }
+      });
+      
+      return true;
+      
+    } catch (error) {
+      console.error('Time range slider update failed:', error);
+      return false;
+    }
+  }, [timeRange]);
+
+  // Handle metric selection with slider update
   const handleMetricClick = useCallback((metric) => {
+    if (metric === selectedMetric) return;
     setSelectedMetric(metric);
-  }, []);
+    setTimeout(() => updateMetricSlider(), 10);
+  }, [selectedMetric, updateMetricSlider]);
+
+  // Handle time range selection with slider update
+  const handleTimeRangeClick = useCallback((range) => {
+    if (range === timeRange) return;
+    setTimeRange(range);
+    setTimeout(() => updateTimeRangeSlider(), 10);
+  }, [timeRange, updateTimeRangeSlider]);
+
+  // NEW: Initialize metric slider
+  useEffect(() => {
+    const initializeMetricSlider = () => {
+      if (!metricContainerRef.current || !metricSliderRef.current) {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        const success = updateMetricSlider();
+        
+        if (success) {
+          setIsMetricSliderInitialized(true);
+        } else {
+          setTimeout(() => {
+            if (updateMetricSlider()) {
+              setIsMetricSliderInitialized(true);
+            } else {
+              if (metricSliderRef.current) {
+                metricSliderRef.current.style.opacity = '1';
+                metricSliderRef.current.style.visibility = 'visible';
+                setIsMetricSliderInitialized(true);
+                setTimeout(updateMetricSlider, 50);
+              }
+            }
+          }, 100);
+        }
+      });
+    };
+
+    const timer = setTimeout(initializeMetricSlider, 100);
+    return () => clearTimeout(timer);
+  }, [updateMetricSlider]);
+
+  // NEW: Initialize time range slider
+  useEffect(() => {
+    const initializeTimeRangeSlider = () => {
+      if (!timeRangeContainerRef.current || !timeRangeSliderRef.current) {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        const success = updateTimeRangeSlider();
+        
+        if (success) {
+          setIsTimeRangeSliderInitialized(true);
+        } else {
+          setTimeout(() => {
+            if (updateTimeRangeSlider()) {
+              setIsTimeRangeSliderInitialized(true);
+            } else {
+              if (timeRangeSliderRef.current) {
+                timeRangeSliderRef.current.style.opacity = '1';
+                timeRangeSliderRef.current.style.visibility = 'visible';
+                setIsTimeRangeSliderInitialized(true);
+                setTimeout(updateTimeRangeSlider, 50);
+              }
+            }
+          }, 100);
+        }
+      });
+    };
+
+    const timer = setTimeout(initializeTimeRangeSlider, 100);
+    return () => clearTimeout(timer);
+  }, [updateTimeRangeSlider]);
+
+  // Handle resize for both sliders
+  useEffect(() => {
+    const handleResize = () => {
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+      
+      resizeTimeoutRef.current = setTimeout(() => {
+        if (isMetricSliderInitialized) {
+          updateMetricSlider();
+        }
+        if (isTimeRangeSliderInitialized) {
+          updateTimeRangeSlider();
+        }
+      }, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
+  }, [isMetricSliderInitialized, isTimeRangeSliderInitialized, updateMetricSlider, updateTimeRangeSlider]);
+
+  // Update sliders when selections change
+  useEffect(() => {
+    if (isMetricSliderInitialized) {
+      setTimeout(updateMetricSlider, 10);
+    }
+  }, [selectedMetric, isMetricSliderInitialized, updateMetricSlider]);
+
+  useEffect(() => {
+    if (isTimeRangeSliderInitialized) {
+      setTimeout(updateTimeRangeSlider, 10);
+    }
+  }, [timeRange, isTimeRangeSliderInitialized, updateTimeRangeSlider]);
 
   // NEW: Handle stat card click
   const handleStatCardClick = useCallback((statType) => {
@@ -462,58 +690,68 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         {/* Controls */}
         <div className="benefit-tracker-controls">
           <div className="metric-selector">
-            <div className="metric-pill-container">
+            {/* UPDATED: Metric pill container with sliding yellow pill */}
+            <div className="metric-pill-container" ref={metricContainerRef}>
+              {/* Yellow sliding pill background */}
+              <div className="metric-pill-slider" ref={metricSliderRef}></div>
+              
               <button 
-                className={`metric-btn energy ${selectedMetric === 'energy' ? 'active' : ''}`}
+                className={`metric-btn ${selectedMetric === 'energy' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('energy')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('energy')}
                 tabIndex={0}
                 aria-pressed={selectedMetric === 'energy'}
+                data-metric="energy"
               >
                 Energy
               </button>
               <button 
-                className={`metric-btn focus ${selectedMetric === 'focus' ? 'active' : ''}`}
+                className={`metric-btn ${selectedMetric === 'focus' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('focus')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('focus')}
                 tabIndex={0}
                 aria-pressed={selectedMetric === 'focus'}
+                data-metric="focus"
               >
                 Focus
               </button>
               <button 
-                className={`metric-btn confidence ${selectedMetric === 'confidence' ? 'active' : ''}`}
+                className={`metric-btn ${selectedMetric === 'confidence' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('confidence')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('confidence')}
                 tabIndex={0}
                 aria-pressed={selectedMetric === 'confidence'}
+                data-metric="confidence"
               >
                 Confidence
               </button>
               <button 
-                className={`metric-btn aura ${selectedMetric === 'aura' ? 'active' : ''}`}
+                className={`metric-btn ${selectedMetric === 'aura' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('aura')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('aura')}
                 tabIndex={0}
                 aria-pressed={selectedMetric === 'aura'}
+                data-metric="aura"
               >
                 Aura
               </button>
               <button 
-                className={`metric-btn sleep ${selectedMetric === 'sleep' ? 'active' : ''}`}
+                className={`metric-btn ${selectedMetric === 'sleep' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('sleep')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('sleep')}
                 tabIndex={0}
                 aria-pressed={selectedMetric === 'sleep'}
+                data-metric="sleep"
               >
                 Sleep Quality
               </button>
               <button 
-                className={`metric-btn workout ${selectedMetric === 'workout' ? 'active' : ''}`}
+                className={`metric-btn ${selectedMetric === 'workout' ? 'active' : ''}`}
                 onClick={() => handleMetricClick('workout')}
                 onKeyDown={(e) => e.key === 'Enter' && handleMetricClick('workout')}
                 tabIndex={0}
                 aria-pressed={selectedMetric === 'workout'}
+                data-metric="workout"
               >
                 Workout
               </button>
@@ -521,34 +759,41 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           </div>
           
           <div className="time-range-selector-container">
-            <div className="time-range-selector" role="radiogroup" aria-label="Time range selection">
+            {/* UPDATED: Time range selector with sliding yellow pill */}
+            <div className="time-range-selector" ref={timeRangeContainerRef} role="radiogroup" aria-label="Time range selection">
+              {/* Yellow sliding pill background */}
+              <div className="time-range-pill-slider" ref={timeRangeSliderRef}></div>
+              
               <button 
                 className={`time-btn ${timeRange === 'week' ? 'active' : ''}`}
-                onClick={() => setTimeRange('week')}
-                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('week')}
+                onClick={() => handleTimeRangeClick('week')}
+                onKeyDown={(e) => e.key === 'Enter' && handleTimeRangeClick('week')}
                 tabIndex={0}
                 role="radio"
                 aria-checked={timeRange === 'week'}
+                data-timerange="week"
               >
                 Week
               </button>
               <button 
                 className={`time-btn ${timeRange === 'month' ? 'active' : ''}`}
-                onClick={() => setTimeRange('month')}
-                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('month')}
+                onClick={() => handleTimeRangeClick('month')}
+                onKeyDown={(e) => e.key === 'Enter' && handleTimeRangeClick('month')}
                 tabIndex={0}
                 role="radio"
                 aria-checked={timeRange === 'month'}
+                data-timerange="month"
               >
                 Month
               </button>
               <button 
                 className={`time-btn ${timeRange === 'quarter' ? 'active' : ''}`}
-                onClick={() => setTimeRange('quarter')}
-                onKeyDown={(e) => e.key === 'Enter' && setTimeRange('quarter')}
+                onClick={() => handleTimeRangeClick('quarter')}
+                onKeyDown={(e) => e.key === 'Enter' && handleTimeRangeClick('quarter')}
                 tabIndex={0}
                 role="radio"
                 aria-checked={timeRange === 'quarter'}
+                data-timerange="quarter"
               >
                 3 Months
               </button>

@@ -276,16 +276,57 @@
   align-items: center;
 }
 
-/* Single row: All 6 benefit items in one container */
+/* Single row: All 6 benefit items in one container - UPDATED: Profile-style sliding pill */
 .metric-pill-container {
   display: flex;
-  gap: var(--spacing-xs);
   padding: var(--spacing-xs);
   background-color: var(--card-background);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
+  position: relative;
   width: 100%;
-  justify-content: center;
+  max-width: 700px;
+  justify-content: space-between;
+  /* Mobile 3D rendering context */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Handle overflow for scrolling on mobile */
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.metric-pill-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* NEW: Yellow sliding pill background for metric selector */
+.metric-pill-slider {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  height: calc(100% - calc(var(--spacing-xs) * 2));
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-full);
+  transform-origin: left center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(0px);
+  width: 0px;
+  will-change: transform, width;
+}
+
+/* MOBILE: Faster transition on smaller screens */
+@media (max-width: 768px) {
+  .metric-pill-slider {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 /* Time range selector */
@@ -296,17 +337,51 @@
   justify-content: center;
 }
 
+/* UPDATED: Time range selector with sliding pill support */
 .time-range-selector {
   display: flex;
-  gap: var(--spacing-xs);
   padding: var(--spacing-xs);
   background-color: var(--card-background);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
+  position: relative;
   width: 100%;
+  justify-content: space-between;
+  /* Mobile 3D rendering context */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-/* ENHANCED: Metric buttons with improved interactions */
+/* NEW: Yellow sliding pill background for time range selector */
+.time-range-pill-slider {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  height: calc(100% - calc(var(--spacing-xs) * 2));
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-full);
+  transform-origin: left center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(0px);
+  width: 0px;
+  will-change: transform, width;
+}
+
+/* MOBILE: Faster transition on smaller screens */
+@media (max-width: 768px) {
+  .time-range-pill-slider {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* UPDATED: Metric buttons with Profile-style sliding pill interactions */
 .metric-btn, .time-btn {
   flex: 1;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -324,19 +399,43 @@
   justify-content: center;
   gap: var(--spacing-xs);
   position: relative;
+  z-index: 2;
   outline: none;
+  min-width: fit-content;
+  /* Mobile touch optimization */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-.metric-btn:hover:not(:disabled), .time-btn:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
+/* MOBILE: Touch targets */
+@media (max-width: 768px) and (pointer: coarse) {
+  .metric-btn, .time-btn {
+    min-height: 44px;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
 }
 
+/* No hover effects - sliding pill provides all visual feedback */
+
+/* UPDATED: Active button styling - BLACK text to contrast with yellow slider background */
 .metric-btn.active, .time-btn.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.15);
+  color: #000000 !important;
+  font-weight: 600 !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none;
+}
+
+/* MOBILE: Ensure active state is always visible */
+@media (max-width: 768px) {
+  .metric-btn.active, .time-btn.active {
+    font-weight: 600;
+    color: #000000 !important;
+  }
 }
 
 /* Locked metric button styles */
