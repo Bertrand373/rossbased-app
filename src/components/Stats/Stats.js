@@ -819,8 +819,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               </div>
               <div className="benefit-tracker-banner-message">
                 {(safeUserData.benefitTracking?.length || 0) >= 14 
-                  ? 'Full insights unlocked - your personalized analytics are ready' 
-                  : `Track ${14 - (safeUserData.benefitTracking?.length || 0)} more days for comprehensive insights and detailed analytics`}
+                  ? 'Your personalized analytics are ready. Access detailed charts tracking each benefit across time periods, pattern recognition identifying your peak performance zones, phase evolution analysis showing how your benefits develop through retention stages, optimization guidance with targeted recommendations, and comprehensive progress trends revealing your journey trajectory.' 
+                  : `Track ${14 - (safeUserData.benefitTracking?.length || 0)} more days to unlock personalized analytics including detailed benefit charts, pattern recognition across all metrics, phase-specific evolution analysis, optimization recommendations, and comprehensive progress trends tailored to your retention journey.`}
               </div>
             </div>
           </div>
