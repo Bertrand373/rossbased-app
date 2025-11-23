@@ -796,33 +796,35 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         <h3>Benefit Tracker</h3>
         
         {/* NEW: Always-visible Building Your Profile banner */}
-        <div className="benefit-tracker-profile-banner">
-          <div className="benefit-tracker-helmet-container">
-            <img 
-              src={helmetImage} 
-              alt="Building Profile" 
-              className="benefit-tracker-helmet"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'block';
-              }}
-            />
-            <div className="benefit-tracker-helmet-fallback" style={{display: 'none'}}>🪖</div>
-          </div>
-          <div className="benefit-tracker-banner-content">
-            <div className="benefit-tracker-banner-title">
-              {safeUserData.benefitTracking?.length >= 14 ? 'Your Analytics Profile' : 'Building Your Profile'}
-              <div className="benefit-tracker-banner-count">
-                {safeUserData.benefitTracking?.length || 0}/14 days
+        {safeUserData && (
+          <div className="benefit-tracker-profile-banner">
+            <div className="benefit-tracker-helmet-container">
+              <img 
+                src={helmetImage} 
+                alt="Building Profile" 
+                className="benefit-tracker-helmet"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div className="benefit-tracker-helmet-fallback" style={{display: 'none'}}>🪖</div>
+            </div>
+            <div className="benefit-tracker-banner-content">
+              <div className="benefit-tracker-banner-title">
+                {(safeUserData.benefitTracking?.length || 0) >= 14 ? 'Your Analytics Profile' : 'Building Your Profile'}
+                <div className="benefit-tracker-banner-count">
+                  {safeUserData.benefitTracking?.length || 0}/14 days
+                </div>
+              </div>
+              <div className="benefit-tracker-banner-message">
+                {(safeUserData.benefitTracking?.length || 0) >= 14 
+                  ? 'Full insights unlocked - your personalized analytics are ready' 
+                  : `Track ${14 - (safeUserData.benefitTracking?.length || 0)} more days for comprehensive insights and detailed analytics`}
               </div>
             </div>
-            <div className="benefit-tracker-banner-message">
-              {safeUserData.benefitTracking?.length >= 14 
-                ? 'Full insights unlocked - your personalized analytics are ready' 
-                : `Track ${14 - (safeUserData.benefitTracking?.length || 0)} more days for comprehensive insights and detailed analytics`}
-            </div>
           </div>
-        </div>
+        )}
         
         {/* Controls */}
         <div className="benefit-tracker-controls">
