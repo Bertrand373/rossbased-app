@@ -295,6 +295,10 @@ export const PatternRecognition = ({
 }) => {
   const sectionDescription = "Identifies correlations between your metrics and predicts trends based on your unique retention journey patterns.";
   
+  // FIXED: Check if we need more data for pattern analysis (14 days minimum)
+  const needsMoreData = !patternInsights || patternInsights.length === 0 || 
+    (patternInsights.length === 1 && patternInsights[0].includes('Need 14+'));
+  
   return (
     <div className="insight-card">
       <div className="insight-card-header">
@@ -303,7 +307,7 @@ export const PatternRecognition = ({
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
-        ) : hasInsufficientData ? (
+        ) : (hasInsufficientData || needsMoreData) ? (
           <InsightEmptyState 
             insight="Pattern Recognition" 
             userData={userData}
@@ -315,23 +319,14 @@ export const PatternRecognition = ({
             {/* NEW: Mini info banner shown when data exists */}
             <MiniInfoBanner description={sectionDescription} />
             
-            {(!patternInsights || patternInsights.length === 0 || 
-              (patternInsights.length === 1 && patternInsights[0].includes('Need 14+'))) ? (
-              <div className="insufficient-data-message">
-                <div className="insufficient-data-text">
-                  Continue tracking daily benefits to unlock pattern analysis. The more data you provide, the more detailed your insights become.
-                </div>
-              </div>
-            ) : (
-              <div className="patterns-display">
-                {patternInsights.map((pattern, index) => (
-                  <div key={index} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></div>
-                ))}
-              </div>
-            )}
+            <div className="patterns-display">
+              {patternInsights.map((pattern, index) => (
+                <div key={index} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></div>
+              ))}
+            </div>
           </>
         )}
-        {dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
+        {dataQuality?.level !== 'insufficient' && !hasInsufficientData && !needsMoreData && (
           <div className="insight-data-status">
             <div className="insight-data-status-indicator">
               <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
@@ -359,6 +354,12 @@ export const OptimizationGuidance = ({
 }) => {
   const sectionDescription = "Analyzes your personal performance patterns to identify your optimal windows and provides phase-aware optimization strategies.";
   
+  // FIXED: Check if we need more data for optimization (10 days minimum)
+  const needsMoreData = !optimizationGuidance || 
+    optimizationGuidance.optimalRate === 'N/A' || 
+    (optimizationGuidance.recommendations?.length === 1 && 
+     optimizationGuidance.recommendations[0].includes('Track 10+'));
+  
   return (
     <div className="insight-card">
       <div className="insight-card-header">
@@ -367,7 +368,7 @@ export const OptimizationGuidance = ({
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Optimization Analysis" isVisible={true} />
-        ) : hasInsufficientData ? (
+        ) : (hasInsufficientData || needsMoreData) ? (
           <InsightEmptyState 
             insight="Performance Optimization" 
             userData={userData}
@@ -408,7 +409,7 @@ export const OptimizationGuidance = ({
           </div>
           </>
         )}
-        {dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
+        {dataQuality?.level !== 'insufficient' && !hasInsufficientData && !needsMoreData && (
           <div className="insight-data-status">
             <div className="insight-data-status-indicator">
               <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
