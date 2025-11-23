@@ -83,8 +83,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const timeRangeSliderRef = useRef(null);
   const [isTimeRangeSliderInitialized, setIsTimeRangeSliderInitialized] = useState(false);
 
-  // Resize timeout ref
+  // Mobile state and resize timeout refs
+  const [isMobile, setIsMobile] = useState(false);
   const resizeTimeoutRef = useRef(null);
+  const scrollTimeoutRef = useRef(null);
 
   // ENHANCED: Defensive programming - ensure userData structure
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
@@ -95,6 +97,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     setTimeout(() => {
       setLoadingStates(prev => ({ ...prev, [insightType]: false }));
     }, duration);
+  }, []);
+
+  // Mobile detection
+  const detectMobile = useCallback(() => {
+    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
+    setIsMobile(isMobileDevice);
+    return isMobileDevice;
   }, []);
 
   // ENHANCED: Trigger loading when time range or metric changes
@@ -113,7 +122,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   }, [timeRange, selectedMetric, simulateInsightLoading, safeUserData.streakHistory]);
 
-  // NEW: Update metric slider position
+  // NEW: Update metric slider position (EmotionalTimeline-exact implementation)
   const updateMetricSlider = useCallback(() => {
     if (!metricContainerRef.current || !metricSliderRef.current) {
       return false;
@@ -138,14 +147,15 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           }
 
           const containerStyle = window.getComputedStyle(container);
-          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
-          const leftOffset = Math.round(buttonRect.left - containerRect.left - paddingLeft);
-          const buttonWidth = Math.round(buttonRect.width);
+          const paddingLeft = parseFloat(containerStyle.paddingLeft) || 4;
+          const scrollLeft = container.scrollLeft || 0;
+          const leftOffset = buttonRect.left - containerRect.left - paddingLeft + scrollLeft;
+          const buttonWidth = buttonRect.width;
           
-          slider.style.width = `${buttonWidth}px`;
+          slider.style.width = `${Math.round(buttonWidth)}px`;
           
           requestAnimationFrame(() => {
-            slider.style.transform = `translateX(${leftOffset}px)`;
+            slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
             slider.style.opacity = '1';
             slider.style.visibility = 'visible';
           });
@@ -163,7 +173,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   }, [selectedMetric]);
 
-  // NEW: Update time range slider position
+  // NEW: Update time range slider position (EmotionalTimeline-exact implementation)
   const updateTimeRangeSlider = useCallback(() => {
     if (!timeRangeContainerRef.current || !timeRangeSliderRef.current) {
       return false;
@@ -188,14 +198,15 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           }
 
           const containerStyle = window.getComputedStyle(container);
-          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
-          const leftOffset = Math.round(buttonRect.left - containerRect.left - paddingLeft);
-          const buttonWidth = Math.round(buttonRect.width);
+          const paddingLeft = parseFloat(containerStyle.paddingLeft) || 4;
+          const scrollLeft = container.scrollLeft || 0;
+          const leftOffset = buttonRect.left - containerRect.left - paddingLeft + scrollLeft;
+          const buttonWidth = buttonRect.width;
           
-          slider.style.width = `${buttonWidth}px`;
+          slider.style.width = `${Math.round(buttonWidth)}px`;
           
           requestAnimationFrame(() => {
-            slider.style.transform = `translateX(${leftOffset}px)`;
+            slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
             slider.style.opacity = '1';
             slider.style.visibility = 'visible';
           });
@@ -213,23 +224,104 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   }, [timeRange]);
 
-  // Handle metric selection with slider update
+  // Scroll active button into view on mobile (for metric selector)
+  const scrollToActiveMetric = useCallback(() => {
+    if (!isMobile || !metricContainerRef.current) return;
+    
+    const container = metricContainerRef.current;
+    const activeButton = container.querySelector(`[data-metric="${selectedMetric}"]`);
+    
+    if (activeButton) {
+      const containerRect = container.getBoundingClientRect();
+      const buttonRect = activeButton.getBoundingClientRect();
+      
+      if (buttonRect.left < containerRect.left || buttonRect.right > containerRect.right) {
+        activeButton.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center',
+          block: 'nearest'
+        });
+      }
+    }
+  }, [selectedMetric, isMobile]);
+
+  // Scroll active button into view on mobile (for time range selector)
+  const scrollToActiveTimeRange = useCallback(() => {
+    if (!isMobile || !timeRangeContainerRef.current) return;
+    
+    const container = timeRangeContainerRef.current;
+    const activeButton = container.querySelector(`[data-timerange="${timeRange}"]`);
+    
+    if (activeButton) {
+      const containerRect = container.getBoundingClientRect();
+      const buttonRect = activeButton.getBoundingClientRect();
+      
+      if (buttonRect.left < containerRect.left || buttonRect.right > containerRect.right) {
+        activeButton.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center',
+          block: 'nearest'
+        });
+      }
+    }
+  }, [timeRange, isMobile]);
+
+  // Handle metric selection with slider update and scroll
   const handleMetricClick = useCallback((metric) => {
     if (metric === selectedMetric) return;
     setSelectedMetric(metric);
-    setTimeout(() => updateMetricSlider(), 10);
-  }, [selectedMetric, updateMetricSlider]);
+    
+    if (isMobile) {
+      setTimeout(() => {
+        scrollToActiveMetric();
+        updateMetricSlider();
+      }, 10);
+    }
+  }, [selectedMetric, isMobile, updateMetricSlider, scrollToActiveMetric]);
 
-  // Handle time range selection with slider update
+  // Handle time range selection with slider update and scroll
   const handleTimeRangeClick = useCallback((range) => {
     if (range === timeRange) return;
     setTimeRange(range);
-    setTimeout(() => updateTimeRangeSlider(), 10);
-  }, [timeRange, updateTimeRangeSlider]);
+    
+    if (isMobile) {
+      setTimeout(() => {
+        scrollToActiveTimeRange();
+        updateTimeRangeSlider();
+      }, 10);
+    }
+  }, [timeRange, isMobile, updateTimeRangeSlider, scrollToActiveTimeRange]);
+
+  // Handle scroll events to update metric slider position on mobile
+  useEffect(() => {
+    if (!isMobile || !metricContainerRef.current) return;
+    
+    const handleScroll = () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      
+      scrollTimeoutRef.current = setTimeout(() => {
+        updateMetricSlider();
+      }, 50);
+    };
+    
+    const container = metricContainerRef.current;
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [isMobile, updateMetricSlider]);
 
   // NEW: Initialize metric slider
   useEffect(() => {
     const initializeMetricSlider = () => {
+      detectMobile();
+      
       if (!metricContainerRef.current || !metricSliderRef.current) {
         return;
       }
@@ -239,10 +331,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         
         if (success) {
           setIsMetricSliderInitialized(true);
+          if (isMobile) {
+            scrollToActiveMetric();
+          }
         } else {
           setTimeout(() => {
             if (updateMetricSlider()) {
               setIsMetricSliderInitialized(true);
+              if (isMobile) {
+                scrollToActiveMetric();
+              }
             } else {
               if (metricSliderRef.current) {
                 metricSliderRef.current.style.opacity = '1';
@@ -258,11 +356,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
     const timer = setTimeout(initializeMetricSlider, 100);
     return () => clearTimeout(timer);
-  }, [updateMetricSlider]);
+  }, [updateMetricSlider, detectMobile, isMobile, scrollToActiveMetric]);
 
   // NEW: Initialize time range slider
   useEffect(() => {
     const initializeTimeRangeSlider = () => {
+      detectMobile();
+      
       if (!timeRangeContainerRef.current || !timeRangeSliderRef.current) {
         return;
       }
@@ -272,10 +372,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         
         if (success) {
           setIsTimeRangeSliderInitialized(true);
+          if (isMobile) {
+            scrollToActiveTimeRange();
+          }
         } else {
           setTimeout(() => {
             if (updateTimeRangeSlider()) {
               setIsTimeRangeSliderInitialized(true);
+              if (isMobile) {
+                scrollToActiveTimeRange();
+              }
             } else {
               if (timeRangeSliderRef.current) {
                 timeRangeSliderRef.current.style.opacity = '1';
@@ -291,11 +397,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
     const timer = setTimeout(initializeTimeRangeSlider, 100);
     return () => clearTimeout(timer);
-  }, [updateTimeRangeSlider]);
+  }, [updateTimeRangeSlider, detectMobile, isMobile, scrollToActiveTimeRange]);
 
   // Handle resize for both sliders
   useEffect(() => {
     const handleResize = () => {
+      const wasMobile = isMobile;
+      detectMobile();
+      
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
@@ -303,9 +412,15 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       resizeTimeoutRef.current = setTimeout(() => {
         if (isMetricSliderInitialized) {
           updateMetricSlider();
+          if (!wasMobile && isMobile) {
+            scrollToActiveMetric();
+          }
         }
         if (isTimeRangeSliderInitialized) {
           updateTimeRangeSlider();
+          if (!wasMobile && isMobile) {
+            scrollToActiveTimeRange();
+          }
         }
       }, 100);
     };
@@ -318,7 +433,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         clearTimeout(resizeTimeoutRef.current);
       }
     };
-  }, [isMetricSliderInitialized, isTimeRangeSliderInitialized, updateMetricSlider, updateTimeRangeSlider]);
+  }, [isMetricSliderInitialized, isTimeRangeSliderInitialized, detectMobile, updateMetricSlider, updateTimeRangeSlider, isMobile, scrollToActiveMetric, scrollToActiveTimeRange]);
 
   // Update sliders when selections change
   useEffect(() => {
