@@ -141,13 +141,6 @@
   gap: var(--spacing-sm);
 }
 
-.data-progress-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
-}
-
 .data-progress-count {
   font-size: 0.75rem;
   font-weight: 500;

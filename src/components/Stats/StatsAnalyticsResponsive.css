@@ -80,6 +80,7 @@
   
   .data-progress-title {
     justify-content: center;
+    flex-wrap: wrap;
   }
   
   .data-progress-helmet {
@@ -621,15 +622,13 @@
   .insight-loading-helmet,
   .insight-loading-helmet-fallback,
   .upgrade-helmet-icon,
-  .upgrade-helmet-fallback {
+  .upgrade-helmet-fallback,
+  .data-progress-helmet,
+  .data-progress-helmet-fallback {
     animation: none !important;
   }
 
   .insight-loading-dots span {
-    animation: none !important;
-  }
-
-  .data-progress-fill::after {
     animation: none !important;
   }
 }

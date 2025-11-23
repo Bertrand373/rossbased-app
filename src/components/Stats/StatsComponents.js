@@ -34,7 +34,7 @@ export const InsightLoadingState = ({ insight, isVisible }) => {
   );
 };
 
-// ENHANCED: Progress indicator component - EXACT COPY structure from EmotionalTimeline banner
+// ENHANCED: Progress indicator component - Banner structure matching EmotionalTimeline
 export const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
   const trackedDays = userData.benefitTracking?.length || 0;
   const isComplete = trackedDays >= targetDays;
@@ -55,11 +55,9 @@ export const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
       </div>
       <div className="data-progress-content">
         <div className="data-progress-title">
-          <div className="data-progress-header">
-            {isComplete ? 'Analytics Ready' : 'Building Your Profile'}
-            <div className="data-progress-count">
-              {trackedDays}/{targetDays} days
-            </div>
+          {isComplete ? 'Analytics Ready' : 'Building Your Profile'}
+          <div className="data-progress-count">
+            {trackedDays}/{targetDays} days
           </div>
         </div>
         <div className="data-progress-message">
