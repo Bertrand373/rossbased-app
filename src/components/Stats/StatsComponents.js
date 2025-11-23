@@ -75,27 +75,11 @@ export const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
   );
 };
 
-// ENHANCED: Empty state component with encouragement
+// ENHANCED: Empty state component - shows only the helmet banner for congruence
 export const InsightEmptyState = ({ insight, userData }) => {
-  const suggestions = {
-    'Smart Urge Management': 'Track your daily benefits to receive personalized vulnerability assessments and timing-based guidance.',
-    'Relapse Risk Predictor': 'Build a benefit tracking history to unlock predictive analytics and risk mitigation strategies.',
-    'Pattern Recognition': 'Continue logging daily benefits to identify correlations and trends in your retention journey.',
-    'Optimization Guidance': 'Track benefits consistently to discover your peak performance zones and optimization opportunities.'
-  };
-
   return (
     <div className="insight-empty-state">
-      <div className="insight-empty-icon">
-        <FaChartLine />
-      </div>
-      <div className="insight-empty-content">
-        <div className="insight-empty-title">Building Your {insight}</div>
-        <div className="insight-empty-description">
-          {suggestions[insight] || 'Continue tracking to unlock personalized insights.'}
-        </div>
-        <DataProgressIndicator userData={userData} />
-      </div>
+      <DataProgressIndicator userData={userData} />
     </div>
   );
 };

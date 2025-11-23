@@ -813,9 +813,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             <div className="benefit-tracker-banner-content">
               <div className="benefit-tracker-banner-title">
                 {(safeUserData.benefitTracking?.length || 0) >= 14 ? 'Your Analytics Profile' : 'Building Your Profile'}
-                <div className="benefit-tracker-banner-count">
-                  {safeUserData.benefitTracking?.length || 0}/14 days
-                </div>
               </div>
               <div className="benefit-tracker-banner-message">
                 {(safeUserData.benefitTracking?.length || 0) >= 14 
