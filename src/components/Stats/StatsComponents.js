@@ -36,6 +36,11 @@ export const InsightLoadingState = ({ insight, isVisible }) => {
 
 // ENHANCED: Progress indicator component - Banner structure matching EmotionalTimeline
 export const DataProgressIndicator = ({ userData, targetDays = 14 }) => {
+  // Safety check for userData
+  if (!userData) {
+    return null;
+  }
+  
   const trackedDays = userData.benefitTracking?.length || 0;
   const isComplete = trackedDays >= targetDays;
   
