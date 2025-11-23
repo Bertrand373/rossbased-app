@@ -1041,6 +1041,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           {/* Phase Evolution Analysis */}
           <PhaseEvolutionAnalysis
             isLoading={loadingStates.phaseEvolution}
+            hasInsufficientData={hasInsufficientData}
+            userData={safeUserData}
             phaseEvolution={memoizedInsights.phaseEvolution}
             selectedMetric={selectedMetric}
             dataQuality={memoizedInsights.dataQuality}

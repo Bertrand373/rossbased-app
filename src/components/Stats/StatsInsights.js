@@ -15,6 +15,9 @@ export const ProgressTrendsAnalysis = ({
 }) => {
   const sectionDescription = "Historical trajectory analysis showing how your performance and relapse patterns have evolved over time.";
   
+  // FIXED: Check if we need more data (14 days minimum for trends)
+  const needsMoreData = !progressTrends || progressTrends === null;
+  
   return (
     <div className="insight-card">
       <div className="insight-card-header">
@@ -23,7 +26,7 @@ export const ProgressTrendsAnalysis = ({
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Progress Analysis" isVisible={true} />
-        ) : hasInsufficientData ? (
+        ) : (hasInsufficientData || needsMoreData) ? (
           <InsightEmptyState 
             insight="Progress & Trends" 
             userData={userData}
@@ -159,7 +162,7 @@ export const ProgressTrendsAnalysis = ({
           </div>
           </>
         )}
-        {dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
+        {dataQuality?.level !== 'insufficient' && !hasInsufficientData && !needsMoreData && (
           <div className="insight-data-status">
             <div className="insight-data-status-indicator">
               <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
@@ -442,6 +445,9 @@ export const PhaseEvolutionAnalysis = ({
 }) => {
   const sectionDescription = `Tracks how your ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} develops through the retention phases and identifies phase-specific patterns and challenges.`;
   
+  // FIXED: Check if we need more data (14 days minimum for phase evolution)
+  const needsMoreData = !phaseEvolution || !phaseEvolution.hasData;
+  
   // Function to determine current phase based on streak - MATCHING EXACT LOGIC
   const getCurrentPhaseKey = (streak) => {
     if (streak <= 14) return 'foundation';
@@ -462,14 +468,7 @@ export const PhaseEvolutionAnalysis = ({
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Phase Analysis" isVisible={true} />
-        ) : hasInsufficientData ? (
-          <InsightEmptyState 
-            insight="Phase Evolution" 
-            userData={userData}
-            sectionTitle="Phase Evolution"
-            sectionDescription={sectionDescription}
-          />
-        ) : !phaseEvolution?.hasData ? (
+        ) : (hasInsufficientData || needsMoreData) ? (
           <InsightEmptyState 
             insight="Phase Evolution" 
             userData={userData}
@@ -531,7 +530,7 @@ export const PhaseEvolutionAnalysis = ({
           </>
         )}
       </div>
-      {dataQuality?.level !== 'insufficient' && !hasInsufficientData && (
+      {dataQuality?.level !== 'insufficient' && !hasInsufficientData && !needsMoreData && (
         <div className="insight-data-status">
           <div className="insight-data-status-indicator">
             <span className={`insight-data-quality ${dataQuality?.level || 'minimal'}`}>
