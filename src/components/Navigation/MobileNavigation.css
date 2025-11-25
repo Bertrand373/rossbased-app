@@ -1,4 +1,4 @@
-/* components/Navigation/MobileNavigation.css - UPDATED: True floating navigation with no borders */
+/* components/Navigation/MobileNavigation.css - ENHANCED: Elevated floating navigation with premium visibility */
 
 /* CRITICAL: Mobile navigation must ALWAYS be sticky - enhanced for iOS */
 .mobile-navigation {
@@ -51,13 +51,16 @@
 }
 
 /* Container layout with sliding animation support - THIS IS THE VISIBLE PILL */
+/* ENHANCED: Premium elevation with yellow accent glow */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm);
-  background-color: var(--card-background);
+  /* ENHANCED: Slightly elevated background for better contrast */
+  background-color: rgba(42, 42, 42, 0.95);
   border-radius: var(--radius-full);
-  border: 1px solid var(--border);
+  /* ENHANCED: Subtle yellow accent border for spartan elite feel */
+  border: 1px solid rgba(255, 208, 0, 0.3);
   width: 100%;
   max-width: 500px;
   position: relative;
@@ -67,8 +70,14 @@
   -webkit-backface-visibility: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  /* Add subtle shadow to the pill itself for floating effect */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  /* ENHANCED: Multi-layered shadow with yellow glow for premium floating effect */
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(255, 208, 0, 0.15);
+  /* OPTIONAL: Modern glass-morphism effect - remove if too much */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .mobile-nav-container::-webkit-scrollbar {
@@ -93,6 +102,8 @@
   width: 0px;
   transform: translateZ(0) translateX(0px);
   will-change: transform, width;
+  /* ENHANCED: Add glow to active slider for extra pop */
+  box-shadow: 0 0 15px rgba(255, 208, 0, 0.4);
 }
 
 /* Ultra-fast transitions for very small screens */
@@ -110,7 +121,8 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  color: var(--text-secondary);
+  /* ENHANCED: Brighter inactive text for better readability */
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.7rem;
   font-weight: 500;
   padding: var(--spacing-sm) var(--spacing-xs);
@@ -129,6 +141,11 @@
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+/* ENHANCED: Hover state for better interactivity on touch devices */
+.mobile-nav-item:active {
+  transform: scale(0.95);
 }
 
 /* Adjust touch targets on actual mobile */
@@ -153,6 +170,13 @@
   flex-shrink: 0;
   display: block;
   text-align: center;
+  /* ENHANCED: Slightly brighter icons for better visibility */
+  filter: brightness(1.1);
+}
+
+/* ENHANCED: Active icon gets full brightness */
+.mobile-nav-item.active .mobile-nav-icon {
+  filter: brightness(1);
 }
 
 .mobile-nav-item span {
@@ -185,6 +209,11 @@
     max-width: 100%;
     gap: 2px;
     padding: 6px;
+    /* Maintain enhanced effects on mobile */
+    box-shadow: 
+      0 6px 20px rgba(0, 0, 0, 0.5),
+      0 3px 10px rgba(0, 0, 0, 0.4),
+      0 0 15px rgba(255, 208, 0, 0.15);
   }
   
   /* Slider positioning for very small screens */
