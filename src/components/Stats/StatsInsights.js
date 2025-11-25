@@ -187,6 +187,10 @@ export const RelapsePatternAnalytics = ({
   daysSinceLastRelapse 
 }) => {
   if (!relapsePatterns?.hasData) return null;
+  
+  const sectionDescription = daysSinceLastRelapse >= 90
+    ? `Review the patterns you've successfully overcome ${daysSinceLastRelapse} days ago. This wisdom helps maintain vigilance and can guide others on their journey.`
+    : 'Analyzes your relapse history to identify trigger patterns, phase vulnerabilities, and provides brutally honest countermeasures based on retention wisdom.';
 
   return (
     <div className="insight-card">
@@ -198,16 +202,10 @@ export const RelapsePatternAnalytics = ({
           }
         </span>
       </div>
-      <div className="insight-info-banner">
-        <FaInfoCircle className="info-icon" />
-        <span>
-          {daysSinceLastRelapse >= 90
-            ? `Review the patterns you've successfully overcome ${daysSinceLastRelapse} days ago. This wisdom helps maintain vigilance and can guide others on their journey.`
-            : 'Analyzes your relapse history to identify trigger patterns, phase vulnerabilities, and provides brutally honest countermeasures based on retention wisdom.'
-          }
-        </span>
-      </div>
       <div className="insight-card-content">
+        {/* NEW: Helmet info banner matching other sections */}
+        <MiniInfoBanner description={sectionDescription} />
+        
         {isLoading ? (
           <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
         ) : (

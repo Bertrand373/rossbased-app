@@ -95,10 +95,17 @@
   /* EXACT COPY: Mobile data progress banner from EmotionalTimeline */
   .data-progress-indicator {
     flex-direction: column;
+    align-items: center;
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
     margin-top: var(--spacing-md);
+  }
+  
+  .data-progress-helmet-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
   }
   
   .data-progress-content {
