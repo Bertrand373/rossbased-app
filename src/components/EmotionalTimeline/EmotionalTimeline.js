@@ -1,4 +1,4 @@
-// components/EmotionalTimeline/EmotionalTimeline.js - FIXED Analysis Logic
+// components/EmotionalTimeline/EmotionalTimeline.js - FIXED Analysis Logic + Mobile Trailing Balls
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -12,7 +12,7 @@ import './EmotionalTimelineModals.css';
 import { 
   FaCheckCircle, FaInfoCircle, FaTimes,
   FaMapSigns, FaHeart, FaBrain, FaEdit,
-  FaExclamationTriangle
+  FaExclamationTriangle, FaChartLine
 } from 'react-icons/fa';
 
 // Import utility functions and data
@@ -50,6 +50,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   const resizeTimeoutRef = useRef(null);
   const scrollTimeoutRef = useRef(null);
   
+  // NEW: Refs for trailing ball indicators on emotion sliders
+  const emotionSliderRefs = useRef({
+    anxiety: { input: null, ball: null },
+    moodStability: { input: null, ball: null },
+    mentalClarity: { input: null, ball: null },
+    emotionalProcessing: { input: null, ball: null }
+  });
+  
   const currentDay = userData.currentStreak || 0;
 
   // Get current phase and mastery level
@@ -86,6 +94,22 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       hasExcellentData: totalDataPoints >= 21 && consistencyRate > 50,
       hasSufficientRecentData: recentDataPoints >= 3
     };
+  };
+  
+  // NEW: Calculate data quality for display
+  const getDataQuality = () => {
+    const dataState = getDataAnalysisState();
+    const { totalDataPoints } = dataState;
+    
+    if (totalDataPoints === 0) {
+      return { level: 'insufficient', label: 'No Data', days: 0 };
+    } else if (totalDataPoints < 7) {
+      return { level: 'minimal', label: 'Basic Analysis', days: totalDataPoints };
+    } else if (totalDataPoints < 21) {
+      return { level: 'good', label: 'Good Analysis', days: totalDataPoints };
+    } else {
+      return { level: 'rich', label: 'Rich Analysis', days: totalDataPoints };
+    }
   };
 
   // FIXED: Smart banner message generation
@@ -148,48 +172,76 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       '--phase-color-light': lighterColor
     };
   };
-
-  // Mobile detection
-  const detectMobile = useCallback(() => {
-    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
-    setIsMobile(isMobileDevice);
-    return isMobileDevice;
+  
+  // NEW: Update trailing ball position for emotion sliders
+  const updateEmotionBallPosition = useCallback((emotionKey, value) => {
+    const refs = emotionSliderRefs.current[emotionKey];
+    if (!refs || !refs.input || !refs.ball) return;
+    
+    try {
+      const input = refs.input;
+      const ball = refs.ball;
+      
+      // Calculate position percentage (value 1-10 mapped to 0-100%)
+      const percentage = ((value - 1) / 9) * 100;
+      
+      // Get thumb width (24px on desktop, 22px on mobile 768px, 20px on mobile 480px)
+      const thumbWidth = window.innerWidth <= 480 ? 20 : window.innerWidth <= 768 ? 22 : 24;
+      
+      // Calculate position: ball center should align with thumb center
+      // Thumb travels from thumbWidth/2 to (trackWidth - thumbWidth/2)
+      const trackWidth = input.offsetWidth;
+      const ballPosition = (thumbWidth / 2) + ((trackWidth - thumbWidth) * (percentage / 100));
+      
+      ball.style.left = `${ballPosition}px`;
+    } catch (error) {
+      console.error('Error updating emotion ball position:', error);
+    }
   }, []);
 
-  // FIXED: Enhanced slider positioning with smooth bidirectional animation
-  const updateTabSlider = useCallback(() => {
+  // Detect mobile
+  const detectMobile = useCallback(() => {
+    setIsMobile(window.innerWidth <= 768);
+  }, []);
+
+  // Detect mobile on mount and resize
+  useEffect(() => {
+    detectMobile();
+    window.addEventListener('resize', detectMobile);
+    return () => window.removeEventListener('resize', detectMobile);
+  }, [detectMobile]);
+
+  // Update slider position function
+  const updateSlider = useCallback(() => {
     if (!tabsRef.current || !sliderRef.current) {
       return false;
     }
     
     try {
-      const tabsContainer = tabsRef.current;
+      const container = tabsRef.current;
       const slider = sliderRef.current;
-      const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeSection}"]`);
+      const activeButton = container.querySelector(`[data-tab="${activeSection}"]`);
       
-      if (!activeTabElement) {
-        console.warn(`Tab element not found: ${activeSection}`);
+      if (!activeButton) {
         return false;
       }
 
       requestAnimationFrame(() => {
         try {
-          const containerRect = tabsContainer.getBoundingClientRect();
-          const tabRect = activeTabElement.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          const buttonRect = activeButton.getBoundingClientRect();
           
-          if (containerRect.width === 0 || tabRect.width === 0) {
-            console.warn('Invalid measurements, container or tab not rendered');
+          if (containerRect.width === 0 || buttonRect.width === 0) {
             return;
           }
 
-          const containerStyle = window.getComputedStyle(tabsContainer);
+          const containerStyle = window.getComputedStyle(container);
           const paddingLeft = parseFloat(containerStyle.paddingLeft) || 4;
-          const scrollLeft = tabsContainer.scrollLeft || 0;
-          const leftOffset = tabRect.left - containerRect.left - paddingLeft + scrollLeft;
-          const tabWidth = tabRect.width;
+          const scrollLeft = container.scrollLeft || 0;
+          const leftOffset = buttonRect.left - containerRect.left - paddingLeft + scrollLeft;
+          const buttonWidth = buttonRect.width;
           
-          // FIXED: Set width FIRST, then transform in next frame
-          slider.style.width = `${Math.round(tabWidth)}px`;
+          slider.style.width = `${Math.round(buttonWidth)}px`;
           
           requestAnimationFrame(() => {
             slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
@@ -210,19 +262,19 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     }
   }, [activeSection]);
 
-  // Scroll active tab into view on mobile
+  // Scroll active button into view on mobile
   const scrollToActiveTab = useCallback(() => {
     if (!isMobile || !tabsRef.current) return;
     
     const container = tabsRef.current;
-    const activeTabElement = container.querySelector(`[data-tab="${activeSection}"]`);
+    const activeButton = container.querySelector(`[data-tab="${activeSection}"]`);
     
-    if (activeTabElement) {
+    if (activeButton) {
       const containerRect = container.getBoundingClientRect();
-      const tabRect = activeTabElement.getBoundingClientRect();
+      const buttonRect = activeButton.getBoundingClientRect();
       
-      if (tabRect.left < containerRect.left || tabRect.right > containerRect.right) {
-        activeTabElement.scrollIntoView({
+      if (buttonRect.left < containerRect.left || buttonRect.right > containerRect.right) {
+        activeButton.scrollIntoView({
           behavior: 'smooth',
           inline: 'center',
           block: 'nearest'
@@ -231,21 +283,20 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     }
   }, [activeSection, isMobile]);
 
-  // Clean tab change handler
-  const handleSectionClick = useCallback((newSection) => {
-    if (newSection === activeSection) return;
-    
-    setActiveSection(newSection);
+  // Handle section change
+  const handleSectionChange = useCallback((sectionId) => {
+    if (sectionId === activeSection) return;
+    setActiveSection(sectionId);
     
     if (isMobile) {
       setTimeout(() => {
         scrollToActiveTab();
-        updateTabSlider();
+        updateSlider();
       }, 10);
     }
-  }, [activeSection, isMobile, updateTabSlider, scrollToActiveTab]);
+  }, [activeSection, isMobile, updateSlider, scrollToActiveTab]);
 
-  // Handle scroll events to update slider position
+  // Handle scroll events
   useEffect(() => {
     if (!isMobile || !tabsRef.current) return;
     
@@ -255,7 +306,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       }
       
       scrollTimeoutRef.current = setTimeout(() => {
-        updateTabSlider();
+        updateSlider();
       }, 50);
     };
     
@@ -268,9 +319,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [isMobile, updateTabSlider]);
+  }, [isMobile, updateSlider]);
 
-  // Slider initialization
+  // Initialize slider
   useEffect(() => {
     const initializeSlider = () => {
       detectMobile();
@@ -280,7 +331,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       }
 
       requestAnimationFrame(() => {
-        const success = updateTabSlider();
+        const success = updateSlider();
         
         if (success) {
           setIsSliderInitialized(true);
@@ -289,17 +340,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           }
         } else {
           setTimeout(() => {
-            if (updateTabSlider()) {
+            if (updateSlider()) {
               setIsSliderInitialized(true);
               if (isMobile) {
                 scrollToActiveTab();
-              }
-            } else {
-              if (sliderRef.current) {
-                sliderRef.current.style.opacity = '1';
-                sliderRef.current.style.visibility = 'visible';
-                setIsSliderInitialized(true);
-                setTimeout(updateTabSlider, 50);
               }
             }
           }, 100);
@@ -307,50 +351,42 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       });
     };
 
-    const timer = setTimeout(initializeSlider, 100);
-    
-    return () => clearTimeout(timer);
-  }, [updateTabSlider, detectMobile, isMobile, scrollToActiveTab]);
+    const timer = setTimeout(initializeSlider, 50);
 
-  // Resize handling
+    return () => {
+      clearTimeout(timer);
+      [resizeTimeoutRef, scrollTimeoutRef].forEach(ref => {
+        if (ref.current) {
+          clearTimeout(ref.current);
+        }
+      });
+    };
+  }, [detectMobile, updateSlider, scrollToActiveTab, isMobile]);
+
+  // Update slider on window resize
   useEffect(() => {
     const handleResize = () => {
-      const wasMobile = isMobile;
-      detectMobile();
-      
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
       
       resizeTimeoutRef.current = setTimeout(() => {
-        if (isSliderInitialized) {
-          updateTabSlider();
-          if (!wasMobile && isMobile) {
-            scrollToActiveTab();
-          }
-        }
-      }, 100);
+        detectMobile();
+        updateSlider();
+      }, 150);
     };
 
     window.addEventListener('resize', handleResize);
     
     return () => {
       window.removeEventListener('resize', handleResize);
-      
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
     };
-  }, [isSliderInitialized, detectMobile, updateTabSlider, isMobile, scrollToActiveTab]);
+  }, [detectMobile, updateSlider]);
 
-  // Update slider when active tab changes
-  useEffect(() => {
-    if (isSliderInitialized) {
-      setTimeout(updateTabSlider, 10);
-    }
-  }, [activeSection, isSliderInitialized, updateTabSlider]);
-
-  // Cleanup timeouts on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       [resizeTimeoutRef, scrollTimeoutRef].forEach(ref => {
@@ -385,13 +421,35 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       setEmotionsLogged(true);
     }
   }, [userData.emotionalTracking]);
+  
+  // NEW: Update all emotion ball positions when emotions change
+  useEffect(() => {
+    Object.keys(todayEmotions).forEach(key => {
+      updateEmotionBallPosition(key, todayEmotions[key]);
+    });
+  }, [todayEmotions, updateEmotionBallPosition]);
+  
+  // NEW: Update ball positions on window resize
+  useEffect(() => {
+    const handleBallResize = () => {
+      Object.keys(todayEmotions).forEach(key => {
+        updateEmotionBallPosition(key, todayEmotions[key]);
+      });
+    };
+    
+    window.addEventListener('resize', handleBallResize);
+    return () => window.removeEventListener('resize', handleBallResize);
+  }, [todayEmotions, updateEmotionBallPosition]);
 
   // UPDATED: Handle emotional tracking with 1-10 scale (whole numbers only)
   const handleEmotionChange = (type, value) => {
+    const newValue = parseInt(value);
     setTodayEmotions(prev => ({
       ...prev,
-      [type]: parseInt(value)
+      [type]: newValue
     }));
+    // Update ball position immediately
+    updateEmotionBallPosition(type, newValue);
   };
 
   const saveEmotions = () => {
@@ -434,7 +492,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       ticks.push(
         <div 
           key={i} 
-          className={`slider-tick ${isKeyTick ? 'key-tick' : ''}`}
+          className={`slider-tick ${isKeyTick ? 'key-tick' : ''}`} 
           data-value={i}
         />
       );
@@ -444,37 +502,32 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   return (
     <div className="emotional-timeline-container">
-      {/* Integrated Header Design */}
+      {/* UPDATED: Integrated Header Design matching Tracker/Calendar/Stats pattern */}
       <div className="integrated-timeline-header">
         <div className="header-title-section">
           <h2>Emotional Timeline</h2>
-          <p className="header-subtitle">Track your emotional journey through the phases of recovery</p>
+          <p className="header-subtitle">Track emotional patterns through retention phases</p>
         </div>
-        
+
+        {/* UPDATED: Navigation pills with sliding background */}
         <div className="header-navigation-section">
-          <div 
-            className="navigation-pill-container" 
-            ref={tabsRef}
-          >
+          <div className="navigation-pill-container" ref={tabsRef}>
             <div 
-              className="navigation-tab-slider" 
+              className="navigation-slider" 
               ref={sliderRef}
-              style={{ 
-                opacity: 0,
-                visibility: 'hidden',
-                transform: 'translateX(0px)',
-                width: '0px'
+              style={{
+                opacity: isSliderInitialized ? '1' : '0',
+                visibility: isSliderInitialized ? 'visible' : 'hidden'
               }}
             />
-            
-            {navigationTabs.map(tab => (
-              <button 
+            {navigationTabs.map((tab) => (
+              <button
                 key={tab.id}
-                className={`navigation-section-btn ${activeSection === tab.id ? 'active' : ''}`}
-                onClick={() => handleSectionClick(tab.id)}
                 data-tab={tab.id}
+                className={`navigation-pill ${activeSection === tab.id ? 'active' : ''}`}
+                onClick={() => handleSectionChange(tab.id)}
               >
-                <tab.icon />
+                <tab.icon className="nav-icon" />
                 <span>{tab.label}</span>
               </button>
             ))}
@@ -482,130 +535,105 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       </div>
 
-      {/* Current Phase Display - ONLY VISIBLE ON JOURNEY MAP TAB */}
-      {currentPhase && currentDay > 0 && activeSection === 'journey-map' && (
-        <div className="current-phase-container">
-          <div className="phase-card current">
-            <div className="phase-date">Day {currentDay} of your journey</div>
-            
-            <div className="phase-icon-section">
-              <div className="timeline-phase-icon" style={{ color: currentPhase.color }}>
-                <currentPhase.icon style={{ color: currentPhase.color }} />
-              </div>
-              <div className="phase-info">
-                <div className="phase-name">{currentPhase.name}</div>
-                <div className="phase-range">Days {currentPhase.dayRange}</div>
-              </div>
-            </div>
-            
-            <div className="phase-description">
-              {currentPhase.description}
-            </div>
-
-            <div className="phase-progress">
-              <div 
-                className="progress-bar progress-bar-shimmer"
-                style={getPhaseColorVariables(currentPhase)}
-              >
-                <div 
-                  className="progress-fill progress-fill-colored progress-fill-shimmer"
-                  style={{ width: `${getPhaseProgress(currentPhase, currentDay, currentMasteryLevel)}%` }}
-                ></div>
-              </div>
-              <div className="progress-text-container">
-                <div className="progress-text">
-                  {getPhaseProgressText(currentPhase, currentDay, currentMasteryLevel)}
-                </div>
-              </div>
-            </div>
-
-            <button 
-              className="phase-detail-btn"
-              onClick={() => showPhaseDetails(currentPhase)}
-            >
-              <FaInfoCircle />
-              View Phase Details
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Section Content */}
-      <div className="timeline-content-container">
+      {/* Main content area */}
+      <div className="emotional-timeline-content">
         {/* Journey Map Section */}
         {activeSection === 'journey-map' && (
-          <div className="timeline-overview">
-            <h3>Complete Journey Map</h3>
-            <div className="phases-timeline">
-              {emotionalPhases.map((phase) => {
-                const isCompleted = currentDay > phase.endDay && phase.endDay !== 999999;
-                const isCurrent = currentPhase?.id === phase.id;
-                const isUpcoming = currentDay < phase.startDay;
-                
-                return (
-                  <div 
-                    key={phase.id} 
-                    className={`timeline-phase ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                    onClick={() => showPhaseDetails(phase)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="timeline-phase-icon">
-                      <phase.icon style={{ color: phase.color }} />
-                    </div>
-                    <div className="timeline-phase-info">
-                      <div className="timeline-phase-name">{phase.name}</div>
-                      <div className="timeline-phase-range">Days {phase.dayRange}</div>
-                      <div className="timeline-phase-description">{phase.description}</div>
-                    </div>
-                    <div className="timeline-phase-check">
-                      <FaCheckCircle />
+          <div className="journey-map-section">
+            {/* Current Phase Card */}
+            {currentPhase && (
+              <div className="current-phase-card" style={getPhaseColorVariables(currentPhase)}>
+                <div className="current-phase-header">
+                  <div className="timeline-phase-icon" style={{ color: currentPhase.color }}>
+                    <currentPhase.icon style={{ color: currentPhase.color }} />
+                  </div>
+                  <div className="current-phase-info">
+                    <h3>{currentPhase.name}</h3>
+                    <div className="current-phase-day">
+                      Day {currentDay} • {getPhaseProgressText(currentDay, currentPhase)}
                     </div>
                   </div>
-                );
-              })}
+                </div>
+
+                <div className="progress-container">
+                  <div className="progress-bar progress-bar-shimmer">
+                    <div 
+                      className="progress-fill progress-fill-shimmer progress-fill-colored" 
+                      style={{ 
+                        width: `${getPhaseProgress(currentDay, currentPhase)}%`,
+                        '--phase-color': currentPhase.color
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                <p className="current-phase-description">{currentPhase.description}</p>
+
+                <button 
+                  className="learn-more-btn"
+                  onClick={() => showPhaseDetails(currentPhase)}
+                >
+                  <FaInfoCircle />
+                  <span>View Full Phase Details</span>
+                </button>
+              </div>
+            )}
+
+            {/* Upcoming Phases */}
+            <div className="phases-timeline">
+              <h3>Your Emotional Journey Map</h3>
+              <div className="phases-grid">
+                {emotionalPhases.map((phase) => {
+                  const isPast = currentDay > phase.endDay;
+                  const isCurrent = currentDay >= phase.startDay && currentDay <= phase.endDay;
+                  const isFuture = currentDay < phase.startDay;
+                  
+                  return (
+                    <div 
+                      key={phase.id}
+                      className={`phase-card ${isPast ? 'past' : ''} ${isCurrent ? 'current' : ''} ${isFuture ? 'future' : ''}`}
+                      style={isCurrent ? getPhaseColorVariables(phase) : {}}
+                      onClick={() => showPhaseDetails(phase)}
+                    >
+                      <div className="phase-card-header">
+                        <div className="timeline-phase-icon" style={{ color: phase.color }}>
+                          <phase.icon style={{ color: phase.color }} />
+                        </div>
+                        <h4>{phase.name}</h4>
+                      </div>
+                      <div className="phase-day-range">Days {phase.dayRange}</div>
+                      {isCurrent && (
+                        <div className="phase-current-indicator">
+                          <FaCheckCircle />
+                          <span>You are here (Day {currentDay})</span>
+                        </div>
+                      )}
+                      {isPast && (
+                        <div className="phase-completed-indicator">
+                          <FaCheckCircle />
+                          <span>Completed</span>
+                        </div>
+                      )}
+                      <p className="phase-card-description">{phase.description}</p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Mastery Levels Display */}
-            {currentDay >= 181 && (
-              <div className="mastery-levels-section">
-                <h3>Mastery Levels (Days 181+)</h3>
-                <div className="mastery-levels-timeline">
-                  {masteryLevels.map((level) => {
-                    const isCompleted = currentDay > level.endDay && level.endDay !== 999999;
-                    const isCurrent = currentMasteryLevel?.id === level.id;
-                    const isUpcoming = currentDay < level.startDay;
-                    
-                    return (
-                      <div 
-                        key={level.id}
-                        className={`mastery-level-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                      >
-                        <div className="mastery-level-icon">
-                          <level.icon style={{ color: 'var(--primary)' }} />
-                        </div>
-                        
-                        <div className="mastery-level-info">
-                          <div className="mastery-level-name">Level {level.level}: {level.name}</div>
-                          <div className="mastery-level-subtitle">{level.subtitle}</div>
-                          <div className="mastery-level-time-range">{level.timeRange}</div>
-                        </div>
-                        
-                        <div className="mastery-level-status">
-                          {isCompleted && (
-                            <div className="mastery-level-check">
-                              <FaCheckCircle />
-                            </div>
-                          )}
-                          {isCurrent && (
-                            <div className="mastery-level-current-badge">
-                              Current
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+            {/* Mastery Level Card */}
+            {currentMasteryLevel && (
+              <div className="mastery-level-card">
+                <div className="mastery-header">
+                  <div className="mastery-icon">
+                    <currentMasteryLevel.icon />
+                  </div>
+                  <div className="mastery-info">
+                    <h3>{currentMasteryLevel.name}</h3>
+                    <div className="mastery-range">Days {currentMasteryLevel.dayRange}</div>
+                  </div>
                 </div>
+                <p className="mastery-description">{currentMasteryLevel.description}</p>
               </div>
             )}
           </div>
@@ -614,36 +642,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         {/* Check-in Section */}
         {activeSection === 'check-in' && (
           <div className="emotional-checkin-section">
-            <h3>Daily Emotional Check-in</h3>
+            <h3>Today's Emotional Check-in</h3>
             
-            {/* Handle no active streak - show unavailable banner */}
-            {!currentPhase || currentDay <= 0 ? (
-              <div className="checkin-benefits-banner">
-                <div className="checkin-benefits-helmet-container">
-                  <img 
-                    className="checkin-benefits-helmet" 
-                    src="/helmet.png" 
-                    alt="Check-in Unavailable" 
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'block';
-                    }}
-                  />
-                  <div className="checkin-benefits-helmet-fallback" style={{ display: 'none' }}>
-                    🛡️
-                  </div>
-                </div>
-                
-                <div className="checkin-benefits-content">
-                  <h4 className="checkin-benefits-title">
-                    Check-in Unavailable - Start Your Journey
-                  </h4>
-                  <p className="checkin-benefits-description">
-                    Emotional tracking requires an active retention streak to provide meaningful phase-based insights. Start your journey to begin daily emotional check-ins that unlock pattern recognition, challenge identification with solutions, and personalized strategies based on your progress through the retention phases.
-                  </p>
-                </div>
-              </div>
-            ) : (
+            {!emotionsLogged ? (
               <>
                 <div className="checkin-benefits-banner">
                   <div className="checkin-benefits-helmet-container">
@@ -692,7 +693,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   )}
                 </div>
 
-                {/* UPDATED: Emotion sliders with 1-10 scale and tick marks */}
+                {/* UPDATED: Emotion sliders with 1-10 scale, tick marks, and real trailing balls */}
                 <div className="emotion-sliders">
                   {[
                     { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety, lowLabel: 'Very Calm', highLabel: 'High Anxiety' },
@@ -709,6 +710,13 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           <div className="slider-tick-marks">
                             {renderSliderTickMarks()}
                           </div>
+                          {/* NEW: Real trailing ball element */}
+                          <div 
+                            className="slider-trailing-ball"
+                            ref={(el) => {
+                              if (el) emotionSliderRefs.current[emotion.key].ball = el;
+                            }}
+                          />
                           <input
                             type="range"
                             min="1"
@@ -718,7 +726,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                             onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
                             className="emotion-range-slider"
                             disabled={emotionsLogged}
-                            style={{ '--slider-value': ((emotion.value - 1) / 9) * 100 }}
+                            ref={(el) => {
+                              if (el) emotionSliderRefs.current[emotion.key].input = el;
+                            }}
                           />
                         </div>
                         <span className="emotion-value-clean">{emotion.value}</span>
@@ -743,11 +753,41 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   </div>
                 )}
               </>
+            ) : (
+              <>
+                <div className="emotions-logged-container">
+                  <div className="emotions-logged">
+                    <FaCheckCircle className="check-icon" />
+                    <span>Today's emotions logged!</span>
+                  </div>
+                  <button 
+                    className="edit-emotions-btn"
+                    onClick={enableEmotionEditing}
+                  >
+                    <FaEdit />
+                    <span>Edit</span>
+                  </button>
+                </div>
+                
+                <div className="logged-emotions-summary">
+                  {[
+                    { key: 'anxiety', label: 'Anxiety Level', value: todayEmotions.anxiety },
+                    { key: 'moodStability', label: 'Mood Stability', value: todayEmotions.moodStability },
+                    { key: 'mentalClarity', label: 'Mental Clarity', value: todayEmotions.mentalClarity },
+                    { key: 'emotionalProcessing', label: 'Emotional Processing', value: todayEmotions.emotionalProcessing }
+                  ].map((emotion) => (
+                    <div key={emotion.key} className="logged-emotion-row">
+                      <span className="logged-emotion-label">{emotion.label}</span>
+                      <span className="logged-emotion-value">{emotion.value}/10</span>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         )}
 
-        {/* FIXED: Analysis Section with improved logic */}
+        {/* FIXED: Analysis Section with improved logic and data quality indicator */}
         {activeSection === 'analysis' && (
           <div className="phase-insight-section">
             <h3>Comprehensive Phase Analysis</h3>
@@ -784,6 +824,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 const analysis = generateComprehensivePhaseAnalysis(currentPhase, currentDay, userData, false, true);
                 const dataState = getDataAnalysisState();
                 const bannerMessage = getBannerMessage();
+                const dataQuality = getDataQuality();
                 
                 return (
                   <>
@@ -816,189 +857,181 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
                     {/* Analysis Cards Grid - ALWAYS SHOW if we have a valid phase */}
                     {analysis && currentPhase && currentDay > 0 && (
-                      <div className="insights-grid">
-                        {/* Phase Education Card - ALWAYS SHOW */}
-                        {analysis?.phaseEducation && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Phase Education</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="optimization-display">
-                                <div className="optimization-metric-card">
-                                  <div className="optimization-metric-value">Day {analysis.phaseEducation.dayInPhase}</div>
-                                  <div className="optimization-metric-label">Current Phase Progress</div>
-                                </div>
-                                <div className="optimization-criteria">
-                                  <div className="optimization-criteria-title">Current Focus</div>
-                                  <div className="optimization-criteria-text">{analysis.phaseEducation.phaseOverview}</div>
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>Key Learning:</strong> {analysis.phaseEducation.keyLearning}
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>What to Expect:</strong> {analysis.phaseEducation.expectation}
+                      <>
+                        <div className="insights-grid">
+                          {/* Phase Education Card - ALWAYS SHOW */}
+                          {analysis?.phaseEducation && (
+                            <div className="insight-card">
+                              <div className="insight-card-header">
+                                <span className="insight-metric">Phase Education</span>
+                              </div>
+                              <div className="insight-text">
+                                <div className="optimization-display">
+                                  <div className="optimization-metric-card">
+                                    <div className="optimization-metric-value">Day {analysis.phaseEducation.dayInPhase}</div>
+                                    <div className="optimization-metric-label">Current Phase Progress</div>
+                                  </div>
+                                  <div className="optimization-criteria">
+                                    <div className="optimization-criteria-title">Current Focus</div>
+                                    <div className="optimization-criteria-text">{analysis.phaseEducation.phaseOverview}</div>
+                                  </div>
+                                  <div className="optimization-item">
+                                    <strong>Key Learning:</strong> {analysis.phaseEducation.keyLearning}
+                                  </div>
+                                  <div className="optimization-item">
+                                    <strong>What to Expect:</strong> {analysis.phaseEducation.expectation}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {/* Scientific Explanation Card - ALWAYS SHOW */}
-                        {analysis?.scientificExplanation && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Scientific Mechanisms</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="patterns-display">
-                                <div className="pattern-item">
-                                  <strong>Neurochemical:</strong> {analysis.scientificExplanation.neurochemical}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>Physiological:</strong> {analysis.scientificExplanation.physiological}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>Behavioral:</strong> {analysis.scientificExplanation.behavioral}
+                          {/* Scientific Explanation Card - ALWAYS SHOW */}
+                          {analysis?.scientificExplanation && (
+                            <div className="insight-card">
+                              <div className="insight-card-header">
+                                <span className="insight-metric">Scientific Explanation</span>
+                              </div>
+                              <div className="insight-text">
+                                <div className="optimization-display">
+                                  <div className="optimization-criteria">
+                                    <div className="optimization-criteria-title">Neurological Mechanism</div>
+                                    <div className="optimization-criteria-text">{analysis.scientificExplanation.mechanism}</div>
+                                  </div>
+                                  <div className="optimization-item">
+                                    <strong>Timeline:</strong> {analysis.scientificExplanation.timeline}
+                                  </div>
+                                  <div className="optimization-item">
+                                    <strong>Research Context:</strong> {analysis.scientificExplanation.research}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {/* Predictive Guidance Card - ALWAYS SHOW */}
-                        {analysis?.predictiveGuidance && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Predictive Guidance</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="optimization-display">
-                                <div className="optimization-criteria">
-                                  <div className="optimization-criteria-title">Current Focus</div>
-                                  <div className="optimization-criteria-text">{analysis.predictiveGuidance.currentFocus}</div>
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>Upcoming Challenge:</strong> {analysis.predictiveGuidance.upcomingChallenge}
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>Preparation:</strong> {analysis.predictiveGuidance.preparation}
-                                </div>
-                                <div className="optimization-item">
-                                  <strong>Timeline:</strong> {analysis.predictiveGuidance.timeline}
-                                </div>
+                          {/* Actionable Strategies Card - ALWAYS SHOW */}
+                          {analysis?.actionableStrategies && (
+                            <div className="insight-card">
+                              <div className="insight-card-header">
+                                <span className="insight-metric">Actionable Strategies</span>
                               </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Actionable Strategies Card - ALWAYS SHOW */}
-                        {analysis?.actionableStrategies && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Actionable Strategies</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="patterns-display">
-                                {analysis.actionableStrategies.urgent && analysis.actionableStrategies.urgent.length > 0 && (
+                              <div className="insight-text">
+                                <div className="patterns-display">
+                                  {analysis.actionableStrategies.urgent && analysis.actionableStrategies.urgent.length > 0 && (
+                                    <div className="pattern-item">
+                                      <strong>Urgent Actions:</strong> {analysis.actionableStrategies.urgent.join(' • ')}
+                                    </div>
+                                  )}
                                   <div className="pattern-item">
-                                    <strong>Urgent Actions:</strong> {analysis.actionableStrategies.urgent.join(' • ')}
+                                    <strong>Daily Practices:</strong> {analysis.actionableStrategies.daily.join(' • ')}
                                   </div>
-                                )}
-                                <div className="pattern-item">
-                                  <strong>Daily Practices:</strong> {analysis.actionableStrategies.daily.join(' • ')}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>Weekly Focus:</strong> {analysis.actionableStrategies.weekly.join(' • ')}
-                                </div>
-                                <div className="pattern-item">
-                                  <strong>Long-term Strategy:</strong> {analysis.actionableStrategies.longTerm.join(' • ')}
+                                  <div className="pattern-item">
+                                    <strong>Weekly Focus:</strong> {analysis.actionableStrategies.weekly.join(' • ')}
+                                  </div>
+                                  <div className="pattern-item">
+                                    <strong>Long-term Strategy:</strong> {analysis.actionableStrategies.longTerm.join(' • ')}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {/* Data Analysis Card - SHOW ONLY IF SUFFICIENT DATA */}
-                        {dataState.hasSufficientRecentData && analysis?.dataAnalysis && analysis.dataAnalysis.type === 'comprehensive' && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Personal Data Analysis</span>
+                          {/* Data Analysis Card - SHOW ONLY IF SUFFICIENT DATA */}
+                          {dataState.hasSufficientRecentData && analysis?.dataAnalysis && analysis.dataAnalysis.type === 'comprehensive' && (
+                            <div className="insight-card">
+                              <div className="insight-card-header">
+                                <span className="insight-metric">Personal Data Analysis</span>
+                              </div>
+                              <div className="insight-text">
+                                <div className="optimization-display">
+                                  <div className="optimization-metrics">
+                                    <div className="optimization-metric-card">
+                                      <div className="optimization-metric-value">{analysis.dataAnalysis.wellbeingScore.toFixed(1)}/10</div>
+                                      <div className="optimization-metric-label">Overall Wellbeing Score</div>
+                                    </div>
+                                    <div className="optimization-metric-card">
+                                      <div className="optimization-metric-value">{dataState.totalDataPoints}</div>
+                                      <div className="optimization-metric-label">Total Data Points</div>
+                                    </div>
+                                    <div className="optimization-metric-card">
+                                      <div className="optimization-metric-value">{dataState.recentDataPoints}/14</div>
+                                      <div className="optimization-metric-label">Recent Days Tracked</div>
+                                    </div>
+                                  </div>
+                                  
+                                  {analysis.dataAnalysis.trends && (
+                                    <div className="patterns-display">
+                                      <div className="pattern-item">
+                                        <strong>Anxiety Trend:</strong> 
+                                        <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
+                                          {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓ Improving' : 
+                                           analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑ Concerning' : ' → Stable'}
+                                        </span>
+                                      </div>
+                                      <div className="pattern-item">
+                                        <strong>Mood Stability:</strong>
+                                        <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
+                                          {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑ Improving' : 
+                                           analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
+                                        </span>
+                                      </div>
+                                      <div className="pattern-item">
+                                        <strong>Mental Clarity:</strong>
+                                        <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
+                                          {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑ Improving' : 
+                                           analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <div className="insight-text">
-                              <div className="optimization-display">
-                                <div className="optimization-metrics">
-                                  <div className="optimization-metric-card">
-                                    <div className="optimization-metric-value">{analysis.dataAnalysis.wellbeingScore.toFixed(1)}/10</div>
-                                    <div className="optimization-metric-label">Overall Wellbeing Score</div>
-                                  </div>
-                                  <div className="optimization-metric-card">
-                                    <div className="optimization-metric-value">{dataState.totalDataPoints}</div>
-                                    <div className="optimization-metric-label">Total Data Points</div>
-                                  </div>
-                                  <div className="optimization-metric-card">
-                                    <div className="optimization-metric-value">{dataState.recentDataPoints}/14</div>
-                                    <div className="optimization-metric-label">Recent Days Tracked</div>
+                          )}
+
+                          {/* Challenge Analysis Card - SHOW ONLY IF CHALLENGES IDENTIFIED */}
+                          {dataState.hasSufficientRecentData && analysis?.challengeIdentification?.challenges && analysis.challengeIdentification.challenges.length > 0 && (
+                            <div className="insight-card">
+                              <div className="insight-card-header">
+                                <span className="insight-metric">Challenge Analysis</span>
+                              </div>
+                              <div className="insight-text">
+                                <div className="risk-level-indicator moderate">
+                                  <div className="risk-score-container">
+                                    <div className="risk-score moderate">{analysis.challengeIdentification.challenges.length}</div>
+                                    <div className="risk-level-text">Active Challenge{analysis.challengeIdentification.challenges.length > 1 ? 's' : ''}</div>
                                   </div>
                                 </div>
                                 
-                                {analysis.dataAnalysis.trends && (
-                                  <div className="patterns-display">
-                                    <div className="pattern-item">
-                                      <strong>Anxiety Trend:</strong> 
-                                      <span className={`trend ${analysis.dataAnalysis.trends.anxiety}`}>
-                                        {analysis.dataAnalysis.trends.anxiety === 'improving' ? ' ↓ Improving' : 
-                                         analysis.dataAnalysis.trends.anxiety === 'concerning' ? ' ↑ Concerning' : ' → Stable'}
-                                      </span>
+                                <div className="patterns-display">
+                                  {analysis.challengeIdentification.challenges.map((challenge, index) => (
+                                    <div key={index} className="pattern-item">
+                                      <strong>{challenge.challenge}:</strong> {challenge.explanation}
+                                      <br />
+                                      <em>Solution: {challenge.solution}</em>
                                     </div>
-                                    <div className="pattern-item">
-                                      <strong>Mood Stability:</strong>
-                                      <span className={`trend ${analysis.dataAnalysis.trends.mood}`}>
-                                        {analysis.dataAnalysis.trends.mood === 'improving' ? ' ↑ Improving' : 
-                                         analysis.dataAnalysis.trends.mood === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
-                                      </span>
-                                    </div>
-                                    <div className="pattern-item">
-                                      <strong>Mental Clarity:</strong>
-                                      <span className={`trend ${analysis.dataAnalysis.trends.clarity}`}>
-                                        {analysis.dataAnalysis.trends.clarity === 'improving' ? ' ↑ Improving' : 
-                                         analysis.dataAnalysis.trends.clarity === 'concerning' ? ' ↓ Concerning' : ' → Stable'}
-                                      </span>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Challenge Analysis Card - SHOW ONLY IF CHALLENGES IDENTIFIED */}
-                        {dataState.hasSufficientRecentData && analysis?.challengeIdentification?.challenges && analysis.challengeIdentification.challenges.length > 0 && (
-                          <div className="insight-card">
-                            <div className="insight-card-header">
-                              <span className="insight-metric">Challenge Analysis</span>
-                            </div>
-                            <div className="insight-text">
-                              <div className="risk-level-indicator moderate">
-                                <div className="risk-score-container">
-                                  <div className="risk-score moderate">{analysis.challengeIdentification.challenges.length}</div>
-                                  <div className="risk-level-text">Active Challenge{analysis.challengeIdentification.challenges.length > 1 ? 's' : ''}</div>
+                                  ))}
                                 </div>
                               </div>
-                              
-                              <div className="patterns-display">
-                                {analysis.challengeIdentification.challenges.map((challenge, index) => (
-                                  <div key={index} className="pattern-item">
-                                    <strong>{challenge.challenge}:</strong> {challenge.explanation}
-                                    <br />
-                                    <em>Solution: {challenge.solution}</em>
-                                  </div>
-                                ))}
-                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* NEW: Data Quality Indicator - Match Stats tab structure */}
+                        {dataQuality.level !== 'insufficient' && (
+                          <div className="insight-data-status">
+                            <div className="insight-data-status-indicator">
+                              <span className={`insight-data-quality ${dataQuality.level}`}>
+                                <FaChartLine />
+                                {dataQuality.label}
+                              </span>
+                              <span className="insight-data-days">
+                                Based on {dataQuality.days} day{dataQuality.days !== 1 ? 's' : ''} of tracking
+                              </span>
                             </div>
                           </div>
                         )}
-                      </div>
+                      </>
                     )}
                   </>
                 );

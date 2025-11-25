@@ -648,11 +648,10 @@ button.action-btn:hover {
   z-index: 1;
 }
 
-.benefit-range-slider::before {
-  content: '';
+/* NEW: Real trailing ball element (works on mobile Safari unlike ::before) */
+.slider-trailing-ball {
   position: absolute;
   top: 50%;
-  left: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
   transform: translateY(-50%);
   width: 4px;
   height: 4px;
@@ -662,6 +661,8 @@ button.action-btn:hover {
   transition: left 0.2s ease;
   z-index: 1;
   pointer-events: none;
+  /* Position will be set by JavaScript */
+  left: 12px;
 }
 
 .benefit-range-slider:hover:not(:disabled) {
