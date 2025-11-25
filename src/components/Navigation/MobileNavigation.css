@@ -1,4 +1,4 @@
-/* components/Navigation/MobileNavigation.css - FIXED: Prevent nav movement during iOS scroll */
+/* components/Navigation/MobileNavigation.css - UPDATED: Floating navigation effect */
 
 /* CRITICAL: Mobile navigation must ALWAYS be sticky - enhanced for iOS */
 .mobile-navigation {
@@ -6,15 +6,16 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  /* REMOVED: background gradient for floating effect */
+  background: transparent;
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
   /* TIGHTER FIX: Use max() to avoid double padding */
   padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 4px));
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+  /* REMOVED: box-shadow for floating effect */
   z-index: 9999;
-  border-top: 1px solid var(--border);
+  /* REMOVED: border-top for floating effect */
   /* CRITICAL: Force hardware acceleration to keep nav sticky */
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
