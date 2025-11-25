@@ -271,10 +271,9 @@
     font-size: 0.8rem;
   }
   
-  /* MOBILE FIXES: Phase Evolution - FIXED Layout */
+  /* MOBILE FIXES: Phase Evolution - IMPROVED BREATHING ROOM */
   .phase-evolution-section {
     padding: var(--spacing-md);
-    /* FIXED: Ensure proper mobile containment */
     width: 100%;
     max-width: 100%;
     overflow: hidden;
@@ -282,27 +281,25 @@
   
   .phase-evolution-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-sm);
-    /* FIXED: Prevent grid overflow */
+    gap: var(--spacing-md);  /* Increased from spacing-sm for better breathing room */
     width: 100%;
     max-width: 100%;
   }
   
   .phase-evolution-card {
-    min-height: 90px;
-    padding: var(--spacing-sm);
-    /* FIXED: Ensure cards fit properly */
+    min-height: 100px;  /* Increased from 90px to match trend cards */
+    padding: var(--spacing-md);  /* Increased from spacing-sm for better spacing */
     max-width: 100%;
     box-sizing: border-box;
   }
   
   .phase-evolution-average {
-    font-size: 1.2rem;
+    font-size: 1.3rem;  /* Slightly larger for better readability */
   }
   
   .phase-evolution-name {
-    font-size: 0.85rem;
-    line-height: 1.2;
+    font-size: 0.875rem;  /* Slightly larger for better readability */
+    line-height: 1.3;  /* More breathing room */
   }
   
   .phase-evolution-range {
@@ -310,34 +307,36 @@
   }
   
   .phase-evolution-data-points {
-    font-size: 0.65rem;
+    font-size: 0.7rem;  /* Slightly larger for better readability */
   }
   
   .phase-evolution-insights {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);  /* More breathing room */
   }
   
   .phase-evolution-insight-item {
-    padding: var(--spacing-sm);
-    margin-bottom: var(--spacing-sm);
-    font-size: 0.8rem;
+    padding: var(--spacing-md);  /* Increased from spacing-sm */
+    margin-bottom: var(--spacing-md);  /* Increased spacing between items */
+    font-size: 0.85rem;  /* Slightly larger for better readability */
+    line-height: 1.4;  /* Better line height */
   }
   
   .phase-evolution-summary {
     grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);  /* Increased from spacing-sm */
   }
   
   .evolution-summary-stat {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);  /* More breathing room */
   }
   
   .evolution-summary-value {
-    font-size: 1.2rem;
+    font-size: 1.3rem;  /* Slightly larger */
   }
   
   .evolution-summary-label {
-    font-size: 0.75rem;
+    font-size: 0.8rem;  /* Slightly larger for better readability */
+    line-height: 1.3;
   }
   
   .optimization-metrics {
@@ -382,12 +381,15 @@
   }
 
   .relapse-stat-label {
-    font-size: 0.8rem;
+    font-size: 0.85rem;  /* Slightly larger for better readability */
+    line-height: 1.3;
   }
 
   .relapse-insight-item {
-    padding: var(--spacing-sm);
-    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-md);  /* Increased from spacing-sm for better breathing room */
+    margin-bottom: var(--spacing-md);  /* Increased spacing */
+    font-size: 0.85rem;  /* Slightly larger */
+    line-height: 1.4;  /* Better line height */
   }
   
   /* MOBILE FIXES: Insight data status */
@@ -581,7 +583,7 @@
     font-size: 0.75rem;
   }
   
-  /* VERY SMALL: Phase Evolution - ULTRA COMPACT */
+  /* VERY SMALL: Phase Evolution - IMPROVED SPACING */
   .phase-evolution-section {
     padding: var(--spacing-sm);
     width: 100%;
@@ -591,50 +593,52 @@
   
   .phase-evolution-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);  /* Increased from spacing-xs for better breathing room */
     width: 100%;
   }
   
   .phase-evolution-card {
-    min-height: 80px;
-    padding: var(--spacing-xs);
+    min-height: 90px;  /* Increased from 80px */
+    padding: var(--spacing-sm);  /* Increased from spacing-xs */
     max-width: 100%;
     box-sizing: border-box;
   }
   
   .phase-evolution-average {
-    font-size: 1.1rem;
+    font-size: 1.2rem;  /* Slightly larger */
   }
   
   .phase-evolution-name {
-    font-size: 0.8rem;
-    line-height: 1.1;
+    font-size: 0.85rem;  /* Slightly larger */
+    line-height: 1.2;
   }
   
   .phase-evolution-range {
-    font-size: 0.65rem;
+    font-size: 0.7rem;  /* Slightly larger */
   }
   
   .phase-evolution-data-points {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
   }
   
   .phase-evolution-insight-item {
-    padding: var(--spacing-xs);
-    margin-bottom: var(--spacing-xs);
-    font-size: 0.75rem;
+    padding: var(--spacing-sm);  /* Increased from spacing-xs */
+    margin-bottom: var(--spacing-sm);  /* Increased spacing */
+    font-size: 0.8rem;  /* Slightly larger */
+    line-height: 1.3;
   }
   
   .evolution-summary-stat {
-    padding: var(--spacing-xs);
+    padding: var(--spacing-sm);  /* Increased from spacing-xs */
   }
   
   .evolution-summary-value {
-    font-size: 1.1rem;
+    font-size: 1.15rem;  /* Slightly larger */
   }
   
   .evolution-summary-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;  /* Slightly larger */
+    line-height: 1.3;
   }
   
   .optimization-metric-card {
