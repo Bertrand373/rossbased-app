@@ -1,4 +1,4 @@
-/* components/Navigation/MobileNavigation.css - UPDATED: Floating navigation effect */
+/* components/Navigation/MobileNavigation.css - UPDATED: True floating navigation with no borders */
 
 /* CRITICAL: Mobile navigation must ALWAYS be sticky - enhanced for iOS */
 .mobile-navigation {
@@ -6,16 +6,18 @@
   bottom: 0;
   left: 0;
   right: 0;
-  /* REMOVED: background gradient for floating effect */
+  /* FLOATING EFFECT: Completely transparent background with no borders or shadows */
   background: transparent;
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
   /* TIGHTER FIX: Use max() to avoid double padding */
   padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 4px));
-  /* REMOVED: box-shadow for floating effect */
+  /* NO box-shadow for floating effect */
+  box-shadow: none;
   z-index: 9999;
-  /* REMOVED: border-top for floating effect */
+  /* NO border-top for floating effect */
+  border: none;
   /* CRITICAL: Force hardware acceleration to keep nav sticky */
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
@@ -42,10 +44,13 @@
     transform: translate3d(0, 0, 9999px);
     -webkit-perspective: 1000;
     perspective: 1000;
+    /* Ensure no borders on iOS */
+    border: none !important;
+    box-shadow: none !important;
   }
 }
 
-/* Container layout with sliding animation support */
+/* Container layout with sliding animation support - THIS IS THE VISIBLE PILL */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
@@ -62,6 +67,8 @@
   -webkit-backface-visibility: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  /* Add subtle shadow to the pill itself for floating effect */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .mobile-nav-container::-webkit-scrollbar {
@@ -169,6 +176,9 @@
     padding: var(--spacing-xs) var(--spacing-sm);
     /* TIGHTER FIX: Keep same approach for consistency */
     padding-bottom: max(var(--spacing-xs), env(safe-area-inset-bottom, 12px));
+    /* Ensure no borders on small screens */
+    border: none;
+    box-shadow: none;
   }
   
   .mobile-nav-container {
