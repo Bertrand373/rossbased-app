@@ -588,6 +588,23 @@ button.action-btn:hover {
 .benefit-slider-track-container {
   position: relative;
   flex: 1;
+  height: 8px; /* Match slider height for proper ball centering */
+}
+
+/* NEW: Real trailing ball element (works on mobile Safari unlike ::before) */
+.slider-trailing-ball {
+  position: absolute;
+  top: 2px; /* Center in 8px track: (8px - 4px) / 2 = 2px */
+  width: 4px;
+  height: 4px;
+  background-color: rgba(255, 221, 0, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(255, 221, 0, 0.6);
+  transition: left 0.2s ease;
+  z-index: 3;
+  pointer-events: none;
+  /* Horizontal position will be set by JavaScript */
+  left: 12px;
 }
 
 .slider-tick-marks {
@@ -648,22 +665,7 @@ button.action-btn:hover {
   z-index: 1;
 }
 
-/* NEW: Real trailing ball element (works on mobile Safari unlike ::before) */
-.slider-trailing-ball {
-  position: absolute;
-  top: 50%;
-  margin-top: -2px; /* Half of height (4px / 2) for perfect centering */
-  width: 4px;
-  height: 4px;
-  background-color: rgba(255, 221, 0, 0.8);
-  border-radius: 50%;
-  box-shadow: 0 0 4px rgba(255, 221, 0, 0.6);
-  transition: left 0.2s ease;
-  z-index: 1;
-  pointer-events: none;
-  /* Position will be set by JavaScript */
-  left: 12px;
-}
+/* NOTE: ::before pseudo-element removed - using real .slider-trailing-ball element instead for mobile Safari compatibility */
 
 .benefit-range-slider:hover:not(:disabled) {
   background: linear-gradient(to right, 
@@ -1159,6 +1161,14 @@ button.action-btn:hover {
     height: 6px;
   }
   
+  .benefit-slider-track-container {
+    height: 6px; /* Match mobile slider height */
+  }
+  
+  .slider-trailing-ball {
+    top: 1px; /* Center in 6px track: (6px - 4px) / 2 = 1px */
+  }
+  
   .benefit-range-slider::-webkit-slider-thumb {
     width: 22px;
     height: 22px;
@@ -1260,6 +1270,14 @@ button.action-btn:hover {
   
   .benefit-range-slider {
     height: 6px;
+  }
+  
+  .benefit-slider-track-container {
+    height: 6px; /* Match mobile slider height */
+  }
+  
+  .slider-trailing-ball {
+    top: 1px; /* Center in 6px track: (6px - 4px) / 2 = 1px */
   }
   
   .benefit-range-slider::-webkit-slider-thumb {

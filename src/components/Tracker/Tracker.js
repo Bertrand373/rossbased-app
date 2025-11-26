@@ -338,7 +338,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     setShowVideo(false);
   };
 
-  // NEW: Update trailing ball position for benefit sliders
+  // NEW: Update trailing ball horizontal position for benefit sliders
   const updateBenefitBallPosition = useCallback((benefitKey, value) => {
     const refs = benefitSliderRefs.current[benefitKey];
     if (!refs || !refs.input || !refs.ball) return;
@@ -353,7 +353,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       // Get thumb width (24px on desktop, 22px on mobile 768px, 20px on mobile 480px)
       const thumbWidth = window.innerWidth <= 480 ? 20 : window.innerWidth <= 768 ? 22 : 24;
       
-      // Calculate position: ball center should align with thumb center
+      // Calculate horizontal position: ball center should align with thumb center
       const trackWidth = input.offsetWidth;
       const ballPosition = (thumbWidth / 2) + ((trackWidth - thumbWidth) * (percentage / 100));
       
@@ -363,14 +363,17 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, []);
 
-  // NEW: Update all benefit ball positions when modalBenefits change
+  // NEW: Update all benefit ball positions when modalBenefits change or modal opens
   useEffect(() => {
     if (showBenefitsModal) {
-      Object.keys(modalBenefits).forEach(key => {
-        updateBenefitBallPosition(key, modalBenefits[key]);
-      });
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        Object.keys(modalBenefits).forEach(key => {
+          updateBenefitBallPosition(key, modalBenefits[key]);
+        });
+      }, 50);
     }
-  }, [modalBenefits, showBenefitsModal, updateBenefitBallPosition]);
+  }, [showBenefitsModal, updateBenefitBallPosition]);
 
   // NEW: Update ball positions on window resize
   useEffect(() => {
@@ -479,7 +482,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                       <div className="slider-tick-marks">
                         {renderSliderTickMarks()}
                       </div>
-                      {/* NEW: Real trailing ball element */}
+                      {/* NEW: Real trailing ball element for mobile Safari compatibility */}
                       <div 
                         className="slider-trailing-ball"
                         ref={(el) => {
