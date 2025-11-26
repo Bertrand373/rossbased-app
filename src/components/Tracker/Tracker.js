@@ -75,13 +75,29 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   
   const today = new Date();
 
-  // Calculate next milestone
+  // Calculate next milestone - Sage Mode after 365 days
   const calculateNextMilestone = (streak) => {
-    const milestones = [7, 30, 90, 180, 365, 730, 1095];
+    const milestones = [7, 14, 30, 90, 180, 365];
     
+    // Sage Mode: 365+ days - they've made it
+    if (streak >= 365) {
+      const yearsComplete = Math.floor(streak / 365);
+      const nextAnniversary = (yearsComplete + 1) * 365;
+      
+      return {
+        isSageMode: true,
+        yearsComplete: yearsComplete,
+        totalDays: streak,
+        daysUntilNextAnniversary: nextAnniversary - streak,
+        nextAnniversaryYear: yearsComplete + 1
+      };
+    }
+    
+    // Normal milestone tracking (pre-Sage Mode)
     for (let milestone of milestones) {
       if (streak < milestone) {
         return {
+          isSageMode: false,
           target: milestone,
           daysRemaining: milestone - streak,
           progress: (streak / milestone) * 100
@@ -89,11 +105,12 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       }
     }
     
-    const nextYearMilestone = Math.ceil(streak / 365) * 365;
+    // Fallback (shouldn't hit this)
     return {
-      target: nextYearMilestone,
-      daysRemaining: nextYearMilestone - streak,
-      progress: ((streak % 365) / 365) * 100
+      isSageMode: false,
+      target: 365,
+      daysRemaining: 365 - streak,
+      progress: (streak / 365) * 100
     };
   };
 
@@ -564,7 +581,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               <div className="milestone-pill">
                 <FaFire className="milestone-pill-icon" />
                 <span className="milestone-pill-text">
-                  {nextMilestone.daysRemaining} days until {nextMilestone.target}-day milestone
+                  {nextMilestone.isSageMode 
+                    ? `Sage Mode • Year ${nextMilestone.yearsComplete}${nextMilestone.daysUntilNextAnniversary <= 30 ? ` • ${nextMilestone.daysUntilNextAnniversary} days until Year ${nextMilestone.nextAnniversaryYear}` : ''}`
+                    : `${nextMilestone.daysRemaining} days until ${nextMilestone.target}-day milestone`
+                  }
                 </span>
               </div>
               
