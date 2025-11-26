@@ -255,17 +255,25 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     setShowBenefitsModal(true);
   };
 
+  // FIXED: Direct DOM update for instant track fill - no React state lag
   const handleModalBenefitChange = (type, value) => {
     const newValue = parseInt(value);
+    
+    // Update React state for the value display and form submission
     setModalBenefits(prev => ({
       ...prev,
       [type]: newValue
     }));
-    // Update track fill width
-    updateTrackFill(type, newValue);
+    
+    // INSTANT: Direct DOM manipulation for track fill - bypasses React render cycle
+    const fillEl = trackFillRefs.current[type];
+    if (fillEl) {
+      const percentage = ((newValue - 1) / 9) * 100;
+      fillEl.style.width = `${percentage}%`;
+    }
   };
   
-  // Update the yellow gradient track fill width
+  // Update the yellow gradient track fill width (used for initial render)
   const updateTrackFill = useCallback((type, value) => {
     const fillEl = trackFillRefs.current[type];
     if (fillEl) {
@@ -452,8 +460,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                       <div className="slider-tick-marks">
                         {renderSliderTickMarks()}
                       </div>
+                      {/* FIXED: Ref attached for instant DOM updates */}
                       <div 
                         className="slider-track-fill"
+                        ref={el => trackFillRefs.current[slider.key] = el}
                         style={{ width: `${((slider.value - 1) / 9) * 100}%` }}
                       />
                       <input
