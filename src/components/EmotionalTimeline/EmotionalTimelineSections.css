@@ -857,12 +857,17 @@
   z-index: 1;
 }
 
-/* NEW: Real trailing ball element (works on mobile Safari unlike ::before) */
-.slider-trailing-ball {
+/* FIXED: Dot indicator that matches actual constrained thumb position */
+.emotion-range-slider::before {
+  content: '';
   position: absolute;
-  top: 0;
-  bottom: 0;
-  margin: auto 0;
+  top: 50%;
+  /* FIXED: Updated for 24px thumb - thumb center moves from 12px to calc(100% - 12px) */
+  /* At value 0, thumb center is at 12px (half of 24px thumb width from left edge) */
+  /* At value 10, thumb center is at calc(100% - 12px) (half thumb width from right edge) */
+  /* So the thumb travels across (100% - 24px) of the track width */
+  left: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
+  transform: translateY(-50%);
   width: 4px;
   height: 4px;
   background-color: rgba(255, 221, 0, 0.8);
@@ -871,8 +876,6 @@
   transition: left 0.2s ease;
   z-index: 1;
   pointer-events: none;
-  /* Position will be set by JavaScript */
-  left: 12px;
 }
 
 .emotion-range-slider:hover:not(:disabled) {
@@ -1014,58 +1017,6 @@
   box-shadow: none !important;
   outline: none !important;
   filter: none !important;
-}
-
-/* NEW: Data Quality Indicator - Matching Stats Tab Structure */
-.insight-data-status {
-  margin-top: var(--spacing-xl);
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.insight-data-status-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
-}
-
-.insight-data-quality {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  transition: all 0.3s ease;
-}
-
-.insight-data-quality:hover {
-  transform: scale(1.05);
-}
-
-.insight-data-quality.minimal,
-.insight-data-quality.good,
-.insight-data-quality.rich {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.insight-data-quality.insufficient {
-  background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  color: var(--text-secondary);
-}
-
-.insight-data-days {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 500;
 }
 
 /* FIXED: Phase Analysis Section with EXACT same padding structure as Check-in */
