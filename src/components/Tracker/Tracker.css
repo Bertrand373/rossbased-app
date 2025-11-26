@@ -651,9 +651,8 @@ button.action-btn:hover {
 /* NEW: Real trailing ball element (works on mobile Safari unlike ::before) */
 .slider-trailing-ball {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  margin: auto 0;
+  top: 50%;
+  margin-top: -2px; /* Half of height (4px / 2) for perfect centering */
   width: 4px;
   height: 4px;
   background-color: rgba(255, 221, 0, 0.8);
