@@ -633,7 +633,7 @@ button.action-btn:hover {
   flex: 1;
   height: 8px;
   border-radius: var(--radius-full);
-  /* Base track - subtle gradient */
+  /* Base track - neutral gray */
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.15) 0%, 
     rgba(128, 128, 128, 0.1) 100%
@@ -654,9 +654,10 @@ button.action-btn:hover {
   top: 0;
   left: 0;
   height: 100%;
+  /* Subtle yellow gradient - not too opaque */
   background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.3) 0%, 
-    rgba(255, 221, 0, 0.5) 100%
+    rgba(255, 221, 0, 0.25) 0%, 
+    rgba(255, 221, 0, 0.4) 100%
   );
   border-radius: var(--radius-full);
   transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -674,8 +675,8 @@ button.action-btn:hover {
 
 .benefit-slider-track-container:hover .slider-track-fill {
   background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.4) 0%, 
-    rgba(255, 221, 0, 0.6) 100%
+    rgba(255, 221, 0, 0.35) 0%, 
+    rgba(255, 221, 0, 0.5) 100%
   );
 }
 
@@ -697,11 +698,10 @@ button.action-btn:hover {
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(255, 221, 0, 0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.15s ease;
+  border: 2px solid rgba(255, 255, 255, 0.2);
   position: relative;
   z-index: 2;
   opacity: 1;
@@ -709,14 +709,13 @@ button.action-btn:hover {
 
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(255, 221, 0, 0.15);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
 .benefit-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(255, 221, 0, 0.2);
-  background: linear-gradient(135deg, #ffdd33 0%, #f5d633 100%);
+  transform: scale(1.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 .benefit-range-slider::-moz-range-thumb {
@@ -725,11 +724,10 @@ button.action-btn:hover {
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(255, 221, 0, 0);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   margin: 0 !important;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s ease;
   position: relative;
   z-index: 2;
   opacity: 1;
@@ -737,14 +735,8 @@ button.action-btn:hover {
 
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(255, 221, 0, 0.15);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
-}
-
-.benefit-range-slider:active::-moz-range-thumb {
-  transform: scale(1.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(255, 221, 0, 0.2);
-  background: linear-gradient(135deg, #ffdd33 0%, #f5d633 100%);
 }
 
 .slider-labels {
