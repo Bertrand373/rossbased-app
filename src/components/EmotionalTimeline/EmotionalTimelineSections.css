@@ -754,12 +754,13 @@
 }
 
 .emotion-label {
-  font-weight: 600;
-  color: var(--text);
-  flex: 1;
-  text-align: left;
+  font-weight: 600 !important;
+  color: var(--text) !important;
+  flex: 1 !important;
+  text-align: left !important;
   font-size: 1rem !important;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.025em !important;
+  display: block !important;
 }
 
 /* UPDATED: Slider container for inline value display */
@@ -837,11 +838,13 @@
 .slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 8/9)); }
 .slider-tick[data-value="10"] { left: calc(100% - 12px); }
 
+/* ENHANCED: Emotion slider with track fill and glowing thumb - EXACT match to benefit-range-slider */
 .emotion-range-slider {
   -webkit-appearance: none;
   flex: 1;
   height: 8px;
   border-radius: var(--radius-full);
+  /* Base track background - unfilled portion */
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.15) 0%, 
     rgba(255, 221, 0, 0.08) 50%, 
@@ -857,24 +860,40 @@
   z-index: 1;
 }
 
-/* FIXED: Dot indicator that matches actual constrained thumb position */
+/* TRACK FILL: Yellow fill from left to thumb position */
 .emotion-range-slider::before {
   content: '';
   position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  /* Width based on slider value - fills from left to thumb */
+  width: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
+  background: linear-gradient(90deg, 
+    rgba(255, 221, 0, 0.6) 0%, 
+    rgba(255, 221, 0, 0.8) 100%
+  );
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 8px rgba(255, 221, 0, 0.4);
+  transition: width 0.15s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* GLOWING DOT: Small indicator dot at thumb position */
+.emotion-range-slider::after {
+  content: '';
+  position: absolute;
   top: 50%;
-  /* FIXED: Updated for 24px thumb - thumb center moves from 12px to calc(100% - 12px) */
-  /* At value 0, thumb center is at 12px (half of 24px thumb width from left edge) */
-  /* At value 10, thumb center is at calc(100% - 12px) (half thumb width from right edge) */
-  /* So the thumb travels across (100% - 24px) of the track width */
   left: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
   transform: translateY(-50%);
-  width: 4px;
-  height: 4px;
-  background-color: rgba(255, 221, 0, 0.8);
+  width: 6px;
+  height: 6px;
+  background-color: rgba(255, 221, 0, 1);
   border-radius: 50%;
-  box-shadow: 0 0 4px rgba(255, 221, 0, 0.6);
-  transition: left 0.2s ease;
-  z-index: 1;
+  box-shadow: 0 0 8px rgba(255, 221, 0, 0.8), 0 0 12px rgba(255, 221, 0, 0.5);
+  transition: left 0.15s ease;
+  z-index: 2;
   pointer-events: none;
 }
 
@@ -887,6 +906,14 @@
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
 }
 
+.emotion-range-slider:hover:not(:disabled)::before {
+  box-shadow: 0 0 12px rgba(255, 221, 0, 0.5);
+}
+
+.emotion-range-slider:hover:not(:disabled)::after {
+  box-shadow: 0 0 10px rgba(255, 221, 0, 1), 0 0 16px rgba(255, 221, 0, 0.6);
+}
+
 .emotion-range-slider:focus:not(:disabled) {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
 }
@@ -897,7 +924,16 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
-/* UPDATED: Bigger, fully opaque slider thumbs */
+.emotion-range-slider:disabled::before {
+  background: rgba(128, 128, 128, 0.3);
+  box-shadow: none;
+}
+
+.emotion-range-slider:disabled::after {
+  display: none;
+}
+
+/* ENHANCED: Glowing slider thumb with stronger glow effect */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -906,24 +942,27 @@
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  /* Enhanced glow effect */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 10px rgba(255, 221, 0, 0.5), 0 0 20px rgba(255, 221, 0, 0.3);
   margin: 0 !important;
   transition: all 0.15s ease;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   position: relative;
-  z-index: 2;
+  z-index: 3;
   opacity: 1;
 }
 
 .emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  transform: scale(1.15);
+  /* Stronger glow on hover */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2), 0 0 15px rgba(255, 221, 0, 0.7), 0 0 25px rgba(255, 221, 0, 0.4);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .emotion-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.05);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transform: scale(1.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 12px rgba(255, 221, 0, 0.6);
 }
 
 .emotion-range-slider::-moz-range-thumb {
@@ -932,19 +971,22 @@
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  /* Enhanced glow effect */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 10px rgba(255, 221, 0, 0.5), 0 0 20px rgba(255, 221, 0, 0.3);
   margin: 0 !important;
   transition: all 0.15s ease;
   position: relative;
-  z-index: 2;
+  z-index: 3;
   opacity: 1;
 }
 
 .emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  transform: scale(1.15);
+  /* Stronger glow on hover */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2), 0 0 15px rgba(255, 221, 0, 0.7), 0 0 25px rgba(255, 221, 0, 0.4);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .slider-labels {
@@ -1222,16 +1264,33 @@
   
   .emotion-range-slider {
     height: 6px;
+    position: relative;
+    z-index: 1;
   }
   
+  /* Mobile track fill - slightly thinner */
+  .emotion-range-slider::before {
+    height: 100%;
+    box-shadow: 0 0 6px rgba(255, 221, 0, 0.35);
+  }
+  
+  /* Mobile glowing dot */
+  .emotion-range-slider::after {
+    width: 5px;
+    height: 5px;
+    box-shadow: 0 0 6px rgba(255, 221, 0, 0.7), 0 0 10px rgba(255, 221, 0, 0.4);
+  }
+
   .emotion-range-slider::-webkit-slider-thumb {
     width: 22px;
     height: 22px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 8px rgba(255, 221, 0, 0.4), 0 0 16px rgba(255, 221, 0, 0.25);
   }
-  
+
   .emotion-range-slider::-moz-range-thumb {
     width: 22px;
     height: 22px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 8px rgba(255, 221, 0, 0.4), 0 0 16px rgba(255, 221, 0, 0.25);
   }
   
   /* Mobile tick marks adjustments - FIXED positioning with contained height */
@@ -1366,16 +1425,33 @@
   
   .emotion-range-slider {
     height: 6px;
+    position: relative;
+    z-index: 1;
   }
   
+  /* Very small screen track fill */
+  .emotion-range-slider::before {
+    height: 100%;
+    box-shadow: 0 0 5px rgba(255, 221, 0, 0.3);
+  }
+  
+  /* Very small screen glowing dot */
+  .emotion-range-slider::after {
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 5px rgba(255, 221, 0, 0.6), 0 0 8px rgba(255, 221, 0, 0.35);
+  }
+
   .emotion-range-slider::-webkit-slider-thumb {
     width: 20px;
     height: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 6px rgba(255, 221, 0, 0.35), 0 0 12px rgba(255, 221, 0, 0.2);
   }
-  
+
   .emotion-range-slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 6px rgba(255, 221, 0, 0.35), 0 0 12px rgba(255, 221, 0, 0.2);
   }
   
   /* Very small screen tick marks adjustments - FIXED positioning with contained height */
