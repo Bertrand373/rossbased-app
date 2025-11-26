@@ -1,5 +1,5 @@
 // components/Tracker/Tracker.js - OPTION 3: Clean widget separation
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -51,6 +51,16 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     aura: 5, 
     sleep: 5,
     workout: 5 
+  });
+  
+  // Refs for track fill elements (yellow gradient that follows thumb)
+  const trackFillRefs = useRef({
+    energy: null,
+    focus: null,
+    confidence: null,
+    aura: null,
+    sleep: null,
+    workout: null
   });
   
   // Initialize with the current date if no start date exists
@@ -246,11 +256,23 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   };
 
   const handleModalBenefitChange = (type, value) => {
+    const newValue = parseInt(value);
     setModalBenefits(prev => ({
       ...prev,
-      [type]: parseInt(value)
+      [type]: newValue
     }));
+    // Update track fill width
+    updateTrackFill(type, newValue);
   };
+  
+  // Update the yellow gradient track fill width
+  const updateTrackFill = useCallback((type, value) => {
+    const fillEl = trackFillRefs.current[type];
+    if (fillEl) {
+      const percentage = ((value - 1) / 9) * 100;
+      fillEl.style.width = `${percentage}%`;
+    }
+  }, []);
 
   const saveBenefitsFromModal = () => {
     const today = new Date();
@@ -324,6 +346,18 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const handleCloseVideo = () => {
     setShowVideo(false);
   };
+
+  // Initialize track fills when modal opens or benefits change
+  useEffect(() => {
+    if (showBenefitsModal) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        Object.keys(modalBenefits).forEach(key => {
+          updateTrackFill(key, modalBenefits[key]);
+        });
+      }, 50);
+    }
+  }, [showBenefitsModal, updateTrackFill]);
 
   const renderSliderTickMarks = () => {
     const ticks = [];

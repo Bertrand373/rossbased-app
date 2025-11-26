@@ -649,20 +649,24 @@ button.action-btn:hover {
 }
 
 /* Real HTML element for track fill - works on iOS Safari */
+/* Matches the premium sliding pill aesthetic from nav menus */
 .slider-track-fill {
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
-  /* Subtle yellow gradient - not too opaque */
+  /* Premium yellow gradient matching nav slider */
   background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.25) 0%, 
-    rgba(255, 221, 0, 0.4) 100%
+    rgba(255, 221, 0, 0.4) 0%, 
+    rgba(255, 221, 0, 0.6) 100%
   );
   border-radius: var(--radius-full);
-  transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Smooth cubic-bezier matching your sliding pills */
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 0;
+  /* Subtle glow for premium feel */
+  box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
 }
 
 .benefit-range-slider:hover:not(:disabled) {
@@ -675,9 +679,10 @@ button.action-btn:hover {
 
 .benefit-slider-track-container:hover .slider-track-fill {
   background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.35) 0%, 
-    rgba(255, 221, 0, 0.5) 100%
+    rgba(255, 221, 0, 0.5) 0%, 
+    rgba(255, 221, 0, 0.7) 100%
   );
+  box-shadow: 0 0 12px rgba(255, 221, 0, 0.4);
 }
 
 .benefit-range-slider:focus:not(:disabled) {
@@ -696,47 +701,53 @@ button.action-btn:hover {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  /* Premium glow matching your nav pills */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
   margin: 0 !important;
-  transition: all 0.15s ease;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  /* Smooth cubic-bezier matching sliding pills */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   position: relative;
   z-index: 2;
   opacity: 1;
 }
 
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
+  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .benefit-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.05);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 16px rgba(255, 221, 0, 0.6);
 }
 
 .benefit-range-slider::-moz-range-thumb {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  /* Premium glow matching your nav pills */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
   margin: 0 !important;
-  transition: all 0.15s ease;
+  /* Smooth cubic-bezier matching sliding pills */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 2;
   opacity: 1;
 }
 
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
+  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .slider-labels {
