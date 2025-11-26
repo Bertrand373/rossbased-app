@@ -588,23 +588,6 @@ button.action-btn:hover {
 .benefit-slider-track-container {
   position: relative;
   flex: 1;
-  height: 8px; /* Match slider height for proper ball centering */
-}
-
-/* NEW: Real trailing ball element (works on mobile Safari unlike ::before) */
-.slider-trailing-ball {
-  position: absolute;
-  top: 2px; /* Center in 8px track: (8px - 4px) / 2 = 2px */
-  width: 4px;
-  height: 4px;
-  background-color: rgba(255, 221, 0, 0.8);
-  border-radius: 50%;
-  box-shadow: 0 0 4px rgba(255, 221, 0, 0.6);
-  transition: left 0.2s ease;
-  z-index: 3;
-  pointer-events: none;
-  /* Horizontal position will be set by JavaScript */
-  left: 12px;
 }
 
 .slider-tick-marks {
@@ -650,10 +633,10 @@ button.action-btn:hover {
   flex: 1;
   height: 8px;
   border-radius: var(--radius-full);
+  /* Base track - subtle gradient */
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.15) 0%, 
-    rgba(255, 221, 0, 0.08) 50%, 
-    rgba(255, 221, 0, 0.12) 100%
+    rgba(128, 128, 128, 0.1) 100%
   );
   outline: none;
   transition: all 0.2s ease;
@@ -665,15 +648,38 @@ button.action-btn:hover {
   z-index: 1;
 }
 
-/* NOTE: ::before pseudo-element removed - using real .slider-trailing-ball element instead for mobile Safari compatibility */
+/* PREMIUM: Track fill effect - yellow gradient follows the thumb */
+.benefit-range-slider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  /* Width controlled by --slider-value CSS variable */
+  width: calc(var(--slider-value, 50) * 1%);
+  background: linear-gradient(90deg, 
+    rgba(255, 221, 0, 0.3) 0%, 
+    rgba(255, 221, 0, 0.5) 100%
+  );
+  border-radius: var(--radius-full);
+  transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 0;
+}
 
 .benefit-range-slider:hover:not(:disabled) {
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.18) 0%, 
-    rgba(255, 221, 0, 0.1) 50%, 
-    rgba(255, 221, 0, 0.15) 100%
+    rgba(128, 128, 128, 0.12) 100%
   );
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
+}
+
+.benefit-range-slider:hover:not(:disabled)::before {
+  background: linear-gradient(90deg, 
+    rgba(255, 221, 0, 0.4) 0%, 
+    rgba(255, 221, 0, 0.6) 100%
+  );
 }
 
 .benefit-range-slider:focus:not(:disabled) {
@@ -694,10 +700,11 @@ button.action-btn:hover {
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(255, 221, 0, 0);
   margin: 0 !important;
-  transition: all 0.15s ease;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   position: relative;
   z-index: 2;
   opacity: 1;
@@ -705,13 +712,14 @@ button.action-btn:hover {
 
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
   transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(255, 221, 0, 0.15);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
 }
 
 .benefit-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.05);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(255, 221, 0, 0.2);
+  background: linear-gradient(135deg, #ffdd33 0%, #f5d633 100%);
 }
 
 .benefit-range-slider::-moz-range-thumb {
@@ -720,10 +728,11 @@ button.action-btn:hover {
   border-radius: 50%;
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(255, 221, 0, 0);
   margin: 0 !important;
-  transition: all 0.15s ease;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 2;
   opacity: 1;
@@ -731,8 +740,14 @@ button.action-btn:hover {
 
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
   transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(255, 221, 0, 0.15);
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+}
+
+.benefit-range-slider:active::-moz-range-thumb {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(255, 221, 0, 0.2);
+  background: linear-gradient(135deg, #ffdd33 0%, #f5d633 100%);
 }
 
 .slider-labels {
@@ -1161,14 +1176,6 @@ button.action-btn:hover {
     height: 6px;
   }
   
-  .benefit-slider-track-container {
-    height: 6px; /* Match mobile slider height */
-  }
-  
-  .slider-trailing-ball {
-    top: 1px; /* Center in 6px track: (6px - 4px) / 2 = 1px */
-  }
-  
   .benefit-range-slider::-webkit-slider-thumb {
     width: 22px;
     height: 22px;
@@ -1270,14 +1277,6 @@ button.action-btn:hover {
   
   .benefit-range-slider {
     height: 6px;
-  }
-  
-  .benefit-slider-track-container {
-    height: 6px; /* Match mobile slider height */
-  }
-  
-  .slider-trailing-ball {
-    top: 1px; /* Center in 6px track: (6px - 4px) / 2 = 1px */
   }
   
   .benefit-range-slider::-webkit-slider-thumb {

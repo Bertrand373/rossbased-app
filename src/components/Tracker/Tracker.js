@@ -1,5 +1,5 @@
-// components/Tracker/Tracker.js - OPTION 3: Clean widget separation with Mobile Trailing Balls
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// components/Tracker/Tracker.js - OPTION 3: Clean widget separation
+import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -51,16 +51,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     aura: 5, 
     sleep: 5,
     workout: 5 
-  });
-  
-  // NEW: Refs for trailing ball indicators on benefit sliders
-  const benefitSliderRefs = useRef({
-    energy: { input: null, ball: null },
-    focus: { input: null, ball: null },
-    confidence: { input: null, ball: null },
-    aura: { input: null, ball: null },
-    sleep: { input: null, ball: null },
-    workout: { input: null, ball: null }
   });
   
   // Initialize with the current date if no start date exists
@@ -256,13 +246,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   };
 
   const handleModalBenefitChange = (type, value) => {
-    const newValue = parseInt(value);
     setModalBenefits(prev => ({
       ...prev,
-      [type]: newValue
+      [type]: parseInt(value)
     }));
-    // Update ball position immediately
-    updateBenefitBallPosition(type, newValue);
   };
 
   const saveBenefitsFromModal = () => {
@@ -337,57 +324,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   const handleCloseVideo = () => {
     setShowVideo(false);
   };
-
-  // NEW: Update trailing ball horizontal position for benefit sliders
-  const updateBenefitBallPosition = useCallback((benefitKey, value) => {
-    const refs = benefitSliderRefs.current[benefitKey];
-    if (!refs || !refs.input || !refs.ball) return;
-    
-    try {
-      const input = refs.input;
-      const ball = refs.ball;
-      
-      // Calculate position percentage (value 1-10 mapped to 0-100%)
-      const percentage = ((value - 1) / 9) * 100;
-      
-      // Get thumb width (24px on desktop, 22px on mobile 768px, 20px on mobile 480px)
-      const thumbWidth = window.innerWidth <= 480 ? 20 : window.innerWidth <= 768 ? 22 : 24;
-      
-      // Calculate horizontal position: ball center should align with thumb center
-      const trackWidth = input.offsetWidth;
-      const ballPosition = (thumbWidth / 2) + ((trackWidth - thumbWidth) * (percentage / 100));
-      
-      ball.style.left = `${ballPosition}px`;
-    } catch (error) {
-      console.error('Error updating benefit ball position:', error);
-    }
-  }, []);
-
-  // NEW: Update all benefit ball positions when modalBenefits change or modal opens
-  useEffect(() => {
-    if (showBenefitsModal) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        Object.keys(modalBenefits).forEach(key => {
-          updateBenefitBallPosition(key, modalBenefits[key]);
-        });
-      }, 50);
-    }
-  }, [showBenefitsModal, updateBenefitBallPosition]);
-
-  // NEW: Update ball positions on window resize
-  useEffect(() => {
-    const handleBallResize = () => {
-      if (showBenefitsModal) {
-        Object.keys(modalBenefits).forEach(key => {
-          updateBenefitBallPosition(key, modalBenefits[key]);
-        });
-      }
-    };
-    
-    window.addEventListener('resize', handleBallResize);
-    return () => window.removeEventListener('resize', handleBallResize);
-  }, [modalBenefits, showBenefitsModal, updateBenefitBallPosition]);
 
   const renderSliderTickMarks = () => {
     const ticks = [];
@@ -482,13 +418,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                       <div className="slider-tick-marks">
                         {renderSliderTickMarks()}
                       </div>
-                      {/* NEW: Real trailing ball element for mobile Safari compatibility */}
-                      <div 
-                        className="slider-trailing-ball"
-                        ref={(el) => {
-                          if (el) benefitSliderRefs.current[slider.key].ball = el;
-                        }}
-                      />
                       <input
                         type="range"
                         min="1"
@@ -497,9 +426,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                         value={slider.value}
                         onChange={(e) => handleModalBenefitChange(slider.key, parseInt(e.target.value))}
                         className="benefit-range-slider"
-                        ref={(el) => {
-                          if (el) benefitSliderRefs.current[slider.key].input = el;
-                        }}
+                        style={{ '--slider-value': ((slider.value - 1) / 9) * 100 }}
                       />
                     </div>
                     <span className="benefit-value-clean">{slider.value}</span>
