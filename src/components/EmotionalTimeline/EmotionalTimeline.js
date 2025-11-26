@@ -709,6 +709,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                           <div className="slider-tick-marks">
                             {renderSliderTickMarks()}
                           </div>
+                          <div 
+                            className="slider-track-fill"
+                            style={{ width: `${((emotion.value - 1) / 9) * 100}%` }}
+                          />
                           <input
                             type="range"
                             min="1"
@@ -718,7 +722,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                             onChange={(e) => handleEmotionChange(emotion.key, parseInt(e.target.value))}
                             className="emotion-range-slider"
                             disabled={emotionsLogged}
-                            style={{ '--slider-value': ((emotion.value - 1) / 9) * 100 }}
                           />
                         </div>
                         <span className="emotion-value-clean">{emotion.value}</span>
