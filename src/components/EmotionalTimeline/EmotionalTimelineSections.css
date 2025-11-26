@@ -732,7 +732,7 @@
   transition: none;
 }
 
-/* UPDATED: Emotion sliders with smaller thumbs and inline value display */
+/* Emotion sliders container */
 .emotion-sliders {
   display: flex;
   flex-direction: column;
@@ -763,7 +763,7 @@
   display: block !important;
 }
 
-/* UPDATED: Slider container for inline value display */
+/* Slider container for inline value display */
 .emotion-slider-with-value {
   display: flex;
   align-items: center;
@@ -778,7 +778,6 @@
   background-color: rgba(255, 221, 0, 0.08);
   padding: var(--spacing-xs);
   border-radius: 50%;
-  /* FIXED: Set fixed width and height for perfect circle */
   width: 32px;
   height: 32px;
   min-width: 32px;
@@ -790,13 +789,20 @@
   flex-shrink: 0;
 }
 
-/* NEW: Slider track container with tick marks */
+/* ============================================================
+   SLIDER STYLING - EXACT MATCH TO TRACKER BENEFIT SLIDERS
+   ============================================================ */
+
+/* Track container - EXACT MATCH to benefit-slider-track-container */
 .emotion-slider-track-container {
   position: relative;
   flex: 1;
+  /* ADDED: Ensure container has height context for positioning */
+  display: flex;
+  align-items: center;
 }
 
-/* NEW: Tick marks container - overlays the slider track exactly */
+/* Tick marks container */
 .slider-tick-marks {
   position: absolute;
   top: 50%;
@@ -808,7 +814,7 @@
   z-index: 0;
 }
 
-/* NEW: Individual tick mark styling - positioned in track center */
+/* Individual tick mark styling */
 .slider-tick {
   position: absolute;
   top: 0;
@@ -819,14 +825,14 @@
   pointer-events: none;
 }
 
-/* NEW: Key tick marks (1, 5, 10) are slightly more visible */
+/* Key tick marks (1, 5, 10) are slightly more visible */
 .slider-tick.key-tick {
   height: 4px;
   width: 1px;
   background-color: rgba(255, 221, 0, 0.25);
 }
 
-/* NEW: Perfect alignment - tick positions match thumb center positions for 1-10 scale */
+/* Tick positions - 1-10 scale */
 .slider-tick[data-value="1"] { left: calc(12px); }
 .slider-tick[data-value="2"] { left: calc(12px + (calc(100% - 24px) * 1/9)); }
 .slider-tick[data-value="3"] { left: calc(12px + (calc(100% - 24px) * 2/9)); }
@@ -838,17 +844,50 @@
 .slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 8/9)); }
 .slider-tick[data-value="10"] { left: calc(100% - 12px); }
 
-/* ENHANCED: Emotion slider with track fill and glowing thumb - EXACT match to benefit-range-slider */
+/* TRACK FILL - EXACT MATCH to Tracker's .slider-track-fill */
+.emotion-slider-track-container .slider-track-fill {
+  position: absolute;
+  /* Vertically center within container */
+  top: 50%;
+  transform: translateY(-50%);
+  /* Start at left edge of track */
+  left: 0;
+  /* Match exact track height */
+  height: 8px;
+  /* Premium yellow gradient matching nav slider */
+  background: linear-gradient(90deg, 
+    rgba(255, 221, 0, 0.4) 0%, 
+    rgba(255, 221, 0, 0.6) 100%
+  );
+  /* Match the track's border-radius for clean containment */
+  border-radius: var(--radius-full);
+  /* Instant sync with thumb for premium responsive feel */
+  transition: none;
+  pointer-events: none;
+  z-index: 0;
+  /* Subtle glow for premium feel */
+  box-shadow: 0 0 4px rgba(255, 221, 0, 0.2);
+}
+
+/* Track fill hover state */
+.emotion-slider-track-container:hover .slider-track-fill {
+  background: linear-gradient(90deg, 
+    rgba(255, 221, 0, 0.5) 0%, 
+    rgba(255, 221, 0, 0.7) 100%
+  );
+  box-shadow: 0 0 6px rgba(255, 221, 0, 0.3);
+}
+
+/* SLIDER INPUT - EXACT MATCH to benefit-range-slider */
 .emotion-range-slider {
   -webkit-appearance: none;
   flex: 1;
   height: 8px;
   border-radius: var(--radius-full);
-  /* Base track background - unfilled portion */
+  /* Base track - neutral gray (EXACT MATCH) */
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.15) 0%, 
-    rgba(255, 221, 0, 0.08) 50%, 
-    rgba(255, 221, 0, 0.12) 100%
+    rgba(128, 128, 128, 0.1) 100%
   );
   outline: none;
   transition: all 0.2s ease;
@@ -860,135 +899,88 @@
   z-index: 1;
 }
 
-/* TRACK FILL: Yellow fill from left to thumb position */
-.emotion-range-slider::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  /* Width based on slider value - fills from left to thumb */
-  width: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
-  background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.6) 0%, 
-    rgba(255, 221, 0, 0.8) 100%
-  );
-  border-radius: var(--radius-full);
-  box-shadow: 0 0 8px rgba(255, 221, 0, 0.4);
-  transition: width 0.15s ease;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* GLOWING DOT: Small indicator dot at thumb position */
-.emotion-range-slider::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: calc(12px + (calc(100% - 24px) * var(--slider-value, 50) / 100));
-  transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
-  background-color: rgba(255, 221, 0, 1);
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(255, 221, 0, 0.8), 0 0 12px rgba(255, 221, 0, 0.5);
-  transition: left 0.15s ease;
-  z-index: 2;
-  pointer-events: none;
-}
-
+/* Slider hover state - EXACT MATCH */
 .emotion-range-slider:hover:not(:disabled) {
   background: linear-gradient(to right, 
     rgba(128, 128, 128, 0.18) 0%, 
-    rgba(255, 221, 0, 0.1) 50%, 
-    rgba(255, 221, 0, 0.15) 100%
+    rgba(128, 128, 128, 0.12) 100%
   );
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
 }
 
-.emotion-range-slider:hover:not(:disabled)::before {
-  box-shadow: 0 0 12px rgba(255, 221, 0, 0.5);
-}
-
-.emotion-range-slider:hover:not(:disabled)::after {
-  box-shadow: 0 0 10px rgba(255, 221, 0, 1), 0 0 16px rgba(255, 221, 0, 0.6);
-}
-
+/* Slider focus state */
 .emotion-range-slider:focus:not(:disabled) {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
 }
 
+/* Slider disabled state */
 .emotion-range-slider:disabled {
   opacity: 0.4;
   cursor: not-allowed;
   background: rgba(128, 128, 128, 0.1);
 }
 
-.emotion-range-slider:disabled::before {
-  background: rgba(128, 128, 128, 0.3);
-  box-shadow: none;
-}
-
-.emotion-range-slider:disabled::after {
-  display: none;
-}
-
-/* ENHANCED: Glowing slider thumb with stronger glow effect */
+/* SLIDER THUMB - EXACT MATCH to benefit-range-slider thumb */
 .emotion-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
   cursor: pointer;
-  /* Enhanced glow effect */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 10px rgba(255, 221, 0, 0.5), 0 0 20px rgba(255, 221, 0, 0.3);
+  /* Premium glow matching nav pills */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
   margin: 0 !important;
-  transition: all 0.15s ease;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  /* Smooth cubic-bezier matching sliding pills */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   position: relative;
-  z-index: 3;
+  z-index: 2;
   opacity: 1;
 }
 
+/* Thumb hover state - EXACT MATCH */
 .emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
   transform: scale(1.15);
-  /* Stronger glow on hover */
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2), 0 0 15px rgba(255, 221, 0, 0.7), 0 0 25px rgba(255, 221, 0, 0.4);
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
+  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
   border-color: rgba(255, 255, 255, 0.4);
 }
 
+/* Thumb active state */
 .emotion-range-slider:active::-webkit-slider-thumb {
   transform: scale(1.1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 12px rgba(255, 221, 0, 0.6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 16px rgba(255, 221, 0, 0.6);
 }
 
+/* Firefox thumb */
 .emotion-range-slider::-moz-range-thumb {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  /* Enhanced glow effect */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 10px rgba(255, 221, 0, 0.5), 0 0 20px rgba(255, 221, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  /* Premium glow matching nav pills */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
   margin: 0 !important;
-  transition: all 0.15s ease;
+  /* Smooth cubic-bezier matching sliding pills */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  z-index: 3;
+  z-index: 2;
   opacity: 1;
 }
 
+/* Firefox thumb hover state */
 .emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
   transform: scale(1.15);
-  /* Stronger glow on hover */
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2), 0 0 15px rgba(255, 221, 0, 0.7), 0 0 25px rgba(255, 221, 0, 0.4);
-  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
+  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
   border-color: rgba(255, 255, 255, 0.4);
 }
 
+/* SLIDER LABELS - EXACT MATCH */
 .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
@@ -1017,6 +1009,10 @@
 .slider-labels span:last-child {
   color: rgba(255, 221, 0, 0.7) !important;
 }
+
+/* ============================================================
+   END SLIDER STYLING
+   ============================================================ */
 
 .emotion-actions {
   display: flex;
@@ -1048,32 +1044,18 @@
   transform: translateY(-1px) !important;
 }
 
-.save-emotions-btn:focus,
-.save-emotions-btn:active,
-.save-emotions-btn:focus-visible {
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-  transform: none !important;
-  opacity: 1 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  filter: none !important;
-}
-
-/* FIXED: Phase Analysis Section with EXACT same padding structure as Check-in */
+/* Phase Insight Section - should match emotional checkin styling */
 .phase-insight-section {
   background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* FIXED: Analysis header with EXACT same spacing as Check-in header */
 .phase-insight-section h3 {
   margin: 0;
   font-size: 1.25rem;
@@ -1083,93 +1065,128 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* Analysis Cards Grid */
+/* Insights Grid */
 .insights-grid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-lg);
 }
 
 /* Insight Cards */
 .insight-card {
-  padding: var(--spacing-xl) var(--spacing-lg);
-  background-color: var(--card-background);
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-lg);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  min-height: 120px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  justify-content: center;
+  min-height: 140px;
   transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
 .insight-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
 }
 
-/* Card Headers */
 .insight-card-header {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  font-weight: 600;
-  color: var(--text);
-  justify-content: center;
-  text-align: center;
   margin-bottom: var(--spacing-md);
 }
 
-.insight-card-header .insight-icon {
+.insight-icon {
+  font-size: 1.25rem;
   color: var(--primary);
-  font-size: 1.125rem;
 }
 
-.insight-metric {
-  color: var(--text);
+.insight-title {
+  font-size: 1rem;
   font-weight: 600;
-}
-
-/* Card Content */
-.insight-text {
   color: var(--text);
+  margin: 0;
+}
+
+.insight-text {
   font-size: 0.875rem;
-  line-height: 1.4;
-  font-weight: 500;
-  text-align: center;
-  padding: 0 var(--spacing-sm);
-}
-
-/* Trend indicators */
-.trend {
-  font-weight: bold;
-  margin-left: 4px;
-}
-
-.trend.improving {
-  color: #22c55e;
-}
-
-.trend.concerning {
-  color: #ef4444;
-}
-
-.trend.stable {
   color: var(--text-secondary);
+  line-height: 1.5;
+  flex: 1;
 }
 
-/* EXACT MOBILE COPY: Mobile Responsiveness matching Profile coming-soon-banner exactly */
+/* Premium Lock Overlay */
+.premium-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  z-index: 10;
+}
+
+.premium-lock-content {
+  text-align: center;
+  color: var(--text);
+  padding: var(--spacing-md);
+}
+
+.premium-lock-icon {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.premium-lock-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* ============================================================
+   RESPONSIVE STYLES
+   ============================================================ */
+
+/* DESKTOP LAYOUT */
+@media (min-width: 1024px) {
+  .emotion-slider-track-container .slider-track-fill {
+    height: 8px;
+  }
+
+  .emotion-range-slider {
+    height: 8px;
+  }
+  
+  .emotion-range-slider::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .emotion-range-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .slider-labels {
+    margin-top: 8px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+/* MOBILE LAYOUT */
 @media (max-width: 768px) {
-  /* EXACT COPY of Profile's .coming-soon-banner mobile styles */
   .checkin-benefits-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
   }
   
   .checkin-benefits-content {
@@ -1189,13 +1206,11 @@
     font-size: 1.25rem;
   }
   
-  /* EXACT COPY of Profile's .coming-soon-banner mobile styles */
   .insight-data-banner {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
   }
   
   .insight-data-content {
@@ -1215,7 +1230,6 @@
     font-size: 1.25rem;
   }
   
-  /* FIXED: Both sections have EXACT same mobile padding */
   .emotional-checkin-section {
     padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
     gap: var(--spacing-lg);
@@ -1255,11 +1269,15 @@
   
   .emotion-value-clean {
     font-size: 0.8rem !important;
-    /* FIXED: Maintain perfect circle on mobile */
     width: 28px;
     height: 28px;
     min-width: 28px;
     padding: 0;
+  }
+  
+  /* Mobile track fill - matches mobile track height */
+  .emotion-slider-track-container .slider-track-fill {
+    height: 6px;
   }
   
   .emotion-range-slider {
@@ -1267,56 +1285,37 @@
     position: relative;
     z-index: 1;
   }
-  
-  /* Mobile track fill - slightly thinner */
-  .emotion-range-slider::before {
-    height: 100%;
-    box-shadow: 0 0 6px rgba(255, 221, 0, 0.35);
-  }
-  
-  /* Mobile glowing dot */
-  .emotion-range-slider::after {
-    width: 5px;
-    height: 5px;
-    box-shadow: 0 0 6px rgba(255, 221, 0, 0.7), 0 0 10px rgba(255, 221, 0, 0.4);
-  }
 
   .emotion-range-slider::-webkit-slider-thumb {
     width: 22px;
     height: 22px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 8px rgba(255, 221, 0, 0.4), 0 0 16px rgba(255, 221, 0, 0.25);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 221, 0, 0.25);
   }
 
   .emotion-range-slider::-moz-range-thumb {
     width: 22px;
     height: 22px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 8px rgba(255, 221, 0, 0.4), 0 0 16px rgba(255, 221, 0, 0.25);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 221, 0, 0.25);
   }
   
-  /* Mobile tick marks adjustments - FIXED positioning with contained height */
+  /* Mobile tick marks adjustments */
   .slider-tick-marks {
     top: 50%;
     transform: translateY(-50%);
     height: 0;
-    z-index: 0; /* Ensure ticks stay behind slider */
+    z-index: 0;
   }
   
   .slider-tick {
     top: 0;
     transform: translateY(-50%);
-    height: 1.5px; /* Smaller to fit within 6px mobile track */
-    z-index: 0; /* Ensure individual ticks stay behind */
+    height: 1.5px;
+    z-index: 0;
   }
   
   .slider-tick.key-tick {
-    height: 2px; /* Smaller key ticks for mobile */
-    z-index: 0; /* Ensure key ticks stay behind */
-  }
-  
-  /* Ensure mobile slider track stays above ticks */
-  .emotion-range-slider {
-    position: relative;
-    z-index: 1;
+    height: 2px;
+    z-index: 0;
   }
   
   .insights-grid {
@@ -1349,6 +1348,13 @@
   
   .optimization-metric-label {
     font-size: 0.8rem;
+  }
+  
+  .slider-labels {
+    margin-top: 8px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 0.7rem !important;
   }
 }
 
@@ -1416,11 +1422,15 @@
   
   .emotion-value-clean {
     font-size: 0.75rem !important;
-    /* FIXED: Maintain perfect circle on very small screens */
     width: 24px;
     height: 24px;
     min-width: 24px;
     padding: 0;
+  }
+  
+  /* Very small screen track fill */
+  .emotion-slider-track-container .slider-track-fill {
+    height: 6px;
   }
   
   .emotion-range-slider {
@@ -1428,33 +1438,20 @@
     position: relative;
     z-index: 1;
   }
-  
-  /* Very small screen track fill */
-  .emotion-range-slider::before {
-    height: 100%;
-    box-shadow: 0 0 5px rgba(255, 221, 0, 0.3);
-  }
-  
-  /* Very small screen glowing dot */
-  .emotion-range-slider::after {
-    width: 4px;
-    height: 4px;
-    box-shadow: 0 0 5px rgba(255, 221, 0, 0.6), 0 0 8px rgba(255, 221, 0, 0.35);
-  }
 
   .emotion-range-slider::-webkit-slider-thumb {
     width: 20px;
     height: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 6px rgba(255, 221, 0, 0.35), 0 0 12px rgba(255, 221, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 8px rgba(255, 221, 0, 0.2);
   }
 
   .emotion-range-slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 6px rgba(255, 221, 0, 0.35), 0 0 12px rgba(255, 221, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 8px rgba(255, 221, 0, 0.2);
   }
   
-  /* Very small screen tick marks adjustments - FIXED positioning with contained height */
+  /* Very small screen tick marks adjustments */
   .slider-tick-marks {
     top: 50%;
     transform: translateY(-50%);
@@ -1465,19 +1462,13 @@
   .slider-tick {
     top: 0;
     transform: translateY(-50%);
-    height: 1.5px; /* Smaller to fit within 6px track */
+    height: 1.5px;
     z-index: 0;
   }
   
   .slider-tick.key-tick {
-    height: 2px; /* Smaller key ticks for very small screens */
+    height: 2px;
     z-index: 0;
-  }
-  
-  /* Ensure very small screen slider track stays above ticks */
-  .emotion-range-slider {
-    position: relative;
-    z-index: 1;
   }
   
   .slider-labels {
