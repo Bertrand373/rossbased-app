@@ -418,6 +418,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                       <div className="slider-tick-marks">
                         {renderSliderTickMarks()}
                       </div>
+                      <div 
+                        className="slider-track-fill"
+                        style={{ width: `${((slider.value - 1) / 9) * 100}%` }}
+                      />
                       <input
                         type="range"
                         min="1"
@@ -426,7 +430,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                         value={slider.value}
                         onChange={(e) => handleModalBenefitChange(slider.key, parseInt(e.target.value))}
                         className="benefit-range-slider"
-                        style={{ '--slider-value': ((slider.value - 1) / 9) * 100 }}
                       />
                     </div>
                     <span className="benefit-value-clean">{slider.value}</span>

@@ -648,15 +648,12 @@ button.action-btn:hover {
   z-index: 1;
 }
 
-/* PREMIUM: Track fill effect - yellow gradient follows the thumb */
-.benefit-range-slider::before {
-  content: '';
+/* Real HTML element for track fill - works on iOS Safari */
+.slider-track-fill {
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
-  /* Width controlled by --slider-value CSS variable */
-  width: calc(var(--slider-value, 50) * 1%);
   background: linear-gradient(90deg, 
     rgba(255, 221, 0, 0.3) 0%, 
     rgba(255, 221, 0, 0.5) 100%
@@ -675,7 +672,7 @@ button.action-btn:hover {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
 }
 
-.benefit-range-slider:hover:not(:disabled)::before {
+.benefit-slider-track-container:hover .slider-track-fill {
   background: linear-gradient(90deg, 
     rgba(255, 221, 0, 0.4) 0%, 
     rgba(255, 221, 0, 0.6) 100%
