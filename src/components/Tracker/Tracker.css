@@ -669,8 +669,8 @@ button.action-btn:hover {
   );
   /* FIXED: Match the track's border-radius for clean containment */
   border-radius: var(--radius-full);
-  /* Smooth cubic-bezier matching your sliding pills */
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Instant sync with thumb for premium responsive feel */
+  transition: none;
   pointer-events: none;
   z-index: 0;
   /* Subtle glow for premium feel - reduced to not bleed outside track */
