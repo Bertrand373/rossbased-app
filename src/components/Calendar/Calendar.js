@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - UPDATED: Full trigger names in modal badge
+// components/Calendar/Calendar.js - UPDATED: Premium benefit meters with slider labels
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, parseISO, differenceInDays, isAfter, isBefore, 
@@ -983,7 +983,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               })()}
             </div>
 
-            {/* Benefits Details */}
+            {/* UPDATED: Benefits Details with slider labels */}
             {(() => {
               const dayBenefits = getDayBenefits(selectedDate);
               if (dayBenefits) {
@@ -1002,6 +1002,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                           </div>
                           <div className="benefit-value-circle">{dayBenefits.energy}</div>
                         </div>
+                        <div className="benefit-slider-labels">
+                          <span>Low</span>
+                          <span>High</span>
+                        </div>
                       </div>
                       
                       <div className="benefit-slider-item">
@@ -1014,6 +1018,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                             ></div>
                           </div>
                           <div className="benefit-value-circle">{dayBenefits.focus}</div>
+                        </div>
+                        <div className="benefit-slider-labels">
+                          <span>Scattered</span>
+                          <span>Laser</span>
                         </div>
                       </div>
                       
@@ -1028,6 +1036,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                           </div>
                           <div className="benefit-value-circle">{dayBenefits.confidence}</div>
                         </div>
+                        <div className="benefit-slider-labels">
+                          <span>Insecure</span>
+                          <span>Confident</span>
+                        </div>
                       </div>
                       
                       <div className="benefit-slider-item">
@@ -1040,6 +1052,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                             ></div>
                           </div>
                           <div className="benefit-value-circle">{dayBenefits.aura || 5}</div>
+                        </div>
+                        <div className="benefit-slider-labels">
+                          <span>Invisible</span>
+                          <span>Magnetic</span>
                         </div>
                       </div>
                       
@@ -1054,6 +1070,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                           </div>
                           <div className="benefit-value-circle">{dayBenefits.sleep || dayBenefits.attraction || 5}</div>
                         </div>
+                        <div className="benefit-slider-labels">
+                          <span>Poor</span>
+                          <span>Excellent</span>
+                        </div>
                       </div>
                       
                       <div className="benefit-slider-item">
@@ -1066,6 +1086,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                             ></div>
                           </div>
                           <div className="benefit-value-circle">{dayBenefits.workout || dayBenefits.gymPerformance || 5}</div>
+                        </div>
+                        <div className="benefit-slider-labels">
+                          <span>Weak</span>
+                          <span>Strong</span>
                         </div>
                       </div>
                     </div>
