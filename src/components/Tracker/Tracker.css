@@ -588,6 +588,9 @@ button.action-btn:hover {
 .benefit-slider-track-container {
   position: relative;
   flex: 1;
+  /* ADDED: Ensure container has height context for positioning */
+  display: flex;
+  align-items: center;
 }
 
 .slider-tick-marks {
@@ -648,25 +651,30 @@ button.action-btn:hover {
   z-index: 1;
 }
 
-/* Real HTML element for track fill - works on iOS Safari */
-/* Matches the premium sliding pill aesthetic from nav menus */
+/* FIXED: Track fill now constrained to match slider track height exactly */
+/* This prevents the "highlighter" effect where fill bleeds outside the track */
 .slider-track-fill {
   position: absolute;
-  top: 0;
+  /* FIXED: Vertically center within container */
+  top: 50%;
+  transform: translateY(-50%);
+  /* FIXED: Start at left edge of track (accounts for thumb overhang) */
   left: 0;
-  height: 100%;
+  /* FIXED: Match exact track height instead of 100% container height */
+  height: 8px;
   /* Premium yellow gradient matching nav slider */
   background: linear-gradient(90deg, 
     rgba(255, 221, 0, 0.4) 0%, 
     rgba(255, 221, 0, 0.6) 100%
   );
+  /* FIXED: Match the track's border-radius for clean containment */
   border-radius: var(--radius-full);
   /* Smooth cubic-bezier matching your sliding pills */
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 0;
-  /* Subtle glow for premium feel */
-  box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
+  /* Subtle glow for premium feel - reduced to not bleed outside track */
+  box-shadow: 0 0 4px rgba(255, 221, 0, 0.2);
 }
 
 .benefit-range-slider:hover:not(:disabled) {
@@ -682,7 +690,7 @@ button.action-btn:hover {
     rgba(255, 221, 0, 0.5) 0%, 
     rgba(255, 221, 0, 0.7) 100%
   );
-  box-shadow: 0 0 12px rgba(255, 221, 0, 0.4);
+  box-shadow: 0 0 6px rgba(255, 221, 0, 0.3);
 }
 
 .benefit-range-slider:focus:not(:disabled) {
@@ -798,17 +806,7 @@ button.action-btn:hover {
   display: flex;
   gap: var(--spacing-md);
   justify-content: center;
-  flex-wrap: wrap;
-}
-
-.modal-save-btn {
-  flex: 1;
-  min-width: 180px;
-  justify-content: center;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  min-height: auto !important;
+  margin-top: var(--spacing-md);
 }
 
 .cancel-benefits-btn {
@@ -816,40 +814,47 @@ button.action-btn:hover {
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  flex-shrink: 0;
-  min-width: 120px;
-  justify-content: center;
-  min-height: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .cancel-benefits-btn:hover {
-  background-color: rgba(128, 128, 128, 0.2);
-  border-color: var(--text-secondary);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.modal-save-btn {
+  background-color: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
   color: var(--text-secondary);
-  transform: translateY(-1px);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.modal-save-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* DESKTOP LAYOUT */
 @media (min-width: 1024px) {
-  .tracker-header-title-section h2 {
-    font-size: 1.5rem !important;
-  }
-  
-  .tracker-header-subtitle {
-    font-size: 0.875rem !important;
-  }
-
-  .discord-community-section:hover,
-  .youtube-channel-section:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  }
-  
   .tracker-main-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -873,22 +878,50 @@ button.action-btn:hover {
     text-shadow: none;
   }
   
-  /* Desktop pill styling - matching status pill size */
-  .streak-milestone-pills {
-    padding: 0 var(--spacing-lg);
-    gap: var(--spacing-sm);
+  .streak-milestones {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-xl);
+    gap: var(--spacing-xl);
+    justify-content: space-evenly;
   }
   
-  .milestone-pill {
-    padding: var(--spacing-sm) var(--spacing-md);
+  .milestone-item {
+    min-width: 100px;
+    padding: var(--spacing-md);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   
-  .milestone-pill-icon {
-    font-size: 1rem;
+  .milestone-item:hover {
+    background-color: rgba(255, 221, 0, 0.05);
+    border-color: rgba(255, 221, 0, 0.1);
+    transform: translateY(-2px);
   }
   
-  .milestone-pill-text {
+  .milestone-icon {
+    font-size: 1.6rem;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .milestone-value {
+    font-size: 1.75rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .milestone-label {
     font-size: 0.875rem;
+    line-height: 1.2;
+    height: 2.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .streak-actions {
@@ -912,42 +945,12 @@ button.action-btn:hover {
     overflow: hidden;
     max-width: none !important;
   }
-  
-  .benefits-btn-primary {
-    background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
-    border: 1px solid #f0cc00;
-    color: #000000;
-  }
-  
-  .benefits-btn-primary:hover {
-    background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
-    border-color: #f0cc00;
-    color: #000000;
-    transform: translateY(-1px);
-  }
 
-  .discord-join-btn:hover {
-    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
-    border-color: #7289da;
-    color: #ffffff;
-    transform: translateY(-1px);
-  }
-
-  .youtube-subscribe-btn:hover {
-    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
-    border-color: #ff0000;
-    color: #ffffff;
-    transform: translateY(-1px);
-  }
-  
-  .premium-benefits-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-lg) var(--spacing-xl);
-  }
-  
-  .benefit-slider-item {
-    gap: var(--spacing-md);
+  .discord-join-btn, .youtube-subscribe-btn {
+    font-size: 1.125rem;
+    max-width: 600px !important;
+    width: 100% !important;
+    justify-content: center;
   }
 
   .benefits-modal {
@@ -959,6 +962,11 @@ button.action-btn:hover {
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-lg);
     max-height: 60vh;
+  }
+
+  /* FIXED: Desktop track fill height matches desktop track (8px) */
+  .slider-track-fill {
+    height: 8px;
   }
 
   .benefit-range-slider {
@@ -1172,6 +1180,11 @@ button.action-btn:hover {
     padding: 0;
   }
   
+  /* FIXED: Mobile track fill height matches mobile track (6px) */
+  .slider-track-fill {
+    height: 6px;
+  }
+  
   .benefit-range-slider {
     height: 6px;
   }
@@ -1273,6 +1286,11 @@ button.action-btn:hover {
     height: 24px;
     min-width: 24px;
     padding: 0;
+  }
+  
+  /* FIXED: Very small screen track fill height (6px) */
+  .slider-track-fill {
+    height: 6px;
   }
   
   .benefit-range-slider {
