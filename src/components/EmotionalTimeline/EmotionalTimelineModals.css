@@ -1,1558 +1,609 @@
-/* components/EmotionalTimeline/EmotionalTimelineSections.css - Section Components & Analysis Display */
+/* components/EmotionalTimeline/EmotionalTimelineModals.css - Modal Components */
 
-/* EXACT COPY: Check-in Benefits Banner matching Profile coming-soon-banner */
-.checkin-benefits-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
-  margin-bottom: var(--spacing-xl);
-}
+/* ============================================================
+   MODAL OVERLAY & CONTAINER
+   ============================================================ */
 
-.checkin-benefits-helmet-container {
-  flex-shrink: 0;
-}
-
-.checkin-benefits-helmet {
-  width: 40px;
-  height: 40px;
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
-}
-
-.checkin-benefits-helmet-fallback {
-  font-size: 1.5rem;
-  color: var(--primary);
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-}
-
-@keyframes coming-soon-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.96);
-  }
-}
-
-.checkin-benefits-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.checkin-benefits-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.checkin-benefits-description {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin: 0;
-}
-
-/* EXACT COPY: Analysis banner matching Profile coming-soon-banner */
-.insight-data-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
-  margin-bottom: var(--spacing-xl);
-}
-
-.insight-data-helmet-container {
-  flex-shrink: 0;
-}
-
-.insight-data-helmet {
-  width: 40px;
-  height: 40px;
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
-}
-
-.insight-data-helmet-fallback {
-  font-size: 1.5rem;
-  color: var(--primary);
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-}
-
-.insight-data-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.insight-data-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.insight-data-description {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin: 0;
-}
-
-/* ANALYSIS COMPONENTS - Shared styles from Stats */
-
-/* Optimization Display */
-.optimization-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.optimization-criteria {
-  background-color: rgba(255, 221, 0, 0.05);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.optimization-criteria:hover {
-  background-color: rgba(255, 221, 0, 0.08);
-}
-
-.optimization-criteria-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-xs);
-}
-
-.optimization-criteria-text {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-.optimization-metrics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: var(--spacing-md);
-}
-
-.optimization-metric-card {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  justify-content: center;
-  min-height: 80px;
-  transition: all 0.3s ease;
-}
-
-.optimization-metric-card:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-1px);
-}
-
-.optimization-metric-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.optimization-metric-label {
-  font-size: 0.875rem;
-  color: var(--text);
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.optimization-recommendations {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.optimization-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-sm);
-}
-
-.optimization-item {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  font-size: 0.875rem;
-  color: var(--text);
-  line-height: 1.4;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.optimization-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-1px);
-}
-
-/* Pattern Recognition */
-.patterns-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.pattern-item {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  font-size: 0.875rem;
-  color: var(--text);
-  line-height: 1.4;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.pattern-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-1px);
-}
-
-/* Risk Level Indicators */
-.risk-level-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  text-align: center;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: var(--spacing-md);
-}
-
-.risk-level-indicator::before {
-  content: '';
-  position: absolute;
+.modal-overlay {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: var(--spacing-md);
+  animation: modal-fade-in 0.3s ease-out;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-.risk-level-indicator:hover::before {
-  opacity: 1;
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.risk-level-indicator.low {
-  background-color: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: modal-appear 0.4s ease-out;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
-.risk-level-indicator.moderate {
-  background-color: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-.risk-level-indicator.high {
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+/* Phase Detail Modal - larger width */
+.phase-detail-modal {
+  max-width: 700px;
 }
 
-.risk-level-indicator.insufficient {
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid rgba(128, 128, 128, 0.3);
+/* ============================================================
+   MODAL CLOSE BUTTON
+   ============================================================ */
+
+.modal-close {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(128, 128, 128, 0.1);
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  outline: none;
 }
 
-.risk-score-container {
+.modal-close:hover {
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: scale(1.1);
+}
+
+/* ============================================================
+   PHASE MODAL HEADER
+   ============================================================ */
+
+.phase-modal-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.phase-modal-icon {
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.phase-modal-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--spacing-xs);
 }
 
-.risk-score {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: var(--spacing-xs);
-  transition: transform 0.3s ease;
-}
-
-.risk-level-indicator:hover .risk-score {
-  transform: scale(1.05);
-}
-
-.risk-score.low {
-  color: #22c55e;
-}
-
-.risk-score.moderate {
-  color: #f59e0b;
-}
-
-.risk-score.high {
-  color: #ef4444;
-}
-
-.risk-score.insufficient {
-  color: var(--text-secondary);
-}
-
-.risk-level-text {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-/* Analysis Summary Stats */
-.relapse-summary-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-}
-
-.relapse-stat-card {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  justify-content: center;
-  min-height: 100px;
-  transition: all 0.3s ease;
-}
-
-.relapse-stat-card:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-2px);
-}
-
-.relapse-stat-card.conquered-trigger {
-  background-color: rgba(34, 197, 94, 0.05);
-  border-color: rgba(34, 197, 94, 0.2);
-}
-
-.relapse-stat-card.conquered-trigger:hover {
-  background-color: rgba(34, 197, 94, 0.08);
-}
-
-.relapse-stat-card.conquered-trigger .relapse-stat-value {
-  color: #22c55e;
-}
-
-.relapse-stat-card.victory-days {
-  background-color: rgba(255, 221, 0, 0.05);
-  border-color: rgba(255, 221, 0, 0.2);
-}
-
-.relapse-stat-card.victory-days:hover {
-  background-color: rgba(255, 221, 0, 0.08);
-}
-
-.relapse-stat-card.victory-days .relapse-stat-value {
-  color: var(--primary);
-}
-
-.relapse-stat-card.primary-trigger {
-  background-color: rgba(239, 68, 68, 0.05);
-  border-color: rgba(239, 68, 68, 0.2);
-}
-
-.relapse-stat-card.primary-trigger:hover {
-  background-color: rgba(239, 68, 68, 0.08);
-}
-
-.relapse-stat-card.primary-trigger .relapse-stat-value {
-  color: #ef4444;
-}
-
-.relapse-stat-value {
+.phase-modal-name {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
-  margin-bottom: var(--spacing-xs);
-  transition: transform 0.3s ease;
-  text-transform: capitalize;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
 }
 
-.relapse-stat-card:hover .relapse-stat-value {
-  transform: scale(1.05);
-}
-
-.relapse-stat-label {
-  font-size: 0.875rem;
+.phase-modal-range {
+  font-size: 1rem;
   color: var(--text-secondary);
-  line-height: 1.3;
   font-weight: 500;
+  margin: 0;
 }
 
-.relapse-insights-list {
+/* ============================================================
+   PHASE MODAL CONTENT SECTIONS
+   ============================================================ */
+
+.phase-modal-description {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
   background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
 }
 
-.relapse-insights-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-md);
+.phase-modal-insight {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: var(--radius-md);
 }
 
-.relapse-insight-item {
-  font-size: 0.875rem;
+.phase-modal-insight h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.phase-modal-insight p {
+  font-size: 0.9375rem;
   color: var(--text);
   line-height: 1.5;
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-md);
+  margin: 0;
+}
+
+/* ============================================================
+   PHASE MODAL SECTIONS (Scientific, Warning, Strategies)
+   ============================================================ */
+
+.phase-modal-section {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
   background-color: rgba(255, 255, 255, 0.02);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  transition: all 0.3s ease;
 }
 
-.relapse-insight-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  transform: translateY(-1px);
+.phase-modal-section:last-of-type {
+  margin-bottom: var(--spacing-lg);
 }
 
-.relapse-insight-item:last-child {
+.phase-modal-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 var(--spacing-md) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.phase-modal-section h4 svg {
+  color: var(--primary);
+  font-size: 1.125rem;
+}
+
+.phase-modal-section p {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.phase-modal-section ul {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  list-style-type: disc;
+}
+
+.phase-modal-section li {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-sm);
+}
+
+.phase-modal-section li:last-child {
   margin-bottom: 0;
 }
 
-.relapse-insight-item.victory-reminder {
+/* Warning Section - Special styling */
+.phase-modal-section.warning-section {
+  background-color: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.phase-modal-section.warning-section h4 {
+  color: var(--warning);
+}
+
+.phase-modal-section.warning-section h4 svg {
+  color: var(--warning);
+}
+
+/* Success/Positive Section */
+.phase-modal-section.success-section {
   background-color: rgba(34, 197, 94, 0.05);
   border-color: rgba(34, 197, 94, 0.2);
-  color: #22c55e;
-  font-weight: 600;
 }
 
-.relapse-insight-item.victory-reminder:hover {
-  background-color: rgba(34, 197, 94, 0.08);
-}
-
-/* Guidance List */
-.guidance-list {
-  background-color: rgba(255, 255, 255, 0.02);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.guidance-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-sm);
-}
-
-.guidance-item {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin-bottom: var(--spacing-sm);
-}
-
-.guidance-item:last-child {
-  margin-bottom: 0;
-}
-
-/* UPDATED: Progress Indicator with yellow shimmer hint */
-.energy-data-progress-indicator {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-md);
-}
-
-.energy-data-progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.energy-data-progress-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.energy-data-progress-count {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--primary);
-  background-color: rgba(255, 221, 0, 0.1);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  white-space: nowrap;
-}
-
-.energy-data-progress-bar {
-  height: 6px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  position: relative;
-}
-
-/* UPDATED: Yellow shimmer effect on unfilled portion */
-.energy-data-progress-bar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 221, 0, 0.4) 50%, 
-    transparent 100%);
-  opacity: 0.15;
-  animation: progress-shimmer 2s infinite;
-  z-index: 1;
-}
-
-.energy-data-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary) 0%, rgba(255, 221, 0, 0.8) 100%);
-  border-radius: var(--radius-full);
-  transition: width 0.8s ease-out;
-  box-shadow: 0 0 8px rgba(255, 221, 0, 0.3);
-  position: relative;
-  z-index: 2;
-}
-
-@keyframes progress-shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Data Quality */
-.insight-data-quality {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-}
-
-.insight-data-quality:hover {
-  transform: scale(1.05);
-}
-
-.insight-data-quality.minimal,
-.insight-data-quality.good,
-.insight-data-quality.rich {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.1) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-.insight-data-quality.insufficient {
-  background: linear-gradient(135deg, rgba(128, 128, 128, 0.1) 0%, rgba(128, 128, 128, 0.1) 100%);
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  color: var(--text-secondary);
-}
-
-.insight-data-days {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-/* Data Quality Indicator */
-.data-quality-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-}
-
-/* Analysis Reset State */
-.analysis-reset-state {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-}
-
-/* Insufficient Data Section */
-.insufficient-data-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-}
-
-/* Analysis Footer */
-.analysis-footer {
-  margin-top: var(--spacing-xl);
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-/* UPDATED: Emotional Check-in Section - padding to match Analysis section EXACTLY */
-.emotional-checkin-section {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-}
-
-/* FIXED: Header with EXACT same spacing as Analysis section header */
-.emotional-checkin-section h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  text-align: center;
-  font-weight: 600;
-  padding: var(--spacing-lg) 0;
-}
-
-.emotion-status-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-}
-
-/* UPDATED: Success state styled like green benefits pill from Tracker */
-.emotions-logged {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  background-color: rgba(34, 197, 94, 0.05);
-  border: 1px solid rgba(34, 197, 94, 0.1);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-sm) var(--spacing-md);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  flex-wrap: wrap;
-}
-
-.emotions-not-logged {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  background-color: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-sm) var(--spacing-md);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.info-icon {
-  font-size: 1rem;
-  flex-shrink: 0;
-  color: var(--primary);
-}
-
-/* UPDATED: Success icon color to match benefits logged styling */
-.check-icon {
-  font-size: 1rem;
-  flex-shrink: 0;
+.phase-modal-section.success-section h4 {
   color: var(--success);
 }
 
-.edit-emotions-btn {
+.phase-modal-section.success-section h4 svg {
+  color: var(--success);
+}
+
+/* ============================================================
+   MODAL ACTIONS
+   ============================================================ */
+
+.modal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+}
+
+.modal-got-it-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-xl);
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
-  margin-left: var(--spacing-md);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: none;
-}
-
-/* UPDATED: Emotion sliders with smaller thumbs and inline value display */
-.emotion-sliders {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.emotion-slider-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  position: relative;
-}
-
-.emotion-slider-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
-}
-
-.emotion-label {
-  font-weight: 600 !important;
-  color: var(--text) !important;
-  flex: 1 !important;
-  text-align: left !important;
-  font-size: 1rem !important;
-  letter-spacing: 0.025em !important;
-  display: block !important;
-}
-
-/* UPDATED: Slider container for inline value display */
-.emotion-slider-with-value {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  position: relative;
-}
-
-.emotion-value-clean {
-  font-weight: 700;
-  color: var(--text) !important;
-  font-size: 0.875rem !important;
-  background-color: rgba(255, 221, 0, 0.08);
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  /* FIXED: Set fixed width and height for perfect circle */
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  border: 1px solid rgba(255, 221, 0, 0.15);
-  flex-shrink: 0;
-}
-
-/* NEW: Slider track container with tick marks */
-.emotion-slider-track-container {
-  position: relative;
-  flex: 1;
-  /* ADDED: Ensure container has height context for positioning */
-  display: flex;
-  align-items: center;
-}
-
-/* NEW: Tick marks container - overlays the slider track exactly */
-.slider-tick-marks {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 0;
-  transform: translateY(-50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* NEW: Individual tick mark styling - positioned in track center */
-.slider-tick {
-  position: absolute;
-  top: 0;
-  transform: translateY(-50%);
-  width: 1px;
-  height: 3px;
-  background-color: rgba(255, 255, 255, 0.15);
-  pointer-events: none;
-}
-
-/* NEW: Key tick marks (1, 5, 10) are slightly more visible */
-.slider-tick.key-tick {
-  height: 4px;
-  width: 1px;
-  background-color: rgba(255, 221, 0, 0.25);
-}
-
-/* NEW: Perfect alignment - tick positions match thumb center positions for 1-10 scale */
-.slider-tick[data-value="1"] { left: calc(12px); }
-.slider-tick[data-value="2"] { left: calc(12px + (calc(100% - 24px) * 1/9)); }
-.slider-tick[data-value="3"] { left: calc(12px + (calc(100% - 24px) * 2/9)); }
-.slider-tick[data-value="4"] { left: calc(12px + (calc(100% - 24px) * 3/9)); }
-.slider-tick[data-value="5"] { left: calc(12px + (calc(100% - 24px) * 4/9)); }
-.slider-tick[data-value="6"] { left: calc(12px + (calc(100% - 24px) * 5/9)); }
-.slider-tick[data-value="7"] { left: calc(12px + (calc(100% - 24px) * 6/9)); }
-.slider-tick[data-value="8"] { left: calc(12px + (calc(100% - 24px) * 7/9)); }
-.slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 8/9)); }
-.slider-tick[data-value="10"] { left: calc(100% - 12px); }
-
-/* EXACT COPY FROM TRACKER.CSS: Base emotion slider track */
-.emotion-range-slider {
-  -webkit-appearance: none;
-  flex: 1;
-  height: 8px;
-  border-radius: var(--radius-full);
-  /* Base track - neutral gray */
-  background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.15) 0%, 
-    rgba(128, 128, 128, 0.1) 100%
-  );
-  outline: none;
   transition: all 0.2s ease;
-  margin: 0 !important;
-  padding: 0 !important;
-  position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  z-index: 1;
+  min-width: 120px;
+  outline: none;
 }
 
-/* EXACT COPY FROM TRACKER.CSS: Track fill - yellow gradient that follows thumb */
-.slider-track-fill {
-  position: absolute;
-  /* Vertically center within container */
-  top: 50%;
-  transform: translateY(-50%);
-  /* Start at left edge of track */
-  left: 0;
-  /* Match exact track height */
-  height: 8px;
-  /* Premium yellow gradient matching nav slider */
-  background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.4) 0%, 
-    rgba(255, 221, 0, 0.6) 100%
-  );
-  /* Match the track's border-radius for clean containment */
-  border-radius: var(--radius-full);
-  /* Instant sync with thumb for premium responsive feel */
-  transition: none;
-  pointer-events: none;
-  z-index: 0;
-  /* Subtle glow for premium feel */
-  box-shadow: 0 0 4px rgba(255, 221, 0, 0.2);
-}
-
-.emotion-range-slider:hover:not(:disabled) {
-  background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.18) 0%, 
-    rgba(128, 128, 128, 0.12) 100%
-  );
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
-}
-
-/* EXACT COPY FROM TRACKER.CSS: Track fill hover effect */
-.emotion-slider-track-container:hover .slider-track-fill {
-  background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.5) 0%, 
-    rgba(255, 221, 0, 0.7) 100%
-  );
-  box-shadow: 0 0 6px rgba(255, 221, 0, 0.3);
-}
-
-.emotion-range-slider:focus:not(:disabled) {
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
-}
-
-.emotion-range-slider:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background: rgba(128, 128, 128, 0.1);
-}
-
-/* EXACT COPY FROM TRACKER.CSS: Glowing slider thumb - WebKit */
-.emotion-range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
-  cursor: pointer;
-  /* Premium glow matching nav pills */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
-  margin: 0 !important;
-  /* Smooth cubic-bezier matching sliding pills */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  position: relative;
-  z-index: 2;
-  opacity: 1;
-}
-
-.emotion-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.15);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
-  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.emotion-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 16px rgba(255, 221, 0, 0.6);
-}
-
-/* EXACT COPY FROM TRACKER.CSS: Glowing slider thumb - Firefox */
-.emotion-range-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
-  cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  /* Premium glow matching nav pills */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
-  margin: 0 !important;
-  /* Smooth cubic-bezier matching sliding pills */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  z-index: 2;
-  opacity: 1;
-}
-
-.emotion-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.15);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
-  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.slider-labels {
-  display: flex !important;
-  justify-content: space-between !important;
-  font-size: 0.75rem !important;
-  color: var(--text-secondary) !important;
-  margin-top: 8px !important;
-  margin-bottom: 0px !important;
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  line-height: 1 !important;
-  transform: none !important;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.025em !important;
-  position: relative !important;
-  z-index: 1 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8) !important;
-}
-
-.slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.7) !important;
-}
-
-.emotion-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--spacing-lg);
-}
-
-.save-emotions-btn {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-full) !important;
-  color: var(--text-secondary) !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  outline: none !important;
-  justify-content: center !important;
-}
-
-.save-emotions-btn:hover {
+.modal-got-it-btn:hover {
   background-color: rgba(255, 221, 0, 0.1) !important;
   border-color: rgba(255, 221, 0, 0.2) !important;
   color: var(--primary) !important;
   transform: translateY(-1px) !important;
 }
 
-.save-emotions-btn:focus,
-.save-emotions-btn:active,
-.save-emotions-btn:focus-visible {
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-  transform: none !important;
-  opacity: 1 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  filter: none !important;
+/* Primary action button variant */
+.modal-primary-btn {
+  background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
+  border: 1px solid #f0cc00;
+  color: #000000;
 }
 
-/* FIXED: Phase Analysis Section with EXACT same padding structure as Check-in */
-.phase-insight-section {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.modal-primary-btn:hover {
+  background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+  border-color: #f0cc00;
+  color: #000000;
+  transform: translateY(-1px) !important;
 }
 
-/* FIXED: Analysis header with EXACT same spacing as Check-in header */
-.phase-insight-section h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  text-align: center;
-  font-weight: 600;
-  padding: var(--spacing-lg) 0;
-}
+/* ============================================================
+   MASTERY LEVEL MODAL (if used)
+   ============================================================ */
 
-/* Analysis Cards Grid */
-.insights-grid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* Insight Cards */
-.insight-card {
-  padding: var(--spacing-xl) var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  justify-content: center;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.insight-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-/* Card Headers */
-.insight-card-header {
+.mastery-modal-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  font-weight: 600;
-  color: var(--text);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.mastery-modal-icon {
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  text-align: center;
-  margin-bottom: var(--spacing-md);
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: rgba(255, 221, 0, 0.1);
+  border: 2px solid rgba(255, 221, 0, 0.2);
+  flex-shrink: 0;
 }
 
-.insight-card-header .insight-icon {
-  color: var(--primary);
-  font-size: 1.125rem;
+.mastery-modal-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
-.insight-metric {
+.mastery-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--text);
-  font-weight: 600;
+  margin: 0;
 }
 
-/* Card Content */
-.insight-text {
-  color: var(--text);
-  font-size: 0.875rem;
-  line-height: 1.4;
-  font-weight: 500;
-  text-align: center;
-  padding: 0 var(--spacing-sm);
-}
-
-/* Trend indicators */
-.trend {
-  font-weight: bold;
-  margin-left: 4px;
-}
-
-.trend.improving {
-  color: #22c55e;
-}
-
-.trend.concerning {
-  color: #ef4444;
-}
-
-.trend.stable {
+.mastery-modal-subtitle {
+  font-size: 1rem;
   color: var(--text-secondary);
+  margin: 0;
 }
 
-/* EXACT MOBILE COPY: Mobile Responsiveness matching Profile coming-soon-banner exactly */
+.mastery-modal-time {
+  font-size: 0.875rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE STYLES
+   ============================================================ */
+
+/* Desktop enhancements */
+@media (min-width: 1024px) {
+  .modal-content {
+    padding: var(--spacing-2xl);
+  }
+  
+  .phase-detail-modal {
+    max-width: 750px;
+  }
+  
+  .phase-modal-icon {
+    width: 72px;
+    height: 72px;
+    font-size: 2.25rem;
+  }
+  
+  .phase-modal-name {
+    font-size: 1.75rem;
+  }
+  
+  .phase-modal-section {
+    padding: var(--spacing-xl);
+  }
+}
+
+/* Tablet styles */
 @media (max-width: 768px) {
-  /* EXACT COPY of Profile's .coming-soon-banner mobile styles */
-  .checkin-benefits-banner {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
+  .modal-overlay {
+    padding: var(--spacing-sm);
+    align-items: flex-end;
   }
   
-  .checkin-benefits-content {
-    text-align: center;
+  .modal-content {
+    max-width: 100%;
+    max-height: 90vh;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    margin-bottom: 0;
+    animation: modal-slide-up 0.3s ease-out;
   }
   
-  .checkin-benefits-title {
-    justify-content: center;
+  @keyframes modal-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
-  .checkin-benefits-helmet {
-    width: 35px;
-    height: 35px;
+  .phase-detail-modal {
+    max-width: 100%;
   }
   
-  .checkin-benefits-helmet-fallback {
-    font-size: 1.25rem;
-  }
-  
-  /* EXACT COPY of Profile's .coming-soon-banner mobile styles */
-  .insight-data-banner {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-  }
-  
-  .insight-data-content {
-    text-align: center;
-  }
-  
-  .insight-data-title {
-    justify-content: center;
-  }
-  
-  .insight-data-helmet {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .insight-data-helmet-fallback {
-    font-size: 1.25rem;
-  }
-  
-  /* FIXED: Both sections have EXACT same mobile padding */
-  .emotional-checkin-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
-    gap: var(--spacing-lg);
-  }
-  
-  .phase-insight-section {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
-    gap: var(--spacing-lg);
-  }
-  
-  .emotion-sliders {
+  .phase-modal-header {
     gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
   }
   
-  .emotion-status-section {
-    gap: var(--spacing-sm);
+  .phase-modal-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 1.75rem;
   }
   
-  .emotions-logged-container {
+  .phase-modal-name {
+    font-size: 1.25rem;
+  }
+  
+  .phase-modal-range {
+    font-size: 0.875rem;
+  }
+  
+  .phase-modal-description {
+    font-size: 0.9375rem;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .phase-modal-insight {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .phase-modal-insight h4 {
+    font-size: 0.9375rem;
+  }
+  
+  .phase-modal-insight p {
+    font-size: 0.875rem;
+  }
+  
+  .phase-modal-section {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .phase-modal-section h4 {
+    font-size: 0.9375rem;
+  }
+  
+  .phase-modal-section p,
+  .phase-modal-section li {
+    font-size: 0.875rem;
+  }
+  
+  .modal-actions {
     flex-direction: column;
-    align-items: center;
     gap: var(--spacing-sm);
   }
   
-  .emotions-logged {
-    margin: 0;
+  .modal-got-it-btn {
+    width: 100%;
+    min-width: auto;
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 0;
   }
   
-  .edit-emotions-btn {
-    font-size: 0.75rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
+  .modal-content {
+    padding: var(--spacing-md);
+    max-height: 95vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
   
-  .emotion-label {
-    font-size: 0.875rem !important;
-  }
-  
-  .emotion-value-clean {
-    font-size: 0.8rem !important;
-    /* FIXED: Maintain perfect circle on mobile */
+  .modal-close {
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
     width: 28px;
     height: 28px;
-    min-width: 28px;
-    padding: 0;
+    font-size: 0.875rem;
   }
   
-  /* MOBILE: Track fill height matches mobile track (6px) */
-  .slider-track-fill {
-    height: 6px;
-  }
-  
-  .emotion-range-slider {
-    height: 6px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .emotion-range-slider::-webkit-slider-thumb {
-    width: 22px;
-    height: 22px;
-  }
-
-  .emotion-range-slider::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
-  }
-  
-  /* Mobile tick marks adjustments - FIXED positioning with contained height */
-  .slider-tick-marks {
-    top: 50%;
-    transform: translateY(-50%);
-    height: 0;
-    z-index: 0; /* Ensure ticks stay behind slider */
-  }
-  
-  .slider-tick {
-    top: 0;
-    transform: translateY(-50%);
-    height: 1.5px; /* Smaller to fit within 6px mobile track */
-    z-index: 0; /* Ensure individual ticks stay behind */
-  }
-  
-  .slider-tick.key-tick {
-    height: 2px; /* Smaller key ticks for mobile */
-    z-index: 0; /* Ensure key ticks stay behind */
-  }
-  
-  .insights-grid {
-    gap: var(--spacing-md);
-  }
-  
-  .insight-card {
-    padding: var(--spacing-md);
-  }
-  
-  .data-quality-indicator {
+  .phase-modal-header {
     flex-direction: column;
-    gap: var(--spacing-xs);
     text-align: center;
-  }
-  
-  .optimization-metrics {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: var(--spacing-sm);
   }
   
-  .optimization-metric-card {
-    min-height: 70px;
-    padding: var(--spacing-sm);
-  }
-  
-  .optimization-metric-value {
-    font-size: 1.25rem;
-  }
-  
-  .optimization-metric-label {
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-  /* EXACT COPY of Profile's very small mobile banner styles */
-  .checkin-benefits-helmet {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .checkin-benefits-helmet-fallback {
-    font-size: 1rem;
-  }
-  
-  .checkin-benefits-title {
-    font-size: 0.875rem;
-  }
-  
-  .checkin-benefits-description {
-    font-size: 0.8rem;
-  }
-  
-  .insight-data-helmet {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .insight-data-helmet-fallback {
-    font-size: 1rem;
-  }
-  
-  .insight-data-title {
-    font-size: 0.875rem;
-  }
-  
-  .insight-data-description {
-    font-size: 0.8rem;
-  }
-  
-  /* FIXED: Both sections have EXACT same very small screen padding */
-  .emotional-checkin-section {
-    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
-    gap: var(--spacing-md);
-  }
-  
-  .phase-insight-section {
-    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
-    gap: var(--spacing-md);
-  }
-  
-  /* FIXED: Both headers have EXACT same very small screen styling */
-  .phase-insight-section h3 {
-    font-size: 1.125rem;
-    padding: var(--spacing-md) 0;
-  }
-  
-  .emotional-checkin-section h3 {
-    font-size: 1.125rem;
-    padding: var(--spacing-md) 0;
-  }
-  
-  .emotion-label {
-    font-size: 0.8rem !important;
-  }
-  
-  .emotion-value-clean {
-    font-size: 0.75rem !important;
-    /* FIXED: Maintain perfect circle on very small screens */
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    padding: 0;
-  }
-  
-  /* VERY SMALL SCREEN: Track fill height (6px) */
-  .slider-track-fill {
-    height: 6px;
-  }
-  
-  .emotion-range-slider {
-    height: 6px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .emotion-range-slider::-webkit-slider-thumb {
-    width: 20px;
-    height: 20px;
-  }
-
-  .emotion-range-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-  }
-  
-  /* Very small screen tick marks adjustments - FIXED positioning with contained height */
-  .slider-tick-marks {
-    top: 50%;
-    transform: translateY(-50%);
-    height: 0;
-    z-index: 0;
-  }
-  
-  .slider-tick {
-    top: 0;
-    transform: translateY(-50%);
-    height: 1.5px; /* Smaller to fit within 6px track */
-    z-index: 0;
-  }
-  
-  .slider-tick.key-tick {
-    height: 2px; /* Smaller key ticks for very small screens */
-    z-index: 0;
-  }
-  
-  .slider-labels {
-    font-size: 0.7rem !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-  }
-  
-  .insight-card {
-    padding: var(--spacing-sm);
-    min-height: 100px;
-  }
-  
-  .insight-card-header {
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .insight-card-header .insight-icon {
-    font-size: 1rem;
-  }
-  
-  .insight-text {
-    font-size: 0.8rem;
-    padding: 0;
-  }
-  
-  .optimization-metrics {
-    grid-template-columns: 1fr;
-  }
-  
-  .optimization-metric-card {
-    min-height: 60px;
-    padding: var(--spacing-xs);
-  }
-  
-  .optimization-metric-value {
-    font-size: 1.125rem;
-  }
-  
-  .optimization-metric-label {
-    font-size: 0.75rem;
-  }
-  
-  .optimization-item {
-    padding: var(--spacing-sm);
-    font-size: 0.8rem;
-  }
-  
-  .pattern-item {
-    padding: var(--spacing-sm);
-    font-size: 0.8rem;
-  }
-  
-  .relapse-summary-stats {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
-  }
-  
-  .relapse-stat-card {
-    padding: var(--spacing-md);
-    min-height: 80px;
-  }
-  
-  .relapse-stat-value {
-    font-size: 1.25rem;
-  }
-  
-  .relapse-stat-label {
-    font-size: 0.8rem;
-  }
-  
-  .risk-level-indicator {
-    padding: var(--spacing-md);
-  }
-  
-  .risk-score {
+  .phase-modal-icon {
+    width: 48px;
+    height: 48px;
     font-size: 1.5rem;
   }
   
-  .risk-level-text {
+  .phase-modal-info {
+    align-items: center;
+  }
+  
+  .phase-modal-name {
+    font-size: 1.125rem;
+    text-align: center;
+  }
+  
+  .phase-modal-range {
     font-size: 0.8rem;
   }
   
-  .relapse-insights-list {
+  .phase-modal-description {
+    font-size: 0.875rem;
     padding: var(--spacing-sm);
   }
   
-  .relapse-insight-item {
-    padding: var(--spacing-sm);
-    font-size: 0.8rem;
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .guidance-list {
+  .phase-modal-insight {
     padding: var(--spacing-sm);
   }
   
-  .guidance-item {
-    font-size: 0.8rem;
+  .phase-modal-insight h4 {
+    font-size: 0.875rem;
   }
   
-  .energy-data-progress-indicator {
-    padding: var(--spacing-sm);
-  }
-  
-  .energy-data-progress-title {
+  .phase-modal-insight p {
     font-size: 0.8rem;
   }
   
-  .energy-data-progress-count {
-    font-size: 0.7rem;
-    padding: 2px 6px;
+  .phase-modal-section {
+    padding: var(--spacing-sm);
   }
   
-  .insight-data-quality {
-    font-size: 0.7rem;
-    padding: 2px 6px;
+  .phase-modal-section h4 {
+    font-size: 0.875rem;
   }
   
-  .insight-data-days {
-    font-size: 0.7rem;
+  .phase-modal-section p,
+  .phase-modal-section li {
+    font-size: 0.8rem;
   }
   
-  .save-emotions-btn {
-    padding: var(--spacing-sm) var(--spacing-lg) !important;
-    font-size: 0.875rem !important;
+  .phase-modal-section ul {
+    padding-left: var(--spacing-md);
+  }
+  
+  .modal-got-it-btn {
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-lg);
+  }
+  
+  /* Mastery modal mobile */
+  .mastery-modal-header {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .mastery-modal-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 2rem;
+  }
+  
+  .mastery-modal-info {
+    align-items: center;
+  }
+  
+  .mastery-modal-title {
+    font-size: 1.125rem;
+  }
+  
+  .mastery-modal-subtitle {
+    font-size: 0.875rem;
+  }
+  
+  .mastery-modal-time {
+    font-size: 0.8rem;
   }
 }
