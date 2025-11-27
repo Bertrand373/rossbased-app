@@ -21,7 +21,7 @@
   /* CRITICAL: Force hardware acceleration to keep nav sticky */
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
-  will-change: transform;
+  will-change: transform, opacity;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   /* ENHANCED FIX: Prevent iOS rubber band/momentum scrolling from affecting nav */
@@ -29,6 +29,8 @@
   -webkit-overflow-scrolling: auto;
   /* Lock it down completely */
   pointer-events: auto;
+  /* ADDED: Smooth transition for hide/show when modals open */
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
 }
 
 /* IOS SPECIFIC: Absolutely lock position during momentum scrolling */

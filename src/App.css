@@ -1,6 +1,22 @@
-/* App.css - Main application styles with YELLOW main navigation buttons + landing-sized initial loader */
+/* App.css - Global application styles */
+
+/* CSS Variables - Mobile First Responsive */
 :root {
-  /* Color scheme is now defined in index.css */
+  /* Existing variables preserved */
+  --primary: #ffdd00;
+  --primary-light: #ffe44d;
+  --primary-dark: #e6c700;
+  --dark-gray: #1a1a1a;
+  --medium-gray: #2c2c2c;
+  --light-gray: #3d3d3d;
+  --card-background: #2a2a2a;
+  --text: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border: #444444;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
   
   /* Spacing */
   --spacing-xs: 4px;
@@ -8,12 +24,19 @@
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
+  --spacing-2xl: 48px;
   
-  /* Border radius */
+  /* Border Radius */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 9999px;
+  
+  /* Layout */
+  --header-height: 120px;
+  --sidebar-width: 220px;
+  --mobile-nav-height: 80px;
 }
 
 * {
@@ -23,84 +46,323 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--dark-gray);
   color: var(--text);
-  background-color: var(--background);
-  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .app-container {
-  max-width: 1200px;
-  margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
-/* ADDED: Landing page initial loader - matches landing container size */
-.landing-initial-loader {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: var(--background);
-  padding: var(--spacing-lg);
-}
-
-.landing-initial-helmet {
-  width: 100px;
-  height: 100px;
-  animation: initial-helmet-pulse 0.8s ease-in-out;
-  filter: drop-shadow(0 0 20px rgba(255, 221, 0, 0.8));
-}
-
-.landing-initial-helmet-fallback {
-  font-size: 4rem;
-  color: var(--primary);
-  animation: initial-helmet-pulse 0.8s ease-in-out;
-}
-
-@keyframes initial-helmet-pulse {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-/* FIXED: Keep original loading screen structure - just enhance the helmet */
-.spartan-loading-screen {
-  max-width: 1200px;
-  margin: var(--spacing-md) auto;
-  min-height: calc(100vh - 48px);
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+/* Standard form elements */
+input, textarea, select {
+  background-color: var(--medium-gray);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  color: var(--text);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-row {
   display: flex;
-  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+@media (max-width: 1024px) {
+  .form-row {
+    flex-direction: column;
+  }
+}
+
+/* Button variations */
+.btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #000000;
+  font-weight: 600;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: white;
+}
+
+.btn-success {
+  background-color: var(--success);
+  color: white;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* ============================================================
+   GLOBAL MODAL STYLES - Bottom Sheet Pattern
+   ============================================================ */
+
+/* Modal overlay - STANDARDIZED z-index above everything */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 10000; /* Higher than mobile nav (9999) */
+  padding: var(--spacing-md);
+  animation: modal-fade-in 0.3s ease-out;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-/* ENHANCED: App loading helmet sizing classes to match upgrade banners */
-.app-loading-helmet-size {
-  width: 100px !important; /* LARGER: Premium loading experience */
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal content - Desktop centered, Mobile bottom sheet */
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  color: var(--text);
+  border: 1px solid var(--border);
+  animation: modal-appear 0.3s ease-out;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ============================================================
+   MOBILE BOTTOM SHEET PATTERN
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* Bottom sheet alignment */
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  
+  /* Bottom sheet modal content */
+  .modal-content {
+    max-width: 100%;
+    max-height: 92vh;
+    width: 100%;
+    margin: 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: var(--spacing-lg);
+    padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom, 20px));
+    animation: modal-slide-up 0.3s ease-out;
+  }
+  
+  @keyframes modal-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Very small screens - maximize space */
+@media (max-width: 480px) {
+  .modal-content {
+    max-height: 95vh;
+    padding: var(--spacing-md);
+    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 20px));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+}
+
+/* ============================================================
+   HIDE MOBILE NAV WHEN MODAL IS OPEN
+   Using :has() selector - well supported in modern browsers
+   ============================================================ */
+
+/* When any modal overlay exists, hide the mobile navigation */
+body:has(.modal-overlay) .mobile-navigation,
+.app-container:has(.modal-overlay) .mobile-navigation {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(100%);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Fallback for browsers without :has() support - modal still works, nav just stays visible */
+@supports not selector(:has(*)) {
+  .modal-overlay ~ .mobile-navigation,
+  .modal-overlay + .mobile-navigation {
+    display: none;
+  }
+}
+
+/* ============================================================
+   END MODAL STYLES
+   ============================================================ */
+
+/* UPDATED: Mobile responsive styles - HEIGHT FIX - Changed breakpoint to 1024px */
+@media (max-width: 1024px) {
+  .app-content {
+    /* FIXED: Remove fixed bottom margin that creates empty space */
+    margin: 0 var(--spacing-sm) 0 var(--spacing-sm);
+    /* FIXED: Remove min-height that forces extra space */
+    min-height: auto;
+    /* FIXED: Add padding bottom only for mobile nav clearance */
+    padding-bottom: 100px; /* Space for mobile nav + small buffer */
+  }
+  
+  .main-content-wrapper {
+    padding: var(--spacing-md);
+    /* FIXED: Ensure wrapper doesn't force extra height */
+    min-height: auto;
+  }
+  
+  .card {
+    padding: var(--spacing-md);
+  }
+  
+  .card-title {
+    font-size: 1.1rem;
+  }
+}
+
+/* Mobile navigation - UPDATED: Add sliding pill animation support */
+.mobile-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  border-top: 1px solid var(--border);
+  /* Add transition for smooth hide/show */
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Mobile navigation will use its own slider from MobileNavigation.css */
+
+/* Navigation container */
+.nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-md);
+}
+
+/* Default Card Styling */
+.card {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Spartan Loading Screen Styles */
+.spartan-loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--dark-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.spartan-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  text-align: center;
+}
+
+.spartan-loader-animation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spartan-helmet-image {
+  animation: app-helmet-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 221, 0, 0.4));
+}
+
+/* FIXED: Specific size classes for app loading helmet */
+.spartan-helmet-image.app-loading-helmet-size {
+  width: 100px !important;
   height: 100px !important;
-  animation: app-helmet-pulse 2s ease-in-out infinite !important;
-  /* ENHANCED: Stronger glow for main loading */
-  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6)) !important;
 }
 
-.app-loading-helmet-fallback-size {
+.spartan-helmet-image.app-loading-helmet-fallback-size {
   font-size: 4rem !important; /* LARGER: Match 100px helmet */
   color: var(--primary) !important;
   animation: app-helmet-pulse 2s ease-in-out infinite !important;
@@ -164,7 +426,6 @@ body {
 /* UPDATED: Header Navigation with bulletproof sliding pill animation - exactly like profile tabs */
 .header-nav {
   justify-self: center;
-  position: relative;
 }
 
 .header-nav .nav-container {
@@ -185,111 +446,83 @@ body {
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* MOBILE: Handle overflow for very small screens only */
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
 
+/* Add scrollbar hiding for potential overflow */
 .header-nav .nav-container::-webkit-scrollbar {
   display: none;
 }
 
-/* UPDATED: Header navigation slider - YELLOW background like main buttons */
+.header-nav .nav-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Header navigation slider with YELLOW background - exactly like profile tabs & mobile nav */
 .header-nav-slider {
   position: absolute;
   top: var(--spacing-xs);
   left: var(--spacing-xs);
   height: calc(100% - calc(var(--spacing-xs) * 2));
-  /* CHANGED: Full yellow background instead of subtle yellow */
   background-color: var(--primary);
   border: 1px solid var(--primary);
   border-radius: var(--radius-full);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 1;
-  /* IMPORTANT: Start hidden but ready to be shown */
-  opacity: 0;
-  visibility: hidden;
-  transform: translateX(0px);
-  width: 0px;
+  transform: translateZ(0);
+  will-change: transform, width;
 }
 
-/* FIXED: Increased breakpoint to 1024px so landscape mobile stays in mobile mode */
-@media (max-width: 1024px) {
-  .header-nav-slider {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-/* UPDATED: Navigation links with YELLOW background and BLACK text when active */
-.header-nav .nav-link {
+/* Navigation link styling */
+.nav-link {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: transparent;
-  border: 1px solid transparent;
   color: var(--text-secondary);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
   text-decoration: none;
-  /* CONSISTENT SIZING: Natural width based on content */
-  min-width: fit-content;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+  border-radius: var(--radius-full);
   position: relative;
   z-index: 2;
-  /* MOBILE: Prevent text selection and ensure proper touch */
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  white-space: nowrap;
+  flex: 1;
+  justify-content: center;
 }
 
-/* FIXED: Increased breakpoint to 1024px for touch targets */
-@media (max-width: 1024px) and (pointer: coarse) {
-  .header-nav .nav-link {
-    min-height: 44px; /* iOS recommendation for touch targets */
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
+.nav-link:hover {
+  color: var(--text);
 }
 
-/* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
-
-/* UPDATED: Active nav styling - BLACK text to contrast with yellow slider background */
-.header-nav .nav-link.active {
-  /* CHANGED: Black text instead of yellow to contrast with yellow background */
+/* Active navigation link styling with BLACK text on yellow background */
+.nav-link.active {
   color: #000000 !important;
-  font-weight: 600 !important;
-  /* IMPORTANT: No background - let slider handle visual feedback */
-  background-color: transparent !important;
-  border-color: transparent !important;
+  font-weight: 600;
 }
 
-/* FIXED: Increased breakpoint to 1024px to ensure active state is always visible */
+.nav-link.active svg {
+  color: #000000;
+}
+
+/* Hide header nav below 1024px since we use mobile navigation */
 @media (max-width: 1024px) {
-  .header-nav .nav-link.active {
-    /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
-    font-weight: 600;
-    color: #000000 !important;
+  .header-nav {
+    display: none;
   }
 }
 
+/* User controls */
 .user-controls {
   display: flex;
   align-items: center;
-  justify-self: end;
   gap: var(--spacing-md);
+  justify-self: end;
 }
 
-/* Profile button styling - matches logout button non-hover state with active state */
-.profile-btn {
+.logout-btn, .profile-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -298,565 +531,113 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
-  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
 }
 
-.profile-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+.logout-btn:hover, .profile-btn:hover {
+  background-color: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
 }
 
 .profile-btn.active {
-  color: var(--primary);
   background-color: rgba(255, 221, 0, 0.1);
   border-color: rgba(255, 221, 0, 0.2);
+  color: var(--primary);
 }
 
-/* FIXED: Logout button styling - inactive grey with red hover */
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
+.spartan-loader-message {
+  font-size: 1.25rem;
+  color: var(--text);
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
+  text-align: center;
 }
 
-.logout-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1);
-  border-color: var(--danger);
-  color: var(--danger);
-  transform: scale(1.05);
+/* Main content area */
+.app-content {
+  flex: 1;
+  margin: 0 var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background-color: var(--medium-gray);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border: 1px solid var(--border);
+  border-top: none;
 }
 
-/* FIXED: Increased mobile header breakpoint to 1024px */
+.main-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* Mobile Header Styles - Updated for 1024px */
 @media (max-width: 1024px) {
-  /* ADDED: Mobile adjustments for initial loader */
-  .landing-initial-loader {
-    padding: var(--spacing-md);
-  }
-  
-  .landing-initial-helmet {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .landing-initial-helmet-fallback {
-    font-size: 3.2rem;
-  }
-
   .app-header {
     display: flex;
     flex-direction: column;
     padding: var(--spacing-sm) var(--spacing-md);
-    gap: var(--spacing-sm);
-    align-items: stretch;
     margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
-  }
-  
-  .app-logo {
-    height: 100px; /* Increased from 80px - 25% bigger */
+    gap: 0;
   }
   
   .header-top-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
   }
   
-  .header-bottom-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: var(--spacing-xs);
-  }
-  
-  .user-controls {
-    gap: var(--spacing-md);
-  }
-  
-  /* Mobile user controls container */
   .mobile-user-controls {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
   }
   
-  /* Mobile profile button - icon only */
-  .mobile-user-controls .profile-btn {
-    padding: var(--spacing-sm);
-    min-width: 36px;
-    height: 36px;
-    justify-content: center;
-  }
-  
-  .mobile-user-controls .profile-btn span {
-    display: none;
-  }
-  
-  /* Mobile logout button - icon only */
+  .mobile-user-controls .profile-btn,
   .mobile-user-controls .logout-btn {
     padding: var(--spacing-sm);
-    min-width: 36px;
-    height: 36px;
-    justify-content: center;
+    font-size: 1rem;
   }
   
+  .mobile-user-controls .profile-btn span,
   .mobile-user-controls .logout-btn span {
     display: none;
   }
   
-  /* REVERTED: Mobile greeting back to yellow styling */
-  .mobile-username {
-    font-weight: 500;
-    color: var(--text);
-    font-size: 0.9375rem;
-    text-align: center;
-    letter-spacing: 0.025em;
+  .header-bottom-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: var(--spacing-xs);
   }
   
-  .mobile-username::before {
-    content: "Hey there, ";
-    color: var(--primary);
-    opacity: 0.8;
+  .mobile-username {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
     font-weight: 500;
   }
   
-  /* Make the username itself bold while keeping "Hey there" normal weight */
-  .mobile-username {
-    font-weight: 700; /* Make the username bold */
-    color: var(--primary); /* Back to yellow */
+  .app-logo {
+    height: 75px;
   }
   
-  /* Hide header navigation on mobile */
-  .header-nav {
-    display: none;
-  }
-  
-  /* Mobile loading screen adjustments */
-  .spartan-loading-screen {
-    margin: var(--spacing-sm);
-    margin-left: var(--spacing-sm);
-    margin-right: var(--spacing-sm);
-    min-height: calc(100vh - 16px);
-  }
-
-  /* Mobile app loading helmet adjustments */
-  .app-loading-helmet-size {
-    width: 80px !important; /* SCALED: Mobile main loading */
-    height: 80px !important;
-  }
-
-  .app-loading-helmet-fallback-size {
-    font-size: 3.2rem !important;
-  }
-}
-
-/* Very small screens */
-@media (max-width: 480px) {
-  .landing-initial-helmet {
-    width: 70px;
-    height: 70px;
-  }
-  
-  .landing-initial-helmet-fallback {
-    font-size: 2.8rem;
-  }
-
-  .app-loading-helmet-size {
-    width: 70px !important;
-    height: 70px !important;
-  }
-
-  .app-loading-helmet-fallback-size {
-    font-size: 2.8rem !important;
-  }
-}
-
-button {
-  cursor: pointer;
-  font-weight: 500;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-sm) var(--spacing-md);
-  transition: none;
-}
-
-button:active {
-  transform: none;
-}
-
-.login-btn {
-  background-color: var(--primary);
-  color: #000000;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.login-btn:hover {
-  background-color: var(--primary-dark);
-}
-
-/* UPDATED: App content layout - MOBILE HEIGHT FIX */
-.app-content {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--card-background);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  margin: 0 var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border);
-  border-top: none;
-  min-height: calc(100vh - 200px);
-}
-
-/* Main content wrapper - takes up available space */
-.main-content-wrapper {
-  flex: 1;
-  padding: var(--spacing-lg);
-}
-
-/* Card component */
-.card {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  margin-bottom: var(--spacing-lg);
-  border: 1px solid var(--border);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-md);
-}
-
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-/* Form elements */
-input, textarea, select {
-  width: 100%;
-  padding: var(--spacing-md);
-  background-color: var(--medium-gray);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-md);
-  font-size: 1rem;
-  color: var(--text);
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-/* Toggle switch */
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--medium-gray);
-  transition: .4s;
-  border-radius: 34px;
-}
-
-.toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
-}
-
-input:checked + .toggle-slider {
-  background-color: var(--primary);
-}
-
-input:checked + .toggle-slider:before {
-  transform: translateX(26px);
-}
-
-/* Range slider */
-.range-slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 8px;
-  border-radius: var(--radius-full);
-  background: var(--medium-gray);
-  outline: none;
-}
-
-.range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--primary);
-  cursor: pointer;
-}
-
-.range-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--primary);
-  cursor: pointer;
-}
-
-/* Badge */
-.badge {
-  display: inline-block;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.badge-success {
-  background-color: rgba(34, 197, 94, 0.2);
-  color: var(--success);
-}
-
-.badge-danger {
-  background-color: rgba(239, 68, 68, 0.2);
-  color: var(--danger);
-}
-
-.badge-warning {
-  background-color: rgba(245, 158, 11, 0.2);
-  color: var(--warning);
-}
-
-.badge-primary {
-  background-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-/* Subscription Banner */
-.subscription-banner {
-  background: linear-gradient(to right, var(--primary-dark), var(--primary));
-  color: #000000;
-  padding: var(--spacing-md);
-  text-align: center;
-}
-
-.subscription-banner-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.subscription-cta {
-  background-color: var(--background);
-  color: var(--primary);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-full);
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  margin-top: var(--spacing-sm);
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Premium lock overlay */
-.premium-lock {
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(15, 15, 15, 0.9);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-}
-
-.lock-icon {
-  font-size: 2rem;
-  color: var(--primary);
-  margin-bottom: var(--spacing-md);
-}
-
-.premium-message {
-  text-align: center;
-  margin-bottom: var(--spacing-md);
-  font-weight: 500;
-  color: var(--text);
-}
-
-/* Form layout */
-.form-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.form-label {
-  display: block;
-  margin-bottom: var(--spacing-sm);
-  font-weight: 500;
-  color: var(--text);
-}
-
-.form-row {
-  display: flex;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-}
-
-@media (max-width: 1024px) {
-  .form-row {
-    flex-direction: column;
-  }
-}
-
-/* Button variations */
-.btn {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-block;
-  text-align: center;
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  color: #000000;
-  font-weight: 600;
-}
-
-.btn-outline {
-  background-color: transparent;
-  border: 1px solid var(--primary);
-  color: var(--primary);
-}
-
-.btn-danger {
-  background-color: var(--danger);
-  color: white;
-}
-
-.btn-success {
-  background-color: var(--success);
-  color: white;
-}
-
-.btn-full {
-  width: 100%;
-}
-
-/* Modal overlay */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  position: relative;
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-
-/* UPDATED: Mobile responsive styles - HEIGHT FIX - Changed breakpoint to 1024px */
-@media (max-width: 1024px) {
   .app-content {
-    /* FIXED: Remove fixed bottom margin that creates empty space */
-    margin: 0 var(--spacing-sm) 0 var(--spacing-sm);
-    /* FIXED: Remove min-height that forces extra space */
-    min-height: auto;
-    /* FIXED: Add padding bottom only for mobile nav clearance */
-    padding-bottom: 100px; /* Space for mobile nav + small buffer */
-  }
-  
-  .main-content-wrapper {
-    padding: var(--spacing-md);
-    /* FIXED: Ensure wrapper doesn't force extra height */
-    min-height: auto;
-  }
-  
-  .card {
-    padding: var(--spacing-md);
-  }
-  
-  .card-title {
-    font-size: 1.1rem;
+    margin: 0 var(--spacing-sm);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
   }
 }
 
-/* Mobile navigation - UPDATED: Add sliding pill animation support */
-.mobile-navigation {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  display: flex;
-  justify-content: center;
-  padding: var(--spacing-sm) var(--spacing-md);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  border-top: 1px solid var(--border);
+/* Larger screens optimization */
+@media (min-width: 1400px) {
+  .header-nav .nav-container {
+    max-width: 700px;
+  }
+  
+  .nav-link {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: 0.9375rem;
+  }
 }
-
-/* Mobile navigation will use its own slider from MobileNavigation.css */

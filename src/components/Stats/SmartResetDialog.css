@@ -1,39 +1,48 @@
-/* components/Stats/SmartResetDialog.css - Smart Reset Dialog Styling - UPDATED: X button matching Emotional Timeline sizing */
+/* components/Stats/SmartResetDialog.css - Smart Reset Dialog Styling */
 
-/* Modal sizing override for smart reset */
+/* ============================================================
+   MODAL SIZING - Inherits from global modal styles
+   ============================================================ */
+
 .smart-reset-modal {
   max-width: 600px;
   width: 95%;
   position: relative;
 }
 
-/* UPDATED: Close X button matching Emotional Timeline sizing */
+/* Close X button */
 .modal-close-x {
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  background: none;
-  border: none;
+  background: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
   color: var(--text-secondary);
   font-size: 1rem;
   cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  padding: 0;
+  border-radius: 50% !important;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
   z-index: 10;
+  outline: none;
 }
 
 .modal-close-x:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary);
+  transform: scale(1.1);
 }
 
-/* Header Section - UPDATED: Removed icon container */
+/* ============================================================
+   HEADER SECTION
+   ============================================================ */
+
 .smart-reset-header {
   text-align: center;
   margin-bottom: var(--spacing-xl);
@@ -52,7 +61,10 @@
   line-height: 1.5;
 }
 
-/* Reset Options Container */
+/* ============================================================
+   RESET OPTIONS
+   ============================================================ */
+
 .reset-options {
   display: flex;
   flex-direction: column;
@@ -207,7 +219,10 @@
   flex-shrink: 0;
 }
 
-/* Action Buttons - UPDATED: Continue button yellow like Set Date */
+/* ============================================================
+   ACTION BUTTONS
+   ============================================================ */
+
 .smart-reset-actions {
   display: flex;
   gap: var(--spacing-md);
@@ -276,7 +291,10 @@
   box-shadow: none !important;
 }
 
-/* Confirmation Header - UPDATED: Removed icon container */
+/* ============================================================
+   CONFIRMATION SECTION
+   ============================================================ */
+
 .confirmation-header {
   text-align: center;
   margin-bottom: var(--spacing-xl);
@@ -296,7 +314,7 @@
   font-weight: 500;
 }
 
-/* Confirmation Details - UPDATED: Stack vertically on desktop */
+/* Confirmation Details */
 .confirmation-details {
   display: flex;
   flex-direction: column;
@@ -399,7 +417,7 @@
   text-align: center;
 }
 
-/* Confirmation Actions - UPDATED: Match Tracker modal buttons exactly */
+/* Confirmation Actions */
 .confirmation-actions {
   display: flex;
   gap: var(--spacing-md);
@@ -457,19 +475,21 @@
   box-shadow: none !important;
 }
 
-/* Mobile Responsiveness - UPDATED: Keep side-by-side layout like Tracker */
+/* ============================================================
+   MOBILE BOTTOM SHEET - Inherits from global styles
+   ============================================================ */
+
 @media (max-width: 768px) {
   .smart-reset-modal {
-    max-width: 95%;
-    padding: var(--spacing-lg);
-    margin: var(--spacing-md);
+    max-width: 100%;
+    width: 100%;
   }
 
   .modal-close-x {
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
-    width: 28px;
-    height: 28px;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    width: 32px;
+    height: 32px;
     font-size: 1rem;
   }
 
@@ -497,7 +517,7 @@
     gap: var(--spacing-md);
   }
 
-  /* UPDATED: Keep side-by-side layout on mobile like Tracker modals */
+  /* Keep side-by-side layout on mobile like Tracker modals */
   .smart-reset-actions,
   .confirmation-actions {
     flex-direction: row !important;
@@ -517,15 +537,11 @@
 }
 
 @media (max-width: 480px) {
-  .smart-reset-modal {
-    padding: var(--spacing-md);
-  }
-
   .modal-close-x {
-    top: var(--spacing-xs);
-    right: var(--spacing-xs);
-    width: 24px;
-    height: 24px;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    width: 28px;
+    height: 28px;
     font-size: 0.875rem;
   }
 
@@ -546,7 +562,7 @@
     font-size: 0.8rem;
   }
 
-  /* UPDATED: Keep equal width buttons on very small screens */
+  /* Keep equal width buttons on very small screens */
   .btn-proceed,
   .btn-cancel,
   .btn-confirm-reset,
