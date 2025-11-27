@@ -1,29 +1,27 @@
-/* components/Stats/StatsModals.css - Modal Components Styling */
+/* components/Stats/StatsModals.css - Modal Components Styling - FIXED: X buttons EXACTLY matching EmotionalTimeline */
 
-/* ============================================================
-   MODAL OVERLAY & CONTAINER - Standardized z-index
-   ============================================================ */
-
+/* Modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.85);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10000;
-  padding: var(--spacing-md);
-  animation: modal-fade-in 0.3s ease-out;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+  animation: modal-fade-in 0.3s ease;
 }
 
 @keyframes modal-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
@@ -32,32 +30,25 @@
   padding: var(--spacing-xl);
   width: 90%;
   max-width: 500px;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   color: var(--text);
   border: 1px solid var(--border);
-  animation: modal-appear 0.3s ease-out;
+  animation: modal-slide-in 0.3s ease;
   position: relative;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
 }
 
-@keyframes modal-appear {
+@keyframes modal-slide-in {
   from {
+    transform: translateY(-20px);
     opacity: 0;
-    transform: scale(0.95) translateY(-20px);
   }
   to {
+    transform: translateY(0);
     opacity: 1;
-    transform: scale(1) translateY(0);
   }
 }
 
-/* ============================================================
-   MODAL CLOSE BUTTON - Grey circle background
-   ============================================================ */
-
+/* EXACT COPY: X button from EmotionalTimeline modal with grey circle background */
 .modal-close-x,
 .stat-modal-close,
 .badge-modal-close {
@@ -110,10 +101,6 @@
   color: var(--text-secondary);
 }
 
-/* ============================================================
-   MODAL ACTIONS
-   ============================================================ */
-
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -136,7 +123,7 @@
   outline: none;
 }
 
-/* Grey by default, yellow ONLY on hover */
+/* FIXED: Grey by default, yellow ONLY on hover (not focus) */
 .modal-actions .btn-primary {
   background-color: rgba(128, 128, 128, 0.1);
   border-color: var(--border);
@@ -181,7 +168,7 @@
   color: var(--text);
 }
 
-/* "Got It" button styling */
+/* FIXED: Specific "Got It" button styling with proper focus state */
 .modal-got-it-btn {
   display: flex;
   align-items: center;
@@ -219,10 +206,7 @@
   border-color: rgba(255, 221, 0, 0.3);
 }
 
-/* ============================================================
-   STAT DETAILS MODAL
-   ============================================================ */
-
+/* NEW: Stat Details Modal Styling */
 .stat-details-modal {
   text-align: center;
   max-width: 500px;
@@ -283,10 +267,7 @@
   margin-bottom: 0;
 }
 
-/* ============================================================
-   BADGE MODAL
-   ============================================================ */
-
+/* Badge Modal */
 .badge-modal {
   text-align: center;
   max-width: 450px;
@@ -358,43 +339,13 @@
   flex-shrink: 0;
 }
 
-/* ============================================================
-   MOBILE BOTTOM SHEET PATTERN
-   ============================================================ */
-
+/* MOBILE RESPONSIVE - Modal Components */
 @media (max-width: 768px) {
-  .modal-overlay {
-    align-items: flex-end;
-    padding: 0;
-  }
-  
-  .modal-content {
-    max-width: 100%;
-    max-height: 92vh;
-    width: 100%;
-    margin: 0;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    padding: var(--spacing-lg);
-    padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom, 20px));
-    animation: modal-slide-up 0.3s ease-out;
-  }
-  
-  @keyframes modal-slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(100%);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
   .modal-close-x,
   .stat-modal-close,
   .badge-modal-close {
-    top: var(--spacing-md);
-    right: var(--spacing-md);
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
     width: 32px;
     height: 32px;
     font-size: 1rem;
@@ -411,7 +362,8 @@
 
   /* Mobile stat details modal */
   .stat-details-modal {
-    max-width: 100%;
+    max-width: 95%;
+    padding: var(--spacing-lg);
   }
 
   .stat-details-icon {
@@ -434,25 +386,22 @@
   }
 }
 
-/* Very small screens */
+/* VERY SMALL SCREENS - Modal Components */
 @media (max-width: 480px) {
-  .modal-content {
-    max-height: 95vh;
-    padding: var(--spacing-md);
-    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 20px));
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  }
-  
   .modal-close-x,
   .stat-modal-close,
   .badge-modal-close {
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
-    width: 28px;
-    height: 28px;
-    font-size: 0.875rem;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
   }
   
+  .stat-details-modal {
+    padding: var(--spacing-md);
+  }
+
   .stat-details-icon {
     width: 60px;
     height: 60px;

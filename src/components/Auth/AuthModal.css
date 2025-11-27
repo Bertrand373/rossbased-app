@@ -1,22 +1,17 @@
 /* components/Auth/AuthModal.css - Fixed responsive design and app styling with helmet loading */
-
-/* Modal overlay inherits from App.css global styles, but we ensure consistency */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.85);
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10000;
+  z-index: 2000;
   padding: var(--spacing-md);
   overflow-y: auto;
-  animation: modal-fade-in 0.3s ease-out;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
 }
 
 .auth-modal {
@@ -32,18 +27,6 @@
   overflow-y: auto;
   position: relative;
   margin: auto;
-  animation: modal-appear 0.3s ease-out;
-}
-
-@keyframes modal-appear {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
 }
 
 .auth-modal h2 {
@@ -57,8 +40,8 @@
 /* FIXED: Close button positioning to match benefits modal exactly */
 .close-modal-btn {
   position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
+  top: var(--spacing-md);  /* MATCHED: Same as benefits modal in Tracker.css */
+  right: var(--spacing-md);  /* MATCHED: Same as benefits modal in Tracker.css */
   background: rgba(128, 128, 128, 0.1) !important;
   background-color: rgba(128, 128, 128, 0.1) !important;
   border: 1px solid var(--border) !important;
@@ -383,36 +366,19 @@
   cursor: not-allowed;
 }
 
-/* ============================================================
-   MOBILE BOTTOM SHEET PATTERN
-   ============================================================ */
-
+/* Mobile optimizations */
 @media (max-width: 768px) {
   .modal-overlay {
-    align-items: flex-end;
-    padding: 0;
+    padding: var(--spacing-sm);
+    align-items: flex-start;
+    padding-top: 10vh;
   }
   
   .auth-modal {
     max-width: 100%;
-    max-height: 92vh;
-    width: 100%;
-    margin: 0;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    max-height: 85vh;
     padding: var(--spacing-lg);
-    padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom, 20px));
-    animation: modal-slide-up 0.3s ease-out;
-  }
-  
-  @keyframes modal-slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(100%);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    margin: 0;
   }
   
   .auth-modal h2 {
@@ -420,14 +386,16 @@
     margin-bottom: var(--spacing-md);
   }
   
+  /* FIXED: Mobile close button positioning */
   .close-modal-btn {
-    top: var(--spacing-lg);
-    right: var(--spacing-lg);
+    top: var(--spacing-lg);  /* CHANGED: Adjusted for mobile padding */
+    right: var(--spacing-lg);  /* CHANGED: Adjusted for mobile padding */
     width: 32px;
     height: 32px;
     font-size: 1rem;
   }
 
+  /* Mobile auth loading helmet adjustments */
   .auth-loading-helmet {
     width: 70px;
     height: 70px;
@@ -462,22 +430,26 @@
   }
 }
 
-/* Very small screens */
+/* Very small screens - only here do we reduce to 28px like benefits modal */
 @media (max-width: 480px) {
+  .modal-overlay {
+    padding: var(--spacing-xs);
+    padding-top: 5vh;
+  }
+  
   .auth-modal {
     padding: var(--spacing-md);
-    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 20px));
-    max-height: 95vh;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 90vh;
   }
   
   .auth-modal h2 {
     font-size: 1.25rem;
   }
   
+  /* FIXED: Very small screens positioning */
   .close-modal-btn {
-    top: var(--spacing-md);
-    right: var(--spacing-md);
+    top: var(--spacing-md);  /* CHANGED: Adjusted for very small screen padding */
+    right: var(--spacing-md);  /* CHANGED: Adjusted for very small screen padding */
     width: 32px;
     height: 32px;
     font-size: 1rem;
@@ -494,23 +466,24 @@
 }
 
 /* High screens - center vertically */
-@media (min-height: 800px) and (min-width: 769px) {
+@media (min-height: 800px) {
   .modal-overlay {
     align-items: center;
-    padding: var(--spacing-md);
-  }
-  
-  .auth-modal {
-    border-radius: var(--radius-lg);
+    padding-top: var(--spacing-md);
   }
 }
 
 /* Landscape mobile - adjust for smaller height */
 @media (max-height: 600px) and (max-width: 768px) {
+  .modal-overlay {
+    align-items: flex-start;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+  }
+  
   .auth-modal {
-    max-height: 98vh;
+    max-height: 96vh;
     padding: var(--spacing-md);
-    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 12px));
   }
   
   .auth-modal h2 {
