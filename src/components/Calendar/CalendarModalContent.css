@@ -495,7 +495,7 @@
 .day-info-modal .benefit-slider-labels span:first-child {
   color: var(--text-secondary);
   opacity: 0.7;
-  transform: translateX(50%);
+  transform: translateX(25px);
 }
 
 .day-info-modal .benefit-slider-labels span:last-child {
