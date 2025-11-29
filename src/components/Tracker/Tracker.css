@@ -1339,8 +1339,8 @@ button.action-btn:hover {
 }
 
 /* ============================================================
-   MOBILE MODAL FIX - Ensures modals appear above mobile navigation
-   and provides smooth, contained scrolling
+   MOBILE MODAL FIX - Ensures modals appear above mobile navigation,
+   are perfectly centered, and provide smooth contained scrolling
    ============================================================ */
 
 /* CRITICAL: Tracker modal overlay must be above mobile nav (z-index: 9999) */
@@ -1348,11 +1348,20 @@ button.action-btn:hover {
 .modal-overlay:has(.benefits-modal),
 .modal-overlay:has(.date-picker-modal) {
   z-index: 10000;
+  /* Bulletproof centering */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   /* Prevent background scroll when modal is open */
   overscroll-behavior: contain;
 }
 
-/* Enhanced modal content for mobile */
+/* Enhanced modal content - centered on all devices */
 .tracker-container .modal-content,
 .benefits-modal,
 .date-picker-modal {
@@ -1361,6 +1370,9 @@ button.action-btn:hover {
   -webkit-overflow-scrolling: touch;
   /* Prevent scroll chaining to background */
   overscroll-behavior: contain;
+  /* Ensure proper centering */
+  position: relative;
+  margin: 0;
 }
 
 /* Mobile-specific modal enhancements */
@@ -1370,24 +1382,45 @@ button.action-btn:hover {
   .modal-overlay:has(.benefits-modal),
   .modal-overlay:has(.date-picker-modal) {
     z-index: 10000;
+    /* Bulletproof centering for all mobile devices */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: var(--spacing-md);
-    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 0px));
+    /* Account for safe areas on all sides */
+    padding-top: max(var(--spacing-md), env(safe-area-inset-top, 0px));
+    padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom, 0px));
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
+    box-sizing: border-box;
   }
   
-  /* Modal content adjustments for mobile */
+  /* Modal content adjustments for mobile - TRUE CENTER */
   .tracker-container .modal-content,
   .benefits-modal {
+    /* Reset any margins that could offset centering */
+    margin: 0;
+    /* Constrain size */
     max-height: 85vh;
     max-height: 85dvh; /* Dynamic viewport height for mobile browsers */
-    margin: auto;
-    /* Ensure modal doesn't get cut off */
-    margin-bottom: env(safe-area-inset-bottom, 0px);
+    max-width: calc(100vw - var(--spacing-lg));
+    width: 100%;
+    /* Flexbox won't work without this */
+    flex-shrink: 0;
   }
   
   /* Benefits modal specific mobile adjustments */
   .benefits-modal {
     display: flex;
     flex-direction: column;
+    max-width: 600px;
   }
   
   /* Scrollable content area */
@@ -1439,17 +1472,43 @@ button.action-btn:hover {
   .tracker-container .modal-overlay,
   .modal-overlay:has(.benefits-modal) {
     padding: var(--spacing-sm);
-    padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom, 0px));
+    padding-top: max(var(--spacing-sm), env(safe-area-inset-top, 0px));
+    padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 0px));
+    padding-left: max(var(--spacing-sm), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--spacing-sm), env(safe-area-inset-right, 0px));
   }
   
   .benefits-modal {
     max-height: 90vh;
     max-height: 90dvh;
     padding: var(--spacing-md);
+    /* Ensure it stays centered */
+    margin: 0;
   }
   
   .benefits-modal-sliders {
     max-height: 45vh;
     max-height: 45dvh;
+  }
+}
+
+/* Landscape orientation handling */
+@media (max-height: 500px) and (orientation: landscape) {
+  .tracker-container .modal-overlay,
+  .modal-overlay:has(.benefits-modal) {
+    align-items: flex-start;
+    padding-top: var(--spacing-sm);
+    overflow-y: auto;
+  }
+  
+  .benefits-modal {
+    max-height: 95vh;
+    max-height: 95dvh;
+    margin: auto 0;
+  }
+  
+  .benefits-modal-sliders {
+    max-height: 35vh;
+    max-height: 35dvh;
   }
 }
