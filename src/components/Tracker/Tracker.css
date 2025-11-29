@@ -1365,9 +1365,6 @@ button.action-btn:hover {
 .tracker-container .modal-content,
 .benefits-modal,
 .date-picker-modal {
-  /* Smooth scrolling */
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
   /* Prevent scroll chaining to background */
   overscroll-behavior: contain;
   /* Ensure proper centering */
@@ -1412,69 +1409,71 @@ button.action-btn:hover {
     max-height: 85dvh; /* Dynamic viewport height for mobile browsers */
     max-width: calc(100vw - var(--spacing-lg));
     width: 100%;
-    /* Flexbox won't work without this */
-    flex-shrink: 0;
-    /* Enable scrolling on the entire modal */
-    overflow-y: auto;
-    overflow-x: hidden;
+    /* Flexbox layout for proper scrolling */
+    display: flex;
+    flex-direction: column;
+    /* NO overflow on modal itself - children handle it */
+    overflow: hidden;
   }
   
   /* Benefits modal specific mobile adjustments */
   .benefits-modal {
-    display: flex;
-    flex-direction: column;
     max-width: 600px;
   }
   
-  /* Banner should scroll with content on mobile */
-  .benefits-tracking-banner {
+  /* Fixed header elements - always visible */
+  .benefits-modal-header,
+  .benefits-modal-subtitle {
     flex-shrink: 0;
   }
   
-  /* Scrollable content area - remove max-height so it flows naturally */
+  /* Scrollable middle section - banner + sliders */
   .benefits-modal-sliders {
-    flex: 0 0 auto; /* Don't flex, just take natural height */
-    max-height: none; /* Remove max-height constraint */
-    overflow-y: visible; /* Let parent handle scrolling */
+    flex: 1;
+    min-height: 0; /* Critical for flex scrolling */
+    overflow-y: auto;
+    overflow-x: hidden;
     overscroll-behavior: contain;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
     /* Subtle custom scrollbar */
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 221, 0, 0.3) transparent;
+    /* Add padding for breathing room */
+    padding-right: var(--spacing-xs);
   }
   
-  /* Webkit scrollbar styling for the modal itself */
-  .benefits-modal::-webkit-scrollbar {
+  /* Webkit scrollbar styling */
+  .benefits-modal-sliders::-webkit-scrollbar {
     width: 6px;
   }
   
-  .benefits-modal::-webkit-scrollbar-track {
+  .benefits-modal-sliders::-webkit-scrollbar-track {
     background: transparent;
   }
   
-  .benefits-modal::-webkit-scrollbar-thumb {
+  .benefits-modal-sliders::-webkit-scrollbar-thumb {
     background: rgba(255, 221, 0, 0.3);
     border-radius: 3px;
   }
   
-  .benefits-modal::-webkit-scrollbar-thumb:hover {
+  .benefits-modal-sliders::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 221, 0, 0.5);
   }
   
-  /* Modal actions - sticky at bottom */
+  /* Banner inside the scrollable area */
+  .benefits-tracking-banner {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  /* Modal actions - fixed at bottom, never scrolls */
   .benefits-modal-actions {
     flex-shrink: 0;
     padding-top: var(--spacing-md);
     margin-top: var(--spacing-md);
-    /* Sticky positioning to keep buttons visible */
-    position: sticky;
-    bottom: 0;
     /* Subtle top border to separate from scrollable content */
     border-top: 1px solid var(--border);
     background-color: var(--card-background);
-    /* Extra bottom padding for safe area */
-    padding-bottom: var(--spacing-sm);
-    /* Ensure it's above content */
-    z-index: 2;
   }
 }
 

@@ -431,35 +431,35 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               {benefitsLogged ? "Update how you're feeling today" : "How are you feeling today?"}
             </p>
             
-            {!benefitsLogged && (
-              <div className="benefits-tracking-banner">
-                <div className="benefits-tracking-helmet-container">
-                  <img 
-                    className="benefits-tracking-helmet" 
-                    src="/helmet.png" 
-                    alt="Benefits Tracking System" 
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'block';
-                    }}
-                  />
-                  <div className="benefits-tracking-helmet-fallback" style={{ display: 'none' }}>
-                    🛡️
+            <div className="benefits-modal-sliders">
+              {!benefitsLogged && (
+                <div className="benefits-tracking-banner">
+                  <div className="benefits-tracking-helmet-container">
+                    <img 
+                      className="benefits-tracking-helmet" 
+                      src="/helmet.png" 
+                      alt="Benefits Tracking System" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'block';
+                      }}
+                    />
+                    <div className="benefits-tracking-helmet-fallback" style={{ display: 'none' }}>
+                      🛡️
+                    </div>
+                  </div>
+                  
+                  <div className="benefits-tracking-content">
+                    <h4 className="benefits-tracking-title">
+                      Unlock Advanced Insights
+                    </h4>
+                    <p className="benefits-tracking-description">
+                      Track daily benefits to unlock pattern recognition, challenge identification with targeted solutions, trend analysis across all metrics, and personalized strategies based on your unique journey data.
+                    </p>
                   </div>
                 </div>
-                
-                <div className="benefits-tracking-content">
-                  <h4 className="benefits-tracking-title">
-                    Unlock Advanced Insights
-                  </h4>
-                  <p className="benefits-tracking-description">
-                    Track daily benefits to unlock pattern recognition, challenge identification with targeted solutions, trend analysis across all metrics, and personalized strategies based on your unique journey data.
-                  </p>
-                </div>
-              </div>
-            )}
-            
-            <div className="benefits-modal-sliders">
+              )}
+              
               {[
                 { key: 'energy', label: 'Energy', value: modalBenefits.energy, lowLabel: 'Low', highLabel: 'High' },
                 { key: 'focus', label: 'Focus', value: modalBenefits.focus, lowLabel: 'Scattered', highLabel: 'Laser Focus' },
