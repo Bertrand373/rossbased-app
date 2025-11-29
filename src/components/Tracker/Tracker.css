@@ -1337,3 +1337,119 @@ button.action-btn:hover {
     padding-right: 8px !important;
   }
 }
+
+/* ============================================================
+   MOBILE MODAL FIX - Ensures modals appear above mobile navigation
+   and provides smooth, contained scrolling
+   ============================================================ */
+
+/* CRITICAL: Tracker modal overlay must be above mobile nav (z-index: 9999) */
+.tracker-container .modal-overlay,
+.modal-overlay:has(.benefits-modal),
+.modal-overlay:has(.date-picker-modal) {
+  z-index: 10000;
+  /* Prevent background scroll when modal is open */
+  overscroll-behavior: contain;
+}
+
+/* Enhanced modal content for mobile */
+.tracker-container .modal-content,
+.benefits-modal,
+.date-picker-modal {
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  /* Prevent scroll chaining to background */
+  overscroll-behavior: contain;
+}
+
+/* Mobile-specific modal enhancements */
+@media (max-width: 1024px) {
+  /* Ensure modal overlay covers everything including nav */
+  .tracker-container .modal-overlay,
+  .modal-overlay:has(.benefits-modal),
+  .modal-overlay:has(.date-picker-modal) {
+    z-index: 10000;
+    padding: var(--spacing-md);
+    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 0px));
+  }
+  
+  /* Modal content adjustments for mobile */
+  .tracker-container .modal-content,
+  .benefits-modal {
+    max-height: 85vh;
+    max-height: 85dvh; /* Dynamic viewport height for mobile browsers */
+    margin: auto;
+    /* Ensure modal doesn't get cut off */
+    margin-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  
+  /* Benefits modal specific mobile adjustments */
+  .benefits-modal {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Scrollable content area */
+  .benefits-modal-sliders {
+    flex: 1;
+    min-height: 0; /* Allow flex shrinking */
+    max-height: 50vh;
+    max-height: 50dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Subtle custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 221, 0, 0.3) transparent;
+  }
+  
+  /* Webkit scrollbar styling */
+  .benefits-modal-sliders::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .benefits-modal-sliders::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .benefits-modal-sliders::-webkit-scrollbar-thumb {
+    background: rgba(255, 221, 0, 0.3);
+    border-radius: 3px;
+  }
+  
+  .benefits-modal-sliders::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 221, 0, 0.5);
+  }
+  
+  /* Modal actions - sticky at bottom with proper spacing */
+  .benefits-modal-actions {
+    flex-shrink: 0;
+    padding-top: var(--spacing-md);
+    margin-top: auto;
+    /* Subtle top border to separate from scrollable content */
+    border-top: 1px solid var(--border);
+    background-color: var(--card-background);
+    /* Extra bottom padding for safe area */
+    padding-bottom: var(--spacing-sm);
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .tracker-container .modal-overlay,
+  .modal-overlay:has(.benefits-modal) {
+    padding: var(--spacing-sm);
+    padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom, 0px));
+  }
+  
+  .benefits-modal {
+    max-height: 90vh;
+    max-height: 90dvh;
+    padding: var(--spacing-md);
+  }
+  
+  .benefits-modal-sliders {
+    max-height: 45vh;
+    max-height: 45dvh;
+  }
+}
