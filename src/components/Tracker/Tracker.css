@@ -1414,6 +1414,9 @@ button.action-btn:hover {
     width: 100%;
     /* Flexbox won't work without this */
     flex-shrink: 0;
+    /* Enable scrolling on the entire modal */
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   
   /* Benefits modal specific mobile adjustments */
@@ -1423,47 +1426,55 @@ button.action-btn:hover {
     max-width: 600px;
   }
   
-  /* Scrollable content area */
+  /* Banner should scroll with content on mobile */
+  .benefits-tracking-banner {
+    flex-shrink: 0;
+  }
+  
+  /* Scrollable content area - remove max-height so it flows naturally */
   .benefits-modal-sliders {
-    flex: 1;
-    min-height: 0; /* Allow flex shrinking */
-    max-height: 50vh;
-    max-height: 50dvh;
-    overflow-y: auto;
+    flex: 0 0 auto; /* Don't flex, just take natural height */
+    max-height: none; /* Remove max-height constraint */
+    overflow-y: visible; /* Let parent handle scrolling */
     overscroll-behavior: contain;
     /* Subtle custom scrollbar */
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 221, 0, 0.3) transparent;
   }
   
-  /* Webkit scrollbar styling */
-  .benefits-modal-sliders::-webkit-scrollbar {
+  /* Webkit scrollbar styling for the modal itself */
+  .benefits-modal::-webkit-scrollbar {
     width: 6px;
   }
   
-  .benefits-modal-sliders::-webkit-scrollbar-track {
+  .benefits-modal::-webkit-scrollbar-track {
     background: transparent;
   }
   
-  .benefits-modal-sliders::-webkit-scrollbar-thumb {
+  .benefits-modal::-webkit-scrollbar-thumb {
     background: rgba(255, 221, 0, 0.3);
     border-radius: 3px;
   }
   
-  .benefits-modal-sliders::-webkit-scrollbar-thumb:hover {
+  .benefits-modal::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 221, 0, 0.5);
   }
   
-  /* Modal actions - sticky at bottom with proper spacing */
+  /* Modal actions - sticky at bottom */
   .benefits-modal-actions {
     flex-shrink: 0;
     padding-top: var(--spacing-md);
-    margin-top: auto;
+    margin-top: var(--spacing-md);
+    /* Sticky positioning to keep buttons visible */
+    position: sticky;
+    bottom: 0;
     /* Subtle top border to separate from scrollable content */
     border-top: 1px solid var(--border);
     background-color: var(--card-background);
     /* Extra bottom padding for safe area */
     padding-bottom: var(--spacing-sm);
+    /* Ensure it's above content */
+    z-index: 2;
   }
 }
 
@@ -1485,11 +1496,6 @@ button.action-btn:hover {
     /* Ensure it stays centered */
     margin: 0;
   }
-  
-  .benefits-modal-sliders {
-    max-height: 45vh;
-    max-height: 45dvh;
-  }
 }
 
 /* Landscape orientation handling */
@@ -1505,10 +1511,5 @@ button.action-btn:hover {
     max-height: 95vh;
     max-height: 95dvh;
     margin: auto 0;
-  }
-  
-  .benefits-modal-sliders {
-    max-height: 35vh;
-    max-height: 35dvh;
   }
 }
