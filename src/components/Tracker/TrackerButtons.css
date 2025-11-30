@@ -1,32 +1,18 @@
-/* components/Tracker/TrackerButtons.css - Unified Liquid Glass Button Family */
+/* components/Tracker/TrackerButtons.css - Liquid Glass Button System */
 /* 
    All buttons share the same Liquid Glass DNA:
    - backdrop-filter blur + saturation
    - subtle inner highlight (::before)
    - spring animation timing
    - hover lift behavior
-   
-   Differentiated by color tint:
-   - Gold (primary actions)
-   - Grey (neutral/destructive)
-   - Amber (warning/caution)
-   - Purple (Discord)
-   - Red (YouTube)
 */
 
 /* ============================================================
-   LIQUID GLASS BASE - Shared DNA for all buttons
+   LIQUID GLASS BUTTONS - Base + Color Variants
    ============================================================ */
 
-/* Core glass properties - applied to all button types */
-.liquid-btn,
-.liquid-btn-gold,
-.liquid-btn-grey,
-.liquid-btn-amber,
-.liquid-btn-discord,
-.liquid-btn-youtube,
-.liquid-btn-ghost {
-  /* Uniform sizing */
+/* Gold tint - Primary/default */
+.liquid-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,29 +27,23 @@
   min-height: 44px;
   width: 100%;
   text-decoration: none;
+  overflow: hidden;
   
-  /* Liquid Glass foundation */
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 221, 0, 0.08);
+  color: rgba(255, 221, 0, 0.5);
   
-  /* Soft ambient shadow */
   box-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.1),
     0 4px 12px rgba(0, 0, 0, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
   
-  /* Spring animation */
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Glass highlight - shared by all */
-.liquid-btn::before,
-.liquid-btn-gold::before,
-.liquid-btn-grey::before,
-.liquid-btn-amber::before,
-.liquid-btn-discord::before,
-.liquid-btn-youtube::before,
-.liquid-btn-ghost::before {
+.liquid-btn::before {
   content: '';
   position: absolute;
   top: 0;
@@ -77,19 +57,7 @@
   transition: opacity 0.4s ease;
 }
 
-/* ============================================================
-   GOLD TINT - Primary/default (Edit Start Date, Save, Urges)
-   ============================================================ */
-
-.liquid-btn,
-.liquid-btn-gold {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 221, 0, 0.08);
-  color: rgba(255, 221, 0, 0.5);
-}
-
-.liquid-btn:hover,
-.liquid-btn-gold:hover {
+.liquid-btn:hover {
   background: rgba(255, 221, 0, 0.04);
   border-color: rgba(255, 221, 0, 0.15);
   color: rgba(255, 221, 0, 0.8);
@@ -101,302 +69,19 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-.liquid-btn:hover::before,
-.liquid-btn-gold:hover::before {
+.liquid-btn:hover::before {
   opacity: 0.8;
 }
 
-.liquid-btn:active,
-.liquid-btn-gold:active {
+.liquid-btn:active {
   transform: translateY(0) scale(0.98);
   background: rgba(255, 221, 0, 0.06);
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.15),
-    inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.liquid-btn:focus-visible,
-.liquid-btn-gold:focus-visible {
-  outline: 2px solid rgba(255, 221, 0, 0.3);
-  outline-offset: 2px;
 }
 
 /* ============================================================
-   GOLD PROMINENT - Slightly more visible for primary CTA
-   (Log Benefits - the main action)
+   STREAK ACTION BUTTONS - Liquid Glass with color tints
    ============================================================ */
 
-.liquid-btn-gold-primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  outline: none !important;
-  position: relative;
-  min-height: 44px;
-  width: 100%;
-  
-  /* Slightly more visible gold */
-  background: rgba(255, 221, 0, 0.06);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 221, 0, 0.12);
-  color: rgba(255, 221, 0, 0.7);
-  
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.1),
-    0 4px 12px rgba(0, 0, 0, 0.05),
-    0 0 20px rgba(255, 221, 0, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.liquid-btn-gold-primary::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 221, 0, 0.08) 0%, transparent 100%);
-  border-radius: var(--radius-full) var(--radius-full) 0 0;
-  pointer-events: none;
-  opacity: 0.6;
-  transition: opacity 0.4s ease;
-}
-
-.liquid-btn-gold-primary:hover {
-  background: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: rgba(255, 221, 0, 0.9);
-  transform: translateY(-1px);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 0 50px rgba(255, 221, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.liquid-btn-gold-primary:hover::before {
-  opacity: 0.9;
-}
-
-.liquid-btn-gold-primary:active {
-  transform: translateY(0) scale(0.98);
-  background: rgba(255, 221, 0, 0.12);
-}
-
-/* ============================================================
-   GREY TINT - Neutral/Destructive (Log Relapse)
-   ============================================================ */
-
-.liquid-btn-grey {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(150, 150, 150, 0.1);
-  color: rgba(170, 170, 170, 0.6);
-}
-
-.liquid-btn-grey:hover {
-  background: rgba(150, 150, 150, 0.06);
-  border-color: rgba(150, 150, 150, 0.18);
-  color: rgba(200, 200, 200, 0.85);
-  transform: translateY(-1px);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 0 30px rgba(150, 150, 150, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.liquid-btn-grey:hover::before {
-  opacity: 0.8;
-}
-
-.liquid-btn-grey:active {
-  transform: translateY(0) scale(0.98);
-  background: rgba(150, 150, 150, 0.08);
-}
-
-/* ============================================================
-   AMBER TINT - Warning/Caution (Log Wet Dream)
-   ============================================================ */
-
-.liquid-btn-amber {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(245, 158, 11, 0.1);
-  color: rgba(245, 158, 11, 0.55);
-}
-
-.liquid-btn-amber:hover {
-  background: rgba(245, 158, 11, 0.05);
-  border-color: rgba(245, 158, 11, 0.18);
-  color: rgba(245, 158, 11, 0.85);
-  transform: translateY(-1px);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 0 30px rgba(245, 158, 11, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.liquid-btn-amber:hover::before {
-  opacity: 0.8;
-}
-
-.liquid-btn-amber:active {
-  transform: translateY(0) scale(0.98);
-  background: rgba(245, 158, 11, 0.08);
-}
-
-/* ============================================================
-   DISCORD TINT - Purple brand color
-   ============================================================ */
-
-.liquid-btn-discord {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(114, 137, 218, 0.12);
-  color: rgba(114, 137, 218, 0.6);
-}
-
-.liquid-btn-discord:hover {
-  background: rgba(114, 137, 218, 0.06);
-  border-color: rgba(114, 137, 218, 0.2);
-  color: rgba(114, 137, 218, 0.9);
-  transform: translateY(-1px);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 0 30px rgba(114, 137, 218, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.liquid-btn-discord:hover::before {
-  opacity: 0.8;
-}
-
-.liquid-btn-discord:active {
-  transform: translateY(0) scale(0.98);
-  background: rgba(114, 137, 218, 0.1);
-}
-
-/* ============================================================
-   YOUTUBE TINT - Red brand color
-   ============================================================ */
-
-.liquid-btn-youtube {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 0, 0, 0.1);
-  color: rgba(255, 80, 80, 0.6);
-}
-
-.liquid-btn-youtube:hover {
-  background: rgba(255, 0, 0, 0.05);
-  border-color: rgba(255, 0, 0, 0.18);
-  color: rgba(255, 80, 80, 0.9);
-  transform: translateY(-1px);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 0 30px rgba(255, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.liquid-btn-youtube:hover::before {
-  opacity: 0.8;
-}
-
-.liquid-btn-youtube:active {
-  transform: translateY(0) scale(0.98);
-  background: rgba(255, 0, 0, 0.08);
-}
-
-/* ============================================================
-   GHOST TINT - Cancel/Dismiss (barely visible)
-   ============================================================ */
-
-.liquid-btn-ghost {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: rgba(170, 170, 170, 0.5);
-}
-
-.liquid-btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.02);
-  border-color: rgba(255, 221, 0, 0.08);
-  color: rgba(255, 221, 0, 0.5);
-  transform: translateY(-1px);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.08),
-    0 4px 12px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.liquid-btn-ghost:hover::before {
-  opacity: 0.6;
-}
-
-.liquid-btn-ghost:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* ============================================================
-   EXTERNAL ICON - Subtle indicator for outbound links
-   ============================================================ */
-
-.external-icon {
-  font-size: 0.65rem;
-  opacity: 0.5;
-  margin-left: 2px;
-}
-
-/* ============================================================
-   LEGACY CLASS ALIASES - Map old classes to new system
-   ============================================================ */
-
-/* These ensure backward compatibility while using new styles */
-.action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  outline: none !important;
-  position: relative;
-  min-height: 44px;
-  width: 100%;
-  
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 221, 0, 0.08);
-  color: rgba(255, 221, 0, 0.5);
-  
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.1),
-    0 4px 12px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.action-btn:hover {
-  background: rgba(255, 221, 0, 0.04);
-  border-color: rgba(255, 221, 0, 0.15);
-  color: rgba(255, 221, 0, 0.8);
-  transform: translateY(-1px);
-}
-
-/* Streak action buttons - redirect to liquid glass */
 .streak-action-btn {
   display: flex;
   align-items: center;
@@ -411,6 +96,7 @@
   position: relative;
   min-height: 44px;
   width: 100%;
+  overflow: hidden;
   
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -437,7 +123,7 @@
   transition: opacity 0.4s ease;
 }
 
-/* Benefits primary - gold prominent */
+/* Gold prominent - Log Benefits (primary CTA) */
 .benefits-btn-primary {
   background: rgba(255, 221, 0, 0.06);
   border: 1px solid rgba(255, 221, 0, 0.12);
@@ -467,10 +153,9 @@
 
 .benefits-btn-primary:active {
   transform: translateY(0) scale(0.98);
-  background: rgba(255, 221, 0, 0.12);
 }
 
-/* Relapse - grey tint */
+/* Grey tint - Log Relapse */
 .relapse-btn-grey {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(150, 150, 150, 0.1);
@@ -495,10 +180,9 @@
 
 .relapse-btn-grey:active {
   transform: translateY(0) scale(0.98);
-  background: rgba(150, 150, 150, 0.08);
 }
 
-/* Wet dream - amber tint */
+/* Amber tint - Wet Dream */
 .wetdream-btn {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(245, 158, 11, 0.1);
@@ -523,10 +207,9 @@
 
 .wetdream-btn:active {
   transform: translateY(0) scale(0.98);
-  background: rgba(245, 158, 11, 0.08);
 }
 
-/* Urge - gold tint */
+/* Gold tint - Fighting Urges */
 .urge-btn {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 221, 0, 0.08);
@@ -551,10 +234,12 @@
 
 .urge-btn:active {
   transform: translateY(0) scale(0.98);
-  background: rgba(255, 221, 0, 0.06);
 }
 
-/* Discord - purple tint */
+/* ============================================================
+   BRAND BUTTONS - Discord & YouTube with glass treatment
+   ============================================================ */
+
 .discord-join-btn {
   display: flex;
   align-items: center;
@@ -570,6 +255,7 @@
   min-height: 44px;
   width: 100%;
   text-decoration: none;
+  overflow: hidden;
   
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px) saturate(180%);
@@ -617,10 +303,8 @@
 
 .discord-join-btn:active {
   transform: translateY(0) scale(0.98);
-  background: rgba(114, 137, 218, 0.1);
 }
 
-/* YouTube - red tint */
 .youtube-subscribe-btn {
   display: flex;
   align-items: center;
@@ -636,6 +320,7 @@
   min-height: 44px;
   width: 100%;
   text-decoration: none;
+  overflow: hidden;
   
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px) saturate(180%);
@@ -683,7 +368,12 @@
 
 .youtube-subscribe-btn:active {
   transform: translateY(0) scale(0.98);
-  background: rgba(255, 0, 0, 0.08);
+}
+
+.external-icon {
+  font-size: 0.65rem;
+  opacity: 0.5;
+  margin-left: 2px;
 }
 
 /* ============================================================
@@ -704,8 +394,8 @@
   position: relative;
   min-height: 44px;
   flex: 1;
+  overflow: hidden;
   
-  /* Gold liquid glass */
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -770,7 +460,6 @@
   flex: 1;
   overflow: hidden;
   
-  /* Ghost liquid glass - barely there but still glass */
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -804,10 +493,6 @@
   border-color: rgba(150, 150, 150, 0.12);
   color: rgba(200, 200, 200, 0.7);
   transform: translateY(-1px);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 20px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .cancel-benefits-btn:hover::before {
@@ -816,14 +501,99 @@
 
 .cancel-benefits-btn:active {
   transform: translateY(0) scale(0.98);
-  background: rgba(150, 150, 150, 0.06);
 }
 
 /* ============================================================
-   LIQUID GLASS PILLS - Status indicators with glass effect
+   DATE PICKER BUTTONS - Override with Liquid Glass
    ============================================================ */
 
-/* Base glass pill - shared DNA */
+.date-picker-container .primary-action {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  border-radius: var(--radius-full) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  position: relative !important;
+  min-height: 44px !important;
+  flex: 1 !important;
+  overflow: hidden !important;
+  
+  background: rgba(255, 221, 0, 0.06) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 221, 0, 0.12) !important;
+  color: rgba(255, 221, 0, 0.7) !important;
+  
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    0 0 20px rgba(255, 221, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.date-picker-container .primary-action:hover {
+  background: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: rgba(255, 221, 0, 0.9) !important;
+  transform: translateY(-1px) !important;
+}
+
+.date-picker-container .primary-action:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+.date-picker-container .cancel-action {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  border-radius: var(--radius-full) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  position: relative !important;
+  min-height: 44px !important;
+  flex: 1 !important;
+  overflow: hidden !important;
+  
+  background: rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(150, 150, 150, 0.08) !important;
+  color: rgba(170, 170, 170, 0.5) !important;
+  
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+  
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.date-picker-container .cancel-action:hover {
+  background: rgba(150, 150, 150, 0.04) !important;
+  border-color: rgba(150, 150, 150, 0.12) !important;
+  color: rgba(200, 200, 200, 0.7) !important;
+  transform: translateY(-1px) !important;
+}
+
+.date-picker-container .cancel-action:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+/* ============================================================
+   GLASS PILLS - Status indicators with glass effect
+   ============================================================ */
+
 .glass-pill {
   display: inline-flex;
   align-items: center;
@@ -835,17 +605,13 @@
   position: relative;
   overflow: hidden;
   
-  /* Liquid Glass foundation */
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   
-  /* Soft ambient shadow */
   box-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.08),
     0 4px 12px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  
-  transition: all 0.3s ease;
 }
 
 .glass-pill::before {
@@ -861,7 +627,7 @@
   opacity: 0.5;
 }
 
-/* Success/Green glass pill - Benefits logged */
+/* Success/Green - Benefits logged */
 .glass-pill-success {
   background: rgba(34, 197, 94, 0.06);
   border: 1px solid rgba(34, 197, 94, 0.12);
@@ -876,7 +642,7 @@
   color: rgba(34, 197, 94, 0.9);
 }
 
-/* Info/Muted glass pill - Log your benefits prompt */
+/* Info/Muted gold - Prompt pills */
 .glass-pill-info {
   background: rgba(255, 221, 0, 0.04);
   border: 1px solid rgba(255, 221, 0, 0.08);
@@ -891,7 +657,7 @@
   color: rgba(255, 221, 0, 0.7);
 }
 
-/* Neutral glass pill - Milestone indicators */
+/* Neutral - Milestone indicators */
 .glass-pill-neutral {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -902,7 +668,7 @@
   color: rgba(255, 221, 0, 0.6);
 }
 
-/* Discord/Purple glass pill - Leaderboard status */
+/* Discord purple */
 .glass-pill-discord {
   background: rgba(114, 137, 218, 0.06);
   border: 1px solid rgba(114, 137, 218, 0.12);
@@ -917,11 +683,12 @@
   color: rgba(114, 137, 218, 0.9);
 }
 
-/* Warning glass pill - Setup notes */
+/* Warning gold */
 .glass-pill-warning {
   background: rgba(255, 221, 0, 0.04);
   border: 1px solid rgba(255, 221, 0, 0.08);
   color: rgba(255, 221, 0, 0.7);
+  line-height: 1.4;
 }
 
 .glass-pill-warning::before {
@@ -957,7 +724,6 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: none;
   }
   
   .streak-actions {
@@ -967,12 +733,6 @@
     width: 100% !important;
     margin: 0 auto;
     padding: 0;
-  }
-  
-  .discord-community-section:hover,
-  .youtube-channel-section:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -1007,8 +767,7 @@
     justify-content: center;
   }
   
-  .tracker-header-actions .liquid-btn,
-  .integrated-tracker-header .liquid-btn {
+  .tracker-header-actions .liquid-btn {
     width: 100%;
     max-width: 280px;
   }
@@ -1019,7 +778,6 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: none;
   }
   
   .streak-actions {
@@ -1031,22 +789,17 @@
     padding: 0 var(--spacing-sm);
   }
   
-  /* Mobile active states - all buttons */
+  /* Mobile active states */
   .liquid-btn:active,
-  .liquid-btn-gold:active,
-  .liquid-btn-gold-primary:active,
   .benefits-btn-primary:active {
     transform: scale(0.98);
-    background: rgba(255, 221, 0, 0.08);
   }
   
-  .liquid-btn-grey:active,
   .relapse-btn-grey:active {
     transform: scale(0.98);
     background: rgba(150, 150, 150, 0.1);
   }
   
-  .liquid-btn-amber:active,
   .wetdream-btn:active {
     transform: scale(0.98);
     background: rgba(245, 158, 11, 0.1);
@@ -1054,26 +807,15 @@
   
   .urge-btn:active {
     transform: scale(0.98);
-    background: rgba(255, 221, 0, 0.08);
   }
   
-  .liquid-btn-discord:active,
   .discord-join-btn:active {
     transform: scale(0.98);
     background: rgba(114, 137, 218, 0.12);
   }
   
-  .liquid-btn-youtube:active,
   .youtube-subscribe-btn:active {
     transform: scale(0.98);
     background: rgba(255, 0, 0, 0.1);
-  }
-}
-
-@media (max-width: 480px) {
-  .discord-community-stats, .youtube-channel-stats {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    align-items: center;
   }
 }

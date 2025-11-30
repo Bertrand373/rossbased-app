@@ -1,24 +1,125 @@
-/* components/Shared/DatePicker.css - UPDATED: Liquid Glass Button Styling */
+/* components/Shared/DatePicker.css - UPDATED: Helmet banner branding, grey→yellow hover effects, fixed mobile inputs */
 
 .date-picker-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  width: 100%;
-  max-width: 350px;
-  margin: 0 auto;
+  padding: 0; /* REMOVED: No padding around container */
+  background-color: transparent; /* REMOVED: No background */
+  border: none; /* REMOVED: No border */
+  border-radius: 0; /* REMOVED: No border radius */
 }
 
-/* NEW: Helmet info banner - EXACT COPY from Emotional Timeline */
-.date-picker-info-banner {
+.current-date-display {
+  background-color: var(--medium-gray);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.current-date-label {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+}
+
+.current-date-value {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.date-picker-form {
   display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg);
-  background-color: rgba(255, 221, 0, 0.05);
+  flex-direction: column;
+  gap: var(--spacing-md); /* REDUCED: Less gap between sections */
+}
+
+/* IMPROVED: Better spacing and layout for date inputs */
+.date-inputs-row {
+  display: flex;
+  gap: var(--spacing-md); /* INCREASED: More reasonable spacing */
+  align-items: center; /* CHANGED: Center align for proper separator positioning */
+  justify-content: center;
+  padding: var(--spacing-sm) 0; /* FIXED: Match bottom spacing */
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: center; /* ADDED: Center the inputs */
+}
+
+.input-group label {
+  font-size: 0.875rem; /* INCREASED: Larger labels */
+  color: var(--text);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* IMPROVED: Better input styling matching other form elements */
+.date-inputs-row input {
+  padding: var(--spacing-md); /* INCREASED: More padding like other inputs */
+  background-color: var(--medium-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 1rem; /* INCREASED: Larger font size */
+  text-align: center;
+  font-weight: 600;
+  transition: border-color 0.2s, background-color 0.2s;
+  min-height: 44px; /* ADDED: Minimum height for better touch targets */
+}
+
+.date-inputs-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.date-inputs-row input::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* FIXED: Better input widths for mobile - significantly increased */
+.month-input { 
+  width: 72px; /* INCREASED: From 64px to 72px for mobile numbers */
+}
+
+.day-input { 
+  width: 72px; /* INCREASED: From 64px to 72px for mobile numbers */
+}
+
+.year-input { 
+  width: 88px; /* INCREASED: From 80px to 88px for mobile numbers */
+}
+
+.date-separator {
+  font-size: 1.5rem; /* INCREASED: Bigger separator */
+  color: var(--text-secondary);
+  margin: 0 var(--spacing-xs); /* INCREASED: More margin */
+  font-weight: 600;
+  line-height: 1; /* ADDED: Ensure proper line height for centering */
+}
+
+/* NEW: Helmet Info Banner - EXACT COPY from Emotional Timeline */
+.date-picker-info-banner {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
   border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-lg);
-  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
 }
 
 .date-picker-helmet-container {
@@ -28,27 +129,14 @@
 .date-picker-helmet {
   width: 40px;
   height: 40px;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  animation: coming-soon-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
 }
 
 .date-picker-helmet-fallback {
   font-size: 1.5rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-}
-
-/* Coming Soon badge animation */
-.coming-soon-badge {
-  font-size: 0.6rem;
-  background: rgba(255, 221, 0, 0.2);
   color: var(--primary);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   animation: coming-soon-pulse 2s ease-in-out infinite;
-  white-space: nowrap;
 }
 
 @keyframes coming-soon-pulse {
@@ -86,221 +174,74 @@
   margin: 0;
 }
 
-/* Date inputs */
-.date-inputs-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-sm) 0;
-}
+/* REMOVED: Old helper-text styles - replaced with helmet banner */
 
-.date-input-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xs);
-}
-
-.date-input-group label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.date-input-group input {
-  width: 80px;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background-color: var(--input-background, rgba(255, 255, 255, 0.05));
-  color: var(--text);
-  font-size: 1.125rem;
-  font-weight: 600;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.date-input-group input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(255, 221, 0, 0.1);
-}
-
-.date-input-group input::placeholder {
-  color: var(--text-secondary);
-  opacity: 0.5;
-}
-
-.month-input,
-.day-input {
-  width: 72px;
-}
-
-.year-input {
-  width: 88px;
-}
-
-.date-separator {
-  font-size: 1.5rem;
-  font-weight: 300;
-  color: var(--text-secondary);
-  opacity: 0.5;
-  margin-top: var(--spacing-lg);
-}
-
-/* ============================================================
-   LIQUID GLASS BUTTONS - DatePicker Actions
-   ============================================================ */
-
+/* IMPROVED: Button styling with grey→yellow hover effects */
 .date-picker-actions {
   display: flex;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-sm);
+  margin-top: var(--spacing-sm); /* REDUCED: Less margin above buttons */
 }
 
-/* Primary action - Gold Liquid Glass */
+/* UPDATED: Primary action button - grey → yellow hover */
 .date-picker-container .primary-action {
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
   gap: var(--spacing-sm) !important;
   padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
   border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
   font-size: 0.875rem !important;
   font-weight: 500 !important;
   cursor: pointer !important;
-  outline: none !important;
-  position: relative !important;
-  min-height: 44px !important;
+  transition: all 0.2s ease !important;
   flex: 1 !important;
-  overflow: hidden !important;
-  
-  /* Liquid Glass - Gold prominent */
-  background: rgba(255, 221, 0, 0.06) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border: 1px solid rgba(255, 221, 0, 0.12) !important;
-  color: rgba(255, 221, 0, 0.7) !important;
-  
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.1),
-    0 4px 12px rgba(0, 0, 0, 0.05),
-    0 0 20px rgba(255, 221, 0, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
-  
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-}
-
-.date-picker-container .primary-action::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 221, 0, 0.08) 0%, transparent 100%);
-  border-radius: var(--radius-full) var(--radius-full) 0 0;
-  pointer-events: none;
-  opacity: 0.6;
-  transition: opacity 0.4s ease;
+  justify-content: center !important;
+  min-height: auto !important;
 }
 
 .date-picker-container .primary-action:hover {
-  background: rgba(255, 221, 0, 0.1) !important;
+  background-color: rgba(255, 221, 0, 0.1) !important;
   border-color: rgba(255, 221, 0, 0.2) !important;
-  color: rgba(255, 221, 0, 0.9) !important;
+  color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 0 50px rgba(255, 221, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }
 
-.date-picker-container .primary-action:hover::before {
-  opacity: 0.9;
-}
-
-.date-picker-container .primary-action:active {
-  transform: translateY(0) scale(0.98) !important;
-  background: rgba(255, 221, 0, 0.12) !important;
-}
-
-/* Cancel action - Ghost Liquid Glass */
+/* UPDATED: Cancel button - grey → yellow hover */
 .date-picker-container .cancel-action {
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
   gap: var(--spacing-sm) !important;
   padding: var(--spacing-sm) var(--spacing-md) !important;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border: 1px solid var(--border) !important;
   border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
   font-size: 0.875rem !important;
   font-weight: 500 !important;
   cursor: pointer !important;
-  outline: none !important;
-  position: relative !important;
-  min-height: 44px !important;
+  transition: all 0.2s ease !important;
   flex: 1 !important;
-  overflow: hidden !important;
-  
-  /* Ghost liquid glass */
-  background: rgba(255, 255, 255, 0.02) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border: 1px solid rgba(150, 150, 150, 0.08) !important;
-  color: rgba(170, 170, 170, 0.5) !important;
-  
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.08),
-    0 4px 12px rgba(0, 0, 0, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
-  
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-}
-
-.date-picker-container .cancel-action::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%);
-  border-radius: var(--radius-full) var(--radius-full) 0 0;
-  pointer-events: none;
-  opacity: 0.4;
-  transition: opacity 0.4s ease;
+  justify-content: center !important;
+  min-height: auto !important;
 }
 
 .date-picker-container .cancel-action:hover {
-  background: rgba(150, 150, 150, 0.04) !important;
-  border-color: rgba(150, 150, 150, 0.12) !important;
-  color: rgba(200, 200, 200, 0.7) !important;
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 20px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
-.date-picker-container .cancel-action:hover::before {
-  opacity: 0.6;
-}
-
-.date-picker-container .cancel-action:active {
-  transform: translateY(0) scale(0.98) !important;
-  background: rgba(150, 150, 150, 0.06) !important;
-}
-
-/* Mobile responsiveness */
+/* IMPROVED: Mobile responsiveness with better spacing */
 @media (max-width: 768px) {
   .date-picker-container {
-    gap: var(--spacing-md);
+    gap: var(--spacing-md); /* REDUCED: Less gap on mobile */
   }
   
+  /* NEW: Mobile helmet banner styles - EXACT COPY from Emotional Timeline */
   .date-picker-info-banner {
     flex-direction: column;
     text-align: center;
@@ -327,37 +268,99 @@
   }
   
   .date-inputs-row {
-    gap: var(--spacing-sm);
-    padding: var(--spacing-xs) 0;
+    gap: var(--spacing-sm); /* REDUCED: Tighter spacing on mobile */
+    padding: var(--spacing-xs) 0; /* RESTORED: Back to original mobile padding */
   }
   
+  /* FIXED: Better mobile input sizes - even larger for readability */
   .month-input,
   .day-input {
-    width: 68px;
+    width: 68px; /* INCREASED: From 56px to 68px for better mobile display */
   }
   
   .year-input {
-    width: 84px;
+    width: 84px; /* INCREASED: From 72px to 84px for better mobile display */
+  }
+  
+  .date-inputs-row input {
+    padding: var(--spacing-sm) var(--spacing-md); /* INCREASED: Better mobile padding */
+    font-size: 1rem; /* MAINTAINED: Good size for mobile */
+    min-height: 48px; /* INCREASED: Better touch target on mobile */
+  }
+  
+  .input-group label {
+    font-size: 0.8125rem;
   }
   
   .date-separator {
     font-size: 1.25rem;
-    margin-top: var(--spacing-md);
+    margin: 0 var(--spacing-xs);
+    line-height: 1; /* MAINTAINED: Consistent line height */
+  }
+  
+  .current-date-display {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.8125rem;
+  }
+  
+  .current-date-label {
+    font-size: 0.75rem;
+  }
+  
+  .current-date-value {
+    font-size: 0.9375rem;
   }
   
   .date-picker-actions {
-    flex-direction: row;
     gap: var(--spacing-sm);
   }
   
-  /* Mobile active states */
-  .date-picker-container .primary-action:active {
-    transform: scale(0.98) !important;
-    background: rgba(255, 221, 0, 0.1) !important;
+  /* UPDATED: Mobile buttons with grey→yellow hover */
+  .date-picker-container .primary-action,
+  .date-picker-container .cancel-action {
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    min-height: auto !important;
+  }
+}
+
+/* Very small screens - more compact */
+@media (max-width: 480px) {
+  /* NEW: Very small mobile helmet banner styles - EXACT COPY from Emotional Timeline */
+  .date-picker-helmet {
+    width: 30px;
+    height: 30px;
   }
   
-  .date-picker-container .cancel-action:active {
-    transform: scale(0.98) !important;
-    background: rgba(150, 150, 150, 0.08) !important;
+  .date-picker-helmet-fallback {
+    font-size: 1rem;
+  }
+  
+  .date-picker-info-title {
+    font-size: 0.875rem;
+  }
+  
+  .date-picker-info-description {
+    font-size: 0.8rem;
+  }
+  
+  .date-inputs-row {
+    gap: var(--spacing-xs);
+    justify-content: space-evenly; /* CHANGED: Better distribution */
+  }
+  
+  /* FIXED: Larger inputs for very small screens to prevent cutoff */
+  .month-input,
+  .day-input {
+    width: 64px; /* INCREASED: From 52px to 64px */
+  }
+  
+  .year-input {
+    width: 80px; /* INCREASED: From 68px to 80px */
+  }
+  
+  .date-separator {
+    font-size: 1.125rem;
+    margin: 0 2px;
   }
 }

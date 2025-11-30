@@ -5,15 +5,39 @@
   gap: var(--spacing-lg);
 }
 
-/* UPDATED: Integrated header design with subtitle and Calendar-matching sizing */
+/* UPDATED: Integrated header design with Liquid Glass */
 .integrated-tracker-header {
   display: flex;
   flex-direction: column;
-  background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
   padding: var(--spacing-lg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  
+  /* LIQUID GLASS: Core styling */
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  
+  /* Soft shadows */
+  box-shadow: 
+    0 4px 24px rgba(0, 0, 0, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Inner highlight for glass effect */
+.integrated-tracker-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  pointer-events: none;
 }
 
 .tracker-header-title-section {
@@ -141,15 +165,40 @@ button.action-btn:hover {
 }
 
 .streak-card {
-  background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
-  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  
+  /* LIQUID GLASS: Core styling */
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  
+  /* Soft shadows */
+  box-shadow: 
+    0 4px 24px rgba(0, 0, 0, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Inner highlight for glass effect */
+.streak-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .streak-date {

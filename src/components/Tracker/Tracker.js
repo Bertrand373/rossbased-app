@@ -503,17 +503,16 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               ))}
             </div>
             
-            {/* UPDATED: Using new button hierarchy */}
             <div className="benefits-modal-actions">
               <button 
-                className="save-benefits-btn"
+                className="action-btn save-benefits-btn modal-save-btn"
                 onClick={saveBenefitsFromModal}
               >
                 <FaCheckCircle />
                 <span>{benefitsLogged ? 'Update Benefits' : 'Save Benefits'}</span>
               </button>
               <button 
-                className="cancel-benefits-btn"
+                className="action-btn cancel-benefits-btn"
                 onClick={cancelBenefitsModal}
               >
                 <FaTimes />
@@ -613,7 +612,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
               )}
             </div>
             
-            {/* UPDATED: Using new button hierarchy with uniform sizing */}
             <div className="streak-actions">
               <button 
                 className="streak-action-btn benefits-btn-primary"
@@ -688,7 +686,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 </div>
               )}
               
-              {/* UPDATED: Using brand button with uniform sizing */}
               <button 
                 className="discord-join-btn"
                 onClick={handleDiscordJoin}
@@ -747,7 +744,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
             
             <div className="youtube-channel-actions">
-              {/* UPDATED: Using brand button with uniform sizing */}
               <button 
                 className="youtube-subscribe-btn"
                 onClick={handleYouTubeSubscribe}
