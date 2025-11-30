@@ -5,30 +5,47 @@
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
+  --spacing-2xl: 48px;
   --radius-md: 8px;
   --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 9999px;
   
   /* ============================================================
-     PURE BLACK PREMIUM PALETTE - Black Card Luxury
-     Timeless. Exclusive. Competes with the best.
+     REFINED PREMIUM PALETTE - Restrained Luxury
+     True black + rich gold + generous breathing room
      ============================================================ */
-  --primary: #ffdd00;
-  --primary-light: #ffe94d;
-  --primary-dark: #e6c800;
-  --background: #000000;          /* True black - body/app */
-  --card-background: #0a0a0a;     /* Near-black containers */
-  --medium-gray: #141414;         /* Elevated surfaces */
-  --light-gray: #1a1a1a;          /* Cards-within-cards */
-  --border: #262626;              /* Subtle borders */
-  --border-light: #333333;        /* Prominent borders */
+  
+  /* Rich gold - warmer, more luxurious than pure yellow */
+  --primary: #d4a843;
+  --primary-light: #e8c36a;
+  --primary-dark: #b8922e;
+  --primary-glow: rgba(212, 168, 67, 0.35);
+  
+  /* Pure blacks - no tints, timeless */
+  --background: #000000;
+  --surface: #0a0a0a;
+  --surface-raised: #111111;
+  --surface-overlay: #161616;
+  
+  /* Clean borders */
+  --border: #1f1f1f;
+  --border-subtle: #171717;
+  --border-prominent: #2a2a2a;
+  
+  /* Text hierarchy */
   --text: #ffffff;
-  --text-secondary: #888888;      /* Clean neutral muted */
-  --text-accent: #aaaaaa;         /* Brighter secondary */
+  --text-secondary: #737373;
+  --text-tertiary: #525252;
+  
+  /* Secondary accent - soft silver for less important elements */
+  --accent-silver: #a3a3a3;
+  --accent-silver-muted: #525252;
+  
+  /* Status colors */
   --success: #22c55e;
   --danger: #ef4444;
   --warning: #f59e0b;
-  --gray: #666666;                /* General gray */
 }
 
 body {
@@ -47,105 +64,83 @@ code {
     monospace;
 }
 
-/* FIXED: React Hot Toast Custom Styling - Maximum Force Override */
+/* ============================================================
+   TOAST STYLING - Clean, minimal
+   ============================================================ */
 
-/* Toast Container Positioning */
 div[data-hot-toast] {
   top: 20px !important;
   z-index: 9999 !important;
 }
 
-/* Base Toast Styling - PURE BLACK PREMIUM */
 div[data-hot-toast] > div,
 body div[data-hot-toast] > div,
 html body div[data-hot-toast] > div {
-  background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%) !important;
+  background: #0a0a0a !important;
   color: #ffffff !important;
-  border: 1px solid #262626 !important;
+  border: 1px solid #1f1f1f !important;
   border-radius: 12px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5) !important;
   padding: 16px 20px !important;
   font-weight: 500 !important;
   font-size: 14px !important;
   min-width: 300px !important;
   max-width: 400px !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  line-height: 1.4 !important;
+  line-height: 1.5 !important;
 }
 
-/* Success Toast - green left border and icon */
 div[data-hot-toast] > div[role="status"],
 body div[data-hot-toast] > div[role="status"],
 html body div[data-hot-toast] > div[role="status"] {
-  border-left: 4px solid #22c55e !important;
+  border-left: 3px solid #22c55e !important;
 }
 
-/* Error Toast - red left border and icon */
 div[data-hot-toast] > div[role="alert"],
 body div[data-hot-toast] > div[role="alert"],
 html body div[data-hot-toast] > div[role="alert"] {
-  border-left: 4px solid #ef4444 !important;
+  border-left: 3px solid #ef4444 !important;
 }
 
-/* Loading Toast - yellow left border */
 div[data-hot-toast] > div:not([role]),
 body div[data-hot-toast] > div:not([role]),
 html body div[data-hot-toast] > div:not([role]) {
-  border-left: 4px solid #ffdd00 !important;
+  border-left: 3px solid #d4a843 !important;
 }
 
-/* Toast Icon Styling - Maximum Override */
 div[data-hot-toast] svg,
 body div[data-hot-toast] svg,
-html body div[data-hot-toast] svg,
-div[data-hot-toast] > div svg,
-div[data-hot-toast] > div > svg {
+html body div[data-hot-toast] svg {
   color: #22c55e !important;
   margin-right: 12px !important;
-  font-size: 18px !important;
   width: 18px !important;
   height: 18px !important;
   flex-shrink: 0 !important;
 }
 
-/* Error icon color override */
-div[data-hot-toast] > div[role="alert"] svg,
-body div[data-hot-toast] > div[role="alert"] svg,
-html body div[data-hot-toast] > div[role="alert"] svg {
+div[data-hot-toast] > div[role="alert"] svg {
   color: #ef4444 !important;
 }
 
-/* Loading icon color override */
-div[data-hot-toast] > div:not([role]) svg,
-body div[data-hot-toast] > div:not([role]) svg,
-html body div[data-hot-toast] > div:not([role]) svg {
-  color: #ffdd00 !important;
+div[data-hot-toast] > div:not([role]) svg {
+  color: #d4a843 !important;
 }
 
-/* Toast Text Content - Maximum Override */
 div[data-hot-toast] > div > div,
-body div[data-hot-toast] > div > div,
-html body div[data-hot-toast] > div > div,
-div[data-hot-toast] > div span,
-div[data-hot-toast] > div > span,
-div[data-hot-toast] > div div:not(svg),
-div[data-hot-toast] > div > div:not(svg) {
+div[data-hot-toast] > div span {
   color: #ffffff !important;
   font-weight: 500 !important;
   font-size: 14px !important;
-  line-height: 1.4 !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  line-height: 1.5 !important;
 }
 
-/* Animation - Smooth slide in from top */
 div[data-hot-toast] > div {
-  animation: toast-slide-in 0.3s ease-out !important;
+  animation: toast-slide-in 0.25s ease-out !important;
 }
 
 @keyframes toast-slide-in {
   0% {
-    transform: translateY(-100px);
+    transform: translateY(-20px);
     opacity: 0;
   }
   100% {
@@ -154,7 +149,6 @@ div[data-hot-toast] > div {
   }
 }
 
-/* Mobile Responsiveness */
 @media (max-width: 768px) {
   div[data-hot-toast] {
     top: 16px !important;
@@ -162,58 +156,11 @@ div[data-hot-toast] > div {
     right: 16px !important;
   }
   
-  div[data-hot-toast] > div,
-  body div[data-hot-toast] > div,
-  html body div[data-hot-toast] > div {
+  div[data-hot-toast] > div {
     min-width: auto !important;
     max-width: none !important;
     width: calc(100vw - 32px) !important;
-    margin: 0 !important;
     font-size: 13px !important;
     padding: 14px 16px !important;
   }
-  
-  div[data-hot-toast] svg,
-  body div[data-hot-toast] svg {
-    font-size: 16px !important;
-    width: 16px !important;
-    height: 16px !important;
-    margin-right: 10px !important;
-  }
-}
-
-/* Additional Nuclear Overrides for Any Other Toast Libraries - PURE BLACK */
-.toast-container,
-.toast-container *,
-.notification-container,
-.notification-container *,
-.alert-container,
-.alert-container *,
-.react-hot-toast,
-.react-hot-toast *,
-[data-sonner-toaster],
-[data-sonner-toaster] *,
-.Toastify__toast-container,
-.Toastify__toast-container * {
-  background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%) !important;
-  color: #ffffff !important;
-  border: 1px solid #262626 !important;
-  border-radius: 12px !important;
-}
-
-/* Override any stubborn inline styles - PURE BLACK */
-div[style*="background"],
-span[style*="background"] {
-  background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%) !important;
-}
-
-div[style*="color"],
-span[style*="color"] {
-  color: #ffffff !important;
-}
-
-/* Special override for the toast wrapper div - PURE BLACK */
-div[data-hot-toast] > div[style] {
-  background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%) !important;
-  color: #ffffff !important;
 }

@@ -1,47 +1,43 @@
-/* App.css - Main application styles with YELLOW main navigation buttons + landing-sized initial loader */
+/* App.css - Refined Premium Edition */
 /* ============================================================
-   PURE BLACK PREMIUM PALETTE - Black Card Luxury Edition
-   Timeless. Exclusive. Competes with the best.
+   DESIGN PHILOSOPHY:
+   - Flat colors, not gradients (depth via shadows + borders)
+   - Generous whitespace (luxury breathes)
+   - Rich gold, not caution-tape yellow
+   - Restrained effects (less is more)
    ============================================================ */
 
-/* ============================================================
-   PREMIUM POLISH - Import premium font
-   ============================================================ */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Color scheme is now defined in index.css */
-  
-  /* Spacing */
+  /* Spacing - more generous */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
-  --spacing-xl: 32px;
+  --spacing-xl: 40px;
+  --spacing-2xl: 56px;
   
   /* Border radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
   
-  /* ============================================================
-     PREMIUM POLISH - Animation easings
-     ============================================================ */
+  /* Animation - subtle, refined */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   
-  /* PREMIUM POLISH - Glow effects - refined for pure black */
-  --glow-primary: 0 0 20px rgba(255, 221, 0, 0.3);
-  --glow-primary-intense: 0 0 40px rgba(255, 221, 0, 0.4);
-  --glow-primary-subtle: 0 0 12px rgba(255, 221, 0, 0.2);
+  /* Shadows - layered, natural */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
   
-  /* PREMIUM POLISH - Layered shadows - deeper for true black */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.15);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.15), 0 16px 32px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.25), 0 16px 32px rgba(0, 0, 0, 0.2), 0 32px 64px rgba(0, 0, 0, 0.15);
+  /* Gold glow - warm, luxurious */
+  --glow-gold: 0 0 24px rgba(212, 168, 67, 0.25);
+  --glow-gold-strong: 0 0 32px rgba(212, 168, 67, 0.4);
 }
 
 * {
@@ -51,28 +47,34 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   background-color: var(--background);
-  line-height: 1.5;
-  /* PREMIUM POLISH - Smooth text rendering */
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* PREMIUM POLISH - Smooth scrolling */
-  scroll-behavior: smooth;
 }
 
-/* PREMIUM POLISH - Better text rendering for headers */
+/* ============================================================
+   TYPOGRAPHY - Refined hierarchy
+   ============================================================ */
+
 h1, h2, h3, h4, h5, h6 {
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  font-weight: 600;
 }
 
-/* PREMIUM POLISH - Number rendering for stats/counters */
+/* Stats and numbers - tighter, more refined */
 .streak-number, .milestone-value, .stat-value {
   font-feature-settings: 'tnum' 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
+  font-weight: 700;
 }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
 
 .app-container {
   max-width: 1200px;
@@ -82,7 +84,10 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
 }
 
-/* ADDED: Landing page initial loader - matches landing container size */
+/* ============================================================
+   LOADING STATES - Minimal, elegant
+   ============================================================ */
+
 .landing-initial-loader {
   display: flex;
   flex-direction: column;
@@ -90,26 +95,26 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   min-height: 100vh;
   background-color: var(--background);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
 }
 
 .landing-initial-helmet {
-  width: 100px;
-  height: 100px;
-  animation: initial-helmet-pulse 0.8s ease-in-out;
-  filter: drop-shadow(0 0 24px rgba(255, 221, 0, 0.9));
+  width: 80px;
+  height: 80px;
+  animation: helmet-fade 1s ease-out;
+  filter: drop-shadow(0 0 20px rgba(212, 168, 67, 0.5));
 }
 
 .landing-initial-helmet-fallback {
-  font-size: 4rem;
+  font-size: 3.5rem;
   color: var(--primary);
-  animation: initial-helmet-pulse 0.8s ease-in-out;
+  animation: helmet-fade 1s ease-out;
 }
 
-@keyframes initial-helmet-pulse {
+@keyframes helmet-fade {
   0% {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.9);
   }
   50% {
     opacity: 1;
@@ -117,21 +122,16 @@ h1, h2, h3, h4, h5, h6 {
   }
   100% {
     opacity: 0;
-    transform: scale(0.95);
   }
 }
 
-/* FIXED: Keep original loading screen structure - just enhance the helmet */
-/* PURE BLACK: Clean gradient */
 .spartan-loading-screen {
   max-width: 1200px;
   margin: var(--spacing-md) auto;
   min-height: calc(100vh - 48px);
-  /* PURE BLACK - Subtle gradient */
-  background: linear-gradient(145deg, #0a0a0a 0%, #050505 100%);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  /* PREMIUM POLISH - Layered shadow */
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
@@ -139,73 +139,45 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
 }
 
-/* ENHANCED: App loading helmet sizing classes to match upgrade banners */
 .app-loading-helmet-size {
-  width: 100px !important; /* LARGER: Premium loading experience */
-  height: 100px !important;
-  animation: app-helmet-pulse 2s ease-in-out infinite !important;
-  /* ENHANCED: Stronger glow on pure black */
-  filter: drop-shadow(0 0 16px rgba(255, 221, 0, 0.7)) !important;
+  width: 80px !important;
+  height: 80px !important;
+  animation: helmet-pulse 2s ease-in-out infinite !important;
+  filter: drop-shadow(0 0 16px rgba(212, 168, 67, 0.5)) !important;
 }
 
 .app-loading-helmet-fallback-size {
-  font-size: 4rem !important; /* LARGER: Match 100px helmet */
+  font-size: 3.5rem !important;
   color: var(--primary) !important;
-  animation: app-helmet-pulse 2s ease-in-out infinite !important;
+  animation: helmet-pulse 2s ease-in-out infinite !important;
 }
 
-/* ENHANCED: Helmet pulse animation for main app loading */
-@keyframes app-helmet-pulse {
+@keyframes helmet-pulse {
   0%, 100% {
     opacity: 1;
     transform: scale(1);
   }
   50% {
-    opacity: 0.75;
-    transform: scale(0.96);
+    opacity: 0.7;
+    transform: scale(0.97);
   }
 }
 
-/* ADDED: Additional Toast Overrides in App.css as backup */
-/* PURE BLACK: Clean gradient */
-.react-hot-toast div[data-hot-toast] > div {
-  /* PURE BLACK - Gradient with blur */
-  background: linear-gradient(145deg, rgba(10, 10, 10, 0.95) 0%, rgba(5, 5, 5, 0.95) 100%) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  color: var(--text) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-lg) !important;
-  /* PREMIUM POLISH - Dramatic shadow */
-  box-shadow: var(--shadow-lg) !important;
-  padding: var(--spacing-md) var(--spacing-lg) !important;
-  font-weight: 500 !important;
-  font-size: 0.875rem !important;
-}
+/* ============================================================
+   HEADER - Clean, no gradient
+   ============================================================ */
 
-/* PWA FIX: Position toast notifications below Dynamic Island */
-.react-hot-toast {
-  top: env(safe-area-inset-top, 0px) !important;
-}
-
-/* App Header Styles - Navigation truly centered, logo/logout positioned around it */
-/* PURE BLACK: Clean gradient */
 .app-header {
   position: relative;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: var(--spacing-md) var(--spacing-lg);
-  /* PURE BLACK - Subtle gradient with blur-ready background */
-  background: linear-gradient(145deg, rgba(10, 10, 10, 0.95) 0%, rgba(5, 5, 5, 0.95) 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  /* PREMIUM POLISH - Layered shadow */
-  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   margin: var(--spacing-md) var(--spacing-lg) 0 var(--spacing-lg);
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
 }
 
 .logo-container {
@@ -215,11 +187,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .app-logo {
-  height: 107px; /* 25% bigger than 86px */
+  height: 100px;
   width: auto;
 }
 
-/* UPDATED: Header Navigation with bulletproof sliding pill animation - exactly like profile tabs */
+/* ============================================================
+   NAVIGATION - Refined pill system
+   ============================================================ */
+
 .header-nav {
   justify-self: center;
   position: relative;
@@ -227,23 +202,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .header-nav .nav-container {
   display: flex;
-  padding: var(--spacing-xs);
-  background-color: var(--card-background);
+  padding: 4px;
+  background-color: var(--surface-raised);
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   position: relative;
   margin: 0 auto;
-  /* RESPONSIVE: Scale container width based on screen size like profile tabs */
-  width: min(90vw, 600px);
+  width: min(90vw, 560px);
   min-width: fit-content;
-  max-width: 700px;
-  /* EVEN SPACING: Distribute navigation buttons with consistent gaps */
+  max-width: 640px;
   justify-content: space-between;
-  /* MOBILE: Ensure proper 3D rendering context */
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  /* MOBILE: Handle overflow for very small screens only */
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -253,94 +221,60 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
 }
 
-/* UPDATED: Header navigation slider - YELLOW background like main buttons */
 .header-nav-slider {
   position: absolute;
-  top: var(--spacing-xs);
-  left: var(--spacing-xs);
-  height: calc(100% - calc(var(--spacing-xs) * 2));
-  /* CHANGED: Full yellow background instead of subtle yellow */
+  top: 4px;
+  left: 4px;
+  height: calc(100% - 8px);
   background-color: var(--primary);
-  border: 1px solid var(--primary);
   border-radius: var(--radius-full);
-  /* PREMIUM POLISH - Spring animation */
-  transition: transform 0.4s var(--ease-spring), width 0.4s var(--ease-spring);
+  transition: transform 0.35s var(--ease-spring), width 0.35s var(--ease-spring);
   pointer-events: none;
   z-index: 1;
-  /* IMPORTANT: Start hidden but ready to be shown */
   opacity: 0;
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
-  /* PREMIUM POLISH - Glow on pure black */
-  box-shadow: var(--glow-primary-subtle);
+  box-shadow: var(--glow-gold);
 }
 
-/* FIXED: Increased breakpoint to 1024px so landscape mobile stays in mobile mode */
-@media (max-width: 1024px) {
-  .header-nav-slider {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-/* UPDATED: Navigation links with YELLOW background and BLACK text when active */
 .header-nav .nav-link {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
   background-color: transparent;
-  border: 1px solid transparent;
+  border: none;
   color: var(--text-secondary);
   border-radius: var(--radius-full);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
   white-space: nowrap;
   text-decoration: none;
-  /* CONSISTENT SIZING: Natural width based on content */
   min-width: fit-content;
   position: relative;
   z-index: 2;
-  /* MOBILE: Prevent text selection and ensure proper touch */
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
 }
 
-/* FIXED: Increased breakpoint to 1024px for touch targets */
-@media (max-width: 1024px) and (pointer: coarse) {
-  .header-nav .nav-link {
-    min-height: 44px; /* iOS recommendation for touch targets */
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
+.header-nav .nav-link:hover {
+  color: var(--text);
 }
 
-/* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
-
-/* UPDATED: Active nav styling - BLACK text to contrast with yellow slider background */
 .header-nav .nav-link.active {
-  /* CHANGED: Black text instead of yellow to contrast with yellow background */
   color: #000000 !important;
   font-weight: 600 !important;
-  /* IMPORTANT: No background - let slider handle visual feedback */
   background-color: transparent !important;
-  border-color: transparent !important;
 }
 
-/* FIXED: Increased breakpoint to 1024px to ensure active state is always visible */
-@media (max-width: 1024px) {
-  .header-nav .nav-link.active {
-    /* FALLBACK: In case slider fails, ensure active nav is distinguishable */
-    font-weight: 600;
-    color: #000000 !important;
-  }
-}
+/* ============================================================
+   USER CONTROLS - Minimal, refined
+   ============================================================ */
 
 .user-controls {
   display: flex;
@@ -349,84 +283,82 @@ h1, h2, h3, h4, h5, h6 {
   gap: var(--spacing-md);
 }
 
-/* Profile button styling - matches logout button non-hover state with active state */
-/* PURE BLACK: Clean neutral gray */
 .profile-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(102, 102, 102, 0.1);
+  background-color: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .profile-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-prominent);
+  color: var(--text);
 }
 
 .profile-btn.active {
   color: var(--primary);
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
+  border-color: var(--primary);
+  background-color: rgba(212, 168, 67, 0.08);
 }
 
-/* FIXED: Logout button styling - inactive grey with red hover */
-/* PURE BLACK: Clean neutral gray */
 .logout-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(102, 102, 102, 0.1);
+  background-color: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1);
+  background-color: rgba(239, 68, 68, 0.08);
   border-color: var(--danger);
   color: var(--danger);
-  transform: scale(1.05);
 }
 
-/* FIXED: Increased mobile header breakpoint to 1024px */
+/* ============================================================
+   MOBILE HEADER
+   ============================================================ */
+
 @media (max-width: 1024px) {
-  /* ADDED: Mobile adjustments for initial loader */
   .landing-initial-loader {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
   
   .landing-initial-helmet {
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
   }
   
   .landing-initial-helmet-fallback {
-    font-size: 3.2rem;
+    font-size: 2.8rem;
   }
 
   .app-header {
     display: flex;
     flex-direction: column;
-    padding: var(--spacing-sm) var(--spacing-md);
-    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    gap: var(--spacing-md);
     align-items: stretch;
     margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
   }
   
   .app-logo {
-    height: 100px; /* Increased from 80px - 25% bigger */
+    height: 88px;
   }
   
   .header-top-row {
@@ -442,101 +374,51 @@ h1, h2, h3, h4, h5, h6 {
     padding-bottom: var(--spacing-xs);
   }
   
-  .user-controls {
-    gap: var(--spacing-md);
-  }
-  
-  /* Mobile user controls container */
   .mobile-user-controls {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
   }
   
-  /* Mobile profile button - icon only */
-  .mobile-user-controls .profile-btn {
-    padding: var(--spacing-sm);
-    min-width: 36px;
-    height: 36px;
-    justify-content: center;
-  }
-  
-  .mobile-user-controls .profile-btn span {
-    display: none;
-  }
-  
-  /* Mobile logout button - icon only */
+  .mobile-user-controls .profile-btn,
   .mobile-user-controls .logout-btn {
     padding: var(--spacing-sm);
-    min-width: 36px;
-    height: 36px;
+    min-width: 40px;
+    height: 40px;
     justify-content: center;
   }
   
+  .mobile-user-controls .profile-btn span,
   .mobile-user-controls .logout-btn span {
     display: none;
   }
   
-  /* REVERTED: Mobile greeting back to yellow styling */
   .mobile-username {
-    font-weight: 500;
-    color: var(--text);
+    font-weight: 600;
+    color: var(--primary);
     font-size: 0.9375rem;
     text-align: center;
-    letter-spacing: 0.025em;
+    letter-spacing: 0.01em;
   }
   
   .mobile-username::before {
-    content: "Hey there, ";
-    color: var(--primary);
-    opacity: 0.8;
+    content: "Hey, ";
+    color: var(--text-secondary);
     font-weight: 500;
   }
   
-  /* Make the username itself bold while keeping "Hey there" normal weight */
-  .mobile-username {
-    font-weight: 700; /* Make the username bold */
-    color: var(--primary); /* Back to yellow */
-  }
-  
-  /* Hide header navigation on mobile */
   .header-nav {
     display: none;
   }
   
-  /* Mobile loading screen adjustments */
   .spartan-loading-screen {
     margin: var(--spacing-sm);
-    margin-left: var(--spacing-sm);
-    margin-right: var(--spacing-sm);
     min-height: calc(100vh - 16px);
   }
 
-  /* Mobile app loading helmet adjustments */
   .app-loading-helmet-size {
-    width: 80px !important; /* SCALED: Mobile main loading */
-    height: 80px !important;
-  }
-
-  .app-loading-helmet-fallback-size {
-    font-size: 3.2rem !important;
-  }
-}
-
-/* Very small screens */
-@media (max-width: 480px) {
-  .landing-initial-helmet {
-    width: 70px;
-    height: 70px;
-  }
-  
-  .landing-initial-helmet-fallback {
-    font-size: 2.8rem;
-  }
-
-  .app-loading-helmet-size {
-    width: 70px !important;
-    height: 70px !important;
+    width: 64px !important;
+    height: 64px !important;
   }
 
   .app-loading-helmet-fallback-size {
@@ -544,348 +426,89 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@media (max-width: 480px) {
+  .landing-initial-helmet,
+  .app-loading-helmet-size {
+    width: 56px !important;
+    height: 56px !important;
+  }
+  
+  .landing-initial-helmet-fallback,
+  .app-loading-helmet-fallback-size {
+    font-size: 2.4rem !important;
+  }
+}
+
+/* ============================================================
+   BUTTONS - Clean, purposeful
+   ============================================================ */
+
 button {
   cursor: pointer;
   font-weight: 500;
   border: none;
   border-radius: var(--radius-md);
   padding: var(--spacing-sm) var(--spacing-md);
-  /* PREMIUM POLISH - Smooth transitions */
-  transition: transform 0.15s var(--ease-smooth), box-shadow 0.15s var(--ease-smooth);
+  transition: all 0.15s ease;
 }
 
-/* PREMIUM POLISH - Satisfying press effect */
 button:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 .login-btn {
   background-color: var(--primary);
   color: #000000;
   font-weight: 600;
-  transition: all 0.2s var(--ease-smooth);
+  padding: var(--spacing-md) var(--spacing-xl);
 }
 
 .login-btn:hover {
-  background-color: var(--primary-dark);
-  /* PREMIUM POLISH - Glow on hover */
-  box-shadow: var(--glow-primary);
+  background-color: var(--primary-light);
+  box-shadow: var(--glow-gold);
 }
 
-/* UPDATED: App content layout - MOBILE HEIGHT FIX */
-/* PURE BLACK: Clean gradient */
-.app-content {
-  display: flex;
-  flex-direction: column;
-  /* PURE BLACK - Subtle gradient */
-  background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  margin: 0 var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
-  /* PREMIUM POLISH - Layered shadow */
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
-  border-top: none;
-  min-height: calc(100vh - 200px);
-}
-
-/* Main content wrapper - takes up available space */
-.main-content-wrapper {
-  flex: 1;
-  padding: var(--spacing-lg);
-}
-
-/* Card component */
-/* PURE BLACK: Clean gradient */
-.card {
-  /* PURE BLACK - Subtle gradient background */
-  background: linear-gradient(145deg, #0f0f0f 0%, #0a0a0a 100%);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  /* PREMIUM POLISH - Layered shadow */
-  box-shadow: var(--shadow-md);
-  margin-bottom: var(--spacing-lg);
-  border: 1px solid var(--border);
-  /* PREMIUM POLISH - Smooth transitions */
-  transition: box-shadow 0.3s var(--ease-smooth), transform 0.3s var(--ease-smooth);
-}
-
-/* PREMIUM POLISH - Subtle hover lift on cards */
-.card:hover {
-  box-shadow: var(--shadow-lg);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-md);
-}
-
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-/* Form elements */
-/* PURE BLACK: Clean gradient */
-input, textarea, select {
-  width: 100%;
-  padding: var(--spacing-md);
-  /* PURE BLACK - Subtle gradient background */
-  background: linear-gradient(145deg, #141414 0%, #0a0a0a 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-md);
-  font-size: 1rem;
-  color: var(--text);
-  /* PREMIUM POLISH - Smooth transitions */
-  transition: border-color 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth);
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: var(--primary);
-  /* PREMIUM POLISH - Glow on focus - enhanced for pure black */
-  box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.15), var(--glow-primary-subtle);
-}
-
-/* Toggle switch */
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* PURE BLACK: Clean gradient */
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  /* PURE BLACK - Subtle gradient */
-  background: linear-gradient(145deg, #1a1a1a 0%, #141414 100%);
-  /* PREMIUM POLISH - Smooth spring transition */
-  transition: all 0.3s var(--ease-spring);
-  border-radius: 34px;
-  border: 1px solid var(--border);
-}
-
-.toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 3px;
-  background-color: white;
-  /* PREMIUM POLISH - Spring transition */
-  transition: transform 0.3s var(--ease-spring);
-  border-radius: 50%;
-  /* PREMIUM POLISH - Subtle shadow on knob */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-input:checked + .toggle-slider {
-  background-color: var(--primary);
-  border-color: var(--primary);
-  /* PREMIUM POLISH - Glow when active - enhanced for pure black */
-  box-shadow: var(--glow-primary);
-}
-
-input:checked + .toggle-slider:before {
-  transform: translateX(26px);
-}
-
-/* Range slider */
-/* PURE BLACK: Clean gradient */
-.range-slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 8px;
-  border-radius: var(--radius-full);
-  /* PURE BLACK - Subtle gradient track */
-  background: linear-gradient(90deg, #1a1a1a 0%, #141414 100%);
-  outline: none;
-}
-
-.range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--primary);
-  cursor: pointer;
-  /* PREMIUM POLISH - Glow effect - enhanced for pure black */
-  box-shadow: var(--glow-primary);
-  /* PREMIUM POLISH - Spring transition */
-  transition: transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-smooth);
-}
-
-.range-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: var(--glow-primary-intense);
-}
-
-.range-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--primary);
-  cursor: pointer;
-  border: none;
-  box-shadow: var(--glow-primary);
-}
-
-/* Badge */
-.badge {
-  display: inline-block;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.badge-success {
-  background-color: rgba(34, 197, 94, 0.2);
-  color: var(--success);
-}
-
-.badge-danger {
-  background-color: rgba(239, 68, 68, 0.2);
-  color: var(--danger);
-}
-
-.badge-warning {
-  background-color: rgba(245, 158, 11, 0.2);
-  color: var(--warning);
-}
-
-.badge-primary {
-  background-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-}
-
-/* Subscription Banner */
-.subscription-banner {
-  background: linear-gradient(to right, var(--primary-dark), var(--primary));
-  color: #000000;
-  padding: var(--spacing-md);
-  text-align: center;
-}
-
-.subscription-banner-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.subscription-cta {
-  background-color: var(--background);
-  color: var(--primary);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-full);
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  margin-top: var(--spacing-sm);
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Premium lock overlay */
-/* PURE BLACK: True black overlay */
-.premium-lock {
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.92);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-}
-
-.lock-icon {
-  font-size: 2rem;
-  color: var(--primary);
-  margin-bottom: var(--spacing-md);
-}
-
-.premium-message {
-  text-align: center;
-  margin-bottom: var(--spacing-md);
-  font-weight: 500;
-  color: var(--text);
-}
-
-/* Form layout */
-.form-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.form-label {
-  display: block;
-  margin-bottom: var(--spacing-sm);
-  font-weight: 500;
-  color: var(--text);
-}
-
-.form-row {
-  display: flex;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-}
-
-@media (max-width: 1024px) {
-  .form-row {
-    flex-direction: column;
-  }
-}
-
-/* Button variations */
 .btn {
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-xl);
   border-radius: var(--radius-md);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  display: inline-block;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  transition: all 0.15s ease;
 }
 
 .btn-primary {
   background-color: var(--primary);
   color: #000000;
-  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-light);
+  box-shadow: var(--glow-gold);
 }
 
 .btn-outline {
   background-color: transparent;
   border: 1px solid var(--primary);
   color: var(--primary);
+}
+
+.btn-outline:hover {
+  background-color: rgba(212, 168, 67, 0.08);
+}
+
+.btn-secondary {
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface-overlay);
+  border-color: var(--border-prominent);
 }
 
 .btn-danger {
@@ -902,133 +525,413 @@ input:checked + .toggle-slider:before {
   width: 100%;
 }
 
-/* Modal overlay */
-/* PURE BLACK: Enhanced blur */
+/* ============================================================
+   MAIN CONTENT - Generous spacing
+   ============================================================ */
+
+.app-content {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  margin: 0 var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  border-top: none;
+  min-height: calc(100vh - 200px);
+}
+
+.main-content-wrapper {
+  flex: 1;
+  padding: var(--spacing-xl);
+}
+
+/* ============================================================
+   CARDS - Flat, clean, spacious
+   ============================================================ */
+
+.card {
+  background: var(--surface-raised);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================
+   FORM ELEMENTS - Clean, refined
+   ============================================================ */
+
+input, textarea, select {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  font-size: 1rem;
+  color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.12);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.form-row {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+@media (max-width: 1024px) {
+  .form-row {
+    flex-direction: column;
+  }
+}
+
+/* ============================================================
+   TOGGLE - Refined
+   ============================================================ */
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface-overlay);
+  transition: all 0.25s var(--ease-spring);
+  border-radius: 28px;
+  border: 1px solid var(--border);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-secondary);
+  transition: all 0.25s var(--ease-spring);
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+  background-color: #000000;
+}
+
+/* ============================================================
+   RANGE SLIDER - Minimal
+   ============================================================ */
+
+.range-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--border-prominent);
+  outline: none;
+}
+
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: var(--glow-gold);
+  transition: transform 0.15s ease;
+}
+
+.range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.range-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: none;
+}
+
+/* ============================================================
+   BADGES - Clean, refined
+   ============================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge-success {
+  background-color: rgba(34, 197, 94, 0.12);
+  color: var(--success);
+}
+
+.badge-danger {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+.badge-warning {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+}
+
+.badge-primary {
+  background-color: rgba(212, 168, 67, 0.12);
+  color: var(--primary);
+}
+
+/* ============================================================
+   SUBSCRIPTION BANNER
+   ============================================================ */
+
+.subscription-banner {
+  background: var(--primary);
+  color: #000000;
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.subscription-banner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.subscription-cta {
+  background-color: #000000;
+  color: var(--primary);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.15s ease;
+}
+
+.subscription-cta:hover {
+  background-color: var(--surface-raised);
+}
+
+/* ============================================================
+   PREMIUM OVERLAY
+   ============================================================ */
+
+.premium-lock {
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.lock-icon {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.premium-message {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* ============================================================
+   MODALS - Clean, centered
+   ============================================================ */
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  /* PREMIUM POLISH - Darker with blur */
   background-color: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-/* PURE BLACK: Clean gradient */
 .modal-content {
-  /* PURE BLACK - Gradient background */
-  background: linear-gradient(145deg, #0f0f0f 0%, #0a0a0a 100%);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-2xl);
   width: 90%;
-  max-width: 500px;
-  /* PREMIUM POLISH - Dramatic shadow */
+  max-width: 480px;
   box-shadow: var(--shadow-xl);
-  position: relative;
   color: var(--text);
   border: 1px solid var(--border);
-  /* PREMIUM POLISH - Entrance animation */
-  animation: modal-enter 0.3s var(--ease-out-expo);
+  animation: modal-enter 0.2s var(--ease-out);
 }
 
 @keyframes modal-enter {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(-10px);
+    transform: scale(0.96);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1);
   }
 }
 
-/* UPDATED: Mobile responsive styles - HEIGHT FIX - Changed breakpoint to 1024px */
+/* ============================================================
+   MOBILE RESPONSIVE
+   ============================================================ */
+
 @media (max-width: 1024px) {
   .app-content {
-    /* FIXED: Remove fixed bottom margin that creates empty space */
     margin: 0 var(--spacing-sm) 0 var(--spacing-sm);
-    /* FIXED: Remove min-height that forces extra space */
     min-height: auto;
-    /* FIXED: Add padding bottom only for mobile nav clearance */
-    padding-bottom: 100px; /* Space for mobile nav + small buffer */
+    padding-bottom: 100px;
   }
   
   .main-content-wrapper {
-    padding: var(--spacing-md);
-    /* FIXED: Ensure wrapper doesn't force extra height */
-    min-height: auto;
+    padding: var(--spacing-lg);
   }
   
   .card {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
   
   .card-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 }
 
-/* Mobile navigation - UPDATED: Add sliding pill animation support */
-/* PURE BLACK: Enhanced blur */
+/* ============================================================
+   MOBILE NAVIGATION - Clean, refined
+   ============================================================ */
+
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  /* PURE BLACK - Blur effect */
-  background: rgba(5, 5, 5, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
-  /* PREMIUM POLISH - Subtle top glow */
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4), 0 -1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 -1px 0 var(--border);
   z-index: 1000;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom, 0px));
 }
-
-/* Mobile navigation will use its own slider from MobileNavigation.css */
 
 /* ============================================================
-   PREMIUM POLISH - Global enhancements
+   GLOBAL REFINEMENTS
    ============================================================ */
 
-/* Premium glow effect for primary accent elements - enhanced for pure black */
+/* Premium glow on stats */
 .streak-number {
-  text-shadow: 0 0 50px rgba(255, 221, 0, 0.4);
+  text-shadow: 0 0 32px rgba(212, 168, 67, 0.3);
 }
 
-/* Premium hover glow for primary buttons - enhanced for pure black */
-.btn-primary:hover,
-.benefits-btn-primary:hover,
-.discord-join-btn:hover,
-.youtube-subscribe-btn:hover {
-  box-shadow: var(--glow-primary-intense);
-}
-
-/* Premium focus ring for accessibility */
+/* Focus states */
 *:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
-/* Smooth selection color */
+/* Selection */
 ::selection {
-  background-color: rgba(255, 221, 0, 0.35);
+  background-color: rgba(212, 168, 67, 0.25);
   color: var(--text);
 }
 
-/* Premium scrollbar styling */
+/* Scrollbars - minimal */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -1036,60 +939,48 @@ input:checked + .toggle-slider:before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 4px;
+  background: var(--border);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--border-prominent);
 }
 
-/* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  scrollbar-color: var(--border) transparent;
 }
 
-/* Premium loading shimmer for skeleton states */
-@keyframes premium-shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.skeleton-loading {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.02) 0%,
-    rgba(255, 255, 255, 0.06) 50%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  background-size: 200% 100%;
-  animation: premium-shimmer 1.5s infinite;
-}
-
-/* Premium pulse animation for important elements */
-@keyframes premium-pulse {
-  0%, 100% {
-    opacity: 1;
-    box-shadow: var(--glow-primary-subtle);
-  }
-  50% {
-    opacity: 0.85;
-    box-shadow: var(--glow-primary);
-  }
-}
-
-/* Reduced motion support */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.text-gold {
+  color: var(--primary);
+}
+
+.text-muted {
+  color: var(--text-secondary);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
 }
