@@ -1,10 +1,10 @@
-/* App.css - Refined Premium Edition */
+/* App.css - Refined Premium Edition with #ffdd00 */
 /* ============================================================
    DESIGN PHILOSOPHY:
-   - Flat colors, not gradients (depth via shadows + borders)
-   - Generous whitespace (luxury breathes)
-   - Rich gold, not caution-tape yellow
-   - Restrained effects (less is more)
+   - Your gold (#ffdd00), used strategically
+   - Flat colors, not gradients
+   - Generous whitespace
+   - Restrained effects
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -35,9 +35,9 @@
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
   
-  /* Gold glow - warm, luxurious */
-  --glow-gold: 0 0 24px rgba(212, 168, 67, 0.25);
-  --glow-gold-strong: 0 0 32px rgba(212, 168, 67, 0.4);
+  /* Gold glow - softer to prevent harshness */
+  --glow-gold: 0 0 20px rgba(255, 221, 0, 0.15);
+  --glow-gold-strong: 0 0 28px rgba(255, 221, 0, 0.25);
 }
 
 * {
@@ -65,7 +65,6 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
-/* Stats and numbers - tighter, more refined */
 .streak-number, .milestone-value, .stat-value {
   font-feature-settings: 'tnum' 1;
   letter-spacing: -0.04em;
@@ -85,7 +84,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
-   LOADING STATES - Minimal, elegant
+   LOADING STATES
    ============================================================ */
 
 .landing-initial-loader {
@@ -102,7 +101,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 80px;
   height: 80px;
   animation: helmet-fade 1s ease-out;
-  filter: drop-shadow(0 0 20px rgba(212, 168, 67, 0.5));
+  filter: drop-shadow(0 0 16px rgba(255, 221, 0, 0.4));
 }
 
 .landing-initial-helmet-fallback {
@@ -143,7 +142,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 80px !important;
   height: 80px !important;
   animation: helmet-pulse 2s ease-in-out infinite !important;
-  filter: drop-shadow(0 0 16px rgba(212, 168, 67, 0.5)) !important;
+  filter: drop-shadow(0 0 14px rgba(255, 221, 0, 0.4)) !important;
 }
 
 .app-loading-helmet-fallback-size {
@@ -164,7 +163,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
-   HEADER - Clean, no gradient
+   HEADER - Clean, flat
    ============================================================ */
 
 .app-header {
@@ -235,6 +234,7 @@ h1, h2, h3, h4, h5, h6 {
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
+  /* Softer glow - key to making bright gold feel premium */
   box-shadow: var(--glow-gold);
 }
 
@@ -272,8 +272,21 @@ h1, h2, h3, h4, h5, h6 {
   background-color: transparent !important;
 }
 
+@media (max-width: 1024px) {
+  .header-nav-slider {
+    transition: transform 0.25s var(--ease-out), width 0.25s var(--ease-out);
+  }
+}
+
+@media (max-width: 1024px) and (pointer: coarse) {
+  .header-nav .nav-link {
+    min-height: 44px;
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+}
+
 /* ============================================================
-   USER CONTROLS - Minimal, refined
+   USER CONTROLS
    ============================================================ */
 
 .user-controls {
@@ -306,7 +319,7 @@ h1, h2, h3, h4, h5, h6 {
 .profile-btn.active {
   color: var(--primary);
   border-color: var(--primary);
-  background-color: rgba(212, 168, 67, 0.08);
+  background-color: var(--primary-muted);
 }
 
 .logout-btn {
@@ -440,7 +453,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
-   BUTTONS - Clean, purposeful
+   BUTTONS
    ============================================================ */
 
 button {
@@ -497,7 +510,7 @@ button:active {
 }
 
 .btn-outline:hover {
-  background-color: rgba(212, 168, 67, 0.08);
+  background-color: var(--primary-muted);
 }
 
 .btn-secondary {
@@ -526,7 +539,7 @@ button:active {
 }
 
 /* ============================================================
-   MAIN CONTENT - Generous spacing
+   MAIN CONTENT
    ============================================================ */
 
 .app-content {
@@ -547,7 +560,7 @@ button:active {
 }
 
 /* ============================================================
-   CARDS - Flat, clean, spacious
+   CARDS - Flat, spacious
    ============================================================ */
 
 .card {
@@ -579,7 +592,7 @@ button:active {
 }
 
 /* ============================================================
-   FORM ELEMENTS - Clean, refined
+   FORM ELEMENTS
    ============================================================ */
 
 input, textarea, select {
@@ -597,7 +610,7 @@ input, textarea, select {
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.12);
+  box-shadow: 0 0 0 3px var(--primary-muted);
 }
 
 input::placeholder, textarea::placeholder {
@@ -629,7 +642,7 @@ input::placeholder, textarea::placeholder {
 }
 
 /* ============================================================
-   TOGGLE - Refined
+   TOGGLE
    ============================================================ */
 
 .toggle-switch {
@@ -681,7 +694,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* ============================================================
-   RANGE SLIDER - Minimal
+   RANGE SLIDER
    ============================================================ */
 
 .range-slider {
@@ -718,7 +731,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* ============================================================
-   BADGES - Clean, refined
+   BADGES
    ============================================================ */
 
 .badge {
@@ -748,7 +761,7 @@ input:checked + .toggle-slider:before {
 }
 
 .badge-primary {
-  background-color: rgba(212, 168, 67, 0.12);
+  background-color: var(--primary-muted);
   color: var(--primary);
 }
 
@@ -823,7 +836,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* ============================================================
-   MODALS - Clean, centered
+   MODALS
    ============================================================ */
 
 .modal-overlay {
@@ -888,7 +901,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* ============================================================
-   MOBILE NAVIGATION - Clean, refined
+   MOBILE NAVIGATION
    ============================================================ */
 
 .mobile-navigation {
@@ -911,9 +924,9 @@ input:checked + .toggle-slider:before {
    GLOBAL REFINEMENTS
    ============================================================ */
 
-/* Premium glow on stats */
+/* Softer glow on stats - prevents harshness */
 .streak-number {
-  text-shadow: 0 0 32px rgba(212, 168, 67, 0.3);
+  text-shadow: 0 0 24px rgba(255, 221, 0, 0.2);
 }
 
 /* Focus states */
@@ -924,7 +937,7 @@ input:checked + .toggle-slider:before {
 
 /* Selection */
 ::selection {
-  background-color: rgba(212, 168, 67, 0.25);
+  background-color: rgba(255, 221, 0, 0.2);
   color: var(--text);
 }
 

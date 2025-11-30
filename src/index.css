@@ -12,15 +12,16 @@
   --radius-full: 9999px;
   
   /* ============================================================
-     REFINED PREMIUM PALETTE - Restrained Luxury
-     True black + rich gold + generous breathing room
+     REFINED PREMIUM PALETTE - Your Gold, Restrained Execution
+     #ffdd00 executed with luxury restraint
      ============================================================ */
   
-  /* Rich gold - warmer, more luxurious than pure yellow */
-  --primary: #d4a843;
-  --primary-light: #e8c36a;
-  --primary-dark: #b8922e;
-  --primary-glow: rgba(212, 168, 67, 0.35);
+  /* Your gold - kept as-is, used more strategically */
+  --primary: #ffdd00;
+  --primary-light: #ffe94d;
+  --primary-dark: #e6c800;
+  --primary-muted: rgba(255, 221, 0, 0.12);
+  --primary-glow: rgba(255, 221, 0, 0.2);
   
   /* Pure blacks - no tints, timeless */
   --background: #000000;
@@ -33,14 +34,13 @@
   --border-subtle: #171717;
   --border-prominent: #2a2a2a;
   
-  /* Text hierarchy */
+  /* Text hierarchy - key to making bright gold work */
   --text: #ffffff;
-  --text-secondary: #737373;
-  --text-tertiary: #525252;
+  --text-secondary: #6b6b6b;
+  --text-tertiary: #4a4a4a;
   
-  /* Secondary accent - soft silver for less important elements */
-  --accent-silver: #a3a3a3;
-  --accent-silver-muted: #525252;
+  /* Secondary accent - for less important elements */
+  --accent-muted: #888888;
   
   /* Status colors */
   --success: #22c55e;
@@ -105,7 +105,7 @@ html body div[data-hot-toast] > div[role="alert"] {
 div[data-hot-toast] > div:not([role]),
 body div[data-hot-toast] > div:not([role]),
 html body div[data-hot-toast] > div:not([role]) {
-  border-left: 3px solid #d4a843 !important;
+  border-left: 3px solid #ffdd00 !important;
 }
 
 div[data-hot-toast] svg,
@@ -123,7 +123,7 @@ div[data-hot-toast] > div[role="alert"] svg {
 }
 
 div[data-hot-toast] > div:not([role]) svg {
-  color: #d4a843 !important;
+  color: #ffdd00 !important;
 }
 
 div[data-hot-toast] > div > div,
