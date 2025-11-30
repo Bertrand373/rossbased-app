@@ -1,4 +1,4 @@
-// App.js - UPDATED: Full-screen app layout with compact mobile header
+// App.js - TITANTRACK COMMAND CENTER
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -39,7 +39,7 @@ import SpartanLoader from './components/Shared/SpartanLoader';
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
 
-// Profile Button Component - handles navigation to profile (Desktop)
+// Profile Button Component - Desktop (with text)
 const ProfileButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,7 +62,7 @@ const ProfileButton = () => {
   );
 };
 
-// Mobile Profile Button Component - icon only
+// Mobile Profile Button - Icon only
 const MobileProfileButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -84,171 +84,19 @@ const MobileProfileButton = () => {
   );
 };
 
-// Header Navigation (Desktop only)
+// Header Navigation - Desktop only (Sharp segmented tabs)
 const HeaderNavigation = () => {
-  const location = useLocation();
-  
-  const navContainerRef = useRef(null);
-  const sliderRef = useRef(null);
-  const [isSliderInitialized, setIsSliderInitialized] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const resizeTimeoutRef = useRef(null);
-  
   const navItems = [
     { path: '/', icon: FaHome, label: 'Tracker' },
     { path: '/calendar', icon: FaCalendarAlt, label: 'Calendar' },
     { path: '/stats', icon: FaChartBar, label: 'Stats' },
     { path: '/timeline', icon: FaMapSigns, label: 'Timeline' },
-    { path: '/urge-toolkit', icon: FaShieldAlt, label: 'Urge Toolkit' }
+    { path: '/urge-toolkit', icon: FaShieldAlt, label: 'Urges' }
   ];
-
-  const detectMobile = useCallback(() => {
-    const isMobileDevice = window.innerWidth <= 1024 || 'ontouchstart' in window;
-    setIsMobile(isMobileDevice);
-    return isMobileDevice;
-  }, []);
-
-  const updateNavSlider = useCallback(() => {
-    if (!navContainerRef.current || !sliderRef.current) {
-      return false;
-    }
-    
-    try {
-      const navContainer = navContainerRef.current;
-      const slider = sliderRef.current;
-      const activeNavElement = navContainer.querySelector('.nav-link.active');
-      
-      if (!activeNavElement) {
-        slider.style.opacity = '0';
-        slider.style.visibility = 'hidden';
-        return false;
-      }
-
-      requestAnimationFrame(() => {
-        try {
-          const containerRect = navContainer.getBoundingClientRect();
-          const navRect = activeNavElement.getBoundingClientRect();
-          
-          if (containerRect.width === 0 || navRect.width === 0) {
-            return;
-          }
-
-          const containerStyle = window.getComputedStyle(navContainer);
-          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
-          
-          const leftOffset = Math.round(navRect.left - containerRect.left - paddingLeft);
-          const navWidth = navRect.width;
-          
-          slider.style.transform = `translateX(${Math.round(leftOffset)}px)`;
-          slider.style.width = `${Math.round(navWidth)}px`;
-          slider.style.opacity = '1';
-          slider.style.visibility = 'visible';
-          
-        } catch (innerError) {
-          console.error('Inner nav slider positioning failed:', innerError);
-        }
-      });
-      
-      return true;
-      
-    } catch (error) {
-      console.error('Nav slider update failed:', error);
-      return false;
-    }
-  }, []);
-
-  useEffect(() => {
-    const initializeSlider = () => {
-      detectMobile();
-      
-      if (!navContainerRef.current || !sliderRef.current) {
-        return;
-      }
-
-      requestAnimationFrame(() => {
-        const success = updateNavSlider();
-        
-        if (success) {
-          setIsSliderInitialized(true);
-        } else {
-          setTimeout(() => {
-            if (updateNavSlider()) {
-              setIsSliderInitialized(true);
-            } else {
-              if (sliderRef.current) {
-                sliderRef.current.style.opacity = '1';
-                sliderRef.current.style.visibility = 'visible';
-                setIsSliderInitialized(true);
-                setTimeout(updateNavSlider, 50);
-              }
-            }
-          }, 100);
-        }
-      });
-    };
-
-    const timer = setTimeout(initializeSlider, 100);
-    
-    return () => clearTimeout(timer);
-  }, [updateNavSlider, detectMobile]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      detectMobile();
-      
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-      
-      resizeTimeoutRef.current = setTimeout(() => {
-        if (isSliderInitialized) {
-          updateNavSlider();
-        }
-      }, 100);
-    };
-
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-    };
-  }, [isSliderInitialized, detectMobile, updateNavSlider]);
-
-  useEffect(() => {
-    if (isSliderInitialized) {
-      setTimeout(updateNavSlider, 10);
-    }
-  }, [location.pathname, isSliderInitialized, updateNavSlider]);
-
-  useEffect(() => {
-    return () => {
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <nav className="header-nav">
-      <div 
-        className="nav-container"
-        ref={navContainerRef}
-      >
-        <div 
-          className="header-nav-slider" 
-          ref={sliderRef}
-          style={{ 
-            opacity: 0,
-            visibility: 'hidden',
-            transform: 'translateX(0px)',
-            width: '0px'
-          }}
-        />
-        
+      <div className="nav-container">
         {navItems.map(item => (
           <NavLink 
             key={item.path}
@@ -359,6 +207,7 @@ function App() {
     return success;
   };
 
+  // Loading screen
   if (isLoading || isRefreshLoading) {
     return (
       <div className="spartan-loading-screen">
@@ -393,39 +242,37 @@ function App() {
           toastOptions={{
             duration: 4000,
             style: {
-              background: 'linear-gradient(135deg, #2c2c2c 0%, #333333 100%)',
+              background: '#161616',
               color: '#ffffff',
-              border: '1px solid #444444',
-              borderRadius: '12px',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-              padding: '16px 20px',
+              border: '1px solid #2a2a2a',
+              borderRadius: '4px',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
+              padding: '12px 16px',
               fontWeight: '500',
               fontSize: '14px',
-              minWidth: '300px',
-              maxWidth: '400px',
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
             },
             success: {
               style: {
-                borderLeft: '4px solid #22c55e',
+                borderLeft: '3px solid #00c853',
               },
               iconTheme: {
-                primary: '#22c55e',
-                secondary: '#ffffff',
+                primary: '#00c853',
+                secondary: '#000000',
               },
             },
             error: {
               style: {
-                borderLeft: '4px solid #ef4444',
+                borderLeft: '3px solid #ff3d3d',
               },
               iconTheme: {
-                primary: '#ef4444',
+                primary: '#ff3d3d',
                 secondary: '#ffffff',
               },
             },
             loading: {
               style: {
-                borderLeft: '4px solid #ffdd00',
+                borderLeft: '3px solid #ffdd00',
               },
               iconTheme: {
                 primary: '#ffdd00',
@@ -445,9 +292,10 @@ function App() {
         
         {isLoggedIn ? (
           <>
+            {/* HEADER - Command Bar */}
             <header className="app-header">
               {!isMobile ? (
-                /* DESKTOP HEADER: Logo | Nav | Controls */
+                /* DESKTOP: Logo | Navigation | Controls */
                 <>
                   <div className="logo-container">
                     <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
@@ -464,7 +312,7 @@ function App() {
                   </div>
                 </>
               ) : (
-                /* MOBILE HEADER: Compact single row - Logo on left, controls on right */
+                /* MOBILE: Logo | Controls (single row) */
                 <>
                   <div className="logo-container">
                     <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
@@ -479,7 +327,7 @@ function App() {
               )}
             </header>
             
-            {/* Bottom navigation for mobile */}
+            {/* Bottom Navigation - Mobile only */}
             {isMobile && (
               <MobileNavigation 
                 activeTab={activeTab} 
@@ -488,6 +336,7 @@ function App() {
               />
             )}
             
+            {/* Main Content Area */}
             <main className="app-content">
               <div className="main-content-wrapper">
                 <Routes>
@@ -505,7 +354,6 @@ function App() {
                   <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                   <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
                   <Route path="/profile" element={<Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />} />
-                  {/* UPDATED: Using unified PredictionDisplay in full mode */}
                   <Route path="/urge-prediction" element={<PredictionDisplay mode="full" userData={userData} />} />
                   <Route path="/ml-training" element={<MLTraining />} />
                   <Route path="*" element={<Navigate to="/" />} />

@@ -1,26 +1,24 @@
-/* components/Navigation/MobileNavigation.css - LIQUID GLASS EDITION */
-/* Premium floating glass navigation */
+/* MobileNavigation.css - TITANTRACK SHARP BOTTOM NAV */
+/* Sharp, commanding bottom navigation */
 
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: transparent;
+  z-index: 1000;
   display: flex;
   justify-content: center;
-  padding: var(--spacing-sm) var(--spacing-md);
-  padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 8px));
-  box-shadow: none;
-  z-index: 9999;
-  border: none;
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  padding-bottom: max(var(--space-2, 8px), env(safe-area-inset-bottom, 8px));
+  background: transparent;
+  pointer-events: none;
+  /* Hardware acceleration */
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  overscroll-behavior-y: contain;
-  pointer-events: auto;
 }
 
 /* iOS specific fixes */
@@ -28,104 +26,34 @@
   .mobile-navigation {
     position: fixed !important;
     bottom: 0 !important;
-    padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 12px)) !important;
+    padding-bottom: max(var(--space-2, 8px), env(safe-area-inset-bottom, 12px)) !important;
     -webkit-transform: translate3d(0, 0, 9999px);
     transform: translate3d(0, 0, 9999px);
-    border: none !important;
-    box-shadow: none !important;
   }
 }
 
-/* LIQUID GLASS: The visible pill container */
+/* The visible nav container - SHARP */
 .mobile-nav-container {
   display: flex;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm);
   width: 100%;
-  max-width: 500px;
-  position: relative;
-  justify-content: space-around;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  
-  /* LIQUID GLASS: Core styling */
-  background: rgba(10, 10, 10, 0.7);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-radius: var(--radius-full);
-  
-  /* Subtle gold accent border */
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  
-  /* LIQUID GLASS: Layered shadows with subtle glow */
-  box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.4),
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    0 0 1px rgba(255, 221, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  max-width: 420px;
+  background-color: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default, #2a2a2a);
+  /* SHARP corners */
+  border-radius: var(--radius-md, 4px);
+  padding: var(--space-1, 4px);
+  pointer-events: auto;
+  /* Subtle shadow for depth */
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* Inner highlight for glass effect */
-.mobile-nav-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%);
-  border-radius: var(--radius-full) var(--radius-full) 0 0;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.mobile-nav-container::-webkit-scrollbar {
-  display: none;
-}
-
-/* Sliding pill indicator - LIQUID GLASS gold */
+/* Hide the old sliding indicator completely */
 .mobile-nav-slider {
-  position: absolute;
-  top: var(--spacing-sm);
-  left: var(--spacing-sm);
-  height: calc(100% - calc(var(--spacing-sm) * 2));
-  border-radius: var(--radius-full);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateX(0px);
-  width: 0px;
-  will-change: transform, width;
-  overflow: hidden;
-  
-  /* LIQUID GLASS: Semi-transparent gold with blur */
-  background: rgba(255, 221, 0, 0.75);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  
-  box-shadow: 
-    0 2px 8px rgba(255, 221, 0, 0.25),
-    0 0 20px rgba(255, 221, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-/* Inner highlight for glass effect on slider */
-.mobile-nav-slider::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 100%);
-  border-radius: var(--radius-full) var(--radius-full) 0 0;
-  pointer-events: none;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 /* Nav items */
@@ -135,130 +63,102 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
+  padding: var(--space-2, 8px) var(--space-1, 4px);
+  color: var(--text-muted, #666666);
   text-decoration: none;
-  color: rgba(170, 170, 170, 0.6);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 500;
-  padding: var(--spacing-sm) var(--spacing-xs);
-  background-color: transparent;
-  border: none;
-  border-radius: var(--radius-md);
-  transition: color 0.3s ease, transform 0.15s ease;
-  position: relative;
-  outline: none;
-  min-height: 56px;
-  z-index: 2;
-  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  /* SHARP corners */
+  border-radius: var(--radius-sm, 2px);
+  transition: all 100ms ease;
+  /* Touch optimization */
+  -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
 }
 
-.mobile-nav-item:active {
-  transform: scale(0.95);
+.mobile-nav-item:hover {
+  color: var(--text-secondary, #a0a0a0);
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
-/* Touch targets on mobile */
-@media (pointer: coarse) {
-  .mobile-nav-item {
-    min-height: 60px;
-    padding: var(--spacing-md) var(--spacing-sm);
-  }
-}
-
-/* Active state - black text on gold */
+/* Active state - Gold background, black text */
 .mobile-nav-item.active {
   color: #000000 !important;
+  background-color: var(--gold, #ffdd00) !important;
   font-weight: 600 !important;
-  background-color: transparent !important;
-}
-
-/* Inactive hover - subtle gold hint */
-.mobile-nav-item:not(.active):hover {
-  color: rgba(255, 221, 0, 0.5);
 }
 
 .mobile-nav-icon {
-  font-size: 1.25rem;
-  margin-bottom: 2px;
-  flex-shrink: 0;
-  display: block;
-  text-align: center;
+  font-size: 1.125rem;
+  line-height: 1;
 }
 
 .mobile-nav-item span {
-  text-align: center;
   line-height: 1.2;
-  font-weight: 500;
-  width: 100%;
-  display: block;
+  text-align: center;
 }
 
-/* App content padding for nav */
-@media (max-width: 768px) {
-  .app-content {
-    padding-bottom: 90px;
+/* Touch device optimization */
+@media (pointer: coarse) {
+  .mobile-nav-item {
+    min-height: 52px;
+    padding: var(--space-3, 12px) var(--space-1, 4px);
   }
 }
 
 /* Small screens */
 @media (max-width: 480px) {
   .mobile-navigation {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    padding-bottom: max(var(--spacing-xs), env(safe-area-inset-bottom, 8px));
+    padding: var(--space-1, 4px) var(--space-2, 8px);
+    padding-bottom: max(var(--space-1, 4px), env(safe-area-inset-bottom, 6px));
   }
   
   .mobile-nav-container {
     max-width: 100%;
-    gap: 2px;
-    padding: 6px;
-    /* Slightly reduced blur on small screens for performance */
-    backdrop-filter: blur(20px) saturate(150%);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    box-shadow: 
-      0 4px 16px rgba(0, 0, 0, 0.4),
-      0 2px 6px rgba(0, 0, 0, 0.3),
-      0 0 1px rgba(255, 221, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  }
-  
-  .mobile-nav-slider {
-    top: 6px;
-    left: 6px;
-    height: calc(100% - 12px);
+    border-radius: var(--radius-sm, 2px);
   }
   
   .mobile-nav-item {
-    padding: var(--spacing-xs);
-    min-height: 52px;
-    font-size: 0.625rem;
+    padding: var(--space-2, 8px) 0;
+    font-size: 0.5625rem;
+    min-height: 48px;
   }
   
   .mobile-nav-icon {
-    font-size: 1.125rem;
-    margin-bottom: 2px;
+    font-size: 1rem;
   }
 }
 
 /* Very small screens */
 @media (max-width: 360px) {
   .mobile-nav-container {
-    padding: 4px;
-  }
-  
-  .mobile-nav-slider {
-    top: 4px;
-    left: 4px;
-    height: calc(100% - 8px);
+    padding: 2px;
   }
   
   .mobile-nav-item {
-    min-height: 48px;
-    font-size: 0.5625rem;
+    min-height: 44px;
+    font-size: 0.5rem;
+    gap: 1px;
   }
   
   .mobile-nav-icon {
-    font-size: 1rem;
+    font-size: 0.9375rem;
+  }
+}
+
+/* App content padding for nav */
+@media (max-width: 1024px) {
+  .app-content {
+    padding-bottom: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-content {
+    padding-bottom: 72px;
   }
 }
