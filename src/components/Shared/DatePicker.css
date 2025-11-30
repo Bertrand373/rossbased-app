@@ -176,63 +176,11 @@
 
 /* REMOVED: Old helper-text styles - replaced with helmet banner */
 
-/* IMPROVED: Button styling with grey→yellow hover effects */
+/* Button styling handled by TrackerButtons.css for Liquid Glass effect */
 .date-picker-actions {
   display: flex;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-sm); /* REDUCED: Less margin above buttons */
-}
-
-/* UPDATED: Primary action button - grey → yellow hover */
-.date-picker-container .primary-action {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-full) !important;
-  color: var(--text-secondary) !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  flex: 1 !important;
-  justify-content: center !important;
-  min-height: auto !important;
-}
-
-.date-picker-container .primary-action:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* UPDATED: Cancel button - grey → yellow hover */
-.date-picker-container .cancel-action {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-full) !important;
-  color: var(--text-secondary) !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  flex: 1 !important;
-  justify-content: center !important;
-  min-height: auto !important;
-}
-
-.date-picker-container .cancel-action:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
+  margin-top: var(--spacing-sm);
 }
 
 /* IMPROVED: Mobile responsiveness with better spacing */
@@ -313,14 +261,6 @@
   
   .date-picker-actions {
     gap: var(--spacing-sm);
-  }
-  
-  /* UPDATED: Mobile buttons with grey→yellow hover */
-  .date-picker-container .primary-action,
-  .date-picker-container .cancel-action {
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    font-size: 0.875rem !important;
-    min-height: auto !important;
   }
 }
 
