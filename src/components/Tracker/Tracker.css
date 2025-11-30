@@ -1429,7 +1429,7 @@ button.action-btn:hover {
   
   /* Add consistent spacing below subtitle before scroll area */
   .benefits-modal-subtitle {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
   }
   
   /* Scrollable middle section - banner + sliders */
@@ -1474,11 +1474,11 @@ button.action-btn:hover {
     flex-shrink: 0;
   }
   
-  /* Modal actions - fixed at bottom, symmetrical spacing with top */
+  /* Modal actions - fixed at bottom, tighter spacing */
   .benefits-modal-actions {
     flex-shrink: 0;
-    padding-top: var(--spacing-md);
-    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    margin-top: 0;
     /* Subtle top border to separate from scrollable content */
     border-top: 1px solid var(--border);
     background-color: var(--card-background);
