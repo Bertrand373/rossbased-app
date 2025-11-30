@@ -1,21 +1,19 @@
-/* components/Tracker/Tracker.css - REFINED PREMIUM EDITION */
-
+/* components/Tracker/Tracker.css - UPDATED: Pill-shaped horizontal milestone indicators */
 .tracker-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* Integrated header - FLAT surface */
+/* UPDATED: Integrated header design with subtitle and Calendar-matching sizing */
 .integrated-tracker-header {
   display: flex;
   flex-direction: column;
-  /* FLAT: Use surface-raised */
-  background-color: var(--surface-raised);
+  background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tracker-header-title-section {
@@ -31,8 +29,8 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-  /* WHITE: Readable */
-  color: #ffffff;
+  color: var(--text);
+  opacity: 0.85;
   text-align: center;
 }
 
@@ -55,21 +53,21 @@
   gap: var(--spacing-md);
 }
 
-/* Desktop main content grid container */
+/* NEW: Desktop main content grid container */
 .tracker-main-content {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* Discord and YouTube column container */
+/* NEW: Discord and YouTube column container */
 .discord-youtube-column {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-/* Legacy header styling */
+/* LEGACY: Keep old header styling for backward compatibility if needed */
 .tracker-header {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -93,14 +91,13 @@
   justify-self: end;
 }
 
-/* Action buttons - REFINED */
+/* UPDATED: Consistent grey → yellow hover pattern for ALL secondary buttons */
 .action-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  /* TRANSPARENT: Clean look */
-  background-color: transparent;
+  background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
@@ -108,28 +105,31 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  outline: none;
+  outline: none !important;
 }
 
+/* UPDATED: Yellow hover effect like navigation pills */
 .action-btn:hover,
 .tracker-actions .action-btn:hover,
 .tracker-header-actions .action-btn:hover,
 button.action-btn:hover {
-  background-color: var(--primary-muted);
-  border-color: var(--primary);
-  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 .action-btn:focus,
 .action-btn:active,
 .action-btn:focus-visible {
-  background-color: transparent;
-  border-color: var(--border);
-  color: var(--text-secondary);
-  transform: none;
-  opacity: 1;
-  box-shadow: none;
-  outline: none;
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  transform: none !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  filter: none !important;
 }
 
 /* Current Streak Section */
@@ -141,11 +141,10 @@ button.action-btn:hover {
 }
 
 .streak-card {
-  /* FLAT: Use surface-raised */
-  background-color: var(--surface-raised);
+  background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   border: 1px solid var(--border);
   display: flex;
@@ -173,18 +172,14 @@ button.action-btn:hover {
   font-size: 4rem;
   font-weight: 700;
   line-height: 1;
-  /* WHITE: Readable */
-  color: #ffffff;
+  color: var(--text);
   margin: 0;
-  /* Subtle glow */
-  text-shadow: 0 0 24px var(--primary-glow);
 }
 
 .streak-label {
   font-size: 1.25rem;
   font-weight: 500;
-  /* WHITE: Readable */
-  color: #ffffff;
+  color: var(--text);
   margin: 0;
 }
 
@@ -196,7 +191,7 @@ button.action-btn:hover {
   margin: 0;
 }
 
-/* Pill-shaped horizontal milestone indicators */
+/* NEW: Pill-shaped horizontal milestone indicators */
 .streak-milestone-pills {
   order: 4;
   display: flex;
@@ -213,14 +208,15 @@ button.action-btn:hover {
   gap: var(--spacing-md);
   padding: var(--spacing-md) var(--spacing-xl);
   background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-full);
   transition: all 0.2s ease;
 }
 
 .milestone-pill:hover {
-  background-color: var(--primary-muted);
-  border-color: rgba(255, 221, 0, 0.2);
+  background-color: rgba(255, 221, 0, 0.05);
+  border-color: rgba(255, 221, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .milestone-pill-icon {
@@ -231,8 +227,7 @@ button.action-btn:hover {
 
 .milestone-pill-text {
   font-size: 0.9375rem;
-  /* WHITE: Readable */
-  color: #ffffff;
+  color: var(--text);
   font-weight: 500;
   letter-spacing: 0.025em;
   line-height: 1.3;
@@ -264,21 +259,22 @@ button.action-btn:hover {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
   border: 1px solid;
 }
 
-/* Main action buttons */
+/* KEEP: Main action buttons unchanged - these are the primary actions */
 .relapse-btn-grey {
-  background-color: transparent;
+  background-color: rgba(128, 128, 128, 0.1);
   color: var(--text-secondary);
-  border-color: var(--border);
+  border-color: var(--text-secondary);
 }
 
 .relapse-btn-grey:hover {
-  background-color: rgba(128, 128, 128, 0.1);
+  background-color: rgba(128, 128, 128, 0.2);
   border-color: var(--text-secondary);
   color: var(--text-secondary);
+  transform: scale(1.05);
 }
 
 .wetdream-btn {
@@ -288,50 +284,55 @@ button.action-btn:hover {
 }
 
 .wetdream-btn:hover {
-  background-color: rgba(245, 158, 11, 0.15);
+  background-color: rgba(245, 158, 11, 0.2);
   border-color: var(--warning);
   color: var(--warning);
+  transform: scale(1.05);
 }
 
 .urge-btn {
-  background-color: var(--primary-muted);
+  background-color: rgba(37, 99, 235, 0.1);
   color: var(--primary);
   border-color: var(--primary);
 }
 
 .urge-btn:hover {
-  background-color: rgba(255, 221, 0, 0.15);
+  background-color: rgba(37, 99, 235, 0.2);
   border-color: var(--primary);
   color: var(--primary);
+  transform: scale(1.05);
 }
 
-/* Benefits button - PRIMARY YELLOW */
+/* NEW: Benefits button styling - PRIMARY YELLOW like login button */
 .benefits-btn-primary {
-  background-color: var(--primary-muted);
+  background-color: rgba(255, 221, 0, 0.1);
   color: var(--primary);
   border-color: var(--primary);
 }
 
 .benefits-btn-primary:hover {
-  background-color: rgba(255, 221, 0, 0.15);
+  background-color: rgba(255, 221, 0, 0.2);
   border-color: var(--primary);
   color: var(--primary);
+  transform: scale(1.05);
 }
 
-/* Discord and YouTube buttons */
+/* UPDATED: Discord and YouTube buttons use scale transform */
 .discord-join-btn:hover {
-  background: #5865F2;
-  border-color: #5865F2;
+  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+  border-color: #7289da;
   color: #ffffff;
+  transform: scale(1.05);
 }
 
 .youtube-subscribe-btn:hover {
-  background: #ff0000;
+  background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
   border-color: #ff0000;
   color: #ffffff;
+  transform: scale(1.05);
 }
 
-/* Benefits Status Indicator */
+/* UPDATED: Benefits Status Indicator - MATCHES emotional timeline pill sizing */
 .benefits-status-indicator {
   order: 5.5;
   display: flex;
@@ -345,8 +346,8 @@ button.action-btn:hover {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  background-color: rgba(34, 197, 94, 0.08);
-  border: 1px solid rgba(34, 197, 94, 0.15);
+  background-color: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.1);
   border-radius: var(--radius-full);
   padding: var(--spacing-sm) var(--spacing-md);
   color: var(--text-secondary);
@@ -364,8 +365,8 @@ button.action-btn:hover {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  background-color: var(--primary-muted);
-  border: 1px solid rgba(255, 221, 0, 0.15);
+  background-color: rgba(255, 221, 0, 0.05);
+  border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-full);
   padding: var(--spacing-sm) var(--spacing-md);
   color: var(--text-secondary);
@@ -380,7 +381,7 @@ button.action-btn:hover {
   flex-shrink: 0;
 }
 
-/* Premium Benefits Container */
+/* Premium Benefits Container - NOT USED IN MODAL */
 .premium-benefits-container {
   display: flex;
   flex-direction: column;
@@ -391,8 +392,7 @@ button.action-btn:hover {
 .date-picker-modal h2 {
   margin: 0 0 var(--spacing-sm) 0;
   font-size: 1.25rem;
-  /* WHITE: Readable */
-  color: #ffffff;
+  color: var(--text);
   text-align: center;
   font-weight: 600;
 }
@@ -405,22 +405,20 @@ button.action-btn:hover {
   text-align: center;
 }
 
-/* Modal close button - REFINED */
 .modal-close-btn {
   position: absolute;
-  top: var(--spacing-lg);
-  right: var(--spacing-lg);
-  /* TRANSPARENT: Clean look */
-  background: transparent;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: var(--text-secondary);
   cursor: pointer;
   padding: 0;
   border-radius: 50%;
   transition: all 0.2s ease;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -429,34 +427,24 @@ button.action-btn:hover {
 }
 
 .modal-close-btn:hover {
-  background-color: var(--primary-muted);
-  border-color: var(--primary);
-  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: scale(1.1);
 }
 
-/* Benefits Modal - FLAT, sticky header pattern */
+/* Benefits Modal Styling */
 .benefits-modal {
   max-width: 600px;
   max-height: 85vh;
-  /* FLAT: No gradient */
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  /* Flexbox for sticky header */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
 .benefits-modal-header {
   margin: 0 0 var(--spacing-sm) 0;
   font-size: 1.25rem;
-  /* WHITE: Readable */
-  color: #ffffff;
+  color: var(--text);
   text-align: center;
   font-weight: 600;
-  /* STICKY */
-  flex-shrink: 0;
 }
 
 .benefits-modal-subtitle {
@@ -465,15 +453,12 @@ button.action-btn:hover {
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.4;
-  /* STICKY */
-  flex-shrink: 0;
 }
 
-/* Benefits Tracking Banner - REFINED */
+/* Benefits Tracking Banner */
 .benefits-tracking-banner {
-  /* FLAT: Subtle gold tint */
-  background: var(--primary-muted);
-  border: 1px solid rgba(255, 221, 0, 0.15);
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 221, 0, 0.1);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   display: flex;
@@ -492,7 +477,7 @@ button.action-btn:hover {
   width: 40px;
   height: 40px;
   animation: coming-soon-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 8px var(--primary-glow));
+  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
 }
 
 .benefits-tracking-helmet-fallback {
@@ -507,8 +492,8 @@ button.action-btn:hover {
     transform: scale(1);
   }
   50% {
-    opacity: 0.7;
-    transform: scale(0.97);
+    opacity: 0.8;
+    transform: scale(0.96);
   }
 }
 
@@ -522,8 +507,7 @@ button.action-btn:hover {
 .benefits-tracking-title {
   font-size: 1rem;
   font-weight: 600;
-  /* WHITE: Readable */
-  color: #ffffff;
+  color: var(--text);
   margin: 0;
   display: flex;
   align-items: center;
@@ -537,7 +521,6 @@ button.action-btn:hover {
   margin: 0;
 }
 
-/* Scrollable sliders section */
 .benefits-modal-sliders {
   display: flex;
   flex-direction: column;
@@ -548,21 +531,6 @@ button.action-btn:hover {
   padding-right: var(--spacing-xs);
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-
-.benefits-modal-sliders::-webkit-scrollbar {
-  width: 6px;
-}
-
-.benefits-modal-sliders::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.benefits-modal-sliders::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
 }
 
 /* Benefit Sliders */
@@ -584,8 +552,7 @@ button.action-btn:hover {
 .premium-benefits-container .benefit-label,
 .benefit-slider-item .benefit-label {
   font-weight: 600 !important;
-  /* WHITE: Readable */
-  color: #ffffff !important;
+  color: var(--text) !important;
   flex: 1 !important;
   text-align: left !important;
   font-size: 1rem !important;
@@ -602,10 +569,9 @@ button.action-btn:hover {
 
 .benefit-value-clean {
   font-weight: 700;
-  /* WHITE: Readable */
-  color: #ffffff !important;
+  color: var(--text) !important;
   font-size: 0.875rem !important;
-  background-color: var(--primary-muted);
+  background-color: rgba(255, 221, 0, 0.08);
   padding: var(--spacing-xs);
   border-radius: 50%;
   width: 32px;
@@ -622,6 +588,7 @@ button.action-btn:hover {
 .benefit-slider-track-container {
   position: relative;
   flex: 1;
+  /* ADDED: Ensure container has height context for positioning */
   display: flex;
   align-items: center;
 }
@@ -643,14 +610,14 @@ button.action-btn:hover {
   transform: translateY(-50%);
   width: 1px;
   height: 3px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
   pointer-events: none;
 }
 
 .slider-tick.key-tick {
   height: 4px;
   width: 1px;
-  background-color: rgba(255, 221, 0, 0.2);
+  background-color: rgba(255, 221, 0, 0.25);
 }
 
 .slider-tick[data-value="1"] { left: calc(12px); }
@@ -669,37 +636,53 @@ button.action-btn:hover {
   flex: 1;
   height: 8px;
   border-radius: var(--radius-full);
-  /* FLAT: Solid track */
-  background: var(--surface-overlay);
+  /* Base track - neutral gray */
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.15) 0%, 
+    rgba(128, 128, 128, 0.1) 100%
+  );
   outline: none;
   transition: all 0.2s ease;
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
-  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.03);
   z-index: 1;
 }
 
+/* FIXED: Track fill now constrained to match slider track height exactly */
+/* This prevents the "highlighter" effect where fill bleeds outside the track */
 .slider-track-fill {
   position: absolute;
+  /* FIXED: Vertically center within container */
   top: 50%;
   transform: translateY(-50%);
+  /* FIXED: Start at left edge of track (accounts for thumb overhang) */
   left: 0;
+  /* FIXED: Match exact track height instead of 100% container height */
   height: 8px;
-  /* Gold fill */
+  /* Premium yellow gradient matching nav slider */
   background: linear-gradient(90deg, 
     rgba(255, 221, 0, 0.4) 0%, 
     rgba(255, 221, 0, 0.6) 100%
   );
+  /* FIXED: Match the track's border-radius for clean containment */
   border-radius: var(--radius-full);
+  /* Instant sync with thumb for premium responsive feel */
   transition: none;
   pointer-events: none;
   z-index: 0;
-  box-shadow: 0 0 4px var(--primary-glow);
+  /* Subtle glow for premium feel - reduced to not bleed outside track */
+  box-shadow: 0 0 4px rgba(255, 221, 0, 0.2);
 }
 
 .benefit-range-slider:hover:not(:disabled) {
-  border-color: var(--border-prominent);
+  background: linear-gradient(to right, 
+    rgba(128, 128, 128, 0.18) 0%, 
+    rgba(128, 128, 128, 0.12) 100%
+  );
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
 }
 
 .benefit-slider-track-container:hover .slider-track-fill {
@@ -707,16 +690,17 @@ button.action-btn:hover {
     rgba(255, 221, 0, 0.5) 0%, 
     rgba(255, 221, 0, 0.7) 100%
   );
+  box-shadow: 0 0 6px rgba(255, 221, 0, 0.3);
 }
 
 .benefit-range-slider:focus:not(:disabled) {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px var(--primary-muted);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
 }
 
 .benefit-range-slider:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  background: rgba(128, 128, 128, 0.1);
 }
 
 .benefit-range-slider::-webkit-slider-thumb {
@@ -725,49 +709,60 @@ button.action-btn:hover {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--primary);
+  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
   cursor: pointer;
-  box-shadow: var(--glow-gold);
+  /* Premium glow matching your nav pills */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
   margin: 0 !important;
-  transition: all 0.2s ease;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  /* Smooth cubic-bezier matching sliding pills */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   position: relative;
   z-index: 2;
+  opacity: 1;
 }
 
 .benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.1);
-  box-shadow: var(--glow-gold-strong);
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
+  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .benefit-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.05);
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 16px rgba(255, 221, 0, 0.6);
 }
 
 .benefit-range-slider::-moz-range-thumb {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--primary);
+  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: var(--glow-gold);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  /* Premium glow matching your nav pills */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
   margin: 0 !important;
-  transition: all 0.2s ease;
+  /* Smooth cubic-bezier matching sliding pills */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 2;
+  opacity: 1;
 }
 
 .benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.1);
-  box-shadow: var(--glow-gold-strong);
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
+  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .slider-labels {
   display: flex !important;
   justify-content: space-between !important;
   font-size: 0.75rem !important;
-  color: var(--text-muted) !important;
+  color: var(--text-secondary) !important;
   margin-top: 8px !important;
   margin-bottom: 0px !important;
   padding-top: 0px !important;
@@ -785,11 +780,11 @@ button.action-btn:hover {
 }
 
 .slider-labels span:first-child {
-  color: var(--text-muted) !important;
+  color: rgba(156, 163, 175, 0.8) !important;
 }
 
 .slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.6) !important;
+  color: rgba(255, 221, 0, 0.7) !important;
 }
 
 .modal-benefit-item {
@@ -807,18 +802,15 @@ button.action-btn:hover {
   padding-right: 10px !important;
 }
 
-/* Modal actions - STICKY at bottom */
 .benefits-modal-actions {
   display: flex;
   gap: var(--spacing-md);
   justify-content: center;
   margin-top: var(--spacing-md);
-  /* STICKY */
-  flex-shrink: 0;
 }
 
 .cancel-benefits-btn {
-  background-color: transparent;
+  background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
@@ -833,13 +825,14 @@ button.action-btn:hover {
 }
 
 .cancel-benefits-btn:hover {
-  background-color: var(--primary-muted);
-  border-color: var(--primary);
-  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 .modal-save-btn {
-  background-color: transparent;
+  background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
@@ -854,13 +847,14 @@ button.action-btn:hover {
 }
 
 .modal-save-btn:hover {
-  background-color: var(--primary-muted);
-  border-color: var(--primary);
-  color: var(--primary);
+  background-color: rgba(255, 221, 0, 0.1) !important;
+  border-color: rgba(255, 221, 0, 0.2) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* DESKTOP LAYOUT */
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
   .tracker-main-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -877,7 +871,7 @@ button.action-btn:hover {
   
   .streak-number {
     font-size: 5rem !important;
-    background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -897,7 +891,7 @@ button.action-btn:hover {
     padding: var(--spacing-md);
     background-color: rgba(255, 255, 255, 0.02);
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.2s ease;
     min-height: 120px;
     display: flex;
@@ -906,8 +900,9 @@ button.action-btn:hover {
   }
   
   .milestone-item:hover {
-    background-color: var(--primary-muted);
-    border-color: rgba(255, 221, 0, 0.2);
+    background-color: rgba(255, 221, 0, 0.05);
+    border-color: rgba(255, 221, 0, 0.1);
+    transform: translateY(-2px);
   }
   
   .milestone-icon {
@@ -969,6 +964,7 @@ button.action-btn:hover {
     max-height: 60vh;
   }
 
+  /* FIXED: Desktop track fill height matches desktop track (8px) */
   .slider-track-fill {
     height: 8px;
   }
@@ -996,7 +992,7 @@ button.action-btn:hover {
 }
 
 /* MOBILE LAYOUT */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .tracker-header-title-section h2 {
     font-size: 1.25rem !important;
   }
@@ -1060,7 +1056,7 @@ button.action-btn:hover {
   
   .streak-number {
     font-size: 3.5rem !important;
-    background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1078,8 +1074,8 @@ button.action-btn:hover {
   }
   
   .milestone-pill:active {
-    background-color: var(--primary-muted);
-    border-color: rgba(255, 221, 0, 0.2);
+    background-color: rgba(255, 221, 0, 0.08);
+    border-color: rgba(255, 221, 0, 0.15);
     transform: scale(0.98);
   }
   
@@ -1113,21 +1109,24 @@ button.action-btn:hover {
   }
   
   .benefits-btn-primary:active {
-    background: var(--primary);
-    border-color: var(--primary);
+    background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
+    border-color: #f0cc00;
     color: #000000;
+    transform: translateY(-1px);
   }
 
   .discord-join-btn:active {
-    background: #5865F2;
-    border-color: #5865F2;
+    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
+    border-color: #7289da;
     color: #ffffff;
+    transform: translateY(-1px);
   }
   
   .youtube-subscribe-btn:active {
-    background: #ff0000;
+    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
     border-color: #ff0000;
     color: #ffffff;
+    transform: translateY(-1px);
   }
   
   .benefits-status-indicator {
@@ -1181,6 +1180,7 @@ button.action-btn:hover {
     padding: 0;
   }
   
+  /* FIXED: Mobile track fill height matches mobile track (6px) */
   .slider-track-fill {
     height: 6px;
   }
@@ -1269,6 +1269,7 @@ button.action-btn:hover {
     align-items: center;
   }
   
+  /* Very small screen pill adjustments */
   .milestone-pill-text {
     font-size: 0.75rem;
   }
@@ -1287,6 +1288,7 @@ button.action-btn:hover {
     padding: 0;
   }
   
+  /* FIXED: Very small screen track fill height (6px) */
   .slider-track-fill {
     height: 6px;
   }
@@ -1337,13 +1339,16 @@ button.action-btn:hover {
 }
 
 /* ============================================================
-   MOBILE MODAL FIX - Above mobile navigation, centered, scrollable
+   MOBILE MODAL FIX - Ensures modals appear above mobile navigation,
+   are perfectly centered, and provide smooth contained scrolling
    ============================================================ */
 
+/* CRITICAL: Tracker modal overlay must be above mobile nav (z-index: 9999) */
 .tracker-container .modal-overlay,
 .modal-overlay:has(.benefits-modal),
 .modal-overlay:has(.date-picker-modal) {
   z-index: 10000;
+  /* Bulletproof centering */
   position: fixed;
   top: 0;
   left: 0;
@@ -1352,27 +1357,29 @@ button.action-btn:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Prevent background scroll when modal is open */
   overscroll-behavior: contain;
-  /* REFINED: Darker overlay */
-  background-color: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
 }
 
+/* Enhanced modal content - centered on all devices */
 .tracker-container .modal-content,
 .benefits-modal,
 .date-picker-modal {
+  /* Prevent scroll chaining to background */
   overscroll-behavior: contain;
+  /* Ensure proper centering */
   position: relative;
   margin: 0;
 }
 
-/* Mobile modal enhancements */
+/* Mobile-specific modal enhancements */
 @media (max-width: 1024px) {
+  /* Ensure modal overlay covers everything including nav */
   .tracker-container .modal-overlay,
   .modal-overlay:has(.benefits-modal),
   .modal-overlay:has(.date-picker-modal) {
     z-index: 10000;
+    /* Bulletproof centering for all mobile devices */
     position: fixed;
     top: 0;
     left: 0;
@@ -1384,6 +1391,7 @@ button.action-btn:hover {
     align-items: center;
     justify-content: center;
     padding: var(--spacing-md);
+    /* Account for safe areas on all sides */
     padding-top: max(var(--spacing-md), env(safe-area-inset-top, 0px));
     padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom, 0px));
     padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
@@ -1391,47 +1399,58 @@ button.action-btn:hover {
     box-sizing: border-box;
   }
   
+  /* Modal content adjustments for mobile - TRUE CENTER */
   .tracker-container .modal-content,
   .benefits-modal {
+    /* Reset any margins that could offset centering */
     margin: 0;
+    /* Constrain size */
     max-height: 85vh;
-    max-height: 85dvh;
+    max-height: 85dvh; /* Dynamic viewport height for mobile browsers */
     max-width: calc(100vw - var(--spacing-lg));
     width: 100%;
+    /* Flexbox layout for proper scrolling */
     display: flex;
     flex-direction: column;
+    /* NO overflow on modal itself - children handle it */
     overflow: hidden;
   }
   
+  /* Benefits modal specific mobile adjustments */
   .benefits-modal {
     max-width: 600px;
   }
   
-  /* Fixed header elements */
+  /* Fixed header elements - always visible */
   .benefits-modal-header,
   .benefits-modal-subtitle {
     flex-shrink: 0;
   }
   
+  /* Add consistent spacing below subtitle before scroll area */
   .benefits-modal-subtitle {
     margin-bottom: var(--spacing-sm);
   }
   
-  /* Scrollable middle section */
+  /* Scrollable middle section - banner + sliders */
   .benefits-modal-sliders {
     flex: 1;
-    min-height: 0;
+    min-height: 0; /* Critical for flex scrolling */
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    /* Subtle custom scrollbar */
     scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    scrollbar-color: rgba(255, 221, 0, 0.3) transparent;
+    /* Add padding for breathing room */
     padding-right: var(--spacing-xs);
+    /* FIX: Prevent content from getting cut off at bottom */
     padding-bottom: var(--spacing-sm);
   }
   
+  /* Webkit scrollbar styling */
   .benefits-modal-sliders::-webkit-scrollbar {
     width: 6px;
   }
@@ -1441,23 +1460,28 @@ button.action-btn:hover {
   }
   
   .benefits-modal-sliders::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: rgba(255, 221, 0, 0.3);
     border-radius: 3px;
   }
   
+  .benefits-modal-sliders::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 221, 0, 0.5);
+  }
+  
+  /* Banner inside the scrollable area - ensure it shows fully */
   .benefits-tracking-banner {
     margin-bottom: var(--spacing-lg);
     flex-shrink: 0;
   }
   
-  /* Modal actions - fixed at bottom */
+  /* Modal actions - fixed at bottom, tighter spacing */
   .benefits-modal-actions {
     flex-shrink: 0;
-    padding-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
     margin-top: 0;
+    /* Subtle top border to separate from scrollable content */
     border-top: 1px solid var(--border);
-    /* FLAT: Use surface */
-    background-color: var(--surface);
+    background-color: var(--card-background);
   }
 }
 
@@ -1476,19 +1500,12 @@ button.action-btn:hover {
     max-height: 90vh;
     max-height: 90dvh;
     padding: var(--spacing-md);
+    /* Ensure it stays centered */
     margin: 0;
-  }
-  
-  .modal-close-btn {
-    top: var(--spacing-md);
-    right: var(--spacing-md);
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
   }
 }
 
-/* Landscape orientation */
+/* Landscape orientation handling */
 @media (max-height: 500px) and (orientation: landscape) {
   .tracker-container .modal-overlay,
   .modal-overlay:has(.benefits-modal) {
