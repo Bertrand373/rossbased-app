@@ -1,10 +1,10 @@
-/* App.css - Refined Premium Edition with #ffdd00 */
+/* App.css - FULL-SCREEN APP LAYOUT */
 /* ============================================================
    DESIGN PHILOSOPHY:
+   - Full-width, edge-to-edge like a real mobile app
+   - Compact sticky header on mobile
+   - No container boxes - content fills the screen
    - Your gold (#ffdd00), used strategically
-   - Flat colors, not gradients
-   - Generous whitespace
-   - Restrained effects
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -38,12 +38,21 @@
   /* Gold glow - softer to prevent harshness */
   --glow-gold: 0 0 20px rgba(255, 221, 0, 0.15);
   --glow-gold-strong: 0 0 28px rgba(255, 221, 0, 0.25);
+  
+  /* Header heights for spacing calculations */
+  --mobile-header-height: 56px;
+  --desktop-header-height: 72px;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -72,15 +81,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
-   LAYOUT
+   LAYOUT - FULL SCREEN APP MODE
    ============================================================ */
 
 .app-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--background);
+  /* NO max-width - full screen */
+  /* NO margins - edge to edge */
 }
 
 /* ============================================================
@@ -125,17 +136,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .spartan-loading-screen {
-  max-width: 1200px;
-  margin: var(--spacing-md) auto;
-  min-height: calc(100vh - 48px);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  width: 100%;
+  min-height: 100vh;
+  background: var(--background);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  /* NO borders, NO rounded corners - full screen */
 }
 
 .app-loading-helmet-size {
@@ -163,20 +171,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
-   HEADER - Clean, flat
+   HEADER - DESKTOP: Full-width sticky bar
    ============================================================ */
 
 .app-header {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-xl);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  margin: var(--spacing-md) var(--spacing-lg) 0 var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
   gap: var(--spacing-xl);
+  min-height: var(--desktop-header-height);
+  /* NO rounded corners - full width bar */
+  /* NO margins - edge to edge */
 }
 
 .logo-container {
@@ -186,12 +197,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .app-logo {
-  height: 100px;
+  height: 48px;
   width: auto;
 }
 
 /* ============================================================
-   NAVIGATION - Refined pill system
+   NAVIGATION - Desktop pill system
    ============================================================ */
 
 .header-nav {
@@ -234,7 +245,6 @@ h1, h2, h3, h4, h5, h6 {
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
-  /* Softer glow - key to making bright gold feel premium */
   box-shadow: var(--glow-gold);
 }
 
@@ -286,7 +296,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
-   USER CONTROLS
+   USER CONTROLS - Desktop
    ============================================================ */
 
 .user-controls {
@@ -344,7 +354,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
-   MOBILE HEADER
+   MOBILE HEADER - Compact sticky bar with logo + controls
    ============================================================ */
 
 @media (max-width: 1024px) {
@@ -361,32 +371,42 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 2.8rem;
   }
 
+  /* MOBILE HEADER: Single-row compact sticky bar */
   .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
     display: flex;
-    flex-direction: column;
-    padding: var(--spacing-md) var(--spacing-lg);
-    gap: var(--spacing-md);
-    align-items: stretch;
-    margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
-  }
-  
-  .app-logo {
-    height: 88px;
-  }
-  
-  .header-top-row {
-    display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-md);
+    padding-top: max(var(--spacing-sm), env(safe-area-inset-top, 0px));
+    gap: var(--spacing-sm);
+    min-height: var(--mobile-header-height);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    /* NO rounded corners, NO margins */
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  /* Mobile logo - smaller */
+  .app-logo {
+    height: 36px;
+    width: auto;
+  }
+  
+  /* Hide desktop layout elements */
+  .header-top-row {
+    display: contents;
   }
   
   .header-bottom-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: var(--spacing-xs);
+    display: none;
   }
   
+  /* Mobile user controls - horizontal row */
   .mobile-user-controls {
     display: flex;
     align-items: center;
@@ -399,6 +419,7 @@ h1, h2, h3, h4, h5, h6 {
     min-width: 40px;
     height: 40px;
     justify-content: center;
+    border-radius: var(--radius-md);
   }
   
   .mobile-user-controls .profile-btn span,
@@ -406,27 +427,21 @@ h1, h2, h3, h4, h5, h6 {
     display: none;
   }
   
+  /* Hide the username row on mobile - keep it compact */
   .mobile-username {
-    font-weight: 600;
-    color: var(--primary);
-    font-size: 0.9375rem;
-    text-align: center;
-    letter-spacing: 0.01em;
+    display: none;
   }
   
-  .mobile-username::before {
-    content: "Hey, ";
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
-  
+  /* Hide desktop nav on mobile */
   .header-nav {
     display: none;
   }
   
   .spartan-loading-screen {
-    margin: var(--spacing-sm);
-    min-height: calc(100vh - 16px);
+    min-height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    border: none;
   }
 
   .app-loading-helmet-size {
@@ -440,6 +455,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 480px) {
+  .app-header {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    padding-top: max(var(--spacing-xs), env(safe-area-inset-top, 0px));
+    min-height: 48px;
+  }
+  
+  .app-logo {
+    height: 32px;
+  }
+  
+  .mobile-user-controls .profile-btn,
+  .mobile-user-controls .logout-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: var(--spacing-xs);
+  }
+  
   .landing-initial-helmet,
   .app-loading-helmet-size {
     width: 56px !important;
@@ -550,24 +582,42 @@ button:active {
 }
 
 /* ============================================================
-   MAIN CONTENT
+   MAIN CONTENT - Full width, edge to edge
    ============================================================ */
 
 .app-content {
   display: flex;
   flex-direction: column;
+  flex: 1;
   background: var(--surface);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  margin: 0 var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
-  border-top: none;
-  min-height: calc(100vh - 200px);
+  min-height: calc(100vh - var(--desktop-header-height));
+  /* NO border-radius, NO margins, NO borders - full screen */
 }
 
 .main-content-wrapper {
   flex: 1;
   padding: var(--spacing-xl);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Mobile content adjustments */
+@media (max-width: 1024px) {
+  .app-content {
+    min-height: auto;
+    padding-bottom: 100px; /* Space for bottom nav */
+  }
+  
+  .main-content-wrapper {
+    padding: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content-wrapper {
+    padding: var(--spacing-sm);
+  }
 }
 
 /* ============================================================
@@ -607,6 +657,24 @@ button:active {
   font-weight: 600;
   color: #ffffff;
   letter-spacing: -0.02em;
+}
+
+@media (max-width: 1024px) {
+  .card {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+  }
+  
+  .card-title {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
 }
 
 /* ============================================================
@@ -909,14 +977,17 @@ input:checked + .toggle-slider:before {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: var(--spacing-md);
 }
 
 .modal-content {
   background: var(--surface);
   border-radius: var(--radius-xl);
   padding: var(--spacing-2xl);
-  width: 90%;
+  width: 100%;
   max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: var(--shadow-xl);
   color: var(--text);
   border: 1px solid var(--border);
@@ -934,32 +1005,15 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* ============================================================
-   MOBILE RESPONSIVE
-   ============================================================ */
-
-@media (max-width: 1024px) {
-  .app-content {
-    margin: 0 var(--spacing-sm) 0 var(--spacing-sm);
-    min-height: auto;
-    padding-bottom: 100px;
-  }
-  
-  .main-content-wrapper {
+@media (max-width: 480px) {
+  .modal-content {
     padding: var(--spacing-lg);
-  }
-  
-  .card {
-    padding: var(--spacing-lg);
-  }
-  
-  .card-title {
-    font-size: 1rem;
+    border-radius: var(--radius-lg);
   }
 }
 
 /* ============================================================
-   MOBILE NAVIGATION
+   MOBILE NAVIGATION (Bottom nav pill)
    ============================================================ */
 
 .mobile-navigation {
@@ -967,15 +1021,12 @@ input:checked + .toggle-slider:before {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(10, 10, 10, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: transparent;
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
-  box-shadow: 0 -1px 0 var(--border);
+  padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 8px));
   z-index: 1000;
-  padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom, 0px));
 }
 
 /* ============================================================

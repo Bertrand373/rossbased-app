@@ -1,4 +1,4 @@
-// App.js - UPDATED: Using unified PredictionDisplay component
+// App.js - UPDATED: Full-screen app layout with compact mobile header
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -39,7 +39,7 @@ import SpartanLoader from './components/Shared/SpartanLoader';
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
 
-// Profile Button Component - handles navigation to profile
+// Profile Button Component - handles navigation to profile (Desktop)
 const ProfileButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,7 +62,7 @@ const ProfileButton = () => {
   );
 };
 
-// Mobile Profile Button Component
+// Mobile Profile Button Component - icon only
 const MobileProfileButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -84,7 +84,7 @@ const MobileProfileButton = () => {
   );
 };
 
-// Header Navigation
+// Header Navigation (Desktop only)
 const HeaderNavigation = () => {
   const location = useLocation();
   
@@ -447,9 +447,10 @@ function App() {
           <>
             <header className="app-header">
               {!isMobile ? (
+                /* DESKTOP HEADER: Logo | Nav | Controls */
                 <>
                   <div className="logo-container">
-                    <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
+                    <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
                   </div>
                   
                   <HeaderNavigation />
@@ -463,25 +464,22 @@ function App() {
                   </div>
                 </>
               ) : (
+                /* MOBILE HEADER: Compact single row - Logo on left, controls on right */
                 <>
-                  <div className="header-top-row">
-                    <div className="logo-container">
-                      <img src={trackerLogo} alt="Tracker App Logo" className="app-logo" />
-                    </div>
-                    <div className="mobile-user-controls">
-                      <MobileProfileButton />
-                      <button className="logout-btn" onClick={logout} title="Logout">
-                        <FaPowerOff />
-                      </button>
-                    </div>
+                  <div className="logo-container">
+                    <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
                   </div>
-                  <div className="header-bottom-row">
-                    <span className="mobile-username">{userData.username}</span>
+                  <div className="mobile-user-controls">
+                    <MobileProfileButton />
+                    <button className="logout-btn" onClick={logout} title="Logout">
+                      <FaPowerOff />
+                    </button>
                   </div>
                 </>
               )}
             </header>
             
+            {/* Bottom navigation for mobile */}
             {isMobile && (
               <MobileNavigation 
                 activeTab={activeTab} 
