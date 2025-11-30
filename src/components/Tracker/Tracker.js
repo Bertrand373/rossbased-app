@@ -579,7 +579,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             <div className="streak-divider"></div>
             
             <div className="streak-milestone-pills">
-              <div className="milestone-pill">
+              <div className="glass-pill glass-pill-neutral">
                 <FaFire className="milestone-pill-icon" />
                 <span className="milestone-pill-text">
                   {nextMilestone.isSageMode 
@@ -589,7 +589,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
                 </span>
               </div>
               
-              <div className="milestone-pill">
+              <div className="glass-pill glass-pill-neutral">
                 <FaClipboardCheck className="milestone-pill-icon" />
                 <span className="milestone-pill-text">
                   {monthProgress.logged} of {monthProgress.total} days tracked this month
@@ -601,12 +601,12 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             <div className="benefits-status-indicator">
               {benefitsLogged ? (
-                <div className="benefits-logged-status">
+                <div className="glass-pill glass-pill-success">
                   <FaCheckCircle className="check-icon" />
                   <span>Benefits logged for today!</span>
                 </div>
               ) : (
-                <div className="benefits-not-logged-status">
+                <div className="glass-pill glass-pill-info">
                   <FaInfoCircle className="info-icon" />
                   <span>Log your daily benefits</span>
                 </div>
@@ -682,7 +682,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             
             <div className="discord-community-actions">
               {userData.showOnLeaderboard && userData.discordUsername && (
-                <div className="leaderboard-status">
+                <div className="glass-pill glass-pill-discord">
                   <FaCheckCircle className="check-icon" />
                   <span>You're on the leaderboard as <strong>{userData.discordUsername}</strong></span>
                 </div>
@@ -700,7 +700,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
             </div>
             
             {userData.showOnLeaderboard && !userData.discordUsername && (
-              <div className="discord-setup-note">
+              <div className="glass-pill glass-pill-warning" style={{ textAlign: 'center', lineHeight: '1.4' }}>
                 <FaInfoCircle className="info-icon" />
                 <span>Set your Discord username in Profile settings to appear on the leaderboard</span>
               </div>
