@@ -1,87 +1,32 @@
-/* components/Tracker/TrackerButtons.css - Complete Button Hierarchy System */
+/* components/Tracker/TrackerButtons.css - Unified Liquid Glass Button Family */
 /* 
-   BUTTON TIERS:
-   - Tier 1 (.btn-primary-solid): Solid gold, black text - hero CTAs
-   - Tier 2 (.liquid-btn): Liquid Glass - secondary actions, confirms
-   - Tier 3 (.ghost-btn): Nearly invisible - cancel, close, dismiss
-   - Tier 4 (.contextual-btn-*): Colored by meaning - status actions
-   - Tier 5 (.brand-btn-*): External brand colors - Discord, YouTube
+   All buttons share the same Liquid Glass DNA:
+   - backdrop-filter blur + saturation
+   - subtle inner highlight (::before)
+   - spring animation timing
+   - hover lift behavior
+   
+   Differentiated by color tint:
+   - Gold (primary actions)
+   - Grey (neutral/destructive)
+   - Amber (warning/caution)
+   - Purple (Discord)
+   - Red (YouTube)
 */
 
 /* ============================================================
-   UNIFORM BUTTON BASE - All buttons share these dimensions
+   LIQUID GLASS BASE - Shared DNA for all buttons
    ============================================================ */
 
-.btn-uniform {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  outline: none !important;
-  text-decoration: none;
-  min-height: 44px;
-  width: 100%;
-}
-
-/* ============================================================
-   TIER 1: PRIMARY SOLID - Hero action, one per screen
-   Solid gold with black text
-   ============================================================ */
-
-.btn-primary-solid {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  outline: none !important;
-  min-height: 44px;
-  width: 100%;
-  
-  /* Solid gold - flat, premium */
-  background: var(--primary);
-  border: 1px solid var(--primary);
-  color: #000000;
-  
-  /* Subtle depth */
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.2),
-    0 0 20px rgba(255, 221, 0, 0.1);
-  
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.btn-primary-solid:hover {
-  background: #ffe94d;
-  border-color: #ffe94d;
-  box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.25),
-    0 0 30px rgba(255, 221, 0, 0.2);
-  transform: translateY(-1px);
-}
-
-.btn-primary-solid:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.2),
-    0 0 15px rgba(255, 221, 0, 0.1);
-}
-
-/* ============================================================
-   TIER 2: LIQUID GLASS - Secondary actions, confirms
-   Apple-inspired subtle glass effect with gold tint
-   ============================================================ */
-
-.liquid-btn {
+/* Core glass properties - applied to all button types */
+.liquid-btn,
+.liquid-btn-gold,
+.liquid-btn-grey,
+.liquid-btn-amber,
+.liquid-btn-discord,
+.liquid-btn-youtube,
+.liquid-btn-ghost {
+  /* Uniform sizing */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,12 +40,11 @@
   position: relative;
   min-height: 44px;
   width: 100%;
+  text-decoration: none;
   
-  /* Liquid Glass base - barely visible */
-  background: rgba(255, 255, 255, 0.03);
+  /* Liquid Glass foundation */
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 221, 0, 0.08);
   
   /* Soft ambient shadow */
   box-shadow: 
@@ -108,14 +52,18 @@
     0 4px 12px rgba(0, 0, 0, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
   
-  /* Muted gold text */
-  color: rgba(255, 221, 0, 0.5);
-  
+  /* Spring animation */
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Glass highlight */
-.liquid-btn::before {
+/* Glass highlight - shared by all */
+.liquid-btn::before,
+.liquid-btn-gold::before,
+.liquid-btn-grey::before,
+.liquid-btn-amber::before,
+.liquid-btn-discord::before,
+.liquid-btn-youtube::before,
+.liquid-btn-ghost::before {
   content: '';
   position: absolute;
   top: 0;
@@ -129,23 +77,37 @@
   transition: opacity 0.4s ease;
 }
 
-.liquid-btn:hover {
+/* ============================================================
+   GOLD TINT - Primary/default (Edit Start Date, Save, Urges)
+   ============================================================ */
+
+.liquid-btn,
+.liquid-btn-gold {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 221, 0, 0.08);
+  color: rgba(255, 221, 0, 0.5);
+}
+
+.liquid-btn:hover,
+.liquid-btn-gold:hover {
   background: rgba(255, 221, 0, 0.04);
   border-color: rgba(255, 221, 0, 0.15);
+  color: rgba(255, 221, 0, 0.8);
+  transform: translateY(-1px);
   box-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 8px 24px rgba(0, 0, 0, 0.08),
     0 0 40px rgba(255, 221, 0, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  color: rgba(255, 221, 0, 0.8);
-  transform: translateY(-1px);
 }
 
-.liquid-btn:hover::before {
+.liquid-btn:hover::before,
+.liquid-btn-gold:hover::before {
   opacity: 0.8;
 }
 
-.liquid-btn:active {
+.liquid-btn:active,
+.liquid-btn-gold:active {
   transform: translateY(0) scale(0.98);
   background: rgba(255, 221, 0, 0.06);
   box-shadow: 
@@ -153,56 +115,18 @@
     inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.liquid-btn:focus-visible {
+.liquid-btn:focus-visible,
+.liquid-btn-gold:focus-visible {
   outline: 2px solid rgba(255, 221, 0, 0.3);
   outline-offset: 2px;
 }
 
 /* ============================================================
-   TIER 3: GHOST - Cancel, close, dismiss
-   Nearly invisible, de-emphasized
+   GOLD PROMINENT - Slightly more visible for primary CTA
+   (Log Benefits - the main action)
    ============================================================ */
 
-.ghost-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  outline: none !important;
-  min-height: 44px;
-  width: 100%;
-  
-  /* Nearly invisible */
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-secondary);
-  
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.ghost-btn:hover {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 221, 0, 0.1);
-  color: rgba(255, 221, 0, 0.6);
-}
-
-.ghost-btn:active {
-  transform: scale(0.98);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-/* ============================================================
-   TIER 4: CONTEXTUAL - Status-based actions
-   Liquid Glass with colored tints
-   ============================================================ */
-
-/* Base contextual style */
-.contextual-btn {
+.liquid-btn-gold-primary {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -217,181 +141,262 @@
   min-height: 44px;
   width: 100%;
   
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
-  
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Grey/Neutral - Relapse */
-.contextual-btn-grey {
-  background: rgba(128, 128, 128, 0.06);
-  border: 1px solid rgba(128, 128, 128, 0.15);
-  color: rgba(170, 170, 170, 0.8);
-}
-
-.contextual-btn-grey:hover {
-  background: rgba(128, 128, 128, 0.12);
-  border-color: rgba(128, 128, 128, 0.25);
-  color: var(--text-secondary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.contextual-btn-grey:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* Amber/Warning - Wet Dream */
-.contextual-btn-amber {
-  background: rgba(245, 158, 11, 0.06);
-  border: 1px solid rgba(245, 158, 11, 0.15);
-  color: rgba(245, 158, 11, 0.8);
-}
-
-.contextual-btn-amber:hover {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.25);
-  color: var(--warning);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
-}
-
-.contextual-btn-amber:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* Gold/Primary - Urges */
-.contextual-btn-gold {
+  /* Slightly more visible gold */
   background: rgba(255, 221, 0, 0.06);
-  border: 1px solid rgba(255, 221, 0, 0.15);
-  color: rgba(255, 221, 0, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 221, 0, 0.12);
+  color: rgba(255, 221, 0, 0.7);
+  
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    0 0 20px rgba(255, 221, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.contextual-btn-gold:hover {
+.liquid-btn-gold-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 221, 0, 0.08) 0%, transparent 100%);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity 0.4s ease;
+}
+
+.liquid-btn-gold-primary:hover {
+  background: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: rgba(255, 221, 0, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 50px rgba(255, 221, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.liquid-btn-gold-primary:hover::before {
+  opacity: 0.9;
+}
+
+.liquid-btn-gold-primary:active {
+  transform: translateY(0) scale(0.98);
   background: rgba(255, 221, 0, 0.12);
-  border-color: rgba(255, 221, 0, 0.25);
-  color: var(--primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.1);
-}
-
-.contextual-btn-gold:active {
-  transform: translateY(0) scale(0.98);
 }
 
 /* ============================================================
-   TIER 5: BRAND - External platforms
-   Liquid Glass with brand color tints (uniform size)
+   GREY TINT - Neutral/Destructive (Log Relapse)
    ============================================================ */
 
-.brand-btn-discord {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  outline: none !important;
-  position: relative;
-  min-height: 44px;
-  width: 100%;
-  text-decoration: none;
-  
-  /* Discord purple glass */
+.liquid-btn-grey {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(150, 150, 150, 0.1);
+  color: rgba(170, 170, 170, 0.6);
+}
+
+.liquid-btn-grey:hover {
+  background: rgba(150, 150, 150, 0.06);
+  border-color: rgba(150, 150, 150, 0.18);
+  color: rgba(200, 200, 200, 0.85);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 30px rgba(150, 150, 150, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.liquid-btn-grey:hover::before {
+  opacity: 0.8;
+}
+
+.liquid-btn-grey:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(150, 150, 150, 0.08);
+}
+
+/* ============================================================
+   AMBER TINT - Warning/Caution (Log Wet Dream)
+   ============================================================ */
+
+.liquid-btn-amber {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  color: rgba(245, 158, 11, 0.55);
+}
+
+.liquid-btn-amber:hover {
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.18);
+  color: rgba(245, 158, 11, 0.85);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 30px rgba(245, 158, 11, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.liquid-btn-amber:hover::before {
+  opacity: 0.8;
+}
+
+.liquid-btn-amber:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+/* ============================================================
+   DISCORD TINT - Purple brand color
+   ============================================================ */
+
+.liquid-btn-discord {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(114, 137, 218, 0.12);
+  color: rgba(114, 137, 218, 0.6);
+}
+
+.liquid-btn-discord:hover {
+  background: rgba(114, 137, 218, 0.06);
+  border-color: rgba(114, 137, 218, 0.2);
+  color: rgba(114, 137, 218, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 30px rgba(114, 137, 218, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.liquid-btn-discord:hover::before {
+  opacity: 0.8;
+}
+
+.liquid-btn-discord:active {
+  transform: translateY(0) scale(0.98);
   background: rgba(114, 137, 218, 0.1);
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
-  border: 1px solid rgba(114, 137, 218, 0.2);
-  color: #7289da;
-  
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.brand-btn-discord:hover {
-  background: rgba(114, 137, 218, 0.18);
-  border-color: rgba(114, 137, 218, 0.35);
-  color: #8399e0;
+/* ============================================================
+   YOUTUBE TINT - Red brand color
+   ============================================================ */
+
+.liquid-btn-youtube {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  color: rgba(255, 80, 80, 0.6);
+}
+
+.liquid-btn-youtube:hover {
+  background: rgba(255, 0, 0, 0.05);
+  border-color: rgba(255, 0, 0, 0.18);
+  color: rgba(255, 80, 80, 0.9);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(114, 137, 218, 0.15);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 30px rgba(255, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-.brand-btn-discord:active {
+.liquid-btn-youtube:hover::before {
+  opacity: 0.8;
+}
+
+.liquid-btn-youtube:active {
   transform: translateY(0) scale(0.98);
-}
-
-.brand-btn-youtube {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  outline: none !important;
-  position: relative;
-  min-height: 44px;
-  width: 100%;
-  text-decoration: none;
-  
-  /* YouTube red glass */
   background: rgba(255, 0, 0, 0.08);
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
-  border: 1px solid rgba(255, 0, 0, 0.15);
-  color: #ff4444;
-  
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.brand-btn-youtube:hover {
-  background: rgba(255, 0, 0, 0.15);
-  border-color: rgba(255, 0, 0, 0.3);
-  color: #ff6666;
+/* ============================================================
+   GHOST TINT - Cancel/Dismiss (barely visible)
+   ============================================================ */
+
+.liquid-btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(170, 170, 170, 0.5);
+}
+
+.liquid-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 221, 0, 0.08);
+  color: rgba(255, 221, 0, 0.5);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(255, 0, 0, 0.12);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.brand-btn-youtube:active {
+.liquid-btn-ghost:hover::before {
+  opacity: 0.6;
+}
+
+.liquid-btn-ghost:active {
   transform: translateY(0) scale(0.98);
 }
 
 /* ============================================================
-   LEGACY SUPPORT - Keep old classes working
+   EXTERNAL ICON - Subtle indicator for outbound links
    ============================================================ */
 
+.external-icon {
+  font-size: 0.65rem;
+  opacity: 0.5;
+  margin-left: 2px;
+}
+
+/* ============================================================
+   LEGACY CLASS ALIASES - Map old classes to new system
+   ============================================================ */
+
+/* These ensure backward compatibility while using new styles */
 .action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
   outline: none !important;
+  position: relative;
   min-height: 44px;
   width: 100%;
+  
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 221, 0, 0.08);
+  color: rgba(255, 221, 0, 0.5);
+  
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .action-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
+  background: rgba(255, 221, 0, 0.04);
+  border-color: rgba(255, 221, 0, 0.15);
+  color: rgba(255, 221, 0, 0.8);
+  transform: translateY(-1px);
 }
 
-/* Legacy streak buttons - redirect to new system */
+/* Streak action buttons - redirect to liquid glass */
 .streak-action-btn {
   display: flex;
   align-items: center;
@@ -402,67 +407,154 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid;
+  outline: none !important;
+  position: relative;
   min-height: 44px;
   width: 100%;
+  
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Legacy color classes - now using contextual system */
-.relapse-btn-grey {
-  background: rgba(128, 128, 128, 0.06);
-  border: 1px solid rgba(128, 128, 128, 0.15);
-  color: rgba(170, 170, 170, 0.8);
+.streak-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.4s ease;
 }
 
-.relapse-btn-grey:hover {
-  background: rgba(128, 128, 128, 0.12);
-  border-color: rgba(128, 128, 128, 0.25);
-  color: var(--text-secondary);
-  transform: translateY(-1px);
-}
-
-.wetdream-btn {
-  background: rgba(245, 158, 11, 0.06);
-  border: 1px solid rgba(245, 158, 11, 0.15);
-  color: rgba(245, 158, 11, 0.8);
-}
-
-.wetdream-btn:hover {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.25);
-  color: var(--warning);
-  transform: translateY(-1px);
-}
-
-.urge-btn {
-  background: rgba(255, 221, 0, 0.06);
-  border: 1px solid rgba(255, 221, 0, 0.15);
-  color: rgba(255, 221, 0, 0.8);
-}
-
-.urge-btn:hover {
-  background: rgba(255, 221, 0, 0.12);
-  border-color: rgba(255, 221, 0, 0.25);
-  color: var(--primary);
-  transform: translateY(-1px);
-}
-
+/* Benefits primary - gold prominent */
 .benefits-btn-primary {
-  background: var(--primary);
-  border: 1px solid var(--primary);
-  color: #000000;
-  font-weight: 600;
+  background: rgba(255, 221, 0, 0.06);
+  border: 1px solid rgba(255, 221, 0, 0.12);
+  color: rgba(255, 221, 0, 0.7);
+}
+
+.benefits-btn-primary::before {
+  background: linear-gradient(180deg, rgba(255, 221, 0, 0.08) 0%, transparent 100%) !important;
+  opacity: 0.6 !important;
 }
 
 .benefits-btn-primary:hover {
-  background: #ffe94d;
-  border-color: #ffe94d;
+  background: rgba(255, 221, 0, 0.1);
+  border-color: rgba(255, 221, 0, 0.2);
+  color: rgba(255, 221, 0, 0.9);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.2);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 50px rgba(255, 221, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-/* Legacy community buttons */
+.benefits-btn-primary:hover::before {
+  opacity: 0.9 !important;
+}
+
+.benefits-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(255, 221, 0, 0.12);
+}
+
+/* Relapse - grey tint */
+.relapse-btn-grey {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(150, 150, 150, 0.1);
+  color: rgba(170, 170, 170, 0.6);
+}
+
+.relapse-btn-grey:hover {
+  background: rgba(150, 150, 150, 0.06);
+  border-color: rgba(150, 150, 150, 0.18);
+  color: rgba(200, 200, 200, 0.85);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 30px rgba(150, 150, 150, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.relapse-btn-grey:hover::before {
+  opacity: 0.8;
+}
+
+.relapse-btn-grey:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(150, 150, 150, 0.08);
+}
+
+/* Wet dream - amber tint */
+.wetdream-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  color: rgba(245, 158, 11, 0.55);
+}
+
+.wetdream-btn:hover {
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.18);
+  color: rgba(245, 158, 11, 0.85);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 30px rgba(245, 158, 11, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.wetdream-btn:hover::before {
+  opacity: 0.8;
+}
+
+.wetdream-btn:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+/* Urge - gold tint */
+.urge-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 221, 0, 0.08);
+  color: rgba(255, 221, 0, 0.5);
+}
+
+.urge-btn:hover {
+  background: rgba(255, 221, 0, 0.04);
+  border-color: rgba(255, 221, 0, 0.15);
+  color: rgba(255, 221, 0, 0.8);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 40px rgba(255, 221, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.urge-btn:hover::before {
+  opacity: 0.8;
+}
+
+.urge-btn:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(255, 221, 0, 0.06);
+}
+
+/* Discord - purple tint */
 .discord-join-btn {
   display: flex;
   align-items: center;
@@ -473,25 +565,62 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  text-decoration: none;
+  outline: none !important;
+  position: relative;
   min-height: 44px;
   width: 100%;
+  text-decoration: none;
   
-  background: rgba(114, 137, 218, 0.1);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(114, 137, 218, 0.2);
-  color: #7289da;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(114, 137, 218, 0.12);
+  color: rgba(114, 137, 218, 0.6);
+  
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.discord-join-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.4s ease;
 }
 
 .discord-join-btn:hover {
-  background: rgba(114, 137, 218, 0.18);
-  border-color: rgba(114, 137, 218, 0.35);
-  color: #8399e0;
+  background: rgba(114, 137, 218, 0.06);
+  border-color: rgba(114, 137, 218, 0.2);
+  color: rgba(114, 137, 218, 0.9);
   transform: translateY(-1px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 30px rgba(114, 137, 218, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
+.discord-join-btn:hover::before {
+  opacity: 0.8;
+}
+
+.discord-join-btn:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(114, 137, 218, 0.1);
+}
+
+/* YouTube - red tint */
 .youtube-subscribe-btn {
   display: flex;
   align-items: center;
@@ -502,27 +631,63 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  text-decoration: none;
+  outline: none !important;
+  position: relative;
   min-height: 44px;
   width: 100%;
+  text-decoration: none;
   
-  background: rgba(255, 0, 0, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 0, 0, 0.15);
-  color: #ff4444;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  color: rgba(255, 80, 80, 0.6);
+  
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.youtube-subscribe-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.4s ease;
 }
 
 .youtube-subscribe-btn:hover {
-  background: rgba(255, 0, 0, 0.15);
-  border-color: rgba(255, 0, 0, 0.3);
-  color: #ff6666;
+  background: rgba(255, 0, 0, 0.05);
+  border-color: rgba(255, 0, 0, 0.18);
+  color: rgba(255, 80, 80, 0.9);
   transform: translateY(-1px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 30px rgba(255, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.youtube-subscribe-btn:hover::before {
+  opacity: 0.8;
+}
+
+.youtube-subscribe-btn:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(255, 0, 0, 0.08);
 }
 
 /* ============================================================
-   BENEFIT MODAL BUTTONS - Using new hierarchy
+   MODAL BUTTONS - Benefits modal save/cancel
    ============================================================ */
 
 .save-benefits-btn {
@@ -540,29 +705,53 @@
   min-height: 44px;
   flex: 1;
   
-  /* Liquid Glass style */
+  /* Gold liquid glass */
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 221, 0, 0.08);
+  color: rgba(255, 221, 0, 0.5);
+  
   box-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.1),
     0 4px 12px rgba(0, 0, 0, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  color: rgba(255, 221, 0, 0.5);
   
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.save-benefits-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.4s ease;
 }
 
 .save-benefits-btn:hover {
   background: rgba(255, 221, 0, 0.04);
   border-color: rgba(255, 221, 0, 0.15);
+  color: rgba(255, 221, 0, 0.8);
+  transform: translateY(-1px);
   box-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 8px 24px rgba(0, 0, 0, 0.08),
-    0 0 40px rgba(255, 221, 0, 0.04);
-  color: rgba(255, 221, 0, 0.8);
-  transform: translateY(-1px);
+    0 0 40px rgba(255, 221, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.save-benefits-btn:hover::before {
+  opacity: 0.8;
+}
+
+.save-benefits-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .cancel-benefits-btn {
@@ -576,35 +765,55 @@
   font-weight: 500;
   cursor: pointer;
   outline: none !important;
+  position: relative;
   min-height: 44px;
   flex: 1;
   
-  /* Ghost style */
+  /* Ghost - barely there */
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-secondary);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(170, 170, 170, 0.5);
   
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cancel-benefits-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+  pointer-events: none;
+  opacity: 0.3;
+  transition: opacity 0.4s ease;
 }
 
 .cancel-benefits-btn:hover {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 221, 0, 0.1);
-  color: rgba(255, 221, 0, 0.6);
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 221, 0, 0.08);
+  color: rgba(255, 221, 0, 0.5);
+  transform: translateY(-1px);
+}
+
+.cancel-benefits-btn:hover::before {
+  opacity: 0.5;
+}
+
+.cancel-benefits-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 /* ============================================================
-   EXTERNAL ICON - Subtle indicator
-   ============================================================ */
-
-.external-icon {
-  font-size: 0.7rem;
-  opacity: 0.6;
-  margin-left: var(--spacing-xs);
-}
-
-/* ============================================================
-   DESKTOP RESPONSIVE - Maintain uniform sizing
+   DESKTOP RESPONSIVE
    ============================================================ */
 
 @media (min-width: 1024px) {
@@ -640,24 +849,6 @@
     padding: 0;
   }
   
-  /* Desktop: all buttons same size */
-  .streak-action-btn,
-  .benefits-btn-primary,
-  .discord-join-btn,
-  .youtube-subscribe-btn,
-  .liquid-btn,
-  .btn-primary-solid,
-  .contextual-btn,
-  .contextual-btn-grey,
-  .contextual-btn-amber,
-  .contextual-btn-gold,
-  .brand-btn-discord,
-  .brand-btn-youtube {
-    min-height: 44px;
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.875rem;
-  }
-  
   .discord-community-section:hover,
   .youtube-channel-section:hover {
     transform: translateY(-2px);
@@ -666,7 +857,7 @@
 }
 
 /* ============================================================
-   MOBILE RESPONSIVE - Maintain uniform sizing
+   MOBILE RESPONSIVE
    ============================================================ */
 
 @media (max-width: 768px) {
@@ -696,7 +887,6 @@
     justify-content: center;
   }
   
-  /* Mobile: uniform button sizing */
   .tracker-header-actions .liquid-btn,
   .integrated-tracker-header .liquid-btn {
     width: 100%;
@@ -721,51 +911,42 @@
     padding: 0 var(--spacing-sm);
   }
   
-  /* Mobile: all buttons uniform */
-  .streak-action-btn,
-  .benefits-btn-primary,
-  .discord-join-btn,
-  .youtube-subscribe-btn {
-    width: 100%;
-    min-height: 44px;
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.875rem;
+  /* Mobile active states - all buttons */
+  .liquid-btn:active,
+  .liquid-btn-gold:active,
+  .liquid-btn-gold-primary:active,
+  .benefits-btn-primary:active {
+    transform: scale(0.98);
+    background: rgba(255, 221, 0, 0.08);
   }
   
-  /* Mobile active states */
-  .relapse-btn-grey:active,
-  .contextual-btn-grey:active {
-    background: rgba(128, 128, 128, 0.15);
+  .liquid-btn-grey:active,
+  .relapse-btn-grey:active {
     transform: scale(0.98);
+    background: rgba(150, 150, 150, 0.1);
   }
   
-  .wetdream-btn:active,
-  .contextual-btn-amber:active {
-    background: rgba(245, 158, 11, 0.15);
+  .liquid-btn-amber:active,
+  .wetdream-btn:active {
     transform: scale(0.98);
+    background: rgba(245, 158, 11, 0.1);
   }
   
-  .urge-btn:active,
-  .contextual-btn-gold:active {
-    background: rgba(255, 221, 0, 0.15);
+  .urge-btn:active {
     transform: scale(0.98);
+    background: rgba(255, 221, 0, 0.08);
   }
   
-  .benefits-btn-primary:active,
-  .btn-primary-solid:active {
+  .liquid-btn-discord:active,
+  .discord-join-btn:active {
     transform: scale(0.98);
+    background: rgba(114, 137, 218, 0.12);
   }
   
-  .discord-join-btn:active,
-  .brand-btn-discord:active {
-    background: rgba(114, 137, 218, 0.2);
+  .liquid-btn-youtube:active,
+  .youtube-subscribe-btn:active {
     transform: scale(0.98);
-  }
-  
-  .youtube-subscribe-btn:active,
-  .brand-btn-youtube:active {
-    background: rgba(255, 0, 0, 0.18);
-    transform: scale(0.98);
+    background: rgba(255, 0, 0, 0.1);
   }
 }
 
