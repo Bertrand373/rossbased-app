@@ -1,4 +1,5 @@
 /* components/Tracker/TrackerSections.css - Community and Interactive Sections with Original Red Circular Play Button */
+/* UPDATED: Using new premium color system variables */
 
 /* Community Sections */
 .section-icon-header {
@@ -25,7 +26,7 @@
 }
 
 .discord-community-section, .youtube-channel-section {
-  background-color: var(--medium-gray);
+  background-color: var(--surface-raised, #111111);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -209,7 +210,7 @@
 }
 
 .video-modal-content {
-  background-color: var(--card-background);
+  background-color: var(--surface-raised, #111111);
   border-radius: var(--radius-lg);
   padding: 0;
   width: 100%;

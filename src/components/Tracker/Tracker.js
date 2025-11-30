@@ -554,7 +554,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
           <div className="tracker-header-actions">
             {userData.startDate && (
               <button 
-                className="action-btn"
+                className="glass-btn"
                 onClick={() => setShowSetStartDate(true)}
               >
                 <FaEdit />

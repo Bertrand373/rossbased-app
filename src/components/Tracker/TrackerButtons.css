@@ -1,6 +1,136 @@
 /* components/Tracker/TrackerButtons.css - All button styles and responsive behavior with 4-button support */
+/* UPDATED: Added glassmorphism button style for Edit Start Date */
 
-/* Base Button Styles */
+/* ============================================================
+   NEW: GLASSMORPHISM BUTTON - Bubbly/Watery Premium Style
+   Toned-down gold with glass depth effect
+   ============================================================ */
+
+.glass-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  outline: none !important;
+  position: relative;
+  overflow: hidden;
+  
+  /* Glassmorphism base - toned down gold tint */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 221, 0, 0.08) 0%,
+    rgba(255, 221, 0, 0.04) 50%,
+    rgba(255, 221, 0, 0.08) 100%
+  );
+  
+  /* Frosted glass effect */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  /* Subtle golden border glow */
+  border: 1px solid rgba(255, 221, 0, 0.15);
+  
+  /* Inner light effect - creates depth */
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(255, 221, 0, 0.05);
+  
+  /* Text styling */
+  color: rgba(255, 221, 0, 0.7);
+}
+
+/* Animated shimmer overlay - creates watery light refraction */
+.glass-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+/* Bubble highlight - top edge light refraction */
+.glass-btn::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  border-radius: var(--radius-full);
+  pointer-events: none;
+}
+
+.glass-btn:hover {
+  /* Intensified glass effect on hover */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 221, 0, 0.12) 0%,
+    rgba(255, 221, 0, 0.06) 50%,
+    rgba(255, 221, 0, 0.12) 100%
+  );
+  
+  border-color: rgba(255, 221, 0, 0.25);
+  
+  /* Enhanced glow */
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(255, 221, 0, 0.1);
+  
+  /* Brighter text */
+  color: rgba(255, 221, 0, 0.9);
+  
+  /* Subtle lift */
+  transform: translateY(-2px);
+}
+
+/* Shimmer animation on hover */
+.glass-btn:hover::before {
+  left: 100%;
+}
+
+/* Active/pressed state */
+.glass-btn:active {
+  transform: translateY(0px) scale(0.98);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    0 1px 4px rgba(0, 0, 0, 0.2),
+    0 0 15px rgba(255, 221, 0, 0.08);
+}
+
+/* Focus state - accessibility */
+.glass-btn:focus-visible {
+  outline: 2px solid rgba(255, 221, 0, 0.5);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   BASE BUTTON STYLES
+   ============================================================ */
+
 .action-btn {
   display: flex;
   align-items: center;
@@ -37,7 +167,10 @@
   filter: none !important;
 }
 
-/* Streak Action Buttons */
+/* ============================================================
+   STREAK ACTION BUTTONS
+   ============================================================ */
+
 .streak-action-btn {
   display: flex;
   align-items: center;
@@ -78,33 +211,39 @@
 }
 
 .urge-btn {
-  background-color: rgba(37, 99, 235, 0.1);
+  background-color: rgba(255, 221, 0, 0.1);
   color: var(--primary);
   border-color: var(--primary);
 }
 
 .urge-btn:hover {
-  background-color: rgba(37, 99, 235, 0.2);
+  background-color: rgba(255, 221, 0, 0.2);
   border-color: var(--primary);
   color: var(--primary);
   transform: scale(1.05);
 }
 
-/* NEW: Benefits Button - SOLID YELLOW with black text like Discord/YouTube pattern */
+/* ============================================================
+   BENEFITS BUTTON - Solid Yellow Primary Action
+   ============================================================ */
+
 .benefits-btn-primary {
   background: linear-gradient(135deg, #f0cc00 0%, #e6c200 100%);
   border: 1px solid #f0cc00;
-  color: #000000; /* Black text on yellow background */
+  color: #000000;
 }
 
 .benefits-btn-primary:hover {
   background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
   border-color: #f0cc00;
   color: #000000;
-  transform: translateY(-1px); /* CONSISTENT: translateY like edit button */
+  transform: translateY(-1px);
 }
 
-/* Benefit Section Buttons */
+/* ============================================================
+   BENEFIT SECTION BUTTONS
+   ============================================================ */
+
 .edit-benefits-btn {
   background-color: rgba(128, 128, 128, 0.1);
   border: 1px solid var(--border);
@@ -147,7 +286,10 @@
   transform: translateY(-1px) !important;
 }
 
-/* Community Buttons */
+/* ============================================================
+   COMMUNITY BUTTONS
+   ============================================================ */
+
 .discord-join-btn {
   display: flex;
   align-items: center;
@@ -198,9 +340,11 @@
   transform: scale(1.05);
 }
 
-/* DESKTOP RESPONSIVE STYLES */
+/* ============================================================
+   DESKTOP RESPONSIVE STYLES
+   ============================================================ */
+
 @media (min-width: 1024px) {
-  /* SIMPLIFIED: Main content grid without benefits section constraint */
   .tracker-main-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -214,8 +358,6 @@
     gap: var(--spacing-lg);
     height: fit-content;
   }
-  
-  /* REMOVED: No more benefit-logging-container grid styling */
   
   .streak-number {
     font-size: 5rem !important;
@@ -272,10 +414,9 @@
     justify-content: center;
   }
   
-  /* UPDATED: Desktop streak actions for 4-button layout */
   .streak-actions {
     flex-direction: column;
-    gap: var(--spacing-md); /* REDUCED: From var(--spacing-lg) for 4 buttons */
+    gap: var(--spacing-md);
     max-width: 600px !important;
     width: 100% !important;
     margin: 0 auto;
@@ -285,11 +426,11 @@
   .streak-action-btn {
     width: 100% !important;
     justify-content: center;
-    padding: var(--spacing-md) var(--spacing-xl) !important; /* REDUCED: From var(--spacing-lg) */
-    font-size: 1rem !important; /* REDUCED: From 1.125rem */
+    padding: var(--spacing-md) var(--spacing-xl) !important;
+    font-size: 1rem !important;
     font-weight: 600;
     letter-spacing: 0.025em;
-    min-height: 52px !important; /* REDUCED: From 60px for 4 buttons */
+    min-height: 52px !important;
     position: relative;
     overflow: hidden;
     max-width: none !important;
@@ -391,7 +532,10 @@
   }
 }
 
-/* MOBILE RESPONSIVE STYLES */
+/* ============================================================
+   MOBILE RESPONSIVE STYLES
+   ============================================================ */
+
 @media (max-width: 768px) {
   .integrated-tracker-header {
     padding: var(--spacing-lg);
@@ -417,6 +561,17 @@
   .tracker-header-actions {
     width: 100%;
     justify-content: center;
+  }
+  
+  /* Glass button mobile adjustments */
+  .tracker-header-actions .glass-btn,
+  .integrated-tracker-header .glass-btn {
+    flex: 1;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    min-height: auto !important;
   }
   
   .tracker-header-actions .action-btn,
@@ -480,10 +635,9 @@
     font-size: 0.75rem;
   }
   
-  /* UPDATED: Mobile streak actions for 4-button layout */
   .streak-actions {
     flex-direction: column;
-    gap: var(--spacing-md); /* REDUCED: From var(--spacing-lg) for 4 buttons */
+    gap: var(--spacing-md);
     max-width: 100% !important;
     width: 100% !important;
     margin: 0 auto;
@@ -493,11 +647,11 @@
   .streak-action-btn {
     width: 100%;
     justify-content: center;
-    padding: var(--spacing-md) var(--spacing-lg) !important; /* REDUCED: Smaller padding */
-    font-size: 0.9375rem !important; /* REDUCED: From 1rem */
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    font-size: 0.9375rem !important;
     font-weight: 600;
     letter-spacing: 0.025em;
-    min-height: 46px !important; /* REDUCED: From 50px for 4 buttons */
+    min-height: 46px !important;
     position: relative;
     overflow: hidden;
   }
@@ -517,21 +671,18 @@
   }
   
   .urge-btn:active {
-    background-color: rgba(37, 99, 235, 0.2);
+    background-color: rgba(255, 221, 0, 0.2);
     border-color: var(--primary);
     color: var(--primary);
     transform: scale(1.02);
   }
   
-  /* Mobile benefits button active state */
   .benefits-btn:active {
     background-color: rgba(34, 197, 94, 0.2);
     border-color: var(--success);
     color: var(--success);
     transform: scale(1.02);
   }
-  
-  /* REMOVED: Old benefit section mobile styles - no longer needed since consolidating to modal */
   
   .section-header-icon {
     font-size: 1.5rem;
