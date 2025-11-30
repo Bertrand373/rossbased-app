@@ -10,25 +10,25 @@
   --radius-full: 9999px;
   
   /* ============================================================
-     TEAL-BLACK PALETTE - rossbased Brand Identity
-     Your signature #141d1d with cohesive depth layers
+     PURE BLACK PREMIUM PALETTE - Black Card Luxury
+     Timeless. Exclusive. Competes with the best.
      ============================================================ */
   --primary: #ffdd00;
-  --primary-light: #ffea62;
-  --primary-dark: #d9bc00;
-  --background: #0a1111;          /* Deepest teal-black - body/app */
-  --card-background: #141d1d;     /* Your brand color - primary containers */
-  --medium-gray: #1a2525;         /* Elevated elements, inputs */
-  --light-gray: #1e2a2a;          /* Cards-within-cards, subtle lifts */
-  --border: #2a3838;              /* Teal-tinted borders */
-  --border-light: #3a4a4a;        /* More prominent borders */
+  --primary-light: #ffe94d;
+  --primary-dark: #e6c800;
+  --background: #000000;          /* True black - body/app */
+  --card-background: #0a0a0a;     /* Near-black containers */
+  --medium-gray: #141414;         /* Elevated surfaces */
+  --light-gray: #1a1a1a;          /* Cards-within-cards */
+  --border: #262626;              /* Subtle borders */
+  --border-light: #333333;        /* Prominent borders */
   --text: #ffffff;
-  --text-secondary: #8a9a9a;      /* Teal-tinted muted text */
-  --text-accent: #b0c0c0;         /* Brighter teal secondary */
+  --text-secondary: #888888;      /* Clean neutral muted */
+  --text-accent: #aaaaaa;         /* Brighter secondary */
   --success: #22c55e;
   --danger: #ef4444;
   --warning: #f59e0b;
-  --gray: #5a6a6a;                /* General teal-tinted gray */
+  --gray: #666666;                /* General gray */
 }
 
 body {
@@ -55,15 +55,15 @@ div[data-hot-toast] {
   z-index: 9999 !important;
 }
 
-/* Base Toast Styling - TEAL-BLACK */
+/* Base Toast Styling - PURE BLACK PREMIUM */
 div[data-hot-toast] > div,
 body div[data-hot-toast] > div,
 html body div[data-hot-toast] > div {
-  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
+  background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%) !important;
   color: #ffffff !important;
-  border: 1px solid #2a3838 !important;
+  border: 1px solid #262626 !important;
   border-radius: 12px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
   padding: 16px 20px !important;
   font-weight: 500 !important;
   font-size: 14px !important;
@@ -182,7 +182,7 @@ div[data-hot-toast] > div {
   }
 }
 
-/* Additional Nuclear Overrides for Any Other Toast Libraries - TEAL-BLACK */
+/* Additional Nuclear Overrides for Any Other Toast Libraries - PURE BLACK */
 .toast-container,
 .toast-container *,
 .notification-container,
@@ -195,16 +195,16 @@ div[data-hot-toast] > div {
 [data-sonner-toaster] *,
 .Toastify__toast-container,
 .Toastify__toast-container * {
-  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
+  background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%) !important;
   color: #ffffff !important;
-  border: 1px solid #2a3838 !important;
+  border: 1px solid #262626 !important;
   border-radius: 12px !important;
 }
 
-/* Override any stubborn inline styles - TEAL-BLACK */
+/* Override any stubborn inline styles - PURE BLACK */
 div[style*="background"],
 span[style*="background"] {
-  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
+  background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%) !important;
 }
 
 div[style*="color"],
@@ -212,8 +212,8 @@ span[style*="color"] {
   color: #ffffff !important;
 }
 
-/* Special override for the toast wrapper div - TEAL-BLACK */
+/* Special override for the toast wrapper div - PURE BLACK */
 div[data-hot-toast] > div[style] {
-  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
+  background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%) !important;
   color: #ffffff !important;
 }

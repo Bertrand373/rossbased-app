@@ -1,6 +1,7 @@
 /* App.css - Main application styles with YELLOW main navigation buttons + landing-sized initial loader */
 /* ============================================================
-   TEAL-BLACK PALETTE - rossbased Brand Identity Edition
+   PURE BLACK PREMIUM PALETTE - Black Card Luxury Edition
+   Timeless. Exclusive. Competes with the best.
    ============================================================ */
 
 /* ============================================================
@@ -31,16 +32,16 @@
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   
-  /* PREMIUM POLISH - Glow effects */
-  --glow-primary: 0 0 20px rgba(255, 221, 0, 0.25);
-  --glow-primary-intense: 0 0 40px rgba(255, 221, 0, 0.35);
-  --glow-primary-subtle: 0 0 12px rgba(255, 221, 0, 0.15);
+  /* PREMIUM POLISH - Glow effects - refined for pure black */
+  --glow-primary: 0 0 20px rgba(255, 221, 0, 0.3);
+  --glow-primary-intense: 0 0 40px rgba(255, 221, 0, 0.4);
+  --glow-primary-subtle: 0 0 12px rgba(255, 221, 0, 0.2);
   
-  /* PREMIUM POLISH - Layered shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.15), 0 16px 32px rgba(0, 0, 0, 0.15), 0 32px 64px rgba(0, 0, 0, 0.2);
+  /* PREMIUM POLISH - Layered shadows - deeper for true black */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.15), 0 16px 32px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.25), 0 16px 32px rgba(0, 0, 0, 0.2), 0 32px 64px rgba(0, 0, 0, 0.15);
 }
 
 * {
@@ -96,7 +97,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100px;
   height: 100px;
   animation: initial-helmet-pulse 0.8s ease-in-out;
-  filter: drop-shadow(0 0 20px rgba(255, 221, 0, 0.8));
+  filter: drop-shadow(0 0 24px rgba(255, 221, 0, 0.9));
 }
 
 .landing-initial-helmet-fallback {
@@ -121,13 +122,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* FIXED: Keep original loading screen structure - just enhance the helmet */
-/* TEAL-BLACK: Updated gradient */
+/* PURE BLACK: Clean gradient */
 .spartan-loading-screen {
   max-width: 1200px;
   margin: var(--spacing-md) auto;
   min-height: calc(100vh - 48px);
-  /* TEAL-BLACK - Subtle gradient */
-  background: linear-gradient(145deg, #141d1d 0%, #101818 100%);
+  /* PURE BLACK - Subtle gradient */
+  background: linear-gradient(145deg, #0a0a0a 0%, #050505 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   /* PREMIUM POLISH - Layered shadow */
@@ -143,8 +144,8 @@ h1, h2, h3, h4, h5, h6 {
   width: 100px !important; /* LARGER: Premium loading experience */
   height: 100px !important;
   animation: app-helmet-pulse 2s ease-in-out infinite !important;
-  /* ENHANCED: Stronger glow for main loading */
-  filter: drop-shadow(0 0 12px rgba(255, 221, 0, 0.6)) !important;
+  /* ENHANCED: Stronger glow on pure black */
+  filter: drop-shadow(0 0 16px rgba(255, 221, 0, 0.7)) !important;
 }
 
 .app-loading-helmet-fallback-size {
@@ -166,10 +167,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ADDED: Additional Toast Overrides in App.css as backup */
-/* TEAL-BLACK: Updated gradient */
+/* PURE BLACK: Clean gradient */
 .react-hot-toast div[data-hot-toast] > div {
-  /* TEAL-BLACK - Gradient with blur */
-  background: linear-gradient(145deg, rgba(20, 29, 29, 0.95) 0%, rgba(16, 24, 24, 0.95) 100%) !important;
+  /* PURE BLACK - Gradient with blur */
+  background: linear-gradient(145deg, rgba(10, 10, 10, 0.95) 0%, rgba(5, 5, 5, 0.95) 100%) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   color: var(--text) !important;
@@ -188,15 +189,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* App Header Styles - Navigation truly centered, logo/logout positioned around it */
-/* TEAL-BLACK: Updated gradient */
+/* PURE BLACK: Clean gradient */
 .app-header {
   position: relative;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: var(--spacing-md) var(--spacing-lg);
-  /* TEAL-BLACK - Subtle gradient with blur-ready background */
-  background: linear-gradient(145deg, rgba(20, 29, 29, 0.95) 0%, rgba(16, 24, 24, 0.95) 100%);
+  /* PURE BLACK - Subtle gradient with blur-ready background */
+  background: linear-gradient(145deg, rgba(10, 10, 10, 0.95) 0%, rgba(5, 5, 5, 0.95) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   /* PREMIUM POLISH - Layered shadow */
@@ -271,7 +272,7 @@ h1, h2, h3, h4, h5, h6 {
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
-  /* PREMIUM POLISH - Subtle glow */
+  /* PREMIUM POLISH - Glow on pure black */
   box-shadow: var(--glow-primary-subtle);
 }
 
@@ -349,13 +350,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Profile button styling - matches logout button non-hover state with active state */
-/* TEAL-BLACK: Updated rgba values */
+/* PURE BLACK: Clean neutral gray */
 .profile-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(90, 106, 106, 0.1);
+  background-color: rgba(102, 102, 102, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
@@ -376,13 +377,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* FIXED: Logout button styling - inactive grey with red hover */
-/* TEAL-BLACK: Updated rgba values */
+/* PURE BLACK: Clean neutral gray */
 .logout-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(90, 106, 106, 0.1);
+  background-color: rgba(102, 102, 102, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
@@ -572,12 +573,12 @@ button:active {
 }
 
 /* UPDATED: App content layout - MOBILE HEIGHT FIX */
-/* TEAL-BLACK: Updated gradient */
+/* PURE BLACK: Clean gradient */
 .app-content {
   display: flex;
   flex-direction: column;
-  /* TEAL-BLACK - Subtle gradient */
-  background: linear-gradient(180deg, #141d1d 0%, #101818 100%);
+  /* PURE BLACK - Subtle gradient */
+  background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   margin: 0 var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
   /* PREMIUM POLISH - Layered shadow */
@@ -594,10 +595,10 @@ button:active {
 }
 
 /* Card component */
-/* TEAL-BLACK: Updated gradient */
+/* PURE BLACK: Clean gradient */
 .card {
-  /* TEAL-BLACK - Subtle gradient background */
-  background: linear-gradient(145deg, #182222 0%, #141d1d 100%);
+  /* PURE BLACK - Subtle gradient background */
+  background: linear-gradient(145deg, #0f0f0f 0%, #0a0a0a 100%);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   /* PREMIUM POLISH - Layered shadow */
@@ -627,12 +628,12 @@ button:active {
 }
 
 /* Form elements */
-/* TEAL-BLACK: Updated gradient */
+/* PURE BLACK: Clean gradient */
 input, textarea, select {
   width: 100%;
   padding: var(--spacing-md);
-  /* TEAL-BLACK - Subtle gradient background */
-  background: linear-gradient(145deg, #1a2525 0%, #141d1d 100%);
+  /* PURE BLACK - Subtle gradient background */
+  background: linear-gradient(145deg, #141414 0%, #0a0a0a 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   margin-bottom: var(--spacing-md);
@@ -645,8 +646,8 @@ input, textarea, select {
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--primary);
-  /* PREMIUM POLISH - Glow on focus */
-  box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.1), var(--glow-primary-subtle);
+  /* PREMIUM POLISH - Glow on focus - enhanced for pure black */
+  box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.15), var(--glow-primary-subtle);
 }
 
 /* Toggle switch */
@@ -663,7 +664,7 @@ input:focus, textarea:focus, select:focus {
   height: 0;
 }
 
-/* TEAL-BLACK: Updated gradient */
+/* PURE BLACK: Clean gradient */
 .toggle-slider {
   position: absolute;
   cursor: pointer;
@@ -671,8 +672,8 @@ input:focus, textarea:focus, select:focus {
   left: 0;
   right: 0;
   bottom: 0;
-  /* TEAL-BLACK - Subtle gradient */
-  background: linear-gradient(145deg, #1e2a2a 0%, #1a2525 100%);
+  /* PURE BLACK - Subtle gradient */
+  background: linear-gradient(145deg, #1a1a1a 0%, #141414 100%);
   /* PREMIUM POLISH - Smooth spring transition */
   transition: all 0.3s var(--ease-spring);
   border-radius: 34px;
@@ -691,14 +692,14 @@ input:focus, textarea:focus, select:focus {
   transition: transform 0.3s var(--ease-spring);
   border-radius: 50%;
   /* PREMIUM POLISH - Subtle shadow on knob */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 input:checked + .toggle-slider {
   background-color: var(--primary);
   border-color: var(--primary);
-  /* PREMIUM POLISH - Glow when active */
-  box-shadow: var(--glow-primary-subtle);
+  /* PREMIUM POLISH - Glow when active - enhanced for pure black */
+  box-shadow: var(--glow-primary);
 }
 
 input:checked + .toggle-slider:before {
@@ -706,14 +707,14 @@ input:checked + .toggle-slider:before {
 }
 
 /* Range slider */
-/* TEAL-BLACK: Updated gradient */
+/* PURE BLACK: Clean gradient */
 .range-slider {
   -webkit-appearance: none;
   width: 100%;
   height: 8px;
   border-radius: var(--radius-full);
-  /* TEAL-BLACK - Subtle gradient track */
-  background: linear-gradient(90deg, #1e2a2a 0%, #1a2525 100%);
+  /* PURE BLACK - Subtle gradient track */
+  background: linear-gradient(90deg, #1a1a1a 0%, #141414 100%);
   outline: none;
 }
 
@@ -725,15 +726,15 @@ input:checked + .toggle-slider:before {
   border-radius: 50%;
   background: var(--primary);
   cursor: pointer;
-  /* PREMIUM POLISH - Glow effect */
-  box-shadow: var(--glow-primary-subtle);
+  /* PREMIUM POLISH - Glow effect - enhanced for pure black */
+  box-shadow: var(--glow-primary);
   /* PREMIUM POLISH - Spring transition */
   transition: transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-smooth);
 }
 
 .range-slider::-webkit-slider-thumb:hover {
   transform: scale(1.1);
-  box-shadow: var(--glow-primary);
+  box-shadow: var(--glow-primary-intense);
 }
 
 .range-slider::-moz-range-thumb {
@@ -743,7 +744,7 @@ input:checked + .toggle-slider:before {
   background: var(--primary);
   cursor: pointer;
   border: none;
-  box-shadow: var(--glow-primary-subtle);
+  box-shadow: var(--glow-primary);
 }
 
 /* Badge */
@@ -808,7 +809,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* Premium lock overlay */
-/* TEAL-BLACK: Updated rgba */
+/* PURE BLACK: True black overlay */
 .premium-lock {
   position: relative;
   overflow: hidden;
@@ -820,7 +821,7 @@ input:checked + .toggle-slider:before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(10, 17, 17, 0.9);
+  background-color: rgba(0, 0, 0, 0.92);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -902,7 +903,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* Modal overlay */
-/* TEAL-BLACK: Updated blur */
+/* PURE BLACK: Enhanced blur */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -910,7 +911,7 @@ input:checked + .toggle-slider:before {
   right: 0;
   bottom: 0;
   /* PREMIUM POLISH - Darker with blur */
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
@@ -919,10 +920,10 @@ input:checked + .toggle-slider:before {
   z-index: 1000;
 }
 
-/* TEAL-BLACK: Updated gradient */
+/* PURE BLACK: Clean gradient */
 .modal-content {
-  /* TEAL-BLACK - Gradient background */
-  background: linear-gradient(145deg, #182222 0%, #141d1d 100%);
+  /* PURE BLACK - Gradient background */
+  background: linear-gradient(145deg, #0f0f0f 0%, #0a0a0a 100%);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   width: 90%;
@@ -974,21 +975,21 @@ input:checked + .toggle-slider:before {
 }
 
 /* Mobile navigation - UPDATED: Add sliding pill animation support */
-/* TEAL-BLACK: Updated background */
+/* PURE BLACK: Enhanced blur */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  /* TEAL-BLACK - Blur effect */
-  background: rgba(16, 24, 24, 0.85);
+  /* PURE BLACK - Blur effect */
+  background: rgba(5, 5, 5, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
   /* PREMIUM POLISH - Subtle top glow */
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3), 0 -1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4), 0 -1px 0 rgba(255, 255, 255, 0.05);
   z-index: 1000;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -999,17 +1000,17 @@ input:checked + .toggle-slider:before {
    PREMIUM POLISH - Global enhancements
    ============================================================ */
 
-/* Premium glow effect for primary accent elements */
+/* Premium glow effect for primary accent elements - enhanced for pure black */
 .streak-number {
-  text-shadow: 0 0 40px rgba(255, 221, 0, 0.3);
+  text-shadow: 0 0 50px rgba(255, 221, 0, 0.4);
 }
 
-/* Premium hover glow for primary buttons */
+/* Premium hover glow for primary buttons - enhanced for pure black */
 .btn-primary:hover,
 .benefits-btn-primary:hover,
 .discord-join-btn:hover,
 .youtube-subscribe-btn:hover {
-  box-shadow: var(--glow-primary);
+  box-shadow: var(--glow-primary-intense);
 }
 
 /* Premium focus ring for accessibility */
@@ -1020,7 +1021,7 @@ input:checked + .toggle-slider:before {
 
 /* Smooth selection color */
 ::selection {
-  background-color: rgba(255, 221, 0, 0.3);
+  background-color: rgba(255, 221, 0, 0.35);
   color: var(--text);
 }
 
@@ -1035,18 +1036,18 @@ input:checked + .toggle-slider:before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 /* Premium loading shimmer for skeleton states */
@@ -1062,9 +1063,9 @@ input:checked + .toggle-slider:before {
 .skeleton-loading {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.03) 0%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.03) 100%
+    rgba(255, 255, 255, 0.02) 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.02) 100%
   );
   background-size: 200% 100%;
   animation: premium-shimmer 1.5s infinite;
