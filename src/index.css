@@ -9,23 +9,26 @@
   --radius-lg: 12px;
   --radius-full: 9999px;
   
-  /* NEW TEAL-BLACK COLOR PALETTE - Based on #141d1d */
+  /* ============================================================
+     WARM CHARCOAL PALETTE - Premium Luxury
+     Rich warmth that makes gold feel like actual gold
+     ============================================================ */
   --primary: #ffdd00;
   --primary-light: #ffea62;
   --primary-dark: #d9bc00;
-  --background: #0a1111;          /* Deepest - body/app background */
-  --card-background: #141d1d;     /* Your brand color - primary containers */
-  --medium-gray: #1a2525;         /* Elevated elements, inputs */
-  --light-gray: #1e2a2a;          /* Cards-within-cards, subtle lifts */
-  --border: #2a3838;              /* Subtle borders */
-  --border-light: #3a4a4a;        /* More prominent borders, dividers */
+  --background: #0d0b09;          /* Deepest warm black - body/app */
+  --card-background: #1a1612;     /* Rich warm charcoal - primary containers */
+  --medium-gray: #231e19;         /* Elevated elements, inputs */
+  --light-gray: #2a241e;          /* Cards-within-cards, subtle lifts */
+  --border: #3d352c;              /* Warm subtle borders */
+  --border-light: #4a4035;        /* More prominent borders */
   --text: #ffffff;
-  --text-secondary: #8a9a9a;      /* Muted text - teal-tinted */
-  --text-accent: #b0c0c0;         /* Brighter secondary text */
+  --text-secondary: #a89a8a;      /* Warm muted text */
+  --text-accent: #c4b8a8;         /* Brighter warm secondary */
   --success: #22c55e;
   --danger: #ef4444;
   --warning: #f59e0b;
-  --gray: #5a6a6a;                /* General gray - teal-tinted */
+  --gray: #6a5d50;                /* General warm gray */
 }
 
 body {
@@ -52,13 +55,13 @@ div[data-hot-toast] {
   z-index: 9999 !important;
 }
 
-/* Base Toast Styling - NUCLEAR OVERRIDE - UPDATED TO TEAL-BLACK */
+/* Base Toast Styling - WARM CHARCOAL */
 div[data-hot-toast] > div,
 body div[data-hot-toast] > div,
 html body div[data-hot-toast] > div {
-  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
+  background: linear-gradient(135deg, #1a1612 0%, #231e19 100%) !important;
   color: #ffffff !important;
-  border: 1px solid #2a3838 !important;
+  border: 1px solid #3d352c !important;
   border-radius: 12px !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
   padding: 16px 20px !important;
@@ -179,7 +182,7 @@ div[data-hot-toast] > div {
   }
 }
 
-/* Additional Nuclear Overrides for Any Other Toast Libraries - UPDATED TO TEAL-BLACK */
+/* Additional Nuclear Overrides for Any Other Toast Libraries - WARM CHARCOAL */
 .toast-container,
 .toast-container *,
 .notification-container,
@@ -192,16 +195,16 @@ div[data-hot-toast] > div {
 [data-sonner-toaster] *,
 .Toastify__toast-container,
 .Toastify__toast-container * {
-  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
+  background: linear-gradient(135deg, #1a1612 0%, #231e19 100%) !important;
   color: #ffffff !important;
-  border: 1px solid #2a3838 !important;
+  border: 1px solid #3d352c !important;
   border-radius: 12px !important;
 }
 
-/* Override any stubborn inline styles - UPDATED TO TEAL-BLACK */
+/* Override any stubborn inline styles - WARM CHARCOAL */
 div[style*="background"],
 span[style*="background"] {
-  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
+  background: linear-gradient(135deg, #1a1612 0%, #231e19 100%) !important;
 }
 
 div[style*="color"],
@@ -209,8 +212,8 @@ span[style*="color"] {
   color: #ffffff !important;
 }
 
-/* Special override for the toast wrapper div - UPDATED TO TEAL-BLACK */
+/* Special override for the toast wrapper div - WARM CHARCOAL */
 div[data-hot-toast] > div[style] {
-  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
+  background: linear-gradient(135deg, #1a1612 0%, #231e19 100%) !important;
   color: #ffffff !important;
 }

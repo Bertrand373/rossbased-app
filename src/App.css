@@ -1,4 +1,7 @@
 /* App.css - Main application styles with YELLOW main navigation buttons + landing-sized initial loader */
+/* ============================================================
+   WARM CHARCOAL PALETTE - Premium Luxury Edition
+   ============================================================ */
 
 /* ============================================================
    PREMIUM POLISH - Import premium font
@@ -34,10 +37,10 @@
   --glow-primary-subtle: 0 0 12px rgba(255, 221, 0, 0.15);
   
   /* PREMIUM POLISH - Layered shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.15), 0 32px 64px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.15), 0 16px 32px rgba(0, 0, 0, 0.15), 0 32px 64px rgba(0, 0, 0, 0.2);
 }
 
 * {
@@ -118,12 +121,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* FIXED: Keep original loading screen structure - just enhance the helmet */
+/* WARM CHARCOAL: Updated gradient */
 .spartan-loading-screen {
   max-width: 1200px;
   margin: var(--spacing-md) auto;
   min-height: calc(100vh - 48px);
-  /* PREMIUM POLISH - Subtle gradient */
-  background: linear-gradient(145deg, rgba(28, 28, 28, 1) 0%, rgba(22, 22, 22, 1) 100%);
+  /* WARM CHARCOAL - Subtle gradient */
+  background: linear-gradient(145deg, #1a1612 0%, #151210 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   /* PREMIUM POLISH - Layered shadow */
@@ -162,9 +166,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ADDED: Additional Toast Overrides in App.css as backup */
+/* WARM CHARCOAL: Updated gradient */
 .react-hot-toast div[data-hot-toast] > div {
-  /* PREMIUM POLISH - Gradient with blur */
-  background: linear-gradient(145deg, rgba(32, 32, 32, 0.95) 0%, rgba(24, 24, 24, 0.95) 100%) !important;
+  /* WARM CHARCOAL - Gradient with blur */
+  background: linear-gradient(145deg, rgba(26, 22, 18, 0.95) 0%, rgba(21, 18, 16, 0.95) 100%) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   color: var(--text) !important;
@@ -183,14 +188,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* App Header Styles - Navigation truly centered, logo/logout positioned around it */
+/* WARM CHARCOAL: Updated gradient */
 .app-header {
   position: relative;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: var(--spacing-md) var(--spacing-lg);
-  /* PREMIUM POLISH - Subtle gradient with blur-ready background */
-  background: linear-gradient(145deg, rgba(30, 30, 30, 0.95) 0%, rgba(22, 22, 22, 0.95) 100%);
+  /* WARM CHARCOAL - Subtle gradient with blur-ready background */
+  background: linear-gradient(145deg, rgba(26, 22, 18, 0.95) 0%, rgba(21, 18, 16, 0.95) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   /* PREMIUM POLISH - Layered shadow */
@@ -343,12 +349,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Profile button styling - matches logout button non-hover state with active state */
+/* WARM CHARCOAL: Updated rgba values */
 .profile-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
+  background-color: rgba(106, 93, 80, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
@@ -369,12 +376,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* FIXED: Logout button styling - inactive grey with red hover */
+/* WARM CHARCOAL: Updated rgba values */
 .logout-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
+  background-color: rgba(106, 93, 80, 0.1);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
@@ -564,11 +572,12 @@ button:active {
 }
 
 /* UPDATED: App content layout - MOBILE HEIGHT FIX */
+/* WARM CHARCOAL: Updated gradient */
 .app-content {
   display: flex;
   flex-direction: column;
-  /* PREMIUM POLISH - Subtle gradient */
-  background: linear-gradient(180deg, rgba(26, 26, 26, 1) 0%, rgba(22, 22, 22, 1) 100%);
+  /* WARM CHARCOAL - Subtle gradient */
+  background: linear-gradient(180deg, #1a1612 0%, #151210 100%);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   margin: 0 var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
   /* PREMIUM POLISH - Layered shadow */
@@ -585,9 +594,10 @@ button:active {
 }
 
 /* Card component */
+/* WARM CHARCOAL: Updated gradient */
 .card {
-  /* PREMIUM POLISH - Subtle gradient background */
-  background: linear-gradient(145deg, rgba(30, 30, 30, 1) 0%, rgba(24, 24, 24, 1) 100%);
+  /* WARM CHARCOAL - Subtle gradient background */
+  background: linear-gradient(145deg, #1e1a16 0%, #181412 100%);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   /* PREMIUM POLISH - Layered shadow */
@@ -617,11 +627,12 @@ button:active {
 }
 
 /* Form elements */
+/* WARM CHARCOAL: Updated gradient */
 input, textarea, select {
   width: 100%;
   padding: var(--spacing-md);
-  /* PREMIUM POLISH - Subtle gradient background */
-  background: linear-gradient(145deg, rgba(28, 28, 28, 1) 0%, rgba(24, 24, 24, 1) 100%);
+  /* WARM CHARCOAL - Subtle gradient background */
+  background: linear-gradient(145deg, #1c1814 0%, #181412 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   margin-bottom: var(--spacing-md);
@@ -652,6 +663,7 @@ input:focus, textarea:focus, select:focus {
   height: 0;
 }
 
+/* WARM CHARCOAL: Updated gradient */
 .toggle-slider {
   position: absolute;
   cursor: pointer;
@@ -659,8 +671,8 @@ input:focus, textarea:focus, select:focus {
   left: 0;
   right: 0;
   bottom: 0;
-  /* PREMIUM POLISH - Subtle gradient */
-  background: linear-gradient(145deg, rgba(40, 40, 40, 1) 0%, rgba(32, 32, 32, 1) 100%);
+  /* WARM CHARCOAL - Subtle gradient */
+  background: linear-gradient(145deg, #2a241e 0%, #231e19 100%);
   /* PREMIUM POLISH - Smooth spring transition */
   transition: all 0.3s var(--ease-spring);
   border-radius: 34px;
@@ -694,13 +706,14 @@ input:checked + .toggle-slider:before {
 }
 
 /* Range slider */
+/* WARM CHARCOAL: Updated gradient */
 .range-slider {
   -webkit-appearance: none;
   width: 100%;
   height: 8px;
   border-radius: var(--radius-full);
-  /* PREMIUM POLISH - Subtle gradient track */
-  background: linear-gradient(90deg, rgba(50, 50, 50, 1) 0%, rgba(40, 40, 40, 1) 100%);
+  /* WARM CHARCOAL - Subtle gradient track */
+  background: linear-gradient(90deg, #2a241e 0%, #231e19 100%);
   outline: none;
 }
 
@@ -795,6 +808,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* Premium lock overlay */
+/* WARM CHARCOAL: Updated rgba */
 .premium-lock {
   position: relative;
   overflow: hidden;
@@ -806,7 +820,7 @@ input:checked + .toggle-slider:before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(15, 15, 15, 0.9);
+  background-color: rgba(13, 11, 9, 0.9);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -888,6 +902,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* Modal overlay */
+/* WARM CHARCOAL: Updated blur */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -904,9 +919,10 @@ input:checked + .toggle-slider:before {
   z-index: 1000;
 }
 
+/* WARM CHARCOAL: Updated gradient */
 .modal-content {
-  /* PREMIUM POLISH - Gradient background */
-  background: linear-gradient(145deg, rgba(32, 32, 32, 1) 0%, rgba(24, 24, 24, 1) 100%);
+  /* WARM CHARCOAL - Gradient background */
+  background: linear-gradient(145deg, #1e1a16 0%, #181412 100%);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   width: 90%;
@@ -958,13 +974,14 @@ input:checked + .toggle-slider:before {
 }
 
 /* Mobile navigation - UPDATED: Add sliding pill animation support */
+/* WARM CHARCOAL: Updated background */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  /* PREMIUM POLISH - Blur effect instead of solid background */
-  background: rgba(20, 20, 20, 0.85);
+  /* WARM CHARCOAL - Blur effect */
+  background: rgba(21, 18, 16, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   display: flex;
