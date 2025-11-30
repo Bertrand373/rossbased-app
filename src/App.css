@@ -1,4 +1,10 @@
 /* App.css - Main application styles with YELLOW main navigation buttons + landing-sized initial loader */
+
+/* ============================================================
+   PREMIUM POLISH - Import premium font
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
   /* Color scheme is now defined in index.css */
   
@@ -14,6 +20,24 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-full: 9999px;
+  
+  /* ============================================================
+     PREMIUM POLISH - Animation easings
+     ============================================================ */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* PREMIUM POLISH - Glow effects */
+  --glow-primary: 0 0 20px rgba(255, 221, 0, 0.25);
+  --glow-primary-intense: 0 0 40px rgba(255, 221, 0, 0.35);
+  --glow-primary-subtle: 0 0 12px rgba(255, 221, 0, 0.15);
+  
+  /* PREMIUM POLISH - Layered shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.15), 0 32px 64px rgba(0, 0, 0, 0.2);
 }
 
 * {
@@ -27,6 +51,23 @@ body {
   color: var(--text);
   background-color: var(--background);
   line-height: 1.5;
+  /* PREMIUM POLISH - Smooth text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* PREMIUM POLISH - Smooth scrolling */
+  scroll-behavior: smooth;
+}
+
+/* PREMIUM POLISH - Better text rendering for headers */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+}
+
+/* PREMIUM POLISH - Number rendering for stats/counters */
+.streak-number, .milestone-value, .stat-value {
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.03em;
 }
 
 .app-container {
@@ -81,10 +122,12 @@ body {
   max-width: 1200px;
   margin: var(--spacing-md) auto;
   min-height: calc(100vh - 48px);
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  /* PREMIUM POLISH - Subtle gradient */
+  background: linear-gradient(145deg, rgba(28, 28, 28, 1) 0%, rgba(22, 22, 22, 1) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  /* PREMIUM POLISH - Layered shadow */
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -120,11 +163,15 @@ body {
 
 /* ADDED: Additional Toast Overrides in App.css as backup */
 .react-hot-toast div[data-hot-toast] > div {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%) !important;
+  /* PREMIUM POLISH - Gradient with blur */
+  background: linear-gradient(145deg, rgba(32, 32, 32, 0.95) 0%, rgba(24, 24, 24, 0.95) 100%) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-lg) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  /* PREMIUM POLISH - Dramatic shadow */
+  box-shadow: var(--shadow-lg) !important;
   padding: var(--spacing-md) var(--spacing-lg) !important;
   font-weight: 500 !important;
   font-size: 0.875rem !important;
@@ -142,8 +189,12 @@ body {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: var(--spacing-md) var(--spacing-lg);
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  /* PREMIUM POLISH - Subtle gradient with blur-ready background */
+  background: linear-gradient(145deg, rgba(30, 30, 30, 0.95) 0%, rgba(22, 22, 22, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  /* PREMIUM POLISH - Layered shadow */
+  box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   margin: var(--spacing-md) var(--spacing-lg) 0 var(--spacing-lg);
@@ -205,7 +256,8 @@ body {
   background-color: var(--primary);
   border: 1px solid var(--primary);
   border-radius: var(--radius-full);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* PREMIUM POLISH - Spring animation */
+  transition: transform 0.4s var(--ease-spring), width 0.4s var(--ease-spring);
   pointer-events: none;
   z-index: 1;
   /* IMPORTANT: Start hidden but ready to be shown */
@@ -213,6 +265,8 @@ body {
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
+  /* PREMIUM POLISH - Subtle glow */
+  box-shadow: var(--glow-primary-subtle);
 }
 
 /* FIXED: Increased breakpoint to 1024px so landscape mobile stays in mobile mode */
@@ -487,32 +541,38 @@ button {
   border: none;
   border-radius: var(--radius-md);
   padding: var(--spacing-sm) var(--spacing-md);
-  transition: none;
+  /* PREMIUM POLISH - Smooth transitions */
+  transition: transform 0.15s var(--ease-smooth), box-shadow 0.15s var(--ease-smooth);
 }
 
+/* PREMIUM POLISH - Satisfying press effect */
 button:active {
-  transform: none;
+  transform: scale(0.97);
 }
 
 .login-btn {
   background-color: var(--primary);
   color: #000000;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: all 0.2s var(--ease-smooth);
 }
 
 .login-btn:hover {
   background-color: var(--primary-dark);
+  /* PREMIUM POLISH - Glow on hover */
+  box-shadow: var(--glow-primary);
 }
 
 /* UPDATED: App content layout - MOBILE HEIGHT FIX */
 .app-content {
   display: flex;
   flex-direction: column;
-  background-color: var(--card-background);
+  /* PREMIUM POLISH - Subtle gradient */
+  background: linear-gradient(180deg, rgba(26, 26, 26, 1) 0%, rgba(22, 22, 22, 1) 100%);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   margin: 0 var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  /* PREMIUM POLISH - Layered shadow */
+  box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
   border-top: none;
   min-height: calc(100vh - 200px);
@@ -526,12 +586,21 @@ button:active {
 
 /* Card component */
 .card {
-  background-color: var(--medium-gray);
+  /* PREMIUM POLISH - Subtle gradient background */
+  background: linear-gradient(145deg, rgba(30, 30, 30, 1) 0%, rgba(24, 24, 24, 1) 100%);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  /* PREMIUM POLISH - Layered shadow */
+  box-shadow: var(--shadow-md);
   margin-bottom: var(--spacing-lg);
   border: 1px solid var(--border);
+  /* PREMIUM POLISH - Smooth transitions */
+  transition: box-shadow 0.3s var(--ease-smooth), transform 0.3s var(--ease-smooth);
+}
+
+/* PREMIUM POLISH - Subtle hover lift on cards */
+.card:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 .card-header {
@@ -551,17 +620,22 @@ button:active {
 input, textarea, select {
   width: 100%;
   padding: var(--spacing-md);
-  background-color: var(--medium-gray);
+  /* PREMIUM POLISH - Subtle gradient background */
+  background: linear-gradient(145deg, rgba(28, 28, 28, 1) 0%, rgba(24, 24, 24, 1) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   margin-bottom: var(--spacing-md);
   font-size: 1rem;
   color: var(--text);
+  /* PREMIUM POLISH - Smooth transitions */
+  transition: border-color 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth);
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--primary);
+  /* PREMIUM POLISH - Glow on focus */
+  box-shadow: 0 0 0 3px rgba(255, 221, 0, 0.1), var(--glow-primary-subtle);
 }
 
 /* Toggle switch */
@@ -585,9 +659,12 @@ input:focus, textarea:focus, select:focus {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--medium-gray);
-  transition: .4s;
+  /* PREMIUM POLISH - Subtle gradient */
+  background: linear-gradient(145deg, rgba(40, 40, 40, 1) 0%, rgba(32, 32, 32, 1) 100%);
+  /* PREMIUM POLISH - Smooth spring transition */
+  transition: all 0.3s var(--ease-spring);
   border-radius: 34px;
+  border: 1px solid var(--border);
 }
 
 .toggle-slider:before {
@@ -596,14 +673,20 @@ input:focus, textarea:focus, select:focus {
   height: 26px;
   width: 26px;
   left: 4px;
-  bottom: 4px;
+  bottom: 3px;
   background-color: white;
-  transition: .4s;
+  /* PREMIUM POLISH - Spring transition */
+  transition: transform 0.3s var(--ease-spring);
   border-radius: 50%;
+  /* PREMIUM POLISH - Subtle shadow on knob */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 input:checked + .toggle-slider {
   background-color: var(--primary);
+  border-color: var(--primary);
+  /* PREMIUM POLISH - Glow when active */
+  box-shadow: var(--glow-primary-subtle);
 }
 
 input:checked + .toggle-slider:before {
@@ -616,7 +699,8 @@ input:checked + .toggle-slider:before {
   width: 100%;
   height: 8px;
   border-radius: var(--radius-full);
-  background: var(--medium-gray);
+  /* PREMIUM POLISH - Subtle gradient track */
+  background: linear-gradient(90deg, rgba(50, 50, 50, 1) 0%, rgba(40, 40, 40, 1) 100%);
   outline: none;
 }
 
@@ -628,6 +712,15 @@ input:checked + .toggle-slider:before {
   border-radius: 50%;
   background: var(--primary);
   cursor: pointer;
+  /* PREMIUM POLISH - Glow effect */
+  box-shadow: var(--glow-primary-subtle);
+  /* PREMIUM POLISH - Spring transition */
+  transition: transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-smooth);
+}
+
+.range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: var(--glow-primary);
 }
 
 .range-slider::-moz-range-thumb {
@@ -636,6 +729,8 @@ input:checked + .toggle-slider:before {
   border-radius: 50%;
   background: var(--primary);
   cursor: pointer;
+  border: none;
+  box-shadow: var(--glow-primary-subtle);
 }
 
 /* Badge */
@@ -799,7 +894,10 @@ input:checked + .toggle-slider:before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  /* PREMIUM POLISH - Darker with blur */
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -807,15 +905,30 @@ input:checked + .toggle-slider:before {
 }
 
 .modal-content {
-  background-color: var(--card-background);
+  /* PREMIUM POLISH - Gradient background */
+  background: linear-gradient(145deg, rgba(32, 32, 32, 1) 0%, rgba(24, 24, 24, 1) 100%);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  /* PREMIUM POLISH - Dramatic shadow */
+  box-shadow: var(--shadow-xl);
   position: relative;
   color: var(--text);
   border: 1px solid var(--border);
+  /* PREMIUM POLISH - Entrance animation */
+  animation: modal-enter 0.3s var(--ease-out-expo);
+}
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 /* UPDATED: Mobile responsive styles - HEIGHT FIX - Changed breakpoint to 1024px */
@@ -850,13 +963,115 @@ input:checked + .toggle-slider:before {
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
+  /* PREMIUM POLISH - Blur effect instead of solid background */
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+  /* PREMIUM POLISH - Subtle top glow */
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3), 0 -1px 0 rgba(255, 255, 255, 0.05);
   z-index: 1000;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Mobile navigation will use its own slider from MobileNavigation.css */
+
+/* ============================================================
+   PREMIUM POLISH - Global enhancements
+   ============================================================ */
+
+/* Premium glow effect for primary accent elements */
+.streak-number {
+  text-shadow: 0 0 40px rgba(255, 221, 0, 0.3);
+}
+
+/* Premium hover glow for primary buttons */
+.btn-primary:hover,
+.benefits-btn-primary:hover,
+.discord-join-btn:hover,
+.youtube-subscribe-btn:hover {
+  box-shadow: var(--glow-primary);
+}
+
+/* Premium focus ring for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Smooth selection color */
+::selection {
+  background-color: rgba(255, 221, 0, 0.3);
+  color: var(--text);
+}
+
+/* Premium scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* Premium loading shimmer for skeleton states */
+@keyframes premium-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-loading {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: premium-shimmer 1.5s infinite;
+}
+
+/* Premium pulse animation for important elements */
+@keyframes premium-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: var(--glow-primary-subtle);
+  }
+  50% {
+    opacity: 0.85;
+    box-shadow: var(--glow-primary);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
