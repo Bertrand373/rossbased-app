@@ -446,7 +446,6 @@ button.back-to-info-btn:active,
   .modal-overlay:has(.day-info-modal),
   .modal-overlay:has(.edit-day-modal) {
     z-index: 10000;
-    /* Bulletproof centering for all mobile devices */
     position: fixed;
     top: 0;
     left: 0;
@@ -458,7 +457,6 @@ button.back-to-info-btn:active,
     align-items: center;
     justify-content: center;
     padding: var(--spacing-md);
-    /* Account for safe areas on all sides */
     padding-top: max(var(--spacing-md), env(safe-area-inset-top, 0px));
     padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom, 0px));
     padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
@@ -466,54 +464,13 @@ button.back-to-info-btn:active,
     box-sizing: border-box;
   }
   
-  /* Modal content adjustments for mobile - TRUE CENTER */
-  .calendar-container .modal-content,
-  .day-info-modal,
-  .edit-day-modal {
-    /* Reset any margins that could offset centering */
+  /* Day info modal - scrollable with sticky header/footer */
+  .day-info-modal {
     margin: 0;
-    /* Constrain size */
     max-height: 85vh;
     max-height: 85dvh;
-    max-width: calc(100vw - var(--spacing-lg));
-    width: 100%;
-    /* Flexbox layout for proper scrolling */
-    display: flex;
-    flex-direction: column;
-    /* NO overflow on modal itself - children handle it */
-    overflow: hidden;
-  }
-  
-  /* Day info modal specific adjustments */
-  .day-info-modal {
     max-width: 600px;
-  }
-  
-  /* Edit day modal specific adjustments */
-  .edit-day-modal {
-    max-width: 500px;
-  }
-  
-  /* Fixed header elements - date and streak badge always visible */
-  .day-info-modal h3,
-  .day-info-modal .day-status-info,
-  .edit-day-modal .modal-header-simple {
-    flex-shrink: 0;
-  }
-  
-  /* Add spacing below fixed header before scroll area */
-  .day-info-modal .day-status-info {
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  /* Scrollable middle section */
-  .day-info-modal .day-benefits,
-  .day-info-modal .day-journal,
-  .day-info-modal .day-tracking-info,
-  .edit-day-modal .edit-day-options,
-  .edit-day-modal .trigger-selection {
-    flex: 1;
-    min-height: 0;
+    width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
@@ -521,39 +478,105 @@ button.back-to-info-btn:active,
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 221, 0, 0.3) transparent;
-    padding-right: var(--spacing-xs);
-    padding-bottom: var(--spacing-sm);
   }
   
-  /* Webkit scrollbar styling */
-  .day-info-modal .day-benefits::-webkit-scrollbar,
-  .day-info-modal .day-journal::-webkit-scrollbar,
-  .edit-day-modal .edit-day-options::-webkit-scrollbar {
+  /* Webkit scrollbar styling for modal */
+  .day-info-modal::-webkit-scrollbar {
     width: 6px;
   }
   
-  .day-info-modal .day-benefits::-webkit-scrollbar-track,
-  .day-info-modal .day-journal::-webkit-scrollbar-track,
-  .edit-day-modal .edit-day-options::-webkit-scrollbar-track {
+  .day-info-modal::-webkit-scrollbar-track {
     background: transparent;
   }
   
-  .day-info-modal .day-benefits::-webkit-scrollbar-thumb,
-  .day-info-modal .day-journal::-webkit-scrollbar-thumb,
-  .edit-day-modal .edit-day-options::-webkit-scrollbar-thumb {
+  .day-info-modal::-webkit-scrollbar-thumb {
     background: rgba(255, 221, 0, 0.3);
     border-radius: 3px;
   }
   
-  /* Modal actions - fixed at bottom, symmetrical spacing */
-  .day-info-modal .modal-actions,
+  .day-info-modal::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 221, 0, 0.5);
+  }
+  
+  /* STICKY HEADER: Date title - sticks to top */
+  .day-info-modal h3 {
+    position: sticky;
+    top: 0;
+    background-color: var(--card-background);
+    z-index: 2;
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  /* STICKY HEADER: Streak badge - sticks below title */
+  .day-info-modal .day-status-info {
+    position: sticky;
+    top: 2.5rem; /* Below the h3 */
+    background-color: var(--card-background);
+    z-index: 2;
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  /* Scrollable content sections - benefits, journal, etc */
+  .day-info-modal .day-benefits {
+    margin-top: 0;
+  }
+  
+  .day-info-modal .day-journal {
+    /* Normal flow, scrolls with content */
+  }
+  
+  /* STICKY FOOTER: Modal actions - sticks to bottom */
+  .day-info-modal .modal-actions {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--card-background);
+    z-index: 2;
+    padding-top: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    border-top: 1px solid var(--border);
+  }
+  
+  /* Edit day modal */
+  .edit-day-modal {
+    margin: 0;
+    max-height: 85vh;
+    max-height: 85dvh;
+    max-width: 500px;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 221, 0, 0.3) transparent;
+  }
+  
+  .edit-day-modal::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .edit-day-modal::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .edit-day-modal::-webkit-scrollbar-thumb {
+    background: rgba(255, 221, 0, 0.3);
+    border-radius: 3px;
+  }
+  
+  /* Edit modal sticky footer */
   .edit-day-modal .modal-actions,
   .edit-day-modal .form-actions {
-    flex-shrink: 0;
-    padding-top: var(--spacing-sm);
-    margin-top: 0;
-    border-top: 1px solid var(--border);
+    position: sticky;
+    bottom: 0;
     background-color: var(--card-background);
+    z-index: 2;
+    padding-top: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    border-top: 1px solid var(--border);
   }
 }
 
@@ -575,6 +598,11 @@ button.back-to-info-btn:active,
     max-height: 90dvh;
     padding: var(--spacing-md);
     margin: 0;
+  }
+  
+  /* Adjust sticky header position for smaller screens */
+  .day-info-modal .day-status-info {
+    top: 2rem;
   }
 }
 
