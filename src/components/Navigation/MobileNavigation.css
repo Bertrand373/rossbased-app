@@ -86,7 +86,7 @@
   display: none;
 }
 
-/* Sliding pill indicator - gold glass */
+/* Sliding pill indicator - LIQUID GLASS gold */
 .mobile-nav-slider {
   position: absolute;
   top: var(--spacing-sm);
@@ -101,12 +101,31 @@
   transform: translateX(0px);
   width: 0px;
   will-change: transform, width;
+  overflow: hidden;
   
-  /* LIQUID GLASS: Gold tint for active state */
-  background: rgba(255, 221, 0, 0.9);
+  /* LIQUID GLASS: Semi-transparent gold with blur */
+  background: rgba(255, 221, 0, 0.75);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
   box-shadow: 
-    0 2px 8px rgba(255, 221, 0, 0.3),
-    0 0 20px rgba(255, 221, 0, 0.15);
+    0 2px 8px rgba(255, 221, 0, 0.25),
+    0 0 20px rgba(255, 221, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Inner highlight for glass effect on slider */
+.mobile-nav-slider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 100%);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+  pointer-events: none;
 }
 
 /* Nav items */

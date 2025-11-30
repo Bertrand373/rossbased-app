@@ -381,33 +381,33 @@
    ============================================================ */
 
 .save-benefits-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  border-radius: var(--radius-full) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
   outline: none !important;
-  position: relative;
-  min-height: 44px;
-  flex: 1;
-  overflow: hidden;
+  position: relative !important;
+  min-height: 44px !important;
+  flex: 1 !important;
+  overflow: hidden !important;
   
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 221, 0, 0.08);
-  color: rgba(255, 221, 0, 0.5);
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 221, 0, 0.08) !important;
+  color: rgba(255, 221, 0, 0.5) !important;
   
   box-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.1),
     0 4px 12px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
   
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 
 .save-benefits-btn::before {
@@ -425,15 +425,15 @@
 }
 
 .save-benefits-btn:hover {
-  background: rgba(255, 221, 0, 0.04);
-  border-color: rgba(255, 221, 0, 0.15);
-  color: rgba(255, 221, 0, 0.8);
-  transform: translateY(-1px);
+  background: rgba(255, 221, 0, 0.04) !important;
+  border-color: rgba(255, 221, 0, 0.15) !important;
+  color: rgba(255, 221, 0, 0.8) !important;
+  transform: translateY(-1px) !important;
   box-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 8px 24px rgba(0, 0, 0, 0.08),
     0 0 40px rgba(255, 221, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }
 
 .save-benefits-btn:hover::before {
@@ -445,33 +445,33 @@
 }
 
 .cancel-benefits-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  border-radius: var(--radius-full) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
   outline: none !important;
-  position: relative;
-  min-height: 44px;
-  flex: 1;
-  overflow: hidden;
+  position: relative !important;
+  min-height: 44px !important;
+  flex: 1 !important;
+  overflow: hidden !important;
   
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(150, 150, 150, 0.08);
-  color: rgba(170, 170, 170, 0.5);
+  background: rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(150, 150, 150, 0.08) !important;
+  color: rgba(170, 170, 170, 0.5) !important;
   
   box-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.08),
     0 4px 12px rgba(0, 0, 0, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
   
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 
 .cancel-benefits-btn::before {
@@ -489,10 +489,10 @@
 }
 
 .cancel-benefits-btn:hover {
-  background: rgba(150, 150, 150, 0.04);
-  border-color: rgba(150, 150, 150, 0.12);
-  color: rgba(200, 200, 200, 0.7);
-  transform: translateY(-1px);
+  background: rgba(150, 150, 150, 0.04) !important;
+  border-color: rgba(150, 150, 150, 0.12) !important;
+  color: rgba(200, 200, 200, 0.7) !important;
+  transform: translateY(-1px) !important;
 }
 
 .cancel-benefits-btn:hover::before {
