@@ -9,7 +9,7 @@
 .integrated-tracker-header {
   display: flex;
   flex-direction: column;
-  background-color: var(--surface-raised, #111111);
+  background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   padding: var(--spacing-lg);
@@ -141,7 +141,7 @@ button.action-btn:hover {
 }
 
 .streak-card {
-  background-color: var(--surface-raised, #111111);
+  background-color: var(--medium-gray);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -1481,7 +1481,7 @@ button.action-btn:hover {
     margin-top: 0;
     /* Subtle top border to separate from scrollable content */
     border-top: 1px solid var(--border);
-    background-color: var(--surface-raised, #111111);
+    background-color: var(--card-background);
   }
 }
 

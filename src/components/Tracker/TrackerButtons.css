@@ -1,12 +1,12 @@
 /* components/Tracker/TrackerButtons.css - All button styles and responsive behavior with 4-button support */
-/* UPDATED: Added glassmorphism button style for Edit Start Date */
+/* UPDATED: Apple Liquid Glass inspired button style for premium feel */
 
 /* ============================================================
-   NEW: GLASSMORPHISM BUTTON - Bubbly/Watery Premium Style
-   Toned-down gold with glass depth effect
+   NEW: LIQUID GLASS BUTTON - Apple-inspired premium style
+   Ultra-subtle, toned-down gold with soft blur and diffused edges
    ============================================================ */
 
-.glass-btn {
+.liquid-btn {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -15,115 +15,86 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   outline: none !important;
   position: relative;
-  overflow: hidden;
   
-  /* Glassmorphism base - toned down gold tint */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 221, 0, 0.08) 0%,
-    rgba(255, 221, 0, 0.04) 50%,
-    rgba(255, 221, 0, 0.08) 100%
-  );
+  /* Liquid Glass base - barely visible, ultra-subtle */
+  background: rgba(255, 255, 255, 0.03);
   
-  /* Frosted glass effect */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* Soft blur for glass depth */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   
-  /* Subtle golden border glow */
-  border: 1px solid rgba(255, 221, 0, 0.15);
+  /* Whisper of gold in the border - almost invisible */
+  border: 1px solid rgba(255, 221, 0, 0.08);
   
-  /* Inner light effect - creates depth */
+  /* Soft ambient shadow - no harsh edges */
   box-shadow: 
-    inset 0 1px 1px rgba(255, 255, 255, 0.1),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.1),
-    0 2px 8px rgba(0, 0, 0, 0.2),
-    0 0 20px rgba(255, 221, 0, 0.05);
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
   
-  /* Text styling */
-  color: rgba(255, 221, 0, 0.7);
+  /* Text - muted gold, understated */
+  color: rgba(255, 221, 0, 0.5);
 }
 
-/* Animated shimmer overlay - creates watery light refraction */
-.glass-btn::before {
+/* Subtle inner highlight for glass edge */
+.liquid-btn::before {
   content: '';
   position: absolute;
   top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
+  left: 0;
+  right: 0;
+  height: 50%;
   background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.08) 50%,
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
     transparent 100%
   );
-  transition: left 0.5s ease;
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
   pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.4s ease;
 }
 
-/* Bubble highlight - top edge light refraction */
-.glass-btn::after {
-  content: '';
-  position: absolute;
-  top: 1px;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.2) 50%,
-    transparent 100%
-  );
-  border-radius: var(--radius-full);
-  pointer-events: none;
-}
-
-.glass-btn:hover {
-  /* Intensified glass effect on hover */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 221, 0, 0.12) 0%,
-    rgba(255, 221, 0, 0.06) 50%,
-    rgba(255, 221, 0, 0.12) 100%
-  );
+.liquid-btn:hover {
+  /* Glass becomes more visible on hover */
+  background: rgba(255, 221, 0, 0.04);
   
-  border-color: rgba(255, 221, 0, 0.25);
+  /* Border gains subtle presence */
+  border-color: rgba(255, 221, 0, 0.15);
   
-  /* Enhanced glow */
+  /* Soft glow emerges */
   box-shadow: 
-    inset 0 1px 2px rgba(255, 255, 255, 0.15),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
-    0 4px 16px rgba(0, 0, 0, 0.3),
-    0 0 30px rgba(255, 221, 0, 0.1);
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 40px rgba(255, 221, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   
-  /* Brighter text */
-  color: rgba(255, 221, 0, 0.9);
+  /* Text brightens */
+  color: rgba(255, 221, 0, 0.8);
   
-  /* Subtle lift */
-  transform: translateY(-2px);
+  /* Gentle lift */
+  transform: translateY(-1px);
 }
 
-/* Shimmer animation on hover */
-.glass-btn:hover::before {
-  left: 100%;
+.liquid-btn:hover::before {
+  opacity: 0.8;
 }
 
-/* Active/pressed state */
-.glass-btn:active {
-  transform: translateY(0px) scale(0.98);
+/* Active/pressed - glass compresses */
+.liquid-btn:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(255, 221, 0, 0.06);
   box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.2),
-    0 1px 4px rgba(0, 0, 0, 0.2),
-    0 0 15px rgba(255, 221, 0, 0.08);
+    0 1px 2px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Focus state - accessibility */
-.glass-btn:focus-visible {
-  outline: 2px solid rgba(255, 221, 0, 0.5);
+.liquid-btn:focus-visible {
+  outline: 2px solid rgba(255, 221, 0, 0.3);
   outline-offset: 2px;
 }
 
@@ -563,9 +534,9 @@
     justify-content: center;
   }
   
-  /* Glass button mobile adjustments */
-  .tracker-header-actions .glass-btn,
-  .integrated-tracker-header .glass-btn {
+  /* Liquid button mobile adjustments */
+  .tracker-header-actions .liquid-btn,
+  .integrated-tracker-header .liquid-btn {
     flex: 1;
     justify-content: center;
     padding: var(--spacing-sm) var(--spacing-md) !important;
