@@ -1,66 +1,54 @@
-/* components/Navigation/MobileNavigation.css - ENHANCED: Elevated floating navigation with premium visibility */
+/* components/Navigation/MobileNavigation.css - REFINED PREMIUM EDITION */
+/* Pure black floating pill navigation */
 
-/* CRITICAL: Mobile navigation must ALWAYS be sticky - enhanced for iOS */
 .mobile-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  /* FLOATING EFFECT: Completely transparent background with no borders or shadows */
+  /* FLOATING: Transparent background */
   background: transparent;
   display: flex;
   justify-content: center;
   padding: var(--spacing-sm) var(--spacing-md);
-  /* TIGHTER FIX: Use max() to avoid double padding */
-  padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 4px));
-  /* NO box-shadow for floating effect */
+  padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 8px));
+  /* No shadow on outer container */
   box-shadow: none;
   z-index: 9999;
-  /* NO border-top for floating effect */
   border: none;
-  /* CRITICAL: Force hardware acceleration to keep nav sticky */
+  /* Hardware acceleration */
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  /* ENHANCED FIX: Prevent iOS rubber band/momentum scrolling from affecting nav */
   overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: auto;
-  /* Lock it down completely */
   pointer-events: auto;
 }
 
-/* IOS SPECIFIC: Absolutely lock position during momentum scrolling */
+/* iOS specific fixes */
 @supports (-webkit-touch-callout: none) {
   .mobile-navigation {
-    /* Override any iOS positioning quirks */
     position: fixed !important;
     bottom: 0 !important;
-    /* Ensure it stays above iOS safe area */
     padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 12px)) !important;
-    /* Force strongest GPU layer */
     -webkit-transform: translate3d(0, 0, 9999px);
     transform: translate3d(0, 0, 9999px);
-    -webkit-perspective: 1000;
-    perspective: 1000;
-    /* Ensure no borders on iOS */
     border: none !important;
     box-shadow: none !important;
   }
 }
 
-/* Container layout with sliding animation support - THIS IS THE VISIBLE PILL */
-/* ENHANCED: Premium elevation with yellow accent glow */
+/* The visible pill container */
 .mobile-nav-container {
   display: flex;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm);
-  /* ENHANCED: Slightly elevated background for better contrast */
-  background-color: rgba(42, 42, 42, 0.95);
+  /* PURE BLACK: Match the refined palette */
+  background-color: rgba(10, 10, 10, 0.95);
   border-radius: var(--radius-full);
-  /* ENHANCED: Subtle yellow accent border for spartan elite feel */
-  border: 1px solid rgba(255, 208, 0, 0.3);
+  /* SUBTLE: Gold accent border */
+  border: 1px solid rgba(255, 221, 0, 0.15);
   width: 100%;
   max-width: 500px;
   position: relative;
@@ -70,28 +58,27 @@
   -webkit-backface-visibility: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  /* ENHANCED: Multi-layered shadow with yellow glow for premium floating effect */
+  /* PREMIUM: Layered shadow with subtle gold glow */
   box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.5),
-    0 4px 12px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(255, 208, 0, 0.15);
-  /* OPTIONAL: Modern glass-morphism effect - remove if too much */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 1px rgba(255, 221, 0, 0.2);
+  /* Glass effect */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .mobile-nav-container::-webkit-scrollbar {
   display: none;
 }
 
-/* Mobile navigation slider with YELLOW background */
+/* Sliding pill indicator */
 .mobile-nav-slider {
   position: absolute;
   top: var(--spacing-sm);
   left: var(--spacing-sm);
   height: calc(100% - calc(var(--spacing-sm) * 2));
   background-color: var(--primary);
-  border: 1px solid var(--primary);
   border-radius: var(--radius-full);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
@@ -100,20 +87,12 @@
   visibility: hidden;
   transform: translateX(0px);
   width: 0px;
-  transform: translateZ(0) translateX(0px);
   will-change: transform, width;
-  /* ENHANCED: Add glow to active slider for extra pop */
-  box-shadow: 0 0 15px rgba(255, 208, 0, 0.4);
+  /* Subtle glow on active pill */
+  box-shadow: var(--glow-gold);
 }
 
-/* Ultra-fast transitions for very small screens */
-@media (max-width: 480px) {
-  .mobile-nav-slider {
-    transition: transform 0.2s ease-out, width 0.2s ease-out;
-  }
-}
-
-/* Mobile nav items with improved centering */
+/* Nav items */
 .mobile-nav-item {
   flex: 1;
   display: flex;
@@ -121,62 +100,51 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  /* ENHANCED: Brighter inactive text for better readability */
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.7rem;
+  /* READABLE: Brighter inactive text */
+  color: var(--text-secondary);
+  font-size: 0.6875rem;
   font-weight: 500;
   padding: var(--spacing-sm) var(--spacing-xs);
   background-color: transparent;
-  border: 1px solid transparent;
+  border: none;
   border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, transform 0.15s ease;
   position: relative;
   outline: none;
-  min-height: 60px;
+  min-height: 56px;
   z-index: 2;
   text-align: center;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 
-/* ENHANCED: Hover state for better interactivity on touch devices */
 .mobile-nav-item:active {
   transform: scale(0.95);
 }
 
-/* Adjust touch targets on actual mobile */
-@media (max-width: 768px) and (pointer: coarse) {
+/* Touch targets on mobile */
+@media (pointer: coarse) {
   .mobile-nav-item {
-    min-height: 64px;
+    min-height: 60px;
     padding: var(--spacing-md) var(--spacing-sm);
   }
 }
 
-/* Active mobile nav styling with BLACK text to contrast with yellow background */
+/* Active state - black text on gold */
 .mobile-nav-item.active {
   color: #000000 !important;
   font-weight: 600 !important;
   background-color: transparent !important;
-  border-color: transparent !important;
 }
 
 .mobile-nav-icon {
-  font-size: 1.4rem;
-  margin-bottom: var(--spacing-xs);
+  font-size: 1.25rem;
+  margin-bottom: 2px;
   flex-shrink: 0;
   display: block;
   text-align: center;
-  /* ENHANCED: Slightly brighter icons for better visibility */
-  filter: brightness(1.1);
-}
-
-/* ENHANCED: Active icon gets full brightness */
-.mobile-nav-item.active .mobile-nav-icon {
-  filter: brightness(1);
 }
 
 .mobile-nav-item span {
@@ -187,36 +155,31 @@
   display: block;
 }
 
-/* Add padding to the bottom of the app content to account for mobile navigation */
+/* App content padding for nav */
 @media (max-width: 768px) {
   .app-content {
     padding-bottom: 90px;
   }
 }
 
-/* Responsive adjustments for smaller screens */
+/* Small screens */
 @media (max-width: 480px) {
   .mobile-navigation {
     padding: var(--spacing-xs) var(--spacing-sm);
-    /* TIGHTER FIX: Keep same approach for consistency */
-    padding-bottom: max(var(--spacing-xs), env(safe-area-inset-bottom, 12px));
-    /* Ensure no borders on small screens */
-    border: none;
-    box-shadow: none;
+    padding-bottom: max(var(--spacing-xs), env(safe-area-inset-bottom, 8px));
   }
   
   .mobile-nav-container {
     max-width: 100%;
     gap: 2px;
     padding: 6px;
-    /* Maintain enhanced effects on mobile */
+    /* Slightly less shadow on small screens */
     box-shadow: 
-      0 6px 20px rgba(0, 0, 0, 0.5),
-      0 3px 10px rgba(0, 0, 0, 0.4),
-      0 0 15px rgba(255, 208, 0, 0.15);
+      0 4px 16px rgba(0, 0, 0, 0.5),
+      0 2px 6px rgba(0, 0, 0, 0.4),
+      0 0 1px rgba(255, 221, 0, 0.15);
   }
   
-  /* Slider positioning for very small screens */
   .mobile-nav-slider {
     top: 6px;
     left: 6px;
@@ -225,12 +188,34 @@
   
   .mobile-nav-item {
     padding: var(--spacing-xs);
-    min-height: 55px;
-    font-size: 0.65rem;
+    min-height: 52px;
+    font-size: 0.625rem;
   }
   
   .mobile-nav-icon {
-    font-size: 1.2rem;
+    font-size: 1.125rem;
     margin-bottom: 2px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .mobile-nav-container {
+    padding: 4px;
+  }
+  
+  .mobile-nav-slider {
+    top: 4px;
+    left: 4px;
+    height: calc(100% - 8px);
+  }
+  
+  .mobile-nav-item {
+    min-height: 48px;
+    font-size: 0.5625rem;
+  }
+  
+  .mobile-nav-icon {
+    font-size: 1rem;
   }
 }

@@ -1,43 +1,48 @@
-/* components/Landing/Landing.css - Updated to match app styling */
+/* components/Landing/Landing.css - REFINED PREMIUM EDITION */
+
 .landing-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: var(--background);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
   color: var(--text);
   justify-content: center;
   align-items: center;
 }
 
 .landing-content {
-  max-width: 1200px; /* CHANGED: From 800px to match app container width */
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: var(--spacing-lg) var(--spacing-lg);
+  padding: var(--spacing-2xl) var(--spacing-xl);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border-radius: var(--radius-lg);
+  /* FLAT: No gradient */
+  background: var(--surface);
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .landing-logo {
   height: 140px;
   width: auto;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  /* Subtle glow on logo */
+  filter: drop-shadow(0 0 20px var(--primary-glow));
 }
 
 .landing-subtitle {
   font-size: 1.25rem;
+  /* READABLE: Brighter secondary text */
   color: var(--text-secondary);
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
   font-weight: 500;
-  line-height: 1.4;
-  max-width: 85%;
+  line-height: 1.5;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -46,33 +51,28 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
   width: 100%;
 }
 
 .feature-item {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
+  /* FLAT: No gradient */
+  background: var(--surface-raised);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.2s ease; /* ADDED: Smooth transition for hover */
-  position: relative;
-  /* Subtle inner glow for depth */
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-/* ADDED: Desktop hover effect for feature cards */
 .feature-item:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border-color: rgba(255, 221, 0, 0.1);
+  border-color: var(--border-prominent);
   transform: translateY(-2px);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .feature-icon {
   font-size: 2.5rem;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   color: var(--primary);
   display: flex;
   justify-content: center;
@@ -83,21 +83,23 @@
 .feature-item h3 {
   margin-bottom: var(--spacing-sm);
   font-size: 1.125rem;
-  color: var(--text);
+  /* WHITE: Readable */
+  color: #ffffff;
   font-weight: 600;
 }
 
 .feature-item p {
+  /* READABLE: Brighter secondary */
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .landing-cta {
   margin: var(--spacing-lg) 0;
   width: 100%;
-  max-width: 360px; /* INCREASED: From 280px to 360px for more noticeable width */
+  max-width: 360px;
 }
 
 .login-cta-btn {
@@ -105,7 +107,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xxl); /* Wider padding */
+  padding: var(--spacing-lg) var(--spacing-2xl);
   font-size: 1.125rem;
   background-color: var(--primary);
   color: #000000;
@@ -114,19 +116,23 @@
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 48px;
-  width: 100%; /* Full width of container */
+  min-height: 56px;
+  width: 100%;
 }
 
 .login-cta-btn:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+  background-color: var(--primary-light);
+  box-shadow: var(--glow-gold);
+}
+
+.login-cta-btn:active {
+  transform: scale(0.98);
 }
 
 .privacy-notice {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  /* MUTED: This can be truly muted */
+  color: var(--text-muted);
   margin-top: var(--spacing-lg);
   font-weight: 500;
 }
@@ -140,7 +146,7 @@
   display: none;
 }
 
-/* Loading Animation - uses SpartanLoader component */
+/* Loading Animation */
 .loading-screen {
   display: flex;
   justify-content: center;
@@ -150,85 +156,77 @@
   background-color: var(--background);
 }
 
-/* Tablet - intermediate sizing */
+/* Tablet */
 @media (max-width: 1024px) {
+  .landing-container {
+    padding: var(--spacing-lg);
+  }
+  
   .landing-content {
-    max-width: 900px; /* INTERMEDIATE: Between mobile and desktop */
-    padding: var(--spacing-lg) var(--spacing-lg);
+    max-width: 900px;
+    padding: var(--spacing-xl) var(--spacing-lg);
   }
   
   .landing-logo {
-    height: 140px;
+    height: 120px;
   }
   
   .landing-subtitle {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
   }
   
   .feature-icon {
-    font-size: 2.5rem;
-    height: 80px;
+    font-size: 2.25rem;
+    height: 72px;
   }
   
   .feature-item h3 {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
   
   .feature-item p {
     font-size: 0.875rem;
   }
-  
-  .login-cta-btn {
-    font-size: 1.125rem;
-    min-height: 48px;
-  }
 }
 
-/* Mobile responsiveness - CRITICAL for matching app styling */
+/* Mobile */
 @media (max-width: 768px) {
   .landing-container {
     padding: var(--spacing-md);
     min-height: 100vh;
     justify-content: flex-start;
-    padding-top: var(--spacing-lg);
+    padding-top: var(--spacing-xl);
   }
   
   .landing-content {
-    max-width: 100%; /* MOBILE: Full width */
-    padding: var(--spacing-lg) var(--spacing-md);
+    max-width: 100%;
+    padding: var(--spacing-xl) var(--spacing-lg);
     min-height: auto;
-    max-height: none;
   }
   
-  /* FIXED: Match the app header logo size exactly - FORCE OVERRIDE */
   .landing-logo {
     height: 100px !important;
-    max-height: 100px !important;
-    min-height: 100px !important;
-    width: auto !important;
     margin-bottom: var(--spacing-md) !important;
-    object-fit: contain !important;
   }
   
   .landing-subtitle {
-    font-size: 1.125rem;
-    margin-bottom: var(--spacing-lg);
-    max-width: 85%;
+    font-size: 1rem;
+    margin-bottom: var(--spacing-xl);
+    max-width: 90%;
   }
   
   .landing-features {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    max-width: 100%;
+    margin-bottom: var(--spacing-xl);
   }
   
   .feature-item {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
   
   .feature-item:hover {
-    transform: none; /* DISABLE: Hover on mobile */
+    transform: none;
   }
   
   /* Switch to mobile icons */
@@ -240,108 +238,77 @@
     display: block;
   }
   
-  /* FIXED: Perfectly centered icons with minimal, equal spacing */
   .feature-icon {
     font-size: 1.75rem;
-    height: 36px !important; /* REDUCED: Minimal fixed height */
-    margin: 0 !important; /* REMOVED: All margins */
-    margin-bottom: 8px !important; /* MINIMAL: Just 8px bottom spacing */
-    display: flex;
-    align-items: center; /* CENTER: Vertically center the icon */
-    justify-content: center; /* CENTER: Horizontally center the icon */
+    height: 40px !important;
+    margin: 0 !important;
+    margin-bottom: var(--spacing-sm) !important;
   }
   
   .feature-item h3 {
     font-size: 1rem;
-    margin-top: 0; /* ENSURE: No extra top spacing on h3 */
+    margin-top: 0;
     margin-bottom: var(--spacing-xs);
   }
   
   .feature-item p {
-    font-size: 0.8rem;
+    font-size: 0.8125rem;
   }
   
   .landing-cta {
-    margin: var(--spacing-md) 0;
+    margin: var(--spacing-lg) 0;
     width: 100%;
   }
   
   .login-cta-btn {
     width: 100%;
     font-size: 1rem;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-xl);
+    min-height: 52px;
   }
   
   .privacy-notice {
-    font-size: 0.7rem;
+    font-size: 0.6875rem;
     margin-top: var(--spacing-md);
-  }
-  
-  /* FORCE LOGO SIZE - Most specific selector possible */
-  .landing-container .landing-content .landing-logo {
-    height: 100px !important;
-    max-height: 100px !important;
-    min-height: 100px !important;
   }
 }
 
-/* Very small screens - ensure no scroll needed */
-@media (max-width: 480px) and (max-height: 700px) {
+/* Very small screens */
+@media (max-width: 480px) {
   .landing-container {
     padding: var(--spacing-sm);
-    padding-top: var(--spacing-md);
+    padding-top: var(--spacing-lg);
   }
   
   .landing-content {
-    padding: var(--spacing-md) var(--spacing-sm);
+    padding: var(--spacing-lg) var(--spacing-md);
   }
   
-  /* FIXED: Smaller but still matching app proportions - FORCE OVERRIDE */
   .landing-logo {
     height: 85px !important;
-    max-height: 85px !important;
-    min-height: 85px !important;
-    width: auto !important;
     margin-bottom: var(--spacing-sm) !important;
-    object-fit: contain !important;
   }
   
   .landing-subtitle {
-    font-size: 1rem;
-    margin-bottom: var(--spacing-md);
-    padding: 0 var(--spacing-sm);
-    max-width: 85%;
-  }
-  
-  .landing-features {
-    margin-bottom: var(--spacing-md);
+    font-size: 0.9375rem;
+    margin-bottom: var(--spacing-lg);
   }
   
   .feature-item {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
   
-  /* FIXED: Even smaller screens maintain centered icons */
   .feature-icon {
     font-size: 1.5rem;
-    height: 30px !important;
-    margin: 0 !important;
-    margin-bottom: 6px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    height: 32px !important;
+    margin-bottom: var(--spacing-xs) !important;
   }
   
   .feature-item h3 {
-    font-size: 0.875rem;
-    margin-top: 0;
+    font-size: 0.9375rem;
   }
   
   .feature-item p {
     font-size: 0.75rem;
-  }
-  
-  .privacy-notice {
-    margin-top: var(--spacing-sm);
   }
 }
