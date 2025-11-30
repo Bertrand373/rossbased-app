@@ -9,22 +9,23 @@
   --radius-lg: 12px;
   --radius-full: 9999px;
   
-  /* Updated color variables */
+  /* NEW TEAL-BLACK COLOR PALETTE - Based on #141d1d */
   --primary: #ffdd00;
   --primary-light: #ffea62;
   --primary-dark: #d9bc00;
-  --background: #0f0f0f;
-  --medium-gray: #333333;
-  --card-background: #2c2c2c;
-  --border: #444444;
+  --background: #0a1111;          /* Deepest - body/app background */
+  --card-background: #141d1d;     /* Your brand color - primary containers */
+  --medium-gray: #1a2525;         /* Elevated elements, inputs */
+  --light-gray: #1e2a2a;          /* Cards-within-cards, subtle lifts */
+  --border: #2a3838;              /* Subtle borders */
+  --border-light: #3a4a4a;        /* More prominent borders, dividers */
   --text: #ffffff;
-  --text-secondary: #aaaaaa;
-  --text-accent: #cccccc;
+  --text-secondary: #8a9a9a;      /* Muted text - teal-tinted */
+  --text-accent: #b0c0c0;         /* Brighter secondary text */
   --success: #22c55e;
   --danger: #ef4444;
   --warning: #f59e0b;
-  --gray: #6b7280;
-  --light-gray: #262626;
+  --gray: #5a6a6a;                /* General gray - teal-tinted */
 }
 
 body {
@@ -51,15 +52,15 @@ div[data-hot-toast] {
   z-index: 9999 !important;
 }
 
-/* Base Toast Styling - NUCLEAR OVERRIDE */
+/* Base Toast Styling - NUCLEAR OVERRIDE - UPDATED TO TEAL-BLACK */
 div[data-hot-toast] > div,
 body div[data-hot-toast] > div,
 html body div[data-hot-toast] > div {
-  background: linear-gradient(135deg, #2c2c2c 0%, #333333 100%) !important;
+  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
   color: #ffffff !important;
-  border: 1px solid #444444 !important;
+  border: 1px solid #2a3838 !important;
   border-radius: 12px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
   padding: 16px 20px !important;
   font-weight: 500 !important;
   font-size: 14px !important;
@@ -178,7 +179,7 @@ div[data-hot-toast] > div {
   }
 }
 
-/* Additional Nuclear Overrides for Any Other Toast Libraries */
+/* Additional Nuclear Overrides for Any Other Toast Libraries - UPDATED TO TEAL-BLACK */
 .toast-container,
 .toast-container *,
 .notification-container,
@@ -191,16 +192,16 @@ div[data-hot-toast] > div {
 [data-sonner-toaster] *,
 .Toastify__toast-container,
 .Toastify__toast-container * {
-  background: linear-gradient(135deg, #2c2c2c 0%, #333333 100%) !important;
+  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
   color: #ffffff !important;
-  border: 1px solid #444444 !important;
+  border: 1px solid #2a3838 !important;
   border-radius: 12px !important;
 }
 
-/* Override any stubborn inline styles */
+/* Override any stubborn inline styles - UPDATED TO TEAL-BLACK */
 div[style*="background"],
 span[style*="background"] {
-  background: linear-gradient(135deg, #2c2c2c 0%, #333333 100%) !important;
+  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
 }
 
 div[style*="color"],
@@ -208,8 +209,8 @@ span[style*="color"] {
   color: #ffffff !important;
 }
 
-/* Special override for the toast wrapper div */
+/* Special override for the toast wrapper div - UPDATED TO TEAL-BLACK */
 div[data-hot-toast] > div[style] {
-  background: linear-gradient(135deg, #2c2c2c 0%, #333333 100%) !important;
+  background: linear-gradient(135deg, #141d1d 0%, #1a2525 100%) !important;
   color: #ffffff !important;
 }
