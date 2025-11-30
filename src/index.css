@@ -34,12 +34,13 @@
   --border-subtle: #171717;
   --border-prominent: #2a2a2a;
   
-  /* Text hierarchy - key to making bright gold work */
+  /* Text hierarchy - readable first, aesthetic second */
   --text: #ffffff;
-  --text-secondary: #6b6b6b;
-  --text-tertiary: #4a4a4a;
+  --text-secondary: #a0a0a0;      /* Readable - use for most secondary text */
+  --text-muted: #666666;          /* Truly muted - timestamps, metadata only */
+  --text-tertiary: #4a4a4a;       /* Placeholders only */
   
-  /* Secondary accent - for less important elements */
+  /* Secondary accent - for less important interactive elements */
   --accent-muted: #888888;
   
   /* Status colors */
