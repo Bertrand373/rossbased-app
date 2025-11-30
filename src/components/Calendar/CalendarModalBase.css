@@ -404,3 +404,194 @@ button.back-to-info-btn:active,
     font-size: 0.75rem;
   }
 }
+
+/* ============================================================
+   MOBILE MODAL FIX - Ensures modals appear above mobile navigation,
+   are perfectly centered, and provide smooth contained scrolling
+   ============================================================ */
+
+/* CRITICAL: Calendar modal overlay must be above mobile nav (z-index: 9999) */
+.calendar-container .modal-overlay,
+.modal-overlay:has(.day-info-modal),
+.modal-overlay:has(.edit-day-modal) {
+  z-index: 10000;
+  /* Bulletproof centering */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Prevent background scroll when modal is open */
+  overscroll-behavior: contain;
+}
+
+/* Enhanced modal content - centered on all devices */
+.calendar-container .modal-content,
+.day-info-modal,
+.edit-day-modal {
+  /* Prevent scroll chaining to background */
+  overscroll-behavior: contain;
+  /* Ensure proper centering */
+  position: relative;
+  margin: 0;
+}
+
+/* Mobile-specific modal enhancements */
+@media (max-width: 1024px) {
+  /* Ensure modal overlay covers everything including nav */
+  .calendar-container .modal-overlay,
+  .modal-overlay:has(.day-info-modal),
+  .modal-overlay:has(.edit-day-modal) {
+    z-index: 10000;
+    /* Bulletproof centering for all mobile devices */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+    /* Account for safe areas on all sides */
+    padding-top: max(var(--spacing-md), env(safe-area-inset-top, 0px));
+    padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom, 0px));
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
+    box-sizing: border-box;
+  }
+  
+  /* Modal content adjustments for mobile - TRUE CENTER */
+  .calendar-container .modal-content,
+  .day-info-modal,
+  .edit-day-modal {
+    /* Reset any margins that could offset centering */
+    margin: 0;
+    /* Constrain size */
+    max-height: 85vh;
+    max-height: 85dvh;
+    max-width: calc(100vw - var(--spacing-lg));
+    width: 100%;
+    /* Flexbox layout for proper scrolling */
+    display: flex;
+    flex-direction: column;
+    /* NO overflow on modal itself - children handle it */
+    overflow: hidden;
+  }
+  
+  /* Day info modal specific adjustments */
+  .day-info-modal {
+    max-width: 600px;
+  }
+  
+  /* Edit day modal specific adjustments */
+  .edit-day-modal {
+    max-width: 500px;
+  }
+  
+  /* Fixed header elements - date and streak badge always visible */
+  .day-info-modal h3,
+  .day-info-modal .day-status-info,
+  .edit-day-modal .modal-header-simple {
+    flex-shrink: 0;
+  }
+  
+  /* Add spacing below fixed header before scroll area */
+  .day-info-modal .day-status-info {
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  /* Scrollable middle section */
+  .day-info-modal .day-benefits,
+  .day-info-modal .day-journal,
+  .day-info-modal .day-tracking-info,
+  .edit-day-modal .edit-day-options,
+  .edit-day-modal .trigger-selection {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 221, 0, 0.3) transparent;
+    padding-right: var(--spacing-xs);
+    padding-bottom: var(--spacing-sm);
+  }
+  
+  /* Webkit scrollbar styling */
+  .day-info-modal .day-benefits::-webkit-scrollbar,
+  .day-info-modal .day-journal::-webkit-scrollbar,
+  .edit-day-modal .edit-day-options::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .day-info-modal .day-benefits::-webkit-scrollbar-track,
+  .day-info-modal .day-journal::-webkit-scrollbar-track,
+  .edit-day-modal .edit-day-options::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .day-info-modal .day-benefits::-webkit-scrollbar-thumb,
+  .day-info-modal .day-journal::-webkit-scrollbar-thumb,
+  .edit-day-modal .edit-day-options::-webkit-scrollbar-thumb {
+    background: rgba(255, 221, 0, 0.3);
+    border-radius: 3px;
+  }
+  
+  /* Modal actions - fixed at bottom, symmetrical spacing */
+  .day-info-modal .modal-actions,
+  .edit-day-modal .modal-actions,
+  .edit-day-modal .form-actions {
+    flex-shrink: 0;
+    padding-top: var(--spacing-sm);
+    margin-top: 0;
+    border-top: 1px solid var(--border);
+    background-color: var(--card-background);
+  }
+}
+
+/* Mobile modal - very small screens */
+@media (max-width: 480px) {
+  .calendar-container .modal-overlay,
+  .modal-overlay:has(.day-info-modal),
+  .modal-overlay:has(.edit-day-modal) {
+    padding: var(--spacing-sm);
+    padding-top: max(var(--spacing-sm), env(safe-area-inset-top, 0px));
+    padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 0px));
+    padding-left: max(var(--spacing-sm), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--spacing-sm), env(safe-area-inset-right, 0px));
+  }
+  
+  .day-info-modal,
+  .edit-day-modal {
+    max-height: 90vh;
+    max-height: 90dvh;
+    padding: var(--spacing-md);
+    margin: 0;
+  }
+}
+
+/* Landscape orientation handling */
+@media (max-height: 500px) and (orientation: landscape) {
+  .calendar-container .modal-overlay,
+  .modal-overlay:has(.day-info-modal),
+  .modal-overlay:has(.edit-day-modal) {
+    align-items: flex-start;
+    padding-top: var(--spacing-sm);
+    overflow-y: auto;
+  }
+  
+  .day-info-modal,
+  .edit-day-modal {
+    max-height: 95vh;
+    max-height: 95dvh;
+    margin: auto 0;
+  }
+}
