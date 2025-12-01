@@ -15,8 +15,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 0 24px;
+  justify-content: flex-start;
+  padding: 15vh 24px 0 24px;
   text-align: center;
 }
 
@@ -24,7 +24,7 @@
   font-size: 0.8125rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 20px 0;
+  margin: 0 0 16px 0;
 }
 
 /* Streak - tappable */
@@ -72,7 +72,7 @@
   font-size: 0.8125rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.25);
-  margin: 24px 0 0 0;
+  margin: 20px 0 0 0;
 }
 
 /* ============================================================
@@ -493,20 +493,21 @@
    ============================================================ */
 
 @media (min-width: 768px) {
+  .tracker-main {
+    padding: 20vh 32px 0 32px;
+    justify-content: flex-start;
+  }
+  
   .streak-num {
     font-size: 9rem;
   }
   
-  .tracker-main {
-    padding: 0 32px;
-  }
-  
   .date {
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
   
   .milestone {
-    margin-top: 32px;
+    margin-top: 28px;
   }
   
   .tracker-footer {
@@ -516,20 +517,20 @@
 
 @media (max-width: 480px) {
   .tracker-main {
-    padding: 0 20px;
+    padding: 12vh 20px 0 20px;
   }
   
   .streak-num {
-    font-size: 6.5rem;
+    font-size: 6rem;
   }
   
   .date {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     font-size: 0.75rem;
   }
   
   .milestone {
-    margin-top: 20px;
+    margin-top: 16px;
     font-size: 0.75rem;
   }
   
@@ -549,36 +550,44 @@
 
 /* Short screens - ensure button visibility */
 @media (max-height: 700px) {
+  .tracker-main {
+    padding-top: 8vh;
+  }
+  
   .streak-num {
-    font-size: 5.5rem;
+    font-size: 5rem;
   }
   
   .date {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   
   .milestone {
-    margin-top: 16px;
+    margin-top: 12px;
   }
   
   .tracker-footer {
-    padding: 16px 20px;
+    padding: 12px 20px;
   }
 }
 
 /* Very short screens */
 @media (max-height: 600px) {
+  .tracker-main {
+    padding-top: 6vh;
+  }
+  
   .streak-num {
     font-size: 4.5rem;
   }
   
   .date {
     font-size: 0.6875rem;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   
   .milestone {
-    margin-top: 12px;
+    margin-top: 10px;
     font-size: 0.6875rem;
   }
   
@@ -588,7 +597,7 @@
   
   .btn-primary,
   .btn-logged {
-    padding: 14px 20px;
+    padding: 12px 20px;
   }
 }
 
