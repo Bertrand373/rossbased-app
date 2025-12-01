@@ -340,7 +340,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               );
             }
             
-            return <Line data={chartData} options={chartOptions} height={180} />;
+            // Override chart colors to white
+            const styledChartData = {
+              ...chartData,
+              datasets: chartData.datasets.map(ds => ({
+                ...ds,
+                borderColor: '#ffffff',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#ffffff',
+                pointHoverBackgroundColor: '#ffffff',
+                pointHoverBorderColor: '#ffffff',
+              }))
+            };
+            return <Line data={styledChartData} options={chartOptions} height={180} />;
           })()}
         </div>
 

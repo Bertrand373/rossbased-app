@@ -1,115 +1,45 @@
-// components/Stats/StatsComponents.js - FIXED: X button positioning and autoFocus removed
+// StatsComponents.js - TITANTRACK MINIMAL
+// Clean helper components without helmet decorations
 import React from 'react';
-import { FaChartLine, FaTrophy, FaInfoCircle, FaTimes, FaExclamationTriangle, FaMoon, FaCheckCircle } from 'react-icons/fa';
 import { format } from 'date-fns';
-import helmetImage from '../../assets/helmet.png';
 
-// ENHANCED: Loading states component with helmet animation
+// Minimal loading state - just a spinner
 export const InsightLoadingState = ({ insight, isVisible }) => {
   if (!isVisible) return null;
   
   return (
-    <div className="insight-loading-state">
-      <div className="insight-loading-content">
-        <img 
-          src={helmetImage} 
-          alt="Analyzing" 
-          className="insight-loading-helmet"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'block';
-          }}
-        />
-        <div className="insight-loading-helmet-fallback" style={{display: 'none'}}>🧠</div>
-        <div className="insight-loading-text">
-          <div className="insight-loading-title">Calculating {insight}...</div>
-          <div className="insight-loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </div>
-      </div>
+    <div className="insight-loading">
+      <div className="insight-loading-spinner"></div>
     </div>
   );
 };
 
-// ENHANCED: Progress indicator component - Banner structure with custom messaging per section
-export const DataProgressIndicator = ({ userData, targetDays = 14, sectionTitle, sectionDescription }) => {
-  // Safety check for userData
-  if (!userData) {
-    return null;
-  }
-  
-  const trackedDays = userData.benefitTracking?.length || 0;
-  const isComplete = trackedDays >= targetDays;
+// Minimal empty state - clean text only
+export const InsightEmptyState = ({ insight, userData, sectionTitle, sectionDescription }) => {
+  const trackedDays = userData?.benefitTracking?.length || 0;
+  const targetDays = 14;
+  const remaining = targetDays - trackedDays;
   
   return (
-    <div className="data-progress-indicator">
-      <div className="data-progress-helmet-container">
-        <img 
-          src={helmetImage} 
-          alt="Building Profile" 
-          className="data-progress-helmet"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'block';
-          }}
-        />
-        <div className="data-progress-helmet-fallback" style={{display: 'none'}}>🪖</div>
-      </div>
-      <div className="data-progress-content">
-        <div className="data-progress-title">
-          {isComplete ? sectionTitle : `Building Your ${sectionTitle}`}
-          <div className="data-progress-count">
-            {trackedDays}/{targetDays} days
-          </div>
-        </div>
-        <div className="data-progress-message">
-          {isComplete 
-            ? sectionDescription
-            : `${sectionDescription} Track ${targetDays - trackedDays} more days to unlock.`}
-        </div>
-      </div>
+    <div className="insight-empty">
+      <p className="insight-empty-title">{trackedDays}/{targetDays} days tracked</p>
+      <p className="insight-empty-text">
+        {sectionDescription} Track {remaining} more days to unlock.
+      </p>
     </div>
   );
 };
 
-// NEW: Mini horizontal info banner with helmet - shows when data exists
+// Minimal info banner - text only, no helmet
 export const MiniInfoBanner = ({ description }) => {
   return (
     <div className="mini-info-banner">
-      <div className="mini-info-helmet-container">
-        <img 
-          src={helmetImage} 
-          alt="Info" 
-          className="mini-info-helmet"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'block';
-          }}
-        />
-        <div className="mini-info-helmet-fallback" style={{display: 'none'}}>🪖</div>
-      </div>
-      <div className="mini-info-text">{description}</div>
+      <p>{description}</p>
     </div>
   );
 };
 
-// ENHANCED: Empty state component - passes custom section details to banner
-export const InsightEmptyState = ({ insight, userData, sectionTitle, sectionDescription }) => {
-  return (
-    <div className="insight-empty-state">
-      <DataProgressIndicator 
-        userData={userData} 
-        sectionTitle={sectionTitle}
-        sectionDescription={sectionDescription}
-      />
-    </div>
-  );
-};
-
-// FIXED: Helper function to format trigger names - handles invalid triggers
+// Helper function to format trigger names
 const formatTriggerName = (trigger) => {
   if (!trigger || typeof trigger !== 'string') return 'not recorded';
   
@@ -127,144 +57,76 @@ const formatTriggerName = (trigger) => {
     'sleep_deprivation': 'sleep deprivation'
   };
   
-  // Return mapped name or sanitized version of unknown trigger
   return triggerMap[trigger] || trigger.replace(/_/g, ' ').replace(/[^a-zA-Z0-9\s]/g, '');
 };
 
-// FIXED: Stat Card Modal with X button at modal level and no autoFocus
+// Stat Card Modal - Clean minimal design
 export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }) => {
   if (!showModal || !selectedStatCard) return null;
 
   const generateStatCardContent = (statType) => {
     const streakHistory = userData.streakHistory || [];
-    const startDate = userData.startDate ? new Date(userData.startDate) : new Date();
+    const startDate = userData.startDate ? new Date(userData.startDate) : null;
     
     switch (statType) {
+      case 'currentStreak':
+        return {
+          value: userData.currentStreak || 0,
+          label: 'Current Streak',
+          description: 'Your active streak of consecutive days. This resets if you log a relapse.',
+          breakdown: startDate ? [
+            { label: 'Started', value: format(startDate, 'MMM d, yyyy') }
+          ] : null
+        };
+        
       case 'longestStreak':
-        const longestStreak = userData.longestStreak || 0;
+        const longestFromHistory = streakHistory.reduce((max, s) => {
+          const length = s?.length || 0;
+          return length > max ? length : max;
+        }, 0);
+        const longest = Math.max(userData.longestStreak || 0, longestFromHistory);
         
-        // Find the longest streak record from history
-        const longestStreakRecord = streakHistory
-          .filter(streak => streak && streak.days)
-          .reduce((longest, current) => {
-            return (current.days || 0) > (longest?.days || 0) ? current : longest;
-          }, null);
-
-        const longestStreakStart = longestStreakRecord?.start ? 
-          format(new Date(longestStreakRecord.start), 'MMMM d, yyyy') : 'Not recorded';
-        const longestStreakEnd = longestStreakRecord?.end ? 
-          format(new Date(longestStreakRecord.end), 'MMMM d, yyyy') : format(new Date(), 'MMMM d, yyyy');
-        
-        // Determine if this longest streak is still active (no end date)
-        const isStillActive = !longestStreakRecord?.end;
-        const durationText = longestStreakRecord ? 
-          `Duration: ${longestStreakStart} to ${longestStreakEnd}${isStillActive ? ' (still active)' : ''}` : 
-          'Date records not available for this streak.';
-
         return {
-          title: 'Longest Streak Record',
-          icon: <FaTrophy />,
-          mainValue: `${longestStreak} days`,
-          content: [
-            longestStreak === 0 ? 
-              'No streak longer than 1 day recorded yet.' :
-              `Personal best streak: ${longestStreak} consecutive days.`,
-            
-            durationText,
-            
-            longestStreakRecord?.reason ? 
-              `Ended due to: ${longestStreakRecord.reason.replace(/_/g, ' ')}` :
-              isStillActive ? 'Currently ongoing - keep up the great work!' : 'End reason not recorded.'
-          ]
+          value: longest,
+          label: 'Longest Streak',
+          description: 'Your personal best - the longest streak you\'ve achieved. A record to beat.',
+          breakdown: null
         };
-
+        
       case 'wetDreams':
-        const wetDreamCount = userData.wetDreamCount || 0;
-        
-        // Calculate tracking period
-        const daysSinceStart = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
-        const frequency = daysSinceStart > 30 && wetDreamCount > 0 ? 
-          Math.round(daysSinceStart / wetDreamCount) : null;
-
         return {
-          title: 'Wet Dream Record',
-          icon: <FaMoon />,
-          mainValue: `${wetDreamCount} total`,
-          content: [
-            `Total occurrences: ${wetDreamCount} wet dreams recorded.`,
-            
-            `Tracking period: ${daysSinceStart} days since ${format(startDate, 'MMMM d, yyyy')}.`,
-            
-            frequency ? 
-              `Average frequency: approximately every ${frequency} days.` : 
-              wetDreamCount === 0 ? 
-                'No wet dreams recorded during tracking period.' :
-                'Frequency calculation requires longer tracking period.'
-          ]
+          value: userData.wetDreamCount || 0,
+          label: 'Wet Dreams',
+          description: 'Natural nocturnal emissions. These don\'t count as relapses - they\'re part of the body\'s normal regulation process.',
+          breakdown: null
         };
-
+        
       case 'relapses':
-        const relapseCount = userData.relapseCount || 0;
+        const relapseHistory = streakHistory.filter(s => s?.reason === 'relapse') || [];
+        const triggers = {};
         
-        // Find most recent relapse
-        const relapses = streakHistory.filter(streak => 
-          streak && streak.reason === 'relapse'
-        );
-        
-        const mostRecentRelapse = relapses.length > 0 ? 
-          relapses.reduce((latest, current) => {
-            try {
-              const currentDate = new Date(current.end || current.start);
-              const latestDate = new Date(latest.end || latest.start);
-              return currentDate > latestDate ? current : latest;
-            } catch (error) {
-              return latest;
-            }
-          }) : null;
-
-        const daysSinceLastRelapse = mostRecentRelapse ? 
-          Math.floor((new Date() - new Date(mostRecentRelapse.end || mostRecentRelapse.start)) / (1000 * 60 * 60 * 24)) : null;
-
-        // FIXED: Find most recorded trigger with proper validation
-        const triggerCounts = {};
-        relapses.forEach(relapse => {
-          const trigger = relapse.trigger || 'not recorded';
-          // Only count valid triggers, skip invalid ones like 'celebration'
-          if (trigger !== 'celebration' && trigger !== 'not recorded') {
-            triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
-          }
+        relapseHistory.forEach(r => {
+          const trigger = r.trigger || 'unknown';
+          triggers[trigger] = (triggers[trigger] || 0) + 1;
         });
         
-        const mostRecordedTrigger = Object.keys(triggerCounts).length > 0 ? 
-          Object.entries(triggerCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0] : null;
-
+        const topTrigger = Object.entries(triggers).sort((a, b) => b[1] - a[1])[0];
+        
         return {
-          title: 'Relapse Record',
-          icon: <FaExclamationTriangle />,
-          mainValue: `${relapseCount} total`,
-          content: [
-            `Total relapses: ${relapseCount} recorded since starting.`,
-            
-            daysSinceLastRelapse !== null ? 
-              `Most recent: ${daysSinceLastRelapse} days ago (${format(new Date(mostRecentRelapse.end || mostRecentRelapse.start), 'MMMM d, yyyy')})` :
-              relapseCount > 0 ? 
-                'Most recent relapse date not recorded.' :
-                'No relapses recorded.',
-            
-            mostRecordedTrigger ? 
-              `Most frequent trigger: ${formatTriggerName(mostRecordedTrigger)} (${triggerCounts[mostRecordedTrigger]} times)` :
-              relapseCount > 0 ? 
-                'Trigger information not available.' :
-                'No trigger data to display.'
-          ]
+          value: userData.relapseCount || 0,
+          label: 'Relapses',
+          description: 'Total relapse count. Each one is a lesson. What matters is you\'re still here, still trying.',
+          breakdown: topTrigger ? [
+            { label: 'Top Trigger', value: formatTriggerName(topTrigger[0]) }
+          ] : null
         };
-
+        
       default:
         return {
-          title: 'Stat Information',
-          icon: <FaInfoCircle />,
-          mainValue: 'N/A',
-          content: ['Information not available for this statistic.']
+          value: 0,
+          label: 'Unknown',
+          description: '',
+          breakdown: null
         };
     }
   };
@@ -272,46 +134,34 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
   const content = generateStatCardContent(selectedStatCard);
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="stat-modal-title">
-      <div className="modal-content stat-details-modal" onClick={e => e.stopPropagation()}>
-        {/* FIXED: X button moved to modal level (outside header) */}
-        <button 
-          className="stat-modal-close"
-          onClick={onClose}
-          aria-label="Close modal"
-        >
-          <FaTimes />
-        </button>
+    <div className="stats-overlay" onClick={onClose}>
+      <div className="stats-modal stat-detail-modal" onClick={e => e.stopPropagation()}>
+        <div className="stat-detail-value">{content.value}</div>
+        <div className="stat-detail-label">{content.label}</div>
+        <p className="stat-detail-info">{content.description}</p>
         
-        <div className="stat-details-header">
-          <div className="stat-details-icon">
-            {content.icon}
+        {content.breakdown && (
+          <div className="stat-detail-breakdown">
+            {content.breakdown.map((item, index) => (
+              <div key={index} className="stat-breakdown-item">
+                <span className="stat-breakdown-label">{item.label}</span>
+                <span className="stat-breakdown-value">{item.value}</span>
+              </div>
+            ))}
           </div>
-          <h3 id="stat-modal-title">{content.title}</h3>
-        </div>
-        
-        <div className="stat-details-value">
-          {content.mainValue}
-        </div>
-        
-        <div className="stat-details-content">
-          {content.content.map((text, index) => (
-            <p key={index}>{text}</p>
-          ))}
-        </div>
+        )}
         
         <div className="modal-actions">
-          {/* FIXED: Removed autoFocus to prevent yellow appearance on modal open */}
-          <button 
-            className="modal-got-it-btn" 
-            onClick={onClose}
-            onKeyDown={(e) => e.key === 'Enter' && onClose()}
-          >
-            <FaCheckCircle />
-            Got It
-          </button>
+          <button className="btn-ghost" onClick={onClose}>Close</button>
         </div>
       </div>
     </div>
   );
+};
+
+export default {
+  InsightLoadingState,
+  InsightEmptyState,
+  MiniInfoBanner,
+  StatCardModal
 };
