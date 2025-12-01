@@ -1,15 +1,9 @@
-// components/Profile/Profile.js - WITH EDIT MODE FOR PRIVACY SETTINGS
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// Profile.js - TITANTRACK REDESIGNED
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
 import { useNotifications } from '../../hooks/useNotifications';
-
-// Icons
-import { FaUser, FaEdit, FaCrown, FaDiscord, FaCog, FaCommentAlt, FaBug, 
-  FaLightbulb, FaStar, FaPaperPlane, FaTimes, FaCheckCircle, 
-  FaTrash, FaDownload, FaSignOutAlt, FaCreditCard, 
-  FaBell, FaGlobe, FaLock, FaClock } from 'react-icons/fa';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
@@ -32,11 +26,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
   
-  // NOTIFICATION HOOK WITH BACKEND
+  // Notification Hook
   const {
     permission,
     isSupported,
-    subscription,
     fcmToken,
     requestPermission,
     subscribeToPush,
@@ -47,9 +40,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
-  const [toggleKey, setToggleKey] = useState(0);
   
-  // NEW: Notification Preferences States
+  // Notification Preferences
   const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
   const [quietHoursStart, setQuietHoursStart] = useState('22:00');
   const [quietHoursEnd, setQuietHoursEnd] = useState('08:00');
@@ -65,47 +57,37 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [feedbackType, setFeedbackType] = useState('general');
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
-  
-  // Tab slider refs
-  const tabsRef = useRef(null);
-  const sliderRef = useRef(null);
-  const [isSliderInitialized, setIsSliderInitialized] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const resizeTimeoutRef = useRef(null);
-  
-  const feedbackTypes = [
-    { id: 'bug', label: 'Bug Report', icon: FaBug },
-    { id: 'feature', label: 'Feature Request', icon: FaLightbulb },
-    { id: 'improvement', label: 'Suggestion', icon: FaStar },
-    { id: 'general', label: 'General', icon: FaCommentAlt }
-  ];
 
   const tabs = [
-    { id: 'account', label: 'Account', icon: FaUser },
-    { id: 'privacy', label: 'Privacy', icon: FaLock },
-    { id: 'settings', label: 'Settings', icon: FaCog },
-    { id: 'data', label: 'Data', icon: FaDownload }
+    { id: 'account', label: 'Account' },
+    { id: 'privacy', label: 'Privacy' },
+    { id: 'settings', label: 'Settings' },
+    { id: 'data', label: 'Data' }
   ];
 
-  // CHECK EXISTING NOTIFICATION SUBSCRIPTION ON MOUNT
+  const feedbackTypes = [
+    { id: 'bug', label: 'Bug' },
+    { id: 'feature', label: 'Feature' },
+    { id: 'improvement', label: 'Suggestion' },
+    { id: 'general', label: 'General' }
+  ];
+
+  // Check existing notification subscription
   useEffect(() => {
     if (isSupported && userData?.username) {
       checkExistingSubscription().then((sub) => {
         setNotificationsEnabled(!!sub);
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSupported, userData?.username]);
+  }, [isSupported, userData?.username, checkExistingSubscription]);
 
-  // NEW: Load notification preferences when notifications are enabled
+  // Load notification preferences
   useEffect(() => {
     if (notificationsEnabled && userData?.username) {
       loadNotificationPreferences();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notificationsEnabled, userData?.username]);
 
-  // NEW: Load notification preferences from API
   const loadNotificationPreferences = async () => {
     try {
       const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`);
@@ -123,16 +105,11 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   };
 
-  // NEW: Update notification type
   const updateNotifType = (type) => {
     if (!isEditingPrivacy) return;
-    setNotifTypes(prev => ({
-      ...prev,
-      [type]: !prev[type]
-    }));
+    setNotifTypes(prev => ({ ...prev, [type]: !prev[type] }));
   };
 
-  // NEW: Save notification preferences
   const handleSaveNotificationPreferences = async () => {
     const preferences = {
       quietHoursEnabled,
@@ -152,27 +129,17 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       });
 
       if (response.ok) {
-        localStorage.setItem(
-          `notificationPrefs_${userData.username}`,
-          JSON.stringify(preferences)
-        );
+        localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
         setIsEditingPrivacy(false);
-        toast.success('✅ Notification preferences saved!');
       } else {
         throw new Error('Failed to save preferences');
       }
     } catch (error) {
-      console.error('Save error:', error);
-      localStorage.setItem(
-        `notificationPrefs_${userData.username}`,
-        JSON.stringify(preferences)
-      );
+      localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
       setIsEditingPrivacy(false);
-      toast.success('✅ Preferences saved locally');
     }
   };
 
-  // HANDLE NOTIFICATION TOGGLE WITH BACKEND
   const handleNotificationToggle = async () => {
     if (isTogglingNotifications || !isEditingPrivacy) return;
     
@@ -182,13 +149,11 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       if (notificationsEnabled) {
         await unsubscribeFromPush();
         setNotificationsEnabled(false);
-        setToggleKey(prev => prev + 1);
-        toast.success('✅ Push notifications disabled');
       } else {
         if (permission !== 'granted') {
           const granted = await requestPermission();
           if (!granted) {
-            toast.error('Please enable notifications in your browser settings');
+            toast.error('Please enable notifications in browser settings');
             setIsTogglingNotifications(false);
             return;
           }
@@ -196,187 +161,47 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         
         await subscribeToPush();
         setNotificationsEnabled(true);
-        setToggleKey(prev => prev + 1);
-        await new Promise(resolve => setTimeout(resolve, 100));
-        toast.success('✅ Push notifications enabled!');
         
         setTimeout(async () => {
           try {
-            await sendLocalNotification('🎉 Notifications Activated!', {
+            await sendLocalNotification('Notifications Activated', {
               body: 'You\'ll now receive milestone alerts and motivational messages',
-              icon: '/icon-192.png',
-              badge: '/icon-192.png'
+              icon: '/icon-192.png'
             });
           } catch (error) {
-            console.error('Failed to send welcome notification:', error);
+            console.error('Welcome notification failed:', error);
           }
         }, 1000);
       }
     } catch (error) {
-      console.error('❌ Toggle error:', error);
-      setNotificationsEnabled(prev => !prev);
-      setToggleKey(prev => prev + 1);
+      console.error('Toggle error:', error);
       toast.error('Failed to update notification settings');
     } finally {
       setIsTogglingNotifications(false);
     }
   };
 
-  // HANDLE TEST NOTIFICATION
   const handleTestNotification = async () => {
     try {
-      const success = await sendLocalNotification('🔔 Test Notification', {
-        body: 'If you can see this, notifications are working perfectly!',
-        icon: '/icon-192.png',
-        badge: '/icon-192.png',
-        requireInteraction: true
+      const success = await sendLocalNotification('Test Notification', {
+        body: 'Notifications are working correctly!',
+        icon: '/icon-192.png'
       });
       
-      if (success) {
-        toast.success('Test notification sent! Check your notifications.');
-      } else {
+      if (!success) {
         toast.error('Failed to send test notification');
       }
     } catch (error) {
-      console.error('Test notification error:', error);
       toast.error('Error sending test notification');
     }
   };
-
-  const detectMobile = useCallback(() => {
-    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
-    setIsMobile(isMobileDevice);
-    return isMobileDevice;
-  }, []);
-
-  const updateTabSlider = useCallback(() => {
-    if (!tabsRef.current || !sliderRef.current) {
-      return false;
-    }
-    
-    try {
-      const tabsContainer = tabsRef.current;
-      const slider = sliderRef.current;
-      const activeTabElement = tabsContainer.querySelector(`[data-tab="${activeTab}"]`);
-      
-      if (!activeTabElement) {
-        return false;
-      }
-
-      requestAnimationFrame(() => {
-        try {
-          const containerRect = tabsContainer.getBoundingClientRect();
-          const tabRect = activeTabElement.getBoundingClientRect();
-          
-          if (containerRect.width === 0 || tabRect.width === 0) {
-            return;
-          }
-
-          const containerStyle = window.getComputedStyle(tabsContainer);
-          const paddingLeft = Math.round(parseFloat(containerStyle.paddingLeft) || 8);
-          const leftOffset = Math.round(tabRect.left - containerRect.left - paddingLeft);
-          const tabWidth = Math.round(tabRect.width);
-          
-          slider.style.width = `${tabWidth}px`;
-          
-          requestAnimationFrame(() => {
-            slider.style.transform = `translateX(${leftOffset}px)`;
-            slider.style.opacity = '1';
-            slider.style.visibility = 'visible';
-          });
-          
-        } catch (innerError) {
-          console.error('Inner slider positioning failed:', innerError);
-        }
-      });
-      
-      return true;
-      
-    } catch (error) {
-      console.error('Slider update failed:', error);
-      return false;
-    }
-  }, [activeTab]);
-
-  const handleTabChange = useCallback((newTab) => {
-    if (newTab === activeTab) return;
-    setActiveTab(newTab);
-    if (isMobile) {
-      setTimeout(() => updateTabSlider(), 10);
-    }
-  }, [activeTab, isMobile, updateTabSlider]);
-
-  useEffect(() => {
-    const initializeSlider = () => {
-      detectMobile();
-      
-      if (!tabsRef.current || !sliderRef.current) {
-        return;
-      }
-
-      requestAnimationFrame(() => {
-        const success = updateTabSlider();
-        
-        if (success) {
-          setIsSliderInitialized(true);
-        } else {
-          setTimeout(() => {
-            if (updateTabSlider()) {
-              setIsSliderInitialized(true);
-            } else {
-              if (sliderRef.current) {
-                sliderRef.current.style.opacity = '1';
-                sliderRef.current.style.visibility = 'visible';
-                setIsSliderInitialized(true);
-                setTimeout(updateTabSlider, 50);
-              }
-            }
-          }, 100);
-        }
-      });
-    };
-
-    const timer = setTimeout(initializeSlider, 100);
-    return () => clearTimeout(timer);
-  }, [updateTabSlider, detectMobile]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      detectMobile();
-      
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-      
-      resizeTimeoutRef.current = setTimeout(() => {
-        if (isSliderInitialized) {
-          updateTabSlider();
-        }
-      }, 100);
-    };
-
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-    };
-  }, [isSliderInitialized, detectMobile, updateTabSlider]);
-
-  useEffect(() => {
-    if (isSliderInitialized) {
-      setTimeout(updateTabSlider, 10);
-    }
-  }, [activeTab, isSliderInitialized, updateTabSlider]);
 
   const userStats = {
     memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown'
   };
 
   const handleProfileUpdate = () => {
-    const updates = {
+    updateUserData({
       username: username.trim(),
       email: email.trim(),
       discordUsername: discordUsername.trim(),
@@ -384,23 +209,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       dataSharing,
       analyticsOptIn,
       marketingEmails
-    };
-    
-    updateUserData(updates);
+    });
     setIsEditingProfile(false);
-    toast.success('Profile updated successfully!');
   };
 
   const handlePrivacyUpdate = () => {
-    const updates = {
-      dataSharing,
-      analyticsOptIn,
-      marketingEmails
-    };
-    
-    updateUserData(updates);
+    updateUserData({ dataSharing, analyticsOptIn, marketingEmails });
     setIsEditingPrivacy(false);
-    toast.success('Privacy settings saved!');
   };
 
   const handleFeedbackSubmit = () => {
@@ -409,24 +224,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       return;
     }
     
-    const feedbackData = {
-      type: feedbackType,
-      subject: feedbackSubject.trim(),
-      message: feedbackMessage.trim(),
-      userData: {
-        username: userData.username,
-        timestamp: new Date().toISOString()
-      }
-    };
-    
-    console.log('Feedback submitted:', feedbackData);
+    console.log('Feedback:', { type: feedbackType, subject: feedbackSubject, message: feedbackMessage });
     
     setFeedbackSubject('');
     setFeedbackMessage('');
     setFeedbackType('general');
     setShowFeedbackModal(false);
-    
-    toast.success('Thank you! Your feedback has been submitted.');
   };
 
   const handleDataExport = () => {
@@ -453,8 +256,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       exportDate: new Date().toISOString()
     };
     
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const dataBlob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
@@ -465,607 +267,441 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     URL.revokeObjectURL(url);
     
     setShowExportModal(false);
-    toast.success('Your data has been exported successfully!');
   };
 
   const handleAccountDeletion = () => {
     localStorage.clear();
-    toast.success('Account deleted successfully');
     onLogout();
   };
 
+  // Get user initial
+  const userInitial = userData?.email?.charAt(0)?.toUpperCase() || 
+                      userData?.username?.charAt(0)?.toUpperCase() || '?';
+
   return (
-    <div className="profile-container">
-      <div className="integrated-profile-header">
-        <div className="profile-header-title-section">
-          <h2>Profile & Settings</h2>
-          <p className="profile-header-subtitle">Manage your account, privacy settings, and preferences</p>
-        </div>
-        
-        <div className="profile-header-actions-section">
-          <div className="profile-header-actions">
-            <button 
-              className="feedback-btn"
-              onClick={() => setShowFeedbackModal(true)}
-            >
-              <FaCommentAlt />
-              <span className="feedback-btn-text">Feedback</span>
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="profile">
+      {/* Header */}
+      <header className="profile-header">
+        <h1>Profile</h1>
+        <p className="profile-subtitle">Manage your account and preferences</p>
+      </header>
 
-      <div className="profile-overview-card">
-        <div className="profile-avatar-section">
-          <div className="profile-avatar">
-            <FaUser />
-            <div className="premium-crown"><FaCrown /></div>
-          </div>
-          <div className="profile-basic-info">
-            <div className="profile-username">{userData.username}</div>
-            <div className="profile-plan">
-              All Features Unlocked
-              <FaCrown className="plan-crown" />
-            </div>
-            <div className="profile-member-since">
-              Member since {userStats.memberSince}
-            </div>
-          </div>
+      {/* User Card */}
+      <section className="profile-user-card">
+        <div className="profile-avatar">{userInitial}</div>
+        <div className="profile-user-info">
+          <span className="profile-username">{userData.username}</span>
+          <span className="profile-member">Member since {userStats.memberSince}</span>
         </div>
-      </div>
+        <button className="profile-feedback-btn" onClick={() => setShowFeedbackModal(true)}>
+          Feedback
+        </button>
+      </section>
 
-      <div 
-        className="profile-tabs" 
-        ref={tabsRef}
-      >
-        <div 
-          className="profile-tab-slider" 
-          ref={sliderRef}
-          style={{ 
-            opacity: 0,
-            visibility: 'hidden',
-            transform: 'translateX(0px)',
-            width: '0px'
-          }}
-        />
-        
+      {/* Tab Navigation */}
+      <nav className="profile-nav">
         {tabs.map(tab => (
-          <button 
+          <button
             key={tab.id}
-            className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => handleTabChange(tab.id)}
-            data-tab={tab.id}
+            className={`profile-nav-btn ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
           >
-            <tab.icon />
-            <span>{tab.label}</span>
+            {tab.label}
           </button>
         ))}
-      </div>
+      </nav>
 
-      <div className="profile-tab-content">
+      {/* Tab Content */}
+      <div className="profile-content">
+        
+        {/* Account Tab */}
         {activeTab === 'account' && (
-          <div className="account-section">
+          <section className="profile-section">
             <div className="section-header">
-              <h3>Account Information</h3>
+              <h2>Account Information</h2>
               <button 
-                className="edit-profile-btn"
+                className="section-edit-btn"
                 onClick={() => setIsEditingProfile(!isEditingProfile)}
               >
-                <FaEdit />
-                <span>{isEditingProfile ? 'Cancel' : 'Edit Profile'}</span>
+                {isEditingProfile ? 'Cancel' : 'Edit'}
               </button>
             </div>
 
-            <div className="account-form">
-              <div className="form-group">
+            <div className="profile-form">
+              <div className="form-field">
                 <label>Username</label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={!isEditingProfile}
-                  placeholder="Enter your username"
+                  placeholder="Your username"
                 />
               </div>
 
-              <div className="form-group">
-                <label>Email Address</label>
+              <div className="form-field">
+                <label>Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={!isEditingProfile}
-                  placeholder="Enter your email"
+                  placeholder="your@email.com"
                 />
               </div>
 
-              <div className="form-group">
-                <label>Discord Username</label>
+              <div className="form-field">
+                <label>Discord</label>
                 <input
                   type="text"
                   value={discordUsername}
                   onChange={(e) => setDiscordUsername(e.target.value)}
                   disabled={!isEditingProfile}
-                  placeholder="For leaderboard integration"
+                  placeholder="For leaderboard"
                 />
               </div>
 
-              <div className="form-group">
-                <div className="toggle-setting">
-                  <div className="toggle-info">
-                    <span className="toggle-label">Show on Leaderboard</span>
-                    <span className="toggle-description">Display your streak on the Discord leaderboard</span>
-                  </div>
-                  <div 
-                    className={`toggle-switch ${showOnLeaderboard ? 'active' : ''} ${!isEditingProfile ? 'disabled' : ''}`}
-                    onClick={() => isEditingProfile && setShowOnLeaderboard(!showOnLeaderboard)}
-                  >
-                    <div className="toggle-slider"></div>
-                  </div>
+              <div className="toggle-row">
+                <div className="toggle-info">
+                  <span className="toggle-label">Show on Leaderboard</span>
+                  <span className="toggle-desc">Display your streak publicly</span>
                 </div>
+                <button 
+                  className={`toggle ${showOnLeaderboard ? 'active' : ''}`}
+                  onClick={() => isEditingProfile && setShowOnLeaderboard(!showOnLeaderboard)}
+                  disabled={!isEditingProfile}
+                >
+                  <span className="toggle-thumb" />
+                </button>
               </div>
 
               {isEditingProfile && (
                 <div className="form-actions">
-                  <button className="save-btn" onClick={handleProfileUpdate}>
-                    <FaCheckCircle />
-                    Save Changes
-                  </button>
-                  <button className="cancel-btn" onClick={() => setIsEditingProfile(false)}>
-                    <FaTimes />
-                    Cancel
+                  <button className="btn-primary" onClick={handleProfileUpdate}>Save</button>
+                  <button className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Cancel</button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Privacy Tab */}
+        {activeTab === 'privacy' && (
+          <section className="profile-section">
+            <div className="section-header">
+              <h2>Privacy Settings</h2>
+              <button 
+                className="section-edit-btn"
+                onClick={() => setIsEditingPrivacy(!isEditingPrivacy)}
+              >
+                {isEditingPrivacy ? 'Cancel' : 'Edit'}
+              </button>
+            </div>
+
+            <div className="settings-group">
+              <h3>Data & Analytics</h3>
+              
+              <div className="toggle-row">
+                <div className="toggle-info">
+                  <span className="toggle-label">Anonymous Analytics</span>
+                  <span className="toggle-desc">Help improve the app</span>
+                </div>
+                <button 
+                  className={`toggle ${analyticsOptIn ? 'active' : ''}`}
+                  onClick={() => isEditingPrivacy && setAnalyticsOptIn(!analyticsOptIn)}
+                  disabled={!isEditingPrivacy}
+                >
+                  <span className="toggle-thumb" />
+                </button>
+              </div>
+
+              <div className="toggle-row">
+                <div className="toggle-info">
+                  <span className="toggle-label">Community Insights</span>
+                  <span className="toggle-desc">Share aggregated data</span>
+                </div>
+                <button 
+                  className={`toggle ${dataSharing ? 'active' : ''}`}
+                  onClick={() => isEditingPrivacy && setDataSharing(!dataSharing)}
+                  disabled={!isEditingPrivacy}
+                >
+                  <span className="toggle-thumb" />
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-group">
+              <h3>Communications</h3>
+              
+              <div className="toggle-row">
+                <div className="toggle-info">
+                  <span className="toggle-label">Marketing Emails</span>
+                  <span className="toggle-desc">New features and tips</span>
+                </div>
+                <button 
+                  className={`toggle ${marketingEmails ? 'active' : ''}`}
+                  onClick={() => isEditingPrivacy && setMarketingEmails(!marketingEmails)}
+                  disabled={!isEditingPrivacy}
+                >
+                  <span className="toggle-thumb" />
+                </button>
+              </div>
+
+              {isSupported && (
+                <div className="toggle-row">
+                  <div className="toggle-info">
+                    <span className="toggle-label">Push Notifications</span>
+                    <span className="toggle-desc">
+                      {permission === 'denied' ? 'Blocked in browser' : 'Milestone alerts'}
+                    </span>
+                  </div>
+                  <button 
+                    className={`toggle ${notificationsEnabled ? 'active' : ''}`}
+                    onClick={handleNotificationToggle}
+                    disabled={!isEditingPrivacy || isTogglingNotifications || permission === 'denied'}
+                  >
+                    <span className="toggle-thumb" />
                   </button>
                 </div>
               )}
             </div>
-          </div>
-        )}
 
-        {activeTab === 'privacy' && (
-          <div className="privacy-section">
-            <div className="section-header">
-              <h3>Privacy Settings</h3>
-              <button 
-                className="edit-profile-btn"
-                onClick={() => setIsEditingPrivacy(!isEditingPrivacy)}
-              >
-                <FaEdit />
-                <span>{isEditingPrivacy ? 'Cancel' : 'Edit Privacy Settings'}</span>
-              </button>
-            </div>
-            
-            <div className="privacy-settings">
-              <div className="privacy-group">
-                <h4>Data & Analytics</h4>
+            {/* Notification Preferences */}
+            {isSupported && notificationsEnabled && isEditingPrivacy && (
+              <div className="settings-group">
+                <h3>Notification Preferences</h3>
                 
-                <div className="toggle-setting">
+                <div className="toggle-row">
                   <div className="toggle-info">
-                    <span className="toggle-label">Anonymous Analytics</span>
-                    <span className="toggle-description">Help improve the app by sharing anonymous usage data</span>
+                    <span className="toggle-label">Quiet Hours</span>
+                    <span className="toggle-desc">Pause during sleep</span>
                   </div>
-                  <div 
-                    className={`toggle-switch ${analyticsOptIn ? 'active' : ''} ${!isEditingPrivacy ? 'disabled' : ''}`}
-                    onClick={() => isEditingPrivacy && setAnalyticsOptIn(!analyticsOptIn)}
+                  <button 
+                    className={`toggle ${quietHoursEnabled ? 'active' : ''}`}
+                    onClick={() => setQuietHoursEnabled(!quietHoursEnabled)}
                   >
-                    <div className="toggle-slider"></div>
-                  </div>
+                    <span className="toggle-thumb" />
+                  </button>
                 </div>
 
-                <div className="toggle-setting">
+                {quietHoursEnabled && (
+                  <div className="time-range">
+                    <input
+                      type="time"
+                      value={quietHoursStart}
+                      onChange={(e) => setQuietHoursStart(e.target.value)}
+                    />
+                    <span>to</span>
+                    <input
+                      type="time"
+                      value={quietHoursEnd}
+                      onChange={(e) => setQuietHoursEnd(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                <div className="toggle-row">
                   <div className="toggle-info">
-                    <span className="toggle-label">Community Data Sharing</span>
-                    <span className="toggle-description">Allow aggregated data to be used for community insights</span>
+                    <span className="toggle-label">Milestones</span>
+                    <span className="toggle-desc">Day 7, 30, 90...</span>
                   </div>
-                  <div 
-                    className={`toggle-switch ${dataSharing ? 'active' : ''} ${!isEditingPrivacy ? 'disabled' : ''}`}
-                    onClick={() => isEditingPrivacy && setDataSharing(!dataSharing)}
+                  <button 
+                    className={`toggle ${notifTypes.milestones ? 'active' : ''}`}
+                    onClick={() => updateNotifType('milestones')}
                   >
-                    <div className="toggle-slider"></div>
-                  </div>
+                    <span className="toggle-thumb" />
+                  </button>
                 </div>
-              </div>
 
-              <div className="privacy-group">
-                <h4>Communications</h4>
-                
-                <div className="toggle-setting">
+                <div className="toggle-row">
                   <div className="toggle-info">
-                    <span className="toggle-label">Marketing Emails</span>
-                    <span className="toggle-description">Receive updates about new features and tips</span>
+                    <span className="toggle-label">Urge Support</span>
+                    <span className="toggle-desc">Encouragement messages</span>
                   </div>
-                  <div 
-                    className={`toggle-switch ${marketingEmails ? 'active' : ''} ${!isEditingPrivacy ? 'disabled' : ''}`}
-                    onClick={() => isEditingPrivacy && setMarketingEmails(!marketingEmails)}
+                  <button 
+                    className={`toggle ${notifTypes.urgeSupport ? 'active' : ''}`}
+                    onClick={() => updateNotifType('urgeSupport')}
                   >
-                    <div className="toggle-slider"></div>
-                  </div>
+                    <span className="toggle-thumb" />
+                  </button>
                 </div>
 
-                {/* PUSH NOTIFICATIONS TOGGLE */}
-                {isSupported && (
-                  <div className="toggle-setting" key={`notification-${toggleKey}`}>
-                    <div className="toggle-info">
-                      <span className="toggle-label">Push Notifications</span>
-                      <span className="toggle-description">
-                        {permission === 'denied' 
-                          ? '⚠️ Blocked in browser settings - please enable in your device settings'
-                          : 'Get milestone alerts and motivational messages'
-                        }
-                      </span>
-                    </div>
-                    <div 
-                      className={`toggle-switch ${notificationsEnabled ? 'active' : ''} ${isTogglingNotifications || permission === 'denied' || !isEditingPrivacy ? 'disabled' : ''}`}
-                      onClick={handleNotificationToggle}
-                    >
-                      <div className="toggle-slider"></div>
-                    </div>
+                <div className="toggle-row">
+                  <div className="toggle-info">
+                    <span className="toggle-label">Weekly Summary</span>
+                    <span className="toggle-desc">Sunday progress report</span>
+                  </div>
+                  <button 
+                    className={`toggle ${notifTypes.weeklyProgress ? 'active' : ''}`}
+                    onClick={() => updateNotifType('weeklyProgress')}
+                  >
+                    <span className="toggle-thumb" />
+                  </button>
+                </div>
+
+                <div className="toggle-row">
+                  <div className="toggle-info">
+                    <span className="toggle-label">Daily Reminder</span>
+                    <span className="toggle-desc">Log your benefits</span>
+                  </div>
+                  <button 
+                    className={`toggle ${dailyReminderEnabled ? 'active' : ''}`}
+                    onClick={() => setDailyReminderEnabled(!dailyReminderEnabled)}
+                  >
+                    <span className="toggle-thumb" />
+                  </button>
+                </div>
+
+                {dailyReminderEnabled && (
+                  <div className="time-single">
+                    <label>Reminder Time</label>
+                    <input
+                      type="time"
+                      value={dailyReminderTime}
+                      onChange={(e) => setDailyReminderTime(e.target.value)}
+                    />
                   </div>
                 )}
 
-                {/* NEW: NOTIFICATION PREFERENCES - Only show when notifications enabled AND editing */}
-                {isSupported && notificationsEnabled && isEditingPrivacy && (
-                  <>
-                    <div className="privacy-group">
-                      <h4>Notification Preferences</h4>
-                      
-                      {/* Quiet Hours Toggle */}
-                      <div className="toggle-setting">
-                        <div className="toggle-info">
-                          <span className="toggle-label">Quiet Hours</span>
-                          <span className="toggle-description">
-                            Don't send notifications during sleep hours
-                          </span>
-                        </div>
-                        <div 
-                          className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
-                          onClick={() => setQuietHoursEnabled(!quietHoursEnabled)}
-                        >
-                          <div className="toggle-slider"></div>
-                        </div>
-                      </div>
-
-                      {/* Time Pickers - only show when quiet hours enabled */}
-                      {quietHoursEnabled && (
-                        <div className="toggle-setting">
-                          <div className="toggle-info" style={{ width: '100%' }}>
-                            <span className="toggle-label">Sleep Schedule</span>
-                            <div className="time-picker-wrapper">
-                              <input
-                                type="time"
-                                className="time-input"
-                                value={quietHoursStart}
-                                onChange={(e) => setQuietHoursStart(e.target.value)}
-                              />
-                              <span className="time-separator">to</span>
-                              <input
-                                type="time"
-                                className="time-input"
-                                value={quietHoursEnd}
-                                onChange={(e) => setQuietHoursEnd(e.target.value)}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Notification Types */}
-                      <div className="toggle-setting">
-                        <div className="toggle-info">
-                          <span className="toggle-label">Milestone Alerts</span>
-                          <span className="toggle-description">
-                            Celebrate major milestones (Day 7, 30, 90, 100, etc.)
-                          </span>
-                        </div>
-                        <div 
-                          className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
-                          onClick={() => updateNotifType('milestones')}
-                        >
-                          <div className="toggle-slider"></div>
-                        </div>
-                      </div>
-
-                      <div className="toggle-setting">
-                        <div className="toggle-info">
-                          <span className="toggle-label">Urge Support</span>
-                          <span className="toggle-description">
-                            Get encouragement when you log urges
-                          </span>
-                        </div>
-                        <div 
-                          className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
-                          onClick={() => updateNotifType('urgeSupport')}
-                        >
-                          <div className="toggle-slider"></div>
-                        </div>
-                      </div>
-
-                      <div className="toggle-setting">
-                        <div className="toggle-info">
-                          <span className="toggle-label">Weekly Progress</span>
-                          <span className="toggle-description">
-                            Sunday summary of your achievements
-                          </span>
-                        </div>
-                        <div 
-                          className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
-                          onClick={() => updateNotifType('weeklyProgress')}
-                        >
-                          <div className="toggle-slider"></div>
-                        </div>
-                      </div>
-
-                      <div className="toggle-setting">
-                        <div className="toggle-info">
-                          <span className="toggle-label">Daily Check-In</span>
-                          <span className="toggle-description">
-                            Optional daily reminder at a time you choose
-                          </span>
-                        </div>
-                        <div 
-                          className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
-                          onClick={() => setDailyReminderEnabled(!dailyReminderEnabled)}
-                        >
-                          <div className="toggle-slider"></div>
-                        </div>
-                      </div>
-
-                      {/* Daily reminder time picker */}
-                      {dailyReminderEnabled && (
-                        <div className="toggle-setting time-picker-container">
-                          <div className="toggle-info">
-                            <span className="toggle-label">Daily Reminder Time</span>
-                            <div className="time-picker-inputs">
-                              <input
-                                type="time"
-                                value={dailyReminderTime}
-                                onChange={(e) => setDailyReminderTime(e.target.value)}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-
-                {/* TEST NOTIFICATION BUTTON - Only show when notifications enabled AND NOT editing */}
-                {isSupported && notificationsEnabled && !isEditingPrivacy && (
-                  <div className="toggle-setting">
-                    <div className="toggle-info">
-                      <span className="toggle-label">Test Notifications</span>
-                      <span className="toggle-description">
-                        Send a test notification to verify everything works
-                      </span>
-                    </div>
-                    <button 
-                      className="action-btn"
-                      onClick={handleTestNotification}
-                    >
-                      <FaBell />
-                      Send Test
-                    </button>
-                  </div>
-                )}
-
-                {!isSupported && (
-                  <div className="toggle-setting">
-                    <div className="toggle-info">
-                      <span className="toggle-label">Push Notifications</span>
-                      <span className="toggle-description" style={{ color: '#f59e0b' }}>
-                        ⚠️ Not supported in this browser
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {isEditingPrivacy && (
-              <div className="privacy-actions">
-                <button className="save-btn" onClick={handleSaveNotificationPreferences}>
-                  <FaCheckCircle />
-                  Save All Settings
-                </button>
-                <button className="cancel-btn" onClick={() => setIsEditingPrivacy(false)}>
-                  <FaTimes />
-                  Cancel
+                <button className="test-btn" onClick={handleTestNotification}>
+                  Test Notification
                 </button>
               </div>
             )}
-          </div>
+
+            {isEditingPrivacy && (
+              <div className="form-actions">
+                <button className="btn-primary" onClick={handleSaveNotificationPreferences}>Save</button>
+                <button className="btn-ghost" onClick={() => setIsEditingPrivacy(false)}>Cancel</button>
+              </div>
+            )}
+          </section>
         )}
 
+        {/* Settings Tab */}
         {activeTab === 'settings' && (
-          <div className="settings-section">
-            <h3>App Settings</h3>
-            
-            <div className="settings-groups">
-              <div className="settings-group">
-                <h4>Language & Localization</h4>
-                
-                <div className="coming-soon-banner">
-                  <div className="coming-soon-helmet-container">
-                    <img 
-                      className="coming-soon-helmet" 
-                      src="/helmet.png" 
-                      alt="Coming Soon" 
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'block';
-                      }}
-                    />
-                    <div className="coming-soon-helmet-fallback" style={{ display: 'none' }}>
-                      ⚔️
-                    </div>
-                  </div>
-                  
-                  <div className="coming-soon-content">
-                    <h4 className="coming-soon-title">
-                      Multi-Language Support
-                    </h4>
-                    <p className="coming-soon-description">
-                      Multiple language options are being developed and will be available soon. Stay tuned for updates!
-                    </p>
-                  </div>
-                </div>
+          <section className="profile-section">
+            <div className="section-header">
+              <h2>App Settings</h2>
+            </div>
+
+            <div className="settings-group">
+              <h3>Language</h3>
+              <div className="coming-soon">
+                <span className="coming-soon-badge">Coming Soon</span>
+                <p>Multi-language support is being developed</p>
               </div>
             </div>
-          </div>
+          </section>
         )}
 
+        {/* Data Tab */}
         {activeTab === 'data' && (
-          <div className="data-section">
-            <h3>Data Management</h3>
-            
-            <div className="data-actions">
-              <div className="data-action-card">
-                <div className="data-action-info">
-                  <h4>Export Your Data</h4>
-                  <p>Download all your tracking data, journal entries, and settings as a JSON file</p>
-                </div>
-                <button className="action-btn" onClick={() => setShowExportModal(true)}>
-                  <FaDownload />
-                  Export Data
-                </button>
-              </div>
-
-              <div className="data-action-card danger">
-                <div className="data-action-info">
-                  <h4>Delete Account</h4>
-                  <p>Permanently delete your account and all associated data. This action cannot be undone.</p>
-                </div>
-                <button className="danger-btn" onClick={() => setShowDeleteConfirm(true)}>
-                  <FaTrash />
-                  Delete Account
-                </button>
-              </div>
+          <section className="profile-section">
+            <div className="section-header">
+              <h2>Data Management</h2>
             </div>
 
-            <div className="logout-section">
-              <button className="logout-btn" onClick={onLogout}>
-                <FaSignOutAlt />
-                Sign Out
+            <div className="data-card">
+              <div className="data-info">
+                <h3>Export Data</h3>
+                <p>Download your tracking data as JSON</p>
+              </div>
+              <button className="btn-secondary" onClick={() => setShowExportModal(true)}>
+                Export
               </button>
             </div>
-          </div>
+
+            <div className="data-card danger">
+              <div className="data-info">
+                <h3>Delete Account</h3>
+                <p>Permanently remove all your data</p>
+              </div>
+              <button className="btn-danger" onClick={() => setShowDeleteConfirm(true)}>
+                Delete
+              </button>
+            </div>
+
+            <button className="signout-btn" onClick={onLogout}>
+              Sign Out
+            </button>
+          </section>
         )}
       </div>
 
+      {/* Feedback Modal */}
       {showFeedbackModal && (
         <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
-          <div className="modal-content feedback-modal" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowFeedbackModal(false)}>
-              <FaTimes />
-            </button>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2>Send Feedback</h2>
             
-            <div className="modal-header">
-              <h3>Send Feedback</h3>
+            <div className="feedback-types">
+              {feedbackTypes.map(type => (
+                <button
+                  key={type.id}
+                  className={`feedback-type ${feedbackType === type.id ? 'active' : ''}`}
+                  onClick={() => setFeedbackType(type.id)}
+                >
+                  {type.label}
+                </button>
+              ))}
             </div>
 
-            <div className="feedback-form">
-              <div className="feedback-types">
-                <label>Feedback Type</label>
-                <div className="type-options">
-                  {feedbackTypes.map(type => (
-                    <button
-                      key={type.id}
-                      className={`type-option ${feedbackType === type.id ? 'active' : ''}`}
-                      onClick={() => setFeedbackType(type.id)}
-                    >
-                      <type.icon />
-                      <span>{type.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div className="form-field">
+              <label>Subject</label>
+              <input
+                type="text"
+                value={feedbackSubject}
+                onChange={(e) => setFeedbackSubject(e.target.value)}
+                placeholder="Brief description"
+                maxLength={100}
+              />
+            </div>
 
-              <div className="form-group">
-                <label>Subject</label>
-                <input
-                  type="text"
-                  value={feedbackSubject}
-                  onChange={(e) => setFeedbackSubject(e.target.value)}
-                  placeholder="Brief description of your feedback"
-                  maxLength={100}
-                />
-                <div className="char-count">{feedbackSubject.length}/100</div>
-              </div>
-
-              <div className="form-group">
-                <label>Message</label>
-                <textarea
-                  value={feedbackMessage}
-                  onChange={(e) => setFeedbackMessage(e.target.value)}
-                  placeholder="Please provide details about your feedback..."
-                  rows={5}
-                  maxLength={500}
-                ></textarea>
-                <div className="char-count">{feedbackMessage.length}/500</div>
-              </div>
+            <div className="form-field">
+              <label>Message</label>
+              <textarea
+                value={feedbackMessage}
+                onChange={(e) => setFeedbackMessage(e.target.value)}
+                placeholder="Your feedback..."
+                rows={4}
+                maxLength={500}
+              />
             </div>
 
             <div className="modal-actions">
-              <button className="submit-btn" onClick={handleFeedbackSubmit}>
-                <FaPaperPlane />
-                Submit
-              </button>
-              <button className="cancel-btn" onClick={() => setShowFeedbackModal(false)}>
-                <FaTimes />
-                Cancel
-              </button>
+              <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
+              <button className="btn-ghost" onClick={() => setShowFeedbackModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Export Modal */}
       {showExportModal && (
         <div className="modal-overlay" onClick={() => setShowExportModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3>Export Your Data</h3>
-            <p>This will download all your tracking data, including:</p>
-            <ul>
-              <li>Profile information</li>
-              <li>Streak history and statistics</li>
-              <li>Benefit tracking data</li>
-              <li>Journal entries</li>
-              <li>Badges and achievements</li>
-              <li>Urge management logs</li>
-            </ul>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2>Export Data</h2>
+            <p>Download all your tracking data including streak history, journal entries, and settings.</p>
+            
             <div className="modal-actions">
-              <button className="action-btn" onClick={handleDataExport}>
-                <FaDownload />
-                Download Data
-              </button>
-              <button className="cancel-btn" onClick={() => setShowExportModal(false)}>
-                Cancel
-              </button>
+              <button className="btn-primary" onClick={handleDataExport}>Download</button>
+              <button className="btn-ghost" onClick={() => setShowExportModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Delete Confirm Modal */}
       {showDeleteConfirm && (
         <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3>Delete Account</h3>
-            <p>Are you absolutely sure you want to delete your account?</p>
-            <p><strong>This action cannot be undone.</strong> All your data including:</p>
-            <ul>
-              <li>Streak history and progress</li>
-              <li>Journal entries</li>
-              <li>Benefit tracking data</li>
-              <li>Badges and achievements</li>
-            </ul>
-            <p>will be permanently deleted.</p>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2>Delete Account?</h2>
+            <p>This will permanently delete all your data. This action cannot be undone.</p>
             
             <div className="modal-actions">
-              <button className="danger-btn" onClick={handleAccountDeletion}>
-                <FaTrash />
-                Yes, Delete My Account
-              </button>
-              <button className="cancel-btn" onClick={() => setShowDeleteConfirm(false)}>
-                Cancel
-              </button>
+              <button className="btn-danger" onClick={handleAccountDeletion}>Delete</button>
+              <button className="btn-ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
             </div>
           </div>
         </div>

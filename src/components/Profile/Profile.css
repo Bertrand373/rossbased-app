@@ -1,1639 +1,856 @@
-/* components/Profile/Profile.css - MOBILE-FIRST: Enhanced sliding tab animation with bulletproof mobile support */
-.profile-container {
+/* Profile.css - TITANTRACK REDESIGNED */
+
+.profile {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: 32px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 16px 120px;
 }
 
-/* UPDATED: Integrated header design matching tracker/calendar */
-.integrated-profile-header {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  padding: var(--spacing-lg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+/* =============================================================================
+   HEADER
+   ============================================================================= */
 
-.profile-header-title-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--spacing-lg);
-  position: relative;
-}
-
-.profile-header-title-section h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text);
-  opacity: 0.85;
-  text-align: center;
-}
-
-/* NEW: Header subtitle matching other tabs */
-.profile-header-subtitle {
-  margin: var(--spacing-xs) 0 0 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  text-align: center;
-  font-style: italic;
-}
-
-.profile-header-actions-section {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.profile-header-actions {
-  display: flex;
-  gap: var(--spacing-md);
-}
-
-/* LEGACY: Keep old header for backward compatibility */
 .profile-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-  margin-top: 0;
-}
-
-.profile-header-spacer {
-  /* Empty spacer for centering */
-}
-
-.profile-header h2 {
   text-align: center;
+}
+
+.profile-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 8px;
+}
+
+.profile-subtitle {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
   margin: 0;
-  justify-self: center;
 }
 
-.profile-header-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-self: end;
-}
+/* =============================================================================
+   USER CARD
+   ============================================================================= */
 
-/* CORRECTED: Feedback button matching tracker "edit date" button - smaller, compact size */
-.feedback-btn {
+.profile-user-card {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.feedback-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* UPDATED: Profile Overview Card - REMOVED gold accent border */
-.profile-overview-card {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--spacing-xl);
-}
-
-.profile-avatar-section {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
+  gap: 16px;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
 }
 
 .profile-avatar {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border: 2px solid var(--border);
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  color: var(--text-secondary);
-}
-
-.premium-crown {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 24px;
-  height: 24px;
-  background-color: var(--primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #000;
-  font-size: 0.75rem;
-  border: 2px solid var(--background);
-}
-
-.profile-basic-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.profile-username {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.profile-plan {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 0.875rem;
-  color: var(--primary);
-  font-weight: 500;
-}
-
-.plan-crown {
-  font-size: 0.75rem;
-}
-
-.profile-member-since {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-/* FIXED: Responsive tab navigation container with even spacing */
-.profile-tabs {
-  display: flex;
-  padding: var(--spacing-xs);
-  background-color: var(--card-background);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  position: relative;
-  margin: 0 auto;
-  /* RESPONSIVE: Scale container width based on screen size */
-  width: min(90vw, 400px);
-  min-width: fit-content;
-  max-width: 500px;
-  /* EVEN SPACING: Distribute tabs with consistent gaps */
-  justify-content: space-between;
-  /* MOBILE: Ensure proper 3D rendering context */
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  /* MOBILE: Handle overflow for very small screens only */
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.profile-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-/* UPDATED: Enhanced sliding background indicator - YELLOW background like main nav */
-.profile-tab-slider {
-  position: absolute;
-  top: var(--spacing-xs);
-  left: var(--spacing-xs);
-  height: calc(100% - calc(var(--spacing-xs) * 2));
-  background-color: var(--primary);
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-full);
-  transform-origin: left center;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateX(0px);
-  width: 0px;
-  will-change: transform, width;
-}
-
-/* MOBILE: Faster transition on smaller screens */
-@media (max-width: 768px) {
-  .profile-tab-slider {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-/* ENHANCED: Tab buttons with consistent natural sizing */
-.profile-tab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: transparent;
-  border: 1px solid transparent;
-  color: var(--text-secondary);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  /* CONSISTENT SIZING: Natural width based on content */
-  min-width: fit-content;
-  position: relative;
-  z-index: 2;
-  /* MOBILE: Prevent text selection and ensure proper touch */
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-/* MOBILE: Only adjust touch targets on actual mobile, not desktop */
-@media (max-width: 768px) and (pointer: coarse) {
-  .profile-tab {
-    min-height: 44px; /* iOS recommendation for touch targets */
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
-}
-
-/* Removed hover effects for cleaner interaction - sliding pill provides all visual feedback needed */
-
-/* UPDATED: Active tab styling - BLACK text to contrast with yellow slider background */
-.profile-tab.active {
-  /* CHANGED: Black text instead of yellow to contrast with yellow slider */
-  color: #000000 !important;
-  font-weight: 600 !important;
-  /* IMPORTANT: No background - let slider handle visual feedback */
-  background-color: transparent !important;
-  border-color: transparent !important;
-}
-
-/* MOBILE: Ensure active state is always visible */
-@media (max-width: 768px) {
-  .profile-tab.active {
-    /* FALLBACK: In case slider fails, ensure active tab is distinguishable */
-    font-weight: 600;
-    color: #000000 !important;
-  }
-}
-
-.profile-tab svg {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-/* MOBILE: Responsive icon sizing */
-@media (max-width: 480px) {
-  .profile-tab svg {
-    font-size: 0.875rem;
-  }
-  
-  .profile-tab {
-    font-size: 0.8rem;
-    gap: var(--spacing-xs);
-  }
-}
-
-/* Tab Content */
-.profile-tab-content {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-}
-
-/* UPDATED: Section Headers - centered main headers with proper spacing */
-.section-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-  text-align: center;
-  gap: var(--spacing-md);
-}
-
-.section-header h3 {
-  margin: 0;
   font-size: 1.25rem;
-  color: var(--text);
-}
-
-/* Edit button positioned below centered header */
-.section-header .edit-profile-btn {
-  align-self: center;
-}
-
-/* CORRECTED: Edit profile button matching tracker buttons - smaller, compact size */
-.edit-profile-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.edit-profile-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* UPDATED: Coming Soon Banner matching Timeline banners exactly */
-.coming-soon-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
-}
-
-.coming-soon-helmet-container {
+  font-weight: 600;
+  color: #ffffff;
   flex-shrink: 0;
 }
 
-.coming-soon-helmet {
-  width: 40px;
-  height: 40px;
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
-}
-
-.coming-soon-helmet-fallback {
-  font-size: 1.5rem;
-  color: var(--primary);
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-}
-
-@keyframes coming-soon-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.96);
-  }
-}
-
-.coming-soon-content {
+.profile-user-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 4px;
 }
 
-.coming-soon-title {
-  font-size: 1rem;
+.profile-username {
+  font-size: 1.125rem;
   font-weight: 600;
-  color: var(--text);
-  margin: 0;
+  color: #ffffff;
+}
+
+.profile-member {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.profile-feedback-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.profile-feedback-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* =============================================================================
+   TAB NAVIGATION - Matches Calendar Month/Week Toggle
+   ============================================================================= */
+
+.profile-nav {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  align-self: center;
+}
+
+.profile-nav-btn {
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.profile-nav-btn.active {
+  background: #ffffff;
+  color: #000000;
+  font-weight: 600;
+}
+
+.profile-nav-btn:not(.active):hover {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* =============================================================================
+   CONTENT AREA
+   ============================================================================= */
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Section Header */
+.section-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.coming-soon-description {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
+.section-header h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
   margin: 0;
 }
 
-/* Form Elements */
-.account-form {
+.section-edit-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.section-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+/* =============================================================================
+   FORMS
+   ============================================================================= */
+
+.profile-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
+  gap: 20px;
 }
 
-.form-group {
+.form-field {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 8px;
 }
 
-.form-group label {
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
+.form-field label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: var(--spacing-md);
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text);
-  font-size: 0.875rem;
-  transition: border-color 0.2s;
+.form-field input,
+.form-field textarea {
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: all 200ms ease;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.form-field input:focus,
+.form-field textarea:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: rgba(255, 221, 0, 0.4);
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.form-group input:disabled {
-  background-color: var(--light-gray);
-  color: var(--text-secondary);
+.form-field input:disabled,
+.form-field textarea:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.char-count {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-align: right;
-  margin-top: var(--spacing-xs);
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
 }
 
-/* FIXED: Toggle Settings - removed white circle issue */
-.toggle-setting {
+.form-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  gap: 12px;
+  padding-top: 8px;
 }
 
-/* When toggle-setting contains time picker, center everything */
-.toggle-setting:has(.time-picker-wrapper) {
+/* =============================================================================
+   SETTINGS GROUPS
+   ============================================================================= */
+
+.settings-group {
+  display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+
+.settings-group h3 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+  padding-top: 8px;
+}
+
+/* =============================================================================
+   TOGGLE ROWS
+   ============================================================================= */
+
+.toggle-row {
+  display: flex;
   align-items: center;
-  text-align: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.toggle-row:last-child {
+  border-bottom: none;
 }
 
 .toggle-info {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 4px;
   flex: 1;
 }
 
 .toggle-label {
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #ffffff;
 }
 
-.toggle-description {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
+.toggle-desc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
-/* FIXED: Profile-specific toggle switch - overrides global App.css styles */
-.profile-container .toggle-switch {
-  position: relative !important;
-  width: 56px !important;
-  height: 28px !important;
-  background-color: var(--light-gray) !important;
-  border-radius: 14px !important;
-  border: 1px solid var(--border) !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  flex-shrink: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  padding: 2px !important;
+/* Toggle Switch */
+.toggle {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 200ms ease;
+  flex-shrink: 0;
+  padding: 0;
 }
 
-/* CRITICAL: Remove any input elements inside toggle (from global App.css) */
-.profile-container .toggle-switch input {
-  display: none !important;
-  opacity: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-/* CRITICAL: Remove global toggle slider pseudo-elements */
-.profile-container .toggle-switch::before,
-.profile-container .toggle-switch::after {
-  display: none !important;
-  content: none !important;
-}
-
-.profile-container .toggle-switch.active {
-  background-color: rgba(255, 221, 0, 0.2) !important;
-  border-color: var(--primary) !important;
-}
-
-/* FIXED: Profile-specific toggle slider - completely override global styles */
-.profile-container .toggle-slider {
-  width: 22px !important;
-  height: 22px !important;
-  background-color: var(--text-secondary) !important;
-  border-radius: 50% !important;
-  transition: transform 0.3s ease !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
-  position: relative !important;
-  /* CRITICAL: Override any global pseudo-elements */
-  content: none !important;
-}
-
-/* CRITICAL: Remove any pseudo-elements from slider */
-.profile-container .toggle-slider::before,
-.profile-container .toggle-slider::after {
-  display: none !important;
-  content: none !important;
-}
-
-.profile-container .toggle-switch.active .toggle-slider {
-  transform: translateX(28px) !important;
-  background-color: var(--primary) !important;
-}
-
-/* NEW: Disabled state for notification toggle - doesn't break animation */
-.profile-container .toggle-switch.disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-}
-
-/* NEW: Time picker wrapper and inputs - CLEAN AND PROPERLY SPACED */
-.time-picker-wrapper {
-  display: flex;
-  gap: var(--spacing-md);
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: var(--spacing-md);
-  padding: var(--spacing-sm) 0;
-}
-
-.time-input {
-  padding: var(--spacing-md);
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text);
-  font-size: 0.875rem;
-  font-family: inherit;
-  width: 140px;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.time-input:focus {
-  outline: none;
-  border-color: var(--primary);
-  background-color: var(--card-background);
-}
-
-.time-input:disabled {
-  opacity: 0.5;
+.toggle:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-.time-separator {
-  color: var(--text);
-  font-weight: 600;
-  font-size: 0.875rem;
-  padding: 0 var(--spacing-xs);
+.toggle.active {
+  background: #ffdd00;
 }
 
-.select-setting {
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border);
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 200ms ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.select-setting label {
-  display: block;
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
-  margin-bottom: var(--spacing-sm);
+.toggle.active .toggle-thumb {
+  transform: translateX(20px);
+  background: #000000;
 }
 
-/* NEW: Time input styling for notification preferences */
-.select-setting input[type="time"] {
-  padding: var(--spacing-md);
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text);
+/* =============================================================================
+   TIME INPUTS
+   ============================================================================= */
+
+.time-range {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.time-range input {
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #ffffff;
   font-size: 0.875rem;
-  transition: border-color 0.2s;
   font-family: inherit;
 }
 
-.select-setting input[type="time"]:focus {
+.time-range input:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: rgba(255, 221, 0, 0.4);
 }
 
-/* Subscription Section */
-.current-plan-card {
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border);
-  margin-bottom: var(--spacing-lg);
+.time-range span {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.875rem;
 }
 
-.plan-header {
+.time-single {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.time-single label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.time-single input {
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+/* Test Button */
+.test-btn {
+  align-self: flex-start;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 200ms ease;
+  margin-top: 8px;
+}
+
+.test-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+/* =============================================================================
+   BUTTONS
+   ============================================================================= */
+
+.btn-primary {
+  padding: 14px 28px;
+  background: #ffffff;
+  border: none;
+  border-radius: 10px;
+  color: #000000;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.btn-primary:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  padding: 14px 28px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.btn-danger {
+  padding: 12px 24px;
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 10px;
+  color: #f87171;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.btn-danger:hover {
+  background: rgba(248, 113, 113, 0.25);
+}
+
+/* =============================================================================
+   DATA CARDS
+   ============================================================================= */
+
+.data-card {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-lg);
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
 }
 
-.plan-header h3 {
-  margin: 0;
-  font-size: 1.125rem;
-  color: var(--text);
+.data-card.danger {
+  border-color: rgba(248, 113, 113, 0.2);
+  background: rgba(248, 113, 113, 0.03);
 }
 
-.plan-badge {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.plan-badge.premium {
-  background-color: rgba(255, 221, 0, 0.1);
-  color: var(--primary);
-  border: 1px solid rgba(255, 221, 0, 0.2);
-}
-
-.plan-badge.free {
-  background-color: rgba(128, 128, 128, 0.1);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-.plan-details {
-  margin-bottom: var(--spacing-lg);
-}
-
-.plan-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: var(--spacing-md);
-}
-
-.plan-features {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.plan-feature {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--text);
-  font-size: 0.875rem;
-}
-
-.plan-feature svg {
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
-.subscription-actions {
-  display: flex;
-  gap: var(--spacing-md);
-}
-
-/* CORRECTED: All action buttons matching tracker compact button style */
-.upgrade-btn,
-.manage-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.upgrade-btn:hover,
-.manage-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.premium-benefits h4 {
-  margin-bottom: var(--spacing-lg);
+.data-info h3 {
   font-size: 1rem;
-  color: var(--text);
-  text-align: center;
-}
-
-.benefits-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
-}
-
-.benefit-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.benefit-icon {
-  width: 32px;
-  height: 32px;
-  color: var(--primary);
-  font-size: 1.125rem;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.benefit-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.benefit-title {
   font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
+  color: #ffffff;
+  margin: 0 0 4px;
 }
 
-.benefit-description {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-/* Privacy & Settings Sections - UPDATED: Centered main headers, consistent spacing */
-.privacy-settings,
-.settings-groups {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-}
-
-/* FIXED: Privacy section header styling - matching Account section */
-.privacy-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.privacy-section .section-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-  text-align: center;
-  gap: var(--spacing-md);
-}
-
-.privacy-section .section-header h3 {
+.data-info p {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
   margin: 0;
+}
+
+.signout-btn {
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 200ms ease;
+  margin-top: 16px;
+}
+
+.signout-btn:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: #ffffff;
+}
+
+/* =============================================================================
+   COMING SOON
+   ============================================================================= */
+
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+
+.coming-soon-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(255, 221, 0, 0.15);
+  border-radius: 4px;
+  color: #ffdd00;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+}
+
+.coming-soon p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* =============================================================================
+   MODALS
+   ============================================================================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000;
+}
+
+.modal {
+  width: 100%;
+  max-width: 400px;
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal h2 {
   font-size: 1.25rem;
-  color: var(--text);
-}
-
-.privacy-section .section-header .edit-profile-btn {
-  align-self: center;
-}
-
-.privacy-section h3,
-.settings-section h3,
-.data-section h3 {
-  margin: 0 0 var(--spacing-xl) 0;
-  font-size: 1.25rem;
-  color: var(--text);
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
   text-align: center;
 }
 
-.privacy-group,
-.settings-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.privacy-group h4,
-.settings-group h4 {
+.modal p {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
   margin: 0;
-  font-size: 1rem;
-  color: var(--text);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-}
-
-/* Privacy and Settings Actions - UPDATED: Consistent spacing */
-.settings-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--spacing-xl);
-}
-
-/* Data Section - UPDATED: Consistent spacing throughout */
-.data-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-  margin-top: var(--spacing-lg);
-}
-
-.data-action-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-}
-
-.data-action-card.danger {
-  border-color: rgba(239, 68, 68, 0.3);
-  background-color: rgba(239, 68, 68, 0.05);
-}
-
-.data-action-info {
-  flex: 1;
-}
-
-.data-action-info h4 {
-  margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1rem;
-  color: var(--text);
-}
-
-.data-action-info p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.logout-section {
-  display: flex;
-  justify-content: center;
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid var(--border);
-}
-
-/* FIXED: Profile-specific logout button - same compact size as other buttons */
-.profile-container .logout-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* EXCEPTION: Logout button keeps red hover (not yellow) */
-.profile-container .logout-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1) !important;
-  border-color: var(--danger) !important;
-  color: var(--danger) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* CORRECTED: Profile action buttons matching tracker compact button style */
-.profile-container .action-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.profile-container .action-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* CORRECTED: Delete account button styled like logout - compact size */
-.danger-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.danger-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1) !important;
-  border-color: var(--danger) !important;
-  color: var(--danger) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* CORRECTED: Profile cancel button matching tracker compact style */
-.profile-container .cancel-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.profile-container .cancel-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* KEEP: Save button styling (green) */
-.save-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background-color: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.2);
-  border-radius: var(--radius-full);
-  color: var(--success);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.save-btn:hover {
-  background-color: rgba(34, 197, 94, 0.2) !important;
-  border-color: var(--success) !important;
-  color: var(--success) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* UPDATED: Privacy settings save button - grey with yellow hover */
-.privacy-actions .save-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.privacy-actions .save-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.form-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-content: center;
-  margin-top: var(--spacing-lg);
-}
-
-/* UPDATED: Privacy actions styling - centered with proper spacing */
-.privacy-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-content: center;
-  margin-top: var(--spacing-xl);
-}
-
-/* Feedback Modal */
-.feedback-modal {
-  max-width: 600px;
-  background-color: var(--card-background);
-}
-
-/* UPDATED: Feedback Modal header - centered */
-.modal-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: var(--spacing-lg);
-  position: relative;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text);
   text-align: center;
-}
-
-/* Position close button absolutely in top right */
-.modal-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  font-size: 1rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: var(--radius-full);
-  transition: all 0.2s ease;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-close:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.feedback-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-}
-
-.feedback-types label {
-  display: block;
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.875rem;
-  margin-bottom: var(--spacing-sm);
-}
-
-.type-options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-sm);
-}
-
-/* CORRECTED: Type option buttons in feedback modal matching tracker compact style */
-.type-option {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.type-option:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.type-option.active {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: var(--primary) !important;
-  color: var(--primary) !important;
-}
-
-.type-option svg {
-  font-size: 1rem;
-  color: var(--type-color, var(--text-secondary));
-}
-
-.type-option.active svg {
-  color: var(--primary);
 }
 
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
+  gap: 12px;
+  margin-top: 8px;
 }
 
-/* CORRECTED: Submit button matching tracker compact style */
-.submit-btn {
+.modal-actions .btn-primary,
+.modal-actions .btn-ghost,
+.modal-actions .btn-danger {
+  flex: 1;
+}
+
+/* Feedback Types */
+.feedback-types {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.feedback-type {
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 200ms ease;
 }
 
-.submit-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
+.feedback-type:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
 }
 
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  padding: var(--spacing-md);
-  overflow-y: auto;
+.feedback-type.active {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
 }
 
-.modal-content {
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  color: var(--text);
-  border: 1px solid var(--border);
-  position: relative;
-}
+/* =============================================================================
+   RESPONSIVE - TABLET
+   ============================================================================= */
 
-.modal-content h3 {
-  margin-bottom: var(--spacing-md);
-  color: var(--text);
-  text-align: center;
-}
-
-.modal-content p {
-  margin-bottom: var(--spacing-md);
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.modal-content ul {
-  margin-bottom: var(--spacing-lg);
-  padding-left: var(--spacing-lg);
-}
-
-.modal-content li {
-  margin-bottom: var(--spacing-xs);
-  color: var(--text);
-}
-
-/* MOBILE-FIRST: Enhanced Mobile Responsiveness with bulletproof tab handling */
 @media (max-width: 768px) {
-  /* UPDATED: Mobile header layout */
-  .integrated-profile-header {
-    padding: var(--spacing-lg);
+  .profile {
+    padding: 20px 16px 120px;
+    gap: 28px;
   }
-  
-  .profile-header-title-section {
-    margin-bottom: var(--spacing-lg);
+
+  .profile-header h1 {
+    font-size: 1.5rem;
   }
-  
-  .profile-header-title-section h2 {
-    font-size: 1.25rem;
-    margin-bottom: var(--spacing-xs);
+
+  .profile-user-card {
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  
-  .profile-header-subtitle {
-    font-size: 0.8rem;
-  }
-  
-  .profile-header-actions-section {
-    gap: var(--spacing-md);
-  }
-  
-  .feedback-btn {
+
+  .profile-feedback-btn {
     width: 100%;
     justify-content: center;
   }
-  
-  /* FIXED: Mobile feedback button text responsiveness */
-  .feedback-btn-text {
-    display: inline;
-  }
-  
-  /* LEGACY: Mobile profile header compatibility */
-  .profile-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-    margin-top: 0;
-  }
-  
-  .profile-header h2 {
-    text-align: center;
-    order: 1;
-  }
-  
-  .profile-header-actions {
-    width: 100%;
-    order: 2;
-    justify-self: center;
-  }
-  
-  /* IMPROVED: Better mobile layout - completely centered */
-  .profile-overview-card {
-    flex-direction: column;
-    gap: var(--spacing-lg);
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .profile-avatar-section {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    align-items: center;
-    text-align: center;
-  }
-  
-  /* ADDED: Make sure all profile info is centered on mobile */
-  .profile-basic-info {
-    align-items: center;
-    text-align: center;
-  }
-  
-  .profile-username,
-  .profile-plan,
-  .profile-member-since {
-    text-align: center;
-  }
-  
-  /* FIXED: Mobile tab container - allow horizontal scrolling when needed */
-  .profile-tabs {
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    width: 100%;
-    margin: 0;
-    /* MOBILE: Force hardware acceleration */
-    transform: translateZ(0);
-    /* MOBILE: Ensure smooth scrolling */
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    /* MOBILE: Keep inline-flex for perfect content fitting */
-    display: inline-flex;
-    min-width: 100%;
-  }
-  
-  .profile-tabs::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* MOBILE: Enhanced slider for mobile - more reliable positioning */
-  .profile-tab-slider {
-    /* MOBILE: Faster transitions */
-    transition: transform 0.25s ease-out, width 0.25s ease-out;
-    /* MOBILE: Force GPU acceleration */
-    transform: translateZ(0) translateX(0px);
-    will-change: transform, width;
-  }
-  
-  .profile-tab-content {
-    padding: var(--spacing-lg);
-  }
-  
-  /* FIXED: Mobile section headers - proper font sizing consistent with app */
-  .section-header h3,
-  .privacy-section h3,
-  .settings-section h3,
-  .data-section h3 {
-    font-size: 1.125rem !important;
-  }
-  
-  /* FIXED: Mobile privacy and settings group headers */
-  .privacy-group h4,
-  .settings-group h4,
-  .data-action-info h4 {
-    font-size: 0.875rem !important;
-  }
-  
-  .edit-profile-btn {
+
+  .profile-nav {
     width: 100%;
     justify-content: center;
   }
-  
-  .benefits-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .subscription-actions {
-    flex-direction: column;
-  }
-  
-  .data-action-card {
-    flex-direction: column;
-    gap: var(--spacing-md);
+
+  .profile-nav-btn {
+    padding: 10px 16px;
+    font-size: 0.8125rem;
+    flex: 1;
     text-align: center;
   }
-  
-  .modal-actions button,
-  .form-actions button,
-  .privacy-actions button,
-  .settings-actions button {
-    flex: 1 !important;
-    justify-content: center !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
+
+  .toggle-row {
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  
+
+  .time-range {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .time-range input {
+    flex: 1;
+    min-width: 100px;
+  }
+
   .form-actions {
-    flex-direction: row !important;
-    gap: var(--spacing-sm);
-    align-items: center;
-  }
-  
-  .toggle-setting {
     flex-direction: column;
-    gap: var(--spacing-md);
-    text-align: center;
   }
-  
-  /* NEW: Mobile time picker styling - clean and centered */
-  .time-picker-wrapper {
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-sm);
-  }
-  
-  .time-input {
+
+  .form-actions .btn-primary,
+  .form-actions .btn-ghost {
     width: 100%;
-    max-width: 220px;
   }
-  
-  .time-separator {
-    display: block;
-    margin: var(--spacing-xs) 0;
-  }
-  
-  .select-setting input[type="time"] {
-    width: 100%;
-    text-align: center;
-  }
-  
-  /* UPDATED: Coming soon banner mobile layout matching Timeline banners exactly */
-  .coming-soon-banner {
+
+  .data-card {
     flex-direction: column;
     text-align: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
+    gap: 12px;
   }
-  
-  .coming-soon-content {
+
+  .data-info {
     text-align: center;
   }
-  
-  .coming-soon-title {
-    justify-content: center;
-  }
-  
-  .coming-soon-helmet {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .coming-soon-helmet-fallback {
-    font-size: 1.25rem;
+
+  .data-card .btn-secondary,
+  .data-card .btn-danger {
+    width: 100%;
   }
 }
 
-/* Hide feedback text on very small screens */
-@media (max-width: 320px) {
-  .feedback-btn-text {
-    display: none;
-  }
-}
+/* =============================================================================
+   RESPONSIVE - MOBILE
+   ============================================================================= */
 
-/* Very Small Screens - Enhanced mobile slider support */
 @media (max-width: 480px) {
-  .integrated-profile-header {
-    padding: var(--spacing-md);
+  .profile {
+    padding: 16px 12px 120px;
+    gap: 24px;
   }
-  
-  .profile-header-title-section h2 {
-    font-size: 1.125rem;
+
+  .profile-header h1 {
+    font-size: 1.375rem;
   }
-  
-  .profile-header-subtitle {
+
+  .profile-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .profile-user-card {
+    padding: 16px;
+  }
+
+  .profile-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+  }
+
+  .profile-username {
+    font-size: 1rem;
+  }
+
+  .profile-nav-btn {
+    padding: 10px 12px;
     font-size: 0.75rem;
   }
-  
-  .profile-overview-card {
-    padding: var(--spacing-lg);
+
+  .section-header h2 {
+    font-size: 1rem;
   }
-  
+
+  .toggle-label {
+    font-size: 0.875rem;
+  }
+
+  .toggle-desc {
+    font-size: 0.75rem;
+  }
+
+  .modal {
+    padding: 20px;
+    margin: 16px;
+  }
+
+  .modal h2 {
+    font-size: 1.125rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .feedback-types {
+    flex-direction: column;
+  }
+
+  .feedback-type {
+    text-align: center;
+  }
+}
+
+/* =============================================================================
+   DESKTOP ENHANCEMENTS
+   ============================================================================= */
+
+@media (min-width: 1024px) {
+  .profile {
+    max-width: 640px;
+    padding: 32px 24px 80px;
+    gap: 36px;
+  }
+
+  .profile-header h1 {
+    font-size: 2rem;
+  }
+
+  .profile-user-card {
+    padding: 24px 28px;
+  }
+
   .profile-avatar {
     width: 64px;
     height: 64px;
     font-size: 1.5rem;
   }
-  
-  .premium-crown {
-    width: 20px;
-    height: 20px;
-    font-size: 0.625rem;
-  }
-  
-  .profile-username {
-    font-size: 1.25rem;
-  }
-  
-  /* MOBILE: Even more aggressive slider optimizations for small screens */
-  .profile-tabs {
-    padding: 6px;
-    gap: 4px;
-  }
-  
-  .profile-tab-slider {
-    top: 6px;
-    left: 6px;
-    height: calc(100% - 12px);
-    /* MOBILE: Ultra-fast transitions for small screens */
-    transition: transform 0.2s ease-out, width 0.2s ease-out;
-  }
-  
-  .profile-tab {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: 0.8rem;
-    min-height: 36px;
-  }
-  
-  .profile-tab svg {
-    font-size: 0.8rem;
-  }
-  
-  .profile-tab-content {
-    padding: var(--spacing-md);
-  }
-  
-  /* FIXED: Very small screen heading sizes */
-  .section-header h3,
-  .privacy-section h3,
-  .settings-section h3,
-  .data-section h3 {
-    font-size: 1rem !important;
-  }
-  
-  .privacy-group h4,
-  .settings-group h4,
-  .data-action-info h4 {
-    font-size: 0.8rem !important;
-  }
-  
-  .benefit-item {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-sm);
-  }
-  
-  .benefit-icon {
-    align-self: center;
-  }
-  
-  .modal-content {
-    padding: var(--spacing-lg);
-    margin: var(--spacing-sm);
-  }
-  
-  .feedback-modal {
-    max-width: 100%;
-  }
-  
-  .type-options {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
-  }
-  
-  /* UPDATED: Very small coming soon banner matching Timeline exactly */
-  .coming-soon-helmet {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .coming-soon-helmet-fallback {
-    font-size: 1rem;
-  }
-  
-  .coming-soon-title {
-    font-size: 0.875rem;
-  }
-  
-  .coming-soon-description {
-    font-size: 0.8rem;
-  }
-}
 
-/* MOBILE: Additional support for landscape orientation */
-@media (max-width: 768px) and (orientation: landscape) {
-  .profile-tabs {
-    /* MOBILE: Ensure tabs are always visible in landscape */
-    max-width: 100vw;
-    overflow-x: auto;
+  .profile-nav-btn {
+    padding: 14px 28px;
+    font-size: 0.9375rem;
   }
-  
-  .profile-tab-slider {
-    /* MOBILE: Maintain smooth animation even in landscape */
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  .toggle {
+    width: 52px;
+    height: 30px;
+    border-radius: 15px;
+  }
+
+  .toggle-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .toggle.active .toggle-thumb {
+    transform: translateX(22px);
   }
 }
