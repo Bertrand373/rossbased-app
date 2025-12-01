@@ -1,6 +1,6 @@
-// Stats.js - TITANTRACK MINIMAL (Full Featured)
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { format, subDays } from 'date-fns';
+// Stats.js - TITANTRACK REFINED
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import './Stats.css';
@@ -18,15 +18,11 @@ import {
 
 // Import utility functions
 import {
-  renderTextWithBold,
   getTimeRangeDisplayText,
-  checkAndUpdateBadges,
   getCurrentPhase,
   getPhaseGuidance,
-  getFilteredBenefitData,
   generateChartData,
   calculateAverage,
-  shouldShowInfoBanner,
   calculateDataQuality,
   calculateDaysSinceLastRelapse,
   validateUserData
@@ -41,22 +37,17 @@ import {
   calculateProgressTrends
 } from './StatsAnalyticsUtils';
 
-// Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const Stats = ({ userData, isPremium, updateUserData }) => {
-  // Core state
   const [selectedMetric, setSelectedMetric] = useState('energy');
   const [timeRange, setTimeRange] = useState('week');
-  const [showBadgeModal, setShowBadgeModal] = useState(false);
-  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
+  const [selectedMilestone, setSelectedMilestone] = useState(null);
   const [showResetModal, setShowResetModal] = useState(false);
-  
-  // Stat card modal states
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   
-  // Loading states for insights
   const [loadingStates, setLoadingStates] = useState({
     progressTrends: true,
     relapsePatterns: true,
@@ -65,10 +56,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     phaseEvolution: true
   });
 
-  // Safe user data
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
 
-  // Simulate loading for premium insights
   useEffect(() => {
     if (isPremium) {
       const timers = [
@@ -82,15 +71,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   }, [isPremium, selectedMetric, timeRange]);
 
-  // Check for insufficient data
   const hasInsufficientData = useMemo(() => {
     return (safeUserData.benefitTracking?.length || 0) < 3;
   }, [safeUserData.benefitTracking]);
 
-  // Memoized insights calculations
   const memoizedInsights = useMemo(() => {
     if (!isPremium) return {};
-    
     return {
       dataQuality: calculateDataQuality(safeUserData),
       patternInsights: generatePatternRecognition(safeUserData, selectedMetric),
@@ -102,22 +88,21 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     };
   }, [safeUserData, selectedMetric, isPremium]);
 
-  // Milestones data (replaces badges visual)
+  // Milestones - simple labels
   const milestones = useMemo(() => {
     const maxStreak = Math.max(safeUserData.currentStreak || 0, safeUserData.longestStreak || 0);
     const badges = safeUserData.badges || [];
     
     return [
-      { days: 7, name: 'First Week', earned: maxStreak >= 7, date: badges.find(b => b.name === '7-Day Warrior')?.date },
-      { days: 14, name: 'Two Weeks', earned: maxStreak >= 14, date: badges.find(b => b.name === '14-Day Monk')?.date },
-      { days: 30, name: 'One Month', earned: maxStreak >= 30, date: badges.find(b => b.name === '30-Day Master')?.date },
-      { days: 90, name: 'Quarter', earned: maxStreak >= 90, date: badges.find(b => b.name === '90-Day King')?.date },
-      { days: 180, name: 'Half Year', earned: maxStreak >= 180, date: badges.find(b => b.name === '180-Day Emperor')?.date },
-      { days: 365, name: 'One Year', earned: maxStreak >= 365, date: badges.find(b => b.name === '365-Day Sage')?.date }
+      { days: 7, label: '1 week', earned: maxStreak >= 7, date: badges.find(b => b.name === '7-Day Warrior')?.date },
+      { days: 14, label: '2 weeks', earned: maxStreak >= 14, date: badges.find(b => b.name === '14-Day Monk')?.date },
+      { days: 30, label: '1 month', earned: maxStreak >= 30, date: badges.find(b => b.name === '30-Day Master')?.date },
+      { days: 90, label: '3 months', earned: maxStreak >= 90, date: badges.find(b => b.name === '90-Day King')?.date },
+      { days: 180, label: '6 months', earned: maxStreak >= 180, date: badges.find(b => b.name === '180-Day Emperor')?.date },
+      { days: 365, label: '1 year', earned: maxStreak >= 365, date: badges.find(b => b.name === '365-Day Sage')?.date }
     ];
   }, [safeUserData]);
 
-  // Chart options - minimal styling
   const chartOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
@@ -125,24 +110,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       y: {
         min: 0,
         max: 10,
-        ticks: {
-          stepSize: 5,
-          color: 'rgba(255, 255, 255, 0.3)',
-          font: { size: 11 }
-        },
-        grid: {
-          color: 'rgba(255, 255, 255, 0.06)',
-          drawBorder: false
-        },
+        ticks: { stepSize: 5, color: 'rgba(255,255,255,0.2)', font: { size: 10 } },
+        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
         border: { display: false }
       },
       x: {
-        ticks: {
-          color: 'rgba(255, 255, 255, 0.3)',
-          font: { size: 10 },
-          maxRotation: 0,
-          maxTicksLimit: timeRange === 'quarter' ? 8 : 7
-        },
+        ticks: { color: 'rgba(255,255,255,0.2)', font: { size: 10 }, maxRotation: 0, maxTicksLimit: 7 },
         grid: { display: false },
         border: { display: false }
       }
@@ -150,23 +123,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: 'rgba(20, 20, 20, 0.95)',
-        titleColor: '#ffffff',
-        bodyColor: 'rgba(255, 255, 255, 0.7)',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'rgba(0,0,0,0.9)',
+        titleColor: '#fff',
+        bodyColor: 'rgba(255,255,255,0.7)',
+        borderColor: 'rgba(255,255,255,0.1)',
         borderWidth: 1,
         cornerRadius: 8,
         padding: 12,
         displayColors: false,
-        callbacks: {
-          label: (context) => context.parsed.y === null ? '' : `${context.parsed.y}/10`
-        }
+        callbacks: { label: (ctx) => ctx.parsed.y === null ? '' : `${ctx.parsed.y}/10` }
       }
     },
     interaction: { mode: 'index', intersect: false }
-  }), [timeRange]);
+  }), []);
 
-  // Handlers
   const handleStatCardClick = (statType) => {
     setSelectedStatCard(statType);
     setShowStatModal(true);
@@ -174,24 +144,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
   const handleMilestoneClick = (milestone) => {
     if (milestone.earned) {
-      const badgeMap = {
-        7: '7-Day Warrior',
-        14: '14-Day Monk',
-        30: '30-Day Master',
-        90: '90-Day King',
-        180: '180-Day Emperor',
-        365: '365-Day Sage'
-      };
-      setSelectedBadge({
-        name: badgeMap[milestone.days],
-        date: milestone.date,
-        days: milestone.days
-      });
-      setShowBadgeModal(true);
+      setSelectedMilestone(milestone);
+      setShowMilestoneModal(true);
     }
   };
-
-  const handleResetStats = () => setShowResetModal(true);
 
   const confirmResetStats = async () => {
     try {
@@ -213,7 +169,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  // Get current insight for free users
   const getCurrentInsight = useCallback(() => {
     const phase = getCurrentPhase(safeUserData);
     const guidance = getPhaseGuidance(phase, safeUserData.currentStreak || 0);
@@ -221,37 +176,33 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   }, [safeUserData]);
 
   return (
-    <div className="stats-container">
+    <div className="stats-page">
       {/* Header */}
-      <div className="stats-header">
-        <h2>Stats</h2>
-        <p className="stats-subtitle">Your journey analytics</p>
-      </div>
+      <header className="stats-header">
+        <h1>Stats</h1>
+        <p>Your journey analytics</p>
+      </header>
 
       {/* Stat Cards */}
-      <div className="stat-cards">
-        <div className="stat-card" onClick={() => handleStatCardClick('currentStreak')}>
-          <div className="stat-value">{safeUserData.currentStreak || 0}</div>
-          <div className="stat-label">Current</div>
-        </div>
-        
-        <div className="stat-card" onClick={() => handleStatCardClick('longestStreak')}>
-          <div className="stat-value">{safeUserData.longestStreak || 0}</div>
-          <div className="stat-label">Longest</div>
-        </div>
-        
-        <div className="stat-card" onClick={() => handleStatCardClick('wetDreams')}>
-          <div className="stat-value">{safeUserData.wetDreamCount || 0}</div>
-          <div className="stat-label">Wet Dreams</div>
-        </div>
-        
-        <div className="stat-card" onClick={() => handleStatCardClick('relapses')}>
-          <div className="stat-value">{safeUserData.relapseCount || 0}</div>
-          <div className="stat-label">Relapses</div>
-        </div>
+      <div className="stat-grid">
+        <button className="stat-card" onClick={() => handleStatCardClick('currentStreak')}>
+          <span className="stat-num">{safeUserData.currentStreak || 0}</span>
+          <span className="stat-label">Current</span>
+        </button>
+        <button className="stat-card" onClick={() => handleStatCardClick('longestStreak')}>
+          <span className="stat-num">{safeUserData.longestStreak || 0}</span>
+          <span className="stat-label">Longest</span>
+        </button>
+        <button className="stat-card" onClick={() => handleStatCardClick('wetDreams')}>
+          <span className="stat-num">{safeUserData.wetDreamCount || 0}</span>
+          <span className="stat-label">Wet Dreams</span>
+        </button>
+        <button className="stat-card" onClick={() => handleStatCardClick('relapses')}>
+          <span className="stat-num">{safeUserData.relapseCount || 0}</span>
+          <span className="stat-label">Relapses</span>
+        </button>
       </div>
 
-      {/* Stat Card Modal */}
       <StatCardModal
         showModal={showStatModal}
         selectedStatCard={selectedStatCard}
@@ -261,121 +212,82 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
       {/* Milestones */}
       <section className="stats-section">
-        <h3 className="section-title">Milestones</h3>
-        <div className="milestones-grid">
+        <h2>Milestones</h2>
+        <div className="milestone-grid">
           {milestones.map((m) => (
-            <div
+            <button
               key={m.days}
-              className={`milestone-card ${m.earned ? 'earned' : 'locked'}`}
+              className={`milestone-card ${m.earned ? 'earned' : ''}`}
               onClick={() => handleMilestoneClick(m)}
+              disabled={!m.earned}
             >
-              <div className="milestone-days">{m.days}</div>
-              <div className="milestone-name">{m.name}</div>
-              {m.earned && <div className="milestone-check">✓</div>}
-            </div>
+              <span className="milestone-num">{m.days}</span>
+              <span className="milestone-label">{m.label}</span>
+            </button>
           ))}
         </div>
       </section>
 
       {/* Benefit Tracker */}
       <section className="stats-section">
-        <h3 className="section-title">Benefit Tracker</h3>
+        <h2>Benefit Tracker</h2>
         
-        {/* Metric Toggle */}
-        <div className="toggle-container">
-          <div className="toggle-group">
-            {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map((metric) => (
-              <button
-                key={metric}
-                className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
-                onClick={() => setSelectedMetric(metric)}
-              >
-                {metric === 'sleep' ? 'Sleep' : metric.charAt(0).toUpperCase() + metric.slice(1)}
-              </button>
-            ))}
-          </div>
+        <div className="toggle-row">
+          {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map((metric) => (
+            <button
+              key={metric}
+              className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
+              onClick={() => setSelectedMetric(metric)}
+            >
+              {metric.charAt(0).toUpperCase() + metric.slice(1)}
+            </button>
+          ))}
         </div>
 
-        {/* Time Range Toggle */}
-        <div className="toggle-container">
-          <div className="toggle-group small">
-            {[
-              { key: 'week', label: 'Week' },
-              { key: 'month', label: 'Month' },
-              { key: 'quarter', label: '3 Months' }
-            ].map((range) => (
-              <button
-                key={range.key}
-                className={`toggle-btn ${timeRange === range.key ? 'active' : ''}`}
-                onClick={() => setTimeRange(range.key)}
-              >
-                {range.label}
-              </button>
-            ))}
-          </div>
+        <div className="toggle-row">
+          {[{ key: 'week', label: 'Week' }, { key: 'month', label: 'Month' }, { key: 'quarter', label: '3 Months' }].map((r) => (
+            <button
+              key={r.key}
+              className={`toggle-btn sm ${timeRange === r.key ? 'active' : ''}`}
+              onClick={() => setTimeRange(r.key)}
+            >
+              {r.label}
+            </button>
+          ))}
         </div>
 
-        {/* Average Display */}
-        <div className="average-display">
-          <span className="average-value">
-            {calculateAverage(safeUserData, selectedMetric, timeRange, isPremium)}
-          </span>
-          <span className="average-max">/10</span>
+        <div className="average-block">
+          <span className="average-num">{calculateAverage(safeUserData, selectedMetric, timeRange, isPremium)}</span>
+          <span className="average-suffix">/10</span>
         </div>
-        <p className="average-label">
-          Average {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric} {getTimeRangeDisplayText(timeRange)}
-        </p>
+        <p className="average-label">Average {selectedMetric} {getTimeRangeDisplayText(timeRange)}</p>
 
-        {/* Chart */}
-        <div className="chart-container">
+        <div className="chart-box">
           {(() => {
             const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
-            const hasData = chartData.datasets[0].data.some(val => val !== null);
-            
-            if (!hasData) {
-              return (
-                <div className="chart-empty">
-                  <p>Start tracking to see your progress</p>
-                </div>
-              );
-            }
-            
-            // Override chart colors to white
-            const styledChartData = {
-              ...chartData,
-              datasets: chartData.datasets.map(ds => ({
-                ...ds,
-                borderColor: '#ffffff',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                pointBackgroundColor: '#ffffff',
-                pointBorderColor: '#ffffff',
-                pointHoverBackgroundColor: '#ffffff',
-                pointHoverBorderColor: '#ffffff',
-              }))
-            };
-            return <Line data={styledChartData} options={chartOptions} height={180} />;
+            const hasData = chartData.datasets[0].data.some(v => v !== null);
+            if (!hasData) return <p className="chart-empty">Start tracking to see your progress</p>;
+            return <Line data={chartData} options={chartOptions} height={160} />;
           })()}
         </div>
 
-        {/* Free User: Single Insight */}
+        {/* Free User */}
         {!isPremium && (
-          <div className="insight-preview">
-            <div className="insight-card">
-              <div className="insight-header">Current Phase Guidance</div>
-              <p className="insight-text">{getCurrentInsight()}</p>
+          <div className="free-section">
+            <div className="free-card">
+              <h3>Phase Guidance</h3>
+              <p>{getCurrentInsight()}</p>
             </div>
-            
-            <div className="upgrade-prompt">
-              <p>Unlock detailed analytics, pattern recognition, and personalized optimization</p>
-              <button className="upgrade-btn">Upgrade to Premium</button>
+            <div className="upgrade-card">
+              <p>Unlock detailed analytics and personalized optimization</p>
+              <button className="btn-primary">Upgrade to Premium</button>
             </div>
           </div>
         )}
 
-        {/* Premium User: Full Analytics */}
+        {/* Premium Analytics */}
         {isPremium && (
-          <div className="premium-insights">
-            {/* Progress Trends */}
+          <div className="analytics-stack">
             <ProgressTrendsAnalysis
               isLoading={loadingStates.progressTrends}
               hasInsufficientData={hasInsufficientData}
@@ -384,8 +296,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               dataQuality={memoizedInsights.dataQuality}
               selectedMetric={selectedMetric}
             />
-
-            {/* Relapse Pattern Analytics */}
             <RelapsePatternAnalytics
               isLoading={loadingStates.relapsePatterns}
               hasInsufficientData={false}
@@ -393,8 +303,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               relapsePatterns={memoizedInsights.relapsePatterns}
               daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
             />
-
-            {/* Pattern Recognition */}
             <PatternRecognition
               isLoading={loadingStates.patternRecognition}
               hasInsufficientData={hasInsufficientData}
@@ -402,8 +310,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               patternInsights={memoizedInsights.patternInsights}
               dataQuality={memoizedInsights.dataQuality}
             />
-
-            {/* Optimization Guidance */}
             <OptimizationGuidance
               isLoading={loadingStates.optimization}
               hasInsufficientData={hasInsufficientData}
@@ -411,8 +317,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               optimizationGuidance={memoizedInsights.optimizationGuidance}
               dataQuality={memoizedInsights.dataQuality}
             />
-
-            {/* Phase Evolution */}
             <PhaseEvolutionAnalysis
               isLoading={loadingStates.phaseEvolution}
               hasInsufficientData={hasInsufficientData}
@@ -426,46 +330,40 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         )}
       </section>
 
-      {/* Reset Button */}
-      <button className="reset-btn" onClick={handleResetStats}>
+      {/* Reset Link */}
+      <button className="reset-link" onClick={() => setShowResetModal(true)}>
         Reset All Stats
       </button>
 
-      {/* Milestone/Badge Modal */}
-      {showBadgeModal && selectedBadge && (
-        <div className="stats-overlay" onClick={() => setShowBadgeModal(false)}>
-          <div className="stats-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-number">{selectedBadge.days}</div>
-            <h3 className="modal-title">{selectedBadge.name}</h3>
-            {selectedBadge.date && (
-              <p className="modal-date">
-                Reached {format(new Date(selectedBadge.date), 'MMMM d, yyyy')}
-              </p>
+      {/* Milestone Modal */}
+      {showMilestoneModal && selectedMilestone && (
+        <div className="overlay" onClick={() => setShowMilestoneModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <span className="modal-num">{selectedMilestone.days}</span>
+            <h2>{selectedMilestone.label}</h2>
+            {selectedMilestone.date && (
+              <p className="modal-date">Reached {format(new Date(selectedMilestone.date), 'MMMM d, yyyy')}</p>
             )}
-            <p className="modal-description">
-              {selectedBadge.days === 7 && "Your foundation phase is complete. Energy fluctuations are stabilizing and mental clarity is emerging."}
-              {selectedBadge.days === 14 && "Two weeks of dedication. Noticeable improvements in focus, confidence, and physical energy."}
-              {selectedBadge.days === 30 && "A full month of commitment. You've built lasting habits and experienced real transformation."}
-              {selectedBadge.days === 90 && "The 90-day mark represents complete neurological rewiring. You've achieved mastery."}
-              {selectedBadge.days === 180 && "Half a year of discipline. Your baseline has permanently elevated."}
-              {selectedBadge.days === 365 && "A full year. You've transcended the practice - it's now who you are."}
+            <p className="modal-text">
+              {selectedMilestone.days === 7 && "Foundation set. Energy stabilizing, clarity emerging."}
+              {selectedMilestone.days === 14 && "Two weeks in. Focus and physical energy improving."}
+              {selectedMilestone.days === 30 && "One month. Habits formed, transformation underway."}
+              {selectedMilestone.days === 90 && "Ninety days. Neurological rewiring complete."}
+              {selectedMilestone.days === 180 && "Six months. Baseline permanently elevated."}
+              {selectedMilestone.days === 365 && "One year. This is now who you are."}
             </p>
-            <div className="modal-actions">
-              <button className="btn-ghost" onClick={() => setShowBadgeModal(false)}>Close</button>
-            </div>
+            <button className="btn-ghost" onClick={() => setShowMilestoneModal(false)}>Close</button>
           </div>
         </div>
       )}
 
-      {/* Reset Confirmation Modal */}
+      {/* Reset Modal */}
       {showResetModal && (
-        <div className="stats-overlay" onClick={() => setShowResetModal(false)}>
-          <div className="stats-modal reset-modal" onClick={e => e.stopPropagation()}>
-            <h3 className="modal-title">Reset All Stats?</h3>
-            <p className="modal-description">
-              This will permanently delete all your progress data including streaks, benefits, and milestones. This cannot be undone.
-            </p>
-            <div className="modal-actions row">
+        <div className="overlay" onClick={() => setShowResetModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2>Reset All Stats?</h2>
+            <p className="modal-text">This will permanently delete all progress data. This cannot be undone.</p>
+            <div className="modal-buttons">
               <button className="btn-danger" onClick={confirmResetStats}>Reset</button>
               <button className="btn-ghost" onClick={() => setShowResetModal(false)}>Cancel</button>
             </div>
