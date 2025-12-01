@@ -1,4 +1,4 @@
-/* Stats.css - TITANTRACK MINIMAL */
+/* Stats.css - TITANTRACK MINIMAL (Full Featured) */
 /* Matches Tracker, Calendar, Profile aesthetic */
 
 /* ============================================================
@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   padding: 24px;
-  padding-bottom: 100px;
+  padding-bottom: 120px;
   background-color: #000000;
 }
 
@@ -20,11 +20,12 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 32px 24px;
+    padding-bottom: 60px;
   }
 }
 
 /* ============================================================
-   HEADER - Matches Tracker/Calendar exactly
+   HEADER
    ============================================================ */
 
 .stats-header {
@@ -40,7 +41,7 @@
   letter-spacing: -0.02em;
 }
 
-.stats-header-subtitle {
+.stats-subtitle {
   font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.4);
   margin: 8px 0 0 0;
@@ -48,14 +49,14 @@
 }
 
 /* ============================================================
-   STAT CARDS - Large numbers, minimal styling
+   STAT CARDS
    ============================================================ */
 
 .stat-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .stat-card {
@@ -88,17 +89,12 @@
 }
 
 .stat-card .stat-label {
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.6875rem;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.4);
   margin-top: 8px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-
-/* Current streak highlight */
-.stat-card.current-streak .stat-value {
-  color: #ffffff;
 }
 
 @media (max-width: 480px) {
@@ -113,40 +109,40 @@
   .stat-card .stat-value {
     font-size: 2rem;
   }
-  
-  .stat-card .stat-label {
-    font-size: 0.6875rem;
-  }
 }
 
 /* ============================================================
-   MILESTONES - Numbers as hero, minimal styling
+   SECTIONS
    ============================================================ */
 
-.milestones-section {
-  margin-bottom: 40px;
+.stats-section {
+  margin-bottom: 32px;
 }
 
-.milestones-section h3 {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
   margin: 0 0 16px 0;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
+
+/* ============================================================
+   MILESTONES
+   ============================================================ */
 
 .milestones-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .milestone-card {
   background-color: transparent;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  padding: 20px 12px;
+  padding: 16px 8px;
   text-align: center;
   cursor: pointer;
   transition: all 150ms ease;
@@ -157,7 +153,6 @@
   background-color: rgba(255, 255, 255, 0.03);
 }
 
-/* Earned state */
 .milestone-card.earned {
   background-color: rgba(255, 255, 255, 0.03);
   border-color: rgba(255, 255, 255, 0.1);
@@ -168,16 +163,15 @@
 }
 
 .milestone-card.earned .milestone-name {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .milestone-card.earned .milestone-check {
   color: #ffdd00;
 }
 
-/* Locked state */
 .milestone-card.locked {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: default;
 }
 
@@ -186,7 +180,7 @@
 }
 
 .milestone-days {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.3);
   line-height: 1;
@@ -195,83 +189,74 @@
 }
 
 .milestone-name {
-  font-size: 0.6875rem;
-  font-weight: 400;
+  font-size: 0.625rem;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.3);
-  margin-top: 8px;
+  margin-top: 6px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .milestone-check {
   font-size: 0.75rem;
-  margin-top: 8px;
+  margin-top: 6px;
   color: transparent;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 380px) {
   .milestones-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
   }
   
   .milestone-card {
-    padding: 16px 8px;
+    padding: 12px 6px;
   }
   
   .milestone-days {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
   
   .milestone-name {
-    font-size: 0.625rem;
+    font-size: 0.5625rem;
   }
 }
 
 /* ============================================================
-   BENEFIT TRACKER SECTION
+   TOGGLE GROUPS (Metric & Time Range)
    ============================================================ */
 
-.benefit-section {
-  margin-bottom: 40px;
+.toggle-container {
+  margin-bottom: 16px;
 }
 
-.benefit-section h3 {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 16px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-/* ============================================================
-   METRIC TOGGLE - Matches Calendar toggle exactly
-   ============================================================ */
-
-.metric-toggle {
+.toggle-group {
   display: inline-flex;
   background-color: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   padding: 4px;
-  margin-bottom: 16px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  max-width: 100%;
 }
 
-.metric-toggle::-webkit-scrollbar {
+.toggle-group::-webkit-scrollbar {
   display: none;
 }
 
-.metric-toggle button {
-  padding: 10px 16px;
+.toggle-group.small {
+  margin-top: 8px;
+}
+
+.toggle-btn {
+  padding: 10px 14px;
   background: transparent;
   border: none;
   border-radius: 10px;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -280,85 +265,30 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.metric-toggle button:hover {
+.toggle-btn:hover {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.metric-toggle button.active {
+.toggle-btn.active {
   background-color: #ffffff;
   color: #000000;
 }
 
-/* ============================================================
-   TIME RANGE TOGGLE
-   ============================================================ */
-
-.time-toggle {
-  display: inline-flex;
-  background-color: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 24px;
+.toggle-group.small .toggle-btn {
+  padding: 8px 12px;
+  font-size: 0.6875rem;
 }
 
-.time-toggle button {
-  padding: 8px 16px;
-  background: transparent;
-  border: none;
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.75rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.time-toggle button:hover {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.time-toggle button.active {
-  background-color: #ffffff;
-  color: #000000;
-}
-
-/* ============================================================
-   CHART CONTAINER
-   ============================================================ */
-
-.chart-container {
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-}
-
-.chart-container canvas {
-  max-height: 200px;
-}
-
-.no-chart-data {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  text-align: center;
-}
-
-.no-chart-data svg {
-  font-size: 2rem;
-  color: rgba(255, 255, 255, 0.2);
-  margin-bottom: 16px;
-}
-
-.no-chart-data p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
+@media (max-width: 480px) {
+  .toggle-group {
+    width: 100%;
+  }
+  
+  .toggle-btn {
+    flex: 1;
+    padding: 10px 10px;
+    font-size: 0.6875rem;
+  }
 }
 
 /* ============================================================
@@ -368,12 +298,12 @@
 .average-display {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 4px;
+  margin: 24px 0 4px 0;
 }
 
 .average-value {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1;
@@ -390,97 +320,98 @@
 .average-label {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 4px;
+  margin: 0 0 24px 0;
+  text-transform: capitalize;
+}
+
+@media (max-width: 480px) {
+  .average-value {
+    font-size: 3rem;
+  }
+  
+  .average-max {
+    font-size: 1rem;
+  }
 }
 
 /* ============================================================
-   INSIGHTS SECTION - Clean cards
+   CHART
    ============================================================ */
 
-.insights-section {
-  margin-bottom: 40px;
+.chart-container {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
 }
 
-.insights-section h3 {
+.chart-container canvas {
+  max-height: 180px;
+}
+
+.chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+}
+
+.chart-empty p {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 16px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0;
 }
 
-.insight-card {
+/* ============================================================
+   FREE USER INSIGHT PREVIEW
+   ============================================================ */
+
+.insight-preview {
+  margin-top: 24px;
+}
+
+.insight-preview .insight-card {
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   padding: 20px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
-.insight-card:last-child {
-  margin-bottom: 0;
-}
-
-.insight-label {
+.insight-preview .insight-header {
   font-size: 0.6875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
-.insight-text {
+.insight-preview .insight-text {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
   margin: 0;
 }
 
-.insight-action {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.5;
-  margin: 12px 0 0 0;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* ============================================================
-   PREMIUM LOCK OVERLAY
-   ============================================================ */
-
-.premium-section {
-  position: relative;
-}
-
-.premium-lock-overlay {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.upgrade-prompt {
   text-align: center;
-  padding: 24px;
-  z-index: 10;
+  padding: 24px 16px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
 }
 
-.premium-lock-text {
+.upgrade-prompt p {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   margin: 0 0 16px 0;
+  line-height: 1.5;
 }
 
-.premium-unlock-btn {
-  padding: 12px 24px;
+.upgrade-btn {
+  padding: 14px 28px;
   background-color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -492,8 +423,486 @@
   transition: opacity 150ms ease;
 }
 
-.premium-unlock-btn:hover {
+.upgrade-btn:hover {
   opacity: 0.9;
+}
+
+/* ============================================================
+   PREMIUM INSIGHTS CONTAINER
+   ============================================================ */
+
+.premium-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+/* ============================================================
+   INSIGHT CARDS (Used by StatsInsights components)
+   ============================================================ */
+
+.insight-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.insight-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.insight-card-header span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.insight-card-content {
+  padding: 20px;
+}
+
+/* Loading state */
+.insight-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.insight-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Empty state */
+.insight-empty {
+  text-align: center;
+  padding: 24px 16px;
+}
+
+.insight-empty-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 8px 0;
+}
+
+.insight-empty-text {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Mini info banner */
+.mini-info-banner {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.mini-info-banner p {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Data quality indicator */
+.insight-data-status {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.insight-data-status-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.insight-data-quality {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.insight-data-quality svg {
+  font-size: 0.75rem;
+}
+
+.insight-data-quality.rich {
+  color: rgba(255, 221, 0, 0.8);
+}
+
+.insight-data-quality.conquered {
+  color: rgba(255, 221, 0, 0.8);
+}
+
+.insight-data-days {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================================
+   PROGRESS TRENDS
+   ============================================================ */
+
+.progress-trends-display {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.trend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.trend-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.trend-icon svg {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.trend-icon.positive svg {
+  color: rgba(52, 199, 89, 0.8);
+}
+
+.trend-icon.negative svg {
+  color: rgba(255, 59, 48, 0.8);
+}
+
+.trend-content {
+  flex: 1;
+}
+
+.trend-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.trend-text {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================================
+   RELAPSE PATTERNS
+   ============================================================ */
+
+.relapse-patterns-display {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.relapse-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.relapse-stat-label {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.relapse-stat-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  font-feature-settings: 'tnum' 1;
+}
+
+.relapse-insight {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.relapse-insight strong {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* Victory state */
+.victory-display {
+  text-align: center;
+  padding: 16px;
+}
+
+.victory-days {
+  font-size: 2.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.victory-label {
+  font-size: 0.75rem;
+  color: rgba(255, 221, 0, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+}
+
+.victory-message {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ============================================================
+   PATTERN RECOGNITION
+   ============================================================ */
+
+.patterns-display {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pattern-item {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+}
+
+.pattern-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 4px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+.pattern-item strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+/* ============================================================
+   OPTIMIZATION GUIDANCE
+   ============================================================ */
+
+.optimization-display {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.optimization-criteria {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.optimization-criteria-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.optimization-criteria-text {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+.optimization-metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.optimization-metric-card {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.optimization-metric-value {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.optimization-metric-label {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.optimization-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.optimization-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.optimization-item {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+}
+
+.optimization-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 4px;
+  height: 4px;
+  background-color: rgba(255, 221, 0, 0.6);
+  border-radius: 50%;
+}
+
+.optimization-item strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+/* ============================================================
+   PHASE EVOLUTION
+   ============================================================ */
+
+.phase-evolution-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.phase-evolution-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+  transition: all 150ms ease;
+}
+
+.phase-evolution-card.current {
+  background-color: rgba(255, 221, 0, 0.05);
+  border-color: rgba(255, 221, 0, 0.2);
+}
+
+.phase-name {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.phase-evolution-card.current .phase-name {
+  color: rgba(255, 221, 0, 0.8);
+}
+
+.phase-value {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.phase-range {
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.phase-evolution-insight {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.phase-evolution-insight strong {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+@media (max-width: 380px) {
+  .phase-evolution-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .phase-evolution-card {
+    padding: 12px 8px;
+  }
+  
+  .phase-value {
+    font-size: 1.125rem;
+  }
 }
 
 /* ============================================================
@@ -504,33 +913,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   width: 100%;
   padding: 14px 24px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: all 150ms ease;
-  margin-top: 40px;
+  margin-top: 16px;
 }
 
 .reset-btn:hover {
   background-color: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.reset-btn svg {
-  font-size: 0.875rem;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* ============================================================
-   OVERLAY - Matches Tracker exactly
+   OVERLAY & MODALS
    ============================================================ */
 
 .stats-overlay {
@@ -564,10 +968,6 @@
   to { opacity: 1; }
 }
 
-/* ============================================================
-   MODAL - Transparent floating style
-   ============================================================ */
-
 .stats-modal {
   width: 100%;
   max-width: 340px;
@@ -588,103 +988,49 @@
   }
 }
 
-.stats-modal h2 {
-  font-size: 1.375rem;
+.modal-number {
+  font-size: 4rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.modal-title {
+  font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
   margin: 0 0 8px 0;
   letter-spacing: -0.02em;
 }
 
-.stats-modal p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* Milestone modal - number hero */
-.milestone-modal-number {
-  font-size: 4rem;
-  font-weight: 500;
-  color: #ffffff;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
-}
-
-.milestone-modal-name {
-  font-size: 1rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 8px;
-}
-
-.milestone-modal-date {
+.modal-date {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 24px;
+  margin: 0 0 24px 0;
 }
 
-.milestone-modal-description {
+.modal-description {
   font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
   margin: 0;
 }
 
-/* Stat detail modal */
-.stat-modal-value {
-  font-size: 4rem;
-  font-weight: 500;
-  color: #ffffff;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
-}
-
-.stat-modal-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 24px;
-}
-
-.stat-modal-info {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
-  margin: 0;
-}
-
-/* Modal actions */
-.stats-modal-actions {
+.modal-actions {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 40px;
 }
 
-.stats-modal-actions .btn-primary {
-  width: 100%;
-  padding: 16px 24px;
-  background-color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  color: #000000;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: opacity 150ms ease;
+.modal-actions.row {
+  flex-direction: row;
 }
 
-.stats-modal-actions .btn-primary:hover {
-  opacity: 0.9;
-}
-
-.stats-modal-actions .btn-ghost {
-  width: 100%;
+.btn-ghost {
+  flex: 1;
   padding: 16px 24px;
   background: transparent;
   border: none;
@@ -697,40 +1043,13 @@
   transition: color 150ms ease;
 }
 
-.stats-modal-actions .btn-ghost:hover {
+.btn-ghost:hover {
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Reset confirmation modal */
-.reset-modal {
-  width: 100%;
-  max-width: 320px;
-  text-align: center;
-}
-
-.reset-modal h2 {
-  font-size: 1.375rem;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 12px 0;
-}
-
-.reset-modal p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.reset-modal-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 32px;
-}
-
-.reset-modal-actions .btn-danger {
+.btn-danger {
   flex: 1;
-  padding: 14px 20px;
+  padding: 16px 24px;
   background: rgba(255, 59, 48, 0.15);
   border: none;
   border-radius: 12px;
@@ -742,69 +1061,83 @@
   transition: background-color 150ms ease;
 }
 
-.reset-modal-actions .btn-danger:hover {
+.btn-danger:hover {
   background: rgba(255, 59, 48, 0.25);
 }
 
-.reset-modal-actions .btn-ghost {
-  flex: 1;
-  padding: 14px 20px;
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9375rem;
+/* Reset modal specific */
+.reset-modal {
+  max-width: 320px;
+}
+
+.reset-modal .modal-title {
+  margin-bottom: 12px;
+}
+
+.reset-modal .modal-description {
+  font-size: 0.875rem;
+}
+
+.reset-modal .modal-actions {
+  margin-top: 32px;
+}
+
+/* ============================================================
+   STAT CARD MODAL (from StatsComponents)
+   ============================================================ */
+
+.stat-detail-modal {
+  max-width: 340px;
+}
+
+.stat-detail-value {
+  font-size: 4rem;
   font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 8px;
 }
 
-.reset-modal-actions .btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
+.stat-detail-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 24px;
 }
 
-/* ============================================================
-   LOADING STATE
-   ============================================================ */
-
-.stats-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-}
-
-.stats-loading-icon {
-  width: 40px;
-  height: 40px;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.95); }
-}
-
-/* ============================================================
-   EMPTY STATE
-   ============================================================ */
-
-.stats-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-}
-
-.stats-empty p {
+.stat-detail-info {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
+  margin: 0;
+}
+
+.stat-detail-breakdown {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.stat-breakdown-item:last-child {
+  border-bottom: none;
+}
+
+.stat-breakdown-label {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.stat-breakdown-value {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #ffffff;
 }
 
 /* ============================================================
@@ -814,7 +1147,7 @@
 @media (max-width: 480px) {
   .stats-container {
     padding: 20px 16px;
-    padding-bottom: 100px;
+    padding-bottom: 120px;
   }
   
   .stats-header {
@@ -825,59 +1158,23 @@
     font-size: 1.125rem;
   }
   
-  .stats-header-subtitle {
+  .stats-subtitle {
     font-size: 0.75rem;
   }
   
-  .metric-toggle {
-    width: 100%;
-  }
-  
-  .metric-toggle button {
-    flex: 1;
-    padding: 10px 12px;
-    font-size: 0.75rem;
-  }
-  
-  .time-toggle button {
-    padding: 8px 12px;
+  .section-title {
     font-size: 0.6875rem;
   }
   
-  .chart-container {
+  .insight-card-content {
     padding: 16px;
   }
   
-  .average-value {
-    font-size: 2.5rem;
-  }
-  
-  .average-max {
-    font-size: 1rem;
-  }
-  
-  .insight-card {
-    padding: 16px;
-  }
-  
-  .insight-text {
-    font-size: 0.875rem;
-  }
-  
-  .insight-action {
-    font-size: 0.75rem;
-  }
-  
-  .stats-modal {
-    max-width: 300px;
-  }
-  
-  .milestone-modal-number,
-  .stat-modal-value {
+  .modal-number {
     font-size: 3rem;
   }
   
-  .reset-modal-actions {
+  .modal-actions.row {
     flex-direction: column;
   }
 }
@@ -892,7 +1189,7 @@
     animation: none;
   }
   
-  .stats-loading-icon {
+  .insight-loading-spinner {
     animation: none;
   }
 }
