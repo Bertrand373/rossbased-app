@@ -1,347 +1,391 @@
-/* components/Landing/Landing.css - Updated to match app styling */
-.landing-container {
+/* Landing.css - TITANTRACK MODERN MINIMAL */
+
+.landing {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background-color: var(--background);
-  padding: var(--spacing-lg);
-  color: var(--text);
-  justify-content: center;
-  align-items: center;
+  background-color: #000000;
+  color: #ffffff;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.landing-content {
-  max-width: 1200px; /* CHANGED: From 800px to match app container width */
-  width: 100%;
-  margin: 0 auto;
-  padding: var(--spacing-lg) var(--spacing-lg);
-  text-align: center;
+/* Subtle background gradient */
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 120%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Main content area */
+.landing-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--medium-gray) 100%);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  padding: 80px 24px 40px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo */
+.landing-logo-container {
+  margin-bottom: 32px;
 }
 
 .landing-logo {
-  height: 140px;
+  height: 32px;
   width: auto;
-  margin-bottom: var(--spacing-md);
+  opacity: 0.95;
 }
 
-.landing-subtitle {
-  font-size: 1.25rem;
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-xl);
-  font-weight: 500;
-  line-height: 1.4;
-  max-width: 85%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.landing-features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-  width: 100%;
-}
-
-.feature-item {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
+/* Tagline */
+.landing-tagline {
+  font-size: 1.125rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.2s ease; /* ADDED: Smooth transition for hover */
-  position: relative;
-  /* Subtle inner glow for depth */
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  max-width: 400px;
+  line-height: 1.6;
+  margin-bottom: 48px;
+  letter-spacing: -0.01em;
 }
 
-/* ADDED: Desktop hover effect for feature cards */
-.feature-item:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border-color: rgba(255, 221, 0, 0.1);
-  transform: translateY(-2px);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.feature-icon {
-  font-size: 2.5rem;
-  margin-bottom: var(--spacing-md);
-  color: var(--primary);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 80px;
-}
-
-.feature-item h3 {
-  margin-bottom: var(--spacing-sm);
-  font-size: 1.125rem;
-  color: var(--text);
-  font-weight: 600;
-}
-
-.feature-item p {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
+/* CTA Button */
 .landing-cta {
-  margin: var(--spacing-lg) 0;
-  width: 100%;
-  max-width: 360px; /* INCREASED: From 280px to 360px for more noticeable width */
-}
-
-.login-cta-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xxl); /* Wider padding */
-  font-size: 1.125rem;
-  background-color: var(--primary);
-  color: #000000;
+  padding: 16px 48px;
+  font-size: 0.9375rem;
   font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background-color: #ffffff;
+  color: #000000;
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 48px;
-  width: 100%; /* Full width of container */
+  transition: all 200ms ease;
+  letter-spacing: 0.01em;
 }
 
-.login-cta-btn:hover {
-  background-color: var(--primary-dark);
+.landing-cta:hover {
+  background-color: rgba(255, 255, 255, 0.9);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
 }
 
-.privacy-notice {
+.landing-cta:active {
+  transform: translateY(0);
+}
+
+/* Stats section */
+.landing-stats {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-top: 64px;
+  padding-top: 32px;
+}
+
+.landing-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.landing-stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.landing-stat-label {
   font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: var(--spacing-lg);
-  font-weight: 500;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.02em;
 }
 
-/* Desktop icons - show by default */
-.desktop-icon {
-  display: block;
+.landing-stat-divider {
+  width: 1px;
+  height: 32px;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-.mobile-icon {
-  display: none;
-}
-
-/* Loading Animation - uses SpartanLoader component */
-.loading-screen {
+/* Features section */
+.landing-features {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100%;
-  background-color: var(--background);
+  gap: 64px;
+  padding: 48px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  z-index: 1;
 }
 
-/* Tablet - intermediate sizing */
+.landing-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  max-width: 200px;
+}
+
+.landing-feature-number {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+  font-feature-settings: 'tnum' 1;
+}
+
+.landing-feature-content h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+
+.landing-feature-content p {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+}
+
+/* Footer */
+.landing-footer {
+  padding: 24px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.landing-footer p {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 400;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* Tablet */
 @media (max-width: 1024px) {
-  .landing-content {
-    max-width: 900px; /* INTERMEDIATE: Between mobile and desktop */
-    padding: var(--spacing-lg) var(--spacing-lg);
+  .landing-features {
+    gap: 48px;
   }
   
-  .landing-logo {
-    height: 140px;
-  }
-  
-  .landing-subtitle {
-    font-size: 1.25rem;
-  }
-  
-  .feature-icon {
-    font-size: 2.5rem;
-    height: 80px;
-  }
-  
-  .feature-item h3 {
-    font-size: 1.125rem;
-  }
-  
-  .feature-item p {
-    font-size: 0.875rem;
-  }
-  
-  .login-cta-btn {
-    font-size: 1.125rem;
-    min-height: 48px;
+  .landing-feature {
+    max-width: 180px;
   }
 }
 
-/* Mobile responsiveness - CRITICAL for matching app styling */
+/* Mobile */
 @media (max-width: 768px) {
-  .landing-container {
-    padding: var(--spacing-md);
-    min-height: 100vh;
+  .landing-main {
+    padding: 60px 20px 32px;
     justify-content: flex-start;
-    padding-top: var(--spacing-lg);
+    padding-top: 20vh;
   }
   
-  .landing-content {
-    max-width: 100%; /* MOBILE: Full width */
-    padding: var(--spacing-lg) var(--spacing-md);
-    min-height: auto;
-    max-height: none;
-  }
-  
-  /* FIXED: Match the app header logo size exactly - FORCE OVERRIDE */
   .landing-logo {
-    height: 100px !important;
-    max-height: 100px !important;
-    min-height: 100px !important;
-    width: auto !important;
-    margin-bottom: var(--spacing-md) !important;
-    object-fit: contain !important;
+    height: 28px;
   }
   
-  .landing-subtitle {
-    font-size: 1.125rem;
-    margin-bottom: var(--spacing-lg);
-    max-width: 85%;
-  }
-  
-  .landing-features {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    max-width: 100%;
-  }
-  
-  .feature-item {
-    padding: var(--spacing-md);
-  }
-  
-  .feature-item:hover {
-    transform: none; /* DISABLE: Hover on mobile */
-  }
-  
-  /* Switch to mobile icons */
-  .desktop-icon {
-    display: none;
-  }
-  
-  .mobile-icon {
-    display: block;
-  }
-  
-  /* FIXED: Perfectly centered icons with minimal, equal spacing */
-  .feature-icon {
-    font-size: 1.75rem;
-    height: 36px !important; /* REDUCED: Minimal fixed height */
-    margin: 0 !important; /* REMOVED: All margins */
-    margin-bottom: 8px !important; /* MINIMAL: Just 8px bottom spacing */
-    display: flex;
-    align-items: center; /* CENTER: Vertically center the icon */
-    justify-content: center; /* CENTER: Horizontally center the icon */
-  }
-  
-  .feature-item h3 {
+  .landing-tagline {
     font-size: 1rem;
-    margin-top: 0; /* ENSURE: No extra top spacing on h3 */
-    margin-bottom: var(--spacing-xs);
-  }
-  
-  .feature-item p {
-    font-size: 0.8rem;
+    max-width: 300px;
+    margin-bottom: 40px;
   }
   
   .landing-cta {
-    margin: var(--spacing-md) 0;
+    padding: 14px 40px;
+    font-size: 0.875rem;
     width: 100%;
+    max-width: 280px;
   }
   
-  .login-cta-btn {
-    width: 100%;
-    font-size: 1rem;
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
-  
-  .privacy-notice {
-    font-size: 0.7rem;
-    margin-top: var(--spacing-md);
-  }
-  
-  /* FORCE LOGO SIZE - Most specific selector possible */
-  .landing-container .landing-content .landing-logo {
-    height: 100px !important;
-    max-height: 100px !important;
-    min-height: 100px !important;
-  }
-}
-
-/* Very small screens - ensure no scroll needed */
-@media (max-width: 480px) and (max-height: 700px) {
-  .landing-container {
-    padding: var(--spacing-sm);
-    padding-top: var(--spacing-md);
-  }
-  
-  .landing-content {
-    padding: var(--spacing-md) var(--spacing-sm);
-  }
-  
-  /* FIXED: Smaller but still matching app proportions - FORCE OVERRIDE */
-  .landing-logo {
-    height: 85px !important;
-    max-height: 85px !important;
-    min-height: 85px !important;
-    width: auto !important;
-    margin-bottom: var(--spacing-sm) !important;
-    object-fit: contain !important;
-  }
-  
-  .landing-subtitle {
-    font-size: 1rem;
-    margin-bottom: var(--spacing-md);
-    padding: 0 var(--spacing-sm);
-    max-width: 85%;
-  }
-  
-  .landing-features {
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .feature-item {
-    padding: var(--spacing-sm);
-  }
-  
-  /* FIXED: Even smaller screens maintain centered icons */
-  .feature-icon {
-    font-size: 1.5rem;
-    height: 30px !important;
-    margin: 0 !important;
-    margin-bottom: 6px !important;
-    display: flex;
-    align-items: center;
+  .landing-stats {
+    gap: 24px;
+    margin-top: 48px;
+    flex-wrap: wrap;
     justify-content: center;
   }
   
-  .feature-item h3 {
-    font-size: 0.875rem;
-    margin-top: 0;
+  .landing-stat-value {
+    font-size: 1.125rem;
   }
   
-  .feature-item p {
+  .landing-stat-label {
+    font-size: 0.6875rem;
+  }
+  
+  .landing-stat-divider {
+    height: 24px;
+  }
+  
+  .landing-features {
+    flex-direction: column;
+    gap: 24px;
+    padding: 32px 24px;
+    align-items: center;
+  }
+  
+  .landing-feature {
+    max-width: 280px;
+    width: 100%;
+  }
+  
+  .landing-feature-content h3 {
+    font-size: 0.875rem;
+  }
+  
+  .landing-feature-content p {
     font-size: 0.75rem;
   }
   
-  .privacy-notice {
-    margin-top: var(--spacing-sm);
+  .landing-footer {
+    padding: 20px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .landing-main {
+    padding-top: 15vh;
+  }
+  
+  .landing-logo {
+    height: 24px;
+  }
+  
+  .landing-logo-container {
+    margin-bottom: 24px;
+  }
+  
+  .landing-tagline {
+    font-size: 0.9375rem;
+    margin-bottom: 32px;
+  }
+  
+  .landing-cta {
+    padding: 14px 32px;
+    border-radius: 6px;
+  }
+  
+  .landing-stats {
+    gap: 16px;
+    margin-top: 40px;
+  }
+  
+  .landing-stat-divider {
+    display: none;
+  }
+  
+  .landing-stat {
+    min-width: 80px;
+  }
+  
+  .landing-features {
+    gap: 20px;
+    padding: 24px 20px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .landing-main {
+    padding: 48px 16px 24px;
+    padding-top: 12vh;
+  }
+  
+  .landing-logo {
+    height: 22px;
+  }
+  
+  .landing-tagline {
+    font-size: 0.875rem;
+  }
+  
+  .landing-cta {
+    padding: 12px 24px;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Landscape mobile - prevent awkward layout */
+@media (max-height: 600px) and (orientation: landscape) {
+  .landing-main {
+    padding-top: 40px;
+    justify-content: center;
+  }
+  
+  .landing-logo-container {
+    margin-bottom: 20px;
+  }
+  
+  .landing-tagline {
+    margin-bottom: 24px;
+  }
+  
+  .landing-stats {
+    margin-top: 32px;
+  }
+  
+  .landing-features {
+    flex-direction: row;
+    padding: 24px;
+  }
+}
+
+/* Animation for entrance */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-logo-container {
+  animation: fadeInUp 600ms ease forwards;
+}
+
+.landing-tagline {
+  animation: fadeInUp 600ms ease 100ms forwards;
+  opacity: 0;
+}
+
+.landing-cta {
+  animation: fadeInUp 600ms ease 200ms forwards;
+  opacity: 0;
+}
+
+.landing-stats {
+  animation: fadeInUp 600ms ease 300ms forwards;
+  opacity: 0;
+}
+
+.landing-features {
+  animation: fadeInUp 600ms ease 400ms forwards;
+  opacity: 0;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .landing-logo-container,
+  .landing-tagline,
+  .landing-cta,
+  .landing-stats,
+  .landing-features {
+    animation: none;
+    opacity: 1;
   }
 }
