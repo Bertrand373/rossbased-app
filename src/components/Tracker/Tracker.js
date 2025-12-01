@@ -203,21 +203,24 @@ const Tracker = ({ userData, updateUserData }) => {
       {showStreakOptions && (
         <div className="overlay" onClick={() => setShowStreakOptions(false)}>
           <div className="sheet" onClick={e => e.stopPropagation()}>
-            <button onClick={() => { setShowStreakOptions(false); setShowDatePicker(true); }}>
-              Edit start date
-            </button>
-            <button 
-              className="danger" 
-              onClick={() => { setResetType('relapse'); setShowResetConfirm(true); }}
-            >
-              Reset streak
-            </button>
-            <button 
-              onClick={() => { setResetType('wetdream'); setShowResetConfirm(true); }}
-            >
-              Log wet dream
-            </button>
-            <div className="sheet-divider" />
+            <div className="sheet-content">
+              <button onClick={() => { setShowStreakOptions(false); setShowDatePicker(true); }}>
+                Edit start date
+              </button>
+              <div className="sheet-divider" />
+              <button 
+                onClick={() => { setResetType('wetdream'); setShowResetConfirm(true); }}
+              >
+                Log wet dream
+              </button>
+              <div className="sheet-divider" />
+              <button 
+                className="danger" 
+                onClick={() => { setResetType('relapse'); setShowResetConfirm(true); }}
+              >
+                Reset streak
+              </button>
+            </div>
             <button className="cancel" onClick={() => setShowStreakOptions(false)}>
               Cancel
             </button>

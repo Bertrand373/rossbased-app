@@ -128,80 +128,80 @@
 }
 
 /* ============================================================
-   OVERLAY
+   OVERLAY - Darker, more immersive
    ============================================================ */
 
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background-color: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
   padding: 24px;
-  animation: fadeIn 150ms ease;
+  animation: overlayIn 200ms ease;
 }
 
-@keyframes fadeIn {
+@keyframes overlayIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 /* ============================================================
-   MODAL (Benefits, Confirm)
+   MODAL - Clean, minimal, no box feeling
    ============================================================ */
 
 .modal {
   width: 100%;
-  max-width: 400px;
-  background-color: #111111;
-  border-radius: 24px;
-  padding: 32px;
-  animation: modalIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 380px;
+  background-color: transparent;
+  padding: 0;
+  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes modalIn {
   from { 
     opacity: 0; 
-    transform: scale(0.96) translateY(8px); 
+    transform: translateY(16px); 
   }
   to { 
     opacity: 1; 
-    transform: scale(1) translateY(0); 
+    transform: translateY(0); 
   }
 }
 
 .modal h2 {
-  font-size: 1.375rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 500;
   color: #ffffff;
-  margin: 0 0 24px 0;
+  margin: 0 0 8px 0;
   text-align: center;
   letter-spacing: -0.02em;
 }
 
 .modal p {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 24px 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 40px 0;
   text-align: center;
   line-height: 1.5;
 }
 
 .modal-actions {
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  margin-top: 32px;
+  margin-top: 48px;
 }
 
 .modal-actions .btn-primary,
 .modal-actions .btn-danger,
 .modal-actions .btn-ghost {
-  flex: 1;
-  padding: 16px 20px;
+  width: 100%;
+  padding: 16px 24px;
   border-radius: 12px;
   font-size: 0.9375rem;
   font-weight: 600;
@@ -211,14 +211,13 @@
 }
 
 .modal-actions .btn-ghost {
-  background: rgba(255, 255, 255, 0.06);
+  background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .modal-actions .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .modal-actions .btn-primary {
@@ -227,61 +226,101 @@
   color: #000000;
 }
 
+.modal-actions .btn-primary:hover {
+  opacity: 0.9;
+}
+
 .modal-actions .btn-danger {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
-  color: #000000;
+  color: #ffffff;
+}
+
+.modal-actions .btn-danger:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* ============================================================
-   BENEFITS MODAL
+   CONFIRM MODAL
+   ============================================================ */
+
+.confirm-modal {
+  text-align: center;
+}
+
+.confirm-modal h2 {
+  margin-bottom: 12px;
+}
+
+.confirm-modal p {
+  margin-bottom: 0;
+}
+
+.confirm-modal .modal-actions {
+  margin-top: 40px;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.confirm-modal .modal-actions button {
+  flex: 1;
+}
+
+/* ============================================================
+   BENEFITS MODAL - Elegant sliders
    ============================================================ */
 
 .benefits-modal {
-  max-height: 85vh;
+  max-width: 400px;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
+}
+
+.benefits-modal h2 {
+  margin-bottom: 40px;
 }
 
 .benefits-list {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 32px;
   overflow-y: auto;
   flex: 1;
-  padding-right: 8px;
+  padding: 0 4px;
 }
 
 .benefit-row {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .benefit-info {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
 }
 
 .benefit-info span:first-child {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.01em;
 }
 
 .benefit-num {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 500;
   color: #ffffff;
   font-feature-settings: 'tnum' 1;
 }
 
 .benefit-slider {
   position: relative;
-  height: 4px;
+  height: 2px;
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  border-radius: 1px;
 }
 
 .benefit-fill {
@@ -290,8 +329,8 @@
   left: 0;
   height: 100%;
   background-color: #ffffff;
-  border-radius: 2px;
-  transition: width 80ms ease;
+  border-radius: 1px;
+  transition: width 60ms ease;
 }
 
 .benefit-slider input {
@@ -300,7 +339,7 @@
   left: 0;
   transform: translateY(-50%);
   width: 100%;
-  height: 40px;
+  height: 44px;
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
@@ -310,27 +349,41 @@
 
 .benefit-slider input::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   background: #ffffff;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 150ms ease;
+}
+
+.benefit-slider input::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
 }
 
 .benefit-slider input::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   background: #ffffff;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.benefits-modal .modal-actions {
+  margin-top: 40px;
+  flex-direction: row;
+}
+
+.benefits-modal .modal-actions button {
+  flex: 1;
 }
 
 /* ============================================================
-   SHEET (Action sheet)
+   SHEET (Action sheet) - Floating, minimal
    ============================================================ */
 
 .sheet {
@@ -338,66 +391,100 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #1c1c1e;
-  border-radius: 14px 14px 0 0;
-  padding: 8px;
-  padding-bottom: max(8px, env(safe-area-inset-bottom));
-  animation: sheetIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  background: transparent;
+  padding: 16px;
+  padding-bottom: max(16px, calc(env(safe-area-inset-bottom) + 8px));
+  animation: sheetIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes sheetIn {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from { 
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.sheet-content {
+  background-color: rgba(28, 28, 30, 0.98);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 16px;
+  padding: 8px;
+  margin-bottom: 8px;
 }
 
 .sheet button {
   display: block;
   width: 100%;
-  padding: 18px 20px;
+  padding: 16px 20px;
   background: transparent;
   border: none;
   border-radius: 10px;
   color: #ffffff;
-  font-size: 1.0625rem;
-  font-weight: 400;
+  font-size: 1rem;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   text-align: center;
   transition: background-color 100ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .sheet button:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 .sheet button:active {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sheet button.danger {
   color: #ff453a;
 }
 
-.sheet button.cancel {
-  color: rgba(255, 255, 255, 0.5);
-}
-
 .sheet-divider {
   height: 1px;
-  background-color: rgba(255, 255, 255, 0.1);
-  margin: 8px 16px;
+  background-color: rgba(255, 255, 255, 0.08);
+  margin: 4px 12px;
 }
 
-/* Desktop: sheet becomes modal */
+.sheet button.cancel {
+  background-color: rgba(28, 28, 30, 0.98);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+.sheet button.cancel:hover {
+  background-color: rgba(40, 40, 42, 0.98);
+  color: #ffffff;
+}
+
+/* Desktop: sheet becomes centered modal */
 @media (min-width: 768px) {
   .sheet {
     position: relative;
     bottom: auto;
     left: auto;
     right: auto;
-    max-width: 320px;
-    border-radius: 14px;
-    animation: modalIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 300px;
+    padding: 0;
+    background: transparent;
+    animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .sheet-content {
+    margin-bottom: 12px;
+  }
+  
+  .sheet button.cancel {
+    margin-top: 0;
   }
 }
 
@@ -453,11 +540,6 @@
   .btn-primary,
   .btn-logged {
     padding: 14px 24px;
-  }
-  
-  .modal {
-    padding: 24px;
-    border-radius: 20px;
   }
   
   .benefits-list {
@@ -545,9 +627,9 @@
   }
 }
 
-/* Scrollbar for benefits */
+/* Scrollbar for benefits - barely visible */
 .benefits-list::-webkit-scrollbar {
-  width: 4px;
+  width: 2px;
 }
 
 .benefits-list::-webkit-scrollbar-track {
@@ -555,6 +637,6 @@
 }
 
 .benefits-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
 }
