@@ -1,0 +1,632 @@
+/* =============================================================================
+   CALENDAR MODALS - TITANTRACK MODERN MINIMAL
+   Matches Tracker.css modal system EXACTLY:
+   - Immersive overlay with blur
+   - Floating content (NO box/card background)
+   - White primary buttons, ghost secondary
+   - Sheet-style action menus
+   ============================================================================= */
+
+/* =============================================================================
+   OVERLAY - Immersive dark backdrop
+   ============================================================================= */
+
+.calendar .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10000;
+  padding: 24px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: overlayIn 200ms ease;
+}
+
+/* Spacers push content to center, collapse when content is tall */
+.calendar .overlay::before,
+.calendar .overlay::after {
+  content: '';
+  flex: 1;
+  min-height: 40px;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* =============================================================================
+   DAY MODAL - Floating, no box, matches benefits-modal
+   ============================================================================= */
+
+.calendar .day-modal {
+  width: 100%;
+  max-width: 360px;
+  max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  flex-shrink: 0;
+  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* NO background - floating content */
+  background: transparent;
+  padding: 0;
+}
+
+@keyframes modalIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(16px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Modal title */
+.calendar .day-modal h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+/* Status text - matches Tracker's subtle paragraph style */
+.calendar .day-modal .status-current,
+.calendar .day-modal .status-former,
+.calendar .day-modal .status-relapse,
+.calendar .day-modal .status-wet,
+.calendar .day-modal .status-none {
+  font-size: 0.875rem;
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+}
+
+.calendar .day-modal .status-current {
+  color: #34c759;
+}
+
+.calendar .day-modal .status-former {
+  color: #5856d6;
+}
+
+.calendar .day-modal .status-relapse {
+  color: #ff3b30;
+}
+
+.calendar .day-modal .status-wet {
+  color: #af52de;
+}
+
+.calendar .day-modal .status-none {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* =============================================================================
+   BENEFITS SECTION - Matches Tracker benefits-modal exactly
+   ============================================================================= */
+
+.calendar .benefits-section {
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.calendar .benefits-section h3 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+.calendar .benefits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.calendar .benefit-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.calendar .benefit-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.calendar .benefit-info span:first-child {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.calendar .benefit-num {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #ffffff;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Benefit bar - matches Tracker slider look */
+.calendar .benefit-bar {
+  position: relative;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 1px;
+}
+
+.calendar .benefit-fill {
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: 1px;
+  transition: width 300ms ease;
+}
+
+/* =============================================================================
+   JOURNAL SECTION
+   ============================================================================= */
+
+.calendar .journal-section {
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.calendar .journal-section h3 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+/* Journal view */
+.calendar .journal-view {
+  text-align: left;
+}
+
+.calendar .journal-view p {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+
+/* Journal edit */
+.calendar .journal-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calendar .journal-edit textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color 150ms ease;
+}
+
+.calendar .journal-edit textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.calendar .journal-edit textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.calendar .journal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Journal empty state */
+.calendar .journal-empty {
+  text-align: center;
+}
+
+.calendar .journal-empty p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+/* =============================================================================
+   MODAL ACTIONS - Matches Tracker exactly
+   ============================================================================= */
+
+.calendar .modal-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+/* Primary button - white background */
+.calendar .btn-primary {
+  flex: 1;
+  padding: 14px 20px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.calendar .btn-primary:hover {
+  opacity: 0.9;
+}
+
+.calendar .btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Ghost button - transparent */
+.calendar .btn-ghost {
+  flex: 1;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.calendar .btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* =============================================================================
+   SHEET - Action sheet style (matches Tracker exactly)
+   ============================================================================= */
+
+.calendar .sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+  padding: 16px;
+  padding-bottom: max(16px, calc(env(safe-area-inset-bottom) + 8px));
+  animation: sheetIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes sheetIn {
+  from { 
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.calendar .sheet-content {
+  background-color: rgba(28, 28, 30, 0.98);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 16px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.calendar .sheet-content button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 100ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calendar .sheet-content button:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.calendar .sheet-content button:active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.calendar .sheet-content button.danger {
+  color: #ff453a;
+}
+
+.calendar .sheet-divider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+  margin: 4px 12px;
+}
+
+.calendar .sheet button.cancel {
+  display: block;
+  width: 100%;
+  padding: 16px 20px;
+  background-color: rgba(28, 28, 30, 0.98);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 8px;
+  transition: all 100ms ease;
+}
+
+.calendar .sheet button.cancel:hover {
+  background-color: rgba(40, 40, 42, 0.98);
+  color: #ffffff;
+}
+
+/* Desktop: sheet becomes centered modal */
+@media (min-width: 768px) {
+  .calendar .sheet {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    max-width: 300px;
+    padding: 0;
+    background: transparent;
+    animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .calendar .sheet-content {
+    margin-bottom: 12px;
+  }
+  
+  .calendar .sheet button.cancel {
+    margin-top: 0;
+  }
+}
+
+/* =============================================================================
+   TRIGGER MODAL - For relapse trigger selection
+   ============================================================================= */
+
+.calendar .trigger-modal {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  flex-shrink: 0;
+  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* NO background - floating */
+  background: transparent;
+}
+
+.calendar .trigger-modal h2 {
+  font-size: 1.375rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.calendar .trigger-modal p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 32px 0;
+}
+
+.calendar .trigger-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.calendar .trigger-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.calendar .trigger-btn svg {
+  font-size: 1.25rem;
+  opacity: 0.6;
+}
+
+.calendar .trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.calendar .trigger-btn.selected {
+  background: rgba(255, 59, 48, 0.15);
+  border-color: #ff3b30;
+  color: #ff3b30;
+}
+
+.calendar .trigger-btn.selected svg {
+  opacity: 1;
+}
+
+/* =============================================================================
+   RESPONSIVE - Mobile adjustments
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .calendar .overlay {
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  
+  .calendar .day-modal {
+    max-width: 100%;
+    max-height: calc(100vh - 80px);
+    max-height: calc(100dvh - 80px);
+  }
+  
+  .calendar .day-modal h2 {
+    font-size: 1.25rem;
+  }
+  
+  .calendar .benefits-list {
+    gap: 16px;
+  }
+  
+  .calendar .benefit-info span:first-child {
+    font-size: 0.8125rem;
+  }
+  
+  .calendar .benefit-num {
+    font-size: 1rem;
+  }
+  
+  .calendar .modal-actions {
+    flex-direction: row;
+    gap: 10px;
+  }
+  
+  .calendar .btn-primary,
+  .calendar .btn-ghost {
+    padding: 12px 16px;
+    font-size: 0.875rem;
+  }
+  
+  .calendar .trigger-grid {
+    gap: 8px;
+  }
+  
+  .calendar .trigger-btn {
+    padding: 14px 10px;
+    font-size: 0.6875rem;
+  }
+  
+  .calendar .trigger-btn svg {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar .overlay {
+    padding: 12px;
+  }
+  
+  .calendar .day-modal h2 {
+    font-size: 1.125rem;
+  }
+  
+  .calendar .benefits-section h3,
+  .calendar .journal-section h3 {
+    font-size: 0.6875rem;
+  }
+  
+  .calendar .btn-primary,
+  .calendar .btn-ghost {
+    padding: 12px 14px;
+    font-size: 0.8125rem;
+  }
+  
+  .calendar .trigger-modal h2 {
+    font-size: 1.125rem;
+  }
+  
+  .calendar .trigger-modal p {
+    font-size: 0.8125rem;
+    margin-bottom: 24px;
+  }
+}
+
+/* =============================================================================
+   SCROLLBAR - Minimal, barely visible
+   ============================================================================= */
+
+.calendar .day-modal::-webkit-scrollbar {
+  width: 2px;
+}
+
+.calendar .day-modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.calendar .day-modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar .overlay,
+  .calendar .day-modal,
+  .calendar .sheet,
+  .calendar .trigger-modal {
+    animation: none;
+  }
+}
