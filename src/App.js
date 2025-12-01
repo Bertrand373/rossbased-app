@@ -1,7 +1,7 @@
 // App.js - TITANTRACK MODERN MINIMAL
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
 
@@ -179,26 +179,45 @@ function App() {
       <ScrollToTop />
       <ServiceWorkerListener />
       <div className="app-container">
+        {/* Toast Notifications - Bottom position, tap to dismiss */}
         <Toaster 
-          position="top-center"
+          position="bottom-center"
+          containerStyle={{
+            bottom: 100, // Above mobile nav
+          }}
           toastOptions={{
-            duration: 3000,
+            duration: 2000,
             style: {
-              background: '#141414',
+              background: 'rgba(20, 20, 20, 0.95)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
               color: '#ffffff',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
-              padding: '12px 16px',
-              fontSize: '14px',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '100px',
+              padding: '12px 20px',
+              fontSize: '0.875rem',
+              fontWeight: '500',
               fontFamily: 'Inter, -apple-system, sans-serif',
+              boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
+              maxWidth: '90vw',
             },
             success: {
-              style: { borderLeft: '3px solid #34d399' },
-              iconTheme: { primary: '#34d399', secondary: '#000' },
+              style: {
+                background: 'rgba(20, 20, 20, 0.95)',
+              },
+              iconTheme: {
+                primary: '#34d399',
+                secondary: 'transparent',
+              },
             },
             error: {
-              style: { borderLeft: '3px solid #f87171' },
-              iconTheme: { primary: '#f87171', secondary: '#fff' },
+              style: {
+                background: 'rgba(20, 20, 20, 0.95)',
+              },
+              iconTheme: {
+                primary: '#f87171',
+                secondary: 'transparent',
+              },
             },
           }}
         />
