@@ -1,4 +1,4 @@
-// Profile.js - TITANTRACK REDESIGNED
+// Profile.js - TITANTRACK
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -13,20 +13,20 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   
-  // Account Settings States
+  // Account States
   const [username, setUsername] = useState(userData.username || '');
   const [email, setEmail] = useState(userData.email || '');
   const [discordUsername, setDiscordUsername] = useState(userData.discordUsername || '');
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
-  // Privacy Settings States
+  // Privacy States
   const [isEditingPrivacy, setIsEditingPrivacy] = useState(false);
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
   const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
   
-  // Notification Hook
+  // Notifications
   const {
     permission,
     isSupported,
@@ -40,8 +40,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
-  
-  // Notification Preferences
   const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
   const [quietHoursStart, setQuietHoursStart] = useState('22:00');
   const [quietHoursEnd, setQuietHoursEnd] = useState('08:00');
@@ -53,7 +51,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [dailyReminderEnabled, setDailyReminderEnabled] = useState(false);
   const [dailyReminderTime, setDailyReminderTime] = useState('09:00');
   
-  // Feedback States
+  // Feedback
   const [feedbackType, setFeedbackType] = useState('general');
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -72,16 +70,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'general', label: 'General' }
   ];
 
-  // Check existing notification subscription
   useEffect(() => {
     if (isSupported && userData?.username) {
-      checkExistingSubscription().then((sub) => {
-        setNotificationsEnabled(!!sub);
-      });
+      checkExistingSubscription().then((sub) => setNotificationsEnabled(!!sub));
     }
   }, [isSupported, userData?.username, checkExistingSubscription]);
 
-  // Load notification preferences
   useEffect(() => {
     if (notificationsEnabled && userData?.username) {
       loadNotificationPreferences();
@@ -112,39 +106,25 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   const handleSaveNotificationPreferences = async () => {
     const preferences = {
-      quietHoursEnabled,
-      quietHoursStart,
-      quietHoursEnd,
-      types: notifTypes,
-      dailyReminderEnabled,
-      dailyReminderTime,
-      fcmToken
+      quietHoursEnabled, quietHoursStart, quietHoursEnd,
+      types: notifTypes, dailyReminderEnabled, dailyReminderTime, fcmToken
     };
-
     try {
-      const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`, {
+      await fetch(`${API_URL}/api/notification-preferences/${userData.username}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(preferences)
       });
-
-      if (response.ok) {
-        localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
-        setIsEditingPrivacy(false);
-      } else {
-        throw new Error('Failed to save preferences');
-      }
+      localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
     } catch (error) {
       localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
-      setIsEditingPrivacy(false);
     }
+    setIsEditingPrivacy(false);
   };
 
   const handleNotificationToggle = async () => {
     if (isTogglingNotifications || !isEditingPrivacy) return;
-    
     setIsTogglingNotifications(true);
-    
     try {
       if (notificationsEnabled) {
         await unsubscribeFromPush();
@@ -158,74 +138,52 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             return;
           }
         }
-        
         await subscribeToPush();
         setNotificationsEnabled(true);
-        
         setTimeout(async () => {
           try {
             await sendLocalNotification('Notifications Activated', {
-              body: 'You\'ll now receive milestone alerts and motivational messages',
+              body: 'You\'ll now receive milestone alerts',
               icon: '/icon-192.png'
             });
-          } catch (error) {
-            console.error('Welcome notification failed:', error);
-          }
+          } catch (e) {}
         }, 1000);
       }
     } catch (error) {
-      console.error('Toggle error:', error);
-      toast.error('Failed to update notification settings');
+      toast.error('Failed to update notifications');
     } finally {
       setIsTogglingNotifications(false);
     }
   };
 
   const handleTestNotification = async () => {
-    try {
-      const success = await sendLocalNotification('Test Notification', {
-        body: 'Notifications are working correctly!',
-        icon: '/icon-192.png'
-      });
-      
-      if (!success) {
-        toast.error('Failed to send test notification');
-      }
-    } catch (error) {
-      toast.error('Error sending test notification');
-    }
+    const success = await sendLocalNotification('Test Notification', {
+      body: 'Notifications are working!',
+      icon: '/icon-192.png'
+    });
+    if (!success) toast.error('Failed to send test');
   };
 
-  const userStats = {
-    memberSince: userData.startDate ? format(new Date(userData.startDate), 'MMMM yyyy') : 'Unknown'
-  };
+  const memberSince = userData.startDate 
+    ? format(new Date(userData.startDate), 'MMMM yyyy') 
+    : 'Unknown';
 
   const handleProfileUpdate = () => {
     updateUserData({
       username: username.trim(),
       email: email.trim(),
       discordUsername: discordUsername.trim(),
-      showOnLeaderboard,
-      dataSharing,
-      analyticsOptIn,
-      marketingEmails
+      showOnLeaderboard
     });
     setIsEditingProfile(false);
   };
 
-  const handlePrivacyUpdate = () => {
-    updateUserData({ dataSharing, analyticsOptIn, marketingEmails });
-    setIsEditingPrivacy(false);
-  };
-
   const handleFeedbackSubmit = () => {
     if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
-      toast.error('Please fill in both subject and message');
+      toast.error('Please fill in both fields');
       return;
     }
-    
     console.log('Feedback:', { type: feedbackType, subject: feedbackSubject, message: feedbackMessage });
-    
     setFeedbackSubject('');
     setFeedbackMessage('');
     setFeedbackType('general');
@@ -234,38 +192,26 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   const handleDataExport = () => {
     const exportData = {
-      profile: {
-        username: userData.username,
-        memberSince: userData.startDate,
-        isPremium: true,
-        discordUsername: userData.discordUsername
-      },
+      profile: { username: userData.username, memberSince: userData.startDate },
       streakData: {
         currentStreak: userData.currentStreak,
         longestStreak: userData.longestStreak,
         startDate: userData.startDate,
-        streakHistory: userData.streakHistory,
-        relapseCount: userData.relapseCount,
-        wetDreamCount: userData.wetDreamCount
+        streakHistory: userData.streakHistory
       },
       benefitTracking: userData.benefitTracking || [],
-      emotionalTracking: userData.emotionalTracking || [],
       journalEntries: userData.notes || {},
-      badges: userData.badges || [],
-      urgeLog: userData.urgeLog || [],
       exportDate: new Date().toISOString()
     };
-    
-    const dataBlob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `titantrack-data-${format(new Date(), 'yyyy-MM-dd')}.json`;
+    link.download = `titantrack-${format(new Date(), 'yyyy-MM-dd')}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    
     setShowExportModal(false);
   };
 
@@ -274,372 +220,339 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     onLogout();
   };
 
-  // Get user initial
-  const userInitial = userData?.email?.charAt(0)?.toUpperCase() || 
-                      userData?.username?.charAt(0)?.toUpperCase() || '?';
+  const userInitial = userData?.username?.charAt(0)?.toUpperCase() || 
+                      userData?.email?.charAt(0)?.toUpperCase() || '?';
 
   return (
     <div className="profile">
       {/* Header */}
       <header className="profile-header">
         <h1>Profile</h1>
-        <p className="profile-subtitle">Manage your account and preferences</p>
+        <p>Manage your account and preferences</p>
       </header>
 
-      {/* User Card */}
-      <section className="profile-user-card">
+      {/* User Info */}
+      <div className="profile-user">
         <div className="profile-avatar">{userInitial}</div>
-        <div className="profile-user-info">
-          <span className="profile-username">{userData.username}</span>
-          <span className="profile-member">Member since {userStats.memberSince}</span>
+        <div className="profile-user-details">
+          <span className="profile-name">{userData.username}</span>
+          <span className="profile-since">Member since {memberSince}</span>
         </div>
         <button className="profile-feedback-btn" onClick={() => setShowFeedbackModal(true)}>
           Feedback
         </button>
-      </section>
+      </div>
 
-      {/* Tab Navigation */}
-      <nav className="profile-nav">
+      {/* Tab Navigation - Matches Calendar toggle exactly */}
+      <div className="profile-tabs">
         {tabs.map(tab => (
           <button
             key={tab.id}
-            className={`profile-nav-btn ${activeTab === tab.id ? 'active' : ''}`}
+            className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
             {tab.label}
           </button>
         ))}
-      </nav>
+      </div>
 
-      {/* Tab Content */}
+      {/* Content */}
       <div className="profile-content">
         
-        {/* Account Tab */}
+        {/* ACCOUNT TAB */}
         {activeTab === 'account' && (
-          <section className="profile-section">
+          <div className="profile-section">
             <div className="section-header">
-              <h2>Account Information</h2>
-              <button 
-                className="section-edit-btn"
-                onClick={() => setIsEditingProfile(!isEditingProfile)}
-              >
+              <h2>Account</h2>
+              <button className="edit-btn" onClick={() => setIsEditingProfile(!isEditingProfile)}>
                 {isEditingProfile ? 'Cancel' : 'Edit'}
               </button>
             </div>
 
-            <div className="profile-form">
-              <div className="form-field">
-                <label>Username</label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={!isEditingProfile}
-                  placeholder="Your username"
-                />
-              </div>
-
-              <div className="form-field">
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={!isEditingProfile}
-                  placeholder="your@email.com"
-                />
-              </div>
-
-              <div className="form-field">
-                <label>Discord</label>
-                <input
-                  type="text"
-                  value={discordUsername}
-                  onChange={(e) => setDiscordUsername(e.target.value)}
-                  disabled={!isEditingProfile}
-                  placeholder="For leaderboard"
-                />
-              </div>
-
-              <div className="toggle-row">
-                <div className="toggle-info">
-                  <span className="toggle-label">Show on Leaderboard</span>
-                  <span className="toggle-desc">Display your streak publicly</span>
-                </div>
-                <button 
-                  className={`toggle ${showOnLeaderboard ? 'active' : ''}`}
-                  onClick={() => isEditingProfile && setShowOnLeaderboard(!showOnLeaderboard)}
-                  disabled={!isEditingProfile}
-                >
-                  <span className="toggle-thumb" />
-                </button>
-              </div>
-
-              {isEditingProfile && (
-                <div className="form-actions">
-                  <button className="btn-primary" onClick={handleProfileUpdate}>Save</button>
-                  <button className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Cancel</button>
-                </div>
-              )}
+            <div className="form-group">
+              <label>Username</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={!isEditingProfile}
+                placeholder="Your username"
+              />
             </div>
-          </section>
+
+            <div className="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={!isEditingProfile}
+                placeholder="your@email.com"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Discord</label>
+              <input
+                type="text"
+                value={discordUsername}
+                onChange={(e) => setDiscordUsername(e.target.value)}
+                disabled={!isEditingProfile}
+                placeholder="For leaderboard"
+              />
+            </div>
+
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Show on Leaderboard</span>
+                <span className="toggle-desc">Display streak publicly</span>
+              </div>
+              <button 
+                className={`toggle-switch ${showOnLeaderboard ? 'active' : ''}`}
+                onClick={() => isEditingProfile && setShowOnLeaderboard(!showOnLeaderboard)}
+                disabled={!isEditingProfile}
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
+
+            {isEditingProfile && (
+              <div className="section-actions">
+                <button className="btn-primary" onClick={handleProfileUpdate}>Save</button>
+                <button className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Cancel</button>
+              </div>
+            )}
+          </div>
         )}
 
-        {/* Privacy Tab */}
+        {/* PRIVACY TAB */}
         {activeTab === 'privacy' && (
-          <section className="profile-section">
+          <div className="profile-section">
             <div className="section-header">
-              <h2>Privacy Settings</h2>
-              <button 
-                className="section-edit-btn"
-                onClick={() => setIsEditingPrivacy(!isEditingPrivacy)}
-              >
+              <h2>Privacy</h2>
+              <button className="edit-btn" onClick={() => setIsEditingPrivacy(!isEditingPrivacy)}>
                 {isEditingPrivacy ? 'Cancel' : 'Edit'}
               </button>
             </div>
 
-            <div className="settings-group">
-              <h3>Data & Analytics</h3>
-              
-              <div className="toggle-row">
-                <div className="toggle-info">
-                  <span className="toggle-label">Anonymous Analytics</span>
-                  <span className="toggle-desc">Help improve the app</span>
-                </div>
-                <button 
-                  className={`toggle ${analyticsOptIn ? 'active' : ''}`}
-                  onClick={() => isEditingPrivacy && setAnalyticsOptIn(!analyticsOptIn)}
-                  disabled={!isEditingPrivacy}
-                >
-                  <span className="toggle-thumb" />
-                </button>
-              </div>
+            <h3 className="group-label">Data & Analytics</h3>
 
-              <div className="toggle-row">
-                <div className="toggle-info">
-                  <span className="toggle-label">Community Insights</span>
-                  <span className="toggle-desc">Share aggregated data</span>
-                </div>
-                <button 
-                  className={`toggle ${dataSharing ? 'active' : ''}`}
-                  onClick={() => isEditingPrivacy && setDataSharing(!dataSharing)}
-                  disabled={!isEditingPrivacy}
-                >
-                  <span className="toggle-thumb" />
-                </button>
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Anonymous Analytics</span>
+                <span className="toggle-desc">Help improve the app</span>
               </div>
+              <button 
+                className={`toggle-switch ${analyticsOptIn ? 'active' : ''}`}
+                onClick={() => isEditingPrivacy && setAnalyticsOptIn(!analyticsOptIn)}
+                disabled={!isEditingPrivacy}
+              >
+                <span className="toggle-knob" />
+              </button>
             </div>
 
-            <div className="settings-group">
-              <h3>Communications</h3>
-              
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Community Insights</span>
+                <span className="toggle-desc">Share aggregated data</span>
+              </div>
+              <button 
+                className={`toggle-switch ${dataSharing ? 'active' : ''}`}
+                onClick={() => isEditingPrivacy && setDataSharing(!dataSharing)}
+                disabled={!isEditingPrivacy}
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
+
+            <h3 className="group-label">Communications</h3>
+
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Marketing Emails</span>
+                <span className="toggle-desc">Features and tips</span>
+              </div>
+              <button 
+                className={`toggle-switch ${marketingEmails ? 'active' : ''}`}
+                onClick={() => isEditingPrivacy && setMarketingEmails(!marketingEmails)}
+                disabled={!isEditingPrivacy}
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
+
+            {isSupported && (
               <div className="toggle-row">
-                <div className="toggle-info">
-                  <span className="toggle-label">Marketing Emails</span>
-                  <span className="toggle-desc">New features and tips</span>
+                <div className="toggle-text">
+                  <span className="toggle-label">Push Notifications</span>
+                  <span className="toggle-desc">
+                    {permission === 'denied' ? 'Blocked in browser' : 'Milestone alerts'}
+                  </span>
                 </div>
                 <button 
-                  className={`toggle ${marketingEmails ? 'active' : ''}`}
-                  onClick={() => isEditingPrivacy && setMarketingEmails(!marketingEmails)}
-                  disabled={!isEditingPrivacy}
+                  className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
+                  onClick={handleNotificationToggle}
+                  disabled={!isEditingPrivacy || isTogglingNotifications || permission === 'denied'}
                 >
-                  <span className="toggle-thumb" />
+                  <span className="toggle-knob" />
                 </button>
               </div>
-
-              {isSupported && (
-                <div className="toggle-row">
-                  <div className="toggle-info">
-                    <span className="toggle-label">Push Notifications</span>
-                    <span className="toggle-desc">
-                      {permission === 'denied' ? 'Blocked in browser' : 'Milestone alerts'}
-                    </span>
-                  </div>
-                  <button 
-                    className={`toggle ${notificationsEnabled ? 'active' : ''}`}
-                    onClick={handleNotificationToggle}
-                    disabled={!isEditingPrivacy || isTogglingNotifications || permission === 'denied'}
-                  >
-                    <span className="toggle-thumb" />
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Notification Preferences */}
             {isSupported && notificationsEnabled && isEditingPrivacy && (
-              <div className="settings-group">
-                <h3>Notification Preferences</h3>
-                
+              <>
+                <h3 className="group-label">Notification Preferences</h3>
+
                 <div className="toggle-row">
-                  <div className="toggle-info">
+                  <div className="toggle-text">
                     <span className="toggle-label">Quiet Hours</span>
                     <span className="toggle-desc">Pause during sleep</span>
                   </div>
                   <button 
-                    className={`toggle ${quietHoursEnabled ? 'active' : ''}`}
+                    className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
                     onClick={() => setQuietHoursEnabled(!quietHoursEnabled)}
                   >
-                    <span className="toggle-thumb" />
+                    <span className="toggle-knob" />
                   </button>
                 </div>
 
                 {quietHoursEnabled && (
-                  <div className="time-range">
-                    <input
-                      type="time"
-                      value={quietHoursStart}
-                      onChange={(e) => setQuietHoursStart(e.target.value)}
-                    />
+                  <div className="time-row">
+                    <input type="time" value={quietHoursStart} onChange={(e) => setQuietHoursStart(e.target.value)} />
                     <span>to</span>
-                    <input
-                      type="time"
-                      value={quietHoursEnd}
-                      onChange={(e) => setQuietHoursEnd(e.target.value)}
-                    />
+                    <input type="time" value={quietHoursEnd} onChange={(e) => setQuietHoursEnd(e.target.value)} />
                   </div>
                 )}
 
                 <div className="toggle-row">
-                  <div className="toggle-info">
+                  <div className="toggle-text">
                     <span className="toggle-label">Milestones</span>
                     <span className="toggle-desc">Day 7, 30, 90...</span>
                   </div>
                   <button 
-                    className={`toggle ${notifTypes.milestones ? 'active' : ''}`}
+                    className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
                     onClick={() => updateNotifType('milestones')}
                   >
-                    <span className="toggle-thumb" />
+                    <span className="toggle-knob" />
                   </button>
                 </div>
 
                 <div className="toggle-row">
-                  <div className="toggle-info">
+                  <div className="toggle-text">
                     <span className="toggle-label">Urge Support</span>
-                    <span className="toggle-desc">Encouragement messages</span>
+                    <span className="toggle-desc">Encouragement</span>
                   </div>
                   <button 
-                    className={`toggle ${notifTypes.urgeSupport ? 'active' : ''}`}
+                    className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
                     onClick={() => updateNotifType('urgeSupport')}
                   >
-                    <span className="toggle-thumb" />
+                    <span className="toggle-knob" />
                   </button>
                 </div>
 
                 <div className="toggle-row">
-                  <div className="toggle-info">
+                  <div className="toggle-text">
                     <span className="toggle-label">Weekly Summary</span>
-                    <span className="toggle-desc">Sunday progress report</span>
+                    <span className="toggle-desc">Sunday report</span>
                   </div>
                   <button 
-                    className={`toggle ${notifTypes.weeklyProgress ? 'active' : ''}`}
+                    className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
                     onClick={() => updateNotifType('weeklyProgress')}
                   >
-                    <span className="toggle-thumb" />
+                    <span className="toggle-knob" />
                   </button>
                 </div>
 
                 <div className="toggle-row">
-                  <div className="toggle-info">
+                  <div className="toggle-text">
                     <span className="toggle-label">Daily Reminder</span>
-                    <span className="toggle-desc">Log your benefits</span>
+                    <span className="toggle-desc">Log benefits</span>
                   </div>
                   <button 
-                    className={`toggle ${dailyReminderEnabled ? 'active' : ''}`}
+                    className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
                     onClick={() => setDailyReminderEnabled(!dailyReminderEnabled)}
                   >
-                    <span className="toggle-thumb" />
+                    <span className="toggle-knob" />
                   </button>
                 </div>
 
                 {dailyReminderEnabled && (
-                  <div className="time-single">
-                    <label>Reminder Time</label>
-                    <input
-                      type="time"
-                      value={dailyReminderTime}
-                      onChange={(e) => setDailyReminderTime(e.target.value)}
-                    />
+                  <div className="time-row single">
+                    <label>Reminder time</label>
+                    <input type="time" value={dailyReminderTime} onChange={(e) => setDailyReminderTime(e.target.value)} />
                   </div>
                 )}
 
-                <button className="test-btn" onClick={handleTestNotification}>
+                <button className="test-notif-btn" onClick={handleTestNotification}>
                   Test Notification
                 </button>
-              </div>
+              </>
             )}
 
             {isEditingPrivacy && (
-              <div className="form-actions">
+              <div className="section-actions">
                 <button className="btn-primary" onClick={handleSaveNotificationPreferences}>Save</button>
                 <button className="btn-ghost" onClick={() => setIsEditingPrivacy(false)}>Cancel</button>
               </div>
             )}
-          </section>
+          </div>
         )}
 
-        {/* Settings Tab */}
+        {/* SETTINGS TAB */}
         {activeTab === 'settings' && (
-          <section className="profile-section">
+          <div className="profile-section">
             <div className="section-header">
-              <h2>App Settings</h2>
+              <h2>Settings</h2>
             </div>
-
-            <div className="settings-group">
-              <h3>Language</h3>
-              <div className="coming-soon">
-                <span className="coming-soon-badge">Coming Soon</span>
-                <p>Multi-language support is being developed</p>
-              </div>
+            <h3 className="group-label">Language</h3>
+            <div className="coming-soon">
+              <span className="coming-badge">Coming Soon</span>
+              <p>Multi-language support is being developed</p>
             </div>
-          </section>
+          </div>
         )}
 
-        {/* Data Tab */}
+        {/* DATA TAB */}
         {activeTab === 'data' && (
-          <section className="profile-section">
+          <div className="profile-section">
             <div className="section-header">
-              <h2>Data Management</h2>
+              <h2>Data</h2>
             </div>
 
-            <div className="data-card">
-              <div className="data-info">
-                <h3>Export Data</h3>
-                <p>Download your tracking data as JSON</p>
+            <div className="data-row">
+              <div className="data-text">
+                <span className="data-title">Export Data</span>
+                <span className="data-desc">Download as JSON</span>
               </div>
-              <button className="btn-secondary" onClick={() => setShowExportModal(true)}>
-                Export
-              </button>
+              <button className="data-btn" onClick={() => setShowExportModal(true)}>Export</button>
             </div>
 
-            <div className="data-card danger">
-              <div className="data-info">
-                <h3>Delete Account</h3>
-                <p>Permanently remove all your data</p>
+            <div className="data-row danger">
+              <div className="data-text">
+                <span className="data-title">Delete Account</span>
+                <span className="data-desc">Permanently remove data</span>
               </div>
-              <button className="btn-danger" onClick={() => setShowDeleteConfirm(true)}>
-                Delete
-              </button>
+              <button className="data-btn danger" onClick={() => setShowDeleteConfirm(true)}>Delete</button>
             </div>
 
-            <button className="signout-btn" onClick={onLogout}>
-              Sign Out
-            </button>
-          </section>
+            <button className="signout-btn" onClick={onLogout}>Sign Out</button>
+          </div>
         )}
       </div>
 
-      {/* Feedback Modal */}
+      {/* FEEDBACK MODAL */}
       {showFeedbackModal && (
-        <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
+        <div className="overlay" onClick={() => setShowFeedbackModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h2>Send Feedback</h2>
+            <p>Help us improve TitanTrack</p>
             
             <div className="feedback-types">
               {feedbackTypes.map(type => (
                 <button
                   key={type.id}
-                  className={`feedback-type ${feedbackType === type.id ? 'active' : ''}`}
+                  className={`feedback-type-btn ${feedbackType === type.id ? 'active' : ''}`}
                   onClick={() => setFeedbackType(type.id)}
                 >
                   {type.label}
@@ -647,7 +560,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               ))}
             </div>
 
-            <div className="form-field">
+            <div className="modal-field">
               <label>Subject</label>
               <input
                 type="text"
@@ -658,7 +571,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               />
             </div>
 
-            <div className="form-field">
+            <div className="modal-field">
               <label>Message</label>
               <textarea
                 value={feedbackMessage}
@@ -677,14 +590,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       )}
 
-      {/* Export Modal */}
+      {/* EXPORT MODAL */}
       {showExportModal && (
-        <div className="modal-overlay" onClick={() => setShowExportModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="overlay" onClick={() => setShowExportModal(false)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
             <h2>Export Data</h2>
             <p>Download all your tracking data including streak history, journal entries, and settings.</p>
-            
-            <div className="modal-actions">
+            <div className="confirm-actions">
               <button className="btn-primary" onClick={handleDataExport}>Download</button>
               <button className="btn-ghost" onClick={() => setShowExportModal(false)}>Cancel</button>
             </div>
@@ -692,14 +604,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         </div>
       )}
 
-      {/* Delete Confirm Modal */}
+      {/* DELETE MODAL */}
       {showDeleteConfirm && (
-        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
             <h2>Delete Account?</h2>
-            <p>This will permanently delete all your data. This action cannot be undone.</p>
-            
-            <div className="modal-actions">
+            <p>This will permanently delete all your data. This cannot be undone.</p>
+            <div className="confirm-actions">
               <button className="btn-danger" onClick={handleAccountDeletion}>Delete</button>
               <button className="btn-ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
             </div>
