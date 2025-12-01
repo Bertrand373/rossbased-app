@@ -1,25 +1,19 @@
 /* Tracker.css - TITANTRACK */
 
 .tracker {
-  /* Fixed positioning - fills space between header and nav exactly */
-  position: fixed;
-  top: 56px;
-  left: 0;
-  right: 0;
-  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  /* Simple flexbox layout - fills available space */
+  min-height: calc(100dvh - 56px - 80px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 0 24px;
-  overflow: hidden;
   background-color: #000000;
 }
 
 @media (min-width: 1025px) {
   .tracker {
-    top: 64px;
-    bottom: 0; /* no mobile nav on desktop */
+    min-height: calc(100dvh - 64px);
   }
 }
 
@@ -146,20 +140,29 @@
 
 .overlay {
   position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.92);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  z-index: 200;
+  z-index: 300;
   padding: 24px;
-  padding-top: max(24px, env(safe-area-inset-top));
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   animation: overlayIn 200ms ease;
+}
+
+/* Spacers push content to center, collapse when content is tall */
+.overlay::before,
+.overlay::after {
+  content: '';
+  flex: 1;
+  min-height: 40px;
 }
 
 @keyframes overlayIn {
@@ -176,6 +179,7 @@
   max-width: 380px;
   background-color: transparent;
   padding: 0;
+  flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -283,6 +287,7 @@
   width: 100%;
   max-width: 320px;
   text-align: center;
+  flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -369,11 +374,12 @@
 .benefits-modal {
   width: 100%;
   max-width: 360px;
-  max-height: calc(100vh - 48px);
-  max-height: calc(100dvh - 48px);
+  max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
   display: flex;
   flex-direction: column;
   text-align: center;
+  flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -401,7 +407,8 @@
   -webkit-overflow-scrolling: touch;
   flex: 1;
   min-height: 0;
-  padding: 4px 0;
+  padding: 4px 4px 4px 0;
+  margin-right: -4px;
   text-align: left;
 }
 
