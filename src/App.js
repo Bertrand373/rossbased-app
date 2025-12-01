@@ -5,10 +5,8 @@ import { Toaster } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
 
-// Icons for header
+// Icons for navigation
 import { 
-  FaPowerOff, 
-  FaUser,
   FaHome,
   FaCalendarAlt,
   FaChartBar,
@@ -38,39 +36,24 @@ import SpartanLoader from './components/Shared/SpartanLoader';
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
 
-// Profile Button - Desktop
-const ProfileButton = () => {
+// Profile Button - Minimal circle
+const ProfileButton = ({ userData }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
   const isActive = location.pathname === '/profile';
+  
+  // Get first initial from email or username
+  const initial = userData?.email?.charAt(0)?.toUpperCase() || 
+                  userData?.username?.charAt(0)?.toUpperCase() || 
+                  '?';
   
   return (
     <button 
-      className={`profile-btn ${isActive ? 'active' : ''}`} 
+      className={`profile-circle ${isActive ? 'active' : ''}`} 
       onClick={() => navigate('/profile')} 
-      title="Profile"
+      aria-label="Profile"
     >
-      <FaUser />
-      <span>Profile</span>
-    </button>
-  );
-};
-
-// Profile Button - Mobile (icon only)
-const MobileProfileButton = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  const isActive = location.pathname === '/profile';
-  
-  return (
-    <button 
-      className={`profile-btn ${isActive ? 'active' : ''}`} 
-      onClick={() => navigate('/profile')} 
-      title="Profile"
-    >
-      <FaUser />
+      {initial}
     </button>
   );
 };
@@ -241,33 +224,13 @@ function App() {
         {isLoggedIn ? (
           <>
             <header className="app-header">
-              {!isMobile ? (
-                <>
-                  <div className="logo-container">
-                    <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
-                  </div>
-                  <HeaderNavigation />
-                  <div className="user-controls">
-                    <ProfileButton />
-                    <button className="logout-btn" onClick={logout} title="Sign out">
-                      <FaPowerOff />
-                      <span>Sign out</span>
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="logo-container">
-                    <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
-                  </div>
-                  <div className="mobile-user-controls">
-                    <MobileProfileButton />
-                    <button className="logout-btn" onClick={logout} title="Sign out">
-                      <FaPowerOff />
-                    </button>
-                  </div>
-                </>
-              )}
+              <div className="logo-container">
+                <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
+              </div>
+              
+              {!isMobile && <HeaderNavigation />}
+              
+              <ProfileButton userData={userData} />
             </header>
             
             {isMobile && (

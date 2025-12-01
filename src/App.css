@@ -220,7 +220,7 @@ h4 { font-size: 0.875rem; }
 }
 
 /* ============================================================
-   HEADER - Clean, minimal
+   HEADER - Clean, minimal, confident
    ============================================================ */
 
 .app-header {
@@ -232,9 +232,9 @@ h4 { font-size: 0.875rem; }
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--space-6);
-  background-color: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -244,9 +244,38 @@ h4 { font-size: 0.875rem; }
 }
 
 .app-logo {
-  height: 22px;
+  height: 18px;
   width: auto;
-  opacity: 0.95;
+  opacity: 0.9;
+}
+
+/* Profile circle - minimal */
+.profile-circle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.profile-circle:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.profile-circle.active {
+  background-color: #ffffff;
+  color: #000000;
 }
 
 /* ============================================================
@@ -307,49 +336,7 @@ h4 { font-size: 0.875rem; }
   display: none;
 }
 
-/* ============================================================
-   USER CONTROLS
-   ============================================================ */
-
-.user-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.profile-btn,
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background-color: transparent;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.profile-btn:hover {
-  border-color: var(--border-strong);
-  color: var(--text-primary);
-  background-color: var(--accent-subtle);
-}
-
-.profile-btn.active {
-  border-color: var(--accent);
-  color: var(--text-primary);
-  background-color: var(--accent-muted);
-}
-
-.logout-btn:hover {
-  border-color: var(--danger);
-  color: var(--danger);
-  background-color: var(--danger-muted);
-}
+/* Old user controls removed - now using minimal profile-circle */
 
 /* ============================================================
    MOBILE HEADER
@@ -363,47 +350,32 @@ h4 { font-size: 0.875rem; }
   }
   
   .app-logo {
-    height: 18px;
+    height: 16px;
   }
   
   .header-nav {
     display: none;
   }
   
-  .mobile-user-controls {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-  
-  .mobile-user-controls .profile-btn,
-  .mobile-user-controls .logout-btn {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    justify-content: center;
-    border-radius: var(--radius-sm);
-  }
-  
-  .mobile-user-controls .profile-btn span,
-  .mobile-user-controls .logout-btn span {
-    display: none;
+  .profile-circle {
+    width: 34px;
+    height: 34px;
   }
 }
 
 @media (max-width: 480px) {
   .app-header {
-    padding: 0 var(--space-3);
+    padding: 0 var(--space-4);
   }
   
   .app-logo {
-    height: 16px;
+    height: 15px;
   }
   
-  .mobile-user-controls .profile-btn,
-  .mobile-user-controls .logout-btn {
-    width: 36px;
-    height: 36px;
+  .profile-circle {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
   }
 }
 
