@@ -50,24 +50,13 @@ const Tracker = ({ userData, updateUserData }) => {
     const milestones = [7, 14, 30, 60, 90, 180, 365];
     if (streak >= 365) {
       const years = Math.floor(streak / 365);
-      return { display: `Year ${years}`, target: 365 * (years + 1) };
+      return `Year ${years}`;
     }
     const next = milestones.find(m => streak < m);
-    return next ? { display: `${next}`, daysTo: next - streak } : null;
-  };
-
-  // Phase calculation - matches the journey
-  const getPhase = () => {
-    if (streak < 7) return { num: '01', label: 'Foundation' };
-    if (streak < 14) return { num: '02', label: 'Building' };
-    if (streak < 30) return { num: '03', label: 'Momentum' };
-    if (streak < 60) return { num: '04', label: 'Transformation' };
-    if (streak < 90) return { num: '05', label: 'Mastery' };
-    return { num: '06', label: 'Transcendence' };
+    return next ? `${next - streak} to ${next}` : null;
   };
 
   const milestone = getNextMilestone();
-  const phase = getPhase();
 
   // Date submit
   const handleDateSubmit = (date) => {
@@ -270,19 +259,7 @@ const Tracker = ({ userData, updateUserData }) => {
         </button>
         
         {milestone && (
-          <div className="tracker-meta">
-            <span className="meta-phase">
-              <span className="phase-num">{phase.num}</span>
-              <span className="phase-label">{phase.label}</span>
-            </span>
-            <span className="meta-divider" />
-            <span className="meta-milestone">
-              {milestone.daysTo !== undefined 
-                ? `${String(milestone.daysTo).padStart(2, '0')} to ${milestone.display}`
-                : milestone.display
-              }
-            </span>
-          </div>
+          <p className="milestone">{milestone}</p>
         )}
       </main>
 
