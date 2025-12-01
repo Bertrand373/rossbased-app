@@ -1,11 +1,11 @@
 /* =============================================================================
    CALENDAR MODALS - TITANTRACK
-   Complete overhaul to match Tracker/Landing aesthetic
-   Transparent floating content, white buttons, clean minimal
+   COMPLETE FILE - includes overlay, modal base, and all components
+   Transparent floating content - matches Tracker/Landing aesthetic
    ============================================================================= */
 
 /* =============================================================================
-   OVERLAY - Matches Tracker .overlay exactly
+   OVERLAY
    ============================================================================= */
 
 .modal-overlay {
@@ -40,7 +40,7 @@
 }
 
 /* =============================================================================
-   MODAL CONTENT - Transparent, floating (matches Tracker .modal)
+   MODAL CONTENT - TRANSPARENT (NO CARD BACKGROUND)
    ============================================================================= */
 
 .modal-content {
@@ -49,14 +49,21 @@
   max-height: calc(100vh - 120px);
   max-height: calc(100dvh - 120px);
   overflow-y: auto;
-  background: transparent;
-  padding: 0;
   position: relative;
   flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  
+  /* TRANSPARENT - NO CARD */
+  background: transparent;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
 }
 
 .modal-content::-webkit-scrollbar {
@@ -78,7 +85,9 @@
    CLOSE BUTTON
    ============================================================================= */
 
-.modal-close-x {
+.modal-close,
+.modal-close-x,
+.modal-close-btn {
   position: absolute;
   top: 0;
   right: 0;
@@ -92,13 +101,19 @@
   border-radius: 50%;
   color: rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: color 150ms ease;
   z-index: 10;
   padding: 0;
+  font-size: 1rem;
+  outline: none;
 }
 
-.modal-close-x:hover {
+.modal-close:hover,
+.modal-close-x:hover,
+.modal-close-btn:hover {
   color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  transform: none;
 }
 
 /* =============================================================================
@@ -153,7 +168,6 @@
   margin-left: 4px;
 }
 
-/* Status colors */
 .status-badge.current-streak {
   background: rgba(52, 211, 153, 0.1);
   color: #34d399;
@@ -175,7 +189,7 @@
 }
 
 /* =============================================================================
-   BENEFITS SECTION - Matches Tracker benefit sliders
+   BENEFITS SECTION
    ============================================================================= */
 
 .day-benefits {
@@ -245,15 +259,16 @@
   font-weight: 500;
   color: #ffffff;
   font-feature-settings: 'tnum' 1;
+  background: transparent;
+  border: none;
 }
 
-/* Hide low/high labels - cleaner */
 .benefit-slider-labels {
   display: none;
 }
 
 /* =============================================================================
-   JOURNAL SECTION - Clean, minimal
+   JOURNAL SECTION
    ============================================================================= */
 
 .day-journal {
@@ -282,8 +297,8 @@
   margin: 0;
 }
 
-/* Small action button */
-.action-btn {
+.action-btn,
+.action-btn.journal-edit-btn {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -299,12 +314,12 @@
   transition: all 150ms ease;
 }
 
-.action-btn:hover {
+.action-btn:hover,
+.action-btn.journal-edit-btn:hover {
   border-color: rgba(255, 255, 255, 0.2);
   color: #ffffff;
 }
 
-/* Journal entry display */
 .journal-entry {
   padding: 16px;
   font-size: 0.875rem;
@@ -312,9 +327,9 @@
   line-height: 1.6;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
+  border: none;
 }
 
-/* Journal editing */
 .journal-editing {
   display: flex;
   flex-direction: column;
@@ -350,7 +365,7 @@
   gap: 12px;
 }
 
-/* Save button - WHITE (matches Tracker .btn-primary) */
+/* Save button - WHITE */
 .journal-save-btn {
   flex: 1;
   padding: 14px 24px;
@@ -373,7 +388,7 @@
   opacity: 0.9;
 }
 
-/* Cancel button - ghost (matches Tracker .btn-ghost) */
+/* Cancel button - ghost */
 .journal-cancel-btn {
   flex: 1;
   padding: 14px 24px;
@@ -397,16 +412,17 @@
 }
 
 /* =============================================================================
-   JOURNAL EMPTY STATE - Clean, no helmet
+   JOURNAL EMPTY STATE - NO HELMET
    ============================================================================= */
 
 .journal-benefits-banner {
   padding: 24px;
   text-align: center;
   margin-bottom: 16px;
+  background: transparent;
+  border: none;
 }
 
-/* Hide helmet completely */
 .journal-benefits-helmet-container,
 .journal-benefits-helmet,
 .journal-benefits-helmet-fallback {
@@ -437,7 +453,7 @@
 }
 
 /* =============================================================================
-   MODAL ACTIONS - Matches Tracker exactly
+   MODAL ACTIONS
    ============================================================================= */
 
 .modal-actions {
@@ -450,7 +466,8 @@
 /* Primary button - WHITE */
 .btn-primary,
 .modal-actions .btn-primary,
-.modal-actions .edit-day-btn {
+.modal-actions .edit-day-btn,
+.edit-day-btn {
   width: 100%;
   padding: 16px 24px;
   background: #ffffff;
@@ -470,7 +487,8 @@
 
 .btn-primary:hover,
 .modal-actions .btn-primary:hover,
-.modal-actions .edit-day-btn:hover {
+.modal-actions .edit-day-btn:hover,
+.edit-day-btn:hover {
   opacity: 0.9;
 }
 
@@ -553,7 +571,7 @@
   margin: 0 0 32px 0;
 }
 
-/* Edit options - clean pill buttons */
+/* Edit options */
 .edit-day-options {
   display: flex;
   flex-direction: column;
@@ -581,7 +599,7 @@
   font-size: 1rem;
 }
 
-/* Streak button - WHITE (primary action) */
+/* Streak button - WHITE */
 .current-streak-btn {
   background: #ffffff;
   color: #000000;
@@ -602,7 +620,7 @@
   color: #ffffff;
 }
 
-/* Relapse button - subtle red tint */
+/* Relapse button */
 .relapse-btn {
   background: rgba(255, 59, 48, 0.1);
   color: #ff3b30;
@@ -618,6 +636,9 @@
 
 .trigger-selection {
   margin-bottom: 32px;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .trigger-selection h4 {
@@ -861,5 +882,5 @@
 .compact-legend-dot,
 .wet-dream-overlay,
 .trigger-inline {
-  display: none;
+  display: none !important;
 }
