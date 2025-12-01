@@ -1,11 +1,11 @@
 /* =============================================================================
-   CALENDAR MODALS - TITANTRACK MODERN MINIMAL
-   Combined modal styles matching Tracker aesthetic
-   Immersive overlay, floating content, white/ghost buttons
+   CALENDAR MODALS - TITANTRACK ELITE
+   Matches Tracker modal aesthetic exactly
+   Immersive overlay, floating content, white primary buttons
    ============================================================================= */
 
 /* =============================================================================
-   OVERLAY - Immersive dark backdrop with blur
+   OVERLAY - Matches Tracker .overlay exactly
    ============================================================================= */
 
 .modal-overlay {
@@ -41,12 +41,12 @@
 }
 
 /* =============================================================================
-   MODAL CONTENT - Floating, transparent background
+   MODAL CONTENT - Floating, transparent (matches Tracker .modal)
    ============================================================================= */
 
 .modal-content {
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
   max-height: calc(100vh - 120px);
   max-height: calc(100dvh - 120px);
   overflow-y: auto;
@@ -76,7 +76,7 @@
 }
 
 /* =============================================================================
-   CLOSE BUTTON
+   CLOSE BUTTON - Subtle, top right
    ============================================================================= */
 
 .modal-close-x {
@@ -109,15 +109,15 @@
 
 .day-info-modal {
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
+  text-align: center;
 }
 
 .day-info-modal h3 {
   margin: 0 0 24px 0;
-  font-size: 1.375rem;
+  font-size: 1.5rem;
   font-weight: 500;
   color: #ffffff;
-  text-align: center;
   letter-spacing: -0.02em;
 }
 
@@ -126,21 +126,19 @@
    ============================================================================= */
 
 .day-status-info {
-  margin-bottom: 32px;
-  text-align: center;
+  margin-bottom: 40px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   align-items: center;
 }
 
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 0.8125rem;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.875rem;
   font-weight: 500;
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -148,336 +146,140 @@
 }
 
 .status-badge svg {
-  font-size: 0.875rem;
-  opacity: 0.9;
+  font-size: 0.9375rem;
 }
 
 .status-badge .day-count {
   color: rgba(255, 255, 255, 0.4);
   font-weight: 400;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
+  margin-left: 4px;
 }
 
 .status-badge .wet-dream-overlay {
   color: #fbbf24;
   font-weight: 400;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
 }
 
 .status-badge .trigger-inline {
   color: rgba(255, 255, 255, 0.35);
   font-weight: 400;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
 }
 
-/* Status colors */
+/* Status colors - match grid styling */
 .status-badge.current-streak {
-  background-color: rgba(52, 211, 153, 0.08);
-  border-color: rgba(52, 211, 153, 0.15);
+  background-color: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.2);
   color: #34d399;
 }
 
 .status-badge.former-streak {
-  background-color: rgba(96, 165, 250, 0.08);
-  border-color: rgba(96, 165, 250, 0.15);
+  background-color: rgba(96, 165, 250, 0.1);
+  border-color: rgba(96, 165, 250, 0.2);
   color: #60a5fa;
 }
 
 .status-badge.relapse {
-  background-color: rgba(248, 113, 113, 0.08);
-  border-color: rgba(248, 113, 113, 0.15);
+  background-color: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.2);
   color: #f87171;
 }
 
 .status-badge.wet-dream {
-  background-color: rgba(251, 191, 36, 0.08);
-  border-color: rgba(251, 191, 36, 0.15);
+  background-color: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.2);
   color: #fbbf24;
 }
 
 /* =============================================================================
-   EDIT DAY MODAL
-   ============================================================================= */
-
-.edit-day-modal {
-  width: 100%;
-  max-width: 400px;
-}
-
-.modal-header-simple {
-  text-align: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.modal-header-simple h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-}
-
-.edit-day-modal p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1.5;
-  margin: 0 0 24px 0;
-  text-align: center;
-}
-
-/* Edit options - stacked buttons */
-.edit-day-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.edit-option-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 150ms ease;
-  border: 1px solid;
-  width: 100%;
-  text-align: left;
-  background-color: transparent;
-  font-family: inherit;
-}
-
-.edit-option-btn svg {
-  font-size: 1rem;
-  opacity: 0.9;
-}
-
-/* Streak button - green */
-.current-streak-btn {
-  background-color: rgba(52, 211, 153, 0.06);
-  color: #34d399;
-  border-color: rgba(52, 211, 153, 0.15);
-}
-
-.current-streak-btn:hover {
-  background-color: rgba(52, 211, 153, 0.12);
-  border-color: rgba(52, 211, 153, 0.25);
-}
-
-/* Wet dream button - amber */
-.wet-dream-btn {
-  background-color: rgba(251, 191, 36, 0.06);
-  color: #fbbf24;
-  border-color: rgba(251, 191, 36, 0.15);
-}
-
-.wet-dream-btn:hover {
-  background-color: rgba(251, 191, 36, 0.12);
-  border-color: rgba(251, 191, 36, 0.25);
-}
-
-/* Relapse button - red */
-.relapse-btn {
-  background-color: rgba(248, 113, 113, 0.06);
-  color: #f87171;
-  border-color: rgba(248, 113, 113, 0.15);
-}
-
-.relapse-btn:hover {
-  background-color: rgba(248, 113, 113, 0.12);
-  border-color: rgba(248, 113, 113, 0.25);
-}
-
-/* =============================================================================
-   TRIGGER SELECTION
-   ============================================================================= */
-
-.trigger-selection {
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-}
-
-.trigger-selection h4 {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 20px 0;
-  text-align: center;
-  letter-spacing: -0.01em;
-}
-
-.trigger-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-
-.trigger-option-pill {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 150ms ease;
-  font-size: 0.8125rem;
-  font-family: inherit;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.trigger-option-pill:hover:not(.selected) {
-  background-color: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.trigger-option-pill.selected {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-}
-
-.trigger-option-icon {
-  font-size: 0.875rem;
-  opacity: 0.8;
-}
-
-.trigger-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.trigger-actions .btn {
-  padding: 12px 32px;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 150ms ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.trigger-actions .btn:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.trigger-actions .btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.trigger-actions .btn-primary {
-  background-color: #ffffff;
-  border-color: #ffffff;
-  color: #000000;
-}
-
-.trigger-actions .btn-primary:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-/* =============================================================================
-   BENEFITS SECTION
+   BENEFITS SECTION - Matches Tracker slider aesthetic
    ============================================================================= */
 
 .day-benefits {
-  margin-top: 24px;
+  margin-bottom: 32px;
+  text-align: left;
 }
 
 .day-benefits h4,
 .day-journal h4 {
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
   font-size: 0.75rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.4);
   text-align: center;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .benefits-details-enhanced {
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .benefit-slider-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .benefit-slider-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .benefit-label {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 400;
   min-width: 90px;
   flex-shrink: 0;
 }
 
+/* Bar matches Tracker's 2px aesthetic */
 .benefit-meter-enhanced {
   flex: 1;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.06);
-  border-radius: 2px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 1px;
   overflow: hidden;
+  position: relative;
 }
 
 .benefit-level-enhanced {
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 2px;
+  background-color: #ffffff;
+  border-radius: 1px;
   transition: width 300ms ease;
 }
 
 .benefit-value-circle {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  color: #ffffff;
+  font-feature-settings: 'tnum' 1;
 }
 
 .benefit-slider-labels {
   display: flex;
   justify-content: space-between;
-  margin-left: 102px;
-  margin-right: 40px;
+  margin-left: 104px;
+  margin-right: 46px;
   font-size: 0.5rem;
   color: rgba(255, 255, 255, 0.2);
-  font-weight: 400;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -487,14 +289,15 @@
    ============================================================================= */
 
 .day-journal {
-  margin-top: 24px;
+  margin-bottom: 32px;
+  text-align: left;
 }
 
 .journal-header-with-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .journal-header-with-actions h4 {
@@ -508,7 +311,7 @@
   padding: 8px 14px;
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
+  border-radius: 8px;
   color: rgba(255, 255, 255, 0.4);
   font-size: 0.75rem;
   font-weight: 500;
@@ -526,7 +329,7 @@
 .journal-entry {
   background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 16px;
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.7);
@@ -542,10 +345,10 @@
 .journal-textarea {
   width: 100%;
   min-height: 120px;
-  padding: 14px;
+  padding: 16px;
   background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border-radius: 12px;
   color: #ffffff;
   font-size: 0.875rem;
   font-family: inherit;
@@ -565,51 +368,52 @@
 
 .journal-edit-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* Save button matches Tracker .btn-primary */
 .journal-save-btn {
   flex: 1;
-  padding: 12px 20px;
+  padding: 14px 20px;
   background-color: #ffffff;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   color: #000000;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: opacity 150ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .journal-save-btn:hover {
   opacity: 0.9;
 }
 
+/* Cancel button matches Tracker .btn-ghost */
 .journal-cancel-btn {
   flex: 1;
-  padding: 12px 20px;
-  background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: color 150ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .journal-cancel-btn:hover {
-  background-color: rgba(255, 255, 255, 0.03);
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -664,28 +468,26 @@
 }
 
 /* =============================================================================
-   MODAL ACTIONS
+   MODAL ACTIONS - Matches Tracker exactly
    ============================================================================= */
 
 .modal-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 12px;
+  margin-top: 40px;
 }
 
-/* Primary button - white */
+/* Primary button - white (matches Tracker .btn-primary) */
 .modal-actions .btn-primary,
 .modal-actions .edit-day-btn {
   width: 100%;
-  padding: 14px 24px;
+  padding: 16px 24px;
   background-color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   color: #000000;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -693,7 +495,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .modal-actions .btn-primary:hover,
@@ -701,24 +503,29 @@
   opacity: 0.9;
 }
 
-/* Outline/Ghost button */
+.modal-actions .btn-primary:active,
+.modal-actions .edit-day-btn:active {
+  transform: scale(0.98);
+}
+
+/* Ghost button (matches Tracker .btn-ghost) */
 .modal-actions .btn-outline,
 .modal-actions .btn-ghost {
   width: 100%;
-  padding: 14px 24px;
-  background-color: transparent;
+  padding: 16px 24px;
+  background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.9375rem;
+  font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   transition: all 150ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .modal-actions .btn-outline:hover,
@@ -729,24 +536,218 @@
 /* Back button */
 .back-to-info-btn {
   width: 100%;
-  padding: 14px 24px;
-  background-color: transparent;
+  padding: 16px 24px;
+  background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   color: rgba(255, 255, 255, 0.4);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: color 150ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .back-to-info-btn:hover {
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* =============================================================================
+   EDIT DAY MODAL
+   ============================================================================= */
+
+.edit-day-modal {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.modal-header-simple {
+  margin-bottom: 8px;
+}
+
+.modal-header-simple h3 {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.edit-day-modal p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+  margin: 0 0 32px 0;
+}
+
+/* Edit options - stacked buttons */
+.edit-day-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.edit-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+  border: 1px solid;
+  width: 100%;
+  text-align: left;
+  background-color: transparent;
+  font-family: inherit;
+}
+
+.edit-option-btn svg {
+  font-size: 1rem;
+}
+
+.edit-option-btn:active {
+  transform: scale(0.98);
+}
+
+/* Streak button - green */
+.current-streak-btn {
+  background-color: rgba(52, 211, 153, 0.08);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+.current-streak-btn:hover {
+  background-color: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+/* Wet dream button - amber */
+.wet-dream-btn {
+  background-color: rgba(251, 191, 36, 0.08);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.2);
+}
+
+.wet-dream-btn:hover {
+  background-color: rgba(251, 191, 36, 0.15);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+/* Relapse button - red */
+.relapse-btn {
+  background-color: rgba(248, 113, 113, 0.08);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.2);
+}
+
+.relapse-btn:hover {
+  background-color: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+/* =============================================================================
+   TRIGGER SELECTION
+   ============================================================================= */
+
+.trigger-selection {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.trigger-selection h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.01em;
+}
+
+.trigger-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.trigger-option-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.trigger-option-pill:hover:not(.selected) {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.trigger-option-pill.selected {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.trigger-option-icon {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+.trigger-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.trigger-actions .btn {
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.trigger-actions .btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.trigger-actions .btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.trigger-actions .btn-primary {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.trigger-actions .btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
 }
 
 /* =============================================================================
@@ -772,12 +773,33 @@
   }
   
   .day-info-modal h3 {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
   }
   
   .status-badge {
-    padding: 8px 14px;
+    padding: 10px 16px;
+    font-size: 0.8125rem;
+  }
+  
+  .benefits-details-enhanced {
+    gap: 18px;
+  }
+  
+  .benefit-label {
+    font-size: 0.8125rem;
+    min-width: 80px;
+  }
+  
+  .benefit-value-circle {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
     font-size: 0.75rem;
+  }
+  
+  .benefit-slider-labels {
+    margin-left: 94px;
+    margin-right: 42px;
   }
   
   .edit-day-options {
@@ -785,8 +807,8 @@
   }
   
   .edit-option-btn {
-    padding: 14px 16px;
-    font-size: 0.8125rem;
+    padding: 14px 18px;
+    font-size: 0.875rem;
   }
   
   .trigger-options {
@@ -796,29 +818,6 @@
   .trigger-option-pill {
     padding: 8px 12px;
     font-size: 0.75rem;
-  }
-  
-  .benefits-details-enhanced {
-    padding: 16px;
-    gap: 14px;
-  }
-  
-  .benefit-label {
-    font-size: 0.75rem;
-    min-width: 75px;
-  }
-  
-  .benefit-value-circle {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    font-size: 0.6875rem;
-  }
-  
-  .benefit-slider-labels {
-    margin-left: 87px;
-    margin-right: 36px;
-    font-size: 0.4375rem;
   }
   
   .journal-benefits-banner {
@@ -831,14 +830,14 @@
   .journal-header-with-actions {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 12px;
   }
   
   .journal-header-with-actions h4 {
     text-align: center;
   }
   
-  .journal-edit-btn {
+  .action-btn {
     align-self: center;
   }
   
@@ -851,14 +850,14 @@
   }
   
   .modal-actions {
-    gap: 8px;
-    margin-top: 24px;
-    padding-top: 20px;
+    gap: 10px;
+    margin-top: 32px;
   }
   
   .modal-actions button,
   .back-to-info-btn {
     padding: 14px 20px;
+    font-size: 0.875rem;
   }
   
   .modal-close-x {
@@ -873,26 +872,64 @@
   }
   
   .day-info-modal h3 {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
   }
   
   .modal-header-simple h3 {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
   }
   
   .status-badge {
-    padding: 8px 12px;
+    padding: 8px 14px;
+    font-size: 0.75rem;
+    border-radius: 10px;
+  }
+  
+  .day-status-info {
+    margin-bottom: 32px;
+  }
+  
+  .day-benefits h4,
+  .day-journal h4 {
+    font-size: 0.6875rem;
+    margin-bottom: 16px;
+  }
+  
+  .benefit-slider-row {
+    gap: 12px;
+  }
+  
+  .benefit-label {
+    font-size: 0.75rem;
+    min-width: 70px;
+  }
+  
+  .benefit-meter-enhanced {
+    height: 2px;
+  }
+  
+  .benefit-value-circle {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
     font-size: 0.6875rem;
   }
   
+  .benefit-slider-labels {
+    margin-left: 82px;
+    margin-right: 38px;
+    font-size: 0.4375rem;
+  }
+  
   .edit-option-btn {
-    padding: 12px 14px;
-    font-size: 0.75rem;
-    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.8125rem;
+    border-radius: 10px;
   }
   
   .trigger-selection {
-    padding: 16px;
+    padding: 20px;
+    border-radius: 14px;
   }
   
   .trigger-selection h4 {
@@ -902,32 +939,7 @@
   .trigger-option-pill {
     padding: 8px 10px;
     font-size: 0.6875rem;
-  }
-  
-  .benefits-details-enhanced {
-    padding: 14px;
-    gap: 12px;
-  }
-  
-  .benefit-label {
-    font-size: 0.6875rem;
-    min-width: 65px;
-  }
-  
-  .benefit-meter-enhanced {
-    height: 3px;
-  }
-  
-  .benefit-value-circle {
-    width: 22px;
-    height: 22px;
-    min-width: 22px;
-    font-size: 0.625rem;
-  }
-  
-  .benefit-slider-labels {
-    margin-left: 77px;
-    margin-right: 34px;
+    border-radius: 8px;
   }
   
   .journal-benefits-helmet {
@@ -945,26 +957,23 @@
   
   .journal-textarea {
     min-height: 80px;
-    padding: 12px;
+    padding: 14px;
     font-size: 0.8125rem;
+    border-radius: 10px;
   }
   
   .journal-save-btn,
   .journal-cancel-btn {
-    padding: 10px 16px;
-    font-size: 0.75rem;
-  }
-  
-  .day-benefits h4,
-  .day-journal h4 {
-    font-size: 0.6875rem;
+    padding: 12px 18px;
+    font-size: 0.8125rem;
+    border-radius: 10px;
   }
   
   .modal-actions button,
   .back-to-info-btn {
-    padding: 12px 16px;
+    padding: 14px 18px;
     font-size: 0.8125rem;
-    border-radius: 8px;
+    border-radius: 10px;
   }
 }
 

@@ -1,4 +1,4 @@
-// components/Calendar/Calendar.js - TITANTRACK MODERN MINIMAL
+// components/Calendar/Calendar.js - TITANTRACK ELITE
 // Two CSS files: CalendarBase.css + CalendarModals.css
 import React, { useState } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
@@ -375,6 +375,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       
       const cellClasses = [
         'week-day-cell',
+        isToday ? 'today-card' : '',
         dayStatus?.type || '',
         wetDream ? 'wet-dream' : ''
       ].filter(Boolean).join(' ');
@@ -670,8 +671,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 <FaEdit />
                 Edit Day
               </button>
-              <button className="btn-outline" onClick={closeDayInfo}>
-                <FaTimes />
+              <button className="btn-ghost" onClick={closeDayInfo}>
                 Close
               </button>
             </div>
@@ -740,8 +740,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 <FaArrowLeft />
                 Back
               </button>
-              <button className="btn-outline" onClick={closeEditModal}>
-                <FaTimes />
+              <button className="btn-ghost" onClick={closeEditModal}>
                 Cancel
               </button>
             </div>

@@ -1,7 +1,7 @@
 /* =============================================================================
-   CALENDAR BASE - TITANTRACK MODERN MINIMAL
-   Pure black, white accents, full space usage, mobile-first
-   Colors aligned with modal files: green/blue/red/amber
+   CALENDAR BASE - TITANTRACK ELITE
+   Matches Landing page radial gradients + Tracker bold minimalism
+   Pure black, white accents, premium visual hierarchy
    ============================================================================= */
 
 .calendar-container {
@@ -12,30 +12,41 @@
   padding-bottom: 120px;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle radial gradient - matches Landing page */
+.calendar-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255, 255, 255, 0.015) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 /* =============================================================================
-   HEADER - Centered, minimal
+   HEADER - Matches Tracker exactly
    ============================================================================= */
 
 .integrated-calendar-header {
   text-align: center;
-  margin-bottom: 24px;
-  background: transparent;
-  border: none;
-  padding: 0;
-  box-shadow: none;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
 }
 
 .header-title-section {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .header-title-section h2 {
   font-size: 1.5rem;
   font-weight: 500;
   color: #ffffff;
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   letter-spacing: -0.02em;
 }
 
@@ -47,41 +58,36 @@
 }
 
 /* =============================================================================
-   VIEW TOGGLE - Month/Week pill switcher
+   VIEW TOGGLE - Premium pill switcher
    ============================================================================= */
 
 .header-navigation-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 
 .calendar-navigation-pills {
   display: inline-flex;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
   padding: 4px;
   gap: 4px;
-  border: none;
-  position: relative;
-}
-
-.calendar-nav-slider {
-  display: none; /* Using CSS active state instead */
 }
 
 .calendar-nav-btn {
-  padding: 10px 24px;
+  padding: 12px 28px;
   background: transparent;
   border: none;
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.4);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all 200ms ease;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -90,51 +96,52 @@
 .calendar-nav-btn.active {
   background: #ffffff;
   color: #000000;
+  font-weight: 600;
 }
 
 .calendar-nav-btn:not(.active):hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .calendar-nav-btn svg {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 /* =============================================================================
-   PERIOD NAVIGATION - Arrows + Month/Week label
+   PERIOD NAVIGATION
    ============================================================================= */
 
 .calendar-period-navigation {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  margin-bottom: 16px;
-  padding: 0;
-  background: transparent;
-  border: none;
+  gap: 24px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .calendar-period-navigation h3 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
   margin: 0;
-  min-width: 200px;
+  min-width: 220px;
   text-align: center;
   letter-spacing: -0.01em;
 }
 
 .period-nav-btn {
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.6);
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.875rem;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all 200ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -142,8 +149,13 @@
 }
 
 .period-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
   color: #ffffff;
+}
+
+.period-nav-btn:active {
+  transform: scale(0.95);
 }
 
 .period-nav-btn svg {
@@ -152,37 +164,25 @@
 }
 
 /* =============================================================================
-   LEGEND - Horizontal, minimal
+   LEGEND - Minimal, horizontal
    ============================================================================= */
 
 .calendar-legend-compact {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
 }
 
 .compact-legend-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 0;
-  background: transparent;
-  cursor: default;
-}
-
-.compact-legend-item:hover {
-  background: transparent;
-  transform: none;
-  box-shadow: none;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .compact-legend-icon {
@@ -190,50 +190,44 @@
   display: flex;
 }
 
-/* Legend colors - matching modal status colors */
 .compact-legend-icon.current-streak { color: #34d399; }
 .compact-legend-icon.former-streak { color: #60a5fa; }
 .compact-legend-icon.relapse { color: #f87171; }
 .compact-legend-icon.wet-dream { color: #fbbf24; }
-.compact-legend-icon.logged-benefits { color: rgba(255, 255, 255, 0.4); }
-.compact-legend-icon.journal { color: rgba(255, 255, 255, 0.4); }
 
 .compact-legend-dot { display: none; }
 
 /* =============================================================================
-   CALENDAR MAIN SECTION
+   CALENDAR MAIN
    ============================================================================= */
 
 .calendar-main-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  box-shadow: none;
+  position: relative;
+  z-index: 1;
 }
 
 /* =============================================================================
-   MONTH VIEW - Calendar Grid
+   MONTH VIEW - Premium Grid
    ============================================================================= */
 
 .calendar-display {
-  background: transparent;
-  border: none;
-  border-radius: 0;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 16px;
   overflow: visible;
 }
 
 .calendar-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
 }
 
 .header-row {
-  background: transparent;
-  border: none;
   margin-bottom: 8px;
 }
 
@@ -241,191 +235,57 @@
   padding: 12px 4px;
   text-align: center;
   font-size: 0.6875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.35);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
-/* Day cells */
+/* Day cells - substantial, tappable */
 .day-cell {
   position: relative;
   aspect-ratio: 1;
-  min-height: 52px;
+  min-height: 56px;
   cursor: pointer;
-  transition: background-color 150ms ease;
+  transition: all 200ms ease;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  padding: 6px;
+  padding: 8px;
   background: transparent;
   border: none;
-  border-radius: 8px;
-  margin: 2px;
+  border-radius: 12px;
 }
 
 .day-cell:hover {
   background: rgba(255, 255, 255, 0.04);
 }
 
+.day-cell:active {
+  transform: scale(0.96);
+}
+
 /* Day number */
 .day-number {
-  font-size: 0.875rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
   font-feature-settings: 'tnum' 1;
   line-height: 1;
+  transition: all 200ms ease;
 }
 
 .day-cell.other-month .day-number {
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.15);
 }
 
-/* Today - white circle */
+/* TODAY - Bold white circle that POPS */
+.day-cell.today {
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .day-cell.today .day-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: #ffffff;
-  color: #000000;
-  border-radius: 50%;
-  font-weight: 600;
-  font-size: 0.8125rem;
-}
-
-/* Status indicators - subtle left border on cell */
-.day-cell.current-streak {
-  border-left: 2px solid #34d399;
-  border-radius: 0 8px 8px 0;
-}
-
-.day-cell.former-streak {
-  border-left: 2px solid #60a5fa;
-  border-radius: 0 8px 8px 0;
-}
-
-.day-cell.relapse {
-  border-left: 2px solid #f87171;
-  border-radius: 0 8px 8px 0;
-}
-
-.day-cell.wet-dream {
-  border-left: 2px solid #fbbf24;
-  border-radius: 0 8px 8px 0;
-}
-
-/* Day indicators - bottom right icons */
-.day-indicators {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  display: flex;
-  gap: 3px;
-  font-size: 0.625rem;
-}
-
-.day-status-indicator,
-.day-tracking-indicator,
-.day-wet-dream-indicator {
-  display: flex;
-}
-
-/* Icon colors */
-.success-icon { color: #34d399; }
-.relapse-icon { color: #f87171; }
-.wet-dream-icon { color: #fbbf24; }
-.tracking-icon { color: rgba(255, 255, 255, 0.3); }
-
-/* Former streak icon (blue) */
-.day-cell.former-streak .success-icon {
-  color: #60a5fa;
-}
-
-/* Journal indicator top-left */
-.day-journal-indicator-top {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  font-size: 0.5625rem;
-  color: rgba(255, 255, 255, 0.25);
-}
-
-/* Hide old content wrapper if present */
-.day-content {
-  display: contents;
-}
-
-/* =============================================================================
-   WEEK VIEW - Horizontal cards on desktop, stacked on mobile
-   ============================================================================= */
-
-.week-view-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-}
-
-.week-day-cell {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 16px 12px;
-  cursor: pointer;
-  transition: all 150ms ease;
-  display: flex;
-  flex-direction: column;
-  min-height: 140px;
-}
-
-.week-day-cell:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Status borders for week cards */
-.week-day-cell.current-streak {
-  border-left: 2px solid #34d399;
-}
-
-.week-day-cell.former-streak {
-  border-left: 2px solid #60a5fa;
-}
-
-.week-day-cell.relapse {
-  border-left: 2px solid #f87171;
-}
-
-.week-day-cell.wet-dream {
-  border-left: 2px solid #fbbf24;
-}
-
-/* Week day header */
-.week-day-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 12px;
-}
-
-.week-day-name {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.week-day-number {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: #ffffff;
-  font-feature-settings: 'tnum' 1;
-}
-
-.week-day-number.today {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -434,57 +294,236 @@
   background: #ffffff;
   color: #000000;
   border-radius: 50%;
+  font-weight: 700;
   font-size: 0.875rem;
-  font-weight: 600;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
 }
 
-/* Week benefit bars */
+/* STATUS - Left accent bars with subtle glow */
+.day-cell.current-streak {
+  background: linear-gradient(90deg, rgba(52, 211, 153, 0.08) 0%, transparent 50%);
+  border-left: 3px solid #34d399;
+  border-radius: 0 12px 12px 0;
+}
+
+.day-cell.current-streak .day-number {
+  color: #34d399;
+}
+
+.day-cell.former-streak {
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.06) 0%, transparent 50%);
+  border-left: 3px solid #60a5fa;
+  border-radius: 0 12px 12px 0;
+}
+
+.day-cell.former-streak .day-number {
+  color: #60a5fa;
+}
+
+.day-cell.relapse {
+  background: linear-gradient(90deg, rgba(248, 113, 113, 0.08) 0%, transparent 50%);
+  border-left: 3px solid #f87171;
+  border-radius: 0 12px 12px 0;
+}
+
+.day-cell.relapse .day-number {
+  color: #f87171;
+}
+
+.day-cell.wet-dream {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.08) 0%, transparent 50%);
+  border-left: 3px solid #fbbf24;
+  border-radius: 0 12px 12px 0;
+}
+
+/* Preserve today styling when combined with status */
+.day-cell.today.current-streak .day-number,
+.day-cell.today.former-streak .day-number,
+.day-cell.today.relapse .day-number {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* Day indicators - bottom right */
+.day-indicators {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  font-size: 0.625rem;
+}
+
+.day-status-indicator,
+.day-tracking-indicator,
+.day-wet-dream-indicator {
+  display: flex;
+  opacity: 0.8;
+}
+
+.success-icon { color: #34d399; }
+.relapse-icon { color: #f87171; }
+.wet-dream-icon { color: #fbbf24; }
+.tracking-icon { color: rgba(255, 255, 255, 0.25); }
+
+.day-cell.former-streak .success-icon {
+  color: #60a5fa;
+}
+
+/* Journal indicator */
+.day-journal-indicator-top {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.day-content {
+  display: contents;
+}
+
+/* =============================================================================
+   WEEK VIEW - Premium Cards
+   ============================================================================= */
+
+.week-view-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.week-day-cell {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 200ms ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 180px;
+  position: relative;
+}
+
+.week-day-cell:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.week-day-cell:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Today's card - elevated */
+.week-day-cell.today-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 24px rgba(255, 255, 255, 0.03);
+}
+
+/* Status accents for week cards */
+.week-day-cell.current-streak {
+  border-left: 3px solid #34d399;
+  background: linear-gradient(90deg, rgba(52, 211, 153, 0.04) 0%, rgba(255, 255, 255, 0.02) 30%);
+}
+
+.week-day-cell.former-streak {
+  border-left: 3px solid #60a5fa;
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.04) 0%, rgba(255, 255, 255, 0.02) 30%);
+}
+
+.week-day-cell.relapse {
+  border-left: 3px solid #f87171;
+  background: linear-gradient(90deg, rgba(248, 113, 113, 0.04) 0%, rgba(255, 255, 255, 0.02) 30%);
+}
+
+.week-day-cell.wet-dream {
+  border-left: 3px solid #fbbf24;
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.04) 0%, rgba(255, 255, 255, 0.02) 30%);
+}
+
+/* Week day header */
+.week-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.week-day-name {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.week-day-number {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  font-feature-settings: 'tnum' 1;
+  line-height: 1;
+}
+
+/* Today number in week view */
+.week-day-number.today {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.12);
+}
+
+/* Week benefit bars - matches Tracker slider aesthetic */
 .week-benefits-prominent {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .week-benefit-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .week-benefit-label-top {
   font-size: 0.5625rem;
-  font-weight: 500;
+  font-weight: 600;
   color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
 }
 
+/* Bar matches Tracker's 2px white aesthetic */
 .week-benefit-bar {
-  height: 3px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
   overflow: hidden;
 }
 
 .week-benefit-fill {
   height: 100%;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 2px;
+  background: #ffffff;
+  border-radius: 1px;
   transition: width 300ms ease;
 }
 
-/* Remove thumb dot */
-.week-benefit-fill::after {
-  display: none;
-}
-
 /* Week empty state */
-.week-day-cell .week-benefits-prominent:empty::after,
 .week-no-data {
-  content: 'No data';
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.15);
   text-align: center;
   flex: 1;
   display: flex;
@@ -497,16 +536,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   font-size: 0.6875rem;
 }
 
 .week-indicator-left {
   display: flex;
-  gap: 6px;
-  color: rgba(255, 255, 255, 0.3);
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.2);
 }
 
 .week-indicator-right {
@@ -518,37 +557,8 @@
 .week-indicator-right .relapse-icon { color: #f87171; }
 .week-indicator-right .wet-dream-icon { color: #fbbf24; }
 
-/* Former in week view */
 .week-day-cell.former-streak .week-indicator-right .success-icon {
   color: #60a5fa;
-}
-
-/* =============================================================================
-   MODAL CLOSE BUTTON - Consistent with modals
-   ============================================================================= */
-
-.modal-close-x {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  transition: all 150ms ease;
-  z-index: 10;
-  padding: 0;
-}
-
-.modal-close-x:hover {
-  color: rgba(255, 255, 255, 0.7);
-  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* =============================================================================
@@ -561,8 +571,12 @@
     padding-bottom: 100px;
   }
   
+  .integrated-calendar-header {
+    margin-bottom: 24px;
+  }
+  
   .header-title-section h2 {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
   }
   
   .header-subtitle {
@@ -570,26 +584,28 @@
   }
   
   .calendar-nav-btn {
-    padding: 10px 20px;
+    padding: 10px 22px;
     font-size: 0.8125rem;
   }
   
   .calendar-period-navigation {
     gap: 16px;
+    margin-bottom: 20px;
   }
   
   .calendar-period-navigation h3 {
-    font-size: 1rem;
-    min-width: 160px;
+    font-size: 1.0625rem;
+    min-width: 180px;
   }
   
   .period-nav-btn {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
   
   .calendar-legend-compact {
     gap: 16px;
+    margin-bottom: 20px;
   }
   
   .compact-legend-item {
@@ -597,79 +613,81 @@
   }
   
   /* Month view mobile */
+  .calendar-display {
+    padding: 12px;
+    border-radius: 14px;
+  }
+  
   .day-header {
-    padding: 8px 2px;
+    padding: 10px 2px;
     font-size: 0.625rem;
   }
   
   .day-cell {
-    min-height: 48px;
-    padding: 4px;
-    margin: 1px;
+    min-height: 50px;
+    padding: 6px;
+    border-radius: 10px;
   }
   
   .day-number {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
   }
   
   .day-cell.today .day-number {
-    width: 24px;
-    height: 24px;
-    font-size: 0.75rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.8125rem;
   }
   
   .day-indicators {
     font-size: 0.5625rem;
-    gap: 2px;
-    bottom: 2px;
-    right: 2px;
-  }
-  
-  .day-journal-indicator-top {
-    font-size: 0.5rem;
+    gap: 3px;
+    bottom: 4px;
+    right: 4px;
   }
   
   /* Week view mobile - FULL WIDTH STACKED */
   .week-view-grid {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 10px;
   }
   
   .week-day-cell {
     flex-direction: row;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
     min-height: auto;
-    padding: 14px 16px;
+    padding: 16px 18px;
+    border-radius: 14px;
   }
   
   .week-day-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
+    gap: 4px;
     margin-bottom: 0;
-    min-width: 48px;
+    min-width: 56px;
   }
   
   .week-day-number {
-    font-size: 1.25rem;
+    font-size: 1.75rem;
   }
   
   .week-day-number.today {
-    width: 36px;
-    height: 36px;
-    font-size: 0.9375rem;
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
   }
   
   .week-benefits-prominent {
     flex: 1;
-    gap: 6px;
+    gap: 10px;
   }
   
   .week-benefit-item {
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
   
   .week-benefit-label-top {
@@ -679,18 +697,18 @@
   
   .week-benefit-bar {
     flex: 1;
-    height: 4px;
+    height: 3px;
   }
   
   .week-day-indicators {
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     margin-top: 0;
     padding-top: 0;
-    padding-left: 12px;
+    padding-left: 16px;
     border-top: none;
-    border-left: 1px solid rgba(255, 255, 255, 0.06);
-    min-width: 40px;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    min-width: 44px;
   }
   
   .week-indicator-left,
@@ -706,65 +724,90 @@
   }
   
   .header-title-section h2 {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
+  }
+  
+  .calendar-navigation-pills {
+    border-radius: 10px;
   }
   
   .calendar-nav-btn {
-    padding: 8px 16px;
+    padding: 10px 18px;
     font-size: 0.75rem;
+    border-radius: 8px;
   }
   
   .calendar-period-navigation h3 {
-    font-size: 0.9375rem;
-    min-width: 140px;
+    font-size: 1rem;
+    min-width: 150px;
   }
   
   .period-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
   }
   
   .calendar-legend-compact {
-    gap: 12px;
+    gap: 10px;
   }
   
   .compact-legend-item {
     font-size: 0.625rem;
-    gap: 4px;
+    gap: 5px;
+  }
+  
+  .calendar-display {
+    padding: 10px;
+    border-radius: 12px;
+  }
+  
+  .calendar-row {
+    gap: 2px;
   }
   
   .day-header {
-    padding: 6px 2px;
+    padding: 8px 2px;
     font-size: 0.5625rem;
   }
   
   .day-cell {
-    min-height: 44px;
-    padding: 3px;
+    min-height: 46px;
+    padding: 5px;
+    border-radius: 8px;
   }
   
   .day-number {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
   }
   
   .day-cell.today .day-number {
-    width: 22px;
-    height: 22px;
-    font-size: 0.6875rem;
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
   }
   
   .day-indicators {
     font-size: 0.5rem;
+    bottom: 3px;
+    right: 3px;
+  }
+  
+  .day-journal-indicator-top {
+    font-size: 0.4375rem;
+    top: 3px;
+    right: 3px;
   }
   
   /* Week view very small */
   .week-day-cell {
-    padding: 12px 14px;
-    gap: 12px;
+    padding: 14px 16px;
+    gap: 16px;
+    border-radius: 12px;
   }
   
   .week-day-header {
-    min-width: 44px;
+    min-width: 48px;
   }
   
   .week-day-name {
@@ -772,13 +815,13 @@
   }
   
   .week-day-number {
-    font-size: 1.125rem;
+    font-size: 1.5rem;
   }
   
   .week-day-number.today {
-    width: 32px;
-    height: 32px;
-    font-size: 0.875rem;
+    width: 38px;
+    height: 38px;
+    font-size: 0.9375rem;
   }
   
   .week-benefit-label-top {
@@ -787,8 +830,47 @@
   }
   
   .week-benefit-bar {
-    height: 3px;
+    height: 2px;
   }
+  
+  .week-day-indicators {
+    padding-left: 12px;
+    min-width: 38px;
+  }
+}
+
+/* =============================================================================
+   ANIMATIONS - Entrance effects matching Landing
+   ============================================================================= */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.integrated-calendar-header {
+  animation: fadeInUp 500ms ease forwards;
+}
+
+.calendar-period-navigation {
+  animation: fadeInUp 500ms ease 50ms forwards;
+  opacity: 0;
+}
+
+.calendar-legend-compact {
+  animation: fadeInUp 500ms ease 100ms forwards;
+  opacity: 0;
+}
+
+.calendar-main-section {
+  animation: fadeInUp 500ms ease 150ms forwards;
+  opacity: 0;
 }
 
 /* =============================================================================
@@ -796,6 +878,14 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  .integrated-calendar-header,
+  .calendar-period-navigation,
+  .calendar-legend-compact,
+  .calendar-main-section {
+    animation: none;
+    opacity: 1;
+  }
+  
   .calendar-nav-btn,
   .period-nav-btn,
   .day-cell,
