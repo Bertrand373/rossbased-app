@@ -1,11 +1,19 @@
 /* Tracker.css - TITANTRACK */
 
 .tracker {
-  min-height: calc(100vh - 130px);
+  /* Take full height, center everything */
+  min-height: calc(100dvh - 56px - 80px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8vh 24px 0 24px;
+  justify-content: center;
+  padding: 0 24px;
+}
+
+@media (min-width: 1025px) {
+  .tracker {
+    min-height: calc(100dvh - 64px - 32px);
+  }
 }
 
 /* ============================================================
@@ -79,7 +87,7 @@
    ============================================================ */
 
 .tracker-footer {
-  padding: 40px 24px 24px 24px;
+  padding: 32px 24px 0 24px;
   max-width: 360px;
   width: 100%;
 }
@@ -557,10 +565,6 @@
    ============================================================ */
 
 @media (min-width: 768px) {
-  .tracker {
-    padding: 12vh 32px 0 32px;
-  }
-  
   .streak-num {
     font-size: 10rem;
   }
@@ -574,17 +578,13 @@
   }
   
   .tracker-footer {
-    padding: 48px 32px 32px 32px;
+    padding: 40px 32px 0 32px;
   }
 }
 
 @media (max-width: 480px) {
-  .tracker {
-    padding: 6vh 20px 0 20px;
-  }
-  
   .streak-num {
-    font-size: 7.5rem;
+    font-size: 7rem;
   }
   
   .date {
@@ -598,7 +598,7 @@
   }
   
   .tracker-footer {
-    padding: 32px 20px 20px 20px;
+    padding: 24px 20px 0 20px;
   }
   
   .btn-primary,
@@ -632,12 +632,8 @@
 
 /* Short screens */
 @media (max-height: 700px) {
-  .tracker {
-    padding-top: 4vh;
-  }
-  
   .streak-num {
-    font-size: 7rem;
+    font-size: 6rem;
   }
   
   .date {
@@ -649,32 +645,28 @@
   }
   
   .tracker-footer {
-    padding-top: 24px;
+    padding-top: 20px;
   }
 }
 
 /* Very short screens */
 @media (max-height: 600px) {
-  .tracker {
-    padding-top: 2vh;
-  }
-  
   .streak-num {
-    font-size: 6rem;
+    font-size: 5rem;
   }
   
   .date {
     font-size: 0.6875rem;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   
   .milestone {
-    margin-top: 10px;
+    margin-top: 6px;
     font-size: 0.6875rem;
   }
   
   .tracker-footer {
-    padding: 16px;
+    padding-top: 16px;
   }
   
   .btn-primary,
@@ -686,10 +678,9 @@
 /* Landscape */
 @media (max-height: 500px) and (orientation: landscape) {
   .tracker {
-    min-height: auto;
-    padding: 16px;
+    height: auto;
+    min-height: calc(100vh - 60px);
     flex-direction: row;
-    justify-content: center;
     gap: 32px;
   }
   
@@ -700,11 +691,6 @@
   .tracker-footer {
     padding: 0;
     max-width: 200px;
-  }
-  
-  .btn-primary,
-  .btn-logged {
-    flex: 1;
   }
 }
 
