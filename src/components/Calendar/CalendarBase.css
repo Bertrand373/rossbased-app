@@ -242,8 +242,7 @@
 }
 
 /* =============================================================================
-   DAY CELLS - IMPROVED VISUAL ASSOCIATION
-   Background tints + bottom accent bar for clear status indication
+   DAY CELLS - Background tints + bottom bar
    ============================================================================= */
 
 .day-cell {
@@ -288,7 +287,7 @@
 }
 
 /* =============================================================================
-   TODAY - Bold white circle that POPS
+   TODAY - Bold white circle
    ============================================================================= */
 
 .day-cell.today {
@@ -311,7 +310,6 @@
 
 /* =============================================================================
    STATUS CELLS - Background tint + bottom accent bar
-   Using subtle fills that clearly associate with the cell
    ============================================================================= */
 
 /* Current Streak - Green */
@@ -383,7 +381,7 @@
   background: rgba(248, 113, 113, 0.12);
 }
 
-/* Wet Dream - Amber/Yellow */
+/* Wet Dream - Amber */
 .day-cell.wet-dream {
   background: rgba(251, 191, 36, 0.08);
 }
@@ -406,7 +404,6 @@
    TODAY + STATUS COMBINATIONS
    ============================================================================= */
 
-/* Today with current streak */
 .day-cell.today.current-streak {
   background: rgba(52, 211, 153, 0.1);
 }
@@ -416,7 +413,6 @@
   color: #000000;
 }
 
-/* Today with former streak */
 .day-cell.today.former-streak {
   background: rgba(96, 165, 250, 0.1);
 }
@@ -426,7 +422,6 @@
   color: #000000;
 }
 
-/* Today with relapse */
 .day-cell.today.relapse {
   background: rgba(248, 113, 113, 0.1);
 }
@@ -436,7 +431,6 @@
   color: #000000;
 }
 
-/* Today with wet dream */
 .day-cell.today.wet-dream {
   background: rgba(251, 191, 36, 0.1);
 }
@@ -447,74 +441,85 @@
 }
 
 /* =============================================================================
-   DAY INDICATORS - Positioned clearly within cells
+   DAY INDICATORS CONTAINER
    ============================================================================= */
 
 .day-indicators {
-  position: absolute;
-  bottom: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 4px;
-  font-size: 0.5625rem;
-  z-index: 3;
+  display: none;
 }
 
-/* Hide status icons since background tint + bar handles this */
+/* Hide all default status indicators - we use tints instead */
 .day-status-indicator {
   display: none;
 }
 
-/* Tracking indicator (benefits logged) */
+/* =============================================================================
+   BENEFITS LOGGED - Gold dot in top-right corner
+   ============================================================================= */
+
 .day-tracking-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
-  opacity: 0.8;
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  display: block !important;
+  width: 6px !important;
+  height: 6px !important;
+  background: #fbbf24 !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.6) !important;
+  z-index: 10 !important;
 }
 
-.tracking-icon { 
-  color: rgba(255, 255, 255, 0.4); 
-  font-size: 0.4rem;
+/* Hide the icon inside - just the dot */
+.day-tracking-indicator .tracking-icon,
+.tracking-icon {
+  display: none !important;
 }
 
-/* Wet dream indicator - IMPROVED VISIBILITY */
+/* =============================================================================
+   WET DREAM INDICATOR - Larger, visible moon
+   ============================================================================= */
+
 .day-wet-dream-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 14px;
-  height: 14px;
-  background: rgba(251, 191, 36, 0.2);
-  border-radius: 50%;
+  position: absolute !important;
+  bottom: 6px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  top: auto !important;
+  right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 18px !important;
+  height: 18px !important;
+  background: rgba(251, 191, 36, 0.25) !important;
+  border-radius: 50% !important;
+  z-index: 10 !important;
 }
 
 .wet-dream-icon { 
-  color: #fbbf24; 
-  font-size: 0.5rem;
+  color: #fbbf24 !important; 
+  font-size: 0.625rem !important;
 }
 
-/* Success/relapse icons (hidden by default - status shown via tint) */
-.success-icon { color: #34d399; }
-.relapse-icon { color: #f87171; }
+/* Success/relapse icons hidden */
+.success-icon { color: #34d399; display: none; }
+.relapse-icon { color: #f87171; display: none; }
 
-.day-cell.former-streak .success-icon {
-  color: #60a5fa;
-}
+/* =============================================================================
+   JOURNAL INDICATOR - Top left, subtle book icon
+   ============================================================================= */
 
-/* Journal indicator - top right corner */
 .day-journal-indicator-top {
   position: absolute;
   top: 4px;
-  right: 4px;
-  font-size: 0.4375rem;
-  color: rgba(255, 255, 255, 0.25);
-  z-index: 3;
+  left: 4px;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.4);
+  z-index: 10;
 }
 
 .day-content {
@@ -684,7 +689,7 @@
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.6875rem;
+  font-size: 0.875rem;
 }
 
 .week-indicator-left {
@@ -695,12 +700,25 @@
 
 .week-indicator-right {
   display: flex;
-  gap: 6px;
+  gap: 8px;
+  font-size: 1rem;
 }
 
-.week-indicator-right .success-icon { color: #34d399; }
-.week-indicator-right .relapse-icon { color: #f87171; }
-.week-indicator-right .wet-dream-icon { color: #fbbf24; }
+.week-indicator-right .success-icon { 
+  color: #34d399; 
+  display: inline-block;
+}
+
+.week-indicator-right .relapse-icon { 
+  color: #f87171; 
+  display: inline-block;
+}
+
+.week-indicator-right .wet-dream-icon { 
+  color: #fbbf24; 
+  font-size: 1rem;
+  display: inline-block !important;
+}
 
 .week-day-cell.former-streak .week-indicator-right .success-icon {
   color: #60a5fa;
@@ -788,7 +806,7 @@
     font-size: 0.8125rem;
   }
   
-  /* Status bar smaller on mobile */
+  /* Status bar on mobile */
   .day-cell.current-streak::after,
   .day-cell.former-streak::after,
   .day-cell.relapse::after,
@@ -796,33 +814,32 @@
     height: 2px;
   }
   
-  .day-indicators {
-    font-size: 0.5rem;
-    gap: 3px;
-    bottom: 5px;
-  }
-  
+  /* Benefits dot mobile */
   .day-tracking-indicator {
-    width: 10px;
-    height: 10px;
+    width: 5px !important;
+    height: 5px !important;
+    top: 3px !important;
+    right: 3px !important;
   }
   
+  /* Wet dream indicator mobile */
   .day-wet-dream-indicator {
-    width: 12px;
-    height: 12px;
+    width: 16px !important;
+    height: 16px !important;
+    bottom: 5px !important;
   }
   
   .wet-dream-icon {
-    font-size: 0.4375rem;
+    font-size: 0.5625rem !important;
   }
   
   .day-journal-indicator-top {
-    font-size: 0.375rem;
-    top: 2px;
-    right: 2px;
+    font-size: 0.4375rem;
+    top: 3px;
+    left: 3px;
   }
   
-  /* Week view mobile - FULL WIDTH STACKED */
+  /* Week view mobile */
   .week-view-grid {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -885,11 +902,16 @@
     border-top: none;
     border-left: 1px solid rgba(255, 255, 255, 0.05);
     min-width: 44px;
+    font-size: 1.125rem;
   }
   
   .week-indicator-left,
   .week-indicator-right {
     justify-content: center;
+  }
+  
+  .week-indicator-right {
+    font-size: 1.125rem;
   }
 }
 
@@ -933,7 +955,7 @@
     gap: 5px;
   }
   
-  /* Calendar grid - maximum width usage */
+  /* Calendar grid */
   .calendar-display {
     padding: 8px 4px;
     border-radius: 12px;
@@ -971,37 +993,32 @@
     height: 2px;
   }
   
-  .day-indicators {
-    font-size: 0.4375rem;
-    bottom: 4px;
-    gap: 2px;
-  }
-  
+  /* Benefits dot small screens */
   .day-tracking-indicator {
-    width: 8px;
-    height: 8px;
+    width: 4px !important;
+    height: 4px !important;
+    top: 2px !important;
+    right: 2px !important;
   }
   
+  /* Wet dream indicator small screens */
   .day-wet-dream-indicator {
-    width: 10px;
-    height: 10px;
-  }
-  
-  .tracking-icon {
-    font-size: 0.3rem;
+    width: 14px !important;
+    height: 14px !important;
+    bottom: 4px !important;
   }
   
   .wet-dream-icon {
-    font-size: 0.375rem;
+    font-size: 0.5rem !important;
   }
   
   .day-journal-indicator-top {
     font-size: 0.375rem;
-    top: 1px;
-    right: 1px;
+    top: 2px;
+    left: 2px;
   }
   
-  /* Week view very small */
+  /* Week view small */
   .week-day-cell {
     padding: 14px 16px;
     gap: 16px;
@@ -1042,7 +1059,7 @@
 }
 
 /* =============================================================================
-   ANIMATIONS - Entrance effects matching Landing
+   ANIMATIONS
    ============================================================================= */
 
 @keyframes fadeInUp {

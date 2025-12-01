@@ -1,11 +1,11 @@
 /* =============================================================================
    CALENDAR MODALS - TITANTRACK ELITE
    MATCHES Tracker modal aesthetic EXACTLY
-   Immersive overlay, floating content, white primary buttons
+   Transparent floating content over dark overlay - NO card backgrounds
    ============================================================================= */
 
 /* =============================================================================
-   OVERLAY - Matches Tracker .overlay exactly
+   OVERLAY - Dark immersive backdrop (matches Tracker .overlay)
    ============================================================================= */
 
 .modal-overlay {
@@ -41,7 +41,8 @@
 }
 
 /* =============================================================================
-   MODAL CONTENT - Floating, transparent (matches Tracker exactly)
+   MODAL CONTENT - TRANSPARENT, floating (matches Tracker .modal)
+   NO background color, NO border, NO box effect
    ============================================================================= */
 
 .modal-content {
@@ -50,7 +51,10 @@
   max-height: calc(100vh - 120px);
   max-height: calc(100dvh - 120px);
   overflow-y: auto;
-  background-color: transparent;
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   padding: 0;
   position: relative;
   flex-shrink: 0;
@@ -76,7 +80,7 @@
 }
 
 /* =============================================================================
-   CLOSE BUTTON - Subtle, top right
+   CLOSE BUTTON - Subtle X in corner
    ============================================================================= */
 
 .modal-close-x {
@@ -104,13 +108,16 @@
 }
 
 /* =============================================================================
-   DAY INFO MODAL - Matches Tracker modal styling
+   DAY INFO MODAL - TRANSPARENT floating content
    ============================================================================= */
 
 .day-info-modal {
   width: 100%;
   max-width: 380px;
   text-align: center;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .day-info-modal h3 {
@@ -168,7 +175,7 @@
   font-size: 0.8125rem;
 }
 
-/* Status colors - match grid styling */
+/* Status colors */
 .status-badge.current-streak {
   background-color: rgba(52, 211, 153, 0.1);
   border-color: rgba(52, 211, 153, 0.2);
@@ -239,7 +246,7 @@
   flex-shrink: 0;
 }
 
-/* Bar matches Tracker's 2px aesthetic */
+/* White progress bar - matches Tracker */
 .benefit-meter-enhanced {
   flex: 1;
   height: 2px;
@@ -371,7 +378,7 @@
   gap: 12px;
 }
 
-/* Save button - Matches Tracker .btn-primary EXACTLY */
+/* Save button - WHITE (matches Tracker .btn-primary) */
 .journal-save-btn {
   flex: 1;
   padding: 14px 20px;
@@ -398,7 +405,7 @@
   transform: scale(0.98);
 }
 
-/* Cancel button - Matches Tracker .btn-ghost EXACTLY */
+/* Cancel button - ghost (matches Tracker .btn-ghost) */
 .journal-cancel-btn {
   flex: 1;
   padding: 14px 20px;
@@ -482,7 +489,7 @@
   margin-top: 40px;
 }
 
-/* Primary button - WHITE (matches Tracker .btn-primary) */
+/* Primary button - WHITE */
 .modal-actions .btn-primary,
 .modal-actions .edit-day-btn {
   width: 100%;
@@ -512,7 +519,7 @@
   transform: scale(0.98);
 }
 
-/* Ghost button - Matches Tracker .btn-ghost */
+/* Ghost button */
 .modal-actions .btn-outline,
 .modal-actions .btn-ghost {
   width: 100%;
@@ -561,13 +568,16 @@
 }
 
 /* =============================================================================
-   EDIT DAY MODAL
+   EDIT DAY MODAL - TRANSPARENT
    ============================================================================= */
 
 .edit-day-modal {
   width: 100%;
   max-width: 360px;
   text-align: center;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .modal-header-simple {
@@ -589,7 +599,7 @@
   margin: 0 0 32px 0;
 }
 
-/* Edit options - stacked buttons */
+/* Edit options */
 .edit-day-options {
   display: flex;
   flex-direction: column;
@@ -722,7 +732,6 @@
   margin-top: 24px;
 }
 
-/* Trigger confirm button - matches Tracker */
 .trigger-actions .btn {
   padding: 14px 32px;
   border-radius: 12px;
