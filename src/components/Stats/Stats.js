@@ -1,5 +1,5 @@
 // Stats.js - TITANTRACK REFINED
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
@@ -47,6 +47,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [showResetModal, setShowResetModal] = useState(false);
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
+  const [chartKey, setChartKey] = useState(0);
   
   const [loadingStates, setLoadingStates] = useState({
     progressTrends: true,
@@ -56,7 +57,14 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     phaseEvolution: true
   });
 
+  const chartRef = useRef(null);
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
+
+  // Trigger chart re-render for gradient
+  useEffect(() => {
+    const timer = setTimeout(() => setChartKey(prev => prev + 1), 100);
+    return () => clearTimeout(timer);
+  }, [selectedMetric, timeRange]);
 
   useEffect(() => {
     if (isPremium) {
@@ -103,39 +111,116 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     ];
   }, [safeUserData]);
 
+  // Elite chart configuration
   const chartOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: { top: 4, right: 4, bottom: 0, left: 0 }
+    },
     scales: {
       y: {
         min: 0,
         max: 10,
-        ticks: { stepSize: 5, color: 'rgba(255,255,255,0.2)', font: { size: 10 } },
-        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+        ticks: { 
+          stepSize: 5, 
+          color: 'rgba(255,255,255,0.15)', 
+          font: { size: 10, weight: '400' },
+          padding: 8
+        },
+        grid: { 
+          color: 'rgba(255,255,255,0.03)', 
+          drawBorder: false
+        },
         border: { display: false }
       },
       x: {
-        ticks: { color: 'rgba(255,255,255,0.2)', font: { size: 10 }, maxRotation: 0, maxTicksLimit: 7 },
+        ticks: { 
+          color: 'rgba(255,255,255,0.15)', 
+          font: { size: 9, weight: '400' }, 
+          maxRotation: 0, 
+          maxTicksLimit: timeRange === 'quarter' ? 5 : 7,
+          padding: 4
+        },
         grid: { display: false },
         border: { display: false }
+      }
+    },
+    elements: {
+      line: {
+        tension: 0.4,
+        borderWidth: 2,
+        borderCapStyle: 'round',
+        borderJoinStyle: 'round'
+      },
+      point: {
+        radius: 0,
+        hoverRadius: 6,
+        hoverBorderWidth: 2,
+        hitRadius: 30
       }
     },
     plugins: {
       legend: { display: false },
       tooltip: {
+        enabled: true,
         backgroundColor: 'rgba(0,0,0,0.9)',
-        titleColor: '#fff',
-        bodyColor: 'rgba(255,255,255,0.7)',
-        borderColor: 'rgba(255,255,255,0.1)',
+        titleColor: 'rgba(255,255,255,0.5)',
+        titleFont: { size: 10, weight: '400' },
+        bodyColor: '#ffffff',
+        bodyFont: { size: 16, weight: '600' },
+        borderColor: 'rgba(255,255,255,0.08)',
         borderWidth: 1,
         cornerRadius: 8,
-        padding: 12,
+        padding: { top: 8, right: 12, bottom: 8, left: 12 },
         displayColors: false,
-        callbacks: { label: (ctx) => ctx.parsed.y === null ? '' : `${ctx.parsed.y}/10` }
+        caretSize: 0,
+        caretPadding: 10,
+        callbacks: { 
+          title: (items) => items.length ? items[0].label : '',
+          label: (ctx) => ctx.parsed.y === null ? '' : `${ctx.parsed.y}`
+        }
       }
     },
-    interaction: { mode: 'index', intersect: false }
-  }), []);
+    interaction: { 
+      mode: 'index', 
+      intersect: false,
+      axis: 'x'
+    },
+    animation: {
+      duration: 400,
+      easing: 'easeOutQuart'
+    }
+  }), [timeRange]);
+
+  // Generate chart data with gradient fill
+  const getChartData = useCallback(() => {
+    const rawData = generateChartData(safeUserData, selectedMetric, timeRange);
+    const chart = chartRef.current;
+    
+    let gradient = 'rgba(255,255,255,0.06)';
+    
+    if (chart?.ctx && chart?.chartArea) {
+      gradient = chart.ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
+      gradient.addColorStop(0, 'rgba(255,255,255,0.1)');
+      gradient.addColorStop(0.6, 'rgba(255,255,255,0.02)');
+      gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    }
+    
+    return {
+      ...rawData,
+      datasets: [{
+        ...rawData.datasets[0],
+        borderColor: '#ffffff',
+        backgroundColor: gradient,
+        fill: true,
+        pointBackgroundColor: '#ffffff',
+        pointBorderColor: '#000000',
+        pointHoverBackgroundColor: '#ffffff',
+        pointHoverBorderColor: '#000000',
+      }]
+    };
+  }, [safeUserData, selectedMetric, timeRange]);
 
   const handleStatCardClick = (statType) => {
     setSelectedStatCard(statType);
@@ -264,10 +349,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
         <div className="chart-box">
           {(() => {
-            const chartData = generateChartData(safeUserData, selectedMetric, timeRange);
+            const chartData = getChartData();
             const hasData = chartData.datasets[0].data.some(v => v !== null);
             if (!hasData) return <p className="chart-empty">Start tracking to see your progress</p>;
-            return <Line data={chartData} options={chartOptions} height={160} />;
+            return <Line key={chartKey} ref={chartRef} data={chartData} options={chartOptions} />;
           })()}
         </div>
 

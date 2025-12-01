@@ -1,9 +1,9 @@
-// StatsComponents.js - TITANTRACK MINIMAL
-// Clean helper components without helmet decorations
+// StatsComponents.js - TITANTRACK REFINED
+// NO CSS import - all styles from Stats.css
 import React from 'react';
 import { format } from 'date-fns';
 
-// Minimal loading state - just a spinner
+// Loading state component
 export const InsightLoadingState = ({ insight, isVisible }) => {
   if (!isVisible) return null;
   
@@ -14,24 +14,26 @@ export const InsightLoadingState = ({ insight, isVisible }) => {
   );
 };
 
-// Minimal empty state - clean text only
+// Empty state component  
 export const InsightEmptyState = ({ insight, userData, sectionTitle, sectionDescription }) => {
-  const trackedDays = userData?.benefitTracking?.length || 0;
-  const targetDays = 14;
-  const remaining = targetDays - trackedDays;
+  const daysTracked = userData?.benefitTracking?.length || 0;
+  const daysNeeded = 14;
+  const remaining = Math.max(0, daysNeeded - daysTracked);
   
   return (
     <div className="insight-empty">
-      <p className="insight-empty-title">{trackedDays}/{targetDays} days tracked</p>
+      <p className="insight-empty-title">{daysTracked}/{daysNeeded} days tracked</p>
       <p className="insight-empty-text">
-        {sectionDescription} Track {remaining} more days to unlock.
+        {sectionDescription || `Track ${remaining} more days to unlock.`}
       </p>
     </div>
   );
 };
 
-// Minimal info banner - text only, no helmet
+// Mini info banner
 export const MiniInfoBanner = ({ description }) => {
+  if (!description) return null;
+  
   return (
     <div className="mini-info-banner">
       <p>{description}</p>
@@ -39,129 +41,83 @@ export const MiniInfoBanner = ({ description }) => {
   );
 };
 
-// Helper function to format trigger names
-const formatTriggerName = (trigger) => {
-  if (!trigger || typeof trigger !== 'string') return 'not recorded';
-  
-  const triggerMap = {
-    'lustful_thoughts': 'lustful thoughts',
-    'stress': 'stress',
-    'boredom': 'boredom',
-    'social_media': 'social media',
-    'loneliness': 'loneliness',
-    'relationship': 'relationship issues',
-    'home_environment': 'being home alone',
-    'home_alone': 'being home alone',
-    'explicit_content': 'explicit content',
-    'alcohol_substances': 'alcohol/substances',
-    'sleep_deprivation': 'sleep deprivation'
-  };
-  
-  return triggerMap[trigger] || trigger.replace(/_/g, ' ').replace(/[^a-zA-Z0-9\s]/g, '');
-};
-
-// Stat Card Modal - Clean minimal design
+// Stat Card Modal
 export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }) => {
   if (!showModal || !selectedStatCard) return null;
-
-  const generateStatCardContent = (statType) => {
-    const streakHistory = userData.streakHistory || [];
-    const startDate = userData.startDate ? new Date(userData.startDate) : null;
-    
-    switch (statType) {
+  
+  const getStatInfo = () => {
+    switch (selectedStatCard) {
       case 'currentStreak':
         return {
-          value: userData.currentStreak || 0,
+          value: userData?.currentStreak || 0,
           label: 'Current Streak',
-          description: 'Your active streak of consecutive days. This resets if you log a relapse.',
-          breakdown: startDate ? [
-            { label: 'Started', value: format(startDate, 'MMM d, yyyy') }
-          ] : null
+          description: 'Your active streak. Resets if you log a relapse.',
+          details: [
+            { label: 'Started', value: userData?.startDate ? format(new Date(userData.startDate), 'MMM d, yyyy') : 'N/A' },
+            { label: 'Longest', value: `${userData?.longestStreak || 0} days` }
+          ]
         };
-        
       case 'longestStreak':
-        const longestFromHistory = streakHistory.reduce((max, s) => {
-          const length = s?.length || 0;
-          return length > max ? length : max;
-        }, 0);
-        const longest = Math.max(userData.longestStreak || 0, longestFromHistory);
-        
         return {
-          value: longest,
+          value: userData?.longestStreak || 0,
           label: 'Longest Streak',
-          description: 'Your personal best - the longest streak you\'ve achieved. A record to beat.',
-          breakdown: null
+          description: 'Your personal best.',
+          details: [
+            { label: 'Current', value: `${userData?.currentStreak || 0} days` },
+            { label: 'Attempts', value: `${(userData?.relapseCount || 0) + 1}` }
+          ]
         };
-        
       case 'wetDreams':
         return {
-          value: userData.wetDreamCount || 0,
+          value: userData?.wetDreamCount || 0,
           label: 'Wet Dreams',
-          description: 'Natural nocturnal emissions. These don\'t count as relapses - they\'re part of the body\'s normal regulation process.',
-          breakdown: null
+          description: 'Natural emissions. These don\'t count as relapses.',
+          details: []
         };
-        
       case 'relapses':
-        const relapseHistory = streakHistory.filter(s => s?.reason === 'relapse') || [];
-        const triggers = {};
-        
-        relapseHistory.forEach(r => {
-          const trigger = r.trigger || 'unknown';
-          triggers[trigger] = (triggers[trigger] || 0) + 1;
-        });
-        
-        const topTrigger = Object.entries(triggers).sort((a, b) => b[1] - a[1])[0];
-        
         return {
-          value: userData.relapseCount || 0,
+          value: userData?.relapseCount || 0,
           label: 'Relapses',
-          description: 'Total relapse count. Each one is a lesson. What matters is you\'re still here, still trying.',
-          breakdown: topTrigger ? [
-            { label: 'Top Trigger', value: formatTriggerName(topTrigger[0]) }
-          ] : null
+          description: 'Each one is a lesson. You\'re still here.',
+          details: [
+            { label: 'Current', value: `${userData?.currentStreak || 0} days` },
+            { label: 'Best', value: `${userData?.longestStreak || 0} days` }
+          ]
         };
-        
       default:
-        return {
-          value: 0,
-          label: 'Unknown',
-          description: '',
-          breakdown: null
-        };
+        return { value: 0, label: '', description: '', details: [] };
     }
   };
-
-  const content = generateStatCardContent(selectedStatCard);
-
+  
+  const info = getStatInfo();
+  
   return (
-    <div className="stats-overlay" onClick={onClose}>
-      <div className="stats-modal stat-detail-modal" onClick={e => e.stopPropagation()}>
-        <div className="stat-detail-value">{content.value}</div>
-        <div className="stat-detail-label">{content.label}</div>
-        <p className="stat-detail-info">{content.description}</p>
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <span className="modal-num">{info.value}</span>
+        <h2>{info.label}</h2>
+        <p className="modal-text">{info.description}</p>
         
-        {content.breakdown && (
+        {info.details.length > 0 && (
           <div className="stat-detail-breakdown">
-            {content.breakdown.map((item, index) => (
-              <div key={index} className="stat-breakdown-item">
-                <span className="stat-breakdown-label">{item.label}</span>
-                <span className="stat-breakdown-value">{item.value}</span>
+            {info.details.map((detail, idx) => (
+              <div key={idx} className="stat-breakdown-item">
+                <span className="stat-breakdown-label">{detail.label}</span>
+                <span className="stat-breakdown-value">{detail.value}</span>
               </div>
             ))}
           </div>
         )}
         
-        <div className="modal-actions">
-          <button className="btn-ghost" onClick={onClose}>Close</button>
-        </div>
+        <button className="btn-ghost" onClick={onClose}>Close</button>
       </div>
     </div>
   );
 };
 
-export default {
-  InsightLoadingState,
-  InsightEmptyState,
-  MiniInfoBanner,
-  StatCardModal
+// Helper to render bold text
+export const renderTextWithBold = (text) => {
+  if (!text || typeof text !== 'string') return { __html: '' };
+  const htmlText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  return { __html: htmlText };
 };

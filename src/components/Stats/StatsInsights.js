@@ -1,7 +1,7 @@
-// StatsInsights.js - TITANTRACK MINIMAL
-// Clean insight components without helmet decorations or colored status bars
+// StatsInsights.js - TITANTRACK REFINED
+// NO CSS import - all styles from Stats.css
 import React from 'react';
-import { InsightLoadingState, InsightEmptyState, MiniInfoBanner } from './StatsComponents';
+import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
 import { renderTextWithBold } from './StatsUtils';
 
 // Progress & Trends Analysis Component
@@ -32,39 +32,26 @@ export const ProgressTrendsAnalysis = ({
           />
         ) : (
           <div className="progress-trends-display">
-            {/* Relapse Frequency Trend */}
             {progressTrends?.relapseFrequency && (
               <div className="trend-item">
                 <div className="trend-content">
                   <div className="trend-label">Relapse Frequency</div>
-                  <div className="trend-stats">
-                    <span className="trend-stat">{progressTrends.relapseFrequency.recentRate} recent</span>
-                    <span className="trend-divider">vs</span>
-                    <span className="trend-stat">{progressTrends.relapseFrequency.overallRate} overall</span>
-                  </div>
                   <p className="trend-text" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.relapseFrequency.insight)}></p>
                 </div>
               </div>
             )}
 
-            {/* Benefit Performance Trend */}
             {progressTrends?.benefitPerformance && (
               <div className="trend-item">
                 <div className="trend-content">
                   <div className="trend-label">
                     {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Performance
                   </div>
-                  <div className="trend-stats">
-                    <span className="trend-stat">{progressTrends.benefitPerformance.recentAverage} recent</span>
-                    <span className="trend-divider">vs</span>
-                    <span className="trend-stat">{progressTrends.benefitPerformance.overallAverage} overall</span>
-                  </div>
                   <p className="trend-text" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.benefitPerformance.insight)}></p>
                 </div>
               </div>
             )}
 
-            {/* Overall Trajectory */}
             {progressTrends?.overallTrajectory && (
               <div className="trend-item">
                 <div className="trend-content">
@@ -97,37 +84,32 @@ export const RelapsePatternAnalytics = ({
       </div>
       <div className="insight-card-content">
         {isLoading ? (
-          <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
+          <InsightLoadingState insight="Relapse Analysis" isVisible={true} />
+        ) : isConquered ? (
+          <div className="victory-display">
+            <div className="victory-days">{daysSinceLastRelapse}</div>
+            <div className="victory-label">Days Victorious</div>
+            <p className="victory-message">
+              You've transcended past patterns. Your historical triggers have been conquered through consistent discipline.
+            </p>
+          </div>
         ) : (
           <div className="relapse-patterns-display">
-            {/* Stats Row */}
-            <div className="relapse-stats-row">
-              {relapsePatterns.relapseCount && (
-                <div className="relapse-stat">
-                  <span className="relapse-stat-value">{relapsePatterns.relapseCount}</span>
-                  <span className="relapse-stat-label">Total Analyzed</span>
-                </div>
-              )}
-              {relapsePatterns.primaryTrigger && (
-                <div className="relapse-stat">
-                  <span className="relapse-stat-value">{relapsePatterns.primaryTrigger}</span>
-                  <span className="relapse-stat-label">Primary Trigger</span>
-                </div>
-              )}
-              {isConquered && (
-                <div className="relapse-stat">
-                  <span className="relapse-stat-value">{daysSinceLastRelapse}</span>
-                  <span className="relapse-stat-label">Days Clear</span>
-                </div>
-              )}
+            <div className="relapse-stat">
+              <span className="relapse-stat-label">Total Analyzed</span>
+              <span className="relapse-stat-value">{relapsePatterns.totalRelapses}</span>
             </div>
             
-            {/* Insights */}
-            <div className="relapse-insights">
-              {(relapsePatterns?.insights || []).map((insight, index) => (
-                <p key={index} className="relapse-insight" dangerouslySetInnerHTML={renderTextWithBold(insight)}></p>
-              ))}
-            </div>
+            {relapsePatterns.primaryTrigger && (
+              <div className="relapse-stat">
+                <span className="relapse-stat-label">Primary Trigger</span>
+                <span className="relapse-stat-value">{relapsePatterns.primaryTrigger}</span>
+              </div>
+            )}
+            
+            {relapsePatterns.insights?.map((insight, idx) => (
+              <p key={idx} className="relapse-insight" dangerouslySetInnerHTML={renderTextWithBold(insight)}></p>
+            ))}
           </div>
         )}
       </div>
@@ -139,12 +121,11 @@ export const RelapsePatternAnalytics = ({
 export const PatternRecognition = ({ 
   isLoading, 
   hasInsufficientData, 
-  userData, 
+  userData,
   patternInsights, 
   dataQuality 
 }) => {
-  const needsMoreData = !patternInsights || patternInsights.length === 0 || 
-    (patternInsights.length === 1 && patternInsights[0].includes('Need 14+'));
+  const needsMoreData = !patternInsights?.patterns || patternInsights.patterns.length === 0;
   
   return (
     <div className="insight-card">
@@ -163,8 +144,8 @@ export const PatternRecognition = ({
           />
         ) : (
           <div className="patterns-display">
-            {patternInsights.map((pattern, index) => (
-              <p key={index} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></p>
+            {patternInsights.patterns.map((pattern, idx) => (
+              <p key={idx} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></p>
             ))}
           </div>
         )}
@@ -177,14 +158,11 @@ export const PatternRecognition = ({
 export const OptimizationGuidance = ({ 
   isLoading, 
   hasInsufficientData, 
-  userData, 
+  userData,
   optimizationGuidance, 
   dataQuality 
 }) => {
-  const needsMoreData = !optimizationGuidance || 
-    optimizationGuidance.optimalRate === 'N/A' || 
-    (optimizationGuidance.recommendations?.length === 1 && 
-     optimizationGuidance.recommendations[0].includes('Track 10+'));
+  const needsMoreData = !optimizationGuidance?.recommendations || optimizationGuidance.recommendations.length === 0;
   
   return (
     <div className="insight-card">
@@ -198,40 +176,23 @@ export const OptimizationGuidance = ({
           <InsightEmptyState 
             insight="Performance Optimization" 
             userData={userData}
-            sectionTitle="Optimization Profile"
+            sectionTitle="Performance Optimization"
             sectionDescription="Analyzes your personal performance patterns to identify your optimal windows and provides phase-aware optimization strategies."
           />
         ) : (
           <div className="optimization-display">
-            {/* Criteria */}
-            {optimizationGuidance?.criteria && (
+            {optimizationGuidance.criteria && (
               <div className="optimization-criteria">
-                <div className="optimization-criteria-title">
-                  {optimizationGuidance.phase ? `${optimizationGuidance.phase} Phase Criteria` : 'High Performance Criteria'}
-                </div>
-                <p className="optimization-criteria-text">{optimizationGuidance.criteria}</p>
+                <div className="optimization-criteria-title">Your Optimization Criteria</div>
+                <div className="optimization-criteria-text">{optimizationGuidance.criteria}</div>
               </div>
             )}
             
-            {/* Rate */}
-            {optimizationGuidance?.optimalRate && optimizationGuidance.optimalRate !== 'N/A' && (
-              <div className="optimization-metric-card">
-                <div className="optimization-metric-value">{optimizationGuidance.optimalRate}</div>
-                <div className="optimization-metric-label">Meeting high performance criteria</div>
-              </div>
-            )}
-            
-            {/* Recommendations */}
-            {optimizationGuidance?.recommendations && (
-              <div className="optimization-recommendations">
-                <div className="optimization-title">
-                  {optimizationGuidance.phase ? `${optimizationGuidance.phase} Guidance` : 'Recommendations'}
-                </div>
-                {optimizationGuidance.recommendations.map((rec, index) => (
-                  <p key={index} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
-                ))}
-              </div>
-            )}
+            <div className="optimization-recommendations">
+              {optimizationGuidance.recommendations.map((rec, idx) => (
+                <p key={idx} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -242,25 +203,27 @@ export const OptimizationGuidance = ({
 // Phase Evolution Analysis Component
 export const PhaseEvolutionAnalysis = ({ 
   isLoading, 
-  hasInsufficientData,
+  hasInsufficientData, 
   userData,
   phaseEvolution, 
-  selectedMetric, 
+  selectedMetric,
   dataQuality,
   currentStreak
 }) => {
-  const needsMoreData = !phaseEvolution || !phaseEvolution.hasData;
+  const needsMoreData = !phaseEvolution?.phaseAverages;
   
-  const getCurrentPhaseKey = (streak) => {
-    if (streak <= 14) return 'foundation';
-    if (streak <= 45) return 'purification';
-    if (streak <= 90) return 'expansion';
-    if (streak <= 180) return 'integration';
+  // Determine current phase key
+  const getCurrentPhaseKey = () => {
+    const streak = currentStreak || 0;
+    if (streak <= 7) return 'purification';
+    if (streak <= 21) return 'foundation';
+    if (streak <= 45) return 'transmutation';
+    if (streak <= 90) return 'stabilization';
     return 'mastery';
   };
-
-  const currentPhaseKey = getCurrentPhaseKey(currentStreak || 0);
-
+  
+  const currentPhaseKey = getCurrentPhaseKey();
+  
   return (
     <div className="insight-card">
       <div className="insight-card-header">
@@ -278,7 +241,6 @@ export const PhaseEvolutionAnalysis = ({
           />
         ) : (
           <>
-            {/* Phase Grid */}
             <div className="phase-evolution-grid">
               {Object.entries(phaseEvolution.phaseAverages || {}).map(([phaseKey, phaseData]) => {
                 const isCurrentPhase = phaseKey === currentPhaseKey;
@@ -298,7 +260,6 @@ export const PhaseEvolutionAnalysis = ({
               })}
             </div>
             
-            {/* Phase Insight */}
             {phaseEvolution?.insight && (
               <p className="phase-evolution-insight" dangerouslySetInnerHTML={renderTextWithBold(phaseEvolution.insight)}></p>
             )}
