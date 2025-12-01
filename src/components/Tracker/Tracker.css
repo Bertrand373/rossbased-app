@@ -321,17 +321,17 @@
 .benefits-list {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
   overflow-y: auto;
   flex: 1;
-  padding: 0 4px 4px 4px;
+  padding: 0;
   text-align: left;
 }
 
 .benefit-row {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .benefit-info {
@@ -353,61 +353,163 @@
   font-feature-settings: 'tnum' 1;
 }
 
+/* Slider container - just holds the track */
 .benefit-slider {
   position: relative;
-  height: 2px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 1px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
+/* Track background */
+.benefit-slider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+/* Fill bar - shows progress */
 .benefit-fill {
   position: absolute;
-  top: 0;
   left: 0;
-  height: 100%;
+  height: 2px;
   background-color: #ffffff;
   border-radius: 1px;
-  transition: width 60ms ease;
+  pointer-events: none;
+  transition: width 50ms ease-out;
 }
 
-.benefit-slider input {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
+/* The actual input - completely invisible except for thumb */
+.benefit-slider input[type="range"] {
+  position: relative;
   width: 100%;
-  height: 44px;
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  cursor: pointer;
+  height: 20px;
   margin: 0;
-}
-
-.benefit-slider input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #ffffff;
-  border-radius: 50%;
-  border: none;
+  padding: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0;
+  outline: none !important;
+  box-shadow: none !important;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: transform 150ms ease;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.benefit-slider input::-webkit-slider-thumb:hover {
+/* Remove ALL default track styling */
+.benefit-slider input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.benefit-slider input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+/* MS Edge */
+.benefit-slider input[type="range"]::-ms-track {
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  border: none;
+  color: transparent;
+}
+
+.benefit-slider input[type="range"]::-ms-fill-lower,
+.benefit-slider input[type="range"]::-ms-fill-upper {
+  background: transparent;
+  border: none;
+}
+
+/* Thumb styling */
+.benefit-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border: none !important;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.benefit-slider input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.benefit-slider input[type="range"]::-ms-thumb {
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Hover/active states */
+.benefit-slider input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-.benefit-slider input::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #ffffff;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+.benefit-slider input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.benefit-slider input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+.benefit-slider input[type="range"]:active::-moz-range-thumb {
+  transform: scale(1.1);
+}
+
+/* Remove any focus outlines/boxes */
+.benefit-slider input[type="range"]:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.benefit-slider input[type="range"]:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.benefit-slider input[type="range"]:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* Benefits actions - matches date picker exactly */
@@ -607,7 +709,11 @@
   }
   
   .benefits-list {
-    gap: 24px;
+    gap: 20px;
+  }
+  
+  .benefit-row {
+    gap: 12px;
   }
   
   .benefits-modal h2 {
