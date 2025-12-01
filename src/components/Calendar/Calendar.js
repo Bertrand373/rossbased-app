@@ -498,18 +498,20 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         {viewMode === 'month' ? renderMonthView() : renderWeekView()}
       </div>
 
-      {/* Day Info Modal */}
+      {/* ================================================================
+          DAY INFO MODAL - Using SCOPED class names (calendar-*)
+          ================================================================ */}
       {dayInfoModal && selectedDate && (
-        <div className="modal-overlay" onClick={closeDayInfo}>
-          <div className="modal-content day-info-modal" onClick={e => e.stopPropagation()}>
-            <button className="modal-close-x" onClick={closeDayInfo}>
+        <div className="calendar-overlay" onClick={closeDayInfo}>
+          <div className="calendar-modal calendar-day-info" onClick={e => e.stopPropagation()}>
+            <button className="calendar-close" onClick={closeDayInfo}>
               <FaTimes />
             </button>
             
             <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
             
             {/* Status Badge */}
-            <div className="day-status-info">
+            <div className="calendar-status-info">
               {(() => {
                 const dayStatus = getDayStatus(selectedDate);
                 const dayCount = getDayCount(selectedDate);
@@ -517,44 +519,40 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 
                 if (dayStatus?.type === 'current-streak') {
                   return (
-                    <div className="status-badge current-streak">
+                    <div className="calendar-status-badge current-streak">
                       <FaCheckCircle />
                       <span>Current Streak</span>
                       {dayCount && <span className="day-count">Day {dayCount.dayNumber}</span>}
-                      {wetDream && <span className="wet-dream-overlay">+ Wet Dream</span>}
                     </div>
                   );
                 }
                 if (dayStatus?.type === 'former-streak') {
                   return (
-                    <div className="status-badge former-streak">
+                    <div className="calendar-status-badge former-streak">
                       <FaCheckCircle />
                       <span>Former Streak</span>
                       {dayCount && <span className="day-count">Day {dayCount.dayNumber}{dayCount.totalDays ? `/${dayCount.totalDays}` : ''}</span>}
-                      {wetDream && <span className="wet-dream-overlay">+ Wet Dream</span>}
                     </div>
                   );
                 }
                 if (dayStatus?.type === 'relapse') {
-                  const trigger = triggerOptions.find(t => t.id === dayStatus.trigger);
                   return (
-                    <div className="status-badge relapse">
+                    <div className="calendar-status-badge relapse">
                       <FaTimesCircle />
                       <span>Relapse</span>
-                      {trigger && <span className="trigger-inline">{trigger.label}</span>}
                     </div>
                   );
                 }
                 if (wetDream) {
                   return (
-                    <div className="status-badge wet-dream">
+                    <div className="calendar-status-badge wet-dream">
                       <FaMoon />
                       <span>Wet Dream</span>
                     </div>
                   );
                 }
                 return (
-                  <div className="status-badge">
+                  <div className="calendar-status-badge">
                     <span>No status recorded</span>
                   </div>
                 );
@@ -576,22 +574,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               ];
               
               return (
-                <div className="day-benefits">
+                <div className="calendar-benefits">
                   <h4>Benefits</h4>
-                  <div className="benefits-details-enhanced">
+                  <div className="calendar-benefits-list">
                     {benefitItems.map(item => (
-                      <div key={item.label} className="benefit-slider-item">
-                        <div className="benefit-slider-row">
-                          <span className="benefit-label">{item.label}</span>
-                          <div className="benefit-meter-enhanced">
-                            <div className="benefit-level-enhanced" style={{ width: `${item.value * 10}%` }} />
-                          </div>
-                          <div className="benefit-value-circle">{item.value}</div>
+                      <div key={item.label} className="calendar-benefit-row">
+                        <span className="calendar-benefit-label">{item.label}</span>
+                        <div className="calendar-benefit-bar">
+                          <div className="calendar-benefit-fill" style={{ width: `${item.value * 10}%` }} />
                         </div>
-                        <div className="benefit-slider-labels">
-                          <span>Low</span>
-                          <span>High</span>
-                        </div>
+                        <div className="calendar-benefit-value">{item.value}</div>
                       </div>
                     ))}
                   </div>
@@ -600,11 +592,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             })()}
 
             {/* Journal Section */}
-            <div className="day-journal">
-              <div className="journal-header-with-actions">
+            <div className="calendar-journal">
+              <div className="calendar-journal-header">
                 <h4>Journal</h4>
                 {!isEditingNote && noteText && (
-                  <button className="action-btn journal-edit-btn" onClick={startEditingNote}>
+                  <button className="calendar-action-btn" onClick={startEditingNote}>
                     <FaPen />
                     <span>Edit</span>
                   </button>
@@ -612,51 +604,35 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               </div>
               
               {isEditingNote ? (
-                <div className="journal-editing">
+                <div className="calendar-journal-editing">
                   <textarea
-                    className="journal-textarea"
+                    className="calendar-journal-textarea"
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
                     placeholder="What's on your mind?"
                     rows="4"
                   />
-                  <div className="journal-edit-actions">
-                    <button className="journal-save-btn" onClick={saveNote}>
+                  <div className="calendar-journal-actions">
+                    <button className="calendar-save-btn" onClick={saveNote}>
                       <FaCheckCircle />
                       <span>Save</span>
                     </button>
-                    <button className="journal-cancel-btn" onClick={cancelEditingNote}>
+                    <button className="calendar-cancel-btn" onClick={cancelEditingNote}>
                       <FaTimes />
                       <span>Cancel</span>
                     </button>
                   </div>
                 </div>
               ) : noteText ? (
-                <div className="journal-entry">{noteText}</div>
+                <div className="calendar-journal-entry">{noteText}</div>
               ) : (
                 <>
-                  <div className="journal-benefits-banner">
-                    <div className="journal-benefits-helmet-container">
-                      <img 
-                        className="journal-benefits-helmet" 
-                        src="/helmet.png" 
-                        alt=""
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextElementSibling.style.display = 'block';
-                        }}
-                      />
-                      <div className="journal-benefits-helmet-fallback" style={{ display: 'none' }}>🛡️</div>
-                    </div>
-                    <div className="journal-benefits-content">
-                      <h4 className="journal-benefits-title">What's on your mind?</h4>
-                      <p className="journal-benefits-description">
-                        Journaling helps track patterns and maintain accountability on your journey.
-                      </p>
-                    </div>
+                  <div className="calendar-journal-empty">
+                    <h4>What's on your mind?</h4>
+                    <p>Journaling helps track patterns and maintain accountability on your journey.</p>
                   </div>
-                  <div className="journal-start-section">
-                    <button className="action-btn journal-edit-btn" onClick={startEditingNote}>
+                  <div className="calendar-journal-start">
+                    <button className="calendar-action-btn" onClick={startEditingNote}>
                       <FaPen />
                       <span>Add Entry</span>
                     </button>
@@ -666,12 +642,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             </div>
 
             {/* Actions */}
-            <div className="modal-actions">
-              <button className="btn-primary edit-day-btn" onClick={showEditFromInfo}>
+            <div className="calendar-actions">
+              <button className="calendar-btn-primary" onClick={showEditFromInfo}>
                 <FaEdit />
                 Edit Day
               </button>
-              <button className="btn-ghost" onClick={closeDayInfo}>
+              <button className="calendar-btn-ghost" onClick={closeDayInfo}>
                 Close
               </button>
             </div>
@@ -679,53 +655,52 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
 
-      {/* Edit Day Modal */}
+      {/* ================================================================
+          EDIT DAY MODAL - Using SCOPED class names (calendar-*)
+          ================================================================ */}
       {editDayModal && selectedDate && (
-        <div className="modal-overlay" onClick={closeEditModal}>
-          <div className="modal-content edit-day-modal" onClick={e => e.stopPropagation()}>
-            <button className="modal-close-x" onClick={closeEditModal}>
+        <div className="calendar-overlay" onClick={closeEditModal}>
+          <div className="calendar-modal calendar-edit-day" onClick={e => e.stopPropagation()}>
+            <button className="calendar-close" onClick={closeEditModal}>
               <FaTimes />
             </button>
             
-            <div className="modal-header-simple">
-              <h3>Edit {format(selectedDate, 'MMM d, yyyy')}</h3>
-            </div>
-            
+            <h3>Edit {format(selectedDate, 'MMM d, yyyy')}</h3>
             <p>What happened on this day?</p>
 
             {!showTriggerSelection ? (
-              <div className="edit-day-options">
-                <button className="edit-option-btn current-streak-btn" onClick={() => handleStatusClick('current-streak')}>
+              <div className="calendar-edit-options">
+                <button className="calendar-option-btn calendar-option-streak" onClick={() => handleStatusClick('current-streak')}>
                   <FaCheckCircle />
                   <span>Mark as Streak Day</span>
                 </button>
-                <button className="edit-option-btn wet-dream-btn" onClick={() => handleStatusClick('wet-dream')}>
+                <button className="calendar-option-btn calendar-option-wetdream" onClick={() => handleStatusClick('wet-dream')}>
                   <FaMoon />
                   <span>Log Wet Dream</span>
                 </button>
-                <button className="edit-option-btn relapse-btn" onClick={() => handleStatusClick('relapse')}>
+                <button className="calendar-option-btn calendar-option-relapse" onClick={() => handleStatusClick('relapse')}>
                   <FaTimesCircle />
                   <span>Log Relapse</span>
                 </button>
               </div>
             ) : (
-              <div className="trigger-selection">
+              <div className="calendar-trigger-section">
                 <h4>What triggered this?</h4>
-                <div className="trigger-options">
+                <div className="calendar-trigger-options">
                   {triggerOptions.map(trigger => (
                     <button
                       key={trigger.id}
-                      className={`trigger-option-pill ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                      className={`calendar-trigger-pill ${selectedTrigger === trigger.id ? 'selected' : ''}`}
                       onClick={() => setSelectedTrigger(trigger.id)}
                     >
-                      <trigger.icon className="trigger-option-icon" />
+                      <trigger.icon />
                       <span>{trigger.label}</span>
                     </button>
                   ))}
                 </div>
-                <div className="trigger-actions">
+                <div className="calendar-trigger-actions">
                   <button 
-                    className="btn btn-primary"
+                    className="calendar-trigger-confirm"
                     onClick={handleTriggerSelection}
                     disabled={!selectedTrigger}
                   >
@@ -735,12 +710,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               </div>
             )}
 
-            <div className="modal-actions">
-              <button className="back-to-info-btn" onClick={backToDayInfo}>
+            <div className="calendar-actions">
+              <button className="calendar-btn-back" onClick={backToDayInfo}>
                 <FaArrowLeft />
                 Back
               </button>
-              <button className="btn-ghost" onClick={closeEditModal}>
+              <button className="calendar-btn-ghost" onClick={closeEditModal}>
                 Cancel
               </button>
             </div>
