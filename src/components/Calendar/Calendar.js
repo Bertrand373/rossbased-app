@@ -330,26 +330,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         week.push(
           <div key={i} className={cellClasses} onClick={() => openDayInfo(currentDay)}>
             <span className="day-number">{format(currentDay, 'd')}</span>
-            {dayTracking.hasJournal && (
-              <div className="day-journal-indicator-top"><FaBook /></div>
+            {/* Single gold dot if day has any tracked data */}
+            {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
+              <span className="day-has-data-dot"></span>
             )}
-            <div className="day-indicators">
-              {dayTracking.hasBenefits && (
-                <span className="day-tracking-indicator"><FaInfoCircle className="tracking-icon" /></span>
-              )}
-              {wetDream && (
-                <span className="day-wet-dream-indicator"><FaMoon className="wet-dream-icon" /></span>
-              )}
-              {dayStatus?.type === 'current-streak' && (
-                <span className="day-status-indicator"><FaCheckCircle className="success-icon" /></span>
-              )}
-              {dayStatus?.type === 'former-streak' && (
-                <span className="day-status-indicator"><FaCheckCircle className="success-icon" /></span>
-              )}
-              {dayStatus?.type === 'relapse' && (
-                <span className="day-status-indicator"><FaTimesCircle className="relapse-icon" /></span>
-              )}
-            </div>
           </div>
         );
         day = addDays(day, 1);
@@ -415,15 +399,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           )}
           
           <div className="week-day-indicators">
-            <div className="week-indicator-left">
-              {dayBenefits && <FaInfoCircle />}
-              {dayTracking.hasJournal && <FaBook />}
-            </div>
-            <div className="week-indicator-right">
-              {wetDream && <FaMoon className="wet-dream-icon" />}
-              {dayStatus?.type === 'current-streak' && <FaCheckCircle className="success-icon" />}
-              {dayStatus?.type === 'former-streak' && <FaCheckCircle className="success-icon" />}
-              {dayStatus?.type === 'relapse' && <FaTimesCircle className="relapse-icon" />}
+            {/* Single gold dot if has data */}
+            {(dayBenefits || dayTracking.hasJournal) && (
+              <span className="week-has-data-dot"></span>
+            )}
+            {/* Status indicator on right */}
+            <div className="week-status-indicator">
+              {dayStatus?.type === 'current-streak' && <span className="week-status-dot current-streak"></span>}
+              {dayStatus?.type === 'former-streak' && <span className="week-status-dot former-streak"></span>}
+              {dayStatus?.type === 'relapse' && <span className="week-status-dot relapse"></span>}
+              {wetDream && <span className="week-status-dot wet-dream"></span>}
             </div>
           </div>
         </div>
@@ -473,22 +458,22 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </button>
       </div>
 
-      {/* Legend */}
+      {/* Legend - Dots */}
       <div className="calendar-legend-compact">
         <div className="compact-legend-item">
-          <FaCheckCircle className="compact-legend-icon current-streak" />
+          <span className="legend-dot current-streak"></span>
           <span>Current</span>
         </div>
         <div className="compact-legend-item">
-          <FaCheckCircle className="compact-legend-icon former-streak" />
+          <span className="legend-dot former-streak"></span>
           <span>Former</span>
         </div>
         <div className="compact-legend-item">
-          <FaTimesCircle className="compact-legend-icon relapse" />
+          <span className="legend-dot relapse"></span>
           <span>Relapse</span>
         </div>
         <div className="compact-legend-item">
-          <FaMoon className="compact-legend-icon wet-dream" />
+          <span className="legend-dot wet-dream"></span>
           <span>Wet Dream</span>
         </div>
       </div>
@@ -504,9 +489,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       {dayInfoModal && selectedDate && (
         <div className="calendar-overlay" onClick={closeDayInfo}>
           <div className="calendar-modal calendar-day-info" onClick={e => e.stopPropagation()}>
-            <button className="calendar-close" onClick={closeDayInfo}>
-              <FaTimes />
-            </button>
             
             <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
             
@@ -661,9 +643,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       {editDayModal && selectedDate && (
         <div className="calendar-overlay" onClick={closeEditModal}>
           <div className="calendar-modal calendar-edit-day" onClick={e => e.stopPropagation()}>
-            <button className="calendar-close" onClick={closeEditModal}>
-              <FaTimes />
-            </button>
             
             <h3>Edit {format(selectedDate, 'MMM d, yyyy')}</h3>
             <p>What happened on this day?</p>

@@ -164,7 +164,7 @@
 }
 
 /* =============================================================================
-   LEGEND - Minimal, horizontal
+   LEGEND - Tiny colored dots (matches nav indicator style)
    ============================================================================= */
 
 .calendar-legend-compact {
@@ -185,17 +185,21 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
-.compact-legend-icon {
-  font-size: 0.75rem;
-  display: flex;
+/* Legend dots */
+.legend-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-.compact-legend-icon.current-streak { color: #34d399; }
-.compact-legend-icon.former-streak { color: #60a5fa; }
-.compact-legend-icon.relapse { color: #f87171; }
-.compact-legend-icon.wet-dream { color: #fbbf24; }
+.legend-dot.current-streak { background-color: #34d399; }
+.legend-dot.former-streak { background-color: #60a5fa; }
+.legend-dot.relapse { background-color: #f87171; }
+.legend-dot.wet-dream { background-color: #fbbf24; }
 
-.compact-legend-dot { display: none; }
+/* Hide old icon styles */
+.compact-legend-icon { display: none; }
 
 /* =============================================================================
    CALENDAR MAIN
@@ -224,7 +228,7 @@
 .calendar-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 2px;
 }
 
 .header-row {
@@ -241,10 +245,7 @@
   letter-spacing: 0.08em;
 }
 
-/* =============================================================================
-   DAY CELLS - Background tints + bottom bar
-   ============================================================================= */
-
+/* Day cells - substantial, tappable */
 .day-cell {
   position: relative;
   aspect-ratio: 1;
@@ -259,11 +260,10 @@
   background: transparent;
   border: none;
   border-radius: 8px;
-  overflow: hidden;
 }
 
 .day-cell:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .day-cell:active {
@@ -278,8 +278,6 @@
   font-feature-settings: 'tnum' 1;
   line-height: 1;
   transition: all 200ms ease;
-  position: relative;
-  z-index: 2;
 }
 
 .day-cell.other-month .day-number {
@@ -287,7 +285,7 @@
 }
 
 /* =============================================================================
-   TODAY - Bold white circle
+   TODAY - Smaller, cleaner white circle
    ============================================================================= */
 
 .day-cell.today {
@@ -298,232 +296,113 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   background: #ffffff;
   color: #000000;
   border-radius: 50%;
-  font-weight: 700;
-  font-size: 0.875rem;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+  font-size: 0.8125rem;
 }
 
-/* =============================================================================
-   STATUS CELLS - Background tint + bottom accent bar
-   ============================================================================= */
-
-/* Current Streak - Green */
-.day-cell.current-streak {
-  background: rgba(52, 211, 153, 0.08);
-}
-
-.day-cell.current-streak::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: #34d399;
-}
-
-.day-cell.current-streak .day-number {
-  color: #34d399;
-}
-
-.day-cell.current-streak:hover {
-  background: rgba(52, 211, 153, 0.12);
-}
-
-/* Former Streak - Blue */
-.day-cell.former-streak {
-  background: rgba(96, 165, 250, 0.08);
-}
-
-.day-cell.former-streak::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: #60a5fa;
-}
-
-.day-cell.former-streak .day-number {
-  color: #60a5fa;
-}
-
-.day-cell.former-streak:hover {
-  background: rgba(96, 165, 250, 0.12);
-}
-
-/* Relapse - Red */
-.day-cell.relapse {
-  background: rgba(248, 113, 113, 0.08);
-}
-
-.day-cell.relapse::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: #f87171;
-}
-
-.day-cell.relapse .day-number {
-  color: #f87171;
-}
-
-.day-cell.relapse:hover {
-  background: rgba(248, 113, 113, 0.12);
-}
-
-/* Wet Dream - Amber */
-.day-cell.wet-dream {
-  background: rgba(251, 191, 36, 0.08);
-}
-
-.day-cell.wet-dream::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: #fbbf24;
-}
-
-.day-cell.wet-dream:hover {
-  background: rgba(251, 191, 36, 0.12);
-}
-
-/* =============================================================================
-   TODAY + STATUS COMBINATIONS
-   ============================================================================= */
-
-.day-cell.today.current-streak {
-  background: rgba(52, 211, 153, 0.1);
-}
-
-.day-cell.today.current-streak .day-number {
-  background: #ffffff;
-  color: #000000;
-}
-
-.day-cell.today.former-streak {
-  background: rgba(96, 165, 250, 0.1);
-}
-
-.day-cell.today.former-streak .day-number {
-  background: #ffffff;
-  color: #000000;
-}
-
-.day-cell.today.relapse {
-  background: rgba(248, 113, 113, 0.1);
-}
-
-.day-cell.today.relapse .day-number {
-  background: #ffffff;
-  color: #000000;
-}
-
-.day-cell.today.wet-dream {
-  background: rgba(251, 191, 36, 0.1);
-}
-
+/* Preserve today styling when combined with status */
+.day-cell.today.current-streak .day-number,
+.day-cell.today.former-streak .day-number,
+.day-cell.today.relapse .day-number,
 .day-cell.today.wet-dream .day-number {
   background: #ffffff;
   color: #000000;
 }
 
 /* =============================================================================
-   DAY INDICATORS CONTAINER
+   STATUS - Bottom accent bar
    ============================================================================= */
 
-.day-indicators {
-  display: none;
+.day-cell.current-streak::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 3px;
+  background: #34d399;
+  border-radius: 2px;
 }
 
-/* Hide all default status indicators - we use tints instead */
-.day-status-indicator {
-  display: none;
+.day-cell.current-streak .day-number {
+  color: #34d399;
+}
+
+.day-cell.former-streak::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 3px;
+  background: #60a5fa;
+  border-radius: 2px;
+}
+
+.day-cell.former-streak .day-number {
+  color: #60a5fa;
+}
+
+.day-cell.relapse::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 3px;
+  background: #f87171;
+  border-radius: 2px;
+}
+
+.day-cell.relapse .day-number {
+  color: #f87171;
+}
+
+.day-cell.wet-dream::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 3px;
+  background: #fbbf24;
+  border-radius: 2px;
+}
+
+.day-cell.wet-dream .day-number {
+  color: #fbbf24;
 }
 
 /* =============================================================================
-   BENEFITS LOGGED - Gold dot in top-right corner
+   DATA INDICATOR - Single gold dot (top right)
    ============================================================================= */
 
-.day-tracking-indicator {
-  position: absolute !important;
-  top: 4px !important;
-  right: 4px !important;
-  left: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  display: block !important;
-  width: 6px !important;
-  height: 6px !important;
-  background: #fbbf24 !important;
-  border-radius: 50% !important;
-  box-shadow: 0 0 6px rgba(251, 191, 36, 0.6) !important;
-  z-index: 10 !important;
-}
-
-/* Hide the icon inside - just the dot */
-.day-tracking-indicator .tracking-icon,
-.tracking-icon {
-  display: none !important;
-}
-
-/* =============================================================================
-   WET DREAM INDICATOR - Larger, visible moon
-   ============================================================================= */
-
-.day-wet-dream-indicator {
-  position: absolute !important;
-  bottom: 6px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  top: auto !important;
-  right: auto !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 18px !important;
-  height: 18px !important;
-  background: rgba(251, 191, 36, 0.25) !important;
-  border-radius: 50% !important;
-  z-index: 10 !important;
-}
-
-.wet-dream-icon { 
-  color: #fbbf24 !important; 
-  font-size: 0.625rem !important;
-}
-
-/* Success/relapse icons hidden */
-.success-icon { color: #34d399; display: none; }
-.relapse-icon { color: #f87171; display: none; }
-
-/* =============================================================================
-   JOURNAL INDICATOR - Top left, subtle book icon
-   ============================================================================= */
-
-.day-journal-indicator-top {
+.day-has-data-dot {
   position: absolute;
   top: 4px;
-  left: 4px;
-  font-size: 0.5rem;
-  color: rgba(255, 255, 255, 0.4);
-  z-index: 10;
+  right: 4px;
+  width: 5px;
+  height: 5px;
+  background: #ffdd00;
+  border-radius: 50%;
 }
 
-.day-content {
-  display: contents;
+/* Hide old indicator styles */
+.day-indicators,
+.day-status-indicator,
+.day-tracking-indicator,
+.day-wet-dream-indicator,
+.day-journal-indicator-top {
+  display: none;
 }
 
 /* =============================================================================
@@ -537,19 +416,19 @@
 }
 
 .week-day-cell {
-  display: flex;
-  flex-direction: column;
-  min-height: 160px;
-  padding: 16px 12px;
-  background: rgba(255, 255, 255, 0.015);
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 14px;
+  border-radius: 16px;
+  padding: 16px 12px;
   cursor: pointer;
   transition: all 200ms ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 180px;
 }
 
 .week-day-cell:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -557,30 +436,26 @@
   transform: scale(0.98);
 }
 
-/* Week cell status styling */
+/* Week status styling */
 .week-day-cell.current-streak {
-  background: rgba(52, 211, 153, 0.06);
-  border-color: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.2);
 }
 
 .week-day-cell.former-streak {
-  background: rgba(96, 165, 250, 0.06);
-  border-color: rgba(96, 165, 250, 0.12);
+  border-color: rgba(96, 165, 250, 0.2);
 }
 
 .week-day-cell.relapse {
-  background: rgba(248, 113, 113, 0.06);
-  border-color: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.2);
 }
 
 .week-day-cell.wet-dream {
-  background: rgba(251, 191, 36, 0.06);
-  border-color: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.2);
 }
 
 .week-day-cell.today-card {
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Week day header */
@@ -601,59 +476,58 @@
 }
 
 .week-day-number {
-  font-size: 2rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
-  line-height: 1;
   font-feature-settings: 'tnum' 1;
+  line-height: 1;
 }
 
 .week-day-number.today {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   background: #ffffff;
   color: #000000;
   border-radius: 50%;
-  font-weight: 700;
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 
-/* Week cell status-specific number colors */
-.week-day-cell.current-streak .week-day-number:not(.today) {
-  color: #34d399;
+.week-day-cell.current-streak .week-day-number { color: #34d399; }
+.week-day-cell.former-streak .week-day-number { color: #60a5fa; }
+.week-day-cell.relapse .week-day-number { color: #f87171; }
+.week-day-cell.wet-dream .week-day-number { color: #fbbf24; }
+
+.week-day-cell.current-streak .week-day-number.today,
+.week-day-cell.former-streak .week-day-number.today,
+.week-day-cell.relapse .week-day-number.today,
+.week-day-cell.wet-dream .week-day-number.today {
+  background: #ffffff;
+  color: #000000;
 }
 
-.week-day-cell.former-streak .week-day-number:not(.today) {
-  color: #60a5fa;
-}
-
-.week-day-cell.relapse .week-day-number:not(.today) {
-  color: #f87171;
-}
-
-/* Week benefits display */
+/* Week benefits */
 .week-benefits-prominent {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  flex: 1;
 }
 
 .week-benefit-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .week-benefit-label-top {
   font-size: 0.5625rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.25);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .week-benefit-bar {
@@ -681,7 +555,10 @@
   justify-content: center;
 }
 
-/* Week day indicators */
+/* =============================================================================
+   WEEK DAY INDICATORS - Dots only
+   ============================================================================= */
+
 .week-day-indicators {
   display: flex;
   justify-content: space-between;
@@ -689,39 +566,38 @@
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.875rem;
 }
 
-.week-indicator-left {
+/* Gold dot for has data */
+.week-has-data-dot {
+  width: 6px;
+  height: 6px;
+  background: #ffdd00;
+  border-radius: 50%;
+}
+
+/* Status dots on right */
+.week-status-indicator {
   display: flex;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.2);
+  gap: 6px;
+  margin-left: auto;
 }
 
+.week-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.week-status-dot.current-streak { background: #34d399; }
+.week-status-dot.former-streak { background: #60a5fa; }
+.week-status-dot.relapse { background: #f87171; }
+.week-status-dot.wet-dream { background: #fbbf24; }
+
+/* Hide old week indicator styles */
+.week-indicator-left,
 .week-indicator-right {
-  display: flex;
-  gap: 8px;
-  font-size: 1rem;
-}
-
-.week-indicator-right .success-icon { 
-  color: #34d399; 
-  display: inline-block;
-}
-
-.week-indicator-right .relapse-icon { 
-  color: #f87171; 
-  display: inline-block;
-}
-
-.week-indicator-right .wet-dream-icon { 
-  color: #fbbf24; 
-  font-size: 1rem;
-  display: inline-block !important;
-}
-
-.week-day-cell.former-streak .week-indicator-right .success-icon {
-  color: #60a5fa;
+  display: none;
 }
 
 /* =============================================================================
@@ -773,16 +649,22 @@
   
   .compact-legend-item {
     font-size: 0.6875rem;
+    gap: 6px;
   }
   
-  /* Month view mobile */
+  .legend-dot {
+    width: 5px;
+    height: 5px;
+  }
+  
+  /* Month view mobile - maximize width */
   .calendar-display {
     padding: 10px 6px;
     border-radius: 14px;
   }
   
   .calendar-row {
-    gap: 3px;
+    gap: 1px;
   }
   
   .day-header {
@@ -801,45 +683,29 @@
   }
   
   .day-cell.today .day-number {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8125rem;
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
   }
   
-  /* Status bar on mobile */
+  /* Status bar smaller on mobile */
   .day-cell.current-streak::after,
   .day-cell.former-streak::after,
   .day-cell.relapse::after,
   .day-cell.wet-dream::after {
+    width: 12px;
     height: 2px;
+    bottom: 3px;
   }
   
-  /* Benefits dot mobile */
-  .day-tracking-indicator {
-    width: 5px !important;
-    height: 5px !important;
-    top: 3px !important;
-    right: 3px !important;
-  }
-  
-  /* Wet dream indicator mobile */
-  .day-wet-dream-indicator {
-    width: 16px !important;
-    height: 16px !important;
-    bottom: 5px !important;
-  }
-  
-  .wet-dream-icon {
-    font-size: 0.5625rem !important;
-  }
-  
-  .day-journal-indicator-top {
-    font-size: 0.4375rem;
+  .day-has-data-dot {
+    width: 4px;
+    height: 4px;
     top: 3px;
-    left: 3px;
+    right: 3px;
   }
   
-  /* Week view mobile */
+  /* Week view mobile - FULL WIDTH STACKED */
   .week-view-grid {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -902,16 +768,21 @@
     border-top: none;
     border-left: 1px solid rgba(255, 255, 255, 0.05);
     min-width: 44px;
-    font-size: 1.125rem;
+    align-items: center;
   }
   
-  .week-indicator-left,
-  .week-indicator-right {
-    justify-content: center;
+  .week-has-data-dot {
+    width: 5px;
+    height: 5px;
   }
   
-  .week-indicator-right {
-    font-size: 1.125rem;
+  .week-status-indicator {
+    margin-left: 0;
+  }
+  
+  .week-status-dot {
+    width: 5px;
+    height: 5px;
   }
 }
 
@@ -955,14 +826,19 @@
     gap: 5px;
   }
   
-  /* Calendar grid */
+  .legend-dot {
+    width: 4px;
+    height: 4px;
+  }
+  
+  /* Calendar grid - maximum width usage */
   .calendar-display {
     padding: 8px 4px;
     border-radius: 12px;
   }
   
   .calendar-row {
-    gap: 2px;
+    gap: 0;
   }
   
   .day-header {
@@ -981,44 +857,28 @@
   }
   
   .day-cell.today .day-number {
-    width: 26px;
-    height: 26px;
-    font-size: 0.75rem;
+    width: 22px;
+    height: 22px;
+    font-size: 0.6875rem;
   }
   
   .day-cell.current-streak::after,
   .day-cell.former-streak::after,
   .day-cell.relapse::after,
   .day-cell.wet-dream::after {
+    width: 10px;
     height: 2px;
+    bottom: 2px;
   }
   
-  /* Benefits dot small screens */
-  .day-tracking-indicator {
-    width: 4px !important;
-    height: 4px !important;
-    top: 2px !important;
-    right: 2px !important;
-  }
-  
-  /* Wet dream indicator small screens */
-  .day-wet-dream-indicator {
-    width: 14px !important;
-    height: 14px !important;
-    bottom: 4px !important;
-  }
-  
-  .wet-dream-icon {
-    font-size: 0.5rem !important;
-  }
-  
-  .day-journal-indicator-top {
-    font-size: 0.375rem;
+  .day-has-data-dot {
+    width: 3px;
+    height: 3px;
     top: 2px;
-    left: 2px;
+    right: 2px;
   }
   
-  /* Week view small */
+  /* Week view very small */
   .week-day-cell {
     padding: 14px 16px;
     gap: 16px;
@@ -1056,10 +916,16 @@
     padding-left: 12px;
     min-width: 38px;
   }
+  
+  .week-has-data-dot,
+  .week-status-dot {
+    width: 4px;
+    height: 4px;
+  }
 }
 
 /* =============================================================================
-   ANIMATIONS
+   ANIMATIONS - Entrance effects matching Landing
    ============================================================================= */
 
 @keyframes fadeInUp {
