@@ -16,7 +16,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  padding: 24px 24px 0 24px;
   text-align: center;
 }
 
@@ -24,7 +24,7 @@
   font-size: 0.875rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 40px 0;
+  margin: 0 0 24px 0;
 }
 
 /* Streak - tappable */
@@ -34,8 +34,8 @@
   align-items: center;
   background: none;
   border: none;
-  padding: 20px 32px;
-  margin: -20px -32px;
+  padding: 16px 32px;
+  margin: -16px -32px;
   cursor: pointer;
   border-radius: 16px;
   transition: background-color 150ms ease;
@@ -51,7 +51,7 @@
 }
 
 .streak-num {
-  font-size: 9rem;
+  font-size: 8rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1;
@@ -72,7 +72,49 @@
   font-size: 0.875rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.25);
-  margin: 48px 0 0 0;
+  margin: 32px 0 0 0;
+}
+
+/* Meta section - phase + milestone */
+.tracker-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.meta-phase {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.phase-num {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.05em;
+}
+
+.phase-label {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.meta-divider {
+  width: 1px;
+  height: 12px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.meta-milestone {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.02em;
+  font-feature-settings: 'tnum' 1;
 }
 
 /* ============================================================
@@ -407,7 +449,23 @@
 
 @media (min-width: 768px) {
   .streak-num {
-    font-size: 12rem;
+    font-size: 10rem;
+  }
+  
+  .tracker-main {
+    padding: 48px 32px 0 32px;
+  }
+  
+  .date {
+    margin-bottom: 32px;
+  }
+  
+  .milestone {
+    margin-top: 40px;
+  }
+  
+  .tracker-meta {
+    margin-top: 40px;
   }
   
   .tracker-footer {
@@ -417,7 +475,7 @@
 
 @media (max-width: 480px) {
   .tracker-main {
-    padding: 32px 20px;
+    padding: 16px 20px 0 20px;
   }
   
   .streak-num {
@@ -425,11 +483,25 @@
   }
   
   .date {
-    margin-bottom: 32px;
+    margin-bottom: 20px;
   }
   
   .milestone {
-    margin-top: 36px;
+    margin-top: 24px;
+  }
+  
+  .tracker-meta {
+    margin-top: 24px;
+    gap: 12px;
+  }
+  
+  .phase-num {
+    font-size: 0.6875rem;
+  }
+  
+  .phase-label,
+  .meta-milestone {
+    font-size: 0.75rem;
   }
   
   .tracker-footer {
@@ -452,37 +524,14 @@
   }
 }
 
+/* Short screens - ensure button visibility */
 @media (max-height: 700px) {
   .tracker-main {
-    justify-content: flex-start;
-    padding-top: 8vh;
+    padding: 12px 20px 0 20px;
   }
   
   .streak-num {
     font-size: 6rem;
-  }
-  
-  .date {
-    margin-bottom: 24px;
-  }
-  
-  .milestone {
-    margin-top: 28px;
-  }
-}
-
-@media (max-height: 500px) and (orientation: landscape) {
-  .tracker {
-    min-height: auto;
-  }
-  
-  .tracker-main {
-    padding: 24px;
-    justify-content: center;
-  }
-  
-  .streak-num {
-    font-size: 5rem;
   }
   
   .date {
@@ -491,6 +540,72 @@
   
   .milestone {
     margin-top: 20px;
+  }
+  
+  .tracker-meta {
+    margin-top: 20px;
+  }
+  
+  .tracker-footer {
+    padding: 16px 20px;
+  }
+}
+
+/* Very short screens */
+@media (max-height: 600px) {
+  .streak-num {
+    font-size: 5rem;
+  }
+  
+  .date {
+    font-size: 0.8125rem;
+    margin-bottom: 12px;
+  }
+  
+  .milestone {
+    margin-top: 16px;
+    font-size: 0.8125rem;
+  }
+  
+  .tracker-meta {
+    margin-top: 16px;
+    gap: 10px;
+  }
+  
+  .phase-num,
+  .phase-label,
+  .meta-milestone {
+    font-size: 0.6875rem;
+  }
+}
+
+/* Landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+  .tracker {
+    min-height: auto;
+  }
+  
+  .tracker-main {
+    padding: 16px;
+    justify-content: center;
+  }
+  
+  .streak-num {
+    font-size: 4rem;
+  }
+  
+  .tracker-meta {
+    margin-top: 12px;
+  }
+  
+  .tracker-footer {
+    flex-direction: row;
+    max-width: 500px;
+  }
+  
+  .btn-primary,
+  .btn-logged {
+    flex: 1;
   }
 }
 
