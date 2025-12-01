@@ -66,6 +66,88 @@ code {
 }
 
 /* ============================================================
+   CUSTOM SCROLLBAR - Ultra-minimal, matches app aesthetic
+   Completely replaces the default system scrollbar
+   ============================================================ */
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* Modal/list scrollbars - even more subtle */
+.modal-content::-webkit-scrollbar,
+.benefits-list::-webkit-scrollbar,
+.benefits-modal::-webkit-scrollbar {
+  width: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb,
+.benefits-list::-webkit-scrollbar-thumb,
+.benefits-modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1.5px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover,
+.benefits-list::-webkit-scrollbar-thumb:hover,
+.benefits-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile - thinner scrollbar */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* Touch devices - hide scrollbar completely (native scroll still works) */
+@media (hover: none) and (pointer: coarse) {
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+  
+  * {
+    scrollbar-width: none;
+  }
+}
+
+/* ============================================================
    TOAST STYLING - Clean, minimal
    ============================================================ */
 
