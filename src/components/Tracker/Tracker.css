@@ -1,18 +1,25 @@
 /* Tracker.css - TITANTRACK */
 
 .tracker {
-  /* Take full height, center everything */
-  min-height: calc(100dvh - 56px - 80px);
+  /* Fixed positioning - fills space between header and nav exactly */
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 0 24px;
+  overflow: hidden;
+  background-color: #000000;
 }
 
 @media (min-width: 1025px) {
   .tracker {
-    min-height: calc(100dvh - 64px - 32px);
+    top: 64px;
+    bottom: 0; /* no mobile nav on desktop */
   }
 }
 
@@ -784,8 +791,6 @@
 /* Landscape */
 @media (max-height: 500px) and (orientation: landscape) {
   .tracker {
-    height: auto;
-    min-height: calc(100vh - 60px);
     flex-direction: row;
     gap: 32px;
   }
