@@ -120,8 +120,28 @@
   border: none;
 }
 
-.calendar-status-badge svg {
-  font-size: 0.875rem;
+/* Status dot in badge */
+.calendar-status-badge .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.calendar-status-badge.current-streak .status-dot {
+  background-color: #34d399;
+}
+
+.calendar-status-badge.former-streak .status-dot {
+  background-color: #60a5fa;
+}
+
+.calendar-status-badge.relapse .status-dot {
+  background-color: #f87171;
+}
+
+.calendar-status-badge.wet-dream .status-dot {
+  background-color: #fbbf24;
 }
 
 .calendar-status-badge .day-count {
@@ -516,24 +536,36 @@
   font-family: inherit;
 }
 
-.calendar-option-btn svg {
-  font-size: 1rem;
+/* Option dot */
+.calendar-option-btn .option-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-/* Streak button - WHITE */
+/* Streak button - WHITE with green dot */
 .calendar-option-streak {
   background: #ffffff;
   color: #000000;
+}
+
+.calendar-option-streak .option-dot {
+  background-color: #34d399;
 }
 
 .calendar-option-streak:hover {
   opacity: 0.9;
 }
 
-/* Wet dream button - subtle */
+/* Wet dream button - subtle with amber dot */
 .calendar-option-wetdream {
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.7);
+}
+
+.calendar-option-wetdream .option-dot {
+  background-color: #fbbf24;
 }
 
 .calendar-option-wetdream:hover {
@@ -541,10 +573,14 @@
   color: #ffffff;
 }
 
-/* Relapse button */
+/* Relapse button with red dot */
 .calendar-option-relapse {
   background: rgba(255, 59, 48, 0.1);
   color: #ff3b30;
+}
+
+.calendar-option-relapse .option-dot {
+  background-color: #f87171;
 }
 
 .calendar-option-relapse:hover {

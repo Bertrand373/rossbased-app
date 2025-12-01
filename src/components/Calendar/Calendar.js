@@ -8,11 +8,10 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-import { FaCheckCircle, FaTimesCircle, FaMoon, 
-  FaInfoCircle, FaExclamationTriangle, FaFrown, 
-  FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks, FaArrowLeft,
-  FaWineBottle, FaBed, FaPen, FaBook, FaChevronLeft, FaChevronRight,
-  FaCalendarAlt, FaCalendarWeek, FaTimes, FaEdit } from 'react-icons/fa';
+import { FaExclamationTriangle, FaFrown, 
+  FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks,
+  FaWineBottle, FaBed, FaChevronLeft, FaChevronRight,
+  FaCalendarAlt, FaCalendarWeek } from 'react-icons/fa';
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -506,7 +505,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 if (dayStatus?.type === 'current-streak') {
                   return (
                     <div className="calendar-status-badge current-streak">
-                      <FaCheckCircle />
+                      <span className="status-dot"></span>
                       <span>Current Streak</span>
                       {dayCount && <span className="day-count">Day {dayCount.dayNumber}</span>}
                     </div>
@@ -515,7 +514,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 if (dayStatus?.type === 'former-streak') {
                   return (
                     <div className="calendar-status-badge former-streak">
-                      <FaCheckCircle />
+                      <span className="status-dot"></span>
                       <span>Former Streak</span>
                       {dayCount && <span className="day-count">Day {dayCount.dayNumber}{dayCount.totalDays ? `/${dayCount.totalDays}` : ''}</span>}
                     </div>
@@ -524,7 +523,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 if (dayStatus?.type === 'relapse') {
                   return (
                     <div className="calendar-status-badge relapse">
-                      <FaTimesCircle />
+                      <span className="status-dot"></span>
                       <span>Relapse</span>
                     </div>
                   );
@@ -532,7 +531,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 if (wetDream) {
                   return (
                     <div className="calendar-status-badge wet-dream">
-                      <FaMoon />
+                      <span className="status-dot"></span>
                       <span>Wet Dream</span>
                     </div>
                   );
@@ -583,8 +582,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 <h4>Journal</h4>
                 {!isEditingNote && noteText && (
                   <button className="calendar-action-btn" onClick={startEditingNote}>
-                    <FaPen />
-                    <span>Edit</span>
+                    Edit
                   </button>
                 )}
               </div>
@@ -600,12 +598,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                   />
                   <div className="calendar-journal-actions">
                     <button className="calendar-save-btn" onClick={saveNote}>
-                      <FaCheckCircle />
-                      <span>Save</span>
+                      Save
                     </button>
                     <button className="calendar-cancel-btn" onClick={cancelEditingNote}>
-                      <FaTimes />
-                      <span>Cancel</span>
+                      Cancel
                     </button>
                   </div>
                 </div>
@@ -619,8 +615,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                   </div>
                   <div className="calendar-journal-start">
                     <button className="calendar-action-btn" onClick={startEditingNote}>
-                      <FaPen />
-                      <span>Add Entry</span>
+                      Add Entry
                     </button>
                   </div>
                 </>
@@ -630,7 +625,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             {/* Actions */}
             <div className="calendar-actions">
               <button className="calendar-btn-primary" onClick={showEditFromInfo}>
-                <FaEdit />
                 Edit Day
               </button>
               <button className="calendar-btn-ghost" onClick={closeDayInfo}>
@@ -654,15 +648,15 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             {!showTriggerSelection ? (
               <div className="calendar-edit-options">
                 <button className="calendar-option-btn calendar-option-streak" onClick={() => handleStatusClick('current-streak')}>
-                  <FaCheckCircle />
+                  <span className="option-dot"></span>
                   <span>Mark as Streak Day</span>
                 </button>
                 <button className="calendar-option-btn calendar-option-wetdream" onClick={() => handleStatusClick('wet-dream')}>
-                  <FaMoon />
+                  <span className="option-dot"></span>
                   <span>Log Wet Dream</span>
                 </button>
                 <button className="calendar-option-btn calendar-option-relapse" onClick={() => handleStatusClick('relapse')}>
-                  <FaTimesCircle />
+                  <span className="option-dot"></span>
                   <span>Log Relapse</span>
                 </button>
               </div>
@@ -695,7 +689,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
             <div className="calendar-actions">
               <button className="calendar-btn-back" onClick={backToDayInfo}>
-                <FaArrowLeft />
                 Back
               </button>
               <button className="calendar-btn-ghost" onClick={closeEditModal}>
