@@ -1,6 +1,6 @@
 /* =============================================================================
    CALENDAR MODALS - TITANTRACK ELITE
-   Matches Tracker modal aesthetic exactly
+   MATCHES Tracker modal aesthetic EXACTLY
    Immersive overlay, floating content, white primary buttons
    ============================================================================= */
 
@@ -41,7 +41,7 @@
 }
 
 /* =============================================================================
-   MODAL CONTENT - Floating, transparent (matches Tracker .modal)
+   MODAL CONTENT - Floating, transparent (matches Tracker exactly)
    ============================================================================= */
 
 .modal-content {
@@ -104,7 +104,7 @@
 }
 
 /* =============================================================================
-   DAY INFO MODAL
+   DAY INFO MODAL - Matches Tracker modal styling
    ============================================================================= */
 
 .day-info-modal {
@@ -371,7 +371,7 @@
   gap: 12px;
 }
 
-/* Save button matches Tracker .btn-primary */
+/* Save button - Matches Tracker .btn-primary EXACTLY */
 .journal-save-btn {
   flex: 1;
   padding: 14px 20px;
@@ -383,7 +383,7 @@
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: opacity 150ms ease, transform 150ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -394,7 +394,11 @@
   opacity: 0.9;
 }
 
-/* Cancel button matches Tracker .btn-ghost */
+.journal-save-btn:active {
+  transform: scale(0.98);
+}
+
+/* Cancel button - Matches Tracker .btn-ghost EXACTLY */
 .journal-cancel-btn {
   flex: 1;
   padding: 14px 20px;
@@ -468,7 +472,7 @@
 }
 
 /* =============================================================================
-   MODAL ACTIONS - Matches Tracker exactly
+   MODAL ACTIONS - Matches Tracker EXACTLY
    ============================================================================= */
 
 .modal-actions {
@@ -478,7 +482,7 @@
   margin-top: 40px;
 }
 
-/* Primary button - white (matches Tracker .btn-primary) */
+/* Primary button - WHITE (matches Tracker .btn-primary) */
 .modal-actions .btn-primary,
 .modal-actions .edit-day-btn {
   width: 100%;
@@ -508,7 +512,7 @@
   transform: scale(0.98);
 }
 
-/* Ghost button (matches Tracker .btn-ghost) */
+/* Ghost button - Matches Tracker .btn-ghost */
 .modal-actions .btn-outline,
 .modal-actions .btn-ghost {
   width: 100%;
@@ -718,6 +722,7 @@
   margin-top: 24px;
 }
 
+/* Trigger confirm button - matches Tracker */
 .trigger-actions .btn {
   padding: 14px 32px;
   border-radius: 12px;
@@ -748,6 +753,10 @@
 
 .trigger-actions .btn-primary:hover:not(:disabled) {
   opacity: 0.9;
+}
+
+.trigger-actions .btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 /* =============================================================================
