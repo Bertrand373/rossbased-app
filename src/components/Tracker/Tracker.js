@@ -70,14 +70,14 @@ const Tracker = ({ userData, updateUserData }) => {
     toast.success('Updated');
   };
 
-  // Reset streak
+  // Reset streak (relapse only)
   const handleReset = () => {
     const now = new Date();
     const history = [...(userData.streakHistory || [])];
     const currentIdx = history.findIndex(s => !s.end);
     
     if (currentIdx !== -1) {
-      history[currentIdx] = { ...history[currentIdx], end: now, days: streak, reason: resetType };
+      history[currentIdx] = { ...history[currentIdx], end: now, days: streak, reason: 'relapse' };
     }
     history.push({ start: now, end: null, days: 0 });
 
@@ -85,20 +85,27 @@ const Tracker = ({ userData, updateUserData }) => {
       currentStreak: 0,
       startDate: now,
       streakHistory: history,
-      ...(resetType === 'relapse' && { 
-        lastRelapse: now, 
-        relapseCount: (userData.relapseCount || 0) + 1 
-      }),
-      ...(resetType === 'wetdream' && { 
-        wetDreams: [...(userData.wetDreams || []), { date: now, streakDay: streak }],
-        lastWetDream: now
-      })
+      lastRelapse: now, 
+      relapseCount: (userData.relapseCount || 0) + 1 
     });
 
     setShowResetConfirm(false);
     setShowStreakOptions(false);
     setResetType(null);
-    toast.success('New day one');
+    toast.success('Day one');
+  };
+
+  // Log wet dream (does NOT reset streak)
+  const handleLogWetDream = () => {
+    updateUserData({
+      wetDreams: [...(userData.wetDreams || []), { date: new Date(), streakDay: streak }],
+      lastWetDream: new Date()
+    });
+
+    setShowResetConfirm(false);
+    setShowStreakOptions(false);
+    setResetType(null);
+    toast.success('Logged');
   };
 
   // Benefits
@@ -232,21 +239,21 @@ const Tracker = ({ userData, updateUserData }) => {
       {/* Reset Confirm */}
       {showResetConfirm && (
         <div className="overlay" onClick={() => setShowResetConfirm(false)}>
-          <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
             <h2>{resetType === 'wetdream' ? 'Log wet dream?' : 'Reset streak?'}</h2>
             <p>
               {resetType === 'wetdream' 
-                ? 'This will reset your counter. Some choose to continue, others reset.'
+                ? 'This will be logged but won\'t affect your streak. Wet dreams are natural.'
                 : 'Your current streak will be saved to history.'
               }
             </p>
-            <div className="modal-actions">
+            <div className="confirm-actions">
               <button className="btn-ghost" onClick={() => setShowResetConfirm(false)}>Cancel</button>
               <button 
                 className={resetType === 'relapse' ? 'btn-danger' : 'btn-primary'} 
-                onClick={handleReset}
+                onClick={resetType === 'wetdream' ? handleLogWetDream : handleReset}
               >
-                {resetType === 'wetdream' ? 'Reset' : 'Reset streak'}
+                {resetType === 'wetdream' ? 'Log it' : 'Reset'}
               </button>
             </div>
           </div>
