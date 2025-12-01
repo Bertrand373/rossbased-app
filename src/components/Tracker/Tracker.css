@@ -4,6 +4,8 @@
   min-height: calc(100vh - 130px);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: 8vh 24px 0 24px;
 }
 
 /* ============================================================
@@ -11,12 +13,9 @@
    ============================================================ */
 
 .tracker-main {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 8vh 24px 0 24px;
   text-align: center;
 }
 
@@ -76,13 +75,12 @@
 }
 
 /* ============================================================
-   FOOTER
+   FOOTER - Button area
    ============================================================ */
 
 .tracker-footer {
-  padding: 20px;
+  padding: 40px 24px 24px 24px;
   max-width: 360px;
-  margin: 0 auto;
   width: 100%;
 }
 
@@ -511,7 +509,7 @@
    ============================================================ */
 
 @media (min-width: 768px) {
-  .tracker-main {
+  .tracker {
     padding: 12vh 32px 0 32px;
   }
   
@@ -528,12 +526,12 @@
   }
   
   .tracker-footer {
-    padding: 32px;
+    padding: 48px 32px 32px 32px;
   }
 }
 
 @media (max-width: 480px) {
-  .tracker-main {
+  .tracker {
     padding: 6vh 20px 0 20px;
   }
   
@@ -552,7 +550,7 @@
   }
   
   .tracker-footer {
-    padding: 16px 20px;
+    padding: 32px 20px 20px 20px;
   }
   
   .btn-primary,
@@ -565,9 +563,9 @@
   }
 }
 
-/* Short screens - tighter padding, keep streak readable */
+/* Short screens */
 @media (max-height: 700px) {
-  .tracker-main {
+  .tracker {
     padding-top: 4vh;
   }
   
@@ -584,13 +582,13 @@
   }
   
   .tracker-footer {
-    padding: 12px 20px;
+    padding-top: 24px;
   }
 }
 
 /* Very short screens */
 @media (max-height: 600px) {
-  .tracker-main {
+  .tracker {
     padding-top: 2vh;
   }
   
@@ -609,7 +607,7 @@
   }
   
   .tracker-footer {
-    padding: 12px 16px;
+    padding: 16px;
   }
   
   .btn-primary,
@@ -622,11 +620,10 @@
 @media (max-height: 500px) and (orientation: landscape) {
   .tracker {
     min-height: auto;
-  }
-  
-  .tracker-main {
     padding: 16px;
+    flex-direction: row;
     justify-content: center;
+    gap: 32px;
   }
   
   .streak-num {
@@ -634,8 +631,8 @@
   }
   
   .tracker-footer {
-    flex-direction: row;
-    max-width: 500px;
+    padding: 0;
+    max-width: 200px;
   }
   
   .btn-primary,
