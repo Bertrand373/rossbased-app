@@ -461,6 +461,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       {/* Legend - Dots */}
       <div className="calendar-legend-compact">
         <div className="compact-legend-item">
+          <span className="legend-dot tracked"></span>
+          <span>Tracked</span>
+        </div>
+        <div className="compact-legend-item">
           <span className="legend-dot current-streak"></span>
           <span>Current</span>
         </div>
