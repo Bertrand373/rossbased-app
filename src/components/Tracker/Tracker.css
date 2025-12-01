@@ -283,33 +283,47 @@
 }
 
 /* ============================================================
-   BENEFITS MODAL - Elegant sliders
+   BENEFITS MODAL - Matches date picker aesthetic
    ============================================================ */
 
 .benefits-modal {
-  max-width: 400px;
+  width: 100%;
+  max-width: 360px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
+  text-align: center;
+  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .benefits-modal h2 {
-  margin-bottom: 40px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.benefits-modal p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 40px 0;
 }
 
 .benefits-list {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 28px;
   overflow-y: auto;
   flex: 1;
-  padding: 0 4px;
+  padding: 0 4px 4px 4px;
+  text-align: left;
 }
 
 .benefit-row {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .benefit-info {
@@ -321,12 +335,11 @@
 .benefit-info span:first-child {
   font-size: 0.875rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.6);
-  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .benefit-num {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 500;
   color: #ffffff;
   font-feature-settings: 'tnum' 1;
@@ -365,8 +378,8 @@
 
 .benefit-slider input::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   background: #ffffff;
   border-radius: 50%;
   border: none;
@@ -376,12 +389,12 @@
 }
 
 .benefit-slider input::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .benefit-slider input::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   background: #ffffff;
   border-radius: 50%;
   border: none;
@@ -389,13 +402,48 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.benefits-modal .modal-actions {
+/* Benefits actions - matches date picker exactly */
+.benefits-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-top: 40px;
-  flex-direction: row;
 }
 
-.benefits-modal .modal-actions button {
-  flex: 1;
+.benefits-actions .btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.benefits-actions .btn-primary:hover {
+  opacity: 0.9;
+}
+
+.benefits-actions .btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.benefits-actions .btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* ============================================================
@@ -560,6 +608,25 @@
   
   .benefits-list {
     gap: 24px;
+  }
+  
+  .benefits-modal h2 {
+    font-size: 1.25rem;
+  }
+  
+  .benefits-modal p {
+    font-size: 0.8125rem;
+    margin-bottom: 32px;
+  }
+  
+  .benefits-actions {
+    margin-top: 32px;
+  }
+  
+  .benefits-actions .btn-primary,
+  .benefits-actions .btn-ghost {
+    padding: 14px 20px;
+    font-size: 0.875rem;
   }
 }
 

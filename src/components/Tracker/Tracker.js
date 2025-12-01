@@ -149,7 +149,7 @@ const Tracker = ({ userData, updateUserData }) => {
         <div className="overlay">
           <DatePicker
             onSubmit={handleDateSubmit}
-            onCancel={() => userData.startDate && setShowDatePicker(false)}
+            onCancel={userData.startDate ? () => setShowDatePicker(false) : null}
             initialDate={userData.startDate ? new Date(userData.startDate) : new Date()}
             title={userData.startDate ? "Edit start date" : "When did you start?"}
           />
@@ -164,8 +164,9 @@ const Tracker = ({ userData, updateUserData }) => {
       {/* Benefits Modal */}
       {showBenefits && (
         <div className="overlay" onClick={() => setShowBenefits(false)}>
-          <div className="modal benefits-modal" onClick={e => e.stopPropagation()}>
+          <div className="benefits-modal" onClick={e => e.stopPropagation()}>
             <h2>How do you feel?</h2>
+            <p>Rate today's benefits</p>
             
             <div className="benefits-list">
               {benefitsList.map(({ key, label }) => (
@@ -191,7 +192,7 @@ const Tracker = ({ userData, updateUserData }) => {
               ))}
             </div>
             
-            <div className="modal-actions">
+            <div className="benefits-actions">
               <button className="btn-ghost" onClick={() => setShowBenefits(false)}>Cancel</button>
               <button className="btn-primary" onClick={saveBenefits}>Save</button>
             </div>
