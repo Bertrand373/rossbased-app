@@ -197,12 +197,15 @@
   margin-top: 48px;
 }
 
-.modal-actions .btn-primary,
-.modal-actions .btn-danger,
-.modal-actions .btn-ghost {
+/* Button styles - work inside modals */
+.modal .btn-primary,
+.modal-actions .btn-primary {
   width: 100%;
   padding: 16px 24px;
+  background-color: #ffffff;
+  border: none;
   border-radius: 12px;
+  color: #000000;
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -210,32 +213,47 @@
   transition: all 150ms ease;
 }
 
-.modal-actions .btn-ghost {
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.modal-actions .btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.modal-actions .btn-primary {
-  background: #ffffff;
-  border: none;
-  color: #000000;
-}
-
+.modal .btn-primary:hover,
 .modal-actions .btn-primary:hover {
   opacity: 0.9;
 }
 
-.modal-actions .btn-danger {
-  background: rgba(255, 255, 255, 0.1);
+.modal .btn-ghost,
+.modal-actions .btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
   border: none;
-  color: #ffffff;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
 }
 
+.modal .btn-ghost:hover,
+.modal-actions .btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.modal .btn-danger,
+.modal-actions .btn-danger {
+  width: 100%;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.modal .btn-danger:hover,
 .modal-actions .btn-danger:hover {
   background: rgba(255, 255, 255, 0.15);
 }

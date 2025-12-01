@@ -1,306 +1,172 @@
-/* components/Shared/DatePicker.css - UPDATED: Helmet banner branding, grey→yellow hover effects, fixed mobile inputs */
+/* DatePicker.css - TITANTRACK MINIMAL */
 
-.date-picker-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  padding: 0; /* REMOVED: No padding around container */
-  background-color: transparent; /* REMOVED: No background */
-  border: none; /* REMOVED: No border */
-  border-radius: 0; /* REMOVED: No border radius */
-}
-
-.current-date-display {
-  background-color: var(--medium-gray);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
+.date-picker {
+  width: 100%;
+  max-width: 340px;
   text-align: center;
-  font-size: 0.875rem;
-  color: var(--text);
-  border: 1px solid var(--border);
 }
 
-.current-date-label {
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  margin-bottom: var(--spacing-xs);
+.date-picker h2 {
+  font-size: 1.5rem;
   font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
 }
 
-.current-date-value {
-  color: var(--text);
-  font-weight: 600;
-  font-size: 1rem;
+.date-picker p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 48px 0;
 }
 
-.date-picker-form {
+.date-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md); /* REDUCED: Less gap between sections */
+  gap: 48px;
 }
 
-/* IMPROVED: Better spacing and layout for date inputs */
-.date-inputs-row {
+.date-inputs {
   display: flex;
-  gap: var(--spacing-md); /* INCREASED: More reasonable spacing */
-  align-items: center; /* CHANGED: Center align for proper separator positioning */
+  align-items: flex-start;
   justify-content: center;
-  padding: var(--spacing-sm) 0; /* FIXED: Match bottom spacing */
+  gap: 8px;
 }
 
-.input-group {
+.date-field {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
-  align-items: center; /* ADDED: Center the inputs */
+  align-items: center;
+  gap: 8px;
 }
 
-.input-group label {
-  font-size: 0.875rem; /* INCREASED: Larger labels */
-  color: var(--text);
-  font-weight: 600;
+.date-field input {
+  width: 64px;
+  padding: 16px 8px;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 500;
+  font-family: inherit;
   text-align: center;
+  letter-spacing: 0.05em;
+  transition: all 150ms ease;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-/* IMPROVED: Better input styling matching other form elements */
-.date-inputs-row input {
-  padding: var(--spacing-md); /* INCREASED: More padding like other inputs */
-  background-color: var(--medium-gray);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text);
-  font-size: 1rem; /* INCREASED: Larger font size */
-  text-align: center;
-  font-weight: 600;
-  transition: border-color 0.2s, background-color 0.2s;
-  min-height: 44px; /* ADDED: Minimum height for better touch targets */
-}
-
-.date-inputs-row input:focus {
+.date-field input:focus {
   outline: none;
-  border-color: var(--primary);
-  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
-.date-inputs-row input::placeholder {
-  color: var(--text-secondary);
+.date-field input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
   font-weight: 400;
 }
 
-/* FIXED: Better input widths for mobile - significantly increased */
-.month-input { 
-  width: 72px; /* INCREASED: From 64px to 72px for mobile numbers */
+.date-field:last-child input {
+  width: 80px;
 }
 
-.day-input { 
-  width: 72px; /* INCREASED: From 64px to 72px for mobile numbers */
-}
-
-.year-input { 
-  width: 88px; /* INCREASED: From 80px to 88px for mobile numbers */
+.date-label {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .date-separator {
-  font-size: 1.5rem; /* INCREASED: Bigger separator */
-  color: var(--text-secondary);
-  margin: 0 var(--spacing-xs); /* INCREASED: More margin */
-  font-weight: 600;
-  line-height: 1; /* ADDED: Ensure proper line height for centering */
+  font-size: 1.25rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.2);
+  padding-top: 16px;
 }
 
-/* NEW: Helmet Info Banner - EXACT COPY from Emotional Timeline */
-.date-picker-info-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
-  margin-bottom: var(--spacing-lg);
-}
-
-.date-picker-helmet-container {
-  flex-shrink: 0;
-}
-
-.date-picker-helmet {
-  width: 40px;
-  height: 40px;
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
-}
-
-.date-picker-helmet-fallback {
-  font-size: 1.5rem;
-  color: var(--primary);
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-}
-
-@keyframes coming-soon-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.96);
-  }
-}
-
-.date-picker-info-content {
-  flex: 1;
+.date-actions {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 12px;
 }
 
-.date-picker-info-title {
-  font-size: 1rem;
+.date-actions .btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--text);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 150ms ease;
 }
 
-.date-picker-info-description {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin: 0;
+.date-actions .btn-primary:hover {
+  opacity: 0.9;
 }
 
-/* REMOVED: Old helper-text styles - replaced with helmet banner */
-
-/* Button styling handled by TrackerButtons.css for Liquid Glass effect */
-.date-picker-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-sm);
+.date-actions .btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
 }
 
-/* IMPROVED: Mobile responsiveness with better spacing */
-@media (max-width: 768px) {
-  .date-picker-container {
-    gap: var(--spacing-md); /* REDUCED: Less gap on mobile */
-  }
-  
-  /* NEW: Mobile helmet banner styles - EXACT COPY from Emotional Timeline */
-  .date-picker-info-banner {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-  }
-  
-  .date-picker-info-content {
-    text-align: center;
-  }
-  
-  .date-picker-info-title {
-    justify-content: center;
-  }
-  
-  .date-picker-helmet {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .date-picker-helmet-fallback {
-    font-size: 1.25rem;
-  }
-  
-  .date-inputs-row {
-    gap: var(--spacing-sm); /* REDUCED: Tighter spacing on mobile */
-    padding: var(--spacing-xs) 0; /* RESTORED: Back to original mobile padding */
-  }
-  
-  /* FIXED: Better mobile input sizes - even larger for readability */
-  .month-input,
-  .day-input {
-    width: 68px; /* INCREASED: From 56px to 68px for better mobile display */
-  }
-  
-  .year-input {
-    width: 84px; /* INCREASED: From 72px to 84px for better mobile display */
-  }
-  
-  .date-inputs-row input {
-    padding: var(--spacing-sm) var(--spacing-md); /* INCREASED: Better mobile padding */
-    font-size: 1rem; /* MAINTAINED: Good size for mobile */
-    min-height: 48px; /* INCREASED: Better touch target on mobile */
-  }
-  
-  .input-group label {
-    font-size: 0.8125rem;
-  }
-  
-  .date-separator {
-    font-size: 1.25rem;
-    margin: 0 var(--spacing-xs);
-    line-height: 1; /* MAINTAINED: Consistent line height */
-  }
-  
-  .current-date-display {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.8125rem;
-  }
-  
-  .current-date-label {
-    font-size: 0.75rem;
-  }
-  
-  .current-date-value {
-    font-size: 0.9375rem;
-  }
-  
-  .date-picker-actions {
-    gap: var(--spacing-sm);
-  }
+.date-actions .btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* Very small screens - more compact */
+/* Mobile */
 @media (max-width: 480px) {
-  /* NEW: Very small mobile helmet banner styles - EXACT COPY from Emotional Timeline */
-  .date-picker-helmet {
-    width: 30px;
-    height: 30px;
+  .date-picker h2 {
+    font-size: 1.25rem;
   }
   
-  .date-picker-helmet-fallback {
-    font-size: 1rem;
+  .date-picker p {
+    font-size: 0.8125rem;
+    margin-bottom: 40px;
   }
   
-  .date-picker-info-title {
-    font-size: 0.875rem;
+  .date-form {
+    gap: 40px;
   }
   
-  .date-picker-info-description {
-    font-size: 0.8rem;
+  .date-field input {
+    width: 56px;
+    padding: 14px 6px;
+    font-size: 1.125rem;
+    border-radius: 10px;
   }
   
-  .date-inputs-row {
-    gap: var(--spacing-xs);
-    justify-content: space-evenly; /* CHANGED: Better distribution */
+  .date-field:last-child input {
+    width: 72px;
   }
   
-  /* FIXED: Larger inputs for very small screens to prevent cutoff */
-  .month-input,
-  .day-input {
-    width: 64px; /* INCREASED: From 52px to 64px */
-  }
-  
-  .year-input {
-    width: 80px; /* INCREASED: From 68px to 80px */
+  .date-label {
+    font-size: 0.625rem;
   }
   
   .date-separator {
-    font-size: 1.125rem;
-    margin: 0 2px;
+    font-size: 1rem;
+    padding-top: 14px;
+  }
+  
+  .date-actions .btn-primary,
+  .date-actions .btn-ghost {
+    padding: 14px 20px;
+    font-size: 0.875rem;
   }
 }
