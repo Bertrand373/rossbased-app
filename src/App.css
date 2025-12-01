@@ -144,79 +144,44 @@ h4 { font-size: 0.875rem; }
 }
 
 /* ============================================================
-   LOADING SCREEN
+   LOADING SCREEN - Minimal, icon only
    ============================================================ */
 
-.spartan-loading-screen {
-  min-height: 100vh;
+.app-loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: var(--bg-base);
+  z-index: 9999;
 }
 
-.spartan-loader-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-8);
+.app-loading-icon {
+  width: 48px;
+  height: 48px;
+  animation: icon-pulse 2s ease-in-out infinite;
 }
 
-.spartan-loader-animation {
-  position: relative;
+@keyframes icon-pulse {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.4; 
+    transform: scale(0.95);
+  }
 }
 
-.app-loading-helmet-size {
-  width: 140px !important;
-  height: auto !important;
-  animation: logo-pulse 2s ease-in-out infinite;
-  opacity: 0.9;
-}
-
-.app-loading-helmet-fallback-size {
-  font-size: 2rem !important;
-  color: var(--text-primary);
-  animation: logo-pulse 2s ease-in-out infinite;
-}
-
-.spartan-loader-message {
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-  font-weight: 400;
-  letter-spacing: 0.05em;
-}
-
-@keyframes logo-pulse {
-  0%, 100% { opacity: 0.9; }
-  50% { opacity: 0.5; }
-}
-
-.landing-initial-loader {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--bg-base);
-}
-
-.landing-initial-helmet {
-  width: 140px;
-  height: auto;
-  animation: logo-fade 1.2s ease-out;
-}
-
-.landing-initial-helmet-fallback {
-  font-size: 2rem;
-  color: var(--text-primary);
-  animation: logo-fade 1.2s ease-out;
-}
-
-@keyframes logo-fade {
-  0% { opacity: 0; transform: translateY(8px); }
-  50% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; }
+@media (max-width: 480px) {
+  .app-loading-icon {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 /* ============================================================

@@ -1,7 +1,7 @@
 // App.js - TITANTRACK MODERN MINIMAL
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
 
@@ -22,7 +22,6 @@ import MLTraining from './components/MLTraining/MLTraining';
 import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
-import SpartanLoader from './components/Shared/SpartanLoader';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -147,29 +146,15 @@ function App() {
     return success;
   };
 
-  // Loading screen
+  // Loading screen - icon only, no text
   if (isLoading || isRefreshLoading) {
     return (
-      <div className="spartan-loading-screen">
-        <div className="spartan-loader-container">
-          <div className="spartan-loader-animation">
-            <img 
-              src={trackerLogo} 
-              alt="TitanTrack" 
-              className="app-loading-helmet-size"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                if (e.target.nextElementSibling) {
-                  e.target.nextElementSibling.style.display = 'block';
-                }
-              }}
-            />
-            <div className="app-loading-helmet-fallback-size" style={{display: 'none'}}>TT</div>
-          </div>
-          <div className="spartan-loader-message">
-            {loadingMessage}
-          </div>
-        </div>
+      <div className="app-loading-screen">
+        <img 
+          src="/icon-192.png" 
+          alt="" 
+          className="app-loading-icon"
+        />
       </div>
     );
   }
@@ -179,39 +164,24 @@ function App() {
       <ScrollToTop />
       <ServiceWorkerListener />
       <div className="app-container">
-        {/* Toast Notifications - Bottom position, tap to dismiss */}
         <Toaster 
           position="bottom-center"
-          containerStyle={{
-            bottom: 100, // Above mobile nav
-          }}
           toastOptions={{
-            duration: 2000,
+            duration: 3000,
             style: {
-              background: 'rgba(20, 20, 20, 0.95)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              background: '#1a1a1a',
               color: '#ffffff',
-              border: 'none',
+              border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: '12px',
-              padding: '10px 16px',
-              fontSize: '0.8125rem',
-              fontWeight: '500',
+              padding: '12px 20px',
+              fontSize: '14px',
               fontFamily: 'Inter, -apple-system, sans-serif',
-              boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
-              maxWidth: '90vw',
             },
             success: {
-              icon: <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#34d399', flexShrink: 0 }} />,
-              style: {
-                background: 'rgba(20, 20, 20, 0.95)',
-              },
+              iconTheme: { primary: '#22c55e', secondary: '#000' },
             },
             error: {
-              icon: <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f87171', flexShrink: 0 }} />,
-              style: {
-                background: 'rgba(20, 20, 20, 0.95)',
-              },
+              iconTheme: { primary: '#ef4444', secondary: '#fff' },
             },
           }}
         />
