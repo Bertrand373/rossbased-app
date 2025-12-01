@@ -1,10 +1,9 @@
-// App.js - TITANTRACK COMMAND CENTER
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// App.js - TITANTRACK MODERN MINIMAL
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
-import helmetImage from './assets/helmet.png';
 
 // Icons for header
 import { 
@@ -26,7 +25,7 @@ import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
-// Import UNIFIED PredictionDisplay (replaces UrgePrediction)
+// Import UNIFIED PredictionDisplay
 import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay';
 import MLTraining from './components/MLTraining/MLTraining';
 
@@ -39,22 +38,18 @@ import SpartanLoader from './components/Shared/SpartanLoader';
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
 
-// Profile Button Component - Desktop (with text)
+// Profile Button - Desktop
 const ProfileButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const handleProfileClick = () => {
-    navigate('/profile');
-  };
   
   const isActive = location.pathname === '/profile';
   
   return (
     <button 
       className={`profile-btn ${isActive ? 'active' : ''}`} 
-      onClick={handleProfileClick} 
-      title="Profile Settings"
+      onClick={() => navigate('/profile')} 
+      title="Profile"
     >
       <FaUser />
       <span>Profile</span>
@@ -62,29 +57,25 @@ const ProfileButton = () => {
   );
 };
 
-// Mobile Profile Button - Icon only
+// Profile Button - Mobile (icon only)
 const MobileProfileButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const handleProfileClick = () => {
-    navigate('/profile');
-  };
   
   const isActive = location.pathname === '/profile';
   
   return (
     <button 
       className={`profile-btn ${isActive ? 'active' : ''}`} 
-      onClick={handleProfileClick} 
-      title="Profile Settings"
+      onClick={() => navigate('/profile')} 
+      title="Profile"
     >
       <FaUser />
     </button>
   );
 };
 
-// Header Navigation - Desktop only (Sharp segmented tabs)
+// Desktop Navigation
 const HeaderNavigation = () => {
   const navItems = [
     { path: '/', icon: FaHome, label: 'Tracker' },
@@ -112,27 +103,25 @@ const HeaderNavigation = () => {
   );
 };
 
+// Scroll to top on route change
 const ScrollToTop = () => {
   const location = useLocation();
 
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'instant'
-    });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [location.pathname]);
 
   return null;
 };
 
+// Service worker listener for notifications
 const ServiceWorkerListener = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'NAVIGATE_TO_PREDICTION') {
+        if (event.data?.type === 'NAVIGATE_TO_PREDICTION') {
           navigate('/urge-prediction');
         }
       });
@@ -145,13 +134,11 @@ const ServiceWorkerListener = () => {
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
   
   const [isRefreshLoading, setIsRefreshLoading] = useState(() => {
-    const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
-    return storedIsLoggedIn === 'true';
+    return localStorage.getItem('isLoggedIn') === 'true';
   });
-  const [loadingMessage, setLoadingMessage] = useState('Loading your dashboard...');
+  const [loadingMessage, setLoadingMessage] = useState('Loading...');
   
   const { 
     userData, 
@@ -168,42 +155,22 @@ function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
-    setIsInitialLoading(false);
-  }, []);
-
-  useEffect(() => {
     if (isRefreshLoading) {
-      const timer = setTimeout(() => {
-        setIsRefreshLoading(false);
-      }, 1200);
-      
+      const timer = setTimeout(() => setIsRefreshLoading(false), 1200);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [isRefreshLoading]);
 
   const handleLogin = async (username, password) => {
-    setLoadingMessage('Logging you in...');
-    
-    const loginPromise = login(username, password);
-    
-    setTimeout(() => {
-      setLoadingMessage('Loading your dashboard...');
-    }, 800);
-    
-    const success = await loginPromise;
-    
-    if (success) {
-      setShowAuthModal(false);
-    }
+    setLoadingMessage('Signing in...');
+    const success = await login(username, password);
+    if (success) setShowAuthModal(false);
     return success;
   };
 
@@ -214,15 +181,17 @@ function App() {
         <div className="spartan-loader-container">
           <div className="spartan-loader-animation">
             <img 
-              src={helmetImage} 
-              alt="Loading" 
-              className="spartan-helmet-image app-loading-helmet-size"
+              src={trackerLogo} 
+              alt="TitanTrack" 
+              className="app-loading-helmet-size"
               onError={(e) => {
                 e.target.style.display = 'none';
-                e.target.nextElementSibling.style.display = 'block';
+                if (e.target.nextElementSibling) {
+                  e.target.nextElementSibling.style.display = 'block';
+                }
               }}
             />
-            <div className="spartan-helmet-image app-loading-helmet-fallback-size" style={{display: 'none'}}>⚡</div>
+            <div className="app-loading-helmet-fallback-size" style={{display: 'none'}}>TT</div>
           </div>
           <div className="spartan-loader-message">
             {loadingMessage}
@@ -240,44 +209,23 @@ function App() {
         <Toaster 
           position="top-center"
           toastOptions={{
-            duration: 4000,
+            duration: 3000,
             style: {
-              background: '#161616',
+              background: '#141414',
               color: '#ffffff',
-              border: '1px solid #2a2a2a',
-              borderRadius: '4px',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '8px',
               padding: '12px 16px',
-              fontWeight: '500',
               fontSize: '14px',
-              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+              fontFamily: 'Inter, -apple-system, sans-serif',
             },
             success: {
-              style: {
-                borderLeft: '3px solid #00c853',
-              },
-              iconTheme: {
-                primary: '#00c853',
-                secondary: '#000000',
-              },
+              style: { borderLeft: '3px solid #34d399' },
+              iconTheme: { primary: '#34d399', secondary: '#000' },
             },
             error: {
-              style: {
-                borderLeft: '3px solid #ff3d3d',
-              },
-              iconTheme: {
-                primary: '#ff3d3d',
-                secondary: '#ffffff',
-              },
-            },
-            loading: {
-              style: {
-                borderLeft: '3px solid #ffdd00',
-              },
-              iconTheme: {
-                primary: '#ffdd00',
-                secondary: '#000000',
-              },
+              style: { borderLeft: '3px solid #f87171' },
+              iconTheme: { primary: '#f87171', secondary: '#fff' },
             },
           }}
         />
@@ -292,34 +240,29 @@ function App() {
         
         {isLoggedIn ? (
           <>
-            {/* HEADER - Command Bar */}
             <header className="app-header">
               {!isMobile ? (
-                /* DESKTOP: Logo | Navigation | Controls */
                 <>
                   <div className="logo-container">
                     <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
                   </div>
-                  
                   <HeaderNavigation />
-                  
                   <div className="user-controls">
                     <ProfileButton />
-                    <button className="logout-btn" onClick={logout} title="Logout">
+                    <button className="logout-btn" onClick={logout} title="Sign out">
                       <FaPowerOff />
-                      <span>Logout</span>
+                      <span>Sign out</span>
                     </button>
                   </div>
                 </>
               ) : (
-                /* MOBILE: Logo | Controls (single row) */
                 <>
                   <div className="logo-container">
                     <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
                   </div>
                   <div className="mobile-user-controls">
                     <MobileProfileButton />
-                    <button className="logout-btn" onClick={logout} title="Logout">
+                    <button className="logout-btn" onClick={logout} title="Sign out">
                       <FaPowerOff />
                     </button>
                   </div>
@@ -327,16 +270,13 @@ function App() {
               )}
             </header>
             
-            {/* Bottom Navigation - Mobile only */}
             {isMobile && (
               <MobileNavigation 
                 activeTab={activeTab} 
                 setActiveTab={setActiveTab} 
-                isPremium={false}
               />
             )}
             
-            {/* Main Content Area */}
             <main className="app-content">
               <div className="main-content-wrapper">
                 <Routes>
@@ -349,12 +289,24 @@ function App() {
                       cancelGoal={cancelGoal}
                     />
                   } />
-                  <Route path="/calendar" element={<Calendar userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                  <Route path="/stats" element={<Stats userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                  <Route path="/timeline" element={<EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                  <Route path="/urge-toolkit" element={<UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />} />
-                  <Route path="/profile" element={<Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />} />
-                  <Route path="/urge-prediction" element={<PredictionDisplay mode="full" userData={userData} />} />
+                  <Route path="/calendar" element={
+                    <Calendar userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
+                  } />
+                  <Route path="/stats" element={
+                    <Stats userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
+                  } />
+                  <Route path="/timeline" element={
+                    <EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
+                  } />
+                  <Route path="/urge-toolkit" element={
+                    <UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
+                  } />
+                  <Route path="/profile" element={
+                    <Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />
+                  } />
+                  <Route path="/urge-prediction" element={
+                    <PredictionDisplay mode="full" userData={userData} />
+                  } />
                   <Route path="/ml-training" element={<MLTraining />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>

@@ -1,10 +1,8 @@
-// MobileNavigation.js - TITANTRACK SHARP BOTTOM NAV
-// Clean, simple navigation without sliding animations
+// MobileNavigation.js - TITANTRACK MODERN MINIMAL
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import './MobileNavigation.css';
 
-// Icons
 import { 
   FaHome,
   FaCalendarAlt,
@@ -14,8 +12,6 @@ import {
 } from 'react-icons/fa';
 
 const MobileNavigation = ({ activeTab, setActiveTab }) => {
-  const location = useLocation();
-  
   const navItems = [
     { path: '/', icon: FaHome, label: 'Tracker', tab: 'tracker' },
     { path: '/calendar', icon: FaCalendarAlt, label: 'Calendar', tab: 'calendar' },
@@ -34,7 +30,7 @@ const MobileNavigation = ({ activeTab, setActiveTab }) => {
             className={({ isActive }) => 
               isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
             }
-            onClick={() => setActiveTab && setActiveTab(item.tab)}
+            onClick={() => setActiveTab?.(item.tab)}
           >
             <item.icon className="mobile-nav-icon" />
             <span>{item.label}</span>

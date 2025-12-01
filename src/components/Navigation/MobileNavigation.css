@@ -1,5 +1,4 @@
-/* MobileNavigation.css - TITANTRACK SHARP BOTTOM NAV */
-/* Sharp, commanding bottom navigation */
+/* MobileNavigation.css - TITANTRACK MODERN MINIMAL */
 
 .mobile-navigation {
   position: fixed;
@@ -9,123 +8,92 @@
   z-index: 1000;
   display: flex;
   justify-content: center;
-  padding: var(--space-2, 8px) var(--space-3, 12px);
-  padding-bottom: max(var(--space-2, 8px), env(safe-area-inset-bottom, 8px));
+  padding: var(--space-3, 12px);
+  padding-bottom: max(var(--space-3, 12px), env(safe-area-inset-bottom, 12px));
   background: transparent;
   pointer-events: none;
-  /* Hardware acceleration */
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
-/* iOS specific fixes */
+/* iOS specific */
 @supports (-webkit-touch-callout: none) {
   .mobile-navigation {
     position: fixed !important;
     bottom: 0 !important;
-    padding-bottom: max(var(--space-2, 8px), env(safe-area-inset-bottom, 12px)) !important;
-    -webkit-transform: translate3d(0, 0, 9999px);
-    transform: translate3d(0, 0, 9999px);
+    padding-bottom: max(var(--space-3, 12px), env(safe-area-inset-bottom, 16px)) !important;
   }
 }
 
-/* The visible nav container - SHARP */
 .mobile-nav-container {
   display: flex;
   width: 100%;
-  max-width: 420px;
-  background-color: rgba(10, 10, 10, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-default, #2a2a2a);
-  /* SHARP corners */
-  border-radius: var(--radius-md, 4px);
+  max-width: 380px;
+  background-color: rgba(20, 20, 20, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg, 12px);
   padding: var(--space-1, 4px);
   pointer-events: auto;
-  /* Subtle shadow for depth */
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* Hide the old sliding indicator completely */
-.mobile-nav-slider {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-}
-
-/* Nav items */
 .mobile-nav-item {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   padding: var(--space-2, 8px) var(--space-1, 4px);
-  color: var(--text-muted, #666666);
+  color: rgba(255, 255, 255, 0.4);
   text-decoration: none;
   font-size: 0.625rem;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  /* SHARP corners */
-  border-radius: var(--radius-sm, 2px);
-  transition: all 100ms ease;
-  /* Touch optimization */
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-sm, 6px);
+  transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 .mobile-nav-item:hover {
-  color: var(--text-secondary, #a0a0a0);
-  background-color: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.6);
 }
 
-/* Active state - Gold background, black text */
 .mobile-nav-item.active {
-  color: #000000 !important;
-  background-color: var(--gold, #ffdd00) !important;
-  font-weight: 600 !important;
+  color: #000000;
+  background-color: #ffffff;
+  font-weight: 600;
 }
 
 .mobile-nav-icon {
   font-size: 1.125rem;
-  line-height: 1;
+  opacity: 0.9;
 }
 
-.mobile-nav-item span {
-  line-height: 1.2;
-  text-align: center;
+.mobile-nav-item.active .mobile-nav-icon {
+  opacity: 1;
 }
 
-/* Touch device optimization */
-@media (pointer: coarse) {
-  .mobile-nav-item {
-    min-height: 52px;
-    padding: var(--space-3, 12px) var(--space-1, 4px);
-  }
+/* Hide any old slider elements */
+.mobile-nav-slider {
+  display: none !important;
 }
 
 /* Small screens */
 @media (max-width: 480px) {
   .mobile-navigation {
-    padding: var(--space-1, 4px) var(--space-2, 8px);
-    padding-bottom: max(var(--space-1, 4px), env(safe-area-inset-bottom, 6px));
+    padding: var(--space-2, 8px);
+    padding-bottom: max(var(--space-2, 8px), env(safe-area-inset-bottom, 10px));
   }
   
   .mobile-nav-container {
-    max-width: 100%;
-    border-radius: var(--radius-sm, 2px);
+    border-radius: var(--radius-md, 8px);
   }
   
   .mobile-nav-item {
     padding: var(--space-2, 8px) 0;
     font-size: 0.5625rem;
-    min-height: 48px;
   }
   
   .mobile-nav-icon {
@@ -136,29 +104,15 @@
 /* Very small screens */
 @media (max-width: 360px) {
   .mobile-nav-container {
-    padding: 2px;
+    padding: 3px;
   }
   
   .mobile-nav-item {
-    min-height: 44px;
+    gap: 2px;
     font-size: 0.5rem;
-    gap: 1px;
   }
   
   .mobile-nav-icon {
     font-size: 0.9375rem;
-  }
-}
-
-/* App content padding for nav */
-@media (max-width: 1024px) {
-  .app-content {
-    padding-bottom: 80px;
-  }
-}
-
-@media (max-width: 480px) {
-  .app-content {
-    padding-bottom: 72px;
   }
 }
