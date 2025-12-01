@@ -40,10 +40,11 @@
   transition: color 150ms ease;
 }
 
+/* Indicator - Gold underline instead of dot */
 .nav-indicator {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
   background-color: transparent;
   transition: all 150ms ease;
 }
@@ -54,7 +55,7 @@
 }
 
 .nav-item.active .nav-indicator {
-  background-color: #ffffff;
+  background-color: #ffdd00;
 }
 
 /* Hover - only on devices that support it */
@@ -73,6 +74,10 @@
   .nav-item {
     padding: 8px 16px;
   }
+  
+  .nav-indicator {
+    width: 24px;
+  }
 }
 
 /* Small phones */
@@ -83,6 +88,10 @@
   
   .nav-item {
     padding: 8px;
+  }
+  
+  .nav-indicator {
+    width: 16px;
   }
 }
 
