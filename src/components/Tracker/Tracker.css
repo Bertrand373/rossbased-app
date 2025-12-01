@@ -16,7 +16,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 15vh 24px 0 24px;
+  padding: 8vh 24px 0 24px;
   text-align: center;
 }
 
@@ -24,7 +24,7 @@
   font-size: 0.8125rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 16px 0;
+  margin: 0 0 12px 0;
 }
 
 /* Streak - tappable */
@@ -51,7 +51,7 @@
 }
 
 .streak-num {
-  font-size: 7rem;
+  font-size: 8rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1;
@@ -63,7 +63,7 @@
   font-size: 0.875rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.3);
-  margin-top: 6px;
+  margin-top: 4px;
   letter-spacing: 0.15em;
   text-transform: lowercase;
 }
@@ -72,7 +72,7 @@
   font-size: 0.8125rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.25);
-  margin: 20px 0 0 0;
+  margin: 12px 0 0 0;
 }
 
 /* ============================================================
@@ -512,20 +512,19 @@
 
 @media (min-width: 768px) {
   .tracker-main {
-    padding: 20vh 32px 0 32px;
-    justify-content: flex-start;
+    padding: 12vh 32px 0 32px;
   }
   
   .streak-num {
-    font-size: 9rem;
+    font-size: 10rem;
   }
   
   .date {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
   
   .milestone {
-    margin-top: 28px;
+    margin-top: 16px;
   }
   
   .tracker-footer {
@@ -535,20 +534,20 @@
 
 @media (max-width: 480px) {
   .tracker-main {
-    padding: 12vh 20px 0 20px;
+    padding: 6vh 20px 0 20px;
   }
   
   .streak-num {
-    font-size: 6rem;
+    font-size: 7.5rem;
   }
   
   .date {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     font-size: 0.75rem;
   }
   
   .milestone {
-    margin-top: 16px;
+    margin-top: 10px;
     font-size: 0.75rem;
   }
   
@@ -566,22 +565,22 @@
   }
 }
 
-/* Short screens - ensure button visibility */
+/* Short screens - tighter padding, keep streak readable */
 @media (max-height: 700px) {
   .tracker-main {
-    padding-top: 8vh;
+    padding-top: 4vh;
   }
   
   .streak-num {
-    font-size: 5rem;
+    font-size: 7rem;
   }
   
   .date {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   
   .milestone {
-    margin-top: 12px;
+    margin-top: 8px;
   }
   
   .tracker-footer {
@@ -592,11 +591,11 @@
 /* Very short screens */
 @media (max-height: 600px) {
   .tracker-main {
-    padding-top: 6vh;
+    padding-top: 2vh;
   }
   
   .streak-num {
-    font-size: 4.5rem;
+    font-size: 6rem;
   }
   
   .date {
