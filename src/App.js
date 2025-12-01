@@ -202,21 +202,15 @@ function App() {
               maxWidth: '90vw',
             },
             success: {
+              icon: <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#34d399', flexShrink: 0 }} />,
               style: {
                 background: 'rgba(20, 20, 20, 0.95)',
-              },
-              iconTheme: {
-                primary: '#34d399',
-                secondary: 'transparent',
               },
             },
             error: {
+              icon: <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f87171', flexShrink: 0 }} />,
               style: {
                 background: 'rgba(20, 20, 20, 0.95)',
-              },
-              iconTheme: {
-                primary: '#f87171',
-                secondary: 'transparent',
               },
             },
           }}

@@ -58,7 +58,7 @@ const Tracker = ({ userData, updateUserData }) => {
 
   const milestone = getNextMilestone();
 
-  // Date submit
+  // Date submit - no toast, modal closing is confirmation
   const handleDateSubmit = (date) => {
     const newStreak = Math.max(0, differenceInDays(today, date) + 1);
     updateUserData({
@@ -67,10 +67,9 @@ const Tracker = ({ userData, updateUserData }) => {
       longestStreak: Math.max(userData.longestStreak || 0, newStreak)
     });
     setShowDatePicker(false);
-    toast.success('Updated');
   };
 
-  // Reset streak (relapse only)
+  // Reset streak (relapse) - keep toast, this is significant
   const handleReset = () => {
     const now = new Date();
     const history = [...(userData.streakHistory || [])];
@@ -92,10 +91,10 @@ const Tracker = ({ userData, updateUserData }) => {
     setShowResetConfirm(false);
     setShowStreakOptions(false);
     setResetType(null);
-    toast.success('Day one');
+    toast.success('Relapse logged');
   };
 
-  // Log wet dream (does NOT reset streak)
+  // Log wet dream - no toast, modal closing is confirmation
   const handleLogWetDream = () => {
     updateUserData({
       wetDreams: [...(userData.wetDreams || []), { date: new Date(), streakDay: streak }],
@@ -105,7 +104,6 @@ const Tracker = ({ userData, updateUserData }) => {
     setShowResetConfirm(false);
     setShowStreakOptions(false);
     setResetType(null);
-    toast.success('Logged');
   };
 
   // Benefits
@@ -125,6 +123,7 @@ const Tracker = ({ userData, updateUserData }) => {
     updateFill(key, num);
   };
 
+  // Save benefits - no toast, modal closing is confirmation
   const saveBenefits = () => {
     const todayStr = format(today, 'yyyy-MM-dd');
     const existing = userData.benefitTracking || [];
@@ -137,7 +136,6 @@ const Tracker = ({ userData, updateUserData }) => {
 
     updateUserData({ benefitTracking: updated });
     setShowBenefits(false);
-    toast.success('Saved');
   };
 
   const benefitsList = [

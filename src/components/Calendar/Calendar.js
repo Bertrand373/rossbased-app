@@ -197,10 +197,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     const updatedNotes = { ...userData.notes };
     if (noteText.trim()) {
       updatedNotes[dayStr] = noteText.trim();
-      toast.success('Journal saved');
     } else {
       delete updatedNotes[dayStr];
-      toast.success('Journal removed');
     }
     updateUserData({ notes: updatedNotes });
     setIsEditingNote(false);
@@ -218,11 +216,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     if (status === 'relapse') {
       setShowTriggerSelection(true);
     } else if (status === 'current-streak') {
-      toast.success(`${format(selectedDate, 'MMM d')} marked as streak day`);
       closeEditModal();
     } else if (status === 'wet-dream') {
       updateUserData({ wetDreamCount: (userData.wetDreamCount || 0) + 1 });
-      toast.success('Wet dream logged');
       closeEditModal();
     }
   };
