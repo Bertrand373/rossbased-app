@@ -1,1522 +1,669 @@
-/* components/Tracker/Tracker.css - UPDATED: Pill-shaped horizontal milestone indicators */
+/* Tracker.css - TITANTRACK MODERN MINIMAL */
+
 .tracker-container {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: 24px;
 }
 
-/* UPDATED: Integrated header design with subtitle and Calendar-matching sizing */
-.integrated-tracker-header {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  padding: var(--spacing-lg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+/* ============================================================
+   HEADER
+   ============================================================ */
 
-.tracker-header-title-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--spacing-lg);
-  position: relative;
-}
-
-.tracker-header-title-section h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text);
-  opacity: 0.85;
-  text-align: center;
-}
-
-.tracker-header-subtitle {
-  margin: var(--spacing-xs) 0 0 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  text-align: center;
-  font-style: italic;
-}
-
-.tracker-header-actions-section {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.tracker-header-actions {
-  display: flex;
-  gap: var(--spacing-md);
-}
-
-/* NEW: Desktop main content grid container */
-.tracker-main-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* NEW: Discord and YouTube column container */
-.discord-youtube-column {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* LEGACY: Keep old header styling for backward compatibility if needed */
 .tracker-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-  margin-top: 0;
-}
-
-.tracker-header-spacer {
-  /* Empty spacer for centering */
-}
-
-.tracker-header h2 {
-  text-align: center;
-  margin: 0;
-}
-
-.tracker-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-self: end;
-}
-
-/* UPDATED: Consistent grey → yellow hover pattern for ALL secondary buttons */
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none !important;
-}
-
-/* UPDATED: Yellow hover effect like navigation pills */
-.action-btn:hover,
-.tracker-actions .action-btn:hover,
-.tracker-header-actions .action-btn:hover,
-button.action-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.action-btn:focus,
-.action-btn:active,
-.action-btn:focus-visible {
-  background-color: rgba(128, 128, 128, 0.1) !important;
-  border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-  transform: none !important;
-  opacity: 1 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  filter: none !important;
-}
-
-/* Current Streak Section */
-.current-streak-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  margin-top: 0;
-}
-
-.streak-card {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.streak-date {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  text-align: center;
-  margin: 0;
-  order: 1;
-}
-
-.streak-content {
-  order: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.streak-number {
-  font-size: 4rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text);
-  margin: 0;
-}
-
-.streak-label {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--text);
-  margin: 0;
-}
-
-.streak-divider {
-  order: 3;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border), transparent);
-  margin: 0;
-}
-
-/* NEW: Pill-shaped horizontal milestone indicators */
-.streak-milestone-pills {
-  order: 4;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  margin: 0;
-  padding: 0 var(--spacing-md);
-}
-
-.milestone-pill {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md) var(--spacing-xl);
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-full);
-  transition: all 0.2s ease;
-}
-
-.milestone-pill:hover {
-  background-color: rgba(255, 221, 0, 0.05);
-  border-color: rgba(255, 221, 0, 0.1);
-  transform: translateY(-1px);
-}
-
-.milestone-pill-icon {
-  font-size: 1.25rem;
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
-.milestone-pill-text {
-  font-size: 0.9375rem;
-  color: var(--text);
-  font-weight: 500;
-  letter-spacing: 0.025em;
-  line-height: 1.3;
-  text-align: center;
-}
-
-.streak-actions-divider {
-  order: 5;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border), transparent);
-  margin: 0;
-}
-
-.streak-actions {
-  order: 6;
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-lg);
-  margin: 0;
-}
-
-.streak-action-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid;
-}
-
-/* KEEP: Main action buttons unchanged - these are the primary actions */
-.relapse-btn-grey {
-  background-color: rgba(128, 128, 128, 0.1);
-  color: var(--text-secondary);
-  border-color: var(--text-secondary);
-}
-
-.relapse-btn-grey:hover {
-  background-color: rgba(128, 128, 128, 0.2);
-  border-color: var(--text-secondary);
-  color: var(--text-secondary);
-  transform: scale(1.05);
-}
-
-.wetdream-btn {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: var(--warning);
-  border-color: var(--warning);
-}
-
-.wetdream-btn:hover {
-  background-color: rgba(245, 158, 11, 0.2);
-  border-color: var(--warning);
-  color: var(--warning);
-  transform: scale(1.05);
-}
-
-.urge-btn {
-  background-color: rgba(37, 99, 235, 0.1);
-  color: var(--primary);
-  border-color: var(--primary);
-}
-
-.urge-btn:hover {
-  background-color: rgba(37, 99, 235, 0.2);
-  border-color: var(--primary);
-  color: var(--primary);
-  transform: scale(1.05);
-}
-
-/* NEW: Benefits button styling - PRIMARY YELLOW like login button */
-.benefits-btn-primary {
-  background-color: rgba(255, 221, 0, 0.1);
-  color: var(--primary);
-  border-color: var(--primary);
-}
-
-.benefits-btn-primary:hover {
-  background-color: rgba(255, 221, 0, 0.2);
-  border-color: var(--primary);
-  color: var(--primary);
-  transform: scale(1.05);
-}
-
-/* UPDATED: Discord and YouTube buttons use scale transform */
-.discord-join-btn:hover {
-  background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
-  border-color: #7289da;
-  color: #ffffff;
-  transform: scale(1.05);
-}
-
-.youtube-subscribe-btn:hover {
-  background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
-  border-color: #ff0000;
-  color: #ffffff;
-  transform: scale(1.05);
-}
-
-/* UPDATED: Benefits Status Indicator - MATCHES emotional timeline pill sizing */
-.benefits-status-indicator {
-  order: 5.5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: var(--spacing-sm) 0;
-}
-
-.benefits-logged-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  background-color: rgba(34, 197, 94, 0.05);
-  border: 1px solid rgba(34, 197, 94, 0.1);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-sm) var(--spacing-md);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  flex-wrap: wrap;
-}
-
-.benefits-logged-status .check-icon {
-  color: var(--success);
-}
-
-.benefits-not-logged-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  background-color: rgba(255, 221, 0, 0.05);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-sm) var(--spacing-md);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.benefits-not-logged-status .info-icon {
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
-/* Premium Benefits Container - NOT USED IN MODAL */
-.premium-benefits-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* TRACKER SPECIFIC MODAL STYLES */
-.date-picker-modal h2 {
-  margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  text-align: center;
-  font-weight: 600;
-}
-
-.date-picker-modal > p {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin: 0 0 var(--spacing-lg) 0;
-  text-align: center;
-}
-
-.modal-close-btn {
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  background: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  font-size: 1rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  outline: none;
-}
-
-.modal-close-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: scale(1.1);
-}
-
-/* Benefits Modal Styling */
-.benefits-modal {
-  max-width: 600px;
-  max-height: 85vh;
-}
-
-.benefits-modal-header {
-  margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  text-align: center;
-  font-weight: 600;
-}
-
-.benefits-modal-subtitle {
-  margin: 0 0 var(--spacing-lg) 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  text-align: center;
-  line-height: 1.4;
-}
-
-/* Benefits Tracking Banner */
-.benefits-tracking-banner {
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.05) 0%, rgba(255, 221, 0, 0.08) 100%);
-  border: 1px solid rgba(255, 221, 0, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  position: relative;
-  overflow: hidden;
-  margin-bottom: var(--spacing-xl);
-}
-
-.benefits-tracking-helmet-container {
-  flex-shrink: 0;
-}
-
-.benefits-tracking-helmet {
-  width: 40px;
-  height: 40px;
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 221, 0, 0.3));
-}
-
-.benefits-tracking-helmet-fallback {
-  font-size: 1.5rem;
-  color: var(--primary);
-  animation: coming-soon-pulse 2s ease-in-out infinite;
-}
-
-@keyframes coming-soon-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(0.96);
-  }
-}
-
-.benefits-tracking-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.benefits-tracking-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.benefits-tracking-description {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin: 0;
-}
-
-.benefits-modal-sliders {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-  max-height: 50vh;
-  overflow-y: auto;
-  padding-right: var(--spacing-xs);
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Benefit Sliders */
-.benefit-slider-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  position: relative;
-}
-
-.benefit-slider-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
 }
 
-.benefits-modal .benefit-label,
-.premium-benefits-container .benefit-label,
-.benefit-slider-item .benefit-label {
-  font-weight: 600 !important;
-  color: var(--text) !important;
-  flex: 1 !important;
-  text-align: left !important;
-  font-size: 1rem !important;
-  letter-spacing: 0.025em !important;
-  display: block !important;
-}
-
-.benefit-slider-with-value {
+.tracker-header-content {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  position: relative;
+  justify-content: space-between;
+  width: 100%;
 }
 
-.benefit-value-clean {
-  font-weight: 700;
-  color: var(--text) !important;
-  font-size: 0.875rem !important;
-  background-color: rgba(255, 221, 0, 0.08);
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
+.tracker-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* ============================================================
+   MAIN GRID
+   ============================================================ */
+
+.tracker-grid {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  border: 1px solid rgba(255, 221, 0, 0.15);
-  flex-shrink: 0;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.benefit-slider-track-container {
-  position: relative;
-  flex: 1;
-  /* ADDED: Ensure container has height context for positioning */
-  display: flex;
-  align-items: center;
-}
-
-.slider-tick-marks {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 0;
-  transform: translateY(-50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.slider-tick {
-  position: absolute;
-  top: 0;
-  transform: translateY(-50%);
-  width: 1px;
-  height: 3px;
-  background-color: rgba(255, 255, 255, 0.15);
-  pointer-events: none;
-}
-
-.slider-tick.key-tick {
-  height: 4px;
-  width: 1px;
-  background-color: rgba(255, 221, 0, 0.25);
-}
-
-.slider-tick[data-value="1"] { left: calc(12px); }
-.slider-tick[data-value="2"] { left: calc(12px + (calc(100% - 24px) * 1/9)); }
-.slider-tick[data-value="3"] { left: calc(12px + (calc(100% - 24px) * 2/9)); }
-.slider-tick[data-value="4"] { left: calc(12px + (calc(100% - 24px) * 3/9)); }
-.slider-tick[data-value="5"] { left: calc(12px + (calc(100% - 24px) * 4/9)); }
-.slider-tick[data-value="6"] { left: calc(12px + (calc(100% - 24px) * 5/9)); }
-.slider-tick[data-value="7"] { left: calc(12px + (calc(100% - 24px) * 6/9)); }
-.slider-tick[data-value="8"] { left: calc(12px + (calc(100% - 24px) * 7/9)); }
-.slider-tick[data-value="9"] { left: calc(12px + (calc(100% - 24px) * 8/9)); }
-.slider-tick[data-value="10"] { left: calc(100% - 12px); }
-
-.benefit-range-slider {
-  -webkit-appearance: none;
-  flex: 1;
-  height: 8px;
-  border-radius: var(--radius-full);
-  /* Base track - neutral gray */
-  background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.15) 0%, 
-    rgba(128, 128, 128, 0.1) 100%
-  );
-  outline: none;
-  transition: all 0.2s ease;
-  margin: 0 !important;
-  padding: 0 !important;
-  position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  z-index: 1;
-}
-
-/* FIXED: Track fill now constrained to match slider track height exactly */
-/* This prevents the "highlighter" effect where fill bleeds outside the track */
-.slider-track-fill {
-  position: absolute;
-  /* FIXED: Vertically center within container */
-  top: 50%;
-  transform: translateY(-50%);
-  /* FIXED: Start at left edge of track (accounts for thumb overhang) */
-  left: 0;
-  /* FIXED: Match exact track height instead of 100% container height */
-  height: 8px;
-  /* Premium yellow gradient matching nav slider */
-  background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.4) 0%, 
-    rgba(255, 221, 0, 0.6) 100%
-  );
-  /* FIXED: Match the track's border-radius for clean containment */
-  border-radius: var(--radius-full);
-  /* Instant sync with thumb for premium responsive feel */
-  transition: none;
-  pointer-events: none;
-  z-index: 0;
-  /* Subtle glow for premium feel - reduced to not bleed outside track */
-  box-shadow: 0 0 4px rgba(255, 221, 0, 0.2);
-}
-
-.benefit-range-slider:hover:not(:disabled) {
-  background: linear-gradient(to right, 
-    rgba(128, 128, 128, 0.18) 0%, 
-    rgba(128, 128, 128, 0.12) 100%
-  );
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 221, 0, 0.08);
-}
-
-.benefit-slider-track-container:hover .slider-track-fill {
-  background: linear-gradient(90deg, 
-    rgba(255, 221, 0, 0.5) 0%, 
-    rgba(255, 221, 0, 0.7) 100%
-  );
-  box-shadow: 0 0 6px rgba(255, 221, 0, 0.3);
-}
-
-.benefit-range-slider:focus:not(:disabled) {
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 221, 0, 0.15);
-}
-
-.benefit-range-slider:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background: rgba(128, 128, 128, 0.1);
-}
-
-.benefit-range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
-  cursor: pointer;
-  /* Premium glow matching your nav pills */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
-  margin: 0 !important;
-  /* Smooth cubic-bezier matching sliding pills */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  position: relative;
-  z-index: 2;
-  opacity: 1;
-}
-
-.benefit-range-slider:hover:not(:disabled)::-webkit-slider-thumb {
-  transform: scale(1.15);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
-  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.benefit-range-slider:active::-webkit-slider-thumb {
-  transform: scale(1.1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 16px rgba(255, 221, 0, 0.6);
-}
-
-.benefit-range-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f5d633 0%, #e6c200 100%);
-  cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  /* Premium glow matching your nav pills */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 221, 0, 0.3);
-  margin: 0 !important;
-  /* Smooth cubic-bezier matching sliding pills */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  z-index: 2;
-  opacity: 1;
-}
-
-.benefit-range-slider:hover:not(:disabled)::-moz-range-thumb {
-  transform: scale(1.15);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 221, 0, 0.5);
-  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.slider-labels {
-  display: flex !important;
-  justify-content: space-between !important;
-  font-size: 0.75rem !important;
-  color: var(--text-secondary) !important;
-  margin-top: 8px !important;
-  margin-bottom: 0px !important;
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  line-height: 1 !important;
-  transform: none !important;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.025em !important;
-  position: relative !important;
-  z-index: 1 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.slider-labels span:first-child {
-  color: rgba(156, 163, 175, 0.8) !important;
-}
-
-.slider-labels span:last-child {
-  color: rgba(255, 221, 0, 0.7) !important;
-}
-
-.modal-benefit-item {
-  gap: var(--spacing-sm);
-}
-
-.modal-benefit-item .benefit-slider-header {
-  margin-bottom: var(--spacing-xs);
-}
-
-.modal-benefit-item .slider-labels {
-  margin-top: 8px !important;
-  font-size: 0.75rem !important;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
-}
-
-.benefits-modal-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-content: center;
-  margin-top: var(--spacing-md);
-}
-
-.cancel-benefits-btn {
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.cancel-benefits-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-.modal-save-btn {
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.modal-save-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* DESKTOP LAYOUT */
 @media (min-width: 1024px) {
-  .tracker-main-content {
+  .tracker-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-xl);
-    align-items: stretch;
-  }
-  
-  .discord-youtube-column {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-    height: fit-content;
-  }
-  
-  .streak-number {
-    font-size: 5rem !important;
-    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: none;
-  }
-  
-  .streak-milestones {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-xl);
-    gap: var(--spacing-xl);
-    justify-content: space-evenly;
-  }
-  
-  .milestone-item {
-    min-width: 100px;
-    padding: var(--spacing-md);
-    background-color: rgba(255, 255, 255, 0.02);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.2s ease;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
-  .milestone-item:hover {
-    background-color: rgba(255, 221, 0, 0.05);
-    border-color: rgba(255, 221, 0, 0.1);
-    transform: translateY(-2px);
-  }
-  
-  .milestone-icon {
-    font-size: 1.6rem;
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .milestone-value {
-    font-size: 1.75rem;
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .milestone-label {
-    font-size: 0.875rem;
-    line-height: 1.2;
-    height: 2.4em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .streak-actions {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    max-width: 600px !important;
-    width: 100% !important;
-    margin: 0 auto;
-    padding: 0 var(--spacing-md);
-  }
-  
-  .streak-action-btn {
-    width: 100% !important;
-    justify-content: center;
-    padding: var(--spacing-md) var(--spacing-xl) !important;
-    font-size: 1rem !important;
-    font-weight: 600;
-    letter-spacing: 0.025em;
-    min-height: 52px !important;
-    position: relative;
-    overflow: hidden;
-    max-width: none !important;
-  }
-
-  .discord-join-btn, .youtube-subscribe-btn {
-    font-size: 1.125rem;
-    max-width: 600px !important;
-    width: 100% !important;
-    justify-content: center;
-  }
-
-  .benefits-modal {
-    max-width: 650px;
-  }
-
-  .benefits-modal-sliders {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-lg);
-    max-height: 60vh;
-  }
-
-  /* FIXED: Desktop track fill height matches desktop track (8px) */
-  .slider-track-fill {
-    height: 8px;
-  }
-
-  .benefit-range-slider {
-    height: 8px;
-  }
-  
-  .benefit-range-slider::-webkit-slider-thumb {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .benefit-range-slider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .slider-labels {
-    margin-top: 8px !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-    font-size: 0.75rem !important;
-  }
-}
-
-/* MOBILE LAYOUT */
-@media (max-width: 768px) {
-  .tracker-header-title-section h2 {
-    font-size: 1.25rem !important;
-  }
-  
-  .tracker-header-subtitle {
-    font-size: 0.8rem !important;
-  }
-
-  .benefits-tracking-banner {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-  }
-  
-  .benefits-tracking-content {
-    text-align: center;
-  }
-  
-  .benefits-tracking-title {
-    justify-content: center;
-  }
-  
-  .benefits-tracking-helmet {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .benefits-tracking-helmet-fallback {
-    font-size: 1.25rem;
-  }
-
-  .integrated-tracker-header {
-    padding: var(--spacing-lg);
-    margin: 0;
-  }
-  
-  .tracker-header-title-section {
-    margin-bottom: var(--spacing-lg);
-  }
-  
-  .tracker-header-actions-section {
-    width: 100%;
-  }
-  
-  .tracker-header-actions {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .tracker-header-actions .action-btn,
-  .integrated-tracker-header .action-btn {
-    flex: 1;
-    justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    min-height: auto !important;
-  }
-  
-  .streak-number {
-    font-size: 3.5rem !important;
-    background: linear-gradient(135deg, var(--text) 0%, rgba(255, 221, 0, 0.8) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: none;
-  }
-  
-  /* Mobile pill styling - compact */
-  .streak-milestone-pills {
-    padding: 0 var(--spacing-sm);
-    gap: var(--spacing-xs);
-  }
-  
-  .milestone-pill {
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-  
-  .milestone-pill:active {
-    background-color: rgba(255, 221, 0, 0.08);
-    border-color: rgba(255, 221, 0, 0.15);
-    transform: scale(0.98);
-  }
-  
-  .milestone-pill-icon {
-    font-size: 1.125rem;
-  }
-  
-  .milestone-pill-text {
-    font-size: 0.8125rem;
-  }
-  
-  .streak-actions {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 0 auto;
-    padding: 0 var(--spacing-sm);
-  }
-  
-  .streak-action-btn {
-    width: 100%;
-    justify-content: center;
-    padding: var(--spacing-md) var(--spacing-lg) !important;
-    font-size: 0.9375rem !important;
-    font-weight: 600;
-    letter-spacing: 0.025em;
-    min-height: 46px !important;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .benefits-btn-primary:active {
-    background: linear-gradient(135deg, #f5d633 0%, #f0cc00 100%);
-    border-color: #f0cc00;
-    color: #000000;
-    transform: translateY(-1px);
-  }
-
-  .discord-join-btn:active {
-    background: linear-gradient(135deg, #8399e0 0%, #6875b8 100%);
-    border-color: #7289da;
-    color: #ffffff;
-    transform: translateY(-1px);
-  }
-  
-  .youtube-subscribe-btn:active {
-    background: linear-gradient(135deg, #ff3333 0%, #e60000 100%);
-    border-color: #ff0000;
-    color: #ffffff;
-    transform: translateY(-1px);
-  }
-  
-  .benefits-status-indicator {
-    margin: var(--spacing-md) 0;
-  }
-
-  .benefits-logged-status,
-  .benefits-not-logged-status {
-    flex-direction: row;
-    gap: var(--spacing-sm);
-    text-align: center;
-    font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-
-  .benefits-modal {
-    max-width: calc(100vw - 2rem);
-    margin: var(--spacing-sm);
-  }
-
-  .benefits-modal-sliders {
-    max-height: 45vh;
-  }
-
-  .benefits-modal-actions {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
-
-  .modal-save-btn,
-  .cancel-benefits-btn {
-    width: 100%;
-    min-width: auto;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    min-height: auto !important;
-  }
-
-  .benefits-modal .benefit-label,
-  .premium-benefits-container .benefit-label,
-  .benefit-slider-item .benefit-label {
-    font-size: 0.875rem !important;
-  }
-  
-  .benefit-value-clean {
-    font-size: 0.8rem !important;
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    padding: 0;
-  }
-  
-  /* FIXED: Mobile track fill height matches mobile track (6px) */
-  .slider-track-fill {
-    height: 6px;
-  }
-  
-  .benefit-range-slider {
-    height: 6px;
-  }
-  
-  .benefit-range-slider::-webkit-slider-thumb {
-    width: 22px;
-    height: 22px;
-  }
-  
-  .benefit-range-slider::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
-  }
-  
-  .slider-tick-marks {
-    top: 50%;
-    transform: translateY(-50%);
-    height: 0;
-    z-index: 0;
-  }
-  
-  .slider-tick {
-    top: 0;
-    transform: translateY(-50%);
-    height: 1.5px;
-    z-index: 0;
-  }
-  
-  .slider-tick.key-tick {
-    height: 2px;
-    z-index: 0;
-  }
-  
-  .benefit-range-slider {
-    position: relative;
-    z-index: 1;
-  }
-  
-  .slider-labels {
-    margin-top: 8px !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    font-size: 0.7rem !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .tracker-header-title-section h2 {
-    font-size: 1.125rem !important;
-  }
-  
-  .tracker-header-subtitle {
-    font-size: 0.75rem !important;
-  }
-
-  .benefits-tracking-helmet {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .benefits-tracking-helmet-fallback {
-    font-size: 1rem;
-  }
-  
-  .benefits-tracking-title {
-    font-size: 0.875rem;
-  }
-  
-  .benefits-tracking-description {
-    font-size: 0.8rem;
-  }
-
-  .discord-community-stats {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    align-items: center;
-  }
-  
-  .youtube-channel-stats {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    align-items: center;
-  }
-  
-  /* Very small screen pill adjustments */
-  .milestone-pill-text {
-    font-size: 0.75rem;
-  }
-  
-  .benefits-modal .benefit-label,
-  .premium-benefits-container .benefit-label,
-  .benefit-slider-item .benefit-label {
-    font-size: 0.8rem !important;
-  }
-  
-  .benefit-value-clean {
-    font-size: 0.75rem !important;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    padding: 0;
-  }
-  
-  /* FIXED: Very small screen track fill height (6px) */
-  .slider-track-fill {
-    height: 6px;
-  }
-  
-  .benefit-range-slider {
-    height: 6px;
-  }
-  
-  .benefit-range-slider::-webkit-slider-thumb {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .benefit-range-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .slider-tick-marks {
-    top: 50%;
-    transform: translateY(-50%);
-    height: 0;
-    z-index: 0;
-  }
-  
-  .slider-tick {
-    top: 0;
-    transform: translateY(-50%);
-    height: 1.5px;
-    z-index: 0;
-  }
-  
-  .slider-tick.key-tick {
-    height: 2px;
-    z-index: 0;
-  }
-  
-  .benefit-range-slider {
-    position: relative;
-    z-index: 1;
-  }
-  
-  .slider-labels {
-    font-size: 0.7rem !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+    gap: 32px;
+    align-items: start;
   }
 }
 
 /* ============================================================
-   MOBILE MODAL FIX - Ensures modals appear above mobile navigation,
-   are perfectly centered, and provide smooth contained scrolling
+   STREAK CARD - Main focus
    ============================================================ */
 
-/* CRITICAL: Tracker modal overlay must be above mobile nav (z-index: 9999) */
-.tracker-container .modal-overlay,
-.modal-overlay:has(.benefits-modal),
-.modal-overlay:has(.date-picker-modal) {
-  z-index: 10000;
-  /* Bulletproof centering */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.streak-card {
+  background-color: #0d0d0d;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.streak-date {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  font-weight: 400;
+}
+
+.streak-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.streak-number {
+  font-size: 5rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-feature-settings: 'tnum' 1;
+}
+
+.streak-unit {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+}
+
+/* Milestone Meta */
+.streak-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.meta-icon {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+/* Benefits Status */
+.benefits-status {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Prevent background scroll when modal is open */
-  overscroll-behavior: contain;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
 }
 
-/* Enhanced modal content - centered on all devices */
-.tracker-container .modal-content,
-.benefits-modal,
-.date-picker-modal {
-  /* Prevent scroll chaining to background */
-  overscroll-behavior: contain;
-  /* Ensure proper centering */
+.benefits-status.logged {
+  background-color: rgba(52, 211, 153, 0.08);
+  border-color: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.benefits-status svg {
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+.tracker-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ============================================================
+   COMMUNITY CARDS
+   ============================================================ */
+
+.community-card {
+  background-color: #0d0d0d;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.community-header {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.community-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.community-icon.discord {
+  color: #5865F2;
+}
+
+.community-icon.youtube {
+  color: #ff0000;
+}
+
+.community-header h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+}
+
+.community-header p {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.community-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.community-stats .stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.community-stats .stat svg {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.community-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: rgba(88, 101, 242, 0.08);
+  border: 1px solid rgba(88, 101, 242, 0.15);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  color: #5865F2;
+}
+
+.community-status svg {
+  font-size: 0.875rem;
+}
+
+/* Video Preview */
+.video-preview {
   position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 16 / 9;
+}
+
+.video-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 200ms ease;
+}
+
+.video-preview:hover img {
+  transform: scale(1.02);
+}
+
+.play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  background-color: rgba(255, 0, 0, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms ease;
+}
+
+.play-button svg {
+  color: #ffffff;
+  font-size: 1.25rem;
+  margin-left: 3px;
+}
+
+.video-preview:hover .play-button {
+  background-color: #ff0000;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+/* Community Buttons */
+.community-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+  border: 1px solid;
+}
+
+.community-btn.discord {
+  background-color: rgba(88, 101, 242, 0.1);
+  border-color: rgba(88, 101, 242, 0.2);
+  color: #5865F2;
+}
+
+.community-btn.discord:hover {
+  background-color: rgba(88, 101, 242, 0.15);
+  border-color: rgba(88, 101, 242, 0.3);
+}
+
+.community-btn.youtube {
+  background-color: rgba(255, 0, 0, 0.1);
+  border-color: rgba(255, 0, 0, 0.2);
+  color: #ff0000;
+}
+
+.community-btn.youtube:hover {
+  background-color: rgba(255, 0, 0, 0.15);
+  border-color: rgba(255, 0, 0, 0.3);
+}
+
+.external-icon {
+  font-size: 0.625rem;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 24px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.modal-close:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Benefits Modal */
+.benefits-modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  background-color: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: modalEnter 200ms ease;
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.98) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.benefits-modal-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.benefits-modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.benefits-modal-header p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
   margin: 0;
 }
 
-/* Mobile-specific modal enhancements */
-@media (max-width: 1024px) {
-  /* Ensure modal overlay covers everything including nav */
-  .tracker-container .modal-overlay,
-  .modal-overlay:has(.benefits-modal),
-  .modal-overlay:has(.date-picker-modal) {
-    z-index: 10000;
-    /* Bulletproof centering for all mobile devices */
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-md);
-    /* Account for safe areas on all sides */
-    padding-top: max(var(--spacing-md), env(safe-area-inset-top, 0px));
-    padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom, 0px));
-    padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
-    padding-right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
-    box-sizing: border-box;
+.benefits-modal-sliders {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-right: 8px;
+  margin-bottom: 24px;
+}
+
+.benefit-slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.benefit-slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.benefit-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.benefit-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  min-width: 24px;
+  text-align: right;
+  font-feature-settings: 'tnum' 1;
+}
+
+.benefit-slider-track {
+  position: relative;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: visible;
+}
+
+.benefit-slider-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: 3px;
+  transition: width 100ms ease;
+  pointer-events: none;
+}
+
+.benefit-slider {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 24px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+
+.benefit-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 150ms ease;
+}
+
+.benefit-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.benefit-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.benefits-modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Video Modal */
+.video-modal {
+  width: 100%;
+  max-width: 900px;
+  background-color: #000000;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  animation: modalEnter 200ms ease;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn-ghost {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 14px 24px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  color: #000000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn-primary:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 14px 24px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .tracker-header h1 {
+    font-size: 1.25rem;
   }
   
-  /* Modal content adjustments for mobile - TRUE CENTER */
-  .tracker-container .modal-content,
+  .streak-card {
+    padding: 24px;
+  }
+  
+  .streak-number {
+    font-size: 4rem;
+  }
+  
+  .community-card {
+    padding: 20px;
+  }
+  
   .benefits-modal {
-    /* Reset any margins that could offset centering */
-    margin: 0;
-    /* Constrain size */
+    padding: 24px;
     max-height: 85vh;
-    max-height: 85dvh; /* Dynamic viewport height for mobile browsers */
-    max-width: calc(100vw - var(--spacing-lg));
-    width: 100%;
-    /* Flexbox layout for proper scrolling */
-    display: flex;
-    flex-direction: column;
-    /* NO overflow on modal itself - children handle it */
-    overflow: hidden;
   }
   
-  /* Benefits modal specific mobile adjustments */
-  .benefits-modal {
-    max-width: 600px;
-  }
-  
-  /* Fixed header elements - always visible */
-  .benefits-modal-header,
-  .benefits-modal-subtitle {
-    flex-shrink: 0;
-  }
-  
-  /* Add consistent spacing below subtitle before scroll area */
-  .benefits-modal-subtitle {
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  /* Scrollable middle section - banner + sliders */
-  .benefits-modal-sliders {
-    flex: 1;
-    min-height: 0; /* Critical for flex scrolling */
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    /* Subtle custom scrollbar */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 221, 0, 0.3) transparent;
-    /* Add padding for breathing room */
-    padding-right: var(--spacing-xs);
-    /* FIX: Prevent content from getting cut off at bottom */
-    padding-bottom: var(--spacing-sm);
-  }
-  
-  /* Webkit scrollbar styling */
-  .benefits-modal-sliders::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .benefits-modal-sliders::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .benefits-modal-sliders::-webkit-scrollbar-thumb {
-    background: rgba(255, 221, 0, 0.3);
-    border-radius: 3px;
-  }
-  
-  .benefits-modal-sliders::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 221, 0, 0.5);
-  }
-  
-  /* Banner inside the scrollable area - ensure it shows fully */
-  .benefits-tracking-banner {
-    margin-bottom: var(--spacing-lg);
-    flex-shrink: 0;
-  }
-  
-  /* Modal actions - fixed at bottom, tighter spacing */
   .benefits-modal-actions {
-    flex-shrink: 0;
-    padding-top: var(--spacing-sm);
-    margin-top: 0;
-    /* Subtle top border to separate from scrollable content */
-    border-top: 1px solid var(--border);
-    background-color: var(--card-background);
+    flex-direction: column;
   }
 }
 
-/* Very small screens */
 @media (max-width: 480px) {
-  .tracker-container .modal-overlay,
-  .modal-overlay:has(.benefits-modal) {
-    padding: var(--spacing-sm);
-    padding-top: max(var(--spacing-sm), env(safe-area-inset-top, 0px));
-    padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 0px));
-    padding-left: max(var(--spacing-sm), env(safe-area-inset-left, 0px));
-    padding-right: max(var(--spacing-sm), env(safe-area-inset-right, 0px));
+  .tracker-container {
+    gap: 20px;
   }
   
-  .benefits-modal {
-    max-height: 90vh;
-    max-height: 90dvh;
-    padding: var(--spacing-md);
-    /* Ensure it stays centered */
-    margin: 0;
+  .streak-card {
+    padding: 20px;
+    gap: 20px;
+  }
+  
+  .streak-number {
+    font-size: 3.5rem;
+  }
+  
+  .streak-unit {
+    font-size: 0.75rem;
+  }
+  
+  .meta-item {
+    font-size: 0.75rem;
+  }
+  
+  .community-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .play-button {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .play-button svg {
+    font-size: 1rem;
   }
 }
 
-/* Landscape orientation handling */
-@media (max-height: 500px) and (orientation: landscape) {
-  .tracker-container .modal-overlay,
-  .modal-overlay:has(.benefits-modal) {
-    align-items: flex-start;
-    padding-top: var(--spacing-sm);
-    overflow-y: auto;
-  }
-  
-  .benefits-modal {
-    max-height: 95vh;
-    max-height: 95dvh;
-    margin: auto 0;
+/* Modal mobile fixes */
+@media (max-width: 1024px) {
+  .modal-overlay {
+    padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
