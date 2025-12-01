@@ -1,624 +1,867 @@
-// Profile.js - TITANTRACK
-import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
-import toast from 'react-hot-toast';
-import './Profile.css';
-import { useNotifications } from '../../hooks/useNotifications';
+/* Profile.css - TITANTRACK
+   Matches Tracker/Calendar aesthetic exactly */
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+/* =============================================================================
+   CONTAINER
+   ============================================================================= */
 
-const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
-  const [activeTab, setActiveTab] = useState('account');
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showExportModal, setShowExportModal] = useState(false);
-  
-  // Account States
-  const [username, setUsername] = useState(userData.username || '');
-  const [email, setEmail] = useState(userData.email || '');
-  const [discordUsername, setDiscordUsername] = useState(userData.discordUsername || '');
-  const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  
-  // Privacy States
-  const [isEditingPrivacy, setIsEditingPrivacy] = useState(false);
-  const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
-  const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
-  const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
-  
-  // Notifications
-  const {
-    permission,
-    isSupported,
-    fcmToken,
-    requestPermission,
-    subscribeToPush,
-    unsubscribeFromPush,
-    checkExistingSubscription,
-    sendLocalNotification
-  } = useNotifications();
-  
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
-  const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
-  const [quietHoursStart, setQuietHoursStart] = useState('22:00');
-  const [quietHoursEnd, setQuietHoursEnd] = useState('08:00');
-  const [notifTypes, setNotifTypes] = useState({
-    milestones: true,
-    urgeSupport: true,
-    weeklyProgress: true
-  });
-  const [dailyReminderEnabled, setDailyReminderEnabled] = useState(false);
-  const [dailyReminderTime, setDailyReminderTime] = useState('09:00');
-  
-  // Feedback
-  const [feedbackType, setFeedbackType] = useState('general');
-  const [feedbackSubject, setFeedbackSubject] = useState('');
-  const [feedbackMessage, setFeedbackMessage] = useState('');
+.profile {
+  min-height: calc(100dvh - 56px - 80px);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 24px 120px;
+  background-color: #000000;
+  max-width: 480px;
+  margin: 0 auto;
+}
 
-  const tabs = [
-    { id: 'account', label: 'Account' },
-    { id: 'privacy', label: 'Privacy' },
-    { id: 'settings', label: 'Settings' },
-    { id: 'data', label: 'Data' }
-  ];
+@media (min-width: 1025px) {
+  .profile {
+    min-height: calc(100dvh - 64px);
+    padding: 32px 24px 80px;
+    max-width: 520px;
+  }
+}
 
-  const feedbackTypes = [
-    { id: 'bug', label: 'Bug' },
-    { id: 'feature', label: 'Feature' },
-    { id: 'improvement', label: 'Suggestion' },
-    { id: 'general', label: 'General' }
-  ];
+/* =============================================================================
+   HEADER - Simple centered text
+   ============================================================================= */
 
-  useEffect(() => {
-    if (isSupported && userData?.username) {
-      checkExistingSubscription().then((sub) => setNotificationsEnabled(!!sub));
-    }
-  }, [isSupported, userData?.username, checkExistingSubscription]);
+.profile-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
 
-  useEffect(() => {
-    if (notificationsEnabled && userData?.username) {
-      loadNotificationPreferences();
-    }
-  }, [notificationsEnabled, userData?.username]);
+.profile-header h1 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
 
-  const loadNotificationPreferences = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`);
-      if (response.ok) {
-        const prefs = await response.json();
-        setQuietHoursEnabled(prefs.quietHoursEnabled || false);
-        setQuietHoursStart(prefs.quietHoursStart || '22:00');
-        setQuietHoursEnd(prefs.quietHoursEnd || '08:00');
-        setNotifTypes(prefs.types || { milestones: true, urgeSupport: true, weeklyProgress: true });
-        setDailyReminderEnabled(prefs.dailyReminderEnabled || false);
-        setDailyReminderTime(prefs.dailyReminderTime || '09:00');
-      }
-    } catch (error) {
-      console.error('Failed to load notification preferences:', error);
-    }
-  };
+.profile-header p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  font-style: italic;
+}
 
-  const updateNotifType = (type) => {
-    if (!isEditingPrivacy) return;
-    setNotifTypes(prev => ({ ...prev, [type]: !prev[type] }));
-  };
+/* =============================================================================
+   USER INFO
+   ============================================================================= */
 
-  const handleSaveNotificationPreferences = async () => {
-    const preferences = {
-      quietHoursEnabled, quietHoursStart, quietHoursEnd,
-      types: notifTypes, dailyReminderEnabled, dailyReminderTime, fcmToken
-    };
-    try {
-      await fetch(`${API_URL}/api/notification-preferences/${userData.username}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(preferences)
-      });
-      localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
-    } catch (error) {
-      localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
-    }
-    setIsEditingPrivacy(false);
-  };
+.profile-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
 
-  const handleNotificationToggle = async () => {
-    if (isTogglingNotifications || !isEditingPrivacy) return;
-    setIsTogglingNotifications(true);
-    try {
-      if (notificationsEnabled) {
-        await unsubscribeFromPush();
-        setNotificationsEnabled(false);
-      } else {
-        if (permission !== 'granted') {
-          const granted = await requestPermission();
-          if (!granted) {
-            toast.error('Please enable notifications in browser settings');
-            setIsTogglingNotifications(false);
-            return;
-          }
-        }
-        await subscribeToPush();
-        setNotificationsEnabled(true);
-        setTimeout(async () => {
-          try {
-            await sendLocalNotification('Notifications Activated', {
-              body: 'You\'ll now receive milestone alerts',
-              icon: '/icon-192.png'
-            });
-          } catch (e) {}
-        }, 1000);
-      }
-    } catch (error) {
-      toast.error('Failed to update notifications');
-    } finally {
-      setIsTogglingNotifications(false);
-    }
-  };
+.profile-avatar {
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  flex-shrink: 0;
+}
 
-  const handleTestNotification = async () => {
-    const success = await sendLocalNotification('Test Notification', {
-      body: 'Notifications are working!',
-      icon: '/icon-192.png'
-    });
-    if (!success) toast.error('Failed to send test');
-  };
+.profile-user-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
-  const memberSince = userData.startDate 
-    ? format(new Date(userData.startDate), 'MMMM yyyy') 
-    : 'Unknown';
+.profile-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+}
 
-  const handleProfileUpdate = () => {
-    updateUserData({
-      username: username.trim(),
-      email: email.trim(),
-      discordUsername: discordUsername.trim(),
-      showOnLeaderboard
-    });
-    setIsEditingProfile(false);
-  };
+.profile-since {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
+}
 
-  const handleFeedbackSubmit = () => {
-    if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
-      toast.error('Please fill in both fields');
-      return;
-    }
-    console.log('Feedback:', { type: feedbackType, subject: feedbackSubject, message: feedbackMessage });
-    setFeedbackSubject('');
-    setFeedbackMessage('');
-    setFeedbackType('general');
-    setShowFeedbackModal(false);
-  };
+.profile-feedback-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
 
-  const handleDataExport = () => {
-    const exportData = {
-      profile: { username: userData.username, memberSince: userData.startDate },
-      streakData: {
-        currentStreak: userData.currentStreak,
-        longestStreak: userData.longestStreak,
-        startDate: userData.startDate,
-        streakHistory: userData.streakHistory
-      },
-      benefitTracking: userData.benefitTracking || [],
-      journalEntries: userData.notes || {},
-      exportDate: new Date().toISOString()
-    };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `titantrack-${format(new Date(), 'yyyy-MM-dd')}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    setShowExportModal(false);
-  };
+.profile-feedback-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
 
-  const handleAccountDeletion = () => {
-    localStorage.clear();
-    onLogout();
-  };
+/* =============================================================================
+   TAB NAVIGATION - Matches Calendar toggle EXACTLY
+   ============================================================================= */
 
-  const userInitial = userData?.username?.charAt(0)?.toUpperCase() || 
-                      userData?.email?.charAt(0)?.toUpperCase() || '?';
+.profile-tabs {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  align-self: center;
+  margin-bottom: 32px;
+}
 
-  return (
-    <div className="profile">
-      {/* Header */}
-      <header className="profile-header">
-        <h1>Profile</h1>
-        <p>Manage your account and preferences</p>
-      </header>
+.profile-tab {
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
 
-      {/* User Info */}
-      <div className="profile-user">
-        <div className="profile-avatar">{userInitial}</div>
-        <div className="profile-user-details">
-          <span className="profile-name">{userData.username}</span>
-          <span className="profile-since">Member since {memberSince}</span>
-        </div>
-        <button className="profile-feedback-btn" onClick={() => setShowFeedbackModal(true)}>
-          Feedback
-        </button>
-      </div>
+.profile-tab.active {
+  background: #ffffff;
+  color: #000000;
+  font-weight: 600;
+}
 
-      {/* Tab Navigation - Matches Calendar toggle exactly */}
-      <div className="profile-tabs">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+.profile-tab:not(.active):hover {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+}
 
-      {/* Content */}
-      <div className="profile-content">
-        
-        {/* ACCOUNT TAB */}
-        {activeTab === 'account' && (
-          <div className="profile-section">
-            <div className="section-header">
-              <h2>Account</h2>
-              <button className="edit-btn" onClick={() => setIsEditingProfile(!isEditingProfile)}>
-                {isEditingProfile ? 'Cancel' : 'Edit'}
-              </button>
-            </div>
+/* =============================================================================
+   CONTENT
+   ============================================================================= */
 
-            <div className="form-group">
-              <label>Username</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={!isEditingProfile}
-                placeholder="Your username"
-              />
-            </div>
+.profile-content {
+  flex: 1;
+}
 
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={!isEditingProfile}
-                placeholder="your@email.com"
-              />
-            </div>
+.profile-section {
+  display: flex;
+  flex-direction: column;
+}
 
-            <div className="form-group">
-              <label>Discord</label>
-              <input
-                type="text"
-                value={discordUsername}
-                onChange={(e) => setDiscordUsername(e.target.value)}
-                disabled={!isEditingProfile}
-                placeholder="For leaderboard"
-              />
-            </div>
+/* Section Header */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
 
-            <div className="toggle-row">
-              <div className="toggle-text">
-                <span className="toggle-label">Show on Leaderboard</span>
-                <span className="toggle-desc">Display streak publicly</span>
-              </div>
-              <button 
-                className={`toggle-switch ${showOnLeaderboard ? 'active' : ''}`}
-                onClick={() => isEditingProfile && setShowOnLeaderboard(!showOnLeaderboard)}
-                disabled={!isEditingProfile}
-              >
-                <span className="toggle-knob" />
-              </button>
-            </div>
+.section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
 
-            {isEditingProfile && (
-              <div className="section-actions">
-                <button className="btn-primary" onClick={handleProfileUpdate}>Save</button>
-                <button className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Cancel</button>
-              </div>
-            )}
-          </div>
-        )}
+.edit-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
 
-        {/* PRIVACY TAB */}
-        {activeTab === 'privacy' && (
-          <div className="profile-section">
-            <div className="section-header">
-              <h2>Privacy</h2>
-              <button className="edit-btn" onClick={() => setIsEditingPrivacy(!isEditingPrivacy)}>
-                {isEditingPrivacy ? 'Cancel' : 'Edit'}
-              </button>
-            </div>
+.edit-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
 
-            <h3 className="group-label">Data & Analytics</h3>
+/* Group Label */
+.group-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 24px 0 16px;
+}
 
-            <div className="toggle-row">
-              <div className="toggle-text">
-                <span className="toggle-label">Anonymous Analytics</span>
-                <span className="toggle-desc">Help improve the app</span>
-              </div>
-              <button 
-                className={`toggle-switch ${analyticsOptIn ? 'active' : ''}`}
-                onClick={() => isEditingPrivacy && setAnalyticsOptIn(!analyticsOptIn)}
-                disabled={!isEditingPrivacy}
-              >
-                <span className="toggle-knob" />
-              </button>
-            </div>
+.group-label:first-of-type {
+  margin-top: 0;
+}
 
-            <div className="toggle-row">
-              <div className="toggle-text">
-                <span className="toggle-label">Community Insights</span>
-                <span className="toggle-desc">Share aggregated data</span>
-              </div>
-              <button 
-                className={`toggle-switch ${dataSharing ? 'active' : ''}`}
-                onClick={() => isEditingPrivacy && setDataSharing(!dataSharing)}
-                disabled={!isEditingPrivacy}
-              >
-                <span className="toggle-knob" />
-              </button>
-            </div>
+/* =============================================================================
+   FORM INPUTS - Matches Calendar/Tracker exactly
+   ============================================================================= */
 
-            <h3 className="group-label">Communications</h3>
+.form-group {
+  margin-bottom: 20px;
+}
 
-            <div className="toggle-row">
-              <div className="toggle-text">
-                <span className="toggle-label">Marketing Emails</span>
-                <span className="toggle-desc">Features and tips</span>
-              </div>
-              <button 
-                className={`toggle-switch ${marketingEmails ? 'active' : ''}`}
-                onClick={() => isEditingPrivacy && setMarketingEmails(!marketingEmails)}
-                disabled={!isEditingPrivacy}
-              >
-                <span className="toggle-knob" />
-              </button>
-            </div>
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
 
-            {isSupported && (
-              <div className="toggle-row">
-                <div className="toggle-text">
-                  <span className="toggle-label">Push Notifications</span>
-                  <span className="toggle-desc">
-                    {permission === 'denied' ? 'Blocked in browser' : 'Milestone alerts'}
-                  </span>
-                </div>
-                <button 
-                  className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
-                  onClick={handleNotificationToggle}
-                  disabled={!isEditingPrivacy || isTogglingNotifications || permission === 'denied'}
-                >
-                  <span className="toggle-knob" />
-                </button>
-              </div>
-            )}
+.form-group input {
+  width: 100%;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: border-color 150ms ease;
+}
 
-            {/* Notification Preferences */}
-            {isSupported && notificationsEnabled && isEditingPrivacy && (
-              <>
-                <h3 className="group-label">Notification Preferences</h3>
+.form-group input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
+}
 
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Quiet Hours</span>
-                    <span className="toggle-desc">Pause during sleep</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
-                    onClick={() => setQuietHoursEnabled(!quietHoursEnabled)}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
+.form-group input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
-                {quietHoursEnabled && (
-                  <div className="time-row">
-                    <input type="time" value={quietHoursStart} onChange={(e) => setQuietHoursStart(e.target.value)} />
-                    <span>to</span>
-                    <input type="time" value={quietHoursEnd} onChange={(e) => setQuietHoursEnd(e.target.value)} />
-                  </div>
-                )}
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
 
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Milestones</span>
-                    <span className="toggle-desc">Day 7, 30, 90...</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
-                    onClick={() => updateNotifType('milestones')}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
+/* =============================================================================
+   TOGGLE ROWS
+   ============================================================================= */
 
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Urge Support</span>
-                    <span className="toggle-desc">Encouragement</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
-                    onClick={() => updateNotifType('urgeSupport')}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
 
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Weekly Summary</span>
-                    <span className="toggle-desc">Sunday report</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
-                    onClick={() => updateNotifType('weeklyProgress')}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
+.toggle-row:last-of-type {
+  border-bottom: none;
+}
 
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Daily Reminder</span>
-                    <span className="toggle-desc">Log benefits</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
-                    onClick={() => setDailyReminderEnabled(!dailyReminderEnabled)}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
+.toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
-                {dailyReminderEnabled && (
-                  <div className="time-row single">
-                    <label>Reminder time</label>
-                    <input type="time" value={dailyReminderTime} onChange={(e) => setDailyReminderTime(e.target.value)} />
-                  </div>
-                )}
+.toggle-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #ffffff;
+}
 
-                <button className="test-notif-btn" onClick={handleTestNotification}>
-                  Test Notification
-                </button>
-              </>
-            )}
+.toggle-desc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+}
 
-            {isEditingPrivacy && (
-              <div className="section-actions">
-                <button className="btn-primary" onClick={handleSaveNotificationPreferences}>Save</button>
-                <button className="btn-ghost" onClick={() => setIsEditingPrivacy(false)}>Cancel</button>
-              </div>
-            )}
-          </div>
-        )}
+/* Toggle Switch - Gold active */
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+  flex-shrink: 0;
+  padding: 0;
+}
 
-        {/* SETTINGS TAB */}
-        {activeTab === 'settings' && (
-          <div className="profile-section">
-            <div className="section-header">
-              <h2>Settings</h2>
-            </div>
-            <h3 className="group-label">Language</h3>
-            <div className="coming-soon">
-              <span className="coming-badge">Coming Soon</span>
-              <p>Multi-language support is being developed</p>
-            </div>
-          </div>
-        )}
+.toggle-switch:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
-        {/* DATA TAB */}
-        {activeTab === 'data' && (
-          <div className="profile-section">
-            <div className="section-header">
-              <h2>Data</h2>
-            </div>
+.toggle-switch.active {
+  background: #ffdd00;
+}
 
-            <div className="data-row">
-              <div className="data-text">
-                <span className="data-title">Export Data</span>
-                <span className="data-desc">Download as JSON</span>
-              </div>
-              <button className="data-btn" onClick={() => setShowExportModal(true)}>Export</button>
-            </div>
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 200ms ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
-            <div className="data-row danger">
-              <div className="data-text">
-                <span className="data-title">Delete Account</span>
-                <span className="data-desc">Permanently remove data</span>
-              </div>
-              <button className="data-btn danger" onClick={() => setShowDeleteConfirm(true)}>Delete</button>
-            </div>
+.toggle-switch.active .toggle-knob {
+  transform: translateX(20px);
+  background: #000000;
+}
 
-            <button className="signout-btn" onClick={onLogout}>Sign Out</button>
-          </div>
-        )}
-      </div>
+/* =============================================================================
+   TIME INPUTS
+   ============================================================================= */
 
-      {/* FEEDBACK MODAL */}
-      {showFeedbackModal && (
-        <div className="overlay" onClick={() => setShowFeedbackModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2>Send Feedback</h2>
-            <p>Help us improve TitanTrack</p>
-            
-            <div className="feedback-types">
-              {feedbackTypes.map(type => (
-                <button
-                  key={type.id}
-                  className={`feedback-type-btn ${feedbackType === type.id ? 'active' : ''}`}
-                  onClick={() => setFeedbackType(type.id)}
-                >
-                  {type.label}
-                </button>
-              ))}
-            </div>
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0 16px;
+}
 
-            <div className="modal-field">
-              <label>Subject</label>
-              <input
-                type="text"
-                value={feedbackSubject}
-                onChange={(e) => setFeedbackSubject(e.target.value)}
-                placeholder="Brief description"
-                maxLength={100}
-              />
-            </div>
+.time-row.single {
+  gap: 16px;
+}
 
-            <div className="modal-field">
-              <label>Message</label>
-              <textarea
-                value={feedbackMessage}
-                onChange={(e) => setFeedbackMessage(e.target.value)}
-                placeholder="Your feedback..."
-                rows={4}
-                maxLength={500}
-              />
-            </div>
+.time-row label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+}
 
-            <div className="modal-actions">
-              <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
-              <button className="btn-ghost" onClick={() => setShowFeedbackModal(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+.time-row input[type="time"] {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-family: inherit;
+}
 
-      {/* EXPORT MODAL */}
-      {showExportModal && (
-        <div className="overlay" onClick={() => setShowExportModal(false)}>
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <h2>Export Data</h2>
-            <p>Download all your tracking data including streak history, journal entries, and settings.</p>
-            <div className="confirm-actions">
-              <button className="btn-primary" onClick={handleDataExport}>Download</button>
-              <button className="btn-ghost" onClick={() => setShowExportModal(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+.time-row input[type="time"]:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
+}
 
-      {/* DELETE MODAL */}
-      {showDeleteConfirm && (
-        <div className="overlay" onClick={() => setShowDeleteConfirm(false)}>
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <h2>Delete Account?</h2>
-            <p>This will permanently delete all your data. This cannot be undone.</p>
-            <div className="confirm-actions">
-              <button className="btn-danger" onClick={handleAccountDeletion}>Delete</button>
-              <button className="btn-ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+.time-row span {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.875rem;
+}
 
-export default Profile;
+/* Test Notification Button */
+.test-notif-btn {
+  margin-top: 16px;
+  padding: 12px 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  align-self: flex-start;
+}
+
+.test-notif-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* =============================================================================
+   SECTION ACTIONS - Matches Tracker/Calendar exactly
+   ============================================================================= */
+
+.section-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+/* =============================================================================
+   BUTTONS - EXACT match to Tracker/Calendar
+   ============================================================================= */
+
+.btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  background: #ffffff;
+  border: none;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-danger {
+  width: 100%;
+  padding: 16px 24px;
+  background: rgba(255, 59, 48, 0.15);
+  border: none;
+  border-radius: 12px;
+  color: #ff3b30;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.btn-danger:hover {
+  background: rgba(255, 59, 48, 0.25);
+}
+
+/* =============================================================================
+   DATA ROWS
+   ============================================================================= */
+
+.data-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.data-row:last-of-type {
+  border-bottom: none;
+}
+
+.data-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.data-title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.data-desc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.data-row.danger .data-title {
+  color: #ff3b30;
+}
+
+.data-btn {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.data-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.data-btn.danger {
+  background: rgba(255, 59, 48, 0.15);
+  color: #ff3b30;
+}
+
+.data-btn.danger:hover {
+  background: rgba(255, 59, 48, 0.25);
+}
+
+/* Sign Out */
+.signout-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+  margin-top: 24px;
+}
+
+.signout-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* =============================================================================
+   COMING SOON
+   ============================================================================= */
+
+.coming-soon {
+  padding: 20px;
+  text-align: center;
+}
+
+.coming-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: rgba(255, 221, 0, 0.1);
+  border-radius: 6px;
+  color: #ffdd00;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.coming-soon p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+}
+
+/* =============================================================================
+   OVERLAY - Matches Tracker EXACTLY
+   ============================================================================= */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1000;
+  padding: 24px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: overlayIn 200ms ease;
+}
+
+.overlay::before,
+.overlay::after {
+  content: '';
+  flex: 1;
+  min-height: 40px;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* =============================================================================
+   MODAL - TRANSPARENT, floating content
+   ============================================================================= */
+
+.modal {
+  width: 100%;
+  max-width: 360px;
+  background: transparent;
+  padding: 0;
+  flex-shrink: 0;
+  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.modal p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+}
+
+/* Feedback Types */
+.feedback-types {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.feedback-type-btn {
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.feedback-type-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.feedback-type-btn.active {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+/* Modal Fields */
+.modal-field {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.modal-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.modal-field input,
+.modal-field textarea {
+  width: 100%;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: border-color 150ms ease;
+}
+
+.modal-field input:focus,
+.modal-field textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-field input::placeholder,
+.modal-field textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.modal-field textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+/* =============================================================================
+   CONFIRM MODAL - Smaller, side-by-side buttons
+   ============================================================================= */
+
+.confirm-modal {
+  width: 100%;
+  max-width: 320px;
+  background: transparent;
+  text-align: center;
+  flex-shrink: 0;
+  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.confirm-modal h2 {
+  font-size: 1.375rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.02em;
+}
+
+.confirm-modal p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.confirm-actions .btn-primary,
+.confirm-actions .btn-ghost,
+.confirm-actions .btn-danger {
+  flex: 1;
+  padding: 14px 20px;
+}
+
+/* =============================================================================
+   RESPONSIVE
+   ============================================================================= */
+
+@media (max-width: 480px) {
+  .profile {
+    padding: 20px 16px 120px;
+  }
+
+  .profile-header h1 {
+    font-size: 1.375rem;
+  }
+
+  .profile-user {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .profile-feedback-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .profile-tabs {
+    width: 100%;
+  }
+
+  .profile-tab {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 0.8125rem;
+    text-align: center;
+  }
+
+  .section-header h2 {
+    font-size: 1.125rem;
+  }
+
+  .toggle-label {
+    font-size: 0.875rem;
+  }
+
+  .toggle-desc {
+    font-size: 0.75rem;
+  }
+
+  .time-row {
+    flex-wrap: wrap;
+  }
+
+  .time-row input[type="time"] {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .data-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .data-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .confirm-actions {
+    flex-direction: column;
+  }
+
+  .feedback-types {
+    flex-direction: column;
+  }
+
+  .feedback-type-btn {
+    width: 100%;
+  }
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .modal,
+  .confirm-modal {
+    animation: none;
+  }
+}
