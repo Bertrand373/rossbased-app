@@ -1,17 +1,14 @@
 /* =============================================================================
    CALENDAR MODALS - TITANTRACK MODERN MINIMAL
-   Matches Tracker.css modal system EXACTLY:
-   - Immersive overlay with blur
-   - Floating content (NO box/card background)
-   - White primary buttons, ghost secondary
-   - Sheet-style action menus
+   Combined modal styles matching Tracker aesthetic
+   Immersive overlay, floating content, white/ghost buttons
    ============================================================================= */
 
 /* =============================================================================
-   OVERLAY - Immersive dark backdrop
+   OVERLAY - Immersive dark backdrop with blur
    ============================================================================= */
 
-.calendar .overlay {
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -30,9 +27,9 @@
   animation: overlayIn 200ms ease;
 }
 
-/* Spacers push content to center, collapse when content is tall */
-.calendar .overlay::before,
-.calendar .overlay::after {
+/* Spacers push content to center */
+.modal-overlay::before,
+.modal-overlay::after {
   content: '';
   flex: 1;
   min-height: 40px;
@@ -44,449 +41,475 @@
 }
 
 /* =============================================================================
-   DAY MODAL - Floating, no box, matches benefits-modal
+   MODAL CONTENT - Floating, transparent background
    ============================================================================= */
 
-.calendar .day-modal {
+.modal-content {
   width: 100%;
-  max-width: 360px;
+  max-width: 420px;
   max-height: calc(100vh - 120px);
   max-height: calc(100dvh - 120px);
-  display: flex;
-  flex-direction: column;
-  text-align: center;
+  overflow-y: auto;
+  background-color: transparent;
+  padding: 0;
+  position: relative;
   flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  /* NO background - floating content */
-  background: transparent;
-  padding: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.modal-content::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes modalIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(16px); 
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-}
-
-/* Modal title */
-.calendar .day-modal h2 {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 8px 0;
-  letter-spacing: -0.02em;
-  flex-shrink: 0;
-}
-
-/* Status text - matches Tracker's subtle paragraph style */
-.calendar .day-modal .status-current,
-.calendar .day-modal .status-former,
-.calendar .day-modal .status-relapse,
-.calendar .day-modal .status-wet,
-.calendar .day-modal .status-none {
-  font-size: 0.875rem;
-  margin: 0 0 32px 0;
-  line-height: 1.5;
-}
-
-.calendar .day-modal .status-current {
-  color: #34c759;
-}
-
-.calendar .day-modal .status-former {
-  color: #5856d6;
-}
-
-.calendar .day-modal .status-relapse {
-  color: #ff3b30;
-}
-
-.calendar .day-modal .status-wet {
-  color: #af52de;
-}
-
-.calendar .day-modal .status-none {
-  color: rgba(255, 255, 255, 0.4);
 }
 
 /* =============================================================================
-   BENEFITS SECTION - Matches Tracker benefits-modal exactly
+   CLOSE BUTTON
    ============================================================================= */
 
-.calendar .benefits-section {
-  text-align: left;
-  margin-bottom: 32px;
+.modal-close-x {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 150ms ease;
+  z-index: 10;
+  padding: 0;
 }
 
-.calendar .benefits-section h3 {
-  font-size: 0.75rem;
-  font-weight: 600;
+.modal-close-x:hover {
+  color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* =============================================================================
+   DAY INFO MODAL
+   ============================================================================= */
+
+.day-info-modal {
+  width: 100%;
+  max-width: 420px;
+}
+
+.day-info-modal h3 {
+  margin: 0 0 24px 0;
+  font-size: 1.375rem;
+  font-weight: 500;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+/* =============================================================================
+   STATUS SECTION
+   ============================================================================= */
+
+.day-status-info {
+  margin-bottom: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.status-badge svg {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.status-badge .day-count {
   color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0 0 16px 0;
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+
+.status-badge .wet-dream-overlay {
+  color: #fbbf24;
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+
+.status-badge .trigger-inline {
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+
+/* Status colors */
+.status-badge.current-streak {
+  background-color: rgba(52, 211, 153, 0.08);
+  border-color: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.status-badge.former-streak {
+  background-color: rgba(96, 165, 250, 0.08);
+  border-color: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+}
+
+.status-badge.relapse {
+  background-color: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.status-badge.wet-dream {
+  background-color: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+/* =============================================================================
+   EDIT DAY MODAL
+   ============================================================================= */
+
+.edit-day-modal {
+  width: 100%;
+  max-width: 400px;
+}
+
+.modal-header-simple {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal-header-simple h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.edit-day-modal p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+  margin: 0 0 24px 0;
   text-align: center;
 }
 
-.calendar .benefits-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.calendar .benefit-row {
+/* Edit options - stacked buttons */
+.edit-day-options {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-bottom: 24px;
 }
 
-.calendar .benefit-info {
+.edit-option-btn {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+  border: 1px solid;
+  width: 100%;
+  text-align: left;
+  background-color: transparent;
+  font-family: inherit;
 }
 
-.calendar .benefit-info span:first-child {
-  font-size: 0.875rem;
-  font-weight: 400;
+.edit-option-btn svg {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Streak button - green */
+.current-streak-btn {
+  background-color: rgba(52, 211, 153, 0.06);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.15);
+}
+
+.current-streak-btn:hover {
+  background-color: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+/* Wet dream button - amber */
+.wet-dream-btn {
+  background-color: rgba(251, 191, 36, 0.06);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.15);
+}
+
+.wet-dream-btn:hover {
+  background-color: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.25);
+}
+
+/* Relapse button - red */
+.relapse-btn {
+  background-color: rgba(248, 113, 113, 0.06);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.15);
+}
+
+.relapse-btn:hover {
+  background-color: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.25);
+}
+
+/* =============================================================================
+   TRIGGER SELECTION
+   ============================================================================= */
+
+.trigger-selection {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.trigger-selection h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 20px 0;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.trigger-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.trigger-option-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-size: 0.8125rem;
+  font-family: inherit;
   color: rgba(255, 255, 255, 0.5);
 }
 
-.calendar .benefit-num {
-  font-size: 1.125rem;
-  font-weight: 500;
+.trigger-option-pill:hover:not(.selected) {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.trigger-option-pill.selected {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
   color: #ffffff;
-  font-feature-settings: 'tnum' 1;
 }
 
-/* Benefit bar - matches Tracker slider look */
-.calendar .benefit-bar {
-  position: relative;
-  height: 2px;
-  background-color: rgba(255, 255, 255, 0.12);
-  border-radius: 1px;
+.trigger-option-icon {
+  font-size: 0.875rem;
+  opacity: 0.8;
 }
 
-.calendar .benefit-fill {
-  height: 100%;
+.trigger-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.trigger-actions .btn {
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.trigger-actions .btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.trigger-actions .btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.trigger-actions .btn-primary {
   background-color: #ffffff;
-  border-radius: 1px;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+.trigger-actions .btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* =============================================================================
+   BENEFITS SECTION
+   ============================================================================= */
+
+.day-benefits {
+  margin-top: 24px;
+}
+
+.day-benefits h4,
+.day-journal h4 {
+  margin: 0 0 16px 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.benefits-details-enhanced {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.benefit-slider-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.benefit-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.benefit-label {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.benefit-meter-enhanced {
+  flex: 1;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.benefit-level-enhanced {
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
   transition: width 300ms ease;
+}
+
+.benefit-value-circle {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.benefit-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 102px;
+  margin-right: 40px;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* =============================================================================
    JOURNAL SECTION
    ============================================================================= */
 
-.calendar .journal-section {
-  text-align: left;
-  margin-bottom: 32px;
+.day-journal {
+  margin-top: 24px;
 }
 
-.calendar .journal-section h3 {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0 0 16px 0;
-  text-align: center;
-}
-
-/* Journal view */
-.calendar .journal-view {
-  text-align: left;
-}
-
-.calendar .journal-view p {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.6;
-  margin: 0 0 16px 0;
-}
-
-/* Journal edit */
-.calendar .journal-edit {
+.journal-header-with-actions {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
-.calendar .journal-edit textarea {
-  width: 100%;
-  min-height: 120px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.04);
+.journal-header-with-actions h4 {
+  margin: 0;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  color: #ffffff;
-  font-size: 0.9375rem;
-  font-family: inherit;
-  line-height: 1.6;
-  resize: vertical;
-  transition: border-color 150ms ease;
-}
-
-.calendar .journal-edit textarea:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.calendar .journal-edit textarea::placeholder {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.calendar .journal-actions {
-  display: flex;
-  gap: 12px;
-}
-
-/* Journal empty state */
-.calendar .journal-empty {
-  text-align: center;
-}
-
-.calendar .journal-empty p {
-  font-size: 0.875rem;
+  border-radius: 6px;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 16px 0;
-  line-height: 1.5;
-}
-
-/* =============================================================================
-   MODAL ACTIONS - Matches Tracker exactly
-   ============================================================================= */
-
-.calendar .modal-actions {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  margin-top: auto;
-  padding-top: 16px;
-}
-
-/* Primary button - white background */
-.calendar .btn-primary {
-  flex: 1;
-  padding: 14px 20px;
-  background-color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  color: #000000;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.calendar .btn-primary:hover {
-  opacity: 0.9;
-}
-
-.calendar .btn-primary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Ghost button - transparent */
-.calendar .btn-ghost {
-  flex: 1;
-  padding: 14px 20px;
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.calendar .btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* =============================================================================
-   SHEET - Action sheet style (matches Tracker exactly)
-   ============================================================================= */
-
-.calendar .sheet {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: transparent;
-  padding: 16px;
-  padding-bottom: max(16px, calc(env(safe-area-inset-bottom) + 8px));
-  animation: sheetIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes sheetIn {
-  from { 
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to { 
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.calendar .sheet-content {
-  background-color: rgba(28, 28, 30, 0.98);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border-radius: 16px;
-  padding: 8px;
-  margin-bottom: 8px;
-}
-
-.calendar .sheet-content button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 16px 20px;
-  background: transparent;
-  border: none;
-  border-radius: 10px;
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  text-align: center;
-  transition: background-color 100ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.calendar .sheet-content button:hover {
-  background-color: rgba(255, 255, 255, 0.06);
-}
-
-.calendar .sheet-content button:active {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.calendar .sheet-content button.danger {
-  color: #ff453a;
-}
-
-.calendar .sheet-divider {
-  height: 1px;
-  background-color: rgba(255, 255, 255, 0.08);
-  margin: 4px 12px;
-}
-
-.calendar .sheet button.cancel {
-  display: block;
-  width: 100%;
-  padding: 16px 20px;
-  background-color: rgba(28, 28, 30, 0.98);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: none;
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  text-align: center;
-  margin-top: 8px;
-  transition: all 100ms ease;
-}
-
-.calendar .sheet button.cancel:hover {
-  background-color: rgba(40, 40, 42, 0.98);
-  color: #ffffff;
-}
-
-/* Desktop: sheet becomes centered modal */
-@media (min-width: 768px) {
-  .calendar .sheet {
-    position: relative;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    max-width: 300px;
-    padding: 0;
-    background: transparent;
-    animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  
-  .calendar .sheet-content {
-    margin-bottom: 12px;
-  }
-  
-  .calendar .sheet button.cancel {
-    margin-top: 0;
-  }
-}
-
-/* =============================================================================
-   TRIGGER MODAL - For relapse trigger selection
-   ============================================================================= */
-
-.calendar .trigger-modal {
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  flex-shrink: 0;
-  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  /* NO background - floating */
-  background: transparent;
-}
-
-.calendar .trigger-modal h2 {
-  font-size: 1.375rem;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 8px 0;
-  letter-spacing: -0.02em;
-}
-
-.calendar .trigger-modal p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 32px 0;
-}
-
-.calendar .trigger-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 32px;
-}
-
-.calendar .trigger-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 16px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.7);
   font-size: 0.75rem;
   font-weight: 500;
   font-family: inherit;
@@ -494,139 +517,484 @@
   transition: all 150ms ease;
 }
 
-.calendar .trigger-btn svg {
-  font-size: 1.25rem;
-  opacity: 0.6;
-}
-
-.calendar .trigger-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+.action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-.calendar .trigger-btn.selected {
-  background: rgba(255, 59, 48, 0.15);
-  border-color: #ff3b30;
-  color: #ff3b30;
+.journal-entry {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
 }
 
-.calendar .trigger-btn.selected svg {
-  opacity: 1;
+.journal-editing {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.journal-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color 150ms ease;
+}
+
+.journal-textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.journal-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.journal-edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.journal-save-btn {
+  flex: 1;
+  padding: 12px 20px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  color: #000000;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.journal-save-btn:hover {
+  opacity: 0.9;
+}
+
+.journal-cancel-btn {
+  flex: 1;
+  padding: 12px 20px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.journal-cancel-btn:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Journal banner */
+.journal-benefits-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.journal-benefits-helmet-container {
+  flex-shrink: 0;
+}
+
+.journal-benefits-helmet {
+  width: 40px;
+  height: 40px;
+  opacity: 0.6;
+}
+
+.journal-benefits-helmet-fallback {
+  font-size: 1.5rem;
+  opacity: 0.4;
+}
+
+.journal-benefits-content {
+  flex: 1;
+}
+
+.journal-benefits-title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+}
+
+.journal-benefits-description {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.journal-start-section {
+  display: flex;
+  justify-content: center;
 }
 
 /* =============================================================================
-   RESPONSIVE - Mobile adjustments
+   MODAL ACTIONS
+   ============================================================================= */
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Primary button - white */
+.modal-actions .btn-primary,
+.modal-actions .edit-day-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  color: #000000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.modal-actions .btn-primary:hover,
+.modal-actions .edit-day-btn:hover {
+  opacity: 0.9;
+}
+
+/* Outline/Ghost button */
+.modal-actions .btn-outline,
+.modal-actions .btn-ghost {
+  width: 100%;
+  padding: 14px 24px;
+  background-color: transparent;
+  border: none;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.modal-actions .btn-outline:hover,
+.modal-actions .btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Back button */
+.back-to-info-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background-color: transparent;
+  border: none;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.back-to-info-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* =============================================================================
+   MOBILE RESPONSIVE
    ============================================================================= */
 
 @media (max-width: 768px) {
-  .calendar .overlay {
+  .modal-overlay {
     padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
   
-  .calendar .day-modal {
+  .modal-overlay::before,
+  .modal-overlay::after {
+    min-height: 24px;
+  }
+  
+  .modal-content {
     max-width: 100%;
     max-height: calc(100vh - 80px);
     max-height: calc(100dvh - 80px);
   }
   
-  .calendar .day-modal h2 {
+  .day-info-modal h3 {
     font-size: 1.25rem;
   }
   
-  .calendar .benefits-list {
-    gap: 16px;
+  .status-badge {
+    padding: 8px 14px;
+    font-size: 0.75rem;
   }
   
-  .calendar .benefit-info span:first-child {
-    font-size: 0.8125rem;
-  }
-  
-  .calendar .benefit-num {
-    font-size: 1rem;
-  }
-  
-  .calendar .modal-actions {
-    flex-direction: row;
-    gap: 10px;
-  }
-  
-  .calendar .btn-primary,
-  .calendar .btn-ghost {
-    padding: 12px 16px;
-    font-size: 0.875rem;
-  }
-  
-  .calendar .trigger-grid {
+  .edit-day-options {
     gap: 8px;
   }
   
-  .calendar .trigger-btn {
-    padding: 14px 10px;
+  .edit-option-btn {
+    padding: 14px 16px;
+    font-size: 0.8125rem;
+  }
+  
+  .trigger-options {
+    gap: 6px;
+  }
+  
+  .trigger-option-pill {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+  
+  .benefits-details-enhanced {
+    padding: 16px;
+    gap: 14px;
+  }
+  
+  .benefit-label {
+    font-size: 0.75rem;
+    min-width: 75px;
+  }
+  
+  .benefit-value-circle {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
     font-size: 0.6875rem;
   }
   
-  .calendar .trigger-btn svg {
-    font-size: 1.125rem;
+  .benefit-slider-labels {
+    margin-left: 87px;
+    margin-right: 36px;
+    font-size: 0.4375rem;
+  }
+  
+  .journal-benefits-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .journal-header-with-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .journal-header-with-actions h4 {
+    text-align: center;
+  }
+  
+  .journal-edit-btn {
+    align-self: center;
+  }
+  
+  .journal-textarea {
+    min-height: 100px;
+  }
+  
+  .journal-edit-actions {
+    flex-direction: column;
+  }
+  
+  .modal-actions {
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+  
+  .modal-actions button,
+  .back-to-info-btn {
+    padding: 14px 20px;
+  }
+  
+  .modal-close-x {
+    width: 28px;
+    height: 28px;
   }
 }
 
 @media (max-width: 480px) {
-  .calendar .overlay {
+  .modal-overlay {
     padding: 12px;
   }
   
-  .calendar .day-modal h2 {
+  .day-info-modal h3 {
     font-size: 1.125rem;
   }
   
-  .calendar .benefits-section h3,
-  .calendar .journal-section h3 {
+  .modal-header-simple h3 {
+    font-size: 1.125rem;
+  }
+  
+  .status-badge {
+    padding: 8px 12px;
     font-size: 0.6875rem;
   }
   
-  .calendar .btn-primary,
-  .calendar .btn-ghost {
+  .edit-option-btn {
     padding: 12px 14px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+  }
+  
+  .trigger-selection {
+    padding: 16px;
+  }
+  
+  .trigger-selection h4 {
+    font-size: 0.9375rem;
+  }
+  
+  .trigger-option-pill {
+    padding: 8px 10px;
+    font-size: 0.6875rem;
+  }
+  
+  .benefits-details-enhanced {
+    padding: 14px;
+    gap: 12px;
+  }
+  
+  .benefit-label {
+    font-size: 0.6875rem;
+    min-width: 65px;
+  }
+  
+  .benefit-meter-enhanced {
+    height: 3px;
+  }
+  
+  .benefit-value-circle {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    font-size: 0.625rem;
+  }
+  
+  .benefit-slider-labels {
+    margin-left: 77px;
+    margin-right: 34px;
+  }
+  
+  .journal-benefits-helmet {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .journal-benefits-title {
+    font-size: 0.875rem;
+  }
+  
+  .journal-benefits-description {
+    font-size: 0.75rem;
+  }
+  
+  .journal-textarea {
+    min-height: 80px;
+    padding: 12px;
     font-size: 0.8125rem;
   }
   
-  .calendar .trigger-modal h2 {
-    font-size: 1.125rem;
+  .journal-save-btn,
+  .journal-cancel-btn {
+    padding: 10px 16px;
+    font-size: 0.75rem;
   }
   
-  .calendar .trigger-modal p {
+  .day-benefits h4,
+  .day-journal h4 {
+    font-size: 0.6875rem;
+  }
+  
+  .modal-actions button,
+  .back-to-info-btn {
+    padding: 12px 16px;
     font-size: 0.8125rem;
-    margin-bottom: 24px;
+    border-radius: 8px;
+  }
+}
+
+/* Landscape handling */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-overlay {
+    padding-top: 16px;
+  }
+  
+  .modal-overlay::before,
+  .modal-overlay::after {
+    min-height: 16px;
+  }
+  
+  .modal-content {
+    max-height: 95vh;
+    max-height: 95dvh;
   }
 }
 
 /* =============================================================================
-   SCROLLBAR - Minimal, barely visible
+   HIDDEN LEGACY ELEMENTS
    ============================================================================= */
 
-.calendar .day-modal::-webkit-scrollbar {
-  width: 2px;
-}
-
-.calendar .day-modal::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.calendar .day-modal::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 1px;
-}
-
-/* =============================================================================
-   REDUCED MOTION
-   ============================================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .calendar .overlay,
-  .calendar .day-modal,
-  .calendar .sheet,
-  .calendar .trigger-modal {
-    animation: none;
-  }
+.trigger-info,
+.trigger-display,
+.trigger-display-icon,
+.day-streak-info,
+.streak-day-number,
+.streak-context,
+.compact-legend-dot {
+  display: none;
 }
