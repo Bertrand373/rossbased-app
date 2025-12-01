@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './AuthModal.css';
 import trackerLogo from '../../assets/trackerapplogo.png';
 
-import { FaTimes, FaSpinner } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { BsDiscord } from 'react-icons/bs';
 
@@ -127,11 +127,6 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   return (
     <div className="auth-overlay" onClick={handleClose}>
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
-        
-        {/* Close button */}
-        <button className="auth-close" onClick={handleClose}>
-          <FaTimes />
-        </button>
         
         {/* Header */}
         <div className="auth-header">
