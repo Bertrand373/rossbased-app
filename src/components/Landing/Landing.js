@@ -41,21 +41,21 @@ const Landing = ({ onLogin }) => {
           Get Started
         </button>
         
-        {/* Subtle stats or social proof */}
+        {/* App features - truthful stats about capabilities */}
         <div className="landing-stats">
           <div className="landing-stat">
-            <span className="landing-stat-value">10K+</span>
-            <span className="landing-stat-label">Active users</span>
+            <span className="landing-stat-value">6</span>
+            <span className="landing-stat-label">Benefits tracked</span>
           </div>
           <div className="landing-stat-divider" />
           <div className="landing-stat">
-            <span className="landing-stat-value">500K+</span>
-            <span className="landing-stat-label">Days tracked</span>
+            <span className="landing-stat-value">5</span>
+            <span className="landing-stat-label">Phases mapped</span>
           </div>
           <div className="landing-stat-divider" />
           <div className="landing-stat">
-            <span className="landing-stat-value">4.9</span>
-            <span className="landing-stat-label">User rating</span>
+            <span className="landing-stat-value">24/7</span>
+            <span className="landing-stat-label">Crisis support</span>
           </div>
         </div>
       </main>
