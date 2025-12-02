@@ -23,6 +23,11 @@ export function useAutoTrain(userData) {
   const isTrainingInProgress = useRef(false);
 
   const checkAndTrain = useCallback(async () => {
+    // SAFETY: Exit early if no userData
+    if (!userData) {
+      return;
+    }
+
     // Prevent concurrent training attempts
     if (isTrainingInProgress.current) {
       return;
@@ -43,7 +48,7 @@ export function useAutoTrain(userData) {
       // Requirements for auto-training:
       // 1. Can train (20+ days of data)
       // 2. Has relapse history (something to learn from)
-      if (!dataQuality.canTrain || !dataQuality.hasRelapseData) {
+      if (!dataQuality || !dataQuality.canTrain || !dataQuality.hasRelapseData) {
         console.log('🤖 Auto-train: Insufficient data, skipping');
         return;
       }
@@ -52,7 +57,7 @@ export function useAutoTrain(userData) {
       const modelInfo = mlPredictionService.getModelInfo();
       
       // Skip if model is ready and doesn't need retraining
-      if (modelInfo.isReady && !modelInfo.needsRetraining) {
+      if (modelInfo && modelInfo.isReady && !modelInfo.needsRetraining) {
         console.log('🤖 Auto-train: Model already trained and up-to-date');
         hasAttemptedTraining.current = true;
         return;
@@ -66,10 +71,10 @@ export function useAutoTrain(userData) {
       // Train without progress callback (silent)
       const result = await mlPredictionService.train(userData, null);
 
-      if (result.success) {
+      if (result && result.success) {
         console.log(`🤖 Auto-train: Complete! Accuracy: ${result.accuracy?.toFixed(1)}%`);
       } else {
-        console.log('🤖 Auto-train: Training failed -', result.message);
+        console.log('🤖 Auto-train: Training failed -', result?.message || 'Unknown error');
       }
 
     } catch (error) {
@@ -81,8 +86,13 @@ export function useAutoTrain(userData) {
 
   // Run check when userData changes (specifically when tracking data grows)
   useEffect(() => {
-    // Only check if we have userData
-    if (!userData || !userData.benefitTracking) {
+    // SAFETY: Only check if we have valid userData with tracking
+    if (!userData || !userData.benefitTracking || !Array.isArray(userData.benefitTracking)) {
+      return;
+    }
+
+    // Need at least 20 days before even attempting
+    if (userData.benefitTracking.length < 20) {
       return;
     }
 
@@ -92,18 +102,7 @@ export function useAutoTrain(userData) {
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [userData?.benefitTracking?.length, checkAndTrain]);
-
-  // Also check on mount (for returning users)
-  useEffect(() => {
-    if (userData && userData.benefitTracking?.length >= 20) {
-      const mountTimeout = setTimeout(() => {
-        checkAndTrain();
-      }, 3000); // Slight delay on mount to not block initial render
-
-      return () => clearTimeout(mountTimeout);
-    }
-  }, []); // Only on mount
+  }, [userData, checkAndTrain]);
 
   // This hook returns nothing - it's purely side-effect based
   return null;

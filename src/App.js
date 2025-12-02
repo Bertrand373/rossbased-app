@@ -180,11 +180,15 @@ function App() {
     cancelGoal
   } = useUserData();
 
-  // AMBIENT AI: Auto-train ML model silently in background
-  useAutoTrain(userData);
+  // AMBIENT AI: Only run these hooks when user is logged in with valid data
+  // Pass null when not logged in to prevent any processing
+  const safeUserData = (isLoggedIn && userData) ? userData : null;
+  
+  // Auto-train ML model silently in background (only when logged in)
+  useAutoTrain(safeUserData);
 
-  // AMBIENT AI: Get risk indicator state for navigation
-  const { riskLevel } = useRiskIndicator(userData);
+  // Get risk indicator state for navigation (only when logged in)
+  const { riskLevel } = useRiskIndicator(safeUserData);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
