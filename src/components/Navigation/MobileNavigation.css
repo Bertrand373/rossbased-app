@@ -13,7 +13,7 @@
   
   /* Content area + safe area */
   padding-top: 12px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
   
   background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(24px);
@@ -25,24 +25,30 @@
    SLIDING DOT INDICATOR
    ============================================================ */
 
-.nav-slider {
+.nav-slider-dot {
   position: absolute;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0));
-  left: 0;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0));
   
-  /* The dot itself */
   width: 6px;
   height: 6px;
   background-color: #ffffff;
   border-radius: 50%;
   
-  pointer-events: none;
-  
-  /* Smooth sliding animation - translateX centers the dot */
-  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms ease;
-  
-  /* Offset by half width to center the dot at the calculated position */
+  /* Center the dot on the calculated position */
   margin-left: -3px;
+  
+  /* Smooth sliding */
+  transition: left 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms ease;
+  
+  pointer-events: none;
+}
+
+/* ============================================================
+   NAV ITEM WRAPPER
+   ============================================================ */
+
+.nav-item-wrapper {
+  display: flex;
 }
 
 /* ============================================================
@@ -53,12 +59,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
   padding: 8px 12px;
-  padding-bottom: 14px; /* Extra space for dot below */
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transition: opacity 150ms ease;
 }
 
 .nav-label {
@@ -93,7 +96,6 @@
   
   .nav-item {
     padding: 8px 16px;
-    padding-bottom: 14px;
   }
 }
 
@@ -105,10 +107,9 @@
   
   .nav-item {
     padding: 8px;
-    padding-bottom: 12px;
   }
   
-  .nav-slider {
+  .nav-slider-dot {
     width: 5px;
     height: 5px;
     margin-left: -2.5px;
@@ -125,23 +126,18 @@
   .nav-item {
     flex-direction: row;
     gap: 8px;
-    padding-bottom: 8px;
   }
   
-  /* Hide slider in landscape */
-  .nav-slider {
+  /* Hide dot in landscape */
+  .nav-slider-dot {
     display: none;
-  }
-  
-  .nav-item.active .nav-label {
-    color: #ffffff;
   }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .nav-slider {
-    transition: none;
+  .nav-slider-dot {
+    transition: opacity 150ms ease;
   }
   
   .nav-label {

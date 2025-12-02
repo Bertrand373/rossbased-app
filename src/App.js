@@ -1,5 +1,5 @@
 // App.js - TITANTRACK MODERN MINIMAL
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
@@ -51,8 +51,10 @@ const ProfileButton = ({ userData }) => {
 // Desktop Navigation - sliding dot indicator
 const HeaderNavigation = () => {
   const location = useLocation();
-  const navRef = useRef(null);
-  const [sliderStyle, setSliderStyle] = useState({ left: 0, opacity: 0 });
+  const containerRef = useRef(null);
+  const itemRefs = useRef([]);
+  const [dotPosition, setDotPosition] = useState(0);
+  const [isReady, setIsReady] = useState(false);
   
   const navItems = [
     { path: '/', label: 'Tracker' },
@@ -63,63 +65,66 @@ const HeaderNavigation = () => {
   ];
 
   // Find active tab index
-  const activeIndex = navItems.findIndex(item => {
-    if (item.path === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(item.path);
-  });
-
-  // Calculate slider position based on actual element positions
-  useEffect(() => {
-    const updateSliderPosition = () => {
-      if (navRef.current && activeIndex >= 0) {
-        const container = navRef.current;
-        const activeLink = container.querySelectorAll('.nav-link')[activeIndex];
-        
-        if (activeLink) {
-          const containerRect = container.getBoundingClientRect();
-          const linkRect = activeLink.getBoundingClientRect();
-          
-          // Center of the active link relative to container
-          const centerPosition = linkRect.left - containerRect.left + (linkRect.width / 2);
-          
-          setSliderStyle({
-            left: centerPosition,
-            opacity: 1
-          });
-        }
+  const getActiveIndex = useCallback(() => {
+    return navItems.findIndex(item => {
+      if (item.path === '/') {
+        return location.pathname === '/';
       }
-    };
+      return location.pathname.startsWith(item.path);
+    });
+  }, [location.pathname]);
 
-    // Initial calculation
-    updateSliderPosition();
-    
-    // Recalculate on resize
-    window.addEventListener('resize', updateSliderPosition);
-    return () => window.removeEventListener('resize', updateSliderPosition);
-  }, [activeIndex, location.pathname]);
+  // Calculate dot position
+  const updateDotPosition = useCallback(() => {
+    const activeIdx = getActiveIndex();
+    if (activeIdx >= 0 && containerRef.current && itemRefs.current[activeIdx]) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const itemRect = itemRefs.current[activeIdx].getBoundingClientRect();
+      
+      // Calculate center of active item relative to container
+      const centerX = itemRect.left - containerRect.left + (itemRect.width / 2);
+      setDotPosition(centerX);
+      setIsReady(true);
+    }
+  }, [getActiveIndex]);
+
+  // Update on mount and route change
+  useEffect(() => {
+    const timer = setTimeout(updateDotPosition, 10);
+    return () => clearTimeout(timer);
+  }, [location.pathname, updateDotPosition]);
+
+  // Update on resize
+  useEffect(() => {
+    window.addEventListener('resize', updateDotPosition);
+    return () => window.removeEventListener('resize', updateDotPosition);
+  }, [updateDotPosition]);
 
   return (
     <nav className="header-nav">
-      <div className="nav-container" ref={navRef}>
-        {/* Sliding dot indicator */}
+      <div className="nav-container" ref={containerRef}>
+        {/* Sliding dot */}
         <div 
-          className="nav-slider" 
-          style={{ 
-            transform: `translateX(${sliderStyle.left}px)`,
-            opacity: sliderStyle.opacity
-          }} 
+          className="nav-slider-dot"
+          style={{
+            left: `${dotPosition}px`,
+            opacity: isReady ? 1 : 0
+          }}
         />
         
-        {navItems.map(item => (
-          <NavLink 
+        {navItems.map((item, index) => (
+          <div 
             key={item.path}
-            to={item.path}
-            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+            ref={el => itemRefs.current[index] = el}
+            className="nav-item-wrapper"
           >
-            {item.label}
-          </NavLink>
+            <NavLink 
+              to={item.path}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+            >
+              {item.label}
+            </NavLink>
+          </div>
         ))}
       </div>
     </nav>
