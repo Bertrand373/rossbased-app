@@ -412,7 +412,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 48px;
+  margin-top: 32px;
 }
 
 /* Primary button - WHITE */
@@ -680,7 +680,6 @@
   }
   
   .calendar-modal {
-    max-width: 100%;
     max-height: calc(100vh - 80px);
     max-height: calc(100dvh - 80px);
   }
@@ -740,7 +739,7 @@
   }
   
   .calendar-actions {
-    margin-top: 40px;
+    margin-top: 32px;
   }
   
   .calendar-btn-primary,
@@ -813,8 +812,8 @@
   .calendar-btn-primary,
   .calendar-btn-ghost,
   .calendar-btn-back {
-    padding: 14px 18px;
-    font-size: 0.8125rem;
+    padding: 14px 20px;
+    font-size: 0.875rem;
     border-radius: 10px;
   }
 }
@@ -882,11 +881,11 @@
   .calendar-btn-primary,
   .calendar-btn-ghost,
   .calendar-btn-back {
-    padding: 18px 28px;
-    font-size: 1rem;
+    padding: 16px 24px;
+    font-size: 0.9375rem;
   }
   
   .calendar-actions {
-    margin-top: 56px;
+    margin-top: 32px;
   }
 }
