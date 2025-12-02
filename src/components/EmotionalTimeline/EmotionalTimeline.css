@@ -1,6 +1,6 @@
 /* =============================================================================
    EMOTIONALTIMELINE.CSS - TITANTRACK MINIMAL
-   Matches Tracker/Calendar/Stats/Profile aesthetic exactly
+   Matches Landing/Tracker/Stats aesthetic - no header, flowing content
    ============================================================================= */
 
 /* =============================================================================
@@ -11,84 +11,63 @@
   min-height: calc(100dvh - 56px - 80px);
   display: flex;
   flex-direction: column;
-  padding: 24px;
-  padding-bottom: 120px;
+  align-items: center;
+  padding: 48px 24px 120px;
   background-color: #000000;
-  max-width: 500px;
-  margin: 0 auto;
   width: 100%;
 }
 
 @media (min-width: 1025px) {
   .et-container {
     min-height: calc(100dvh - 64px);
-    padding: 32px 24px 60px;
-    max-width: 560px;
+    padding: 56px 24px 80px;
+  }
+  
+  .et-container > * {
+    max-width: 480px;
   }
 }
 
 /* =============================================================================
-   HEADER - Matches other tabs exactly
-   ============================================================================= */
-
-.et-header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.et-header h1 {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-
-.et-header p {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 8px 0 0 0;
-  font-weight: 400;
-}
-
-/* =============================================================================
-   TABS - Matches Calendar/Profile/Stats exactly
+   TABS - Text-only with dividers (matches Calendar/Stats)
    ============================================================================= */
 
 .et-tabs {
-  display: inline-flex;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 4px;
-  gap: 4px;
-  align-self: center;
-  margin-bottom: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 48px;
+  animation: fadeInUp 500ms ease forwards;
+  opacity: 0;
 }
 
 .et-tab {
-  padding: 12px 20px;
+  padding: 8px 16px;
   background: transparent;
   border: none;
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.25);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .et-tab:hover:not(.active) {
-  color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .et-tab.active {
-  background: #ffffff;
-  color: #000000;
+  color: #ffffff;
   font-weight: 600;
+}
+
+.et-tab-divider {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* =============================================================================
@@ -98,118 +77,122 @@
 .et-journey {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  width: 100%;
+  max-width: 400px;
+  animation: fadeInUp 500ms ease 50ms forwards;
+  opacity: 0;
 }
 
-/* Current Phase Card */
+/* Current Phase - Hero display like Tracker streak */
 .et-current {
   text-align: center;
-  padding: 32px 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
+  padding: 0 0 48px 0;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: opacity 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 40px;
 }
 
 .et-current:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  opacity: 0.8;
 }
 
 .et-current:active {
-  transform: scale(0.99);
+  opacity: 0.6;
 }
 
 .et-current-label {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .et-current-name {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 500;
   color: #ffffff;
-  margin: 0 0 4px 0;
+  margin: 0 0 8px 0;
   letter-spacing: -0.02em;
 }
 
 .et-current-days {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 24px 0;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0 32px 0;
 }
 
 /* Progress */
 .et-progress {
-  max-width: 260px;
+  max-width: 240px;
   margin: 0 auto;
 }
 
 .et-progress-bar {
-  height: 3px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 1px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .et-progress-fill {
   height: 100%;
   background: #ffffff;
-  border-radius: 2px;
+  border-radius: 1px;
   transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .et-progress-text {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
 }
 
-/* Phase List */
+/* Phase List - Minimal, no containers */
 .et-phases {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
 }
 
 .et-phase {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px;
+  padding: 20px 0;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: opacity 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
+.et-phase:last-child {
+  border-bottom: none;
+}
+
 .et-phase:hover {
-  background: rgba(255, 255, 255, 0.02);
-  border-color: rgba(255, 255, 255, 0.1);
+  opacity: 0.7;
 }
 
 .et-phase:active {
-  transform: scale(0.99);
+  opacity: 0.5;
 }
 
 .et-phase-num {
   font-size: 0.75rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.15);
   font-feature-settings: 'tnum' 1;
   min-width: 24px;
 }
 
 .et-phase.completed .et-phase-num {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .et-phase.current .et-phase-num {
@@ -224,134 +207,199 @@
   font-size: 0.9375rem;
   font-weight: 500;
   color: #ffffff;
-  margin: 0 0 2px 0;
+  margin: 0 0 4px 0;
   letter-spacing: -0.01em;
 }
 
 .et-phase.upcoming .et-phase-info h3 {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .et-phase-info p {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
   margin: 0;
 }
 
 .et-phase-status {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.15);
   width: 20px;
   display: flex;
   justify-content: center;
 }
 
 .et-phase.completed .et-phase-status {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 /* =============================================================================
-   CHECK-IN TAB
+   CHECK-IN TAB - Tracker-style sliders
    ============================================================================= */
 
 .et-checkin {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  width: 100%;
+  max-width: 360px;
+  animation: fadeInUp 500ms ease 50ms forwards;
+  opacity: 0;
 }
 
-.et-checkin-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 24px;
-}
-
-.et-checkin-card h3 {
+/* Section header */
+.et-checkin-header {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin: 0 0 24px 0;
+  text-align: center;
+  margin-bottom: 40px;
 }
 
+/* Sliders - Match Tracker benefit sliders EXACTLY */
 .et-sliders {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 32px;
+  margin-bottom: 48px;
 }
 
 .et-slider-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.et-slider-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 16px;
 }
 
 .et-slider-label {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
-}
-
-.et-slider-value {
-  font-size: 1rem;
-  font-weight: 600;
   color: #ffffff;
-  font-feature-settings: 'tnum' 1;
-  min-width: 24px;
-  text-align: right;
+  letter-spacing: -0.01em;
 }
 
-/* Slider - Match Tracker aesthetic */
+/* Slider container - Match Tracker .benefit-slider */
+.et-slider-wrap {
+  position: relative;
+}
+
+.et-slider-bg {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-50%);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+.et-slider-fill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 2px;
+  background: #ffffff;
+  transform: translateY(-50%);
+  border-radius: 1px;
+  pointer-events: none;
+  transition: width 50ms ease;
+}
+
 .et-slider {
-  -webkit-appearance: none;
-  appearance: none;
   width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-  outline: none;
+  height: 24px;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  background: transparent !important;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Track - transparent since we use custom bg */
+.et-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 1px;
   cursor: pointer;
 }
 
+.et-slider::-moz-range-track {
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  border: none;
+  border-radius: 1px;
+  cursor: pointer;
+}
+
+/* Thumb styling - Match Tracker exactly */
 .et-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 18px;
+  height: 18px;
   background: #ffffff;
+  border: none !important;
   border-radius: 50%;
   cursor: pointer;
+  margin-top: -8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   transition: transform 150ms ease, box-shadow 150ms ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-.et-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
-}
-
-.et-slider::-webkit-slider-thumb:active {
-  transform: scale(1.05);
 }
 
 .et-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   background: #ffffff;
   border: none;
   border-radius: 50%;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+/* Hover/active states */
+.et-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+.et-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.et-slider:active::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+.et-slider:active::-moz-range-thumb {
+  transform: scale(1.1);
+}
+
+/* Focus state */
+.et-slider:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.et-slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.et-slider:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Disabled state */
 .et-slider:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -364,10 +412,11 @@
 
 .et-slider-desc {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: -8px;
 }
 
-/* Save Button */
+/* Save Button - Match Tracker .btn-primary */
 .et-save-btn {
   width: 100%;
   padding: 16px 24px;
@@ -375,7 +424,7 @@
   border: none;
   border-radius: 12px;
   color: #000000;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -398,70 +447,78 @@
 }
 
 /* =============================================================================
-   ANALYSIS TAB
+   ANALYSIS TAB - Containerless, flowing content
    ============================================================================= */
 
 .et-analysis {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+  animation: fadeInUp 500ms ease 50ms forwards;
+  opacity: 0;
 }
 
-/* Stats Grid */
+/* Stats - Horizontal with dividers (like Stats page) */
 .et-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 40px;
 }
 
 .et-stat {
-  text-align: center;
-  padding: 20px 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+}
+
+.et-stat-divider {
+  width: 1px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .et-stat-value {
-  display: block;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 500;
   color: #ffffff;
   letter-spacing: -0.02em;
   font-feature-settings: 'tnum' 1;
+  line-height: 1;
 }
 
 .et-stat-label {
-  display: block;
-  font-size: 0.5625rem;
+  font-size: 0.6875rem;
   color: rgba(255, 255, 255, 0.35);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 6px;
+  letter-spacing: 0.02em;
 }
 
-/* Trends */
+/* Trends - Containerless, flowing */
 .et-trends {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 20px;
+  padding: 0;
 }
 
 .et-trends h3 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin: 0 0 16px 0;
+  margin: 0 0 24px 0;
 }
 
 .et-trend-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 16px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -470,23 +527,19 @@
   padding-bottom: 0;
 }
 
-.et-trend-row:first-of-type {
-  padding-top: 0;
-}
-
 .et-trend-label {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.et-trend-value {
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.5);
 }
 
+.et-trend-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+}
+
 .et-trend-value.improving {
-  color: rgba(255, 255, 255, 0.8);
+  color: #ffffff;
 }
 
 .et-trend-value.stable {
@@ -494,29 +547,26 @@
 }
 
 .et-trend-value.concerning {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.35);
 }
 
-/* Empty State */
+/* Empty State - Minimal */
 .et-empty {
   text-align: center;
   padding: 48px 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
 }
 
 .et-empty-title {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0 0 8px 0;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 12px 0;
 }
 
 .et-empty-text {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.35);
-  line-height: 1.6;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1.7;
   margin: 0;
   max-width: 280px;
   margin-left: auto;
@@ -524,33 +574,28 @@
 }
 
 /* =============================================================================
-   MODAL - Transparent floating style matching Tracker/Calendar
+   MODAL - Transparent floating (matches Tracker/Calendar)
    ============================================================================= */
 
 .et-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   z-index: 10000;
   padding: 24px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   animation: etOverlayIn 200ms ease;
-}
-
-.et-overlay::before,
-.et-overlay::after {
-  content: '';
-  flex: 1;
-  min-height: 40px;
 }
 
 @keyframes etOverlayIn {
@@ -560,7 +605,7 @@
 
 .et-modal {
   width: 100%;
-  max-width: 380px;
+  max-width: 340px;
   background: transparent;
   text-align: left;
   flex-shrink: 0;
@@ -585,13 +630,13 @@
   gap: 16px;
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .et-modal-num {
   font-size: 2rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.1);
   font-feature-settings: 'tnum' 1;
   line-height: 1;
 }
@@ -606,15 +651,15 @@
 
 .et-modal-header p {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.35);
   margin: 0;
 }
 
-/* Modal Close - Small X in corner */
+/* Modal Close */
 .et-modal-close {
   position: fixed;
-  top: max(24px, env(safe-area-inset-top, 24px));
-  right: 24px;
+  top: max(20px, env(safe-area-inset-top));
+  right: max(20px, env(safe-area-inset-right));
   width: 40px;
   height: 40px;
   display: flex;
@@ -640,10 +685,10 @@
 .et-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 32px;
 }
 
-/* Modal Sections */
+/* Modal Sections - Containerless */
 .et-modal-section {
   padding: 0;
 }
@@ -651,7 +696,7 @@
 .et-modal-section h4 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0 0 12px 0;
@@ -659,7 +704,7 @@
 
 .et-modal-section p {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.55);
   line-height: 1.7;
   margin: 0;
 }
@@ -670,53 +715,47 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .et-modal-section li {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.5;
-  padding-left: 16px;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+  padding-left: 0;
   position: relative;
 }
 
 .et-modal-section li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 8px;
-  width: 4px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 50%;
+  display: none;
 }
 
-/* Warning Section - Subtle, not harsh */
+/* Warning Section */
 .et-warning {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 20px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 24px 0 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .et-warning h4 {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .et-warning h4 svg {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.et-warning li {
   color: rgba(255, 255, 255, 0.4);
 }
 
-.et-warning li::before {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Modal Button - Ghost style, not primary */
+/* Modal Button - Ghost style */
 .et-modal-btn {
   width: 100%;
   padding: 16px 24px;
@@ -729,7 +768,7 @@
   font-family: inherit;
   cursor: pointer;
   transition: color 150ms ease;
-  margin-top: 32px;
+  margin-top: 40px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -738,38 +777,48 @@
 }
 
 /* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================================================
    RESPONSIVE
    ============================================================================= */
 
 @media (max-width: 480px) {
   .et-container {
-    padding: 20px 16px 120px;
-  }
-  
-  .et-header h1 {
-    font-size: 1.125rem;
+    padding: 32px 16px 100px;
   }
   
   .et-tabs {
-    align-self: stretch;
+    margin-bottom: 40px;
   }
   
   .et-tab {
-    flex: 1;
-    padding: 10px 12px;
+    padding: 8px 12px;
     font-size: 0.8125rem;
   }
   
-  .et-current {
-    padding: 28px 20px;
+  .et-current-name {
+    font-size: 1.75rem;
   }
   
-  .et-current-name {
-    font-size: 1.375rem;
+  .et-current-days {
+    margin-bottom: 28px;
   }
   
   .et-phase {
-    padding: 14px;
+    padding: 16px 0;
     gap: 12px;
   }
   
@@ -777,24 +826,35 @@
     font-size: 0.875rem;
   }
   
-  .et-checkin-card {
-    padding: 20px;
+  .et-sliders {
+    gap: 28px;
   }
   
-  .et-sliders {
-    gap: 24px;
+  .et-slider-label {
+    font-size: 0.8125rem;
+  }
+  
+  .et-save-btn {
+    padding: 16px 20px;
+    font-size: 0.9375rem;
   }
   
   .et-stats-grid {
-    gap: 8px;
+    gap: 16px;
+    padding-bottom: 32px;
+    margin-bottom: 32px;
   }
   
   .et-stat {
-    padding: 16px 8px;
+    padding: 0 12px;
   }
   
   .et-stat-value {
-    font-size: 1.375rem;
+    font-size: 1.75rem;
+  }
+  
+  .et-stat-divider {
+    height: 32px;
   }
   
   .et-modal {
@@ -823,11 +883,49 @@
   }
   
   .et-modal-body {
-    gap: 24px;
+    gap: 28px;
   }
   
-  .et-modal-section p {
+  .et-modal-section p,
+  .et-modal-section li {
     font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .et-container {
+    padding: 28px 12px 90px;
+  }
+  
+  .et-stats-grid {
+    gap: 12px;
+  }
+  
+  .et-stat {
+    padding: 0 8px;
+  }
+  
+  .et-stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .et-stat-divider {
+    height: 28px;
+  }
+}
+
+/* Desktop enhancements */
+@media (min-width: 768px) {
+  .et-current-name {
+    font-size: 2.25rem;
+  }
+  
+  .et-stat-value {
+    font-size: 2.25rem;
+  }
+  
+  .et-modal {
+    max-width: 360px;
   }
 }
 
@@ -836,13 +934,19 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  .et-tabs,
+  .et-journey,
+  .et-checkin,
+  .et-analysis {
+    animation: none;
+    opacity: 1;
+  }
+  
   .et-overlay,
   .et-modal,
   .et-progress-fill,
   .et-slider::-webkit-slider-thumb,
-  .et-phase,
-  .et-current,
-  .et-save-btn {
+  .et-slider-fill {
     animation: none;
     transition: none;
   }

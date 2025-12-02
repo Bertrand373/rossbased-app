@@ -1,4 +1,5 @@
 // EmotionalTimeline.js - TITANTRACK MINIMAL
+// Matches Landing/Tracker/Stats aesthetic
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
@@ -217,86 +218,61 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   useEffect(() => {
     if (userData?.emotionalLog) {
       const today = new Date().toDateString();
-      const todayLog = userData.emotionalLog.find(
-        log => new Date(log.date).toDateString() === today
-      );
-      setHasLoggedToday(!!todayLog);
-      
-      if (todayLog) {
+      const lastLog = userData.emotionalLog[userData.emotionalLog.length - 1];
+      if (lastLog && new Date(lastLog.date).toDateString() === today) {
+        setHasLoggedToday(true);
         setEmotions({
-          anxiety: todayLog.anxiety || 5,
-          mood: todayLog.mood || 5,
-          clarity: todayLog.clarity || 5,
-          processing: todayLog.processing || 5
+          anxiety: lastLog.anxiety || 5,
+          mood: lastLog.mood || 5,
+          clarity: lastLog.clarity || 5,
+          processing: lastLog.processing || 5
         });
       }
     }
   }, [userData]);
 
-  // Open phase modal
-  const openPhase = (phase) => {
-    setSelectedPhase(phase);
-    setShowModal(true);
-  };
+  // Analyze emotional data
+  const analyzeEmotions = () => {
+    const log = userData?.emotionalLog || [];
+    if (log.length < 3) return null;
 
-  // Save check-in
-  const handleSave = async () => {
-    if (hasLoggedToday) return;
+    const recent = log.slice(-14);
+    const avg = (arr, key) => arr.reduce((sum, e) => sum + (e[key] || 5), 0) / arr.length;
     
-    const newLog = {
-      date: new Date().toISOString(),
-      day: currentDay,
-      phase: currentPhase?.id || 1,
-      ...emotions
+    const recentAvg = {
+      anxiety: avg(recent, 'anxiety'),
+      mood: avg(recent, 'mood'),
+      clarity: avg(recent, 'clarity')
     };
-
-    const existingLogs = userData?.emotionalLog || [];
-    const updatedLogs = [...existingLogs, newLog];
-
-    try {
-      await updateUserData({ emotionalLog: updatedLogs });
-      setHasLoggedToday(true);
-      toast.success('Check-in saved');
-    } catch (error) {
-      toast.error('Failed to save');
-    }
-  };
-
-  // Calculate analysis
-  const getAnalysis = () => {
-    const logs = userData?.emotionalLog || [];
-    if (logs.length < 3) return null;
-
-    const recent = logs.slice(-14);
-    const older = logs.slice(0, -14);
-
-    const avgRecent = (key) => {
-      const vals = recent.map(l => l[key]).filter(Boolean);
-      return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 5;
-    };
-
-    const avgOlder = (key) => {
-      if (!older.length) return avgRecent(key);
-      const vals = older.map(l => l[key]).filter(Boolean);
-      return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 5;
-    };
-
+    
+    const older = log.slice(0, -7);
+    const olderAvg = older.length > 0 ? {
+      anxiety: avg(older, 'anxiety'),
+      mood: avg(older, 'mood'),
+      clarity: avg(older, 'clarity')
+    } : recentAvg;
+    
     const getTrend = (key, invert = false) => {
-      const r = avgRecent(key);
-      const o = avgOlder(key);
-      const diff = r - o;
-      
-      if (Math.abs(diff) < 0.5) return 'stable';
-      if (invert) return diff > 0 ? 'concerning' : 'improving';
-      return diff > 0 ? 'improving' : 'concerning';
+      const diff = recentAvg[key] - olderAvg[key];
+      const threshold = 0.5;
+      if (invert) {
+        if (diff < -threshold) return 'improving';
+        if (diff > threshold) return 'concerning';
+      } else {
+        if (diff > threshold) return 'improving';
+        if (diff < -threshold) return 'concerning';
+      }
+      return 'stable';
     };
 
-    const wellbeing = ((avgRecent('mood') + avgRecent('clarity') + (10 - avgRecent('anxiety'))) / 3).toFixed(1);
+    const wellbeing = Math.round(
+      ((10 - recentAvg.anxiety) + recentAvg.mood + recentAvg.clarity) / 3 * 10
+    ) / 10;
 
     return {
-      total: logs.length,
+      total: log.length,
       recent: recent.length,
-      wellbeing,
+      wellbeing: wellbeing.toFixed(1),
       trends: {
         anxiety: getTrend('anxiety', true),
         mood: getTrend('mood'),
@@ -305,35 +281,73 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     };
   };
 
-  const analysis = getAnalysis();
+  const analysis = analyzeEmotions();
+
+  // Save check-in
+  const handleSave = async () => {
+    if (hasLoggedToday) return;
+
+    const entry = {
+      date: new Date().toISOString(),
+      day: currentDay,
+      phase: currentPhase?.id || 1,
+      ...emotions
+    };
+
+    try {
+      const existingLog = userData?.emotionalLog || [];
+      await updateUserData({
+        emotionalLog: [...existingLog, entry]
+      });
+      setHasLoggedToday(true);
+      toast.success('Check-in saved');
+    } catch (error) {
+      toast.error('Failed to save');
+    }
+  };
+
+  // Open phase modal
+  const openPhase = (phase) => {
+    setSelectedPhase(phase);
+    setShowModal(true);
+  };
+
+  // Slider items
+  const sliderItems = [
+    { key: 'anxiety', label: 'Anxiety Level', desc: '1 = calm, 10 = severe' },
+    { key: 'mood', label: 'Mood Stability', desc: '1 = volatile, 10 = stable' },
+    { key: 'clarity', label: 'Mental Clarity', desc: '1 = foggy, 10 = sharp' },
+    { key: 'processing', label: 'Emotional Processing', desc: '1 = blocked, 10 = flowing' }
+  ];
+
+  // Tab items
+  const tabs = [
+    { key: 'journey', label: 'Journey' },
+    { key: 'checkin', label: 'Check-in' },
+    { key: 'analysis', label: 'Analysis' }
+  ];
 
   return (
     <div className="et-container">
-      {/* Header */}
-      <header className="et-header">
-        <h1>Timeline</h1>
-        <p>Your emotional journey through retention</p>
-      </header>
-
-      {/* Tabs */}
+      {/* Tabs - Text-only with dividers */}
       <nav className="et-tabs">
-        {['journey', 'checkin', 'analysis'].map(tab => (
-          <button
-            key={tab}
-            className={`et-tab ${activeTab === tab ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab === 'journey' && 'Journey'}
-            {tab === 'checkin' && 'Check-in'}
-            {tab === 'analysis' && 'Analysis'}
-          </button>
+        {tabs.map((tab, index) => (
+          <React.Fragment key={tab.key}>
+            <button
+              className={`et-tab ${activeTab === tab.key ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              {tab.label}
+            </button>
+            {index < tabs.length - 1 && <div className="et-tab-divider" />}
+          </React.Fragment>
         ))}
       </nav>
 
       {/* Journey Tab */}
       {activeTab === 'journey' && (
         <div className="et-journey">
-          {/* Current Phase Card */}
+          {/* Current Phase - Hero display */}
           <div className="et-current" onClick={() => openPhase(currentPhase)}>
             <div className="et-current-label">Current Phase</div>
             <h2 className="et-current-name">{currentPhase?.name}</h2>
@@ -350,7 +364,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             </div>
           </div>
 
-          {/* Phase List */}
+          {/* Phase List - Minimal */}
           <div className="et-phases">
             {phases.map((phase, index) => {
               const status = getPhaseStatus(phase);
@@ -377,37 +391,37 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Check-in Tab */}
+      {/* Check-in Tab - Tracker-style sliders */}
       {activeTab === 'checkin' && (
         <div className="et-checkin">
-          <div className="et-checkin-card">
-            <h3>Daily Check-in</h3>
-            
-            <div className="et-sliders">
-              {[
-                { key: 'anxiety', label: 'Anxiety Level', desc: '1 = calm, 10 = severe' },
-                { key: 'mood', label: 'Mood Stability', desc: '1 = volatile, 10 = stable' },
-                { key: 'clarity', label: 'Mental Clarity', desc: '1 = foggy, 10 = sharp' },
-                { key: 'processing', label: 'Emotional Processing', desc: '1 = blocked, 10 = flowing' }
-              ].map(({ key, label, desc }) => (
-                <div key={key} className="et-slider-group">
-                  <div className="et-slider-header">
-                    <span className="et-slider-label">{label}</span>
-                    <span className="et-slider-value">{emotions[key]}</span>
-                  </div>
+          <div className="et-checkin-header">Daily Check-in</div>
+          
+          <div className="et-sliders">
+            {sliderItems.map(({ key, label, desc }) => (
+              <div key={key} className="et-slider-group">
+                <span className="et-slider-label">{label}</span>
+                <div className="et-slider-wrap">
+                  <div className="et-slider-bg" />
+                  <div 
+                    className="et-slider-fill" 
+                    style={{ width: `${((emotions[key] - 1) / 9) * 100}%` }}
+                  />
                   <input
                     type="range"
                     min="1"
                     max="10"
                     value={emotions[key]}
-                    onChange={(e) => setEmotions(prev => ({ ...prev, [key]: parseInt(e.target.value) }))}
+                    onChange={(e) => setEmotions(prev => ({ 
+                      ...prev, 
+                      [key]: parseInt(e.target.value) 
+                    }))}
                     className="et-slider"
                     disabled={hasLoggedToday}
                   />
-                  <span className="et-slider-desc">{desc}</span>
                 </div>
-              ))}
-            </div>
+                <span className="et-slider-desc">{desc}</span>
+              </div>
+            ))}
           </div>
 
           <button 
@@ -420,7 +434,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Analysis Tab */}
+      {/* Analysis Tab - Horizontal stats with dividers */}
       {activeTab === 'analysis' && (
         <div className="et-analysis">
           {!analysis ? (
@@ -437,13 +451,15 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   <span className="et-stat-value">{analysis.wellbeing}</span>
                   <span className="et-stat-label">Wellbeing</span>
                 </div>
+                <div className="et-stat-divider" />
                 <div className="et-stat">
                   <span className="et-stat-value">{analysis.total}</span>
                   <span className="et-stat-label">Data Points</span>
                 </div>
+                <div className="et-stat-divider" />
                 <div className="et-stat">
                   <span className="et-stat-value">{analysis.recent}</span>
-                  <span className="et-stat-label">Recent (14d)</span>
+                  <span className="et-stat-label">Recent</span>
                 </div>
               </div>
 
