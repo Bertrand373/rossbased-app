@@ -1,47 +1,42 @@
-// components/UrgeToolkit/UrgeToolkit.js - FINAL: Clean pill-shaped phase indicator with seamless circular icon
+// UrgeToolkit.js - TITANTRACK MINIMAL
+// Matches Landing/Stats/Calendar aesthetic
 import React, { useState, useEffect, useRef } from 'react';
-import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import './UrgeToolkit.css';
 
-// Icons - Simplified set
-import { FaShieldAlt, FaExclamationTriangle, FaBolt, FaBrain, FaHeart, 
-  FaPlay, FaPause, FaStop, FaCheckCircle, 
-  FaTimes, FaInfoCircle, FaStopwatch, FaLeaf, FaLightbulb, FaTrophy } from 'react-icons/fa';
-
-// Additional icons for enhanced features
-import { FaFire, FaWind, FaUsers, FaBatteryEmpty } from 'react-icons/fa';
+// Minimal icons for triggers
+import { FaBrain, FaExclamationTriangle, FaClock, FaMeh, FaHeart, 
+  FaFire, FaBatteryEmpty, FaUsers, FaBolt,
+  FaPlay, FaPause, FaStop } from 'react-icons/fa';
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
-  // Core States - Simplified
-  const [currentStep, setCurrentStep] = useState('assessment'); // assessment, protocol, tools, summary
+  // Core States
+  const [currentStep, setCurrentStep] = useState('assessment');
   const [urgeIntensity, setUrgeIntensity] = useState(0);
   const [activeProtocol, setActiveProtocol] = useState(null);
   const [selectedTrigger, setSelectedTrigger] = useState('');
   
-  // ENHANCED: Experience level detection
+  // Experience level detection
   const [experienceLevel, setExperienceLevel] = useState('beginner');
   
-  // FIXED: Proper session timing
+  // Session timing
   const [sessionStartTime, setSessionStartTime] = useState(null);
   const [protocolStartTime, setProtocolStartTime] = useState(null);
   const [totalActiveTime, setTotalActiveTime] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
   
-  // ENHANCED: Advanced breathing protocol states
+  // Breathing states
   const [breathingActive, setBreathingActive] = useState(false);
-  const [breathingPhase, setBreathingPhase] = useState('ready'); // ready, inhale, exhale, bhastrika, hold, complete
+  const [breathingPhase, setBreathingPhase] = useState('ready');
   const [breathingCount, setBreathingCount] = useState(0);
   const [breathingTimer, setBreathingTimer] = useState(0);
   const [advancedBreathing, setAdvancedBreathing] = useState(false);
   
-  // Timer ref
   const breathingIntervalRef = useRef(null);
   
-  // FIXED: Use current streak instead of calculated difference
   const currentDay = userData.currentStreak || 0;
 
-  // ENHANCED: Determine experience level based on streak
+  // Determine experience level
   useEffect(() => {
     if (currentDay <= 30) {
       setExperienceLevel('beginner');
@@ -52,144 +47,110 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   }, [currentDay]);
 
-  // Get current phase info (matching Timeline exactly)
+  // Get current phase
   const getCurrentPhase = () => {
-    if (currentDay <= 14) {
-      return { name: "Initial Adaptation", icon: FaLeaf, color: "#22c55e" };
-    } else if (currentDay <= 45) {
-      return { name: "Emotional Purging", icon: FaHeart, color: "#f59e0b" };
-    } else if (currentDay <= 90) {
-      return { name: "Mental Expansion", icon: FaBrain, color: "#3b82f6" };
-    } else if (currentDay <= 180) {
-      return { name: "Spiritual Integration", icon: FaLightbulb, color: "#8b5cf6" };
-    } else {
-      return { name: "Mastery & Service", icon: FaTrophy, color: "#ffdd00" };
-    }
+    if (currentDay <= 14) return { name: "Initial Adaptation", color: "#22c55e" };
+    if (currentDay <= 45) return { name: "Emotional Processing", color: "#f59e0b" };
+    if (currentDay <= 90) return { name: "Mental Expansion", color: "#3b82f6" };
+    if (currentDay <= 180) return { name: "Spiritual Integration", color: "#8b5cf6" };
+    return { name: "Mastery & Service", color: "#ffdd00" };
   };
 
   const currentPhase = getCurrentPhase();
 
-  // ENHANCED: Intelligent trigger options based on experience level
+  // Trigger options based on experience
   const getTriggerOptions = () => {
-    const baseTriggers = [
+    const base = [
       { id: 'thoughts', label: 'Lustful Thoughts', icon: FaBrain },
       { id: 'content', label: 'Explicit Content', icon: FaExclamationTriangle },
-      { id: 'stress', label: 'Stress/Anxiety', icon: FaStopwatch },
-      { id: 'boredom', label: 'Boredom', icon: FaInfoCircle },
+      { id: 'stress', label: 'Stress/Anxiety', icon: FaClock },
+      { id: 'boredom', label: 'Boredom', icon: FaMeh },
       { id: 'loneliness', label: 'Loneliness', icon: FaHeart },
     ];
-
-    // Add experience-specific triggers
-    if (experienceLevel === 'intermediate' || experienceLevel === 'advanced') {
-      baseTriggers.push(
-        { id: 'energy-overflow', label: 'Energy Overflow (Feeling Wired)', icon: FaFire },
-        { id: 'flatline', label: 'Flatline Depression', icon: FaBatteryEmpty }
-      );
-    }
-
-    if (experienceLevel === 'advanced') {
-      baseTriggers.push(
-        { id: 'social-pressure', label: 'Social Pressure/Undermining', icon: FaUsers }
-      );
-    }
-
-    baseTriggers.push({ id: 'other', label: 'Other Trigger', icon: FaBolt });
     
-    return baseTriggers;
+    if (experienceLevel !== 'beginner') {
+      base.push(
+        { id: 'energy-overflow', label: 'Energy Overflow', icon: FaFire },
+        { id: 'flatline', label: 'Flatline', icon: FaBatteryEmpty }
+      );
+    }
+    
+    if (experienceLevel === 'advanced') {
+      base.push({ id: 'social-pressure', label: 'Social Pressure', icon: FaUsers });
+    }
+    
+    base.push({ id: 'other', label: 'Other', icon: FaBolt });
+    return base;
   };
 
-  const triggerOptions = getTriggerOptions();
-
-  // ENHANCED: Smart protocol definitions based on experience level
+  // Protocol definitions
   const getProtocols = () => {
-    const baseProtocols = {
+    const protocols = {
       breathing: {
         name: experienceLevel === 'beginner' ? "Emergency Breathing" : "Breathing Mastery",
-        duration: experienceLevel === 'beginner' ? "2-3 minutes" : "3-5 minutes",
+        duration: experienceLevel === 'beginner' ? "2-3 min" : "3-5 min",
         description: experienceLevel === 'beginner' 
           ? "Physiological reset using controlled breathing"
           : "Advanced breathing with energy circulation",
-        bestFor: "High intensity urges, anxiety, physical arousal, energy overflow"
+        bestFor: "High intensity, anxiety, physical arousal"
       },
       mental: {
         name: experienceLevel === 'advanced' ? "Mental Transmutation" : "Mental Redirection",
-        duration: "1-2 minutes", 
-        description: experienceLevel === 'advanced'
-          ? "Advanced cognitive techniques and energy redirection"
-          : "Cognitive techniques to break thought patterns",
-        bestFor: "Intrusive thoughts, mental loops, mild urges"
+        duration: "1-2 min", 
+        description: "Cognitive techniques to break thought patterns",
+        bestFor: "Intrusive thoughts, mental loops"
       },
       physical: {
         name: "Physical Reset",
-        duration: "2-5 minutes",
+        duration: "2-5 min",
         description: "Body-based techniques to redirect energy",
-        bestFor: "Restlessness, physical tension, moderate urges"
+        bestFor: "Restlessness, tension, moderate urges"
       }
     };
-
-    // Add advanced protocol for experienced users
-    if (experienceLevel === 'intermediate' || experienceLevel === 'advanced') {
-      baseProtocols.energy = {
+    
+    if (experienceLevel !== 'beginner') {
+      protocols.energy = {
         name: "Energy Circulation",
-        duration: "5-10 minutes",
-        description: "Microcosmic orbit and energy redirection techniques",
-        bestFor: "Energy overflow, flatlines, spiritual development"
+        duration: "5-10 min",
+        description: "Microcosmic orbit and energy redirection",
+        bestFor: "Energy overflow, spiritual development"
       };
     }
-
-    return baseProtocols;
+    
+    return protocols;
   };
 
   const protocols = getProtocols();
 
-  // Cleanup on unmount
+  // Cleanup
   useEffect(() => {
     return () => {
       if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
     };
   }, []);
 
-  // ENHANCED: Handle intensity selection with smart protocol suggestions
+  // Handle intensity selection
   const handleUrgeIntensity = (intensity) => {
-    try {
-      setUrgeIntensity(intensity);
-      
-      // FIXED: Start session timing when user actually begins
-      if (!sessionStartTime) {
-        setSessionStartTime(new Date());
-      }
-      
-      // ENHANCED: Smart protocol suggestions based on intensity and experience
-      if (intensity >= 8) {
-        setActiveProtocol('breathing');
-        setAdvancedBreathing(experienceLevel !== 'beginner');
-        toast.success(`Emergency ${experienceLevel !== 'beginner' ? 'advanced ' : ''}breathing recommended`);
-      } else if (intensity >= 6) {
-        if (experienceLevel !== 'beginner') {
-          setActiveProtocol('energy');
-          toast.success('Energy circulation recommended for overflow');
-        } else {
-          setActiveProtocol('physical');
-          toast.success('Physical reset recommended');
-        }
-      } else if (intensity >= 4) {
-        setActiveProtocol('physical');
-        toast.success('Physical reset should help');
-      } else {
-        setActiveProtocol('mental');
-        toast.success('Mental redirection recommended');
-      }
-      
-      // Auto-progress to protocol selection
-      setTimeout(() => setCurrentStep('protocol'), 500);
-      
-    } catch (error) {
-      console.error('Error handling intensity:', error);
-      toast.error('Error setting intensity level');
+    setUrgeIntensity(intensity);
+    
+    if (!sessionStartTime) setSessionStartTime(new Date());
+    
+    // Smart protocol suggestion
+    if (intensity >= 8) {
+      setActiveProtocol('breathing');
+      setAdvancedBreathing(experienceLevel !== 'beginner');
+    } else if (intensity >= 6) {
+      setActiveProtocol(experienceLevel !== 'beginner' ? 'energy' : 'physical');
+    } else if (intensity >= 4) {
+      setActiveProtocol('physical');
+    } else {
+      setActiveProtocol('mental');
     }
+    
+    setTimeout(() => setCurrentStep('protocol'), 400);
   };
 
-  // FIXED: Start/stop active timing
+  // Timer functions
   const startActiveTimer = () => {
     if (!isTimerActive) {
       setProtocolStartTime(new Date());
@@ -199,177 +160,143 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   const stopActiveTimer = () => {
     if (isTimerActive && protocolStartTime) {
-      const timeSpent = (new Date() - protocolStartTime) / 1000; // seconds
-      setTotalActiveTime(prev => prev + timeSpent);
+      setTotalActiveTime(prev => prev + (new Date() - protocolStartTime) / 1000);
       setIsTimerActive(false);
       setProtocolStartTime(null);
     }
   };
 
-  // Complete breathing session helper
+  // Breathing functions
   const completeBreathingSession = (message) => {
     setBreathingPhase('complete');
     setBreathingActive(false);
-    if (breathingIntervalRef.current) {
-      clearInterval(breathingIntervalRef.current);
-    }
+    if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
     stopActiveTimer();
     toast.success(message);
     setTimeout(() => setCurrentStep('summary'), 1000);
   };
 
-  // FIXED: Proper breathing protocol with correct transitions
   const startBreathing = () => {
-    try {
-      setBreathingActive(true);
-      setBreathingCount(0);
-      startActiveTimer();
-      
-      if (advancedBreathing && experienceLevel !== 'beginner') {
-        // Advanced breathing - start with rapid phase
-        setBreathingPhase('bhastrika');
-        setBreathingTimer(30);
-        toast.success('Starting advanced Bhastrika breathing...');
-      } else {
-        // Standard breathing
-        setBreathingPhase('inhale');
-        setBreathingTimer(4);
-        toast.success('Starting breathing protocol...');
-      }
-      
-      // Start the timer
-      breathingIntervalRef.current = setInterval(() => {
-        setBreathingTimer(prev => {
-          if (prev <= 1) {
-            // Timer is about to hit 0, trigger phase change
-            setTimeout(() => {
-              if (advancedBreathing && experienceLevel !== 'beginner') {
-                handleAdvancedBreathing();
-              } else {
-                handleStandardBreathing();
-              }
-            }, 0);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      
-    } catch (error) {
-      console.error('Error starting breathing:', error);
-      toast.error('Error starting breathing protocol');
+    setBreathingActive(true);
+    setBreathingCount(0);
+    startActiveTimer();
+    
+    if (advancedBreathing && experienceLevel !== 'beginner') {
+      setBreathingPhase('bhastrika');
+      setBreathingTimer(30);
+    } else {
+      setBreathingPhase('inhale');
+      setBreathingTimer(4);
     }
+    
+    breathingIntervalRef.current = setInterval(() => {
+      setBreathingTimer(prev => {
+        if (prev <= 1) {
+          setTimeout(() => {
+            if (advancedBreathing && experienceLevel !== 'beginner') {
+              handleAdvancedBreathing();
+            } else {
+              handleStandardBreathing();
+            }
+          }, 0);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const handleAdvancedBreathing = () => {
-    setBreathingPhase(currentPhase => {
-      if (currentPhase === 'bhastrika') {
-        setBreathingTimer(15); // 15 seconds to hold
+    setBreathingPhase(phase => {
+      if (phase === 'bhastrika') {
+        setBreathingTimer(15);
         return 'hold';
-      } else if (currentPhase === 'hold') {
-        setBreathingTimer(15); // 15 seconds to exhale
+      } else if (phase === 'hold') {
+        setBreathingTimer(15);
         return 'exhale';
-      } else if (currentPhase === 'exhale') {
-        // Complete one cycle
+      } else if (phase === 'exhale') {
         setBreathingCount(prev => {
-          const newCount = prev + 1;
-          if (newCount >= 3) {
-            completeBreathingSession('Advanced breathing complete! Energy redirected upward.');
-            return newCount;
-          } else {
-            // Start next cycle
-            setBreathingTimer(30); // 30 rapid breaths
-            return newCount;
+          if (prev + 1 >= 3) {
+            completeBreathingSession('Advanced breathing complete!');
+            return prev + 1;
           }
+          setBreathingTimer(30);
+          return prev + 1;
         });
         return 'bhastrika';
       }
-      return currentPhase;
+      return phase;
     });
   };
 
   const handleStandardBreathing = () => {
-    setBreathingPhase(currentPhase => {
-      if (currentPhase === 'inhale') {
-        setBreathingTimer(4); // 4 seconds to exhale
+    setBreathingPhase(phase => {
+      if (phase === 'inhale') {
+        setBreathingTimer(4);
         return 'exhale';
-      } else if (currentPhase === 'exhale') {
-        // Complete one cycle
+      } else if (phase === 'exhale') {
         setBreathingCount(prev => {
-          const newCount = prev + 1;
-          if (newCount >= 10) {
-            completeBreathingSession('Breathing complete! How do you feel?');
-            return newCount;
-          } else {
-            // Start next cycle
-            setBreathingTimer(4); // 4 seconds to inhale
-            return newCount;
+          if (prev + 1 >= 10) {
+            completeBreathingSession('Breathing complete!');
+            return prev + 1;
           }
+          setBreathingTimer(4);
+          return prev + 1;
         });
         return 'inhale';
       }
-      return currentPhase;
+      return phase;
     });
   };
 
   const stopBreathing = () => {
-    try {
-      setBreathingActive(false);
-      setBreathingPhase('ready');
-      if (breathingIntervalRef.current) {
-        clearInterval(breathingIntervalRef.current);
-      }
-      stopActiveTimer();
-      setCurrentStep('summary');
-    } catch (error) {
-      console.error('Error stopping breathing:', error);
-    }
+    setBreathingActive(false);
+    setBreathingPhase('ready');
+    if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
+    stopActiveTimer();
+    setCurrentStep('summary');
   };
 
-  // ENHANCED: Experience-based tools
+  // Get phase-specific tools
   const getPhaseTools = () => {
-    const tools = [];
-    
     if (experienceLevel === 'beginner') {
       if (currentDay <= 14) {
-        tools.push(
-          { id: 'cold-shower', name: 'Cold Shower Protocol', action: () => toast.success('Take a 2-minute cold shower - this will reset your nervous system') },
-          { id: 'exercise', name: 'Physical Exercise', action: () => toast.success('Do 20 push-ups or run for 5 minutes to redirect energy') },
-          { id: 'environment', name: 'Change Environment', action: () => toast.success('Leave your current location - go outside or to a public space') }
-        );
+        return [
+          { id: 'cold-shower', name: 'Cold Shower', action: () => toast.success('2-minute cold shower to reset nervous system') },
+          { id: 'exercise', name: 'Physical Exercise', action: () => toast.success('20 push-ups or 5-minute run') },
+          { id: 'environment', name: 'Change Environment', action: () => toast.success('Go outside or to a public space') }
+        ];
       } else if (currentDay <= 45) {
-        tools.push(
-          { id: 'journaling', name: 'Emotional Processing', action: () => toast.success('Write down what you\'re feeling - emotions need to be acknowledged and released') },
-          { id: 'meditation', name: 'Mindfulness Practice', action: () => toast.success('Sit quietly for 5 minutes and observe your emotions without judgment') },
-          { id: 'support', name: 'Reach Out for Support', action: () => toast.success('Call a friend or mentor - you don\'t have to handle this alone') }
-        );
+        return [
+          { id: 'journaling', name: 'Emotional Processing', action: () => toast.success('Write down what you\'re feeling') },
+          { id: 'meditation', name: 'Mindfulness Practice', action: () => toast.success('5 minutes of quiet observation') },
+          { id: 'support', name: 'Reach Out', action: () => toast.success('Call a friend or mentor') }
+        ];
       } else {
-        tools.push(
-          { id: 'creative', name: 'Creative Expression', action: () => toast.success('Channel this energy into art, music, or writing - transmute desire into creation') },
-          { id: 'learning', name: 'Mental Challenge', action: () => toast.success('Engage your mind with a complex problem or new learning material') },
-          { id: 'visualization', name: 'Future Self Visualization', action: () => toast.success('Visualize your future self thanking you for staying strong right now') }
-        );
+        return [
+          { id: 'creative', name: 'Creative Expression', action: () => toast.success('Channel energy into art or writing') },
+          { id: 'learning', name: 'Mental Challenge', action: () => toast.success('Engage with complex material') },
+          { id: 'visualization', name: 'Future Self', action: () => toast.success('Visualize your future self thanking you') }
+        ];
       }
     } else if (experienceLevel === 'intermediate') {
-      tools.push(
-        { id: 'energy-circulation', name: 'Microcosmic Orbit', action: () => toast.success('Circulate energy: up spine to crown, down front to abdomen. 9 complete circles.') },
-        { id: 'cold-therapy', name: 'Advanced Cold Therapy', action: () => toast.success('Ice bath or extended cold shower (5+ minutes) to transmute energy') },
-        { id: 'service', name: 'Channel Into Service', action: () => toast.success('Use this energy surge to help someone else - transform personal struggle into service') },
-        { id: 'creative-project', name: 'Creative Project', action: () => toast.success('Start or continue a meaningful creative project - art, writing, music, building') }
-      );
-    } else { // advanced
-      tools.push(
-        { id: 'energy-mastery', name: 'Advanced Energy Work', action: () => toast.success('Practice bandhas and advanced energy circulation. Direct energy to crown chakra.') },
-        { id: 'teaching', name: 'Teach Others', action: () => toast.success('Share your wisdom with someone earlier in their journey - transform challenge into teaching') },
-        { id: 'spiritual-practice', name: 'Deep Spiritual Practice', action: () => toast.success('Extended meditation, prayer, or spiritual study. Connect with higher purpose.') },
-        { id: 'world-service', name: 'Global Service', action: () => toast.success('Work on projects that serve humanity - your energy is meant for higher purposes') }
-      );
+      return [
+        { id: 'energy-circulation', name: 'Microcosmic Orbit', action: () => toast.success('9 complete energy circles') },
+        { id: 'cold-therapy', name: 'Extended Cold Therapy', action: () => toast.success('5+ minute cold exposure') },
+        { id: 'service', name: 'Channel Into Service', action: () => toast.success('Help someone else') },
+        { id: 'creative-project', name: 'Creative Project', action: () => toast.success('Continue a meaningful project') }
+      ];
+    } else {
+      return [
+        { id: 'energy-mastery', name: 'Advanced Energy Work', action: () => toast.success('Bandhas and crown chakra focus') },
+        { id: 'teaching', name: 'Teach Others', action: () => toast.success('Share wisdom with someone newer') },
+        { id: 'spiritual', name: 'Spiritual Practice', action: () => toast.success('Deep meditation or prayer') },
+        { id: 'world-service', name: 'Global Service', action: () => toast.success('Work on humanity-serving projects') }
+      ];
     }
-    
-    return tools;
   };
 
-  // Handle trigger logging
+  // Log trigger
   const logTrigger = () => {
     if (selectedTrigger && updateUserData) {
       const urgeLog = {
@@ -379,17 +306,14 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         protocol: activeProtocol,
         phase: currentPhase.name,
         day: currentDay,
-        experienceLevel: experienceLevel
+        experienceLevel
       };
-      
-      const updatedUrgeLog = [...(userData.urgeLog || []), urgeLog];
-      updateUserData({ urgeLog: updatedUrgeLog });
-      
-      toast.success('Session logged - this helps identify your patterns');
+      updateUserData({ urgeLog: [...(userData.urgeLog || []), urgeLog] });
+      toast.success('Session logged');
     }
   };
 
-  // Reset to start new session
+  // Reset session
   const resetSession = () => {
     stopActiveTimer();
     setCurrentStep('assessment');
@@ -403,359 +327,343 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     setBreathingCount(0);
     setBreathingTimer(0);
     setAdvancedBreathing(false);
-    if (breathingIntervalRef.current) {
-      clearInterval(breathingIntervalRef.current);
+    if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
+  };
+
+  // Get intensity class
+  const getIntensityClass = (level) => {
+    if (level <= 3) return 'low';
+    if (level <= 6) return 'medium';
+    return 'high';
+  };
+
+  // Steps navigation
+  const steps = [
+    { id: 'assessment', label: 'Assess' },
+    { id: 'protocol', label: 'Protocol' },
+    { id: 'tools', label: 'Tools' },
+    { id: 'summary', label: 'Complete' }
+  ];
+
+  const stepOrder = ['assessment', 'protocol', 'tools', 'summary'];
+  const currentStepIndex = stepOrder.indexOf(currentStep);
+
+  const canNavigateTo = (stepId) => {
+    const targetIndex = stepOrder.indexOf(stepId);
+    return targetIndex <= currentStepIndex;
+  };
+
+  // Protocol step content
+  const getProtocolSteps = () => {
+    if (activeProtocol === 'mental') {
+      return experienceLevel === 'advanced' ? [
+        'Name 5 things you can see around you',
+        'Name 4 things you can hear',
+        'Name 3 things you can touch',
+        'Take 10 deep breaths',
+        'Visualize energy moving up spine to crown'
+      ] : [
+        'Name 5 things you can see around you',
+        'Name 4 things you can hear',
+        'Name 3 things you can touch',
+        'Take 10 deep breaths',
+        'Recite your reasons for retention'
+      ];
+    } else if (activeProtocol === 'physical') {
+      return [
+        'Do 20 jumping jacks or push-ups',
+        'Splash cold water on your face',
+        'Change your physical position/location',
+        'Stand straight, shoulders back',
+        'Take 5 deep breaths'
+      ];
+    } else if (activeProtocol === 'energy') {
+      return [
+        'Sit with spine straight, tongue on roof of mouth',
+        'Breathe energy up spine to crown (4 counts)',
+        'Hold energy at crown chakra (2 counts)',
+        'Breathe energy down front to abdomen (4 counts)',
+        'Rest energy in dan tian below navel (2 counts)',
+        'Repeat for 9 complete circles'
+      ];
     }
+    return [];
   };
 
   return (
-    <div className="urge-toolkit-container">
-      {/* UPDATED: Integrated header design with clean pill-shaped phase indicator */}
-      <div className="integrated-toolkit-header">
-        <div className="toolkit-header-title-section">
-          <h2>Emergency Toolkit</h2>
-          <p className="toolkit-header-subtitle">Smart coping strategies for urge management</p>
-        </div>
-        
-        <div className="toolkit-header-actions-section">
-          <div className="toolkit-header-actions">
-            <div className="phase-indicator" style={{ '--phase-color': currentPhase.color }}>
-              <div className="phase-indicator-content">
-                <div className="phase-indicator-icon">
-                  <currentPhase.icon />
-                </div>
-                <div className="phase-indicator-text">
-                  <span className="phase-name">{currentPhase.name}</span>
-                  <span className="phase-day">Day {currentDay} • {experienceLevel}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="urge-toolkit">
+      {/* Phase Indicator */}
+      <div className="ut-phase">
+        <span className="ut-phase-dot" style={{ background: currentPhase.color }} />
+        <div className="ut-phase-info">
+          <span className="ut-phase-name">{currentPhase.name}</span>
+          <span className="ut-phase-detail">Day {currentDay} · {experienceLevel}</span>
         </div>
       </div>
 
-      {/* Step 1: Intensity Assessment */}
-      {currentStep === 'assessment' && (
-        <div className="assessment-section">
-          <div className="section-header">
-            <h3>How intense is this urge?</h3>
-            <p>Rate what you're experiencing right now (1 = mild thoughts, 10 = overwhelming)</p>
-          </div>
-          
-          <div className="intensity-scale">
-            {[1,2,3,4,5,6,7,8,9,10].map(level => (
-              <button
-                key={level}
-                className={`intensity-btn ${urgeIntensity === level ? 'active' : ''}`}
-                onClick={() => handleUrgeIntensity(level)}
-                type="button"
-              >
-                {level}
-              </button>
-            ))}
-          </div>
-          
-          <div className="intensity-labels">
-            <span>Mild thoughts</span>
-            <span>Overwhelming</span>
-          </div>
-        </div>
-      )}
-
-      {/* Step 2: Protocol Selection & Execution */}
-      {currentStep === 'protocol' && (
-        <div className="protocol-section">
-          <div className="section-header">
-            <h3>Recommended Protocol</h3>
-            <p>Based on intensity level {urgeIntensity}/10 • {experienceLevel} level</p>
-          </div>
-
-          {/* Protocol Selection */}
-          <div className="protocol-selection">
-            {Object.entries(protocols).map(([key, protocol]) => (
-              <div 
-                key={key}
-                className={`protocol-card ${activeProtocol === key ? 'active' : ''}`}
-                onClick={() => setActiveProtocol(key)}
-              >
-                <div className="protocol-name">{protocol.name}</div>
-                <div className="protocol-duration">{protocol.duration}</div>
-                <div className="protocol-description">{protocol.description}</div>
-                <div className="protocol-best-for">Best for: {protocol.bestFor}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* ENHANCED: Advanced breathing interface */}
-          {activeProtocol === 'breathing' && (
-            <div className="breathing-interface">
-              {experienceLevel !== 'beginner' && (
-                <div className="breathing-mode-selector">
-                  <button 
-                    className={`mode-btn ${!advancedBreathing ? 'active' : ''}`}
-                    onClick={() => setAdvancedBreathing(false)}
-                    type="button"
-                  >
-                    Standard Breathing
-                  </button>
-                  <button 
-                    className={`mode-btn ${advancedBreathing ? 'active' : ''}`}
-                    onClick={() => setAdvancedBreathing(true)}
-                    type="button"
-                  >
-                    <FaWind /> Bhastrika (Advanced)
-                  </button>
-                </div>
-              )}
-              
-              <div className="breathing-display">
-                <div className="breathing-circle">
-                  <div className={`breathing-animation ${
-                    breathingPhase === 'inhale' ? 'inhale-animation' : 
-                    breathingPhase === 'exhale' ? 'exhale-animation' :
-                    breathingPhase === 'bhastrika' ? 'rapid-animation' :
-                    breathingPhase === 'hold' ? 'hold-animation' : ''
-                  }`}>
-                  </div>
-                </div>
-                
-                <div className="breathing-status">
-                  {breathingPhase === 'ready' && <span>Ready to begin</span>}
-                  {breathingPhase === 'inhale' && <span>Breathe IN slowly ({breathingTimer}s remaining)</span>}
-                  {breathingPhase === 'exhale' && <span>Breathe OUT slowly ({breathingTimer}s remaining)</span>}
-                  {breathingPhase === 'bhastrika' && <span>Rapid Breathing ({breathingTimer} breaths remaining)</span>}
-                  {breathingPhase === 'hold' && <span>HOLD breath, feel the energy ({breathingTimer}s remaining)</span>}
-                  {breathingPhase === 'complete' && <span>Excellent! Energy redirected.</span>}
-                </div>
-                
-                {breathingActive && (
-                  <div className="breathing-progress">
-                    {advancedBreathing ? 
-                      `Cycle ${breathingCount + 1}/3` : 
-                      `Cycle ${breathingCount + 1}/10`
-                    }
-                  </div>
-                )}
-              </div>
-              
-              <div className="breathing-controls">
-                {!breathingActive ? (
-                  <button className="primary-btn" onClick={startBreathing} type="button">
-                    <FaPlay />
-                    Start {advancedBreathing ? 'Advanced ' : ''}Breathing
-                  </button>
-                ) : (
-                  <button className="secondary-btn" onClick={stopBreathing} type="button">
-                    <FaStop />
-                    Complete Session
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* ENHANCED: Mental protocol with experience-based instructions */}
-          {activeProtocol === 'mental' && (
-            <div className="mental-protocol">
-              <div className="protocol-steps">
-                <h4>{experienceLevel === 'advanced' ? 'Mental Transmutation Steps:' : 'Mental Redirection Steps:'}</h4>
-                <ol>
-                  <li>Name 5 things you can see around you</li>
-                  <li>Name 4 things you can hear</li>
-                  <li>Name 3 things you can touch</li>
-                  <li>Take 10 deep breaths</li>
-                  {experienceLevel === 'advanced' ? 
-                    <li>Visualize sexual energy moving up your spine to crown chakra</li> :
-                    <li>Recite your reasons for retention</li>
-                  }
-                </ol>
-              </div>
-              <button 
-                className="primary-btn" 
-                onClick={() => {
-                  startActiveTimer();
-                  setCurrentStep('tools');
-                }}
-                type="button"
-              >
-                <FaCheckCircle />
-                I've Completed This
-              </button>
-            </div>
-          )}
-
-          {activeProtocol === 'physical' && (
-            <div className="physical-protocol">
-              <div className="protocol-steps">
-                <h4>Physical Reset Steps:</h4>
-                <ol>
-                  <li>Do 20 jumping jacks or push-ups</li>
-                  <li>Splash cold water on your face</li>
-                  <li>Change your physical position/location</li>
-                  <li>Stand straight, shoulders back</li>
-                  <li>Take 5 deep breaths</li>
-                </ol>
-              </div>
-              <button 
-                className="primary-btn" 
-                onClick={() => {
-                  startActiveTimer();
-                  setCurrentStep('tools');
-                }}
-                type="button"
-              >
-                <FaCheckCircle />
-                I've Completed This
-              </button>
-            </div>
-          )}
-
-          {/* NEW: Energy circulation protocol for intermediate/advanced */}
-          {activeProtocol === 'energy' && (experienceLevel !== 'beginner') && (
-            <div className="energy-protocol">
-              <div className="protocol-steps">
-                <h4>Energy Circulation Steps:</h4>
-                <ol>
-                  <li>Sit with spine straight, tongue touching roof of mouth</li>
-                  <li>Breathe energy up your spine to crown of head (4 counts)</li>
-                  <li>Hold energy at crown chakra (2 counts)</li>
-                  <li>Breathe energy down front of body to lower abdomen (4 counts)</li>
-                  <li>Rest energy in dan tian below navel (2 counts)</li>
-                  <li>Repeat for 9 complete circles minimum</li>
-                </ol>
-              </div>
-              <button 
-                className="primary-btn" 
-                onClick={() => {
-                  startActiveTimer();
-                  setCurrentStep('tools');
-                }}
-                type="button"
-              >
-                <FaCheckCircle />
-                Energy Circulated
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Step 3: Experience-Based Tools */}
-      {currentStep === 'tools' && (
-        <div className="tools-section">
-          <div className="section-header">
-            <h3>{experienceLevel === 'advanced' ? 'Master Level Tools' : 
-                 experienceLevel === 'intermediate' ? 'Intermediate Tools' : 
-                 currentPhase.name + ' Tools'}</h3>
-            <p>{experienceLevel === 'advanced' ? 'Advanced techniques for energy mastery' :
-                experienceLevel === 'intermediate' ? 'Intermediate practices for energy development' :
-                'Foundational techniques for your current phase'}</p>
-          </div>
-          
-          <div className="phase-tools">
-            {getPhaseTools().map(tool => (
-              <div key={tool.id} className="tool-card">
-                <div className="tool-name">{tool.name}</div>
-                <button 
-                  className="tool-btn"
-                  onClick={tool.action}
-                  type="button"
-                >
-                  Use This Tool
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="tools-actions">
-            <button 
-              className="primary-btn" 
-              onClick={() => {
-                stopActiveTimer();
-                setCurrentStep('summary');
-              }}
-              type="button"
+      {/* Step Navigation */}
+      <nav className="ut-steps">
+        {steps.map((step, index) => (
+          <React.Fragment key={step.id}>
+            <button
+              className={`ut-step ${currentStep === step.id ? 'active' : ''}`}
+              onClick={() => canNavigateTo(step.id) && setCurrentStep(step.id)}
+              disabled={!canNavigateTo(step.id)}
             >
-              Continue to Summary
+              {step.label}
             </button>
-          </div>
-        </div>
-      )}
+            {index < steps.length - 1 && <div className="ut-step-divider" />}
+          </React.Fragment>
+        ))}
+      </nav>
 
-      {/* Step 4: Enhanced Session Summary */}
-      {currentStep === 'summary' && (
-        <div className="summary-section">
-          <div className="section-header">
-            <h3>Session Complete</h3>
-            <p>Help us understand what triggered this urge</p>
-          </div>
+      {/* Content */}
+      <div className="ut-content">
+        
+        {/* Assessment Step */}
+        {currentStep === 'assessment' && (
+          <>
+            <div className="ut-section-header">
+              <h2 className="ut-section-title">How intense is this urge?</h2>
+              <p className="ut-section-desc">Rate what you're experiencing right now</p>
+            </div>
+            
+            <div className="ut-intensity">
+              <div className="ut-intensity-grid">
+                {[1,2,3,4,5,6,7,8,9,10].map(level => (
+                  <button
+                    key={level}
+                    className={`ut-intensity-btn ${getIntensityClass(level)} ${urgeIntensity === level ? 'active' : ''}`}
+                    onClick={() => handleUrgeIntensity(level)}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+              <div className="ut-intensity-labels">
+                <span>Mild</span>
+                <span>Overwhelming</span>
+              </div>
+            </div>
+          </>
+        )}
 
-          <div className="trigger-selection">
-            <h4>What triggered this urge?</h4>
-            <div className="trigger-options">
-              {triggerOptions.map(trigger => (
+        {/* Protocol Step */}
+        {currentStep === 'protocol' && (
+          <>
+            <div className="ut-section-header">
+              <h2 className="ut-section-title">Select Protocol</h2>
+              <p className="ut-section-desc">Choose your intervention strategy</p>
+            </div>
+            
+            <div className="ut-protocols">
+              {Object.entries(protocols).map(([key, protocol]) => (
                 <button
-                  key={trigger.id}
-                  className={`trigger-option ${selectedTrigger === trigger.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedTrigger(trigger.id)}
-                  type="button"
+                  key={key}
+                  className={`ut-protocol ${activeProtocol === key ? 'active' : ''} ${activeProtocol === key ? 'recommended' : ''}`}
+                  onClick={() => setActiveProtocol(key)}
                 >
-                  <trigger.icon />
-                  <span>{trigger.label}</span>
+                  <div className="ut-protocol-header">
+                    <span className="ut-protocol-name">{protocol.name}</span>
+                    <span className="ut-protocol-duration">{protocol.duration}</span>
+                  </div>
+                  <p className="ut-protocol-desc">{protocol.description}</p>
+                  <p className="ut-protocol-best">Best for: {protocol.bestFor}</p>
                 </button>
               ))}
             </div>
-          </div>
 
-          <div className="session-stats">
-            <div className="stat-item">
-              <span className="stat-label">Experience Level:</span>
-              <span className="stat-value">{experienceLevel} (Day {currentDay})</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Intensity Level:</span>
-              <span className="stat-value">{urgeIntensity}/10</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Protocol Used:</span>
-              <span className="stat-value">{protocols[activeProtocol]?.name}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Session Duration:</span>
-              <span className="stat-value">
-                {sessionStartTime ? Math.round((new Date() - sessionStartTime) / 60000) : 0} minutes
-              </span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Active Protocol Time:</span>
-              <span className="stat-value">
-                {Math.round(totalActiveTime / 60)} minutes {Math.round(totalActiveTime % 60)} seconds
-              </span>
-            </div>
-          </div>
+            {/* Breathing Interface */}
+            {activeProtocol === 'breathing' && (
+              <div className="ut-breathing">
+                {experienceLevel !== 'beginner' && (
+                  <div className="ut-breathing-modes">
+                    <button
+                      className={`ut-mode-btn ${!advancedBreathing ? 'active' : ''}`}
+                      onClick={() => setAdvancedBreathing(false)}
+                    >
+                      Standard
+                    </button>
+                    <button
+                      className={`ut-mode-btn ${advancedBreathing ? 'active' : ''}`}
+                      onClick={() => setAdvancedBreathing(true)}
+                    >
+                      Advanced
+                    </button>
+                  </div>
+                )}
+                
+                <div className="ut-breathing-circle">
+                  <div className={`ut-breathing-orb ${
+                    breathingPhase === 'inhale' ? 'inhale' :
+                    breathingPhase === 'exhale' ? 'exhale' :
+                    breathingPhase === 'hold' ? 'hold' :
+                    breathingPhase === 'bhastrika' ? 'rapid' : ''
+                  }`} />
+                </div>
+                
+                <div className="ut-breathing-info">
+                  {breathingActive ? (
+                    <>
+                      <span className="ut-breathing-phase">
+                        {breathingPhase === 'bhastrika' ? 'Rapid Breath' : breathingPhase}
+                      </span>
+                      <span className="ut-breathing-count">Cycle {breathingCount + 1}</span>
+                      <span className="ut-breathing-timer">{breathingTimer}s</span>
+                    </>
+                  ) : (
+                    <span className="ut-breathing-phase">Ready</span>
+                  )}
+                </div>
+                
+                <div className="ut-breathing-controls">
+                  {!breathingActive ? (
+                    <button className="ut-control-btn primary" onClick={startBreathing}>
+                      <FaPlay />
+                    </button>
+                  ) : (
+                    <button className="ut-control-btn stop" onClick={stopBreathing}>
+                      <FaStop />
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
 
-          <div className="summary-actions">
-            <button 
-              className="primary-btn" 
-              onClick={() => {
-                logTrigger();
-                resetSession();
-              }}
-              type="button"
-            >
-              <FaCheckCircle />
-              Complete Session
-            </button>
-            <button 
-              className="secondary-btn" 
-              onClick={resetSession}
-              type="button"
-            >
-              Start New Session
-            </button>
-          </div>
-        </div>
-      )}
+            {/* Other Protocol Steps */}
+            {(activeProtocol === 'mental' || activeProtocol === 'physical' || activeProtocol === 'energy') && (
+              <>
+                <div className="ut-protocol-steps">
+                  <div className="ut-steps-header">{protocols[activeProtocol].name} Steps</div>
+                  <div className="ut-steps-list">
+                    {getProtocolSteps().map((step, index) => (
+                      <div key={index} className="ut-step-item">
+                        <span className="ut-step-text">{step}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="ut-actions">
+                  <button 
+                    className="ut-btn-primary"
+                    onClick={() => {
+                      startActiveTimer();
+                      setCurrentStep('tools');
+                    }}
+                  >
+                    I've Completed This
+                  </button>
+                </div>
+              </>
+            )}
+          </>
+        )}
+
+        {/* Tools Step */}
+        {currentStep === 'tools' && (
+          <>
+            <div className="ut-section-header">
+              <h2 className="ut-section-title">
+                {experienceLevel === 'advanced' ? 'Master Tools' : 
+                 experienceLevel === 'intermediate' ? 'Intermediate Tools' : 
+                 'Phase Tools'}
+              </h2>
+              <p className="ut-section-desc">Additional techniques for your level</p>
+            </div>
+            
+            <div className="ut-tools">
+              {getPhaseTools().map(tool => (
+                <div key={tool.id} className="ut-tool">
+                  <span className="ut-tool-name">{tool.name}</span>
+                  <button className="ut-tool-btn" onClick={tool.action}>
+                    Use
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            <div className="ut-actions">
+              <button 
+                className="ut-btn-primary"
+                onClick={() => {
+                  stopActiveTimer();
+                  setCurrentStep('summary');
+                }}
+              >
+                Continue to Summary
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Summary Step */}
+        {currentStep === 'summary' && (
+          <>
+            <div className="ut-section-header">
+              <h2 className="ut-section-title">Session Complete</h2>
+              <p className="ut-section-desc">What triggered this urge?</p>
+            </div>
+            
+            <div className="ut-triggers">
+              <div className="ut-triggers-header">Select Trigger</div>
+              <div className="ut-triggers-grid">
+                {getTriggerOptions().map(trigger => (
+                  <button
+                    key={trigger.id}
+                    className={`ut-trigger ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedTrigger(trigger.id)}
+                  >
+                    <trigger.icon />
+                    <span>{trigger.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="ut-stats">
+              <div className="ut-stat">
+                <span className="ut-stat-label">Intensity</span>
+                <span className="ut-stat-value">{urgeIntensity}/10</span>
+              </div>
+              <div className="ut-stat">
+                <span className="ut-stat-label">Protocol</span>
+                <span className="ut-stat-value">{protocols[activeProtocol]?.name}</span>
+              </div>
+              <div className="ut-stat">
+                <span className="ut-stat-label">Session Time</span>
+                <span className="ut-stat-value">
+                  {sessionStartTime ? Math.round((new Date() - sessionStartTime) / 60000) : 0} min
+                </span>
+              </div>
+              <div className="ut-stat">
+                <span className="ut-stat-label">Active Time</span>
+                <span className="ut-stat-value">
+                  {Math.floor(totalActiveTime / 60)}m {Math.round(totalActiveTime % 60)}s
+                </span>
+              </div>
+            </div>
+            
+            <div className="ut-actions">
+              <button 
+                className="ut-btn-ghost"
+                onClick={resetSession}
+              >
+                Start New Session
+              </button>
+              <button 
+                className="ut-btn-primary"
+                onClick={() => {
+                  logTrigger();
+                  resetSession();
+                }}
+              >
+                Complete Session
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,941 +1,857 @@
-/* components/UrgeToolkit/UrgeToolkit.css - FINAL: Clean pill-shaped phase indicator with seamless circular icon */
-.urge-toolkit-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
+/* UrgeToolkit.css - TITANTRACK MINIMAL
+   Matches Landing/Stats/Calendar aesthetic */
 
-/* UPDATED: Integrated header design matching other tabs */
-.integrated-toolkit-header {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  padding: var(--spacing-lg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+/* =============================================================================
+   CONTAINER
+   ============================================================================= */
 
-.toolkit-header-title-section {
+.urge-toolkit {
+  min-height: calc(100dvh - 56px - 80px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin-bottom: var(--spacing-lg);
-  position: relative;
-}
-
-.toolkit-header-title-section h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text);
-  opacity: 0.85;
-  text-align: center;
-}
-
-/* NEW: Header subtitle matching other tabs */
-.toolkit-header-subtitle {
-  margin: var(--spacing-xs) 0 0 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  text-align: center;
-  font-style: italic;
-}
-
-.toolkit-header-actions-section {
-  display: flex;
-  justify-content: center;
+  padding: 48px 24px 120px;
+  background-color: #000000;
   width: 100%;
 }
 
-.toolkit-header-actions {
-  display: flex;
-  gap: var(--spacing-md);
+@media (min-width: 1025px) {
+  .urge-toolkit {
+    min-height: calc(100dvh - 64px);
+    padding: 56px 24px 80px;
+  }
 }
 
-/* UPDATED: Pill-shaped phase indicator with seamless circular icon positioning */
-.phase-indicator {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.phase-indicator:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.phase-indicator-content {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
+.urge-toolkit > * {
   width: 100%;
-  padding-right: var(--spacing-md);
+  max-width: 400px;
 }
 
-/* UPDATED: Circular icon positioned to align with left rounded edge */
-.phase-indicator-icon {
-  width: 48px;
-  height: 48px;
+/* =============================================================================
+   PHASE INDICATOR - Minimal top display
+   ============================================================================= */
+
+.ut-phase {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 40px;
+  animation: fadeInUp 500ms ease forwards;
+  opacity: 0;
+}
+
+.ut-phase-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: var(--phase-color, var(--primary));
   flex-shrink: 0;
-  transition: all 0.2s ease;
-  margin-left: 2px; /* ADDED: Slight offset to align with pill edge */
 }
 
-.phase-indicator-text {
+.ut-phase-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  align-items: flex-start;
-  text-align: left;
-  flex: 1;
-  min-width: 0; /* ADDED: Allows text to shrink properly */
 }
 
-.phase-name {
-  font-size: 0.875rem;
+.ut-phase-name {
+  font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--text);
-  line-height: 1.2;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #ffffff;
 }
 
-.phase-day {
+.ut-phase-detail {
   font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.2;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.35);
 }
 
-/* UPDATED: Section containers matching other tabs */
-.assessment-section,
-.protocol-section,
-.tools-section,
-.summary-section {
-  background-color: var(--medium-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border);
-}
+/* =============================================================================
+   STEP NAVIGATION - Text-only with dividers
+   ============================================================================= */
 
-/* UPDATED: Section headers matching other tabs */
-.section-header {
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
-}
-
-.section-header h3 {
-  margin: 0 0 var(--spacing-sm) 0;
-  font-size: 1.25rem;
-  color: var(--text);
-  font-weight: 600;
-}
-
-.section-header p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-style: italic;
-}
-
-/* UPDATED: Intensity scale with improved button styling */
-.intensity-scale {
+.ut-steps {
   display: flex;
   justify-content: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.intensity-btn {
-  width: 48px;
-  height: 48px;
-  border: 1px solid var(--border);
-  background-color: var(--card-background);
-  color: var(--text-secondary);
-  border-radius: var(--radius-md);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0;
+  margin-bottom: 48px;
+  animation: fadeInUp 500ms ease 50ms forwards;
+  opacity: 0;
 }
 
-.intensity-btn:hover {
-  border-color: rgba(255, 221, 0, 0.3);
-  color: var(--text);
-  transform: translateY(-1px);
-}
-
-.intensity-btn.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: var(--primary);
-  color: var(--primary);
-  transform: translateY(-1px);
-}
-
-.intensity-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-lg);
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* UPDATED: Protocol cards with consistent styling */
-.protocol-selection {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
-}
-
-.protocol-card {
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.protocol-card:hover {
-  background-color: rgba(255, 255, 255, 0.02);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.protocol-card.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.2);
-}
-
-.protocol-name {
-  font-weight: 600;
-  font-size: 1.125rem;
-  color: var(--text);
-  margin-bottom: var(--spacing-xs);
-}
-
-.protocol-duration {
-  font-size: 0.75rem;
-  color: var(--primary);
-  background-color: rgba(255, 221, 0, 0.1);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  display: inline-block;
-  margin-bottom: var(--spacing-sm);
-}
-
-.protocol-description {
-  color: var(--text);
-  font-size: 0.875rem;
-  line-height: 1.4;
-  margin-bottom: var(--spacing-xs);
-}
-
-.protocol-best-for {
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-style: italic;
-}
-
-/* UPDATED: Breathing interface with clean design */
-.breathing-interface {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xl);
-  padding: var(--spacing-xl);
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-}
-
-/* UPDATED: Breathing mode selector */
-.breathing-mode-selector {
-  display: flex;
-  gap: var(--spacing-xs);
-  margin-bottom: var(--spacing-md);
-  background-color: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-xs);
-  border: 1px solid var(--border);
-}
-
-.mode-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
+.ut-step {
+  padding: 8px 16px;
+  background: transparent;
   border: none;
-  background-color: transparent;
-  color: var(--text-secondary);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.8125rem;
   font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.mode-btn:hover {
-  color: var(--text);
+.ut-step:hover:not(.active):not(:disabled) {
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.mode-btn.active {
-  background-color: rgba(255, 221, 0, 0.1);
-  color: var(--primary);
-  transform: translateY(-1px);
-}
-
-.breathing-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-
-.breathing-circle {
-  width: 180px;
-  height: 180px;
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle, rgba(255, 221, 0, 0.05) 0%, transparent 70%);
-  position: relative;
-  overflow: hidden;
-}
-
-.breathing-animation {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.3) 0%, rgba(255, 221, 0, 0.1) 100%);
-  border: 2px solid var(--primary);
-  transition: all 0.5s ease;
-}
-
-.inhale-animation {
-  animation: breathe-in 4s ease-in-out infinite;
-}
-
-.exhale-animation {
-  animation: breathe-out 4s ease-in-out infinite;
-}
-
-.rapid-animation {
-  animation: rapid-breathe 0.5s ease-in-out infinite;
-}
-
-.hold-animation {
-  animation: energy-hold 2s ease-in-out infinite;
-  background: linear-gradient(135deg, rgba(255, 221, 0, 0.5) 0%, rgba(255, 221, 0, 0.2) 100%);
-}
-
-@keyframes breathe-in {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  50% { 
-    transform: scale(1.8);
-    opacity: 1;
-  }
-}
-
-@keyframes breathe-out {
-  0%, 100% { 
-    transform: scale(1.8);
-    opacity: 1;
-  }
-  50% { 
-    transform: scale(1);
-    opacity: 0.6;
-  }
-}
-
-@keyframes rapid-breathe {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  50% { 
-    transform: scale(1.3);
-    opacity: 1;
-  }
-}
-
-@keyframes energy-hold {
-  0%, 100% { 
-    transform: scale(1.5);
-    opacity: 0.8;
-  }
-  50% { 
-    transform: scale(1.7);
-    opacity: 1;
-  }
-}
-
-.breathing-status {
-  text-align: center;
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--text);
-  min-height: 28px;
-}
-
-.breathing-progress {
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-}
-
-/* UPDATED: Breathing controls matching tracker button style */
-.breathing-controls {
-  display: flex;
-  justify-content: center;
-}
-
-.breathing-controls .primary-btn,
-.breathing-controls .secondary-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none;
-}
-
-.breathing-controls .primary-btn:hover,
-.breathing-controls .secondary-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* UPDATED: Protocol steps with consistent styling */
-.mental-protocol,
-.physical-protocol,
-.energy-protocol {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-xl);
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-}
-
-.protocol-steps h4 {
-  margin: 0 0 var(--spacing-md) 0;
-  color: var(--text);
-  font-size: 1rem;
-  text-align: center;
+.ut-step.active {
+  color: #ffffff;
   font-weight: 600;
 }
 
-.protocol-steps ol {
-  margin: 0;
-  padding-left: var(--spacing-xl);
-  color: var(--text);
+.ut-step:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
 }
 
-.protocol-steps li {
-  margin-bottom: var(--spacing-sm);
+.ut-step-divider {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* =============================================================================
+   CONTENT - Main section area
+   ============================================================================= */
+
+.ut-content {
+  animation: fadeInUp 500ms ease 100ms forwards;
+  opacity: 0;
+}
+
+/* Section Headers */
+.ut-section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.ut-section-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.ut-section-desc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
   line-height: 1.5;
 }
 
-/* UPDATED: Phase tools with consistent grid */
-.phase-tools {
+/* =============================================================================
+   INTENSITY SCALE - Assessment step
+   ============================================================================= */
+
+.ut-intensity {
+  margin-bottom: 48px;
+}
+
+.ut-intensity-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.tool-card {
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.tool-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.tool-name {
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: var(--spacing-md);
-  font-size: 1rem;
-}
-
-/* UPDATED: Tool buttons matching tracker button style */
-.tool-btn {
+.ut-intensity-btn {
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
   justify-content: center;
-}
-
-.tool-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* UPDATED: Trigger selection with consistent pill styling */
-.trigger-selection {
-  margin-bottom: var(--spacing-xl);
-}
-
-.trigger-selection h4 {
-  margin: 0 0 var(--spacing-md) 0;
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.4);
   font-size: 1rem;
-  text-align: center;
   font-weight: 600;
-}
-
-.trigger-options {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
-}
-
-.trigger-option {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--card-background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
-  color: var(--text);
-  font-weight: 500;
-  white-space: nowrap;
-  min-width: fit-content;
-  flex-shrink: 0;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.trigger-option:hover {
-  background-color: rgba(255, 255, 255, 0.02);
-  transform: translateY(-1px);
-  border-color: rgba(255, 221, 0, 0.3);
+.ut-intensity-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.trigger-option.selected {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: var(--primary);
-  color: var(--primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(255, 221, 0, 0.2);
+.ut-intensity-btn.active {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
 }
 
-.trigger-option svg {
-  font-size: 1rem;
-  flex-shrink: 0;
-  color: inherit;
+/* Color coding for intensity levels */
+.ut-intensity-btn.low:hover,
+.ut-intensity-btn.low.active {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #000000;
 }
 
-/* UPDATED: Session stats with consistent card styling */
-.session-stats {
+.ut-intensity-btn.medium:hover,
+.ut-intensity-btn.medium.active {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #000000;
+}
+
+.ut-intensity-btn.high:hover,
+.ut-intensity-btn.high.active {
+  background: #ff3b30;
+  border-color: #ff3b30;
+  color: #ffffff;
+}
+
+.ut-intensity-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* =============================================================================
+   PROTOCOL SELECTION
+   ============================================================================= */
+
+.ut-protocols {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
-  padding: var(--spacing-lg);
-  background-color: var(--card-background);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  gap: 12px;
+  margin-bottom: 40px;
 }
 
-.stat-item {
+.ut-protocol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ut-protocol:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.ut-protocol.active {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ut-protocol.recommended {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.ut-protocol.recommended::before {
+  content: 'Recommended';
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #22c55e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.ut-protocol-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ut-protocol-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.ut-protocol-duration {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+}
+
+.ut-protocol-desc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+}
+
+.ut-protocol-best {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+}
+
+/* =============================================================================
+   BREATHING INTERFACE
+   ============================================================================= */
+
+.ut-breathing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 40px 0;
+}
+
+/* Mode Toggle */
+.ut-breathing-modes {
+  display: flex;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.ut-mode-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ut-mode-btn:hover:not(.active) {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ut-mode-btn.active {
+  background: #ffffff;
+  color: #000000;
+  font-weight: 600;
+}
+
+/* Breathing Circle */
+.ut-breathing-circle {
+  width: 180px;
+  height: 180px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.ut-breathing-orb {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.5s ease;
+}
+
+.ut-breathing-orb.inhale {
+  animation: breatheIn 4s ease-in-out infinite;
+}
+
+.ut-breathing-orb.exhale {
+  animation: breatheOut 4s ease-in-out infinite;
+}
+
+.ut-breathing-orb.hold {
+  animation: holdPulse 2s ease-in-out infinite;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.ut-breathing-orb.rapid {
+  animation: rapidBreath 0.5s ease-in-out infinite;
+}
+
+@keyframes breatheIn {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.8); opacity: 1; }
+}
+
+@keyframes breatheOut {
+  0%, 100% { transform: scale(1.8); opacity: 1; }
+  50% { transform: scale(1); opacity: 0.5; }
+}
+
+@keyframes holdPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes rapidBreath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+/* Breathing Info */
+.ut-breathing-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ut-breathing-phase {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.ut-breathing-count {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ut-breathing-timer {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #ffffff;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Breathing Controls */
+.ut-breathing-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.ut-control-btn {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ut-control-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ut-control-btn.primary {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+.ut-control-btn.primary:hover {
+  opacity: 0.9;
+}
+
+.ut-control-btn.stop {
+  background: rgba(255, 59, 48, 0.15);
+  border-color: rgba(255, 59, 48, 0.2);
+  color: #ff3b30;
+}
+
+.ut-control-btn.stop:hover {
+  background: rgba(255, 59, 48, 0.25);
+}
+
+/* =============================================================================
+   PROTOCOL STEPS (Mental/Physical/Energy)
+   ============================================================================= */
+
+.ut-protocol-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.ut-steps-header {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.ut-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  counter-reset: step;
+}
+
+.ut-step-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  counter-increment: step;
+}
+
+.ut-step-item::before {
+  content: counter(step);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ut-step-text {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  padding-top: 4px;
+}
+
+/* =============================================================================
+   TOOLS SECTION
+   ============================================================================= */
+
+.ut-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.ut-tool {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  transition: all 150ms ease;
+}
+
+.ut-tool:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ut-tool-name {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.ut-tool-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ut-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* =============================================================================
+   TRIGGER SELECTION - Summary step
+   ============================================================================= */
+
+.ut-triggers {
+  margin-bottom: 32px;
+}
+
+.ut-triggers-header {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.ut-triggers-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.ut-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ut-trigger:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ut-trigger.selected {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+.ut-trigger svg {
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+/* =============================================================================
+   SESSION STATS
+   ============================================================================= */
+
+.ut-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 32px;
+}
+
+.ut-stat {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
 }
 
-.stat-item:last-child {
-  border-bottom: none;
+.ut-stat:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.stat-label {
-  color: var(--text-secondary);
+.ut-stat-label {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ut-stat-value {
   font-size: 0.875rem;
-}
-
-.stat-value {
-  color: var(--text);
   font-weight: 600;
-  font-size: 0.875rem;
+  color: #ffffff;
 }
 
-/* UPDATED: Action buttons matching tracker "Edit Start Date" button exactly */
-.tools-actions,
-.summary-actions {
+/* =============================================================================
+   BUTTONS
+   ============================================================================= */
+
+.ut-actions {
   display: flex;
-  justify-content: center;
-  gap: var(--spacing-md);
+  flex-direction: column;
+  gap: 12px;
 }
 
-.primary-btn,
-.secondary-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
+.ut-btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  background: #ffffff;
+  border: none;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.primary-btn:hover,
-.secondary-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1) !important;
-  border-color: rgba(255, 221, 0, 0.2) !important;
-  color: var(--primary) !important;
-  transform: translateY(-1px) !important;
+.ut-btn-primary:hover {
+  opacity: 0.9;
 }
 
-/* UPDATED: Action button matching tracker button style */
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: rgba(128, 128, 128, 0.1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  color: var(--text-secondary);
-  font-size: 0.875rem;
+.ut-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.ut-btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
   font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.action-btn:hover {
-  background-color: rgba(255, 221, 0, 0.1);
-  border-color: rgba(255, 221, 0, 0.2);
-  color: var(--primary);
-  transform: translateY(-1px);
+.ut-btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-  /* UPDATED: Mobile header sizing to match Emotional Timeline exactly */
-  .integrated-toolkit-header {
-    padding: var(--spacing-lg);
-    margin: 0;
+/* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
-  
-  .toolkit-header-title-section {
-    margin-bottom: var(--spacing-lg);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .toolkit-header-title-section h2 {
-    font-size: 1.25rem; /* MATCHES: Emotional Timeline mobile size */
+}
+
+/* =============================================================================
+   RESPONSIVE
+   ============================================================================= */
+
+@media (max-width: 480px) {
+  .urge-toolkit {
+    padding: 32px 16px 100px;
   }
-  
-  .toolkit-header-subtitle {
-    font-size: 0.8rem; /* MATCHES: Emotional Timeline mobile subtitle */
+
+  .ut-phase {
+    padding-bottom: 24px;
+    margin-bottom: 32px;
   }
-  
-  .toolkit-header-actions-section {
-    width: 100%;
+
+  .ut-steps {
+    margin-bottom: 40px;
   }
-  
-  .toolkit-header-actions {
-    width: 100%;
-    justify-content: center;
+
+  .ut-step {
+    padding: 8px 12px;
+    font-size: 0.75rem;
   }
-  
-  /* UPDATED: Mobile phase indicator with seamless circular icon positioning */
-  .phase-indicator {
-    width: 100%;
-    max-width: 280px;
-    padding: var(--spacing-xs);
-    gap: var(--spacing-sm);
+
+  .ut-section-title {
+    font-size: 1.125rem;
   }
-  
-  .phase-indicator-content {
-    gap: var(--spacing-sm);
-    padding-right: var(--spacing-sm);
+
+  .ut-intensity-grid {
+    gap: 6px;
   }
-  
-  .phase-indicator-icon {
-    width: 44px; /* MATCHES: Emotional Timeline mobile icon size */
-    height: 44px;
-    font-size: 1.25rem; /* MATCHES: Emotional Timeline mobile icon size */
-    flex-shrink: 0;
-    margin-left: 2px; /* MAINTAINED: Seamless alignment */
-  }
-  
-  .phase-indicator-text {
-    align-items: flex-start;
-    text-align: left;
-    flex: 1;
-    min-width: 0;
-  }
-  
-  .phase-name {
-    font-size: 0.8125rem;
-  }
-  
-  .phase-day {
-    font-size: 0.6875rem;
-  }
-  
-  /* UPDATED: Mobile section padding */
-  .assessment-section,
-  .protocol-section,
-  .tools-section,
-  .summary-section {
-    padding: var(--spacing-lg);
-  }
-  
-  /* UPDATED: Mobile intensity scale */
-  .intensity-scale {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: var(--spacing-sm);
-    max-width: none;
-  }
-  
-  .intensity-btn {
-    width: 100%;
-    height: 44px;
+
+  .ut-intensity-btn {
     font-size: 0.875rem;
+    border-radius: 10px;
   }
-  
-  /* UPDATED: Mobile breathing interface */
-  .breathing-circle {
-    width: 140px;
-    height: 140px;
+
+  .ut-breathing-circle {
+    width: 150px;
+    height: 150px;
   }
-  
-  .breathing-animation {
+
+  .ut-breathing-orb {
     width: 50px;
     height: 50px;
   }
-  
-  .breathing-interface {
-    padding: var(--spacing-lg);
+
+  .ut-breathing-phase {
+    font-size: 1.25rem;
   }
-  
-  .breathing-mode-selector {
+
+  .ut-breathing-timer {
+    font-size: 1.75rem;
+  }
+
+  .ut-control-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+  }
+
+  .ut-triggers-grid {
     flex-direction: column;
-    width: 100%;
-    max-width: 280px;
+    align-items: stretch;
   }
-  
-  .mode-btn {
-    width: 100%;
+
+  .ut-trigger {
     justify-content: center;
-    padding: var(--spacing-md);
-  }
-  
-  /* UPDATED: Mobile phase tools */
-  .phase-tools {
-    grid-template-columns: 1fr;
-  }
-  
-  /* UPDATED: Mobile trigger options */
-  .trigger-options {
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-xs);
-  }
-  
-  .trigger-option {
-    width: 100%;
-    max-width: 280px;
-    justify-content: center;
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
-  
-  /* UPDATED: Mobile action buttons matching tracker style */
-  .tools-actions,
-  .summary-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .primary-btn,
-  .secondary-btn {
-    width: 100%;
-    max-width: 280px;
-    justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.875rem;
-    font-weight: 500;
-    min-height: auto;
-  }
-  
-  .action-btn {
-    flex: 1;
-    justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.875rem;
-    font-weight: 500;
-    min-height: auto;
   }
 }
 
-/* Very Small Screens - Match Emotional Timeline exactly */
-@media (max-width: 480px) {
-  .integrated-toolkit-header {
-    padding: var(--spacing-lg);
-    margin: 0;
+@media (max-width: 360px) {
+  .urge-toolkit {
+    padding: 28px 12px 90px;
   }
-  
-  .toolkit-header-title-section {
-    margin-bottom: var(--spacing-lg);
+
+  .ut-step {
+    padding: 6px 10px;
+    font-size: 0.6875rem;
   }
-  
-  .toolkit-header-title-section h2 {
-    font-size: 1.125rem; /* MATCHES: Emotional Timeline very small mobile */
+
+  .ut-step-divider {
+    height: 12px;
   }
-  
-  .toolkit-header-subtitle {
-    font-size: 0.75rem; /* MATCHES: Emotional Timeline very small mobile */
+
+  .ut-btn-primary,
+  .ut-btn-ghost {
+    padding: 14px 20px;
+    font-size: 0.875rem;
   }
-  
-  .phase-indicator {
-    padding: var(--spacing-xs);
-    max-width: 100%;
-    gap: var(--spacing-xs);
-  }
-  
-  .phase-indicator-content {
-    gap: var(--spacing-xs);
-    padding-right: var(--spacing-xs);
-  }
-  
-  .phase-indicator-icon {
-    width: 40px; /* MATCHES: Emotional Timeline very small mobile */
-    height: 40px;
-    font-size: 1.125rem; /* MATCHES: Emotional Timeline very small mobile */
-    flex-shrink: 0;
-    margin-left: 2px; /* MAINTAINED: Seamless alignment */
-  }
-  
-  .phase-name {
-    font-size: 0.75rem;
-  }
-  
-  .phase-day {
-    font-size: 0.625rem;
-  }
-  
-  .assessment-section,
-  .protocol-section,
-  .tools-section,
-  .summary-section {
-    padding: var(--spacing-md);
-  }
-  
-  .section-header h3 {
-    font-size: 1.125rem;
-  }
-  
-  .intensity-btn {
-    height: 40px;
-    font-size: 0.75rem;
-  }
-  
-  .breathing-circle {
-    width: 120px;
-    height: 120px;
-  }
-  
-  .breathing-animation {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .protocol-card {
-    padding: var(--spacing-md);
-  }
-  
-  .tool-card {
-    padding: var(--spacing-md);
-  }
-  
-  .trigger-option {
-    max-width: 100%;
-    font-size: 0.8rem;
-    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .ut-phase,
+  .ut-steps,
+  .ut-content,
+  .ut-breathing-orb {
+    animation: none;
+    opacity: 1;
   }
 }
