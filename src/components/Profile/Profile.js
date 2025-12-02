@@ -60,7 +60,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const tabs = [
     { id: 'account', label: 'Account' },
     { id: 'privacy', label: 'Privacy' },
-    { id: 'data', label: 'Data' }
+    { id: 'data', label: 'Data' },
+    { id: 'about', label: 'About' }
   ];
 
   const feedbackTypes = [
@@ -545,6 +546,73 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <span className="data-desc">Permanently remove all data</span>
               </div>
               <button className="data-btn danger" onClick={() => setShowDeleteConfirm(true)}>Delete</button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'about' && (
+          <div className="about-section">
+            {/* Brand Header */}
+            <div className="about-brand">
+              <svg className="about-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 5 L15 35 L15 75 L50 95 L85 75 L85 35 Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <path d="M50 20 L30 35 L30 65 L50 78 L70 65 L70 35 Z" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.6"/>
+                <circle cx="50" cy="50" r="8" fill="currentColor" opacity="0.8"/>
+              </svg>
+              <h1 className="about-title">TitanTrack</h1>
+              <span className="about-version">Version 1.0.0</span>
+            </div>
+
+            <div className="about-divider" />
+
+            {/* The Pillars */}
+            <div className="about-pillars">
+              <h2 className="about-pillars-title">The Pillars</h2>
+              
+              <div className="about-pillar">
+                <span className="pillar-name">Streak Tracking</span>
+                <span className="pillar-desc">Your foundation. Every day counts.</span>
+              </div>
+              
+              <div className="about-pillar">
+                <span className="pillar-name">Benefit Analytics</span>
+                <span className="pillar-desc">Track what retention unlocks in you.</span>
+              </div>
+              
+              <div className="about-pillar">
+                <span className="pillar-name">Predictive Intelligence</span>
+                <span className="pillar-desc">On-device ML learns your patterns.</span>
+              </div>
+              
+              <div className="about-pillar">
+                <span className="pillar-name">Crisis Toolkit</span>
+                <span className="pillar-desc">When urges hit, you're prepared.</span>
+              </div>
+            </div>
+
+            <div className="about-divider" />
+
+            {/* Tagline */}
+            <div className="about-tagline">
+              <span className="tagline-main">Hold the Flame.</span>
+              <span className="tagline-sub">Master the fire within.</span>
+            </div>
+
+            <div className="about-divider" />
+
+            {/* Links */}
+            <div className="about-links">
+              <a href="https://discord.gg/RDFC5eUtuA" target="_blank" rel="noopener noreferrer" className="about-link">
+                Discord
+              </a>
+              <span className="about-link-divider" />
+              <button className="about-link" onClick={() => { setActiveTab('account'); setTimeout(() => setShowFeedbackModal(true), 100); }}>
+                Support
+              </button>
+              <span className="about-link-divider" />
+              <a href="/privacy" className="about-link">
+                Privacy
+              </a>
             </div>
           </div>
         )}
