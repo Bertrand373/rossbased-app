@@ -53,16 +53,17 @@
 }
 
 /* =============================================================================
-   STAT CARDS - Landing page style horizontal stats
+   STAT CARDS - 2x2 grid on mobile, inline with dividers on desktop
    ============================================================================= */
 
 .stat-grid {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
   margin-bottom: 48px;
-  flex-wrap: wrap;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .stat-card {
@@ -72,7 +73,7 @@
   gap: 6px;
   background: transparent;
   border: none;
-  padding: 12px 16px;
+  padding: 20px 12px;
   cursor: pointer;
   transition: opacity 150ms ease;
   -webkit-tap-highlight-color: transparent;
@@ -87,11 +88,11 @@
 }
 
 .stat-num {
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 2.5rem;
+  font-weight: 500;
   color: #ffffff;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   font-feature-settings: 'tnum' 1;
 }
 
@@ -102,10 +103,35 @@
   letter-spacing: 0.02em;
 }
 
+/* Dividers - hidden on mobile, shown on desktop */
 .stat-divider {
-  width: 1px;
-  height: 40px;
-  background-color: rgba(255, 255, 255, 0.08);
+  display: none;
+}
+
+/* Desktop: inline layout with dividers */
+@media (min-width: 768px) {
+  .stat-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    max-width: none;
+  }
+  
+  .stat-card {
+    padding: 16px 20px;
+  }
+  
+  .stat-num {
+    font-size: 2.25rem;
+  }
+  
+  .stat-divider {
+    display: block;
+    width: 1px;
+    height: 48px;
+    background-color: rgba(255, 255, 255, 0.08);
+  }
 }
 
 /* =============================================================================
@@ -997,18 +1023,6 @@
     padding: 40px 20px 120px;
   }
   
-  .stat-grid {
-    gap: 20px;
-  }
-  
-  .stat-num {
-    font-size: 1.75rem;
-  }
-  
-  .stat-divider {
-    height: 32px;
-  }
-  
   .average-num {
     font-size: 5rem;
   }
@@ -1028,23 +1042,20 @@
   }
   
   .stat-grid {
-    gap: 12px;
+    gap: 4px 12px;
+    max-width: 280px;
   }
   
   .stat-card {
-    padding: 10px 12px;
+    padding: 16px 8px;
   }
   
   .stat-num {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
   
   .stat-label {
     font-size: 0.625rem;
-  }
-  
-  .stat-divider {
-    height: 28px;
   }
   
   .stats-section h2 {
@@ -1156,19 +1167,16 @@
   }
   
   .stat-grid {
-    gap: 8px;
+    gap: 2px 8px;
+    max-width: 260px;
   }
   
   .stat-card {
-    padding: 8px 10px;
+    padding: 14px 6px;
   }
   
   .stat-num {
-    font-size: 1.25rem;
-  }
-  
-  .stat-divider {
-    display: none;
+    font-size: 1.75rem;
   }
   
   .milestone-card {
@@ -1187,15 +1195,15 @@
 /* Desktop enhancements */
 @media (min-width: 1024px) {
   .stat-grid {
-    gap: 32px;
+    gap: 40px;
   }
   
   .stat-num {
-    font-size: 2.25rem;
+    font-size: 2.5rem;
   }
   
   .stat-divider {
-    height: 48px;
+    height: 56px;
   }
   
   .milestone-grid {

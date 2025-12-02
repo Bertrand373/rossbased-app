@@ -112,12 +112,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     ];
   }, [safeUserData]);
 
-  // Chart configuration
+  // Chart configuration - Clean trend line, endpoints only
   const chartOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     layout: {
-      padding: { top: 4, right: 4, bottom: 0, left: 0 }
+      padding: { top: 8, right: 8, bottom: 0, left: 0 }
     },
     scales: {
       y: {
@@ -140,7 +140,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           color: 'rgba(255,255,255,0.12)', 
           font: { size: 9, weight: '400' }, 
           maxRotation: 0, 
-          maxTicksLimit: timeRange === 'quarter' ? 5 : 7,
+          maxTicksLimit: timeRange === 'quarter' ? 5 : (timeRange === 'month' ? 6 : 7),
           padding: 4
         },
         grid: { display: false },
@@ -150,7 +150,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     elements: {
       line: {
         tension: 0.4,
-        borderWidth: 2,
+        borderWidth: 2.5,
         borderCapStyle: 'round',
         borderJoinStyle: 'round'
       },
@@ -194,7 +194,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   }), [timeRange]);
 
-  // Generate chart data with gradient fill
+  // Generate chart data with gradient fill and endpoint dots
   const getChartData = useCallback(() => {
     const rawData = generateChartData(safeUserData, selectedMetric, timeRange);
     const chart = chartRef.current;
@@ -203,20 +203,47 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     
     if (chart?.ctx && chart?.chartArea) {
       gradient = chart.ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
-      gradient.addColorStop(0, 'rgba(255,255,255,0.08)');
-      gradient.addColorStop(0.6, 'rgba(255,255,255,0.02)');
+      gradient.addColorStop(0, 'rgba(255,255,255,0.1)');
+      gradient.addColorStop(0.5, 'rgba(255,255,255,0.03)');
       gradient.addColorStop(1, 'rgba(255,255,255,0)');
     }
+    
+    // Find first and last valid data points for endpoint dots
+    const data = rawData.datasets[0].data;
+    const pointRadii = data.map((value, index) => {
+      if (value === null) return 0;
+      
+      // Find first valid index
+      const firstValidIndex = data.findIndex(v => v !== null);
+      // Find last valid index
+      let lastValidIndex = -1;
+      for (let i = data.length - 1; i >= 0; i--) {
+        if (data[i] !== null) {
+          lastValidIndex = i;
+          break;
+        }
+      }
+      
+      // Show dot only for first and last valid points
+      if (index === firstValidIndex || index === lastValidIndex) {
+        return 5; // Endpoint dot size
+      }
+      return 0; // No dot for other points
+    });
     
     return {
       ...rawData,
       datasets: [{
         ...rawData.datasets[0],
         borderColor: '#ffffff',
+        borderWidth: 2.5,
         backgroundColor: gradient,
         fill: true,
         pointBackgroundColor: '#ffffff',
         pointBorderColor: '#000000',
+        pointBorderWidth: 2,
+        pointRadius: pointRadii,
+        pointHoverRadius: 6,
         pointHoverBackgroundColor: '#ffffff',
         pointHoverBorderColor: '#000000',
       }]
