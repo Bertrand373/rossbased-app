@@ -211,6 +211,101 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     setIsEditingNote(false);
   };
 
+  // Render helper for status badge (used in both sticky and non-sticky layouts)
+  const renderStatusBadge = () => {
+    const dayStatus = getDayStatus(selectedDate);
+    const dayCount = getDayCount(selectedDate);
+    const wetDream = hasWetDream(selectedDate);
+    
+    if (dayStatus?.type === 'current-streak') {
+      return (
+        <div className="calendar-status-badge current-streak">
+          <span className="status-dot"></span>
+          <span>Current Streak</span>
+          {dayCount && <span className="day-count">Day {dayCount.dayNumber}</span>}
+        </div>
+      );
+    }
+    if (dayStatus?.type === 'former-streak') {
+      return (
+        <div className="calendar-status-badge former-streak">
+          <span className="status-dot"></span>
+          <span>Former Streak</span>
+          {dayCount && <span className="day-count">Day {dayCount.dayNumber}{dayCount.totalDays ? `/${dayCount.totalDays}` : ''}</span>}
+        </div>
+      );
+    }
+    if (dayStatus?.type === 'relapse') {
+      return (
+        <div className="calendar-status-badge relapse">
+          <span className="status-dot"></span>
+          <span>Relapse</span>
+        </div>
+      );
+    }
+    if (wetDream) {
+      return (
+        <div className="calendar-status-badge wet-dream">
+          <span className="status-dot"></span>
+          <span>Wet Dream</span>
+        </div>
+      );
+    }
+    return (
+      <div className="calendar-status-badge">
+        <span>No status recorded</span>
+      </div>
+    );
+  };
+
+  // Render helper for journal section (used in both sticky and non-sticky layouts)
+  const renderJournalSection = () => (
+    <div className="calendar-journal">
+      <div className="calendar-journal-header">
+        <h4>Journal</h4>
+        {!isEditingNote && noteText && (
+          <button className="calendar-action-btn" onClick={startEditingNote}>
+            Edit
+          </button>
+        )}
+      </div>
+      
+      {isEditingNote ? (
+        <div className="calendar-journal-editing">
+          <textarea
+            className="calendar-journal-textarea"
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            placeholder="What's on your mind?"
+            rows="4"
+          />
+          <div className="calendar-journal-actions">
+            <button className="calendar-cancel-btn" onClick={cancelEditingNote}>
+              Cancel
+            </button>
+            <button className="calendar-save-btn" onClick={saveNote}>
+              Save
+            </button>
+          </div>
+        </div>
+      ) : noteText ? (
+        <div className="calendar-journal-entry">{noteText}</div>
+      ) : (
+        <>
+          <div className="calendar-journal-empty">
+            <h4>What's on your mind?</h4>
+            <p>Journaling helps track patterns and maintain accountability on your journey.</p>
+          </div>
+          <div className="calendar-journal-start">
+            <button className="calendar-action-btn" onClick={startEditingNote}>
+              Add Entry
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
   // Status update handlers
   const handleStatusClick = (status) => {
     if (status === 'relapse') {
@@ -487,146 +582,95 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           ================================================================ */}
       {dayInfoModal && selectedDate && (
         <div className="calendar-overlay" onClick={closeDayInfo}>
-          <div className="calendar-modal calendar-day-info" onClick={e => e.stopPropagation()}>
+          <div className={`calendar-modal calendar-day-info ${getDayBenefits(selectedDate) ? 'has-benefits' : ''}`} onClick={e => e.stopPropagation()}>
             
-            <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
-            
-            {/* Status Badge */}
-            <div className="calendar-status-info">
-              {(() => {
-                const dayStatus = getDayStatus(selectedDate);
-                const dayCount = getDayCount(selectedDate);
-                const wetDream = hasWetDream(selectedDate);
-                
-                if (dayStatus?.type === 'current-streak') {
-                  return (
-                    <div className="calendar-status-badge current-streak">
-                      <span className="status-dot"></span>
-                      <span>Current Streak</span>
-                      {dayCount && <span className="day-count">Day {dayCount.dayNumber}</span>}
-                    </div>
-                  );
-                }
-                if (dayStatus?.type === 'former-streak') {
-                  return (
-                    <div className="calendar-status-badge former-streak">
-                      <span className="status-dot"></span>
-                      <span>Former Streak</span>
-                      {dayCount && <span className="day-count">Day {dayCount.dayNumber}{dayCount.totalDays ? `/${dayCount.totalDays}` : ''}</span>}
-                    </div>
-                  );
-                }
-                if (dayStatus?.type === 'relapse') {
-                  return (
-                    <div className="calendar-status-badge relapse">
-                      <span className="status-dot"></span>
-                      <span>Relapse</span>
-                    </div>
-                  );
-                }
-                if (wetDream) {
-                  return (
-                    <div className="calendar-status-badge wet-dream">
-                      <span className="status-dot"></span>
-                      <span>Wet Dream</span>
-                    </div>
-                  );
-                }
-                return (
-                  <div className="calendar-status-badge">
-                    <span>No status recorded</span>
-                  </div>
-                );
-              })()}
-            </div>
-
-            {/* Benefits Section */}
             {(() => {
               const dayBenefits = getDayBenefits(selectedDate);
-              if (!dayBenefits) return null;
+              const hasBenefits = !!dayBenefits;
               
-              const benefitItems = [
-                { label: 'Energy', value: dayBenefits.energy },
-                { label: 'Focus', value: dayBenefits.focus },
-                { label: 'Confidence', value: dayBenefits.confidence },
-                { label: 'Aura', value: dayBenefits.aura || 5 },
-                { label: 'Sleep', value: dayBenefits.sleep || dayBenefits.attraction || 5 },
-                { label: 'Workout', value: dayBenefits.workout || dayBenefits.gymPerformance || 5 }
-              ];
-              
-              return (
-                <div className="calendar-benefits">
-                  <h4>Benefits</h4>
-                  <div className="calendar-benefits-list">
-                    {benefitItems.map(item => (
-                      <div key={item.label} className="calendar-benefit-row">
-                        <span className="calendar-benefit-label">{item.label}</span>
-                        <div className="calendar-benefit-bar">
-                          <div className="calendar-benefit-fill" style={{ width: `${item.value * 10}%` }} />
-                        </div>
-                        <div className="calendar-benefit-value">{item.value}</div>
+              // If benefits exist, use sticky header/footer structure
+              if (hasBenefits) {
+                const benefitItems = [
+                  { label: 'Energy', value: dayBenefits.energy },
+                  { label: 'Focus', value: dayBenefits.focus },
+                  { label: 'Confidence', value: dayBenefits.confidence },
+                  { label: 'Aura', value: dayBenefits.aura || 5 },
+                  { label: 'Sleep', value: dayBenefits.sleep || dayBenefits.attraction || 5 },
+                  { label: 'Workout', value: dayBenefits.workout || dayBenefits.gymPerformance || 5 }
+                ];
+                
+                return (
+                  <>
+                    {/* Sticky Header */}
+                    <div className="calendar-modal-header">
+                      <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
+                      
+                      {/* Status Badge */}
+                      <div className="calendar-status-info">
+                        {renderStatusBadge()}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
+                    </div>
 
-            {/* Journal Section */}
-            <div className="calendar-journal">
-              <div className="calendar-journal-header">
-                <h4>Journal</h4>
-                {!isEditingNote && noteText && (
-                  <button className="calendar-action-btn" onClick={startEditingNote}>
-                    Edit
-                  </button>
-                )}
-              </div>
+                    {/* Scrollable Content */}
+                    <div className="calendar-modal-content">
+                      {/* Benefits Section */}
+                      <div className="calendar-benefits">
+                        <h4>Benefits</h4>
+                        <div className="calendar-benefits-list">
+                          {benefitItems.map(item => (
+                            <div key={item.label} className="calendar-benefit-row">
+                              <span className="calendar-benefit-label">{item.label}</span>
+                              <div className="calendar-benefit-bar">
+                                <div className="calendar-benefit-fill" style={{ width: `${item.value * 10}%` }} />
+                              </div>
+                              <div className="calendar-benefit-value">{item.value}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Journal Section */}
+                      {renderJournalSection()}
+                    </div>
+
+                    {/* Sticky Footer */}
+                    <div className="calendar-modal-footer">
+                      <button className="calendar-btn-ghost" onClick={closeDayInfo}>
+                        Close
+                      </button>
+                      <button className="calendar-btn-primary" onClick={showEditFromInfo}>
+                        Edit Day
+                      </button>
+                    </div>
+                  </>
+                );
+              }
               
-              {isEditingNote ? (
-                <div className="calendar-journal-editing">
-                  <textarea
-                    className="calendar-journal-textarea"
-                    value={noteText}
-                    onChange={(e) => setNoteText(e.target.value)}
-                    placeholder="What's on your mind?"
-                    rows="4"
-                  />
-                  <div className="calendar-journal-actions">
-                    <button className="calendar-cancel-btn" onClick={cancelEditingNote}>
-                      Cancel
-                    </button>
-                    <button className="calendar-save-btn" onClick={saveNote}>
-                      Save
-                    </button>
-                  </div>
-                </div>
-              ) : noteText ? (
-                <div className="calendar-journal-entry">{noteText}</div>
-              ) : (
+              // No benefits - simple flat structure (no scroll needed)
+              return (
                 <>
-                  <div className="calendar-journal-empty">
-                    <h4>What's on your mind?</h4>
-                    <p>Journaling helps track patterns and maintain accountability on your journey.</p>
+                  <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
+                  
+                  {/* Status Badge */}
+                  <div className="calendar-status-info">
+                    {renderStatusBadge()}
                   </div>
-                  <div className="calendar-journal-start">
-                    <button className="calendar-action-btn" onClick={startEditingNote}>
-                      Add Entry
+
+                  {/* Journal Section */}
+                  {renderJournalSection()}
+
+                  {/* Actions */}
+                  <div className="calendar-actions">
+                    <button className="calendar-btn-ghost" onClick={closeDayInfo}>
+                      Close
+                    </button>
+                    <button className="calendar-btn-primary" onClick={showEditFromInfo}>
+                      Edit Day
                     </button>
                   </div>
                 </>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="calendar-actions">
-              <button className="calendar-btn-ghost" onClick={closeDayInfo}>
-                Close
-              </button>
-              <button className="calendar-btn-primary" onClick={showEditFromInfo}>
-                Edit Day
-              </button>
-            </div>
+              );
+            })()}
           </div>
         </div>
       )}
