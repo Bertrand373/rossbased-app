@@ -837,19 +837,24 @@
 .btn-danger {
   width: 100%;
   padding: 16px 24px;
-  background: rgba(255, 59, 48, 0.15);
+  background: rgba(255, 59, 48, 0.15) !important;
   border: none;
   border-radius: 12px;
-  color: #ff3b30;
+  color: #ff3b30 !important;
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   transition: background-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-danger:hover {
-  background: rgba(255, 59, 48, 0.25);
+  background: rgba(255, 59, 48, 0.25) !important;
+}
+
+.btn-danger:active {
+  transform: scale(0.98);
 }
 
 /* =============================================================================
@@ -952,6 +957,11 @@
 .modal-buttons .btn-ghost {
   flex: 1;
   padding: 14px 20px;
+}
+
+.modal-buttons .btn-danger {
+  background: rgba(255, 59, 48, 0.15) !important;
+  color: #ff3b30 !important;
 }
 
 /* Stat detail breakdown */
@@ -1140,6 +1150,11 @@
     padding: 14px 20px;
     font-size: 0.875rem;
     border-radius: 10px;
+  }
+  
+  .btn-danger {
+    background: rgba(255, 59, 48, 0.15) !important;
+    color: #ff3b30 !important;
   }
 }
 
