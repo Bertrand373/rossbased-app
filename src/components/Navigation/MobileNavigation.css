@@ -21,12 +21,43 @@
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+/* ============================================================
+   SLIDING DOT INDICATOR
+   ============================================================ */
+
+.nav-slider {
+  position: absolute;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0));
+  left: 0;
+  width: calc(100% / var(--total-items, 5));
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  
+  /* Smooth sliding animation */
+  transform: translateX(calc(var(--active-index, 0) * 100%));
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-slider::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background-color: #ffffff;
+  border-radius: 50%;
+}
+
+/* ============================================================
+   NAV ITEMS
+   ============================================================ */
+
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 8px 12px;
+  padding-bottom: 14px; /* Extra space for dot below */
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   transition: opacity 150ms ease;
@@ -40,22 +71,9 @@
   transition: color 150ms ease;
 }
 
-/* Indicator - Gold underline instead of dot */
-.nav-indicator {
-  width: 20px;
-  height: 2px;
-  border-radius: 1px;
-  background-color: transparent;
-  transition: all 150ms ease;
-}
-
 /* Active state */
 .nav-item.active .nav-label {
   color: #ffffff;
-}
-
-.nav-item.active .nav-indicator {
-  background-color: #ffdd00;
 }
 
 /* Hover - only on devices that support it */
@@ -65,6 +83,10 @@
   }
 }
 
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
 /* Larger phones */
 @media (min-width: 390px) {
   .nav-label {
@@ -73,10 +95,7 @@
   
   .nav-item {
     padding: 8px 16px;
-  }
-  
-  .nav-indicator {
-    width: 24px;
+    padding-bottom: 14px;
   }
 }
 
@@ -88,10 +107,12 @@
   
   .nav-item {
     padding: 8px;
+    padding-bottom: 12px;
   }
   
-  .nav-indicator {
-    width: 16px;
+  .nav-slider::after {
+    width: 5px;
+    height: 5px;
   }
 }
 
@@ -105,9 +126,11 @@
   .nav-item {
     flex-direction: row;
     gap: 8px;
+    padding-bottom: 8px;
   }
   
-  .nav-indicator {
+  /* Hide slider in landscape */
+  .nav-slider {
     display: none;
   }
   
@@ -118,8 +141,11 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .nav-label,
-  .nav-indicator {
+  .nav-slider {
+    transition: none;
+  }
+  
+  .nav-label {
     transition: none;
   }
 }

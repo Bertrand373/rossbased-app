@@ -48,8 +48,10 @@ const ProfileButton = ({ userData }) => {
   );
 };
 
-// Desktop Navigation - text only
+// Desktop Navigation - sliding dot indicator
 const HeaderNavigation = () => {
+  const location = useLocation();
+  
   const navItems = [
     { path: '/', label: 'Tracker' },
     { path: '/calendar', label: 'Calendar' },
@@ -58,9 +60,26 @@ const HeaderNavigation = () => {
     { path: '/urge-toolkit', label: 'Urges' }
   ];
 
+  // Find active tab index for sliding indicator
+  const activeIndex = navItems.findIndex(item => {
+    if (item.path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(item.path);
+  });
+
   return (
     <nav className="header-nav">
-      <div className="nav-container">
+      <div 
+        className="nav-container"
+        style={{ 
+          '--active-index': activeIndex >= 0 ? activeIndex : 0,
+          '--total-items': navItems.length 
+        }}
+      >
+        {/* Sliding dot indicator */}
+        <div className="nav-slider" />
+        
         {navItems.map(item => (
           <NavLink 
             key={item.path}
@@ -163,37 +182,21 @@ function App() {
     <Router>
       <ScrollToTop />
       <ServiceWorkerListener />
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#1a1a1a',
+            color: '#ffffff',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '12px',
+            fontSize: '0.875rem',
+          },
+        }}
+      />
+      
       <div className="app-container">
-        <Toaster 
-          position="bottom-center"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: '#1a1a1a',
-              color: '#ffffff',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '12px',
-              padding: '12px 20px',
-              fontSize: '14px',
-              fontFamily: 'Inter, -apple-system, sans-serif',
-            },
-            success: {
-              iconTheme: { primary: '#22c55e', secondary: '#000' },
-            },
-            error: {
-              iconTheme: { primary: '#ef4444', secondary: '#fff' },
-            },
-          }}
-        />
-        
-        {showAuthModal && (
-          <AuthModal 
-            onClose={() => setShowAuthModal(false)} 
-            onLogin={handleLogin}
-            loadingMessage={loadingMessage}
-          />
-        )}
-        
         {isLoggedIn ? (
           <>
             <header className="app-header">
