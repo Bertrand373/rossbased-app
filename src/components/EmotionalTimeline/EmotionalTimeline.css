@@ -1,7 +1,6 @@
 /* =============================================================================
-   EMOTIONALTIMELINE.CSS - TITANTRACK MODERN MINIMAL
-   Complete overhaul matching Landing/Tracker/Calendar aesthetic
-   All classes prefixed with "et-" to avoid global CSS conflicts
+   EMOTIONALTIMELINE.CSS - TITANTRACK MINIMAL
+   Matches Tracker/Calendar/Stats/Profile aesthetic exactly
    ============================================================================= */
 
 /* =============================================================================
@@ -23,13 +22,13 @@
 @media (min-width: 1025px) {
   .et-container {
     min-height: calc(100dvh - 64px);
-    padding: 40px 24px 60px;
+    padding: 32px 24px 60px;
     max-width: 560px;
   }
 }
 
 /* =============================================================================
-   HEADER
+   HEADER - Matches other tabs exactly
    ============================================================================= */
 
 .et-header {
@@ -53,26 +52,27 @@
 }
 
 /* =============================================================================
-   TABS - Matches Calendar/Profile style
+   TABS - Matches Calendar/Profile/Stats exactly
    ============================================================================= */
 
 .et-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 32px;
-  padding: 4px;
+  display: inline-flex;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  align-self: center;
+  margin-bottom: 32px;
 }
 
 .et-tab {
-  flex: 1;
-  padding: 10px 16px;
+  padding: 12px 20px;
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   color: rgba(255, 255, 255, 0.4);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -82,6 +82,7 @@
 
 .et-tab:hover:not(.active) {
   color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .et-tab.active {
@@ -113,14 +114,18 @@
 }
 
 .et-current:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.1);
+}
+
+.et-current:active {
+  transform: scale(0.99);
 }
 
 .et-current-label {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 12px;
@@ -137,28 +142,28 @@
 .et-current-days {
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 20px 0;
+  margin: 0 0 24px 0;
 }
 
 /* Progress */
 .et-progress {
-  max-width: 240px;
+  max-width: 260px;
   margin: 0 auto;
 }
 
 .et-progress-bar {
-  height: 4px;
+  height: 3px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .et-progress-fill {
   height: 100%;
   background: #ffffff;
   border-radius: 2px;
-  transition: width 600ms ease;
+  transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .et-progress-text {
@@ -166,7 +171,7 @@
   color: rgba(255, 255, 255, 0.35);
 }
 
-/* Phase List - Numbered like Landing page */
+/* Phase List */
 .et-phases {
   display: flex;
   flex-direction: column;
@@ -191,6 +196,10 @@
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+.et-phase:active {
+  transform: scale(0.99);
+}
+
 .et-phase-num {
   font-size: 0.75rem;
   font-weight: 500;
@@ -200,7 +209,7 @@
 }
 
 .et-phase.completed .et-phase-num {
-  color: rgba(255, 221, 0, 0.6);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .et-phase.current .et-phase-num {
@@ -220,7 +229,7 @@
 }
 
 .et-phase.upcoming .et-phase-info h3 {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .et-phase-info p {
@@ -230,7 +239,7 @@
 }
 
 .et-phase-status {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: rgba(255, 255, 255, 0.2);
   width: 20px;
   display: flex;
@@ -238,7 +247,7 @@
 }
 
 .et-phase.completed .et-phase-status {
-  color: rgba(255, 221, 0, 0.6);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* =============================================================================
@@ -261,7 +270,7 @@
 .et-checkin-card h3 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0 0 24px 0;
@@ -270,13 +279,13 @@
 .et-sliders {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
 }
 
 .et-slider-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .et-slider-header {
@@ -292,7 +301,7 @@
 }
 
 .et-slider-value {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
   font-feature-settings: 'tnum' 1;
@@ -300,6 +309,7 @@
   text-align: right;
 }
 
+/* Slider - Match Tracker aesthetic */
 .et-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -319,12 +329,17 @@
   background: #ffffff;
   border-radius: 50%;
   cursor: pointer;
-  transition: transform 150ms ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .et-slider::-webkit-slider-thumb:hover {
   transform: scale(1.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.et-slider::-webkit-slider-thumb:active {
+  transform: scale(1.05);
 }
 
 .et-slider::-moz-range-thumb {
@@ -334,16 +349,17 @@
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .et-slider:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .et-slider:disabled::-webkit-slider-thumb {
   cursor: not-allowed;
+  transform: none;
 }
 
 .et-slider-desc {
@@ -369,12 +385,15 @@
 
 .et-save-btn:hover:not(.disabled) {
   opacity: 0.9;
-  transform: translateY(-1px);
+}
+
+.et-save-btn:active:not(.disabled) {
+  transform: scale(0.98);
 }
 
 .et-save-btn.disabled {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
 }
 
@@ -385,14 +404,14 @@
 .et-analysis {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 /* Stats Grid */
 .et-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .et-stat {
@@ -414,7 +433,7 @@
 
 .et-stat-label {
   display: block;
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
   color: rgba(255, 255, 255, 0.35);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -432,7 +451,7 @@
 .et-trends h3 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0 0 16px 0;
@@ -463,10 +482,11 @@
 .et-trend-value {
   font-size: 0.8125rem;
   font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .et-trend-value.improving {
-  color: #22c55e;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .et-trend-value.stable {
@@ -474,7 +494,7 @@
 }
 
 .et-trend-value.concerning {
-  color: #ef4444;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 /* Empty State */
@@ -504,7 +524,7 @@
 }
 
 /* =============================================================================
-   MODAL - Matches Calendar modal style exactly
+   MODAL - Transparent floating style matching Tracker/Calendar
    ============================================================================= */
 
 .et-overlay {
@@ -517,11 +537,20 @@
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   z-index: 10000;
   padding: 24px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   animation: etOverlayIn 200ms ease;
+}
+
+.et-overlay::before,
+.et-overlay::after {
+  content: '';
+  flex: 1;
+  min-height: 40px;
 }
 
 @keyframes etOverlayIn {
@@ -531,17 +560,11 @@
 
 .et-modal {
   width: 100%;
-  max-width: 420px;
-  max-height: calc(100vh - 80px);
-  max-height: calc(100dvh - 80px);
-  overflow-y: auto;
-  background: #0a0a0a;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 28px 24px;
-  position: relative;
+  max-width: 380px;
+  background: transparent;
+  text-align: left;
+  flex-shrink: 0;
   animation: etModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  -webkit-overflow-scrolling: touch;
 }
 
 @keyframes etModalIn {
@@ -555,59 +578,29 @@
   }
 }
 
-.et-modal::-webkit-scrollbar {
-  width: 0;
-  display: none;
-}
-
-/* Modal Close */
-.et-modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.et-modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
-}
-
 /* Modal Header */
 .et-modal-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
-  margin-bottom: 24px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .et-modal-num {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.15);
   font-feature-settings: 'tnum' 1;
-  min-width: 48px;
+  line-height: 1;
 }
 
 .et-modal-header h2 {
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   font-weight: 500;
   color: #ffffff;
-  margin: 0 0 2px 0;
+  margin: 0 0 4px 0;
   letter-spacing: -0.02em;
 }
 
@@ -617,11 +610,37 @@
   margin: 0;
 }
 
+/* Modal Close - Small X in corner */
+.et-modal-close {
+  position: fixed;
+  top: max(24px, env(safe-area-inset-top, 24px));
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 10001;
+}
+
+.et-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
 /* Modal Body */
 .et-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 28px;
 }
 
 /* Modal Sections */
@@ -632,16 +651,16 @@
 .et-modal-section h4 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
 }
 
 .et-modal-section p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.7;
   margin: 0;
 }
 
@@ -651,11 +670,11 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .et-modal-section li {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.6);
   line-height: 1.5;
   padding-left: 16px;
@@ -666,52 +685,56 @@
   content: '';
   position: absolute;
   left: 0;
-  top: 7px;
+  top: 8px;
   width: 4px;
   height: 4px;
   background: rgba(255, 255, 255, 0.25);
   border-radius: 50%;
 }
 
-/* Warning Section */
+/* Warning Section - Subtle, not harsh */
 .et-warning {
-  background: rgba(245, 158, 11, 0.05);
-  border: 1px solid rgba(245, 158, 11, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 16px !important;
-  margin: 4px 0;
+  padding: 20px;
 }
 
 .et-warning h4 {
-  color: #f59e0b !important;
+  color: rgba(255, 255, 255, 0.5) !important;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.et-warning li::before {
-  background: rgba(245, 158, 11, 0.5);
+.et-warning h4 svg {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
-/* Modal Button */
+.et-warning li::before {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Modal Button - Ghost style, not primary */
 .et-modal-btn {
   width: 100%;
-  padding: 14px 24px;
-  background: #ffffff;
+  padding: 16px 24px;
+  background: transparent;
   border: none;
   border-radius: 12px;
-  color: #000000;
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
-  margin-top: 24px;
+  transition: color 150ms ease;
+  margin-top: 32px;
   -webkit-tap-highlight-color: transparent;
 }
 
 .et-modal-btn:hover {
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* =============================================================================
@@ -728,21 +751,21 @@
   }
   
   .et-tabs {
-    gap: 2px;
-    padding: 3px;
+    align-self: stretch;
   }
   
   .et-tab {
+    flex: 1;
     padding: 10px 12px;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
   }
   
   .et-current {
-    padding: 24px 20px;
+    padding: 28px 20px;
   }
   
   .et-current-name {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
   }
   
   .et-phase {
@@ -758,6 +781,10 @@
     padding: 20px;
   }
   
+  .et-sliders {
+    gap: 24px;
+  }
+  
   .et-stats-grid {
     gap: 8px;
   }
@@ -767,27 +794,40 @@
   }
   
   .et-stat-value {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
   }
   
   .et-modal {
-    padding: 24px 20px;
-    border-radius: 16px;
-    max-height: calc(100vh - 48px);
-    max-height: calc(100dvh - 48px);
+    max-width: 100%;
   }
   
   .et-modal-header {
     gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
   }
   
   .et-modal-num {
-    font-size: 1.25rem;
-    min-width: 40px;
+    font-size: 1.75rem;
   }
   
   .et-modal-header h2 {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
+  }
+  
+  .et-modal-close {
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .et-modal-body {
+    gap: 24px;
+  }
+  
+  .et-modal-section p {
+    font-size: 0.875rem;
   }
 }
 
@@ -799,7 +839,10 @@
   .et-overlay,
   .et-modal,
   .et-progress-fill,
-  .et-slider::-webkit-slider-thumb {
+  .et-slider::-webkit-slider-thumb,
+  .et-phase,
+  .et-current,
+  .et-save-btn {
     animation: none;
     transition: none;
   }

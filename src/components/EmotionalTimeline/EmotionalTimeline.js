@@ -1,13 +1,7 @@
-// EmotionalTimeline.js - TITANTRACK MODERN MINIMAL
-// Complete overhaul matching Landing/Tracker/Calendar aesthetic
+// EmotionalTimeline.js - TITANTRACK MINIMAL
 import React, { useState, useEffect } from 'react';
-import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
-
-// Single CSS import
 import './EmotionalTimeline.css';
-
-// Minimal icons
 import { FaTimes, FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
 const EmotionalTimeline = ({ userData, updateUserData }) => {
@@ -26,7 +20,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const currentDay = userData?.currentStreak || 0;
 
-  // Phase definitions - clean, self-contained
+  // Phase definitions
   const phases = [
     {
       id: 1,
@@ -219,106 +213,106 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const progress = getProgress();
 
-  // Check if already logged today
+  // Check if logged today
   useEffect(() => {
-    const data = userData?.emotionalTracking || [];
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const entry = data.find(e => format(new Date(e.date), 'yyyy-MM-dd') === today);
-    
-    if (entry) {
-      setHasLoggedToday(true);
-      setEmotions({
-        anxiety: entry.anxiety || 5,
-        mood: entry.moodStability || 5,
-        clarity: entry.mentalClarity || 5,
-        processing: entry.emotionalProcessing || 5
-      });
+    if (userData?.emotionalLog) {
+      const today = new Date().toDateString();
+      const todayLog = userData.emotionalLog.find(
+        log => new Date(log.date).toDateString() === today
+      );
+      setHasLoggedToday(!!todayLog);
+      
+      if (todayLog) {
+        setEmotions({
+          anxiety: todayLog.anxiety || 5,
+          mood: todayLog.mood || 5,
+          clarity: todayLog.clarity || 5,
+          processing: todayLog.processing || 5
+        });
+      }
     }
-  }, [userData?.emotionalTracking]);
+  }, [userData]);
 
-  // Save check-in
-  const handleSave = () => {
-    const data = userData?.emotionalTracking || [];
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const filtered = data.filter(e => format(new Date(e.date), 'yyyy-MM-dd') !== today);
-    
-    const entry = {
-      date: new Date().toISOString(),
-      anxiety: emotions.anxiety,
-      moodStability: emotions.mood,
-      mentalClarity: emotions.clarity,
-      emotionalProcessing: emotions.processing,
-      phase: currentPhase?.name || 'Unknown',
-      day: currentDay
-    };
-    
-    updateUserData({
-      ...userData,
-      emotionalTracking: [...filtered, entry]
-    });
-    
-    setHasLoggedToday(true);
-    toast.success('Check-in saved');
+  // Open phase modal
+  const openPhase = (phase) => {
+    setSelectedPhase(phase);
+    setShowModal(true);
   };
 
-  // Get analysis data
-  const getAnalysis = () => {
-    const data = userData?.emotionalTracking || [];
-    const total = data.length;
-    const recent = data.filter(e => differenceInDays(new Date(), new Date(e.date)) <= 14);
+  // Save check-in
+  const handleSave = async () => {
+    if (hasLoggedToday) return;
     
-    if (total < 3) return null;
-    
-    const avg = (arr, key) => arr.reduce((sum, e) => sum + (e[key] || 5), 0) / arr.length;
-    
-    const avgAnxiety = avg(data, 'anxiety');
-    const avgMood = avg(data, 'moodStability');
-    const avgClarity = avg(data, 'mentalClarity');
-    
-    const getTrend = (key) => {
-      if (recent.length < 2) return 'stable';
-      const sorted = [...recent].sort((a, b) => new Date(a.date) - new Date(b.date));
-      const first = sorted.slice(0, Math.ceil(sorted.length / 2));
-      const second = sorted.slice(Math.ceil(sorted.length / 2));
-      const firstAvg = avg(first, key);
-      const secondAvg = avg(second, key);
-      const diff = secondAvg - firstAvg;
-      
-      if (key === 'anxiety') {
-        if (diff < -0.5) return 'improving';
-        if (diff > 0.5) return 'concerning';
-      } else {
-        if (diff > 0.5) return 'improving';
-        if (diff < -0.5) return 'concerning';
-      }
-      return 'stable';
+    const newLog = {
+      date: new Date().toISOString(),
+      day: currentDay,
+      phase: currentPhase?.id || 1,
+      ...emotions
     };
-    
+
+    const existingLogs = userData?.emotionalLog || [];
+    const updatedLogs = [...existingLogs, newLog];
+
+    try {
+      await updateUserData({ emotionalLog: updatedLogs });
+      setHasLoggedToday(true);
+      toast.success('Check-in saved');
+    } catch (error) {
+      toast.error('Failed to save');
+    }
+  };
+
+  // Calculate analysis
+  const getAnalysis = () => {
+    const logs = userData?.emotionalLog || [];
+    if (logs.length < 3) return null;
+
+    const recent = logs.slice(-14);
+    const older = logs.slice(0, -14);
+
+    const avgRecent = (key) => {
+      const vals = recent.map(l => l[key]).filter(Boolean);
+      return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 5;
+    };
+
+    const avgOlder = (key) => {
+      if (!older.length) return avgRecent(key);
+      const vals = older.map(l => l[key]).filter(Boolean);
+      return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 5;
+    };
+
+    const getTrend = (key, invert = false) => {
+      const r = avgRecent(key);
+      const o = avgOlder(key);
+      const diff = r - o;
+      
+      if (Math.abs(diff) < 0.5) return 'stable';
+      if (invert) return diff > 0 ? 'concerning' : 'improving';
+      return diff > 0 ? 'improving' : 'concerning';
+    };
+
+    const wellbeing = ((avgRecent('mood') + avgRecent('clarity') + (10 - avgRecent('anxiety'))) / 3).toFixed(1);
+
     return {
-      total,
+      total: logs.length,
       recent: recent.length,
-      wellbeing: ((10 - avgAnxiety + avgMood + avgClarity) / 3).toFixed(1),
+      wellbeing,
       trends: {
-        anxiety: getTrend('anxiety'),
-        mood: getTrend('moodStability'),
-        clarity: getTrend('mentalClarity')
+        anxiety: getTrend('anxiety', true),
+        mood: getTrend('mood'),
+        clarity: getTrend('clarity')
       }
     };
   };
 
   const analysis = getAnalysis();
 
-  const openPhase = (phase) => {
-    setSelectedPhase(phase);
-    setShowModal(true);
-  };
-
   return (
     <div className="et-container">
       {/* Header */}
       <header className="et-header">
         <h1>Timeline</h1>
-        <p>Track your emotional journey</p>
+        <p>Your emotional journey through retention</p>
       </header>
 
       {/* Tabs */}
@@ -478,14 +472,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Phase Modal */}
+      {/* Phase Modal - Transparent floating */}
       {showModal && selectedPhase && (
         <div className="et-overlay" onClick={() => setShowModal(false)}>
+          <button className="et-modal-close" onClick={() => setShowModal(false)}>
+            <FaTimes />
+          </button>
+          
           <div className="et-modal" onClick={e => e.stopPropagation()}>
-            <button className="et-modal-close" onClick={() => setShowModal(false)}>
-              <FaTimes />
-            </button>
-
             <div className="et-modal-header">
               <span className="et-modal-num">
                 {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
@@ -530,7 +524,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             </div>
 
             <button className="et-modal-btn" onClick={() => setShowModal(false)}>
-              Got It
+              Close
             </button>
           </div>
         </div>
