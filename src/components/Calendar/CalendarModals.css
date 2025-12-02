@@ -1,11 +1,10 @@
 /* =============================================================================
-   CALENDAR MODALS - TITANTRACK
-   SCOPED class names to avoid conflicts with global App.css modal styles
-   Matches Tracker aesthetic - transparent floating content, white buttons
+   CALENDAR MODALS - TITANTRACK MINIMAL
+   Matches Tracker modal aesthetic exactly - transparent floating
    ============================================================================= */
 
 /* =============================================================================
-   OVERLAY - Full screen, properly centered
+   OVERLAY - Matches Tracker .overlay exactly
    ============================================================================= */
 
 .calendar-overlay {
@@ -14,13 +13,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100vw;
-  height: 100vh;
   background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   z-index: 10000;
   padding: 24px;
@@ -29,35 +26,42 @@
   animation: calendarOverlayIn 200ms ease;
 }
 
+/* Spacers push content to center */
+.calendar-overlay::before,
+.calendar-overlay::after {
+  content: '';
+  flex: 1;
+  min-height: 40px;
+}
+
 @keyframes calendarOverlayIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 /* =============================================================================
-   MODAL CONTAINER - Transparent, centered
+   MODAL CONTAINER - Transparent floating (matches Tracker exactly)
+   Max 360px to match benefits-modal
    ============================================================================= */
 
 .calendar-modal {
   width: 100%;
-  max-width: 400px;
+  max-width: 360px;
   max-height: calc(100vh - 120px);
   max-height: calc(100dvh - 120px);
   overflow-y: auto;
   position: relative;
   animation: calendarModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  
-  /* TRANSPARENT - No card */
   background: transparent;
   border: none;
   border-radius: 0;
   box-shadow: none;
   padding: 0;
   margin: 0 auto;
+  flex-shrink: 0;
 }
 
 .calendar-modal::-webkit-scrollbar {
@@ -84,85 +88,45 @@
 }
 
 .calendar-day-info h3 {
-  margin: 0 0 24px 0;
-  font-size: 1.5rem;
+  margin: 0 0 20px 0;
+  font-size: 1.375rem;
   font-weight: 500;
   color: #ffffff;
   letter-spacing: -0.02em;
 }
 
 /* =============================================================================
-   STATUS BADGE
+   STATUS BADGE - Minimal white pill
    ============================================================================= */
-
-.calendar-status-info {
-  margin-bottom: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
 .calendar-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 24px;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 100px;
-  font-size: 0.875rem;
+  margin-bottom: 32px;
+  font-size: 0.8125rem;
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.7);
-  border: none;
+  color: rgba(255, 255, 255, 0.6);
 }
 
-/* Status dot in badge */
 .calendar-status-badge .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
+  background-color: #ffffff;
   flex-shrink: 0;
 }
 
-.calendar-status-badge.current-streak .status-dot {
-  background-color: #34d399;
-}
-
-.calendar-status-badge.former-streak .status-dot {
-  background-color: #60a5fa;
-}
-
 .calendar-status-badge.relapse .status-dot {
-  background-color: #f87171;
+  background-color: rgba(255, 255, 255, 0.4);
 }
 
 .calendar-status-badge.wet-dream .status-dot {
-  background-color: #fbbf24;
-}
-
-.calendar-status-badge .day-count {
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 400;
-  margin-left: 4px;
-}
-
-.calendar-status-badge.current-streak {
-  background: rgba(52, 211, 153, 0.1);
-  color: #34d399;
-}
-
-.calendar-status-badge.former-streak {
-  background: rgba(96, 165, 250, 0.1);
-  color: #60a5fa;
-}
-
-.calendar-status-badge.relapse {
-  background: rgba(248, 113, 113, 0.1);
-  color: #f87171;
-}
-
-.calendar-status-badge.wet-dream {
-  background: rgba(251, 191, 36, 0.1);
-  color: #fbbf24;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 /* =============================================================================
@@ -170,24 +134,23 @@
    ============================================================================= */
 
 .calendar-benefits {
-  margin-bottom: 32px;
-  text-align: left;
+  margin-bottom: 28px;
 }
 
 .calendar-benefits h4 {
-  margin: 0 0 24px 0;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
-  text-align: center;
-  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 16px 0;
+  text-align: center;
 }
 
-.calendar-benefits-list {
+.calendar-benefits-grid {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 .calendar-benefit-row {
@@ -197,26 +160,10 @@
 }
 
 .calendar-benefit-label {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.5);
-  font-weight: 400;
-  min-width: 100px;
-  flex-shrink: 0;
-}
-
-.calendar-benefit-bar {
-  flex: 1;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 1px;
-  overflow: hidden;
-}
-
-.calendar-benefit-fill {
-  height: 100%;
-  background: #ffffff;
-  border-radius: 1px;
-  transition: width 300ms ease;
+  min-width: 90px;
+  text-align: right;
 }
 
 .calendar-benefit-value {
@@ -226,10 +173,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
   color: #ffffff;
   font-feature-settings: 'tnum' 1;
+}
+
+.calendar-benefit-bar-container {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.calendar-benefit-bar {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: width 300ms ease;
 }
 
 /* =============================================================================
@@ -237,41 +201,192 @@
    ============================================================================= */
 
 .calendar-journal {
-  margin-bottom: 32px;
-  text-align: left;
+  margin-bottom: 28px;
 }
 
 .calendar-journal h4 {
-  margin: 0 0 20px 0;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 12px 0;
+  text-align: center;
+}
+
+.calendar-journal-text {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  text-align: center;
+  font-style: italic;
+}
+
+.calendar-journal-empty {
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.3);
   text-align: center;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
+
+/* =============================================================================
+   MODAL ACTIONS - Matches Tracker exactly
+   ============================================================================= */
+
+.calendar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.calendar-btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.calendar-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.calendar-btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.calendar-btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.calendar-btn-back {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.calendar-btn-back:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* =============================================================================
+   EDIT DAY MODAL
+   ============================================================================= */
+
+.calendar-edit-day {
+  text-align: center;
+}
+
+.calendar-edit-day h3 {
+  font-size: 1.375rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.calendar-edit-day > p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 32px 0;
+}
+
+/* Day Type Options */
+.calendar-day-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.calendar-option-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.calendar-option-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.calendar-option-btn.selected {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+.calendar-option-btn .option-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.6;
+}
+
+.calendar-option-btn.selected .option-dot {
+  opacity: 1;
+}
+
+/* =============================================================================
+   JOURNAL EDIT
+   ============================================================================= */
 
 .calendar-journal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .calendar-journal-header h4 {
   margin: 0;
+  text-align: left;
 }
 
 .calendar-action-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  padding: 6px 12px;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border-radius: 6px;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -279,23 +394,8 @@
 }
 
 .calendar-action-btn:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-}
-
-.calendar-journal-entry {
-  padding: 16px;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.6;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-}
-
-.calendar-journal-editing {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .calendar-journal-textarea {
@@ -313,60 +413,51 @@
   transition: border-color 150ms ease;
 }
 
+.calendar-journal-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
 .calendar-journal-textarea:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.calendar-journal-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.25);
-}
-
 .calendar-journal-actions {
   display: flex;
   gap: 12px;
+  margin-top: 16px;
 }
 
-/* Save button - WHITE */
 .calendar-save-btn {
   flex: 1;
-  padding: 14px 24px;
+  padding: 12px 20px;
   background: #ffffff;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   color: #000000;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   transition: opacity 150ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 
 .calendar-save-btn:hover {
   opacity: 0.9;
 }
 
-/* Cancel button - ghost */
 .calendar-cancel-btn {
   flex: 1;
-  padding: 14px 24px;
+  padding: 12px 20px;
   background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: color 150ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 
 .calendar-cancel-btn:hover {
@@ -374,231 +465,24 @@
 }
 
 /* =============================================================================
-   JOURNAL EMPTY STATE - Clean, no helmet
-   ============================================================================= */
-
-.calendar-journal-empty {
-  padding: 24px;
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-.calendar-journal-empty h4 {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0 0 8px 0;
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.calendar-journal-empty p {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.3);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.calendar-journal-start {
-  display: flex;
-  justify-content: center;
-}
-
-/* =============================================================================
-   MODAL ACTIONS
-   ============================================================================= */
-
-.calendar-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 48px;
-}
-
-/* Primary button - WHITE */
-.calendar-btn-primary {
-  width: 100%;
-  padding: 16px 24px;
-  background: #ffffff;
-  border: none;
-  border-radius: 12px;
-  color: #000000;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.calendar-btn-primary:hover {
-  opacity: 0.9;
-}
-
-/* Ghost button */
-.calendar-btn-ghost {
-  width: 100%;
-  padding: 16px 24px;
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.calendar-btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* Back button */
-.calendar-btn-back {
-  width: 100%;
-  padding: 16px 24px;
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.calendar-btn-back:hover {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* =============================================================================
-   EDIT DAY MODAL
-   ============================================================================= */
-
-.calendar-edit-day {
-  text-align: center;
-}
-
-.calendar-edit-day h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-}
-
-.calendar-edit-day p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1.5;
-  margin: 0 0 32px 0;
-}
-
-/* Edit options */
-.calendar-edit-options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 32px;
-}
-
-.calendar-option-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 16px 24px;
-  border-radius: 12px;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 150ms ease;
-  border: none;
-  width: 100%;
-  font-family: inherit;
-}
-
-/* Option dot */
-.calendar-option-btn .option-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-/* Streak button - WHITE with green dot */
-.calendar-option-streak {
-  background: #ffffff;
-  color: #000000;
-}
-
-.calendar-option-streak .option-dot {
-  background-color: #34d399;
-}
-
-.calendar-option-streak:hover {
-  opacity: 0.9;
-}
-
-/* Wet dream button - subtle with amber dot */
-.calendar-option-wetdream {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.calendar-option-wetdream .option-dot {
-  background-color: #fbbf24;
-}
-
-.calendar-option-wetdream:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-/* Relapse button with red dot */
-.calendar-option-relapse {
-  background: rgba(255, 59, 48, 0.1);
-  color: #ff3b30;
-}
-
-.calendar-option-relapse .option-dot {
-  background-color: #f87171;
-}
-
-.calendar-option-relapse:hover {
-  background: rgba(255, 59, 48, 0.15);
-}
-
-/* =============================================================================
    TRIGGER SELECTION
    ============================================================================= */
 
 .calendar-trigger-section {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .calendar-trigger-section h4 {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0 0 20px 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 16px 0;
   text-align: center;
 }
 
-.calendar-trigger-options {
+.calendar-trigger-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -632,35 +516,7 @@
 }
 
 .calendar-trigger-pill svg {
-  font-size: 0.875rem;
-}
-
-.calendar-trigger-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-.calendar-trigger-confirm {
-  padding: 14px 32px;
-  border-radius: 12px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 150ms ease;
-  border: none;
-  background: #ffffff;
-  color: #000000;
-}
-
-.calendar-trigger-confirm:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-.calendar-trigger-confirm:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
+  font-size: 0.75rem;
 }
 
 /* =============================================================================
@@ -687,33 +543,33 @@
   
   .calendar-day-info h3,
   .calendar-edit-day h3 {
-    font-size: 1.375rem;
+    font-size: 1.25rem;
   }
   
   .calendar-status-badge {
-    padding: 10px 20px;
-    font-size: 0.8125rem;
+    padding: 8px 16px;
+    font-size: 0.75rem;
   }
   
   .calendar-benefit-label {
-    font-size: 0.8125rem;
-    min-width: 90px;
+    font-size: 0.75rem;
+    min-width: 80px;
   }
   
   .calendar-benefit-value {
     width: 28px;
     height: 28px;
     min-width: 28px;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
   }
   
   .calendar-option-btn {
-    padding: 14px 20px;
+    padding: 12px 20px;
     font-size: 0.875rem;
   }
   
   .calendar-trigger-pill {
-    padding: 8px 14px;
+    padding: 8px 12px;
     font-size: 0.75rem;
   }
   
@@ -733,14 +589,12 @@
   
   .calendar-journal-textarea {
     min-height: 100px;
-  }
-  
-  .calendar-journal-actions {
-    flex-direction: column;
+    padding: 14px;
+    font-size: 0.8125rem;
   }
   
   .calendar-actions {
-    margin-top: 40px;
+    margin-top: 32px;
   }
   
   .calendar-btn-primary,
@@ -756,57 +610,18 @@
     padding: 12px;
   }
   
-  .calendar-day-info h3,
-  .calendar-edit-day h3 {
-    font-size: 1.25rem;
-  }
-  
-  .calendar-status-badge {
-    padding: 8px 16px;
-    font-size: 0.75rem;
-  }
-  
   .calendar-benefits h4,
   .calendar-journal h4 {
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
   }
   
   .calendar-benefit-row {
     gap: 12px;
   }
   
-  .calendar-benefit-label {
-    font-size: 0.75rem;
-    min-width: 80px;
-  }
-  
-  .calendar-benefit-value {
-    width: 26px;
-    height: 26px;
-    min-width: 26px;
-    font-size: 0.8125rem;
-  }
-  
-  .calendar-option-btn {
-    padding: 12px 18px;
-    font-size: 0.8125rem;
-    border-radius: 10px;
-  }
-  
-  .calendar-trigger-pill {
-    padding: 8px 12px;
-    font-size: 0.6875rem;
-  }
-  
-  .calendar-journal-textarea {
-    min-height: 80px;
-    padding: 14px;
-    font-size: 0.8125rem;
-  }
-  
   .calendar-save-btn,
   .calendar-cancel-btn {
-    padding: 12px 20px;
+    padding: 12px 16px;
     font-size: 0.8125rem;
   }
   
@@ -820,73 +635,16 @@
 }
 
 /* =============================================================================
-   DESKTOP - Larger modal sizing
+   REDUCED MOTION
    ============================================================================= */
 
-@media (min-width: 1024px) {
+@media (prefers-reduced-motion: reduce) {
+  .calendar-overlay,
   .calendar-modal {
-    max-width: 420px;
+    animation: none;
   }
   
-  .calendar-day-info h3,
-  .calendar-edit-day h3 {
-    font-size: 1.625rem;
-  }
-  
-  .calendar-status-badge {
-    padding: 14px 28px;
-    font-size: 0.9375rem;
-  }
-  
-  .calendar-status-badge .status-dot {
-    width: 9px;
-    height: 9px;
-  }
-  
-  .calendar-benefits h4,
-  .calendar-journal h4 {
-    font-size: 0.8125rem;
-  }
-  
-  .calendar-benefit-row {
-    gap: 20px;
-  }
-  
-  .calendar-benefit-label {
-    font-size: 0.9375rem;
-    min-width: 110px;
-  }
-  
-  .calendar-benefit-value {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    font-size: 1.0625rem;
-  }
-  
-  .calendar-option-btn {
-    padding: 18px 28px;
-    font-size: 1rem;
-  }
-  
-  .calendar-option-btn .option-dot {
-    width: 10px;
-    height: 10px;
-  }
-  
-  .calendar-trigger-pill {
-    padding: 12px 20px;
-    font-size: 0.875rem;
-  }
-  
-  .calendar-btn-primary,
-  .calendar-btn-ghost,
-  .calendar-btn-back {
-    padding: 18px 28px;
-    font-size: 1rem;
-  }
-  
-  .calendar-actions {
-    margin-top: 56px;
+  .calendar-benefit-bar {
+    transition: none;
   }
 }
