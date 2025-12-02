@@ -556,7 +556,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             {/* Brand Header */}
             <div className="about-brand">
               <img src="/icon-192.png" alt="TitanTrack" className="about-logo" />
-              <h1 className="about-title">TitanTrack</h1>
               <span className="about-version">Version 1.0.0</span>
             </div>
 
