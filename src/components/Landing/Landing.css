@@ -184,9 +184,10 @@
   }
 }
 
-/* Mobile */
+/* Mobile - flex: 0.5 reduces the expanding gap */
 @media (max-width: 768px) {
   .landing-main {
+    flex: 0.5;
     padding: 60px 20px 32px;
     justify-content: flex-start;
     padding-top: 12vh;
@@ -215,8 +216,7 @@
   
   .landing-stats {
     gap: 24px;
-    margin-top: 36px;
-    padding-top: 20px;
+    margin-top: 40px;
     flex-wrap: wrap;
     justify-content: center;
   }
@@ -236,7 +236,7 @@
   .landing-features {
     flex-direction: column;
     gap: 24px;
-    padding: 28px 24px;
+    padding: 32px 24px;
     align-items: center;
   }
   
@@ -261,6 +261,7 @@
 /* Small mobile */
 @media (max-width: 480px) {
   .landing-main {
+    flex: 0.4;
     padding-top: 10vh;
   }
   
@@ -284,7 +285,7 @@
   
   .landing-stats {
     gap: 16px;
-    margin-top: 28px;
+    margin-top: 32px;
   }
   
   .landing-stat-divider {
@@ -304,6 +305,7 @@
 /* Very small screens */
 @media (max-width: 360px) {
   .landing-main {
+    flex: 0.35;
     padding: 48px 16px 24px;
     padding-top: 8vh;
   }
@@ -327,13 +329,14 @@
   }
   
   .landing-stats {
-    margin-top: 24px;
+    margin-top: 28px;
   }
 }
 
 /* Landscape mobile - prevent awkward layout */
 @media (max-height: 600px) and (orientation: landscape) {
   .landing-main {
+    flex: 0.5;
     padding-top: 40px;
     justify-content: center;
   }
