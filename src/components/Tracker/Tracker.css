@@ -26,6 +26,8 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  animation: fadeInUp 500ms ease forwards;
+  opacity: 0;
 }
 
 .date {
@@ -91,6 +93,8 @@
   padding: 32px 24px 0 24px;
   max-width: 360px;
   width: 100%;
+  animation: fadeInUp 500ms ease 100ms forwards;
+  opacity: 0;
 }
 
 .btn-primary {
@@ -132,6 +136,21 @@
 .btn-logged:hover {
   background-color: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================================
+   FADE IN UP ANIMATION
+   ============================================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ============================================================
@@ -415,89 +434,64 @@
 .benefit-row {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
-.benefit-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.benefit-info span:first-child {
+.benefit-label {
   font-size: 0.875rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.benefit-num {
-  font-size: 1.125rem;
   font-weight: 500;
   color: #ffffff;
-  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.01em;
 }
 
-/* Slider container - just holds the track */
 .benefit-slider {
   position: relative;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  background: transparent;
-  border: none;
-  box-shadow: none;
 }
 
-/* Track background */
-.benefit-slider::before {
-  content: '';
+.benefit-slider-bg {
   position: absolute;
+  top: 50%;
   left: 0;
   right: 0;
   height: 2px;
-  background-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-50%);
   border-radius: 1px;
   pointer-events: none;
 }
 
-/* Fill bar - shows progress */
-.benefit-fill {
+.benefit-slider-fill {
   position: absolute;
+  top: 50%;
   left: 0;
   height: 2px;
-  background-color: #ffffff;
+  background: #ffffff;
+  transform: translateY(-50%);
   border-radius: 1px;
   pointer-events: none;
-  transition: width 50ms ease-out;
+  transition: width 50ms ease;
 }
 
-/* The actual input - completely invisible except for thumb */
 .benefit-slider input[type="range"] {
-  position: relative;
   width: 100%;
-  height: 20px;
-  margin: 0;
-  padding: 0;
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  border-radius: 0;
-  outline: none !important;
-  box-shadow: none !important;
-  cursor: pointer;
+  height: 24px;
   -webkit-appearance: none !important;
   appearance: none !important;
-  -webkit-tap-highlight-color: transparent;
+  background: transparent !important;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  border: none !important;
+  outline: none !important;
 }
 
-/* Remove ALL default track styling */
+/* Track styling - completely transparent since we use custom bg */
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {
   width: 100%;
   height: 2px;
   background: transparent !important;
   border: none !important;
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: 1px;
   cursor: pointer;
 }
 
@@ -506,8 +500,7 @@
   height: 2px;
   background: transparent;
   border: none;
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: 1px;
   cursor: pointer;
 }
 
@@ -902,8 +895,17 @@
   }
 }
 
-/* Reduced motion */
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
 @media (prefers-reduced-motion: reduce) {
+  .tracker-main,
+  .tracker-footer {
+    animation: none;
+    opacity: 1;
+  }
+  
   .modal,
   .sheet,
   .overlay {
