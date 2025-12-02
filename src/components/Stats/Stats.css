@@ -1,58 +1,10 @@
 /* =============================================================================
    STATS.CSS - TITANTRACK
-   Matches Landing/Tracker/Calendar aesthetic exactly
-   Pure black, white accents, transparent modals, no yellow
+   Matches Landing/Tracker/Calendar aesthetic
    ============================================================================= */
 
 /* =============================================================================
-   NUCLEAR RESET - Kill white arc and legacy styling
-   MUST be first to override any imported CSS
-   ============================================================================= */
-
-/* Kill the white arc - target every possible container */
-.stats-page,
-.stats-page::before,
-.stats-page::after,
-.stats-page > *,
-.stat-grid,
-.stat-grid::before,
-.stat-grid::after,
-[class*="stats-hero"],
-[class*="stats-overview"],
-[class*="stats-container"],
-[class*="stats-wrapper"],
-[class*="stats-arc"],
-[class*="stats-circle"],
-[class*="stat-cards"],
-[class*="stats-summary"] {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  border-radius: 0 !important;
-  clip-path: none !important;
-  mask: none !important;
-  -webkit-mask: none !important;
-}
-
-/* Re-apply correct backgrounds after nuclear reset */
-.stats-page {
-  background-color: #000000 !important;
-}
-
-.stat-card {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border-radius: 12px !important;
-}
-
-/* Force kill any --primary variable usage */
-.stats-page,
-.stats-page * {
-  --primary: #ffffff !important;
-  --primary-light: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* =============================================================================
-   PAGE CONTAINER - Matches Tracker exactly
+   PAGE CONTAINER
    ============================================================================= */
 
 .stats-page {
@@ -63,7 +15,6 @@
   padding: 24px;
   padding-bottom: 120px;
   background-color: #000000;
-  position: relative;
 }
 
 @media (min-width: 1025px) {
@@ -75,14 +26,13 @@
   }
 }
 
-/* Content wrapper */
 .stats-page > * {
   width: 100%;
   max-width: 500px;
 }
 
 /* =============================================================================
-   HEADER - Matches Tracker exactly
+   HEADER
    ============================================================================= */
 
 .stats-header {
@@ -102,11 +52,10 @@
   font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.4);
   margin: 8px 0 0 0;
-  font-weight: 400;
 }
 
 /* =============================================================================
-   STAT CARDS - 2x2 Grid, clean minimal
+   STAT CARDS - Softer labels (not aggressive ALL CAPS)
    ============================================================================= */
 
 .stat-grid {
@@ -117,9 +66,9 @@
 }
 
 .stat-card {
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 12px !important;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
   padding: 20px 16px;
   text-align: center;
   cursor: pointer;
@@ -128,11 +77,11 @@
 }
 
 .stat-card:hover {
-  background-color: rgba(255, 255, 255, 0.02) !important;
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 .stat-card:active {
-  background-color: rgba(255, 255, 255, 0.04) !important;
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
 .stat-num {
@@ -145,14 +94,15 @@
   font-feature-settings: 'tnum' 1;
 }
 
+/* FIXED: Softer label - capitalize instead of uppercase, less letter-spacing */
 .stat-label {
   display: block;
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
   margin-top: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 500;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+  font-weight: 400;
 }
 
 /* =============================================================================
@@ -173,7 +123,7 @@
 }
 
 /* =============================================================================
-   MILESTONES - NO YELLOW, white accent for earned
+   MILESTONES - Subtle gold border + checkmark for earned
    ============================================================================= */
 
 .milestone-grid {
@@ -183,14 +133,15 @@
 }
 
 .milestone-card {
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   padding: 16px 8px;
   text-align: center;
   cursor: pointer;
   transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 
 .milestone-card:disabled {
@@ -199,17 +150,29 @@
 }
 
 .milestone-card:not(:disabled):hover {
-  background-color: rgba(255, 255, 255, 0.02) !important;
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* Earned milestone - WHITE accent, NOT yellow */
+/* Earned milestone - subtle gold accent */
 .milestone-card.earned {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 221, 0, 0.03);
+  border-color: rgba(255, 221, 0, 0.15);
 }
 
 .milestone-card.earned:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 221, 0, 0.05);
+  border-color: rgba(255, 221, 0, 0.25);
+}
+
+/* Subtle gold checkmark for earned milestones */
+.milestone-card.earned::after {
+  content: '✓';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.5rem;
+  color: rgba(255, 221, 0, 0.6);
+  font-weight: 600;
 }
 
 .milestone-num {
@@ -222,7 +185,7 @@
 }
 
 .milestone-card.earned .milestone-num {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .milestone-label {
@@ -235,13 +198,12 @@
   font-weight: 500;
 }
 
-/* NO YELLOW - white label for earned */
 .milestone-card.earned .milestone-label {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(255, 221, 0, 0.6);
 }
 
 /* =============================================================================
-   TOGGLE BUTTONS - Matches Calendar navigation pills
+   TOGGLE BUTTONS
    ============================================================================= */
 
 .toggle-row {
@@ -278,11 +240,10 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* Active toggle - WHITE background, black text */
 .toggle-btn.active {
-  background-color: #ffffff !important;
-  border-color: #ffffff !important;
-  color: #000000 !important;
+  background-color: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
   font-weight: 600;
 }
 
@@ -324,7 +285,7 @@
 }
 
 /* =============================================================================
-   CHART - White line with gradient fill
+   CHART
    ============================================================================= */
 
 .chart-box {
@@ -415,12 +376,11 @@
 }
 
 /* =============================================================================
-   INSIGHT CARDS - Clean, minimal containers
+   INSIGHT CARDS
    ============================================================================= */
 
 .insight-card {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: none !important;
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -428,7 +388,6 @@
 .insight-card-header {
   padding: 14px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  background: transparent !important;
 }
 
 .insight-card-header span {
@@ -441,7 +400,6 @@
 
 .insight-card-content {
   padding: 20px;
-  background: transparent !important;
 }
 
 /* Loading spinner */
@@ -486,8 +444,7 @@
 
 /* Mini info banner */
 .mini-info-banner {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: none !important;
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
   padding: 12px 14px;
   margin-bottom: 16px;
@@ -547,7 +504,7 @@
 }
 
 /* =============================================================================
-   RELAPSE PATTERNS - NO YELLOW
+   RELAPSE PATTERNS
    ============================================================================= */
 
 .relapse-patterns-display {
@@ -561,8 +518,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: none !important;
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
 }
 
@@ -571,11 +527,10 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
-/* NO YELLOW - Primary Trigger value is WHITE */
 .relapse-stat-value {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #ffffff !important;
+  color: #ffffff;
   text-transform: capitalize;
 }
 
@@ -591,7 +546,7 @@
   font-weight: 500;
 }
 
-/* Victory state - NO YELLOW */
+/* Victory state */
 .victory-display {
   text-align: center;
   padding: 16px 12px;
@@ -600,16 +555,15 @@
 .victory-days {
   font-size: 2.5rem;
   font-weight: 500;
-  color: #ffffff !important;
+  color: #ffffff;
   line-height: 1;
   margin-bottom: 6px;
   font-feature-settings: 'tnum' 1;
 }
 
-/* NO YELLOW - victory label is white */
 .victory-label {
   font-size: 0.625rem;
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 16px;
@@ -658,7 +612,7 @@
 }
 
 /* =============================================================================
-   OPTIMIZATION - NO YELLOW background
+   OPTIMIZATION
    ============================================================================= */
 
 .optimization-display {
@@ -667,10 +621,9 @@
   gap: 16px;
 }
 
-/* NO YELLOW - optimization criteria box */
 .optimization-criteria {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   padding: 16px;
   margin-bottom: 16px;
@@ -679,7 +632,7 @@
 .optimization-criteria-title {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 8px;
@@ -687,7 +640,7 @@
 
 .optimization-criteria-text {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6) !important;
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.5;
   margin: 0;
 }
@@ -724,7 +677,7 @@
 }
 
 /* =============================================================================
-   PHASE EVOLUTION - NO YELLOW
+   PHASE EVOLUTION
    ============================================================================= */
 
 .phase-evolution-grid {
@@ -735,17 +688,16 @@
 }
 
 .phase-evolution-card {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   padding: 14px 10px;
   text-align: center;
 }
 
-/* Current phase - WHITE highlight, NOT yellow */
 .phase-evolution-card.current {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .phase-name {
@@ -758,7 +710,7 @@
 }
 
 .phase-evolution-card.current .phase-name {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .phase-value {
@@ -810,7 +762,7 @@
 }
 
 /* =============================================================================
-   BUTTONS - Matches Tracker exactly
+   BUTTONS - Matches Tracker
    ============================================================================= */
 
 .btn-primary {
@@ -872,7 +824,7 @@
 }
 
 /* =============================================================================
-   OVERLAY & MODAL - Matches Tracker EXACTLY (transparent, no box)
+   OVERLAY & MODAL - Solid background with border (matches screenshot)
    ============================================================================= */
 
 .overlay {
@@ -894,7 +846,6 @@
   animation: overlayIn 200ms ease;
 }
 
-/* Spacers push content to center */
 .overlay::before,
 .overlay::after {
   content: '';
@@ -907,14 +858,17 @@
   to { opacity: 1; }
 }
 
-/* Modal - TRANSPARENT like Tracker, no visible box */
+/* Modal - Solid dark background with subtle border */
 .modal {
   width: 100%;
   max-width: 380px;
-  background-color: transparent;
-  padding: 0;
+  background-color: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 32px 24px;
   flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
 }
 
 @keyframes modalIn {
@@ -937,38 +891,37 @@
   letter-spacing: -0.03em;
   margin-bottom: 8px;
   font-feature-settings: 'tnum' 1;
-  text-align: center;
 }
 
 .modal h2 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
   margin: 0 0 8px 0;
-  text-align: center;
   letter-spacing: -0.02em;
 }
 
 .modal-date {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 40px 0;
-  text-align: center;
+  margin: 0 0 20px 0;
 }
 
 .modal-text {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1.5;
-  margin: 0 0 40px 0;
-  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+  margin: 0 0 32px 0;
 }
 
 .modal-buttons {
   display: flex;
-  flex-direction: column;
   gap: 12px;
-  margin-top: 48px;
+}
+
+.modal-buttons .btn-danger,
+.modal-buttons .btn-ghost {
+  flex: 1;
 }
 
 /* Stat detail breakdown */
@@ -1022,8 +975,17 @@
     padding: 8px 10px;
   }
   
+  .modal {
+    padding: 28px 20px;
+    border-radius: 16px;
+  }
+  
   .modal-num {
     font-size: 3.5rem;
+  }
+  
+  .modal-buttons {
+    flex-direction: column;
   }
   
   .chart-box {
@@ -1041,62 +1003,4 @@
   .insight-loading-spinner {
     animation: none;
   }
-}
-
-/* =============================================================================
-   NUCLEAR KILL - All legacy yellow styling
-   Must be at END for highest specificity
-   ============================================================================= */
-
-/* Kill ALL yellow/gold colors anywhere in Stats */
-.stats-page [style*="255, 221, 0"],
-.stats-page [style*="ffdd00"],
-.stats-page [style*="ffd700"],
-.stats-page [style*="251, 191, 36"] {
-  color: #ffffff !important;
-  background-color: transparent !important;
-  border-color: rgba(255, 255, 255, 0.06) !important;
-}
-
-/* Force override any class with yellow */
-.stats-page .victory-label,
-.stats-page .milestone-card.earned .milestone-label,
-.stats-page .relapse-stat-value,
-.stats-page .optimization-criteria-title,
-.stats-page .optimization-criteria-text,
-.stats-page [class*="primary-trigger"],
-.stats-page [class*="conquered"],
-.stats-page [class*="victory"] {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-.stats-page .victory-days,
-.stats-page .relapse-stat-value,
-.stats-page .milestone-card.earned .milestone-num {
-  color: #ffffff !important;
-}
-
-/* Kill old decorative elements */
-.data-progress-helmet,
-.mini-info-helmet,
-.insight-loading-helmet,
-[class*="helmet"],
-[class*="arc"],
-.trend-badge {
-  display: none !important;
-}
-
-/* Kill old stat card styling from StatsAnalytics */
-.relapse-stat-card,
-.relapse-summary-stats,
-.conquered-trigger {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: none !important;
-}
-
-/* Kill EmotionalTimeline bleed */
-.stats-page .energy-data-progress-indicator,
-.stats-page .energy-data-progress-bar {
-  background: transparent !important;
-  border: none !important;
 }
