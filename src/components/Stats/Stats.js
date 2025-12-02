@@ -45,7 +45,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [timeRange, setTimeRange] = useState('week');
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState(null);
-  const [showResetModal, setShowResetModal] = useState(false);
+  const [showResetStreakModal, setShowResetStreakModal] = useState(false);
+  const [showResetAllModal, setShowResetAllModal] = useState(false);
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   const [chartKey, setChartKey] = useState(0);
@@ -262,7 +263,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  const confirmResetStats = async () => {
+  const confirmResetStreak = async () => {
+    try {
+      await updateUserData({
+        currentStreak: 0,
+        startDate: new Date()
+      });
+      setShowResetStreakModal(false);
+      toast.success('Streak reset');
+    } catch (error) {
+      toast.error('Failed to reset streak');
+    }
+  };
+
+  const confirmResetAll = async () => {
     try {
       await updateUserData({
         currentStreak: 0,
@@ -275,10 +289,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         badges: safeUserData.badges?.map(b => ({ ...b, earned: false, date: null })) || [],
         startDate: new Date()
       });
-      setShowResetModal(false);
-      toast.success('Stats reset successfully');
+      setShowResetAllModal(false);
+      toast.success('All data reset');
     } catch (error) {
-      toast.error('Failed to reset stats');
+      toast.error('Failed to reset data');
     }
   };
 
@@ -456,10 +470,17 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         )}
       </section>
 
-      {/* Reset Link */}
-      <button className="reset-link" onClick={() => setShowResetModal(true)}>
-        Reset All Stats
-      </button>
+      {/* Reset Menu - Text-only with dividers */}
+      <div className="reset-menu">
+        <span className="reset-label">Reset:</span>
+        <button className="reset-btn" onClick={() => setShowResetStreakModal(true)}>
+          Streak
+        </button>
+        <div className="reset-divider" />
+        <button className="reset-btn danger" onClick={() => setShowResetAllModal(true)}>
+          All Data
+        </button>
+      </div>
 
       {/* Milestone Modal - Transparent floating */}
       {showMilestoneModal && selectedMilestone && (
@@ -483,15 +504,29 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
 
-      {/* Reset Modal - Transparent floating */}
-      {showResetModal && (
-        <div className="overlay" onClick={() => setShowResetModal(false)}>
+      {/* Reset Streak Modal */}
+      {showResetStreakModal && (
+        <div className="overlay" onClick={() => setShowResetStreakModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2>Reset All Stats?</h2>
-            <p className="modal-text">This will permanently delete all progress data. This cannot be undone.</p>
+            <h2>Reset Streak?</h2>
+            <p className="modal-text">This will reset your current streak to 0. Your history and benefits data will be kept.</p>
             <div className="modal-buttons">
-              <button className="btn-ghost" onClick={() => setShowResetModal(false)}>Cancel</button>
-              <button className="btn-danger" onClick={confirmResetStats}>Reset</button>
+              <button className="btn-ghost" onClick={() => setShowResetStreakModal(false)}>Cancel</button>
+              <button className="btn-danger" onClick={confirmResetStreak}>Reset Streak</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset All Modal */}
+      {showResetAllModal && (
+        <div className="overlay" onClick={() => setShowResetAllModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2>Reset All Data?</h2>
+            <p className="modal-text">This will permanently delete all progress data including streaks, benefits, and milestones. This cannot be undone.</p>
+            <div className="modal-buttons">
+              <button className="btn-ghost" onClick={() => setShowResetAllModal(false)}>Cancel</button>
+              <button className="btn-danger" onClick={confirmResetAll}>Reset All</button>
             </div>
           </div>
         </div>

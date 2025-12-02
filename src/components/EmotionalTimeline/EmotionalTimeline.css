@@ -26,6 +26,13 @@
   .et-container > * {
     max-width: 480px;
   }
+  
+  /* Overlay must break out of max-width constraint */
+  .et-container > .overlay {
+    max-width: none;
+    width: 100%;
+    position: fixed;
+  }
 }
 
 /* =============================================================================
