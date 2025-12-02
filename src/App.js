@@ -1,5 +1,5 @@
 // App.js - TITANTRACK MODERN MINIMAL
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
@@ -51,6 +51,8 @@ const ProfileButton = ({ userData }) => {
 // Desktop Navigation - sliding dot indicator
 const HeaderNavigation = () => {
   const location = useLocation();
+  const navRef = useRef(null);
+  const [sliderStyle, setSliderStyle] = useState({ left: 0, opacity: 0 });
   
   const navItems = [
     { path: '/', label: 'Tracker' },
@@ -60,7 +62,7 @@ const HeaderNavigation = () => {
     { path: '/urge-toolkit', label: 'Urges' }
   ];
 
-  // Find active tab index for sliding indicator
+  // Find active tab index
   const activeIndex = navItems.findIndex(item => {
     if (item.path === '/') {
       return location.pathname === '/';
@@ -68,17 +70,47 @@ const HeaderNavigation = () => {
     return location.pathname.startsWith(item.path);
   });
 
+  // Calculate slider position based on actual element positions
+  useEffect(() => {
+    const updateSliderPosition = () => {
+      if (navRef.current && activeIndex >= 0) {
+        const container = navRef.current;
+        const activeLink = container.querySelectorAll('.nav-link')[activeIndex];
+        
+        if (activeLink) {
+          const containerRect = container.getBoundingClientRect();
+          const linkRect = activeLink.getBoundingClientRect();
+          
+          // Center of the active link relative to container
+          const centerPosition = linkRect.left - containerRect.left + (linkRect.width / 2);
+          
+          setSliderStyle({
+            left: centerPosition,
+            opacity: 1
+          });
+        }
+      }
+    };
+
+    // Initial calculation
+    updateSliderPosition();
+    
+    // Recalculate on resize
+    window.addEventListener('resize', updateSliderPosition);
+    return () => window.removeEventListener('resize', updateSliderPosition);
+  }, [activeIndex, location.pathname]);
+
   return (
     <nav className="header-nav">
-      <div 
-        className="nav-container"
-        style={{ 
-          '--active-index': activeIndex >= 0 ? activeIndex : 0,
-          '--total-items': navItems.length 
-        }}
-      >
+      <div className="nav-container" ref={navRef}>
         {/* Sliding dot indicator */}
-        <div className="nav-slider" />
+        <div 
+          className="nav-slider" 
+          style={{ 
+            transform: `translateX(${sliderStyle.left}px)`,
+            opacity: sliderStyle.opacity
+          }} 
+        />
         
         {navItems.map(item => (
           <NavLink 
