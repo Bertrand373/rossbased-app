@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
-import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
+import { FaTimes, FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
 const EmotionalTimeline = ({ userData, updateUserData }) => {
   const [activeTab, setActiveTab] = useState('journey');
@@ -472,16 +472,22 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Phase Modal - Transparent floating (matches Tracker) */}
+      {/* Phase Modal - Transparent floating */}
       {showModal && selectedPhase && (
         <div className="et-overlay" onClick={() => setShowModal(false)}>
+          <button className="et-modal-close" onClick={() => setShowModal(false)}>
+            <FaTimes />
+          </button>
+          
           <div className="et-modal" onClick={e => e.stopPropagation()}>
             <div className="et-modal-header">
-              <div className="et-modal-num">
+              <span className="et-modal-num">
                 {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <h2>{selectedPhase.name}</h2>
+                <p>Days {selectedPhase.days}</p>
               </div>
-              <h2>{selectedPhase.name}</h2>
-              <p>Days {selectedPhase.days}</p>
             </div>
 
             <div className="et-modal-body">

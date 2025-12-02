@@ -524,8 +524,7 @@
 }
 
 /* =============================================================================
-   MODAL - Transparent floating (matches Tracker exactly)
-   Max 360px to match Tracker benefits-modal
+   MODAL - Transparent floating style matching Tracker/Calendar
    ============================================================================= */
 
 .et-overlay {
@@ -547,7 +546,6 @@
   animation: etOverlayIn 200ms ease;
 }
 
-/* Spacers push content to center */
 .et-overlay::before,
 .et-overlay::after {
   content: '';
@@ -562,9 +560,9 @@
 
 .et-modal {
   width: 100%;
-  max-width: 360px;
+  max-width: 380px;
   background: transparent;
-  text-align: center;
+  text-align: left;
   flex-shrink: 0;
   animation: etModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -580,19 +578,22 @@
   }
 }
 
-/* Modal Header - Centered like Tracker */
+/* Modal Header */
 .et-modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
   margin-bottom: 32px;
-  text-align: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .et-modal-num {
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.15);
   font-feature-settings: 'tnum' 1;
   line-height: 1;
-  margin-bottom: 8px;
 }
 
 .et-modal-header h2 {
@@ -604,22 +605,42 @@
 }
 
 .et-modal-header p {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.4);
   margin: 0;
 }
 
-/* Modal Close - Hidden, use ghost button instead */
+/* Modal Close - Small X in corner */
 .et-modal-close {
-  display: none;
+  position: fixed;
+  top: max(24px, env(safe-area-inset-top, 24px));
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 10001;
+}
+
+.et-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 /* Modal Body */
 .et-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  text-align: left;
+  gap: 28px;
 }
 
 /* Modal Sections */
@@ -633,13 +654,13 @@
   color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
 }
 
 .et-modal-section p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.7;
   margin: 0;
 }
 
@@ -649,14 +670,14 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .et-modal-section li {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.5;
-  padding-left: 14px;
+  padding-left: 16px;
   position: relative;
 }
 
@@ -664,38 +685,38 @@
   content: '';
   position: absolute;
   left: 0;
-  top: 7px;
+  top: 8px;
   width: 4px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 50%;
 }
 
-/* Warning Section - Subtle card */
+/* Warning Section - Subtle, not harsh */
 .et-warning {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px;
 }
 
 .et-warning h4 {
-  color: rgba(255, 255, 255, 0.45) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .et-warning h4 svg {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .et-warning li::before {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Modal Button - Ghost style (matches Tracker) */
+/* Modal Button - Ghost style, not primary */
 .et-modal-btn {
   width: 100%;
   padding: 16px 24px;
@@ -708,7 +729,7 @@
   font-family: inherit;
   cursor: pointer;
   transition: color 150ms ease;
-  margin-top: 40px;
+  margin-top: 32px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -776,48 +797,37 @@
     font-size: 1.375rem;
   }
   
-  /* Modal responsive */
-  .et-overlay {
-    padding: 16px;
-  }
-  
-  .et-overlay::before,
-  .et-overlay::after {
-    min-height: 24px;
-  }
-  
   .et-modal {
     max-width: 100%;
   }
   
+  .et-modal-header {
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+  }
+  
   .et-modal-num {
-    font-size: 2.5rem;
+    font-size: 1.75rem;
   }
   
   .et-modal-header h2 {
     font-size: 1.25rem;
   }
   
+  .et-modal-close {
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+  }
+  
   .et-modal-body {
-    gap: 20px;
+    gap: 24px;
   }
   
   .et-modal-section p {
-    font-size: 0.8125rem;
-  }
-  
-  .et-modal-section li {
-    font-size: 0.75rem;
-  }
-  
-  .et-warning {
-    padding: 14px;
-  }
-  
-  .et-modal-btn {
-    padding: 14px 20px;
     font-size: 0.875rem;
-    margin-top: 32px;
   }
 }
 
