@@ -38,8 +38,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const currentDay = userData.currentStreak || 0;
   const currentPhase = getCurrentPhase(currentDay, emotionalPhases);
-  const phaseProgress = currentPhase ? getPhaseProgress(currentDay, currentPhase) : 0;
-  const progressText = currentPhase ? getPhaseProgressText(currentDay, currentPhase) : '';
+  // NOTE: Functions expect (phase, currentDay) parameter order
+  const phaseProgress = currentPhase ? getPhaseProgress(currentPhase, currentDay) : 0;
+  const progressText = currentPhase ? getPhaseProgressText(currentPhase, currentDay) : '';
 
   // Check if already logged today
   useEffect(() => {
