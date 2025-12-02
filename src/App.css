@@ -595,105 +595,6 @@ label {
   color: var(--danger);
 }
 
-.badge-neutral {
-  background-color: var(--accent-subtle);
-  color: var(--text-secondary);
-}
-
-/* ============================================================
-   TOOLTIPS
-   ============================================================ */
-
-.tooltip {
-  position: relative;
-}
-
-.tooltip-content {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: all var(--transition-fast);
-  z-index: 100;
-}
-
-.tooltip:hover .tooltip-content {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(-4px);
-}
-
-/* ============================================================
-   LOADING STATES
-   ============================================================ */
-
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-card) 25%,
-    var(--bg-card-hover) 50%,
-    var(--bg-card) 75%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s ease-in-out infinite;
-  border-radius: var(--radius-sm);
-}
-
-@keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border-subtle);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ============================================================
-   EMPTY STATES
-   ============================================================ */
-
-.empty-state {
-  text-align: center;
-  padding: var(--space-10);
-  color: var(--text-muted);
-}
-
-.empty-state-icon {
-  font-size: 2.5rem;
-  margin-bottom: var(--space-4);
-  opacity: 0.5;
-}
-
-.empty-state-title {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-2);
-}
-
-.empty-state-description {
-  font-size: 0.875rem;
-  margin-bottom: var(--space-4);
-}
-
 /* ============================================================
    SUBSCRIPTION BANNER
    ============================================================ */
@@ -809,5 +710,80 @@ label {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   FADE IN ANIMATION - Used across components
+   ============================================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   DESKTOP RISK INDICATOR - Ambient AI
+   Shows on Urges nav item when AI detects elevated risk
+   ============================================================ */
+
+.desktop-risk-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-left: 6px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+/* Elevated risk (50-69%) - subtle amber */
+.desktop-risk-dot.elevated {
+  background-color: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+  animation: desktop-pulse-amber 2s ease-in-out infinite;
+}
+
+/* High risk (70%+) - brighter amber/orange */
+.desktop-risk-dot.high {
+  background-color: #f97316;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+  animation: desktop-pulse-orange 1.5s ease-in-out infinite;
+}
+
+@keyframes desktop-pulse-amber {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes desktop-pulse-orange {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .desktop-risk-dot.elevated,
+  .desktop-risk-dot.high {
+    animation: none;
   }
 }

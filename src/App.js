@@ -1,4 +1,6 @@
 // App.js - TITANTRACK MODERN MINIMAL
+// Updated with Ambient AI Intelligence - auto-training and risk indicators
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -14,7 +16,7 @@ import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
-// Import UNIFIED PredictionDisplay
+// ML Components (kept for debugging/advanced users - hidden from normal UI)
 import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay';
 import MLTraining from './components/MLTraining/MLTraining';
 
@@ -23,8 +25,10 @@ import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 
-// Custom hook for user data
+// Custom hooks
 import { useUserData } from './hooks/useUserData';
+import { useAutoTrain } from './hooks/useAutoTrain';
+import { useRiskIndicator } from './hooks/useRiskIndicator';
 
 // Profile Button - Minimal circle
 const ProfileButton = ({ userData }) => {
@@ -32,7 +36,6 @@ const ProfileButton = ({ userData }) => {
   const location = useLocation();
   const isActive = location.pathname === '/profile';
   
-  // Get first initial from email or username
   const initial = userData?.email?.charAt(0)?.toUpperCase() || 
                   userData?.username?.charAt(0)?.toUpperCase() || 
                   '?';
@@ -48,8 +51,8 @@ const ProfileButton = ({ userData }) => {
   );
 };
 
-// Desktop Navigation - sliding dot indicator
-const HeaderNavigation = () => {
+// Desktop Navigation - sliding dot indicator with risk indicator
+const HeaderNavigation = ({ riskLevel = 'none' }) => {
   const location = useLocation();
   const containerRef = useRef(null);
   const itemRefs = useRef([]);
@@ -61,10 +64,9 @@ const HeaderNavigation = () => {
     { path: '/calendar', label: 'Calendar' },
     { path: '/stats', label: 'Stats' },
     { path: '/timeline', label: 'Timeline' },
-    { path: '/urge-toolkit', label: 'Urges' }
+    { path: '/urge-toolkit', label: 'Urges', showRiskIndicator: true }
   ];
 
-  // Find active tab index
   const getActiveIndex = useCallback(() => {
     return navItems.findIndex(item => {
       if (item.path === '/') {
@@ -74,27 +76,22 @@ const HeaderNavigation = () => {
     });
   }, [location.pathname]);
 
-  // Calculate dot position
   const updateDotPosition = useCallback(() => {
     const activeIdx = getActiveIndex();
     if (activeIdx >= 0 && containerRef.current && itemRefs.current[activeIdx]) {
       const containerRect = containerRef.current.getBoundingClientRect();
       const itemRect = itemRefs.current[activeIdx].getBoundingClientRect();
-      
-      // Calculate center of active item relative to container
       const centerX = itemRect.left - containerRect.left + (itemRect.width / 2);
       setDotPosition(centerX);
       setIsReady(true);
     }
   }, [getActiveIndex]);
 
-  // Update on mount and route change
   useEffect(() => {
     const timer = setTimeout(updateDotPosition, 10);
     return () => clearTimeout(timer);
   }, [location.pathname, updateDotPosition]);
 
-  // Update on resize
   useEffect(() => {
     window.addEventListener('resize', updateDotPosition);
     return () => window.removeEventListener('resize', updateDotPosition);
@@ -103,7 +100,6 @@ const HeaderNavigation = () => {
   return (
     <nav className="header-nav">
       <div className="nav-container" ref={containerRef}>
-        {/* Sliding dot */}
         <div 
           className="nav-slider-dot"
           style={{
@@ -123,6 +119,10 @@ const HeaderNavigation = () => {
               className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
             >
               {item.label}
+              {/* Risk indicator for desktop nav */}
+              {item.showRiskIndicator && riskLevel !== 'none' && (
+                <span className={`desktop-risk-dot ${riskLevel}`} />
+              )}
             </NavLink>
           </div>
         ))}
@@ -180,6 +180,12 @@ function App() {
     cancelGoal
   } = useUserData();
 
+  // AMBIENT AI: Auto-train ML model silently in background
+  useAutoTrain(userData);
+
+  // AMBIENT AI: Get risk indicator state for navigation
+  const { riskLevel } = useRiskIndicator(userData);
+
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
   useEffect(() => {
@@ -202,7 +208,7 @@ function App() {
     return success;
   };
 
-  // Loading screen - icon only, no text
+  // Loading screen
   if (isLoading || isRefreshLoading) {
     return (
       <div className="app-loading-screen">
@@ -220,48 +226,35 @@ function App() {
       <ScrollToTop />
       <ServiceWorkerListener />
       <Toaster 
-        position="bottom-center"
-        containerStyle={{
-          bottom: 100,
-        }}
+        position="top-center"
         toastOptions={{
-          duration: 2500,
+          duration: 3000,
           style: {
-            background: 'rgba(255, 255, 255, 0.06)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '12px',
+            background: '#1a1a1a',
             color: '#ffffff',
+            borderRadius: '12px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
             fontSize: '0.875rem',
-            fontWeight: '500',
-            padding: '14px 20px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-          },
-          success: {
-            duration: 2500,
-            icon: <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />,
-          },
-          error: {
-            duration: 3500,
-            style: {
-              background: 'rgba(255, 59, 48, 0.08)',
-              border: '1px solid rgba(255, 59, 48, 0.12)',
-            },
-            icon: <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff3b30', flexShrink: 0 }} />,
+            padding: '12px 16px',
           },
         }}
       />
       
-      <div className="app-container">
-        {isLoggedIn ? (
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        onLogin={handleLogin}
+      />
+      
+      <div className="app">
+        {isLoggedIn && userData ? (
           <>
             <header className="app-header">
               <div className="logo-container">
                 <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
               </div>
               
-              {!isMobile && <HeaderNavigation />}
+              {!isMobile && <HeaderNavigation riskLevel={riskLevel} />}
               
               <ProfileButton userData={userData} />
             </header>
@@ -269,7 +262,8 @@ function App() {
             {isMobile && (
               <MobileNavigation 
                 activeTab={activeTab} 
-                setActiveTab={setActiveTab} 
+                setActiveTab={setActiveTab}
+                riskLevel={riskLevel}
               />
             )}
             
@@ -300,10 +294,13 @@ function App() {
                   <Route path="/profile" element={
                     <Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />
                   } />
+                  
+                  {/* ML Routes - kept for direct access but hidden from nav */}
                   <Route path="/urge-prediction" element={
                     <PredictionDisplay mode="full" userData={userData} />
                   } />
                   <Route path="/ml-training" element={<MLTraining />} />
+                  
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>

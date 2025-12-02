@@ -1,9 +1,11 @@
 // MobileNavigation.js - TITANTRACK
+// Updated with ambient AI risk indicator on Urges tab
+
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import './MobileNavigation.css';
 
-const MobileNavigation = () => {
+const MobileNavigation = ({ riskLevel = 'none' }) => {
   const location = useLocation();
   const navRef = useRef(null);
   const itemRefs = useRef([]);
@@ -15,7 +17,7 @@ const MobileNavigation = () => {
     { path: '/calendar', label: 'Calendar' },
     { path: '/stats', label: 'Stats' },
     { path: '/timeline', label: 'Timeline' },
-    { path: '/urge-toolkit', label: 'Urges' }
+    { path: '/urge-toolkit', label: 'Urges', showRiskIndicator: true }
   ];
 
   // Find active tab index
@@ -57,7 +59,7 @@ const MobileNavigation = () => {
 
   return (
     <nav className="mobile-nav" ref={navRef}>
-      {/* Sliding dot */}
+      {/* Sliding dot indicator */}
       <div 
         className="nav-slider-dot"
         style={{
@@ -77,6 +79,11 @@ const MobileNavigation = () => {
             className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
           >
             <span className="nav-label">{item.label}</span>
+            
+            {/* Risk indicator dot - only on Urges tab */}
+            {item.showRiskIndicator && riskLevel !== 'none' && (
+              <span className={`risk-indicator-dot ${riskLevel}`} />
+            )}
           </NavLink>
         </div>
       ))}
