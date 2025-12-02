@@ -531,7 +531,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
       </div>
 
-      {/* Legend - Subtle dots */}
+      {/* Legend - Subtle single row */}
       <div className="calendar-legend-minimal">
         <div className="legend-item">
           <span className="legend-dot current-streak"></span>
@@ -544,6 +544,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         <div className="legend-item">
           <span className="legend-dot relapse"></span>
           <span>Relapse</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-dot wet-dream"></span>
+          <span>Wet Dream</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-dot tracked"></span>
+          <span>Tracked</span>
         </div>
       </div>
 

@@ -8,8 +8,7 @@
   min-height: 100vh;
   min-height: 100dvh;
   background-color: #000000;
-  padding: 24px 16px;
-  padding-bottom: 120px;
+  padding: 48px 16px 120px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -157,7 +156,8 @@
 .calendar-legend-minimal {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 16px 20px;
   margin-bottom: 24px;
   position: relative;
   z-index: 1;
@@ -185,6 +185,8 @@
 .calendar-legend-minimal .legend-dot.current-streak { background-color: #34d399; }
 .calendar-legend-minimal .legend-dot.former-streak { background-color: #60a5fa; }
 .calendar-legend-minimal .legend-dot.relapse { background-color: #f87171; }
+.calendar-legend-minimal .legend-dot.wet-dream { background-color: #fbbf24; }
+.calendar-legend-minimal .legend-dot.tracked { background-color: #ffffff; }
 
 /* =============================================================================
    CALENDAR MAIN
@@ -773,8 +775,7 @@
 
 @media (max-width: 480px) {
   .calendar-container {
-    padding: 12px 8px;
-    padding-bottom: 90px;
+    padding: 32px 8px 90px;
   }
   
   /* Minimal header adjustments */
@@ -814,7 +815,7 @@
   
   /* Legend */
   .calendar-legend-minimal {
-    gap: 14px;
+    gap: 10px 14px;
     margin-bottom: 20px;
   }
   
@@ -956,8 +957,7 @@
 
 @media (min-width: 1024px) {
   .calendar-container {
-    padding: 32px 48px;
-    padding-bottom: 80px;
+    padding: 56px 48px 80px;
   }
   
   .calendar-container > .calendar-header-minimal,
