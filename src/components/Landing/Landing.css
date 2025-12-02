@@ -27,7 +27,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px 40px;
+  padding: 60px 24px 24px;
   position: relative;
   z-index: 1;
 }
@@ -84,8 +84,8 @@
   display: flex;
   align-items: center;
   gap: 32px;
-  margin-top: 64px;
-  padding-top: 32px;
+  margin-top: 40px;
+  padding-top: 24px;
 }
 
 .landing-stat {
@@ -120,7 +120,7 @@
   display: flex;
   justify-content: center;
   gap: 64px;
-  padding: 48px 24px;
+  padding: 32px 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
   z-index: 1;
@@ -157,7 +157,7 @@
 
 /* Footer */
 .landing-footer {
-  padding: 24px;
+  padding: 20px;
   text-align: center;
   position: relative;
   z-index: 1;
@@ -187,9 +187,9 @@
 /* Mobile */
 @media (max-width: 768px) {
   .landing-main {
-    padding: 60px 20px 32px;
+    padding: 48px 20px 20px;
     justify-content: flex-start;
-    padding-top: 12vh;
+    padding-top: 10vh;
   }
   
   .landing-logo {
@@ -215,7 +215,8 @@
   
   .landing-stats {
     gap: 24px;
-    margin-top: 40px;
+    margin-top: 32px;
+    padding-top: 16px;
     flex-wrap: wrap;
     justify-content: center;
   }
@@ -234,8 +235,8 @@
   
   .landing-features {
     flex-direction: column;
-    gap: 24px;
-    padding: 32px 24px;
+    gap: 20px;
+    padding: 24px 24px;
     align-items: center;
   }
   
@@ -253,14 +254,14 @@
   }
   
   .landing-footer {
-    padding: 20px;
+    padding: 16px;
   }
 }
 
 /* Small mobile */
 @media (max-width: 480px) {
   .landing-main {
-    padding-top: 10vh;
+    padding-top: 8vh;
   }
   
   .landing-logo {
@@ -283,7 +284,7 @@
   
   .landing-stats {
     gap: 16px;
-    margin-top: 32px;
+    margin-top: 28px;
   }
   
   .landing-stat-divider {
@@ -295,16 +296,20 @@
   }
   
   .landing-features {
-    gap: 20px;
-    padding: 24px 20px;
+    gap: 16px;
+    padding: 20px 20px;
+  }
+  
+  .landing-footer {
+    padding: 12px;
   }
 }
 
 /* Very small screens */
 @media (max-width: 360px) {
   .landing-main {
-    padding: 48px 16px 24px;
-    padding-top: 8vh;
+    padding: 40px 16px 16px;
+    padding-top: 6vh;
   }
   
   .landing-logo {
@@ -326,7 +331,16 @@
   }
   
   .landing-stats {
-    margin-top: 28px;
+    margin-top: 24px;
+  }
+  
+  .landing-features {
+    gap: 14px;
+    padding: 16px;
+  }
+  
+  .landing-footer {
+    padding: 10px;
   }
 }
 
@@ -346,12 +360,12 @@
   }
   
   .landing-stats {
-    margin-top: 32px;
+    margin-top: 24px;
   }
   
   .landing-features {
     flex-direction: row;
-    padding: 24px;
+    padding: 20px;
   }
 }
 
