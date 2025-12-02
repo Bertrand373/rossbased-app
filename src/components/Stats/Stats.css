@@ -1086,3 +1086,89 @@
 .stats-page .mini-info-banner {
   border: none !important;
 }
+
+/* =============================================================================
+   KILL EMOTIONALTIMELINE CSS BLEED
+   These classes exist in EmotionalTimelineSections.css and conflict with Stats
+   ============================================================================= */
+
+/* Kill insight-card border from EmotionalTimelineSections */
+.stats-page .insight-card {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.stats-page .insight-card:hover {
+  transform: none !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Kill relapse-stat yellow styling from EmotionalTimelineSections */
+.stats-page .relapse-stat-card {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.stats-page .relapse-stat-card:hover {
+  transform: none !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.stats-page .relapse-stat-value {
+  color: #ffffff !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+}
+
+.stats-page .relapse-stat-label {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* Kill energy-data-progress yellow styling */
+.stats-page .energy-data-progress-indicator {
+  display: none !important;
+}
+
+.stats-page .energy-data-progress-bar {
+  display: none !important;
+}
+
+.stats-page .energy-data-progress-count {
+  display: none !important;
+}
+
+/* Kill any phase-modal styling that might bleed */
+.stats-page .phase-modal-section {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: none !important;
+}
+
+/* Kill insight icons yellow color */
+.stats-page .insight-icon {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Kill any data-quality yellow styling */
+.stats-page .insight-data-quality {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Kill relapse-insights yellow */
+.stats-page .relapse-insight-item {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: none !important;
+}
+
+.stats-page .relapse-insight-item:hover {
+  transform: none !important;
+}
+
+/* Kill guidance list borders */
+.stats-page .guidance-list {
+  background: transparent !important;
+  border: none !important;
+}
