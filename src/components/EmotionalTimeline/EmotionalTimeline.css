@@ -28,10 +28,9 @@
   }
   
   /* Overlay must break out of max-width constraint */
-  .et-container > .overlay {
+  .et-container > .et-overlay {
     max-width: none;
     width: 100%;
-    position: fixed;
   }
 }
 

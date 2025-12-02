@@ -365,7 +365,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         <h2>Benefits</h2>
         
         {/* Metric toggles - text only with dividers */}
-        <div className="toggle-row">
+        <div className="toggle-row benefits">
           {metrics.map((metric, index) => (
             <React.Fragment key={metric}>
               <button
