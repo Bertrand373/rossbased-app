@@ -1,290 +1,617 @@
-// Tracker.js - TITANTRACK
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { format, differenceInDays } from 'date-fns';
+// Profile.js - TITANTRACK MINIMAL
+// Matches Landing/Stats/Calendar aesthetic
+import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import './Profile.css';
+import { useNotifications } from '../../hooks/useNotifications';
 
-import './Tracker.css';
-import DatePicker from '../Shared/DatePicker';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-const Tracker = ({ userData, updateUserData }) => {
-  const [showDatePicker, setShowDatePicker] = useState(!userData.startDate);
-  const [showBenefits, setShowBenefits] = useState(false);
-  const [showStreakOptions, setShowStreakOptions] = useState(false);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [resetType, setResetType] = useState(null);
+const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
+  const [activeTab, setActiveTab] = useState('account');
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   
-  const [benefits, setBenefits] = useState({ 
-    energy: 5, focus: 5, confidence: 5, aura: 5, sleep: 5, workout: 5 
+  // Account States
+  const [username, setUsername] = useState(userData.username || '');
+  const [email, setEmail] = useState(userData.email || '');
+  const [discordUsername, setDiscordUsername] = useState(userData.discordUsername || '');
+  const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  
+  // Privacy States
+  const [isEditingPrivacy, setIsEditingPrivacy] = useState(false);
+  const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
+  const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
+  const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
+  
+  // Notifications
+  const {
+    permission,
+    isSupported,
+    fcmToken,
+    requestPermission,
+    subscribeToPush,
+    unsubscribeFromPush,
+    checkExistingSubscription,
+    sendLocalNotification
+  } = useNotifications();
+  
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
+  const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
+  const [quietHoursStart, setQuietHoursStart] = useState('22:00');
+  const [quietHoursEnd, setQuietHoursEnd] = useState('08:00');
+  const [notifTypes, setNotifTypes] = useState({
+    milestones: true,
+    urgeSupport: true,
+    weeklyProgress: true
   });
+  const [dailyReminderEnabled, setDailyReminderEnabled] = useState(false);
+  const [dailyReminderTime, setDailyReminderTime] = useState('09:00');
   
-  const fillRefs = useRef({});
-  const today = new Date();
-  
-  const streak = userData.startDate 
-    ? Math.max(0, differenceInDays(today, new Date(userData.startDate)) + 1)
-    : 0;
+  // Feedback
+  const [feedbackType, setFeedbackType] = useState('general');
+  const [feedbackSubject, setFeedbackSubject] = useState('');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
-  const todayLogged = userData.benefitTracking?.some(
-    b => format(new Date(b.date), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
-  );
-
-  // Load existing benefits for today
-  useEffect(() => {
-    const existing = userData.benefitTracking?.find(
-      b => format(new Date(b.date), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
-    );
-    if (existing) {
-      setBenefits({
-        energy: existing.energy || 5,
-        focus: existing.focus || 5,
-        confidence: existing.confidence || 5,
-        aura: existing.aura || 5,
-        sleep: existing.sleep || 5,
-        workout: existing.workout || 5
-      });
-    }
-  }, [userData.benefitTracking]);
-
-  // Milestone calculation
-  const getNextMilestone = () => {
-    const milestones = [7, 14, 30, 60, 90, 180, 365];
-    if (streak >= 365) {
-      const years = Math.floor(streak / 365);
-      return `Year ${years}`;
-    }
-    const next = milestones.find(m => streak < m);
-    return next ? `${next - streak} to ${next}` : null;
-  };
-
-  const milestone = getNextMilestone();
-
-  // Date submit - no toast, modal closing is confirmation
-  const handleDateSubmit = (date) => {
-    const newStreak = Math.max(0, differenceInDays(today, date) + 1);
-    updateUserData({
-      startDate: date,
-      currentStreak: newStreak,
-      longestStreak: Math.max(userData.longestStreak || 0, newStreak)
-    });
-    setShowDatePicker(false);
-  };
-
-  // Reset streak (relapse) - keep toast, this is significant
-  const handleReset = () => {
-    const now = new Date();
-    const history = [...(userData.streakHistory || [])];
-    const currentIdx = history.findIndex(s => !s.end);
-    
-    if (currentIdx !== -1) {
-      history[currentIdx] = { ...history[currentIdx], end: now, days: streak, reason: 'relapse' };
-    }
-    history.push({ start: now, end: null, days: 0 });
-
-    updateUserData({
-      currentStreak: 0,
-      startDate: now,
-      streakHistory: history,
-      lastRelapse: now, 
-      relapseCount: (userData.relapseCount || 0) + 1 
-    });
-
-    setShowResetConfirm(false);
-    setShowStreakOptions(false);
-    setResetType(null);
-    toast.success('Relapse logged');
-  };
-
-  // Log wet dream - no toast, modal closing is confirmation
-  const handleLogWetDream = () => {
-    updateUserData({
-      wetDreams: [...(userData.wetDreams || []), { date: new Date(), streakDay: streak }],
-      lastWetDream: new Date()
-    });
-
-    setShowResetConfirm(false);
-    setShowStreakOptions(false);
-    setResetType(null);
-  };
-
-  // Benefits
-  const updateFill = useCallback((key, val) => {
-    if (fillRefs.current[key]) {
-      fillRefs.current[key].style.width = `${((val - 1) / 9) * 100}%`;
-    }
-  }, []);
-
-  useEffect(() => {
-    Object.entries(benefits).forEach(([k, v]) => updateFill(k, v));
-  }, [benefits, updateFill]);
-
-  const handleBenefitChange = (key, val) => {
-    const num = parseInt(val, 10);
-    setBenefits(prev => ({ ...prev, [key]: num }));
-    updateFill(key, num);
-  };
-
-  // Save benefits - no toast, modal closing is confirmation
-  const saveBenefits = () => {
-    const todayStr = format(today, 'yyyy-MM-dd');
-    const existing = userData.benefitTracking || [];
-    const idx = existing.findIndex(b => format(new Date(b.date), 'yyyy-MM-dd') === todayStr);
-    
-    const entry = { date: new Date(), day: streak, ...benefits };
-    const updated = idx !== -1 
-      ? existing.map((b, i) => i === idx ? entry : b)
-      : [...existing, entry];
-
-    updateUserData({ benefitTracking: updated });
-    setShowBenefits(false);
-  };
-
-  const benefitsList = [
-    { key: 'energy', label: 'Energy', desc: '1 = drained, 10 = energized' },
-    { key: 'focus', label: 'Focus', desc: '1 = scattered, 10 = laser' },
-    { key: 'confidence', label: 'Confidence', desc: '1 = low, 10 = high' },
-    { key: 'aura', label: 'Aura', desc: '1 = dim, 10 = radiant' },
-    { key: 'sleep', label: 'Sleep', desc: '1 = poor, 10 = excellent' },
-    { key: 'workout', label: 'Workout', desc: '1 = weak, 10 = strong' }
+  const tabs = [
+    { id: 'account', label: 'Account' },
+    { id: 'privacy', label: 'Privacy' },
+    { id: 'data', label: 'Data' }
   ];
 
-  // Date picker screen
-  if (showDatePicker) {
-    return (
-      <div className="tracker">
-        <div className="overlay">
-          <DatePicker
-            onSubmit={handleDateSubmit}
-            onCancel={userData.startDate ? () => setShowDatePicker(false) : null}
-            initialDate={userData.startDate ? new Date(userData.startDate) : new Date()}
-            title={userData.startDate ? "Edit start date" : "When did you start?"}
-          />
-        </div>
-      </div>
-    );
-  }
+  const feedbackTypes = [
+    { id: 'bug', label: 'Bug' },
+    { id: 'feature', label: 'Feature' },
+    { id: 'improvement', label: 'Suggestion' },
+    { id: 'general', label: 'General' }
+  ];
+
+  useEffect(() => {
+    if (isSupported && userData?.username) {
+      checkExistingSubscription().then((sub) => setNotificationsEnabled(!!sub));
+    }
+  }, [isSupported, userData?.username, checkExistingSubscription]);
+
+  useEffect(() => {
+    if (notificationsEnabled && userData?.username) {
+      loadNotificationPreferences();
+    }
+  }, [notificationsEnabled, userData?.username]);
+
+  const loadNotificationPreferences = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`);
+      if (response.ok) {
+        const prefs = await response.json();
+        setQuietHoursEnabled(prefs.quietHoursEnabled || false);
+        setQuietHoursStart(prefs.quietHoursStart || '22:00');
+        setQuietHoursEnd(prefs.quietHoursEnd || '08:00');
+        setNotifTypes(prefs.types || { milestones: true, urgeSupport: true, weeklyProgress: true });
+        setDailyReminderEnabled(prefs.dailyReminderEnabled || false);
+        setDailyReminderTime(prefs.dailyReminderTime || '09:00');
+      }
+    } catch (error) {
+      console.error('Failed to load notification preferences:', error);
+    }
+  };
+
+  const updateNotifType = (type) => {
+    if (!isEditingPrivacy) return;
+    setNotifTypes(prev => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  const handleSaveNotificationPreferences = async () => {
+    const preferences = {
+      quietHoursEnabled, quietHoursStart, quietHoursEnd,
+      types: notifTypes, dailyReminderEnabled, dailyReminderTime, fcmToken
+    };
+    try {
+      await fetch(`${API_URL}/api/notification-preferences/${userData.username}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(preferences)
+      });
+      localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
+    } catch (error) {
+      localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
+    }
+    setIsEditingPrivacy(false);
+  };
+
+  const handleNotificationToggle = async () => {
+    if (isTogglingNotifications || !isEditingPrivacy) return;
+    setIsTogglingNotifications(true);
+    try {
+      if (notificationsEnabled) {
+        await unsubscribeFromPush();
+        setNotificationsEnabled(false);
+      } else {
+        if (permission !== 'granted') {
+          const granted = await requestPermission();
+          if (!granted) {
+            toast.error('Please enable notifications in browser settings');
+            setIsTogglingNotifications(false);
+            return;
+          }
+        }
+        await subscribeToPush();
+        setNotificationsEnabled(true);
+        setTimeout(async () => {
+          try {
+            await sendLocalNotification('Notifications Activated', {
+              body: 'You\'ll now receive milestone alerts',
+              icon: '/icon-192.png'
+            });
+          } catch (e) {}
+        }, 1000);
+      }
+    } catch (error) {
+      toast.error('Failed to update notifications');
+    } finally {
+      setIsTogglingNotifications(false);
+    }
+  };
+
+  const handleTestNotification = async () => {
+    const success = await sendLocalNotification('Test Notification', {
+      body: 'Notifications are working!',
+      icon: '/icon-192.png'
+    });
+    if (!success) toast.error('Failed to send test');
+  };
+
+  const memberSince = userData.startDate 
+    ? format(new Date(userData.startDate), 'MMMM yyyy') 
+    : 'Unknown';
+
+  const handleProfileUpdate = () => {
+    updateUserData({
+      username: username.trim(),
+      email: email.trim(),
+      discordUsername: discordUsername.trim(),
+      showOnLeaderboard
+    });
+    setIsEditingProfile(false);
+  };
+
+  const handleFeedbackSubmit = () => {
+    if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
+      toast.error('Please fill in both fields');
+      return;
+    }
+    console.log('Feedback:', { type: feedbackType, subject: feedbackSubject, message: feedbackMessage });
+    setFeedbackSubject('');
+    setFeedbackMessage('');
+    setFeedbackType('general');
+    setShowFeedbackModal(false);
+    toast.success('Feedback sent!');
+  };
+
+  const handleDataExport = () => {
+    const exportData = {
+      profile: { username: userData.username, memberSince: userData.startDate },
+      streakData: {
+        currentStreak: userData.currentStreak,
+        longestStreak: userData.longestStreak,
+        startDate: userData.startDate,
+        streakHistory: userData.streakHistory
+      },
+      benefitTracking: userData.benefitTracking || [],
+      journalEntries: userData.notes || {},
+      exportDate: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `titantrack-${format(new Date(), 'yyyy-MM-dd')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setShowExportModal(false);
+    toast.success('Data exported!');
+  };
+
+  const handleAccountDeletion = () => {
+    localStorage.clear();
+    onLogout();
+  };
+
+  const userInitial = userData?.username?.charAt(0)?.toUpperCase() || 
+                      userData?.email?.charAt(0)?.toUpperCase() || '?';
 
   return (
-    <div className="tracker">
-      
-      {/* Benefits Modal */}
-      {showBenefits && (
-        <div className="overlay" onClick={() => setShowBenefits(false)}>
-          <div className="benefits-modal" onClick={e => e.stopPropagation()}>
-            <h2>How do you feel?</h2>
-            <p>Rate today's benefits</p>
-            
-            <div className="benefits-list">
-              {benefitsList.map(({ key, label, desc }) => (
-                <div key={key} className="benefit-row">
-                  <div className="benefit-info">
-                    <span>{label}</span>
-                    <span className="benefit-num">{benefits[key]}/10</span>
-                  </div>
-                  <div className="benefit-slider">
-                    <div 
-                      className="benefit-fill" 
-                      ref={el => fillRefs.current[key] = el}
-                    />
-                    <input
-                      type="range"
-                      min="1"
-                      max="10"
-                      value={benefits[key]}
-                      onChange={e => handleBenefitChange(key, e.target.value)}
-                    />
-                  </div>
-                  <span className="benefit-desc">{desc}</span>
+    <div className="profile">
+      {/* User Info - Sign Out accessible here */}
+      <div className="profile-user">
+        <div className="profile-avatar">{userInitial}</div>
+        <div className="profile-user-info">
+          <span className="profile-name">{userData.username}</span>
+          <span className="profile-since">Member since {memberSince}</span>
+        </div>
+        <button className="profile-signout" onClick={onLogout}>
+          Sign Out
+        </button>
+      </div>
+
+      {/* Tab Navigation - Text-only with dividers */}
+      <nav className="profile-tabs">
+        {tabs.map((tab, index) => (
+          <React.Fragment key={tab.id}>
+            <button
+              className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+            {index < tabs.length - 1 && <div className="profile-tab-divider" />}
+          </React.Fragment>
+        ))}
+      </nav>
+
+      {/* Content */}
+      <div className="profile-content">
+        
+        {/* ACCOUNT TAB */}
+        {activeTab === 'account' && (
+          <div className="profile-section">
+            <div className="section-header">
+              <h2>Account Details</h2>
+              <button className="edit-btn" onClick={() => setIsEditingProfile(!isEditingProfile)}>
+                {isEditingProfile ? 'Cancel' : 'Edit'}
+              </button>
+            </div>
+
+            <div className="form-group">
+              <label>Username</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={!isEditingProfile}
+                placeholder="Your username"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={!isEditingProfile}
+                placeholder="your@email.com"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Discord</label>
+              <input
+                type="text"
+                value={discordUsername}
+                onChange={(e) => setDiscordUsername(e.target.value)}
+                disabled={!isEditingProfile}
+                placeholder="For leaderboard"
+              />
+            </div>
+
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Show on Leaderboard</span>
+                <span className="toggle-desc">Display streak publicly</span>
+              </div>
+              <button 
+                className={`toggle-switch ${showOnLeaderboard ? 'active' : ''}`}
+                onClick={() => isEditingProfile && setShowOnLeaderboard(!showOnLeaderboard)}
+                disabled={!isEditingProfile}
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
+
+            {isEditingProfile && (
+              <div className="section-actions">
+                <button className="btn-primary" onClick={handleProfileUpdate}>Save Changes</button>
+                <button className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Cancel</button>
+              </div>
+            )}
+
+            {/* Feedback Row */}
+            <div className="feedback-row">
+              <div className="feedback-text">
+                <span className="feedback-title">Send Feedback</span>
+                <span className="feedback-desc">Help us improve TitanTrack</span>
+              </div>
+              <button className="feedback-btn" onClick={() => setShowFeedbackModal(true)}>
+                Send
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PRIVACY TAB */}
+        {activeTab === 'privacy' && (
+          <div className="profile-section">
+            <div className="section-header">
+              <h2>Privacy & Notifications</h2>
+              <button className="edit-btn" onClick={() => setIsEditingPrivacy(!isEditingPrivacy)}>
+                {isEditingPrivacy ? 'Cancel' : 'Edit'}
+              </button>
+            </div>
+
+            <h3 className="group-label">Data & Analytics</h3>
+
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Anonymous Analytics</span>
+                <span className="toggle-desc">Help improve the app</span>
+              </div>
+              <button 
+                className={`toggle-switch ${analyticsOptIn ? 'active' : ''}`}
+                onClick={() => isEditingPrivacy && setAnalyticsOptIn(!analyticsOptIn)}
+                disabled={!isEditingPrivacy}
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
+
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Community Insights</span>
+                <span className="toggle-desc">Share aggregated data</span>
+              </div>
+              <button 
+                className={`toggle-switch ${dataSharing ? 'active' : ''}`}
+                onClick={() => isEditingPrivacy && setDataSharing(!dataSharing)}
+                disabled={!isEditingPrivacy}
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
+
+            <h3 className="group-label">Communications</h3>
+
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Marketing Emails</span>
+                <span className="toggle-desc">Features and tips</span>
+              </div>
+              <button 
+                className={`toggle-switch ${marketingEmails ? 'active' : ''}`}
+                onClick={() => isEditingPrivacy && setMarketingEmails(!marketingEmails)}
+                disabled={!isEditingPrivacy}
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
+
+            {isSupported && (
+              <div className="toggle-row">
+                <div className="toggle-text">
+                  <span className="toggle-label">Push Notifications</span>
+                  <span className="toggle-desc">
+                    {permission === 'denied' ? 'Blocked in browser' : 'Milestone alerts'}
+                  </span>
                 </div>
+                <button 
+                  className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
+                  onClick={handleNotificationToggle}
+                  disabled={!isEditingPrivacy || isTogglingNotifications || permission === 'denied'}
+                >
+                  <span className="toggle-knob" />
+                </button>
+              </div>
+            )}
+
+            {/* Notification Preferences */}
+            {isSupported && notificationsEnabled && isEditingPrivacy && (
+              <>
+                <h3 className="group-label">Notification Preferences</h3>
+
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Quiet Hours</span>
+                    <span className="toggle-desc">Pause during sleep</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
+                    onClick={() => setQuietHoursEnabled(!quietHoursEnabled)}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
+
+                {quietHoursEnabled && (
+                  <div className="time-row">
+                    <input type="time" value={quietHoursStart} onChange={(e) => setQuietHoursStart(e.target.value)} />
+                    <span>to</span>
+                    <input type="time" value={quietHoursEnd} onChange={(e) => setQuietHoursEnd(e.target.value)} />
+                  </div>
+                )}
+
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Milestones</span>
+                    <span className="toggle-desc">Day 7, 30, 90...</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
+                    onClick={() => updateNotifType('milestones')}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
+
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Urge Support</span>
+                    <span className="toggle-desc">Encouragement</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
+                    onClick={() => updateNotifType('urgeSupport')}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
+
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Weekly Summary</span>
+                    <span className="toggle-desc">Sunday report</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
+                    onClick={() => updateNotifType('weeklyProgress')}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
+
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Daily Reminder</span>
+                    <span className="toggle-desc">Log benefits</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
+                    onClick={() => setDailyReminderEnabled(!dailyReminderEnabled)}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
+
+                {dailyReminderEnabled && (
+                  <div className="time-row single">
+                    <label>Reminder time</label>
+                    <input type="time" value={dailyReminderTime} onChange={(e) => setDailyReminderTime(e.target.value)} />
+                  </div>
+                )}
+
+                <button className="test-notif-btn" onClick={handleTestNotification}>
+                  Test Notification
+                </button>
+              </>
+            )}
+
+            {isEditingPrivacy && (
+              <div className="section-actions">
+                <button className="btn-primary" onClick={handleSaveNotificationPreferences}>Save Changes</button>
+                <button className="btn-ghost" onClick={() => setIsEditingPrivacy(false)}>Cancel</button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* DATA TAB */}
+        {activeTab === 'data' && (
+          <div className="profile-section">
+            <div className="section-header">
+              <h2>Your Data</h2>
+            </div>
+
+            <div className="data-row">
+              <div className="data-text">
+                <span className="data-title">Export Data</span>
+                <span className="data-desc">Download as JSON</span>
+              </div>
+              <button className="data-btn" onClick={() => setShowExportModal(true)}>Export</button>
+            </div>
+
+            <div className="data-row danger">
+              <div className="data-text">
+                <span className="data-title">Delete Account</span>
+                <span className="data-desc">Permanently remove all data</span>
+              </div>
+              <button className="data-btn danger" onClick={() => setShowDeleteConfirm(true)}>Delete</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* FEEDBACK MODAL */}
+      {showFeedbackModal && (
+        <div className="overlay" onClick={() => setShowFeedbackModal(false)}>
+          <div className="modal legacy" onClick={e => e.stopPropagation()}>
+            <h2>Send Feedback</h2>
+            <p>Help us improve TitanTrack</p>
+            
+            <div className="feedback-types">
+              {feedbackTypes.map(type => (
+                <button
+                  key={type.id}
+                  className={`feedback-type-btn ${feedbackType === type.id ? 'active' : ''}`}
+                  onClick={() => setFeedbackType(type.id)}
+                >
+                  {type.label}
+                </button>
               ))}
             </div>
-            
-            <div className="benefits-actions">
-              <button className="btn-ghost" onClick={() => setShowBenefits(false)}>Cancel</button>
-              <button className="btn-primary" onClick={saveBenefits}>Save</button>
+
+            <div className="modal-field">
+              <label>Subject</label>
+              <input
+                type="text"
+                value={feedbackSubject}
+                onChange={(e) => setFeedbackSubject(e.target.value)}
+                placeholder="Brief description"
+                maxLength={100}
+              />
+            </div>
+
+            <div className="modal-field">
+              <label>Message</label>
+              <textarea
+                value={feedbackMessage}
+                onChange={(e) => setFeedbackMessage(e.target.value)}
+                placeholder="Your feedback..."
+                rows={4}
+                maxLength={500}
+              />
+            </div>
+
+            <div className="modal-actions">
+              <button className="btn-ghost" onClick={() => setShowFeedbackModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Streak Options */}
-      {showStreakOptions && (
-        <div className="overlay" onClick={() => setShowStreakOptions(false)}>
-          <div className="sheet" onClick={e => e.stopPropagation()}>
-            <div className="sheet-content">
-              <button onClick={() => { setShowStreakOptions(false); setShowDatePicker(true); }}>
-                Edit start date
-              </button>
-              <div className="sheet-divider" />
-              <button 
-                onClick={() => { setResetType('wetdream'); setShowResetConfirm(true); }}
-              >
-                Log wet dream
-              </button>
-              <div className="sheet-divider" />
-              <button 
-                className="danger" 
-                onClick={() => { setResetType('relapse'); setShowResetConfirm(true); }}
-              >
-                Reset streak
-              </button>
-            </div>
-            <button className="cancel" onClick={() => setShowStreakOptions(false)}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Reset Confirm */}
-      {showResetConfirm && (
-        <div className="overlay" onClick={() => setShowResetConfirm(false)}>
+      {/* EXPORT MODAL */}
+      {showExportModal && (
+        <div className="overlay" onClick={() => setShowExportModal(false)}>
           <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <h2>{resetType === 'wetdream' ? 'Log wet dream?' : 'Reset streak?'}</h2>
-            <p>
-              {resetType === 'wetdream' 
-                ? 'This will be logged but won\'t affect your streak. Wet dreams are natural.'
-                : 'Your current streak will be saved to history.'
-              }
-            </p>
+            <h2>Export Data</h2>
+            <p>Download all your tracking data including streak history, journal entries, and settings.</p>
             <div className="confirm-actions">
-              <button className="btn-ghost" onClick={() => setShowResetConfirm(false)}>Cancel</button>
-              <button 
-                className={resetType === 'relapse' ? 'btn-danger' : 'btn-primary'} 
-                onClick={resetType === 'wetdream' ? handleLogWetDream : handleReset}
-              >
-                {resetType === 'wetdream' ? 'Log it' : 'Reset'}
-              </button>
+              <button className="btn-primary" onClick={handleDataExport}>Download</button>
+              <button className="btn-ghost" onClick={() => setShowExportModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Main */}
-      <main className="tracker-main">
-        <p className="date">{format(today, 'EEEE, MMMM d')}</p>
-        
-        <button className="streak" onClick={() => setShowStreakOptions(true)}>
-          <span className="streak-num">{streak}</span>
-          <span className="streak-unit">days</span>
-        </button>
-        
-        {milestone && (
-          <p className="milestone">{milestone}</p>
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className="tracker-footer">
-        <button 
-          className={todayLogged ? 'btn-logged' : 'btn-primary'}
-          onClick={() => setShowBenefits(true)}
-        >
-          {todayLogged ? 'Today ✓' : 'Log today'}
-        </button>
-      </footer>
-      
+      {/* DELETE MODAL */}
+      {showDeleteConfirm && (
+        <div className="overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <h2>Delete Account?</h2>
+            <p>This will permanently delete all your data. This cannot be undone.</p>
+            <div className="confirm-actions">
+              <button className="btn-danger" onClick={handleAccountDeletion}>Delete</button>
+              <button className="btn-ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default Tracker;
+export default Profile;

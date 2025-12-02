@@ -430,7 +430,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             className={`et-save-btn ${hasLoggedToday ? 'disabled' : ''}`}
             onClick={hasLoggedToday ? undefined : handleSave}
           >
-            {hasLoggedToday ? 'Today ✓' : 'Save Check-in'}
+            {hasLoggedToday ? 'Logged Today ✓' : 'Save Check-in'}
           </button>
         </div>
       )}
