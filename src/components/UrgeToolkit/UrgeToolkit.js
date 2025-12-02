@@ -405,7 +405,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     <div className="urge-toolkit">
       {/* Phase Indicator */}
       <div className="ut-phase">
-        <span className="ut-phase-num" style={{ color: currentPhase.color }}>{currentPhase.num}</span>
+        <span className="ut-phase-num">{currentPhase.num}</span>
         <div className="ut-phase-info">
           <span className="ut-phase-name">{currentPhase.name}</span>
           <span className="ut-phase-detail">Day {currentDay} · {experienceLevel}</span>
