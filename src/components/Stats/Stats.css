@@ -350,16 +350,18 @@
 }
 
 /* =============================================================================
-   FREE USER SECTION
+   FREE USER SECTION - Minimal, flowing
    ============================================================================= */
 
 .free-section {
-  margin-top: 32px;
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .free-card {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .free-card h3 {
@@ -372,71 +374,84 @@
 }
 
 .free-card p {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.7;
   margin: 0;
 }
 
 .upgrade-card {
   text-align: center;
-  padding: 32px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.01);
+  padding: 40px 24px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 32px;
 }
 
 .upgrade-card p {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 24px 0;
-  line-height: 1.5;
+  margin: 0 0 28px 0;
+  line-height: 1.6;
 }
 
 /* =============================================================================
-   ANALYTICS STACK (Premium)
+   ANALYTICS STACK (Premium) - Flowing content with dividers
    ============================================================================= */
 
 .analytics-stack {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 32px;
+  gap: 0;
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* =============================================================================
-   INSIGHT CARDS - Minimal, floating
+   INSIGHT SECTIONS - No containers, Landing page style
    ============================================================================= */
 
 .insight-card {
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 16px;
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.insight-card:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .insight-card-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 0;
+  margin-bottom: 20px;
+  border-bottom: none;
 }
 
 .insight-card-header span {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 .insight-card-content {
-  padding: 20px;
+  padding: 0;
 }
 
 /* Loading spinner */
 .insight-loading {
   display: flex;
   justify-content: center;
-  padding: 32px;
+  padding: 24px 0;
 }
 
 .insight-loading-spinner {
@@ -455,7 +470,7 @@
 /* Empty state */
 .insight-empty {
   text-align: center;
-  padding: 20px 16px;
+  padding: 16px 0;
 }
 
 .insight-empty-title {
@@ -466,40 +481,40 @@
 }
 
 .insight-empty-text {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.3);
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* Mini info banner */
+/* Mini info banner - subtle inline */
 .mini-info-banner {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 20px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0 0 20px 0;
+  margin-bottom: 0;
 }
 
 .mini-info-banner p {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
   margin: 0;
   line-height: 1.5;
   text-align: center;
 }
 
 /* =============================================================================
-   PROGRESS TRENDS
+   PROGRESS TRENDS - Minimal, flowing
    ============================================================================= */
 
 .progress-trends-display {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .trend-item {
-  padding-bottom: 20px;
+  padding-bottom: 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -511,21 +526,21 @@
 .trend-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .trend-label {
   font-size: 0.625rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .trend-text {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.55);
-  line-height: 1.6;
+  line-height: 1.7;
   margin: 0;
 }
 
@@ -548,13 +563,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 10px;
+  padding: 0;
 }
 
 .relapse-stat-label {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.4);
 }
 
@@ -566,9 +579,9 @@
 }
 
 .relapse-insight {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.55);
-  line-height: 1.6;
+  line-height: 1.7;
   margin: 0;
 }
 
@@ -580,11 +593,11 @@
 /* Victory state */
 .victory-display {
   text-align: center;
-  padding: 24px 16px;
+  padding: 8px 0;
 }
 
 .victory-days {
-  font-size: 3rem;
+  font-size: 4rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1;
@@ -593,48 +606,41 @@
 }
 
 .victory-label {
-  font-size: 0.625rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.35);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .victory-message {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.5);
-  line-height: 1.6;
+  line-height: 1.7;
   margin: 0;
 }
 
 /* =============================================================================
-   PATTERN RECOGNITION
+   PATTERN RECOGNITION - Minimal bullets
    ============================================================================= */
 
 .patterns-display {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .pattern-item {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.55);
-  line-height: 1.6;
-  padding-left: 16px;
+  line-height: 1.7;
+  padding-left: 0;
   position: relative;
   margin: 0;
 }
 
 .pattern-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 9px;
-  width: 4px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
+  display: none;
 }
 
 .pattern-item strong {
@@ -653,51 +659,45 @@
 }
 
 .optimization-criteria {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  padding: 16px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0 0 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .optimization-criteria-title {
   font-size: 0.625rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.35);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 10px;
 }
 
 .optimization-criteria-text {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.55);
-  line-height: 1.5;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
   margin: 0;
 }
 
 .optimization-recommendations {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
 .optimization-item {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.55);
-  line-height: 1.6;
-  padding-left: 16px;
+  line-height: 1.7;
+  padding-left: 0;
   position: relative;
   margin: 0;
 }
 
 .optimization-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 9px;
-  width: 4px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
+  display: none;
 }
 
 .optimization-item strong {
@@ -706,58 +706,57 @@
 }
 
 /* =============================================================================
-   PHASE EVOLUTION
+   PHASE EVOLUTION - Minimal grid
    ============================================================================= */
 
 .phase-evolution-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 16px 24px;
+  margin-bottom: 24px;
 }
 
 .phase-evolution-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
-  padding: 16px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
   text-align: center;
 }
 
-.phase-evolution-card.current {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+.phase-evolution-card.current .phase-value {
+  color: #ffffff;
 }
 
 .phase-name {
   font-size: 0.5625rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .phase-evolution-card.current .phase-name {
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .phase-value {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 500;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.5);
   margin-bottom: 4px;
 }
 
 .phase-range {
   font-size: 0.5625rem;
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.2);
 }
 
 .phase-evolution-insight {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.55);
-  line-height: 1.6;
+  line-height: 1.7;
   margin: 0;
 }
 
@@ -1107,18 +1106,6 @@
     border-radius: 12px;
   }
   
-  .insight-card {
-    border-radius: 12px;
-  }
-  
-  .insight-card-header {
-    padding: 14px 16px;
-  }
-  
-  .insight-card-content {
-    padding: 16px;
-  }
-  
   .modal {
     max-width: 300px;
   }
@@ -1152,11 +1139,6 @@
     padding: 14px 20px;
     font-size: 0.875rem;
     border-radius: 10px;
-  }
-  
-  .upgrade-card {
-    padding: 24px 20px;
-    border-radius: 12px;
   }
 }
 
@@ -1232,10 +1214,6 @@
   
   .chart-box {
     height: 220px;
-    border-radius: 20px;
-  }
-  
-  .insight-card {
     border-radius: 20px;
   }
   
