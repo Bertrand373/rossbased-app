@@ -49,7 +49,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [showResetAllModal, setShowResetAllModal] = useState(false);
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
-  const [chartKey, setChartKey] = useState(0);
   
   const [loadingStates, setLoadingStates] = useState({
     progressTrends: true,
@@ -61,12 +60,6 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
   const chartRef = useRef(null);
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
-
-  // Trigger chart re-render for gradient
-  useEffect(() => {
-    const timer = setTimeout(() => setChartKey(prev => prev + 1), 100);
-    return () => clearTimeout(timer);
-  }, [selectedMetric, timeRange]);
 
   useEffect(() => {
     if (isPremium) {
@@ -422,7 +415,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             const chartData = getChartData();
             const hasData = chartData.datasets[0].data.some(v => v !== null);
             if (!hasData) return <p className="chart-empty">Start tracking to see your progress</p>;
-            return <Line key={chartKey} ref={chartRef} data={chartData} options={chartOptions} />;
+            return <Line ref={chartRef} data={chartData} options={chartOptions} />;
           })()}
         </div>
 

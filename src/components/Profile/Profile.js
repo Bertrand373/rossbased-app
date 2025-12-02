@@ -554,11 +554,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           <div className="about-section">
             {/* Brand Header */}
             <div className="about-brand">
-              <svg className="about-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 5 L15 35 L15 75 L50 95 L85 75 L85 35 Z" stroke="currentColor" strokeWidth="2" fill="none"/>
-                <path d="M50 20 L30 35 L30 65 L50 78 L70 65 L70 35 Z" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.6"/>
-                <circle cx="50" cy="50" r="8" fill="currentColor" opacity="0.8"/>
-              </svg>
+              <img src="/icon-192.png" alt="TitanTrack" className="about-logo" />
               <h1 className="about-title">TitanTrack</h1>
               <span className="about-version">Version 1.0.0</span>
             </div>
