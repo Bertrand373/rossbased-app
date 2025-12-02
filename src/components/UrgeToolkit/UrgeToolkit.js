@@ -31,6 +31,8 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   const [breathingCount, setBreathingCount] = useState(0);
   const [breathingTimer, setBreathingTimer] = useState(0);
   const [advancedBreathing, setAdvancedBreathing] = useState(false);
+  const [showBreathingModal, setShowBreathingModal] = useState(false);
+  const [breathingDuration, setBreathingDuration] = useState(4);
   
   const breathingIntervalRef = useRef(null);
   
@@ -172,6 +174,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     setBreathingActive(false);
     if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
     stopActiveTimer();
+    setShowBreathingModal(false);
     toast.success(message);
     setTimeout(() => setCurrentStep('summary'), 1000);
   };
@@ -184,9 +187,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     if (advancedBreathing && experienceLevel !== 'beginner') {
       setBreathingPhase('bhastrika');
       setBreathingTimer(30);
+      setBreathingDuration(30);
     } else {
       setBreathingPhase('inhale');
       setBreathingTimer(4);
+      setBreathingDuration(4);
     }
     
     breathingIntervalRef.current = setInterval(() => {
@@ -210,9 +215,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     setBreathingPhase(phase => {
       if (phase === 'bhastrika') {
         setBreathingTimer(15);
+        setBreathingDuration(15);
         return 'hold';
       } else if (phase === 'hold') {
         setBreathingTimer(15);
+        setBreathingDuration(15);
         return 'exhale';
       } else if (phase === 'exhale') {
         setBreathingCount(prev => {
@@ -221,6 +228,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             return prev + 1;
           }
           setBreathingTimer(30);
+          setBreathingDuration(30);
           return prev + 1;
         });
         return 'bhastrika';
@@ -233,6 +241,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     setBreathingPhase(phase => {
       if (phase === 'inhale') {
         setBreathingTimer(4);
+        setBreathingDuration(4);
         return 'exhale';
       } else if (phase === 'exhale') {
         setBreathingCount(prev => {
@@ -241,6 +250,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             return prev + 1;
           }
           setBreathingTimer(4);
+          setBreathingDuration(4);
           return prev + 1;
         });
         return 'inhale';
@@ -254,6 +264,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     setBreathingPhase('ready');
     if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
     stopActiveTimer();
+    setShowBreathingModal(false);
     setCurrentStep('summary');
   };
 
@@ -473,9 +484,20 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               ))}
             </div>
 
-            {/* Breathing Interface */}
+            {/* Breathing Interface - Opens Modal */}
             {activeProtocol === 'breathing' && (
-              <div className="ut-breathing">
+              <div className="ut-breathing-trigger">
+                <div className="ut-breathing-info-card">
+                  <span className="ut-breathing-title">
+                    {advancedBreathing && experienceLevel !== 'beginner' ? 'Advanced Breathing' : 'Box Breathing'}
+                  </span>
+                  <span className="ut-breathing-desc">
+                    {advancedBreathing && experienceLevel !== 'beginner' 
+                      ? 'Bhastrika + retention for energy transmutation' 
+                      : '4-4-4-4 pattern for calm and focus'}
+                  </span>
+                </div>
+                
                 {experienceLevel !== 'beginner' && (
                   <div className="ut-breathing-modes">
                     <button
@@ -484,6 +506,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                     >
                       Standard
                     </button>
+                    <span className="ut-mode-divider" />
                     <button
                       className={`ut-mode-btn ${advancedBreathing ? 'active' : ''}`}
                       onClick={() => setAdvancedBreathing(true)}
@@ -493,40 +516,9 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                   </div>
                 )}
                 
-                <div className="ut-breathing-circle">
-                  <div className={`ut-breathing-orb ${
-                    breathingPhase === 'inhale' ? 'inhale' :
-                    breathingPhase === 'exhale' ? 'exhale' :
-                    breathingPhase === 'hold' ? 'hold' :
-                    breathingPhase === 'bhastrika' ? 'rapid' : ''
-                  }`} />
-                </div>
-                
-                <div className="ut-breathing-info">
-                  {breathingActive ? (
-                    <>
-                      <span className="ut-breathing-phase">
-                        {breathingPhase === 'bhastrika' ? 'Rapid Breath' : breathingPhase}
-                      </span>
-                      <span className="ut-breathing-count">Cycle {breathingCount + 1}</span>
-                      <span className="ut-breathing-timer">{breathingTimer}s</span>
-                    </>
-                  ) : (
-                    <span className="ut-breathing-phase">Ready</span>
-                  )}
-                </div>
-                
-                <div className="ut-breathing-controls">
-                  {!breathingActive ? (
-                    <button className="ut-control-btn primary" onClick={startBreathing}>
-                      <FaPlay />
-                    </button>
-                  ) : (
-                    <button className="ut-control-btn stop" onClick={stopBreathing}>
-                      <FaStop />
-                    </button>
-                  )}
-                </div>
+                <button className="ut-btn-primary" onClick={() => setShowBreathingModal(true)}>
+                  Begin Session
+                </button>
               </div>
             )}
 
@@ -664,6 +656,69 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
           </>
         )}
       </div>
+
+      {/* BREATHING MODAL */}
+      {showBreathingModal && (
+        <div className="ut-breathing-overlay">
+          <div className="ut-breathing-modal">
+            <div className="ut-breathing-modal-header">
+              <span className="ut-breathing-modal-title">
+                {advancedBreathing && experienceLevel !== 'beginner' ? 'Advanced Breathing' : 'Box Breathing'}
+              </span>
+              <span className="ut-breathing-modal-subtitle">
+                {advancedBreathing && experienceLevel !== 'beginner' ? '30s rapid · 15s hold · 15s exhale' : '4s inhale · 4s exhale'}
+              </span>
+            </div>
+
+            <div className="ut-breathing-modal-body">
+              <div className="ut-breathing-circle">
+                <div 
+                  className={`ut-breathing-orb ${
+                    breathingPhase === 'inhale' ? 'inhale' :
+                    breathingPhase === 'exhale' ? 'exhale' :
+                    breathingPhase === 'hold' ? 'hold' :
+                    breathingPhase === 'bhastrika' ? 'rapid' : ''
+                  }`}
+                  style={{ '--breath-duration': `${breathingDuration}s` }}
+                />
+              </div>
+
+              <div className="ut-breathing-modal-info">
+                {breathingActive ? (
+                  <>
+                    <span className="ut-breathing-phase-text">
+                      {breathingPhase === 'bhastrika' ? 'RAPID BREATH' : breathingPhase.toUpperCase()}
+                    </span>
+                    <span className="ut-breathing-cycle-text">
+                      Cycle {breathingCount + 1} of {advancedBreathing ? '3' : '10'}
+                    </span>
+                    <span className="ut-breathing-timer-text">{breathingTimer}</span>
+                  </>
+                ) : (
+                  <span className="ut-breathing-phase-text">READY</span>
+                )}
+              </div>
+            </div>
+
+            <div className="ut-breathing-modal-footer">
+              {!breathingActive ? (
+                <>
+                  <button className="ut-btn-ghost" onClick={() => setShowBreathingModal(false)}>
+                    Cancel
+                  </button>
+                  <button className="ut-btn-primary" onClick={startBreathing}>
+                    Start
+                  </button>
+                </>
+              ) : (
+                <button className="ut-btn-stop" onClick={stopBreathing}>
+                  Stop Session
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

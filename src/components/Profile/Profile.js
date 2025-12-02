@@ -13,6 +13,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   
   // Account States
   const [username, setUsername] = useState(userData.username || '');
@@ -606,9 +607,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 Support
               </button>
               <span className="about-link-divider" />
-              <a href="/privacy" className="about-link">
+              <button className="about-link" onClick={() => setShowPrivacyModal(true)}>
                 Privacy
-              </a>
+              </button>
             </div>
           </div>
         )}
@@ -686,6 +687,64 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <div className="confirm-actions">
               <button className="btn-danger" onClick={handleAccountDeletion}>Delete</button>
               <button className="btn-ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PRIVACY POLICY MODAL */}
+      {showPrivacyModal && (
+        <div className="overlay" onClick={() => setShowPrivacyModal(false)}>
+          <div className="privacy-modal" onClick={e => e.stopPropagation()}>
+            <div className="privacy-header">
+              <h2>Privacy Policy</h2>
+              <span className="privacy-updated">Last updated: December 2024</span>
+            </div>
+            
+            <div className="privacy-content">
+              <section className="privacy-section">
+                <h3>Overview</h3>
+                <p>TitanTrack is designed with your privacy as a priority. We collect only what's necessary to provide you with personalized tracking and insights.</p>
+              </section>
+
+              <section className="privacy-section">
+                <h3>What We Collect</h3>
+                <p>Account information (email, username), streak and retention data, benefit ratings, emotional check-ins, urge session data, and app preferences.</p>
+              </section>
+
+              <section className="privacy-section">
+                <h3>On-Device Intelligence</h3>
+                <p>Our predictive models train entirely on your device using TensorFlow.js. Your personal patterns never leave your phone. Only you benefit from your data.</p>
+              </section>
+
+              <section className="privacy-section">
+                <h3>Data Storage</h3>
+                <p>Account data is stored securely on MongoDB Atlas with encryption. ML models are stored locally in your browser's IndexedDB. Push notifications use Firebase Cloud Messaging.</p>
+              </section>
+
+              <section className="privacy-section">
+                <h3>Your Rights</h3>
+                <p>Export all your data anytime from Profile → Data. Permanently delete your account and all associated data. We retain nothing after deletion.</p>
+              </section>
+
+              <section className="privacy-section">
+                <h3>What We Don't Do</h3>
+                <p>We never sell your data. We never share personal information with third parties for marketing. We never use your data to train external AI models.</p>
+              </section>
+
+              <section className="privacy-section">
+                <h3>Age Requirement</h3>
+                <p>TitanTrack is intended for users 18 years and older. By using this app, you confirm you meet this requirement.</p>
+              </section>
+
+              <section className="privacy-section">
+                <h3>Contact</h3>
+                <p>Questions about your privacy? Reach out via the Support link or join our Discord community.</p>
+              </section>
+            </div>
+
+            <div className="privacy-footer">
+              <button className="btn-primary" onClick={() => setShowPrivacyModal(false)}>Done</button>
             </div>
           </div>
         </div>
