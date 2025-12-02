@@ -184,9 +184,10 @@
   }
 }
 
-/* Mobile */
+/* Mobile - KEY FIX: flex: none removes the expanding gap */
 @media (max-width: 768px) {
   .landing-main {
+    flex: none;
     padding: 48px 20px 20px;
     justify-content: flex-start;
     padding-top: 10vh;
@@ -261,6 +262,7 @@
 /* Small mobile */
 @media (max-width: 480px) {
   .landing-main {
+    flex: none;
     padding-top: 8vh;
   }
   
@@ -308,6 +310,7 @@
 /* Very small screens */
 @media (max-width: 360px) {
   .landing-main {
+    flex: none;
     padding: 40px 16px 16px;
     padding-top: 6vh;
   }
@@ -344,11 +347,12 @@
   }
 }
 
-/* Landscape mobile - prevent awkward layout */
+/* Landscape mobile */
 @media (max-height: 600px) and (orientation: landscape) {
   .landing-main {
+    flex: none;
     padding-top: 40px;
-    justify-content: center;
+    justify-content: flex-start;
   }
   
   .landing-logo-container {
