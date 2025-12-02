@@ -401,7 +401,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               <div key={key} className="et-slider-group">
                 <div className="et-slider-header">
                   <span className="et-slider-label">{label}</span>
-                  <span className="et-slider-value">{emotions[key]}</span>
+                  <span className="et-slider-value">{emotions[key]}/10</span>
                 </div>
                 <div className="et-slider-wrap">
                   <div 

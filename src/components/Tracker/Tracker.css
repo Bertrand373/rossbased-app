@@ -429,15 +429,15 @@
 }
 
 .benefit-info span:first-child {
-  font-size: 0.875rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #ffffff;
 }
 
 .benefit-num {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
   font-feature-settings: 'tnum' 1;
 }
 

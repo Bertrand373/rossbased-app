@@ -178,7 +178,7 @@ const Tracker = ({ userData, updateUserData }) => {
                 <div key={key} className="benefit-row">
                   <div className="benefit-info">
                     <span>{label}</span>
-                    <span className="benefit-num">{benefits[key]}</span>
+                    <span className="benefit-num">{benefits[key]}/10</span>
                   </div>
                   <div className="benefit-slider">
                     <div 
