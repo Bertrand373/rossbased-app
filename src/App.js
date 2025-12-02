@@ -1,5 +1,5 @@
 // App.js - TITANTRACK MODERN MINIMAL
-// AI hooks temporarily disabled for debugging
+// DEBUG VERSION - with console logs to diagnose login issue
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
@@ -28,10 +28,6 @@ import MobileNavigation from './components/Navigation/MobileNavigation';
 // Custom hooks
 import { useUserData } from './hooks/useUserData';
 
-// AI HOOKS DISABLED FOR DEBUGGING - uncomment when login works
-// import { useAutoTrain } from './hooks/useAutoTrain';
-// import { useRiskIndicator } from './hooks/useRiskIndicator';
-
 // Profile Button - Minimal circle
 const ProfileButton = ({ userData }) => {
   const navigate = useNavigate();
@@ -54,7 +50,7 @@ const ProfileButton = ({ userData }) => {
 };
 
 // Desktop Navigation - sliding dot indicator
-const HeaderNavigation = ({ riskLevel = 'none' }) => {
+const HeaderNavigation = () => {
   const location = useLocation();
   const containerRef = useRef(null);
   const itemRefs = useRef([]);
@@ -66,7 +62,7 @@ const HeaderNavigation = ({ riskLevel = 'none' }) => {
     { path: '/calendar', label: 'Calendar' },
     { path: '/stats', label: 'Stats' },
     { path: '/timeline', label: 'Timeline' },
-    { path: '/urge-toolkit', label: 'Urges', showRiskIndicator: true }
+    { path: '/urge-toolkit', label: 'Urges' }
   ];
 
   const getActiveIndex = useCallback(() => {
@@ -121,10 +117,6 @@ const HeaderNavigation = ({ riskLevel = 'none' }) => {
               className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
             >
               {item.label}
-              {/* Risk indicator for desktop nav - disabled for now */}
-              {item.showRiskIndicator && riskLevel !== 'none' && (
-                <span className={`desktop-risk-dot ${riskLevel}`} />
-              )}
             </NavLink>
           </div>
         ))}
@@ -182,8 +174,16 @@ function App() {
     cancelGoal
   } = useUserData();
 
-  // AI HOOKS DISABLED - hardcode riskLevel to 'none'
-  const riskLevel = 'none';
+  // DEBUG: Log state changes
+  useEffect(() => {
+    console.log('🔍 DEBUG App.js State:', {
+      isLoggedIn,
+      isLoading,
+      isRefreshLoading,
+      hasUserData: !!userData,
+      username: userData?.username
+    });
+  }, [isLoggedIn, isLoading, isRefreshLoading, userData]);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
@@ -201,14 +201,27 @@ function App() {
   }, [isRefreshLoading]);
 
   const handleLogin = async (username, password) => {
+    console.log('🔍 DEBUG handleLogin called with:', username);
     setLoadingMessage('Signing in...');
     const success = await login(username, password);
+    console.log('🔍 DEBUG login result:', success);
     if (success) setShowAuthModal(false);
     return success;
   };
 
+  // DEBUG: Log render decision
+  console.log('🔍 DEBUG Render decision:', {
+    isLoading,
+    isRefreshLoading,
+    isLoggedIn,
+    hasUserData: !!userData,
+    willShowApp: isLoggedIn && userData,
+    willShowLanding: !isLoggedIn || !userData
+  });
+
   // Loading screen
   if (isLoading || isRefreshLoading) {
+    console.log('🔍 DEBUG: Showing loading screen');
     return (
       <div className="app-loading-screen">
         <img 
@@ -248,12 +261,13 @@ function App() {
       <div className="app">
         {isLoggedIn && userData ? (
           <>
+            {console.log('🔍 DEBUG: Rendering main app')}
             <header className="app-header">
               <div className="logo-container">
                 <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
               </div>
               
-              {!isMobile && <HeaderNavigation riskLevel={riskLevel} />}
+              {!isMobile && <HeaderNavigation />}
               
               <ProfileButton userData={userData} />
             </header>
@@ -262,7 +276,6 @@ function App() {
               <MobileNavigation 
                 activeTab={activeTab} 
                 setActiveTab={setActiveTab}
-                riskLevel={riskLevel}
               />
             )}
             
@@ -306,9 +319,12 @@ function App() {
             </main>
           </>
         ) : (
-          <Routes>
-            <Route path="*" element={<Landing onLogin={handleLogin} />} />
-          </Routes>
+          <>
+            {console.log('🔍 DEBUG: Rendering Landing page')}
+            <Routes>
+              <Route path="*" element={<Landing onLogin={handleLogin} />} />
+            </Routes>
+          </>
         )}
       </div>
     </Router>
