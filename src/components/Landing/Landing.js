@@ -74,7 +74,7 @@ const Landing = ({ onLogin }) => {
           <div className="landing-feature-number">02</div>
           <div className="landing-feature-content">
             <h3>Analyze</h3>
-            <p>Understand your patterns and triggers</p>
+            <p>AI learns your patterns to predict vulnerable moments</p>
           </div>
         </div>
         
