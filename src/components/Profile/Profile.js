@@ -1,4 +1,5 @@
-// Profile.js - TITANTRACK
+// Profile.js - TITANTRACK MINIMAL
+// Matches Landing/Stats/Calendar aesthetic
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -59,7 +60,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const tabs = [
     { id: 'account', label: 'Account' },
     { id: 'privacy', label: 'Privacy' },
-    { id: 'settings', label: 'Settings' },
     { id: 'data', label: 'Data' }
   ];
 
@@ -188,6 +188,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     setFeedbackMessage('');
     setFeedbackType('general');
     setShowFeedbackModal(false);
+    toast.success('Feedback sent!');
   };
 
   const handleDataExport = () => {
@@ -213,6 +214,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     setShowExportModal(false);
+    toast.success('Data exported!');
   };
 
   const handleAccountDeletion = () => {
@@ -225,36 +227,32 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   return (
     <div className="profile">
-      {/* Header */}
-      <header className="profile-header">
-        <h1>Profile</h1>
-        <p>Manage your account and preferences</p>
-      </header>
-
-      {/* User Info */}
+      {/* User Info - Sign Out accessible here */}
       <div className="profile-user">
         <div className="profile-avatar">{userInitial}</div>
-        <div className="profile-user-details">
+        <div className="profile-user-info">
           <span className="profile-name">{userData.username}</span>
           <span className="profile-since">Member since {memberSince}</span>
         </div>
-        <button className="profile-feedback-btn" onClick={() => setShowFeedbackModal(true)}>
-          Feedback
+        <button className="profile-signout" onClick={onLogout}>
+          Sign Out
         </button>
       </div>
 
-      {/* Tab Navigation - Matches Calendar toggle exactly */}
-      <div className="profile-tabs">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
+      {/* Tab Navigation - Text-only with dividers */}
+      <nav className="profile-tabs">
+        {tabs.map((tab, index) => (
+          <React.Fragment key={tab.id}>
+            <button
+              className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+            {index < tabs.length - 1 && <div className="profile-tab-divider" />}
+          </React.Fragment>
         ))}
-      </div>
+      </nav>
 
       {/* Content */}
       <div className="profile-content">
@@ -263,7 +261,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         {activeTab === 'account' && (
           <div className="profile-section">
             <div className="section-header">
-              <h2>Account</h2>
+              <h2>Account Details</h2>
               <button className="edit-btn" onClick={() => setIsEditingProfile(!isEditingProfile)}>
                 {isEditingProfile ? 'Cancel' : 'Edit'}
               </button>
@@ -318,10 +316,21 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
             {isEditingProfile && (
               <div className="section-actions">
-                <button className="btn-primary" onClick={handleProfileUpdate}>Save</button>
+                <button className="btn-primary" onClick={handleProfileUpdate}>Save Changes</button>
                 <button className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Cancel</button>
               </div>
             )}
+
+            {/* Feedback Row */}
+            <div className="feedback-row">
+              <div className="feedback-text">
+                <span className="feedback-title">Send Feedback</span>
+                <span className="feedback-desc">Help us improve TitanTrack</span>
+              </div>
+              <button className="feedback-btn" onClick={() => setShowFeedbackModal(true)}>
+                Send
+              </button>
+            </div>
           </div>
         )}
 
@@ -329,7 +338,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         {activeTab === 'privacy' && (
           <div className="profile-section">
             <div className="section-header">
-              <h2>Privacy</h2>
+              <h2>Privacy & Notifications</h2>
               <button className="edit-btn" onClick={() => setIsEditingPrivacy(!isEditingPrivacy)}>
                 {isEditingPrivacy ? 'Cancel' : 'Edit'}
               </button>
@@ -492,24 +501,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
             {isEditingPrivacy && (
               <div className="section-actions">
-                <button className="btn-primary" onClick={handleSaveNotificationPreferences}>Save</button>
+                <button className="btn-primary" onClick={handleSaveNotificationPreferences}>Save Changes</button>
                 <button className="btn-ghost" onClick={() => setIsEditingPrivacy(false)}>Cancel</button>
               </div>
             )}
-          </div>
-        )}
-
-        {/* SETTINGS TAB */}
-        {activeTab === 'settings' && (
-          <div className="profile-section">
-            <div className="section-header">
-              <h2>Settings</h2>
-            </div>
-            <h3 className="group-label">Language</h3>
-            <div className="coming-soon">
-              <span className="coming-badge">Coming Soon</span>
-              <p>Multi-language support is being developed</p>
-            </div>
           </div>
         )}
 
@@ -517,7 +512,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
         {activeTab === 'data' && (
           <div className="profile-section">
             <div className="section-header">
-              <h2>Data</h2>
+              <h2>Your Data</h2>
             </div>
 
             <div className="data-row">
@@ -531,12 +526,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <div className="data-row danger">
               <div className="data-text">
                 <span className="data-title">Delete Account</span>
-                <span className="data-desc">Permanently remove data</span>
+                <span className="data-desc">Permanently remove all data</span>
               </div>
               <button className="data-btn danger" onClick={() => setShowDeleteConfirm(true)}>Delete</button>
             </div>
-
-            <button className="signout-btn" onClick={onLogout}>Sign Out</button>
           </div>
         )}
       </div>
@@ -544,7 +537,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       {/* FEEDBACK MODAL */}
       {showFeedbackModal && (
         <div className="overlay" onClick={() => setShowFeedbackModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+          <div className="modal legacy" onClick={e => e.stopPropagation()}>
             <h2>Send Feedback</h2>
             <p>Help us improve TitanTrack</p>
             

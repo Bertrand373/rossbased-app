@@ -1,5 +1,5 @@
-/* Profile.css - TITANTRACK
-   Matches Tracker/Calendar aesthetic exactly */
+/* Profile.css - TITANTRACK MINIMAL
+   Matches Landing/Stats/Calendar aesthetic - no header, text toggles */
 
 /* =============================================================================
    CONTAINER
@@ -9,70 +9,54 @@
   min-height: calc(100dvh - 56px - 80px);
   display: flex;
   flex-direction: column;
-  padding: 24px 24px 120px;
+  align-items: center;
+  padding: 48px 24px 120px;
   background-color: #000000;
-  max-width: 480px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 @media (min-width: 1025px) {
   .profile {
     min-height: calc(100dvh - 64px);
-    padding: 32px 24px 80px;
-    max-width: 520px;
+    padding: 56px 24px 80px;
   }
 }
 
-/* =============================================================================
-   HEADER - Simple centered text
-   ============================================================================= */
-
-.profile-header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.profile-header h1 {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 8px 0;
-  letter-spacing: -0.02em;
-}
-
-.profile-header p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
-  font-style: italic;
+.profile > * {
+  width: 100%;
+  max-width: 400px;
 }
 
 /* =============================================================================
-   USER INFO
+   USER INFO - Clean, minimal
    ============================================================================= */
 
 .profile-user {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 40px;
+  animation: fadeInUp 500ms ease forwards;
+  opacity: 0;
 }
 
 .profile-avatar {
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   background: rgba(255, 255, 255, 0.06);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
   color: #ffffff;
   flex-shrink: 0;
 }
 
-.profile-user-details {
+.profile-user-info {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -80,71 +64,75 @@
 }
 
 .profile-name {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
 }
 
 .profile-since {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
 }
 
-.profile-feedback-btn {
+/* Sign Out - Easily accessible */
+.profile-signout {
   padding: 10px 20px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: none;
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.35);
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.profile-feedback-btn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+.profile-signout:hover {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* =============================================================================
-   TAB NAVIGATION - Matches Calendar toggle EXACTLY
+   TAB NAVIGATION - Text-only with dividers (matches Calendar/Stats)
    ============================================================================= */
 
 .profile-tabs {
-  display: inline-flex;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 4px;
-  gap: 4px;
-  align-self: center;
-  margin-bottom: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 48px;
+  animation: fadeInUp 500ms ease 50ms forwards;
+  opacity: 0;
 }
 
 .profile-tab {
-  padding: 12px 20px;
+  padding: 8px 16px;
   background: transparent;
   border: none;
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.25);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.profile-tab:hover:not(.active) {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .profile-tab.active {
-  background: #ffffff;
-  color: #000000;
+  color: #ffffff;
   font-weight: 600;
 }
 
-.profile-tab:not(.active):hover {
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.03);
+.profile-tab-divider {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* =============================================================================
@@ -152,7 +140,8 @@
    ============================================================================= */
 
 .profile-content {
-  flex: 1;
+  animation: fadeInUp 500ms ease 100ms forwards;
+  opacity: 0;
 }
 
 .profile-section {
@@ -160,37 +149,40 @@
   flex-direction: column;
 }
 
-/* Section Header */
+/* Section Header - Minimal */
 .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 24px;
 }
 
 .section-header h2 {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   margin: 0;
-  letter-spacing: -0.02em;
 }
 
 .edit-btn {
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: none;
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .edit-btn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
   color: #ffffff;
 }
 
@@ -198,10 +190,10 @@
 .group-label {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.25);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 24px 0 16px;
+  letter-spacing: 0.1em;
+  margin: 32px 0 16px;
 }
 
 .group-label:first-of-type {
@@ -209,7 +201,7 @@
 }
 
 /* =============================================================================
-   FORM INPUTS - Matches Calendar/Tracker exactly
+   FORM INPUTS
    ============================================================================= */
 
 .form-group {
@@ -218,42 +210,43 @@
 
 .form-group label {
   display: block;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
 }
 
 .form-group input {
   width: 100%;
   padding: 16px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   color: #ffffff;
   font-size: 0.9375rem;
   font-family: inherit;
   transition: border-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .form-group input:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .form-group input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.2);
 }
 
 /* =============================================================================
-   TOGGLE ROWS
+   TOGGLE ROWS - Containerless with dividers
    ============================================================================= */
 
 .toggle-row {
@@ -261,7 +254,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 0;
+  padding: 20px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -272,7 +265,7 @@
 .toggle-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .toggle-label {
@@ -282,31 +275,32 @@
 }
 
 .toggle-desc {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
 }
 
-/* Toggle Switch - Gold active */
+/* Toggle Switch */
 .toggle-switch {
   position: relative;
   width: 50px;
   height: 30px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border: none;
   border-radius: 15px;
   cursor: pointer;
   transition: background-color 200ms ease;
   flex-shrink: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .toggle-switch:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
 .toggle-switch.active {
-  background: #ffdd00;
+  background: #ffffff;
 }
 
 .toggle-knob {
@@ -317,7 +311,7 @@
   height: 24px;
   background: #ffffff;
   border-radius: 50%;
-  transition: transform 200ms ease;
+  transition: transform 200ms ease, background-color 200ms ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -334,7 +328,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 0 16px;
+  padding: 12px 0 20px;
 }
 
 .time-row.single {
@@ -342,70 +336,73 @@
 }
 
 .time-row label {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .time-row input[type="time"] {
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   color: #ffffff;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .time-row input[type="time"]:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .time-row span {
-  color: rgba(255, 255, 255, 0.35);
-  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.8125rem;
 }
 
 /* Test Notification Button */
 .test-notif-btn {
-  margin-top: 16px;
+  margin-top: 20px;
   padding: 12px 20px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: none;
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.4);
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: color 150ms ease;
   align-self: flex-start;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .test-notif-btn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* =============================================================================
-   SECTION ACTIONS - Matches Tracker/Calendar exactly
+   SECTION ACTIONS
    ============================================================================= */
 
 .section-actions {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 32px;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* =============================================================================
-   BUTTONS - EXACT match to Tracker/Calendar
+   BUTTONS
    ============================================================================= */
 
 .btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background: #ffffff;
+  background-color: #ffffff;
   border: none;
   border-radius: 12px;
   color: #000000;
@@ -413,7 +410,8 @@
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: opacity 150ms ease, transform 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary:hover {
@@ -432,10 +430,11 @@
   border-radius: 12px;
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-ghost:hover {
@@ -454,14 +453,19 @@
   font-family: inherit;
   cursor: pointer;
   transition: background-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-danger:hover {
   background: rgba(255, 59, 48, 0.25);
 }
 
+.btn-danger:active {
+  transform: scale(0.98);
+}
+
 /* =============================================================================
-   DATA ROWS
+   DATA ROWS - Containerless
    ============================================================================= */
 
 .data-row {
@@ -480,7 +484,7 @@
 .data-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .data-title {
@@ -490,8 +494,8 @@
 }
 
 .data-desc {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .data-row.danger .data-title {
@@ -509,6 +513,7 @@
   font-family: inherit;
   cursor: pointer;
   transition: background-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .data-btn:hover {
@@ -524,82 +529,103 @@
   background: rgba(255, 59, 48, 0.25);
 }
 
-/* Sign Out */
-.signout-btn {
-  width: 100%;
-  padding: 16px 24px;
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
-  margin-top: 24px;
-}
-
-.signout-btn:hover {
-  color: rgba(255, 255, 255, 0.7);
-}
-
 /* =============================================================================
    COMING SOON
    ============================================================================= */
 
 .coming-soon {
-  padding: 20px;
+  padding: 32px 0;
   text-align: center;
 }
 
 .coming-badge {
   display: inline-block;
   padding: 6px 12px;
-  background: rgba(255, 221, 0, 0.1);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 6px;
-  color: #ffdd00;
+  color: rgba(255, 255, 255, 0.4);
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
   margin-bottom: 12px;
 }
 
 .coming-soon p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.3);
   margin: 0;
 }
 
 /* =============================================================================
-   OVERLAY - Matches Tracker EXACTLY
+   FEEDBACK BUTTON
+   ============================================================================= */
+
+.feedback-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  margin-top: 32px;
+}
+
+.feedback-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feedback-title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.feedback-desc {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.feedback-btn {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.feedback-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* =============================================================================
+   OVERLAY - Matches other tabs
    ============================================================================= */
 
 .overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  z-index: 10000;
   padding: 24px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
   animation: overlayIn 200ms ease;
-}
-
-.overlay::before,
-.overlay::after {
-  content: '';
-  flex: 1;
-  min-height: 40px;
 }
 
 @keyframes overlayIn {
@@ -608,17 +634,17 @@
 }
 
 /* =============================================================================
-   MODAL - TRANSPARENT, floating content
+   MODAL - Transparent floating, sticky header/footer
    ============================================================================= */
 
 .modal {
   width: 100%;
-  max-width: 360px;
+  max-width: 340px;
+  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   background: transparent;
-  padding: 0;
-  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  text-align: center;
 }
 
 @keyframes modalIn {
@@ -632,17 +658,64 @@
   }
 }
 
-.modal h2 {
-  font-size: 1.5rem;
+/* Modal Header - Sticky */
+.modal-header {
+  flex-shrink: 0;
+  text-align: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal-header h2 {
+  font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
   margin: 0 0 8px 0;
   letter-spacing: -0.02em;
 }
 
-.modal p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+.modal-header p {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Modal Scroll Area */
+.modal-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+  padding: 24px 0;
+}
+
+/* Modal Footer - Sticky */
+.modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Legacy modal support (no header/footer split) */
+.modal.legacy {
+  text-align: center;
+}
+
+.modal.legacy h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.modal.legacy p {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
   margin: 0 0 32px 0;
   line-height: 1.5;
 }
@@ -659,14 +732,15 @@
 .feedback-type-btn {
   padding: 10px 16px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .feedback-type-btn:hover {
@@ -688,12 +762,12 @@
 
 .modal-field label {
   display: block;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
 }
 
 .modal-field input,
@@ -701,23 +775,24 @@
   width: 100%;
   padding: 16px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   color: #ffffff;
   font-size: 0.9375rem;
   font-family: inherit;
   transition: border-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .modal-field input:focus,
 .modal-field textarea:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .modal-field input::placeholder,
 .modal-field textarea::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.2);
 }
 
 .modal-field textarea {
@@ -726,7 +801,7 @@
   line-height: 1.5;
 }
 
-/* Modal Actions */
+/* Modal Actions (legacy) */
 .modal-actions {
   display: flex;
   flex-direction: column;
@@ -735,20 +810,19 @@
 }
 
 /* =============================================================================
-   CONFIRM MODAL - Smaller, side-by-side buttons
+   CONFIRM MODAL - Simple centered
    ============================================================================= */
 
 .confirm-modal {
   width: 100%;
-  max-width: 320px;
+  max-width: 340px;
   background: transparent;
   text-align: center;
-  flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .confirm-modal h2 {
-  font-size: 1.375rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
   margin: 0 0 12px 0;
@@ -759,7 +833,7 @@
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.4);
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .confirm-actions {
@@ -777,49 +851,45 @@
 }
 
 /* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================================================
    RESPONSIVE
    ============================================================================= */
 
 @media (max-width: 480px) {
   .profile {
-    padding: 20px 16px 120px;
-  }
-
-  .profile-header h1 {
-    font-size: 1.375rem;
+    padding: 32px 16px 100px;
   }
 
   .profile-user {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .profile-feedback-btn {
-    width: 100%;
-    text-align: center;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
   }
 
   .profile-tabs {
-    width: 100%;
+    margin-bottom: 40px;
   }
 
   .profile-tab {
-    flex: 1;
-    padding: 10px 12px;
+    padding: 8px 12px;
     font-size: 0.8125rem;
-    text-align: center;
-  }
-
-  .section-header h2 {
-    font-size: 1.125rem;
   }
 
   .toggle-label {
     font-size: 0.875rem;
-  }
-
-  .toggle-desc {
-    font-size: 0.75rem;
   }
 
   .time-row {
@@ -852,6 +922,38 @@
   .feedback-type-btn {
     width: 100%;
   }
+
+  .feedback-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .feedback-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .profile {
+    padding: 28px 12px 90px;
+  }
+
+  .profile-tab {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  .profile-tab-divider {
+    height: 12px;
+  }
+
+  .btn-primary,
+  .btn-ghost,
+  .btn-danger {
+    padding: 14px 20px;
+    font-size: 0.875rem;
+  }
 }
 
 /* =============================================================================
@@ -861,7 +963,11 @@
 @media (prefers-reduced-motion: reduce) {
   .overlay,
   .modal,
-  .confirm-modal {
+  .confirm-modal,
+  .profile-user,
+  .profile-tabs,
+  .profile-content {
     animation: none;
+    opacity: 1;
   }
 }
