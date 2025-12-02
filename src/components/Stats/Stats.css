@@ -261,10 +261,15 @@
   margin-bottom: 20px;
 }
 
-/* Benefits row - allows wrapping on mobile */
-.toggle-row.benefits {
-  flex-wrap: wrap;
-  row-gap: 8px;
+/* Tighter spacing for stacked benefit rows */
+.toggle-row.benefits-row {
+  margin-bottom: 12px;
+}
+
+/* More space before time range */
+.toggle-row.time-range {
+  margin-top: 8px;
+  margin-bottom: 24px;
 }
 
 .toggle-btn {
@@ -299,27 +304,6 @@
   height: 16px;
   background-color: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
-}
-
-/* Mobile: 3+3 layout for benefits - hide dividers, use width constraint */
-@media (max-width: 480px) {
-  .toggle-row.benefits {
-    max-width: 240px;
-    margin-left: auto;
-    margin-right: auto;
-    gap: 4px 0;
-  }
-  
-  .toggle-row.benefits .toggle-btn {
-    width: calc(33.33% - 1px);
-    padding: 8px 4px;
-    font-size: 0.75rem;
-    text-align: center;
-  }
-  
-  .toggle-row.benefits .toggle-divider {
-    display: none;
-  }
 }
 
 /* Average Display - Hero number like Tracker */
@@ -1153,12 +1137,16 @@
   
   .toggle-btn {
     font-size: 0.6875rem;
-    padding: 5px 10px;
+    padding: 6px 10px;
   }
   
   .toggle-btn.sm {
     font-size: 0.625rem;
-    padding: 4px 8px;
+    padding: 5px 8px;
+  }
+  
+  .toggle-divider {
+    height: 14px;
   }
   
   .average-num {
