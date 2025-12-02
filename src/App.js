@@ -1,5 +1,4 @@
 // App.js - TITANTRACK MODERN MINIMAL
-// DEBUG VERSION - with console logs to diagnose login issue
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
@@ -174,16 +173,12 @@ function App() {
     cancelGoal
   } = useUserData();
 
-  // DEBUG: Log state changes
+  // CRITICAL FIX: Close auth modal when user becomes logged in
   useEffect(() => {
-    console.log('🔍 DEBUG App.js State:', {
-      isLoggedIn,
-      isLoading,
-      isRefreshLoading,
-      hasUserData: !!userData,
-      username: userData?.username
-    });
-  }, [isLoggedIn, isLoading, isRefreshLoading, userData]);
+    if (isLoggedIn && userData) {
+      setShowAuthModal(false);
+    }
+  }, [isLoggedIn, userData]);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
@@ -201,27 +196,16 @@ function App() {
   }, [isRefreshLoading]);
 
   const handleLogin = async (username, password) => {
-    console.log('🔍 DEBUG handleLogin called with:', username);
     setLoadingMessage('Signing in...');
     const success = await login(username, password);
-    console.log('🔍 DEBUG login result:', success);
-    if (success) setShowAuthModal(false);
+    if (success) {
+      setShowAuthModal(false);
+    }
     return success;
   };
 
-  // DEBUG: Log render decision
-  console.log('🔍 DEBUG Render decision:', {
-    isLoading,
-    isRefreshLoading,
-    isLoggedIn,
-    hasUserData: !!userData,
-    willShowApp: isLoggedIn && userData,
-    willShowLanding: !isLoggedIn || !userData
-  });
-
   // Loading screen
   if (isLoading || isRefreshLoading) {
-    console.log('🔍 DEBUG: Showing loading screen');
     return (
       <div className="app-loading-screen">
         <img 
@@ -252,16 +236,18 @@ function App() {
         }}
       />
       
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)}
-        onLogin={handleLogin}
-      />
+      {/* ONLY show AuthModal when NOT logged in AND showAuthModal is true */}
+      {!isLoggedIn && (
+        <AuthModal 
+          isOpen={showAuthModal} 
+          onClose={() => setShowAuthModal(false)}
+          onLogin={handleLogin}
+        />
+      )}
       
       <div className="app">
         {isLoggedIn && userData ? (
           <>
-            {console.log('🔍 DEBUG: Rendering main app')}
             <header className="app-header">
               <div className="logo-container">
                 <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
@@ -319,12 +305,9 @@ function App() {
             </main>
           </>
         ) : (
-          <>
-            {console.log('🔍 DEBUG: Rendering Landing page')}
-            <Routes>
-              <Route path="*" element={<Landing onLogin={handleLogin} />} />
-            </Routes>
-          </>
+          <Routes>
+            <Route path="*" element={<Landing onLogin={handleLogin} />} />
+          </Routes>
         )}
       </div>
     </Router>
