@@ -1,5 +1,5 @@
 // App.js - TITANTRACK MODERN MINIMAL
-// Updated with Ambient AI Intelligence - auto-training and risk indicators
+// AI hooks temporarily disabled for debugging
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
@@ -16,7 +16,7 @@ import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
-// ML Components (kept for debugging/advanced users - hidden from normal UI)
+// ML Components
 import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay';
 import MLTraining from './components/MLTraining/MLTraining';
 
@@ -27,8 +27,10 @@ import MobileNavigation from './components/Navigation/MobileNavigation';
 
 // Custom hooks
 import { useUserData } from './hooks/useUserData';
-import { useAutoTrain } from './hooks/useAutoTrain';
-import { useRiskIndicator } from './hooks/useRiskIndicator';
+
+// AI HOOKS DISABLED FOR DEBUGGING - uncomment when login works
+// import { useAutoTrain } from './hooks/useAutoTrain';
+// import { useRiskIndicator } from './hooks/useRiskIndicator';
 
 // Profile Button - Minimal circle
 const ProfileButton = ({ userData }) => {
@@ -51,7 +53,7 @@ const ProfileButton = ({ userData }) => {
   );
 };
 
-// Desktop Navigation - sliding dot indicator with risk indicator
+// Desktop Navigation - sliding dot indicator
 const HeaderNavigation = ({ riskLevel = 'none' }) => {
   const location = useLocation();
   const containerRef = useRef(null);
@@ -119,7 +121,7 @@ const HeaderNavigation = ({ riskLevel = 'none' }) => {
               className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
             >
               {item.label}
-              {/* Risk indicator for desktop nav */}
+              {/* Risk indicator for desktop nav - disabled for now */}
               {item.showRiskIndicator && riskLevel !== 'none' && (
                 <span className={`desktop-risk-dot ${riskLevel}`} />
               )}
@@ -180,15 +182,8 @@ function App() {
     cancelGoal
   } = useUserData();
 
-  // AMBIENT AI: Only run these hooks when user is logged in with valid data
-  // Pass null when not logged in to prevent any processing
-  const safeUserData = (isLoggedIn && userData) ? userData : null;
-  
-  // Auto-train ML model silently in background (only when logged in)
-  useAutoTrain(safeUserData);
-
-  // Get risk indicator state for navigation (only when logged in)
-  const { riskLevel } = useRiskIndicator(safeUserData);
+  // AI HOOKS DISABLED - hardcode riskLevel to 'none'
+  const riskLevel = 'none';
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
@@ -299,7 +294,7 @@ function App() {
                     <Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />
                   } />
                   
-                  {/* ML Routes - kept for direct access but hidden from nav */}
+                  {/* ML Routes */}
                   <Route path="/urge-prediction" element={
                     <PredictionDisplay mode="full" userData={userData} />
                   } />
