@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
-import { FaTimes, FaCheck, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
 const EmotionalTimeline = ({ userData, updateUserData }) => {
   const [activeTab, setActiveTab] = useState('journey');
@@ -399,7 +399,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="et-sliders">
             {sliderItems.map(({ key, label, desc }) => (
               <div key={key} className="et-slider-group">
-                <span className="et-slider-label">{label}</span>
+                <div className="et-slider-header">
+                  <span className="et-slider-label">{label}</span>
+                  <span className="et-slider-value">{emotions[key]}/10</span>
+                </div>
                 <div className="et-slider-wrap">
                   <div className="et-slider-bg" />
                   <div 
@@ -488,60 +491,60 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Phase Modal - Transparent floating */}
+      {/* Phase Modal - Transparent floating with sticky footer */}
       {showModal && selectedPhase && (
         <div className="et-overlay" onClick={() => setShowModal(false)}>
-          <button className="et-modal-close" onClick={() => setShowModal(false)}>
-            <FaTimes />
-          </button>
-          
           <div className="et-modal" onClick={e => e.stopPropagation()}>
-            <div className="et-modal-header">
-              <span className="et-modal-num">
-                {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
-              </span>
-              <div>
-                <h2>{selectedPhase.name}</h2>
-                <p>Days {selectedPhase.days}</p>
+            <div className="et-modal-scroll">
+              <div className="et-modal-header">
+                <span className="et-modal-num">
+                  {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
+                </span>
+                <div>
+                  <h2>{selectedPhase.name}</h2>
+                  <p>Days {selectedPhase.days}</p>
+                </div>
+              </div>
+
+              <div className="et-modal-body">
+                <div className="et-modal-section">
+                  <h4>Overview</h4>
+                  <p>{selectedPhase.description}</p>
+                </div>
+
+                <div className="et-modal-section">
+                  <h4>The Science</h4>
+                  <p>{selectedPhase.science}</p>
+                </div>
+
+                <div className="et-modal-section">
+                  <h4>What to Expect</h4>
+                  <ul>
+                    {selectedPhase.symptoms.map((s, i) => <li key={i}>{s}</li>)}
+                  </ul>
+                </div>
+
+                <div className="et-modal-section et-warning">
+                  <h4><FaExclamationTriangle /> Warning Signs</h4>
+                  <ul>
+                    {selectedPhase.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                  </ul>
+                </div>
+
+                <div className="et-modal-section">
+                  <h4>Techniques</h4>
+                  <ul>
+                    {selectedPhase.techniques.map((t, i) => <li key={i}>{t}</li>)}
+                  </ul>
+                </div>
               </div>
             </div>
-
-            <div className="et-modal-body">
-              <div className="et-modal-section">
-                <h4>Overview</h4>
-                <p>{selectedPhase.description}</p>
-              </div>
-
-              <div className="et-modal-section">
-                <h4>The Science</h4>
-                <p>{selectedPhase.science}</p>
-              </div>
-
-              <div className="et-modal-section">
-                <h4>What to Expect</h4>
-                <ul>
-                  {selectedPhase.symptoms.map((s, i) => <li key={i}>{s}</li>)}
-                </ul>
-              </div>
-
-              <div className="et-modal-section et-warning">
-                <h4><FaExclamationTriangle /> Warning Signs</h4>
-                <ul>
-                  {selectedPhase.warnings.map((w, i) => <li key={i}>{w}</li>)}
-                </ul>
-              </div>
-
-              <div className="et-modal-section">
-                <h4>Techniques</h4>
-                <ul>
-                  {selectedPhase.techniques.map((t, i) => <li key={i}>{t}</li>)}
-                </ul>
-              </div>
+            
+            <div className="et-modal-footer">
+              <button className="et-modal-btn" onClick={() => setShowModal(false)}>
+                Cancel
+              </button>
             </div>
-
-            <button className="et-modal-btn" onClick={() => setShowModal(false)}>
-              Close
-            </button>
           </div>
         </div>
       )}
