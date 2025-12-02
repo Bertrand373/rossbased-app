@@ -766,27 +766,33 @@
 }
 
 /* =============================================================================
-   RESET LINK
+   RESET BUTTON - Red/danger like Tracker modals
    ============================================================================= */
 
 .reset-link {
   display: block;
   width: 100%;
-  padding: 20px;
-  background: transparent;
+  padding: 16px 24px;
+  background: rgba(255, 59, 48, 0.1);
   border: none;
-  color: rgba(255, 255, 255, 0.2);
-  font-size: 0.8125rem;
-  font-weight: 500;
+  border-radius: 12px;
+  color: #ff3b30;
+  font-size: 0.9375rem;
+  font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: color 150ms ease;
+  transition: background-color 150ms ease;
   text-align: center;
-  margin-top: 16px;
+  margin-top: 48px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .reset-link:hover {
-  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 59, 48, 0.18);
+}
+
+.reset-link:active {
+  transform: scale(0.98);
 }
 
 /* =============================================================================
