@@ -1,7 +1,23 @@
 /* =============================================================================
    STATS.CSS - TITANTRACK
-   Matches Landing/Tracker/Calendar aesthetic
+   Complete rewrite with nuclear overrides to kill global --primary yellow
    ============================================================================= */
+
+/* =============================================================================
+   NUCLEAR OVERRIDE - Kill global --primary yellow variable
+   MUST BE FIRST for inheritance to work
+   ============================================================================= */
+
+.stats-page,
+.stats-page *,
+.stats-page *::before,
+.stats-page *::after {
+  --primary: #ffffff !important;
+  --primary-light: rgba(255, 255, 255, 0.1) !important;
+  --primary-dark: #ffffff !important;
+  --primary-muted: rgba(255, 255, 255, 0.08) !important;
+  --primary-glow: rgba(255, 255, 255, 0.15) !important;
+}
 
 /* =============================================================================
    PAGE CONTAINER
@@ -55,7 +71,7 @@
 }
 
 /* =============================================================================
-   STAT CARDS - Softer labels (not aggressive ALL CAPS)
+   STAT CARDS - Softer labels (capitalize, not aggressive UPPERCASE)
    ============================================================================= */
 
 .stat-grid {
@@ -94,19 +110,19 @@
   font-feature-settings: 'tnum' 1;
 }
 
-/* FIXED: Softer label - capitalize instead of uppercase, less letter-spacing */
+/* SOFTER: Capitalize instead of uppercase, less aggressive */
 .stat-label {
   display: block;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.35);
   margin-top: 8px;
   text-transform: capitalize;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   font-weight: 400;
 }
 
 /* =============================================================================
-   SECTIONS
+   SECTIONS - NO borders on section headers
    ============================================================================= */
 
 .stats-section {
@@ -123,7 +139,7 @@
 }
 
 /* =============================================================================
-   MILESTONES - Subtle gold border + checkmark for earned
+   MILESTONES - Subtle gold checkmark for earned
    ============================================================================= */
 
 .milestone-grid {
@@ -153,7 +169,7 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* Earned milestone - subtle gold accent */
+/* Earned milestone - subtle gold accent (your signature color) */
 .milestone-card.earned {
   background: rgba(255, 221, 0, 0.03);
   border-color: rgba(255, 221, 0, 0.15);
@@ -161,7 +177,7 @@
 
 .milestone-card.earned:hover {
   background: rgba(255, 221, 0, 0.05);
-  border-color: rgba(255, 221, 0, 0.25);
+  border-color: rgba(255, 221, 0, 0.2);
 }
 
 /* Subtle gold checkmark for earned milestones */
@@ -376,11 +392,12 @@
 }
 
 /* =============================================================================
-   INSIGHT CARDS
+   INSIGHT CARDS - NO visible borders
    ============================================================================= */
 
 .insight-card {
   background: rgba(255, 255, 255, 0.02);
+  border: none;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -388,6 +405,7 @@
 .insight-card-header {
   padding: 14px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: transparent;
 }
 
 .insight-card-header span {
@@ -400,6 +418,7 @@
 
 .insight-card-content {
   padding: 20px;
+  background: transparent;
 }
 
 /* Loading spinner */
@@ -445,6 +464,7 @@
 /* Mini info banner */
 .mini-info-banner {
   background: rgba(255, 255, 255, 0.02);
+  border: none;
   border-radius: 8px;
   padding: 12px 14px;
   margin-bottom: 16px;
@@ -458,7 +478,7 @@
 }
 
 /* =============================================================================
-   PROGRESS TRENDS
+   PROGRESS TRENDS - NO borders between items
    ============================================================================= */
 
 .progress-trends-display {
@@ -504,7 +524,7 @@
 }
 
 /* =============================================================================
-   RELAPSE PATTERNS
+   RELAPSE PATTERNS - WHITE text, not yellow
    ============================================================================= */
 
 .relapse-patterns-display {
@@ -519,6 +539,7 @@
   align-items: center;
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.02);
+  border: none;
   border-radius: 8px;
 }
 
@@ -527,6 +548,7 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
+/* WHITE - not yellow */
 .relapse-stat-value {
   font-size: 0.8125rem;
   font-weight: 600;
@@ -762,7 +784,7 @@
 }
 
 /* =============================================================================
-   BUTTONS - Matches Tracker
+   BUTTONS
    ============================================================================= */
 
 .btn-primary {
@@ -824,7 +846,7 @@
 }
 
 /* =============================================================================
-   OVERLAY & MODAL - Solid background with border (matches screenshot)
+   OVERLAY & MODAL - Solid background
    ============================================================================= */
 
 .overlay {
@@ -858,7 +880,7 @@
   to { opacity: 1; }
 }
 
-/* Modal - Solid dark background with subtle border */
+/* Modal - Solid dark background */
 .modal {
   width: 100%;
   max-width: 380px;
@@ -1003,4 +1025,64 @@
   .insight-loading-spinner {
     animation: none;
   }
+}
+
+/* =============================================================================
+   NUCLEAR KILL SECTION - Override ALL yellow from global CSS
+   Must be at END for maximum specificity
+   ============================================================================= */
+
+/* Kill any element using var(--primary) for color */
+.stats-page [style*="var(--primary)"],
+.stats-page [style*="255, 221, 0"],
+.stats-page [style*="ffdd00"],
+.stats-page [style*="ffd700"],
+.stats-page [style*="251, 191, 36"] {
+  color: #ffffff !important;
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Force white on all value/trigger text */
+.stats-page .relapse-stat-value,
+.stats-page .victory-days,
+.stats-page .victory-label,
+.stats-page .optimization-criteria-title,
+.stats-page .optimization-criteria-text,
+.stats-page [class*="primary-trigger"],
+.stats-page [class*="trigger-value"],
+.stats-page [class*="conquered"] {
+  color: #ffffff !important;
+}
+
+/* Kill old decorative elements */
+.stats-page .data-progress-helmet,
+.stats-page .mini-info-helmet,
+.stats-page .insight-loading-helmet,
+.stats-page [class*="helmet"],
+.stats-page [class*="arc"],
+.stats-page .trend-badge {
+  display: none !important;
+}
+
+/* Kill legacy card borders */
+.stats-page .relapse-stat-card,
+.stats-page .relapse-summary-stats,
+.stats-page .conquered-trigger {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: none !important;
+}
+
+/* Kill EmotionalTimeline CSS bleed */
+.stats-page .energy-data-progress-indicator,
+.stats-page .energy-data-progress-bar {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Override any card with visible border that shouldn't have one */
+.stats-page .insight-card,
+.stats-page .relapse-stat,
+.stats-page .mini-info-banner {
+  border: none !important;
 }

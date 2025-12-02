@@ -1,76 +1,87 @@
-/* src/index.css */
+/* =============================================================================
+   INDEX.CSS - TITANTRACK GLOBAL STYLES
+   Design tokens, base styles, scrollbars, toasts
+   ============================================================================= */
+
+/* =============================================================================
+   DESIGN TOKENS
+   ============================================================================= */
+
 :root {
+  /* Spacing */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
+  
+  /* Border radius */
+  --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 9999px;
   
-  /* ============================================================
-     REFINED PREMIUM PALETTE - Your Gold, Restrained Execution
-     #ffdd00 executed with luxury restraint
-     ============================================================ */
-  
-  /* Your gold - kept as-is, used more strategically */
+  /* Gold accent - used strategically (nav, toggles, achievements) */
   --primary: #ffdd00;
   --primary-light: #ffe94d;
   --primary-dark: #e6c800;
   --primary-muted: rgba(255, 221, 0, 0.12);
   --primary-glow: rgba(255, 221, 0, 0.2);
   
-  /* Pure blacks - no tints, timeless */
+  /* Surfaces - pure black foundation */
   --background: #000000;
   --surface: #0a0a0a;
   --surface-raised: #111111;
   --surface-overlay: #161616;
   
-  /* Clean borders */
-  --border: #1f1f1f;
-  --border-subtle: #171717;
-  --border-prominent: #2a2a2a;
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-prominent: rgba(255, 255, 255, 0.12);
   
-  /* Text hierarchy - readable first, aesthetic second */
+  /* Text hierarchy */
   --text: #ffffff;
-  --text-secondary: #a0a0a0;      /* Readable - use for most secondary text */
-  --text-muted: #666666;          /* Truly muted - timestamps, metadata only */
-  --text-tertiary: #4a4a4a;       /* Placeholders only */
-  
-  /* Secondary accent - for less important interactive elements */
-  --accent-muted: #888888;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --text-tertiary: rgba(255, 255, 255, 0.25);
   
   /* Status colors */
   --success: #22c55e;
-  --danger: #ef4444;
+  --danger: #ff3b30;
   --warning: #f59e0b;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+}
+
+/* =============================================================================
+   BASE STYLES
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background);
   color: var(--text);
+  line-height: 1.5;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+/* =============================================================================
+   SCROLLBAR - Minimal, barely visible
+   ============================================================================= */
 
-/* ============================================================
-   CUSTOM SCROLLBAR - Ultra-minimal, matches app aesthetic
-   Completely replaces the default system scrollbar
-   ============================================================ */
-
-/* WebKit browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -81,16 +92,12 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-::-webkit-scrollbar-thumb:active {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 ::-webkit-scrollbar-corner {
@@ -100,42 +107,18 @@ code {
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
-/* Modal/list scrollbars - even more subtle */
-.modal-content::-webkit-scrollbar,
-.benefits-list::-webkit-scrollbar,
-.benefits-modal::-webkit-scrollbar {
-  width: 3px;
-}
-
-.modal-content::-webkit-scrollbar-thumb,
-.benefits-list::-webkit-scrollbar-thumb,
-.benefits-modal::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 1.5px;
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover,
-.benefits-list::-webkit-scrollbar-thumb:hover,
-.benefits-modal::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Mobile - thinner scrollbar */
+/* Mobile - thinner */
 @media (max-width: 768px) {
   ::-webkit-scrollbar {
     width: 3px;
     height: 3px;
   }
-  
-  ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
-  }
 }
 
-/* Touch devices - hide scrollbar completely (native scroll still works) */
+/* Touch devices - hide scrollbar */
 @media (hover: none) and (pointer: coarse) {
   ::-webkit-scrollbar {
     width: 0;
@@ -147,91 +130,78 @@ code {
   }
 }
 
-/* ============================================================
-   TOAST STYLING - Clean, minimal
-   ============================================================ */
+/* =============================================================================
+   TOAST NOTIFICATIONS - Clean, minimal
+   ============================================================================= */
 
 div[data-hot-toast] {
   top: 20px !important;
   z-index: 9999 !important;
 }
 
-div[data-hot-toast] > div,
-body div[data-hot-toast] > div,
-html body div[data-hot-toast] > div {
-  background: #0a0a0a !important;
-  color: #ffffff !important;
-  border: 1px solid #1f1f1f !important;
-  border-radius: 12px !important;
+div[data-hot-toast] > div {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5) !important;
-  padding: 16px 20px !important;
+  padding: 14px 18px !important;
   font-weight: 500 !important;
-  font-size: 14px !important;
-  min-width: 300px !important;
-  max-width: 400px !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 0.875rem !important;
+  min-width: 280px !important;
+  max-width: 380px !important;
+  font-family: inherit !important;
   line-height: 1.5 !important;
+  animation: toastIn 250ms ease-out !important;
 }
 
-div[data-hot-toast] > div[role="status"],
-body div[data-hot-toast] > div[role="status"],
-html body div[data-hot-toast] > div[role="status"] {
-  border-left: 3px solid #22c55e !important;
+/* Success toast */
+div[data-hot-toast] > div[role="status"] {
+  border-left: 3px solid var(--success) !important;
 }
 
-div[data-hot-toast] > div[role="alert"],
-body div[data-hot-toast] > div[role="alert"],
-html body div[data-hot-toast] > div[role="alert"] {
-  border-left: 3px solid #ef4444 !important;
+/* Error toast */
+div[data-hot-toast] > div[role="alert"] {
+  border-left: 3px solid var(--danger) !important;
 }
 
-div[data-hot-toast] > div:not([role]),
-body div[data-hot-toast] > div:not([role]),
-html body div[data-hot-toast] > div:not([role]) {
-  border-left: 3px solid #ffdd00 !important;
+/* Default/info toast */
+div[data-hot-toast] > div:not([role]) {
+  border-left: 3px solid var(--primary) !important;
 }
 
-div[data-hot-toast] svg,
-body div[data-hot-toast] svg,
-html body div[data-hot-toast] svg {
-  color: #22c55e !important;
+/* Toast icons */
+div[data-hot-toast] svg {
   margin-right: 12px !important;
   width: 18px !important;
   height: 18px !important;
   flex-shrink: 0 !important;
 }
 
+div[data-hot-toast] > div[role="status"] svg {
+  color: var(--success) !important;
+}
+
 div[data-hot-toast] > div[role="alert"] svg {
-  color: #ef4444 !important;
+  color: var(--danger) !important;
 }
 
 div[data-hot-toast] > div:not([role]) svg {
-  color: #ffdd00 !important;
+  color: var(--primary) !important;
 }
 
-div[data-hot-toast] > div > div,
-div[data-hot-toast] > div span {
-  color: #ffffff !important;
-  font-weight: 500 !important;
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-}
-
-div[data-hot-toast] > div {
-  animation: toast-slide-in 0.25s ease-out !important;
-}
-
-@keyframes toast-slide-in {
-  0% {
-    transform: translateY(-20px);
+@keyframes toastIn {
+  from {
+    transform: translateY(-16px);
     opacity: 0;
   }
-  100% {
+  to {
     transform: translateY(0);
     opacity: 1;
   }
 }
 
+/* Mobile toast */
 @media (max-width: 768px) {
   div[data-hot-toast] {
     top: 16px !important;
@@ -242,8 +212,8 @@ div[data-hot-toast] > div {
   div[data-hot-toast] > div {
     min-width: auto !important;
     max-width: none !important;
-    width: calc(100vw - 32px) !important;
-    font-size: 13px !important;
-    padding: 14px 16px !important;
+    width: 100% !important;
+    font-size: 0.8125rem !important;
+    padding: 12px 16px !important;
   }
 }
