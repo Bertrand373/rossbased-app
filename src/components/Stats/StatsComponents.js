@@ -1,5 +1,5 @@
-// StatsComponents.js - TITANTRACK REFINED
-// NO CSS import - all styles from Stats.css
+// StatsComponents.js - TITANTRACK
+// Matches Tracker modal aesthetic - transparent floating content
 import React from 'react';
 import { format } from 'date-fns';
 
@@ -41,7 +41,7 @@ export const MiniInfoBanner = ({ description }) => {
   );
 };
 
-// Stat Card Modal
+// Stat Card Modal - Transparent floating design like Tracker
 export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }) => {
   if (!showModal || !selectedStatCard) return null;
   

@@ -1,5 +1,5 @@
-// StatsInsights.js - TITANTRACK REFINED
-// NO CSS import - all styles from Stats.css
+// StatsInsights.js - TITANTRACK
+// Premium analytics insight cards
 import React from 'react';
 import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
 import { renderTextWithBold } from './StatsUtils';
@@ -80,7 +80,7 @@ export const RelapsePatternAnalytics = ({
   return (
     <div className="insight-card">
       <div className="insight-card-header">
-        <span>{isConquered ? 'Conquered Patterns' : 'Relapse Pattern Analytics'}</span>
+        <span>{isConquered ? 'Conquered Patterns' : 'Relapse Patterns'}</span>
       </div>
       <div className="insight-card-content">
         {isLoading ? (
@@ -167,7 +167,7 @@ export const OptimizationGuidance = ({
   return (
     <div className="insight-card">
       <div className="insight-card-header">
-        <span>Performance Optimization</span>
+        <span>Optimization</span>
       </div>
       <div className="insight-card-content">
         {isLoading ? (

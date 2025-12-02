@@ -1,4 +1,5 @@
-// Stats.js - TITANTRACK REFINED
+// Stats.js - TITANTRACK
+// Matches Landing/Tracker minimalist aesthetic
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -96,7 +97,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     };
   }, [safeUserData, selectedMetric, isPremium]);
 
-  // Milestones - simple labels
+  // Milestones
   const milestones = useMemo(() => {
     const maxStreak = Math.max(safeUserData.currentStreak || 0, safeUserData.longestStreak || 0);
     const badges = safeUserData.badges || [];
@@ -111,7 +112,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     ];
   }, [safeUserData]);
 
-  // Elite chart configuration
+  // Chart configuration
   const chartOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
@@ -124,7 +125,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         max: 10,
         ticks: { 
           stepSize: 5, 
-          color: 'rgba(255,255,255,0.15)', 
+          color: 'rgba(255,255,255,0.12)', 
           font: { size: 10, weight: '400' },
           padding: 8
         },
@@ -136,7 +137,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       },
       x: {
         ticks: { 
-          color: 'rgba(255,255,255,0.15)', 
+          color: 'rgba(255,255,255,0.12)', 
           font: { size: 9, weight: '400' }, 
           maxRotation: 0, 
           maxTicksLimit: timeRange === 'quarter' ? 5 : 7,
@@ -165,11 +166,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       tooltip: {
         enabled: true,
         backgroundColor: 'rgba(0,0,0,0.9)',
-        titleColor: 'rgba(255,255,255,0.5)',
+        titleColor: 'rgba(255,255,255,0.4)',
         titleFont: { size: 10, weight: '400' },
         bodyColor: '#ffffff',
         bodyFont: { size: 16, weight: '600' },
-        borderColor: 'rgba(255,255,255,0.08)',
+        borderColor: 'rgba(255,255,255,0.06)',
         borderWidth: 1,
         cornerRadius: 8,
         padding: { top: 8, right: 12, bottom: 8, left: 12 },
@@ -198,11 +199,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const rawData = generateChartData(safeUserData, selectedMetric, timeRange);
     const chart = chartRef.current;
     
-    let gradient = 'rgba(255,255,255,0.06)';
+    let gradient = 'rgba(255,255,255,0.04)';
     
     if (chart?.ctx && chart?.chartArea) {
       gradient = chart.ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
-      gradient.addColorStop(0, 'rgba(255,255,255,0.1)');
+      gradient.addColorStop(0, 'rgba(255,255,255,0.08)');
       gradient.addColorStop(0.6, 'rgba(255,255,255,0.02)');
       gradient.addColorStop(1, 'rgba(255,255,255,0)');
     }
@@ -260,28 +261,33 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return guidance?.actionable || 'Start tracking your benefits daily to unlock personalized insights.';
   }, [safeUserData]);
 
+  // Metric toggle items
+  const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+  const timeRanges = [
+    { key: 'week', label: 'Week' },
+    { key: 'month', label: 'Month' },
+    { key: 'quarter', label: '90 Days' }
+  ];
+
   return (
     <div className="stats-page">
-      {/* Header */}
-      <header className="stats-header">
-        <h1>Stats</h1>
-        <p>Your journey analytics</p>
-      </header>
-
-      {/* Stat Cards */}
+      {/* Stat Cards - Landing page style with dividers */}
       <div className="stat-grid">
         <button className="stat-card" onClick={() => handleStatCardClick('currentStreak')}>
           <span className="stat-num">{safeUserData.currentStreak || 0}</span>
           <span className="stat-label">Current</span>
         </button>
+        <div className="stat-divider" />
         <button className="stat-card" onClick={() => handleStatCardClick('longestStreak')}>
           <span className="stat-num">{safeUserData.longestStreak || 0}</span>
           <span className="stat-label">Longest</span>
         </button>
+        <div className="stat-divider" />
         <button className="stat-card" onClick={() => handleStatCardClick('wetDreams')}>
           <span className="stat-num">{safeUserData.wetDreamCount || 0}</span>
           <span className="stat-label">Wet Dreams</span>
         </button>
+        <div className="stat-divider" />
         <button className="stat-card" onClick={() => handleStatCardClick('relapses')}>
           <span className="stat-num">{safeUserData.relapseCount || 0}</span>
           <span className="stat-label">Relapses</span>
@@ -315,38 +321,46 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
       {/* Benefit Tracker */}
       <section className="stats-section">
-        <h2>Benefit Tracker</h2>
+        <h2>Benefits</h2>
         
+        {/* Metric toggles - text only with dividers */}
         <div className="toggle-row">
-          {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map((metric) => (
-            <button
-              key={metric}
-              className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
-              onClick={() => setSelectedMetric(metric)}
-            >
-              {metric.charAt(0).toUpperCase() + metric.slice(1)}
-            </button>
+          {metrics.map((metric, index) => (
+            <React.Fragment key={metric}>
+              <button
+                className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
+                onClick={() => setSelectedMetric(metric)}
+              >
+                {metric.charAt(0).toUpperCase() + metric.slice(1)}
+              </button>
+              {index < metrics.length - 1 && <div className="toggle-divider" />}
+            </React.Fragment>
           ))}
         </div>
 
+        {/* Time range toggles */}
         <div className="toggle-row">
-          {[{ key: 'week', label: 'Week' }, { key: 'month', label: 'Month' }, { key: 'quarter', label: '3 Months' }].map((r) => (
-            <button
-              key={r.key}
-              className={`toggle-btn sm ${timeRange === r.key ? 'active' : ''}`}
-              onClick={() => setTimeRange(r.key)}
-            >
-              {r.label}
-            </button>
+          {timeRanges.map((r, index) => (
+            <React.Fragment key={r.key}>
+              <button
+                className={`toggle-btn sm ${timeRange === r.key ? 'active' : ''}`}
+                onClick={() => setTimeRange(r.key)}
+              >
+                {r.label}
+              </button>
+              {index < timeRanges.length - 1 && <div className="toggle-divider" />}
+            </React.Fragment>
           ))}
         </div>
 
+        {/* Average display - Hero number like Tracker */}
         <div className="average-block">
           <span className="average-num">{calculateAverage(safeUserData, selectedMetric, timeRange, isPremium)}</span>
           <span className="average-suffix">/10</span>
         </div>
-        <p className="average-label">Average {selectedMetric} {getTimeRangeDisplayText(timeRange)}</p>
+        <p className="average-label">{selectedMetric} {getTimeRangeDisplayText(timeRange)}</p>
 
+        {/* Chart */}
         <div className="chart-box">
           {(() => {
             const chartData = getChartData();
@@ -420,7 +434,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         Reset All Stats
       </button>
 
-      {/* Milestone Modal */}
+      {/* Milestone Modal - Transparent floating */}
       {showMilestoneModal && selectedMilestone && (
         <div className="overlay" onClick={() => setShowMilestoneModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
@@ -442,15 +456,15 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
       )}
 
-      {/* Reset Modal */}
+      {/* Reset Modal - Transparent floating */}
       {showResetModal && (
         <div className="overlay" onClick={() => setShowResetModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h2>Reset All Stats?</h2>
             <p className="modal-text">This will permanently delete all progress data. This cannot be undone.</p>
             <div className="modal-buttons">
-              <button className="btn-danger" onClick={confirmResetStats}>Reset</button>
               <button className="btn-ghost" onClick={() => setShowResetModal(false)}>Cancel</button>
+              <button className="btn-danger" onClick={confirmResetStats}>Reset</button>
             </div>
           </div>
         </div>
