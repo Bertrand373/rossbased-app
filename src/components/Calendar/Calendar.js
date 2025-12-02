@@ -10,8 +10,7 @@ import './CalendarModals.css';
 
 import { FaExclamationTriangle, FaFrown, 
   FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks,
-  FaWineBottle, FaBed, FaChevronLeft, FaChevronRight,
-  FaCalendarAlt, FaCalendarWeek } from 'react-icons/fa';
+  FaWineBottle, FaBed, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -363,18 +362,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     closeEditModal();
   };
 
-  // Get period text
-  const getPeriodText = () => {
-    if (viewMode === 'month') {
-      return format(currentDate, 'MMMM yyyy');
-    }
-    const { weekStart, weekEnd } = getWeekRange(currentDate);
-    if (isSameMonth(weekStart, weekEnd)) {
-      return `${format(weekStart, 'MMM d')} – ${format(weekEnd, 'd, yyyy')}`;
-    }
-    return `${format(weekStart, 'MMM d')} – ${format(weekEnd, 'MMM d, yyyy')}`;
-  };
-
   // Render month view
   const renderMonthView = () => {
     const monthStart = startOfMonth(currentDate);
@@ -510,65 +497,53 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="calendar-container">
-      {/* Header */}
-      <div className="integrated-calendar-header">
-        <div className="header-title-section">
-          <h2>Calendar</h2>
-          <p className="header-subtitle">Track your journey day by day</p>
+      {/* Minimal Header - Landing page style */}
+      <div className="calendar-header-minimal">
+        {/* Period Display - Typography focused */}
+        <div className="calendar-period-display">
+          <button className="period-arrow" onClick={prevPeriod} aria-label="Previous">
+            <FaChevronLeft />
+          </button>
+          <div className="period-text">
+            <span className="period-month">{viewMode === 'month' ? format(currentDate, 'MMMM') : format(getWeekRange(currentDate).weekStart, 'MMM d') + ' – ' + format(getWeekRange(currentDate).weekEnd, 'd')}</span>
+            <span className="period-year">{format(currentDate, 'yyyy')}</span>
+          </div>
+          <button className="period-arrow" onClick={nextPeriod} aria-label="Next">
+            <FaChevronRight />
+          </button>
         </div>
         
-        <div className="header-navigation-section">
-          <div className="calendar-navigation-pills">
-            <button 
-              className={`calendar-nav-btn ${viewMode === 'month' ? 'active' : ''}`}
-              onClick={() => setViewMode('month')}
-            >
-              <FaCalendarAlt />
-              <span>Month</span>
-            </button>
-            <button 
-              className={`calendar-nav-btn ${viewMode === 'week' ? 'active' : ''}`}
-              onClick={() => setViewMode('week')}
-            >
-              <FaCalendarWeek />
-              <span>Week</span>
-            </button>
-          </div>
+        {/* View Toggle - Text only, like landing stats */}
+        <div className="view-toggle-minimal">
+          <button 
+            className={`toggle-option ${viewMode === 'month' ? 'active' : ''}`}
+            onClick={() => setViewMode('month')}
+          >
+            Month
+          </button>
+          <span className="toggle-divider" />
+          <button 
+            className={`toggle-option ${viewMode === 'week' ? 'active' : ''}`}
+            onClick={() => setViewMode('week')}
+          >
+            Week
+          </button>
         </div>
       </div>
 
-      {/* Period Navigation */}
-      <div className="calendar-period-navigation">
-        <button className="period-nav-btn" onClick={prevPeriod}>
-          <FaChevronLeft />
-        </button>
-        <h3>{getPeriodText()}</h3>
-        <button className="period-nav-btn" onClick={nextPeriod}>
-          <FaChevronRight />
-        </button>
-      </div>
-
-      {/* Legend - Dots */}
-      <div className="calendar-legend-compact">
-        <div className="compact-legend-item">
-          <span className="legend-dot tracked"></span>
-          <span>Tracked</span>
-        </div>
-        <div className="compact-legend-item">
+      {/* Legend - Subtle dots */}
+      <div className="calendar-legend-minimal">
+        <div className="legend-item">
           <span className="legend-dot current-streak"></span>
           <span>Current</span>
         </div>
-        <div className="compact-legend-item">
+        <div className="legend-item">
           <span className="legend-dot former-streak"></span>
           <span>Former</span>
         </div>
-        <div className="compact-legend-item">
+        <div className="legend-item">
           <span className="legend-dot relapse"></span>
           <span>Relapse</span>
-        </div>
-        <div className="compact-legend-item">
-          <span className="legend-dot wet-dream"></span>
-          <span>Wet Dream</span>
         </div>
       </div>
 
