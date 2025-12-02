@@ -14,19 +14,25 @@
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100vw;
-  height: 100vh;
   background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   z-index: 10000;
   padding: 24px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   animation: calendarOverlayIn 200ms ease;
+}
+
+/* Spacers push content to center, collapse when content is tall */
+.calendar-overlay::before,
+.calendar-overlay::after {
+  content: '';
+  flex: 1;
+  min-height: 40px;
 }
 
 @keyframes calendarOverlayIn {
@@ -50,6 +56,7 @@
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  flex-shrink: 0;
   
   /* TRANSPARENT - No card */
   background: transparent;
@@ -57,7 +64,6 @@
   border-radius: 0;
   box-shadow: none;
   padding: 0;
-  margin: 0 auto;
 }
 
 .calendar-modal::-webkit-scrollbar {
@@ -668,12 +674,6 @@
    ============================================================================= */
 
 @media (max-width: 768px) {
-  .calendar-overlay {
-    padding: 16px;
-    padding-top: max(16px, env(safe-area-inset-top));
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
-  }
-  
   .calendar-overlay::before,
   .calendar-overlay::after {
     min-height: 24px;
@@ -751,10 +751,6 @@
 }
 
 @media (max-width: 480px) {
-  .calendar-overlay {
-    padding: 12px;
-  }
-  
   .calendar-day-info h3,
   .calendar-edit-day h3 {
     font-size: 1.25rem;
