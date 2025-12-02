@@ -1,5 +1,4 @@
 // App.js - TITANTRACK MODERN MINIMAL
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -15,7 +14,7 @@ import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
-// ML Components
+// Import UNIFIED PredictionDisplay
 import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay';
 import MLTraining from './components/MLTraining/MLTraining';
 
@@ -24,7 +23,7 @@ import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 
-// Custom hooks
+// Custom hook for user data
 import { useUserData } from './hooks/useUserData';
 
 // Profile Button - Minimal circle
@@ -33,6 +32,7 @@ const ProfileButton = ({ userData }) => {
   const location = useLocation();
   const isActive = location.pathname === '/profile';
   
+  // Get first initial from email or username
   const initial = userData?.email?.charAt(0)?.toUpperCase() || 
                   userData?.username?.charAt(0)?.toUpperCase() || 
                   '?';
@@ -64,6 +64,7 @@ const HeaderNavigation = () => {
     { path: '/urge-toolkit', label: 'Urges' }
   ];
 
+  // Find active tab index
   const getActiveIndex = useCallback(() => {
     return navItems.findIndex(item => {
       if (item.path === '/') {
@@ -73,22 +74,27 @@ const HeaderNavigation = () => {
     });
   }, [location.pathname]);
 
+  // Calculate dot position
   const updateDotPosition = useCallback(() => {
     const activeIdx = getActiveIndex();
     if (activeIdx >= 0 && containerRef.current && itemRefs.current[activeIdx]) {
       const containerRect = containerRef.current.getBoundingClientRect();
       const itemRect = itemRefs.current[activeIdx].getBoundingClientRect();
+      
+      // Calculate center of active item relative to container
       const centerX = itemRect.left - containerRect.left + (itemRect.width / 2);
       setDotPosition(centerX);
       setIsReady(true);
     }
   }, [getActiveIndex]);
 
+  // Update on mount and route change
   useEffect(() => {
     const timer = setTimeout(updateDotPosition, 10);
     return () => clearTimeout(timer);
   }, [location.pathname, updateDotPosition]);
 
+  // Update on resize
   useEffect(() => {
     window.addEventListener('resize', updateDotPosition);
     return () => window.removeEventListener('resize', updateDotPosition);
@@ -97,6 +103,7 @@ const HeaderNavigation = () => {
   return (
     <nav className="header-nav">
       <div className="nav-container" ref={containerRef}>
+        {/* Sliding dot */}
         <div 
           className="nav-slider-dot"
           style={{
@@ -173,13 +180,6 @@ function App() {
     cancelGoal
   } = useUserData();
 
-  // CRITICAL FIX: Close auth modal when user becomes logged in
-  useEffect(() => {
-    if (isLoggedIn && userData) {
-      setShowAuthModal(false);
-    }
-  }, [isLoggedIn, userData]);
-
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
   useEffect(() => {
@@ -198,13 +198,11 @@ function App() {
   const handleLogin = async (username, password) => {
     setLoadingMessage('Signing in...');
     const success = await login(username, password);
-    if (success) {
-      setShowAuthModal(false);
-    }
+    if (success) setShowAuthModal(false);
     return success;
   };
 
-  // Loading screen
+  // Loading screen - icon only, no text
   if (isLoading || isRefreshLoading) {
     return (
       <div className="app-loading-screen">
@@ -222,31 +220,41 @@ function App() {
       <ScrollToTop />
       <ServiceWorkerListener />
       <Toaster 
-        position="top-center"
+        position="bottom-center"
+        containerStyle={{
+          bottom: 100,
+        }}
         toastOptions={{
-          duration: 3000,
+          duration: 2500,
           style: {
-            background: '#1a1a1a',
-            color: '#ffffff',
+            background: 'rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: '#ffffff',
             fontSize: '0.875rem',
-            padding: '12px 16px',
+            fontWeight: '500',
+            padding: '14px 20px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          },
+          success: {
+            duration: 2500,
+            icon: <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />,
+          },
+          error: {
+            duration: 3500,
+            style: {
+              background: 'rgba(255, 59, 48, 0.08)',
+              border: '1px solid rgba(255, 59, 48, 0.12)',
+            },
+            icon: <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff3b30', flexShrink: 0 }} />,
           },
         }}
       />
       
-      {/* ONLY show AuthModal when NOT logged in AND showAuthModal is true */}
-      {!isLoggedIn && (
-        <AuthModal 
-          isOpen={showAuthModal} 
-          onClose={() => setShowAuthModal(false)}
-          onLogin={handleLogin}
-        />
-      )}
-      
-      <div className="app">
-        {isLoggedIn && userData ? (
+      <div className="app-container">
+        {isLoggedIn ? (
           <>
             <header className="app-header">
               <div className="logo-container">
@@ -261,7 +269,7 @@ function App() {
             {isMobile && (
               <MobileNavigation 
                 activeTab={activeTab} 
-                setActiveTab={setActiveTab}
+                setActiveTab={setActiveTab} 
               />
             )}
             
@@ -292,13 +300,10 @@ function App() {
                   <Route path="/profile" element={
                     <Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />
                   } />
-                  
-                  {/* ML Routes */}
                   <Route path="/urge-prediction" element={
                     <PredictionDisplay mode="full" userData={userData} />
                   } />
                   <Route path="/ml-training" element={<MLTraining />} />
-                  
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>
