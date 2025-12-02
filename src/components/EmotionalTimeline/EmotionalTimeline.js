@@ -1,481 +1,535 @@
-// EmotionalTimeline.js - TITANTRACK REFINED
-// Matches Landing/Tracker aesthetic with numbered phases
+// EmotionalTimeline.js - TITANTRACK MODERN MINIMAL
+// Complete overhaul matching Landing/Tracker/Calendar aesthetic
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
-// Single CSS import - unified file
+// Single CSS import
 import './EmotionalTimeline.css';
 
-// Icons
-import { 
-  FaCheckCircle, FaTimes, FaMapSigns, FaBrain, FaEdit,
-  FaExclamationTriangle, FaChartLine, FaLock
-} from 'react-icons/fa';
-
-// Import utility functions and data
-import {
-  emotionalPhases,
-  getCurrentPhase,
-  getPhaseProgress,
-  getPhaseProgressText,
-  generateComprehensivePhaseAnalysis
-} from './EmotionalTimelineUtils';
+// Minimal icons
+import { FaTimes, FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
 const EmotionalTimeline = ({ userData, updateUserData }) => {
+  const [activeTab, setActiveTab] = useState('journey');
   const [selectedPhase, setSelectedPhase] = useState(null);
-  const [showPhaseModal, setShowPhaseModal] = useState(false);
-  const [activeSection, setActiveSection] = useState('journey');
+  const [showModal, setShowModal] = useState(false);
   
-  // Emotional tracking states
-  const [todayEmotions, setTodayEmotions] = useState({
+  // Check-in state
+  const [emotions, setEmotions] = useState({
     anxiety: 5,
-    moodStability: 5,
-    mentalClarity: 5,
-    emotionalProcessing: 5
+    mood: 5,
+    clarity: 5,
+    processing: 5
   });
-  const [emotionsLogged, setEmotionsLogged] = useState(false);
+  const [hasLoggedToday, setHasLoggedToday] = useState(false);
 
-  const currentDay = userData.currentStreak || 0;
-  const currentPhase = getCurrentPhase(currentDay, emotionalPhases);
-  // NOTE: Functions expect (phase, currentDay) parameter order
-  const phaseProgress = currentPhase ? getPhaseProgress(currentPhase, currentDay) : 0;
-  const progressText = currentPhase ? getPhaseProgressText(currentPhase, currentDay) : '';
+  const currentDay = userData?.currentStreak || 0;
 
-  // Check if already logged today
-  useEffect(() => {
-    const emotionalData = userData.emotionalTracking || [];
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const todayEntry = emotionalData.find(entry => 
-      format(new Date(entry.date), 'yyyy-MM-dd') === today
-    );
-    
-    if (todayEntry) {
-      setEmotionsLogged(true);
-      setTodayEmotions({
-        anxiety: todayEntry.anxiety || 5,
-        moodStability: todayEntry.moodStability || 5,
-        mentalClarity: todayEntry.mentalClarity || 5,
-        emotionalProcessing: todayEntry.emotionalProcessing || 5
-      });
+  // Phase definitions - clean, self-contained
+  const phases = [
+    {
+      id: 1,
+      name: "Initial Adaptation",
+      days: "1-14",
+      start: 1,
+      end: 14,
+      summary: "Body begins adapting while urges peak",
+      description: "Your body begins adapting to retention while initial urges peak. This phase builds new neural pathways as your brain rewires dopamine pathways away from instant gratification.",
+      science: "Cessation triggers hypothalamic-pituitary adjustments. Testosterone stabilizes while dopamine receptors rebalance from overstimulation.",
+      symptoms: [
+        "Strong physical urges and restlessness",
+        "Energy fluctuations between high and fatigue",
+        "Sleep disruption as body adjusts",
+        "Excitement and motivation bursts",
+        "Appetite changes and food cravings"
+      ],
+      warnings: [
+        "Extreme mood swings beyond normal adaptation",
+        "Complete inability to sleep for multiple nights",
+        "Severe anxiety or panic attacks",
+        "Thoughts of self-harm or extreme despair"
+      ],
+      techniques: [
+        "Cold showers daily (2-5 minutes)",
+        "Intense physical exercise",
+        "Establish morning routine",
+        "Remove triggers from environment",
+        "4-7-8 breathing during urges"
+      ]
+    },
+    {
+      id: 2,
+      name: "Emotional Processing",
+      days: "15-45",
+      start: 15,
+      end: 45,
+      summary: "Suppressed emotions surface for healing",
+      description: "Suppressed emotions surface for healing - this is often the most challenging phase. Your psyche is healing itself through this natural process.",
+      science: "Without ejaculation's endorphin/prolactin release numbing pain, stored trauma surfaces. Retained energy amplifies all emotions as healing occurs.",
+      symptoms: [
+        "Intense mood swings and emotional volatility",
+        "Waves of anxiety, depression, sadness",
+        "Old memories surfacing vividly",
+        "Crying episodes without clear triggers",
+        "Anger flashes and irritability"
+      ],
+      warnings: [
+        "Suicidal thoughts or self-harm ideation",
+        "Complete emotional numbness lasting weeks",
+        "Violent impulses toward others",
+        "Inability to function in daily life"
+      ],
+      techniques: [
+        "Journal extensively without censoring",
+        "Accept emotions without resistance",
+        "Cold water face splash when overwhelmed",
+        "Vigorous exercise during anger",
+        "Seek therapy for severe trauma"
+      ]
+    },
+    {
+      id: 3,
+      name: "Mental Expansion",
+      days: "46-90",
+      start: 46,
+      end: 90,
+      summary: "Cognitive abilities enhance significantly",
+      description: "Cognitive abilities enhance as emotional turbulence stabilizes. Your brain operates at higher efficiency with optimized neurotransmitter balance.",
+      science: "Retained nutrients rebuild nerve sheaths. Brain tissue becomes more densely connected as resources redirect from reproduction to cognition.",
+      symptoms: [
+        "Dramatically improved focus",
+        "Enhanced creativity and problem-solving",
+        "Clearer, faster decision-making",
+        "Better memory formation and recall",
+        "Interest in deeper subjects"
+      ],
+      warnings: [
+        "Intellectual arrogance or superiority",
+        "Overthinking leading to paralysis",
+        "Neglecting emotional and physical needs"
+      ],
+      techniques: [
+        "Take on challenging mental projects",
+        "Learn new skills",
+        "Read complex material",
+        "Practice strategic thinking",
+        "Engage in creative activities"
+      ]
+    },
+    {
+      id: 4,
+      name: "Integration",
+      days: "91-180",
+      start: 91,
+      end: 180,
+      summary: "Benefits become deeply integrated",
+      description: "Profound inner transformation as benefits become deeply integrated. Complete endocrine rebalancing creates stable high-performance states.",
+      science: "The entire nervous system optimizes for retention, creating self-sustaining high-performance states with permanent neuroplastic changes.",
+      symptoms: [
+        "Deep sense of life purpose",
+        "Natural charisma and presence",
+        "Effortless self-discipline",
+        "Inner peace in all circumstances",
+        "Intuitive abilities strengthen"
+      ],
+      warnings: [
+        "Avoiding practical responsibilities",
+        "Grandiose thinking",
+        "Isolation from human connection"
+      ],
+      techniques: [
+        "Take on leadership roles",
+        "Mentor others on the journey",
+        "Pursue meaningful work",
+        "Build deeper relationships",
+        "Practice daily gratitude"
+      ]
+    },
+    {
+      id: 5,
+      name: "Mastery",
+      days: "181+",
+      start: 181,
+      end: 999999,
+      summary: "Complete integration and transcendence",
+      description: "You've transcended the need for external validation. Sexual energy is permanently redirected, creating sustained states of expanded awareness.",
+      science: "Permanent neuroplastic changes create self-sustaining states. Enhanced connectivity between regions associated with self-control and higher cognition.",
+      symptoms: [
+        "Effortless self-control",
+        "Natural influence and presence",
+        "Deep emotional intelligence",
+        "Visionary thinking",
+        "Others seeking your guidance"
+      ],
+      warnings: [
+        "Using abilities for selfish gain",
+        "Losing touch with ordinary experience",
+        "Developing contempt for others"
+      ],
+      techniques: [
+        "Focus on legacy creation",
+        "Teach and guide others",
+        "Apply abilities to serve others",
+        "Maintain humility",
+        "Stay connected to beginners"
+      ]
     }
-  }, [userData.emotionalTracking]);
+  ];
 
-  // Get data analysis state
-  const getDataState = () => {
-    const emotionalData = userData.emotionalTracking || [];
-    const totalDataPoints = emotionalData.length;
-    const recentData = emotionalData.filter(entry => 
-      differenceInDays(new Date(), new Date(entry.date)) <= 14
-    );
+  // Get current phase
+  const getCurrentPhase = () => {
+    if (currentDay <= 0) return phases[0];
+    for (const phase of phases) {
+      if (currentDay >= phase.start && (phase.end === 999999 || currentDay <= phase.end)) {
+        return phase;
+      }
+    }
+    return phases[0];
+  };
+
+  const currentPhase = getCurrentPhase();
+
+  // Get phase status
+  const getPhaseStatus = (phase) => {
+    if (currentDay < phase.start) return 'upcoming';
+    if (currentDay > phase.end && phase.end !== 999999) return 'completed';
+    return 'current';
+  };
+
+  // Get progress in current phase
+  const getProgress = () => {
+    if (!currentPhase || currentDay <= 0) return { percent: 0, text: '' };
     
-    return {
-      totalDataPoints,
-      recentDataPoints: recentData.length,
-      hasGoodData: totalDataPoints >= 7,
-      hasSufficientRecentData: recentData.length >= 3
+    if (currentPhase.end === 999999) {
+      const daysIn = currentDay - currentPhase.start + 1;
+      return { percent: 100, text: `Day ${daysIn} of mastery` };
+    }
+    
+    const daysIn = currentDay - currentPhase.start + 1;
+    const totalDays = currentPhase.end - currentPhase.start + 1;
+    const remaining = currentPhase.end - currentDay;
+    const percent = Math.min(100, (daysIn / totalDays) * 100);
+    
+    return { 
+      percent, 
+      text: `Day ${daysIn} of ${totalDays} (${remaining} remaining)` 
     };
   };
 
-  // Handle phase click
-  const handlePhaseClick = (phase) => {
-    setSelectedPhase(phase);
-    setShowPhaseModal(true);
-  };
+  const progress = getProgress();
 
-  // Handle emotion slider change
-  const handleSliderChange = (metric, value) => {
-    setTodayEmotions(prev => ({
-      ...prev,
-      [metric]: parseInt(value)
-    }));
-  };
-
-  // Save emotions
-  const handleSaveEmotions = () => {
-    const emotionalData = userData.emotionalTracking || [];
+  // Check if already logged today
+  useEffect(() => {
+    const data = userData?.emotionalTracking || [];
     const today = format(new Date(), 'yyyy-MM-dd');
+    const entry = data.find(e => format(new Date(e.date), 'yyyy-MM-dd') === today);
     
-    // Remove existing entry for today if any
-    const filteredData = emotionalData.filter(entry => 
-      format(new Date(entry.date), 'yyyy-MM-dd') !== today
-    );
+    if (entry) {
+      setHasLoggedToday(true);
+      setEmotions({
+        anxiety: entry.anxiety || 5,
+        mood: entry.moodStability || 5,
+        clarity: entry.mentalClarity || 5,
+        processing: entry.emotionalProcessing || 5
+      });
+    }
+  }, [userData?.emotionalTracking]);
+
+  // Save check-in
+  const handleSave = () => {
+    const data = userData?.emotionalTracking || [];
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const filtered = data.filter(e => format(new Date(e.date), 'yyyy-MM-dd') !== today);
     
-    // Add new entry
-    const newEntry = {
+    const entry = {
       date: new Date().toISOString(),
-      ...todayEmotions,
+      anxiety: emotions.anxiety,
+      moodStability: emotions.mood,
+      mentalClarity: emotions.clarity,
+      emotionalProcessing: emotions.processing,
       phase: currentPhase?.name || 'Unknown',
       day: currentDay
     };
     
     updateUserData({
       ...userData,
-      emotionalTracking: [...filteredData, newEntry]
+      emotionalTracking: [...filtered, entry]
     });
     
-    setEmotionsLogged(true);
+    setHasLoggedToday(true);
     toast.success('Check-in saved');
   };
 
-  // Get phase status
-  const getPhaseStatus = (phase, index) => {
-    const phaseIndex = emotionalPhases.findIndex(p => p.id === currentPhase?.id);
-    if (index < phaseIndex) return 'completed';
-    if (index === phaseIndex) return 'current';
-    return 'upcoming';
+  // Get analysis data
+  const getAnalysis = () => {
+    const data = userData?.emotionalTracking || [];
+    const total = data.length;
+    const recent = data.filter(e => differenceInDays(new Date(), new Date(e.date)) <= 14);
+    
+    if (total < 3) return null;
+    
+    const avg = (arr, key) => arr.reduce((sum, e) => sum + (e[key] || 5), 0) / arr.length;
+    
+    const avgAnxiety = avg(data, 'anxiety');
+    const avgMood = avg(data, 'moodStability');
+    const avgClarity = avg(data, 'mentalClarity');
+    
+    const getTrend = (key) => {
+      if (recent.length < 2) return 'stable';
+      const sorted = [...recent].sort((a, b) => new Date(a.date) - new Date(b.date));
+      const first = sorted.slice(0, Math.ceil(sorted.length / 2));
+      const second = sorted.slice(Math.ceil(sorted.length / 2));
+      const firstAvg = avg(first, key);
+      const secondAvg = avg(second, key);
+      const diff = secondAvg - firstAvg;
+      
+      if (key === 'anxiety') {
+        if (diff < -0.5) return 'improving';
+        if (diff > 0.5) return 'concerning';
+      } else {
+        if (diff > 0.5) return 'improving';
+        if (diff < -0.5) return 'concerning';
+      }
+      return 'stable';
+    };
+    
+    return {
+      total,
+      recent: recent.length,
+      wellbeing: ((10 - avgAnxiety + avgMood + avgClarity) / 3).toFixed(1),
+      trends: {
+        anxiety: getTrend('anxiety'),
+        mood: getTrend('moodStability'),
+        clarity: getTrend('mentalClarity')
+      }
+    };
   };
 
-  // Format phase number
-  const formatPhaseNumber = (index) => {
-    return String(index + 1).padStart(2, '0');
-  };
+  const analysis = getAnalysis();
 
-  const dataState = getDataState();
-  const analysis = dataState.hasGoodData ? 
-    generateComprehensivePhaseAnalysis(currentPhase, userData, currentDay) : null;
+  const openPhase = (phase) => {
+    setSelectedPhase(phase);
+    setShowModal(true);
+  };
 
   return (
-    <div className="emotional-timeline-container">
+    <div className="et-container">
       {/* Header */}
-      <div className="timeline-header">
+      <header className="et-header">
         <h1>Timeline</h1>
         <p>Track your emotional journey</p>
-      </div>
+      </header>
 
-      {/* Navigation */}
-      <div className="timeline-nav">
-        <button 
-          className={`timeline-nav-btn ${activeSection === 'journey' ? 'active' : ''}`}
-          onClick={() => setActiveSection('journey')}
-        >
-          <FaMapSigns />
-          <span>Journey</span>
-        </button>
-        <button 
-          className={`timeline-nav-btn ${activeSection === 'checkin' ? 'active' : ''}`}
-          onClick={() => setActiveSection('checkin')}
-        >
-          <FaEdit />
-          <span>Check-in</span>
-        </button>
-        <button 
-          className={`timeline-nav-btn ${activeSection === 'analysis' ? 'active' : ''}`}
-          onClick={() => setActiveSection('analysis')}
-        >
-          <FaBrain />
-          <span>Analysis</span>
-        </button>
-      </div>
+      {/* Tabs */}
+      <nav className="et-tabs">
+        {['journey', 'checkin', 'analysis'].map(tab => (
+          <button
+            key={tab}
+            className={`et-tab ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab === 'journey' && 'Journey'}
+            {tab === 'checkin' && 'Check-in'}
+            {tab === 'analysis' && 'Analysis'}
+          </button>
+        ))}
+      </nav>
 
-      {/* Journey Map Section */}
-      {activeSection === 'journey' && (
-        <>
-          {/* Current Phase Hero */}
-          {currentPhase && (
-            <div className="phase-hero">
-              <div className="phase-hero-icon" style={{ color: currentPhase.color }}>
-                <currentPhase.icon />
+      {/* Journey Tab */}
+      {activeTab === 'journey' && (
+        <div className="et-journey">
+          {/* Current Phase Card */}
+          <div className="et-current" onClick={() => openPhase(currentPhase)}>
+            <div className="et-current-label">Current Phase</div>
+            <h2 className="et-current-name">{currentPhase?.name}</h2>
+            <p className="et-current-days">Days {currentPhase?.days}</p>
+            
+            <div className="et-progress">
+              <div className="et-progress-bar">
+                <div 
+                  className="et-progress-fill" 
+                  style={{ width: `${progress.percent}%` }} 
+                />
               </div>
-              <h2 className="phase-hero-name">{currentPhase.name}</h2>
-              <p className="phase-hero-range">Days {currentPhase.dayRange}</p>
-              
-              <div className="phase-hero-progress">
-                <div className="phase-progress-bar">
-                  <div 
-                    className="phase-progress-fill" 
-                    style={{ width: `${phaseProgress}%` }}
-                  />
-                </div>
-                <p className="phase-progress-text">{progressText}</p>
-              </div>
-              
-              <button 
-                className="phase-details-btn"
-                onClick={() => handlePhaseClick(currentPhase)}
-              >
-                View Details
-              </button>
+              <span className="et-progress-text">{progress.text}</span>
             </div>
-          )}
+          </div>
 
-          {/* Phase Timeline */}
-          <div className="phase-timeline">
-            {emotionalPhases.map((phase, index) => {
-              const status = getPhaseStatus(phase, index);
+          {/* Phase List */}
+          <div className="et-phases">
+            {phases.map((phase, index) => {
+              const status = getPhaseStatus(phase);
               return (
                 <div 
                   key={phase.id}
-                  className={`phase-item ${status}`}
-                  onClick={() => handlePhaseClick(phase)}
+                  className={`et-phase ${status}`}
+                  onClick={() => openPhase(phase)}
                 >
-                  <div className="phase-number">{formatPhaseNumber(index)}</div>
-                  <div className="phase-content">
-                    <h3 className="phase-name">{phase.name}</h3>
-                    <p className="phase-days">Days {phase.dayRange}</p>
+                  <div className="et-phase-num">
+                    {String(index + 1).padStart(2, '0')}
                   </div>
-                  <div className="phase-status">
-                    {status === 'completed' && <FaCheckCircle />}
-                    {status === 'current' && <FaChartLine />}
-                    {status === 'upcoming' && <FaLock />}
+                  <div className="et-phase-info">
+                    <h3>{phase.name}</h3>
+                    <p>Days {phase.days}</p>
+                  </div>
+                  <div className="et-phase-status">
+                    {status === 'completed' && <FaCheck />}
                   </div>
                 </div>
               );
             })}
           </div>
-        </>
+        </div>
       )}
 
-      {/* Check-in Section */}
-      {activeSection === 'checkin' && (
-        <div className="checkin-section">
-          <div className="checkin-card">
-            <h3>Daily Emotional Check-in</h3>
+      {/* Check-in Tab */}
+      {activeTab === 'checkin' && (
+        <div className="et-checkin">
+          <div className="et-checkin-card">
+            <h3>Daily Check-in</h3>
             
-            <div className="checkin-sliders">
-              <div className="checkin-slider-row">
-                <div className="checkin-slider-label">
-                  <span className="checkin-slider-name">Anxiety Level</span>
-                  <span className="checkin-slider-value">{todayEmotions.anxiety}/10</span>
+            <div className="et-sliders">
+              {[
+                { key: 'anxiety', label: 'Anxiety Level', desc: '1 = calm, 10 = severe' },
+                { key: 'mood', label: 'Mood Stability', desc: '1 = volatile, 10 = stable' },
+                { key: 'clarity', label: 'Mental Clarity', desc: '1 = foggy, 10 = sharp' },
+                { key: 'processing', label: 'Emotional Processing', desc: '1 = blocked, 10 = flowing' }
+              ].map(({ key, label, desc }) => (
+                <div key={key} className="et-slider-group">
+                  <div className="et-slider-header">
+                    <span className="et-slider-label">{label}</span>
+                    <span className="et-slider-value">{emotions[key]}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={emotions[key]}
+                    onChange={(e) => setEmotions(prev => ({ ...prev, [key]: parseInt(e.target.value) }))}
+                    className="et-slider"
+                    disabled={hasLoggedToday}
+                  />
+                  <span className="et-slider-desc">{desc}</span>
                 </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={todayEmotions.anxiety}
-                  onChange={(e) => handleSliderChange('anxiety', e.target.value)}
-                  className="checkin-slider"
-                  disabled={emotionsLogged}
-                />
-              </div>
-              
-              <div className="checkin-slider-row">
-                <div className="checkin-slider-label">
-                  <span className="checkin-slider-name">Mood Stability</span>
-                  <span className="checkin-slider-value">{todayEmotions.moodStability}/10</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={todayEmotions.moodStability}
-                  onChange={(e) => handleSliderChange('moodStability', e.target.value)}
-                  className="checkin-slider"
-                  disabled={emotionsLogged}
-                />
-              </div>
-              
-              <div className="checkin-slider-row">
-                <div className="checkin-slider-label">
-                  <span className="checkin-slider-name">Mental Clarity</span>
-                  <span className="checkin-slider-value">{todayEmotions.mentalClarity}/10</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={todayEmotions.mentalClarity}
-                  onChange={(e) => handleSliderChange('mentalClarity', e.target.value)}
-                  className="checkin-slider"
-                  disabled={emotionsLogged}
-                />
-              </div>
-              
-              <div className="checkin-slider-row">
-                <div className="checkin-slider-label">
-                  <span className="checkin-slider-name">Emotional Processing</span>
-                  <span className="checkin-slider-value">{todayEmotions.emotionalProcessing}/10</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={todayEmotions.emotionalProcessing}
-                  onChange={(e) => handleSliderChange('emotionalProcessing', e.target.value)}
-                  className="checkin-slider"
-                  disabled={emotionsLogged}
-                />
-              </div>
+              ))}
             </div>
           </div>
-          
+
           <button 
-            className={`checkin-save-btn ${emotionsLogged ? 'logged' : ''}`}
-            onClick={handleSaveEmotions}
-            disabled={emotionsLogged}
+            className={`et-save-btn ${hasLoggedToday ? 'disabled' : ''}`}
+            onClick={handleSave}
+            disabled={hasLoggedToday}
           >
-            {emotionsLogged ? 'Already Logged Today' : 'Save Check-in'}
+            {hasLoggedToday ? 'Already Logged Today' : 'Save Check-in'}
           </button>
         </div>
       )}
 
-      {/* Analysis Section */}
-      {activeSection === 'analysis' && (
-        <div className="analysis-section">
-          {/* Banner */}
-          <div className="analysis-banner">
-            <h3 className="analysis-banner-title">
-              {dataState.hasGoodData ? 'Analysis Active' : 'Building Your Analysis'}
-            </h3>
-            <p className="analysis-banner-text">
-              {dataState.hasGoodData 
-                ? `Based on ${dataState.totalDataPoints} data points. Continue tracking for deeper insights.`
-                : `Track ${7 - dataState.totalDataPoints} more days to unlock pattern recognition and personalized insights.`
-              }
-            </p>
-          </div>
-
-          {!dataState.hasGoodData ? (
-            <div className="analysis-empty">
-              <div className="analysis-empty-icon">
-                <FaBrain />
-              </div>
-              <h3 className="analysis-empty-title">Not Enough Data Yet</h3>
-              <p className="analysis-empty-text">
-                Complete daily check-ins to unlock comprehensive analysis of your emotional patterns and personalized guidance.
+      {/* Analysis Tab */}
+      {activeTab === 'analysis' && (
+        <div className="et-analysis">
+          {!analysis ? (
+            <div className="et-empty">
+              <p className="et-empty-title">Not Enough Data</p>
+              <p className="et-empty-text">
+                Complete at least 3 daily check-ins to unlock pattern analysis and personalized insights.
               </p>
             </div>
           ) : (
-            <div className="analysis-cards">
-              {/* Wellbeing Overview */}
-              {analysis?.dataAnalysis && (
-                <div className="analysis-card">
-                  <div className="analysis-card-header">
-                    <span>Wellbeing Overview</span>
-                  </div>
-                  <div className="analysis-card-content">
-                    <div className="analysis-metrics">
-                      <div className="analysis-metric">
-                        <div className="analysis-metric-value">
-                          {analysis.dataAnalysis.wellbeingScore?.toFixed(1) || '—'}
-                        </div>
-                        <div className="analysis-metric-label">Overall</div>
-                      </div>
-                      <div className="analysis-metric">
-                        <div className="analysis-metric-value">{dataState.totalDataPoints}</div>
-                        <div className="analysis-metric-label">Data Points</div>
-                      </div>
-                      <div className="analysis-metric">
-                        <div className="analysis-metric-value">{dataState.recentDataPoints}/14</div>
-                        <div className="analysis-metric-label">Recent</div>
-                      </div>
-                    </div>
-                    
-                    {analysis.dataAnalysis.trends && (
-                      <div className="analysis-trends">
-                        <div className="analysis-trend">
-                          <span className="analysis-trend-label">Anxiety</span>
-                          <span className={`analysis-trend-value ${analysis.dataAnalysis.trends.anxiety}`}>
-                            {analysis.dataAnalysis.trends.anxiety === 'improving' ? '↓ Improving' : 
-                             analysis.dataAnalysis.trends.anxiety === 'concerning' ? '↑ Concerning' : '→ Stable'}
-                          </span>
-                        </div>
-                        <div className="analysis-trend">
-                          <span className="analysis-trend-label">Mood</span>
-                          <span className={`analysis-trend-value ${analysis.dataAnalysis.trends.mood}`}>
-                            {analysis.dataAnalysis.trends.mood === 'improving' ? '↑ Improving' : 
-                             analysis.dataAnalysis.trends.mood === 'concerning' ? '↓ Concerning' : '→ Stable'}
-                          </span>
-                        </div>
-                        <div className="analysis-trend">
-                          <span className="analysis-trend-label">Clarity</span>
-                          <span className={`analysis-trend-value ${analysis.dataAnalysis.trends.clarity}`}>
-                            {analysis.dataAnalysis.trends.clarity === 'improving' ? '↑ Improving' : 
-                             analysis.dataAnalysis.trends.clarity === 'concerning' ? '↓ Concerning' : '→ Stable'}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+            <>
+              <div className="et-stats-grid">
+                <div className="et-stat">
+                  <span className="et-stat-value">{analysis.wellbeing}</span>
+                  <span className="et-stat-label">Wellbeing</span>
                 </div>
-              )}
+                <div className="et-stat">
+                  <span className="et-stat-value">{analysis.total}</span>
+                  <span className="et-stat-label">Data Points</span>
+                </div>
+                <div className="et-stat">
+                  <span className="et-stat-value">{analysis.recent}</span>
+                  <span className="et-stat-label">Recent (14d)</span>
+                </div>
+              </div>
 
-              {/* Challenges */}
-              {analysis?.challengeIdentification?.challenges?.length > 0 && (
-                <div className="analysis-card">
-                  <div className="analysis-card-header">
-                    <span>Active Challenges</span>
-                  </div>
-                  <div className="analysis-card-content">
-                    <div className="analysis-challenges">
-                      {analysis.challengeIdentification.challenges.map((challenge, index) => (
-                        <div key={index} className="analysis-challenge">
-                          <h4 className="analysis-challenge-title">{challenge.challenge}</h4>
-                          <p className="analysis-challenge-text">{challenge.explanation}</p>
-                          <p className="analysis-challenge-solution">Solution: {challenge.solution}</p>
-                        </div>
-                      ))}
+              <div className="et-trends">
+                <h3>Trends</h3>
+                {[
+                  { key: 'anxiety', label: 'Anxiety', invert: true },
+                  { key: 'mood', label: 'Mood Stability' },
+                  { key: 'clarity', label: 'Mental Clarity' }
+                ].map(({ key, label, invert }) => {
+                  const trend = analysis.trends[key];
+                  const symbol = trend === 'improving' ? (invert ? '↓' : '↑') : 
+                                 trend === 'concerning' ? (invert ? '↑' : '↓') : '→';
+                  return (
+                    <div key={key} className="et-trend-row">
+                      <span className="et-trend-label">{label}</span>
+                      <span className={`et-trend-value ${trend}`}>
+                        {symbol} {trend.charAt(0).toUpperCase() + trend.slice(1)}
+                      </span>
                     </div>
-                  </div>
-                </div>
-              )}
-            </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       )}
 
-      {/* Phase Detail Modal */}
-      {showPhaseModal && selectedPhase && (
-        <div className="tl-overlay" onClick={() => setShowPhaseModal(false)}>
-          <div className="tl-modal" onClick={e => e.stopPropagation()}>
-            <button 
-              className="tl-modal-close" 
-              onClick={() => setShowPhaseModal(false)}
-            >
+      {/* Phase Modal */}
+      {showModal && selectedPhase && (
+        <div className="et-overlay" onClick={() => setShowModal(false)}>
+          <div className="et-modal" onClick={e => e.stopPropagation()}>
+            <button className="et-modal-close" onClick={() => setShowModal(false)}>
               <FaTimes />
             </button>
 
-            <div className="tl-modal-header">
-              <div className="tl-modal-icon" style={{ color: selectedPhase.color }}>
-                <selectedPhase.icon />
-              </div>
-              <div className="tl-modal-title">
+            <div className="et-modal-header">
+              <span className="et-modal-num">
+                {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
+              </span>
+              <div>
                 <h2>{selectedPhase.name}</h2>
-                <p>Days {selectedPhase.dayRange}</p>
+                <p>Days {selectedPhase.days}</p>
               </div>
             </div>
 
-            <div className="tl-modal-insight">
-              <h3>What's Happening</h3>
-              <p>{selectedPhase.description}</p>
-              <p><strong>Scientific basis:</strong> {selectedPhase.scientificMechanism}</p>
+            <div className="et-modal-body">
+              <div className="et-modal-section">
+                <h4>Overview</h4>
+                <p>{selectedPhase.description}</p>
+              </div>
+
+              <div className="et-modal-section">
+                <h4>The Science</h4>
+                <p>{selectedPhase.science}</p>
+              </div>
+
+              <div className="et-modal-section">
+                <h4>What to Expect</h4>
+                <ul>
+                  {selectedPhase.symptoms.map((s, i) => <li key={i}>{s}</li>)}
+                </ul>
+              </div>
+
+              <div className="et-modal-section et-warning">
+                <h4><FaExclamationTriangle /> Warning Signs</h4>
+                <ul>
+                  {selectedPhase.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                </ul>
+              </div>
+
+              <div className="et-modal-section">
+                <h4>Techniques</h4>
+                <ul>
+                  {selectedPhase.techniques.map((t, i) => <li key={i}>{t}</li>)}
+                </ul>
+              </div>
             </div>
 
-            <div className="tl-modal-section">
-              <h3>Expected Symptoms</h3>
-              <ul>
-                {selectedPhase.expectedSymptoms?.map((symptom, index) => (
-                  <li key={index}>{symptom}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="tl-modal-section warning">
-              <h3>
-                <FaExclamationTriangle />
-                Warning Signs
-              </h3>
-              <ul>
-                {selectedPhase.warningSigns?.map((sign, index) => (
-                  <li key={index}>{sign}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="tl-modal-section">
-              <h3>Techniques</h3>
-              <ul>
-                {selectedPhase.specificTechniques?.map((technique, index) => (
-                  <li key={index}>{technique}</li>
-                ))}
-              </ul>
-            </div>
-
-            <button 
-              className="tl-modal-btn"
-              onClick={() => setShowPhaseModal(false)}
-            >
-              <FaCheckCircle />
+            <button className="et-modal-btn" onClick={() => setShowModal(false)}>
               Got It
             </button>
           </div>
