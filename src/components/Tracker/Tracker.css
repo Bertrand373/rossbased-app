@@ -406,7 +406,7 @@
 .benefits-list {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   flex: 1;
@@ -419,7 +419,7 @@
 .benefit-row {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .benefit-info {
@@ -439,6 +439,13 @@
   font-weight: 600;
   color: rgba(255, 255, 255, 0.4);
   font-feature-settings: 'tnum' 1;
+}
+
+/* Description below slider */
+.benefit-desc {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: -4px;
 }
 
 /* Slider container - just holds the track */

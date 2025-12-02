@@ -398,7 +398,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           
           <div className="et-sliders">
             {sliderItems.map(({ key, label, desc }) => (
-              <div key={key} className="et-slider-group">
+              <div key={key} className={`et-slider-group ${hasLoggedToday ? 'disabled' : ''}`}>
                 <div className="et-slider-header">
                   <span className="et-slider-label">{label}</span>
                   <span className="et-slider-value">{emotions[key]}/10</span>

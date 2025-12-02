@@ -139,12 +139,12 @@ const Tracker = ({ userData, updateUserData }) => {
   };
 
   const benefitsList = [
-    { key: 'energy', label: 'Energy' },
-    { key: 'focus', label: 'Focus' },
-    { key: 'confidence', label: 'Confidence' },
-    { key: 'aura', label: 'Aura' },
-    { key: 'sleep', label: 'Sleep' },
-    { key: 'workout', label: 'Workout' }
+    { key: 'energy', label: 'Energy', desc: '1 = drained, 10 = energized' },
+    { key: 'focus', label: 'Focus', desc: '1 = scattered, 10 = laser' },
+    { key: 'confidence', label: 'Confidence', desc: '1 = low, 10 = high' },
+    { key: 'aura', label: 'Aura', desc: '1 = dim, 10 = radiant' },
+    { key: 'sleep', label: 'Sleep', desc: '1 = poor, 10 = excellent' },
+    { key: 'workout', label: 'Workout', desc: '1 = weak, 10 = strong' }
   ];
 
   // Date picker screen
@@ -174,7 +174,7 @@ const Tracker = ({ userData, updateUserData }) => {
             <p>Rate today's benefits</p>
             
             <div className="benefits-list">
-              {benefitsList.map(({ key, label }) => (
+              {benefitsList.map(({ key, label, desc }) => (
                 <div key={key} className="benefit-row">
                   <div className="benefit-info">
                     <span>{label}</span>
@@ -193,6 +193,7 @@ const Tracker = ({ userData, updateUserData }) => {
                       onChange={e => handleBenefitChange(key, e.target.value)}
                     />
                   </div>
+                  <span className="benefit-desc">{desc}</span>
                 </div>
               ))}
             </div>
