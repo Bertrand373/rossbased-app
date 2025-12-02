@@ -234,7 +234,7 @@
 }
 
 /* =============================================================================
-   CHECK-IN TAB - Tracker-style sliders
+   CHECK-IN TAB - Matches Tracker benefit sliders EXACTLY
    ============================================================================= */
 
 .et-checkin {
@@ -257,93 +257,103 @@
   margin-bottom: 40px;
 }
 
-/* Sliders - Match Tracker benefit sliders EXACTLY */
+/* Sliders container - matches Tracker .benefits-list */
 .et-sliders {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
   margin-bottom: 48px;
+  text-align: left;
 }
 
+/* Slider group - matches Tracker .benefit-row */
 .et-slider-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
+/* Slider header - matches Tracker .benefit-info */
 .et-slider-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
 }
 
 .et-slider-label {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: #ffffff;
-  letter-spacing: -0.01em;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .et-slider-value {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #ffffff;
   font-feature-settings: 'tnum' 1;
 }
 
-/* Slider container - Match Tracker .benefit-slider */
+/* Slider container - matches Tracker .benefit-slider exactly */
 .et-slider-wrap {
   position: relative;
-  height: 24px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
-.et-slider-bg {
+/* Track background - matches Tracker .benefit-slider::before */
+.et-slider-wrap::before {
+  content: '';
   position: absolute;
-  top: 50%;
   left: 0;
   right: 0;
   height: 2px;
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.12);
   border-radius: 1px;
   pointer-events: none;
 }
 
+/* Fill bar - matches Tracker .benefit-fill */
 .et-slider-fill {
   position: absolute;
-  top: 50%;
   left: 0;
   height: 2px;
-  background: #ffffff;
-  transform: translateY(-50%);
+  background-color: #ffffff;
   border-radius: 1px;
   pointer-events: none;
-  transition: width 50ms ease;
+  transition: width 50ms ease-out;
 }
 
+/* Input - matches Tracker .benefit-slider input exactly */
 .et-slider {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 24px;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  background: transparent !important;
-  cursor: pointer;
+  height: 20px;
   margin: 0;
   padding: 0;
+  background: transparent !important;
+  background-color: transparent !important;
   border: none !important;
+  border-radius: 0;
   outline: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Track - transparent since we use custom bg */
+/* Track - completely transparent */
 .et-slider::-webkit-slider-runnable-track {
   width: 100%;
   height: 2px;
   background: transparent !important;
   border: none !important;
-  border-radius: 1px;
+  border-radius: 0;
+  box-shadow: none;
   cursor: pointer;
 }
 
@@ -352,11 +362,27 @@
   height: 2px;
   background: transparent;
   border: none;
-  border-radius: 1px;
+  border-radius: 0;
+  box-shadow: none;
   cursor: pointer;
 }
 
-/* Thumb styling - Match Tracker exactly */
+/* MS Edge */
+.et-slider::-ms-track {
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  border: none;
+  color: transparent;
+}
+
+.et-slider::-ms-fill-lower,
+.et-slider::-ms-fill-upper {
+  background: transparent;
+  border: none;
+}
+
+/* Thumb - matches Tracker exactly */
 .et-slider::-webkit-slider-thumb {
   -webkit-appearance: none !important;
   appearance: none !important;
@@ -380,6 +406,16 @@
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.et-slider::-ms-thumb {
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* Hover/active states */
@@ -430,7 +466,7 @@
 .et-slider-desc {
   font-size: 0.6875rem;
   color: rgba(255, 255, 255, 0.25);
-  margin-top: 8px;
+  margin-top: -6px;
 }
 
 /* Save Button - Match Tracker .btn-primary */
@@ -591,7 +627,7 @@
 }
 
 /* =============================================================================
-   MODAL - Transparent floating with sticky footer (matches Tracker/Calendar)
+   MODAL - Sticky header/footer with scrollable body (matches Tracker/Calendar)
    ============================================================================= */
 
 .et-overlay {
@@ -640,22 +676,15 @@
   }
 }
 
-/* Scrollable content area */
-.et-modal-scroll {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 24px;
-}
-
-/* Modal Header */
+/* Modal Header - Sticky at top */
 .et-modal-header {
+  flex-shrink: 0;
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  margin-bottom: 32px;
   padding-bottom: 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
 }
 
 .et-modal-num {
@@ -678,6 +707,15 @@
   font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.35);
   margin: 0;
+}
+
+/* Scrollable content area */
+.et-modal-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+  padding: 32px 0;
 }
 
 /* Modal Body */
@@ -833,15 +871,15 @@
   }
   
   .et-sliders {
-    gap: 28px;
+    gap: 20px;
   }
   
   .et-slider-label {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
   }
   
   .et-slider-value {
-    font-size: 0.8125rem;
+    font-size: 1rem;
   }
   
   .et-save-btn {
@@ -873,7 +911,6 @@
   
   .et-modal-header {
     gap: 12px;
-    margin-bottom: 28px;
     padding-bottom: 20px;
   }
   

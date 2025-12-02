@@ -401,10 +401,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               <div key={key} className="et-slider-group">
                 <div className="et-slider-header">
                   <span className="et-slider-label">{label}</span>
-                  <span className="et-slider-value">{emotions[key]}/10</span>
+                  <span className="et-slider-value">{emotions[key]}</span>
                 </div>
                 <div className="et-slider-wrap">
-                  <div className="et-slider-bg" />
                   <div 
                     className="et-slider-fill" 
                     style={{ width: `${((emotions[key] - 1) / 9) * 100}%` }}
@@ -491,21 +490,23 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Phase Modal - Transparent floating with sticky footer */}
+      {/* Phase Modal - Sticky header/footer with scrollable body */}
       {showModal && selectedPhase && (
         <div className="et-overlay" onClick={() => setShowModal(false)}>
           <div className="et-modal" onClick={e => e.stopPropagation()}>
-            <div className="et-modal-scroll">
-              <div className="et-modal-header">
-                <span className="et-modal-num">
-                  {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
-                </span>
-                <div>
-                  <h2>{selectedPhase.name}</h2>
-                  <p>Days {selectedPhase.days}</p>
-                </div>
+            {/* Sticky Header */}
+            <div className="et-modal-header">
+              <span className="et-modal-num">
+                {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <h2>{selectedPhase.name}</h2>
+                <p>Days {selectedPhase.days}</p>
               </div>
+            </div>
 
+            {/* Scrollable Body */}
+            <div className="et-modal-scroll">
               <div className="et-modal-body">
                 <div className="et-modal-section">
                   <h4>Overview</h4>
@@ -540,6 +541,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               </div>
             </div>
             
+            {/* Sticky Footer */}
             <div className="et-modal-footer">
               <button className="et-modal-btn" onClick={() => setShowModal(false)}>
                 Cancel
