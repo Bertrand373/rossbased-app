@@ -593,11 +593,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     rows="4"
                   />
                   <div className="calendar-journal-actions">
-                    <button className="calendar-save-btn" onClick={saveNote}>
-                      Save
-                    </button>
                     <button className="calendar-cancel-btn" onClick={cancelEditingNote}>
                       Cancel
+                    </button>
+                    <button className="calendar-save-btn" onClick={saveNote}>
+                      Save
                     </button>
                   </div>
                 </div>
@@ -620,11 +620,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
             {/* Actions */}
             <div className="calendar-actions">
-              <button className="calendar-btn-primary" onClick={showEditFromInfo}>
-                Edit Day
-              </button>
               <button className="calendar-btn-ghost" onClick={closeDayInfo}>
                 Close
+              </button>
+              <button className="calendar-btn-primary" onClick={showEditFromInfo}>
+                Edit Day
               </button>
             </div>
           </div>
@@ -684,11 +684,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             )}
 
             <div className="calendar-actions">
-              <button className="calendar-btn-back" onClick={backToDayInfo}>
-                Back
-              </button>
               <button className="calendar-btn-ghost" onClick={closeEditModal}>
                 Cancel
+              </button>
+              <button className="calendar-btn-back" onClick={backToDayInfo}>
+                Back
               </button>
             </div>
           </div>
