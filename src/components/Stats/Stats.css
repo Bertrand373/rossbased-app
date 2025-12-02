@@ -1,87 +1,88 @@
 /* =============================================================================
-   STATS - TITANTRACK ELITE
-   FIXED: All yellow removed + nuclear overrides for legacy CSS
-   Matches Landing, Tracker, and Calendar design system
-   Pure black, white accents, premium minimalism
+   STATS.CSS - TITANTRACK
+   Matches Landing/Tracker/Calendar aesthetic exactly
+   Pure black, white accents, transparent modals, no yellow
    ============================================================================= */
 
 /* =============================================================================
-   NUCLEAR RESET - Kill external legacy styling
-   This MUST be at the top to override anything from other CSS files
+   NUCLEAR RESET - Kill white arc and legacy styling
+   MUST be first to override any imported CSS
    ============================================================================= */
 
-/* Kill any white arc/decorative elements from legacy CSS */
+/* Kill the white arc - target every possible container */
 .stats-page,
+.stats-page::before,
 .stats-page::after,
-.stats-container,
-.stats-wrapper,
-.stats-hero,
-.stats-overview,
-.stats-summary,
-.stat-cards-wrapper,
+.stats-page > *,
+.stat-grid,
+.stat-grid::before,
+.stat-grid::after,
 [class*="stats-hero"],
+[class*="stats-overview"],
+[class*="stats-container"],
+[class*="stats-wrapper"],
 [class*="stats-arc"],
 [class*="stats-circle"],
-[class*="stats-decorative"] {
+[class*="stat-cards"],
+[class*="stats-summary"] {
+  background: transparent !important;
+  background-color: transparent !important;
   background-image: none !important;
+  border-radius: 0 !important;
   clip-path: none !important;
   mask: none !important;
   -webkit-mask: none !important;
 }
 
-/* Force override any global --primary variable to white in Stats */
+/* Re-apply correct backgrounds after nuclear reset */
+.stats-page {
+  background-color: #000000 !important;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-radius: 12px !important;
+}
+
+/* Force kill any --primary variable usage */
 .stats-page,
 .stats-page * {
-  --primary: #ffffff;
-  --primary-light: rgba(255, 255, 255, 0.1);
-  --primary-dark: rgba(255, 255, 255, 0.8);
+  --primary: #ffffff !important;
+  --primary-light: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* =============================================================================
-   PAGE CONTAINER
+   PAGE CONTAINER - Matches Tracker exactly
    ============================================================================= */
 
 .stats-page {
-  min-height: 100vh;
-  min-height: 100dvh;
-  background-color: #000000 !important;
-  background: #000000 !important;
-  padding: 24px 16px;
-  padding-bottom: 120px;
+  min-height: calc(100dvh - 56px - 80px);
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 24px;
+  padding-bottom: 120px;
+  background-color: #000000;
   position: relative;
-  overflow-x: hidden;
 }
 
-/* Subtle radial gradient - matches Landing/Calendar */
-.stats-page::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  width: 100vw;
-  max-width: none;
-  left: 50%;
-  transform: translateX(-50%);
-  background: 
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255, 255, 255, 0.015) 0%, transparent 50%) !important;
-  pointer-events: none;
-  border-radius: 0 !important;
-  clip-path: none !important;
+@media (min-width: 1025px) {
+  .stats-page {
+    min-height: calc(100dvh - 64px);
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
 }
 
 /* Content wrapper */
 .stats-page > * {
   width: 100%;
-  max-width: 600px;
-  position: relative;
-  z-index: 1;
+  max-width: 500px;
 }
 
 /* =============================================================================
-   HEADER - Matches Tracker/Calendar
+   HEADER - Matches Tracker exactly
    ============================================================================= */
 
 .stats-header {
@@ -90,21 +91,22 @@
 }
 
 .stats-header h1 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
-  margin: 0 0 8px 0;
+  margin: 0;
   letter-spacing: -0.02em;
 }
 
 .stats-header p {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0;
+  margin: 8px 0 0 0;
+  font-weight: 400;
 }
 
 /* =============================================================================
-   STAT CARDS - 2x2 Grid
+   STAT CARDS - 2x2 Grid, clean minimal
    ============================================================================= */
 
 .stat-grid {
@@ -112,46 +114,44 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin-bottom: 40px;
-  background: transparent !important;
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-radius: 16px;
-  padding: 24px 16px;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 20px 16px;
   text-align: center;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: background-color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .stat-card:hover {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.02) !important;
 }
 
 .stat-card:active {
-  transform: scale(0.98);
+  background-color: rgba(255, 255, 255, 0.04) !important;
 }
 
 .stat-num {
   display: block;
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   font-feature-settings: 'tnum' 1;
 }
 
 .stat-label {
   display: block;
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.35);
-  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   font-weight: 500;
 }
 
@@ -164,17 +164,16 @@
 }
 
 .stats-section h2 {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
-  margin: 0 0 20px 0;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0 16px 0;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  text-align: center;
 }
 
 /* =============================================================================
-   MILESTONES - NO YELLOW - White highlight for earned
+   MILESTONES - NO YELLOW, white accent for earned
    ============================================================================= */
 
 .milestone-grid {
@@ -184,49 +183,42 @@
 }
 
 .milestone-card {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
-  padding: 20px 8px;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 12px;
+  padding: 16px 8px;
   text-align: center;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .milestone-card:disabled {
   cursor: default;
-  opacity: 0.35;
+  opacity: 0.3;
 }
 
 .milestone-card:not(:disabled):hover {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.02) !important;
 }
 
-.milestone-card:not(:disabled):active {
-  transform: scale(0.97);
-}
-
-/* FIXED: Earned milestone - WHITE accent, not yellow */
+/* Earned milestone - WHITE accent, NOT yellow */
 .milestone-card.earned {
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  background: rgba(255, 255, 255, 0.04) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 .milestone-card.earned:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .milestone-num {
   display: block;
-  font-size: 1.625rem;
+  font-size: 1.5rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.25);
   line-height: 1;
   font-feature-settings: 'tnum' 1;
-  letter-spacing: -0.02em;
 }
 
 .milestone-card.earned .milestone-num {
@@ -237,33 +229,29 @@
   display: block;
   font-size: 0.5625rem;
   color: rgba(255, 255, 255, 0.25);
-  margin-top: 8px;
+  margin-top: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   font-weight: 500;
 }
 
-/* FIXED: Earned milestone label - WHITE, not yellow */
+/* NO YELLOW - white label for earned */
 .milestone-card.earned .milestone-label {
   color: rgba(255, 255, 255, 0.5) !important;
 }
 
 /* =============================================================================
-   TOGGLE BUTTONS - WHITE active state
+   TOGGLE BUTTONS - Matches Calendar navigation pills
    ============================================================================= */
 
 .toggle-row {
   display: flex;
-  justify-content: center;
-  gap: 4px;
-  margin-bottom: 12px;
-  padding: 4px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
+  gap: 6px;
+  margin-bottom: 8px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  padding-bottom: 2px;
 }
 
 .toggle-row::-webkit-scrollbar {
@@ -271,35 +259,36 @@
 }
 
 .toggle-btn {
-  padding: 10px 16px;
+  padding: 8px 14px;
   background: transparent;
-  border: none;
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
   color: rgba(255, 255, 255, 0.4);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: all 150ms ease;
   white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
 }
 
 .toggle-btn:hover:not(.active) {
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.6);
 }
 
-/* WHITE active state */
+/* Active toggle - WHITE background, black text */
 .toggle-btn.active {
-  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border-color: #ffffff !important;
   color: #000000 !important;
   font-weight: 600;
 }
 
 .toggle-btn.sm {
-  padding: 8px 14px;
-  font-size: 0.6875rem;
+  padding: 6px 12px;
+  font-size: 0.625rem;
 }
 
 /* =============================================================================
@@ -307,13 +296,12 @@
    ============================================================================= */
 
 .average-block {
-  text-align: center;
-  margin: 32px 0 4px 0;
+  margin: 24px 0 2px 0;
   line-height: 1;
 }
 
 .average-num {
-  font-size: 5rem;
+  font-size: 4.5rem;
   font-weight: 500;
   color: #ffffff;
   letter-spacing: -0.04em;
@@ -321,32 +309,31 @@
 }
 
 .average-suffix {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: rgba(255, 255, 255, 0.2);
   font-weight: 400;
   margin-left: 2px;
 }
 
 .average-label {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: rgba(255, 255, 255, 0.3);
-  margin: 8px 0 28px 0;
-  text-align: center;
+  margin: 6px 0 20px 0;
   text-transform: capitalize;
   letter-spacing: 0.02em;
 }
 
 /* =============================================================================
-   CHART
+   CHART - White line with gradient fill
    ============================================================================= */
 
 .chart-box {
   position: relative;
   background: transparent;
-  border-radius: 16px;
-  padding: 16px 4px 8px 0;
-  margin-bottom: 28px;
-  height: 180px;
+  border-radius: 12px;
+  padding: 12px 4px 4px 0;
+  margin-bottom: 24px;
+  height: 160px;
 }
 
 .chart-box canvas {
@@ -359,9 +346,16 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.25);
   margin: 0;
+}
+
+@media (min-width: 768px) {
+  .chart-box {
+    height: 180px;
+    padding: 16px 8px 8px 0;
+  }
 }
 
 /* =============================================================================
@@ -369,45 +363,43 @@
    ============================================================================= */
 
 .free-section {
-  margin-top: 28px;
+  margin-top: 24px;
 }
 
 .free-card {
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 12px;
+  padding: 20px;
   margin-bottom: 16px;
 }
 
 .free-card h3 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 14px 0;
+  letter-spacing: 0.08em;
+  margin: 0 0 12px 0;
 }
 
 .free-card p {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
   margin: 0;
 }
 
 .upgrade-card {
   text-align: center;
-  padding: 28px 24px;
+  padding: 24px 20px;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.01);
+  border-radius: 12px;
 }
 
 .upgrade-card p {
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 20px 0;
+  margin: 0 0 16px 0;
   line-height: 1.5;
 }
 
@@ -419,22 +411,22 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 28px;
+  margin-top: 24px;
 }
 
 /* =============================================================================
-   INSIGHT CARDS - NO yellow anywhere
+   INSIGHT CARDS - Clean, minimal containers
    ============================================================================= */
 
 .insight-card {
-  background: rgba(255, 255, 255, 0.01) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: none !important;
+  border-radius: 12px;
   overflow: hidden;
 }
 
 .insight-card-header {
-  padding: 16px 20px;
+  padding: 14px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   background: transparent !important;
 }
@@ -442,9 +434,9 @@
 .insight-card-header span {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
 }
 
 .insight-card-content {
@@ -452,21 +444,18 @@
   background: transparent !important;
 }
 
-/* =============================================================================
-   INSIGHT LOADING STATE
-   ============================================================================= */
-
+/* Loading spinner */
 .insight-loading {
   display: flex;
   justify-content: center;
-  padding: 36px;
+  padding: 32px;
 }
 
 .insight-loading-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.08);
-  border-top-color: rgba(255, 255, 255, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.4);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -475,25 +464,38 @@
   to { transform: rotate(360deg); }
 }
 
-/* =============================================================================
-   INSIGHT EMPTY STATE
-   ============================================================================= */
-
+/* Empty state */
 .insight-empty {
   text-align: center;
-  padding: 24px 16px;
+  padding: 20px 16px;
 }
 
 .insight-empty-title {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
   font-weight: 500;
 }
 
 .insight-empty-text {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Mini info banner */
+.mini-info-banner {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: none !important;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.mini-info-banner p {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.35);
   margin: 0;
   line-height: 1.5;
 }
@@ -505,7 +507,7 @@
 .progress-trends-display {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .trend-item {
@@ -521,11 +523,11 @@
 .trend-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .trend-label {
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
@@ -533,99 +535,91 @@
 }
 
 .trend-text {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.6);
-  line-height: 1.65;
+  line-height: 1.6;
   margin: 0;
 }
 
 .trend-text strong {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
 /* =============================================================================
-   RELAPSE PATTERN ANALYTICS - NO yellow
+   RELAPSE PATTERNS - NO YELLOW
    ============================================================================= */
 
 .relapse-patterns-display {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .relapse-stat {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.relapse-stat:last-of-type {
-  border-bottom: none;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: none !important;
+  border-radius: 8px;
 }
 
 .relapse-stat-label {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-/* FIXED: Primary trigger value - WHITE, not yellow */
+/* NO YELLOW - Primary Trigger value is WHITE */
 .relapse-stat-value {
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: #ffffff !important;
   text-transform: capitalize;
 }
 
 .relapse-insight {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.6);
-  line-height: 1.65;
+  line-height: 1.6;
   margin: 0;
-  padding: 0;
 }
 
 .relapse-insight strong {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
-/* =============================================================================
-   VICTORY DISPLAY (90+ days)
-   ============================================================================= */
-
+/* Victory state - NO YELLOW */
 .victory-display {
   text-align: center;
-  padding: 24px 0;
+  padding: 16px 12px;
 }
 
-/* FIXED: Victory days - WHITE, not yellow */
 .victory-days {
-  font-size: 3.5rem;
+  font-size: 2.5rem;
   font-weight: 500;
   color: #ffffff !important;
-  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 6px;
   font-feature-settings: 'tnum' 1;
-  margin-bottom: 4px;
 }
 
+/* NO YELLOW - victory label is white */
 .victory-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.5) !important;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   margin-bottom: 16px;
 }
 
 .victory-message {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.55);
   line-height: 1.6;
-  max-width: 280px;
-  margin: 0 auto;
+  margin: 0;
 }
 
 /* =============================================================================
@@ -635,14 +629,14 @@
 .patterns-display {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .pattern-item {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.65;
-  padding-left: 16px;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  padding-left: 14px;
   position: relative;
   margin: 0;
 }
@@ -651,43 +645,44 @@
   content: '';
   position: absolute;
   left: 0;
-  top: 9px;
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.2);
+  top: 8px;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 50%;
 }
 
 .pattern-item strong {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
 /* =============================================================================
-   OPTIMIZATION - NO yellow background
+   OPTIMIZATION - NO YELLOW background
    ============================================================================= */
 
 .optimization-display {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-/* FIXED: Optimization criteria - NO yellow background */
+/* NO YELLOW - optimization criteria box */
 .optimization-criteria {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  border-radius: 12px;
-  padding: 18px;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .optimization-criteria-title {
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
 }
 
 .optimization-criteria-text {
@@ -700,13 +695,13 @@
 .optimization-recommendations {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .optimization-item {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
   padding-left: 16px;
   position: relative;
   margin: 0;
@@ -717,9 +712,9 @@
   position: absolute;
   left: 0;
   top: 9px;
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 50%;
 }
 
@@ -729,157 +724,65 @@
 }
 
 /* =============================================================================
-   PHASE EVOLUTION
+   PHASE EVOLUTION - NO YELLOW
    ============================================================================= */
 
 .phase-evolution-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .phase-evolution-card {
   background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  border-radius: 12px;
-  padding: 16px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 10px;
+  padding: 14px 10px;
   text-align: center;
 }
 
-/* FIXED: Current phase - WHITE highlight, not yellow */
+/* Current phase - WHITE highlight, NOT yellow */
 .phase-evolution-card.current {
   background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 .phase-name {
-  font-size: 0.6875rem;
+  font-size: 0.5625rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   margin-bottom: 8px;
 }
 
-.phase-value {
-  font-size: 1.375rem;
-  font-weight: 500;
+.phase-evolution-card.current .phase-name {
   color: #ffffff !important;
-  font-feature-settings: 'tnum' 1;
+}
+
+.phase-value {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 4px;
 }
 
 .phase-range {
-  font-size: 0.6875rem;
+  font-size: 0.5625rem;
   color: rgba(255, 255, 255, 0.3);
-  margin-top: 4px;
 }
 
 .phase-evolution-insight {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
   margin: 0;
-  text-align: center;
 }
 
 .phase-evolution-insight strong {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
-}
-
-/* =============================================================================
-   MINI INFO BANNER
-   ============================================================================= */
-
-.mini-info-banner {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-top: 16px;
-}
-
-.mini-info-banner p {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
-  line-height: 1.5;
-  text-align: center;
-}
-
-/* =============================================================================
-   BUTTONS - WHITE primary
-   ============================================================================= */
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 28px;
-  background: #ffffff;
-  color: #000000;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 200ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.btn-primary:hover {
-  background: rgba(255, 255, 255, 0.9);
-  transform: translateY(-1px);
-}
-
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 28px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 200ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.btn-danger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 28px;
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 200ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.btn-danger:hover {
-  background: rgba(239, 68, 68, 0.15);
-  border-color: rgba(239, 68, 68, 0.3);
 }
 
 /* =============================================================================
@@ -891,60 +794,133 @@
   width: 100%;
   padding: 16px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.3);
   border: none;
+  color: rgba(255, 255, 255, 0.3);
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: color 200ms ease;
-  margin-top: 20px;
+  transition: color 150ms ease;
   text-align: center;
-  -webkit-tap-highlight-color: transparent;
+  margin-top: 8px;
 }
 
 .reset-link:hover {
-  color: #ef4444;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* =============================================================================
-   MODALS
+   BUTTONS - Matches Tracker exactly
+   ============================================================================= */
+
+.btn-primary {
+  width: 100%;
+  padding: 14px 28px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  width: 100%;
+  padding: 14px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-danger {
+  width: 100%;
+  padding: 14px 24px;
+  background: rgba(255, 59, 48, 0.15);
+  border: none;
+  border-radius: 12px;
+  color: #ff3b30;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.btn-danger:hover {
+  background: rgba(255, 59, 48, 0.25);
+}
+
+/* =============================================================================
+   OVERLAY & MODAL - Matches Tracker EXACTLY (transparent, no box)
    ============================================================================= */
 
 .overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.95);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  z-index: 1000;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  z-index: 300;
   padding: 24px;
-  animation: fadeIn 200ms ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: overlayIn 200ms ease;
 }
 
-@keyframes fadeIn {
+/* Spacers push content to center */
+.overlay::before,
+.overlay::after {
+  content: '';
+  flex: 1;
+  min-height: 40px;
+}
+
+@keyframes overlayIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
+/* Modal - TRANSPARENT like Tracker, no visible box */
 .modal {
   width: 100%;
-  max-width: 400px;
-  background: #0a0a0a;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 32px 24px;
-  text-align: center;
-  animation: slideUp 300ms ease;
+  max-width: 380px;
+  background-color: transparent;
+  padding: 0;
+  flex-shrink: 0;
+  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideUp {
+@keyframes modalIn {
   from { 
     opacity: 0; 
-    transform: translateY(20px); 
+    transform: translateY(16px); 
   }
   to { 
     opacity: 1; 
@@ -954,50 +930,51 @@
 
 .modal-num {
   display: block;
-  font-size: 5rem;
+  font-size: 4.5rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1;
   letter-spacing: -0.03em;
   margin-bottom: 8px;
   font-feature-settings: 'tnum' 1;
+  text-align: center;
 }
 
 .modal h2 {
-  font-size: 1.375rem;
+  font-size: 1.5rem;
   font-weight: 500;
   color: #ffffff;
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
+  text-align: center;
   letter-spacing: -0.02em;
 }
 
 .modal-date {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 24px 0;
+  margin: 0 0 40px 0;
+  text-align: center;
 }
 
 .modal-text {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.6;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
   margin: 0 0 40px 0;
+  text-align: center;
 }
 
 .modal-buttons {
   display: flex;
+  flex-direction: column;
   gap: 12px;
-}
-
-.modal-buttons .btn-danger,
-.modal-buttons .btn-ghost {
-  flex: 1;
+  margin-top: 48px;
 }
 
 /* Stat detail breakdown */
 .stat-detail-breakdown {
-  margin: 28px 0;
-  padding: 20px 0;
+  margin: 24px 0;
+  padding: 16px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -1005,302 +982,52 @@
 .stat-breakdown-item {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 8px 0;
 }
 
 .stat-breakdown-label {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.4);
 }
 
 .stat-breakdown-value {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: #ffffff;
   font-feature-settings: 'tnum' 1;
 }
 
 /* =============================================================================
-   ANIMATIONS
+   RESPONSIVE
    ============================================================================= */
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.stats-header {
-  animation: fadeInUp 500ms ease forwards;
-}
-
-.stat-grid {
-  animation: fadeInUp 500ms ease 50ms forwards;
-  opacity: 0;
-}
-
-.stats-section {
-  animation: fadeInUp 500ms ease 100ms forwards;
-  opacity: 0;
-}
-
-/* =============================================================================
-   RESPONSIVE - Mobile
-   ============================================================================= */
-
-@media (max-width: 768px) {
-  .stats-page {
-    padding: 20px 16px;
-    padding-bottom: 100px;
-  }
-  
-  .stats-header h1 {
-    font-size: 1.375rem;
-  }
-  
-  .stat-num {
-    font-size: 2.25rem;
-  }
-  
-  .average-num {
-    font-size: 4.5rem;
-  }
-  
-  .modal-num {
-    font-size: 4rem;
-  }
-}
 
 @media (max-width: 480px) {
   .stats-page {
-    padding: 16px 12px;
-    padding-bottom: 90px;
-  }
-  
-  .stats-header {
-    margin-bottom: 24px;
+    padding: 20px 16px 120px;
   }
   
   .stats-header h1 {
-    font-size: 1.25rem;
-  }
-  
-  .stats-header p {
-    font-size: 0.8125rem;
-  }
-  
-  .stat-grid {
-    gap: 10px;
-    margin-bottom: 32px;
-  }
-  
-  .stat-card {
-    padding: 20px 12px;
-    border-radius: 14px;
+    font-size: 1.125rem;
   }
   
   .stat-num {
     font-size: 2rem;
   }
   
-  .stat-label {
-    font-size: 0.625rem;
-    margin-top: 8px;
-  }
-  
-  .stats-section h2 {
-    font-size: 0.6875rem;
-    margin-bottom: 16px;
-  }
-  
-  .milestone-grid {
-    gap: 8px;
-  }
-  
-  .milestone-card {
-    padding: 16px 6px;
-    border-radius: 12px;
-  }
-  
-  .milestone-num {
-    font-size: 1.375rem;
-  }
-  
-  .milestone-label {
-    font-size: 0.5rem;
-    margin-top: 6px;
-  }
-  
-  .toggle-row {
-    border-radius: 10px;
-    padding: 3px;
+  .average-num {
+    font-size: 3.5rem;
   }
   
   .toggle-btn {
-    padding: 8px 12px;
-    font-size: 0.6875rem;
-    border-radius: 8px;
-  }
-  
-  .toggle-btn.sm {
-    padding: 6px 10px;
-    font-size: 0.625rem;
-  }
-  
-  .average-block {
-    margin: 24px 0 4px 0;
-  }
-  
-  .average-num {
-    font-size: 4rem;
-  }
-  
-  .average-suffix {
-    font-size: 1rem;
-  }
-  
-  .average-label {
-    font-size: 0.6875rem;
-    margin: 6px 0 24px 0;
-  }
-  
-  .chart-box {
-    height: 160px;
-    margin-bottom: 24px;
-  }
-  
-  .insight-card {
-    border-radius: 14px;
-  }
-  
-  .insight-card-header {
-    padding: 14px 16px;
-  }
-  
-  .insight-card-content {
-    padding: 16px;
-  }
-  
-  .overlay {
-    padding: 16px;
-  }
-  
-  .modal {
-    max-width: 100%;
+    padding: 8px 10px;
   }
   
   .modal-num {
     font-size: 3.5rem;
   }
   
-  .modal h2 {
-    font-size: 1.25rem;
-  }
-  
-  .modal-text {
-    font-size: 0.875rem;
-    margin-bottom: 32px;
-  }
-  
-  .modal-buttons {
-    flex-direction: column;
-  }
-  
-  .btn-primary,
-  .btn-ghost,
-  .btn-danger {
-    padding: 14px 20px;
-    font-size: 0.875rem;
-  }
-  
-  .phase-evolution-grid {
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  
-  .phase-evolution-card {
-    padding: 14px 10px;
-    border-radius: 10px;
-  }
-  
-  .phase-value {
-    font-size: 1.125rem;
-  }
-}
-
-/* =============================================================================
-   DESKTOP ENHANCEMENTS
-   ============================================================================= */
-
-@media (min-width: 1024px) {
-  .stats-page {
-    padding: 40px 48px;
-    padding-bottom: 80px;
-  }
-  
-  .stats-page > * {
-    max-width: 680px;
-  }
-  
-  .stats-header {
-    margin-bottom: 40px;
-  }
-  
-  .stats-header h1 {
-    font-size: 1.75rem;
-  }
-  
-  .stat-grid {
-    gap: 16px;
-    margin-bottom: 48px;
-  }
-  
-  .stat-card {
-    padding: 28px 20px;
-    border-radius: 18px;
-  }
-  
-  .stat-num {
-    font-size: 2.75rem;
-  }
-  
-  .milestone-card {
-    padding: 24px 12px;
-    border-radius: 16px;
-  }
-  
-  .milestone-num {
-    font-size: 1.875rem;
-  }
-  
-  .toggle-btn {
-    padding: 12px 20px;
-    font-size: 0.8125rem;
-  }
-  
-  .average-num {
-    font-size: 5.5rem;
-  }
-  
   .chart-box {
-    height: 200px;
-  }
-  
-  .insight-card {
-    border-radius: 18px;
-  }
-  
-  .modal-num {
-    font-size: 5.5rem;
-  }
-  
-  .modal h2 {
-    font-size: 1.5rem;
+    height: 140px;
   }
 }
 
@@ -1309,90 +1036,67 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .stats-header,
-  .stat-grid,
-  .stats-section,
   .overlay,
   .modal,
   .insight-loading-spinner {
     animation: none;
-    opacity: 1;
-  }
-  
-  .stat-card,
-  .milestone-card,
-  .toggle-btn,
-  .btn-primary,
-  .btn-ghost,
-  .btn-danger {
-    transition: none;
   }
 }
 
 /* =============================================================================
-   NUCLEAR OVERRIDES - Kill ALL legacy yellow styling
-   Must be at the END to have highest specificity
+   NUCLEAR KILL - All legacy yellow styling
+   Must be at END for highest specificity
    ============================================================================= */
 
-/* Kill any yellow/gold from other CSS files */
-.stats-page .insight-card,
-.stats-page .optimization-criteria,
-.stats-page .phase-evolution-card,
-.stats-page .relapse-stat,
-.stats-page .milestone-card,
-.stats-page [class*="victory"],
-.stats-page [class*="trigger"],
-.stats-page [class*="primary-trigger"] {
-  background-image: none !important;
-  border-color: rgba(255, 255, 255, 0.05) !important;
+/* Kill ALL yellow/gold colors anywhere in Stats */
+.stats-page [style*="255, 221, 0"],
+.stats-page [style*="ffdd00"],
+.stats-page [style*="ffd700"],
+.stats-page [style*="251, 191, 36"] {
+  color: #ffffff !important;
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
 }
 
-/* Force white text on all stat values */
+/* Force override any class with yellow */
+.stats-page .victory-label,
+.stats-page .milestone-card.earned .milestone-label,
 .stats-page .relapse-stat-value,
+.stats-page .optimization-criteria-title,
+.stats-page .optimization-criteria-text,
+.stats-page [class*="primary-trigger"],
+.stats-page [class*="conquered"],
+.stats-page [class*="victory"] {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
 .stats-page .victory-days,
-.stats-page [class*="trigger-value"],
-.stats-page [class*="primary-trigger"] span {
+.stats-page .relapse-stat-value,
+.stats-page .milestone-card.earned .milestone-num {
   color: #ffffff !important;
 }
 
-/* Hide any old decorative elements */
+/* Kill old decorative elements */
 .data-progress-helmet,
 .mini-info-helmet,
 .insight-loading-helmet,
-.data-progress-helmet-container,
-.mini-info-helmet-container,
-.data-progress-helmet-fallback,
-.mini-info-helmet-fallback,
 [class*="helmet"],
-[class*="arc-decoration"],
-[class*="stats-arc"],
-[class*="decorative-arc"] {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* Hide old trend badges */
-.trend-badge,
-.trend-badge.improving,
-.trend-badge.stable,
-.trend-badge.worsening {
+[class*="arc"],
+.trend-badge {
   display: none !important;
 }
 
-/* Kill EmotionalTimelineSections.css bleed-through */
-.stats-page .energy-data-progress-indicator,
-.stats-page .energy-data-progress-header,
-.stats-page .energy-data-progress-bar,
-.stats-page .energy-data-progress-fill,
-.stats-page .relapse-stat-card,
-.stats-page .relapse-stat-card.victory-days,
-.stats-page .relapse-stat-card.primary-trigger {
+/* Kill old stat card styling from StatsAnalytics */
+.relapse-stat-card,
+.relapse-summary-stats,
+.conquered-trigger {
   background: rgba(255, 255, 255, 0.02) !important;
-  background-color: rgba(255, 255, 255, 0.02) !important;
-  background-image: none !important;
-  border-color: rgba(255, 255, 255, 0.05) !important;
+  border: none !important;
 }
 
-.stats-page .relapse-stat-card .relapse-stat-value {
-  color: #ffffff !important;
+/* Kill EmotionalTimeline bleed */
+.stats-page .energy-data-progress-indicator,
+.stats-page .energy-data-progress-bar {
+  background: transparent !important;
+  border: none !important;
 }
