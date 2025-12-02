@@ -40,7 +40,7 @@
 
 .calendar-modal {
   width: 100%;
-  max-width: 400px;
+  max-width: 360px;
   max-height: calc(100vh - 120px);
   max-height: calc(100dvh - 120px);
   overflow-y: auto;
@@ -825,7 +825,7 @@
 
 @media (min-width: 1024px) {
   .calendar-modal {
-    max-width: 420px;
+    max-width: 360px;
   }
   
   .calendar-day-info h3,
