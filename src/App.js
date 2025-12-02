@@ -220,15 +220,35 @@ function App() {
       <ScrollToTop />
       <ServiceWorkerListener />
       <Toaster 
-        position="top-center"
+        position="bottom-center"
+        containerStyle={{
+          bottom: 100,
+        }}
         toastOptions={{
-          duration: 3000,
+          duration: 2500,
           style: {
-            background: '#1a1a1a',
-            color: '#ffffff',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '12px',
+            color: '#ffffff',
             fontSize: '0.875rem',
+            fontWeight: '500',
+            padding: '14px 20px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          },
+          success: {
+            duration: 2500,
+            icon: <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />,
+          },
+          error: {
+            duration: 3500,
+            style: {
+              background: 'rgba(255, 59, 48, 0.08)',
+              border: '1px solid rgba(255, 59, 48, 0.12)',
+            },
+            icon: <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff3b30', flexShrink: 0 }} />,
           },
         }}
       />
