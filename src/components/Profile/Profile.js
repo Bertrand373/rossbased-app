@@ -316,8 +316,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
             {isEditingProfile && (
               <div className="section-actions">
-                <button className="btn-primary" onClick={handleProfileUpdate}>Save Changes</button>
                 <button className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Cancel</button>
+                <button className="btn-primary" onClick={handleProfileUpdate}>Save Changes</button>
               </div>
             )}
 
@@ -330,6 +330,22 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               <button className="feedback-btn" onClick={() => setShowFeedbackModal(true)}>
                 Send
               </button>
+            </div>
+
+            {/* Discord Row */}
+            <div className="feedback-row">
+              <div className="feedback-text">
+                <span className="feedback-title">Join the Community</span>
+                <span className="feedback-desc">Connect with others on Discord</span>
+              </div>
+              <a 
+                href="https://discord.gg/RDFC5eUtuA" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="feedback-btn"
+              >
+                Join
+              </a>
             </div>
           </div>
         )}
@@ -501,8 +517,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
             {isEditingPrivacy && (
               <div className="section-actions">
-                <button className="btn-primary" onClick={handleSaveNotificationPreferences}>Save Changes</button>
                 <button className="btn-ghost" onClick={() => setIsEditingPrivacy(false)}>Cancel</button>
+                <button className="btn-primary" onClick={handleSaveNotificationPreferences}>Save Changes</button>
               </div>
             )}
           </div>
@@ -576,8 +592,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             </div>
 
             <div className="modal-actions">
-              <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
               <button className="btn-ghost" onClick={() => setShowFeedbackModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
             </div>
           </div>
         </div>
