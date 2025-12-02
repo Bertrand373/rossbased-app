@@ -444,11 +444,11 @@
   gap: 32px;
 }
 
-/* Breathing Circle */
+/* Breathing Circle - Outer ring for depth */
 .ut-breathing-circle {
   width: 180px;
   height: 180px;
-  border: 2px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -456,12 +456,28 @@
   position: relative;
 }
 
-.ut-breathing-orb {
-  width: 60px;
-  height: 60px;
+/* Subtle outer glow ring */
+.ut-breathing-circle::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
+.ut-breathing-orb {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, 
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(255, 255, 255, 0.7) 50%, 
+    rgba(255, 255, 255, 0.4) 100%);
+  box-shadow: 
+    0 0 20px rgba(255, 255, 255, 0.15),
+    0 0 40px rgba(255, 255, 255, 0.05);
+  filter: blur(0.5px);
 }
 
 /* Dynamic duration via CSS variable */
@@ -475,8 +491,10 @@
 
 .ut-breathing-orb.hold {
   animation: holdPulse 2s ease-in-out infinite;
-  background: rgba(255, 255, 255, 0.25);
   transform: scale(1.8);
+  box-shadow: 
+    0 0 40px rgba(255, 255, 255, 0.25),
+    0 0 80px rgba(255, 255, 255, 0.1);
 }
 
 .ut-breathing-orb.rapid {
@@ -486,33 +504,65 @@
 @keyframes breatheIn {
   from { 
     transform: scale(1); 
-    opacity: 0.4; 
+    box-shadow: 
+      0 0 20px rgba(255, 255, 255, 0.1),
+      0 0 40px rgba(255, 255, 255, 0.03);
+    filter: blur(0.5px);
   }
   to { 
     transform: scale(1.8); 
-    opacity: 1; 
+    box-shadow: 
+      0 0 40px rgba(255, 255, 255, 0.3),
+      0 0 80px rgba(255, 255, 255, 0.15),
+      0 0 120px rgba(255, 255, 255, 0.05);
+    filter: blur(0px);
   }
 }
 
 @keyframes breatheOut {
   from { 
     transform: scale(1.8); 
-    opacity: 1; 
+    box-shadow: 
+      0 0 40px rgba(255, 255, 255, 0.3),
+      0 0 80px rgba(255, 255, 255, 0.15),
+      0 0 120px rgba(255, 255, 255, 0.05);
+    filter: blur(0px);
   }
   to { 
     transform: scale(1); 
-    opacity: 0.4; 
+    box-shadow: 
+      0 0 20px rgba(255, 255, 255, 0.1),
+      0 0 40px rgba(255, 255, 255, 0.03);
+    filter: blur(0.5px);
   }
 }
 
 @keyframes holdPulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
+  0%, 100% { 
+    box-shadow: 
+      0 0 40px rgba(255, 255, 255, 0.2),
+      0 0 80px rgba(255, 255, 255, 0.1);
+  }
+  50% { 
+    box-shadow: 
+      0 0 50px rgba(255, 255, 255, 0.35),
+      0 0 100px rgba(255, 255, 255, 0.15);
+  }
 }
 
 @keyframes rapidBreath {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.4); }
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 
+      0 0 20px rgba(255, 255, 255, 0.15),
+      0 0 40px rgba(255, 255, 255, 0.05);
+  }
+  50% { 
+    transform: scale(1.4); 
+    box-shadow: 
+      0 0 30px rgba(255, 255, 255, 0.25),
+      0 0 60px rgba(255, 255, 255, 0.1);
+  }
 }
 
 /* Breathing Modal Info */
@@ -959,8 +1009,16 @@
   }
 
   .ut-breathing-orb {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .ut-breathing-phase-text {
+    font-size: 1rem;
+  }
+
+  .ut-breathing-timer-text {
+    font-size: 2.5rem;
   }
 
   .ut-breathing-phase {
