@@ -598,6 +598,11 @@
   font-family: inherit;
   cursor: pointer;
   transition: background-color 150ms ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
   -webkit-tap-highlight-color: transparent;
 }
 
