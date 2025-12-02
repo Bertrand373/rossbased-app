@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import './MobileNavigation.css';
 
-const MobileNavigation = ({ activeTab, setActiveTab, riskLevel }) => {
+const MobileNavigation = ({ activeTab, setActiveTab, riskLevel = 'none' }) => {
   const location = useLocation();
   const navRef = useRef(null);
   const itemRefs = useRef([]);
@@ -15,7 +15,7 @@ const MobileNavigation = ({ activeTab, setActiveTab, riskLevel }) => {
     { path: '/calendar', label: 'Calendar' },
     { path: '/stats', label: 'Stats' },
     { path: '/timeline', label: 'Timeline' },
-    { path: '/urge-toolkit', label: 'Urges' }
+    { path: '/urge-toolkit', label: 'Urges', showRiskIndicator: true }
   ];
 
   // Find active tab index
@@ -77,6 +77,10 @@ const MobileNavigation = ({ activeTab, setActiveTab, riskLevel }) => {
             className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
           >
             <span className="nav-label">{item.label}</span>
+            {/* Risk indicator dot for Urges tab */}
+            {item.showRiskIndicator && riskLevel !== 'none' && (
+              <span className={`mobile-risk-dot ${riskLevel}`} />
+            )}
           </NavLink>
         </div>
       ))}

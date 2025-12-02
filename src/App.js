@@ -26,6 +26,10 @@ import MobileNavigation from './components/Navigation/MobileNavigation';
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
 
+// AMBIENT AI HOOKS
+import { useAutoTrain } from './hooks/useAutoTrain';
+import { useRiskIndicator } from './hooks/useRiskIndicator';
+
 // Profile Button - Minimal circle
 const ProfileButton = ({ userData }) => {
   const navigate = useNavigate();
@@ -48,8 +52,8 @@ const ProfileButton = ({ userData }) => {
   );
 };
 
-// Desktop Navigation - sliding dot indicator
-const HeaderNavigation = () => {
+// Desktop Navigation - sliding dot indicator (with optional risk indicator)
+const HeaderNavigation = ({ riskLevel = 'none' }) => {
   const location = useLocation();
   const containerRef = useRef(null);
   const itemRefs = useRef([]);
@@ -61,7 +65,7 @@ const HeaderNavigation = () => {
     { path: '/calendar', label: 'Calendar' },
     { path: '/stats', label: 'Stats' },
     { path: '/timeline', label: 'Timeline' },
-    { path: '/urge-toolkit', label: 'Urges' }
+    { path: '/urge-toolkit', label: 'Urges', showRiskIndicator: true }
   ];
 
   // Find active tab index
@@ -123,6 +127,10 @@ const HeaderNavigation = () => {
               className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
             >
               {item.label}
+              {/* Risk indicator dot for Urges tab */}
+              {item.showRiskIndicator && riskLevel !== 'none' && (
+                <span className={`desktop-risk-dot ${riskLevel}`} />
+              )}
             </NavLink>
           </div>
         ))}
@@ -179,6 +187,11 @@ function App() {
     setGoal,
     cancelGoal
   } = useUserData();
+
+  // AMBIENT AI: Only run when logged in with valid userData
+  // These hooks are safe - they check for null userData internally
+  useAutoTrain(isLoggedIn ? userData : null);
+  const { riskLevel } = useRiskIndicator(isLoggedIn ? userData : null);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
@@ -261,7 +274,7 @@ function App() {
                 <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
               </div>
               
-              {!isMobile && <HeaderNavigation />}
+              {!isMobile && <HeaderNavigation riskLevel={riskLevel} />}
               
               <ProfileButton userData={userData} />
             </header>
@@ -269,7 +282,8 @@ function App() {
             {isMobile && (
               <MobileNavigation 
                 activeTab={activeTab} 
-                setActiveTab={setActiveTab} 
+                setActiveTab={setActiveTab}
+                riskLevel={riskLevel}
               />
             )}
             

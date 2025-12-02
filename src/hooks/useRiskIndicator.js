@@ -1,111 +1,77 @@
-// src/hooks/useAutoTrain.js
-// Silent auto-training hook - trains AI model in background when conditions are met
-// No UI feedback - completely invisible to user
+// src/hooks/useRiskIndicator.js
+// Ambient risk indicator hook - provides risk state for navigation UI
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import mlPredictionService from '../services/MLPredictionService';
-import dataPreprocessor from '../utils/DataPreprocessor';
 
-/**
- * useAutoTrain - Ambient Intelligence Auto-Training
- * 
- * This hook silently monitors user data and automatically trains the ML model
- * when sufficient data is available. The user never sees training UI or progress.
- * 
- * Training triggers when:
- * - 20+ days of benefit tracking data
- * - At least 1 historical relapse (to learn patterns from)
- * - Model not already trained OR needs retraining (7+ days since last train)
- * - Not currently training
- */
-export function useAutoTrain(userData) {
-  const hasAttemptedTraining = useRef(false);
-  const isTrainingInProgress = useRef(false);
+export function useRiskIndicator(userData) {
+  const [riskLevel, setRiskLevel] = useState('none');
+  const [riskScore, setRiskScore] = useState(null);
+  const [isModelReady, setIsModelReady] = useState(false);
 
-  const checkAndTrain = useCallback(async () => {
-    // SAFETY: Exit early if no userData
+  const checkRisk = useCallback(async () => {
+    // SAFETY: Exit if no userData
     if (!userData) {
-      return;
-    }
-
-    // Prevent concurrent training attempts
-    if (isTrainingInProgress.current) {
-      return;
-    }
-
-    // Only attempt once per session unless data significantly changes
-    if (hasAttemptedTraining.current) {
+      setRiskLevel('none');
       return;
     }
 
     try {
-      // Initialize ML service if needed
       await mlPredictionService.initialize();
       
-      // Check data quality
-      const dataQuality = dataPreprocessor.getDataQualityReport(userData);
-      
-      // Requirements for auto-training:
-      // 1. Can train (20+ days of data)
-      // 2. Has relapse history (something to learn from)
-      if (!dataQuality || !dataQuality.canTrain || !dataQuality.hasRelapseData) {
-        console.log('🤖 Auto-train: Insufficient data, skipping');
-        return;
-      }
-
-      // Check if model needs training
       const modelInfo = mlPredictionService.getModelInfo();
-      
-      // Skip if model is ready and doesn't need retraining
-      if (modelInfo && modelInfo.isReady && !modelInfo.needsRetraining) {
-        console.log('🤖 Auto-train: Model already trained and up-to-date');
-        hasAttemptedTraining.current = true;
+      setIsModelReady(modelInfo?.isReady || false);
+
+      // No indicator if model not trained
+      if (!modelInfo?.isReady) {
+        setRiskLevel('none');
         return;
       }
 
-      // All conditions met - train silently
-      console.log('🤖 Auto-train: Starting silent background training...');
-      isTrainingInProgress.current = true;
-      hasAttemptedTraining.current = true;
+      const prediction = await mlPredictionService.predict(userData);
 
-      // Train without progress callback (silent)
-      const result = await mlPredictionService.train(userData, null);
-
-      if (result && result.success) {
-        console.log(`🤖 Auto-train: Complete! Accuracy: ${result.accuracy?.toFixed(1)}%`);
-      } else {
-        console.log('🤖 Auto-train: Training failed -', result?.message || 'Unknown error');
+      // Only trust ML predictions
+      if (!prediction?.usedML) {
+        setRiskLevel('none');
+        return;
       }
 
+      setRiskScore(prediction.riskScore);
+
+      // Set risk level
+      if (prediction.riskScore >= 70) {
+        setRiskLevel('high');
+      } else if (prediction.riskScore >= 50) {
+        setRiskLevel('elevated');
+      } else {
+        setRiskLevel('none');
+      }
     } catch (error) {
-      console.error('🤖 Auto-train error:', error);
-    } finally {
-      isTrainingInProgress.current = false;
+      console.error('Risk indicator error:', error);
+      setRiskLevel('none');
     }
   }, [userData]);
 
-  // Run check when userData changes (specifically when tracking data grows)
   useEffect(() => {
-    // SAFETY: Only check if we have valid userData with tracking
-    if (!userData || !userData.benefitTracking || !Array.isArray(userData.benefitTracking)) {
+    // SAFETY: Only run with valid userData
+    if (!userData?.benefitTracking) {
+      setRiskLevel('none');
       return;
     }
 
-    // Need at least 20 days before even attempting
-    if (userData.benefitTracking.length < 20) {
-      return;
-    }
+    // Initial check with delay
+    const initialTimeout = setTimeout(checkRisk, 2000);
 
-    // Debounce - wait a moment after data changes before checking
-    const timeoutId = setTimeout(() => {
-      checkAndTrain();
-    }, 2000);
+    // Check every 30 minutes
+    const intervalId = setInterval(checkRisk, 30 * 60 * 1000);
 
-    return () => clearTimeout(timeoutId);
-  }, [userData, checkAndTrain]);
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(intervalId);
+    };
+  }, [userData, checkRisk]);
 
-  // This hook returns nothing - it's purely side-effect based
-  return null;
+  return { riskLevel, riskScore, isModelReady, refreshRisk: checkRisk };
 }
 
-export default useAutoTrain;
+export default useRiskIndicator;
