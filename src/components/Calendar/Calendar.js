@@ -10,6 +10,9 @@ import './CalendarModals.css';
 
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
+// NEW: Import InterventionService for ML feedback loop
+import interventionService from '../../services/InterventionService';
+
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -437,6 +440,17 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       currentStreak: Math.max(0, newCurrentStreak),
       startDate: newStreakStart
     });
+    
+    // NEW: Notify InterventionService for ML feedback loop
+    // This marks any pending interventions within 48-hour window as "failed"
+    try {
+      const markedCount = interventionService.onRelapse(selectedDate);
+      if (markedCount > 0) {
+        console.log(`📊 Marked ${markedCount} pending interventions as relapse`);
+      }
+    } catch (error) {
+      console.warn('InterventionService notification error:', error);
+    }
     
     toast.success('Relapse logged');
     closeEditModal();
@@ -881,16 +895,20 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             {renderEditContent()}
 
             <div className="calendar-actions">
-              {showTriggerSelection ? (
-                <button className="calendar-btn-ghost" onClick={() => {
+              <button className="calendar-btn-ghost" onClick={closeEditModal}>
+                Cancel
+              </button>
+              {!showTriggerSelection && getEditOptions().type !== 'future' && (
+                <button className="calendar-btn-back" onClick={backToDayInfo}>
+                  Back
+                </button>
+              )}
+              {showTriggerSelection && (
+                <button className="calendar-btn-back" onClick={() => {
                   setShowTriggerSelection(false);
                   setEditingExistingTrigger(false);
                   setSelectedTrigger('');
                 }}>
-                  Back
-                </button>
-              ) : (
-                <button className="calendar-btn-ghost" onClick={backToDayInfo}>
                   Back
                 </button>
               )}

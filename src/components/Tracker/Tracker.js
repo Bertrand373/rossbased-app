@@ -7,6 +7,9 @@ import './Tracker.css';
 import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 
+// NEW: Import InterventionService for ML feedback loop
+import interventionService from '../../services/InterventionService';
+
 const Tracker = ({ userData, updateUserData }) => {
   const [showDatePicker, setShowDatePicker] = useState(!userData.startDate);
   const [showBenefits, setShowBenefits] = useState(false);
@@ -88,6 +91,17 @@ const Tracker = ({ userData, updateUserData }) => {
       lastRelapse: now, 
       relapseCount: (userData.relapseCount || 0) + 1 
     });
+
+    // NEW: Notify InterventionService for ML feedback loop
+    // This marks any pending interventions within 48-hour window as "failed"
+    try {
+      const markedCount = interventionService.onRelapse(now);
+      if (markedCount > 0) {
+        console.log(`📊 Marked ${markedCount} pending interventions as relapse`);
+      }
+    } catch (error) {
+      console.warn('InterventionService notification error:', error);
+    }
 
     setShowResetConfirm(false);
     setShowStreakOptions(false);

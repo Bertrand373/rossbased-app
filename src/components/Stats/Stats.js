@@ -29,13 +29,15 @@ import {
   validateUserData
 } from './StatsUtils';
 
-// Import analytics functions
+// Import analytics functions - UPDATED: Added ML pattern functions
 import {
   generatePatternRecognition,
   generateOptimizationGuidance,
   calculatePhaseEvolutionAnalysis,
   generateRelapsePatternAnalysis,
-  calculateProgressTrends
+  calculateProgressTrends,
+  discoverMLPatterns,
+  generateMLOptimization
 } from './StatsAnalyticsUtils';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
@@ -49,6 +51,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [showResetAllModal, setShowResetAllModal] = useState(false);
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
+  
+  // NEW: ML pattern state
+  const [mlPatterns, setMLPatterns] = useState(null);
+  const [mlOptimization, setMLOptimization] = useState(null);
   
   const [loadingStates, setLoadingStates] = useState({
     progressTrends: true,
@@ -73,6 +79,36 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       return () => timers.forEach(clearTimeout);
     }
   }, [isPremium, selectedMetric, timeRange]);
+
+  // NEW: Load ML patterns when premium user has enough data
+  useEffect(() => {
+    const loadMLPatterns = async () => {
+      // Only load for premium users with sufficient data
+      if (!isPremium || !safeUserData?.benefitTracking?.length || safeUserData.benefitTracking.length < 20) {
+        setMLPatterns(null);
+        setMLOptimization(null);
+        return;
+      }
+      
+      try {
+        // Load AI-discovered patterns
+        const patterns = await discoverMLPatterns(safeUserData);
+        setMLPatterns(patterns);
+        
+        // Load AI optimization suggestions
+        const optimization = await generateMLOptimization(safeUserData);
+        setMLOptimization(optimization);
+        
+        console.log('✅ ML patterns loaded:', patterns?.hasMLPatterns);
+      } catch (error) {
+        console.warn('ML patterns loading error:', error);
+        setMLPatterns(null);
+        setMLOptimization(null);
+      }
+    };
+    
+    loadMLPatterns();
+  }, [safeUserData, isPremium]);
 
   const hasInsufficientData = useMemo(() => {
     return (safeUserData.benefitTracking?.length || 0) < 3;
@@ -434,7 +470,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           </div>
         )}
 
-        {/* Premium Analytics */}
+        {/* Premium Analytics - UPDATED: Pass mlPatterns and mlOptimization props */}
         {isPremium && (
           <div className="analytics-stack">
             <ProgressTrendsAnalysis
@@ -458,6 +494,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               userData={safeUserData}
               patternInsights={memoizedInsights.patternInsights}
               dataQuality={memoizedInsights.dataQuality}
+              mlPatterns={mlPatterns}
             />
             <OptimizationGuidance
               isLoading={loadingStates.optimization}
@@ -465,6 +502,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               userData={safeUserData}
               optimizationGuidance={memoizedInsights.optimizationGuidance}
               dataQuality={memoizedInsights.dataQuality}
+              mlOptimization={mlOptimization}
             />
             <PhaseEvolutionAnalysis
               isLoading={loadingStates.phaseEvolution}
