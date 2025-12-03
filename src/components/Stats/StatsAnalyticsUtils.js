@@ -82,11 +82,12 @@ export const generateUrgeManagementGuidance = (userData, timeRange) => {
 };
 
 // NEW: Progress & Trends Analysis - Historical trajectory calculation
-export const calculateProgressTrends = (userData, timeRange) => {
+export const calculateProgressTrends = (userData, timeRange, selectedMetric = 'energy') => {
   try {
     const safeData = validateUserData(userData);
     const allBenefitData = safeData.benefitTracking || [];
     const streakHistory = safeData.streakHistory || [];
+    const metricToUse = selectedMetric || 'energy';
     
     // Need at least 14 days of data for meaningful trends
     if (allBenefitData.length < 14) {
@@ -137,12 +138,12 @@ export const calculateProgressTrends = (userData, timeRange) => {
     
     // 2. BENEFIT PERFORMANCE TREND (for selected metric)
     if (allBenefitData.length >= 14) {
-      // Get last 7 days average
+      // Get last 7 days average for selected metric
       const last7Days = allBenefitData.slice(-7);
-      const recentAvg = calculateAverage({ benefitTracking: last7Days }, 'energy', 'week', true);
+      const recentAvg = calculateAverage({ benefitTracking: last7Days }, metricToUse, 'week', true);
       
-      // Get overall average
-      const overallAvg = calculateAverage(safeData, 'energy', 'quarter', true);
+      // Get overall average for selected metric
+      const overallAvg = calculateAverage(safeData, metricToUse, 'quarter', true);
       
       if (recentAvg !== 'N/A' && overallAvg !== 'N/A') {
         const recentNum = parseFloat(recentAvg);
@@ -228,12 +229,25 @@ export const calculateProgressTrends = (userData, timeRange) => {
   }
 };
 
-// ENHANCED: Pattern Recognition with caching and better error handling
+// ENHANCED: Pattern Recognition - Now actually uses selectedMetric
 export const generatePatternRecognition = (userData, selectedMetric, isPremium) => {
   try {
     const safeData = validateUserData(userData);
     const allData = safeData.benefitTracking || [];
     const currentStreak = safeData.currentStreak || 0;
+    const metric = selectedMetric || 'energy';
+    
+    // Helper to get metric value from a data point
+    const getMetricValue = (d) => {
+      if (!d) return null;
+      if (metric === 'sleep') {
+        return d.sleep || d.attraction || null;
+      }
+      return d[metric] || null;
+    };
+    
+    // Helper for metric display name
+    const metricDisplayName = metric === 'sleep' ? 'sleep quality' : metric;
     
     // Require substantial data for meaningful patterns
     if (allData.length < 14) {
@@ -242,114 +256,168 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
     
     const patterns = [];
     
-    // Energy-focus relationship (require significant data)
-    if (isPremium && allData.length >= 20) {
+    // 1. SELECTED METRIC TREND (5-day momentum)
+    if (allData.length >= 7) {
       try {
-        const energyData = allData.filter(d => d && typeof d.energy === 'number' && d.energy >= 7);
-        if (energyData.length >= 5) {
-          const validFocusValues = energyData
-            .map(d => d.focus || 0)
-            .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
-            
-          const allValidFocusValues = allData
-            .map(d => d.focus || 0)
-            .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
-            
-          if (validFocusValues.length >= 3 && allValidFocusValues.length >= 10) {
-            const avgFocusWhenEnergyHigh = validFocusValues.reduce((sum, val) => sum + val, 0) / validFocusValues.length;
-            const overallAvgFocus = allValidFocusValues.reduce((sum, val) => sum + val, 0) / allValidFocusValues.length;
-            const improvement = ((avgFocusWhenEnergyHigh - overallAvgFocus) / overallAvgFocus * 100).toFixed(0);
-            
-            if (improvement > 20) {
-              patterns.push(`**Energy-Focus Pattern**: When your energy hits 7+, focus averages ${avgFocusWhenEnergyHigh.toFixed(1)}/10 (${improvement}% above baseline). Schedule important work during high-energy periods.`);
+        const last5Days = allData.slice(-5);
+        if (last5Days.length >= 3) {
+          const firstValue = getMetricValue(last5Days[0]);
+          const lastValue = getMetricValue(last5Days[last5Days.length - 1]);
+          
+          if (typeof firstValue === 'number' && typeof lastValue === 'number' && 
+              firstValue >= 1 && firstValue <= 10 && lastValue >= 1 && lastValue <= 10) {
+            const trend = lastValue - firstValue;
+            if (Math.abs(trend) >= 1) {
+              if (trend > 0) {
+                patterns.push(`**${metricDisplayName.charAt(0).toUpperCase() + metricDisplayName.slice(1)} Trend**: Rising ${trend.toFixed(1)} points over 5 days. This upward momentum indicates positive adaptation - maintain current practices.`);
+              } else {
+                patterns.push(`**${metricDisplayName.charAt(0).toUpperCase() + metricDisplayName.slice(1)} Decline**: Dropped ${Math.abs(trend).toFixed(1)} points over 5 days. Fluctuations during retention are normal - focus on rest and recovery.`);
+              }
             }
           }
         }
-      } catch (patternError) {
-        console.warn('Energy-focus pattern error:', patternError);
+      } catch (trendError) {
+        console.warn('Metric trend error:', trendError);
       }
     }
     
-    // Sleep-confidence pattern (require significant data)
+    // 2. CORRELATION PATTERNS - How selected metric relates to other metrics
     if (isPremium && allData.length >= 20) {
       try {
-        const poorSleepDays = allData.filter(d => {
-          const sleepValue = d && (d.sleep || 5);
-          return typeof sleepValue === 'number' && sleepValue < 5;
+        // Find days where selected metric is high (7+)
+        const highMetricDays = allData.filter(d => {
+          const val = getMetricValue(d);
+          return typeof val === 'number' && val >= 7;
         });
         
-        if (poorSleepDays.length >= 5) {
-          const nextDayConfidence = poorSleepDays.map(d => {
-            try {
+        if (highMetricDays.length >= 5) {
+          // Check correlation with energy (if not already selected)
+          if (metric !== 'energy') {
+            const energyOnHighDays = highMetricDays
+              .map(d => d.energy || 0)
+              .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
+            
+            const allEnergyValues = allData
+              .map(d => d.energy || 0)
+              .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
+            
+            if (energyOnHighDays.length >= 3 && allEnergyValues.length >= 10) {
+              const avgEnergyWhenMetricHigh = energyOnHighDays.reduce((sum, val) => sum + val, 0) / energyOnHighDays.length;
+              const overallAvgEnergy = allEnergyValues.reduce((sum, val) => sum + val, 0) / allEnergyValues.length;
+              const correlation = ((avgEnergyWhenMetricHigh - overallAvgEnergy) / overallAvgEnergy * 100).toFixed(0);
+              
+              if (correlation > 15) {
+                patterns.push(`**${metricDisplayName.charAt(0).toUpperCase() + metricDisplayName.slice(1)}-Energy Link**: When ${metricDisplayName} hits 7+, your energy averages ${avgEnergyWhenMetricHigh.toFixed(1)}/10 (${correlation}% above baseline). These metrics reinforce each other.`);
+              }
+            }
+          }
+          
+          // Check correlation with confidence (if not already selected)
+          if (metric !== 'confidence') {
+            const confidenceOnHighDays = highMetricDays
+              .map(d => d.confidence || 0)
+              .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
+            
+            const allConfidenceValues = allData
+              .map(d => d.confidence || 0)
+              .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
+            
+            if (confidenceOnHighDays.length >= 3 && allConfidenceValues.length >= 10) {
+              const avgConfidenceWhenMetricHigh = confidenceOnHighDays.reduce((sum, val) => sum + val, 0) / confidenceOnHighDays.length;
+              const overallAvgConfidence = allConfidenceValues.reduce((sum, val) => sum + val, 0) / allConfidenceValues.length;
+              const correlation = ((avgConfidenceWhenMetricHigh - overallAvgConfidence) / overallAvgConfidence * 100).toFixed(0);
+              
+              if (correlation > 15) {
+                patterns.push(`**${metricDisplayName.charAt(0).toUpperCase() + metricDisplayName.slice(1)}-Confidence Link**: High ${metricDisplayName} (7+) correlates with ${avgConfidenceWhenMetricHigh.toFixed(1)}/10 confidence (${correlation}% above your average). Prioritize ${metricDisplayName} for emotional stability.`);
+              }
+            }
+          }
+        }
+      } catch (correlationError) {
+        console.warn('Correlation pattern error:', correlationError);
+      }
+    }
+    
+    // 3. SLEEP IMPACT ON SELECTED METRIC (if not sleep itself)
+    if (isPremium && metric !== 'sleep' && allData.length >= 20) {
+      try {
+        const goodSleepDays = allData.filter(d => {
+          const sleepVal = d.sleep || d.attraction || 5;
+          return typeof sleepVal === 'number' && sleepVal >= 7;
+        });
+        
+        const poorSleepDays = allData.filter(d => {
+          const sleepVal = d.sleep || d.attraction || 5;
+          return typeof sleepVal === 'number' && sleepVal < 5;
+        });
+        
+        if (goodSleepDays.length >= 5 && poorSleepDays.length >= 3) {
+          // Get next-day metric values after good vs poor sleep
+          const getNextDayMetric = (days) => {
+            return days.map(d => {
               const dayAfter = allData.find(next => {
-                if (!next || !next.date || !d.date) return false;
+                if (!next?.date || !d.date) return false;
                 const dayAfterDate = new Date(d.date);
                 dayAfterDate.setDate(dayAfterDate.getDate() + 1);
                 const nextDate = new Date(next.date);
-                return !isNaN(nextDate.getTime()) && 
-                       nextDate.toISOString().split('T')[0] === dayAfterDate.toISOString().split('T')[0];
+                return nextDate.toISOString().split('T')[0] === dayAfterDate.toISOString().split('T')[0];
               });
-              return dayAfter && typeof dayAfter.confidence === 'number' ? dayAfter.confidence : null;
-            } catch (dayError) {
-              return null;
-            }
-          }).filter(confidence => confidence !== null && confidence >= 1 && confidence <= 10);
+              return dayAfter ? getMetricValue(dayAfter) : null;
+            }).filter(val => val !== null && val >= 1 && val <= 10);
+          };
           
-          if (nextDayConfidence.length >= 3) {
-            const lowConfidenceRate = (nextDayConfidence.filter(c => c < 5).length / nextDayConfidence.length * 100).toFixed(0);
-            if (lowConfidenceRate >= 60) {
-              patterns.push(`**Sleep-Confidence Pattern**: Poor sleep leads to low confidence the next day ${lowConfidenceRate}% of the time (${nextDayConfidence.length} instances tracked). Sleep optimization is critical for emotional stability.`);
+          const metricAfterGoodSleep = getNextDayMetric(goodSleepDays);
+          const metricAfterPoorSleep = getNextDayMetric(poorSleepDays);
+          
+          if (metricAfterGoodSleep.length >= 3 && metricAfterPoorSleep.length >= 2) {
+            const avgAfterGood = metricAfterGoodSleep.reduce((sum, val) => sum + val, 0) / metricAfterGoodSleep.length;
+            const avgAfterPoor = metricAfterPoorSleep.reduce((sum, val) => sum + val, 0) / metricAfterPoorSleep.length;
+            const difference = avgAfterGood - avgAfterPoor;
+            
+            if (difference > 0.8) {
+              patterns.push(`**Sleep Impact on ${metricDisplayName.charAt(0).toUpperCase() + metricDisplayName.slice(1)}**: After quality sleep (7+), your next-day ${metricDisplayName} averages ${avgAfterGood.toFixed(1)}/10 vs ${avgAfterPoor.toFixed(1)}/10 after poor sleep. Sleep is foundational for ${metricDisplayName}.`);
             }
           }
         }
-      } catch (sleepError) {
-        console.warn('Sleep-confidence pattern error:', sleepError);
+      } catch (sleepImpactError) {
+        console.warn('Sleep impact pattern error:', sleepImpactError);
       }
     }
     
-    // Spermatogenesis phase insights
+    // 4. SPERMATOGENESIS PHASE IMPACT ON SELECTED METRIC
     if (currentStreak >= 74 && safeData.startDate) {
       try {
         const startDate = new Date(safeData.startDate);
         if (!isNaN(startDate.getTime())) {
           const post74Data = allData.filter(d => {
-            try {
-              if (!d || !d.date) return false;
-              const itemDate = new Date(d.date);
-              const daysSinceStart = Math.floor((itemDate - startDate) / (1000 * 60 * 60 * 24));
-              return !isNaN(daysSinceStart) && daysSinceStart >= 74;
-            } catch (filterError) {
-              return false;
-            }
+            if (!d?.date) return false;
+            const itemDate = new Date(d.date);
+            const daysSinceStart = Math.floor((itemDate - startDate) / (1000 * 60 * 60 * 24));
+            return !isNaN(daysSinceStart) && daysSinceStart >= 74;
           });
           
-          if (post74Data.length > 7) {
-            const validPost74Energy = post74Data
-              .map(d => d.energy || 0)
-              .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
-              
-            const pre74Data = allData.filter(d => {
-              try {
-                if (!d || !d.date) return false;
-                const itemDate = new Date(d.date);
-                const daysSinceStart = Math.floor((itemDate - startDate) / (1000 * 60 * 60 * 24));
-                return !isNaN(daysSinceStart) && daysSinceStart < 74;
-              } catch (filterError) {
-                return false;
-              }
-            });
+          const pre74Data = allData.filter(d => {
+            if (!d?.date) return false;
+            const itemDate = new Date(d.date);
+            const daysSinceStart = Math.floor((itemDate - startDate) / (1000 * 60 * 60 * 24));
+            return !isNaN(daysSinceStart) && daysSinceStart < 74 && daysSinceStart >= 1;
+          });
+          
+          if (post74Data.length >= 7 && pre74Data.length >= 7) {
+            const validPost74 = post74Data.map(d => getMetricValue(d)).filter(val => val !== null && val >= 1 && val <= 10);
+            const validPre74 = pre74Data.map(d => getMetricValue(d)).filter(val => val !== null && val >= 1 && val <= 10);
             
-            const validPre74Energy = pre74Data
-              .map(d => d.energy || 0)
-              .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
-            
-            if (validPost74Energy.length > 0 && validPre74Energy.length > 0) {
-              const avgEnergyPost74 = validPost74Energy.reduce((sum, val) => sum + val, 0) / validPost74Energy.length;
-              const avgEnergyPre74 = validPre74Energy.reduce((sum, val) => sum + val, 0) / validPre74Energy.length;
+            if (validPost74.length > 0 && validPre74.length > 0) {
+              const avgPost74 = validPost74.reduce((sum, val) => sum + val, 0) / validPost74.length;
+              const avgPre74 = validPre74.reduce((sum, val) => sum + val, 0) / validPre74.length;
+              const improvement = ((avgPost74 - avgPre74) / avgPre74 * 100).toFixed(0);
               
-              const improvement = ((avgEnergyPost74 - avgEnergyPre74) / avgEnergyPre74 * 100).toFixed(0);
-              if (improvement > 10) {
-                patterns.push(`**Post-Spermatogenesis Pattern**: Energy after day 74 averages ${avgEnergyPost74.toFixed(1)}/10 (${improvement}% higher than pre-74). Your body completed the biological transition from reproduction to cellular optimization.`);
+              if (Math.abs(improvement) > 10) {
+                if (improvement > 0) {
+                  patterns.push(`**Post-Spermatogenesis ${metricDisplayName.charAt(0).toUpperCase() + metricDisplayName.slice(1)}**: After day 74, your ${metricDisplayName} averages ${avgPost74.toFixed(1)}/10 (${improvement}% higher than pre-74). Biological optimization is enhancing this metric.`);
+                } else {
+                  patterns.push(`**Post-74 ${metricDisplayName.charAt(0).toUpperCase() + metricDisplayName.slice(1)} Shift**: Your ${metricDisplayName} averaged ${avgPre74.toFixed(1)}/10 pre-day 74 vs ${avgPost74.toFixed(1)}/10 after. This shift may reflect energy redistribution to other areas.`);
+                }
               }
             }
           }
@@ -359,32 +427,7 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
       }
     }
     
-    // Energy trend prediction (require sufficient recent data)
-    if (allData.length >= 7) {
-      try {
-        const last5Days = allData.slice(-5);
-        if (last5Days.length >= 3) {
-          const firstEnergy = last5Days[0]?.energy;
-          const lastEnergy = last5Days[last5Days.length - 1]?.energy;
-          
-          if (typeof firstEnergy === 'number' && typeof lastEnergy === 'number' && 
-              firstEnergy >= 1 && firstEnergy <= 10 && lastEnergy >= 1 && lastEnergy <= 10) {
-            const energyTrend = lastEnergy - firstEnergy;
-            if (Math.abs(energyTrend) >= 1) {
-              if (energyTrend > 0) {
-                patterns.push(`**Energy Trend**: Rising ${energyTrend.toFixed(1)} points over 5 days. This upward momentum suggests successful energy transmutation - maintain current practices.`);
-              } else {
-                patterns.push(`**Energy Decline**: Dropped ${Math.abs(energyTrend).toFixed(1)} points over 5 days. Energy fluctuations during retention are normal - focus on rest and gentle movement.`);
-              }
-            }
-          }
-        }
-      } catch (trendError) {
-        console.warn('Energy trend error:', trendError);
-      }
-    }
-    
-    // Only add phase insights if user has been in current phase for meaningful time
+    // 5. PHASE-SPECIFIC GUIDANCE (always include)
     if (currentStreak >= 7) {
       const phase = getCurrentPhase(safeData);
       patterns.push(`**${phase} Phase**: ${getPhaseGuidance(phase, currentStreak)}`);
@@ -1099,7 +1142,7 @@ export const generateRelapsePatternAnalysis = (userData) => {
 
     return {
       hasData: true,
-      relapseCount: relapses.length,
+      totalRelapses: relapses.length,
       primaryTrigger: formatTriggerName(primaryTrigger[0]),
       insights: insights,
       triggerBreakdown: sortedTriggers.map(([trigger, count]) => [formatTriggerName(trigger), count])

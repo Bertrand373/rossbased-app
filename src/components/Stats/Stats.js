@@ -87,7 +87,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, isPremium),
       phaseEvolution: calculatePhaseEvolutionAnalysis(safeUserData, selectedMetric),
       relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
-      progressTrends: calculateProgressTrends(safeUserData, timeRange),
+      progressTrends: calculateProgressTrends(safeUserData, timeRange, selectedMetric),
       daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData)
     };
   }, [safeUserData, selectedMetric, timeRange, isPremium]);
