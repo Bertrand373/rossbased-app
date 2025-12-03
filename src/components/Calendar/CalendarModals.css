@@ -392,19 +392,19 @@
   gap: 12px;
 }
 
-/* Save button - WHITE */
+/* Save button - subtle (doesn't compete with main CTA) */
 .calendar-save-btn {
   flex: 1;
   padding: 14px 24px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
   border: none;
   border-radius: 12px;
-  color: #000000;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: all 150ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -412,7 +412,8 @@
 }
 
 .calendar-save-btn:hover {
-  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 /* Cancel button - ghost */
