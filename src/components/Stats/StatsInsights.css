@@ -1,5 +1,6 @@
-/* src/components/Stats/StatsInsights.css */
-/* Consolidated ML-enhanced insights - matches app minimal aesthetic */
+/* StatsInsights.css - TITANTRACK
+   Data-driven analytics styling
+   Matches Landing/Calendar/UrgeToolkit aesthetic */
 
 /* ============================================================
    INSIGHT CARDS - Floating sections with dividers
@@ -35,13 +36,6 @@
   letter-spacing: 0.1em;
 }
 
-.insight-card-header .header-sub {
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.2);
-  text-transform: none;
-  letter-spacing: 0;
-}
-
 .insight-card-header .header-badge {
   font-size: 0.5625rem;
   font-weight: 600;
@@ -57,388 +51,367 @@
 }
 
 /* ============================================================
-   LOADING & EMPTY STATES
+   EMPTY & LOADING STATES
    ============================================================ */
 
-.insight-loading {
-  padding: 24px 0;
-  text-align: center;
-}
-
-.insight-loading p {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.3);
-  margin: 0;
-}
-
 .insight-empty {
-  padding: 20px 0;
+  padding: 16px 0;
   text-align: center;
 }
 
 .empty-message {
-  font-size: 0.875rem;
+  font-size: 1rem;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 8px 0;
-}
-
-.empty-progress {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.25);
-  margin: 0;
+  margin: 0 0 6px 0;
+  font-feature-settings: 'tnum' 1;
 }
 
 .empty-context {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.2);
-  margin: 4px 0 0 0;
+  margin: 0;
 }
 
 /* ============================================================
-   YOUR NUMBERS - Grid layout
+   TRENDS - Metric comparison rows
    ============================================================ */
 
-.numbers-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.number-item {
+.trends-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 4px;
+  gap: 0;
 }
 
-.number-label {
-  font-size: 0.6875rem;
+.trend-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.trend-row:last-of-type {
+  border-bottom: none;
+}
+
+.trend-metric {
+  font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.5);
   text-transform: capitalize;
 }
 
-.number-value {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1;
-}
-
-.number-delta {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.number-delta.positive {
-  color: rgba(52, 211, 153, 0.8);
-}
-
-.number-delta.negative {
-  color: rgba(248, 113, 113, 0.7);
-}
-
-.number-delta.neutral {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-/* ============================================================
-   YOUR TRENDS
-   ============================================================ */
-
-.trends-display {
+.trend-comparison {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.trend-item {
-  text-align: center;
-}
-
-.trend-title {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0 0 6px 0;
-}
-
-.trend-value {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0 0 4px 0;
-}
-
-.trend-direction {
-  font-weight: 400;
-}
-
-.trend-direction.improving {
-  color: rgba(52, 211, 153, 0.8);
-}
-
-.trend-direction.declining,
-.trend-direction.worsening {
-  color: rgba(248, 113, 113, 0.7);
-}
-
-.trend-context {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.25);
-  margin: 0;
-}
-
-.trend-detail {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* ============================================================
-   RELAPSE PATTERNS
-   ============================================================ */
-
-.relapse-display {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  text-align: center;
-}
-
-.relapse-stat {
-  margin-bottom: 8px;
-}
-
-.relapse-stat-value {
-  font-size: 2rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  display: block;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.relapse-stat-label {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.relapse-item {
-  padding: 0;
-}
-
-.relapse-text {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
-  line-height: 1.5;
-}
-
-.triggers-section {
-  margin-top: 8px;
-}
-
-.triggers-label {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
-  margin: 0 0 10px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.triggers-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  align-items: center;
   gap: 8px;
 }
 
-.trigger-tag {
+.trend-recent {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  font-feature-settings: 'tnum' 1;
+}
+
+.trend-delta {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.trend-delta.improving {
+  color: rgba(52, 211, 153, 0.8);
+}
+
+.trend-delta.declining {
+  color: rgba(248, 113, 113, 0.7);
+}
+
+.trend-delta.stable {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.trend-baseline {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 6px 12px;
-  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.25);
+  font-feature-settings: 'tnum' 1;
 }
 
-.danger-zone {
-  margin-top: 8px;
-  padding: 12px 16px;
-  background: rgba(248, 113, 113, 0.06);
-  border-radius: 8px;
-}
-
-.danger-text {
+.trend-summary {
   font-size: 0.8125rem;
-  color: rgba(248, 113, 113, 0.8);
-  margin: 0;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.6;
+  margin: 16px 0 0 0;
+  text-align: center;
 }
 
 /* ============================================================
-   ML DISCOVERED PATTERNS
+   VICTORY DISPLAY - Triumphant number
    ============================================================ */
 
-.patterns-display {
+.victory-display {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 0;
 }
 
-.pattern-item {
+.victory-number {
+  font-size: 3.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-feature-settings: 'tnum' 1;
+}
+
+.victory-unit {
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.victory-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 8px;
+}
+
+/* ============================================================
+   RELAPSE ANALYSIS - Data rows
+   ============================================================ */
+
+.relapse-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.analysis-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.analysis-stat-row:last-of-type {
+  border-bottom: none;
+}
+
+.analysis-label {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.analysis-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.analysis-value.trigger {
+  color: rgba(248, 113, 113, 0.8);
+}
+
+/* Danger zone - highlighted */
+.danger-zone-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 16px;
+  margin: 8px 0;
+  background: rgba(248, 113, 113, 0.04);
+  border-radius: 8px;
+  border: 1px solid rgba(248, 113, 113, 0.08);
+}
+
+.danger-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(248, 113, 113, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.danger-days {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: rgba(248, 113, 113, 0.9);
+  font-feature-settings: 'tnum' 1;
+}
+
+.danger-pct {
+  font-size: 0.75rem;
+  color: rgba(248, 113, 113, 0.5);
+}
+
+.analysis-insight {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.6;
+  margin: 12px 0 0 0;
   text-align: center;
-  padding: 16px;
+}
+
+/* ============================================================
+   PATTERNS - Condition → Outcome rows
+   ============================================================ */
+
+.patterns-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pattern-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
 }
 
 .pattern-condition {
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0 0 6px 0;
+  color: rgba(255, 255, 255, 0.7);
+  flex: 1;
+}
+
+.pattern-arrow {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
 }
 
 .pattern-outcome {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.45);
+  flex: 1;
+  text-align: right;
+}
+
+.pattern-text {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
   margin: 0;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.pattern-text:last-child {
+  border-bottom: none;
 }
 
 /* ============================================================
-   PHASE EVOLUTION
+   OPTIMIZATION - Suggestions list
    ============================================================ */
 
-.phase-display {
+.optimization-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.phase-metric-label {
+.optimization-item {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ============================================================
+   PHASE CONTEXT - Current phase with averages
+   ============================================================ */
+
+.phase-context {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Hero phase display */
+.phase-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.phase-num {
+  font-size: 2rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.25);
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+}
+
+.phase-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.phase-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.phase-range {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
-  margin: 0 0 8px 0;
-  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
 }
 
-.phase-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* Phase averages grid */
+.phase-averages {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 20px;
+  padding: 16px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.phase-bar-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.phase-bar-item.current {
-  opacity: 1;
-}
-
-.phase-bar-item.no-data {
-  opacity: 0.4;
-}
-
-.phase-bar-header {
+.phase-avg-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.phase-name {
+.phase-avg-label {
   font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: capitalize;
+}
+
+.phase-avg-value {
+  font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.phase-bar-item.current .phase-name {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.phase-days {
-  font-size: 0.625rem;
-  color: rgba(255, 255, 255, 0.25);
-}
-
-.phase-bar-track {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.phase-bar-fill {
-  height: 100%;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 2px;
-  transition: width 300ms ease;
-}
-
-.phase-bar-item.current .phase-bar-fill {
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.phase-avg {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.4);
-  text-align: right;
-}
-
-.phase-bar-item.current .phase-avg {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.phase-no-data {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.2);
-  text-align: center;
-  padding: 4px 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-feature-settings: 'tnum' 1;
 }
 
 .phase-insight {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.45);
-  margin: 8px 0 0 0;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.6;
+  margin: 0;
   text-align: center;
-  line-height: 1.5;
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-
-@media (max-width: 480px) {
-  .numbers-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  
-  .number-value {
-    font-size: 1.375rem;
-  }
-  
-  .trend-value {
-    font-size: 1.125rem;
-  }
-  
-  .relapse-stat-value {
-    font-size: 1.75rem;
-  }
-  
-  .pattern-item {
-    padding: 14px;
-  }
-  
-  .pattern-condition {
-    font-size: 0.875rem;
-  }
+.phase-link-hint {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.2);
+  margin: 0;
+  text-align: center;
 }
 
 /* ============================================================
@@ -452,4 +425,128 @@
   margin-top: 40px;
   padding-top: 40px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .trend-row {
+    padding: 12px 0;
+  }
+  
+  .trend-metric {
+    font-size: 0.8125rem;
+  }
+  
+  .trend-recent {
+    font-size: 0.875rem;
+  }
+  
+  .trend-baseline {
+    font-size: 0.6875rem;
+  }
+  
+  .victory-number {
+    font-size: 3rem;
+  }
+  
+  .danger-days {
+    font-size: 1.125rem;
+  }
+  
+  .pattern-row {
+    padding: 12px 14px;
+    flex-wrap: wrap;
+  }
+  
+  .pattern-condition,
+  .pattern-outcome {
+    font-size: 0.75rem;
+  }
+  
+  .phase-num {
+    font-size: 1.75rem;
+  }
+  
+  .phase-name {
+    font-size: 0.9375rem;
+  }
+  
+  .phase-averages {
+    gap: 10px 16px;
+  }
+  
+  .phase-avg-label {
+    font-size: 0.6875rem;
+  }
+  
+  .phase-avg-value {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .empty-message {
+    font-size: 0.9375rem;
+  }
+  
+  .trend-comparison {
+    gap: 6px;
+  }
+  
+  .victory-number {
+    font-size: 2.5rem;
+  }
+  
+  .pattern-row {
+    padding: 10px 12px;
+  }
+  
+  .phase-hero {
+    gap: 12px;
+  }
+  
+  .phase-num {
+    font-size: 1.5rem;
+  }
+}
+
+/* Desktop enhancements */
+@media (min-width: 768px) {
+  .trend-row {
+    padding: 16px 0;
+  }
+  
+  .victory-number {
+    font-size: 4rem;
+  }
+  
+  .danger-zone-display {
+    padding: 24px 20px;
+  }
+  
+  .phase-averages {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  
+  .phase-avg-item {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .insight-card,
+  .trend-row,
+  .pattern-row {
+    transition: none;
+  }
 }

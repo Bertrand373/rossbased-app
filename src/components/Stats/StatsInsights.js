@@ -1,11 +1,13 @@
 // StatsInsights.js - TITANTRACK
-// Premium analytics insight cards
-// UPDATED: AI pattern discovery integration for PatternRecognition and OptimizationGuidance
+// Data-driven analytics - Landing/Calendar/UrgeToolkit aesthetic
+// Same component API as before - no changes needed to Stats.js
 import React from 'react';
-import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
+import { InsightLoadingState } from './StatsComponents';
 import { renderTextWithBold } from './StatsUtils';
 
-// Progress & Trends Analysis Component (unchanged)
+// ============================================================
+// PROGRESS & TRENDS - Numerical trajectory display
+// ============================================================
 export const ProgressTrendsAnalysis = ({ 
   isLoading, 
   hasInsufficientData, 
@@ -14,52 +16,86 @@ export const ProgressTrendsAnalysis = ({
   dataQuality,
   selectedMetric
 }) => {
-  const needsMoreData = !progressTrends || progressTrends === null;
+  const daysTracked = userData?.benefitTracking?.length || 0;
+  const UNLOCK_THRESHOLD = 7;
   
+  // Need 7+ days for trends
+  if (daysTracked < UNLOCK_THRESHOLD) {
+    return (
+      <div className="insight-card">
+        <div className="insight-card-header">
+          <span>Your Trends</span>
+        </div>
+        <div className="insight-card-content">
+          <div className="insight-empty">
+            <p className="empty-message">{daysTracked}/{UNLOCK_THRESHOLD} days</p>
+            <p className="empty-context">Trend analysis unlocks at 7 days</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  const hasTrends = progressTrends && (
+    progressTrends.benefitPerformance || 
+    progressTrends.relapseFrequency || 
+    progressTrends.overallTrajectory
+  );
+  
+  // Format metric name for display
+  const formatMetricName = (metric) => {
+    if (metric === 'sleep') return 'Sleep';
+    return metric.charAt(0).toUpperCase() + metric.slice(1);
+  };
+
   return (
     <div className="insight-card">
       <div className="insight-card-header">
-        <span>Progress & Trends</span>
+        <span>Your Trends</span>
       </div>
       <div className="insight-card-content">
         {isLoading ? (
-          <InsightLoadingState insight="Progress Analysis" isVisible={true} />
-        ) : (hasInsufficientData || needsMoreData) ? (
-          <InsightEmptyState 
-            insight="Progress & Trends" 
-            userData={userData}
-            sectionTitle="Progress Analysis"
-            sectionDescription="Historical trajectory analysis showing how your performance and relapse patterns have evolved over time."
-          />
+          <InsightLoadingState insight="Trends" isVisible={true} />
+        ) : !hasTrends ? (
+          <div className="insight-empty">
+            <p className="empty-message">Analyzing patterns...</p>
+            <p className="empty-context">Keep tracking for insights</p>
+          </div>
         ) : (
-          <div className="progress-trends-display">
-            {progressTrends?.relapseFrequency && (
-              <div className="trend-item">
-                <div className="trend-content">
-                  <div className="trend-label">Relapse Frequency</div>
-                  <p className="trend-text" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.relapseFrequency.insight)}></p>
+          <div className="trends-list">
+            {/* Benefit Performance - The core metric */}
+            {progressTrends.benefitPerformance && (
+              <div className="trend-row">
+                <span className="trend-metric">{formatMetricName(selectedMetric)}</span>
+                <div className="trend-comparison">
+                  <span className="trend-recent">{progressTrends.benefitPerformance.recentAvg}</span>
+                  <span className={`trend-delta ${progressTrends.benefitPerformance.trend}`}>
+                    {progressTrends.benefitPerformance.trend === 'improving' ? '↑' : 
+                     progressTrends.benefitPerformance.trend === 'declining' ? '↓' : '→'}
+                  </span>
+                  <span className="trend-baseline">vs {progressTrends.benefitPerformance.overallAvg}</span>
                 </div>
               </div>
             )}
-
-            {progressTrends?.benefitPerformance && (
-              <div className="trend-item">
-                <div className="trend-content">
-                  <div className="trend-label">
-                    {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Performance
-                  </div>
-                  <p className="trend-text" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.benefitPerformance.insight)}></p>
+            
+            {/* Relapse Frequency */}
+            {progressTrends.relapseFrequency && (
+              <div className="trend-row">
+                <span className="trend-metric">Relapse rate</span>
+                <div className="trend-comparison">
+                  <span className="trend-recent">{progressTrends.relapseFrequency.recentRate}</span>
+                  <span className={`trend-delta ${progressTrends.relapseFrequency.trend === 'improving' ? 'improving' : progressTrends.relapseFrequency.trend === 'worsening' ? 'declining' : 'stable'}`}>
+                    {progressTrends.relapseFrequency.trend === 'improving' ? '↓' : 
+                     progressTrends.relapseFrequency.trend === 'worsening' ? '↑' : '→'}
+                  </span>
+                  <span className="trend-baseline">vs {progressTrends.relapseFrequency.overallRate}</span>
                 </div>
               </div>
             )}
-
-            {progressTrends?.overallTrajectory && (
-              <div className="trend-item">
-                <div className="trend-content">
-                  <div className="trend-label">Overall Trajectory</div>
-                  <p className="trend-text" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.overallTrajectory.summary)}></p>
-                </div>
-              </div>
+            
+            {/* Overall Trajectory Summary */}
+            {progressTrends.overallTrajectory?.summary && (
+              <p className="trend-summary" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.overallTrajectory.summary)}></p>
             )}
           </div>
         )}
@@ -68,48 +104,61 @@ export const ProgressTrendsAnalysis = ({
   );
 };
 
-// Relapse Pattern Analytics Component (unchanged)
+// ============================================================
+// RELAPSE PATTERN ANALYTICS - Victory or danger zone display
+// ============================================================
 export const RelapsePatternAnalytics = ({ 
   isLoading, 
   relapsePatterns, 
   daysSinceLastRelapse 
 }) => {
+  // Don't render if no relapse data
   if (!relapsePatterns?.hasData) return null;
   
-  const isConquered = daysSinceLastRelapse >= 90;
+  const isVictory = daysSinceLastRelapse >= 90;
 
   return (
     <div className="insight-card">
       <div className="insight-card-header">
-        <span>{isConquered ? 'Conquered Patterns' : 'Relapse Patterns'}</span>
+        <span>{isVictory ? 'Victory' : 'Relapse Analysis'}</span>
       </div>
       <div className="insight-card-content">
         {isLoading ? (
-          <InsightLoadingState insight="Relapse Analysis" isVisible={true} />
-        ) : isConquered ? (
+          <InsightLoadingState insight="Analysis" isVisible={true} />
+        ) : isVictory ? (
           <div className="victory-display">
-            <div className="victory-days">{daysSinceLastRelapse}</div>
-            <div className="victory-label">Days Victorious</div>
-            <p className="victory-message">
-              You've transcended past patterns. Your historical triggers have been conquered through consistent discipline.
-            </p>
+            <span className="victory-number">{daysSinceLastRelapse}</span>
+            <span className="victory-unit">days</span>
+            <span className="victory-label">since last relapse</span>
           </div>
         ) : (
-          <div className="relapse-patterns-display">
-            <div className="relapse-stat">
-              <span className="relapse-stat-label">Total Analyzed</span>
-              <span className="relapse-stat-value">{relapsePatterns.totalRelapses}</span>
+          <div className="relapse-analysis">
+            {/* Primary stat */}
+            <div className="analysis-stat-row">
+              <span className="analysis-label">Analyzed</span>
+              <span className="analysis-value">{relapsePatterns.totalRelapses} relapses</span>
             </div>
             
-            {relapsePatterns.primaryTrigger && (
-              <div className="relapse-stat">
-                <span className="relapse-stat-label">Primary Trigger</span>
-                <span className="relapse-stat-value">{relapsePatterns.primaryTrigger}</span>
+            {/* Danger zone - key insight */}
+            {relapsePatterns.dangerZone && (
+              <div className="danger-zone-display">
+                <span className="danger-label">Danger zone</span>
+                <span className="danger-days">Days {relapsePatterns.dangerZone.start}–{relapsePatterns.dangerZone.end}</span>
+                <span className="danger-pct">{relapsePatterns.dangerZone.percentage}% of relapses</span>
               </div>
             )}
             
-            {relapsePatterns.insights?.map((insight, idx) => (
-              <p key={idx} className="relapse-insight" dangerouslySetInnerHTML={renderTextWithBold(insight)}></p>
+            {/* Primary trigger */}
+            {relapsePatterns.primaryTrigger && (
+              <div className="analysis-stat-row">
+                <span className="analysis-label">Primary trigger</span>
+                <span className="analysis-value trigger">{relapsePatterns.primaryTrigger}</span>
+              </div>
+            )}
+            
+            {/* Additional insights if available */}
+            {relapsePatterns.insights?.slice(0, 1).map((insight, idx) => (
+              <p key={idx} className="analysis-insight" dangerouslySetInnerHTML={renderTextWithBold(insight)}></p>
             ))}
           </div>
         )}
@@ -118,7 +167,9 @@ export const RelapsePatternAnalytics = ({
   );
 };
 
-// Pattern Recognition Component - UPDATED: AI-powered with tiered unlock
+// ============================================================
+// PATTERN RECOGNITION - AI + Rule-based patterns
+// ============================================================
 export const PatternRecognition = ({ 
   isLoading, 
   hasInsufficientData, 
@@ -130,53 +181,49 @@ export const PatternRecognition = ({
   const daysTracked = userData?.benefitTracking?.length || 0;
   const relapseCount = (userData?.streakHistory || []).filter(s => s.reason === 'relapse').length;
   
-  // Determine what to show based on data availability
-  const hasAIData = mlPatterns?.hasMLPatterns && mlPatterns.patterns?.length > 0;
-  const hasRuleBasedData = patternInsights?.patterns?.length > 0;
+  // Thresholds
+  const BASIC_THRESHOLD = 14;
+  const AI_THRESHOLD = 20;
+  const MIN_RELAPSES = 2;
   
-  // Tiered thresholds
-  const BASIC_PATTERNS_THRESHOLD = 14;
-  const AI_PATTERNS_THRESHOLD = 20;
-  const MIN_RELAPSES_FOR_PATTERNS = 2;
+  // Determine what to show
+  const hasAIPatterns = mlPatterns?.hasMLPatterns && mlPatterns.patterns?.length > 0;
+  const hasRulePatterns = patternInsights?.patterns?.length > 0;
   
-  // Show AI patterns if available (20+ days), otherwise fall back to rule-based (14+ days)
-  const showAI = hasAIData;
-  const showRuleBased = !showAI && hasRuleBasedData;
-  const showEmpty = !showAI && !showRuleBased;
+  const showAI = hasAIPatterns;
+  const showRules = !showAI && hasRulePatterns;
+  const showEmpty = !showAI && !showRules;
   
-  // Determine empty state messaging
-  const getEmptyStateContent = () => {
-    if (daysTracked < BASIC_PATTERNS_THRESHOLD) {
-      // User hasn't hit first unlock threshold
+  // Empty state messaging
+  const getEmptyContent = () => {
+    if (daysTracked < BASIC_THRESHOLD) {
       return {
-        message: `${daysTracked}/${BASIC_PATTERNS_THRESHOLD} days tracked`,
-        context: 'Pattern insights unlock at 14 days'
-      };
-    } else if (daysTracked < AI_PATTERNS_THRESHOLD) {
-      // User has basic data but AI not available yet
-      if (relapseCount < MIN_RELAPSES_FOR_PATTERNS) {
-        return {
-          message: 'Need relapse data for patterns',
-          context: 'Patterns emerge from analyzing what preceded past relapses'
-        };
-      }
-      return {
-        message: `${daysTracked}/${AI_PATTERNS_THRESHOLD} days tracked`,
-        context: 'AI pattern discovery unlocks at 20 days'
-      };
-    } else {
-      // User has 20+ days but no patterns showing
-      if (relapseCount < MIN_RELAPSES_FOR_PATTERNS) {
-        return {
-          message: 'Need relapse data for patterns',
-          context: 'Patterns emerge from analyzing what preceded past relapses'
-        };
-      }
-      return {
-        message: 'AI is learning your patterns',
-        context: 'Keep tracking to improve predictions'
+        message: `${daysTracked}/${BASIC_THRESHOLD} days`,
+        context: 'Patterns unlock at 14 days'
       };
     }
+    if (daysTracked >= BASIC_THRESHOLD && daysTracked < AI_THRESHOLD) {
+      if (relapseCount < MIN_RELAPSES) {
+        return {
+          message: 'No relapse data',
+          context: 'Patterns emerge from relapse history'
+        };
+      }
+      return {
+        message: `${daysTracked}/${AI_THRESHOLD} days`,
+        context: 'AI patterns unlock at 20 days'
+      };
+    }
+    if (relapseCount < MIN_RELAPSES) {
+      return {
+        message: 'Insufficient data',
+        context: 'Need relapse history for pattern analysis'
+      };
+    }
+    return {
+      message: 'Learning patterns',
+      context: 'Keep tracking consistently'
+    };
   };
   
   return (
@@ -187,28 +234,26 @@ export const PatternRecognition = ({
       </div>
       <div className="insight-card-content">
         {isLoading ? (
-          <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
+          <InsightLoadingState insight="Patterns" isVisible={true} />
         ) : showEmpty ? (
-          // Empty state with tiered messaging
           <div className="insight-empty">
-            <p className="empty-message">{getEmptyStateContent().message}</p>
-            <p className="empty-context">{getEmptyStateContent().context}</p>
+            <p className="empty-message">{getEmptyContent().message}</p>
+            <p className="empty-context">{getEmptyContent().context}</p>
           </div>
         ) : showAI ? (
-          // AI-discovered patterns
-          <div className="patterns-display">
+          <div className="patterns-list">
             {mlPatterns.patterns.map((pattern, idx) => (
-              <div key={idx} className="pattern-item">
-                <p className="pattern-condition">{pattern.condition}</p>
-                <p className="pattern-outcome">{pattern.outcome}</p>
+              <div key={`ai-${idx}`} className="pattern-row">
+                <span className="pattern-condition">{pattern.condition}</span>
+                <span className="pattern-arrow">→</span>
+                <span className="pattern-outcome">{pattern.outcome}</span>
               </div>
             ))}
           </div>
-        ) : showRuleBased ? (
-          // Fallback to rule-based patterns (14-19 days)
-          <div className="patterns-display">
-            {patternInsights.patterns.map((pattern, idx) => (
-              <p key={idx} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></p>
+        ) : showRules ? (
+          <div className="patterns-list">
+            {patternInsights.patterns.slice(0, 3).map((pattern, idx) => (
+              <p key={`rule-${idx}`} className="pattern-text" dangerouslySetInnerHTML={renderTextWithBold(typeof pattern === 'string' ? pattern : pattern.finding || '')}></p>
             ))}
           </div>
         ) : null}
@@ -217,7 +262,9 @@ export const PatternRecognition = ({
   );
 };
 
-// Optimization Guidance Component - UPDATED: AI-informed suggestions
+// ============================================================
+// OPTIMIZATION GUIDANCE - AI or rule-based suggestions
+// ============================================================
 export const OptimizationGuidance = ({ 
   isLoading, 
   hasInsufficientData, 
@@ -226,77 +273,44 @@ export const OptimizationGuidance = ({
   mlOptimization,
   dataQuality 
 }) => {
-  // Determine what to show
-  const hasAISuggestions = mlOptimization?.hasMLSuggestions && mlOptimization.suggestions?.length > 0;
-  const hasRuleBasedGuidance = optimizationGuidance?.recommendations?.length > 0;
+  const hasAI = mlOptimization?.hasMLSuggestions && mlOptimization.suggestions?.length > 0;
+  const hasRules = optimizationGuidance?.recommendations?.length > 0;
   
-  // Combine AI suggestions with rule-based if both available
-  const showAI = hasAISuggestions;
-  const showRuleBased = hasRuleBasedGuidance;
-  const showEmpty = !showAI && !showRuleBased;
+  // Only show if we have content
+  if (!hasAI && !hasRules && !isLoading) {
+    return null;
+  }
   
   return (
     <div className="insight-card">
       <div className="insight-card-header">
         <span>Optimization</span>
-        {showAI && <span className="header-badge">AI</span>}
+        {hasAI && <span className="header-badge">AI</span>}
       </div>
       <div className="insight-card-content">
         {isLoading ? (
-          <InsightLoadingState insight="Optimization Analysis" isVisible={true} />
-        ) : showEmpty ? (
-          <InsightEmptyState 
-            insight="Performance Optimization" 
-            userData={userData}
-            sectionTitle="Performance Optimization"
-            sectionDescription="Analyzes your personal performance patterns to identify your optimal windows and provides phase-aware optimization strategies."
-          />
-        ) : (
-          <div className="optimization-display">
-            {/* AI-informed suggestions first (if available) */}
-            {showAI && (
-              <div className="optimization-recommendations ai-section">
-                {mlOptimization.suggestions.map((suggestion, idx) => (
-                  <p key={`ai-${idx}`} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(suggestion)}></p>
-                ))}
-              </div>
-            )}
-            
-            {/* Rule-based optimization (show when no AI) */}
-            {showRuleBased && !showAI && (
-              <>
-                {optimizationGuidance.criteria && (
-                  <div className="optimization-criteria">
-                    <div className="optimization-criteria-title">Your Optimization Criteria</div>
-                    <div className="optimization-criteria-text">{optimizationGuidance.criteria}</div>
-                  </div>
-                )}
-                
-                <div className="optimization-recommendations">
-                  {optimizationGuidance.recommendations.map((rec, idx) => (
-                    <p key={idx} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
-                  ))}
-                </div>
-              </>
-            )}
-            
-            {/* When AI is available, show condensed rule-based context */}
-            {showAI && showRuleBased && optimizationGuidance.recommendations?.length > 0 && (
-              <div className="optimization-recommendations">
-                {/* Show just first 1-2 most relevant rule-based recommendations */}
-                {optimizationGuidance.recommendations.slice(0, 2).map((rec, idx) => (
-                  <p key={`rule-${idx}`} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
-                ))}
-              </div>
-            )}
+          <InsightLoadingState insight="Optimization" isVisible={true} />
+        ) : hasAI ? (
+          <div className="optimization-list">
+            {mlOptimization.suggestions.slice(0, 3).map((suggestion, idx) => (
+              <p key={idx} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(suggestion)}></p>
+            ))}
           </div>
-        )}
+        ) : hasRules ? (
+          <div className="optimization-list">
+            {optimizationGuidance.recommendations.slice(0, 2).map((rec, idx) => (
+              <p key={idx} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );
 };
 
-// Phase Evolution Analysis Component (unchanged)
+// ============================================================
+// PHASE EVOLUTION - Current phase with link to Timeline
+// ============================================================
 export const PhaseEvolutionAnalysis = ({ 
   isLoading, 
   hasInsufficientData, 
@@ -306,61 +320,66 @@ export const PhaseEvolutionAnalysis = ({
   dataQuality,
   currentStreak
 }) => {
-  const needsMoreData = !phaseEvolution?.phaseAverages;
-  
-  // Align phase key detection with StatsAnalyticsUtils.js getRetentionPhase()
-  // Must match: foundation (1-14), purification (15-45), expansion (46-90), integration (91-180), mastery (180+)
-  const getCurrentPhaseKey = () => {
-    const streak = currentStreak || 0;
-    if (streak <= 14) return 'foundation';
-    if (streak <= 45) return 'purification';
-    if (streak <= 90) return 'expansion';
-    if (streak <= 180) return 'integration';
-    return 'mastery';
+  // Phase info aligned with Emotional Timeline
+  const getPhaseInfo = (streak) => {
+    if (streak <= 14) return { name: 'Initial Adaptation', range: '1–14', num: 1 };
+    if (streak <= 45) return { name: 'Emotional Processing', range: '15–45', num: 2 };
+    if (streak <= 90) return { name: 'Mental Expansion', range: '46–90', num: 3 };
+    if (streak <= 180) return { name: 'Integration & Growth', range: '91–180', num: 4 };
+    return { name: 'Mastery & Purpose', range: '180+', num: 5 };
   };
   
-  const currentPhaseKey = getCurrentPhaseKey();
+  const phase = getPhaseInfo(currentStreak || 0);
+  const hasPhaseData = phaseEvolution?.phaseAverages && Object.keys(phaseEvolution.phaseAverages).length > 0;
+  
+  // Format metric for display
+  const formatMetric = (metric) => {
+    if (metric === 'sleep') return 'Sleep';
+    return metric.charAt(0).toUpperCase() + metric.slice(1);
+  };
   
   return (
     <div className="insight-card">
       <div className="insight-card-header">
-        <span>Phase Evolution</span>
+        <span>Current Phase</span>
       </div>
       <div className="insight-card-content">
         {isLoading ? (
-          <InsightLoadingState insight="Phase Analysis" isVisible={true} />
-        ) : (hasInsufficientData || needsMoreData) ? (
-          <InsightEmptyState 
-            insight="Phase Evolution" 
-            userData={userData}
-            sectionTitle="Phase Evolution"
-            sectionDescription={`Tracks how your ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} develops through the retention phases.`}
-          />
+          <InsightLoadingState insight="Phase" isVisible={true} />
         ) : (
-          <>
-            <div className="phase-evolution-grid">
-              {Object.entries(phaseEvolution.phaseAverages || {}).map(([phaseKey, phaseData]) => {
-                const isCurrentPhase = phaseKey === currentPhaseKey;
-                
-                return (
-                  <div 
-                    key={phaseKey} 
-                    className={`phase-evolution-card ${isCurrentPhase ? 'current' : ''}`}
-                  >
-                    <div className="phase-name">{phaseData.name || phaseData.displayName || phaseKey}</div>
-                    <div className="phase-value">
-                      {phaseData.average ? `${phaseData.average}/10` : '—'}
-                    </div>
-                    <div className="phase-range">{phaseData.range || ''}</div>
-                  </div>
-                );
-              })}
+          <div className="phase-context">
+            {/* Current phase display */}
+            <div className="phase-hero">
+              <span className="phase-num">{phase.num}</span>
+              <div className="phase-info">
+                <span className="phase-name">{phase.name}</span>
+                <span className="phase-range">Days {phase.range}</span>
+              </div>
             </div>
             
-            {phaseEvolution?.insight && (
-              <p className="phase-evolution-insight" dangerouslySetInnerHTML={renderTextWithBold(phaseEvolution.insight)}></p>
+            {/* Phase averages if we have data */}
+            {hasPhaseData && (
+              <div className="phase-averages">
+                {Object.entries(phaseEvolution.phaseAverages)
+                  .filter(([_, data]) => data.average)
+                  .slice(0, 4)
+                  .map(([key, data]) => (
+                    <div key={key} className="phase-avg-item">
+                      <span className="phase-avg-label">{data.displayName || data.name || key}</span>
+                      <span className="phase-avg-value">{data.average}</span>
+                    </div>
+                  ))}
+              </div>
             )}
-          </>
+            
+            {/* Insight if available */}
+            {phaseEvolution?.insight && (
+              <p className="phase-insight" dangerouslySetInnerHTML={renderTextWithBold(phaseEvolution.insight)}></p>
+            )}
+            
+            {/* Hint to Emotional Timeline */}
+            <p className="phase-link-hint">See Emotional Timeline for phase guidance</p>
+          </div>
         )}
       </div>
     </div>
