@@ -1,364 +1,94 @@
 // StatsInsights.js - TITANTRACK
-// Premium analytics insight cards
-// UPDATED: AI pattern discovery integration for PatternRecognition and OptimizationGuidance
+// Pure data analytics components - no static educational content
+// REFACTORED: Sections are now data-driven, matching Landing page aesthetic
+
 import React from 'react';
-import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
-import { renderTextWithBold } from './StatsUtils';
 
-// Progress & Trends Analysis Component (unchanged)
-export const ProgressTrendsAnalysis = ({ 
-  isLoading, 
-  hasInsufficientData, 
-  userData, 
-  progressTrends,
-  dataQuality,
-  selectedMetric
+// ============================================================
+// SECTION 1: YOUR NUMBERS - Always visible, even Day 1
+// 7-day averages with trend indicators
+// ============================================================
+export const YourNumbers = ({ 
+  metricAverages, 
+  metricTrends, 
+  metricExtremes,
+  daysTracked,
+  isLoading 
 }) => {
-  const needsMoreData = !progressTrends || progressTrends === null;
+  const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
   
-  return (
-    <div className="insight-card">
-      <div className="insight-card-header">
-        <span>Progress & Trends</span>
-      </div>
-      <div className="insight-card-content">
-        {isLoading ? (
-          <InsightLoadingState insight="Progress Analysis" isVisible={true} />
-        ) : (hasInsufficientData || needsMoreData) ? (
-          <InsightEmptyState 
-            insight="Progress & Trends" 
-            userData={userData}
-            sectionTitle="Progress Analysis"
-            sectionDescription="Historical trajectory analysis showing how your performance and relapse patterns have evolved over time."
-          />
-        ) : (
-          <div className="progress-trends-display">
-            {progressTrends?.relapseFrequency && (
-              <div className="trend-item">
-                <div className="trend-content">
-                  <div className="trend-label">Relapse Frequency</div>
-                  <p className="trend-text" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.relapseFrequency.insight)}></p>
-                </div>
-              </div>
-            )}
-
-            {progressTrends?.benefitPerformance && (
-              <div className="trend-item">
-                <div className="trend-content">
-                  <div className="trend-label">
-                    {selectedMetric === 'sleep' ? 'Sleep Quality' : selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Performance
-                  </div>
-                  <p className="trend-text" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.benefitPerformance.insight)}></p>
-                </div>
-              </div>
-            )}
-
-            {progressTrends?.overallTrajectory && (
-              <div className="trend-item">
-                <div className="trend-content">
-                  <div className="trend-label">Overall Trajectory</div>
-                  <p className="trend-text" dangerouslySetInnerHTML={renderTextWithBold(progressTrends.overallTrajectory.summary)}></p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Relapse Pattern Analytics Component (unchanged)
-export const RelapsePatternAnalytics = ({ 
-  isLoading, 
-  relapsePatterns, 
-  daysSinceLastRelapse 
-}) => {
-  if (!relapsePatterns?.hasData) return null;
-  
-  const isConquered = daysSinceLastRelapse >= 90;
-
-  return (
-    <div className="insight-card">
-      <div className="insight-card-header">
-        <span>{isConquered ? 'Conquered Patterns' : 'Relapse Patterns'}</span>
-      </div>
-      <div className="insight-card-content">
-        {isLoading ? (
-          <InsightLoadingState insight="Relapse Analysis" isVisible={true} />
-        ) : isConquered ? (
-          <div className="victory-display">
-            <div className="victory-days">{daysSinceLastRelapse}</div>
-            <div className="victory-label">Days Victorious</div>
-            <p className="victory-message">
-              You've transcended past patterns. Your historical triggers have been conquered through consistent discipline.
-            </p>
-          </div>
-        ) : (
-          <div className="relapse-patterns-display">
-            <div className="relapse-stat">
-              <span className="relapse-stat-label">Total Analyzed</span>
-              <span className="relapse-stat-value">{relapsePatterns.totalRelapses}</span>
-            </div>
-            
-            {relapsePatterns.primaryTrigger && (
-              <div className="relapse-stat">
-                <span className="relapse-stat-label">Primary Trigger</span>
-                <span className="relapse-stat-value">{relapsePatterns.primaryTrigger}</span>
-              </div>
-            )}
-            
-            {relapsePatterns.insights?.map((insight, idx) => (
-              <p key={idx} className="relapse-insight" dangerouslySetInnerHTML={renderTextWithBold(insight)}></p>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Pattern Recognition Component - UPDATED: AI-powered with tiered unlock
-export const PatternRecognition = ({ 
-  isLoading, 
-  hasInsufficientData, 
-  userData,
-  patternInsights,
-  mlPatterns,
-  dataQuality 
-}) => {
-  const daysTracked = userData?.benefitTracking?.length || 0;
-  const relapseCount = (userData?.streakHistory || []).filter(s => s.reason === 'relapse').length;
-  
-  // Determine what to show based on data availability
-  const hasAIData = mlPatterns?.hasMLPatterns && mlPatterns.patterns?.length > 0;
-  const hasRuleBasedData = patternInsights?.patterns?.length > 0;
-  
-  // Tiered thresholds
-  const BASIC_PATTERNS_THRESHOLD = 14;
-  const AI_PATTERNS_THRESHOLD = 20;
-  const MIN_RELAPSES_FOR_PATTERNS = 2;
-  
-  // Show AI patterns if available (20+ days), otherwise fall back to rule-based (14+ days)
-  const showAI = hasAIData;
-  const showRuleBased = !showAI && hasRuleBasedData;
-  const showEmpty = !showAI && !showRuleBased;
-  
-  // Determine empty state messaging
-  const getEmptyStateContent = () => {
-    if (daysTracked < BASIC_PATTERNS_THRESHOLD) {
-      // User hasn't hit first unlock threshold
-      return {
-        message: `${daysTracked}/${BASIC_PATTERNS_THRESHOLD} days tracked`,
-        context: 'Pattern insights unlock at 14 days'
-      };
-    } else if (daysTracked < AI_PATTERNS_THRESHOLD) {
-      // User has basic data but AI not available yet
-      if (relapseCount < MIN_RELAPSES_FOR_PATTERNS) {
-        return {
-          message: 'Need relapse data for patterns',
-          context: 'Patterns emerge from analyzing what preceded past relapses'
-        };
-      }
-      return {
-        message: `${daysTracked}/${AI_PATTERNS_THRESHOLD} days tracked`,
-        context: 'AI pattern discovery unlocks at 20 days'
-      };
-    } else {
-      // User has 20+ days but no patterns showing
-      if (relapseCount < MIN_RELAPSES_FOR_PATTERNS) {
-        return {
-          message: 'Need relapse data for patterns',
-          context: 'Patterns emerge from analyzing what preceded past relapses'
-        };
-      }
-      return {
-        message: 'AI is learning your patterns',
-        context: 'Keep tracking to improve predictions'
-      };
+  // Render trend indicator
+  const renderDelta = (metric) => {
+    if (!metricTrends || !metricTrends[metric]) {
+      return <span className="number-delta neutral">—</span>;
     }
+    
+    const { delta, direction } = metricTrends[metric];
+    
+    if (direction === 'up') {
+      return <span className="number-delta positive">↑ {delta > 0 ? '+' : ''}{delta}</span>;
+    } else if (direction === 'down') {
+      return <span className="number-delta negative">↓ {delta}</span>;
+    }
+    return <span className="number-delta neutral">—</span>;
+  };
+  
+  // Get value or placeholder
+  const getValue = (metric) => {
+    if (!metricAverages?.averages?.[metric]?.value) {
+      return '—';
+    }
+    return metricAverages.averages[metric].value.toFixed(1);
   };
   
   return (
     <div className="insight-card">
       <div className="insight-card-header">
-        <span>Your Patterns</span>
-        {showAI && <span className="header-badge">AI</span>}
+        <span>Your Numbers</span>
+        <span className="header-sub">7-day avg</span>
       </div>
       <div className="insight-card-content">
         {isLoading ? (
-          <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
-        ) : showEmpty ? (
-          // Empty state with tiered messaging
+          <div className="insight-loading">
+            <div className="insight-loading-spinner"></div>
+          </div>
+        ) : !metricAverages ? (
           <div className="insight-empty">
-            <p className="empty-message">{getEmptyStateContent().message}</p>
-            <p className="empty-context">{getEmptyStateContent().context}</p>
+            <p className="empty-message">Start tracking to see your averages</p>
+            <p className="empty-context">Log your daily benefits in the Tracker tab</p>
           </div>
-        ) : showAI ? (
-          // AI-discovered patterns
-          <div className="patterns-display">
-            {mlPatterns.patterns.map((pattern, idx) => (
-              <div key={idx} className="pattern-item">
-                <p className="pattern-condition">{pattern.condition}</p>
-                <p className="pattern-outcome">{pattern.outcome}</p>
-              </div>
-            ))}
-          </div>
-        ) : showRuleBased ? (
-          // Fallback to rule-based patterns (14-19 days)
-          <div className="patterns-display">
-            {patternInsights.patterns.map((pattern, idx) => (
-              <p key={idx} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></p>
-            ))}
-          </div>
-        ) : null}
-      </div>
-    </div>
-  );
-};
-
-// Optimization Guidance Component - UPDATED: AI-informed suggestions
-export const OptimizationGuidance = ({ 
-  isLoading, 
-  hasInsufficientData, 
-  userData,
-  optimizationGuidance,
-  mlOptimization,
-  dataQuality 
-}) => {
-  // Determine what to show
-  const hasAISuggestions = mlOptimization?.hasMLSuggestions && mlOptimization.suggestions?.length > 0;
-  const hasRuleBasedGuidance = optimizationGuidance?.recommendations?.length > 0;
-  
-  // Combine AI suggestions with rule-based if both available
-  const showAI = hasAISuggestions;
-  const showRuleBased = hasRuleBasedGuidance;
-  const showEmpty = !showAI && !showRuleBased;
-  
-  return (
-    <div className="insight-card">
-      <div className="insight-card-header">
-        <span>Optimization</span>
-        {showAI && <span className="header-badge">AI</span>}
-      </div>
-      <div className="insight-card-content">
-        {isLoading ? (
-          <InsightLoadingState insight="Optimization Analysis" isVisible={true} />
-        ) : showEmpty ? (
-          <InsightEmptyState 
-            insight="Performance Optimization" 
-            userData={userData}
-            sectionTitle="Performance Optimization"
-            sectionDescription="Analyzes your personal performance patterns to identify your optimal windows and provides phase-aware optimization strategies."
-          />
-        ) : (
-          <div className="optimization-display">
-            {/* AI-informed suggestions first (if available) */}
-            {showAI && (
-              <div className="optimization-recommendations ai-section">
-                {mlOptimization.suggestions.map((suggestion, idx) => (
-                  <p key={`ai-${idx}`} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(suggestion)}></p>
-                ))}
-              </div>
-            )}
-            
-            {/* Rule-based optimization (show when no AI) */}
-            {showRuleBased && !showAI && (
-              <>
-                {optimizationGuidance.criteria && (
-                  <div className="optimization-criteria">
-                    <div className="optimization-criteria-title">Your Optimization Criteria</div>
-                    <div className="optimization-criteria-text">{optimizationGuidance.criteria}</div>
-                  </div>
-                )}
-                
-                <div className="optimization-recommendations">
-                  {optimizationGuidance.recommendations.map((rec, idx) => (
-                    <p key={idx} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
-                  ))}
-                </div>
-              </>
-            )}
-            
-            {/* When AI is available, show condensed rule-based context */}
-            {showAI && showRuleBased && optimizationGuidance.recommendations?.length > 0 && (
-              <div className="optimization-recommendations">
-                {/* Show just first 1-2 most relevant rule-based recommendations */}
-                {optimizationGuidance.recommendations.slice(0, 2).map((rec, idx) => (
-                  <p key={`rule-${idx}`} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Phase Evolution Analysis Component (unchanged)
-export const PhaseEvolutionAnalysis = ({ 
-  isLoading, 
-  hasInsufficientData, 
-  userData,
-  phaseEvolution, 
-  selectedMetric,
-  dataQuality,
-  currentStreak
-}) => {
-  const needsMoreData = !phaseEvolution?.phaseAverages;
-  
-  // Align phase key detection with StatsAnalyticsUtils.js getRetentionPhase()
-  // Must match: foundation (1-14), purification (15-45), expansion (46-90), integration (91-180), mastery (180+)
-  const getCurrentPhaseKey = () => {
-    const streak = currentStreak || 0;
-    if (streak <= 14) return 'foundation';
-    if (streak <= 45) return 'purification';
-    if (streak <= 90) return 'expansion';
-    if (streak <= 180) return 'integration';
-    return 'mastery';
-  };
-  
-  const currentPhaseKey = getCurrentPhaseKey();
-  
-  return (
-    <div className="insight-card">
-      <div className="insight-card-header">
-        <span>Phase Evolution</span>
-      </div>
-      <div className="insight-card-content">
-        {isLoading ? (
-          <InsightLoadingState insight="Phase Analysis" isVisible={true} />
-        ) : (hasInsufficientData || needsMoreData) ? (
-          <InsightEmptyState 
-            insight="Phase Evolution" 
-            userData={userData}
-            sectionTitle="Phase Evolution"
-            sectionDescription={`Tracks how your ${selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric} develops through the retention phases.`}
-          />
         ) : (
           <>
-            <div className="phase-evolution-grid">
-              {Object.entries(phaseEvolution.phaseAverages || {}).map(([phaseKey, phaseData]) => {
-                const isCurrentPhase = phaseKey === currentPhaseKey;
-                
-                return (
-                  <div 
-                    key={phaseKey} 
-                    className={`phase-evolution-card ${isCurrentPhase ? 'current' : ''}`}
-                  >
-                    <div className="phase-name">{phaseData.name || phaseData.displayName || phaseKey}</div>
-                    <div className="phase-value">
-                      {phaseData.average ? `${phaseData.average}/10` : '—'}
-                    </div>
-                    <div className="phase-range">{phaseData.range || ''}</div>
-                  </div>
-                );
-              })}
+            <div className="numbers-grid">
+              {metrics.map(metric => (
+                <div key={metric} className="number-item">
+                  <span className="number-label">{metric}</span>
+                  <span className="number-value">{getValue(metric)}</span>
+                  {daysTracked >= 14 && renderDelta(metric)}
+                </div>
+              ))}
             </div>
             
-            {phaseEvolution?.insight && (
-              <p className="phase-evolution-insight" dangerouslySetInnerHTML={renderTextWithBold(phaseEvolution.insight)}></p>
+            {/* Strongest & Growth Area - only show if meaningful */}
+            {metricExtremes?.strongest && metricExtremes?.growthArea && (
+              <div className="extremes-row">
+                <div className="extreme-item">
+                  <span className="extreme-label">Strongest</span>
+                  <span className="extreme-value">{metricExtremes.strongest.metric}</span>
+                </div>
+                <div className="extreme-divider" />
+                <div className="extreme-item">
+                  <span className="extreme-label">Growth area</span>
+                  <span className="extreme-value">{metricExtremes.growthArea.metric}</span>
+                </div>
+              </div>
+            )}
+            
+            {/* Show tracking prompt if not enough data for trends */}
+            {daysTracked < 14 && (
+              <p className="tracking-prompt">
+                {14 - daysTracked} more days for trend analysis
+              </p>
             )}
           </>
         )}
@@ -367,10 +97,326 @@ export const PhaseEvolutionAnalysis = ({
   );
 };
 
+// ============================================================
+// SECTION 2: YOUR PATTERNS - Unlocks at 14+ days
+// Real correlations from user data
+// ============================================================
+export const YourPatterns = ({ 
+  dayOfWeekPatterns,
+  metricCorrelations,
+  growthRates,
+  selectedMetric,
+  daysTracked,
+  isLoading 
+}) => {
+  const UNLOCK_THRESHOLD = 14;
+  const needsMoreData = daysTracked < UNLOCK_THRESHOLD;
+  
+  // Format metric name for display
+  const formatMetric = (metric) => {
+    if (metric === 'sleep') return 'sleep quality';
+    return metric;
+  };
+  
+  // Build pattern insights from data
+  const buildPatternInsights = () => {
+    const insights = [];
+    
+    // Day-of-week pattern for selected metric
+    if (dayOfWeekPatterns?.peakDay) {
+      const peakDays = dayOfWeekPatterns.dayAverages
+        .filter(d => d.average >= dayOfWeekPatterns.peakDay.average - 0.3)
+        .map(d => d.day)
+        .slice(0, 3);
+      
+      if (peakDays.length > 0) {
+        insights.push({
+          type: 'day_pattern',
+          text: `${formatMetric(selectedMetric)} peaks ${peakDays.join('-')}`,
+          detail: `${dayOfWeekPatterns.peakDay.average}/10 avg`
+        });
+      }
+    }
+    
+    // Weekday vs weekend pattern
+    if (dayOfWeekPatterns?.weekdayAvg && dayOfWeekPatterns?.weekendAvg) {
+      const diff = dayOfWeekPatterns.weekdayAvg - dayOfWeekPatterns.weekendAvg;
+      if (Math.abs(diff) >= 0.5) {
+        const better = diff > 0 ? 'weekdays' : 'weekends';
+        insights.push({
+          type: 'week_pattern',
+          text: `Higher ${formatMetric(selectedMetric)} on ${better}`,
+          detail: `${Math.abs(diff).toFixed(1)} point difference`
+        });
+      }
+    }
+    
+    // Sleep correlations
+    if (metricCorrelations) {
+      const sleepCorr = metricCorrelations.find(c => c.source === 'sleep' && c.target === selectedMetric);
+      if (sleepCorr && sleepCorr.difference >= 0.8) {
+        insights.push({
+          type: 'correlation',
+          text: `Sleep quality affects next-day ${formatMetric(selectedMetric)}`,
+          detail: `+${sleepCorr.difference} when sleep ≥7`
+        });
+      }
+      
+      // Workout-energy correlation
+      const workoutCorr = metricCorrelations.find(c => c.source === 'workout' && c.target === 'energy');
+      if (workoutCorr && selectedMetric === 'energy' && workoutCorr.difference >= 0.8) {
+        insights.push({
+          type: 'correlation',
+          text: `Workout intensity boosts energy`,
+          detail: `+${workoutCorr.difference} on high workout days`
+        });
+      }
+    }
+    
+    // Growth rates
+    if (growthRates?.rates?.[selectedMetric]) {
+      const rate = growthRates.rates[selectedMetric];
+      if (rate.direction !== 'stable') {
+        const direction = rate.direction === 'up' ? 'improved' : 'declined';
+        insights.push({
+          type: 'growth',
+          text: `${formatMetric(selectedMetric)} ${direction} ${Math.abs(rate.percentChange)}%`,
+          detail: `Over last ${growthRates.days} days`
+        });
+      }
+    }
+    
+    return insights;
+  };
+  
+  const patterns = needsMoreData ? [] : buildPatternInsights();
+  
+  return (
+    <div className="insight-card">
+      <div className="insight-card-header">
+        <span>Your Patterns</span>
+      </div>
+      <div className="insight-card-content">
+        {isLoading ? (
+          <div className="insight-loading">
+            <div className="insight-loading-spinner"></div>
+          </div>
+        ) : needsMoreData ? (
+          <div className="insight-empty">
+            <p className="empty-message">{daysTracked}/{UNLOCK_THRESHOLD} days tracked</p>
+            <p className="empty-context">Pattern insights unlock at 14 days</p>
+          </div>
+        ) : patterns.length === 0 ? (
+          <div className="insight-empty">
+            <p className="empty-message">Keep tracking for patterns</p>
+            <p className="empty-context">More data reveals your unique patterns</p>
+          </div>
+        ) : (
+          <div className="patterns-list">
+            {patterns.map((pattern, idx) => (
+              <div key={idx} className="pattern-row">
+                <span className="pattern-text">{pattern.text}</span>
+                <span className="pattern-detail">{pattern.detail}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// SECTION 3: AI INSIGHTS - Unlocks at 20+ days AND 2+ relapses
+// ML-discovered patterns
+// ============================================================
+export const AIInsights = ({ 
+  mlPatterns,
+  mlOptimization,
+  daysTracked,
+  relapseCount,
+  isLoading 
+}) => {
+  const AI_THRESHOLD = 20;
+  const MIN_RELAPSES = 2;
+  
+  const hasAIData = mlPatterns?.hasMLPatterns && mlPatterns.patterns?.length > 0;
+  const hasAISuggestions = mlOptimization?.hasMLSuggestions && mlOptimization.suggestions?.length > 0;
+  
+  // Determine empty state message
+  const getEmptyState = () => {
+    if (daysTracked < AI_THRESHOLD) {
+      return {
+        message: `${daysTracked}/${AI_THRESHOLD} days tracked`,
+        context: 'AI patterns unlock at 20 days'
+      };
+    }
+    if (relapseCount < MIN_RELAPSES) {
+      return {
+        message: 'Need relapse data for AI',
+        context: 'AI learns from analyzing what preceded past relapses'
+      };
+    }
+    if (mlPatterns?.reason === 'model_not_trained') {
+      return {
+        message: 'AI is learning your patterns',
+        context: 'Predictions will appear once training completes'
+      };
+    }
+    return {
+      message: 'AI analysis processing',
+      context: 'Keep tracking to improve predictions'
+    };
+  };
+  
+  const showEmpty = !hasAIData && !hasAISuggestions;
+  const emptyState = showEmpty ? getEmptyState() : null;
+  
+  return (
+    <div className="insight-card">
+      <div className="insight-card-header">
+        <span>AI Insights</span>
+        {(hasAIData || hasAISuggestions) && <span className="header-badge">AI</span>}
+      </div>
+      <div className="insight-card-content">
+        {isLoading ? (
+          <div className="insight-loading">
+            <div className="insight-loading-spinner"></div>
+          </div>
+        ) : showEmpty ? (
+          <div className="insight-empty">
+            <p className="empty-message">{emptyState.message}</p>
+            <p className="empty-context">{emptyState.context}</p>
+          </div>
+        ) : (
+          <div className="ai-insights-list">
+            {/* AI-discovered patterns */}
+            {hasAIData && mlPatterns.patterns.map((pattern, idx) => (
+              <div key={`p-${idx}`} className="ai-insight-row">
+                <span className="ai-condition">{pattern.condition}</span>
+                <span className="ai-outcome">{pattern.outcome}</span>
+              </div>
+            ))}
+            
+            {/* AI optimization suggestions */}
+            {hasAISuggestions && mlOptimization.suggestions.map((suggestion, idx) => (
+              <div key={`s-${idx}`} className="ai-insight-row">
+                <span className="ai-condition">{suggestion.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// SECTION 4: RELAPSE ANALYTICS - Only show if user has relapse data
+// ============================================================
+export const RelapseAnalytics = ({ 
+  relapsePatterns,
+  daysSinceLastRelapse,
+  isLoading 
+}) => {
+  // Don't render if no relapse data
+  if (!relapsePatterns?.hasData) {
+    return null;
+  }
+  
+  const isConquered = daysSinceLastRelapse >= 90;
+  
+  return (
+    <div className="insight-card">
+      <div className="insight-card-header">
+        <span>{isConquered ? 'Conquered' : 'Relapse Data'}</span>
+      </div>
+      <div className="insight-card-content">
+        {isLoading ? (
+          <div className="insight-loading">
+            <div className="insight-loading-spinner"></div>
+          </div>
+        ) : isConquered ? (
+          <div className="conquered-display">
+            <span className="conquered-days">{daysSinceLastRelapse}</span>
+            <span className="conquered-label">days since last relapse</span>
+          </div>
+        ) : (
+          <div className="relapse-stats">
+            <div className="relapse-stat-row">
+              <span className="relapse-stat-label">Total relapses</span>
+              <span className="relapse-stat-value">{relapsePatterns.totalRelapses}</span>
+            </div>
+            
+            {relapsePatterns.avgStreakAtRelapse && (
+              <div className="relapse-stat-row">
+                <span className="relapse-stat-label">Avg streak at relapse</span>
+                <span className="relapse-stat-value">{relapsePatterns.avgStreakAtRelapse} days</span>
+              </div>
+            )}
+            
+            {relapsePatterns.dangerZone && (
+              <div className="relapse-stat-row">
+                <span className="relapse-stat-label">Danger zone</span>
+                <span className="relapse-stat-value">Days {relapsePatterns.dangerZone}</span>
+              </div>
+            )}
+            
+            {relapsePatterns.primaryTrigger && (
+              <div className="relapse-stat-row">
+                <span className="relapse-stat-label">Primary trigger</span>
+                <span className="relapse-stat-value">{relapsePatterns.primaryTrigger}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// SECTION 5: PHASE CONTEXT - Simple one-liner, not educational
+// ============================================================
+export const PhaseContext = ({ 
+  currentStreak, 
+  phaseInfo,
+  onLearnMore 
+}) => {
+  if (!phaseInfo) return null;
+  
+  return (
+    <div className="phase-context">
+      <span className="phase-day">Day {currentStreak || 0}</span>
+      <span className="phase-divider">·</span>
+      <span className="phase-name">{phaseInfo.name}</span>
+      {onLearnMore && (
+        <button className="phase-link" onClick={onLearnMore}>
+          Learn what to expect →
+        </button>
+      )}
+    </div>
+  );
+};
+
+// ============================================================
+// LOADING STATE - Reusable
+// ============================================================
+export const InsightLoadingState = ({ isVisible }) => {
+  if (!isVisible) return null;
+  
+  return (
+    <div className="insight-loading">
+      <div className="insight-loading-spinner"></div>
+    </div>
+  );
+};
+
 export default {
-  ProgressTrendsAnalysis,
-  RelapsePatternAnalytics,
-  PatternRecognition,
-  OptimizationGuidance,
-  PhaseEvolutionAnalysis
+  YourNumbers,
+  YourPatterns,
+  AIInsights,
+  RelapseAnalytics,
+  PhaseContext,
+  InsightLoadingState
 };

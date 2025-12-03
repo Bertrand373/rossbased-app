@@ -1,5 +1,6 @@
 // Stats.js - TITANTRACK
 // Matches Landing/Tracker minimalist aesthetic
+// REFACTORED: Analytics section now pure data, no educational content
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -10,18 +11,16 @@ import toast from 'react-hot-toast';
 // Import extracted components
 import { StatCardModal } from './StatsComponents';
 import { 
-  ProgressTrendsAnalysis,
-  RelapsePatternAnalytics, 
-  PatternRecognition, 
-  OptimizationGuidance,
-  PhaseEvolutionAnalysis
+  YourNumbers,
+  YourPatterns,
+  AIInsights,
+  RelapseAnalytics,
+  PhaseContext
 } from './StatsInsights';
 
 // Import utility functions
 import {
   getTimeRangeDisplayText,
-  getCurrentPhase,
-  getPhaseGuidance,
   generateChartData,
   calculateAverage,
   calculateDataQuality,
@@ -29,13 +28,16 @@ import {
   validateUserData
 } from './StatsUtils';
 
-// Import analytics functions - UPDATED: Added ML pattern functions
+// Import analytics functions - UPDATED: New data-focused functions
 import {
-  generatePatternRecognition,
-  generateOptimizationGuidance,
-  calculatePhaseEvolutionAnalysis,
+  getPhaseInfo,
+  calculateMetricAverages,
+  calculateMetricTrends,
+  identifyMetricExtremes,
+  calculateDayOfWeekPatterns,
+  calculateMetricCorrelations,
+  calculateGrowthRates,
   generateRelapsePatternAnalysis,
-  calculateProgressTrends,
   discoverMLPatterns,
   generateMLOptimization
 } from './StatsAnalyticsUtils';
@@ -52,54 +54,57 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   
-  // NEW: ML pattern state
+  // ML pattern state
   const [mlPatterns, setMLPatterns] = useState(null);
   const [mlOptimization, setMLOptimization] = useState(null);
   
   const [loadingStates, setLoadingStates] = useState({
-    progressTrends: true,
-    relapsePatterns: true,
-    patternRecognition: true,
-    optimization: true,
-    phaseEvolution: true
+    numbers: true,
+    patterns: true,
+    ai: true,
+    relapse: true
   });
 
   const chartRef = useRef(null);
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
+  
+  // Get days tracked for unlock logic
+  const daysTracked = useMemo(() => {
+    return safeUserData.benefitTracking?.length || 0;
+  }, [safeUserData.benefitTracking]);
+  
+  // Get relapse count for AI unlock logic
+  const relapseCount = useMemo(() => {
+    return (safeUserData.streakHistory || []).filter(s => s.reason === 'relapse').length;
+  }, [safeUserData.streakHistory]);
 
   useEffect(() => {
     if (isPremium) {
       const timers = [
-        setTimeout(() => setLoadingStates(prev => ({ ...prev, progressTrends: false })), 400),
-        setTimeout(() => setLoadingStates(prev => ({ ...prev, relapsePatterns: false })), 600),
-        setTimeout(() => setLoadingStates(prev => ({ ...prev, patternRecognition: false })), 800),
-        setTimeout(() => setLoadingStates(prev => ({ ...prev, optimization: false })), 1000),
-        setTimeout(() => setLoadingStates(prev => ({ ...prev, phaseEvolution: false })), 1200)
+        setTimeout(() => setLoadingStates(prev => ({ ...prev, numbers: false })), 300),
+        setTimeout(() => setLoadingStates(prev => ({ ...prev, patterns: false })), 500),
+        setTimeout(() => setLoadingStates(prev => ({ ...prev, ai: false })), 700),
+        setTimeout(() => setLoadingStates(prev => ({ ...prev, relapse: false })), 400)
       ];
       return () => timers.forEach(clearTimeout);
     }
-  }, [isPremium, selectedMetric, timeRange]);
+  }, [isPremium, selectedMetric]);
 
-  // NEW: Load ML patterns when premium user has enough data
+  // Load ML patterns when premium user has enough data
   useEffect(() => {
     const loadMLPatterns = async () => {
-      // Only load for premium users with sufficient data
-      if (!isPremium || !safeUserData?.benefitTracking?.length || safeUserData.benefitTracking.length < 20) {
+      if (!isPremium || daysTracked < 20) {
         setMLPatterns(null);
         setMLOptimization(null);
         return;
       }
       
       try {
-        // Load AI-discovered patterns
         const patterns = await discoverMLPatterns(safeUserData);
         setMLPatterns(patterns);
         
-        // Load AI optimization suggestions
         const optimization = await generateMLOptimization(safeUserData);
         setMLOptimization(optimization);
-        
-        console.log('✅ ML patterns loaded:', patterns?.hasMLPatterns);
       } catch (error) {
         console.warn('ML patterns loading error:', error);
         setMLPatterns(null);
@@ -108,25 +113,30 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     };
     
     loadMLPatterns();
-  }, [safeUserData, isPremium]);
+  }, [safeUserData, isPremium, daysTracked]);
 
-  const hasInsufficientData = useMemo(() => {
-    return (safeUserData.benefitTracking?.length || 0) < 3;
-  }, [safeUserData.benefitTracking]);
-
-  // FIX: Pass all required parameters to analytics functions
+  // UPDATED: Memoized analytics - pure data calculations
   const memoizedInsights = useMemo(() => {
     if (!isPremium) return {};
     return {
-      dataQuality: calculateDataQuality(safeUserData),
-      patternInsights: generatePatternRecognition(safeUserData, selectedMetric, isPremium),
-      optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, isPremium),
-      phaseEvolution: calculatePhaseEvolutionAnalysis(safeUserData, selectedMetric),
+      // Your Numbers data
+      metricAverages: calculateMetricAverages(safeUserData, 7),
+      metricTrends: calculateMetricTrends(safeUserData, 7, 7),
+      metricExtremes: identifyMetricExtremes(safeUserData, 7),
+      
+      // Your Patterns data
+      dayOfWeekPatterns: calculateDayOfWeekPatterns(safeUserData, selectedMetric),
+      metricCorrelations: calculateMetricCorrelations(safeUserData),
+      growthRates: calculateGrowthRates(safeUserData, 30),
+      
+      // Relapse data
       relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
-      progressTrends: calculateProgressTrends(safeUserData, timeRange, selectedMetric),
-      daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData)
+      daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData),
+      
+      // Phase info (aligned with Emotional Timeline)
+      phaseInfo: getPhaseInfo(safeUserData.currentStreak || 0)
     };
-  }, [safeUserData, selectedMetric, timeRange, isPremium]);
+  }, [safeUserData, selectedMetric, isPremium]);
 
   // Milestones
   const milestones = useMemo(() => {
@@ -244,9 +254,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const pointRadii = data.map((value, index) => {
       if (value === null) return 0;
       
-      // Find first valid index
       const firstValidIndex = data.findIndex(v => v !== null);
-      // Find last valid index
       let lastValidIndex = -1;
       for (let i = data.length - 1; i >= 0; i--) {
         if (data[i] !== null) {
@@ -255,11 +263,10 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         }
       }
       
-      // Show dot only for first and last valid points
       if (index === firstValidIndex || index === lastValidIndex) {
-        return 5; // Endpoint dot size
+        return 5;
       }
-      return 0; // No dot for other points
+      return 0;
     });
     
     return {
@@ -326,14 +333,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  const getCurrentInsight = useCallback(() => {
-    const phase = getCurrentPhase(safeUserData);
-    const guidance = getPhaseGuidance(phase, safeUserData.currentStreak || 0);
-    return guidance?.actionable || 'Start tracking your benefits daily to unlock personalized insights.';
-  }, [safeUserData]);
-
   // Metric toggle items
-  const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
   const timeRanges = [
     { key: 'week', label: 'Week' },
     { key: 'month', label: 'Month' },
@@ -460,8 +460,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         {!isPremium && (
           <div className="free-section">
             <div className="free-card">
-              <h3>Phase Guidance</h3>
-              <p>{getCurrentInsight()}</p>
+              <h3>Phase Context</h3>
+              <p>Day {safeUserData.currentStreak || 0} · {memoizedInsights.phaseInfo?.name || 'Initial Adaptation'}</p>
             </div>
             <div className="upgrade-card">
               <p>Unlock detailed analytics and personalized optimization</p>
@@ -470,48 +470,48 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           </div>
         )}
 
-        {/* Premium Analytics - UPDATED: Pass mlPatterns and mlOptimization props */}
+        {/* Premium Analytics - UPDATED: Pure data components */}
         {isPremium && (
           <div className="analytics-stack">
-            <ProgressTrendsAnalysis
-              isLoading={loadingStates.progressTrends}
-              hasInsufficientData={hasInsufficientData}
-              userData={safeUserData}
-              progressTrends={memoizedInsights.progressTrends}
-              dataQuality={memoizedInsights.dataQuality}
-              selectedMetric={selectedMetric}
+            {/* Section 1: Your Numbers - Always visible */}
+            <YourNumbers
+              metricAverages={memoizedInsights.metricAverages}
+              metricTrends={memoizedInsights.metricTrends}
+              metricExtremes={memoizedInsights.metricExtremes}
+              daysTracked={daysTracked}
+              isLoading={loadingStates.numbers}
             />
-            <RelapsePatternAnalytics
-              isLoading={loadingStates.relapsePatterns}
-              hasInsufficientData={false}
-              userData={safeUserData}
+            
+            {/* Section 2: Your Patterns - Unlocks at 14+ days */}
+            <YourPatterns
+              dayOfWeekPatterns={memoizedInsights.dayOfWeekPatterns}
+              metricCorrelations={memoizedInsights.metricCorrelations}
+              growthRates={memoizedInsights.growthRates}
+              selectedMetric={selectedMetric}
+              daysTracked={daysTracked}
+              isLoading={loadingStates.patterns}
+            />
+            
+            {/* Section 3: AI Insights - Unlocks at 20+ days AND 2+ relapses */}
+            <AIInsights
+              mlPatterns={mlPatterns}
+              mlOptimization={mlOptimization}
+              daysTracked={daysTracked}
+              relapseCount={relapseCount}
+              isLoading={loadingStates.ai}
+            />
+            
+            {/* Section 4: Relapse Analytics - Only shows if has relapse data */}
+            <RelapseAnalytics
               relapsePatterns={memoizedInsights.relapsePatterns}
               daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
+              isLoading={loadingStates.relapse}
             />
-            <PatternRecognition
-              isLoading={loadingStates.patternRecognition}
-              hasInsufficientData={hasInsufficientData}
-              userData={safeUserData}
-              patternInsights={memoizedInsights.patternInsights}
-              dataQuality={memoizedInsights.dataQuality}
-              mlPatterns={mlPatterns}
-            />
-            <OptimizationGuidance
-              isLoading={loadingStates.optimization}
-              hasInsufficientData={hasInsufficientData}
-              userData={safeUserData}
-              optimizationGuidance={memoizedInsights.optimizationGuidance}
-              dataQuality={memoizedInsights.dataQuality}
-              mlOptimization={mlOptimization}
-            />
-            <PhaseEvolutionAnalysis
-              isLoading={loadingStates.phaseEvolution}
-              hasInsufficientData={hasInsufficientData}
-              userData={safeUserData}
-              phaseEvolution={memoizedInsights.phaseEvolution}
-              selectedMetric={selectedMetric}
-              dataQuality={memoizedInsights.dataQuality}
+            
+            {/* Section 5: Phase Context - Simple one-liner */}
+            <PhaseContext
               currentStreak={safeUserData.currentStreak}
+              phaseInfo={memoizedInsights.phaseInfo}
             />
           </div>
         )}

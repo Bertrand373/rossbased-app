@@ -1,11 +1,11 @@
 // components/Stats/StatsCalculationUtils.js - Core Calculation Functions
 import { subDays, startOfDay, format, differenceInDays } from 'date-fns';
 
-// ENHANCED: Memoization cache for expensive calculations
+// Memoization cache for expensive calculations
 const calculationCache = new Map();
 const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
 
-// ENHANCED: Cache utilities
+// Cache utilities
 const generateCacheKey = (userData, ...args) => {
   try {
     const safeUserData = userData || {};
@@ -44,7 +44,7 @@ const setCachedResult = (key, result) => {
   }
 };
 
-// ENHANCED: Safe data validator
+// Safe data validator
 export const validateUserData = (userData) => {
   if (!userData || typeof userData !== 'object') {
     return {
@@ -68,7 +68,7 @@ export const validateUserData = (userData) => {
   };
 };
 
-// ENHANCED: Filter benefit data with better error handling and caching
+// Filter benefit data with error handling and caching
 export const getFilteredBenefitData = (userData, timeRange) => {
   try {
     const cacheKey = generateCacheKey(userData, 'filtered', timeRange);
@@ -118,7 +118,7 @@ export const getFilteredBenefitData = (userData, timeRange) => {
   }
 };
 
-// ENHANCED: Generate chart data with defensive programming
+// Generate chart data with defensive programming
 export const generateChartData = (userData, selectedMetric, timeRange) => {
   try {
     const cacheKey = generateCacheKey(userData, 'chart', selectedMetric, timeRange);
@@ -244,7 +244,7 @@ export const generateChartData = (userData, selectedMetric, timeRange) => {
   }
 };
 
-// ENHANCED: Calculate average with better error handling
+// Calculate average with error handling
 export const calculateAverage = (userData, selectedMetric, timeRange, isPremium) => {
   try {
     const cacheKey = generateCacheKey(userData, 'average', selectedMetric, timeRange, isPremium);
@@ -358,7 +358,7 @@ export const calculateDataQuality = (userData) => {
   }
 };
 
-// ENHANCED: Cache cleanup utility
+// Cache cleanup utility
 export const clearStatsCache = () => {
   try {
     calculationCache.clear();
@@ -368,13 +368,13 @@ export const clearStatsCache = () => {
   }
 };
 
-// ENHANCED: Performance monitoring utility
+// Performance monitoring utility
 export const getStatsPerformanceMetrics = () => {
   try {
     return {
       cacheSize: calculationCache.size,
       cacheKeys: Array.from(calculationCache.keys()),
-      memoryUsage: calculationCache.size * 100 // Rough estimate in bytes
+      memoryUsage: calculationCache.size * 100
     };
   } catch (error) {
     console.warn('Performance metrics error:', error);

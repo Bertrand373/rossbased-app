@@ -1,5 +1,5 @@
 // StatsComponents.js - TITANTRACK
-// Matches Tracker modal aesthetic - transparent floating content
+// Shared components for Stats - modals and loading states
 import React from 'react';
 import { format } from 'date-fns';
 

@@ -1,5 +1,6 @@
-// components/Stats/StatsUtils.js - REFACTORED: Utility Functions Split from Main Utils
-import { format, subDays, addDays, startOfDay, differenceInDays } from 'date-fns';
+// components/Stats/StatsUtils.js - Utility Functions
+// REFACTORED: Removed educational phase content, keeping essential utilities
+import { format, subDays, differenceInDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import { validateUserData, getFilteredBenefitData, calculateAverage, calculateDataQuality } from './StatsCalculationUtils';
 
@@ -25,7 +26,7 @@ export const getTimeRangeDisplayText = (timeRange) => {
   return ranges[timeRange] || '';
 };
 
-// ENHANCED: Badge checking logic with better error handling
+// Badge checking logic with error handling
 export const checkAndUpdateBadges = (userData) => {
   try {
     const safeData = validateUserData(userData);
@@ -96,51 +97,13 @@ export const checkAndUpdateBadges = (userData) => {
   }
 };
 
-// Get current phase based on streak
-export const getCurrentPhase = (userData) => {
-  try {
-    const safeData = validateUserData(userData);
-    const currentStreak = safeData.currentStreak || 0;
-    
-    if (currentStreak <= 14) return 'Foundation';
-    if (currentStreak <= 45) return 'Purification';
-    if (currentStreak <= 90) return 'Expansion';
-    if (currentStreak <= 180) return 'Integration';
-    return 'Mastery';
-  } catch (error) {
-    console.warn('Phase calculation error:', error);
-    return 'Foundation';
-  }
-};
-
-// Helper function for phase guidance
-export const getPhaseGuidance = (phase, streak) => {
-  try {
-    const safeStreak = Number.isInteger(streak) ? streak : 0;
-    const safePhase = typeof phase === 'string' ? phase : 'Foundation';
-    
-    const guidance = {
-      'Foundation': `Day ${safeStreak}: Building new neural pathways. Every urge resisted strengthens your willpower circuitry.`,
-      'Purification': `Day ${safeStreak}: Emotional purging active. Mood swings indicate deep healing - maintain practices even when motivation dips.`,
-      'Expansion': `Day ${safeStreak}: Mental clarity emerging. Channel rising energy into creative projects and learning.`,
-      'Integration': `Day ${safeStreak}: Spiritual integration beginning. You're developing natural magnetism and leadership presence.`,
-      'Mastery': `Day ${safeStreak}: Mastery phase - your energy serves higher purposes. Focus on mentoring and service.`
-    };
-    
-    return guidance[safePhase] || 'Continue building momentum with consistent daily practices.';
-  } catch (error) {
-    console.warn('Phase guidance error:', error);
-    return 'Continue building momentum with consistent daily practices.';
-  }
-};
-
-// NEW: Calculate days since last relapse for smart reframing
+// Calculate days since last relapse
 export const calculateDaysSinceLastRelapse = (userData) => {
   try {
     const safeData = validateUserData(userData);
     const streakHistory = safeData.streakHistory || [];
     
-    // Filter for actual relapses (not wet dreams or other reasons)
+    // Filter for actual relapses
     const relapses = streakHistory.filter(streak => 
       streak && streak.reason === 'relapse' && streak.end
     );
@@ -187,7 +150,7 @@ export const shouldShowInfoBanner = (userData, timeRange) => {
     return hasMinimalData || isNewUser;
   } catch (error) {
     console.warn('Info banner check error:', error);
-    return true; // Show banner on error to be safe
+    return true;
   }
 };
 
