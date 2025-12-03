@@ -1,10 +1,11 @@
 // StatsInsights.js - TITANTRACK
 // Premium analytics insight cards
+// UPDATED: AI pattern discovery integration for PatternRecognition and OptimizationGuidance
 import React from 'react';
 import { InsightLoadingState, InsightEmptyState } from './StatsComponents';
 import { renderTextWithBold } from './StatsUtils';
 
-// Progress & Trends Analysis Component
+// Progress & Trends Analysis Component (unchanged)
 export const ProgressTrendsAnalysis = ({ 
   isLoading, 
   hasInsufficientData, 
@@ -67,7 +68,7 @@ export const ProgressTrendsAnalysis = ({
   );
 };
 
-// Relapse Pattern Analytics Component
+// Relapse Pattern Analytics Component (unchanged)
 export const RelapsePatternAnalytics = ({ 
   isLoading, 
   relapsePatterns, 
@@ -117,62 +118,133 @@ export const RelapsePatternAnalytics = ({
   );
 };
 
-// Pattern Recognition Component
+// Pattern Recognition Component - UPDATED: AI-powered with tiered unlock
 export const PatternRecognition = ({ 
   isLoading, 
   hasInsufficientData, 
   userData,
-  patternInsights, 
+  patternInsights,
+  mlPatterns,
   dataQuality 
 }) => {
-  const needsMoreData = !patternInsights?.patterns || patternInsights.patterns.length === 0;
+  const daysTracked = userData?.benefitTracking?.length || 0;
+  const relapseCount = (userData?.streakHistory || []).filter(s => s.reason === 'relapse').length;
+  
+  // Determine what to show based on data availability
+  const hasAIData = mlPatterns?.hasMLPatterns && mlPatterns.patterns?.length > 0;
+  const hasRuleBasedData = patternInsights?.patterns?.length > 0;
+  
+  // Tiered thresholds
+  const BASIC_PATTERNS_THRESHOLD = 14;
+  const AI_PATTERNS_THRESHOLD = 20;
+  const MIN_RELAPSES_FOR_PATTERNS = 2;
+  
+  // Show AI patterns if available (20+ days), otherwise fall back to rule-based (14+ days)
+  const showAI = hasAIData;
+  const showRuleBased = !showAI && hasRuleBasedData;
+  const showEmpty = !showAI && !showRuleBased;
+  
+  // Determine empty state messaging
+  const getEmptyStateContent = () => {
+    if (daysTracked < BASIC_PATTERNS_THRESHOLD) {
+      // User hasn't hit first unlock threshold
+      return {
+        message: `${daysTracked}/${BASIC_PATTERNS_THRESHOLD} days tracked`,
+        context: 'Pattern insights unlock at 14 days'
+      };
+    } else if (daysTracked < AI_PATTERNS_THRESHOLD) {
+      // User has basic data but AI not available yet
+      if (relapseCount < MIN_RELAPSES_FOR_PATTERNS) {
+        return {
+          message: 'Need relapse data for patterns',
+          context: 'Patterns emerge from analyzing what preceded past relapses'
+        };
+      }
+      return {
+        message: `${daysTracked}/${AI_PATTERNS_THRESHOLD} days tracked`,
+        context: 'AI pattern discovery unlocks at 20 days'
+      };
+    } else {
+      // User has 20+ days but no patterns showing
+      if (relapseCount < MIN_RELAPSES_FOR_PATTERNS) {
+        return {
+          message: 'Need relapse data for patterns',
+          context: 'Patterns emerge from analyzing what preceded past relapses'
+        };
+      }
+      return {
+        message: 'AI is learning your patterns',
+        context: 'Keep tracking to improve predictions'
+      };
+    }
+  };
   
   return (
     <div className="insight-card">
       <div className="insight-card-header">
-        <span>Pattern Recognition</span>
+        <span>Your Patterns</span>
+        {showAI && <span className="header-badge">AI</span>}
       </div>
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Pattern Analysis" isVisible={true} />
-        ) : (hasInsufficientData || needsMoreData) ? (
-          <InsightEmptyState 
-            insight="Pattern Recognition" 
-            userData={userData}
-            sectionTitle="Pattern Recognition"
-            sectionDescription="Identifies correlations between your metrics and predicts trends based on your unique retention journey patterns."
-          />
-        ) : (
+        ) : showEmpty ? (
+          // Empty state with tiered messaging
+          <div className="insight-empty">
+            <p className="empty-message">{getEmptyStateContent().message}</p>
+            <p className="empty-context">{getEmptyStateContent().context}</p>
+          </div>
+        ) : showAI ? (
+          // AI-discovered patterns
+          <div className="patterns-display">
+            {mlPatterns.patterns.map((pattern, idx) => (
+              <div key={idx} className="pattern-item">
+                <p className="pattern-condition">{pattern.condition}</p>
+                <p className="pattern-outcome">{pattern.outcome}</p>
+              </div>
+            ))}
+          </div>
+        ) : showRuleBased ? (
+          // Fallback to rule-based patterns (14-19 days)
           <div className="patterns-display">
             {patternInsights.patterns.map((pattern, idx) => (
               <p key={idx} className="pattern-item" dangerouslySetInnerHTML={renderTextWithBold(pattern)}></p>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
 };
 
-// Optimization Guidance Component
+// Optimization Guidance Component - UPDATED: AI-informed suggestions
 export const OptimizationGuidance = ({ 
   isLoading, 
   hasInsufficientData, 
   userData,
-  optimizationGuidance, 
+  optimizationGuidance,
+  mlOptimization,
   dataQuality 
 }) => {
-  const needsMoreData = !optimizationGuidance?.recommendations || optimizationGuidance.recommendations.length === 0;
+  // Determine what to show
+  const hasAISuggestions = mlOptimization?.hasMLSuggestions && mlOptimization.suggestions?.length > 0;
+  const hasRuleBasedGuidance = optimizationGuidance?.recommendations?.length > 0;
+  
+  // Combine AI suggestions with rule-based if both available
+  const showAI = hasAISuggestions;
+  const showRuleBased = hasRuleBasedGuidance;
+  const showEmpty = !showAI && !showRuleBased;
   
   return (
     <div className="insight-card">
       <div className="insight-card-header">
         <span>Optimization</span>
+        {showAI && <span className="header-badge">AI</span>}
       </div>
       <div className="insight-card-content">
         {isLoading ? (
           <InsightLoadingState insight="Optimization Analysis" isVisible={true} />
-        ) : (hasInsufficientData || needsMoreData) ? (
+        ) : showEmpty ? (
           <InsightEmptyState 
             insight="Performance Optimization" 
             userData={userData}
@@ -181,18 +253,42 @@ export const OptimizationGuidance = ({
           />
         ) : (
           <div className="optimization-display">
-            {optimizationGuidance.criteria && (
-              <div className="optimization-criteria">
-                <div className="optimization-criteria-title">Your Optimization Criteria</div>
-                <div className="optimization-criteria-text">{optimizationGuidance.criteria}</div>
+            {/* AI-informed suggestions first (if available) */}
+            {showAI && (
+              <div className="optimization-recommendations ai-section">
+                {mlOptimization.suggestions.map((suggestion, idx) => (
+                  <p key={`ai-${idx}`} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(suggestion)}></p>
+                ))}
               </div>
             )}
             
-            <div className="optimization-recommendations">
-              {optimizationGuidance.recommendations.map((rec, idx) => (
-                <p key={idx} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
-              ))}
-            </div>
+            {/* Rule-based optimization (show when no AI) */}
+            {showRuleBased && !showAI && (
+              <>
+                {optimizationGuidance.criteria && (
+                  <div className="optimization-criteria">
+                    <div className="optimization-criteria-title">Your Optimization Criteria</div>
+                    <div className="optimization-criteria-text">{optimizationGuidance.criteria}</div>
+                  </div>
+                )}
+                
+                <div className="optimization-recommendations">
+                  {optimizationGuidance.recommendations.map((rec, idx) => (
+                    <p key={idx} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
+                  ))}
+                </div>
+              </>
+            )}
+            
+            {/* When AI is available, show condensed rule-based context */}
+            {showAI && showRuleBased && optimizationGuidance.recommendations?.length > 0 && (
+              <div className="optimization-recommendations">
+                {/* Show just first 1-2 most relevant rule-based recommendations */}
+                {optimizationGuidance.recommendations.slice(0, 2).map((rec, idx) => (
+                  <p key={`rule-${idx}`} className="optimization-item" dangerouslySetInnerHTML={renderTextWithBold(rec)}></p>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -200,7 +296,7 @@ export const OptimizationGuidance = ({
   );
 };
 
-// Phase Evolution Analysis Component
+// Phase Evolution Analysis Component (unchanged)
 export const PhaseEvolutionAnalysis = ({ 
   isLoading, 
   hasInsufficientData, 
@@ -212,7 +308,7 @@ export const PhaseEvolutionAnalysis = ({
 }) => {
   const needsMoreData = !phaseEvolution?.phaseAverages;
   
-  // FIX: Align phase key detection with StatsAnalyticsUtils.js getRetentionPhase()
+  // Align phase key detection with StatsAnalyticsUtils.js getRetentionPhase()
   // Must match: foundation (1-14), purification (15-45), expansion (46-90), integration (91-180), mastery (180+)
   const getCurrentPhaseKey = () => {
     const streak = currentStreak || 0;

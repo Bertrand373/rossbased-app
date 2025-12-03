@@ -1,7 +1,15 @@
 // components/Stats/StatsAnalyticsUtils.js - Analytics and Pattern Recognition Functions
+// UPDATED: Added AI pattern discovery integration
 import { subDays } from 'date-fns';
 import { validateUserData, getFilteredBenefitData, calculateAverage } from './StatsCalculationUtils';
 import { getCurrentPhase, getPhaseGuidance } from './StatsUtils';
+
+// ============================================================
+// THRESHOLD CONSTANTS
+// ============================================================
+const BASIC_PATTERNS_THRESHOLD = 14;  // Days required for rule-based patterns
+const AI_PATTERNS_THRESHOLD = 20;     // Days required for AI patterns
+const MIN_RELAPSES_FOR_PATTERNS = 2;  // Minimum relapses to learn patterns
 
 // ENHANCED: Smart Urge Management with caching and error handling
 export const generateUrgeManagementGuidance = (userData, timeRange) => {
@@ -81,7 +89,7 @@ export const generateUrgeManagementGuidance = (userData, timeRange) => {
   }
 };
 
-// NEW: Progress & Trends Analysis - Historical trajectory calculation
+// Progress & Trends Analysis - Historical trajectory calculation
 export const calculateProgressTrends = (userData, timeRange, selectedMetric = 'energy') => {
   try {
     const safeData = validateUserData(userData);
@@ -90,7 +98,7 @@ export const calculateProgressTrends = (userData, timeRange, selectedMetric = 'e
     const metricToUse = selectedMetric || 'energy';
     
     // Need at least 14 days of data for meaningful trends
-    if (allBenefitData.length < 14) {
+    if (allBenefitData.length < BASIC_PATTERNS_THRESHOLD) {
       return null;
     }
     
@@ -137,7 +145,7 @@ export const calculateProgressTrends = (userData, timeRange, selectedMetric = 'e
     }
     
     // 2. BENEFIT PERFORMANCE TREND (for selected metric)
-    if (allBenefitData.length >= 14) {
+    if (allBenefitData.length >= BASIC_PATTERNS_THRESHOLD) {
       // Get last 7 days average for selected metric
       const last7Days = allBenefitData.slice(-7);
       const recentAvg = calculateAverage({ benefitTracking: last7Days }, metricToUse, 'week', true);
@@ -229,7 +237,7 @@ export const calculateProgressTrends = (userData, timeRange, selectedMetric = 'e
   }
 };
 
-// ENHANCED: Pattern Recognition - Now actually uses selectedMetric
+// Pattern Recognition - Rule-based (14+ days)
 export const generatePatternRecognition = (userData, selectedMetric, isPremium) => {
   try {
     const safeData = validateUserData(userData);
@@ -250,7 +258,7 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
     const metricDisplayName = metric === 'sleep' ? 'sleep quality' : metric;
     
     // Require substantial data for meaningful patterns
-    if (allData.length < 14) {
+    if (allData.length < BASIC_PATTERNS_THRESHOLD) {
       return { patterns: [] };
     }
     
@@ -282,7 +290,7 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
     }
     
     // 2. CORRELATION PATTERNS - How selected metric relates to other metrics
-    if (isPremium && allData.length >= 20) {
+    if (isPremium && allData.length >= AI_PATTERNS_THRESHOLD) {
       try {
         // Find days where selected metric is high (7+)
         const highMetricDays = allData.filter(d => {
@@ -339,7 +347,7 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
     }
     
     // 3. SLEEP IMPACT ON SELECTED METRIC (if not sleep itself)
-    if (isPremium && metric !== 'sleep' && allData.length >= 20) {
+    if (isPremium && metric !== 'sleep' && allData.length >= AI_PATTERNS_THRESHOLD) {
       try {
         const goodSleepDays = allData.filter(d => {
           const sleepVal = d.sleep || 5;
@@ -440,7 +448,7 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
   }
 };
 
-// ENHANCED: Optimization Guidance with Dynamic Performance Analysis
+// Optimization Guidance with Dynamic Performance Analysis
 export const generateOptimizationGuidance = (userData, selectedMetric, timeRange, isPremium) => {
   try {
     const safeData = validateUserData(userData);
@@ -455,7 +463,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
       };
     }
     
-    // FIXED: Calculate dynamic performance thresholds based on user's actual data - ALL 6 METRICS
+    // Calculate dynamic performance thresholds based on user's actual data - ALL 6 METRICS
     const calculateDynamicThresholds = (data) => {
       const getValidData = (metric) => {
         if (metric === 'sleep') {
@@ -516,7 +524,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
       };
     }
     
-    // FIXED: Calculate high performance days using dynamic thresholds
+    // Calculate high performance days using dynamic thresholds
     const highPerformanceDays = allData.filter(d => {
       try {
         if (!d) return false;
@@ -545,7 +553,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
     const metricName = getMetricDisplayName(selectedMetric);
     const metricNameCapitalized = metricName.charAt(0).toUpperCase() + metricName.slice(1);
     
-    // FIXED: Generate phase-aware criteria labels
+    // Generate phase-aware criteria labels
     const getCurrentPhaseFromStreak = (streak) => {
       if (streak <= 14) return 'Foundation';
       if (streak <= 45) return 'Purification';
@@ -556,7 +564,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
     
     const phase = getCurrentPhaseFromStreak(currentStreak);
     
-    // FIXED: Create realistic, personalized criteria description
+    // Create realistic, personalized criteria description
     let criteriaLabel;
     if (isPremium) {
       criteriaLabel = `Your Top 25%: Energy ${thresholds.energy}+, Confidence ${thresholds.confidence}+, Sleep ${thresholds.sleep}+`;
@@ -572,7 +580,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
       thresholds: thresholds
     };
     
-    // ENHANCED: Phase-aware performance context - USE SELECTED METRIC'S THRESHOLD
+    // Phase-aware performance context - USE SELECTED METRIC'S THRESHOLD
     const metricKey = selectedMetric === 'sleep' ? 'sleep' : selectedMetric;
     const selectedThreshold = thresholds[metricKey] || thresholds.energy;
     const selectedAvg = thresholds[`${metricKey}Avg`] || thresholds.energyAvg;
@@ -602,8 +610,8 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
       }
     }
     
-    // ENHANCED: Pattern-based insights using dynamic thresholds
-    if (isPremium && allData.length >= 20) {
+    // Pattern-based insights using dynamic thresholds
+    if (isPremium && allData.length >= AI_PATTERNS_THRESHOLD) {
       try {
         // Find correlation between high confidence and other metrics
         const highConfidenceDays = allData.filter(d => {
@@ -652,7 +660,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
       }
     }
     
-    // ENHANCED: Data quality and improvement suggestions
+    // Data quality and improvement suggestions
     if (highPerformanceRate < 20) {
       guidance.recommendations.push(`**Performance Opportunity**: Only ${highPerformanceRate}% of days meet your high performance criteria. Focus on sleep optimization, stress management, and consistent daily practices to increase this rate.`);
     } else if (highPerformanceRate > 40) {
@@ -670,21 +678,21 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
   }
 };
 
-// FIXED: Phase Evolution Analysis with CORRECT phase detection and ALL 6 metrics support
+// Phase Evolution Analysis with CORRECT phase detection and ALL 6 metrics support
 export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
   try {
     const safeData = validateUserData(userData);
     const allData = safeData.benefitTracking || [];
     const currentStreak = safeData.currentStreak || 0;
     
-    if (allData.length < 14) {
+    if (allData.length < BASIC_PATTERNS_THRESHOLD) {
       return {
         hasData: false,
         message: 'Need 14+ days of benefit tracking for meaningful phase evolution analysis'
       };
     }
     
-    // FIXED: Define retention phases based on EXACT logic - MATCHING getCurrentPhaseKey
+    // Define retention phases based on EXACT logic - MATCHING getCurrentPhaseKey
     const getRetentionPhase = (daysSinceStart) => {
       if (daysSinceStart <= 14) return 'foundation';
       if (daysSinceStart <= 45) return 'purification'; 
@@ -746,206 +754,73 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
           phaseData[phase] = [];
         }
         
-        // FIXED: Support ALL 6 metrics properly
+        // Support ALL 6 metrics properly
         let value = null;
         if (selectedMetric === 'sleep') {
-          // Sleep metric (premium)
           value = item.sleep || null;
-        } else if (['energy', 'focus', 'confidence', 'aura', 'workout'].includes(selectedMetric)) {
-          // All other 6 metrics: energy, focus, confidence, aura, workout
+        } else {
           value = item[selectedMetric] || null;
         }
         
         if (typeof value === 'number' && value >= 1 && value <= 10) {
-          phaseData[phase].push({
-            value: value,
-            daysSinceStart: daysSinceStart,
-            date: itemDate
-          });
+          phaseData[phase].push(value);
         }
       } catch (itemError) {
-        console.warn('Phase data processing error:', itemError);
+        console.warn('Phase data item error:', itemError);
       }
     });
     
-    if (Object.keys(phaseData).length === 0) {
-      return {
-        hasData: false,
-        message: 'No valid data points found for phase analysis'
-      };
-    }
-    
-    // FIXED: Calculate averages with proper decimals (1 decimal place max)
+    // Calculate phase averages
     const phaseAverages = {};
-    Object.keys(phaseData).forEach(phase => {
-      const values = phaseData[phase];
-      if (values.length > 0) {
-        const sum = values.reduce((acc, item) => acc + item.value, 0);
-        const avg = sum / values.length;
+    const phases = ['foundation', 'purification', 'expansion', 'integration', 'mastery'];
+    
+    phases.forEach(phase => {
+      const data = phaseData[phase] || [];
+      if (data.length > 0) {
+        const avg = data.reduce((sum, val) => sum + val, 0) / data.length;
         phaseAverages[phase] = {
-          average: Math.round(avg * 10) / 10, // Round to 1 decimal place
-          dataPoints: values.length,
-          range: getPhaseRange(phase),
           name: getPhaseDisplayName(phase),
-          displayName: getPhaseDisplayName(phase)
+          displayName: getPhaseDisplayName(phase),
+          range: getPhaseRange(phase),
+          average: avg.toFixed(1),
+          dataPoints: data.length
+        };
+      } else {
+        phaseAverages[phase] = {
+          name: getPhaseDisplayName(phase),
+          displayName: getPhaseDisplayName(phase),
+          range: getPhaseRange(phase),
+          average: null,
+          dataPoints: 0
         };
       }
     });
     
-    // FIXED: Current phase analysis using CURRENT STREAK, not data dates
-    const currentPhase = getRetentionPhase(currentStreak);
-    const currentAvg = calculateAverage(safeData, selectedMetric, 'week', true);
+    // Generate insight based on progression
+    let insight = null;
+    const phasesWithData = phases.filter(p => phaseAverages[p]?.average);
     
-    // ENHANCED: Generate wisdom-based evolution insights
-    const insights = [];
-    const completedPhases = Object.keys(phaseAverages).filter(phase => 
-      phase !== currentPhase || currentStreak > (phase === 'foundation' ? 14 : 
-                                                  phase === 'purification' ? 45 :
-                                                  phase === 'expansion' ? 90 : 180)
-    );
-    
-    if (completedPhases.length === 0) {
-      // Current phase insights - metric-appropriate
-      const metricLabel = selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric;
+    if (phasesWithData.length >= 2) {
+      const metricName = selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric;
+      const firstPhase = phasesWithData[0];
+      const lastPhase = phasesWithData[phasesWithData.length - 1];
+      const firstAvg = parseFloat(phaseAverages[firstPhase].average);
+      const lastAvg = parseFloat(phaseAverages[lastPhase].average);
       
-      const getPhaseInsight = (phase, metric) => {
-        const genericInsights = {
-          'foundation': `**Foundation Building**: Your ${metricLabel} is stabilizing as your body adapts to retention. Fluctuations are normal during this initial phase.`,
-          'purification': `**Emotional Purging Active**: ${metricLabel} patterns during days 15-45 reflect internal healing. Lower scores can be therapeutic - old patterns are being released.`,
-          'expansion': `**Expansion Phase**: Your ${metricLabel} is developing as retained energy integrates. This phase brings noticeable improvements.`,
-          'integration': `**Spiritual Integration**: ${metricLabel} stability indicates deep adaptation. You're developing sustainable patterns.`,
-          'mastery': `**Mastery Phase**: Your ${metricLabel} consistency shows mastery. Sustained high performance is now your baseline.`
-        };
-        
-        // Metric-specific insights for more relevant guidance
-        if (metric === 'sleep') {
-          return {
-            'foundation': `**Foundation Building**: Your sleep quality is adjusting as your body adapts to retention. Sleep patterns often shift during this phase - trust the process.`,
-            'purification': `**Emotional Purging Active**: Sleep quality during days 15-45 may fluctuate as your psyche processes suppressed emotions. This is normal healing.`,
-            'expansion': `**Sleep Optimization**: Your nervous system is calming during expansion phase. Deeper, more restorative sleep becomes possible.`,
-            'integration': `**Sleep Integration**: Sleep quality stability indicates your body has fully adapted. Consistent rest now supports all other metrics.`,
-            'mastery': `**Sleep Mastery**: Your sleep quality consistency reflects internal harmony. Restoration happens naturally and efficiently.`
-          }[phase] || genericInsights[phase];
-        } else if (metric === 'energy') {
-          return {
-            'foundation': `**Foundation Building**: Your energy is stabilizing as your body learns to conserve vital force. Fluctuations are normal - your system is adapting.`,
-            'purification': `**Emotional Purging Active**: Energy during days 15-45 reflects internal healing. Lower levels are therapeutic - old blockages are being cleared.`,
-            'expansion': `**Energy Transmutation**: Your energy is converting into focused power. You're entering the stage where raw vitality becomes directed force.`,
-            'integration': `**Spiritual Integration**: Energy stability indicates major optimization. You're developing sustainable high-performance patterns.`,
-            'mastery': `**Service Orientation**: Your energy consistency shows mastery. Vital force now flows effortlessly and can be directed at will.`
-          }[phase] || genericInsights[phase];
-        } else if (metric === 'focus') {
-          return {
-            'foundation': `**Foundation Building**: Your focus is developing as mental fog begins to lift. Clarity comes in waves during this phase.`,
-            'purification': `**Mental Clearing**: Focus during days 15-45 may fluctuate as your mind releases old patterns. This is cognitive healing.`,
-            'expansion': `**Mental Transmutation**: Your focus is sharpening significantly. Sexual energy is converting to cognitive power and mental clarity.`,
-            'integration': `**Cognitive Integration**: Focus stability indicates your mind has become a precision instrument. Deep concentration is now accessible.`,
-            'mastery': `**Mental Mastery**: Your focus consistency shows cognitive mastery. Sustained attention is now your natural state.`
-          }[phase] || genericInsights[phase];
-        }
-        
-        return genericInsights[phase] || `Still building data in your current phase - evolution patterns will emerge as you progress.`;
-      };
-      
-      insights.push(getPhaseInsight(currentPhase, selectedMetric));
-    } else {
-      // Find progression patterns
-      const phaseOrder = ['foundation', 'purification', 'expansion', 'integration', 'mastery'];
-      const completedInOrder = completedPhases.filter(phase => phaseOrder.includes(phase))
-                                             .sort((a, b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b));
-      
-      // Define metricLabel early so it can be used throughout
-      const metricLabel = selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric;
-      
-      if (completedInOrder.length >= 2) {
-        const firstPhase = completedInOrder[0];
-        const lastCompleted = completedInOrder[completedInOrder.length - 1];
-        const firstAvg = phaseAverages[firstPhase].average;
-        const lastAvg = phaseAverages[lastCompleted].average;
-        
-        const evolution = ((lastAvg - firstAvg) / firstAvg * 100).toFixed(0);
-        
-        if (Math.abs(evolution) >= 15) {
-          if (evolution > 0) {
-            insights.push(`**Phase Evolution**: Your ${metricLabel} improved ${evolution}% from ${getPhaseDisplayName(firstPhase)} (${firstAvg}/10) to ${getPhaseDisplayName(lastCompleted)} (${lastAvg}/10). This shows successful energy transmutation through the phases.`);
-          } else {
-            insights.push(`**Phase Challenge**: ${metricLabel} declined ${Math.abs(evolution)}% from ${getPhaseDisplayName(firstPhase)} to ${getPhaseDisplayName(lastCompleted)}. This suggests phase-specific challenges that need addressing.`);
-          }
-        }
-      }
-      
-      // ENHANCED: Phase-specific insights - now contextually appropriate for each metric
-      const getMetricInsightContext = (metric) => {
-        const contexts = {
-          energy: {
-            expansion: 'This confirms successful transmutation of sexual energy into vitality and drive.',
-            integration: 'shows major life force optimization. You\'ve achieved sustainable high energy.',
-            mastery: 'Your vital energy now flows effortlessly. This is the reward of consistent practice.'
-          },
-          focus: {
-            expansion: 'This confirms successful transmutation of sexual energy into enhanced cognitive abilities.',
-            integration: 'shows major mental clarity gains. Your mind has become a precision instrument.',
-            mastery: 'Your mental power now serves higher purposes. Deep focus is your natural state.'
-          },
-          confidence: {
-            expansion: 'This confirms emotional stabilization and growing self-assurance.',
-            integration: 'shows you\'ve developed unshakeable inner certainty. You trust yourself deeply.',
-            mastery: 'Your confidence now radiates naturally. Others sense your grounded presence.'
-          },
-          aura: {
-            expansion: 'This confirms growing magnetic presence and social influence.',
-            integration: 'shows you\'ve developed natural charisma. People are drawn to your energy.',
-            mastery: 'Your presence now speaks before you do. This is the mark of retained power.'
-          },
-          sleep: {
-            expansion: 'This confirms your nervous system has adapted to retention. Deep rest comes naturally.',
-            integration: 'shows complete sleep optimization. Your body recovers efficiently.',
-            mastery: 'Your sleep quality reflects internal harmony. Restoration happens effortlessly.'
-          },
-          workout: {
-            expansion: 'This confirms physical adaptation to retained energy. Your body craves movement.',
-            integration: 'shows peak physical performance integration. Training feels natural.',
-            mastery: 'Your physical practice now sustains itself. The body has become a willing partner.'
-          }
-        };
-        return contexts[metric] || contexts.energy;
-      };
-      
-      const insightContext = getMetricInsightContext(selectedMetric);
-      
-      if (phaseAverages.purification && phaseAverages.purification.average < 5.5) {
-        insights.push(`**Purification Phase Pattern**: ${metricLabel} averaged ${phaseAverages.purification.average}/10 during emotional purging (days 15-45). Lower metrics during this phase are normal - your psyche was healing suppressed emotions.`);
-      }
-      
-      if (phaseAverages.expansion && phaseAverages.expansion.average > 7) {
-        insights.push(`**Expansion Phase Success**: ${metricLabel} peaked at ${phaseAverages.expansion.average}/10 during mental expansion (days 46-90). ${insightContext.expansion}`);
-      }
-      
-      if (phaseAverages.integration && phaseAverages.integration.average > 7.5) {
-        insights.push(`**Integration Mastery**: ${metricLabel} at ${phaseAverages.integration.average}/10 during spiritual integration (days 91-180) ${insightContext.integration}`);
-      }
-      
-      if (phaseAverages.mastery && phaseAverages.mastery.average > 8) {
-        insights.push(`**Service Excellence**: ${metricLabel} maintains ${phaseAverages.mastery.average}/10 in mastery phase (180+ days). ${insightContext.mastery}`);
-      }
-      
-      // Current phase guidance
-      if (currentPhase === 'purification' && currentAvg !== 'N/A' && parseFloat(currentAvg) < 6) {
-        insights.push(`**Current Phase Alert**: You're in Purification phase where emotional turbulence naturally lowers benefit scores. This is temporary but necessary healing - maintain practices even when metrics dip.`);
-      }
-      
-      if (currentPhase === 'expansion' && currentAvg !== 'N/A' && parseFloat(currentAvg) >= 7) {
-        insights.push(`**Peak Performance Zone**: You're in Expansion phase with ${metricLabel} at ${currentAvg}/10. This is optimal timing for ambitious goals, creative projects, and major life decisions.`);
+      if (lastAvg > firstAvg + 0.5) {
+        insight = `Your **${metricName}** shows clear improvement from ${getPhaseDisplayName(firstPhase)} (${firstAvg}/10) to ${getPhaseDisplayName(lastPhase)} (${lastAvg}/10). Retention is working for you.`;
+      } else if (lastAvg < firstAvg - 0.5) {
+        insight = `Your **${metricName}** has dipped from ${getPhaseDisplayName(firstPhase)} (${firstAvg}/10) to ${getPhaseDisplayName(lastPhase)} (${lastAvg}/10). This can be normal during certain phases - focus on recovery.`;
+      } else {
+        insight = `Your **${metricName}** remains stable across phases (${firstAvg}/10 to ${lastAvg}/10). Consistency is the foundation of mastery.`;
       }
     }
     
     return {
       hasData: true,
-      phaseAverages: phaseAverages,
-      insights: insights,
-      insight: insights.length > 0 ? insights.join(' ') : null,
-      completedPhases: completedPhases.length,
-      totalPhases: Object.keys(phaseAverages).length
+      phaseAverages,
+      insight,
+      selectedMetric
     };
   } catch (error) {
     console.error('Phase evolution analysis error:', error);
@@ -956,135 +831,66 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
   }
 };
 
-// ENHANCED: Relapse risk assessment with better error handling
-export const calculateRelapseRisk = (userData, timeRange, isPremium) => {
+// Helper to calculate risk factors
+export const calculateRiskAssessment = (userData) => {
   try {
     const safeData = validateUserData(userData);
-    const filteredData = getFilteredBenefitData(safeData, timeRange);
     const currentStreak = safeData.currentStreak || 0;
+    const currentHour = new Date().getHours();
+    const currentDay = new Date().getDay();
     
-    if (filteredData.length < 3) {
-      return { 
-        score: 'N/A', 
-        factors: ['Need 3+ days of benefit tracking for risk assessment'], 
-        level: 'Insufficient Data' 
-      };
-    }
-    
-    const last3Days = filteredData.slice(-3);
-    let riskScore = 0;
     const riskFactors = [];
-    
-    // Energy decline trend
-    if (last3Days.length >= 2) {
-      try {
-        const firstEnergy = last3Days[0]?.energy;
-        const lastEnergy = last3Days[last3Days.length - 1]?.energy;
-        
-        if (typeof firstEnergy === 'number' && typeof lastEnergy === 'number' && 
-            firstEnergy >= 1 && firstEnergy <= 10 && lastEnergy >= 1 && lastEnergy <= 10) {
-          const energyTrend = lastEnergy - firstEnergy;
-          if (energyTrend < -1) {
-            riskScore += 25;
-            riskFactors.push(`**Energy declining**: Dropped ${Math.abs(energyTrend).toFixed(1)} points in 3 days. Low vitality increases vulnerability - take cold shower or exercise immediately.`);
-          }
-        }
-      } catch (energyError) {
-        console.warn('Energy trend calculation error:', energyError);
-      }
-    }
-    
-    // Low confidence
-    try {
-      const validConfidenceValues = last3Days
-        .map(day => day?.confidence || 5)
-        .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
-        
-      if (validConfidenceValues.length > 0) {
-        const avgConfidence = validConfidenceValues.reduce((sum, val) => sum + val, 0) / validConfidenceValues.length;
-        if (avgConfidence < 4) {
-          riskScore += 20;
-          riskFactors.push(`**Confidence low**: Averaging ${avgConfidence.toFixed(1)}/10. Emotional instability precedes most relapses - practice self-compassion and avoid isolation.`);
-        }
-      }
-    } catch (confidenceError) {
-      console.warn('Confidence calculation error:', confidenceError);
-    }
-    
-    // Poor sleep quality
-    if (isPremium) {
-      try {
-        const validSleepValues = last3Days
-          .map(day => day?.sleep || 5)
-          .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
-          
-        if (validSleepValues.length > 0) {
-          const avgSleep = validSleepValues.reduce((sum, val) => sum + val, 0) / validSleepValues.length;
-          if (avgSleep < 5) {
-            riskScore += 15;
-            riskFactors.push(`**Sleep disrupted**: Quality at ${avgSleep.toFixed(1)}/10. Poor sleep weakens willpower - optimize evening routine and avoid screens after 9pm.`);
-          }
-        }
-      } catch (sleepError) {
-        console.warn('Sleep calculation error:', sleepError);
-      }
-    }
-    
-    // Low focus
-    if (isPremium) {
-      try {
-        const validFocusValues = last3Days
-          .map(day => day?.focus || 5)
-          .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
-          
-        if (validFocusValues.length > 0) {
-          const avgFocus = validFocusValues.reduce((sum, val) => sum + val, 0) / validFocusValues.length;
-          if (avgFocus < 4) {
-            riskScore += 20;
-            riskFactors.push(`**Focus scattered**: Averaging ${avgFocus.toFixed(1)}/10. Mental fog often signals approaching flatline - maintain practices and trust the process.`);
-          }
-        }
-      } catch (focusError) {
-        console.warn('Focus calculation error:', focusError);
-      }
-    }
-    
-    // Critical spermatogenesis phase
-    if (currentStreak >= 60 && currentStreak <= 74) {
-      riskScore += 15;
-      riskFactors.push(`**Critical phase**: Day ${currentStreak} approaching spermatogenesis completion. Biological transition increases urge intensity - extra vigilance needed.`);
-    }
+    let riskScore = 0;
     
     // Time-based risks
-    try {
-      const currentHour = new Date().getHours();
-      const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
-      const isEvening = currentHour >= 20 && currentHour <= 23;
+    if (currentHour >= 22 || currentHour <= 5) {
+      riskFactors.push('Late night hours (highest vulnerability)');
+      riskScore += 30;
+    } else if (currentHour >= 20) {
+      riskFactors.push('Evening hours (elevated risk)');
+      riskScore += 15;
+    }
+    
+    // Day-based risks
+    if (currentDay === 0 || currentDay === 6) {
+      riskFactors.push('Weekend (reduced structure)');
+      riskScore += 15;
+    }
+    
+    // Streak-based risks
+    if (currentStreak >= 7 && currentStreak <= 14) {
+      riskFactors.push('Week 2 transition (common relapse window)');
+      riskScore += 20;
+    } else if (currentStreak >= 21 && currentStreak <= 28) {
+      riskFactors.push('Week 3-4 (flatline period)');
+      riskScore += 15;
+    } else if (currentStreak >= 60 && currentStreak <= 74) {
+      riskFactors.push('Spermatogenesis completion phase');
+      riskScore += 25;
+    }
+    
+    // Recent benefit data check
+    const benefitData = safeData.benefitTracking || [];
+    if (benefitData.length >= 3) {
+      const last3Days = benefitData.slice(-3);
+      const avgEnergy = last3Days.reduce((sum, d) => sum + (d.energy || 5), 0) / 3;
       
-      if (isWeekend) {
-        riskScore += 10;
-        riskFactors.push('**Weekend vulnerability**: Reduced structure increases risk - plan specific activities and avoid idle time.');
+      if (avgEnergy < 5) {
+        riskFactors.push(`Low energy trend (${avgEnergy.toFixed(1)}/10)`);
+        riskScore += 20;
       }
-      
-      if (isEvening) {
-        riskScore += 10;
-        riskFactors.push('**Evening hours**: Natural dopamine peaks increase urge intensity - end screen time and prepare for sleep.');
-      }
-    } catch (timeError) {
-      console.warn('Time-based risk calculation error:', timeError);
     }
     
     // Determine risk level
     let level = 'Low';
-    if (riskScore >= 50) level = 'High';
-    else if (riskScore >= 25) level = 'Medium';
-    
-    if (riskFactors.length === 0) {
-      riskFactors.push('All metrics stable - retention patterns appear sustainable');
+    if (riskScore >= 50) {
+      level = 'High';
+    } else if (riskScore >= 25) {
+      level = 'Medium';
     }
     
     return {
-      score: Math.min(riskScore, 100),
+      score: riskScore,
       factors: riskFactors,
       level
     };
@@ -1119,7 +925,7 @@ const formatTriggerName = (trigger) => {
   return triggerMap[trigger] || trigger.replace(/_/g, ' ');
 };
 
-// NEW: Relapse Pattern Analytics - Brutally Honest Trigger Analysis
+// Relapse Pattern Analytics - Brutally Honest Trigger Analysis
 export const generateRelapsePatternAnalysis = (userData) => {
   try {
     const safeData = validateUserData(userData);
@@ -1139,7 +945,7 @@ export const generateRelapsePatternAnalysis = (userData) => {
       };
     }
 
-    if (relapses.length < 2) {
+    if (relapses.length < MIN_RELAPSES_FOR_PATTERNS) {
       const formattedSingleTrigger = formatTriggerName(relapses[0].trigger);
       return {
         hasData: false,
@@ -1260,4 +1066,229 @@ export const generateRelapsePatternAnalysis = (userData) => {
       insights: ['Pattern analysis temporarily unavailable. Continue tracking relapses with triggers for future insights.']
     };
   }
+};
+
+// ============================================================
+// AI PATTERN DISCOVERY
+// Uses PatternLearningService for neural network insights
+// Requires 20+ days of tracking data
+// ============================================================
+
+export const discoverMLPatterns = async (userData) => {
+  try {
+    // Dynamic import to avoid circular dependencies
+    const { default: patternLearningService } = await import('../../services/PatternLearningService');
+    
+    const safeData = validateUserData(userData);
+    const daysTracked = safeData.benefitTracking?.length || 0;
+    const relapseCount = (safeData.streakHistory || []).filter(s => s.reason === 'relapse').length;
+    
+    // Require 20+ days for AI patterns
+    if (daysTracked < AI_PATTERNS_THRESHOLD) {
+      return { 
+        hasMLPatterns: false, 
+        patterns: [], 
+        reason: 'insufficient_data',
+        daysTracked,
+        daysRequired: AI_PATTERNS_THRESHOLD
+      };
+    }
+    
+    // Require at least 2 relapses for pattern learning
+    if (relapseCount < MIN_RELAPSES_FOR_PATTERNS) {
+      return {
+        hasMLPatterns: false,
+        patterns: [],
+        reason: 'insufficient_relapses',
+        relapseCount,
+        relapsesRequired: MIN_RELAPSES_FOR_PATTERNS
+      };
+    }
+    
+    // Check if model is trained
+    const status = patternLearningService.getTrainingStatus();
+    if (!status.isTrained) {
+      return { 
+        hasMLPatterns: false, 
+        patterns: [], 
+        reason: 'model_not_trained',
+        message: 'AI is learning your patterns'
+      };
+    }
+    
+    // Get model insights
+    const insights = patternLearningService.getModelInsights();
+    if (!insights) {
+      return { 
+        hasMLPatterns: false, 
+        patterns: [], 
+        reason: 'no_insights' 
+      };
+    }
+    
+    const patterns = [];
+    
+    // Convert AI insights to display patterns
+    if (insights.topRiskFactors && insights.topRiskFactors.length > 0) {
+      insights.topRiskFactors.slice(0, 3).forEach((factor) => {
+        const factorName = formatAIFactorName(factor.factor);
+        const importance = Math.round(factor.importance * 100);
+        if (importance >= 10) {
+          patterns.push({
+            type: 'risk_factor',
+            condition: factorName,
+            outcome: `${importance}% influence on your risk`,
+            confidence: factor.importance
+          });
+        }
+      });
+    }
+    
+    // Add temporal patterns if available
+    if (insights.temporalPatterns) {
+      if (insights.temporalPatterns.riskyHours?.length > 0) {
+        const hours = insights.temporalPatterns.riskyHours.slice(0, 3).map(h => formatHour(h)).join(', ');
+        patterns.push({
+          type: 'temporal',
+          condition: `Higher risk: ${hours}`,
+          outcome: 'Based on your historical patterns',
+          confidence: 0.7
+        });
+      }
+      
+      if (insights.temporalPatterns.riskyDays?.length > 0) {
+        const days = insights.temporalPatterns.riskyDays.slice(0, 2).map(d => formatDay(d)).join(', ');
+        patterns.push({
+          type: 'temporal',
+          condition: `${days} show elevated risk`,
+          outcome: 'Plan extra support on these days',
+          confidence: 0.7
+        });
+      }
+    }
+    
+    // Add streak-based patterns
+    if (insights.streakVulnerability?.dangerZone) {
+      const vuln = insights.streakVulnerability;
+      patterns.push({
+        type: 'streak',
+        condition: `Days ${vuln.dangerZone.start}-${vuln.dangerZone.end} critical`,
+        outcome: `${vuln.dangerZone.percentage}% of your relapses occur here`,
+        confidence: 0.85
+      });
+    }
+    
+    return {
+      hasMLPatterns: patterns.length > 0,
+      patterns,
+      modelAccuracy: status.lastAccuracy,
+      trainingDataPoints: status.totalDataPoints,
+      daysTracked,
+      relapseCount
+    };
+    
+  } catch (error) {
+    console.error('[AI Patterns] Error:', error);
+    return { 
+      hasMLPatterns: false, 
+      patterns: [], 
+      reason: 'error',
+      error: error.message 
+    };
+  }
+};
+
+// Generate AI-informed optimization suggestions
+export const generateMLOptimization = async (userData) => {
+  try {
+    const { default: patternLearningService } = await import('../../services/PatternLearningService');
+    
+    const safeData = validateUserData(userData);
+    const daysTracked = safeData.benefitTracking?.length || 0;
+    
+    if (daysTracked < AI_PATTERNS_THRESHOLD) {
+      return { hasMLSuggestions: false, suggestions: [], reason: 'insufficient_data' };
+    }
+    
+    const status = patternLearningService.getTrainingStatus();
+    if (!status.isTrained) {
+      return { hasMLSuggestions: false, suggestions: [], reason: 'model_not_trained' };
+    }
+    
+    const insights = patternLearningService.getModelInsights();
+    if (!insights) {
+      return { hasMLSuggestions: false, suggestions: [], reason: 'no_insights' };
+    }
+    
+    const suggestions = [];
+    
+    // Generate suggestions based on top risk factors
+    if (insights.topRiskFactors?.length > 0) {
+      const topFactor = insights.topRiskFactors[0];
+      const factorName = formatAIFactorName(topFactor.factor);
+      
+      suggestions.push(`**Primary Risk Factor**: ${factorName} has the strongest influence on your vulnerability. Build specific defenses for this pattern.`);
+    }
+    
+    // Temporal-based suggestions
+    if (insights.temporalPatterns?.riskyHours?.length > 0) {
+      const riskyHour = insights.temporalPatterns.riskyHours[0];
+      const hourStr = formatHour(riskyHour);
+      suggestions.push(`**High-Risk Window**: Your data shows elevated risk around ${hourStr}. Plan alternative activities or remove triggers during this time.`);
+    }
+    
+    if (insights.temporalPatterns?.riskyDays?.length > 0) {
+      const riskyDay = formatDay(insights.temporalPatterns.riskyDays[0]);
+      suggestions.push(`**${riskyDay} Alert**: This day shows higher vulnerability in your history. Schedule engaging activities and accountability check-ins.`);
+    }
+    
+    // Streak-based suggestions
+    if (insights.streakVulnerability?.dangerZone) {
+      const { start, end } = insights.streakVulnerability.dangerZone;
+      suggestions.push(`**Critical Period**: Days ${start}-${end} are your danger zone. Increase toolkit usage and social accountability during this window.`);
+    }
+    
+    return {
+      hasMLSuggestions: suggestions.length > 0,
+      suggestions,
+      modelAccuracy: status.lastAccuracy
+    };
+    
+  } catch (error) {
+    console.error('[AI Optimization] Error:', error);
+    return { hasMLSuggestions: false, suggestions: [], reason: 'error' };
+  }
+};
+
+// Helper: Format AI factor names for display
+const formatAIFactorName = (factor) => {
+  const factorMap = {
+    'hour': 'Time of day',
+    'dayOfWeek': 'Day of week',
+    'streakDay': 'Streak length',
+    'energy': 'Energy levels',
+    'focus': 'Focus levels',
+    'confidence': 'Confidence levels',
+    'sleep': 'Sleep quality',
+    'aura': 'Aura/presence',
+    'workout': 'Workout intensity',
+    'recentRelapseCount': 'Recent relapse frequency',
+    'avgBenefitScore': 'Overall benefit score',
+    'daysSinceLastRelapse': 'Recovery momentum'
+  };
+  return factorMap[factor] || factor.replace(/([A-Z])/g, ' $1').trim();
+};
+
+// Helper: Format hour for display
+const formatHour = (hour) => {
+  if (hour === 0) return '12 AM';
+  if (hour < 12) return `${hour} AM`;
+  if (hour === 12) return '12 PM';
+  return `${hour - 12} PM`;
+};
+
+// Helper: Format day for display
+const formatDay = (dayIndex) => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return days[dayIndex] || `Day ${dayIndex}`;
 };

@@ -577,7 +577,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               
               <div className="about-pillar">
                 <span className="pillar-name">Predictive Intelligence</span>
-                <span className="pillar-desc">On-device ML learns your patterns.</span>
+                <span className="pillar-desc">On-device AI learns your patterns.</span>
               </div>
               
               <div className="about-pillar">
