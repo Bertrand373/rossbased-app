@@ -1,5 +1,5 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// Pure typography design - no icons, no feedback buttons
+// Full screen modal matching Tracker/Calendar modal aesthetic
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -20,14 +20,12 @@ function PredictionDisplay({ userData }) {
     setIsLoading(true);
     
     try {
-      // Check if prediction was passed via navigation state
       if (location.state?.prediction) {
         setPrediction(location.state.prediction);
         setIsLoading(false);
         return;
       }
 
-      // Otherwise, get a fresh prediction
       if (!userData?.benefitTracking?.length) {
         setPrediction({ riskScore: 0, reason: 'No data available' });
         setIsLoading(false);
@@ -68,9 +66,9 @@ function PredictionDisplay({ userData }) {
   // Loading state
   if (isLoading) {
     return (
-      <div className="prediction-display">
-        <div className="prediction-loading">
-          <p className="loading-text">Analyzing patterns...</p>
+      <div className="prediction-overlay">
+        <div className="prediction-modal">
+          <p className="prediction-loading">Analyzing patterns...</p>
         </div>
       </div>
     );
@@ -79,116 +77,101 @@ function PredictionDisplay({ userData }) {
   const riskScore = prediction?.riskScore || 0;
   const riskInfo = getRiskInfo(riskScore);
   const patterns = prediction?.patterns;
+  const hasPatterns = patterns?.streak?.isHighRiskDay || 
+                      patterns?.time?.isHighRiskTime || 
+                      patterns?.benefits?.hasSignificantDrop || 
+                      prediction?.factors?.inPurgePhase;
 
   return (
-    <div className="prediction-display">
-      {/* Back button - text only */}
-      <button className="prediction-back" onClick={() => navigate('/')}>
-        ←
-      </button>
-
-      <div className="prediction-content">
-        {/* Header label */}
-        <p className="prediction-label">Pattern Analysis</p>
-
-        {/* Risk score */}
-        <div className="prediction-score-container">
-          <span className={`prediction-score ${riskInfo.level}`}>
-            {riskScore}
-          </span>
-          <span className="prediction-percent">%</span>
+    <div className="prediction-overlay">
+      <div className="prediction-modal">
+        
+        {/* Header */}
+        <div className="prediction-header">
+          <p className="prediction-label">Pattern Analysis</p>
+          <div className="prediction-score-row">
+            <span className="prediction-score">{riskScore}</span>
+            <span className="prediction-percent">%</span>
+          </div>
+          <p className="prediction-level">{riskInfo.label} Risk</p>
         </div>
 
-        <p className={`prediction-level ${riskInfo.level}`}>
-          {riskInfo.label} Risk
-        </p>
-
-        {/* Pattern insights - only show if elevated risk */}
-        {riskScore >= 50 && patterns && (
-          <div className="pattern-insights">
+        {/* Pattern insights - only for elevated risk */}
+        {riskScore >= 50 && hasPatterns && (
+          <div className="prediction-insights">
             
-            {/* Why this alert section */}
-            {(patterns.streak?.isHighRiskDay || patterns.time?.isHighRiskTime || patterns.benefits?.hasSignificantDrop || prediction?.factors?.inPurgePhase) && (
-              <div className="insight-section">
-                <p className="insight-header">Why this alert</p>
-                
-                {/* Streak day pattern */}
-                {patterns.streak?.isHighRiskDay && (
-                  <div className="insight-item">
-                    <p className="insight-title">Day {patterns.streak.currentDay}</p>
-                    <p className="insight-detail">
-                      You've relapsed {patterns.streak.relapsesInRange} of {patterns.streak.totalRelapses} times 
-                      between days {patterns.streak.rangeDays[0]}-{patterns.streak.rangeDays[1]}
-                    </p>
-                  </div>
-                )}
-                
-                {/* Time pattern */}
-                {patterns.time?.isHighRiskTime && (
-                  <div className="insight-item">
-                    <p className="insight-title">Evening hours</p>
-                    <p className="insight-detail">
-                      {patterns.time.eveningPercentage}% of your relapses happened after 8pm
-                    </p>
-                  </div>
-                )}
-                
-                {/* Benefit drops */}
-                {patterns.benefits?.hasSignificantDrop && patterns.benefits.drops.map((drop, i) => (
-                  <div className="insight-item" key={i}>
-                    <p className="insight-title">{drop.metric} dropped</p>
-                    <p className="insight-detail">
-                      From {drop.from} → {drop.to} over the last {patterns.benefits.daysCovered} days
-                    </p>
-                  </div>
-                ))}
-
-                {/* Purge phase */}
-                {prediction?.factors?.inPurgePhase && !patterns.streak?.isHighRiskDay && (
-                  <div className="insight-item">
-                    <p className="insight-title">Purge phase</p>
-                    <p className="insight-detail">
-                      Days 15-45 are typically the most challenging
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Historical match */}
-            {patterns.historical && (
-              <div className="insight-section">
-                <p className="insight-header">Historical match</p>
-                <p className="historical-text">
-                  Similar conditions on Day {patterns.historical.matchDay}
-                </p>
-                <p className="historical-outcome">
-                  {patterns.historical.daysUntilRelapse > 0 
-                    ? `Relapsed ${patterns.historical.daysUntilRelapse} days later`
-                    : 'Relapsed same day'
-                  }
+            <p className="insight-section-label">Why this alert</p>
+            
+            {patterns?.streak?.isHighRiskDay && (
+              <div className="insight-block">
+                <p className="insight-title">Day {patterns.streak.currentDay}</p>
+                <p className="insight-detail">
+                  You've relapsed {patterns.streak.relapsesInRange} of {patterns.streak.totalRelapses} times between days {patterns.streak.rangeDays[0]}-{patterns.streak.rangeDays[1]}
                 </p>
               </div>
             )}
+            
+            {patterns?.time?.isHighRiskTime && (
+              <div className="insight-block">
+                <p className="insight-title">Evening hours</p>
+                <p className="insight-detail">
+                  {patterns.time.eveningPercentage}% of your relapses happened after 8pm
+                </p>
+              </div>
+            )}
+            
+            {patterns?.benefits?.hasSignificantDrop && patterns.benefits.drops.map((drop, i) => (
+              <div className="insight-block" key={i}>
+                <p className="insight-title">{drop.metric} dropped</p>
+                <p className="insight-detail">
+                  From {drop.from} → {drop.to} over the last {patterns.benefits.daysCovered} days
+                </p>
+              </div>
+            ))}
 
-            {/* Suggested focus */}
-            {patterns.suggestions && patterns.suggestions.length > 0 && (
-              <div className="insight-section">
-                <p className="insight-header">Suggested focus</p>
-                {patterns.suggestions.map((suggestion, i) => (
-                  <div className="insight-item" key={i}>
-                    <p className="insight-title">{suggestion.focus}</p>
-                    <p className="insight-detail">{suggestion.reason}</p>
-                  </div>
-                ))}
+            {prediction?.factors?.inPurgePhase && !patterns?.streak?.isHighRiskDay && (
+              <div className="insight-block">
+                <p className="insight-title">Purge phase</p>
+                <p className="insight-detail">
+                  Days 15-45 are typically the most challenging
+                </p>
               </div>
             )}
           </div>
         )}
 
+        {/* Historical match */}
+        {riskScore >= 50 && patterns?.historical && (
+          <div className="prediction-insights">
+            <p className="insight-section-label">Historical match</p>
+            <p className="historical-line">
+              Similar conditions on Day {patterns.historical.matchDay}
+            </p>
+            <p className="historical-outcome">
+              {patterns.historical.daysUntilRelapse > 0 
+                ? `Relapsed ${patterns.historical.daysUntilRelapse} days later`
+                : 'Relapsed same day'
+              }
+            </p>
+          </div>
+        )}
+
+        {/* Suggested focus */}
+        {riskScore >= 50 && patterns?.suggestions?.length > 0 && (
+          <div className="prediction-insights">
+            <p className="insight-section-label">Suggested focus</p>
+            {patterns.suggestions.map((suggestion, i) => (
+              <div className="insight-block" key={i}>
+                <p className="insight-title">{suggestion.focus}</p>
+                <p className="insight-detail">{suggestion.reason}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Low risk message */}
         {riskScore < 50 && (
-          <p className="prediction-explanation">
+          <p className="prediction-message">
             Conditions look stable based on your patterns. Keep up the good work.
           </p>
         )}
@@ -198,34 +181,23 @@ function PredictionDisplay({ userData }) {
           This is pattern awareness, not prediction. You may feel fine—this is just a heads up based on your data.
         </p>
 
-        {/* Action buttons */}
-        {riskScore >= 50 && (
-          <div className="prediction-actions">
-            <button 
-              className="prediction-btn primary"
-              onClick={handleStruggling}
-            >
-              I'm struggling
-            </button>
-            <button 
-              className="prediction-btn secondary"
-              onClick={handleDismiss}
-            >
-              I'm fine
-            </button>
-          </div>
-        )}
-
-        {riskScore < 50 && (
-          <div className="prediction-actions">
-            <button 
-              className="prediction-btn secondary"
-              onClick={handleDismiss}
-            >
+        {/* Actions */}
+        <div className="prediction-actions">
+          {riskScore >= 50 ? (
+            <>
+              <button className="btn-ghost" onClick={handleDismiss}>
+                I'm fine
+              </button>
+              <button className="btn-primary" onClick={handleStruggling}>
+                I'm struggling
+              </button>
+            </>
+          ) : (
+            <button className="btn-ghost" onClick={handleDismiss}>
               Back to Dashboard
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Data context */}
         {prediction?.dataContext && (
@@ -236,6 +208,7 @@ function PredictionDisplay({ userData }) {
             }
           </p>
         )}
+
       </div>
     </div>
   );
