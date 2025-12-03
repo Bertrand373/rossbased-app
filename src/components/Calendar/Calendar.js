@@ -881,20 +881,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             {renderEditContent()}
 
             <div className="calendar-actions">
-              <button className="calendar-btn-ghost" onClick={closeEditModal}>
-                Cancel
-              </button>
-              {!showTriggerSelection && getEditOptions().type !== 'future' && (
-                <button className="calendar-btn-back" onClick={backToDayInfo}>
-                  Back
-                </button>
-              )}
-              {showTriggerSelection && (
-                <button className="calendar-btn-back" onClick={() => {
+              {showTriggerSelection ? (
+                <button className="calendar-btn-ghost" onClick={() => {
                   setShowTriggerSelection(false);
                   setEditingExistingTrigger(false);
                   setSelectedTrigger('');
                 }}>
+                  Back
+                </button>
+              ) : (
+                <button className="calendar-btn-ghost" onClick={backToDayInfo}>
                   Back
                 </button>
               )}
