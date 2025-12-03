@@ -455,11 +455,22 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
       };
     }
     
-    // FIXED: Calculate dynamic performance thresholds based on user's actual data
+    // FIXED: Calculate dynamic performance thresholds based on user's actual data - ALL 6 METRICS
     const calculateDynamicThresholds = (data) => {
-      const validEnergyData = data.map(d => d.energy || 0).filter(val => val >= 1 && val <= 10);
-      const validConfidenceData = data.map(d => d.confidence || 0).filter(val => val >= 1 && val <= 10);
-      const validSleepData = data.map(d => d.sleep || 0).filter(val => val >= 1 && val <= 10);
+      const getValidData = (metric) => {
+        if (metric === 'sleep') {
+          // Sleep may be stored as 'attraction' in older data
+          return data.map(d => d.sleep || d.attraction || 0).filter(val => val >= 1 && val <= 10);
+        }
+        return data.map(d => d[metric] || 0).filter(val => val >= 1 && val <= 10);
+      };
+      
+      const validEnergyData = getValidData('energy');
+      const validFocusData = getValidData('focus');
+      const validConfidenceData = getValidData('confidence');
+      const validAuraData = getValidData('aura');
+      const validSleepData = getValidData('sleep');
+      const validWorkoutData = getValidData('workout');
       
       if (validEnergyData.length < 5) {
         return null; // Not enough data for meaningful analysis
@@ -467,23 +478,32 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
       
       // Calculate percentiles for dynamic thresholds
       const getPercentile = (arr, percentile) => {
+        if (arr.length === 0) return 7; // Default threshold
         const sorted = [...arr].sort((a, b) => a - b);
         const index = Math.ceil((percentile / 100) * sorted.length) - 1;
         return sorted[Math.max(0, index)];
       };
       
-      // Use 75th percentile as "high performance" threshold
-      const energyThreshold = Math.max(7, getPercentile(validEnergyData, 75));
-      const confidenceThreshold = Math.max(6, getPercentile(validConfidenceData, 75));
-      const sleepThreshold = validSleepData.length >= 5 ? Math.max(7, getPercentile(validSleepData, 75)) : 7;
+      const getAverage = (arr) => {
+        if (arr.length === 0) return 5; // Default average
+        return arr.reduce((sum, val) => sum + val, 0) / arr.length;
+      };
       
+      // Use 75th percentile as "high performance" threshold for each metric
       return {
-        energy: energyThreshold,
-        confidence: confidenceThreshold,
-        sleep: sleepThreshold,
-        energyAvg: validEnergyData.reduce((sum, val) => sum + val, 0) / validEnergyData.length,
-        confidenceAvg: validConfidenceData.length > 0 ? validConfidenceData.reduce((sum, val) => sum + val, 0) / validConfidenceData.length : 5,
-        sleepAvg: validSleepData.length > 0 ? validSleepData.reduce((sum, val) => sum + val, 0) / validSleepData.length : 6
+        energy: Math.max(7, getPercentile(validEnergyData, 75)),
+        focus: Math.max(6, getPercentile(validFocusData, 75)),
+        confidence: Math.max(6, getPercentile(validConfidenceData, 75)),
+        aura: Math.max(6, getPercentile(validAuraData, 75)),
+        sleep: validSleepData.length >= 5 ? Math.max(7, getPercentile(validSleepData, 75)) : 7,
+        workout: Math.max(6, getPercentile(validWorkoutData, 75)),
+        // Averages for baseline comparison
+        energyAvg: getAverage(validEnergyData),
+        focusAvg: getAverage(validFocusData),
+        confidenceAvg: getAverage(validConfidenceData),
+        auraAvg: getAverage(validAuraData),
+        sleepAvg: getAverage(validSleepData),
+        workoutAvg: getAverage(validWorkoutData)
       };
     };
     
@@ -516,7 +536,15 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
     });
     
     const highPerformanceRate = allData.length > 0 ? (highPerformanceDays.length / allData.length * 100).toFixed(0) : '0';
-    const currentAvgEnergy = parseFloat(calculateAverage(safeData, selectedMetric, timeRange, isPremium));
+    const currentMetricAvg = parseFloat(calculateAverage(safeData, selectedMetric, timeRange, isPremium));
+    
+    // Helper for metric display name
+    const getMetricDisplayName = (metric) => {
+      if (metric === 'sleep') return 'sleep quality';
+      return metric;
+    };
+    const metricName = getMetricDisplayName(selectedMetric);
+    const metricNameCapitalized = metricName.charAt(0).toUpperCase() + metricName.slice(1);
     
     // FIXED: Generate phase-aware criteria labels
     const getCurrentPhaseFromStreak = (streak) => {
@@ -545,29 +573,33 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
       thresholds: thresholds
     };
     
-    // ENHANCED: Phase-aware performance context
-    const isCurrentlyHigh = currentAvgEnergy >= thresholds.energy && !isNaN(currentAvgEnergy);
-    const isAboveBaseline = currentAvgEnergy > thresholds.energyAvg && !isNaN(currentAvgEnergy);
+    // ENHANCED: Phase-aware performance context - USE SELECTED METRIC'S THRESHOLD
+    const metricKey = selectedMetric === 'sleep' ? 'sleep' : selectedMetric;
+    const selectedThreshold = thresholds[metricKey] || thresholds.energy;
+    const selectedAvg = thresholds[`${metricKey}Avg`] || thresholds.energyAvg;
+    
+    const isCurrentlyHigh = currentMetricAvg >= selectedThreshold && !isNaN(currentMetricAvg);
+    const isAboveBaseline = currentMetricAvg > selectedAvg && !isNaN(currentMetricAvg);
     
     if (isCurrentlyHigh) {
-      guidance.recommendations.push(`**${phase} Phase Peak Performance**: Your energy at ${currentAvgEnergy}/10 matches your top 25% of days. This is your optimal window for challenging decisions, intense workouts, and ambitious goals.`);
+      guidance.recommendations.push(`**${phase} Phase Peak Performance**: Your ${metricName} at ${currentMetricAvg}/10 matches your top 25% of days. This is your optimal window for challenging decisions, intense workouts, and ambitious goals.`);
       
       // Phase-specific peak performance guidance
       if (phase === 'Foundation') {
-        guidance.recommendations.push("**Foundation Phase Excellence**: High energy this early shows exceptional adaptation. Use this momentum to establish unbreakable daily routines and eliminate environmental triggers.");
+        guidance.recommendations.push(`**Foundation Phase Excellence**: High ${metricName} this early shows exceptional adaptation. Use this momentum to establish unbreakable daily routines and eliminate environmental triggers.`);
       } else if (phase === 'Expansion') {
-        guidance.recommendations.push("**Expansion Phase Optimization**: Peak mental clarity is active. This is the ideal time for learning new skills, making important decisions, and tackling complex projects.");
+        guidance.recommendations.push(`**Expansion Phase Optimization**: Peak ${metricName} is active. This is the ideal time for learning new skills, making important decisions, and tackling complex projects.`);
       } else if (phase === 'Integration' || phase === 'Mastery') {
-        guidance.recommendations.push("**Advanced Phase Mastery**: Your sustained high performance demonstrates spiritual-physical integration. Channel this energy into mentoring others and creating lasting value.");
+        guidance.recommendations.push(`**Advanced Phase Mastery**: Your sustained high ${metricName} demonstrates spiritual-physical integration. Channel this energy into mentoring others and creating lasting value.`);
       }
     } else if (isAboveBaseline) {
-      guidance.recommendations.push(`**Above Baseline Performance**: Energy at ${currentAvgEnergy}/10 exceeds your average (${thresholds.energyAvg.toFixed(1)}/10). Good for moderate challenges and steady progress.`);
+      guidance.recommendations.push(`**Above Baseline Performance**: ${metricNameCapitalized} at ${currentMetricAvg}/10 exceeds your average (${selectedAvg.toFixed(1)}/10). Good for moderate challenges and steady progress.`);
     } else {
-      guidance.recommendations.push(`**Integration Period**: Energy at ${currentAvgEnergy}/10 below your peak threshold (${thresholds.energy}/10). Natural recovery cycle - prioritize rest, reflection, and gentle activities.`);
+      guidance.recommendations.push(`**Integration Period**: ${metricNameCapitalized} at ${currentMetricAvg}/10 below your peak threshold (${selectedThreshold}/10). Natural recovery cycle - prioritize rest, reflection, and gentle activities.`);
       
       // Phase-specific low energy context
       if (phase === 'Purification') {
-        guidance.recommendations.push("**Purification Phase Normal**: Lower energy during days 15-45 indicates emotional purging. This temporary dip is therapeutic - maintain basic practices and trust the process.");
+        guidance.recommendations.push(`**Purification Phase Normal**: Lower ${metricName} during days 15-45 indicates emotional purging. This temporary dip is therapeutic - maintain basic practices and trust the process.`);
       }
     }
     
@@ -774,16 +806,49 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
     );
     
     if (completedPhases.length === 0) {
-      // Current phase insights based on wisdom from guide
-      const currentPhaseInsights = {
-        'foundation': `**Foundation Building**: Your ${selectedMetric} is stabilizing as your body learns to conserve vital force. Energy fluctuations are normal - your nervous system is adapting to higher frequencies.`,
-        'purification': `**Emotional Purging Active**: ${selectedMetric} patterns during days 15-45 reflect your psyche healing suppressed emotions. Lower scores are therapeutic - old patterns are being purged.`,
-        'expansion': `**Mental Transmutation**: ${selectedMetric} improvements show sexual energy converting to cognitive power. You're entering the alchemical refinement stage where raw energy becomes mental clarity.`,
-        'integration': `**Spiritual Integration**: ${selectedMetric} stability indicates major consciousness expansion. You're embodying the divine masculine archetype and developing natural magnetism.`,
-        'mastery': `**Service Orientation**: Your ${selectedMetric} consistency shows mastery - individual development now serves universal consciousness evolution. You're becoming a teacher and healer.`
+      // Current phase insights - metric-appropriate
+      const metricLabel = selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric;
+      
+      const getPhaseInsight = (phase, metric) => {
+        const genericInsights = {
+          'foundation': `**Foundation Building**: Your ${metricLabel} is stabilizing as your body adapts to retention. Fluctuations are normal during this initial phase.`,
+          'purification': `**Emotional Purging Active**: ${metricLabel} patterns during days 15-45 reflect internal healing. Lower scores can be therapeutic - old patterns are being released.`,
+          'expansion': `**Expansion Phase**: Your ${metricLabel} is developing as retained energy integrates. This phase brings noticeable improvements.`,
+          'integration': `**Spiritual Integration**: ${metricLabel} stability indicates deep adaptation. You're developing sustainable patterns.`,
+          'mastery': `**Mastery Phase**: Your ${metricLabel} consistency shows mastery. Sustained high performance is now your baseline.`
+        };
+        
+        // Metric-specific insights for more relevant guidance
+        if (metric === 'sleep') {
+          return {
+            'foundation': `**Foundation Building**: Your sleep quality is adjusting as your body adapts to retention. Sleep patterns often shift during this phase - trust the process.`,
+            'purification': `**Emotional Purging Active**: Sleep quality during days 15-45 may fluctuate as your psyche processes suppressed emotions. This is normal healing.`,
+            'expansion': `**Sleep Optimization**: Your nervous system is calming during expansion phase. Deeper, more restorative sleep becomes possible.`,
+            'integration': `**Sleep Integration**: Sleep quality stability indicates your body has fully adapted. Consistent rest now supports all other metrics.`,
+            'mastery': `**Sleep Mastery**: Your sleep quality consistency reflects internal harmony. Restoration happens naturally and efficiently.`
+          }[phase] || genericInsights[phase];
+        } else if (metric === 'energy') {
+          return {
+            'foundation': `**Foundation Building**: Your energy is stabilizing as your body learns to conserve vital force. Fluctuations are normal - your system is adapting.`,
+            'purification': `**Emotional Purging Active**: Energy during days 15-45 reflects internal healing. Lower levels are therapeutic - old blockages are being cleared.`,
+            'expansion': `**Energy Transmutation**: Your energy is converting into focused power. You're entering the stage where raw vitality becomes directed force.`,
+            'integration': `**Spiritual Integration**: Energy stability indicates major optimization. You're developing sustainable high-performance patterns.`,
+            'mastery': `**Service Orientation**: Your energy consistency shows mastery. Vital force now flows effortlessly and can be directed at will.`
+          }[phase] || genericInsights[phase];
+        } else if (metric === 'focus') {
+          return {
+            'foundation': `**Foundation Building**: Your focus is developing as mental fog begins to lift. Clarity comes in waves during this phase.`,
+            'purification': `**Mental Clearing**: Focus during days 15-45 may fluctuate as your mind releases old patterns. This is cognitive healing.`,
+            'expansion': `**Mental Transmutation**: Your focus is sharpening significantly. Sexual energy is converting to cognitive power and mental clarity.`,
+            'integration': `**Cognitive Integration**: Focus stability indicates your mind has become a precision instrument. Deep concentration is now accessible.`,
+            'mastery': `**Mental Mastery**: Your focus consistency shows cognitive mastery. Sustained attention is now your natural state.`
+          }[phase] || genericInsights[phase];
+        }
+        
+        return genericInsights[phase] || `Still building data in your current phase - evolution patterns will emerge as you progress.`;
       };
       
-      insights.push(currentPhaseInsights[currentPhase] || 'Still building data in your current phase - evolution patterns will emerge as you progress.');
+      insights.push(getPhaseInsight(currentPhase, selectedMetric));
     } else {
       // Find progression patterns
       const phaseOrder = ['foundation', 'purification', 'expansion', 'integration', 'mastery'];
@@ -807,21 +872,60 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
         }
       }
       
-      // ENHANCED: Phase-specific insights based on your guide's wisdom
+      // ENHANCED: Phase-specific insights - now contextually appropriate for each metric
+      const getMetricInsightContext = (metric) => {
+        const contexts = {
+          energy: {
+            expansion: 'This confirms successful transmutation of sexual energy into vitality and drive.',
+            integration: 'shows major life force optimization. You\'ve achieved sustainable high energy.',
+            mastery: 'Your vital energy now flows effortlessly. This is the reward of consistent practice.'
+          },
+          focus: {
+            expansion: 'This confirms successful transmutation of sexual energy into enhanced cognitive abilities.',
+            integration: 'shows major mental clarity gains. Your mind has become a precision instrument.',
+            mastery: 'Your mental power now serves higher purposes. Deep focus is your natural state.'
+          },
+          confidence: {
+            expansion: 'This confirms emotional stabilization and growing self-assurance.',
+            integration: 'shows you\'ve developed unshakeable inner certainty. You trust yourself deeply.',
+            mastery: 'Your confidence now radiates naturally. Others sense your grounded presence.'
+          },
+          aura: {
+            expansion: 'This confirms growing magnetic presence and social influence.',
+            integration: 'shows you\'ve developed natural charisma. People are drawn to your energy.',
+            mastery: 'Your presence now speaks before you do. This is the mark of retained power.'
+          },
+          sleep: {
+            expansion: 'This confirms your nervous system has adapted to retention. Deep rest comes naturally.',
+            integration: 'shows complete sleep optimization. Your body recovers efficiently.',
+            mastery: 'Your sleep quality reflects internal harmony. Restoration happens effortlessly.'
+          },
+          workout: {
+            expansion: 'This confirms physical adaptation to retained energy. Your body craves movement.',
+            integration: 'shows peak physical performance integration. Training feels natural.',
+            mastery: 'Your physical practice now sustains itself. The body has become a willing partner.'
+          }
+        };
+        return contexts[metric] || contexts.energy;
+      };
+      
+      const insightContext = getMetricInsightContext(selectedMetric);
+      const metricLabel = selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric;
+      
       if (phaseAverages.purification && phaseAverages.purification.average < 5.5) {
-        insights.push(`**Purification Phase Pattern**: ${selectedMetric} averaged ${phaseAverages.purification.average}/10 during emotional purging (days 15-45). Lower metrics during this phase are normal - your psyche was healing suppressed emotions.`);
+        insights.push(`**Purification Phase Pattern**: ${metricLabel} averaged ${phaseAverages.purification.average}/10 during emotional purging (days 15-45). Lower metrics during this phase are normal - your psyche was healing suppressed emotions.`);
       }
       
       if (phaseAverages.expansion && phaseAverages.expansion.average > 7) {
-        insights.push(`**Expansion Phase Success**: ${selectedMetric} peaked at ${phaseAverages.expansion.average}/10 during mental expansion (days 46-90). This confirms successful transmutation of sexual energy into enhanced cognitive abilities.`);
+        insights.push(`**Expansion Phase Success**: ${metricLabel} peaked at ${phaseAverages.expansion.average}/10 during mental expansion (days 46-90). ${insightContext.expansion}`);
       }
       
       if (phaseAverages.integration && phaseAverages.integration.average > 7.5) {
-        insights.push(`**Integration Mastery**: ${selectedMetric} at ${phaseAverages.integration.average}/10 during spiritual integration (days 91-180) shows major consciousness expansion. You embodied the divine masculine archetype.`);
+        insights.push(`**Integration Mastery**: ${metricLabel} at ${phaseAverages.integration.average}/10 during spiritual integration (days 91-180) ${insightContext.integration}`);
       }
       
       if (phaseAverages.mastery && phaseAverages.mastery.average > 8) {
-        insights.push(`**Service Excellence**: ${selectedMetric} maintains ${phaseAverages.mastery.average}/10 in mastery phase (180+ days). Your individual development now serves universal consciousness evolution.`);
+        insights.push(`**Service Excellence**: ${metricLabel} maintains ${phaseAverages.mastery.average}/10 in mastery phase (180+ days). ${insightContext.mastery}`);
       }
       
       // Current phase guidance
