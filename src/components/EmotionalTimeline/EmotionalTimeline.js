@@ -1,8 +1,9 @@
 // EmotionalTimeline.js - TITANTRACK MINIMAL
+// Matches Landing/Tracker/Stats aesthetic
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
-import { FaTimes, FaCheck, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
 const EmotionalTimeline = ({ userData, updateUserData }) => {
   const [activeTab, setActiveTab] = useState('journey');
@@ -17,7 +18,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     processing: 5
   });
   const [hasLoggedToday, setHasLoggedToday] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   const currentDay = userData?.currentStreak || 0;
 
@@ -214,35 +214,30 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const progress = getProgress();
 
-  // Check if logged today and load existing values
+  // Check if logged today
   useEffect(() => {
     if (userData?.emotionalLog) {
       const today = new Date().toDateString();
-      const todayLog = userData.emotionalLog.find(
-        log => new Date(log.date).toDateString() === today
-      );
-      if (todayLog) {
+      const lastLog = userData.emotionalLog[userData.emotionalLog.length - 1];
+      if (lastLog && new Date(lastLog.date).toDateString() === today) {
         setHasLoggedToday(true);
         setEmotions({
-          anxiety: todayLog.anxiety || 5,
-          mood: todayLog.mood || 5,
-          clarity: todayLog.clarity || 5,
-          processing: todayLog.processing || 5
+          anxiety: lastLog.anxiety || 5,
+          mood: lastLog.mood || 5,
+          clarity: lastLog.clarity || 5,
+          processing: lastLog.processing || 5
         });
       }
     }
-  }, [userData?.emotionalLog]);
+  }, [userData]);
 
-  // Analysis
-  const getAnalysis = () => {
-    if (!userData?.emotionalLog || userData.emotionalLog.length < 3) return null;
-    
-    const logs = userData.emotionalLog;
-    const recent = logs.slice(-14);
-    const older = logs.slice(0, -14);
-    
-    // Calculate averages
-    const avg = (arr, key) => arr.reduce((s, l) => s + (l[key] || 5), 0) / arr.length;
+  // Analyze emotional data
+  const analyzeEmotions = () => {
+    const log = userData?.emotionalLog || [];
+    if (log.length < 3) return null;
+
+    const recent = log.slice(-14);
+    const avg = (arr, key) => arr.reduce((sum, e) => sum + (e[key] || 5), 0) / arr.length;
     
     const recentAvg = {
       anxiety: avg(recent, 'anxiety'),
@@ -250,15 +245,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       clarity: avg(recent, 'clarity')
     };
     
+    const older = log.slice(0, -7);
     const olderAvg = older.length > 0 ? {
       anxiety: avg(older, 'anxiety'),
       mood: avg(older, 'mood'),
       clarity: avg(older, 'clarity')
-    } : null;
+    } : recentAvg;
     
-    // Trends
     const getTrend = (key, invert = false) => {
-      if (!olderAvg) return 'stable';
       const diff = recentAvg[key] - olderAvg[key];
       const threshold = 0.5;
       if (invert) {
@@ -270,16 +264,15 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       }
       return 'stable';
     };
-    
-    // Wellbeing score
+
     const wellbeing = Math.round(
       ((10 - recentAvg.anxiety) + recentAvg.mood + recentAvg.clarity) / 3 * 10
-    );
-    
+    ) / 10;
+
     return {
-      total: logs.length,
+      total: log.length,
       recent: recent.length,
-      wellbeing: `${wellbeing}%`,
+      wellbeing: wellbeing.toFixed(1),
       trends: {
         anxiety: getTrend('anxiety', true),
         mood: getTrend('mood'),
@@ -288,56 +281,29 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     };
   };
 
-  const analysis = getAnalysis();
+  const analysis = analyzeEmotions();
 
-  // Save handler
-  const handleSave = () => {
-    if (!userData) return;
-    
-    const today = new Date().toDateString();
-    const existingLogs = userData.emotionalLog || [];
-    
-    // Remove existing entry for today if editing
-    const filteredLogs = existingLogs.filter(
-      log => new Date(log.date).toDateString() !== today
-    );
-    
-    const newEntry = {
-      date: new Date(),
+  // Save check-in
+  const handleSave = async () => {
+    if (hasLoggedToday) return;
+
+    const entry = {
+      date: new Date().toISOString(),
       day: currentDay,
-      phase: currentPhase?.name || 'Unknown',
+      phase: currentPhase?.id || 1,
       ...emotions
     };
-    
-    updateUserData({ emotionalLog: [...filteredLogs, newEntry] });
-    setHasLoggedToday(true);
-    setIsEditing(false);
-    toast.success(isEditing ? 'Check-in updated' : 'Check-in saved');
-  };
 
-  // Enable editing
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  // Cancel editing
-  const handleCancelEdit = () => {
-    // Reload original values
-    if (userData?.emotionalLog) {
-      const today = new Date().toDateString();
-      const todayLog = userData.emotionalLog.find(
-        log => new Date(log.date).toDateString() === today
-      );
-      if (todayLog) {
-        setEmotions({
-          anxiety: todayLog.anxiety || 5,
-          mood: todayLog.mood || 5,
-          clarity: todayLog.clarity || 5,
-          processing: todayLog.processing || 5
-        });
-      }
+    try {
+      const existingLog = userData?.emotionalLog || [];
+      await updateUserData({
+        emotionalLog: [...existingLog, entry]
+      });
+      setHasLoggedToday(true);
+      toast.success('Check-in saved');
+    } catch (error) {
+      toast.error('Failed to save');
     }
-    setIsEditing(false);
   };
 
   // Open phase modal
@@ -346,30 +312,34 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     setShowModal(true);
   };
 
-  // Determine if sliders should be interactive
-  const slidersDisabled = hasLoggedToday && !isEditing;
+  // Slider items
+  const sliderItems = [
+    { key: 'anxiety', label: 'Anxiety Level', desc: '1 = calm, 10 = severe' },
+    { key: 'mood', label: 'Mood Stability', desc: '1 = volatile, 10 = stable' },
+    { key: 'clarity', label: 'Mental Clarity', desc: '1 = foggy, 10 = sharp' },
+    { key: 'processing', label: 'Emotional Processing', desc: '1 = blocked, 10 = flowing' }
+  ];
+
+  // Tab items
+  const tabs = [
+    { key: 'journey', label: 'Journey' },
+    { key: 'checkin', label: 'Check-in' },
+    { key: 'analysis', label: 'Analysis' }
+  ];
 
   return (
     <div className="et-container">
-      {/* Header */}
-      <header className="et-header">
-        <h1>Emotional Timeline</h1>
-        <p>Day {currentDay} · {currentPhase?.name}</p>
-      </header>
-
-      {/* Tabs - Text only with dividers */}
+      {/* Tabs - Text-only with dividers */}
       <nav className="et-tabs">
-        {['journey', 'checkin', 'analysis'].map((tab, index, arr) => (
-          <React.Fragment key={tab}>
+        {tabs.map((tab, index) => (
+          <React.Fragment key={tab.key}>
             <button
-              className={`et-tab ${activeTab === tab ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab)}
+              className={`et-tab ${activeTab === tab.key ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.key)}
             >
-              {tab === 'journey' && 'Journey'}
-              {tab === 'checkin' && 'Check-in'}
-              {tab === 'analysis' && 'Analysis'}
+              {tab.label}
             </button>
-            {index < arr.length - 1 && <span className="et-tab-divider" />}
+            {index < tabs.length - 1 && <div className="et-tab-divider" />}
           </React.Fragment>
         ))}
       </nav>
@@ -377,7 +347,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       {/* Journey Tab */}
       {activeTab === 'journey' && (
         <div className="et-journey">
-          {/* Current Phase Card */}
+          {/* Current Phase - Hero display */}
           <div className="et-current" onClick={() => openPhase(currentPhase)}>
             <div className="et-current-label">Current Phase</div>
             <h2 className="et-current-name">{currentPhase?.name}</h2>
@@ -394,7 +364,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             </div>
           </div>
 
-          {/* Phase List */}
+          {/* Phase List - Minimal */}
           <div className="et-phases">
             {phases.map((phase, index) => {
               const status = getPhaseStatus(phase);
@@ -421,138 +391,109 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Check-in Tab */}
+      {/* Check-in Tab - Tracker-style sliders */}
       {activeTab === 'checkin' && (
         <div className="et-checkin">
-          <div className="et-checkin-header">
-            <span className="et-checkin-label">Daily Check-in</span>
-            {hasLoggedToday && !isEditing && (
-              <button className="et-edit-btn" onClick={handleEdit}>
-                Edit
-              </button>
-            )}
-            {isEditing && (
-              <button className="et-cancel-btn" onClick={handleCancelEdit}>
-                Cancel
-              </button>
-            )}
-          </div>
+          <div className="et-checkin-header">Daily Check-in</div>
           
-          <div className={`et-sliders ${slidersDisabled ? 'disabled' : ''}`}>
-            {[
-              { key: 'anxiety', label: 'Anxiety Level', desc: '1 = calm, 10 = severe' },
-              { key: 'mood', label: 'Mood Stability', desc: '1 = volatile, 10 = stable' },
-              { key: 'clarity', label: 'Mental Clarity', desc: '1 = foggy, 10 = sharp' },
-              { key: 'processing', label: 'Emotional Processing', desc: '1 = blocked, 10 = flowing' }
-            ].map(({ key, label, desc }, index, arr) => (
-              <React.Fragment key={key}>
-                <div className="et-slider-group">
-                  <div className="et-slider-header">
-                    <span className="et-slider-label">{label}</span>
-                    <span className="et-slider-value">{emotions[key]}</span>
-                  </div>
-                  <div className="et-slider-track-wrapper">
-                    <input
-                      type="range"
-                      min="1"
-                      max="10"
-                      value={emotions[key]}
-                      onChange={(e) => setEmotions(prev => ({ ...prev, [key]: parseInt(e.target.value) }))}
-                      className="et-slider"
-                      disabled={slidersDisabled}
-                    />
-                  </div>
-                  <span className="et-slider-desc">{desc}</span>
+          <div className="et-sliders">
+            {sliderItems.map(({ key, label, desc }) => (
+              <div key={key} className={`et-slider-group ${hasLoggedToday ? 'disabled' : ''}`}>
+                <div className="et-slider-header">
+                  <span className="et-slider-label">{label}</span>
+                  <span className="et-slider-value">{emotions[key]}/10</span>
                 </div>
-                {index < arr.length - 1 && <div className="et-slider-divider" />}
-              </React.Fragment>
+                <div className="et-slider-wrap">
+                  <div 
+                    className="et-slider-fill" 
+                    style={{ width: `${((emotions[key] - 1) / 9) * 100}%` }}
+                  />
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={emotions[key]}
+                    onChange={(e) => setEmotions(prev => ({ 
+                      ...prev, 
+                      [key]: parseInt(e.target.value) 
+                    }))}
+                    className="et-slider"
+                    disabled={hasLoggedToday}
+                  />
+                </div>
+                <span className="et-slider-desc">{desc}</span>
+              </div>
             ))}
           </div>
 
           <button 
-            className={`et-save-btn ${slidersDisabled ? 'disabled' : ''}`}
-            onClick={handleSave}
-            disabled={slidersDisabled}
+            className={`et-save-btn ${hasLoggedToday ? 'disabled' : ''}`}
+            onClick={hasLoggedToday ? undefined : handleSave}
           >
-            {hasLoggedToday && !isEditing ? 'Logged Today' : isEditing ? 'Update Check-in' : 'Save Check-in'}
+            {hasLoggedToday ? 'Logged Today ✓' : 'Save Check-in'}
           </button>
         </div>
       )}
 
-      {/* Analysis Tab - Stats analytics style */}
+      {/* Analysis Tab - Horizontal stats with dividers */}
       {activeTab === 'analysis' && (
         <div className="et-analysis">
           {!analysis ? (
-            <div className="et-analysis-empty">
-              <p className="et-analysis-empty-title">Not Enough Data</p>
-              <p className="et-analysis-empty-text">
+            <div className="et-empty">
+              <p className="et-empty-title">Not Enough Data</p>
+              <p className="et-empty-text">
                 Complete at least 3 daily check-ins to unlock pattern analysis and personalized insights.
               </p>
             </div>
           ) : (
-            <div className="et-analysis-stack">
-              {/* Wellbeing Section */}
-              <div className="et-analysis-section">
-                <span className="et-analysis-label">Overall Wellbeing</span>
-                <div className="et-analysis-content">
-                  <span className="et-wellbeing-score">{analysis.wellbeing}</span>
-                  <p className="et-wellbeing-desc">
-                    Based on your anxiety, mood, and clarity scores over the past {analysis.recent} days.
-                  </p>
+            <>
+              <div className="et-stats-grid">
+                <div className="et-stat">
+                  <span className="et-stat-value">{analysis.wellbeing}</span>
+                  <span className="et-stat-label">Wellbeing</span>
+                </div>
+                <div className="et-stat-divider" />
+                <div className="et-stat">
+                  <span className="et-stat-value">{analysis.total}</span>
+                  <span className="et-stat-label">Data Points</span>
+                </div>
+                <div className="et-stat-divider" />
+                <div className="et-stat">
+                  <span className="et-stat-value">{analysis.recent}</span>
+                  <span className="et-stat-label">Recent</span>
                 </div>
               </div>
 
-              {/* Data Points Section */}
-              <div className="et-analysis-section">
-                <span className="et-analysis-label">Data Collection</span>
-                <div className="et-analysis-content">
-                  <div className="et-data-row">
-                    <span className="et-data-label">Total check-ins</span>
-                    <span className="et-data-value">{analysis.total}</span>
-                  </div>
-                  <div className="et-data-row">
-                    <span className="et-data-label">Recent (14 days)</span>
-                    <span className="et-data-value">{analysis.recent}</span>
-                  </div>
-                </div>
+              <div className="et-trends">
+                <h3>Trends</h3>
+                {[
+                  { key: 'anxiety', label: 'Anxiety', invert: true },
+                  { key: 'mood', label: 'Mood Stability' },
+                  { key: 'clarity', label: 'Mental Clarity' }
+                ].map(({ key, label, invert }) => {
+                  const trend = analysis.trends[key];
+                  const symbol = trend === 'improving' ? (invert ? '↓' : '↑') : 
+                                 trend === 'concerning' ? (invert ? '↑' : '↓') : '→';
+                  return (
+                    <div key={key} className="et-trend-row">
+                      <span className="et-trend-label">{label}</span>
+                      <span className={`et-trend-value ${trend}`}>
+                        {symbol} {trend.charAt(0).toUpperCase() + trend.slice(1)}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-
-              {/* Trends Section */}
-              <div className="et-analysis-section">
-                <span className="et-analysis-label">Trends</span>
-                <div className="et-analysis-content">
-                  {[
-                    { key: 'anxiety', label: 'Anxiety', invert: true },
-                    { key: 'mood', label: 'Mood Stability' },
-                    { key: 'clarity', label: 'Mental Clarity' }
-                  ].map(({ key, label, invert }) => {
-                    const trend = analysis.trends[key];
-                    const symbol = trend === 'improving' ? (invert ? '↓' : '↑') : 
-                                   trend === 'concerning' ? (invert ? '↑' : '↓') : '→';
-                    return (
-                      <div key={key} className="et-trend-row">
-                        <span className="et-trend-label">{label}</span>
-                        <span className={`et-trend-value ${trend}`}>
-                          {symbol} {trend.charAt(0).toUpperCase() + trend.slice(1)}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            </>
           )}
         </div>
       )}
 
-      {/* Phase Modal - Transparent floating */}
+      {/* Phase Modal - Sticky header/footer with scrollable body */}
       {showModal && selectedPhase && (
         <div className="et-overlay" onClick={() => setShowModal(false)}>
-          <button className="et-modal-close" onClick={() => setShowModal(false)}>
-            <FaTimes />
-          </button>
-          
           <div className="et-modal" onClick={e => e.stopPropagation()}>
+            {/* Sticky Header */}
             <div className="et-modal-header">
               <span className="et-modal-num">
                 {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
@@ -563,42 +504,48 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               </div>
             </div>
 
-            <div className="et-modal-body">
-              <div className="et-modal-section">
-                <h4>Overview</h4>
-                <p>{selectedPhase.description}</p>
-              </div>
+            {/* Scrollable Body */}
+            <div className="et-modal-scroll">
+              <div className="et-modal-body">
+                <div className="et-modal-section">
+                  <h4>Overview</h4>
+                  <p>{selectedPhase.description}</p>
+                </div>
 
-              <div className="et-modal-section">
-                <h4>The Science</h4>
-                <p>{selectedPhase.science}</p>
-              </div>
+                <div className="et-modal-section">
+                  <h4>The Science</h4>
+                  <p>{selectedPhase.science}</p>
+                </div>
 
-              <div className="et-modal-section">
-                <h4>What to Expect</h4>
-                <ul>
-                  {selectedPhase.symptoms.map((s, i) => <li key={i}>{s}</li>)}
-                </ul>
-              </div>
+                <div className="et-modal-section">
+                  <h4>What to Expect</h4>
+                  <ul>
+                    {selectedPhase.symptoms.map((s, i) => <li key={i}>{s}</li>)}
+                  </ul>
+                </div>
 
-              <div className="et-modal-section et-warning">
-                <h4><FaExclamationTriangle /> Warning Signs</h4>
-                <ul>
-                  {selectedPhase.warnings.map((w, i) => <li key={i}>{w}</li>)}
-                </ul>
-              </div>
+                <div className="et-modal-section et-warning">
+                  <h4><FaExclamationTriangle /> Warning Signs</h4>
+                  <ul>
+                    {selectedPhase.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                  </ul>
+                </div>
 
-              <div className="et-modal-section">
-                <h4>Techniques</h4>
-                <ul>
-                  {selectedPhase.techniques.map((t, i) => <li key={i}>{t}</li>)}
-                </ul>
+                <div className="et-modal-section">
+                  <h4>Techniques</h4>
+                  <ul>
+                    {selectedPhase.techniques.map((t, i) => <li key={i}>{t}</li>)}
+                  </ul>
+                </div>
               </div>
             </div>
-
-            <button className="et-modal-btn" onClick={() => setShowModal(false)}>
-              Close
-            </button>
+            
+            {/* Sticky Footer */}
+            <div className="et-modal-footer">
+              <button className="et-modal-btn" onClick={() => setShowModal(false)}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
