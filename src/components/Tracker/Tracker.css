@@ -38,6 +38,16 @@
   margin: 0 0 12px 0;
 }
 
+.time-separator {
+  margin: 0 6px;
+  opacity: 0.5;
+}
+
+.time {
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0.01em;
+}
+
 /* Streak - tappable */
 .streak {
   display: flex;

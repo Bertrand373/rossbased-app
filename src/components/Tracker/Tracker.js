@@ -1,6 +1,6 @@
 // Tracker.js - TITANTRACK
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { format, differenceInDays } from 'date-fns';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 import './Tracker.css';
@@ -21,21 +21,31 @@ const Tracker = ({ userData, updateUserData }) => {
     energy: 5, focus: 5, confidence: 5, aura: 5, sleep: 5, workout: 5 
   });
   
-  const fillRefs = useRef({});
-  const today = new Date();
+  // Live clock state - updates every minute
+  const [currentTime, setCurrentTime] = useState(new Date());
   
-  const streak = userData.startDate 
-    ? Math.max(0, differenceInDays(today, new Date(userData.startDate)) + 1)
-    : 0;
+  const fillRefs = useRef({});
+  
+  // Use stored currentStreak for consistency across all tabs
+  const streak = userData.currentStreak || 0;
 
   const todayLogged = userData.benefitTracking?.some(
-    b => format(new Date(b.date), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+    b => format(new Date(b.date), 'yyyy-MM-dd') === format(currentTime, 'yyyy-MM-dd')
   );
+
+  // Live clock effect - updates every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every 60 seconds
+    
+    return () => clearInterval(timer);
+  }, []);
 
   // Load existing benefits for today
   useEffect(() => {
     const existing = userData.benefitTracking?.find(
-      b => format(new Date(b.date), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+      b => format(new Date(b.date), 'yyyy-MM-dd') === format(currentTime, 'yyyy-MM-dd')
     );
     if (existing) {
       setBenefits({
@@ -47,7 +57,7 @@ const Tracker = ({ userData, updateUserData }) => {
         workout: existing.workout || 5
       });
     }
-  }, [userData.benefitTracking]);
+  }, [userData.benefitTracking, currentTime]);
 
   // Milestone calculation
   const getNextMilestone = () => {
@@ -64,7 +74,9 @@ const Tracker = ({ userData, updateUserData }) => {
 
   // Date submit - no toast, modal closing is confirmation
   const handleDateSubmit = (date) => {
-    const newStreak = Math.max(0, differenceInDays(today, date) + 1);
+    const now = new Date();
+    const daysDiff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+    const newStreak = Math.max(0, daysDiff);
     updateUserData({
       startDate: date,
       currentStreak: newStreak,
@@ -140,7 +152,7 @@ const Tracker = ({ userData, updateUserData }) => {
 
   // Save benefits - no toast, modal closing is confirmation
   const saveBenefits = () => {
-    const todayStr = format(today, 'yyyy-MM-dd');
+    const todayStr = format(currentTime, 'yyyy-MM-dd');
     const existing = userData.benefitTracking || [];
     const idx = existing.findIndex(b => format(new Date(b.date), 'yyyy-MM-dd') === todayStr);
     
@@ -279,7 +291,11 @@ const Tracker = ({ userData, updateUserData }) => {
 
       {/* Main */}
       <main className="tracker-main">
-        <p className="date">{format(today, 'EEEE, MMMM d')}</p>
+        <p className="date">
+          {format(currentTime, 'EEEE, MMMM d')}
+          <span className="time-separator">·</span>
+          <span className="time">{format(currentTime, 'h:mm a')}</span>
+        </p>
         
         <button className="streak" onClick={() => setShowStreakOptions(true)}>
           <span className="streak-num">{streak}</span>
