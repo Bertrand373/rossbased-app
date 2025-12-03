@@ -1,16 +1,19 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
 // Full screen modal matching Tracker/Calendar modal aesthetic
+// Integrated with InterventionService for outcome tracking
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './PredictionDisplay.css';
 import mlPredictionService from '../../services/MLPredictionService';
+import interventionService from '../../services/InterventionService';
 
 function PredictionDisplay({ userData }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [prediction, setPrediction] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [interventionId, setInterventionId] = useState(null);
 
   useEffect(() => {
     loadPrediction();
@@ -20,8 +23,20 @@ function PredictionDisplay({ userData }) {
     setIsLoading(true);
     
     try {
+      // Check if intervention ID was passed
+      if (location.state?.interventionId) {
+        setInterventionId(location.state.interventionId);
+      }
+      
       if (location.state?.prediction) {
         setPrediction(location.state.prediction);
+        
+        // Create intervention if not already passed
+        if (!location.state?.interventionId) {
+          const id = interventionService.createIntervention(location.state.prediction);
+          setInterventionId(id);
+        }
+        
         setIsLoading(false);
         return;
       }
@@ -35,6 +50,12 @@ function PredictionDisplay({ userData }) {
       await mlPredictionService.initialize();
       const result = await mlPredictionService.predict(userData);
       setPrediction(result);
+      
+      // Create intervention for fresh prediction
+      if (result.riskScore >= 50) {
+        const id = interventionService.createIntervention(result);
+        setInterventionId(id);
+      }
     } catch (error) {
       console.error('Prediction error:', error);
       setPrediction({ riskScore: 0, reason: 'Unable to analyze patterns' });
@@ -44,9 +65,15 @@ function PredictionDisplay({ userData }) {
   };
 
   const handleStruggling = () => {
+    // Record that user acknowledged they're struggling
+    if (interventionId) {
+      interventionService.recordResponse(interventionId, 'struggling');
+    }
+    
     navigate('/urge-toolkit', { 
       state: { 
         fromPrediction: true,
+        interventionId: interventionId,
         riskScore: prediction?.riskScore,
         suggestedTools: prediction?.patterns?.suggestions?.[0]?.tools 
       } 
@@ -54,6 +81,11 @@ function PredictionDisplay({ userData }) {
   };
 
   const handleDismiss = () => {
+    // Record that user said they're fine
+    if (interventionId) {
+      interventionService.recordResponse(interventionId, 'fine');
+    }
+    
     navigate('/');
   };
 

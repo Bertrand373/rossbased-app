@@ -1,16 +1,19 @@
 // src/components/PatternInsight/PatternInsightCard.js
 // Ambient AI pattern awareness - floating minimal design
+// Integrated with InterventionService for outcome tracking
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PatternInsightCard.css';
 import mlPredictionService from '../../services/MLPredictionService';
+import interventionService from '../../services/InterventionService';
 
 const PatternInsightCard = ({ userData }) => {
   const navigate = useNavigate();
   const [insight, setInsight] = useState(null);
   const [isDismissed, setIsDismissed] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const interventionIdRef = useRef(null);
 
   useEffect(() => {
     checkForInsight();
@@ -45,16 +48,16 @@ const PatternInsightCard = ({ userData }) => {
 
       const prediction = await mlPredictionService.predict(userData);
       
-      // Show for elevated risk (50%+) - works with both ML and fallback predictions
-      // For seeded test data, also show if fallback gives high enough score
+      // Show for elevated risk (50%+)
       if (prediction.riskScore < 50) {
         return;
       }
 
-      setInsight({
-        riskScore: prediction.riskScore,
-        reason: prediction.reason
-      });
+      setInsight(prediction);
+      
+      // Create intervention when alert is shown
+      // This tracks that the user was shown an alert
+      interventionIdRef.current = interventionService.createIntervention(prediction);
 
       // Animate in after a short delay
       setTimeout(() => setIsVisible(true), 500);
@@ -65,6 +68,11 @@ const PatternInsightCard = ({ userData }) => {
   };
 
   const handleDismiss = () => {
+    // Record that user dismissed/ignored the alert
+    if (interventionIdRef.current) {
+      interventionService.recordResponse(interventionIdRef.current, 'dismissed');
+    }
+    
     setIsVisible(false);
     setTimeout(() => {
       setIsDismissed(true);
@@ -73,7 +81,13 @@ const PatternInsightCard = ({ userData }) => {
   };
 
   const handleViewInsights = () => {
-    navigate('/urge-prediction');
+    // Pass the prediction data AND intervention ID
+    navigate('/urge-prediction', { 
+      state: { 
+        prediction: insight,
+        interventionId: interventionIdRef.current
+      } 
+    });
   };
 
   // Don't render if dismissed or no insight
