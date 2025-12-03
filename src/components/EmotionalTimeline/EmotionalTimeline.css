@@ -1,6 +1,6 @@
 /* =============================================================================
    EMOTIONALTIMELINE.CSS - TITANTRACK MINIMAL
-   Matches Landing/Tracker/Stats aesthetic - no header, flowing content
+   Matches Tracker/Calendar/Stats/Profile aesthetic exactly
    ============================================================================= */
 
 /* =============================================================================
@@ -11,48 +11,63 @@
   min-height: calc(100dvh - 56px - 80px);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 48px 24px 120px;
+  padding: 24px;
+  padding-bottom: 120px;
   background-color: #000000;
+  max-width: 500px;
+  margin: 0 auto;
   width: 100%;
 }
 
 @media (min-width: 1025px) {
   .et-container {
     min-height: calc(100dvh - 64px);
-    padding: 56px 24px 80px;
-  }
-  
-  .et-container > * {
-    max-width: 480px;
-  }
-  
-  /* Overlay must break out of max-width constraint */
-  .et-container > .et-overlay {
-    max-width: none;
-    width: 100%;
+    padding: 32px 24px 60px;
+    max-width: 560px;
   }
 }
 
 /* =============================================================================
-   TABS - Text-only with dividers (matches Calendar/Stats)
+   HEADER - Matches other tabs exactly
+   ============================================================================= */
+
+.et-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.et-header h1 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.et-header p {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 8px 0 0 0;
+  font-weight: 400;
+}
+
+/* =============================================================================
+   TABS - Text only with dividers (matches nav pattern)
    ============================================================================= */
 
 .et-tabs {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 0;
-  margin-bottom: 48px;
-  animation: fadeInUp 500ms ease forwards;
-  opacity: 0;
+  margin-bottom: 32px;
 }
 
 .et-tab {
   padding: 8px 16px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.3);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
@@ -72,8 +87,9 @@
 
 .et-tab-divider {
   width: 1px;
-  height: 16px;
-  background-color: rgba(255, 255, 255, 0.1);
+  height: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 /* =============================================================================
@@ -83,122 +99,118 @@
 .et-journey {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 400px;
-  animation: fadeInUp 500ms ease 50ms forwards;
-  opacity: 0;
+  gap: 24px;
 }
 
-/* Current Phase - Hero display like Tracker streak */
+/* Current Phase Card */
 .et-current {
   text-align: center;
-  padding: 0 0 48px 0;
+  padding: 32px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 40px;
 }
 
 .et-current:hover {
-  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .et-current:active {
-  opacity: 0.6;
+  transform: scale(0.99);
 }
 
 .et-current-label {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .et-current-name {
-  font-size: 1.375rem;
+  font-size: 1.5rem;
   font-weight: 500;
   color: #ffffff;
-  margin: 0 0 8px 0;
+  margin: 0 0 4px 0;
   letter-spacing: -0.02em;
 }
 
 .et-current-days {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.35);
-  margin: 0 0 32px 0;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 24px 0;
 }
 
 /* Progress */
 .et-progress {
-  max-width: 240px;
+  max-width: 260px;
   margin: 0 auto;
 }
 
 .et-progress-bar {
-  height: 2px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 1px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .et-progress-fill {
   height: 100%;
   background: #ffffff;
-  border-radius: 1px;
+  border-radius: 2px;
   transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .et-progress-text {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.35);
 }
 
-/* Phase List - Minimal, no containers */
+/* Phase List */
 .et-phases {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 8px;
 }
 
 .et-phase {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px 0;
+  padding: 16px;
   background: transparent;
-  border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.et-phase:last-child {
-  border-bottom: none;
-}
-
 .et-phase:hover {
-  opacity: 0.7;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .et-phase:active {
-  opacity: 0.5;
+  transform: scale(0.99);
 }
 
 .et-phase-num {
   font-size: 0.75rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.2);
   font-feature-settings: 'tnum' 1;
   min-width: 24px;
 }
 
 .et-phase.completed .et-phase-num {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .et-phase.current .et-phase-num {
@@ -213,298 +225,212 @@
   font-size: 0.9375rem;
   font-weight: 500;
   color: #ffffff;
-  margin: 0 0 4px 0;
+  margin: 0 0 2px 0;
   letter-spacing: -0.01em;
 }
 
 .et-phase.upcoming .et-phase-info h3 {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .et-phase-info p {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.35);
   margin: 0;
 }
 
 .et-phase-status {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.2);
   width: 20px;
   display: flex;
   justify-content: center;
 }
 
 .et-phase.completed .et-phase-status {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* =============================================================================
-   CHECK-IN TAB - Clean slider styling
+   CHECK-IN TAB
    ============================================================================= */
 
 .et-checkin {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 360px;
-  animation: fadeInUp 500ms ease 50ms forwards;
-  opacity: 0;
+  gap: 24px;
 }
 
-/* Section header */
+/* Check-in Header with Edit button */
 .et-checkin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.et-checkin-label {
   font-size: 0.6875rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  text-align: center;
-  margin-bottom: 40px;
+}
+
+.et-edit-btn,
+.et-cancel-btn {
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.et-edit-btn:hover,
+.et-cancel-btn:hover {
+  color: #ffffff;
 }
 
 /* Sliders container */
 .et-sliders {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  margin-bottom: 48px;
-  text-align: left;
+  gap: 0;
 }
 
-/* Slider group */
+.et-slider-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.04);
+  margin: 8px 0;
+}
+
 .et-slider-group {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  padding: 16px 0;
 }
 
-/* Slider header - white label, muted value */
+.et-slider-group:first-child {
+  padding-top: 0;
+}
+
+.et-slider-group:last-child {
+  padding-bottom: 0;
+}
+
 .et-slider-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
 }
 
 .et-slider-label {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
-  color: #ffffff;
 }
 
 .et-slider-value {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
   font-feature-settings: 'tnum' 1;
+  min-width: 24px;
+  text-align: right;
 }
 
-/* Slider container */
-.et-slider-wrap {
+/* Slider track wrapper */
+.et-slider-track-wrapper {
   position: relative;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  background: transparent;
-  border: none;
-  box-shadow: none;
 }
 
-/* Track background */
-.et-slider-wrap::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: rgba(255, 255, 255, 0.12);
-  border-radius: 1px;
-  pointer-events: none;
-}
-
-/* Fill bar */
-.et-slider-fill {
-  position: absolute;
-  left: 0;
-  height: 2px;
-  background-color: #ffffff;
-  border-radius: 1px;
-  pointer-events: none;
-  transition: width 50ms ease-out;
-}
-
-/* Input */
+/* Slider - Active state */
 .et-slider {
-  position: relative;
+  -webkit-appearance: none;
+  appearance: none;
   width: 100%;
-  height: 20px;
-  margin: 0;
-  padding: 0;
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  border-radius: 0;
-  outline: none !important;
-  box-shadow: none !important;
-  cursor: pointer;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Track - completely transparent */
-.et-slider::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 2px;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0;
-  box-shadow: none;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  outline: none;
   cursor: pointer;
 }
 
-.et-slider::-moz-range-track {
-  width: 100%;
-  height: 2px;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  cursor: pointer;
-}
-
-/* MS Edge */
-.et-slider::-ms-track {
-  width: 100%;
-  height: 2px;
-  background: transparent;
-  border: none;
-  color: transparent;
-}
-
-.et-slider::-ms-fill-lower,
-.et-slider::-ms-fill-upper {
-  background: transparent;
-  border: none;
-}
-
-/* Thumb */
 .et-slider::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 18px;
-  height: 18px;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
   background: #ffffff;
-  border: none !important;
   border-radius: 50%;
   cursor: pointer;
-  margin-top: -8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   transition: transform 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.et-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.et-slider::-webkit-slider-thumb:active {
+  transform: scale(1.05);
 }
 
 .et-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   background: #ffffff;
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
-
-.et-slider::-ms-thumb {
-  width: 18px;
-  height: 18px;
-  background: #ffffff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-/* Hover/active states */
-.et-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-.et-slider::-moz-range-thumb:hover {
-  transform: scale(1.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+/* Disabled state - hide track, ghost thumb */
+.et-sliders.disabled .et-slider {
+  cursor: default;
+  background: transparent;
 }
 
-.et-slider:active::-webkit-slider-thumb {
-  transform: scale(1.1);
-}
-
-.et-slider:active::-moz-range-thumb {
-  transform: scale(1.1);
-}
-
-/* Focus state */
-.et-slider:focus {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.et-slider:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-.et-slider:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-/* Disabled state - locked appearance */
-.et-slider:disabled {
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.et-slider:disabled::-webkit-slider-thumb {
-  cursor: not-allowed;
+.et-sliders.disabled .et-slider::-webkit-slider-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: none;
+  cursor: default;
   transform: none;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  opacity: 0.5;
 }
 
-.et-slider:disabled::-moz-range-thumb {
-  cursor: not-allowed;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  opacity: 0.5;
+.et-sliders.disabled .et-slider::-moz-range-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: none;
+  cursor: default;
 }
 
-/* Dim the fill and track when disabled */
-.et-slider-group.disabled .et-slider-fill {
-  opacity: 0.5;
+.et-sliders.disabled .et-slider-label {
+  color: rgba(255, 255, 255, 0.4);
 }
 
-.et-slider-group.disabled .et-slider-wrap::before {
-  opacity: 0.6;
+.et-sliders.disabled .et-slider-value {
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.et-slider-group.disabled .et-slider-label,
-.et-slider-group.disabled .et-slider-value {
-  opacity: 0.5;
+.et-sliders.disabled .et-slider-desc {
+  color: rgba(255, 255, 255, 0.2);
 }
 
-.et-slider-group.disabled .et-slider-desc {
-  opacity: 0.5;
-}
-
-/* Description text below slider */
 .et-slider-desc {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.25);
-  margin-top: -4px;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.3);
 }
 
-/* Save Button - Match Tracker .btn-primary */
+/* Save Button */
 .et-save-btn {
   width: 100%;
   padding: 16px 24px;
@@ -512,12 +438,13 @@
   border: none;
   border-radius: 12px;
   color: #000000;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  margin-top: 8px;
 }
 
 .et-save-btn:hover:not(.disabled) {
@@ -530,89 +457,132 @@
 
 .et-save-btn.disabled {
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-}
-
-.et-save-btn.disabled:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: default;
 }
 
 /* =============================================================================
-   ANALYSIS TAB - Containerless, flowing content
+   ANALYSIS TAB - Matches Stats analytics section exactly
    ============================================================================= */
 
 .et-analysis {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 400px;
-  animation: fadeInUp 500ms ease 50ms forwards;
-  opacity: 0;
 }
 
-/* Stats - Horizontal with dividers (like Stats page) */
-.et-stats-grid {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
-  padding-bottom: 40px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 40px;
+/* Empty State - Matches Stats insight-empty */
+.et-analysis-empty {
+  text-align: center;
+  padding: 40px 0;
 }
 
-.et-stat {
+.et-analysis-empty-title {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+.et-analysis-empty-text {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Analytics Stack - Flowing content with dividers */
+.et-analysis-stack {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 0 16px;
+  gap: 0;
 }
 
-.et-stat-divider {
-  width: 1px;
-  height: 40px;
-  background-color: rgba(255, 255, 255, 0.08);
+/* Analysis Section - No containers, transparent */
+.et-analysis-section {
+  background: transparent;
+  border: none;
+  padding-bottom: 28px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.et-stat-value {
-  font-size: 2rem;
-  font-weight: 500;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-  font-feature-settings: 'tnum' 1;
-  line-height: 1;
+.et-analysis-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
-.et-stat-label {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-/* Trends - Containerless, flowing */
-.et-trends {
-  padding: 0;
-}
-
-.et-trends h3 {
+.et-analysis-label {
+  display: block;
   font-size: 0.6875rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin: 0 0 24px 0;
+  margin-bottom: 16px;
 }
 
+.et-analysis-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Wellbeing Score */
+.et-wellbeing-score {
+  font-size: 2.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  font-feature-settings: 'tnum' 1;
+}
+
+.et-wellbeing-desc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Data Rows */
+.et-data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.et-data-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.et-data-row:first-child {
+  padding-top: 0;
+}
+
+.et-data-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.et-data-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Trend Rows */
 .et-trend-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 0;
+  padding: 12px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -621,19 +591,23 @@
   padding-bottom: 0;
 }
 
+.et-trend-row:first-child {
+  padding-top: 0;
+}
+
 .et-trend-label {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.5);
 }
 
 .et-trend-value {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .et-trend-value.improving {
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .et-trend-value.stable {
@@ -644,50 +618,34 @@
   color: rgba(255, 255, 255, 0.35);
 }
 
-/* Empty State - Minimal */
-.et-empty {
-  text-align: center;
-  padding: 48px 24px;
-}
-
-.et-empty-title {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 12px 0;
-}
-
-.et-empty-text {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.3);
-  line-height: 1.7;
-  margin: 0;
-  max-width: 280px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 /* =============================================================================
-   MODAL - Sticky header/footer with scrollable body (matches Tracker/Calendar)
+   MODAL - Transparent floating style matching Tracker/Calendar
    ============================================================================= */
 
 .et-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   z-index: 10000;
   padding: 24px;
-  padding-top: max(24px, env(safe-area-inset-top));
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
-  padding-left: max(24px, env(safe-area-inset-left));
-  padding-right: max(24px, env(safe-area-inset-right));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   animation: etOverlayIn 200ms ease;
+}
+
+.et-overlay::before,
+.et-overlay::after {
+  content: '';
+  flex: 1;
+  min-height: 40px;
 }
 
 @keyframes etOverlayIn {
@@ -697,12 +655,10 @@
 
 .et-modal {
   width: 100%;
-  max-width: 340px;
-  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-width: 380px;
   background: transparent;
   text-align: left;
-  display: flex;
-  flex-direction: column;
+  flex-shrink: 0;
   animation: etModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -717,27 +673,26 @@
   }
 }
 
-/* Modal Header - Sticky at top */
+/* Modal Header */
 .et-modal-header {
-  flex-shrink: 0;
   display: flex;
   align-items: flex-start;
   gap: 16px;
+  margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .et-modal-num {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.15);
   font-feature-settings: 'tnum' 1;
   line-height: 1;
 }
 
 .et-modal-header h2 {
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   font-weight: 500;
   color: #ffffff;
   margin: 0 0 4px 0;
@@ -746,27 +701,44 @@
 
 .et-modal-header p {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   margin: 0;
 }
 
-/* Scrollable content area */
-.et-modal-scroll {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  min-height: 0;
-  padding: 32px 0;
+/* Modal Close - Small X in corner */
+.et-modal-close {
+  position: fixed;
+  top: max(24px, env(safe-area-inset-top, 24px));
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 10001;
+}
+
+.et-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 /* Modal Body */
 .et-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 28px;
 }
 
-/* Modal Sections - Containerless */
+/* Modal Sections */
 .et-modal-section {
   padding: 0;
 }
@@ -774,7 +746,7 @@
 .et-modal-section h4 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0 0 12px 0;
@@ -782,7 +754,7 @@
 
 .et-modal-section p {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.65);
   line-height: 1.7;
   margin: 0;
 }
@@ -793,55 +765,53 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .et-modal-section li {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.55);
-  line-height: 1.6;
-  padding-left: 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  padding-left: 16px;
   position: relative;
 }
 
 .et-modal-section li::before {
-  display: none;
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
 }
 
-/* Warning Section */
+/* Warning Section - Subtle, not harsh */
 .et-warning {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 24px 0 0 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
 }
 
 .et-warning h4 {
-  color: rgba(255, 255, 255, 0.4) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .et-warning h4 svg {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.et-warning li {
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* Modal Footer - Sticky at bottom */
-.et-modal-footer {
-  flex-shrink: 0;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: transparent;
+.et-warning li::before {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Modal Button - Ghost style */
+/* Modal Button - Ghost style, not primary */
 .et-modal-btn {
   width: 100%;
   padding: 16px 24px;
@@ -854,6 +824,7 @@
   font-family: inherit;
   cursor: pointer;
   transition: color 150ms ease;
+  margin-top: 32px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -862,48 +833,40 @@
 }
 
 /* =============================================================================
-   ANIMATIONS
-   ============================================================================= */
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* =============================================================================
    RESPONSIVE
    ============================================================================= */
 
 @media (max-width: 480px) {
   .et-container {
-    padding: 32px 16px 100px;
+    padding: 20px 16px 120px;
+  }
+  
+  .et-header h1 {
+    font-size: 1.125rem;
   }
   
   .et-tabs {
-    margin-bottom: 40px;
+    align-self: stretch;
+    justify-content: space-between;
   }
   
   .et-tab {
-    padding: 8px 12px;
+    flex: 1;
+    padding: 8px 8px;
     font-size: 0.8125rem;
+    text-align: center;
+  }
+  
+  .et-current {
+    padding: 28px 20px;
   }
   
   .et-current-name {
-    font-size: 1.25rem;
-  }
-  
-  .et-current-days {
-    margin-bottom: 28px;
+    font-size: 1.375rem;
   }
   
   .et-phase {
-    padding: 16px 0;
+    padding: 14px;
     gap: 12px;
   }
   
@@ -911,43 +874,12 @@
     font-size: 0.875rem;
   }
   
-  .et-sliders {
-    gap: 28px;
+  .et-slider-group {
+    padding: 14px 0;
   }
   
-  .et-slider-label {
-    font-size: 0.875rem;
-  }
-  
-  .et-slider-value {
-    font-size: 0.875rem;
-  }
-  
-  .et-slider-desc {
-    font-size: 0.6875rem;
-  }
-  
-  .et-save-btn {
-    padding: 16px 20px;
-    font-size: 0.9375rem;
-  }
-  
-  .et-stats-grid {
-    gap: 16px;
-    padding-bottom: 32px;
-    margin-bottom: 32px;
-  }
-  
-  .et-stat {
-    padding: 0 12px;
-  }
-  
-  .et-stat-value {
-    font-size: 1.75rem;
-  }
-  
-  .et-stat-divider {
-    height: 32px;
+  .et-wellbeing-score {
+    font-size: 2rem;
   }
   
   .et-modal {
@@ -956,6 +888,7 @@
   
   .et-modal-header {
     gap: 12px;
+    margin-bottom: 28px;
     padding-bottom: 20px;
   }
   
@@ -975,49 +908,11 @@
   }
   
   .et-modal-body {
-    gap: 28px;
+    gap: 24px;
   }
   
-  .et-modal-section p,
-  .et-modal-section li {
+  .et-modal-section p {
     font-size: 0.875rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .et-container {
-    padding: 28px 12px 90px;
-  }
-  
-  .et-stats-grid {
-    gap: 12px;
-  }
-  
-  .et-stat {
-    padding: 0 8px;
-  }
-  
-  .et-stat-value {
-    font-size: 1.5rem;
-  }
-  
-  .et-stat-divider {
-    height: 28px;
-  }
-}
-
-/* Desktop enhancements */
-@media (min-width: 768px) {
-  .et-current-name {
-    font-size: 2.25rem;
-  }
-  
-  .et-stat-value {
-    font-size: 2.25rem;
-  }
-  
-  .et-modal {
-    max-width: 360px;
   }
 }
 
@@ -1026,19 +921,13 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .et-tabs,
-  .et-journey,
-  .et-checkin,
-  .et-analysis {
-    animation: none;
-    opacity: 1;
-  }
-  
   .et-overlay,
   .et-modal,
   .et-progress-fill,
   .et-slider::-webkit-slider-thumb,
-  .et-slider-fill {
+  .et-phase,
+  .et-current,
+  .et-save-btn {
     animation: none;
     transition: none;
   }
