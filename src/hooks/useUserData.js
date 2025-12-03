@@ -1,4 +1,4 @@
-// src/hooks/useUserData.js - FIXED: Clears ML data when switching users + AI Card Test User
+// src/hooks/useUserData.js - UPDATED: 12-feature ML model support + Clears ML data when switching users
 import { useState, useEffect } from 'react';
 import { addDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -96,6 +96,7 @@ export const useUserData = () => {
   };
 
   // Seed ML data for AI card test user so the PatternInsightCard shows
+  // UPDATED: Now 12 features including ET emotional data
   const seedMLDataForTesting = () => {
     const trainingHistory = {
       accuracy: [0.72, 0.75, 0.78],
@@ -104,15 +105,17 @@ export const useUserData = () => {
       totalEpochs: 150
     };
     
+    // 12 features: energy, focus, confidence, energyDrop, hourOfDay, isWeekend, 
+    // streakDay, inPurgePhase, anxiety, moodStability, mentalClarity, emotionalProcessing
     const normalizationStats = {
-      means: [6.5, 6.8, 6.5, 0.5, 14, 0.3, 20, 0.4, 5, 6],
-      stds: [1.8, 1.6, 1.7, 1.2, 6, 0.45, 15, 0.49, 2, 2]
+      means: [6.5, 6.8, 6.5, 0.5, 14, 0.3, 20, 0.4, 5, 6, 5.5, 5],
+      stds: [1.8, 1.6, 1.7, 1.2, 6, 0.45, 15, 0.49, 2, 2, 2, 2]
     };
     
     localStorage.setItem('ml_training_history', JSON.stringify(trainingHistory));
     localStorage.setItem('ml_normalization_stats', JSON.stringify(normalizationStats));
     
-    console.log('🧠 ML data seeded for testing - PatternInsightCard will show');
+    console.log('🧠 ML data seeded for testing - PatternInsightCard will show (12 features)');
   };
 
   const login = async (username, password = 'demo') => {

@@ -1,58 +1,58 @@
 // src/utils/DataPreprocessor.js
 // Data Preprocessing Utilities for ML Pipeline
 // Handles feature extraction, normalization, and data validation
+// UPDATED: Now integrates Emotional Timeline check-in data (emotionalLog)
 
 /**
  * DataPreprocessor - Prepares raw user data for machine learning
  * 
- * SIMPLE EXPLANATION:
- * Think of this as a "translator" that converts your app data into a format
- * the neural network can understand. It's like converting English to numbers.
- * 
- * KEY JOBS:
- * 1. Extract features (pull out the important numbers)
- * 2. Validate data (make sure it's good quality)
- * 3. Normalize (scale everything to 0-1 range for consistent learning)
- * 4. Generate training examples (create input-output pairs for learning)
+ * FEATURE SET (12 total):
+ * 1-3: Benefit metrics (energy, focus, confidence)
+ * 4: Energy drop from previous day
+ * 5-6: Temporal (hour of day, weekend)
+ * 7-8: Streak context (streak day, purge phase)
+ * 9-12: Emotional state from ET check-in (anxiety, mood, clarity, processing)
  */
 class DataPreprocessor {
   constructor() {
-    // Feature names for reference
+    // Feature names for reference - NOW 12 FEATURES
     this.featureNames = [
-      'energy',
-      'focus',
-      'confidence',
-      'energyDrop',
-      'hourOfDay',
-      'isWeekend',
-      'streakDay',
-      'inPurgePhase',
-      'anxiety',
-      'moodStability'
+      'energy',           // 1: Benefit metric
+      'focus',            // 2: Benefit metric
+      'confidence',       // 3: Benefit metric
+      'energyDrop',       // 4: Change from yesterday
+      'hourOfDay',        // 5: Temporal - normalized 0-1
+      'isWeekend',        // 6: Temporal - binary
+      'streakDay',        // 7: Context
+      'inPurgePhase',     // 8: Context - binary (days 15-45)
+      'anxiety',          // 9: ET emotional - HIGH PREDICTIVE VALUE
+      'moodStability',    // 10: ET emotional - HIGH PREDICTIVE VALUE
+      'mentalClarity',    // 11: ET emotional - MEDIUM PREDICTIVE VALUE
+      'emotionalProcessing' // 12: ET emotional - HIGH PREDICTIVE VALUE
     ];
     
-    console.log('📊 DataPreprocessor initialized');
+    console.log('📊 DataPreprocessor initialized with 12 features (including ET emotional data)');
   }
 
   /**
    * Extract features from a single day's data
-   * This is the main function that pulls out the 10 numbers we need
+   * Now pulls from both benefitTracking AND emotionalLog
    * 
    * @param {Object} current - Today's benefit tracking
-   * @param {Object} previous - Yesterday's benefit tracking (for comparison)
+   * @param {Object} previous - Yesterday's benefit tracking
    * @param {Date} date - The date we're extracting features for
    * @param {Object} userData - Full user data for context
-   * @returns {Array} Array of 10 feature values
+   * @returns {Array} Array of 12 feature values
    */
   extractFeatures(current, previous, date, userData) {
     try {
-      // FEATURE 1-3: Core benefit metrics (0-10 scale)
+      // FEATURES 1-3: Core benefit metrics (0-10 scale)
       const energy = this.validateNumber(current.energy, 5, 0, 10);
       const focus = this.validateNumber(current.focus, 5, 0, 10);
       const confidence = this.validateNumber(current.confidence, 5, 0, 10);
       
       // FEATURE 4: Energy drop from previous day
-      // This catches fatigue patterns that might lead to urges
+      // Catches fatigue patterns that might lead to urges
       const previousEnergy = previous ? this.validateNumber(previous.energy, 5, 0, 10) : energy;
       const energyDrop = previousEnergy - energy;
       
@@ -65,23 +65,20 @@ class DataPreprocessor {
       const isWeekend = (date.getDay() === 0 || date.getDay() === 6) ? 1 : 0;
       
       // FEATURE 7: Current streak day
-      // Pattern detection based on how far into the streak
       const streakDay = this.validateNumber(userData.currentStreak, 0, 0, 1000);
       
       // FEATURE 8: In purge phase? (days 15-45)
-      // This is a known high-risk emotional phase
+      // Known high-risk emotional phase
       const inPurgePhase = (streakDay >= 15 && streakDay <= 45) ? 1 : 0;
       
-      // FEATURE 9-10: Emotional state
-      // High anxiety + low mood stability = high risk
-      let anxiety = 5;
-      let moodStability = 5;
+      // FEATURES 9-12: Emotional state from Emotional Timeline check-in
+      // These are the MOST PREDICTIVE features for relapse risk
+      const emotionalData = this.getLatestEmotionalData(userData, date);
       
-      if (userData.emotionalTracking && userData.emotionalTracking.length > 0) {
-        const latestEmotion = userData.emotionalTracking[userData.emotionalTracking.length - 1];
-        anxiety = this.validateNumber(latestEmotion.anxiety, 5, 0, 10);
-        moodStability = this.validateNumber(latestEmotion.moodStability, 5, 0, 10);
-      }
+      const anxiety = emotionalData.anxiety;           // High = high risk
+      const moodStability = emotionalData.mood;        // Low = high risk
+      const mentalClarity = emotionalData.clarity;     // Low = impaired judgment
+      const emotionalProcessing = emotionalData.processing; // Low = blocked emotions
       
       return [
         energy,
@@ -93,19 +90,79 @@ class DataPreprocessor {
         streakDay,
         inPurgePhase,
         anxiety,
-        moodStability
+        moodStability,
+        mentalClarity,
+        emotionalProcessing
       ];
       
     } catch (error) {
       console.error('❌ Error extracting features:', error);
-      // Return default safe values
-      return [5, 5, 5, 0, 12, 0, 0, 0, 5, 5];
+      // Return default safe values (12 features)
+      return [5, 5, 5, 0, 12, 0, 0, 0, 5, 5, 5, 5];
     }
   }
 
   /**
+   * Get the most recent emotional data from emotionalLog
+   * Matches by date or uses most recent entry
+   * 
+   * @param {Object} userData - User data containing emotionalLog
+   * @param {Date} targetDate - Date to find emotional data for
+   * @returns {Object} { anxiety, mood, clarity, processing }
+   */
+  getLatestEmotionalData(userData, targetDate) {
+    const defaults = { anxiety: 5, mood: 5, clarity: 5, processing: 5 };
+    
+    // Check emotionalLog (from Emotional Timeline check-in)
+    if (!userData.emotionalLog || userData.emotionalLog.length === 0) {
+      return defaults;
+    }
+    
+    const targetDateStr = this.dateToString(targetDate);
+    
+    // Try to find an entry for the target date
+    const matchingEntry = userData.emotionalLog.find(entry => {
+      if (!entry.date) return false;
+      return this.dateToString(new Date(entry.date)) === targetDateStr;
+    });
+    
+    if (matchingEntry) {
+      return {
+        anxiety: this.validateNumber(matchingEntry.anxiety, 5, 1, 10),
+        mood: this.validateNumber(matchingEntry.mood, 5, 1, 10),
+        clarity: this.validateNumber(matchingEntry.clarity, 5, 1, 10),
+        processing: this.validateNumber(matchingEntry.processing, 5, 1, 10)
+      };
+    }
+    
+    // No exact match - use most recent entry within 3 days
+    const sorted = [...userData.emotionalLog]
+      .filter(e => e.date)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    if (sorted.length > 0) {
+      const mostRecent = sorted[0];
+      const daysDiff = Math.abs(
+        (targetDate - new Date(mostRecent.date)) / (1000 * 60 * 60 * 24)
+      );
+      
+      // Only use if within 3 days (emotional state is relatively recent)
+      if (daysDiff <= 3) {
+        return {
+          anxiety: this.validateNumber(mostRecent.anxiety, 5, 1, 10),
+          mood: this.validateNumber(mostRecent.mood, 5, 1, 10),
+          clarity: this.validateNumber(mostRecent.clarity, 5, 1, 10),
+          processing: this.validateNumber(mostRecent.processing, 5, 1, 10)
+        };
+      }
+    }
+    
+    return defaults;
+  }
+
+  /**
    * Generate training dataset from user's historical data
-   * Creates input-output pairs for the neural network to learn from
+   * Creates input-output pairs for the neural network
    * 
    * @param {Object} userData - User's complete historical data
    * @returns {Object} { features: [[...]], labels: [[...]], count: number }
@@ -140,14 +197,14 @@ class DataPreprocessor {
         // Check if there was a relapse on this day
         const hadRelapse = this.checkRelapseOnDate(currentDate, relapses);
         
-        // Extract features for this day
+        // Extract features for this day (now 12 features)
         const dayFeatures = this.extractFeatures(current, previous, currentDate, userData);
         
         features.push(dayFeatures);
         labels.push([hadRelapse ? 1 : 0]); // 1 = relapse, 0 = no relapse
       }
       
-      console.log(`✅ Generated ${features.length} training examples`);
+      console.log(`✅ Generated ${features.length} training examples (12 features each)`);
       console.log(`   Positive examples (relapses): ${labels.filter(l => l[0] === 1).length}`);
       console.log(`   Negative examples (no relapse): ${labels.filter(l => l[0] === 0).length}`);
       
@@ -165,7 +222,6 @@ class DataPreprocessor {
 
   /**
    * Get relapse history from streak history
-   * Extracts all the times a relapse occurred
    * 
    * @param {Object} userData - User data
    * @returns {Array} Array of relapse objects with date and details
@@ -203,300 +259,127 @@ class DataPreprocessor {
 
   /**
    * Calculate normalization statistics for features
-   * Finds min/max for each feature so we can scale to 0-1
+   * Now handles 12 features
    * 
-   * SIMPLE EXPLANATION:
-   * Neural networks learn best when all inputs are in the same range (0-1).
-   * This function finds the min and max of each feature so we can scale them.
-   * 
-   * @param {Array} featureArray - Array of feature arrays [[...], [...], ...]
-   * @returns {Array} Array of {min, max} objects for each feature
+   * @param {Array} features - Array of feature arrays
+   * @returns {Object} { means: [...], stds: [...] }
    */
-  calculateNormalizationStats(featureArray) {
-    if (!featureArray || featureArray.length === 0) {
+  calculateNormalizationStats(features) {
+    if (!features || features.length === 0) {
       return null;
     }
     
-    const numFeatures = featureArray[0].length;
-    const stats = [];
+    const numFeatures = 12; // Updated from 10
+    const means = new Array(numFeatures).fill(0);
+    const stds = new Array(numFeatures).fill(0);
     
-    for (let featureIndex = 0; featureIndex < numFeatures; featureIndex++) {
-      // Get all values for this feature
-      const values = featureArray.map(features => features[featureIndex]);
-      
-      // Calculate min and max
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      
-      stats.push({
-        name: this.featureNames[featureIndex] || `feature_${featureIndex}`,
-        min,
-        max,
-        range: max - min
-      });
+    // Calculate means
+    for (const row of features) {
+      for (let i = 0; i < numFeatures; i++) {
+        means[i] += row[i] || 0;
+      }
+    }
+    for (let i = 0; i < numFeatures; i++) {
+      means[i] /= features.length;
     }
     
-    console.log('📏 Normalization stats calculated:');
-    stats.forEach((stat, i) => {
-      console.log(`   ${stat.name}: [${stat.min.toFixed(2)} - ${stat.max.toFixed(2)}]`);
-    });
+    // Calculate standard deviations
+    for (const row of features) {
+      for (let i = 0; i < numFeatures; i++) {
+        stds[i] += Math.pow((row[i] || 0) - means[i], 2);
+      }
+    }
+    for (let i = 0; i < numFeatures; i++) {
+      stds[i] = Math.sqrt(stds[i] / features.length);
+      // Prevent division by zero
+      if (stds[i] < 0.001) stds[i] = 1;
+    }
     
-    return stats;
+    console.log('📐 Normalization stats calculated for 12 features');
+    
+    return { means, stds };
   }
 
   /**
-   * Normalize features to 0-1 range
-   * 
-   * FORMULA: normalized = (value - min) / (max - min)
+   * Normalize features using calculated stats
    * 
    * @param {Array} features - Raw feature array
-   * @param {Array} stats - Normalization stats from calculateNormalizationStats
-   * @returns {Array} Normalized features (all values 0-1)
+   * @param {Object} stats - { means, stds }
+   * @returns {Array} Normalized features
    */
   normalizeFeatures(features, stats) {
-    if (!stats || stats.length !== features.length) {
-      console.warn('⚠️  Stats mismatch, using default normalization');
-      // Fallback: divide by 10 (assumes most features are 0-10)
-      return features.map(f => Math.max(0, Math.min(1, f / 10)));
+    if (!stats || !stats.means || !stats.stds) {
+      return features;
     }
     
-    return features.map((value, index) => {
-      const { min, max } = stats[index];
-      
-      // Handle edge case where min === max
-      if (max === min) {
-        return 0.5; // Return middle value
-      }
-      
-      // Normalize to 0-1 range
-      const normalized = (value - min) / (max - min);
-      
-      // Clamp to 0-1 (in case of outliers)
-      return Math.max(0, Math.min(1, normalized));
+    return features.map((value, i) => {
+      return (value - stats.means[i]) / stats.stds[i];
     });
   }
 
   /**
-   * Denormalize features back to original scale
-   * Useful for displaying feature values to users
+   * Validate training data quality
    * 
-   * @param {Array} normalizedFeatures - Features in 0-1 range
-   * @param {Array} stats - Normalization stats
-   * @returns {Array} Features in original scale
+   * @param {Object} userData - User data
+   * @returns {Object} { isValid, message, stats }
    */
-  denormalizeFeatures(normalizedFeatures, stats) {
-    if (!stats || stats.length !== normalizedFeatures.length) {
-      return normalizedFeatures.map(f => f * 10); // Fallback
+  validateTrainingData(userData) {
+    const benefitDays = userData.benefitTracking?.length || 0;
+    const emotionalDays = userData.emotionalLog?.length || 0;
+    const relapses = this.getRelapseHistory(userData).length;
+    
+    // Minimum requirements
+    if (benefitDays < 14) {
+      return {
+        isValid: false,
+        message: `Need ${14 - benefitDays} more days of benefit tracking`,
+        stats: { benefitDays, emotionalDays, relapses }
+      };
     }
     
-    return normalizedFeatures.map((normalized, index) => {
-      const { min, max } = stats[index];
-      return normalized * (max - min) + min;
-    });
+    if (relapses < 1) {
+      return {
+        isValid: false,
+        message: 'Need at least 1 relapse in history for pattern learning',
+        stats: { benefitDays, emotionalDays, relapses }
+      };
+    }
+    
+    // Check for emotional data (not required but improves accuracy)
+    const emotionalCoverage = emotionalDays / benefitDays;
+    let dataQuality = 'good';
+    if (emotionalCoverage < 0.3) {
+      dataQuality = 'limited';
+    } else if (emotionalCoverage > 0.7) {
+      dataQuality = 'excellent';
+    }
+    
+    return {
+      isValid: true,
+      message: `Ready for training (${dataQuality} emotional data coverage)`,
+      stats: { benefitDays, emotionalDays, relapses, emotionalCoverage, dataQuality }
+    };
   }
 
   /**
-   * Validate and sanitize a number value
-   * Ensures it's within expected range and not NaN
-   * 
-   * @param {any} value - Value to validate
-   * @param {number} defaultValue - Default if invalid
-   * @param {number} min - Minimum allowed value
-   * @param {number} max - Maximum allowed value
-   * @returns {number} Valid number
+   * Helper: Validate a number is within bounds
    */
-  validateNumber(value, defaultValue = 0, min = -Infinity, max = Infinity) {
-    // Convert to number
-    const num = Number(value);
-    
-    // Check if valid
-    if (isNaN(num) || !isFinite(num)) {
-      return defaultValue;
-    }
-    
-    // Clamp to range
+  validateNumber(value, defaultVal, min, max) {
+    const num = parseFloat(value);
+    if (isNaN(num)) return defaultVal;
     return Math.max(min, Math.min(max, num));
   }
 
   /**
-   * Validate user data quality
-   * Checks if there's enough data for training
-   * 
-   * @param {Object} userData - User data to validate
-   * @returns {Object} { isValid, message, dataPoints }
-   */
-  validateTrainingData(userData) {
-    const issues = [];
-    let dataPoints = 0;
-    
-    // Check benefit tracking
-    if (!userData.benefitTracking || !Array.isArray(userData.benefitTracking)) {
-      issues.push('No benefit tracking data found');
-    } else {
-      dataPoints = userData.benefitTracking.length;
-      if (dataPoints < 20) {
-        issues.push(`Need at least 20 days of data (have ${dataPoints})`);
-      }
-    }
-    
-    // Check streak history
-    if (!userData.streakHistory || !Array.isArray(userData.streakHistory)) {
-      issues.push('No streak history found');
-    } else {
-      const relapses = userData.streakHistory.filter(s => s.reason === 'relapse');
-      if (relapses.length === 0) {
-        issues.push('Need at least one historical relapse for learning');
-      }
-    }
-    
-    // Check current streak
-    if (!userData.currentStreak || userData.currentStreak < 1) {
-      issues.push('Invalid current streak value');
-    }
-    
-    return {
-      isValid: issues.length === 0,
-      message: issues.length > 0 ? issues.join('; ') : 'Data is valid',
-      issues,
-      dataPoints,
-      hasEnoughData: dataPoints >= 20
-    };
-  }
-
-  /**
-   * Get feature importance for explanation
-   * Returns which features contributed most to a prediction
-   * 
-   * @param {Array} features - Feature values
-   * @param {Array} weights - Feature weights (optional)
-   * @returns {Array} Sorted array of {name, value, importance}
-   */
-  getFeatureImportance(features, weights = null) {
-    const importance = features.map((value, index) => ({
-      name: this.featureNames[index],
-      value: value,
-      weight: weights ? weights[index] : 1,
-      importance: weights ? Math.abs(value * weights[index]) : Math.abs(value)
-    }));
-    
-    // Sort by importance (highest first)
-    return importance.sort((a, b) => b.importance - a.importance);
-  }
-
-  /**
-   * Split data into training and validation sets
-   * 
-   * @param {Array} features - Feature arrays
-   * @param {Array} labels - Label arrays
-   * @param {number} validationSplit - Fraction for validation (0-1)
-   * @returns {Object} { trainFeatures, trainLabels, valFeatures, valLabels }
-   */
-  trainValidationSplit(features, labels, validationSplit = 0.2) {
-    const totalSize = features.length;
-    const valSize = Math.floor(totalSize * validationSplit);
-    const trainSize = totalSize - valSize;
-    
-    // Shuffle indices
-    const indices = Array.from({ length: totalSize }, (_, i) => i);
-    this.shuffleArray(indices);
-    
-    // Split
-    const trainIndices = indices.slice(0, trainSize);
-    const valIndices = indices.slice(trainSize);
-    
-    return {
-      trainFeatures: trainIndices.map(i => features[i]),
-      trainLabels: trainIndices.map(i => labels[i]),
-      valFeatures: valIndices.map(i => features[i]),
-      valLabels: valIndices.map(i => labels[i])
-    };
-  }
-
-  /**
-   * Shuffle array in place (Fisher-Yates algorithm)
-   * 
-   * @param {Array} array - Array to shuffle
-   */
-  shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
-
-  /**
-   * Convert date to YYYY-MM-DD string for comparison
-   * 
-   * @param {Date} date - Date object
-   * @returns {string} Date string
+   * Helper: Convert date to YYYY-MM-DD string
    */
   dateToString(date) {
-    if (!date || isNaN(date.getTime())) return '';
-    return date.toISOString().split('T')[0];
-  }
-
-  /**
-   * Get data quality report
-   * Useful for showing users what data they have
-   * 
-   * @param {Object} userData - User data
-   * @returns {Object} Quality report
-   */
-  getDataQualityReport(userData) {
-    const benefitDays = userData.benefitTracking?.length || 0;
-    const emotionalDays = userData.emotionalTracking?.length || 0;
-    const relapseCount = userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0;
-    const currentStreak = userData.currentStreak || 0;
-    
-    // Calculate completeness
-    const hasMinimumData = benefitDays >= 20;
-    const hasRelapseData = relapseCount > 0;
-    const hasEmotionalData = emotionalDays > 0;
-    
-    let qualityScore = 0;
-    if (hasMinimumData) qualityScore += 40;
-    if (hasRelapseData) qualityScore += 30;
-    if (hasEmotionalData) qualityScore += 20;
-    if (currentStreak > 0) qualityScore += 10;
-    
-    return {
-      qualityScore, // 0-100
-      benefitDays,
-      emotionalDays,
-      relapseCount,
-      currentStreak,
-      hasMinimumData,
-      hasRelapseData,
-      hasEmotionalData,
-      canTrain: hasMinimumData && hasRelapseData,
-      recommendation: this.getDataRecommendation(qualityScore, hasMinimumData, hasRelapseData)
-    };
-  }
-
-  /**
-   * Get recommendation based on data quality
-   * 
-   * @param {number} qualityScore - Quality score (0-100)
-   * @param {boolean} hasMinimumData - Has enough data points
-   * @param {boolean} hasRelapseData - Has relapse history
-   * @returns {string} Recommendation message
-   */
-  getDataRecommendation(qualityScore, hasMinimumData, hasRelapseData) {
-    if (qualityScore >= 80) {
-      return 'Excellent data quality! Model will perform well.';
-    } else if (qualityScore >= 60) {
-      return 'Good data quality. Model can be trained.';
-    } else if (!hasMinimumData) {
-      return 'Keep tracking daily benefits. Need 20+ days for training.';
-    } else if (!hasRelapseData) {
-      return 'Need relapse history to learn risk patterns.';
-    } else {
-      return 'Add more emotional tracking for better predictions.';
-    }
+    if (!date) return '';
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 }
 
 // Export singleton instance
 const dataPreprocessor = new DataPreprocessor();
-
 export default dataPreprocessor;
