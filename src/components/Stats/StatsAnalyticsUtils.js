@@ -237,7 +237,7 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
     
     // Require substantial data for meaningful patterns
     if (allData.length < 14) {
-      return ['Need 14+ days of benefit tracking to identify meaningful patterns in your data'];
+      return { patterns: [] };
     }
     
     const patterns = [];
@@ -390,10 +390,10 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
       patterns.push(`**${phase} Phase**: ${getPhaseGuidance(phase, currentStreak)}`);
     }
     
-    return patterns;
+    return { patterns: patterns };
   } catch (error) {
     console.error('Pattern recognition error:', error);
-    return ['Unable to analyze patterns at this time. Please try again later.'];
+    return { patterns: [] };
   }
 };
 
@@ -712,6 +712,7 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
           average: Math.round(avg * 10) / 10, // Round to 1 decimal place
           dataPoints: values.length,
           range: getPhaseRange(phase),
+          name: getPhaseDisplayName(phase),
           displayName: getPhaseDisplayName(phase)
         };
       }
@@ -794,6 +795,7 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
       hasData: true,
       phaseAverages: phaseAverages,
       insights: insights,
+      insight: insights.length > 0 ? insights.join(' ') : null,
       completedPhases: completedPhases.length,
       totalPhases: Object.keys(phaseAverages).length
     };

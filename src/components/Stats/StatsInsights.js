@@ -212,13 +212,14 @@ export const PhaseEvolutionAnalysis = ({
 }) => {
   const needsMoreData = !phaseEvolution?.phaseAverages;
   
-  // Determine current phase key
+  // FIX: Align phase key detection with StatsAnalyticsUtils.js getRetentionPhase()
+  // Must match: foundation (1-14), purification (15-45), expansion (46-90), integration (91-180), mastery (180+)
   const getCurrentPhaseKey = () => {
     const streak = currentStreak || 0;
-    if (streak <= 7) return 'purification';
-    if (streak <= 21) return 'foundation';
-    if (streak <= 45) return 'transmutation';
-    if (streak <= 90) return 'stabilization';
+    if (streak <= 14) return 'foundation';
+    if (streak <= 45) return 'purification';
+    if (streak <= 90) return 'expansion';
+    if (streak <= 180) return 'integration';
     return 'mastery';
   };
   
@@ -250,7 +251,7 @@ export const PhaseEvolutionAnalysis = ({
                     key={phaseKey} 
                     className={`phase-evolution-card ${isCurrentPhase ? 'current' : ''}`}
                   >
-                    <div className="phase-name">{phaseData.name || phaseKey}</div>
+                    <div className="phase-name">{phaseData.name || phaseData.displayName || phaseKey}</div>
                     <div className="phase-value">
                       {phaseData.average ? `${phaseData.average}/10` : '—'}
                     </div>

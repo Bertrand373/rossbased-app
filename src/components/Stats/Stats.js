@@ -78,18 +78,19 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     return (safeUserData.benefitTracking?.length || 0) < 3;
   }, [safeUserData.benefitTracking]);
 
+  // FIX: Pass all required parameters to analytics functions
   const memoizedInsights = useMemo(() => {
     if (!isPremium) return {};
     return {
       dataQuality: calculateDataQuality(safeUserData),
-      patternInsights: generatePatternRecognition(safeUserData, selectedMetric),
-      optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric),
+      patternInsights: generatePatternRecognition(safeUserData, selectedMetric, isPremium),
+      optimizationGuidance: generateOptimizationGuidance(safeUserData, selectedMetric, timeRange, isPremium),
       phaseEvolution: calculatePhaseEvolutionAnalysis(safeUserData, selectedMetric),
       relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
-      progressTrends: calculateProgressTrends(safeUserData, selectedMetric),
+      progressTrends: calculateProgressTrends(safeUserData, timeRange),
       daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData)
     };
-  }, [safeUserData, selectedMetric, isPremium]);
+  }, [safeUserData, selectedMetric, timeRange, isPremium]);
 
   // Milestones
   const milestones = useMemo(() => {
