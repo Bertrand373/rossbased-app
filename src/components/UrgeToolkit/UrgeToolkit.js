@@ -341,13 +341,6 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
   };
 
-  // Get intensity class
-  const getIntensityClass = (level) => {
-    if (level <= 3) return 'low';
-    if (level <= 6) return 'medium';
-    return 'high';
-  };
-
   // Steps navigation
   const steps = [
     { id: 'assessment', label: 'Assess' },
@@ -444,7 +437,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 {[1,2,3,4,5,6,7,8,9,10].map(level => (
                   <button
                     key={level}
-                    className={`ut-intensity-btn ${getIntensityClass(level)} ${urgeIntensity === level ? 'active' : ''}`}
+                    className={`ut-intensity-btn ${urgeIntensity === level ? 'active' : ''}`}
                     onClick={() => handleUrgeIntensity(level)}
                   >
                     {level}
@@ -468,19 +461,23 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
             
             <div className="ut-protocols">
-              {Object.entries(protocols).map(([key, protocol]) => (
-                <button
-                  key={key}
-                  className={`ut-protocol ${activeProtocol === key ? 'active' : ''} ${activeProtocol === key ? 'recommended' : ''}`}
-                  onClick={() => setActiveProtocol(key)}
-                >
-                  <div className="ut-protocol-header">
-                    <span className="ut-protocol-name">{protocol.name}</span>
-                    <span className="ut-protocol-duration">{protocol.duration}</span>
-                  </div>
-                  <p className="ut-protocol-desc">{protocol.description}</p>
-                  <p className="ut-protocol-best">Best for: {protocol.bestFor}</p>
-                </button>
+              {Object.entries(protocols).map(([key, protocol], index, arr) => (
+                <React.Fragment key={key}>
+                  <button
+                    className={`ut-protocol ${activeProtocol === key ? 'active' : ''}`}
+                    onClick={() => setActiveProtocol(key)}
+                  >
+                    <div className="ut-protocol-main">
+                      <span className="ut-protocol-name">{protocol.name}</span>
+                      <span className="ut-protocol-meta">
+                        {activeProtocol === key && <span className="ut-protocol-rec">Recommended</span>}
+                        <span className="ut-protocol-duration">{protocol.duration}</span>
+                      </span>
+                    </div>
+                    <p className="ut-protocol-desc">{protocol.description}</p>
+                  </button>
+                  {index < arr.length - 1 && <div className="ut-protocol-divider" />}
+                </React.Fragment>
               ))}
             </div>
 
@@ -526,10 +523,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             {(activeProtocol === 'mental' || activeProtocol === 'physical' || activeProtocol === 'energy') && (
               <>
                 <div className="ut-protocol-steps">
-                  <div className="ut-steps-header">{protocols[activeProtocol].name} Steps</div>
+                  <div className="ut-steps-header">{protocols[activeProtocol].name}</div>
                   <div className="ut-steps-list">
                     {getProtocolSteps().map((step, index) => (
                       <div key={index} className="ut-step-item">
+                        <span className="ut-step-num">{String(index + 1).padStart(2, '0')}</span>
                         <span className="ut-step-text">{step}</span>
                       </div>
                     ))}
@@ -565,13 +563,16 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
             
             <div className="ut-tools">
-              {getPhaseTools().map(tool => (
-                <div key={tool.id} className="ut-tool">
-                  <span className="ut-tool-name">{tool.name}</span>
-                  <button className="ut-tool-btn" onClick={tool.action}>
-                    Use
-                  </button>
-                </div>
+              {getPhaseTools().map((tool, index, arr) => (
+                <React.Fragment key={tool.id}>
+                  <div className="ut-tool">
+                    <span className="ut-tool-name">{tool.name}</span>
+                    <button className="ut-tool-btn" onClick={tool.action}>
+                      Use
+                    </button>
+                  </div>
+                  {index < arr.length - 1 && <div className="ut-tool-divider" />}
+                </React.Fragment>
               ))}
             </div>
             
@@ -598,17 +599,19 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
             
             <div className="ut-triggers">
-              <div className="ut-triggers-header">Select Trigger</div>
-              <div className="ut-triggers-grid">
-                {getTriggerOptions().map(trigger => (
-                  <button
-                    key={trigger.id}
-                    className={`ut-trigger ${selectedTrigger === trigger.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedTrigger(trigger.id)}
-                  >
-                    <trigger.icon />
-                    <span>{trigger.label}</span>
-                  </button>
+              <div className="ut-triggers-label">Select Trigger</div>
+              <div className="ut-triggers-list">
+                {getTriggerOptions().map((trigger, index, arr) => (
+                  <React.Fragment key={trigger.id}>
+                    <button
+                      className={`ut-trigger ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                      onClick={() => setSelectedTrigger(trigger.id)}
+                    >
+                      <span>{trigger.label}</span>
+                      {selectedTrigger === trigger.id && <span className="ut-trigger-check">✓</span>}
+                    </button>
+                    {index < arr.length - 1 && <div className="ut-trigger-divider" />}
+                  </React.Fragment>
                 ))}
               </div>
             </div>
