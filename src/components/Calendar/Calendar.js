@@ -391,32 +391,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     closeEditModal();
   };
 
-  // Remove relapse
-  const handleRemoveRelapse = () => {
-    if (!selectedDate || !updateUserData) return;
-    
-    let updatedStreakHistory = [...(userData.streakHistory || [])];
-    const relapseIndex = updatedStreakHistory.findIndex(streak => 
-      streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), selectedDate)
-    );
-    
-    if (relapseIndex !== -1) {
-      updatedStreakHistory[relapseIndex] = {
-        ...updatedStreakHistory[relapseIndex],
-        reason: null,
-        trigger: null
-      };
-      
-      updateUserData({ 
-        streakHistory: updatedStreakHistory,
-        relapseCount: Math.max(0, (userData.relapseCount || 0) - 1)
-      });
-      toast.success('Relapse removed');
-    }
-    
-    closeEditModal();
-  };
-
   const handleTriggerSelection = () => {
     // If editing existing trigger, use update function
     if (editingExistingTrigger) {
@@ -548,12 +522,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               onClick={handleEditTrigger}
             >
               Change Trigger
-            </button>
-            <button 
-              className="calendar-option-btn calendar-option-remove"
-              onClick={handleRemoveRelapse}
-            >
-              Remove Relapse
             </button>
           </div>
         </div>
