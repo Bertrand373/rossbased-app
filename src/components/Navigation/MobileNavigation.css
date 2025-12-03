@@ -1,4 +1,5 @@
 /* MobileNavigation.css - TITANTRACK */
+/* Text-only navigation with dividers */
 
 .mobile-nav {
   position: fixed;
@@ -7,98 +8,79 @@
   right: 0;
   z-index: 90;
   
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
-  
-  /* Content area + safe area */
-  padding-top: 12px;
+  /* Safe area padding */
+  padding: 16px 20px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
   
   background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* ============================================================
-   SLIDING DOT INDICATOR
-   ============================================================ */
-
-.nav-slider-dot {
-  position: absolute;
-  bottom: calc(10px + env(safe-area-inset-bottom, 0));
-  
-  width: 6px;
-  height: 6px;
-  background-color: #ffffff;
-  border-radius: 50%;
-  
-  /* Center the dot on the calculated position */
-  margin-left: -3px;
-  
-  /* Smooth sliding */
-  transition: left 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms ease;
-  
-  pointer-events: none;
-}
-
-/* ============================================================
-   NAV ITEM WRAPPER
-   ============================================================ */
-
-.nav-item-wrapper {
+.mobile-nav-inner {
   display: flex;
-  position: relative;
-}
-
-/* ============================================================
-   NAV ITEMS
-   ============================================================ */
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 8px 12px;
+  justify-content: center;
+  gap: 0;
+}
+
+/* ============================================================
+   NAV ITEMS - Text only
+   ============================================================ */
+
+.mobile-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
   text-decoration: none;
-  position: relative;
   -webkit-tap-highlight-color: transparent;
 }
 
-.nav-label {
+.mobile-nav-label {
   font-size: 0.6875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.01em;
   transition: color 150ms ease;
+  white-space: nowrap;
 }
 
 /* Active state */
-.nav-item.active .nav-label {
+.mobile-nav-item.active .mobile-nav-label {
   color: #ffffff;
+  font-weight: 600;
 }
 
 /* Hover - only on devices that support it */
 @media (hover: hover) {
-  .nav-item:hover .nav-label {
-    color: rgba(255, 255, 255, 0.7);
+  .mobile-nav-item:hover .mobile-nav-label {
+    color: rgba(255, 255, 255, 0.6);
   }
 }
 
 /* ============================================================
-   MOBILE RISK INDICATOR DOT
+   DIVIDERS
+   ============================================================ */
+
+.mobile-nav-divider {
+  width: 1px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   RISK INDICATOR DOT
    Shows when AI detects elevated risk - appears on Urges tab
    ============================================================ */
 
 .mobile-risk-dot {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  pointer-events: none;
+  flex-shrink: 0;
 }
 
 /* Elevated risk (50-69%) - subtle amber */
@@ -141,72 +123,57 @@
    RESPONSIVE
    ============================================================ */
 
-/* Larger phones */
+/* Larger phones - slightly more spacing */
 @media (min-width: 390px) {
-  .nav-label {
+  .mobile-nav-item {
+    padding: 8px 12px;
+  }
+  
+  .mobile-nav-label {
     font-size: 0.75rem;
   }
   
-  .nav-item {
-    padding: 8px 16px;
+  .mobile-nav-divider {
+    height: 14px;
   }
 }
 
-/* Small phones */
+/* Small phones - tighter */
 @media (max-width: 350px) {
-  .nav-label {
+  .mobile-nav {
+    padding: 14px 12px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0));
+  }
+  
+  .mobile-nav-item {
+    padding: 6px 6px;
+  }
+  
+  .mobile-nav-label {
     font-size: 0.625rem;
   }
   
-  .nav-item {
-    padding: 8px;
-  }
-  
-  .nav-slider-dot {
-    width: 5px;
-    height: 5px;
-    margin-left: -2.5px;
+  .mobile-nav-divider {
+    height: 10px;
   }
   
   .mobile-risk-dot {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
   }
 }
 
 /* Landscape */
 @media (max-height: 500px) and (orientation: landscape) {
   .mobile-nav {
-    padding-top: 8px;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0));
-  }
-  
-  .nav-item {
-    flex-direction: row;
-    gap: 8px;
-  }
-  
-  /* Hide dot in landscape */
-  .nav-slider-dot {
-    display: none;
-  }
-  
-  /* Adjust risk dot for landscape */
-  .mobile-risk-dot {
-    position: relative;
-    top: auto;
-    right: auto;
-    margin-left: 6px;
+    padding: 10px 20px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0));
   }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .nav-slider-dot {
-    transition: opacity 150ms ease;
-  }
-  
-  .nav-label {
+  .mobile-nav-label {
     transition: none;
   }
   

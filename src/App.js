@@ -1,5 +1,5 @@
 // App.js - TITANTRACK MODERN MINIMAL
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
@@ -52,14 +52,8 @@ const ProfileButton = ({ userData }) => {
   );
 };
 
-// Desktop Navigation - sliding dot indicator (with optional risk indicator)
+// Desktop Navigation - Text only with dividers
 const HeaderNavigation = ({ riskLevel = 'none' }) => {
-  const location = useLocation();
-  const containerRef = useRef(null);
-  const itemRefs = useRef([]);
-  const [dotPosition, setDotPosition] = useState(0);
-  const [isReady, setIsReady] = useState(false);
-  
   const navItems = [
     { path: '/', label: 'Tracker' },
     { path: '/calendar', label: 'Calendar' },
@@ -68,63 +62,14 @@ const HeaderNavigation = ({ riskLevel = 'none' }) => {
     { path: '/urge-toolkit', label: 'Urges', showRiskIndicator: true }
   ];
 
-  // Find active tab index
-  const getActiveIndex = useCallback(() => {
-    return navItems.findIndex(item => {
-      if (item.path === '/') {
-        return location.pathname === '/';
-      }
-      return location.pathname.startsWith(item.path);
-    });
-  }, [location.pathname]);
-
-  // Calculate dot position
-  const updateDotPosition = useCallback(() => {
-    const activeIdx = getActiveIndex();
-    if (activeIdx >= 0 && containerRef.current && itemRefs.current[activeIdx]) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const itemRect = itemRefs.current[activeIdx].getBoundingClientRect();
-      
-      // Calculate center of active item relative to container
-      const centerX = itemRect.left - containerRect.left + (itemRect.width / 2);
-      setDotPosition(centerX);
-      setIsReady(true);
-    }
-  }, [getActiveIndex]);
-
-  // Update on mount and route change
-  useEffect(() => {
-    const timer = setTimeout(updateDotPosition, 10);
-    return () => clearTimeout(timer);
-  }, [location.pathname, updateDotPosition]);
-
-  // Update on resize
-  useEffect(() => {
-    window.addEventListener('resize', updateDotPosition);
-    return () => window.removeEventListener('resize', updateDotPosition);
-  }, [updateDotPosition]);
-
   return (
     <nav className="header-nav">
-      <div className="nav-container" ref={containerRef}>
-        {/* Sliding dot */}
-        <div 
-          className="nav-slider-dot"
-          style={{
-            left: `${dotPosition}px`,
-            opacity: isReady ? 1 : 0
-          }}
-        />
-        
+      <div className="nav-container">
         {navItems.map((item, index) => (
-          <div 
-            key={item.path}
-            ref={el => itemRefs.current[index] = el}
-            className="nav-item-wrapper"
-          >
+          <React.Fragment key={item.path}>
             <NavLink 
               to={item.path}
-              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
             >
               {item.label}
               {/* Risk indicator dot for Urges tab */}
@@ -132,7 +77,8 @@ const HeaderNavigation = ({ riskLevel = 'none' }) => {
                 <span className={`desktop-risk-dot ${riskLevel}`} />
               )}
             </NavLink>
-          </div>
+            {index < navItems.length - 1 && <span className="nav-divider" />}
+          </React.Fragment>
         ))}
       </div>
     </nav>

@@ -1,89 +1,39 @@
 // MobileNavigation.js - TITANTRACK
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+// Text-only navigation with dividers
+import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import './MobileNavigation.css';
 
-const MobileNavigation = ({ activeTab, setActiveTab, riskLevel = 'none' }) => {
+const MobileNavigation = ({ riskLevel = 'none' }) => {
   const location = useLocation();
-  const navRef = useRef(null);
-  const itemRefs = useRef([]);
-  const [dotPosition, setDotPosition] = useState(0);
-  const [isReady, setIsReady] = useState(false);
   
   const navItems = [
-    { path: '/', label: 'Tracker' },
+    { path: '/', label: 'Track' },
     { path: '/calendar', label: 'Calendar' },
     { path: '/stats', label: 'Stats' },
     { path: '/timeline', label: 'Timeline' },
     { path: '/urge-toolkit', label: 'Urges', showRiskIndicator: true }
   ];
 
-  // Find active tab index
-  const getActiveIndex = useCallback(() => {
-    return navItems.findIndex(item => {
-      if (item.path === '/') {
-        return location.pathname === '/';
-      }
-      return location.pathname.startsWith(item.path);
-    });
-  }, [location.pathname]);
-
-  // Calculate dot position
-  const updateDotPosition = useCallback(() => {
-    const activeIdx = getActiveIndex();
-    if (activeIdx >= 0 && navRef.current && itemRefs.current[activeIdx]) {
-      const navRect = navRef.current.getBoundingClientRect();
-      const itemRect = itemRefs.current[activeIdx].getBoundingClientRect();
-      
-      // Calculate center of active item relative to nav
-      const centerX = itemRect.left - navRect.left + (itemRect.width / 2);
-      setDotPosition(centerX);
-      setIsReady(true);
-    }
-  }, [getActiveIndex]);
-
-  // Update on mount and route change
-  useEffect(() => {
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(updateDotPosition, 10);
-    return () => clearTimeout(timer);
-  }, [location.pathname, updateDotPosition]);
-
-  // Update on resize
-  useEffect(() => {
-    window.addEventListener('resize', updateDotPosition);
-    return () => window.removeEventListener('resize', updateDotPosition);
-  }, [updateDotPosition]);
-
   return (
-    <nav className="mobile-nav" ref={navRef}>
-      {/* Sliding dot */}
-      <div 
-        className="nav-slider-dot"
-        style={{
-          left: `${dotPosition}px`,
-          opacity: isReady ? 1 : 0
-        }}
-      />
-      
-      {navItems.map((item, index) => (
-        <div 
-          key={item.path}
-          ref={el => itemRefs.current[index] = el}
-          className="nav-item-wrapper"
-        >
-          <NavLink 
-            to={item.path}
-            className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
-          >
-            <span className="nav-label">{item.label}</span>
-            {/* Risk indicator dot for Urges tab */}
-            {item.showRiskIndicator && riskLevel !== 'none' && (
-              <span className={`mobile-risk-dot ${riskLevel}`} />
-            )}
-          </NavLink>
-        </div>
-      ))}
+    <nav className="mobile-nav">
+      <div className="mobile-nav-inner">
+        {navItems.map((item, index) => (
+          <React.Fragment key={item.path}>
+            <NavLink 
+              to={item.path}
+              className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
+            >
+              <span className="mobile-nav-label">{item.label}</span>
+              {/* Risk indicator for Urges tab */}
+              {item.showRiskIndicator && riskLevel !== 'none' && (
+                <span className={`mobile-risk-dot ${riskLevel}`} />
+              )}
+            </NavLink>
+            {index < navItems.length - 1 && <span className="mobile-nav-divider" />}
+          </React.Fragment>
+        ))}
+      </div>
     </nav>
   );
 };

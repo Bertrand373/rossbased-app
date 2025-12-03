@@ -244,7 +244,7 @@ h4 { font-size: 0.875rem; }
 }
 
 /* ============================================================
-   DESKTOP NAVIGATION - Sliding dot indicator
+   DESKTOP NAVIGATION - Text only with dividers
    ============================================================ */
 
 .header-nav {
@@ -254,41 +254,16 @@ h4 { font-size: 0.875rem; }
 }
 
 .header-nav .nav-container {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 32px;
-}
-
-/* Sliding dot */
-.header-nav .nav-slider-dot {
-  position: absolute;
-  bottom: -10px;
-  
-  width: 6px;
-  height: 6px;
-  background-color: #ffffff;
-  border-radius: 50%;
-  
-  /* Center the dot on the calculated position */
-  margin-left: -3px;
-  
-  /* Smooth sliding */
-  transition: left 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms ease;
-  
-  pointer-events: none;
-}
-
-/* Nav item wrapper */
-.header-nav .nav-item-wrapper {
-  display: flex;
+  gap: 0;
 }
 
 .header-nav .nav-link {
   display: flex;
   align-items: center;
-  padding: 4px 0;
-  color: rgba(255, 255, 255, 0.4);
+  padding: 8px 16px;
+  color: rgba(255, 255, 255, 0.35);
   font-size: 0.8125rem;
   font-weight: 500;
   text-decoration: none;
@@ -297,11 +272,20 @@ h4 { font-size: 0.875rem; }
 }
 
 .header-nav .nav-link:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .header-nav .nav-link.active {
   color: #ffffff;
+  font-weight: 600;
+}
+
+/* Divider between nav items */
+.header-nav .nav-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 /* ============================================================
@@ -371,7 +355,7 @@ h4 { font-size: 0.875rem; }
   }
   
   .main-content-wrapper {
-    padding: var(--space-5);
+    padding: var(--space-6);
   }
 }
 
@@ -382,39 +366,7 @@ h4 { font-size: 0.875rem; }
 }
 
 /* ============================================================
-   CARDS - Refined with subtle borders
-   ============================================================ */
-
-.card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
-  transition: all var(--transition-fast);
-}
-
-.card:hover {
-  background-color: var(--bg-card-hover);
-  border-color: var(--border-default);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-4);
-}
-
-.card-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-secondary);
-}
-
-/* ============================================================
-   BUTTONS - Consistent across the app
+   BUTTONS - Refined system
    ============================================================ */
 
 .btn {
@@ -735,13 +687,12 @@ label {
 
 .desktop-risk-dot {
   display: inline-block;
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   margin-left: 6px;
   vertical-align: middle;
-  position: relative;
-  top: -1px;
+  flex-shrink: 0;
 }
 
 /* Elevated risk (50-69%) - subtle amber */
