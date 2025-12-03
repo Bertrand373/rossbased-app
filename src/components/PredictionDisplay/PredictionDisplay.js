@@ -1,463 +1,242 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
-// FIXED: Show Active pill and Retrain button based on trained model status
+// Pure typography design - no icons, no feedback buttons
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaCheckCircle, FaMicrochip, FaChartLine, FaBell, FaWind, FaTint, FaDumbbell, FaOm, FaThumbsUp, FaThumbsDown, FaExclamationTriangle, FaLightbulb, FaRocket, FaSearch, FaArrowLeft, FaSyncAlt, FaInfoCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './PredictionDisplay.css';
-import { usePrediction } from '../../hooks/usePrediction';
-import notificationService from '../../services/NotificationService';
 import mlPredictionService from '../../services/MLPredictionService';
-import { getRiskLevel, formatTime } from '../../utils/predictionUtils';
 
-function PredictionDisplay({ 
-  mode = 'compact',
-  userData,
-  onFeedback = null
-}) {
+function PredictionDisplay({ userData }) {
   const navigate = useNavigate();
-  const { prediction, nextCheckTime, isLoading } = usePrediction(userData);
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
-  
-  const [notificationPermission, setNotificationPermission] = useState(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      return Notification.permission;
-    }
-    return 'unsupported';
-  });
+  const location = useLocation();
+  const [prediction, setPrediction] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  React.useEffect(() => {
-    // Always check permission, regardless of mode
-    const checkPermission = () => {
-      if (typeof window !== 'undefined' && 'Notification' in window) {
-        const currentPermission = Notification.permission;
-        setNotificationPermission(currentPermission);
-      }
-    };
+  useEffect(() => {
+    loadPrediction();
+  }, [userData]);
 
-    // Check immediately on mount
-    checkPermission();
-
-    // Then check every 3 seconds
-    const interval = setInterval(checkPermission, 3000);
-    return () => clearInterval(interval);
-  }, []); // No dependencies - always run
-
-  const handleEnableNotifications = async () => {
-    const granted = await notificationService.requestPermission();
-    if (granted) {
-      setNotificationPermission('granted');
-    }
-  };
-
-  const handleViewDetails = () => {
-    navigate('/urge-prediction');
-  };
-
-  const handleInterventionClick = (interventionType) => {
-    const interventionLog = {
-      timestamp: new Date().toISOString(),
-      type: interventionType,
-      riskScore: prediction.riskScore,
-      reason: prediction.reason,
-      usedML: prediction.usedML
-    };
-
-    const existingLogs = JSON.parse(localStorage.getItem('intervention_logs') || '[]');
-    existingLogs.push(interventionLog);
-    localStorage.setItem('intervention_logs', JSON.stringify(existingLogs));
-
-    navigate('/urge-toolkit', { state: { selectedTool: interventionType } });
-  };
-
-  const handleFeedback = async (wasHelpful) => {
-    try {
-      const feedback = {
-        timestamp: new Date().toISOString(),
-        riskScore: prediction.riskScore,
-        userFeedback: wasHelpful ? 'helpful' : 'false_alarm',
-        factors: prediction.factors,
-        reason: prediction.reason,
-        usedML: prediction.usedML
-      };
-
-      if (prediction.usedML) {
-        mlPredictionService.processFeedback(feedback);
-      }
-
-      const existingFeedback = JSON.parse(localStorage.getItem('prediction_feedback') || '[]');
-      existingFeedback.push(feedback);
-      localStorage.setItem('prediction_feedback', JSON.stringify(existingFeedback));
-
-      setFeedbackSubmitted(true);
-
-      if (onFeedback) {
-        onFeedback(feedback);
-      }
-
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
-    } catch (error) {
-      console.error('Error processing feedback:', error);
-      setFeedbackSubmitted(true);
-      setTimeout(() => navigate('/'), 2000);
-    }
-  };
-
-  // Helper function to get reliability color
-  const getReliabilityColor = (reliability) => {
-    if (reliability >= 70) return '#22c55e'; // Green
-    if (reliability >= 50) return '#ffdd00'; // Yellow
-    return '#ef4444'; // Red
-  };
-
-  // COMPACT MODE
-  if (mode === 'compact') {
-    if (!prediction) {
-      return null;
-    }
-
-    const riskLevel = getRiskLevel(prediction.riskScore);
-    const reliabilityColor = getReliabilityColor(prediction.reliability);
+  const loadPrediction = async () => {
+    setIsLoading(true);
     
-    // Check if model is trained (usedML means AI model was used for prediction)
-    const hasTrainedModel = prediction.usedML === true;
+    try {
+      // Check if prediction was passed via navigation state
+      if (location.state?.prediction) {
+        setPrediction(location.state.prediction);
+        setIsLoading(false);
+        return;
+      }
 
-    return (
-      <div className="prediction-widget">
-        <div className="prediction-widget-header">
-          <div className="widget-title">
-            <FaMicrochip style={{ fontSize: '1rem', color: 'var(--success)' }} />
-            <span>AI Relapse Risk Prediction</span>
-          </div>
-          {/* Show Active badge if model is trained OR notifications granted */}
-          {(hasTrainedModel || notificationPermission === 'granted') && (
-            <span className="notification-status active">
-              <FaCheckCircle style={{ fontSize: '0.75rem' }} />
-              Active
-            </span>
-          )}
-        </div>
+      // Otherwise, get a fresh prediction
+      if (!userData?.benefitTracking?.length) {
+        setPrediction({ riskScore: 0, reason: 'No data available' });
+        setIsLoading(false);
+        return;
+      }
 
-        <div className="prediction-widget-content">
-          <div className="risk-display">
-            <div className="risk-score" style={{ color: riskLevel.color }}>
-              {prediction.riskScore}%
-            </div>
-            <div 
-              className="risk-badge" 
-              style={{ 
-                backgroundColor: riskLevel.bgColor,
-                color: riskLevel.color,
-                border: `1px solid ${riskLevel.color}40`
-              }}
-            >
-              {riskLevel.label} RISK
-            </div>
-          </div>
+      await mlPredictionService.initialize();
+      const result = await mlPredictionService.predict(userData);
+      setPrediction(result);
+    } catch (error) {
+      console.error('Prediction error:', error);
+      setPrediction({ riskScore: 0, reason: 'Unable to analyze patterns' });
+    }
+    
+    setIsLoading(false);
+  };
 
-          <div className="prediction-info">
-            <div className="info-row">
-              <span className="info-label">Prediction Reliability:</span>
-              <span className="info-value" style={{ color: reliabilityColor }}>
-                {prediction.reliability}%
-              </span>
-            </div>
-            {prediction.dataContext && (
-              <>
-                <div className="info-row">
-                  <span className="info-label">Based on:</span>
-                  <span className="info-value">
-                    {prediction.dataContext.trackingDays} days
-                  </span>
-                </div>
-                <div className="info-row">
-                  <span className="info-label">Relapses analyzed:</span>
-                  <span className="info-value">
-                    {prediction.dataContext.relapseCount}
-                  </span>
-                </div>
-              </>
-            )}
-            <div className="info-row">
-              <span className="info-label">Next Check:</span>
-              <span className="info-value">{formatTime(nextCheckTime)}</span>
-            </div>
-          </div>
+  const handleStruggling = () => {
+    navigate('/urge-toolkit', { 
+      state: { 
+        fromPrediction: true,
+        riskScore: prediction?.riskScore,
+        suggestedTools: prediction?.patterns?.suggestions?.[0]?.tools 
+      } 
+    });
+  };
 
-          {prediction.reliability < 60 && (
-            <div className="data-warning">
-              <FaInfoCircle style={{ fontSize: '0.875rem', color: '#ef4444' }} />
-              <span className="warning-text">
-                Limited data - predictions will improve as you track more
-              </span>
-            </div>
-          )}
+  const handleDismiss = () => {
+    navigate('/');
+  };
 
-          {prediction.riskScore >= 50 && (
-            <div className="quick-reason">
-              <FaLightbulb style={{ fontSize: '1rem', color: 'var(--primary)' }} />
-              <span className="reason-text">{prediction.reason}</span>
-            </div>
-          )}
+  const getRiskInfo = (score) => {
+    if (score >= 70) return { level: 'high', label: 'High' };
+    if (score >= 50) return { level: 'elevated', label: 'Elevated' };
+    return { level: 'low', label: 'Low' };
+  };
 
-          {/* Button logic - prioritize showing trained model features */}
-          <div className="widget-actions">
-            {hasTrainedModel ? (
-              // Model is trained - always show View + Retrain
-              <>
-                <button 
-                  className="widget-btn view-details"
-                  onClick={handleViewDetails}
-                >
-                  <FaSearch style={{ fontSize: '0.875rem' }} />
-                  <span>View Analysis</span>
-                </button>
-                <button 
-                  className="widget-btn retrain-btn"
-                  onClick={() => navigate('/ml-training')}
-                >
-                  <FaSyncAlt style={{ fontSize: '0.875rem' }} />
-                  <span>Retrain</span>
-                </button>
-              </>
-            ) : notificationPermission === 'unsupported' ? (
-              // No notification support and no model - show only view button
-              <button 
-                className="widget-btn view-details"
-                onClick={handleViewDetails}
-              >
-                <FaSearch style={{ fontSize: '0.875rem' }} />
-                <span>View Analysis</span>
-              </button>
-            ) : notificationPermission !== 'granted' ? (
-              // Notifications available but not granted - show enable + details
-              <>
-                <button 
-                  className="widget-btn enable-notifications"
-                  onClick={handleEnableNotifications}
-                >
-                  <FaBell style={{ fontSize: '0.875rem' }} />
-                  <span>Enable Alerts</span>
-                </button>
-                <button 
-                  className="widget-btn view-details"
-                  onClick={handleViewDetails}
-                >
-                  <FaSearch style={{ fontSize: '0.875rem' }} />
-                  <span>Details</span>
-                </button>
-              </>
-            ) : (
-              // Notifications granted but no model - show view + enable would be redundant, so just view
-              <button 
-                className="widget-btn view-details"
-                onClick={handleViewDetails}
-              >
-                <FaSearch style={{ fontSize: '0.875rem' }} />
-                <span>View Analysis</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // FULL MODE
+  // Loading state
   if (isLoading) {
     return (
-      <div className="relapse-prediction-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Analyzing relapse risk factors...</p>
+      <div className="prediction-display">
+        <div className="prediction-loading">
+          <p className="loading-text">Analyzing patterns...</p>
         </div>
       </div>
     );
   }
 
-  if (!prediction || prediction.riskScore < 40) {
-    return (
-      <div className="relapse-prediction-container">
-        <div className="low-risk-message">
-          <FaCheckCircle style={{ fontSize: '4rem', color: 'var(--success)', marginBottom: 'var(--spacing-lg)' }} />
-          <h2>Low Relapse Risk</h2>
-          <p>Current risk level: <strong>{prediction ? prediction.riskScore : 0}%</strong></p>
-          <p className="subtext">
-            {prediction?.usedML 
-              ? 'AI shows low relapse risk based on your personal patterns' 
-              : 'Conditions look stable - keep up the good work'}
-          </p>
-          <button onClick={() => navigate('/')} className="back-button">
-            <FaArrowLeft style={{ fontSize: '0.875rem' }} />
-            Back to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const riskLevel = getRiskLevel(prediction.riskScore);
-  const reliabilityColor = getReliabilityColor(prediction.reliability);
+  const riskScore = prediction?.riskScore || 0;
+  const riskInfo = getRiskInfo(riskScore);
+  const patterns = prediction?.patterns;
 
   return (
-    <div className="relapse-prediction-container">
-      {feedbackSubmitted ? (
-        <div className="feedback-success">
-          <FaCheckCircle style={{ fontSize: '4rem', color: 'var(--success)', marginBottom: 'var(--spacing-lg)' }} />
-          <h2>Thank You!</h2>
-          <p>Your feedback helps improve the AI predictor.</p>
-          <p className="subtext">Redirecting to dashboard...</p>
+    <div className="prediction-display">
+      {/* Back button - text only */}
+      <button className="prediction-back" onClick={() => navigate('/')}>
+        ←
+      </button>
+
+      <div className="prediction-content">
+        {/* Header label */}
+        <p className="prediction-label">Pattern Analysis</p>
+
+        {/* Risk score */}
+        <div className="prediction-score-container">
+          <span className={`prediction-score ${riskInfo.level}`}>
+            {riskScore}
+          </span>
+          <span className="prediction-percent">%</span>
         </div>
-      ) : (
-        <div className="prediction-card">
-          <div className="prediction-header">
-            <FaExclamationTriangle style={{ fontSize: '3rem', color: riskLevel.color, marginBottom: 'var(--spacing-sm)' }} />
-            <h1>{riskLevel.label} RELAPSE RISK DETECTED</h1>
-            <p className="prediction-context">
-              Based on patterns from your past relapses
-            </p>
-          </div>
 
-          <div className="risk-meter-section">
-            <div className="risk-percentage" style={{ color: riskLevel.color }}>
-              {prediction.riskScore}%
-            </div>
-            <div className="risk-bar-container">
-              <div 
-                className="risk-bar-fill" 
-                style={{ 
-                  width: `${prediction.riskScore}%`,
-                  backgroundColor: riskLevel.color
-                }}
-              ></div>
-            </div>
-            <div className="risk-label" style={{ color: riskLevel.color }}>
-              {riskLevel.label} RELAPSE RISK
-            </div>
-          </div>
+        <p className={`prediction-level ${riskInfo.level}`}>
+          {riskInfo.label} Risk
+        </p>
 
-          <div className="reason-section">
-            <h3>Why this alert?</h3>
-            <p className="reason-text">
-              {prediction.usedML 
-                ? `AI detected: ${prediction.reason}` 
-                : prediction.reason}
-            </p>
+        {/* Pattern insights - only show if elevated risk */}
+        {riskScore >= 50 && patterns && (
+          <div className="pattern-insights">
             
-            {prediction.factors?.similarPastRelapse && (
-              <div className="past-relapse-warning">
-                <FaExclamationTriangle style={{ fontSize: '1.25rem' }} />
-                <div>
-                  <strong>Pattern Match:</strong> Current conditions similar to day {prediction.factors.similarPastRelapse.days} before past relapse
-                </div>
+            {/* Why this alert section */}
+            {(patterns.streak?.isHighRiskDay || patterns.time?.isHighRiskTime || patterns.benefits?.hasSignificantDrop || prediction?.factors?.inPurgePhase) && (
+              <div className="insight-section">
+                <p className="insight-header">Why this alert</p>
+                
+                {/* Streak day pattern */}
+                {patterns.streak?.isHighRiskDay && (
+                  <div className="insight-item">
+                    <p className="insight-title">Day {patterns.streak.currentDay}</p>
+                    <p className="insight-detail">
+                      You've relapsed {patterns.streak.relapsesInRange} of {patterns.streak.totalRelapses} times 
+                      between days {patterns.streak.rangeDays[0]}-{patterns.streak.rangeDays[1]}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Time pattern */}
+                {patterns.time?.isHighRiskTime && (
+                  <div className="insight-item">
+                    <p className="insight-title">Evening hours</p>
+                    <p className="insight-detail">
+                      {patterns.time.eveningPercentage}% of your relapses happened after 8pm
+                    </p>
+                  </div>
+                )}
+                
+                {/* Benefit drops */}
+                {patterns.benefits?.hasSignificantDrop && patterns.benefits.drops.map((drop, i) => (
+                  <div className="insight-item" key={i}>
+                    <p className="insight-title">{drop.metric} dropped</p>
+                    <p className="insight-detail">
+                      From {drop.from} → {drop.to} over the last {patterns.benefits.daysCovered} days
+                    </p>
+                  </div>
+                ))}
+
+                {/* Purge phase */}
+                {prediction?.factors?.inPurgePhase && !patterns.streak?.isHighRiskDay && (
+                  <div className="insight-item">
+                    <p className="insight-title">Purge phase</p>
+                    <p className="insight-detail">
+                      Days 15-45 are typically the most challenging
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Historical match */}
+            {patterns.historical && (
+              <div className="insight-section">
+                <p className="insight-header">Historical match</p>
+                <p className="historical-text">
+                  Similar conditions on Day {patterns.historical.matchDay}
+                </p>
+                <p className="historical-outcome">
+                  {patterns.historical.daysUntilRelapse > 0 
+                    ? `Relapsed ${patterns.historical.daysUntilRelapse} days later`
+                    : 'Relapsed same day'
+                  }
+                </p>
+              </div>
+            )}
+
+            {/* Suggested focus */}
+            {patterns.suggestions && patterns.suggestions.length > 0 && (
+              <div className="insight-section">
+                <p className="insight-header">Suggested focus</p>
+                {patterns.suggestions.map((suggestion, i) => (
+                  <div className="insight-item" key={i}>
+                    <p className="insight-title">{suggestion.focus}</p>
+                    <p className="insight-detail">{suggestion.reason}</p>
+                  </div>
+                ))}
               </div>
             )}
           </div>
+        )}
 
-          <div className="interventions-section">
-            <h3>Recommended Actions</h3>
-            <div className="intervention-grid">
-              <button 
-                className="intervention-card"
-                onClick={() => handleInterventionClick('breathing')}
-              >
-                <FaWind style={{ fontSize: '2rem', color: 'var(--primary)' }} />
-                <div className="intervention-content">
-                  <div className="intervention-title">Breathing Exercise</div>
-                  <div className="intervention-description">Calm your nervous system</div>
-                </div>
-                <span className="arrow">→</span>
-              </button>
+        {/* Low risk message */}
+        {riskScore < 50 && (
+          <p className="prediction-explanation">
+            Conditions look stable based on your patterns. Keep up the good work.
+          </p>
+        )}
 
-              <button 
-                className="intervention-card"
-                onClick={() => handleInterventionClick('coldshower')}
-              >
-                <FaTint style={{ fontSize: '2rem', color: 'var(--primary)' }} />
-                <div className="intervention-content">
-                  <div className="intervention-title">Cold Shower</div>
-                  <div className="intervention-description">Reset your system</div>
-                </div>
-                <span className="arrow">→</span>
-              </button>
+        {/* Disclaimer */}
+        <p className="prediction-disclaimer">
+          This is pattern awareness, not prediction. You may feel fine—this is just a heads up based on your data.
+        </p>
 
-              <button 
-                className="intervention-card"
-                onClick={() => handleInterventionClick('exercise')}
-              >
-                <FaDumbbell style={{ fontSize: '2rem', color: 'var(--primary)' }} />
-                <div className="intervention-content">
-                  <div className="intervention-title">Physical Exercise</div>
-                  <div className="intervention-description">Channel the energy</div>
-                </div>
-                <span className="arrow">→</span>
-              </button>
-
-              <button 
-                className="intervention-card"
-                onClick={() => handleInterventionClick('meditation')}
-              >
-                <FaOm style={{ fontSize: '2rem', color: 'var(--primary)' }} />
-                <div className="intervention-content">
-                  <div className="intervention-title">Meditation</div>
-                  <div className="intervention-description">Find your center</div>
-                </div>
-                <span className="arrow">→</span>
-              </button>
-            </div>
+        {/* Action buttons */}
+        {riskScore >= 50 && (
+          <div className="prediction-actions">
+            <button 
+              className="prediction-btn primary"
+              onClick={handleStruggling}
+            >
+              I'm struggling
+            </button>
+            <button 
+              className="prediction-btn secondary"
+              onClick={handleDismiss}
+            >
+              I'm fine
+            </button>
           </div>
+        )}
 
-          <div className="feedback-section">
-            <h4>Was this prediction accurate?</h4>
-            <p className="feedback-subtext">
-              {prediction.usedML 
-                ? 'Your feedback trains the AI to predict your relapse patterns better' 
-                : 'Your feedback helps improve future risk detection'}
-            </p>
-            <div className="feedback-buttons">
-              <button 
-                className="feedback-button helpful"
-                onClick={() => handleFeedback(true)}
-              >
-                <FaThumbsUp style={{ fontSize: '0.875rem' }} />
-                Yes, helpful
-              </button>
-              <button 
-                className="feedback-button false-alarm"
-                onClick={() => handleFeedback(false)}
-              >
-                <FaThumbsDown style={{ fontSize: '0.875rem' }} />
-                False alarm
-              </button>
-            </div>
+        {riskScore < 50 && (
+          <div className="prediction-actions">
+            <button 
+              className="prediction-btn secondary"
+              onClick={handleDismiss}
+            >
+              Back to Dashboard
+            </button>
           </div>
+        )}
 
-          <div className="confidence-footer">
-            <div className="confidence-info">
-              <span className="confidence-label">Prediction Reliability:</span>
-              <span className="confidence-value" style={{ color: reliabilityColor }}>
-                {prediction.reliability}%
-              </span>
-              {prediction.dataContext && (
-                <span className="accuracy-note">
-                  Based on {prediction.dataContext.trackingDays} days, {prediction.dataContext.relapseCount} relapses
-                </span>
-              )}
-            </div>
-            {prediction.usedML && (
-              <button 
-                className="retrain-model-btn"
-                onClick={() => navigate('/ml-training')}
-              >
-                <FaRocket style={{ fontSize: '0.875rem' }} />
-                <span>Retrain Model</span>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+        {/* Data context */}
+        {prediction?.dataContext && (
+          <p className="prediction-context">
+            Based on {prediction.dataContext.trackingDays} days of data
+            {prediction.dataContext.relapseCount > 0 && 
+              ` · ${prediction.dataContext.relapseCount} patterns analyzed`
+            }
+          </p>
+        )}
+      </div>
     </div>
   );
 }
