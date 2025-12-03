@@ -685,17 +685,19 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               </div>
             ) : (
               <div className="calendar-trigger-section">
-                <h4>What triggered this?</h4>
-                <div className="calendar-trigger-options">
-                  {triggerOptions.map(trigger => (
-                    <button
-                      key={trigger.id}
-                      className={`calendar-trigger-pill ${selectedTrigger === trigger.id ? 'selected' : ''}`}
-                      onClick={() => setSelectedTrigger(trigger.id)}
-                    >
-                      <trigger.icon />
-                      <span>{trigger.label}</span>
-                    </button>
+                <div className="calendar-triggers-label">Select Trigger</div>
+                <div className="calendar-triggers-list">
+                  {triggerOptions.map((trigger, index, arr) => (
+                    <React.Fragment key={trigger.id}>
+                      <button
+                        className={`calendar-trigger ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                        onClick={() => setSelectedTrigger(trigger.id)}
+                      >
+                        <span>{trigger.label}</span>
+                        {selectedTrigger === trigger.id && <span className="calendar-trigger-check">✓</span>}
+                      </button>
+                      {index < arr.length - 1 && <div className="calendar-trigger-divider" />}
+                    </React.Fragment>
                   ))}
                 </div>
                 <div className="calendar-trigger-actions">

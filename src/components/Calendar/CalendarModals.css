@@ -648,56 +648,64 @@
 }
 
 /* =============================================================================
-   TRIGGER SELECTION
+   TRIGGER SELECTION - List style (matches Urge Toolkit)
    ============================================================================= */
 
 .calendar-trigger-section {
   margin-bottom: 32px;
 }
 
-.calendar-trigger-section h4 {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0 0 20px 0;
+.calendar-triggers-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
   text-align: center;
 }
 
-.calendar-trigger-options {
+.calendar-triggers-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0;
 }
 
-.calendar-trigger-pill {
+.calendar-trigger {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 100px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
   transition: all 150ms ease;
-  font-size: 0.8125rem;
-  font-family: inherit;
-  color: rgba(255, 255, 255, 0.5);
+  text-align: left;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.calendar-trigger-pill:hover:not(.selected) {
-  background: rgba(255, 255, 255, 0.08);
+.calendar-trigger:hover {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.calendar-trigger-pill.selected {
-  background: #ffffff;
-  border-color: #ffffff;
-  color: #000000;
+.calendar-trigger.selected {
+  color: #ffffff;
 }
 
-.calendar-trigger-pill svg {
+.calendar-trigger-check {
   font-size: 0.875rem;
+  color: #ffffff;
+}
+
+.calendar-trigger-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .calendar-trigger-actions {
@@ -707,7 +715,8 @@
 }
 
 .calendar-trigger-confirm {
-  padding: 14px 32px;
+  width: 100%;
+  padding: 16px 24px;
   border-radius: 12px;
   font-size: 0.9375rem;
   font-weight: 600;
@@ -721,6 +730,10 @@
 
 .calendar-trigger-confirm:hover:not(:disabled) {
   opacity: 0.9;
+}
+
+.calendar-trigger-confirm:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .calendar-trigger-confirm:disabled {
@@ -771,9 +784,9 @@
     font-size: 0.875rem;
   }
   
-  .calendar-trigger-pill {
-    padding: 8px 14px;
-    font-size: 0.75rem;
+  .calendar-trigger {
+    padding: 12px 0;
+    font-size: 0.8125rem;
   }
   
   .calendar-journal-header {
@@ -849,9 +862,9 @@
     border-radius: 10px;
   }
   
-  .calendar-trigger-pill {
-    padding: 8px 12px;
-    font-size: 0.6875rem;
+  .calendar-trigger {
+    padding: 12px 0;
+    font-size: 0.75rem;
   }
   
   .calendar-journal-textarea {
@@ -931,9 +944,9 @@
     height: 10px;
   }
   
-  .calendar-trigger-pill {
-    padding: 12px 20px;
-    font-size: 0.875rem;
+  .calendar-trigger {
+    padding: 16px 0;
+    font-size: 0.9375rem;
   }
   
   .calendar-btn-primary,
