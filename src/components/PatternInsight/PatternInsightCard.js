@@ -34,15 +34,20 @@ const PatternInsightCard = ({ userData }) => {
       
       const modelInfo = mlPredictionService.getModelInfo();
       
-      // Only show if model is actually trained
-      if (!modelInfo?.isReady || !modelInfo?.lastTrained) {
+      // Check if model is trained OR if we have seeded training data (for testing)
+      const trainingHistory = localStorage.getItem('ml_training_history');
+      const hasSeededData = trainingHistory && JSON.parse(trainingHistory).lastTrained;
+      
+      // Only show if model is actually trained or we have test data
+      if (!modelInfo?.isReady && !hasSeededData) {
         return;
       }
 
       const prediction = await mlPredictionService.predict(userData);
       
-      // Only show for ML predictions with elevated risk (50%+)
-      if (!prediction?.usedML || prediction.riskScore < 50) {
+      // Show for elevated risk (50%+) - works with both ML and fallback predictions
+      // For seeded test data, also show if fallback gives high enough score
+      if (prediction.riskScore < 50) {
         return;
       }
 

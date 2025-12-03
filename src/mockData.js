@@ -1,4 +1,4 @@
-// src/mockData.js - COMPREHENSIVE test data with ALL users + 6 AI TEST USERS
+// src/mockData.js - COMPREHENSIVE test data with ALL users + 6 AI TEST USERS + AI CARD TEST USER
 import { format, subDays, addDays } from 'date-fns';
 
 // Helper functions
@@ -278,6 +278,49 @@ export const aiTestUser6 = {
   language: 'en',
   wisdomMode: false,
   urgeToolUsage: [{ date: subDays(new Date(), 20), tool: 'breathing', effective: true }]
+};
+
+// ========================================
+// AI CARD TEST USER - Pre-trained model, shows PatternInsightCard
+// ========================================
+
+export const aiCardTestUser = {
+  username: 'aicard',
+  email: 'aicard@example.com',
+  startDate: subDays(new Date(), 28),
+  currentStreak: 28,
+  longestStreak: 35,
+  wetDreamCount: 1,
+  relapseCount: 5,
+  isPremium: true,
+  badges: getEarnedBadges(28),
+  benefitTracking: createBenefitTracking(subDays(new Date(), 28), 28, 'moderate'),
+  streakHistory: [
+    { id: 1, start: subDays(new Date(), 120), end: subDays(new Date(), 105), days: 15, reason: 'relapse', trigger: 'stress' },
+    { id: 2, start: subDays(new Date(), 104), end: subDays(new Date(), 85), days: 19, reason: 'relapse', trigger: 'evening' },
+    { id: 3, start: subDays(new Date(), 84), end: subDays(new Date(), 49), days: 35, reason: 'relapse', trigger: 'social_media' },
+    { id: 4, start: subDays(new Date(), 48), end: subDays(new Date(), 35), days: 13, reason: 'relapse', trigger: 'boredom' },
+    { id: 5, start: subDays(new Date(), 34), end: subDays(new Date(), 29), days: 5, reason: 'relapse', trigger: 'evening' },
+    { id: 6, start: subDays(new Date(), 28), end: null, days: 28, reason: null, trigger: null }
+  ],
+  emotionalTracking: [
+    { date: new Date(), day: 28, phase: 2, anxiety: 7, moodStability: 4, mentalClarity: 5, emotionalProcessing: 5 }
+  ],
+  urgeLog: [
+    { date: new Date(), intensity: 7, trigger: 'evening', protocol: 'breathing', phase: 'Emotional Purging Phase', day: 28 },
+    { date: subDays(new Date(), 1), intensity: 6, trigger: 'stress', protocol: 'cold_shower', phase: 'Emotional Purging Phase', day: 27 }
+  ],
+  notes: { [format(new Date(), 'yyyy-MM-dd')]: "Day 28 - Testing AI Card!" },
+  discordUsername: '',
+  showOnLeaderboard: false,
+  dataSharing: false,
+  analyticsOptIn: true,
+  marketingEmails: false,
+  darkMode: true,
+  notifications: true,
+  language: 'en',
+  wisdomMode: false,
+  urgeToolUsage: []
 };
 
 // ========================================

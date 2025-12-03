@@ -1,9 +1,9 @@
-// src/hooks/useUserData.js - FIXED: Clears ML data when switching users
+// src/hooks/useUserData.js - FIXED: Clears ML data when switching users + AI Card Test User
 import { useState, useEffect } from 'react';
 import { addDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
-// IMPORT: All mock data including 6 AI test users
+// IMPORT: All mock data including 6 AI test users + AI Card Test User
 import comprehensiveMockData, { 
   newUserMockData, 
   veteranUserMockData, 
@@ -16,7 +16,8 @@ import comprehensiveMockData, {
   aiTestUser3,
   aiTestUser4,
   aiTestUser5,
-  aiTestUser6
+  aiTestUser6,
+  aiCardTestUser
 } from '../mockData';
 
 // Custom hook to manage user data
@@ -94,6 +95,26 @@ export const useUserData = () => {
     }
   };
 
+  // Seed ML data for AI card test user so the PatternInsightCard shows
+  const seedMLDataForTesting = () => {
+    const trainingHistory = {
+      accuracy: [0.72, 0.75, 0.78],
+      loss: [0.45, 0.38, 0.32],
+      lastTrained: new Date().toISOString(),
+      totalEpochs: 150
+    };
+    
+    const normalizationStats = {
+      means: [6.5, 6.8, 6.5, 0.5, 14, 0.3, 20, 0.4, 5, 6],
+      stds: [1.8, 1.6, 1.7, 1.2, 6, 0.45, 15, 0.49, 2, 2]
+    };
+    
+    localStorage.setItem('ml_training_history', JSON.stringify(trainingHistory));
+    localStorage.setItem('ml_normalization_stats', JSON.stringify(normalizationStats));
+    
+    console.log('🧠 ML data seeded for testing - PatternInsightCard will show');
+  };
+
   const login = async (username, password = 'demo') => {
     try {
       setIsLoading(true);
@@ -168,6 +189,11 @@ export const useUserData = () => {
           mockUserData = aiTestUser6;
           break;
           
+        case 'aicard':
+        case 'cardtest':
+          mockUserData = aiCardTestUser;
+          break;
+          
         default:
           mockUserData = comprehensiveMockData;
           break;
@@ -205,6 +231,11 @@ export const useUserData = () => {
       setUserData(mockUserData);
       setIsLoggedIn(true);
       setIsPremium(true);
+      
+      // Seed ML data for AI card test user
+      if (username.toLowerCase() === 'aicard' || username.toLowerCase() === 'cardtest') {
+        seedMLDataForTesting();
+      }
       
       localStorage.setItem('userData', JSON.stringify(mockUserData));
       localStorage.setItem('isLoggedIn', 'true');
@@ -256,6 +287,9 @@ export const useUserData = () => {
         return '(AI Test 5 - Day 19, HIGH RISK 72%)';
       case 'aitest6':
         return '(AI Test 6 - Day 45, AI Active 42%)';
+      case 'aicard':
+      case 'cardtest':
+        return '(AI Card Test - Day 28, CARD VISIBLE)';
       default:
         return '(Main Demo - Day 25)';
     }

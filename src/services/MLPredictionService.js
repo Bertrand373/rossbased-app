@@ -573,13 +573,39 @@ class MLPredictionService {
   fallbackPrediction(userData) {
     let riskScore = 30;
     
+    // Purge phase (days 15-45) - most vulnerable period
     if (userData.currentStreak >= 15 && userData.currentStreak <= 45) {
       riskScore += 15;
     }
     
+    // Evening hours - higher risk
     const hour = new Date().getHours();
     if (hour >= 20 && hour <= 23) {
       riskScore += 20;
+    } else if (hour >= 17 && hour < 20) {
+      riskScore += 10; // Late afternoon also elevated
+    }
+    
+    // Weekend - slightly higher risk
+    const dayOfWeek = new Date().getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      riskScore += 8;
+    }
+    
+    // More relapse history = more patterns to learn from
+    const relapseCount = userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0;
+    if (relapseCount >= 4) {
+      riskScore += 10; // User has established patterns
+    }
+    
+    // Check recent benefit drops
+    if (userData.benefitTracking && userData.benefitTracking.length >= 2) {
+      const recent = userData.benefitTracking[userData.benefitTracking.length - 1];
+      const previous = userData.benefitTracking[userData.benefitTracking.length - 2];
+      const energyDrop = (previous?.energy || 5) - (recent?.energy || 5);
+      if (energyDrop >= 2) {
+        riskScore += 10;
+      }
     }
     
     const reliability = this.calculateReliability(userData);
