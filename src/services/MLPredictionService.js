@@ -1,5 +1,6 @@
 // src/services/MLPredictionService.js
-// FIXED: Model only marked ready if actually trained (has lastTrained timestamp)
+// FIXED: Model only marked ready if actually trained
+// UPDATED: Pattern-aware notification copy (not alarming)
 
 import * as tf from '@tensorflow/tfjs';
 import notificationService from './NotificationService';
@@ -315,40 +316,35 @@ class MLPredictionService {
 
   // Calculate honest reliability based on data quality
   calculateReliability(userData) {
-    // Base reliability on model's training accuracy
     let reliability = this.trainingHistory.accuracy.length > 0
       ? this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1] * 100
-      : 50; // Default for untrained model
+      : 50;
     
-    // Factor 1: Penalize for insufficient tracking data
     const dataPoints = userData.benefitTracking?.length || 0;
     if (dataPoints < 30) {
-      reliability *= 0.7; // Reduce by 30% for minimal data
+      reliability *= 0.7;
     } else if (dataPoints < 50) {
-      reliability *= 0.85; // Reduce by 15% for limited data
+      reliability *= 0.85;
     }
     
-    // Factor 2: Penalize for few relapses (can't learn patterns from 1-2 relapses)
     const relapseCount = userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0;
     if (relapseCount < 2) {
-      reliability *= 0.75; // Reduce by 25% for insufficient relapse history
+      reliability *= 0.75;
     } else if (relapseCount < 4) {
-      reliability *= 0.9; // Reduce by 10% for limited relapse history
+      reliability *= 0.9;
     }
     
-    // Factor 3: Penalize for missing emotional data (reduces pattern detection)
     const hasEmotionalData = userData.emotionalTracking && userData.emotionalTracking.length > 0;
     if (!hasEmotionalData) {
-      reliability *= 0.9; // Reduce by 10% for missing emotional context
+      reliability *= 0.9;
     }
     
-    // Cap at 85% - never claim perfect reliability
     return Math.min(Math.round(reliability), 85);
   }
 
   async predict(userData) {
     try {
-      // CRITICAL: Double-check model is actually trained before predicting
+      // CRITICAL: Triple-check model is actually trained before predicting
       if (!this.isModelReady || !this.model || !this.trainingHistory.lastTrained) {
         console.log('⚠️ Model not ready or not trained, using fallback prediction');
         return this.fallbackPrediction(userData);
@@ -358,7 +354,7 @@ class MLPredictionService {
         return {
           riskScore: 30,
           reliability: 20,
-          reason: 'Insufficient data for AI prediction',
+          reason: 'Insufficient data for pattern analysis',
           usedML: false,
           factors: {},
           dataContext: {
@@ -397,17 +393,13 @@ class MLPredictionService {
       const reliability = this.calculateReliability(userData);
       const reason = this.generateReason(rawFeatures, riskScore);
       
-      console.log(`🤖 AI Prediction: ${riskScore}% risk (${reliability}% reliable)`);
+      console.log(`🤖 Pattern Analysis: ${riskScore}% similarity to past difficult days`);
       
-      // Send Firebase notification through backend if high risk
+      // Send notification for high risk (70%+) - pattern-focused copy
       if (riskScore >= 70) {
         const username = localStorage.getItem('username');
         if (username) {
-          await this.sendAIPredictionNotification(username, riskScore, reason);
-        } else {
-          console.warn('⚠️ No username found - cannot send AI notification');
-          // Fallback to local notification
-          await notificationService.sendUrgePredictionNotification(riskScore, reason);
+          await this.sendPatternNotification(username, riskScore, reason);
         }
       }
       
@@ -448,32 +440,21 @@ class MLPredictionService {
     }
   }
 
-  // Send Firebase Cloud Messaging notification through backend
-  async sendAIPredictionNotification(username, riskScore, reason) {
+  // UPDATED: Pattern-focused notification (not alarming)
+  async sendPatternNotification(username, riskScore, reason) {
     try {
-      // Get FCM token from localStorage
       const fcmToken = localStorage.getItem('fcmToken');
       
       if (!fcmToken) {
-        console.warn('⚠️ No FCM token available - user may not have enabled notifications');
-        // Fallback to local notification
-        await notificationService.sendUrgePredictionNotification(riskScore, reason);
+        console.warn('⚠️ No FCM token available');
         return false;
       }
 
-      // Determine notification type based on risk level
-      let notificationType;
-      if (riskScore >= 80) {
-        notificationType = 'urge_high_risk';
-      } else if (riskScore >= 70) {
-        notificationType = 'urge_medium_risk';
-      } else {
-        notificationType = 'urge_alert';
-      }
+      // Pattern-focused notification type
+      const notificationType = riskScore >= 80 ? 'pattern_high' : 'pattern_elevated';
 
-      console.log(`🔔 Sending AI prediction notification: ${notificationType} (${riskScore}%)`);
+      console.log(`🔔 Sending pattern insight notification (${riskScore}%)`);
 
-      // Send notification through backend
       const response = await fetch(`${API_URL}/api/notifications/send`, {
         method: 'POST',
         headers: {
@@ -485,7 +466,7 @@ class MLPredictionService {
           customData: {
             riskScore: riskScore.toString(),
             reason: reason,
-            source: 'ai_prediction',
+            source: 'pattern_analysis',
             timestamp: Date.now().toString()
           }
         })
@@ -494,81 +475,58 @@ class MLPredictionService {
       const result = await response.json();
 
       if (result.success) {
-        console.log('✅ AI prediction notification sent successfully via Firebase');
-        
-        // Also show local browser notification as backup for immediate visibility
-        await this.showLocalNotification(riskScore, reason);
-        
+        console.log('✅ Pattern notification sent');
+        await this.showLocalPatternNotification(riskScore);
         return true;
       } else {
-        console.error('❌ Failed to send Firebase notification:', result.reason || result.error);
-        
-        // Fallback to local notification only
-        await notificationService.sendUrgePredictionNotification(riskScore, reason);
-        
+        // Fallback to local notification
+        await this.showLocalPatternNotification(riskScore);
         return false;
       }
     } catch (error) {
-      console.error('❌ Error sending AI prediction notification:', error);
-      
-      // Fallback to local notification
-      await notificationService.sendUrgePredictionNotification(riskScore, reason);
-      
+      console.error('❌ Error sending pattern notification:', error);
+      await this.showLocalPatternNotification(riskScore);
       return false;
     }
   }
 
-  // Show local browser notification as immediate feedback
-  async showLocalNotification(riskScore, reason) {
+  // UPDATED: Pattern-focused local notification copy
+  async showLocalPatternNotification(riskScore) {
     try {
-      if (!('Notification' in window)) {
-        return;
-      }
-
-      if (Notification.permission !== 'granted') {
+      if (!('Notification' in window) || Notification.permission !== 'granted') {
         return;
       }
 
       const registration = await navigator.serviceWorker.ready;
 
-      let title, body;
-      if (riskScore >= 80) {
-        title = '🚨 CRITICAL: High Relapse Risk';
-        body = 'AI detected critical risk patterns. Take action now!';
-      } else if (riskScore >= 70) {
-        title = '⚠️ WARNING: Elevated Relapse Risk';
-        body = 'AI detected concerning patterns. Stay vigilant!';
-      } else {
-        title = '⚡ AI Alert: Risk Detected';
-        body = 'Your patterns suggest increased risk.';
-      }
+      // Pattern-focused, non-alarming copy
+      const title = 'TitanTrack';
+      const body = 'Your patterns suggest today may require extra awareness. Tap for insights.';
 
       await registration.showNotification(title, {
         body: body,
         icon: '/icon-192.png',
         badge: '/icon-192.png',
-        tag: 'ai-prediction',
-        requireInteraction: true,
-        vibrate: [200, 100, 200, 100, 200],
+        tag: 'pattern-insight',
+        requireInteraction: false,
         data: {
-          type: 'ai_prediction',
+          type: 'pattern_insight',
           riskScore: riskScore.toString(),
-          reason: reason,
           url: '/urge-prediction'
         },
         actions: [
           {
             action: 'view',
-            title: 'View Details'
+            title: 'View Insights'
           },
           {
-            action: 'emergency',
-            title: 'Emergency Help'
+            action: 'dismiss',
+            title: 'Dismiss'
           }
         ]
       });
 
-      console.log('✅ Local notification shown');
+      console.log('✅ Local pattern notification shown');
     } catch (error) {
       console.error('Error showing local notification:', error);
     }
@@ -584,19 +542,19 @@ class MLPredictionService {
     }
     
     if (hour >= 20 && hour <= 23) {
-      reasons.push('Evening hours (high-risk time)');
+      reasons.push('Evening hours');
     }
     
     if (isWeekend) {
-      reasons.push('Weekend (less structure)');
+      reasons.push('Weekend');
     }
     
     if (inPurgePhase) {
-      reasons.push('In emotional purging phase (days 15-45)');
+      reasons.push('Purge phase (days 15-45)');
     }
     
     if (anxiety > 7 && moodStability < 4) {
-      reasons.push('High anxiety + low mood stability');
+      reasons.push('Elevated anxiety');
     }
     
     if (energy < 4 && focus < 4) {
@@ -604,11 +562,9 @@ class MLPredictionService {
     }
     
     if (reasons.length === 0) {
-      if (riskScore > 60) {
-        return 'AI detected elevated risk pattern';
-      } else {
-        return 'Overall conditions favorable';
-      }
+      return riskScore > 60 
+        ? 'Conditions similar to past difficult days' 
+        : 'Conditions look favorable';
     }
     
     return reasons.slice(0, 2).join(' + ');
@@ -631,7 +587,7 @@ class MLPredictionService {
     return {
       riskScore: Math.min(riskScore, 100),
       reliability,
-      reason: 'Using basic prediction (model not trained yet)',
+      reason: 'Pattern analysis requires more data',
       usedML: false,
       factors: {},
       dataContext: {
@@ -740,19 +696,6 @@ class MLPredictionService {
       localStorage.setItem('prediction_feedback', JSON.stringify(allFeedback));
       
       console.log('✅ Feedback recorded:', feedback.userFeedback);
-      
-      const recentFeedback = allFeedback.filter(f => {
-        const feedbackDate = new Date(f.timestamp);
-        const cutoffDate = new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - 7);
-        return feedbackDate >= cutoffDate;
-      });
-      
-      const falseAlarms = recentFeedback.filter(f => f.userFeedback === 'false_alarm').length;
-      
-      if (falseAlarms >= 5) {
-        console.log('⚠️ Multiple false alarms detected. Consider retraining.');
-      }
       
       return true;
     } catch (error) {

@@ -241,7 +241,7 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
     const getMetricValue = (d) => {
       if (!d) return null;
       if (metric === 'sleep') {
-        return d.sleep || d.attraction || null;
+        return d.sleep || null;
       }
       return d[metric] || null;
     };
@@ -342,12 +342,12 @@ export const generatePatternRecognition = (userData, selectedMetric, isPremium) 
     if (isPremium && metric !== 'sleep' && allData.length >= 20) {
       try {
         const goodSleepDays = allData.filter(d => {
-          const sleepVal = d.sleep || d.attraction || 5;
+          const sleepVal = d.sleep || 5;
           return typeof sleepVal === 'number' && sleepVal >= 7;
         });
         
         const poorSleepDays = allData.filter(d => {
-          const sleepVal = d.sleep || d.attraction || 5;
+          const sleepVal = d.sleep || 5;
           return typeof sleepVal === 'number' && sleepVal < 5;
         });
         
@@ -459,8 +459,7 @@ export const generateOptimizationGuidance = (userData, selectedMetric, timeRange
     const calculateDynamicThresholds = (data) => {
       const getValidData = (metric) => {
         if (metric === 'sleep') {
-          // Sleep may be stored as 'attraction' in older data
-          return data.map(d => d.sleep || d.attraction || 0).filter(val => val >= 1 && val <= 10);
+          return data.map(d => d.sleep || 0).filter(val => val >= 1 && val <= 10);
         }
         return data.map(d => d[metric] || 0).filter(val => val >= 1 && val <= 10);
       };
@@ -750,8 +749,8 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
         // FIXED: Support ALL 6 metrics properly
         let value = null;
         if (selectedMetric === 'sleep') {
-          // Sleep metric (premium) - check both sleep and fallback to attraction
-          value = item[selectedMetric] || item.attraction || null;
+          // Sleep metric (premium)
+          value = item.sleep || null;
         } else if (['energy', 'focus', 'confidence', 'aura', 'workout'].includes(selectedMetric)) {
           // All other 6 metrics: energy, focus, confidence, aura, workout
           value = item[selectedMetric] || null;
@@ -855,6 +854,9 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
       const completedInOrder = completedPhases.filter(phase => phaseOrder.includes(phase))
                                              .sort((a, b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b));
       
+      // Define metricLabel early so it can be used throughout
+      const metricLabel = selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric;
+      
       if (completedInOrder.length >= 2) {
         const firstPhase = completedInOrder[0];
         const lastCompleted = completedInOrder[completedInOrder.length - 1];
@@ -865,9 +867,9 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
         
         if (Math.abs(evolution) >= 15) {
           if (evolution > 0) {
-            insights.push(`**Phase Evolution**: Your ${selectedMetric} improved ${evolution}% from ${getPhaseDisplayName(firstPhase)} (${firstAvg}/10) to ${getPhaseDisplayName(lastCompleted)} (${lastAvg}/10). This shows successful energy transmutation through the phases.`);
+            insights.push(`**Phase Evolution**: Your ${metricLabel} improved ${evolution}% from ${getPhaseDisplayName(firstPhase)} (${firstAvg}/10) to ${getPhaseDisplayName(lastCompleted)} (${lastAvg}/10). This shows successful energy transmutation through the phases.`);
           } else {
-            insights.push(`**Phase Challenge**: ${selectedMetric} declined ${Math.abs(evolution)}% from ${getPhaseDisplayName(firstPhase)} to ${getPhaseDisplayName(lastCompleted)}. This suggests phase-specific challenges that need addressing.`);
+            insights.push(`**Phase Challenge**: ${metricLabel} declined ${Math.abs(evolution)}% from ${getPhaseDisplayName(firstPhase)} to ${getPhaseDisplayName(lastCompleted)}. This suggests phase-specific challenges that need addressing.`);
           }
         }
       }
@@ -910,7 +912,6 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
       };
       
       const insightContext = getMetricInsightContext(selectedMetric);
-      const metricLabel = selectedMetric === 'sleep' ? 'sleep quality' : selectedMetric;
       
       if (phaseAverages.purification && phaseAverages.purification.average < 5.5) {
         insights.push(`**Purification Phase Pattern**: ${metricLabel} averaged ${phaseAverages.purification.average}/10 during emotional purging (days 15-45). Lower metrics during this phase are normal - your psyche was healing suppressed emotions.`);
@@ -934,7 +935,7 @@ export const calculatePhaseEvolutionAnalysis = (userData, selectedMetric) => {
       }
       
       if (currentPhase === 'expansion' && currentAvg !== 'N/A' && parseFloat(currentAvg) >= 7) {
-        insights.push(`**Peak Performance Zone**: You're in Expansion phase with ${selectedMetric} at ${currentAvg}/10. This is optimal timing for ambitious goals, creative projects, and major life decisions.`);
+        insights.push(`**Peak Performance Zone**: You're in Expansion phase with ${metricLabel} at ${currentAvg}/10. This is optimal timing for ambitious goals, creative projects, and major life decisions.`);
       }
     }
     

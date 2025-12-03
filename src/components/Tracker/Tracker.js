@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 
 import './Tracker.css';
 import DatePicker from '../Shared/DatePicker';
+import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 
 const Tracker = ({ userData, updateUserData }) => {
   const [showDatePicker, setShowDatePicker] = useState(!userData.startDate);
@@ -165,6 +166,9 @@ const Tracker = ({ userData, updateUserData }) => {
 
   return (
     <div className="tracker">
+      
+      {/* AI Pattern Insight - ambient, non-intrusive */}
+      <PatternInsightCard userData={userData} />
       
       {/* Benefits Modal */}
       {showBenefits && (
