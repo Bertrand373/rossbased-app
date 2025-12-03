@@ -1,9 +1,8 @@
 // src/components/PatternInsight/PatternInsightCard.js
-// Ambient AI pattern awareness - non-intrusive card on Tracker
+// Ambient AI pattern awareness - floating minimal design
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaTimes } from 'react-icons/fa';
 import './PatternInsightCard.css';
 import mlPredictionService from '../../services/MLPredictionService';
 
@@ -49,8 +48,7 @@ const PatternInsightCard = ({ userData }) => {
 
       setInsight({
         riskScore: prediction.riskScore,
-        reason: prediction.reason,
-        level: prediction.riskScore >= 70 ? 'high' : 'elevated'
+        reason: prediction.reason
       });
 
       // Animate in after a short delay
@@ -63,7 +61,6 @@ const PatternInsightCard = ({ userData }) => {
 
   const handleDismiss = () => {
     setIsVisible(false);
-    // Wait for animation to complete
     setTimeout(() => {
       setIsDismissed(true);
       sessionStorage.setItem('pattern_insight_dismissed', 'true');
@@ -80,36 +77,25 @@ const PatternInsightCard = ({ userData }) => {
   }
 
   return (
-    <div className={`pattern-insight-card ${insight.level} ${isVisible ? 'visible' : ''}`}>
-      <button 
-        className="pattern-insight-dismiss" 
-        onClick={handleDismiss}
-        aria-label="Dismiss"
-      >
-        <FaTimes />
-      </button>
-      
-      <div className="pattern-insight-content">
-        <div className="pattern-insight-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-        </div>
-        
-        <div className="pattern-insight-text">
-          <h4>Heads Up</h4>
-          <p>Your patterns suggest today may require extra awareness.</p>
-        </div>
+    <div className={`pattern-insight ${isVisible ? 'visible' : ''}`}>
+      <p className="pattern-insight-label">Heads up</p>
+      <p className="pattern-insight-message">
+        Your patterns suggest today may require extra awareness.
+      </p>
+      <div className="pattern-insight-actions">
+        <button 
+          className="pattern-insight-view"
+          onClick={handleViewInsights}
+        >
+          View Insights
+        </button>
+        <button 
+          className="pattern-insight-dismiss"
+          onClick={handleDismiss}
+        >
+          Dismiss
+        </button>
       </div>
-      
-      <button 
-        className="pattern-insight-action"
-        onClick={handleViewInsights}
-      >
-        View Insights
-      </button>
     </div>
   );
 };
