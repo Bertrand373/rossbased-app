@@ -8,9 +8,7 @@ import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
 
-import { FaExclamationTriangle, FaFrown, 
-  FaLaptop, FaHome, FaHeart, FaClock, FaBrain, FaTheaterMasks,
-  FaWineBottle, FaBed, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -20,23 +18,30 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [viewMode, setViewMode] = useState('month');
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
+  const [editingExistingTrigger, setEditingExistingTrigger] = useState(false);
 
   // Journal states
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
 
   const triggerOptions = [
-    { id: 'lustful_thoughts', label: 'Lustful Thoughts', icon: FaBrain },
-    { id: 'stress', label: 'Stress', icon: FaExclamationTriangle },
-    { id: 'boredom', label: 'Boredom', icon: FaClock },
-    { id: 'social_media', label: 'Social Media', icon: FaLaptop },
-    { id: 'loneliness', label: 'Loneliness', icon: FaFrown },
-    { id: 'relationship', label: 'Relationship', icon: FaHeart },
-    { id: 'home_alone', label: 'Home Alone', icon: FaHome },
-    { id: 'explicit_content', label: 'Explicit Content', icon: FaTheaterMasks },
-    { id: 'alcohol_substances', label: 'Substances', icon: FaWineBottle },
-    { id: 'sleep_deprivation', label: 'Sleep Deprived', icon: FaBed }
+    { id: 'lustful_thoughts', label: 'Lustful Thoughts' },
+    { id: 'stress', label: 'Stress' },
+    { id: 'boredom', label: 'Boredom' },
+    { id: 'social_media', label: 'Social Media' },
+    { id: 'loneliness', label: 'Loneliness' },
+    { id: 'relationship', label: 'Relationship' },
+    { id: 'home_alone', label: 'Home Alone' },
+    { id: 'explicit_content', label: 'Explicit Content' },
+    { id: 'alcohol_substances', label: 'Substances' },
+    { id: 'sleep_deprivation', label: 'Sleep Deprived' }
   ];
+
+  // Helper to get trigger label from ID
+  const getTriggerLabel = (triggerId) => {
+    const trigger = triggerOptions.find(t => t.id === triggerId);
+    return trigger ? trigger.label : triggerId;
+  };
 
   // Navigation
   const prevPeriod = () => {
@@ -53,6 +58,15 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return { weekStart, weekEnd };
   };
 
+  // Check if day is in the future
+  const isFutureDay = (day) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDay = new Date(day);
+    checkDay.setHours(0, 0, 0, 0);
+    return isAfter(checkDay, today);
+  };
+
   // Status helpers
   const getDayStatus = (day) => {
     const today = new Date();
@@ -65,7 +79,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     const relapseDay = userData.streakHistory?.find(streak => 
       streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), checkDay)
     );
-    if (relapseDay) return { type: 'relapse', trigger: relapseDay.trigger };
+    if (relapseDay) return { type: 'relapse', trigger: relapseDay.trigger, streakId: relapseDay.id };
     
     const formerStreak = userData.streakHistory?.find(streak => {
       if (!streak.start || !streak.end) return false;
@@ -170,20 +184,30 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   };
 
   const showEditFromInfo = () => {
+    // Don't allow editing future days
+    if (isFutureDay(selectedDate)) {
+      toast.error("Can't edit future days");
+      return;
+    }
+    
     setDayInfoModal(false);
     setEditDayModal(true);
     setShowTriggerSelection(false);
+    setEditingExistingTrigger(false);
     setSelectedTrigger('');
   };
 
   const closeEditModal = () => {
     setEditDayModal(false);
     setShowTriggerSelection(false);
+    setEditingExistingTrigger(false);
     setSelectedTrigger('');
   };
 
   const backToDayInfo = () => {
     setEditDayModal(false);
+    setShowTriggerSelection(false);
+    setEditingExistingTrigger(false);
     setDayInfoModal(true);
   };
 
@@ -236,9 +260,17 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     }
     if (dayStatus?.type === 'relapse') {
       return (
-        <div className="calendar-status-badge relapse">
-          <span className="status-dot"></span>
-          <span>Relapse</span>
+        <div className="calendar-relapse-info">
+          <div className="calendar-status-badge relapse">
+            <span className="status-dot"></span>
+            <span>Relapse</span>
+          </div>
+          {dayStatus.trigger && (
+            <div className="calendar-trigger-display">
+              <span className="trigger-label">Trigger</span>
+              <span className="trigger-value">{getTriggerLabel(dayStatus.trigger)}</span>
+            </div>
+          )}
         </div>
       );
     }
@@ -250,6 +282,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         </div>
       );
     }
+    
+    // Future day
+    if (isFutureDay(selectedDate)) {
+      return (
+        <div className="calendar-status-badge future">
+          <span>Future Day</span>
+        </div>
+      );
+    }
+    
     return (
       <div className="calendar-status-badge">
         <span>No status recorded</span>
@@ -309,15 +351,83 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const handleStatusClick = (status) => {
     if (status === 'relapse') {
       setShowTriggerSelection(true);
-    } else if (status === 'current-streak') {
-      closeEditModal();
+      setEditingExistingTrigger(false);
     } else if (status === 'wet-dream') {
       updateUserData({ wetDreamCount: (userData.wetDreamCount || 0) + 1 });
+      toast.success('Wet dream logged');
       closeEditModal();
     }
   };
 
+  // Edit existing relapse trigger
+  const handleEditTrigger = () => {
+    const dayStatus = getDayStatus(selectedDate);
+    if (dayStatus?.trigger) {
+      setSelectedTrigger(dayStatus.trigger);
+    }
+    setShowTriggerSelection(true);
+    setEditingExistingTrigger(true);
+  };
+
+  // Update existing trigger
+  const handleUpdateTrigger = () => {
+    if (!selectedDate || !updateUserData || !selectedTrigger) return;
+    
+    let updatedStreakHistory = [...(userData.streakHistory || [])];
+    const relapseIndex = updatedStreakHistory.findIndex(streak => 
+      streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), selectedDate)
+    );
+    
+    if (relapseIndex !== -1) {
+      updatedStreakHistory[relapseIndex] = {
+        ...updatedStreakHistory[relapseIndex],
+        trigger: selectedTrigger
+      };
+      
+      updateUserData({ streakHistory: updatedStreakHistory });
+      toast.success('Trigger updated');
+    }
+    
+    closeEditModal();
+  };
+
+  // Remove relapse
+  const handleRemoveRelapse = () => {
+    if (!selectedDate || !updateUserData) return;
+    
+    // Find and remove the relapse entry, merge streaks back together
+    let updatedStreakHistory = [...(userData.streakHistory || [])];
+    const relapseIndex = updatedStreakHistory.findIndex(streak => 
+      streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), selectedDate)
+    );
+    
+    if (relapseIndex !== -1) {
+      // This is complex - we'd need to merge the streak that ended with relapse
+      // with the one that started after. For safety, just remove the relapse flag
+      // and let the user re-log if needed. A full merge is error-prone.
+      updatedStreakHistory[relapseIndex] = {
+        ...updatedStreakHistory[relapseIndex],
+        reason: null,
+        trigger: null
+      };
+      
+      updateUserData({ 
+        streakHistory: updatedStreakHistory,
+        relapseCount: Math.max(0, (userData.relapseCount || 0) - 1)
+      });
+      toast.success('Relapse removed');
+    }
+    
+    closeEditModal();
+  };
+
   const handleTriggerSelection = () => {
+    // If editing existing trigger, use update function
+    if (editingExistingTrigger) {
+      handleUpdateTrigger();
+      return;
+    }
+    
     if (!selectedDate || !updateUserData) return;
     
     const today = new Date();
@@ -362,6 +472,179 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     closeEditModal();
   };
 
+  // Determine what edit options to show based on day status
+  const getEditOptions = () => {
+    const dayStatus = getDayStatus(selectedDate);
+    const isFuture = isFutureDay(selectedDate);
+    
+    // Future days - no editing allowed
+    if (isFuture) {
+      return { type: 'future' };
+    }
+    
+    // Relapse day - show trigger info and allow edit/remove
+    if (dayStatus?.type === 'relapse') {
+      return { 
+        type: 'relapse', 
+        trigger: dayStatus.trigger,
+        triggerLabel: dayStatus.trigger ? getTriggerLabel(dayStatus.trigger) : null
+      };
+    }
+    
+    // Former streak day - read only, it's history
+    if (dayStatus?.type === 'former-streak') {
+      return { type: 'former-streak' };
+    }
+    
+    // Current streak day - only wet dream or relapse options
+    if (dayStatus?.type === 'current-streak') {
+      return { type: 'current-streak' };
+    }
+    
+    // No status - could be before any streak started
+    // Only show if user might want to backdate (we'll keep it simple and not allow)
+    return { type: 'no-status' };
+  };
+
+  // Render the appropriate edit modal content
+  const renderEditContent = () => {
+    const editOptions = getEditOptions();
+    
+    // Trigger selection mode (for new relapse or editing existing)
+    if (showTriggerSelection) {
+      return (
+        <div className="calendar-trigger-section">
+          <div className="calendar-triggers-label">
+            {editingExistingTrigger ? 'Update Trigger' : 'Select Trigger'}
+          </div>
+          <div className="calendar-triggers-list">
+            {triggerOptions.map((trigger, index, arr) => (
+              <React.Fragment key={trigger.id}>
+                <button
+                  className={`calendar-trigger ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedTrigger(trigger.id)}
+                >
+                  <span>{trigger.label}</span>
+                  {selectedTrigger === trigger.id && <span className="calendar-trigger-check">✓</span>}
+                </button>
+                {index < arr.length - 1 && <div className="calendar-trigger-divider" />}
+              </React.Fragment>
+            ))}
+          </div>
+          <div className="calendar-trigger-actions">
+            <button 
+              className="calendar-trigger-confirm"
+              onClick={handleTriggerSelection}
+              disabled={!selectedTrigger}
+            >
+              {editingExistingTrigger ? 'Update Trigger' : 'Confirm Relapse'}
+            </button>
+          </div>
+        </div>
+      );
+    }
+    
+    // Future day - blocked
+    if (editOptions.type === 'future') {
+      return (
+        <div className="calendar-edit-message">
+          <p>This day hasn't happened yet.</p>
+          <p className="calendar-edit-hint">Come back when it arrives.</p>
+        </div>
+      );
+    }
+    
+    // Relapse day - show trigger and options to edit/remove
+    if (editOptions.type === 'relapse') {
+      return (
+        <div className="calendar-relapse-edit">
+          <div className="calendar-relapse-current">
+            <span className="calendar-relapse-label">Logged Trigger</span>
+            <span className="calendar-relapse-value">
+              {editOptions.triggerLabel || 'None recorded'}
+            </span>
+          </div>
+          <div className="calendar-edit-options">
+            <button 
+              className="calendar-option-btn calendar-option-edit"
+              onClick={handleEditTrigger}
+            >
+              Change Trigger
+            </button>
+            <button 
+              className="calendar-option-btn calendar-option-remove"
+              onClick={handleRemoveRelapse}
+            >
+              Remove Relapse
+            </button>
+          </div>
+        </div>
+      );
+    }
+    
+    // Former streak day - read only
+    if (editOptions.type === 'former-streak') {
+      return (
+        <div className="calendar-edit-message">
+          <p>This day is part of a completed streak.</p>
+          <p className="calendar-edit-hint">Historical records can't be modified.</p>
+        </div>
+      );
+    }
+    
+    // Current streak day - only wet dream or relapse
+    if (editOptions.type === 'current-streak') {
+      return (
+        <div className="calendar-edit-options">
+          <button 
+            className="calendar-option-btn calendar-option-wetdream"
+            onClick={() => handleStatusClick('wet-dream')}
+          >
+            <span className="option-dot"></span>
+            <span>Log Wet Dream</span>
+          </button>
+          <button 
+            className="calendar-option-btn calendar-option-relapse"
+            onClick={() => handleStatusClick('relapse')}
+          >
+            <span className="option-dot"></span>
+            <span>Log Relapse</span>
+          </button>
+        </div>
+      );
+    }
+    
+    // No status day (before streak started)
+    return (
+      <div className="calendar-edit-message">
+        <p>No streak data for this day.</p>
+        <p className="calendar-edit-hint">This day is before your tracked history.</p>
+      </div>
+    );
+  };
+
+  // Get the appropriate subtitle for edit modal
+  const getEditSubtitle = () => {
+    const editOptions = getEditOptions();
+    
+    if (showTriggerSelection) {
+      return editingExistingTrigger ? 'What caused the relapse?' : 'What triggered this?';
+    }
+    
+    switch (editOptions.type) {
+      case 'future':
+        return '';
+      case 'relapse':
+        return 'Manage this relapse entry';
+      case 'former-streak':
+        return '';
+      case 'current-streak':
+        return 'What happened on this day?';
+      default:
+        return '';
+    }
+  };
+
   // Render month view
   const renderMonthView = () => {
     const monthStart = startOfMonth(currentDate);
@@ -398,123 +681,100 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         
         const cellClasses = [
           'day-cell',
-          !isCurrentMonth ? 'other-month' : '',
-          isToday ? 'today' : '',
-          dayStatus?.type || '',
-          wetDream ? 'wet-dream' : ''
+          !isCurrentMonth && 'other-month',
+          isToday && 'today',
+          dayStatus?.type === 'current-streak' && 'current-streak',
+          dayStatus?.type === 'former-streak' && 'former-streak',
+          dayStatus?.type === 'relapse' && 'relapse',
+          wetDream && 'wet-dream',
+          dayTracking.hasBenefits && 'has-tracking'
         ].filter(Boolean).join(' ');
-
+        
         week.push(
-          <div key={i} className={cellClasses} onClick={() => openDayInfo(currentDay)}>
+          <div 
+            key={currentDay.toString()} 
+            className={cellClasses}
+            onClick={() => openDayInfo(currentDay)}
+          >
             <span className="day-number">{format(currentDay, 'd')}</span>
-            {/* Single gold dot if day has any tracked data */}
-            {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
-              <span className="day-has-data-dot"></span>
-            )}
           </div>
         );
         day = addDays(day, 1);
       }
-      rows.push(<div className="calendar-row" key={format(day, 'yyyy-MM-dd')}>{week}</div>);
+      rows.push(<div className="calendar-row" key={day.toString()}>{week}</div>);
     }
     
-    return <div className="calendar-display">{rows}</div>;
+    return rows;
   };
 
   // Render week view
   const renderWeekView = () => {
     const { weekStart } = getWeekRange(currentDate);
+    
     const days = [];
+    let day = weekStart;
     
     for (let i = 0; i < 7; i++) {
-      const day = addDays(weekStart, i);
-      const dayStatus = getDayStatus(day);
-      const dayBenefits = getDayBenefits(day);
-      const dayTracking = getDayTracking(day);
-      const wetDream = hasWetDream(day);
-      const isToday = isSameDay(day, new Date());
+      const currentDay = new Date(day);
+      const dayStatus = getDayStatus(currentDay);
+      const isToday = isSameDay(currentDay, new Date());
+      const dayTracking = getDayTracking(currentDay);
+      const wetDream = hasWetDream(currentDay);
       
       const cellClasses = [
         'week-day-cell',
-        isToday ? 'today-card' : '',
-        dayStatus?.type || '',
-        wetDream ? 'wet-dream' : ''
+        isToday && 'today',
+        dayStatus?.type === 'current-streak' && 'current-streak',
+        dayStatus?.type === 'former-streak' && 'former-streak',
+        dayStatus?.type === 'relapse' && 'relapse',
+        wetDream && 'wet-dream',
+        dayTracking.hasBenefits && 'has-tracking'
       ].filter(Boolean).join(' ');
       
       days.push(
-        <div key={i} className={cellClasses} onClick={() => openDayInfo(day)}>
-          <div className="week-day-header">
-            <span className="week-day-name">{format(day, 'EEE')}</span>
-            <span className={`week-day-number ${isToday ? 'today' : ''}`}>{format(day, 'd')}</span>
-          </div>
-          
-          {dayBenefits && isPremium ? (
-            <div className="week-benefits-prominent">
-              <div className="week-benefit-item">
-                <span className="week-benefit-label-top">Energy</span>
-                <div className="week-benefit-bar">
-                  <div className="week-benefit-fill" style={{ width: `${dayBenefits.energy * 10}%` }} />
-                </div>
-              </div>
-              <div className="week-benefit-item">
-                <span className="week-benefit-label-top">Focus</span>
-                <div className="week-benefit-bar">
-                  <div className="week-benefit-fill" style={{ width: `${dayBenefits.focus * 10}%` }} />
-                </div>
-              </div>
-              <div className="week-benefit-item">
-                <span className="week-benefit-label-top">Confidence</span>
-                <div className="week-benefit-bar">
-                  <div className="week-benefit-fill" style={{ width: `${dayBenefits.confidence * 10}%` }} />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="week-benefits-prominent">
-              <span className="week-no-data">No data</span>
-            </div>
-          )}
-          
-          <div className="week-day-indicators">
-            {/* Single gold dot if has data */}
-            {(dayBenefits || dayTracking.hasJournal) && (
-              <span className="week-has-data-dot"></span>
-            )}
-            {/* Status indicator on right */}
-            <div className="week-status-indicator">
-              {dayStatus?.type === 'current-streak' && <span className="week-status-dot current-streak"></span>}
-              {dayStatus?.type === 'former-streak' && <span className="week-status-dot former-streak"></span>}
-              {dayStatus?.type === 'relapse' && <span className="week-status-dot relapse"></span>}
-              {wetDream && <span className="week-status-dot wet-dream"></span>}
-            </div>
-          </div>
+        <div 
+          key={currentDay.toString()} 
+          className={cellClasses}
+          onClick={() => openDayInfo(currentDay)}
+        >
+          <span className="week-day-name">{format(currentDay, 'EEE')}</span>
+          <span className="week-day-number">{format(currentDay, 'd')}</span>
         </div>
       );
+      day = addDays(day, 1);
     }
     
-    return <div className="week-view-grid">{days}</div>;
+    return <div className="week-view">{days}</div>;
+  };
+
+  // Month title format
+  const getTitle = () => {
+    if (viewMode === 'week') {
+      const { weekStart, weekEnd } = getWeekRange(currentDate);
+      if (weekStart.getMonth() === weekEnd.getMonth()) {
+        return format(weekStart, 'MMMM yyyy');
+      }
+      return `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d, yyyy')}`;
+    }
+    return format(currentDate, 'MMMM yyyy');
   };
 
   return (
     <div className="calendar-container">
-      {/* Minimal Header - Landing page style */}
-      <div className="calendar-header-minimal">
-        {/* Period Display - Typography focused */}
-        <div className="calendar-period-display">
-          <button className="period-arrow" onClick={prevPeriod} aria-label="Previous">
+      {/* Navigation Header */}
+      <div className="calendar-header">
+        <div className="calendar-nav">
+          <button className="nav-btn" onClick={prevPeriod}>
             <FaChevronLeft />
           </button>
-          <div className="period-text">
-            <span className="period-month">{viewMode === 'month' ? format(currentDate, 'MMMM') : format(getWeekRange(currentDate).weekStart, 'MMM d') + ' – ' + format(getWeekRange(currentDate).weekEnd, 'd')}</span>
-            <span className="period-year">{format(currentDate, 'yyyy')}</span>
-          </div>
-          <button className="period-arrow" onClick={nextPeriod} aria-label="Next">
+          <h2 className="calendar-title">{getTitle()}</h2>
+          <button className="nav-btn" onClick={nextPeriod}>
             <FaChevronRight />
           </button>
         </div>
         
-        {/* View Toggle - Text only, like landing stats */}
-        <div className="view-toggle-minimal">
+        {/* View Toggle */}
+        <div className="view-toggle">
           <button 
             className={`toggle-option ${viewMode === 'month' ? 'active' : ''}`}
             onClick={() => setViewMode('month')}
@@ -570,6 +830,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             {(() => {
               const dayBenefits = getDayBenefits(selectedDate);
               const hasBenefits = !!dayBenefits;
+              const isFuture = isFutureDay(selectedDate);
               
               // If benefits exist, use sticky header/footer structure
               if (hasBenefits) {
@@ -621,9 +882,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                       <button className="calendar-btn-ghost" onClick={closeDayInfo}>
                         Close
                       </button>
-                      <button className="calendar-btn-primary" onClick={showEditFromInfo}>
-                        Edit Day
-                      </button>
+                      {!isFuture && (
+                        <button className="calendar-btn-primary" onClick={showEditFromInfo}>
+                          Edit Day
+                        </button>
+                      )}
                     </div>
                   </>
                 );
@@ -639,17 +902,19 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     {renderStatusBadge()}
                   </div>
 
-                  {/* Journal Section */}
-                  {renderJournalSection()}
+                  {/* Journal Section - only for non-future days */}
+                  {!isFuture && renderJournalSection()}
 
                   {/* Actions */}
                   <div className="calendar-actions">
                     <button className="calendar-btn-ghost" onClick={closeDayInfo}>
                       Close
                     </button>
-                    <button className="calendar-btn-primary" onClick={showEditFromInfo}>
-                      Edit Day
-                    </button>
+                    {!isFuture && (
+                      <button className="calendar-btn-primary" onClick={showEditFromInfo}>
+                        Edit Day
+                      </button>
+                    )}
                   </div>
                 </>
               );
@@ -659,66 +924,35 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       )}
 
       {/* ================================================================
-          EDIT DAY MODAL - Using SCOPED class names (calendar-*)
+          EDIT DAY MODAL - Context-aware based on day status
           ================================================================ */}
       {editDayModal && selectedDate && (
         <div className="calendar-overlay" onClick={closeEditModal}>
           <div className="calendar-modal calendar-edit-day" onClick={e => e.stopPropagation()}>
             
-            <h3>Edit {format(selectedDate, 'MMM d, yyyy')}</h3>
-            <p>What happened on this day?</p>
+            <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
+            {getEditSubtitle() && <p>{getEditSubtitle()}</p>}
 
-            {!showTriggerSelection ? (
-              <div className="calendar-edit-options">
-                <button className="calendar-option-btn calendar-option-streak" onClick={() => handleStatusClick('current-streak')}>
-                  <span className="option-dot"></span>
-                  <span>Mark as Streak Day</span>
-                </button>
-                <button className="calendar-option-btn calendar-option-wetdream" onClick={() => handleStatusClick('wet-dream')}>
-                  <span className="option-dot"></span>
-                  <span>Log Wet Dream</span>
-                </button>
-                <button className="calendar-option-btn calendar-option-relapse" onClick={() => handleStatusClick('relapse')}>
-                  <span className="option-dot"></span>
-                  <span>Log Relapse</span>
-                </button>
-              </div>
-            ) : (
-              <div className="calendar-trigger-section">
-                <div className="calendar-triggers-label">Select Trigger</div>
-                <div className="calendar-triggers-list">
-                  {triggerOptions.map((trigger, index, arr) => (
-                    <React.Fragment key={trigger.id}>
-                      <button
-                        className={`calendar-trigger ${selectedTrigger === trigger.id ? 'selected' : ''}`}
-                        onClick={() => setSelectedTrigger(trigger.id)}
-                      >
-                        <span>{trigger.label}</span>
-                        {selectedTrigger === trigger.id && <span className="calendar-trigger-check">✓</span>}
-                      </button>
-                      {index < arr.length - 1 && <div className="calendar-trigger-divider" />}
-                    </React.Fragment>
-                  ))}
-                </div>
-                <div className="calendar-trigger-actions">
-                  <button 
-                    className="calendar-trigger-confirm"
-                    onClick={handleTriggerSelection}
-                    disabled={!selectedTrigger}
-                  >
-                    Confirm Relapse
-                  </button>
-                </div>
-              </div>
-            )}
+            {renderEditContent()}
 
             <div className="calendar-actions">
               <button className="calendar-btn-ghost" onClick={closeEditModal}>
                 Cancel
               </button>
-              <button className="calendar-btn-back" onClick={backToDayInfo}>
-                Back
-              </button>
+              {!showTriggerSelection && getEditOptions().type !== 'future' && (
+                <button className="calendar-btn-back" onClick={backToDayInfo}>
+                  Back
+                </button>
+              )}
+              {showTriggerSelection && (
+                <button className="calendar-btn-back" onClick={() => {
+                  setShowTriggerSelection(false);
+                  setEditingExistingTrigger(false);
+                  setSelectedTrigger('');
+                }}>
+                  Back
+                </button>
+              )}
             </div>
           </div>
         </div>

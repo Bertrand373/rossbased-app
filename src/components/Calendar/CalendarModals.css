@@ -742,6 +742,123 @@
 }
 
 /* =============================================================================
+   TRIGGER DISPLAY IN DAY INFO MODAL
+   ============================================================================= */
+
+.calendar-relapse-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.calendar-trigger-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.calendar-trigger-display .trigger-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.calendar-trigger-display .trigger-value {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Future day badge */
+.calendar-status-badge.future {
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* =============================================================================
+   EDIT MESSAGE - For blocked/read-only days
+   ============================================================================= */
+
+.calendar-edit-message {
+  text-align: center;
+  padding: 32px 0;
+  margin-bottom: 32px;
+}
+
+.calendar-edit-message p {
+  margin: 0 0 8px 0;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+.calendar-edit-message .calendar-edit-hint {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0;
+}
+
+/* =============================================================================
+   RELAPSE EDIT SECTION
+   ============================================================================= */
+
+.calendar-relapse-edit {
+  margin-bottom: 32px;
+}
+
+.calendar-relapse-current {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.calendar-relapse-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.calendar-relapse-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+/* Edit trigger button - subtle outline */
+.calendar-option-edit {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.calendar-option-edit:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Remove relapse button - danger style */
+.calendar-option-remove {
+  background: transparent;
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  color: rgba(255, 59, 48, 0.7);
+}
+
+.calendar-option-remove:hover {
+  background: rgba(255, 59, 48, 0.1);
+  border-color: rgba(255, 59, 48, 0.5);
+  color: #ff3b30;
+}
+
+/* =============================================================================
    MOBILE RESPONSIVE
    ============================================================================= */
 
