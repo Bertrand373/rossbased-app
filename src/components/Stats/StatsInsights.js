@@ -3,7 +3,6 @@
 // Removed: Wisdom Mode, Journey Guidance, Streak Comparison, Personalized Analysis cards
 
 import React from 'react';
-import { renderTextWithBold } from './StatsUtils';
 
 // ============================================================
 // LOADING & EMPTY STATES
