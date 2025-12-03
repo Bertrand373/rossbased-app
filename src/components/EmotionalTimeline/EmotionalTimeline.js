@@ -1,5 +1,6 @@
 // EmotionalTimeline.js - TITANTRACK MINIMAL
 // Matches Landing/Tracker/Stats aesthetic
+// UPDATED: Check-in flow now matches Tracker (tap "Logged Today" to edit)
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
@@ -18,6 +19,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     processing: 5
   });
   const [hasLoggedToday, setHasLoggedToday] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // NEW: Edit mode state
 
   const currentDay = userData?.currentStreak || 0;
 
@@ -214,13 +216,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const progress = getProgress();
 
-  // Check if logged today
+  // Check if logged today - load existing values
   useEffect(() => {
     if (userData?.emotionalLog) {
       const today = new Date().toDateString();
       const lastLog = userData.emotionalLog[userData.emotionalLog.length - 1];
       if (lastLog && new Date(lastLog.date).toDateString() === today) {
         setHasLoggedToday(true);
+        setIsEditing(false); // Ensure not in edit mode when already logged
         setEmotions({
           anxiety: lastLog.anxiety || 5,
           mood: lastLog.mood || 5,
@@ -283,7 +286,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const analysis = analyzeEmotions();
 
-  // Save check-in
+  // Save check-in (first time)
   const handleSave = async () => {
     if (hasLoggedToday) return;
 
@@ -300,11 +303,72 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         emotionalLog: [...existingLog, entry]
       });
       setHasLoggedToday(true);
+      setIsEditing(false);
       toast.success('Check-in saved');
     } catch (error) {
       toast.error('Failed to save');
     }
   };
+
+  // Update check-in (editing existing)
+  const handleUpdate = async () => {
+    if (!hasLoggedToday || !isEditing) return;
+
+    try {
+      const existingLog = userData?.emotionalLog || [];
+      const today = new Date().toDateString();
+      
+      // Find and update today's entry
+      const updatedLog = existingLog.map(entry => {
+        if (new Date(entry.date).toDateString() === today) {
+          return {
+            ...entry,
+            ...emotions
+          };
+        }
+        return entry;
+      });
+
+      await updateUserData({
+        emotionalLog: updatedLog
+      });
+      setIsEditing(false);
+      toast.success('Check-in updated');
+    } catch (error) {
+      toast.error('Failed to update');
+    }
+  };
+
+  // Handle button click - matches Tracker flow
+  const handleButtonClick = () => {
+    if (!hasLoggedToday) {
+      // First save
+      handleSave();
+    } else if (!isEditing) {
+      // Enable editing
+      setIsEditing(true);
+    } else {
+      // Save updates
+      handleUpdate();
+    }
+  };
+
+  // Get button text based on state
+  const getButtonText = () => {
+    if (!hasLoggedToday) return 'Save Check-in';
+    if (isEditing) return 'Update Check-in';
+    return 'Logged Today ✓';
+  };
+
+  // Get button class based on state
+  const getButtonClass = () => {
+    if (!hasLoggedToday) return 'et-save-btn';
+    if (isEditing) return 'et-save-btn';
+    return 'et-save-btn logged';
+  };
+
+  // Determine if sliders should be interactive
+  const slidersInteractive = !hasLoggedToday || isEditing;
 
   // Open phase modal
   const openPhase = (phase) => {
@@ -391,14 +455,17 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Check-in Tab - Tracker-style sliders */}
+      {/* Check-in Tab - Tracker-style flow */}
       {activeTab === 'checkin' && (
         <div className="et-checkin">
           <div className="et-checkin-header">Daily Check-in</div>
           
           <div className="et-sliders">
             {sliderItems.map(({ key, label, desc }) => (
-              <div key={key} className={`et-slider-group ${hasLoggedToday ? 'disabled' : ''}`}>
+              <div 
+                key={key} 
+                className={`et-slider-group ${!slidersInteractive ? 'view-mode' : ''}`}
+              >
                 <div className="et-slider-header">
                   <span className="et-slider-label">{label}</span>
                   <span className="et-slider-value">{emotions[key]}/10</span>
@@ -418,7 +485,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                       [key]: parseInt(e.target.value) 
                     }))}
                     className="et-slider"
-                    disabled={hasLoggedToday}
+                    disabled={!slidersInteractive}
                   />
                 </div>
                 <span className="et-slider-desc">{desc}</span>
@@ -427,10 +494,10 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           </div>
 
           <button 
-            className={`et-save-btn ${hasLoggedToday ? 'disabled' : ''}`}
-            onClick={hasLoggedToday ? undefined : handleSave}
+            className={getButtonClass()}
+            onClick={handleButtonClick}
           >
-            {hasLoggedToday ? 'Logged Today ✓' : 'Save Check-in'}
+            {getButtonText()}
           </button>
         </div>
       )}

@@ -1,6 +1,7 @@
 /* =============================================================================
    EMOTIONALTIMELINE.CSS - TITANTRACK MINIMAL
    Matches Landing/Tracker/Stats aesthetic - no header, flowing content
+   UPDATED: View-mode state hides slider thumbs when logged (matches Tracker flow)
    ============================================================================= */
 
 /* =============================================================================
@@ -400,7 +401,7 @@
   cursor: pointer;
   margin-top: -8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
 }
 
 .et-slider::-moz-range-thumb {
@@ -411,7 +412,7 @@
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
 }
 
 .et-slider::-ms-thumb {
@@ -458,7 +459,67 @@
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Disabled state - locked appearance */
+/* =============================================================================
+   VIEW MODE - Logged state with hidden thumbs (Tracker-style flow)
+   Shows only the fill bar for a clean, "finished" look
+   ============================================================================= */
+
+.et-slider-group.view-mode .et-slider {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Hide thumb in view mode - WebKit */
+.et-slider-group.view-mode .et-slider::-webkit-slider-thumb {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Hide thumb in view mode - Firefox */
+.et-slider-group.view-mode .et-slider::-moz-range-thumb {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Hide thumb in view mode - MS Edge */
+.et-slider-group.view-mode .et-slider::-ms-thumb {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Keep fill bar fully visible in view mode */
+.et-slider-group.view-mode .et-slider-fill {
+  opacity: 1;
+}
+
+/* Keep track visible in view mode */
+.et-slider-group.view-mode .et-slider-wrap::before {
+  opacity: 1;
+}
+
+/* Keep labels fully visible in view mode */
+.et-slider-group.view-mode .et-slider-label,
+.et-slider-group.view-mode .et-slider-value {
+  opacity: 1;
+}
+
+.et-slider-group.view-mode .et-slider-desc {
+  opacity: 1;
+}
+
+/* =============================================================================
+   DISABLED STATE (legacy - kept for backwards compatibility)
+   ============================================================================= */
+
 .et-slider:disabled {
   cursor: not-allowed;
   pointer-events: none;
@@ -479,7 +540,7 @@
   opacity: 0.5;
 }
 
-/* Dim the fill and track when disabled */
+/* Dim the fill and track when disabled (old style) */
 .et-slider-group.disabled .et-slider-fill {
   opacity: 0.5;
 }
@@ -504,7 +565,10 @@
   margin-top: -4px;
 }
 
-/* Save Button - Match Tracker .btn-primary */
+/* =============================================================================
+   SAVE BUTTON - Match Tracker flow with 3 states
+   ============================================================================= */
+
 .et-save-btn {
   width: 100%;
   padding: 16px 24px;
@@ -520,24 +584,29 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.et-save-btn:hover:not(.disabled) {
+.et-save-btn:hover:not(.logged) {
   opacity: 0.9;
 }
 
-.et-save-btn:active:not(.disabled) {
+.et-save-btn:active:not(.logged) {
   transform: scale(0.98);
 }
 
-.et-save-btn.disabled {
+/* Logged state - "Logged Today ✓" - clickable to edit */
+.et-save-btn.logged {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
 }
 
-.et-save-btn.disabled:hover {
+.et-save-btn.logged:hover {
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.7);
+}
+
+.et-save-btn.logged:active {
+  transform: scale(0.98);
 }
 
 /* =============================================================================

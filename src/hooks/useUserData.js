@@ -271,28 +271,28 @@ export const useUserData = () => {
       case 'struggling':
       case 'struggle':
       case 'hard':
-        return '(Struggling - Day 3)';
+        return '(Struggling User - Day 3)';
       case 'intj':
-        return '(INTJ - 425 days, Religious Tracker)';
+        return '(INTJ - 425 days!)';
       case 'intp':
-        return '(INTP - 275 days, Good Tracker)';
+        return '(INTP - 89 days)';
       case 'enfp':
-        return '(ENFP - 89 days, Previous 423 day streak)';
+        return '(ENFP - 21 days)';
       case 'aitest1':
-        return '(AI Test 1 - Day 12, Building Data)';
+        return '(AI Test 1 - New, no relapses)';
       case 'aitest2':
-        return '(AI Test 2 - Day 21, Ready to Train)';
+        return '(AI Test 2 - Moderate, some relapses)';
       case 'aitest3':
-        return '(AI Test 3 - Day 38, Low Risk 35%)';
+        return '(AI Test 3 - Veteran, many relapses)';
       case 'aitest4':
-        return '(AI Test 4 - Day 18, MODERATE RISK 55%)';
+        return '(AI Test 4 - Sparse data)';
       case 'aitest5':
-        return '(AI Test 5 - Day 19, HIGH RISK 72%)';
+        return '(AI Test 5 - Perfect data)';
       case 'aitest6':
-        return '(AI Test 6 - Day 45, AI Active 42%)';
+        return '(AI Test 6 - Chaotic patterns)';
       case 'aicard':
       case 'cardtest':
-        return '(AI Card Test - Day 28, CARD VISIBLE)';
+        return '(AI Card Test - Pre-seeded ML)';
       default:
         return '(Main Demo - Day 25)';
     }
@@ -466,6 +466,16 @@ export const useUserData = () => {
         
         if (parsedUserData.startDate) {
           parsedUserData.startDate = new Date(parsedUserData.startDate);
+          
+          // SYNC STREAK ON APP LOAD - ensures accuracy after days away
+          const today = new Date();
+          const daysDiff = Math.floor((today - parsedUserData.startDate) / (1000 * 60 * 60 * 24));
+          parsedUserData.currentStreak = Math.max(0, daysDiff);
+          
+          // Also update longestStreak if current exceeds it
+          if (parsedUserData.currentStreak > (parsedUserData.longestStreak || 0)) {
+            parsedUserData.longestStreak = parsedUserData.currentStreak;
+          }
         }
 
         if (parsedUserData.goal) {
@@ -541,6 +551,9 @@ export const useUserData = () => {
         setUserData(parsedUserData);
         setIsLoggedIn(true);
         setIsPremium(true);
+        
+        // Save updated streak back to localStorage
+        localStorage.setItem('userData', JSON.stringify(parsedUserData));
       } catch (err) {
         console.error('Error parsing stored user data:', err);
         localStorage.removeItem('userData');
