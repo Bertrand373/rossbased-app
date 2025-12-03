@@ -310,50 +310,84 @@
 }
 
 /* ============================================================
-   PHASE CONTEXT - Simple one-liner
+   PHASE CONTEXT - Styled like ET/Urge tab headers
    ============================================================ */
 
-.phase-context {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 20px 0;
+.phase-context-section {
+  padding: 24px 0 0 0;
+  margin-top: 32px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-  margin-top: 8px;
 }
 
-.phase-day {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  font-feature-settings: 'tnum' 1;
+.phase-context-header {
+  margin-bottom: 16px;
 }
 
-.phase-divider {
-  color: rgba(255, 255, 255, 0.2);
+.phase-context-header span {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-.phase-name {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.phase-link {
-  background: none;
-  border: none;
-  padding: 0;
-  margin-left: 8px;
-  font-size: 0.75rem;
-  font-family: inherit;
-  color: rgba(255, 255, 255, 0.25);
+.phase-context-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
   cursor: pointer;
-  transition: color 150ms ease;
+  transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.phase-link:hover {
-  color: rgba(255, 255, 255, 0.5);
+.phase-context-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.phase-context-row:active {
+  transform: scale(0.99);
+}
+
+.phase-context-num {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.phase-context-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.phase-context-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
+}
+
+.phase-context-days {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+  font-feature-settings: 'tnum' 1;
+}
+
+.phase-context-arrow {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+  padding-top: 2px;
 }
 
 /* ============================================================
@@ -417,16 +451,12 @@
     font-size: 2.5rem;
   }
   
-  .phase-context {
-    flex-wrap: wrap;
-    gap: 8px;
+  .phase-context-row {
+    padding: 14px;
   }
   
-  .phase-link {
-    width: 100%;
-    text-align: center;
-    margin-left: 0;
-    margin-top: 4px;
+  .phase-context-name {
+    font-size: 0.875rem;
   }
 }
 

@@ -3,6 +3,7 @@
 // REFACTORED: Sections are now data-driven, matching Landing page aesthetic
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './StatsInsights.css';
 import './StatsInsights.css';
 
@@ -120,23 +121,31 @@ export const YourPatterns = ({
     return metric;
   };
   
+  // Capitalize first letter helper
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+  
   // Build pattern insights from data
   const buildPatternInsights = () => {
     const insights = [];
     
     // Day-of-week pattern for selected metric
-    if (dayOfWeekPatterns?.peakDay) {
-      const peakDays = dayOfWeekPatterns.dayAverages
-        .filter(d => d.average >= dayOfWeekPatterns.peakDay.average - 0.3)
-        .map(d => d.day)
-        .slice(0, 3);
+    if (dayOfWeekPatterns?.peakDay && dayOfWeekPatterns?.lowDay) {
+      // Only show if there's meaningful variation (peak vs low difference > 0.5)
+      const variation = dayOfWeekPatterns.peakDay.average - dayOfWeekPatterns.lowDay.average;
       
-      if (peakDays.length > 0) {
-        insights.push({
-          type: 'day_pattern',
-          text: `${formatMetric(selectedMetric)} peaks ${peakDays.join('-')}`,
-          detail: `${dayOfWeekPatterns.peakDay.average}/10 avg`
-        });
+      if (variation >= 0.5) {
+        const peakDays = dayOfWeekPatterns.dayAverages
+          .filter(d => d.average >= dayOfWeekPatterns.peakDay.average - 0.2)
+          .map(d => d.day)
+          .slice(0, 3);
+        
+        if (peakDays.length > 0 && peakDays.length < 5) { // Don't show if almost all days are "peak"
+          insights.push({
+            type: 'day_pattern',
+            text: `${capitalize(formatMetric(selectedMetric))} peaks ${peakDays.join(', ')}`,
+            detail: `${dayOfWeekPatterns.peakDay.average}/10 avg`
+          });
+        }
       }
     }
     
@@ -164,26 +173,28 @@ export const YourPatterns = ({
         });
       }
       
-      // Workout-energy correlation
-      const workoutCorr = metricCorrelations.find(c => c.source === 'workout' && c.target === 'energy');
-      if (workoutCorr && selectedMetric === 'energy' && workoutCorr.difference >= 0.8) {
-        insights.push({
-          type: 'correlation',
-          text: `Workout intensity boosts energy`,
-          detail: `+${workoutCorr.difference} on high workout days`
-        });
+      // Workout-energy correlation (only show when energy is selected)
+      if (selectedMetric === 'energy') {
+        const workoutCorr = metricCorrelations.find(c => c.source === 'workout' && c.target === 'energy');
+        if (workoutCorr && workoutCorr.difference >= 0.8) {
+          insights.push({
+            type: 'correlation',
+            text: `Workout intensity boosts energy`,
+            detail: `+${workoutCorr.difference} on active days`
+          });
+        }
       }
     }
     
     // Growth rates
     if (growthRates?.rates?.[selectedMetric]) {
       const rate = growthRates.rates[selectedMetric];
-      if (rate.direction !== 'stable') {
+      if (rate.direction !== 'stable' && Math.abs(rate.percentChange) >= 5) {
         const direction = rate.direction === 'up' ? 'improved' : 'declined';
         insights.push({
           type: 'growth',
-          text: `${formatMetric(selectedMetric)} ${direction} ${Math.abs(rate.percentChange)}%`,
-          detail: `Over last ${growthRates.days} days`
+          text: `${capitalize(formatMetric(selectedMetric))} ${direction} ${Math.abs(rate.percentChange)}%`,
+          detail: `Over ${growthRates.days} days`
         });
       }
     }
@@ -378,25 +389,47 @@ export const RelapseAnalytics = ({
 };
 
 // ============================================================
-// SECTION 5: PHASE CONTEXT - Simple one-liner, not educational
+// SECTION 5: PHASE CONTEXT - Styled like ET/Urge headers with number
 // ============================================================
 export const PhaseContext = ({ 
   currentStreak, 
-  phaseInfo,
-  onLearnMore 
+  phaseInfo
 }) => {
+  const navigate = useNavigate();
+  
   if (!phaseInfo) return null;
   
+  // Map phase key to number (matches Emotional Timeline order)
+  const getPhaseNumber = (key) => {
+    const phaseNumbers = {
+      'initial': '01',
+      'emotional': '02',
+      'mental': '03',
+      'integration': '04',
+      'mastery': '05'
+    };
+    return phaseNumbers[key] || '01';
+  };
+  
+  const handleNavigateToTimeline = () => {
+    navigate('/timeline');
+  };
+  
   return (
-    <div className="phase-context">
-      <span className="phase-day">Day {currentStreak || 0}</span>
-      <span className="phase-divider">·</span>
-      <span className="phase-name">{phaseInfo.name}</span>
-      {onLearnMore && (
-        <button className="phase-link" onClick={onLearnMore}>
-          Learn what to expect →
-        </button>
-      )}
+    <div className="phase-context-section">
+      <div className="phase-context-header">
+        <span>Current Phase</span>
+      </div>
+      <div className="phase-context-row" onClick={handleNavigateToTimeline}>
+        <div className="phase-context-num">
+          {getPhaseNumber(phaseInfo.key)}
+        </div>
+        <div className="phase-context-info">
+          <h3 className="phase-context-name">{phaseInfo.name}</h3>
+          <p className="phase-context-days">Day {currentStreak || 0} · Days {phaseInfo.range}</p>
+        </div>
+        <div className="phase-context-arrow">→</div>
+      </div>
     </div>
   );
 };
