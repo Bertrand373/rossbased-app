@@ -1,5 +1,5 @@
 // src/services/MLPredictionService.js
-// UPDATED: Added Firebase notification integration for AI predictions
+// FIXED: Model only marked ready if actually trained (has lastTrained timestamp)
 
 import * as tf from '@tensorflow/tfjs';
 import notificationService from './NotificationService';
@@ -28,24 +28,33 @@ class MLPredictionService {
     try {
       console.log('🔄 Initializing AI Prediction Service...');
       
+      // CRITICAL FIX: Load training history FIRST to verify model was actually trained
+      this.loadTrainingHistory();
+      this.loadNormalizationStats();
+      
       const modelLoaded = await this.loadModel();
       
-      if (modelLoaded) {
-        console.log('✅ Loaded existing trained model');
+      // CRITICAL FIX: Only mark ready if model exists AND was actually trained
+      if (modelLoaded && this.trainingHistory.lastTrained) {
+        console.log('✅ Loaded existing trained model (trained: ' + this.trainingHistory.lastTrained + ')');
         this.isModelReady = true;
+      } else if (modelLoaded && !this.trainingHistory.lastTrained) {
+        // Model file exists but was NEVER trained - ignore it
+        console.log('⚠️ Model file exists but was never trained - treating as untrained');
+        this.isModelReady = false;
+        await this.createModel(); // Create fresh model
       } else {
         console.log('📦 No existing model found, creating new neural network...');
         await this.createModel();
         console.log('✅ New neural network created (untrained)');
+        this.isModelReady = false;
       }
-      
-      this.loadTrainingHistory();
-      this.loadNormalizationStats();
       
       return true;
     } catch (error) {
       console.error('❌ Error initializing AI service:', error);
       await this.createModel();
+      this.isModelReady = false;
       return false;
     }
   }
@@ -304,7 +313,7 @@ class MLPredictionService {
     return features.map((f, i) => (f - stats.means[i]) / stats.stds[i]);
   }
 
-  // NEW: Calculate honest reliability based on data quality
+  // Calculate honest reliability based on data quality
   calculateReliability(userData) {
     // Base reliability on model's training accuracy
     let reliability = this.trainingHistory.accuracy.length > 0
@@ -339,8 +348,9 @@ class MLPredictionService {
 
   async predict(userData) {
     try {
-      if (!this.isModelReady || !this.model) {
-        console.log('⚠️ Model not ready, using fallback prediction');
+      // CRITICAL: Double-check model is actually trained before predicting
+      if (!this.isModelReady || !this.model || !this.trainingHistory.lastTrained) {
+        console.log('⚠️ Model not ready or not trained, using fallback prediction');
         return this.fallbackPrediction(userData);
       }
       
@@ -368,9 +378,13 @@ class MLPredictionService {
         this.loadNormalizationStats();
       }
       
-      const normalizedFeatures = this.normalizationStats
-        ? this.normalizeFeatures(rawFeatures, this.normalizationStats)
-        : rawFeatures.map(f => f / 10);
+      // CRITICAL: If no normalization stats, model wasn't properly trained
+      if (!this.normalizationStats) {
+        console.log('⚠️ No normalization stats found - model not properly trained');
+        return this.fallbackPrediction(userData);
+      }
+      
+      const normalizedFeatures = this.normalizeFeatures(rawFeatures, this.normalizationStats);
       
       const inputTensor = tf.tensor2d([normalizedFeatures]);
       const prediction = this.model.predict(inputTensor);
@@ -385,7 +399,7 @@ class MLPredictionService {
       
       console.log(`🤖 AI Prediction: ${riskScore}% risk (${reliability}% reliable)`);
       
-      // NEW: Send Firebase notification through backend if high risk
+      // Send Firebase notification through backend if high risk
       if (riskScore >= 70) {
         const username = localStorage.getItem('username');
         if (username) {
@@ -434,7 +448,7 @@ class MLPredictionService {
     }
   }
 
-  // NEW: Send Firebase Cloud Messaging notification through backend
+  // Send Firebase Cloud Messaging notification through backend
   async sendAIPredictionNotification(username, riskScore, reason) {
     try {
       // Get FCM token from localStorage
@@ -504,7 +518,7 @@ class MLPredictionService {
     }
   }
 
-  // NEW: Show local browser notification as immediate feedback
+  // Show local browser notification as immediate feedback
   async showLocalNotification(riskScore, reason) {
     try {
       if (!('Notification' in window)) {
@@ -705,7 +719,7 @@ class MLPredictionService {
 
   getModelInfo() {
     return {
-      isReady: this.isModelReady,
+      isReady: this.isModelReady && this.trainingHistory.lastTrained !== null,
       isTraining: this.isTraining,
       lastTrained: this.trainingHistory.lastTrained,
       totalEpochs: this.trainingHistory.totalEpochs,
