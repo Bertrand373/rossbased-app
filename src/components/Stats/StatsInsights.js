@@ -3,6 +3,8 @@
 // REFACTORED: Sections are now data-driven, matching Landing page aesthetic
 
 import React from 'react';
+import './StatsInsights.css';
+import './StatsInsights.css';
 
 // ============================================================
 // SECTION 1: YOUR NUMBERS - Always visible, even Day 1
