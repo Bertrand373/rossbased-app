@@ -297,9 +297,9 @@
   font-weight: 600;
 }
 
+/* Time range buttons - same padding as metrics for visual consistency */
 .toggle-btn.sm {
   font-size: 0.75rem;
-  padding: 6px 8px;
 }
 
 .toggle-divider {
@@ -1155,7 +1155,7 @@
     font-size: 0.5rem;
   }
   
-  /* Toggle buttons - even tighter on small screens */
+  /* Toggle buttons - tighter on small screens */
   .toggle-btn {
     font-size: 0.6875rem;
     padding: 5px 8px;
@@ -1163,7 +1163,6 @@
   
   .toggle-btn.sm {
     font-size: 0.625rem;
-    padding: 5px 6px;
   }
   
   .toggle-divider {
@@ -1272,7 +1271,6 @@
   
   .toggle-btn.sm {
     font-size: 0.5625rem;
-    padding: 4px 5px;
   }
 }
 
