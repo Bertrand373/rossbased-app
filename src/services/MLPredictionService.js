@@ -200,9 +200,15 @@ class MLPredictionService {
 
   async predict(userData) {
     try {
-      // Check if model is ready
-      if (!this.isModelReady || !this.model || !this.trainingHistory.lastTrained) {
-        console.log('⚠️ Model not ready, using fallback prediction');
+      // Check if model is ready AND actually trained (not just seeded data)
+      // Seeded data sets trainingHistory but doesn't create real model weights
+      const hasRealTrainedModel = this.isModelReady && 
+                                   this.model && 
+                                   this.trainingHistory.lastTrained &&
+                                   this.trainingHistory.totalEpochs > 0; // Real training has epochs
+      
+      if (!hasRealTrainedModel) {
+        console.log('⚠️ No real trained model, using fallback prediction with rich patterns');
         return this.fallbackPrediction(userData);
       }
       
