@@ -1,5 +1,5 @@
 // src/hooks/useNotifications.js - WITH BACKEND INTEGRATION
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { messaging, getToken, onMessage } from '../config/firebase';
 import { VAPID_KEY } from '../config/firebase';
 
@@ -136,25 +136,38 @@ export const useNotifications = () => {
     }
   };
 
-  const checkExistingSubscription = async () => {
+  const checkExistingSubscription = useCallback(async () => {
     try {
       if (!isSupported) return null;
       
       const savedToken = localStorage.getItem('fcmToken');
       const username = localStorage.getItem('username');
       
-      if (savedToken && username) {
-        // Check with backend if subscription is still active
+      if (!savedToken || !username) {
+        return null;
+      }
+      
+      // Try to verify with backend, but fall back to localStorage if it fails
+      try {
         const response = await fetch(`${API_URL}/api/notifications/preferences/${username}`);
         
         if (response.ok) {
           const data = await response.json();
-          if (data.subscription && data.subscription.notificationsEnabled) {
+          // Check both possible data structures from backend
+          const isEnabled = data.notificationsEnabled || 
+                           (data.subscription && data.subscription.notificationsEnabled);
+          if (isEnabled) {
             setFcmToken(savedToken);
             setSubscription({ endpoint: savedToken });
             return { endpoint: savedToken };
           }
         }
+      } catch (fetchError) {
+        // Backend check failed, but we have a local token - trust it
+        console.warn('Backend subscription check failed, using localStorage:', fetchError);
+        setFcmToken(savedToken);
+        setSubscription({ endpoint: savedToken });
+        return { endpoint: savedToken };
       }
       
       return null;
@@ -162,7 +175,7 @@ export const useNotifications = () => {
       console.error('Failed to check subscription:', error);
       return null;
     }
-  };
+  }, [isSupported]);
 
   const sendLocalNotification = async (title, options = {}) => {
     if (!isSupported || permission !== 'granted') {

@@ -125,7 +125,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   };
 
   const handleNotificationToggle = async () => {
-    if (isTogglingNotifications || !isEditingPrivacy) return;
+    if (isTogglingNotifications) return;
     setIsTogglingNotifications(true);
     try {
       if (notificationsEnabled) {
@@ -419,7 +419,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <button 
                   className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
                   onClick={handleNotificationToggle}
-                  disabled={!isEditingPrivacy || isTogglingNotifications || permission === 'denied'}
+                  disabled={isTogglingNotifications || permission === 'denied'}
                 >
                   <span className="toggle-knob" />
                 </button>
