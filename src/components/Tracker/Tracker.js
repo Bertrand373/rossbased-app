@@ -7,6 +7,7 @@ import './Tracker.css';
 import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 import DailyQuote from '../DailyQuote/DailyQuote';
+import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
@@ -17,6 +18,11 @@ const Tracker = ({ userData, updateUserData }) => {
   const [showStreakOptions, setShowStreakOptions] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetType, setResetType] = useState(null);
+  
+  // Onboarding state - show if user hasn't seen it AND has a start date
+  const [showOnboarding, setShowOnboarding] = useState(
+    !userData.hasSeenOnboarding && userData.startDate
+  );
   
   const [benefits, setBenefits] = useState({ 
     energy: 5, focus: 5, confidence: 5, aura: 5, sleep: 5, workout: 5 
@@ -72,6 +78,19 @@ const Tracker = ({ userData, updateUserData }) => {
   };
 
   const milestone = getNextMilestone();
+
+  // Handle onboarding complete
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    updateUserData({ hasSeenOnboarding: true });
+  };
+
+  // Handle onboarding trigger for date picker
+  const handleOnboardingDateTrigger = () => {
+    setShowOnboarding(false);
+    setShowDatePicker(true);
+    updateUserData({ hasSeenOnboarding: true });
+  };
 
   // Date submit - no toast, modal closing is confirmation
   const handleDateSubmit = (date) => {
@@ -194,6 +213,14 @@ const Tracker = ({ userData, updateUserData }) => {
   return (
     <div className="tracker">
       
+      {/* Onboarding Guide - First time only */}
+      {showOnboarding && (
+        <OnboardingGuide 
+          onComplete={handleOnboardingComplete}
+          onTriggerDatePicker={handleOnboardingDateTrigger}
+        />
+      )}
+      
       {/* AI Pattern Insight - ambient, non-intrusive */}
       <PatternInsightCard userData={userData} />
       
@@ -298,7 +325,8 @@ const Tracker = ({ userData, updateUserData }) => {
           <span className="time">{format(currentTime, 'h:mm a')}</span>
         </p>
         
-        <button className="streak" onClick={() => setShowStreakOptions(true)}>
+        {/* ONBOARDING TARGET: streak-counter */}
+        <button className="streak streak-counter" onClick={() => setShowStreakOptions(true)}>
           <span className="streak-num">{streak}</span>
           <span className="streak-unit">days</span>
         </button>
@@ -312,8 +340,9 @@ const Tracker = ({ userData, updateUserData }) => {
 
       {/* Footer */}
       <footer className="tracker-footer">
+        {/* ONBOARDING TARGET: benefits-trigger */}
         <button 
-          className={todayLogged ? 'btn-logged' : 'btn-primary'}
+          className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
           onClick={() => setShowBenefits(true)}
         >
           {todayLogged ? 'Logged Today ✓' : 'Log Today'}

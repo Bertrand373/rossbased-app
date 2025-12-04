@@ -108,16 +108,14 @@ app.post('/api/login', async (req, res) => {
         wetDreamCount: 0,
         relapseCount: 0,
         isPremium: false,
+        hasSeenOnboarding: false,  // NEW: Track onboarding completion
         badges: [
           { id: 1, name: '7-Day Warrior', earned: false, date: null },
           { id: 2, name: '14-Day Monk', earned: false, date: null },
           { id: 3, name: '30-Day Master', earned: false, date: null },
           { id: 4, name: '90-Day King', earned: false, date: null }
         ],
-        benefitTracking: [
-          { date: new Date(), energy: 8, focus: 7, confidence: 6 },
-          { date: addDays(new Date(), -2), energy: 6, focus: 5, confidence: 7 }
-        ],
+        benefitTracking: [],
         streakHistory: [{
           id: 1,
           start: new Date(),
