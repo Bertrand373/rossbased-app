@@ -277,6 +277,60 @@ app.post('/api/notification-preferences/:username', async (req, res) => {
   }
 });
 
+// ============================================
+// FEEDBACK TO DISCORD WEBHOOK
+// ============================================
+app.post('/api/feedback', async (req, res) => {
+  const { type, subject, message, username } = req.body;
+  
+  if (!subject || !message) {
+    return res.status(400).json({ error: 'Subject and message are required' });
+  }
+  
+  const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1446208891561054360/97_-2IRepbgkGtDruh4cWN5ep-6c5_Iw8ibP5N5cFPKigucQlO669h4bhLFlU-2DwEv-';
+  
+  // Format type for display
+  const typeLabels = {
+    general: '💬 General',
+    bug: '🐛 Bug Report',
+    feature: '✨ Feature Request',
+    improvement: '💡 Suggestion',
+    other: '📝 Other'
+  };
+  
+  const embed = {
+    embeds: [{
+      title: `${typeLabels[type] || '💬 General'} Feedback`,
+      color: 0xFFD700, // Gold color to match TitanTrack
+      fields: [
+        { name: 'Subject', value: subject, inline: false },
+        { name: 'Message', value: message, inline: false },
+        { name: 'From', value: username || 'Anonymous', inline: true },
+        { name: 'Time', value: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }), inline: true }
+      ],
+      footer: { text: 'TitanTrack App Feedback' }
+    }]
+  };
+  
+  try {
+    const response = await fetch(DISCORD_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(embed)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Discord webhook failed');
+    }
+    
+    console.log('✅ Feedback sent to Discord from:', username || 'Anonymous');
+    res.json({ success: true, message: 'Feedback sent successfully' });
+  } catch (error) {
+    console.error('❌ Failed to send feedback to Discord:', error);
+    res.status(500).json({ error: 'Failed to send feedback' });
+  }
+});
+
 // Mount notification routes
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/auth', googleAuthRoutes);

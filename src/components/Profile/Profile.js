@@ -180,17 +180,37 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     setIsEditingProfile(false);
   };
 
-  const handleFeedbackSubmit = () => {
+  const handleFeedbackSubmit = async () => {
     if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
       toast.error('Please fill in both fields');
       return;
     }
-    console.log('Feedback:', { type: feedbackType, subject: feedbackSubject, message: feedbackMessage });
-    setFeedbackSubject('');
-    setFeedbackMessage('');
-    setFeedbackType('general');
-    setShowFeedbackModal(false);
-    toast.success('Feedback sent!');
+    
+    try {
+      const response = await fetch(`${API_URL}/api/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: feedbackType,
+          subject: feedbackSubject.trim(),
+          message: feedbackMessage.trim(),
+          username: userData?.username || 'Anonymous'
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to send feedback');
+      }
+      
+      setFeedbackSubject('');
+      setFeedbackMessage('');
+      setFeedbackType('general');
+      setShowFeedbackModal(false);
+      toast.success('Feedback sent! Thank you 🔥');
+    } catch (error) {
+      console.error('Feedback error:', error);
+      toast.error('Failed to send feedback. Please try again.');
+    }
   };
 
   const handleDataExport = () => {
