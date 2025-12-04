@@ -5,11 +5,27 @@ const express = require('express');
 const router = express.Router();
 const NotificationSubscription = require('../models/NotificationSubscription');
 const User = require('../models/User');
+const notificationService = require('../services/notificationService');
 const { 
   sendNotificationToUser, 
   sendBulkNotifications,
-  checkAndSendMilestoneNotification 
-} = require('../services/notificationService');
+  notificationTemplates
+} = notificationService;
+
+// checkAndSendMilestoneNotification may or may not be exported
+const checkAndSendMilestoneNotification = notificationService.checkAndSendMilestoneNotification || 
+  async (username, currentStreak) => {
+    // Fallback implementation if not exported
+    const milestones = [7, 14, 30, 60, 90, 180, 365];
+    if (!milestones.includes(currentStreak)) {
+      return { success: false, reason: `${currentStreak} is not a milestone day` };
+    }
+    const templateKey = `milestone_${currentStreak}`;
+    if (!notificationTemplates[templateKey]) {
+      return { success: false, reason: `No template for milestone_${currentStreak}` };
+    }
+    return await sendNotificationToUser(username, templateKey);
+  };
 
 // Subscribe to notifications (store FCM token)
 router.post('/subscribe', async (req, res) => {
@@ -191,6 +207,65 @@ router.put('/preferences', async (req, res) => {
   }
 });
 
+// Save notification preferences (POST version for Profile component)
+router.post('/notification-preferences/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { 
+      quietHoursEnabled,
+      quietHoursStart,
+      quietHoursEnd,
+      types,
+      dailyReminderEnabled,
+      dailyReminderTime,
+      fcmToken
+    } = req.body;
+    
+    // Update preferences in User model
+    const user = await User.findOne({ username });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Build preferences object
+    const preferences = {
+      quietHoursEnabled: quietHoursEnabled || false,
+      quietHoursStart: quietHoursStart || '22:00',
+      quietHoursEnd: quietHoursEnd || '08:00',
+      types: types || { milestones: true, urgeSupport: true, weeklyProgress: true },
+      dailyReminderEnabled: dailyReminderEnabled || false,
+      dailyReminderTime: dailyReminderTime || '09:00'
+    };
+    
+    user.notificationPreferences = preferences;
+    await user.save();
+    
+    // Also update FCM token in subscription if provided
+    if (fcmToken) {
+      await NotificationSubscription.findOneAndUpdate(
+        { username },
+        { fcmToken, notificationsEnabled: true },
+        { upsert: true }
+      );
+    }
+    
+    console.log(`✅ Saved notification preferences for: ${username}`);
+    res.json({ 
+      success: true, 
+      message: 'Preferences saved successfully',
+      preferences: user.notificationPreferences
+    });
+    
+  } catch (error) {
+    console.error('❌ Error saving notification preferences:', error);
+    res.status(500).json({ 
+      error: 'Failed to save preferences',
+      details: error.message 
+    });
+  }
+});
+
 // Send notification to specific user (manual trigger)
 router.post('/send', async (req, res) => {
   try {
@@ -315,6 +390,241 @@ router.post('/test', async (req, res) => {
       error: 'Failed to send test notification',
       details: error.message 
     });
+  }
+});
+
+// ============================================================================
+// DEBUG/TESTING ENDPOINT - Comprehensive notification testing
+// ============================================================================
+router.post('/debug-test', async (req, res) => {
+  try {
+    const { username, notificationType, sendActual = false } = req.body;
+    
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+    
+    const debugInfo = {
+      username,
+      notificationType: notificationType || 'daily_reminder',
+      timestamp: new Date().toISOString(),
+      serverTime: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }),
+      checks: {},
+      wouldSend: true,
+      blockReasons: [],
+      actualSendResult: null
+    };
+    
+    // 1. Check if user exists
+    const user = await User.findOne({ username });
+    debugInfo.checks.userExists = !!user;
+    
+    if (!user) {
+      debugInfo.wouldSend = false;
+      debugInfo.blockReasons.push('User not found in database');
+      return res.json(debugInfo);
+    }
+    
+    // 2. Check subscription exists and has FCM token
+    const subscription = await NotificationSubscription.findOne({ username });
+    debugInfo.checks.subscriptionExists = !!subscription;
+    debugInfo.checks.hasValidFcmToken = !!(subscription?.fcmToken);
+    debugInfo.checks.subscriptionEnabled = subscription?.notificationsEnabled ?? false;
+    
+    if (!subscription) {
+      debugInfo.wouldSend = false;
+      debugInfo.blockReasons.push('No notification subscription found - user needs to enable notifications');
+    } else if (!subscription.fcmToken) {
+      debugInfo.wouldSend = false;
+      debugInfo.blockReasons.push('No FCM token - browser push not registered');
+    } else if (!subscription.notificationsEnabled) {
+      debugInfo.wouldSend = false;
+      debugInfo.blockReasons.push('Notifications disabled at subscription level');
+    }
+    
+    // 3. Get user preferences
+    const prefs = user.notificationPreferences || {};
+    debugInfo.userPreferences = {
+      quietHoursEnabled: prefs.quietHoursEnabled || false,
+      quietHoursStart: prefs.quietHoursStart || '22:00',
+      quietHoursEnd: prefs.quietHoursEnd || '08:00',
+      dailyReminderEnabled: prefs.dailyReminderEnabled || false,
+      dailyReminderTime: prefs.dailyReminderTime || '09:00',
+      types: prefs.types || { milestones: true, urgeSupport: true, weeklyProgress: true }
+    };
+    
+    // 4. Check quiet hours
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    debugInfo.checks.currentTimeMinutes = currentMinutes;
+    debugInfo.checks.currentTimeFormatted = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    if (prefs.quietHoursEnabled) {
+      const [startH, startM] = (prefs.quietHoursStart || '22:00').split(':').map(Number);
+      const [endH, endM] = (prefs.quietHoursEnd || '08:00').split(':').map(Number);
+      
+      const quietStart = startH * 60 + startM;
+      const quietEnd = endH * 60 + endM;
+      
+      debugInfo.checks.quietHoursRange = `${prefs.quietHoursStart} - ${prefs.quietHoursEnd}`;
+      debugInfo.checks.quietStartMinutes = quietStart;
+      debugInfo.checks.quietEndMinutes = quietEnd;
+      
+      // Handle overnight quiet hours (e.g., 22:00 to 08:00)
+      const isQuietTime = quietStart > quietEnd
+        ? (currentMinutes >= quietStart || currentMinutes < quietEnd)
+        : (currentMinutes >= quietStart && currentMinutes < quietEnd);
+      
+      debugInfo.checks.isInQuietHours = isQuietTime;
+      
+      if (isQuietTime) {
+        debugInfo.wouldSend = false;
+        debugInfo.blockReasons.push(`Currently in quiet hours (${prefs.quietHoursStart} - ${prefs.quietHoursEnd})`);
+      }
+    } else {
+      debugInfo.checks.isInQuietHours = false;
+      debugInfo.checks.quietHoursRange = 'Disabled';
+    }
+    
+    // 5. Check notification type preference
+    const type = notificationType || 'daily_reminder';
+    const typeCategory = type.split('_')[0];
+    
+    // Map notification types to preference keys
+    const typeMapping = {
+      'milestone': 'milestones',
+      'daily': 'dailyReminder', // Special handling
+      'urge': 'urgeSupport',
+      'weekly': 'weeklyProgress',
+      'encouragement': 'weeklyProgress',
+      'motivational': 'weeklyProgress',
+      'streak': 'milestones'
+    };
+    
+    const prefKey = typeMapping[typeCategory];
+    debugInfo.checks.notificationType = type;
+    debugInfo.checks.typeCategory = typeCategory;
+    debugInfo.checks.mappedPreferenceKey = prefKey;
+    
+    // Special handling for daily reminder
+    if (typeCategory === 'daily') {
+      debugInfo.checks.dailyReminderEnabled = prefs.dailyReminderEnabled || false;
+      debugInfo.checks.dailyReminderTime = prefs.dailyReminderTime || '09:00';
+      
+      if (!prefs.dailyReminderEnabled) {
+        debugInfo.wouldSend = false;
+        debugInfo.blockReasons.push('Daily reminders are disabled in preferences');
+      } else {
+        // Check if current hour matches reminder time
+        const [reminderH] = (prefs.dailyReminderTime || '09:00').split(':').map(Number);
+        const currentHour = now.getHours();
+        debugInfo.checks.currentHour = currentHour;
+        debugInfo.checks.reminderHour = reminderH;
+        debugInfo.checks.hoursMatch = currentHour === reminderH;
+        
+        if (currentHour !== reminderH) {
+          debugInfo.checks.schedulerWouldSkip = true;
+          debugInfo.checks.schedulerNote = `Scheduler runs hourly. Would fire at ${String(reminderH).padStart(2, '0')}:00, current hour is ${String(currentHour).padStart(2, '0')}:00`;
+        }
+      }
+    } else if (prefKey && prefs.types) {
+      const isTypeEnabled = prefs.types[prefKey] !== false;
+      debugInfo.checks.typeEnabled = isTypeEnabled;
+      
+      if (!isTypeEnabled) {
+        debugInfo.wouldSend = false;
+        debugInfo.blockReasons.push(`${prefKey} notifications are disabled in preferences`);
+      }
+    }
+    
+    // 6. Check template exists
+    const templateExists = !!notificationTemplates[type];
+    debugInfo.checks.templateExists = templateExists;
+    
+    if (!templateExists) {
+      debugInfo.checks.availableTemplates = Object.keys(notificationTemplates);
+      debugInfo.blockReasons.push(`Template '${type}' not found. Available: ${Object.keys(notificationTemplates).join(', ')}`);
+    } else {
+      debugInfo.templatePreview = {
+        title: notificationTemplates[type].title,
+        body: notificationTemplates[type].body
+      };
+    }
+    
+    // 7. User streak info (for milestone context)
+    debugInfo.userInfo = {
+      currentStreak: user.currentStreak || 0,
+      longestStreak: user.longestStreak || 0
+    };
+    
+    // Final determination
+    debugInfo.wouldSend = debugInfo.blockReasons.length === 0;
+    
+    // 8. Actually send if requested and would succeed
+    if (sendActual && debugInfo.wouldSend) {
+      debugInfo.actualSendAttempted = true;
+      const result = await sendNotificationToUser(username, type, { debug: 'true' });
+      debugInfo.actualSendResult = result;
+    }
+    
+    // Summary
+    debugInfo.summary = debugInfo.wouldSend 
+      ? '✅ All checks passed - notification would be sent'
+      : `❌ Blocked by: ${debugInfo.blockReasons.join('; ')}`;
+    
+    res.json(debugInfo);
+    
+  } catch (error) {
+    console.error('❌ Error in debug-test:', error);
+    res.status(500).json({ 
+      error: 'Debug test failed',
+      details: error.message 
+    });
+  }
+});
+
+// ============================================================================
+// LIST ALL AVAILABLE NOTIFICATION TEMPLATES
+// ============================================================================
+router.get('/templates', async (req, res) => {
+  try {
+    const templates = Object.entries(notificationTemplates).map(([key, value]) => ({
+      key,
+      title: value.title,
+      body: value.body,
+      category: key.split('_')[0]
+    }));
+    
+    res.json({
+      success: true,
+      count: templates.length,
+      templates
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get templates' });
+  }
+});
+
+// ============================================================================
+// GET ALL SUBSCRIBED USERS (for testing)
+// ============================================================================
+router.get('/subscribed-users', async (req, res) => {
+  try {
+    const subscriptions = await NotificationSubscription.find({ notificationsEnabled: true })
+      .select('username notificationsEnabled createdAt')
+      .lean();
+    
+    res.json({
+      success: true,
+      count: subscriptions.length,
+      users: subscriptions.map(s => ({
+        username: s.username,
+        enabled: s.notificationsEnabled,
+        subscribedAt: s.createdAt
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get subscribed users' });
   }
 });
 
