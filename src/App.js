@@ -171,10 +171,14 @@ function App() {
     <Router>
       <ScrollToTop />
       <ServiceWorkerListener />
+      {/* RESPONSIVE TOAST: Desktop top-right, Mobile top-center below header */}
       <Toaster 
-        position="bottom-center"
-        containerStyle={{
-          bottom: 100,
+        position={isMobile ? "top-center" : "top-right"}
+        containerStyle={isMobile ? {
+          top: 70,  // Below mobile header
+        } : {
+          top: 80,   // Below desktop header
+          right: 24,
         }}
         toastOptions={{
           duration: 2500,
@@ -189,6 +193,7 @@ function App() {
             fontWeight: '500',
             padding: '14px 20px',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            maxWidth: isMobile ? 'calc(100vw - 32px)' : '380px',
           },
           success: {
             duration: 2500,

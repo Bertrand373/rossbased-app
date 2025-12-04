@@ -268,41 +268,42 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     setCurrentStep('summary');
   };
 
-  // Get phase-specific tools
+  // Get phase-specific tools - UPDATED: Removed toast notifications
+  // Button click is acknowledgment enough; no toast needed for instructions
   const getPhaseTools = () => {
     if (experienceLevel === 'beginner') {
       if (currentDay <= 14) {
         return [
-          { id: 'cold-shower', name: 'Cold Shower', action: () => toast.success('2-minute cold shower to reset nervous system') },
-          { id: 'exercise', name: 'Physical Exercise', action: () => toast.success('20 push-ups or 5-minute run') },
-          { id: 'environment', name: 'Change Environment', action: () => toast.success('Go outside or to a public space') }
+          { id: 'cold-shower', name: 'Cold Shower', action: () => {} },
+          { id: 'exercise', name: 'Physical Exercise', action: () => {} },
+          { id: 'environment', name: 'Change Environment', action: () => {} }
         ];
       } else if (currentDay <= 45) {
         return [
-          { id: 'journaling', name: 'Emotional Processing', action: () => toast.success('Write down what you\'re feeling') },
-          { id: 'meditation', name: 'Mindfulness Practice', action: () => toast.success('5 minutes of quiet observation') },
-          { id: 'support', name: 'Reach Out', action: () => toast.success('Call a friend or mentor') }
+          { id: 'journaling', name: 'Emotional Processing', action: () => {} },
+          { id: 'meditation', name: 'Mindfulness Practice', action: () => {} },
+          { id: 'support', name: 'Reach Out', action: () => {} }
         ];
       } else {
         return [
-          { id: 'creative', name: 'Creative Expression', action: () => toast.success('Channel energy into art or writing') },
-          { id: 'learning', name: 'Mental Challenge', action: () => toast.success('Engage with complex material') },
-          { id: 'visualization', name: 'Future Self', action: () => toast.success('Visualize your future self thanking you') }
+          { id: 'creative', name: 'Creative Expression', action: () => {} },
+          { id: 'learning', name: 'Mental Challenge', action: () => {} },
+          { id: 'visualization', name: 'Future Self', action: () => {} }
         ];
       }
     } else if (experienceLevel === 'intermediate') {
       return [
-        { id: 'energy-circulation', name: 'Microcosmic Orbit', action: () => toast.success('9 complete energy circles') },
-        { id: 'cold-therapy', name: 'Extended Cold Therapy', action: () => toast.success('5+ minute cold exposure') },
-        { id: 'service', name: 'Channel Into Service', action: () => toast.success('Help someone else') },
-        { id: 'creative-project', name: 'Creative Project', action: () => toast.success('Continue a meaningful project') }
+        { id: 'energy-circulation', name: 'Microcosmic Orbit', action: () => {} },
+        { id: 'cold-therapy', name: 'Extended Cold Therapy', action: () => {} },
+        { id: 'service', name: 'Channel Into Service', action: () => {} },
+        { id: 'creative-project', name: 'Creative Project', action: () => {} }
       ];
     } else {
       return [
-        { id: 'energy-mastery', name: 'Advanced Energy Work', action: () => toast.success('Bandhas and crown chakra focus') },
-        { id: 'teaching', name: 'Teach Others', action: () => toast.success('Share wisdom with someone newer') },
-        { id: 'spiritual', name: 'Spiritual Practice', action: () => toast.success('Deep meditation or prayer') },
-        { id: 'world-service', name: 'Global Service', action: () => toast.success('Work on humanity-serving projects') }
+        { id: 'energy-mastery', name: 'Advanced Energy Work', action: () => {} },
+        { id: 'teaching', name: 'Teach Others', action: () => {} },
+        { id: 'spiritual', name: 'Spiritual Practice', action: () => {} },
+        { id: 'world-service', name: 'Global Service', action: () => {} }
       ];
     }
   };

@@ -606,11 +606,7 @@ export const useUserData = () => {
 
       updateUserData(goalData);
       
-      if (isAchieved) {
-        toast.success(`Goal set and already achieved! You've reached ${targetDays} days!`);
-      } else {
-        toast.success(`Goal set: Reach ${targetDays} days!`);
-      }
+      // No toast needed - modal closing is sufficient confirmation
       
       return true;
     } catch (err) {
@@ -633,7 +629,7 @@ export const useUserData = () => {
       };
 
       updateUserData(goalData);
-      toast.success('Goal cancelled');
+      // No toast needed - modal closing is sufficient confirmation
       return true;
     } catch (err) {
       console.error('Cancel goal error:', err);
