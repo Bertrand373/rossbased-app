@@ -1,5 +1,5 @@
 // OnboardingGuide.js - TITANTRACK
-// First-time user onboarding - 3 focused tooltips
+// First-time user onboarding - 3 focused tooltips with premium animations
 import React, { useState, useEffect, useCallback } from 'react';
 import './OnboardingGuide.css';
 
@@ -7,6 +7,8 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [targetRect, setTargetRect] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
   // Check for mobile on resize
@@ -17,7 +19,6 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
   }, []);
 
   // Define the 3 onboarding steps
-  // Nav target changes based on device
   const steps = [
     {
       target: '.streak-counter',
@@ -32,7 +33,6 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
       position: 'top'
     },
     {
-      // Mobile: bottom nav, Desktop: header nav
       target: isMobile ? '.mobile-nav' : '.header-nav',
       title: 'Explore when ready',
       message: 'Calendar, stats, timeline, and crisis tools await.',
@@ -66,7 +66,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       updateTargetPosition();
-    }, 100);
+    }, 50);
     
     window.addEventListener('resize', updateTargetPosition);
     window.addEventListener('scroll', updateTargetPosition);
@@ -78,10 +78,30 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     };
   }, [updateTargetPosition, currentStep]);
 
+  // Smooth transition to next step
+  const transitionToStep = (nextStep) => {
+    // Start transition - fade out tooltip
+    setIsTransitioning(true);
+    setTooltipVisible(false);
+    
+    // After tooltip fades, move spotlight
+    setTimeout(() => {
+      setCurrentStep(nextStep);
+    }, 200);
+    
+    // After spotlight glides, fade in new tooltip
+    setTimeout(() => {
+      setTooltipVisible(true);
+      setIsTransitioning(false);
+    }, 500);
+  };
+
   // Handle next step or complete
   const handleNext = () => {
+    if (isTransitioning) return;
+    
     if (currentStep < steps.length - 1) {
-      setCurrentStep(prev => prev + 1);
+      transitionToStep(currentStep + 1);
     } else {
       handleComplete();
     }
@@ -89,14 +109,17 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
 
   // Handle skip/complete
   const handleComplete = () => {
+    setTooltipVisible(false);
     setIsVisible(false);
     setTimeout(() => {
       onComplete();
-    }, 200);
+    }, 300);
   };
 
   // Handle spotlight tap
   const handleSpotlightTap = () => {
+    if (isTransitioning) return;
+    
     if (currentStep === 0 && onTriggerDatePicker) {
       onTriggerDatePicker();
     } else {
@@ -119,7 +142,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
       };
     }
 
-    const tooltipOffset = 20;
+    const tooltipOffset = 24;
 
     if (step.position === 'bottom') {
       return {
@@ -138,9 +161,9 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     return {};
   };
 
-  // Get spotlight style - clean rounded corners, no border
+  // Get spotlight style with smooth transitions
   const getSpotlightStyle = () => {
-    if (!targetRect) return {};
+    if (!targetRect) return { opacity: 0 };
     
     // For nav (step 3), use full width
     if (currentStep === 2) {
@@ -156,38 +179,45 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     // For counter (step 1), generous padding
     if (currentStep === 0) {
       return {
-        top: `${targetRect.top - 20}px`,
-        left: `${targetRect.left - 20}px`,
-        width: `${targetRect.width + 40}px`,
-        height: `${targetRect.height + 40}px`,
-        borderRadius: '24px'
+        top: `${targetRect.top - 24}px`,
+        left: `${targetRect.left - 24}px`,
+        width: `${targetRect.width + 48}px`,
+        height: `${targetRect.height + 48}px`,
+        borderRadius: '28px'
       };
     }
     
     // For benefits button (step 2)
     return {
-      top: `${targetRect.top - 12}px`,
-      left: `${targetRect.left - 12}px`,
-      width: `${targetRect.width + 24}px`,
-      height: `${targetRect.height + 24}px`,
-      borderRadius: '16px'
+      top: `${targetRect.top - 16}px`,
+      left: `${targetRect.left - 16}px`,
+      width: `${targetRect.width + 32}px`,
+      height: `${targetRect.height + 32}px`,
+      borderRadius: '20px'
     };
   };
 
   return (
     <div className="onboarding-overlay">
-      {/* Spotlight cutout effect */}
+      {/* Spotlight with pulse ring */}
       {targetRect && (
-        <div 
-          className="onboarding-spotlight"
-          style={getSpotlightStyle()}
-          onClick={handleSpotlightTap}
-        />
+        <>
+          <div 
+            className="onboarding-spotlight"
+            style={getSpotlightStyle()}
+            onClick={handleSpotlightTap}
+          />
+          {/* Pulse ring - separate element for animation */}
+          <div 
+            className="onboarding-pulse-ring"
+            style={getSpotlightStyle()}
+          />
+        </>
       )}
 
-      {/* Tooltip */}
+      {/* Tooltip with fade transition */}
       <div 
-        className={`onboarding-tooltip ${step.position}`}
+        className={`onboarding-tooltip ${step.position} ${tooltipVisible ? 'visible' : 'hidden'}`}
         style={getTooltipStyle()}
       >
         {/* Progress dots */}
@@ -209,12 +239,14 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
           <button 
             className="onboarding-skip"
             onClick={handleComplete}
+            disabled={isTransitioning}
           >
             Skip
           </button>
           <button 
             className="onboarding-next"
             onClick={handleNext}
+            disabled={isTransitioning}
           >
             {isLastStep ? 'Get Started' : 'Next'}
           </button>
