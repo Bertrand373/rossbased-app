@@ -267,10 +267,13 @@
   margin-bottom: 16px;
 }
 
-/* More space before time range */
+/* More space before time range - compact width on all screens */
 .toggle-row.time-range {
   margin-top: 4px;
   margin-bottom: 24px;
+  max-width: 240px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Toggle buttons - tight spacing matching Calendar/ET */

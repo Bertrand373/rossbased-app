@@ -394,9 +394,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       <section className="stats-section">
         <h2>Benefits</h2>
         
-        {/* Metric toggles - Row 1: Energy, Focus, Confidence */}
+        {/* Metric toggles - Single row, wraps on mobile */}
         <div className="toggle-row benefits-row">
-          {['energy', 'focus', 'confidence'].map((metric, index) => (
+          {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map((metric, index) => (
             <React.Fragment key={metric}>
               <button
                 className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
@@ -404,22 +404,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               >
                 {metric.charAt(0).toUpperCase() + metric.slice(1)}
               </button>
-              {index < 2 && <div className="toggle-divider" />}
-            </React.Fragment>
-          ))}
-        </div>
-        
-        {/* Metric toggles - Row 2: Aura, Sleep, Workout */}
-        <div className="toggle-row benefits-row">
-          {['aura', 'sleep', 'workout'].map((metric, index) => (
-            <React.Fragment key={metric}>
-              <button
-                className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
-                onClick={() => setSelectedMetric(metric)}
-              >
-                {metric.charAt(0).toUpperCase() + metric.slice(1)}
-              </button>
-              {index < 2 && <div className="toggle-divider" />}
+              {index < 5 && <div className="toggle-divider" />}
             </React.Fragment>
           ))}
         </div>
