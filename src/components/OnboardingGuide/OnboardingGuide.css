@@ -4,7 +4,7 @@
    ============================================================================= */
 
 /* =============================================================================
-   OVERLAY - Dark focus
+   OVERLAY - Dark focus, blocks all interaction
    ============================================================================= */
 
 .onboarding-overlay {
@@ -16,11 +16,21 @@
   background: transparent;
   z-index: 10000;
   animation: onboardingFadeIn 400ms ease;
+  
+  /* Block ALL clicks on background */
+  pointer-events: auto;
+}
+
+/* Only tooltip content is interactive */
+.onboarding-connector,
+.onboarding-dot {
   pointer-events: none;
 }
 
-.onboarding-overlay > * {
+/* Spotlight blocks clicks on highlighted element */
+.onboarding-spotlight {
   pointer-events: auto;
+  cursor: default;
 }
 
 @keyframes onboardingFadeIn {
@@ -35,7 +45,6 @@
 .onboarding-spotlight {
   position: fixed;
   z-index: 10001;
-  cursor: pointer;
   
   /* Dark surround */
   box-shadow: 
