@@ -1,18 +1,16 @@
 // MobileNavigation.js - TITANTRACK
-// Text-only navigation with dividers
+// Text-only navigation with dividers (risk dots removed - floating card handles alerts)
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import './MobileNavigation.css';
 
-const MobileNavigation = ({ riskLevel = 'none' }) => {
-  const location = useLocation();
-  
+const MobileNavigation = () => {
   const navItems = [
     { path: '/', label: 'Track' },
     { path: '/calendar', label: 'Calendar' },
     { path: '/stats', label: 'Stats' },
     { path: '/timeline', label: 'Timeline' },
-    { path: '/urge-toolkit', label: 'Urges', showRiskIndicator: true }
+    { path: '/urge-toolkit', label: 'Urges' }
   ];
 
   return (
@@ -25,10 +23,6 @@ const MobileNavigation = ({ riskLevel = 'none' }) => {
               className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
             >
               <span className="mobile-nav-label">{item.label}</span>
-              {/* Risk indicator for Urges tab */}
-              {item.showRiskIndicator && riskLevel !== 'none' && (
-                <span className={`mobile-risk-dot ${riskLevel}`} />
-              )}
             </NavLink>
             {index < navItems.length - 1 && <span className="mobile-nav-divider" />}
           </React.Fragment>

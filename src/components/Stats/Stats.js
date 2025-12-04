@@ -1,6 +1,6 @@
 // Stats.js - TITANTRACK
 // Matches Landing/Tracker minimalist aesthetic
-// REFACTORED: Analytics section now pure data, no educational content
+// UPDATED: Your Patterns now shows streak-phase proof instead of day-of-week patterns
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -28,13 +28,13 @@ import {
   validateUserData
 } from './StatsUtils';
 
-// Import analytics functions - UPDATED: New data-focused functions
+// Import analytics functions - UPDATED: Added calculateStreakPhaseAverages
 import {
   getPhaseInfo,
   calculateMetricAverages,
   calculateMetricTrends,
   identifyMetricExtremes,
-  calculateDayOfWeekPatterns,
+  calculateStreakPhaseAverages,
   calculateMetricCorrelations,
   calculateGrowthRates,
   generateRelapsePatternAnalysis,
@@ -115,7 +115,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     loadMLPatterns();
   }, [safeUserData, isPremium, daysTracked]);
 
-  // UPDATED: Memoized analytics - pure data calculations
+  // UPDATED: Memoized analytics - now includes streak-phase averages
   const memoizedInsights = useMemo(() => {
     if (!isPremium) return {};
     return {
@@ -124,8 +124,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       metricTrends: calculateMetricTrends(safeUserData, 7, 7),
       metricExtremes: identifyMetricExtremes(safeUserData, 7),
       
-      // Your Patterns data
-      dayOfWeekPatterns: calculateDayOfWeekPatterns(safeUserData, selectedMetric),
+      // Your Progress data (renamed from Patterns)
+      streakPhaseAverages: calculateStreakPhaseAverages(safeUserData),
       metricCorrelations: calculateMetricCorrelations(safeUserData),
       growthRates: calculateGrowthRates(safeUserData, 30),
       
@@ -483,9 +483,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
                 isLoading={loadingStates.numbers}
               />
               
-              {/* Section 2: Your Patterns - Unlocks at 14+ days */}
+              {/* Section 2: Your Progress - Streak-phase proof + correlations */}
               <YourPatterns
-                dayOfWeekPatterns={memoizedInsights.dayOfWeekPatterns}
+                streakPhaseAverages={memoizedInsights.streakPhaseAverages}
                 metricCorrelations={memoizedInsights.metricCorrelations}
                 growthRates={memoizedInsights.growthRates}
                 selectedMetric={selectedMetric}

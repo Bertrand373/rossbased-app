@@ -1,5 +1,6 @@
 // components/Stats/StatsAnalyticsUtils.js - Pure Data Analytics Functions
 // REFACTORED: Removed all static educational content, now pure data calculations
+// UPDATED: Added streak-phase averages for "Your Progress" section
 import { subDays, format, differenceInDays } from 'date-fns';
 import { validateUserData, getFilteredBenefitData, calculateAverage } from './StatsCalculationUtils';
 
@@ -29,6 +30,182 @@ export const getPhaseInfo = (streak) => {
     return { key: 'integration', name: 'Integration & Growth', range: '91-180' };
   }
   return { key: 'mastery', name: 'Mastery & Purpose', range: '181+' };
+};
+
+// ============================================================
+// STREAK-PHASE AVERAGES - THE CORE INSIGHT
+// Shows benefit averages grouped by streak length phases
+// This is the "proof" that retention works for the user
+// ============================================================
+export const calculateStreakPhaseAverages = (userData) => {
+  try {
+    const safeData = validateUserData(userData);
+    const benefitTracking = safeData.benefitTracking || [];
+    const streakHistory = safeData.streakHistory || [];
+    const currentStreak = safeData.currentStreak || 0;
+    const startDate = safeData.startDate ? new Date(safeData.startDate) : null;
+    
+    if (benefitTracking.length < BASIC_PATTERNS_THRESHOLD) {
+      return null;
+    }
+    
+    const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    
+    // Phase definitions
+    const phases = {
+      early: { label: 'Days 1-14', min: 1, max: 14, data: {} },
+      middle: { label: 'Days 15-45', min: 15, max: 45, data: {} },
+      advanced: { label: 'Days 45+', min: 46, max: Infinity, data: {} }
+    };
+    
+    // Initialize data arrays for each metric in each phase
+    Object.keys(phases).forEach(phaseKey => {
+      metrics.forEach(metric => {
+        phases[phaseKey].data[metric] = [];
+      });
+    });
+    
+    // Build a timeline of streak days
+    // We need to map each benefit tracking date to what day of a streak it was
+    const getStreakDayForDate = (dateStr) => {
+      const targetDate = new Date(dateStr);
+      if (isNaN(targetDate.getTime())) return null;
+      
+      // Check if this date falls within the current streak
+      if (startDate) {
+        const currentStreakStart = new Date(startDate);
+        if (targetDate >= currentStreakStart) {
+          const dayOfStreak = differenceInDays(targetDate, currentStreakStart) + 1;
+          if (dayOfStreak > 0 && dayOfStreak <= currentStreak + 7) { // Allow some buffer
+            return dayOfStreak;
+          }
+        }
+      }
+      
+      // Check historical streaks
+      for (const streak of streakHistory) {
+        if (!streak.start || !streak.end) continue;
+        
+        const streakStart = new Date(streak.start);
+        const streakEnd = new Date(streak.end);
+        
+        if (isNaN(streakStart.getTime()) || isNaN(streakEnd.getTime())) continue;
+        
+        if (targetDate >= streakStart && targetDate <= streakEnd) {
+          return differenceInDays(targetDate, streakStart) + 1;
+        }
+      }
+      
+      // If we can't determine from history, estimate based on current streak
+      // This is a fallback for users with incomplete streak history
+      if (startDate && benefitTracking.length > 0) {
+        // Sort benefit tracking by date
+        const sortedBenefits = [...benefitTracking].sort((a, b) => 
+          new Date(a.date) - new Date(b.date)
+        );
+        
+        const firstBenefitDate = new Date(sortedBenefits[0].date);
+        const daysSinceFirstTracking = differenceInDays(targetDate, firstBenefitDate);
+        
+        if (daysSinceFirstTracking >= 0) {
+          // Estimate based on position in tracking history
+          return daysSinceFirstTracking + 1;
+        }
+      }
+      
+      return null;
+    };
+    
+    // Process each benefit tracking entry
+    benefitTracking.forEach(entry => {
+      if (!entry?.date) return;
+      
+      const streakDay = getStreakDayForDate(entry.date);
+      if (streakDay === null || streakDay < 1) return;
+      
+      // Determine which phase this day belongs to
+      let targetPhase = null;
+      if (streakDay >= 1 && streakDay <= 14) {
+        targetPhase = 'early';
+      } else if (streakDay >= 15 && streakDay <= 45) {
+        targetPhase = 'middle';
+      } else if (streakDay > 45) {
+        targetPhase = 'advanced';
+      }
+      
+      if (!targetPhase) return;
+      
+      // Add metric values to the phase
+      metrics.forEach(metric => {
+        const value = entry[metric];
+        if (typeof value === 'number' && value >= 1 && value <= 10) {
+          phases[targetPhase].data[metric].push(value);
+        }
+      });
+    });
+    
+    // Calculate averages for each phase and metric
+    const phaseAverages = {};
+    let hasAnyData = false;
+    
+    Object.entries(phases).forEach(([phaseKey, phase]) => {
+      phaseAverages[phaseKey] = {
+        label: phase.label,
+        metrics: {}
+      };
+      
+      metrics.forEach(metric => {
+        const values = phase.data[metric];
+        if (values.length >= 2) {
+          const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
+          phaseAverages[phaseKey].metrics[metric] = {
+            value: parseFloat(avg.toFixed(1)),
+            dataPoints: values.length
+          };
+          hasAnyData = true;
+        } else {
+          phaseAverages[phaseKey].metrics[metric] = null;
+        }
+      });
+    });
+    
+    if (!hasAnyData) {
+      return null;
+    }
+    
+    // Calculate improvement from early to later phases
+    const improvements = {};
+    metrics.forEach(metric => {
+      const early = phaseAverages.early.metrics[metric]?.value;
+      const middle = phaseAverages.middle.metrics[metric]?.value;
+      const advanced = phaseAverages.advanced.metrics[metric]?.value;
+      
+      // Find the best comparison we can make
+      if (early && (middle || advanced)) {
+        const laterValue = advanced || middle;
+        const improvement = laterValue - early;
+        if (Math.abs(improvement) >= 0.3) {
+          improvements[metric] = {
+            from: early,
+            to: laterValue,
+            change: parseFloat(improvement.toFixed(1)),
+            direction: improvement > 0 ? 'up' : 'down'
+          };
+        }
+      }
+    });
+    
+    return {
+      phases: phaseAverages,
+      improvements,
+      hasEarlyData: Object.values(phaseAverages.early.metrics).some(m => m !== null),
+      hasMiddleData: Object.values(phaseAverages.middle.metrics).some(m => m !== null),
+      hasAdvancedData: Object.values(phaseAverages.advanced.metrics).some(m => m !== null)
+    };
+  } catch (error) {
+    console.error('Streak phase averages calculation error:', error);
+    return null;
+  }
 };
 
 // ============================================================
@@ -204,82 +381,6 @@ export const identifyMetricExtremes = (userData, days = 7) => {
     };
   } catch (error) {
     console.error('Metric extremes calculation error:', error);
-    return null;
-  }
-};
-
-// ============================================================
-// DAY-OF-WEEK PATTERNS
-// ============================================================
-export const calculateDayOfWeekPatterns = (userData, metric = 'energy') => {
-  try {
-    const safeData = validateUserData(userData);
-    const allData = safeData.benefitTracking || [];
-    
-    if (allData.length < BASIC_PATTERNS_THRESHOLD) {
-      return null;
-    }
-    
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const dayData = [[], [], [], [], [], [], []]; // 0=Sun through 6=Sat
-    
-    allData.forEach(item => {
-      if (!item?.date) return;
-      const value = item[metric];
-      if (typeof value !== 'number' || value < 1 || value > 10) return;
-      
-      const itemDate = new Date(item.date);
-      if (isNaN(itemDate.getTime())) return;
-      
-      const dayOfWeek = itemDate.getDay();
-      dayData[dayOfWeek].push(value);
-    });
-    
-    // Calculate averages per day
-    const dayAverages = dayData.map((values, idx) => {
-      if (values.length < 2) return null;
-      const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
-      return {
-        day: dayNames[idx],
-        dayIndex: idx,
-        average: parseFloat(avg.toFixed(1)),
-        dataPoints: values.length
-      };
-    }).filter(d => d !== null);
-    
-    if (dayAverages.length < 3) {
-      return null;
-    }
-    
-    // Find peak and low days
-    const sorted = [...dayAverages].sort((a, b) => b.average - a.average);
-    const peakDay = sorted[0];
-    const lowDay = sorted[sorted.length - 1];
-    
-    // Find if there's a weekday vs weekend pattern
-    const weekdayAvgs = dayAverages.filter(d => d.dayIndex >= 1 && d.dayIndex <= 5);
-    const weekendAvgs = dayAverages.filter(d => d.dayIndex === 0 || d.dayIndex === 6);
-    
-    let weekdayAvg = null;
-    let weekendAvg = null;
-    
-    if (weekdayAvgs.length >= 3) {
-      weekdayAvg = weekdayAvgs.reduce((sum, d) => sum + d.average, 0) / weekdayAvgs.length;
-    }
-    if (weekendAvgs.length >= 1) {
-      weekendAvg = weekendAvgs.reduce((sum, d) => sum + d.average, 0) / weekendAvgs.length;
-    }
-    
-    return {
-      metric,
-      peakDay,
-      lowDay,
-      weekdayAvg: weekdayAvg ? parseFloat(weekdayAvg.toFixed(1)) : null,
-      weekendAvg: weekendAvg ? parseFloat(weekendAvg.toFixed(1)) : null,
-      dayAverages
-    };
-  } catch (error) {
-    console.error('Day of week patterns error:', error);
     return null;
   }
 };

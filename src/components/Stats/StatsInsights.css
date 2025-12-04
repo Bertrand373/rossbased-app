@@ -1,5 +1,6 @@
 /* src/components/Stats/StatsInsights.css */
 /* Pure data analytics styling - matches Landing page minimal aesthetic */
+/* UPDATED: Added streak-phase block styling */
 
 /* ============================================================
    INSIGHT CARDS - Floating sections with dividers
@@ -197,15 +198,78 @@
 }
 
 /* ============================================================
-   YOUR PATTERNS - List layout
+   YOUR PROGRESS - Streak-phase proof + patterns
    ============================================================ */
 
-.patterns-list {
+.progress-insights-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
+/* Streak Phase Block - THE CORE INSIGHT */
+.streak-phase-block {
+  padding: 0;
+}
+
+.streak-phase-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 12px;
+  text-transform: capitalize;
+}
+
+.streak-phase-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.streak-phase-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.streak-phase-item .phase-value {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1;
+  font-feature-settings: 'tnum' 1;
+}
+
+.streak-phase-item .phase-label {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 8px;
+  letter-spacing: 0.02em;
+}
+
+/* Arrow between phases to show progression */
+.streak-phase-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Highlight improvement visually */
+.streak-phase-item:last-child .phase-value {
+  color: rgba(52, 211, 153, 0.9);
+}
+
+/* Pattern rows (correlations, growth) */
 .pattern-row {
   display: flex;
   justify-content: space-between;
@@ -225,6 +289,13 @@
   font-feature-settings: 'tnum' 1;
   flex-shrink: 0;
   margin-left: 12px;
+}
+
+/* Legacy patterns-list (keep for compatibility) */
+.patterns-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* ============================================================
@@ -429,6 +500,23 @@
     font-size: 0.8125rem;
   }
   
+  /* Streak phase responsive */
+  .streak-phase-grid {
+    gap: 8px;
+  }
+  
+  .streak-phase-item {
+    padding: 12px 6px;
+  }
+  
+  .streak-phase-item .phase-value {
+    font-size: 1.25rem;
+  }
+  
+  .streak-phase-item .phase-label {
+    font-size: 0.5625rem;
+  }
+  
   .pattern-row {
     flex-direction: column;
     align-items: flex-start;
@@ -477,6 +565,10 @@
   .extreme-divider {
     display: none;
   }
+  
+  .streak-phase-item .phase-value {
+    font-size: 1.125rem;
+  }
 }
 
 /* Desktop enhancements */
@@ -487,6 +579,14 @@
   
   .number-value {
     font-size: 1.625rem;
+  }
+  
+  .streak-phase-item {
+    padding: 20px 12px;
+  }
+  
+  .streak-phase-item .phase-value {
+    font-size: 1.75rem;
   }
   
   .ai-insight-row {
