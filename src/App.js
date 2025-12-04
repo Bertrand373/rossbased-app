@@ -176,9 +176,11 @@ function App() {
         position={isMobile ? "top-center" : "top-right"}
         containerStyle={isMobile ? {
           top: 70,  // Below mobile header
+          zIndex: 9999,  // Above modals
         } : {
           top: 80,   // Below desktop header
           right: 24,
+          zIndex: 9999,  // Above modals
         }}
         toastOptions={{
           duration: 2500,
