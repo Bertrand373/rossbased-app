@@ -15,6 +15,10 @@
   /* Spacing from content below */
   margin-bottom: 32px;
   
+  /* For smooth collapse animation */
+  max-height: 200px;
+  overflow: hidden;
+  
   /* Animation - fade and slide down */
   opacity: 0;
   transform: translateY(-12px);
@@ -24,6 +28,15 @@
 .pattern-insight.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Dismissing - collapse height and margin smoothly */
+.pattern-insight.dismissing {
+  opacity: 0;
+  transform: translateY(-12px);
+  max-height: 0;
+  margin-bottom: 0;
+  transition: opacity 250ms ease, transform 250ms ease, max-height 300ms ease 50ms, margin-bottom 300ms ease 50ms;
 }
 
 /* Label - subtle, uppercase */
@@ -154,7 +167,8 @@
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  .pattern-insight {
+  .pattern-insight,
+  .pattern-insight.dismissing {
     opacity: 1;
     transform: none;
     transition: none;

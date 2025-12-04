@@ -12,6 +12,7 @@ const PatternInsightCard = ({ userData }) => {
   const navigate = useNavigate();
   const [insight, setInsight] = useState(null);
   const [isDismissed, setIsDismissed] = useState(false);
+  const [isDismissing, setIsDismissing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const interventionIdRef = useRef(null);
 
@@ -73,11 +74,15 @@ const PatternInsightCard = ({ userData }) => {
       interventionService.recordResponse(interventionIdRef.current, 'dismissed');
     }
     
+    // Phase 1: Start collapse animation
     setIsVisible(false);
+    setIsDismissing(true);
+    
+    // Phase 2: Remove from DOM after animation completes
     setTimeout(() => {
       setIsDismissed(true);
       sessionStorage.setItem('pattern_insight_dismissed', 'true');
-    }, 300);
+    }, 400);
   };
 
   const handleViewInsights = () => {
@@ -96,7 +101,7 @@ const PatternInsightCard = ({ userData }) => {
   }
 
   return (
-    <div className={`pattern-insight ${isVisible ? 'visible' : ''}`}>
+    <div className={`pattern-insight ${isVisible ? 'visible' : ''} ${isDismissing ? 'dismissing' : ''}`}>
       <p className="pattern-insight-label">Heads up</p>
       <p className="pattern-insight-message">
         Your patterns suggest today may require extra awareness.
