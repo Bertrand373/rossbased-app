@@ -73,6 +73,68 @@ const getEarnedBadges = (streakDays) => {
   return allBadges;
 };
 
+// Helper function to create comprehensive emotional tracking data
+const createEmotionalTracking = (startDate, streakDays) => {
+  const tracking = [];
+  
+  // Define phase boundaries
+  const getPhase = (day) => {
+    if (day <= 7) return 1;      // Initial Adaptation
+    if (day <= 21) return 2;     // Emotional Purging
+    if (day <= 45) return 3;     // Mental Expansion
+    if (day <= 90) return 4;     // Spiritual Awakening
+    if (day <= 180) return 5;    // Stabilization
+    return 6;                    // Mastery
+  };
+  
+  // Create entries for key days (not every day, but enough for analysis)
+  const keyDays = [1, 3, 5, 7, 10, 12, 14, 17, 19, 21, 24, 26, 28];
+  
+  keyDays.forEach(day => {
+    if (day > streakDays) return;
+    
+    const date = addDays(startDate, day - 1);
+    const phase = getPhase(day);
+    
+    // Simulate realistic emotional patterns through phases
+    let anxiety, moodStability, mentalClarity, emotionalProcessing;
+    
+    if (phase === 1) {
+      // Initial Adaptation: Higher anxiety, lower stability
+      anxiety = Math.min(10, Math.max(1, Math.round(7 - (day * 0.3) + (Math.random() * 2 - 1))));
+      moodStability = Math.min(10, Math.max(1, Math.round(4 + (day * 0.2) + (Math.random() * 2 - 1))));
+      mentalClarity = Math.min(10, Math.max(1, Math.round(4 + (day * 0.15) + (Math.random() * 2 - 1))));
+      emotionalProcessing = Math.min(10, Math.max(1, Math.round(3 + (day * 0.2) + (Math.random() * 2 - 1))));
+    } else if (phase === 2) {
+      // Emotional Purging: Volatile, peaks and valleys
+      const volatility = Math.sin(day * 0.5) * 2;
+      anxiety = Math.min(10, Math.max(1, Math.round(5 + volatility + (Math.random() * 2 - 1))));
+      moodStability = Math.min(10, Math.max(1, Math.round(5 - volatility * 0.5 + (Math.random() * 2 - 1))));
+      mentalClarity = Math.min(10, Math.max(1, Math.round(5 + (day - 7) * 0.15 + (Math.random() * 2 - 1))));
+      emotionalProcessing = Math.min(10, Math.max(1, Math.round(5 + (day - 7) * 0.1 + (Math.random() * 2 - 1))));
+    } else {
+      // Later phases: Generally improving
+      const progress = (day - 21) / streakDays;
+      anxiety = Math.min(10, Math.max(1, Math.round(4 - progress * 2 + (Math.random() * 2 - 1))));
+      moodStability = Math.min(10, Math.max(1, Math.round(6 + progress * 3 + (Math.random() * 2 - 1))));
+      mentalClarity = Math.min(10, Math.max(1, Math.round(6 + progress * 3 + (Math.random() * 2 - 1))));
+      emotionalProcessing = Math.min(10, Math.max(1, Math.round(6 + progress * 2 + (Math.random() * 2 - 1))));
+    }
+    
+    tracking.push({
+      date,
+      day,
+      phase,
+      anxiety,
+      moodStability,
+      mentalClarity,
+      emotionalProcessing
+    });
+  });
+  
+  return tracking;
+};
+
 // ========================================
 // AI TEST USERS (6 scenarios)
 // ========================================
@@ -282,6 +344,7 @@ export const aiTestUser6 = {
 
 // ========================================
 // AI CARD TEST USER - Pre-trained model, shows PatternInsightCard
+// UPDATED: Now has comprehensive emotional tracking for analysis tab testing
 // ========================================
 
 export const aiCardTestUser = {
@@ -303,14 +366,40 @@ export const aiCardTestUser = {
     { id: 5, start: subDays(new Date(), 34), end: subDays(new Date(), 29), days: 5, reason: 'relapse', trigger: 'evening' },
     { id: 6, start: subDays(new Date(), 28), end: null, days: 28, reason: null, trigger: null }
   ],
+  // COMPREHENSIVE emotional tracking for analysis tab testing
   emotionalTracking: [
-    { date: new Date(), day: 28, phase: 2, anxiety: 7, moodStability: 4, mentalClarity: 5, emotionalProcessing: 5 }
+    // Phase 1: Initial Adaptation (Days 1-7) - Higher anxiety, lower stability
+    { date: subDays(new Date(), 27), day: 1, phase: 1, anxiety: 7, moodStability: 4, mentalClarity: 4, emotionalProcessing: 3 },
+    { date: subDays(new Date(), 25), day: 3, phase: 1, anxiety: 6, moodStability: 4, mentalClarity: 5, emotionalProcessing: 4 },
+    { date: subDays(new Date(), 23), day: 5, phase: 1, anxiety: 6, moodStability: 5, mentalClarity: 5, emotionalProcessing: 4 },
+    { date: subDays(new Date(), 21), day: 7, phase: 1, anxiety: 5, moodStability: 5, mentalClarity: 5, emotionalProcessing: 5 },
+    
+    // Phase 2: Emotional Purging (Days 8-21) - Volatile, peaks and valleys
+    { date: subDays(new Date(), 18), day: 10, phase: 2, anxiety: 7, moodStability: 4, mentalClarity: 6, emotionalProcessing: 5 },
+    { date: subDays(new Date(), 16), day: 12, phase: 2, anxiety: 5, moodStability: 6, mentalClarity: 6, emotionalProcessing: 5 },
+    { date: subDays(new Date(), 14), day: 14, phase: 2, anxiety: 8, moodStability: 3, mentalClarity: 5, emotionalProcessing: 4 },
+    { date: subDays(new Date(), 11), day: 17, phase: 2, anxiety: 6, moodStability: 5, mentalClarity: 6, emotionalProcessing: 6 },
+    { date: subDays(new Date(), 9), day: 19, phase: 2, anxiety: 5, moodStability: 6, mentalClarity: 7, emotionalProcessing: 6 },
+    { date: subDays(new Date(), 7), day: 21, phase: 2, anxiety: 4, moodStability: 6, mentalClarity: 7, emotionalProcessing: 6 },
+    
+    // Phase 3: Mental Expansion (Days 22-28) - Generally improving
+    { date: subDays(new Date(), 4), day: 24, phase: 3, anxiety: 4, moodStability: 7, mentalClarity: 7, emotionalProcessing: 7 },
+    { date: subDays(new Date(), 2), day: 26, phase: 3, anxiety: 5, moodStability: 6, mentalClarity: 7, emotionalProcessing: 6 },
+    { date: new Date(), day: 28, phase: 3, anxiety: 7, moodStability: 4, mentalClarity: 5, emotionalProcessing: 5 }
   ],
   urgeLog: [
-    { date: new Date(), intensity: 7, trigger: 'evening', protocol: 'breathing', phase: 'Emotional Purging Phase', day: 28 },
-    { date: subDays(new Date(), 1), intensity: 6, trigger: 'stress', protocol: 'cold_shower', phase: 'Emotional Purging Phase', day: 27 }
+    { date: new Date(), intensity: 7, trigger: 'evening', protocol: 'breathing', phase: 'Mental Expansion Phase', day: 28 },
+    { date: subDays(new Date(), 1), intensity: 6, trigger: 'stress', protocol: 'cold_shower', phase: 'Mental Expansion Phase', day: 27 },
+    { date: subDays(new Date(), 5), intensity: 5, trigger: 'boredom', protocol: 'exercise', phase: 'Mental Expansion Phase', day: 23 },
+    { date: subDays(new Date(), 10), intensity: 8, trigger: 'stress', protocol: 'breathing', phase: 'Emotional Purging Phase', day: 18 },
+    { date: subDays(new Date(), 14), intensity: 7, trigger: 'evening', protocol: 'cold_shower', phase: 'Emotional Purging Phase', day: 14 }
   ],
-  notes: { [format(new Date(), 'yyyy-MM-dd')]: "Day 28 - Testing AI Card!" },
+  notes: { 
+    [format(new Date(), 'yyyy-MM-dd')]: "Day 28 - Testing AI Card!",
+    [format(subDays(new Date(), 7), 'yyyy-MM-dd')]: "Day 21 - Made it through the purge phase!",
+    [format(subDays(new Date(), 14), 'yyyy-MM-dd')]: "Day 14 - Rough day but staying strong.",
+    [format(subDays(new Date(), 21), 'yyyy-MM-dd')]: "Day 7 - First week complete!"
+  },
   discordUsername: '',
   showOnLeaderboard: false,
   dataSharing: false,
@@ -320,7 +409,13 @@ export const aiCardTestUser = {
   notifications: true,
   language: 'en',
   wisdomMode: false,
-  urgeToolUsage: []
+  urgeToolUsage: [
+    { date: new Date(), tool: 'breathing', effective: true },
+    { date: subDays(new Date(), 1), tool: 'cold_shower', effective: true },
+    { date: subDays(new Date(), 5), tool: 'exercise', effective: true },
+    { date: subDays(new Date(), 10), tool: 'breathing', effective: false },
+    { date: subDays(new Date(), 14), tool: 'cold_shower', effective: true }
+  ]
 };
 
 // ========================================
