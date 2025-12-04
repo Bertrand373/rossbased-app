@@ -327,8 +327,8 @@ class MLPredictionService {
       if (factors.moodVolatility) {
         return 'Emotional volatility pattern - journal and ground yourself';
       }
-      if (factors.purgePhase) {
-        return 'Emotional purging phase - intense but temporary';
+      if (factors.emotionalProcessingPhase || factors.purgePhase) {
+        return 'Emotional Processing phase - intense but temporary';
       }
       if (factors.energyCrash) {
         return 'Energy crash pattern detected - rest and recover';
@@ -408,13 +408,14 @@ class MLPredictionService {
       }
     }
     
-    // Streak phase - set inPurgePhase for modal display compatibility
+    // Streak phase - check if in Emotional Processing phase (Days 15-45)
     const streak = userData.currentStreak || 0;
-    const inPurgePhase = streak >= 15 && streak <= 45;
-    if (inPurgePhase) {
+    const currentPhase = this.getCurrentPhase(streak);
+    const inEmotionalProcessing = streak >= 15 && streak <= 45;
+    if (inEmotionalProcessing) {
       riskScore += 15;
-      factors.purgePhase = { value: streak, weight: 0.12 };
-      factors.inPurgePhase = true; // For PredictionDisplay compatibility
+      factors.emotionalProcessingPhase = { value: streak, weight: 0.12, phaseName: currentPhase.name };
+      factors.inPurgePhase = true; // For PredictionDisplay compatibility (legacy)
     }
     
     // Time factors
@@ -433,7 +434,7 @@ class MLPredictionService {
     }
     
     // Generate pattern analysis for rich modal display
-    const patterns = this.generateFallbackPatterns(userData, streak, isHighRiskHour, hasEnergyDrop, inPurgePhase);
+    const patterns = this.generateFallbackPatterns(userData, streak, isHighRiskHour, hasEnergyDrop, inEmotionalProcessing);
     
     const finalRiskScore = Math.min(85, Math.max(15, riskScore));
     
@@ -452,10 +453,21 @@ class MLPredictionService {
     };
   }
 
+  // Get current phase based on streak day
+  getCurrentPhase(streakDay) {
+    if (streakDay <= 14) return { id: 1, name: 'Initial Adaptation', days: '1-14' };
+    if (streakDay <= 45) return { id: 2, name: 'Emotional Processing', days: '15-45' };
+    if (streakDay <= 90) return { id: 3, name: 'Mental Expansion', days: '46-90' };
+    if (streakDay <= 180) return { id: 4, name: 'Spiritual Awakening', days: '91-180' };
+    if (streakDay <= 365) return { id: 5, name: 'Stabilization', days: '181-365' };
+    return { id: 6, name: 'Mastery', days: '366+' };
+  }
+
   // Generate rich pattern data for fallback predictions
-  generateFallbackPatterns(userData, currentStreak, isHighRiskHour, hasEnergyDrop, inPurgePhase) {
+  generateFallbackPatterns(userData, currentStreak, isHighRiskHour, hasEnergyDrop, inEmotionalProcessing) {
     const relapses = (userData.streakHistory || []).filter(s => s.reason === 'relapse');
     const patterns = {};
+    const currentPhase = this.getCurrentPhase(currentStreak);
     
     // Streak pattern analysis
     if (relapses.length >= 2) {
@@ -507,10 +519,10 @@ class MLPredictionService {
     
     // Suggestions based on risk factors
     const suggestions = [];
-    if (inPurgePhase) {
+    if (inEmotionalProcessing) {
       suggestions.push({
-        focus: 'Emotional awareness',
-        reason: 'Days 15-45 often bring intense emotional processing'
+        focus: currentPhase.name + ' phase',
+        reason: 'Days 15-45 often bring intense emotional processing as suppressed feelings surface'
       });
     }
     if (isHighRiskHour) {

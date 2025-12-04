@@ -1,6 +1,7 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
 // Full screen modal matching Tracker/Calendar modal aesthetic
 // Integrated with InterventionService for outcome tracking
+// FIXED: Uses correct Emotional Timeline phase names
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -95,6 +96,16 @@ function PredictionDisplay({ userData }) {
     return { level: 'low', label: 'Low' };
   };
 
+  // Get current phase name based on streak day
+  const getCurrentPhaseName = (streakDay) => {
+    if (streakDay <= 14) return 'Initial Adaptation';
+    if (streakDay <= 45) return 'Emotional Processing';
+    if (streakDay <= 90) return 'Mental Expansion';
+    if (streakDay <= 180) return 'Spiritual Awakening';
+    if (streakDay <= 365) return 'Stabilization';
+    return 'Mastery';
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -109,10 +120,13 @@ function PredictionDisplay({ userData }) {
   const riskScore = prediction?.riskScore || 0;
   const riskInfo = getRiskInfo(riskScore);
   const patterns = prediction?.patterns;
+  const currentStreak = userData?.currentStreak || 0;
+  const currentPhaseName = getCurrentPhaseName(currentStreak);
   const hasPatterns = patterns?.streak?.isHighRiskDay || 
                       patterns?.time?.isHighRiskTime || 
                       patterns?.benefits?.hasSignificantDrop || 
-                      prediction?.factors?.inPurgePhase;
+                      prediction?.factors?.inPurgePhase ||
+                      prediction?.factors?.emotionalProcessingPhase;
 
   return (
     <div className="prediction-overlay">
@@ -161,11 +175,15 @@ function PredictionDisplay({ userData }) {
               </div>
             ))}
 
-            {prediction?.factors?.inPurgePhase && !patterns?.streak?.isHighRiskDay && (
+            {/* Show phase info - uses correct phase name from Emotional Timeline */}
+            {(prediction?.factors?.inPurgePhase || prediction?.factors?.emotionalProcessingPhase) && !patterns?.streak?.isHighRiskDay && (
               <div className="insight-block">
-                <p className="insight-title">Purge phase</p>
+                <p className="insight-title">{currentPhaseName} phase</p>
                 <p className="insight-detail">
-                  Days 15-45 are typically the most challenging
+                  {currentStreak <= 45 
+                    ? 'Days 15-45 often bring intense emotional processing as suppressed feelings surface'
+                    : `You're in the ${currentPhaseName} phase of your journey`
+                  }
                 </p>
               </div>
             )}
