@@ -450,17 +450,17 @@
 }
 
 .benefit-desc {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.3);
-  margin-top: -8px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: -4px;
 }
 
 /* Slider styling */
 .benefit-slider {
   position: relative;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 1px;
   overflow: visible;
 }
 
@@ -470,7 +470,7 @@
   left: 0;
   height: 100%;
   background-color: #ffffff;
-  border-radius: 2px;
+  border-radius: 1px;
   transition: width 50ms ease;
   pointer-events: none;
 }
@@ -494,21 +494,21 @@
 
 /* Track - invisible (we use .benefit-fill instead) */
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {
-  height: 4px;
+  height: 2px;
   background: transparent !important;
   border: none !important;
-  border-radius: 2px;
+  border-radius: 1px;
 }
 
 .benefit-slider input[type="range"]::-moz-range-track {
-  height: 4px;
+  height: 2px;
   background: transparent !important;
   border: none !important;
-  border-radius: 2px;
+  border-radius: 1px;
 }
 
 .benefit-slider input[type="range"]::-ms-track {
-  height: 4px;
+  height: 2px;
   background: transparent !important;
   border: none !important;
   border-color: transparent;
