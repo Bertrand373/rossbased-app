@@ -249,7 +249,8 @@
 }
 
 /* =============================================================================
-   BENEFIT TRACKER - Toggle Pattern (matches Calendar/EmotionalTimeline/Profile)
+   BENEFIT TRACKER - Toggle Pattern (matches Calendar/EmotionalTimeline)
+   UPDATED: Single row on desktop, wraps to 2 rows on mobile
    ============================================================================= */
 
 /* Toggle Row - Text-only buttons with vertical dividers */
@@ -261,21 +262,22 @@
   margin-bottom: 20px;
 }
 
-/* Tighter spacing for stacked benefit rows */
+/* Benefits row - single row on desktop, wraps on mobile */
 .toggle-row.benefits-row {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 /* More space before time range */
 .toggle-row.time-range {
-  margin-top: 8px;
+  margin-top: 4px;
   margin-bottom: 24px;
 }
 
+/* Toggle buttons - tight spacing matching Calendar/ET */
 .toggle-btn {
   background: transparent;
   border: none;
-  padding: 8px 16px;
+  padding: 6px 12px;
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
@@ -283,6 +285,7 @@
   transition: color 150ms ease;
   color: rgba(255, 255, 255, 0.25);
   -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
 }
 
 .toggle-btn:hover:not(.active) {
@@ -301,7 +304,7 @@
 
 .toggle-divider {
   width: 1px;
-  height: 16px;
+  height: 14px;
   background-color: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 }
@@ -1092,6 +1095,23 @@
   }
 }
 
+/* Mobile: Benefits row wraps to 2 rows of 3 */
+@media (max-width: 520px) {
+  .toggle-row.benefits-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 4px;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Hide the divider between row 1 and row 2 (after 3rd item) */
+  .toggle-row.benefits-row .toggle-divider:nth-of-type(5) {
+    display: none;
+  }
+}
+
 @media (max-width: 480px) {
   .stats-page {
     padding: 32px 16px 100px;
@@ -1135,9 +1155,10 @@
     font-size: 0.5rem;
   }
   
+  /* Toggle buttons - even tighter on small screens */
   .toggle-btn {
     font-size: 0.6875rem;
-    padding: 6px 10px;
+    padding: 5px 8px;
   }
   
   .toggle-btn.sm {
@@ -1146,7 +1167,7 @@
   }
   
   .toggle-divider {
-    height: 14px;
+    height: 12px;
   }
   
   .average-num {
@@ -1238,9 +1259,35 @@
   .average-num {
     font-size: 3.5rem;
   }
+  
+  /* Benefits row on very small screens */
+  .toggle-row.benefits-row {
+    max-width: 240px;
+  }
+  
+  .toggle-btn {
+    font-size: 0.625rem;
+    padding: 4px 6px;
+  }
+  
+  .toggle-btn.sm {
+    font-size: 0.5625rem;
+    padding: 4px 6px;
+  }
 }
 
 /* Desktop enhancements */
+@media (min-width: 768px) {
+  /* All 6 metrics in single row on desktop */
+  .toggle-row.benefits-row {
+    flex-wrap: nowrap;
+  }
+  
+  .toggle-btn {
+    padding: 6px 14px;
+  }
+}
+
 @media (min-width: 1024px) {
   .stat-grid {
     gap: 40px;

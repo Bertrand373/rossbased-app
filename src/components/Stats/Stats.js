@@ -206,93 +206,61 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       legend: { display: false },
       tooltip: {
         enabled: true,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        titleColor: 'rgba(255,255,255,0.4)',
-        titleFont: { size: 10, weight: '400' },
-        bodyColor: '#ffffff',
-        bodyFont: { size: 16, weight: '600' },
-        borderColor: 'rgba(255,255,255,0.06)',
-        borderWidth: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        titleColor: '#fff',
+        bodyColor: 'rgba(255, 255, 255, 0.8)',
+        titleFont: { size: 12, weight: '500' },
+        bodyFont: { size: 13, weight: '600' },
+        padding: { top: 8, bottom: 8, left: 12, right: 12 },
         cornerRadius: 8,
-        padding: { top: 8, right: 12, bottom: 8, left: 12 },
         displayColors: false,
-        caretSize: 0,
-        caretPadding: 10,
-        callbacks: { 
-          title: (items) => items.length ? items[0].label : '',
-          label: (ctx) => ctx.parsed.y === null ? '' : `${ctx.parsed.y}`
+        callbacks: {
+          title: (context) => {
+            if (context[0]) {
+              return context[0].label;
+            }
+            return '';
+          },
+          label: (context) => {
+            if (context.parsed.y !== null) {
+              return `${context.parsed.y}/10`;
+            }
+            return 'No data';
+          }
+        },
+        filter: (tooltipItem) => {
+          return tooltipItem.parsed.y !== null;
         }
       }
     },
-    interaction: { 
-      mode: 'index', 
-      intersect: false,
-      axis: 'x'
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false
     },
-    animation: {
-      duration: 400,
-      easing: 'easeOutQuart'
+    onHover: (event, chartElement) => {
+      if (event.native) {
+        event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
+      }
     }
   }), [timeRange]);
 
-  // Generate chart data with gradient fill and endpoint dots
+  // Time range options
+  const timeRanges = [
+    { key: 'week', label: 'Week' },
+    { key: 'month', label: 'Month' },
+    { key: 'quarter', label: '90 Days' }
+  ];
+
+  // Benefit metrics array for single row
+  const benefitMetrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+
+  // Generate chart data function
   const getChartData = useCallback(() => {
-    const rawData = generateChartData(safeUserData, selectedMetric, timeRange);
-    const chart = chartRef.current;
-    
-    let gradient = 'rgba(255,255,255,0.04)';
-    
-    if (chart?.ctx && chart?.chartArea) {
-      gradient = chart.ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
-      gradient.addColorStop(0, 'rgba(255,255,255,0.1)');
-      gradient.addColorStop(0.5, 'rgba(255,255,255,0.03)');
-      gradient.addColorStop(1, 'rgba(255,255,255,0)');
-    }
-    
-    // Find first and last valid data points for endpoint dots
-    const data = rawData.datasets[0].data;
-    const pointRadii = data.map((value, index) => {
-      if (value === null) return 0;
-      
-      const firstValidIndex = data.findIndex(v => v !== null);
-      let lastValidIndex = -1;
-      for (let i = data.length - 1; i >= 0; i--) {
-        if (data[i] !== null) {
-          lastValidIndex = i;
-          break;
-        }
-      }
-      
-      if (index === firstValidIndex || index === lastValidIndex) {
-        return 5;
-      }
-      return 0;
-    });
-    
-    return {
-      ...rawData,
-      datasets: [{
-        ...rawData.datasets[0],
-        borderColor: '#ffffff',
-        borderWidth: 2.5,
-        backgroundColor: gradient,
-        fill: true,
-        pointBackgroundColor: '#ffffff',
-        pointBorderColor: '#000000',
-        pointBorderWidth: 2,
-        pointRadius: pointRadii,
-        pointHoverRadius: 6,
-        pointHoverBackgroundColor: '#ffffff',
-        pointHoverBorderColor: '#000000',
-      }]
-    };
+    return generateChartData(safeUserData, selectedMetric, timeRange);
   }, [safeUserData, selectedMetric, timeRange]);
 
-  const handleStatCardClick = (statType) => {
-    setSelectedStatCard(statType);
-    setShowStatModal(true);
-  };
-
+  // Handlers
   const handleMilestoneClick = (milestone) => {
     if (milestone.earned) {
       setSelectedMilestone(milestone);
@@ -300,49 +268,53 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
+  const handleStatCardClick = (statType) => {
+    setSelectedStatCard(statType);
+    setShowStatModal(true);
+  };
+
   const confirmResetStreak = async () => {
     try {
-      await updateUserData({
+      const updatedData = {
+        ...safeUserData,
         currentStreak: 0,
         startDate: new Date()
-      });
+      };
+      await updateUserData(updatedData);
       setShowResetStreakModal(false);
       toast.success('Streak reset');
     } catch (error) {
+      console.error('Reset streak error:', error);
       toast.error('Failed to reset streak');
     }
   };
 
   const confirmResetAll = async () => {
     try {
-      await updateUserData({
+      const freshData = {
         currentStreak: 0,
         longestStreak: 0,
-        wetDreamCount: 0,
+        startDate: new Date(),
         relapseCount: 0,
+        wetDreamCount: 0,
         benefitTracking: [],
-        relapseHistory: [],
         streakHistory: [],
-        badges: safeUserData.badges?.map(b => ({ ...b, earned: false, date: null })) || [],
-        startDate: new Date()
-      });
+        emotionalTimeline: [],
+        urgeHistory: [],
+        badges: safeUserData.badges?.map(b => ({ ...b, earned: false, date: null })) || []
+      };
+      await updateUserData(freshData);
       setShowResetAllModal(false);
       toast.success('All data reset');
     } catch (error) {
+      console.error('Reset all error:', error);
       toast.error('Failed to reset data');
     }
   };
 
-  // Metric toggle items
-  const timeRanges = [
-    { key: 'week', label: 'Week' },
-    { key: 'month', label: 'Month' },
-    { key: 'quarter', label: '90 Days' }
-  ];
-
   return (
     <div className="stats-page">
-      {/* Stat Cards - Landing page style with dividers */}
+      {/* Stat Cards - Top Level Numbers */}
       <div className="stat-grid">
         <button className="stat-card" onClick={() => handleStatCardClick('currentStreak')}>
           <span className="stat-num">{safeUserData.currentStreak || 0}</span>
@@ -365,6 +337,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </button>
       </div>
 
+      {/* Stat Card Modal */}
       <StatCardModal
         showModal={showStatModal}
         selectedStatCard={selectedStatCard}
@@ -372,7 +345,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         userData={safeUserData}
       />
 
-      {/* Milestones */}
+      {/* Milestones Grid */}
       <section className="stats-section">
         <h2>Milestones</h2>
         <div className="milestone-grid">
@@ -394,9 +367,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       <section className="stats-section">
         <h2>Benefits</h2>
         
-        {/* Metric toggles - Row 1: Energy, Focus, Confidence */}
+        {/* Metric toggles - Single row, wraps on mobile */}
         <div className="toggle-row benefits-row">
-          {['energy', 'focus', 'confidence'].map((metric, index) => (
+          {benefitMetrics.map((metric, index) => (
             <React.Fragment key={metric}>
               <button
                 className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
@@ -404,22 +377,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               >
                 {metric.charAt(0).toUpperCase() + metric.slice(1)}
               </button>
-              {index < 2 && <div className="toggle-divider" />}
-            </React.Fragment>
-          ))}
-        </div>
-        
-        {/* Metric toggles - Row 2: Aura, Sleep, Workout */}
-        <div className="toggle-row benefits-row">
-          {['aura', 'sleep', 'workout'].map((metric, index) => (
-            <React.Fragment key={metric}>
-              <button
-                className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
-                onClick={() => setSelectedMetric(metric)}
-              >
-                {metric.charAt(0).toUpperCase() + metric.slice(1)}
-              </button>
-              {index < 2 && <div className="toggle-divider" />}
+              {index < benefitMetrics.length - 1 && <div className="toggle-divider" />}
             </React.Fragment>
           ))}
         </div>

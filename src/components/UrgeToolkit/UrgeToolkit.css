@@ -27,6 +27,12 @@
   max-width: 400px;
 }
 
+/* Overlay must break out of max-width constraint */
+.urge-toolkit > .ut-breathing-overlay {
+  max-width: none;
+  width: 100%;
+}
+
 /* =============================================================================
    PHASE INDICATOR - Minimal top display
    ============================================================================= */
