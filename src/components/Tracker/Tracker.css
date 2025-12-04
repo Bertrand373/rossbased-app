@@ -472,7 +472,7 @@
   top: 0;
   left: 0;
   height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.6) 100%);
+  background-color: #ffffff;
   border-radius: 2px;
   transition: width 50ms ease;
   pointer-events: none;
