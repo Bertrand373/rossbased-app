@@ -22,7 +22,7 @@
   }
 }
 
-.profile > * {
+.profile > *:not(.overlay) {
   width: 100%;
   max-width: 400px;
 }
@@ -616,7 +616,12 @@
 
 .overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: none;
   background-color: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);

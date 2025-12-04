@@ -61,7 +61,7 @@ export const checkAndUpdateBadges = (userData) => {
         hasNewBadges = true;
         
         try {
-          toast.success(`🏆 Achievement Unlocked: ${badge.name}!`, {
+          toast.success(`Achievement Unlocked: ${badge.name}!`, {
             duration: 4000,
             style: {
               background: '#1a1a1a',

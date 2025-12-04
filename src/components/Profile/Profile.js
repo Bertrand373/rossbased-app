@@ -206,7 +206,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       setFeedbackMessage('');
       setFeedbackType('general');
       setShowFeedbackModal(false);
-      toast.success('Feedback sent! Thank you 🔥');
+      toast.success('Feedback sent');
     } catch (error) {
       console.error('Feedback error:', error);
       toast.error('Failed to send feedback. Please try again.');
