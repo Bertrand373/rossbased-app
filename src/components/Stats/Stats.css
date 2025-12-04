@@ -299,7 +299,7 @@
 
 .toggle-btn.sm {
   font-size: 0.75rem;
-  padding: 6px 12px;
+  padding: 6px 8px;
 }
 
 .toggle-divider {
@@ -1106,8 +1106,8 @@
     margin-right: auto;
   }
   
-  /* Hide the divider between row 1 and row 2 (after 3rd item) */
-  .toggle-row.benefits-row .toggle-divider:nth-of-type(5) {
+  /* Hide the divider after Confidence (3rd divider) - it's at end of row 1 */
+  .toggle-row.benefits-row .toggle-divider:nth-of-type(3) {
     display: none;
   }
 }
@@ -1163,7 +1163,7 @@
   
   .toggle-btn.sm {
     font-size: 0.625rem;
-    padding: 5px 8px;
+    padding: 5px 6px;
   }
   
   .toggle-divider {
@@ -1272,7 +1272,7 @@
   
   .toggle-btn.sm {
     font-size: 0.5625rem;
-    padding: 4px 6px;
+    padding: 4px 5px;
   }
 }
 
