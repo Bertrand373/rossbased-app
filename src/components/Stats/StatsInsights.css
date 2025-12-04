@@ -98,19 +98,13 @@
 }
 
 /* ============================================================
-   YOUR NUMBERS - Toggle row pattern with dividers (like Calendar)
+   YOUR NUMBERS - 3x2 Grid layout
    ============================================================ */
 
-.numbers-row {
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
-  gap: 0;
-  margin-bottom: 16px;
-}
-
-.numbers-row:last-child {
-  margin-bottom: 0;
+.numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 16px;
 }
 
 .number-item {
@@ -119,7 +113,6 @@
   align-items: center;
   text-align: center;
   gap: 4px;
-  padding: 0 16px;
 }
 
 .number-label {
@@ -142,13 +135,6 @@
   font-weight: 500;
   color: rgba(255, 255, 255, 0.3);
   font-feature-settings: 'tnum' 1;
-}
-
-.number-divider {
-  width: 1px;
-  height: 40px;
-  background-color: rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
 }
 
 .number-delta.positive {
@@ -349,21 +335,22 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  padding: 16px 0;
+  padding: 16px;
   background: transparent;
-  border: none;
-  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .phase-context-row:hover {
-  opacity: 0.7;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .phase-context-row:active {
-  opacity: 0.5;
+  transform: scale(0.99);
 }
 
 .phase-context-num {
@@ -421,12 +408,9 @@
    ============================================================ */
 
 @media (max-width: 480px) {
-  .numbers-row {
-    margin-bottom: 14px;
-  }
-  
-  .number-item {
-    padding: 0 12px;
+  .numbers-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 24px;
   }
   
   .number-value {
@@ -435,10 +419,6 @@
   
   .number-label {
     font-size: 0.625rem;
-  }
-  
-  .number-divider {
-    height: 36px;
   }
   
   .extremes-row {
@@ -472,7 +452,7 @@
   }
   
   .phase-context-row {
-    padding: 14px 0;
+    padding: 14px;
   }
   
   .phase-context-name {
@@ -481,16 +461,12 @@
 }
 
 @media (max-width: 360px) {
-  .number-item {
-    padding: 0 8px;
+  .numbers-grid {
+    gap: 16px 20px;
   }
   
   .number-value {
     font-size: 1.25rem;
-  }
-  
-  .number-divider {
-    height: 32px;
   }
   
   .extremes-row {
@@ -505,20 +481,12 @@
 
 /* Desktop enhancements */
 @media (min-width: 768px) {
-  .numbers-row {
-    margin-bottom: 20px;
-  }
-  
-  .number-item {
-    padding: 0 20px;
+  .numbers-grid {
+    gap: 24px 20px;
   }
   
   .number-value {
     font-size: 1.625rem;
-  }
-  
-  .number-divider {
-    height: 44px;
   }
   
   .ai-insight-row {
