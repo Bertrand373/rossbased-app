@@ -679,3 +679,27 @@ label {
     transform: translateY(0);
   }
 }
+
+/* ============================================================
+   MODAL SCROLL LOCK - Prevents background scroll when modals open
+   ============================================================ */
+
+/* Body scroll lock when modal is open */
+body.modal-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none !important;
+}
+
+/* Prevent scroll bleed on all overlay types */
+.overlay,
+.auth-overlay,
+.calendar-overlay,
+.prediction-overlay,
+.et-overlay,
+.modal-overlay,
+.ut-breathing-overlay {
+  overscroll-behavior: contain !important;
+}

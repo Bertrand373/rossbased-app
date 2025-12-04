@@ -3,6 +3,9 @@
 import React from 'react';
 import { format } from 'date-fns';
 
+// Body scroll lock for modals
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+
 // Loading state component
 export const InsightLoadingState = ({ insight, isVisible }) => {
   if (!isVisible) return null;
@@ -43,6 +46,9 @@ export const MiniInfoBanner = ({ description }) => {
 
 // Stat Card Modal - Transparent floating design like Tracker
 export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }) => {
+  // Lock body scroll when modal is open
+  useBodyScrollLock(showModal);
+  
   if (!showModal || !selectedStatCard) return null;
   
   const getStatInfo = () => {
@@ -92,7 +98,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
   const info = getStatInfo();
   
   return (
-    <div className="overlay" onClick={onClose}>
+    <div className="overlay">
       <div className="modal" onClick={e => e.stopPropagation()}>
         <span className="modal-num">{info.value}</span>
         <h2>{info.label}</h2>

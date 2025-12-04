@@ -6,6 +6,9 @@ import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
 import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
+// Body scroll lock for modals
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+
 const EmotionalTimeline = ({ userData, updateUserData }) => {
   const [activeTab, setActiveTab] = useState('journey');
   const [selectedPhase, setSelectedPhase] = useState(null);
@@ -20,6 +23,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   });
   const [hasLoggedToday, setHasLoggedToday] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Lock body scroll when modal is open
+  useBodyScrollLock(showModal);
 
   const currentDay = userData?.currentStreak || 0;
 
@@ -595,7 +601,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
       {/* Phase Modal */}
       {showModal && selectedPhase && (
-        <div className="et-overlay" onClick={() => setShowModal(false)}>
+        <div className="et-overlay">
           <div className="et-modal" onClick={e => e.stopPropagation()}>
             <div className="et-modal-header">
               <span className="et-modal-num">

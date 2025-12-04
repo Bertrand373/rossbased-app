@@ -7,6 +7,9 @@ import { FaSpinner } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { BsDiscord } from 'react-icons/bs';
 
+// Body scroll lock for modals
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+
 // API URL - same as your useUserData hook
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -19,6 +22,9 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
+  
+  // Lock body scroll when modal is open (always true since this component only renders when shown)
+  useBodyScrollLock(true);
   
   // Google Client ID
   const GOOGLE_CLIENT_ID = '81026306470-im14ikk81801f6l1obk0b4cu260nito1.apps.googleusercontent.com';
@@ -201,7 +207,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="auth-overlay" onClick={handleClose}>
+      <div className="auth-overlay">
         <div className="auth-modal" onClick={e => e.stopPropagation()}>
           <div className="auth-loading">
             <img 
@@ -225,7 +231,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   }
   
   return (
-    <div className="auth-overlay" onClick={handleClose}>
+    <div className="auth-overlay">
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
         
         {/* Header */}

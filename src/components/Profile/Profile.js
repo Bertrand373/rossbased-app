@@ -6,6 +6,9 @@ import toast from 'react-hot-toast';
 import './Profile.css';
 import { useNotifications } from '../../hooks/useNotifications';
 
+// Body scroll lock for modals
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
@@ -57,6 +60,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [feedbackType, setFeedbackType] = useState('general');
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
+
+  // Lock body scroll when any modal is open
+  useBodyScrollLock(showFeedbackModal || showDeleteConfirm || showExportModal || showPrivacyModal);
 
   const tabs = [
     { id: 'account', label: 'Account' },
@@ -636,7 +642,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
       {/* FEEDBACK MODAL */}
       {showFeedbackModal && (
-        <div className="overlay" onClick={() => setShowFeedbackModal(false)}>
+        <div className="overlay">
           <div className="modal legacy" onClick={e => e.stopPropagation()}>
             <h2>Send Feedback</h2>
             <p>Help us improve TitanTrack</p>
@@ -685,7 +691,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
       {/* EXPORT MODAL */}
       {showExportModal && (
-        <div className="overlay" onClick={() => setShowExportModal(false)}>
+        <div className="overlay">
           <div className="confirm-modal" onClick={e => e.stopPropagation()}>
             <h2>Export Data</h2>
             <p>Download all your tracking data including streak history, journal entries, and settings.</p>
@@ -699,7 +705,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
       {/* DELETE MODAL */}
       {showDeleteConfirm && (
-        <div className="overlay" onClick={() => setShowDeleteConfirm(false)}>
+        <div className="overlay">
           <div className="confirm-modal" onClick={e => e.stopPropagation()}>
             <h2>Delete Account?</h2>
             <p>This will permanently delete all your data. This cannot be undone.</p>
@@ -713,7 +719,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
       {/* PRIVACY POLICY MODAL */}
       {showPrivacyModal && (
-        <div className="overlay" onClick={() => setShowPrivacyModal(false)}>
+        <div className="overlay">
           <div className="privacy-modal" onClick={e => e.stopPropagation()}>
             <div className="privacy-header">
               <h2>Privacy Policy</h2>

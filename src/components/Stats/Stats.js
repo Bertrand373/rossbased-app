@@ -42,6 +42,9 @@ import {
   generateMLOptimization
 } from './StatsAnalyticsUtils';
 
+// Body scroll lock for modals
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const Stats = ({ userData, isPremium, updateUserData }) => {
@@ -67,6 +70,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
   const chartRef = useRef(null);
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
+  
+  // Lock body scroll when any modal is open
+  useBodyScrollLock(showMilestoneModal || showResetStreakModal || showResetAllModal || showStatModal);
   
   // Get days tracked for unlock logic
   const daysTracked = useMemo(() => {
@@ -518,7 +524,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
       {/* Milestone Modal - Transparent floating */}
       {showMilestoneModal && selectedMilestone && (
-        <div className="overlay" onClick={() => setShowMilestoneModal(false)}>
+        <div className="overlay">
           <div className="modal" onClick={e => e.stopPropagation()}>
             <span className="modal-num">{selectedMilestone.days}</span>
             <h2>{selectedMilestone.label}</h2>
@@ -540,7 +546,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
       {/* Reset Streak Modal */}
       {showResetStreakModal && (
-        <div className="overlay" onClick={() => setShowResetStreakModal(false)}>
+        <div className="overlay">
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h2>Reset Streak?</h2>
             <p className="modal-text">This will reset your current streak to 0. Your history and benefits data will be kept.</p>
@@ -554,7 +560,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
       {/* Reset All Modal */}
       {showResetAllModal && (
-        <div className="overlay" onClick={() => setShowResetAllModal(false)}>
+        <div className="overlay">
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h2>Reset All Data?</h2>
             <p className="modal-text">This will permanently delete all progress data including streaks, benefits, and milestones. This cannot be undone.</p>

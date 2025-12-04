@@ -9,6 +9,9 @@ import { FaBrain, FaExclamationTriangle, FaClock, FaMeh, FaHeart,
   FaFire, FaBatteryEmpty, FaUsers, FaBolt,
   FaPlay, FaPause, FaStop } from 'react-icons/fa';
 
+// Body scroll lock for modals
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   // Core States
   const [currentStep, setCurrentStep] = useState('assessment');
@@ -35,6 +38,9 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   const [breathingDuration, setBreathingDuration] = useState(4);
   
   const breathingIntervalRef = useRef(null);
+  
+  // Lock body scroll when breathing modal is open
+  useBodyScrollLock(showBreathingModal);
   
   const currentDay = userData.currentStreak || 0;
 

@@ -13,6 +13,9 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
 
+// Body scroll lock for modals
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -26,6 +29,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   // Journal states
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
+
+  // Lock body scroll when any modal is open
+  useBodyScrollLock(dayInfoModal || editDayModal);
 
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts' },
@@ -799,7 +805,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           DAY INFO MODAL
           ================================================================ */}
       {dayInfoModal && selectedDate && (
-        <div className="calendar-overlay" onClick={closeDayInfo}>
+        <div className="calendar-overlay">
           <div className={`calendar-modal calendar-day-info ${getDayBenefits(selectedDate) ? 'has-benefits' : ''}`} onClick={e => e.stopPropagation()}>
             
             {(() => {
@@ -886,7 +892,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           EDIT DAY MODAL - Context-aware
           ================================================================ */}
       {editDayModal && selectedDate && (
-        <div className="calendar-overlay" onClick={closeEditModal}>
+        <div className="calendar-overlay">
           <div className="calendar-modal calendar-edit-day" onClick={e => e.stopPropagation()}>
             
             <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>

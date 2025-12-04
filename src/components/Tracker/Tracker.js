@@ -12,6 +12,9 @@ import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
 
+// Body scroll lock for modals
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+
 const Tracker = ({ userData, updateUserData }) => {
   const [showDatePicker, setShowDatePicker] = useState(!userData.startDate);
   const [showBenefits, setShowBenefits] = useState(false);
@@ -32,6 +35,9 @@ const Tracker = ({ userData, updateUserData }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   
   const fillRefs = useRef({});
+  
+  // Lock body scroll when any modal is open
+  useBodyScrollLock(showBenefits || showStreakOptions || showResetConfirm);
   
   // Use stored currentStreak for consistency across all tabs
   const streak = userData.currentStreak || 0;
@@ -226,7 +232,7 @@ const Tracker = ({ userData, updateUserData }) => {
       
       {/* Benefits Modal */}
       {showBenefits && (
-        <div className="overlay" onClick={() => setShowBenefits(false)}>
+        <div className="overlay">
           <div className="benefits-modal" onClick={e => e.stopPropagation()}>
             <h2>How do you feel?</h2>
             <p>Rate today's benefits</p>
@@ -266,7 +272,7 @@ const Tracker = ({ userData, updateUserData }) => {
 
       {/* Streak Options */}
       {showStreakOptions && (
-        <div className="overlay" onClick={() => setShowStreakOptions(false)}>
+        <div className="overlay">
           <div className="sheet" onClick={e => e.stopPropagation()}>
             <div className="sheet-content">
               <button onClick={() => { setShowStreakOptions(false); setShowDatePicker(true); }}>
@@ -295,7 +301,7 @@ const Tracker = ({ userData, updateUserData }) => {
 
       {/* Reset Confirm */}
       {showResetConfirm && (
-        <div className="overlay" onClick={() => setShowResetConfirm(false)}>
+        <div className="overlay">
           <div className="confirm-modal" onClick={e => e.stopPropagation()}>
             <h2>{resetType === 'wetdream' ? 'Log wet dream?' : 'Reset streak?'}</h2>
             <p>
