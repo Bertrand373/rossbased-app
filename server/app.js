@@ -20,7 +20,7 @@ const app = express();
 
 // Configure CORS
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://app.rossbased.com', 'https://rossbased-app.onrender.com'],
+  origin: ['http://localhost:3000', 'https://app.rossbased.com', 'https://rossbased-app.onrender.com', 'https://titantrack.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
