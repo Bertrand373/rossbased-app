@@ -1,7 +1,7 @@
 /* =============================================================================
    EMOTIONALTIMELINE.CSS - TITANTRACK MINIMAL
-   Matches Landing/Tracker/Stats aesthetic - no header, flowing content
-   UPDATED: View-mode state hides slider thumbs when logged (matches Tracker flow)
+   Matches Landing/Tracker/Stats aesthetic
+   UPDATED: Analysis tab focused on ONE powerful insight - emotional trajectory
    ============================================================================= */
 
 /* =============================================================================
@@ -28,7 +28,6 @@
     max-width: 480px;
   }
   
-  /* Overlay must break out of max-width constraint */
   .et-container > .et-overlay {
     max-width: none;
     width: 100%;
@@ -36,7 +35,7 @@
 }
 
 /* =============================================================================
-   TABS - Text-only with dividers (matches Calendar/Stats)
+   TABS - Text-only with dividers
    ============================================================================= */
 
 .et-tabs {
@@ -90,7 +89,6 @@
   opacity: 0;
 }
 
-/* Current Phase - Hero display like Tracker streak */
 .et-current {
   text-align: center;
   padding: 0 0 48px 0;
@@ -158,7 +156,7 @@
   color: rgba(255, 255, 255, 0.3);
 }
 
-/* Phase List - Minimal, no containers */
+/* Phase List */
 .et-phases {
   display: flex;
   flex-direction: column;
@@ -241,7 +239,7 @@
 }
 
 /* =============================================================================
-   CHECK-IN TAB - Clean slider styling
+   CHECK-IN TAB
    ============================================================================= */
 
 .et-checkin {
@@ -253,7 +251,6 @@
   opacity: 0;
 }
 
-/* Section header */
 .et-checkin-header {
   font-size: 0.6875rem;
   font-weight: 600;
@@ -264,7 +261,6 @@
   margin-bottom: 40px;
 }
 
-/* Sliders container */
 .et-sliders {
   display: flex;
   flex-direction: column;
@@ -273,14 +269,12 @@
   text-align: left;
 }
 
-/* Slider group */
 .et-slider-group {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* Slider header - white label, muted value */
 .et-slider-header {
   display: flex;
   justify-content: space-between;
@@ -300,7 +294,6 @@
   font-feature-settings: 'tnum' 1;
 }
 
-/* Slider container */
 .et-slider-wrap {
   position: relative;
   height: 20px;
@@ -311,7 +304,6 @@
   box-shadow: none;
 }
 
-/* Track background */
 .et-slider-wrap::before {
   content: '';
   position: absolute;
@@ -323,7 +315,6 @@
   pointer-events: none;
 }
 
-/* Fill bar */
 .et-slider-fill {
   position: absolute;
   left: 0;
@@ -334,7 +325,6 @@
   transition: width 50ms ease-out;
 }
 
-/* Input */
 .et-slider {
   position: relative;
   width: 100%;
@@ -353,7 +343,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Track - completely transparent */
 .et-slider::-webkit-slider-runnable-track {
   width: 100%;
   height: 2px;
@@ -374,7 +363,6 @@
   cursor: pointer;
 }
 
-/* MS Edge */
 .et-slider::-ms-track {
   width: 100%;
   height: 2px;
@@ -389,7 +377,6 @@
   border: none;
 }
 
-/* Thumb */
 .et-slider::-webkit-slider-thumb {
   -webkit-appearance: none !important;
   appearance: none !important;
@@ -425,7 +412,6 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Hover/active states */
 .et-slider::-webkit-slider-thumb:hover {
   transform: scale(1.15);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -444,7 +430,6 @@
   transform: scale(1.1);
 }
 
-/* Focus state */
 .et-slider:focus {
   outline: none !important;
   border: none !important;
@@ -459,17 +444,12 @@
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* =============================================================================
-   VIEW MODE - Logged state with hidden thumbs (Tracker-style flow)
-   Shows only the fill bar for a clean, "finished" look
-   ============================================================================= */
-
+/* View mode - logged state */
 .et-slider-group.view-mode .et-slider {
   cursor: default;
   pointer-events: none;
 }
 
-/* Hide thumb in view mode - WebKit */
 .et-slider-group.view-mode .et-slider::-webkit-slider-thumb {
   opacity: 0;
   width: 0;
@@ -478,7 +458,6 @@
   box-shadow: none;
 }
 
-/* Hide thumb in view mode - Firefox */
 .et-slider-group.view-mode .et-slider::-moz-range-thumb {
   opacity: 0;
   width: 0;
@@ -487,7 +466,6 @@
   box-shadow: none;
 }
 
-/* Hide thumb in view mode - MS Edge */
 .et-slider-group.view-mode .et-slider::-ms-thumb {
   opacity: 0;
   width: 0;
@@ -496,79 +474,21 @@
   box-shadow: none;
 }
 
-/* Keep fill bar fully visible in view mode */
-.et-slider-group.view-mode .et-slider-fill {
-  opacity: 1;
-}
-
-/* Keep track visible in view mode */
-.et-slider-group.view-mode .et-slider-wrap::before {
-  opacity: 1;
-}
-
-/* Keep labels fully visible in view mode */
+.et-slider-group.view-mode .et-slider-fill,
+.et-slider-group.view-mode .et-slider-wrap::before,
 .et-slider-group.view-mode .et-slider-label,
-.et-slider-group.view-mode .et-slider-value {
-  opacity: 1;
-}
-
+.et-slider-group.view-mode .et-slider-value,
 .et-slider-group.view-mode .et-slider-desc {
   opacity: 1;
 }
 
-/* =============================================================================
-   DISABLED STATE (legacy - kept for backwards compatibility)
-   ============================================================================= */
-
-.et-slider:disabled {
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.et-slider:disabled::-webkit-slider-thumb {
-  cursor: not-allowed;
-  transform: none;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  opacity: 0.5;
-}
-
-.et-slider:disabled::-moz-range-thumb {
-  cursor: not-allowed;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  opacity: 0.5;
-}
-
-/* Dim the fill and track when disabled (old style) */
-.et-slider-group.disabled .et-slider-fill {
-  opacity: 0.5;
-}
-
-.et-slider-group.disabled .et-slider-wrap::before {
-  opacity: 0.6;
-}
-
-.et-slider-group.disabled .et-slider-label,
-.et-slider-group.disabled .et-slider-value {
-  opacity: 0.5;
-}
-
-.et-slider-group.disabled .et-slider-desc {
-  opacity: 0.5;
-}
-
-/* Description text below slider */
 .et-slider-desc {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.25);
   margin-top: -4px;
 }
 
-/* =============================================================================
-   SAVE BUTTON - Match Tracker flow with 3 states
-   ============================================================================= */
-
+/* Save button */
 .et-save-btn {
   width: 100%;
   padding: 16px 24px;
@@ -592,7 +512,6 @@
   transform: scale(0.98);
 }
 
-/* Logged state - "Logged Today ✓" - clickable to edit */
 .et-save-btn.logged {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -610,7 +529,7 @@
 }
 
 /* =============================================================================
-   ANALYSIS TAB - Containerless, flowing content
+   ANALYSIS TAB - Focused, clean, matches Stats Insights
    ============================================================================= */
 
 .et-analysis {
@@ -622,122 +541,180 @@
   opacity: 0;
 }
 
-/* Stats - Horizontal with dividers (like Stats page) */
-.et-stats-grid {
+/* ============================================================
+   INSIGHT CARD - Matches Stats Insights exactly
+   ============================================================ */
+
+.et-analysis .insight-card {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding-bottom: 32px;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.et-analysis .insight-card-header {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 24px;
-  padding-bottom: 40px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 40px;
+  justify-content: space-between;
+  margin-bottom: 24px;
 }
 
-.et-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 0 16px;
-}
-
-.et-stat-divider {
-  width: 1px;
-  height: 40px;
-  background-color: rgba(255, 255, 255, 0.08);
-}
-
-.et-stat-value {
-  font-size: 2rem;
-  font-weight: 500;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-  font-feature-settings: 'tnum' 1;
-  line-height: 1;
-}
-
-.et-stat-label {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-/* Trends - Containerless, flowing */
-.et-trends {
-  padding: 0;
-}
-
-.et-trends h3 {
+.et-analysis .insight-card-header span {
   font-size: 0.6875rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin: 0 0 24px 0;
 }
 
-.et-trend-row {
+.et-analysis .insight-card-header .header-sub {
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.2);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.et-analysis .insight-card-content {
+  padding: 0;
+}
+
+/* ============================================================
+   EMPTY STATE - Matches Stats Insights
+   ============================================================ */
+
+.et-analysis .insight-empty {
+  padding: 32px 0;
+  text-align: center;
+}
+
+.et-analysis .empty-message {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  font-feature-settings: 'tnum' 1;
+}
+
+.et-analysis .empty-context {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TRAJECTORY LIST - The core insight display
+   ============================================================ */
+
+.trajectory-list {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0;
+}
+
+.trajectory-row {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 16px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.et-trend-row:last-child {
+.trajectory-row:last-child {
   border-bottom: none;
   padding-bottom: 0;
 }
 
-.et-trend-label {
+.trajectory-label {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.et-trend-value {
-  font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 90px;
 }
 
-.et-trend-value.improving {
-  color: #ffffff;
+.trajectory-values {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.et-trend-value.stable {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.et-trend-value.concerning {
+.trajectory-early {
+  font-size: 0.9375rem;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.35);
+  font-feature-settings: 'tnum' 1;
+  min-width: 28px;
+  text-align: right;
 }
 
-/* Empty State - Minimal */
-.et-empty {
-  text-align: center;
-  padding: 48px 24px;
+.trajectory-arrow {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.2);
 }
 
-.et-empty-title {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 12px 0;
-}
-
-.et-empty-text {
+.trajectory-now {
   font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  font-feature-settings: 'tnum' 1;
+  min-width: 28px;
+}
+
+.trajectory-delta {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-feature-settings: 'tnum' 1;
+  min-width: 48px;
+  text-align: right;
+}
+
+.trajectory-delta.improved {
+  color: rgba(52, 211, 153, 0.9);
+}
+
+.trajectory-delta.declined {
+  color: rgba(248, 113, 113, 0.8);
+}
+
+.trajectory-delta.stable {
   color: rgba(255, 255, 255, 0.3);
-  line-height: 1.7;
-  margin: 0;
-  max-width: 280px;
-  margin-left: auto;
-  margin-right: auto;
+}
+
+/* ============================================================
+   PHASE CONTEXT - Subtle footer context
+   ============================================================ */
+
+.phase-context {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.phase-context-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.phase-context-phase {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.phase-context-expectation {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
 }
 
 /* =============================================================================
-   MODAL - Sticky header/footer with scrollable body (matches Tracker/Calendar)
+   MODAL
    ============================================================================= */
 
 .et-overlay {
@@ -786,7 +763,6 @@
   }
 }
 
-/* Modal Header - Sticky at top */
 .et-modal-header {
   flex-shrink: 0;
   display: flex;
@@ -819,7 +795,6 @@
   margin: 0;
 }
 
-/* Scrollable content area */
 .et-modal-scroll {
   flex: 1;
   overflow-y: auto;
@@ -828,14 +803,12 @@
   padding: 32px 0;
 }
 
-/* Modal Body */
 .et-modal-body {
   display: flex;
   flex-direction: column;
   gap: 32px;
 }
 
-/* Modal Sections - Containerless */
 .et-modal-section {
   padding: 0;
 }
@@ -877,7 +850,6 @@
   display: none;
 }
 
-/* Warning Section */
 .et-warning {
   background: transparent;
   border: none;
@@ -902,7 +874,6 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* Modal Footer - Sticky at bottom */
 .et-modal-footer {
   flex-shrink: 0;
   padding-top: 24px;
@@ -910,7 +881,6 @@
   background: transparent;
 }
 
-/* Modal Button - Ghost style */
 .et-modal-btn {
   width: 100%;
   padding: 16px 24px;
@@ -984,10 +954,7 @@
     gap: 28px;
   }
   
-  .et-slider-label {
-    font-size: 0.875rem;
-  }
-  
+  .et-slider-label,
   .et-slider-value {
     font-size: 0.875rem;
   }
@@ -1001,22 +968,28 @@
     font-size: 0.9375rem;
   }
   
-  .et-stats-grid {
-    gap: 16px;
-    padding-bottom: 32px;
-    margin-bottom: 32px;
+  /* Analysis responsive */
+  .trajectory-row {
+    padding: 14px 0;
   }
   
-  .et-stat {
-    padding: 0 12px;
+  .trajectory-label {
+    font-size: 0.875rem;
+    min-width: 80px;
   }
   
-  .et-stat-value {
-    font-size: 1.75rem;
+  .trajectory-early,
+  .trajectory-now {
+    font-size: 0.875rem;
   }
   
-  .et-stat-divider {
-    height: 32px;
+  .trajectory-delta {
+    font-size: 0.75rem;
+    min-width: 44px;
+  }
+  
+  .phase-context-expectation {
+    font-size: 0.8125rem;
   }
   
   .et-modal {
@@ -1036,13 +1009,6 @@
     font-size: 1.25rem;
   }
   
-  .et-modal-close {
-    top: 16px;
-    right: 16px;
-    width: 36px;
-    height: 36px;
-  }
-  
   .et-modal-body {
     gap: 28px;
   }
@@ -1058,20 +1024,23 @@
     padding: 28px 12px 90px;
   }
   
-  .et-stats-grid {
-    gap: 12px;
+  .trajectory-values {
+    gap: 6px;
   }
   
-  .et-stat {
-    padding: 0 8px;
+  .trajectory-label {
+    min-width: 70px;
+    font-size: 0.8125rem;
   }
   
-  .et-stat-value {
-    font-size: 1.5rem;
+  .trajectory-early,
+  .trajectory-now {
+    font-size: 0.8125rem;
+    min-width: 24px;
   }
   
-  .et-stat-divider {
-    height: 28px;
+  .trajectory-delta {
+    min-width: 40px;
   }
 }
 
@@ -1081,8 +1050,21 @@
     font-size: 2.25rem;
   }
   
-  .et-stat-value {
-    font-size: 2.25rem;
+  .trajectory-row {
+    padding: 18px 0;
+  }
+  
+  .trajectory-label {
+    font-size: 1rem;
+  }
+  
+  .trajectory-early,
+  .trajectory-now {
+    font-size: 1rem;
+  }
+  
+  .trajectory-delta {
+    font-size: 0.875rem;
   }
   
   .et-modal {

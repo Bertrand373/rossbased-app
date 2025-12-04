@@ -1,6 +1,6 @@
 // EmotionalTimeline.js - TITANTRACK MINIMAL
 // Matches Landing/Tracker/Stats aesthetic
-// UPDATED: Check-in flow now matches Tracker (tap "Logged Today" to edit)
+// UPDATED: Analysis tab focused on ONE powerful insight - emotional trajectory
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
@@ -19,7 +19,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     processing: 5
   });
   const [hasLoggedToday, setHasLoggedToday] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // NEW: Edit mode state
+  const [isEditing, setIsEditing] = useState(false);
 
   const currentDay = userData?.currentStreak || 0;
 
@@ -34,6 +34,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       summary: "Body begins adapting while urges peak",
       description: "Your body begins adapting to retention while initial urges peak. This phase builds new neural pathways as your brain rewires dopamine pathways away from instant gratification.",
       science: "Cessation triggers hypothalamic-pituitary adjustments. Testosterone stabilizes while dopamine receptors rebalance from overstimulation.",
+      expectation: "Emotional volatility is normal. Your system is recalibrating.",
       symptoms: [
         "Strong physical urges and restlessness",
         "Energy fluctuations between high and fatigue",
@@ -64,6 +65,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       summary: "Suppressed emotions surface for healing",
       description: "Suppressed emotions surface for healing - this is often the most challenging phase. Your psyche is healing itself through this natural process.",
       science: "Without ejaculation's endorphin/prolactin release numbing pain, stored trauma surfaces. Retained energy amplifies all emotions as healing occurs.",
+      expectation: "This is the hardest phase. Emotional turbulence means healing is happening.",
       symptoms: [
         "Intense mood swings and emotional volatility",
         "Waves of anxiety, depression, sadness",
@@ -94,6 +96,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       summary: "Cognitive abilities enhance significantly",
       description: "Cognitive abilities enhance as emotional turbulence stabilizes. Your brain operates at higher efficiency with optimized neurotransmitter balance.",
       science: "Retained nutrients rebuild nerve sheaths. Brain tissue becomes more densely connected as resources redirect from reproduction to cognition.",
+      expectation: "Emotional stability returns. Clarity and calm become the norm.",
       symptoms: [
         "Dramatically improved focus",
         "Enhanced creativity and problem-solving",
@@ -123,6 +126,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       summary: "Benefits become deeply integrated",
       description: "Profound inner transformation as benefits become deeply integrated. Complete endocrine rebalancing creates stable high-performance states.",
       science: "The entire nervous system optimizes for retention, creating self-sustaining high-performance states with permanent neuroplastic changes.",
+      expectation: "Deep inner peace. Emotions serve you rather than control you.",
       symptoms: [
         "Deep sense of life purpose",
         "Natural charisma and presence",
@@ -152,6 +156,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       summary: "Complete integration and transcendence",
       description: "You've transcended the need for external validation. Sexual energy is permanently redirected, creating sustained states of expanded awareness.",
       science: "Permanent neuroplastic changes create self-sustaining states. Enhanced connectivity between regions associated with self-control and higher cognition.",
+      expectation: "Emotional mastery. You choose your state rather than react.",
       symptoms: [
         "Effortless self-control",
         "Natural influence and presence",
@@ -223,7 +228,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       const lastLog = userData.emotionalLog[userData.emotionalLog.length - 1];
       if (lastLog && new Date(lastLog.date).toDateString() === today) {
         setHasLoggedToday(true);
-        setIsEditing(false); // Ensure not in edit mode when already logged
+        setIsEditing(false);
         setEmotions({
           anxiety: lastLog.anxiety || 5,
           mood: lastLog.mood || 5,
@@ -234,57 +239,102 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     }
   }, [userData]);
 
-  // Analyze emotional data
-  const analyzeEmotions = () => {
+  // ============================================================
+  // ANALYSIS - Focused trajectory calculation
+  // ============================================================
+  const calculateTrajectory = () => {
     const log = userData?.emotionalLog || [];
-    if (log.length < 3) return null;
+    
+    // Need at least 7 check-ins for meaningful comparison
+    if (log.length < 7) {
+      return { 
+        hasData: false, 
+        checkIns: log.length,
+        needed: 7 
+      };
+    }
 
-    const recent = log.slice(-14);
-    const avg = (arr, key) => arr.reduce((sum, e) => sum + (e[key] || 5), 0) / arr.length;
-    
-    const recentAvg = {
-      anxiety: avg(recent, 'anxiety'),
-      mood: avg(recent, 'mood'),
-      clarity: avg(recent, 'clarity')
+    // Sort by date to ensure correct order
+    const sortedLog = [...log].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Early = first 7 check-ins
+    const early = sortedLog.slice(0, 7);
+    // Now = last 7 check-ins
+    const now = sortedLog.slice(-7);
+
+    const avg = (arr, key) => {
+      const valid = arr.filter(e => typeof e[key] === 'number');
+      if (valid.length === 0) return null;
+      return valid.reduce((sum, e) => sum + e[key], 0) / valid.length;
     };
-    
-    const older = log.slice(0, -7);
-    const olderAvg = older.length > 0 ? {
-      anxiety: avg(older, 'anxiety'),
-      mood: avg(older, 'mood'),
-      clarity: avg(older, 'clarity')
-    } : recentAvg;
-    
-    const getTrend = (key, invert = false) => {
-      const diff = recentAvg[key] - olderAvg[key];
-      const threshold = 0.5;
-      if (invert) {
-        if (diff < -threshold) return 'improving';
-        if (diff > threshold) return 'concerning';
-      } else {
-        if (diff > threshold) return 'improving';
-        if (diff < -threshold) return 'concerning';
+
+    const metrics = [
+      { 
+        key: 'anxiety', 
+        label: 'Anxiety',
+        invert: true // Lower is better
+      },
+      { 
+        key: 'mood', 
+        label: 'Mood',
+        invert: false // Higher is better
+      },
+      { 
+        key: 'clarity', 
+        label: 'Clarity',
+        invert: false
+      },
+      { 
+        key: 'processing', 
+        label: 'Processing',
+        invert: false
       }
-      return 'stable';
-    };
+    ];
 
-    const wellbeing = Math.round(
-      ((10 - recentAvg.anxiety) + recentAvg.mood + recentAvg.clarity) / 3 * 10
-    ) / 10;
+    const trajectory = metrics.map(metric => {
+      const earlyAvg = avg(early, metric.key);
+      const nowAvg = avg(now, metric.key);
+      
+      if (earlyAvg === null || nowAvg === null) {
+        return { ...metric, early: null, now: null, delta: null, improved: null };
+      }
+
+      const delta = nowAvg - earlyAvg;
+      // For anxiety, improvement means going DOWN (negative delta)
+      // For others, improvement means going UP (positive delta)
+      const improved = metric.invert ? delta < -0.3 : delta > 0.3;
+      const declined = metric.invert ? delta > 0.3 : delta < -0.3;
+
+      return {
+        ...metric,
+        early: earlyAvg.toFixed(1),
+        now: nowAvg.toFixed(1),
+        delta: Math.abs(delta).toFixed(1),
+        direction: metric.invert 
+          ? (delta < 0 ? 'down' : delta > 0 ? 'up' : 'stable')
+          : (delta > 0 ? 'up' : delta < 0 ? 'down' : 'stable'),
+        improved,
+        declined,
+        stable: !improved && !declined
+      };
+    });
+
+    // Count improvements
+    const improvements = trajectory.filter(t => t.improved).length;
+    const declines = trajectory.filter(t => t.declined).length;
 
     return {
-      total: log.length,
-      recent: recent.length,
-      wellbeing: wellbeing.toFixed(1),
-      trends: {
-        anxiety: getTrend('anxiety', true),
-        mood: getTrend('mood'),
-        clarity: getTrend('clarity')
-      }
+      hasData: true,
+      checkIns: log.length,
+      trajectory,
+      improvements,
+      declines,
+      overallTrend: improvements > declines ? 'positive' : 
+                    declines > improvements ? 'concerning' : 'stable'
     };
   };
 
-  const analysis = analyzeEmotions();
+  const analysis = calculateTrajectory();
 
   // Save check-in (first time)
   const handleSave = async () => {
@@ -318,20 +368,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       const existingLog = userData?.emotionalLog || [];
       const today = new Date().toDateString();
       
-      // Find and update today's entry
       const updatedLog = existingLog.map(entry => {
         if (new Date(entry.date).toDateString() === today) {
-          return {
-            ...entry,
-            ...emotions
-          };
+          return { ...entry, ...emotions };
         }
         return entry;
       });
 
-      await updateUserData({
-        emotionalLog: updatedLog
-      });
+      await updateUserData({ emotionalLog: updatedLog });
       setIsEditing(false);
       toast.success('Check-in updated');
     } catch (error) {
@@ -339,16 +383,13 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     }
   };
 
-  // Handle button click - matches Tracker flow
+  // Handle button click
   const handleButtonClick = () => {
     if (!hasLoggedToday) {
-      // First save
       handleSave();
     } else if (!isEditing) {
-      // Enable editing
       setIsEditing(true);
     } else {
-      // Save updates
       handleUpdate();
     }
   };
@@ -393,7 +434,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   return (
     <div className="et-container">
-      {/* Tabs - Text-only with dividers */}
+      {/* Tabs */}
       <nav className="et-tabs">
         {tabs.map((tab, index) => (
           <React.Fragment key={tab.key}>
@@ -411,7 +452,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       {/* Journey Tab */}
       {activeTab === 'journey' && (
         <div className="et-journey">
-          {/* Current Phase - Hero display */}
           <div className="et-current" onClick={() => openPhase(currentPhase)}>
             <div className="et-current-label">Current Phase</div>
             <h2 className="et-current-name">{currentPhase?.name}</h2>
@@ -428,7 +468,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             </div>
           </div>
 
-          {/* Phase List - Minimal */}
           <div className="et-phases">
             {phases.map((phase, index) => {
               const status = getPhaseStatus(phase);
@@ -455,7 +494,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Check-in Tab - Tracker-style flow */}
+      {/* Check-in Tab */}
       {activeTab === 'checkin' && (
         <div className="et-checkin">
           <div className="et-checkin-header">Daily Check-in</div>
@@ -502,65 +541,63 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Analysis Tab - Horizontal stats with dividers */}
+      {/* Analysis Tab - ONE powerful insight */}
       {activeTab === 'analysis' && (
         <div className="et-analysis">
-          {!analysis ? (
-            <div className="et-empty">
-              <p className="et-empty-title">Not Enough Data</p>
-              <p className="et-empty-text">
-                Complete at least 3 daily check-ins to unlock pattern analysis and personalized insights.
-              </p>
+          {/* YOUR PROGRESS - The core insight */}
+          <div className="insight-card">
+            <div className="insight-card-header">
+              <span>Your Progress</span>
+              {analysis.hasData && <span className="header-sub">Early → Now</span>}
             </div>
-          ) : (
-            <>
-              <div className="et-stats-grid">
-                <div className="et-stat">
-                  <span className="et-stat-value">{analysis.wellbeing}</span>
-                  <span className="et-stat-label">Wellbeing</span>
+            <div className="insight-card-content">
+              {!analysis.hasData ? (
+                <div className="insight-empty">
+                  <p className="empty-message">{analysis.checkIns}/{analysis.needed} check-ins</p>
+                  <p className="empty-context">
+                    {analysis.needed - analysis.checkIns} more to unlock your emotional trajectory
+                  </p>
                 </div>
-                <div className="et-stat-divider" />
-                <div className="et-stat">
-                  <span className="et-stat-value">{analysis.total}</span>
-                  <span className="et-stat-label">Data Points</span>
-                </div>
-                <div className="et-stat-divider" />
-                <div className="et-stat">
-                  <span className="et-stat-value">{analysis.recent}</span>
-                  <span className="et-stat-label">Recent</span>
-                </div>
-              </div>
-
-              <div className="et-trends">
-                <h3>Trends</h3>
-                {[
-                  { key: 'anxiety', label: 'Anxiety', invert: true },
-                  { key: 'mood', label: 'Mood Stability' },
-                  { key: 'clarity', label: 'Mental Clarity' }
-                ].map(({ key, label, invert }) => {
-                  const trend = analysis.trends[key];
-                  const symbol = trend === 'improving' ? (invert ? '↓' : '↑') : 
-                                 trend === 'concerning' ? (invert ? '↑' : '↓') : '→';
-                  return (
-                    <div key={key} className="et-trend-row">
-                      <span className="et-trend-label">{label}</span>
-                      <span className={`et-trend-value ${trend}`}>
-                        {symbol} {trend.charAt(0).toUpperCase() + trend.slice(1)}
+              ) : (
+                <div className="trajectory-list">
+                  {analysis.trajectory.map((metric) => (
+                    <div key={metric.key} className="trajectory-row">
+                      <span className="trajectory-label">{metric.label}</span>
+                      <div className="trajectory-values">
+                        <span className="trajectory-early">{metric.early}</span>
+                        <span className="trajectory-arrow">→</span>
+                        <span className="trajectory-now">{metric.now}</span>
+                      </div>
+                      <span className={`trajectory-delta ${
+                        metric.improved ? 'improved' : 
+                        metric.declined ? 'declined' : 'stable'
+                      }`}>
+                        {metric.improved ? (metric.invert ? '↓' : '↑') : 
+                         metric.declined ? (metric.invert ? '↑' : '↓') : '→'} {metric.delta}
                       </span>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* PHASE CONTEXT - Only show when we have trajectory data */}
+          {analysis.hasData && (
+            <div className="phase-context">
+              <div className="phase-context-inner">
+                <span className="phase-context-phase">{currentPhase?.name}</span>
+                <span className="phase-context-expectation">{currentPhase?.expectation}</span>
               </div>
-            </>
+            </div>
           )}
         </div>
       )}
 
-      {/* Phase Modal - Sticky header/footer with scrollable body */}
+      {/* Phase Modal */}
       {showModal && selectedPhase && (
         <div className="et-overlay" onClick={() => setShowModal(false)}>
           <div className="et-modal" onClick={e => e.stopPropagation()}>
-            {/* Sticky Header */}
             <div className="et-modal-header">
               <span className="et-modal-num">
                 {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
@@ -571,7 +608,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               </div>
             </div>
 
-            {/* Scrollable Body */}
             <div className="et-modal-scroll">
               <div className="et-modal-body">
                 <div className="et-modal-section">
@@ -607,10 +643,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
               </div>
             </div>
             
-            {/* Sticky Footer */}
             <div className="et-modal-footer">
               <button className="et-modal-btn" onClick={() => setShowModal(false)}>
-                Cancel
+                Close
               </button>
             </div>
           </div>
