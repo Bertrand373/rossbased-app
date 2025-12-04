@@ -14,6 +14,7 @@ const User = require('./models/User');
 // Import notification modules (these need env vars to be loaded first!)
 const notificationRoutes = require('./routes/notifications');
 const googleAuthRoutes = require('./routes/googleAuth');
+const discordAuthRoutes = require('./routes/discordAuth');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 
 const app = express();
@@ -281,6 +282,7 @@ app.post('/api/notification-preferences/:username', async (req, res) => {
 // Mount notification routes
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/auth', googleAuthRoutes);
+app.use('/api/auth', discordAuthRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

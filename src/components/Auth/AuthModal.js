@@ -22,6 +22,9 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   
   // Google Client ID
   const GOOGLE_CLIENT_ID = '81026306470-im14ikk81801f6l1obk0b4cu260nito1.apps.googleusercontent.com';
+  
+  // Discord Client ID
+  const DISCORD_CLIENT_ID = '1446165239174529132';
 
   // Handle Google credential response
   const handleGoogleResponse = useCallback(async (response) => {
@@ -172,7 +175,6 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
       if (googleLoaded && window.google?.accounts?.id) {
         window.google.accounts.id.prompt((notification) => {
           if (notification.isNotDisplayed()) {
-            // Fallback: use popup mode
             window.google.accounts.id.prompt();
           }
         });
@@ -180,7 +182,15 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
         setError('Google Sign-In is loading. Please try again.');
       }
     } else if (provider === 'Discord') {
-      setError('Discord login coming soon');
+      // Discord OAuth - redirect to Discord
+      const REDIRECT_URI = encodeURIComponent(
+        window.location.hostname === 'localhost' 
+          ? 'http://localhost:3000/auth/discord/callback'
+          : 'https://titantrack.app/auth/discord/callback'
+      );
+      const scope = encodeURIComponent('identify email');
+      
+      window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${scope}`;
     }
   };
   
