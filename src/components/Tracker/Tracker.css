@@ -2,7 +2,6 @@
 
 .tracker {
   /* Simple flexbox layout - fills available space */
-  position: relative; /* Required for PatternInsightCard positioning */
   min-height: calc(100dvh - 56px - 80px);
   display: flex;
   flex-direction: column;
@@ -417,19 +416,18 @@
 .benefits-list {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 28px;
+  flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  flex: 1;
-  min-height: 0;
-  padding: 4px 4px 4px 0;
+  padding-right: 4px;
   margin-right: -4px;
 }
 
 .benefit-row {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .benefit-info {
@@ -445,25 +443,24 @@
 }
 
 .benefit-num {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.8125rem;
+  font-weight: 600;
   color: rgba(255, 255, 255, 0.6);
   font-feature-settings: 'tnum' 1;
 }
 
 .benefit-desc {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
-  text-align: left;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: -8px;
 }
 
-/* Custom slider - elegant minimal design */
+/* Slider styling */
 .benefit-slider {
   position: relative;
-  width: 100%;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 1px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
   overflow: visible;
 }
 
@@ -473,56 +470,52 @@
   left: 0;
   height: 100%;
   background-color: #ffffff;
-  border-radius: 1px;
+  border-radius: 2px;
   transition: width 50ms ease;
   pointer-events: none;
 }
 
-/* Range input - completely transparent, only thumb visible */
 .benefit-slider input[type="range"] {
   position: absolute;
   top: 50%;
   left: 0;
-  transform: translateY(-50%);
   width: 100%;
   height: 24px;
-  background: transparent !important;
+  margin: 0;
+  transform: translateY(-50%);
   -webkit-appearance: none !important;
   appearance: none !important;
+  background: transparent !important;
   cursor: pointer;
-  margin: 0;
-  padding: 0;
-  outline: none !important;
   border: none !important;
-  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
 }
 
-/* Hide the track completely */
+/* Track - invisible (we use .benefit-fill instead) */
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 2px;
+  height: 4px;
   background: transparent !important;
   border: none !important;
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 .benefit-slider input[type="range"]::-moz-range-track {
-  width: 100%;
-  height: 2px;
+  height: 4px;
   background: transparent !important;
   border: none !important;
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 .benefit-slider input[type="range"]::-ms-track {
-  width: 100%;
-  height: 2px;
+  height: 4px;
   background: transparent !important;
   border: none !important;
+  border-color: transparent;
   color: transparent;
 }
 
-/* Style the thumb - white circle */
+/* Thumb - clean white circle */
 .benefit-slider input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none !important;
   appearance: none !important;

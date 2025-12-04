@@ -1,29 +1,32 @@
 /* src/components/PatternInsight/PatternInsightCard.css */
-/* Floating minimal design - matches app's transparent aesthetic */
+/* Inline flow design - part of tracker's flex column */
+/* Content below smoothly shifts when card appears/disappears */
 
 .pattern-insight {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-8px);
+  /* Inline flow - part of tracker's flex column */
+  width: 100%;
+  max-width: 300px;
   
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  z-index: 10;
   
-  /* Animation */
+  /* Spacing from content below */
+  margin-bottom: 32px;
+  
+  /* Animation - fade and slide down */
   opacity: 0;
-  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(-12px);
+  transition: opacity 300ms ease, transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .pattern-insight.visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
 
-/* Label - subtle, like .date in Tracker */
+/* Label - subtle, uppercase */
 .pattern-insight-label {
   font-size: 0.75rem;
   font-weight: 500;
@@ -89,8 +92,8 @@
 
 @media (max-width: 480px) {
   .pattern-insight {
-    top: 16px;
-    width: calc(100% - 48px);
+    max-width: 280px;
+    margin-bottom: 24px;
   }
   
   .pattern-insight-label {
@@ -113,16 +116,36 @@
   }
 }
 
-/* iOS safe area */
-@supports (padding-top: env(safe-area-inset-top)) {
+/* Short screens - tighter spacing */
+@media (max-height: 700px) {
   .pattern-insight {
-    top: calc(20px + env(safe-area-inset-top));
+    margin-bottom: 24px;
   }
   
-  @media (max-width: 480px) {
-    .pattern-insight {
-      top: calc(16px + env(safe-area-inset-top));
-    }
+  .pattern-insight-message {
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-height: 600px) {
+  .pattern-insight {
+    margin-bottom: 20px;
+  }
+  
+  .pattern-insight-label {
+    font-size: 0.6875rem;
+    margin-bottom: 4px;
+  }
+  
+  .pattern-insight-message {
+    font-size: 0.6875rem;
+    margin-bottom: 10px;
+  }
+  
+  .pattern-insight-view,
+  .pattern-insight-dismiss {
+    padding: 6px 10px;
+    font-size: 0.6875rem;
   }
 }
 
@@ -133,7 +156,7 @@
 @media (prefers-reduced-motion: reduce) {
   .pattern-insight {
     opacity: 1;
-    transform: translateX(-50%);
+    transform: none;
     transition: none;
   }
 }
