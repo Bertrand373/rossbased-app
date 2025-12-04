@@ -1,5 +1,5 @@
 // OnboardingGuide.js - TITANTRACK
-// First-time user onboarding - 3 focused tooltips with premium animations
+// Premium onboarding with architectural line+dot connector
 import React, { useState, useEffect, useCallback } from 'react';
 import './OnboardingGuide.css';
 
@@ -18,25 +18,31 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Define the 3 onboarding steps
+  // Define the 3 onboarding steps - TIGHT targeting
   const steps = [
     {
+      // Target ONLY the streak number button
       target: '.streak-counter',
       title: 'Set your start date',
       message: 'Tap the counter to set when your journey began.',
-      position: 'bottom'
+      position: 'bottom',
+      padding: 8 // Tight padding - just the counter
     },
     {
+      // Target the log button
       target: '.benefits-trigger',
       title: 'Track daily benefits',
       message: 'Log how you feel each day. This powers your AI insights.',
-      position: 'top'
+      position: 'top',
+      padding: 6 // Tight padding - just the button
     },
     {
+      // Target navigation
       target: isMobile ? '.mobile-nav' : '.header-nav',
       title: 'Explore when ready',
       message: 'Calendar, stats, timeline, and crisis tools await.',
-      position: isMobile ? 'top' : 'bottom'
+      position: isMobile ? 'top' : 'bottom',
+      padding: 4 // Minimal for nav bar
     }
   ];
 
@@ -55,7 +61,9 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
         width: rect.width,
         height: rect.height,
         bottom: rect.bottom,
-        right: rect.right
+        right: rect.right,
+        centerX: rect.left + rect.width / 2,
+        centerY: rect.top + rect.height / 2
       });
     } else {
       setTargetRect(null);
@@ -80,20 +88,17 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
 
   // Smooth transition to next step
   const transitionToStep = (nextStep) => {
-    // Start transition - fade out tooltip
     setIsTransitioning(true);
     setTooltipVisible(false);
     
-    // After tooltip fades, move spotlight
     setTimeout(() => {
       setCurrentStep(nextStep);
     }, 200);
     
-    // After spotlight glides, fade in new tooltip
     setTimeout(() => {
       setTooltipVisible(true);
       setIsTransitioning(false);
-    }, 500);
+    }, 550);
   };
 
   // Handle next step or complete
@@ -131,6 +136,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
 
   const step = steps[currentStep];
   const isLastStep = currentStep === steps.length - 1;
+  const padding = step.padding || 8;
 
   // Calculate tooltip position
   const getTooltipStyle = () => {
@@ -142,17 +148,18 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
       };
     }
 
-    const tooltipOffset = 24;
+    // Space for the connector line
+    const tooltipOffset = 48;
 
     if (step.position === 'bottom') {
       return {
-        top: `${targetRect.bottom + tooltipOffset}px`,
+        top: `${targetRect.bottom + padding + tooltipOffset}px`,
         left: '50%',
         transform: 'translateX(-50%)'
       };
     } else if (step.position === 'top') {
       return {
-        bottom: `${window.innerHeight - targetRect.top + tooltipOffset}px`,
+        bottom: `${window.innerHeight - targetRect.top + padding + tooltipOffset}px`,
         left: '50%',
         transform: 'translateX(-50%)'
       };
@@ -161,61 +168,103 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     return {};
   };
 
-  // Get spotlight style with smooth transitions
+  // Get spotlight style - TIGHT, element-specific
   const getSpotlightStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
-    // For nav (step 3), use full width
+    // For nav (step 3), full width but tight height
     if (currentStep === 2) {
       return {
-        top: `${targetRect.top - 8}px`,
+        top: `${targetRect.top - padding}px`,
         left: '0',
         width: '100%',
-        height: `${targetRect.height + 16}px`,
+        height: `${targetRect.height + (padding * 2)}px`,
         borderRadius: '0'
       };
     }
     
-    // For counter (step 1), generous padding
-    if (currentStep === 0) {
+    // For counter and button - tight spotlight
+    return {
+      top: `${targetRect.top - padding}px`,
+      left: `${targetRect.left - padding}px`,
+      width: `${targetRect.width + (padding * 2)}px`,
+      height: `${targetRect.height + (padding * 2)}px`,
+      borderRadius: currentStep === 0 ? '20px' : '14px'
+    };
+  };
+
+  // Calculate connector line position
+  const getConnectorStyle = () => {
+    if (!targetRect) return { opacity: 0 };
+    
+    const lineLength = 32;
+    
+    if (step.position === 'bottom') {
+      // Line goes from bottom of spotlight to tooltip
       return {
-        top: `${targetRect.top - 24}px`,
-        left: `${targetRect.left - 24}px`,
-        width: `${targetRect.width + 48}px`,
-        height: `${targetRect.height + 48}px`,
-        borderRadius: '28px'
+        left: '50%',
+        top: `${targetRect.bottom + padding + 4}px`,
+        height: `${lineLength}px`,
+        transform: 'translateX(-50%)'
+      };
+    } else {
+      // Line goes from top of spotlight up to tooltip
+      return {
+        left: '50%',
+        bottom: `${window.innerHeight - targetRect.top + padding + 4}px`,
+        height: `${lineLength}px`,
+        transform: 'translateX(-50%)'
       };
     }
+  };
+
+  // Get dot position (at end of line, near tooltip)
+  const getDotStyle = () => {
+    if (!targetRect) return { opacity: 0 };
     
-    // For benefits button (step 2)
-    return {
-      top: `${targetRect.top - 16}px`,
-      left: `${targetRect.left - 16}px`,
-      width: `${targetRect.width + 32}px`,
-      height: `${targetRect.height + 32}px`,
-      borderRadius: '20px'
-    };
+    if (step.position === 'bottom') {
+      return {
+        left: '50%',
+        top: `${targetRect.bottom + padding + 32}px`,
+        transform: 'translateX(-50%)'
+      };
+    } else {
+      return {
+        left: '50%',
+        bottom: `${window.innerHeight - targetRect.top + padding + 32}px`,
+        transform: 'translateX(-50%)'
+      };
+    }
   };
 
   return (
     <div className="onboarding-overlay">
-      {/* Spotlight with pulse ring */}
+      {/* Spotlight - tight focus on element */}
       {targetRect && (
-        <>
-          <div 
-            className="onboarding-spotlight"
-            style={getSpotlightStyle()}
-            onClick={handleSpotlightTap}
-          />
-          {/* Pulse ring - separate element for animation */}
-          <div 
-            className="onboarding-pulse-ring"
-            style={getSpotlightStyle()}
-          />
-        </>
+        <div 
+          className="onboarding-spotlight"
+          style={getSpotlightStyle()}
+          onClick={handleSpotlightTap}
+        />
       )}
 
-      {/* Tooltip with fade transition */}
+      {/* Connector line */}
+      {targetRect && tooltipVisible && (
+        <div 
+          className={`onboarding-connector ${tooltipVisible ? 'visible' : ''}`}
+          style={getConnectorStyle()}
+        />
+      )}
+
+      {/* Terminal dot */}
+      {targetRect && tooltipVisible && (
+        <div 
+          className={`onboarding-dot ${tooltipVisible ? 'visible' : ''}`}
+          style={getDotStyle()}
+        />
+      )}
+
+      {/* Tooltip */}
       <div 
         className={`onboarding-tooltip ${step.position} ${tooltipVisible ? 'visible' : 'hidden'}`}
         style={getTooltipStyle()}
