@@ -408,8 +408,8 @@
   gap: 16px;
   padding: 16px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
+  border: none;
+  border-radius: 0;
   cursor: pointer;
   transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
@@ -417,7 +417,6 @@
 
 .phase-context-row:hover {
   background: rgba(255, 255, 255, 0.02);
-  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .phase-context-row:active {

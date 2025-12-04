@@ -267,10 +267,10 @@
   margin-bottom: 16px;
 }
 
-/* More space before time range - compact width on all screens */
+/* Time range - equal spacing above and below */
 .toggle-row.time-range {
-  margin-top: 4px;
-  margin-bottom: 24px;
+  margin-top: 0;
+  margin-bottom: 16px;
   max-width: 240px;
   margin-left: auto;
   margin-right: auto;
