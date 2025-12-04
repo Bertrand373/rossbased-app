@@ -13,8 +13,8 @@ const {
 } = notificationService;
 
 // checkAndSendMilestoneNotification may or may not be exported
-const checkAndSendMilestoneNotification = notificationService.checkAndSendMilestoneNotification || 
-  async (username, currentStreak) => {
+const checkAndSendMilestoneNotification = notificationService.checkAndSendMilestoneNotification || (
+  async function(username, currentStreak) {
     // Fallback implementation if not exported
     const milestones = [7, 14, 30, 60, 90, 180, 365];
     if (!milestones.includes(currentStreak)) {
@@ -25,7 +25,8 @@ const checkAndSendMilestoneNotification = notificationService.checkAndSendMilest
       return { success: false, reason: `No template for milestone_${currentStreak}` };
     }
     return await sendNotificationToUser(username, templateKey);
-  };
+  }
+);
 
 // Subscribe to notifications (store FCM token)
 router.post('/subscribe', async (req, res) => {
