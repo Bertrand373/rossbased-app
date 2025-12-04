@@ -1,0 +1,91 @@
+/* src/components/DailyQuote/DailyQuote.css */
+/* TitanTrack Daily Wisdom - Matches Tracker minimal aesthetic */
+
+.daily-quote {
+  max-width: 280px;
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  animation: quoteIn 600ms ease 200ms forwards;
+  opacity: 0;
+}
+
+.quote-text {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.01em;
+}
+
+.quote-author {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.2);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+@keyframes quoteIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 374px) {
+  .daily-quote {
+    max-width: 240px;
+    margin-top: 20px;
+    padding-top: 20px;
+  }
+  
+  .quote-text {
+    font-size: 0.75rem;
+  }
+  
+  .quote-author {
+    font-size: 0.625rem;
+  }
+}
+
+/* Short screens - reduce spacing */
+@media (max-height: 700px) {
+  .daily-quote {
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+}
+
+/* Very short screens - hide quote to prioritize core elements */
+@media (max-height: 600px) {
+  .daily-quote {
+    display: none;
+  }
+}
+
+/* Landscape - hide on very cramped screens */
+@media (max-height: 500px) and (orientation: landscape) {
+  .daily-quote {
+    display: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .daily-quote {
+    animation: none;
+    opacity: 1;
+  }
+}

@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import './Tracker.css';
 import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
+import DailyQuote from '../DailyQuote/DailyQuote';
 
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
@@ -305,6 +306,8 @@ const Tracker = ({ userData, updateUserData }) => {
         {milestone && (
           <p className="milestone">{milestone}</p>
         )}
+        
+        <DailyQuote />
       </main>
 
       {/* Footer */}
