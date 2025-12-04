@@ -344,7 +344,8 @@ export const aiTestUser6 = {
 
 // ========================================
 // AI CARD TEST USER - Pre-trained model, shows PatternInsightCard
-// UPDATED: Now has comprehensive emotional tracking for analysis tab testing
+// UPDATED: Now has comprehensive emotional data for analysis tab testing
+// NOTE: Uses BOTH emotionalLog (for EmotionalTimeline) AND emotionalTracking (for ML)
 // ========================================
 
 export const aiCardTestUser = {
@@ -366,25 +367,30 @@ export const aiCardTestUser = {
     { id: 5, start: subDays(new Date(), 34), end: subDays(new Date(), 29), days: 5, reason: 'relapse', trigger: 'evening' },
     { id: 6, start: subDays(new Date(), 28), end: null, days: 28, reason: null, trigger: null }
   ],
-  // COMPREHENSIVE emotional tracking for analysis tab testing
-  emotionalTracking: [
+  // emotionalLog - Used by EmotionalTimeline component for Analysis tab
+  // Uses field names: anxiety, mood, clarity, processing (what the component expects)
+  emotionalLog: [
     // Phase 1: Initial Adaptation (Days 1-7) - Higher anxiety, lower stability
-    { date: subDays(new Date(), 27), day: 1, phase: 1, anxiety: 7, moodStability: 4, mentalClarity: 4, emotionalProcessing: 3 },
-    { date: subDays(new Date(), 25), day: 3, phase: 1, anxiety: 6, moodStability: 4, mentalClarity: 5, emotionalProcessing: 4 },
-    { date: subDays(new Date(), 23), day: 5, phase: 1, anxiety: 6, moodStability: 5, mentalClarity: 5, emotionalProcessing: 4 },
-    { date: subDays(new Date(), 21), day: 7, phase: 1, anxiety: 5, moodStability: 5, mentalClarity: 5, emotionalProcessing: 5 },
+    { date: subDays(new Date(), 27).toISOString(), day: 1, phase: 1, anxiety: 7, mood: 4, clarity: 4, processing: 3 },
+    { date: subDays(new Date(), 25).toISOString(), day: 3, phase: 1, anxiety: 6, mood: 4, clarity: 5, processing: 4 },
+    { date: subDays(new Date(), 23).toISOString(), day: 5, phase: 1, anxiety: 6, mood: 5, clarity: 5, processing: 4 },
+    { date: subDays(new Date(), 21).toISOString(), day: 7, phase: 1, anxiety: 5, mood: 5, clarity: 5, processing: 5 },
     
     // Phase 2: Emotional Purging (Days 8-21) - Volatile, peaks and valleys
-    { date: subDays(new Date(), 18), day: 10, phase: 2, anxiety: 7, moodStability: 4, mentalClarity: 6, emotionalProcessing: 5 },
-    { date: subDays(new Date(), 16), day: 12, phase: 2, anxiety: 5, moodStability: 6, mentalClarity: 6, emotionalProcessing: 5 },
-    { date: subDays(new Date(), 14), day: 14, phase: 2, anxiety: 8, moodStability: 3, mentalClarity: 5, emotionalProcessing: 4 },
-    { date: subDays(new Date(), 11), day: 17, phase: 2, anxiety: 6, moodStability: 5, mentalClarity: 6, emotionalProcessing: 6 },
-    { date: subDays(new Date(), 9), day: 19, phase: 2, anxiety: 5, moodStability: 6, mentalClarity: 7, emotionalProcessing: 6 },
-    { date: subDays(new Date(), 7), day: 21, phase: 2, anxiety: 4, moodStability: 6, mentalClarity: 7, emotionalProcessing: 6 },
+    { date: subDays(new Date(), 18).toISOString(), day: 10, phase: 2, anxiety: 7, mood: 4, clarity: 6, processing: 5 },
+    { date: subDays(new Date(), 16).toISOString(), day: 12, phase: 2, anxiety: 5, mood: 6, clarity: 6, processing: 5 },
+    { date: subDays(new Date(), 14).toISOString(), day: 14, phase: 2, anxiety: 8, mood: 3, clarity: 5, processing: 4 },
+    { date: subDays(new Date(), 11).toISOString(), day: 17, phase: 2, anxiety: 6, mood: 5, clarity: 6, processing: 6 },
+    { date: subDays(new Date(), 9).toISOString(), day: 19, phase: 2, anxiety: 5, mood: 6, clarity: 7, processing: 6 },
+    { date: subDays(new Date(), 7).toISOString(), day: 21, phase: 2, anxiety: 4, mood: 6, clarity: 7, processing: 6 },
     
     // Phase 3: Mental Expansion (Days 22-28) - Generally improving
-    { date: subDays(new Date(), 4), day: 24, phase: 3, anxiety: 4, moodStability: 7, mentalClarity: 7, emotionalProcessing: 7 },
-    { date: subDays(new Date(), 2), day: 26, phase: 3, anxiety: 5, moodStability: 6, mentalClarity: 7, emotionalProcessing: 6 },
+    { date: subDays(new Date(), 4).toISOString(), day: 24, phase: 3, anxiety: 4, mood: 7, clarity: 7, processing: 7 },
+    { date: subDays(new Date(), 2).toISOString(), day: 26, phase: 3, anxiety: 5, mood: 6, clarity: 7, processing: 6 },
+    { date: new Date().toISOString(), day: 28, phase: 3, anxiety: 7, mood: 4, clarity: 5, processing: 5 }
+  ],
+  // emotionalTracking - Used by ML system for predictions (different field names)
+  emotionalTracking: [
     { date: new Date(), day: 28, phase: 3, anxiety: 7, moodStability: 4, mentalClarity: 5, emotionalProcessing: 5 }
   ],
   urgeLog: [

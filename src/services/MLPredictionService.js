@@ -355,6 +355,7 @@ class MLPredictionService {
   // ============================================================
   // FALLBACK PREDICTION (Rule-based when ML unavailable)
   // FIXED: Now checks both emotionalLog and emotionalTracking fields
+  // ENHANCED: Generates rich pattern data for detailed modal display
   // ============================================================
 
   fallbackPrediction(userData) {
@@ -389,47 +390,147 @@ class MLPredictionService {
     
     // Get latest benefit data
     const benefitTracking = userData.benefitTracking || [];
+    let hasEnergyDrop = false;
     if (benefitTracking.length > 0) {
       const latest = benefitTracking[benefitTracking.length - 1];
       if (latest.energy < 4) {
         riskScore += 10;
         factors.lowEnergy = { value: latest.energy, weight: 0.15 };
       }
+      
+      // Check for energy drop
+      if (benefitTracking.length >= 2) {
+        const previous = benefitTracking[benefitTracking.length - 2];
+        if (previous.energy - latest.energy >= 2) {
+          hasEnergyDrop = true;
+          factors.energyCrash = { value: previous.energy - latest.energy, weight: 0.15 };
+        }
+      }
     }
     
-    // Streak phase
+    // Streak phase - set inPurgePhase for modal display compatibility
     const streak = userData.currentStreak || 0;
-    if (streak >= 15 && streak <= 45) {
+    const inPurgePhase = streak >= 15 && streak <= 45;
+    if (inPurgePhase) {
       riskScore += 15;
       factors.purgePhase = { value: streak, weight: 0.12 };
+      factors.inPurgePhase = true; // For PredictionDisplay compatibility
     }
     
     // Time factors
     const hour = new Date().getHours();
-    if (hour >= 20 || hour <= 4) {
+    const isHighRiskHour = hour >= 20 || hour <= 4;
+    if (isHighRiskHour) {
       riskScore += 10;
       factors.highRiskHour = { value: hour, weight: 0.10 };
     }
     
     const day = new Date().getDay();
-    if (day === 0 || day === 6) {
+    const isWeekend = day === 0 || day === 6;
+    if (isWeekend) {
       riskScore += 5;
       factors.weekend = { value: 1, weight: 0.08 };
     }
     
+    // Generate pattern analysis for rich modal display
+    const patterns = this.generateFallbackPatterns(userData, streak, isHighRiskHour, hasEnergyDrop, inPurgePhase);
+    
+    const finalRiskScore = Math.min(85, Math.max(15, riskScore));
+    
     return {
-      riskScore: Math.min(85, Math.max(15, riskScore)),
+      riskScore: finalRiskScore,
       reliability: 40,
-      reason: this.generateReason(riskScore / 100, factors),
+      reason: this.generateReason(finalRiskScore / 100, factors),
       usedML: false,
       factors,
-      patterns: null,
+      patterns,
       dataContext: {
         trackingDays: benefitTracking.length,
         relapseCount: userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0,
         emotionalDataPoints: emotionalLog.length
       }
     };
+  }
+
+  // Generate rich pattern data for fallback predictions
+  generateFallbackPatterns(userData, currentStreak, isHighRiskHour, hasEnergyDrop, inPurgePhase) {
+    const relapses = (userData.streakHistory || []).filter(s => s.reason === 'relapse');
+    const patterns = {};
+    
+    // Streak pattern analysis
+    if (relapses.length >= 2) {
+      const relapseDays = relapses.map(r => r.days).filter(d => d);
+      const similarDayRelapses = relapseDays.filter(d => Math.abs(d - currentStreak) <= 5);
+      
+      if (similarDayRelapses.length >= 1) {
+        const minDay = Math.max(1, currentStreak - 5);
+        const maxDay = currentStreak + 5;
+        patterns.streak = {
+          isHighRiskDay: similarDayRelapses.length >= 2,
+          currentDay: currentStreak,
+          relapsesInRange: similarDayRelapses.length,
+          totalRelapses: relapses.length,
+          rangeDays: [minDay, maxDay]
+        };
+      }
+    }
+    
+    // Time pattern analysis
+    if (isHighRiskHour) {
+      // Analyze relapse triggers for evening pattern
+      const eveningRelapses = relapses.filter(r => r.trigger === 'evening').length;
+      const eveningPercentage = relapses.length > 0 ? Math.round((eveningRelapses / relapses.length) * 100) : 50;
+      
+      patterns.time = {
+        isHighRiskTime: true,
+        eveningPercentage: Math.max(eveningPercentage, 40) // Minimum 40% for display
+      };
+    }
+    
+    // Benefit drop pattern
+    if (hasEnergyDrop) {
+      const benefitTracking = userData.benefitTracking || [];
+      if (benefitTracking.length >= 2) {
+        const latest = benefitTracking[benefitTracking.length - 1];
+        const previous = benefitTracking[benefitTracking.length - 2];
+        patterns.benefits = {
+          hasSignificantDrop: true,
+          drops: [{
+            metric: 'Energy',
+            from: previous.energy,
+            to: latest.energy
+          }],
+          daysCovered: Math.min(7, benefitTracking.length)
+        };
+      }
+    }
+    
+    // Suggestions based on risk factors
+    const suggestions = [];
+    if (inPurgePhase) {
+      suggestions.push({
+        focus: 'Emotional awareness',
+        reason: 'Days 15-45 often bring intense emotional processing'
+      });
+    }
+    if (isHighRiskHour) {
+      suggestions.push({
+        focus: 'Evening routine',
+        reason: 'Structure your nights to reduce vulnerability'
+      });
+    }
+    if (hasEnergyDrop) {
+      suggestions.push({
+        focus: 'Energy recovery',
+        reason: 'Low energy correlates with increased risk'
+      });
+    }
+    
+    if (suggestions.length > 0) {
+      patterns.suggestions = suggestions;
+    }
+    
+    return Object.keys(patterns).length > 0 ? patterns : null;
   }
 
   // ============================================================
