@@ -13,13 +13,14 @@ const User = require('./models/User');
 
 // Import notification modules (these need env vars to be loaded first!)
 const notificationRoutes = require('./routes/notifications');
+const googleAuthRoutes = require('./routes/googleAuth');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 
 const app = express();
 
 // Configure CORS
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://app.rossbased.com'],
+  origin: ['http://localhost:3000', 'https://app.rossbased.com', 'https://rossbased-app.onrender.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -279,6 +280,7 @@ app.post('/api/notification-preferences/:username', async (req, res) => {
 
 // Mount notification routes
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/auth', googleAuthRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

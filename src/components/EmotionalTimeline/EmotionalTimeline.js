@@ -548,7 +548,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="insight-card">
             <div className="insight-card-header">
               <span>Your Progress</span>
-              {analysis.hasData && <span className="header-sub">Early → Now</span>}
             </div>
             <div className="insight-card-content">
               {!analysis.hasData ? (

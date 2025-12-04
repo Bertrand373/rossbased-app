@@ -1,11 +1,14 @@
 // AuthModal.js - TITANTRACK MODERN MINIMAL
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './AuthModal.css';
 import trackerLogo from '../../assets/trackerapplogo.png';
 
 import { FaSpinner } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { BsDiscord } from 'react-icons/bs';
+
+// API URL - same as your useUserData hook
+const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
 const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +18,79 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoaded, setGoogleLoaded] = useState(false);
+  
+  // Google Client ID
+  const GOOGLE_CLIENT_ID = '81026306470-im14ikk81801f6l1obk0b4cu260nito1.apps.googleusercontent.com';
+
+  // Handle Google credential response
+  const handleGoogleResponse = useCallback(async (response) => {
+    if (!response.credential) {
+      setError('Google sign-in failed');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch(`${API_URL}/api/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Google authentication failed');
+      }
+
+      // Store token and username
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+
+      // Call onLogin with the username (this will trigger data load)
+      await onLogin(data.username, null, true); // true = isGoogleAuth
+
+    } catch (err) {
+      console.error('Google auth error:', err);
+      setError(err.message || 'Google sign-in failed. Please try again.');
+      setIsLoading(false);
+    }
+  }, [onLogin]);
+
+  // Load Google Sign-In script
+  useEffect(() => {
+    // Check if already loaded
+    if (window.google?.accounts?.id) {
+      setGoogleLoaded(true);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      setGoogleLoaded(true);
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup if needed
+    };
+  }, []);
+
+  // Initialize Google Sign-In when loaded
+  useEffect(() => {
+    if (googleLoaded && window.google?.accounts?.id) {
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleResponse
+      });
+    }
+  }, [googleLoaded, handleGoogleResponse]);
   
   // Clear error when switching modes
   useEffect(() => {
@@ -91,7 +167,21 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   
   const handleSocialLogin = (provider) => {
     if (isLoading) return;
-    setError(`${provider} login coming soon`);
+    
+    if (provider === 'Google') {
+      if (googleLoaded && window.google?.accounts?.id) {
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed()) {
+            // Fallback: use popup mode
+            window.google.accounts.id.prompt();
+          }
+        });
+      } else {
+        setError('Google Sign-In is loading. Please try again.');
+      }
+    } else if (provider === 'Discord') {
+      setError('Discord login coming soon');
+    }
   };
   
   const handleClose = () => {

@@ -1,4 +1,4 @@
-// src/hooks/useUserData.js - UPDATED: 12-feature ML model support + Clears ML data when switching users
+// src/hooks/useUserData.js - UPDATED: Google OAuth support + Mock mode toggle
 import { useState, useEffect } from 'react';
 import { addDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -19,6 +19,12 @@ import comprehensiveMockData, {
   aiTestUser6,
   aiCardTestUser
 } from '../mockData';
+
+// ========== TOGGLE THIS FOR PRODUCTION ==========
+const MOCK_MODE = true; // Set to false for production with real API
+// ================================================
+
+const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
 // Custom hook to manage user data
 export const useUserData = () => {
@@ -118,7 +124,157 @@ export const useUserData = () => {
     console.log('🧠 ML data seeded for testing - PatternInsightCard will show (12 features)');
   };
 
-  const login = async (username, password = 'demo') => {
+  // Helper to process user data from API
+  const processUserData = (data) => {
+    const processed = { ...data };
+    
+    if (processed.startDate) {
+      processed.startDate = new Date(processed.startDate);
+    }
+    
+    if (!processed.goal) {
+      processed.goal = {
+        targetDays: null,
+        isActive: false,
+        targetDate: null,
+        achieved: false,
+        achievementDate: null
+      };
+    } else {
+      if (processed.goal.targetDate) {
+        processed.goal.targetDate = new Date(processed.goal.targetDate);
+      }
+      if (processed.goal.achievementDate) {
+        processed.goal.achievementDate = new Date(processed.goal.achievementDate);
+      }
+    }
+    
+    if (processed.badges) {
+      processed.badges = processed.badges.map(badge => ({
+        ...badge,
+        date: badge.date ? new Date(badge.date) : null
+      }));
+    }
+    
+    if (processed.benefitTracking) {
+      processed.benefitTracking = processed.benefitTracking.map(item => ({
+        ...item,
+        date: new Date(item.date),
+        aura: item.aura || 5,
+        sleep: item.sleep || item.attraction || 5,
+        workout: item.workout || item.gymPerformance || 5
+      }));
+    }
+    
+    if (processed.emotionalTracking) {
+      processed.emotionalTracking = processed.emotionalTracking.map(item => ({
+        ...item,
+        date: new Date(item.date)
+      }));
+    } else {
+      processed.emotionalTracking = [];
+    }
+    
+    if (processed.urgeLog) {
+      processed.urgeLog = processed.urgeLog.map(item => ({
+        ...item,
+        date: new Date(item.date)
+      }));
+    } else {
+      processed.urgeLog = [];
+    }
+    
+    if (processed.streakHistory) {
+      processed.streakHistory = processed.streakHistory.map(streak => ({
+        ...streak,
+        start: new Date(streak.start),
+        end: streak.end ? new Date(streak.end) : null
+      }));
+    }
+    
+    // Set defaults
+    processed.email = processed.email || '';
+    processed.dataSharing = processed.dataSharing || false;
+    processed.analyticsOptIn = processed.analyticsOptIn !== false;
+    processed.marketingEmails = processed.marketingEmails || false;
+    processed.darkMode = processed.darkMode !== false;
+    processed.notifications = processed.notifications !== false;
+    processed.language = processed.language || 'en';
+    processed.wisdomMode = processed.wisdomMode || false;
+    processed.isPremium = true;
+    
+    return processed;
+  };
+
+  // Production login via API
+  const loginViaAPI = async (username, password, isGoogleAuth = false) => {
+    try {
+      setIsLoading(true);
+      await clearMLData();
+      
+      let token = localStorage.getItem('token');
+      let userDataFromAPI;
+      
+      if (isGoogleAuth) {
+        // Google auth already set the token, just fetch user data
+        token = localStorage.getItem('token');
+        const storedUsername = localStorage.getItem('username');
+        
+        const response = await fetch(`${API_URL}/api/user/${storedUsername}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        
+        userDataFromAPI = await response.json();
+      } else {
+        // Regular username/password login
+        const response = await fetch(`${API_URL}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Login failed');
+        }
+        
+        userDataFromAPI = await response.json();
+        token = userDataFromAPI.token;
+        
+        localStorage.setItem('token', token);
+        localStorage.setItem('username', username);
+      }
+      
+      const processed = processUserData(userDataFromAPI);
+      
+      setUserData(processed);
+      setIsLoggedIn(true);
+      setIsPremium(true);
+      
+      localStorage.setItem('userData', JSON.stringify(processed));
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      setIsLoading(false);
+      toast.success(`Welcome, ${processed.username}!`);
+      
+      return true;
+    } catch (err) {
+      console.error('Login error:', err);
+      setIsLoading(false);
+      toast.error(err.message || 'Login failed. Please try again.');
+      return false;
+    }
+  };
+
+  // Mock login for testing
+  const loginViaMock = async (username, password) => {
     try {
       setIsLoading(true);
       console.log('Logging in with:', username);
@@ -257,44 +413,57 @@ export const useUserData = () => {
     }
   };
 
+  // Main login function - routes to mock or API based on mode
+  const login = async (username, password = 'demo', isGoogleAuth = false) => {
+    // Always use API for Google auth, regardless of MOCK_MODE
+    if (isGoogleAuth || !MOCK_MODE) {
+      return loginViaAPI(username, password, isGoogleAuth);
+    }
+    return loginViaMock(username, password);
+  };
+
   const getScenarioInfo = (username) => {
     switch(username.toLowerCase()) {
+      case 'testuser':
+      case 'test':
+      case 'demo':
+        return 'Comprehensive mock data loaded';
       case 'newbie':
       case 'new':
       case 'beginner':
-        return '(New User - Day 0)';
+        return 'New user scenario (Day 3)';
       case 'veteran':
       case 'vet':
       case 'master':
       case 'king':
-        return '(Veteran - 127 days!)';
+        return 'Veteran user (Day 45)';
       case 'struggling':
       case 'struggle':
       case 'hard':
-        return '(Struggling User - Day 3)';
+        return 'Struggling user scenario';
       case 'intj':
-        return '(INTJ - 425 days!)';
+        return 'INTJ personality type';
       case 'intp':
-        return '(INTP - 89 days)';
+        return 'INTP personality type';
       case 'enfp':
-        return '(ENFP - 21 days)';
+        return 'ENFP personality type';
       case 'aitest1':
-        return '(AI Test 1 - New, no relapses)';
+        return 'AI Test: Insufficient data (<20 days)';
       case 'aitest2':
-        return '(AI Test 2 - Moderate, some relapses)';
+        return 'AI Test: Low risk prediction';
       case 'aitest3':
-        return '(AI Test 3 - Veteran, many relapses)';
+        return 'AI Test: Medium risk prediction';
       case 'aitest4':
-        return '(AI Test 4 - Sparse data)';
+        return 'AI Test: High risk prediction';
       case 'aitest5':
-        return '(AI Test 5 - Perfect data)';
+        return 'AI Test: Long streak (Day 60)';
       case 'aitest6':
-        return '(AI Test 6 - Chaotic patterns)';
+        return 'AI Test: Post-relapse recovery';
       case 'aicard':
       case 'cardtest':
-        return '(AI Card Test - Pre-seeded ML)';
+        return 'AI Card Test: ML model seeded';
       default:
-        return '(Main Demo - Day 25)';
+        return 'Loaded';
     }
   };
 
@@ -347,11 +516,13 @@ export const useUserData = () => {
     
     localStorage.removeItem('userData');
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
     
     toast.success('Logged out successfully');
   };
 
-  const updateUserData = (newData) => {
+  const updateUserData = async (newData) => {
     try {
       const updatedData = { ...userData, ...newData, isPremium: true };
 
@@ -389,6 +560,21 @@ export const useUserData = () => {
       setIsPremium(true);
       
       localStorage.setItem('userData', JSON.stringify(updatedData));
+      
+      // If not in mock mode, also save to API
+      if (!MOCK_MODE) {
+        const token = localStorage.getItem('token');
+        if (token && updatedData.username) {
+          fetch(`${API_URL}/api/user/${updatedData.username}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedData)
+          }).catch(err => console.error('Failed to sync to API:', err));
+        }
+      }
       
       return true;
     } catch (err) {
