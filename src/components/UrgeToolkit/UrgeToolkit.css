@@ -75,7 +75,7 @@
 }
 
 /* =============================================================================
-   STEP NAVIGATION - Text-only with dividers
+   STEP NAVIGATION - Text-only with dividers (matches Profile/Stats/EmotionalTimeline)
    ============================================================================= */
 
 .ut-steps {
@@ -93,7 +93,7 @@
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.25);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -316,7 +316,7 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* Mode Toggle - Text-only with dividers (matches other tabs) */
+/* Mode Toggle - Text-only with dividers (matches Profile/Stats/EmotionalTimeline) */
 .ut-breathing-modes {
   display: flex;
   justify-content: center;
@@ -324,14 +324,12 @@
   gap: 0;
 }
 
-/* Support both class names for compatibility */
-.ut-mode-btn,
-.ut-toggle-btn {
+.ut-mode-btn {
   padding: 8px 16px;
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.25);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -339,13 +337,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ut-mode-btn:hover:not(.active),
-.ut-toggle-btn:hover:not(.active) {
+.ut-mode-btn:hover:not(.active) {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.ut-mode-btn.active,
-.ut-toggle-btn.active {
+.ut-mode-btn.active {
   color: #ffffff;
   font-weight: 600;
 }
@@ -358,7 +354,7 @@
 }
 
 /* =============================================================================
-   BREATHING MODAL
+   BREATHING MODAL - CORRECT STYLING FROM WORKING VERSION
    ============================================================================= */
 
 .ut-breathing-overlay {
@@ -966,13 +962,12 @@
 
   .ut-step {
     padding: 8px 12px;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
   }
   
-  .ut-mode-btn,
-  .ut-toggle-btn {
+  .ut-mode-btn {
     padding: 8px 12px;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
   }
 
   .ut-section-title {
@@ -1032,13 +1027,12 @@
 
   .ut-step {
     padding: 6px 10px;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
   }
   
-  .ut-mode-btn,
-  .ut-toggle-btn {
+  .ut-mode-btn {
     padding: 6px 10px;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
   }
 
   .ut-step-divider {
