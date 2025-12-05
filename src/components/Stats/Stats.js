@@ -212,108 +212,139 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       legend: { display: false },
       tooltip: {
         enabled: true,
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        titleColor: 'rgba(255, 255, 255, 0.5)',
+        backgroundColor: 'rgba(0,0,0,0.9)',
+        titleColor: 'rgba(255,255,255,0.4)',
+        titleFont: { size: 10, weight: '400' },
         bodyColor: '#ffffff',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        bodyFont: { size: 16, weight: '600' },
+        borderColor: 'rgba(255,255,255,0.06)',
         borderWidth: 1,
         cornerRadius: 8,
-        padding: 12,
-        titleFont: { size: 11, weight: '400' },
-        bodyFont: { size: 14, weight: '600' },
+        padding: { top: 8, right: 12, bottom: 8, left: 12 },
         displayColors: false,
-        callbacks: {
-          title: (items) => items[0]?.label || '',
-          label: (item) => item.parsed.y !== null ? `${item.parsed.y}/10` : 'No data'
+        caretSize: 0,
+        caretPadding: 10,
+        callbacks: { 
+          title: (items) => items.length ? items[0].label : '',
+          label: (ctx) => ctx.parsed.y === null ? '' : `${ctx.parsed.y}`
         }
       }
     },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false
+    interaction: { 
+      mode: 'index', 
+      intersect: false,
+      axis: 'x'
+    },
+    animation: {
+      duration: 400,
+      easing: 'easeOutQuart'
     }
   }), [timeRange]);
 
-  // Time range options
+  // Generate chart data with gradient fill and endpoint dots
+  const getChartData = useCallback(() => {
+    const rawData = generateChartData(safeUserData, selectedMetric, timeRange);
+    const chart = chartRef.current;
+    
+    let gradient = 'rgba(255,255,255,0.04)';
+    
+    if (chart?.ctx && chart?.chartArea) {
+      gradient = chart.ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
+      gradient.addColorStop(0, 'rgba(255,255,255,0.1)');
+      gradient.addColorStop(0.5, 'rgba(255,255,255,0.03)');
+      gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    }
+    
+    // Find first and last valid data points for endpoint dots
+    const data = rawData.datasets[0].data;
+    const pointRadii = data.map((value, index) => {
+      if (value === null) return 0;
+      
+      const firstValidIndex = data.findIndex(v => v !== null);
+      let lastValidIndex = -1;
+      for (let i = data.length - 1; i >= 0; i--) {
+        if (data[i] !== null) {
+          lastValidIndex = i;
+          break;
+        }
+      }
+      
+      if (index === firstValidIndex || index === lastValidIndex) {
+        return 5;
+      }
+      return 0;
+    });
+    
+    return {
+      ...rawData,
+      datasets: [{
+        ...rawData.datasets[0],
+        borderColor: '#ffffff',
+        borderWidth: 2.5,
+        backgroundColor: gradient,
+        fill: true,
+        pointBackgroundColor: '#ffffff',
+        pointBorderColor: '#000000',
+        pointBorderWidth: 2,
+        pointRadius: pointRadii,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: '#ffffff',
+        pointHoverBorderColor: '#000000',
+      }]
+    };
+  }, [safeUserData, selectedMetric, timeRange]);
+
+  const handleStatCardClick = (statType) => {
+    setSelectedStatCard(statType);
+    setShowStatModal(true);
+  };
+
+  const handleMilestoneClick = (milestone) => {
+    if (milestone.earned) {
+      setSelectedMilestone(milestone);
+      setShowMilestoneModal(true);
+    }
+  };
+
+  const confirmResetStreak = async () => {
+    try {
+      await updateUserData({
+        currentStreak: 0,
+        startDate: new Date()
+      });
+      setShowResetStreakModal(false);
+      toast.success('Streak reset');
+    } catch (error) {
+      toast.error('Failed to reset streak');
+    }
+  };
+
+  const confirmResetAll = async () => {
+    try {
+      await updateUserData({
+        currentStreak: 0,
+        longestStreak: 0,
+        wetDreamCount: 0,
+        relapseCount: 0,
+        benefitTracking: [],
+        relapseHistory: [],
+        streakHistory: [],
+        badges: safeUserData.badges?.map(b => ({ ...b, earned: false, date: null })) || [],
+        startDate: new Date()
+      });
+      setShowResetAllModal(false);
+      toast.success('All data reset');
+    } catch (error) {
+      toast.error('Failed to reset data');
+    }
+  };
+
+  // Metric toggle items
   const timeRanges = [
     { key: 'week', label: 'Week' },
     { key: 'month', label: 'Month' },
     { key: 'quarter', label: '90 Days' }
   ];
-
-  // Chart data generator
-  const getChartData = useCallback(() => {
-    return generateChartData(safeUserData, selectedMetric, timeRange);
-  }, [safeUserData, selectedMetric, timeRange]);
-
-  // Event handlers
-  const handleMilestoneClick = useCallback((milestone) => {
-    if (!milestone.earned) return;
-    setSelectedMilestone(milestone);
-    setShowMilestoneModal(true);
-  }, []);
-
-  const handleStatCardClick = useCallback((statType) => {
-    setSelectedStatCard(statType);
-    setShowStatModal(true);
-  }, []);
-
-  const confirmResetStreak = useCallback(async () => {
-    if (!updateUserData) return;
-    try {
-      const newHistory = [...(safeUserData.streakHistory || [])];
-      if (safeUserData.currentStreak > 0) {
-        newHistory.push({
-          start: safeUserData.startDate,
-          end: new Date(),
-          length: safeUserData.currentStreak,
-          reason: 'manual_reset'
-        });
-      }
-      
-      await updateUserData({
-        currentStreak: 0,
-        startDate: new Date(),
-        streakHistory: newHistory
-      });
-      
-      setShowResetStreakModal(false);
-      toast.success('Streak reset');
-    } catch (error) {
-      console.error('Reset streak error:', error);
-      toast.error('Failed to reset streak');
-    }
-  }, [safeUserData, updateUserData]);
-
-  const confirmResetAll = useCallback(async () => {
-    if (!updateUserData) return;
-    try {
-      await updateUserData({
-        currentStreak: 0,
-        longestStreak: 0,
-        startDate: new Date(),
-        benefitTracking: [],
-        streakHistory: [],
-        relapseCount: 0,
-        wetDreamCount: 0,
-        badges: [
-          { name: '7-Day Warrior', earned: false, date: null },
-          { name: '14-Day Monk', earned: false, date: null },
-          { name: '30-Day Master', earned: false, date: null },
-          { name: '90-Day King', earned: false, date: null },
-          { name: '180-Day Emperor', earned: false, date: null },
-          { name: '365-Day Sage', earned: false, date: null }
-        ]
-      });
-      
-      setShowResetAllModal(false);
-      toast.success('All data reset');
-    } catch (error) {
-      console.error('Reset all error:', error);
-      toast.error('Failed to reset data');
-    }
-  }, [updateUserData]);
 
   return (
     <div className="stats-page">
@@ -389,7 +420,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           {timeRanges.map((r, index) => (
             <React.Fragment key={r.key}>
               <button
-                className={`toggle-btn ${timeRange === r.key ? 'active' : ''}`}
+                className={`toggle-btn sm ${timeRange === r.key ? 'active' : ''}`}
                 onClick={() => setTimeRange(r.key)}
               >
                 {r.label}
