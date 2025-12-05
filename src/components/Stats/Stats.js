@@ -420,7 +420,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           {timeRanges.map((r, index) => (
             <React.Fragment key={r.key}>
               <button
-                className={`toggle-btn sm ${timeRange === r.key ? 'active' : ''}`}
+                className={`toggle-btn ${timeRange === r.key ? 'active' : ''}`}
                 onClick={() => setTimeRange(r.key)}
               >
                 {r.label}
