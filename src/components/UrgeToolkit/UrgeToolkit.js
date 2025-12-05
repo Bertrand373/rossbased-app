@@ -1,14 +1,13 @@
-// UrgeToolkit.js - TITANTRACK MINIMAL
-// Matches Landing/Stats/Calendar aesthetic
+// UrgeToolkit.js - TITANTRACK ELITE
+// Complete urge management system with guided interventions
 import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import './UrgeToolkit.css';
 
-// Icons for triggers and UI
+// Icons
 import { FaBrain, FaExclamationTriangle, FaClock, FaMeh, FaHeart, 
   FaFire, FaBatteryEmpty, FaUsers, FaBolt, FaMobile, FaUserFriends,
-  FaHome, FaWineGlass, FaBed,
-  FaPlay, FaPause, FaStop } from 'react-icons/fa';
+  FaHome, FaWineGlass, FaBed } from 'react-icons/fa';
 
 // Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
@@ -18,21 +17,38 @@ import { getAllTriggers } from '../../constants/triggerConstants';
 
 // Icon mapping for triggers
 const TRIGGER_ICONS = {
-  FaBrain,
-  FaExclamationTriangle,
-  FaClock,
-  FaMeh,
-  FaHeart,
-  FaFire,
-  FaBatteryEmpty,
-  FaUsers,
-  FaBolt,
-  FaMobile,
-  FaUserFriends,
-  FaHome,
-  FaWineGlass,
-  FaBed
+  FaBrain, FaExclamationTriangle, FaClock, FaMeh, FaHeart,
+  FaFire, FaBatteryEmpty, FaUsers, FaBolt, FaMobile, FaUserFriends,
+  FaHome, FaWineGlass, FaBed
 };
+
+// Intensity level descriptions
+const INTENSITY_LABELS = {
+  1: 'Barely noticeable',
+  2: 'Very mild',
+  3: 'Mild',
+  4: 'Moderate',
+  5: 'Noticeable',
+  6: 'Strong',
+  7: 'Very strong',
+  8: 'Intense',
+  9: 'Severe',
+  10: 'Overwhelming'
+};
+
+// Microcosmic Orbit energy points
+const ORBIT_POINTS = [
+  { id: 'perineum', name: 'Hui Yin', location: 'Perineum', instruction: 'Feel energy gather at the base of your spine' },
+  { id: 'sacrum', name: 'Ming Men', location: 'Lower Back', instruction: 'Energy rises to the kidney area' },
+  { id: 'spine', name: 'Ji Zhong', location: 'Mid Spine', instruction: 'Energy flows up through the spine' },
+  { id: 'neck', name: 'Da Zhui', location: 'Base of Neck', instruction: 'Energy reaches the base of skull' },
+  { id: 'crown', name: 'Bai Hui', location: 'Crown', instruction: 'Energy arrives at the top of your head' },
+  { id: 'thirdeye', name: 'Yin Tang', location: 'Third Eye', instruction: 'Energy settles between your eyebrows' },
+  { id: 'throat', name: 'Tian Tu', location: 'Throat', instruction: 'Energy descends through the throat' },
+  { id: 'heart', name: 'Shan Zhong', location: 'Heart Center', instruction: 'Energy drops to the heart' },
+  { id: 'solar', name: 'Zhong Wan', location: 'Solar Plexus', instruction: 'Energy reaches the stomach area' },
+  { id: 'dantian', name: 'Qi Hai', location: 'Dan Tian', instruction: 'Energy rests below your navel - one cycle complete' }
+];
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   // Core States
@@ -50,7 +66,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   const [totalActiveTime, setTotalActiveTime] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
   
-  // Breathing states
+  // Breathing modal states
   const [breathingActive, setBreathingActive] = useState(false);
   const [breathingPhase, setBreathingPhase] = useState('ready');
   const [breathingCount, setBreathingCount] = useState(0);
@@ -59,10 +75,32 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   const [showBreathingModal, setShowBreathingModal] = useState(false);
   const [breathingDuration, setBreathingDuration] = useState(4);
   
-  const breathingIntervalRef = useRef(null);
+  // Orbit modal states
+  const [showOrbitModal, setShowOrbitModal] = useState(false);
+  const [orbitActive, setOrbitActive] = useState(false);
+  const [orbitPointIndex, setOrbitPointIndex] = useState(0);
+  const [orbitCycleCount, setOrbitCycleCount] = useState(0);
+  const [orbitTimer, setOrbitTimer] = useState(4);
+  const [orbitTargetCycles, setOrbitTargetCycles] = useState(9);
   
-  // Lock body scroll when breathing modal is open
-  useBodyScrollLock(showBreathingModal);
+  // Grounding modal states
+  const [showGroundingModal, setShowGroundingModal] = useState(false);
+  const [groundingStep, setGroundingStep] = useState(0);
+  const [groundingItems, setGroundingItems] = useState({ see: [], hear: [], touch: [], smell: [], taste: [] });
+  
+  // Cold timer states
+  const [showColdModal, setShowColdModal] = useState(false);
+  const [coldActive, setColdActive] = useState(false);
+  const [coldTimer, setColdTimer] = useState(0);
+  const [coldTarget, setColdTarget] = useState(120); // 2 minutes default
+  
+  // Refs
+  const breathingIntervalRef = useRef(null);
+  const orbitIntervalRef = useRef(null);
+  const coldIntervalRef = useRef(null);
+  
+  // Lock body scroll for modals
+  useBodyScrollLock(showBreathingModal || showOrbitModal || showGroundingModal || showColdModal);
   
   const currentDay = userData.currentStreak || 0;
 
@@ -77,16 +115,6 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   }, [currentDay]);
 
-  // Lock scroll on Assessment tab (fixed content)
-  useEffect(() => {
-    if (currentStep === 'assessment') {
-      document.body.classList.add('static-view');
-    } else {
-      document.body.classList.remove('static-view');
-    }
-    return () => document.body.classList.remove('static-view');
-  }, [currentStep]);
-
   // Get current phase
   const getCurrentPhase = () => {
     if (currentDay <= 14) return { num: "01", name: "Initial Adaptation", color: "#22c55e" };
@@ -98,10 +126,9 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   const currentPhase = getCurrentPhase();
 
-  // Get trigger options from unified constants (show ALL triggers)
+  // Get trigger options from unified constants
   const getTriggerOptions = () => {
     const triggers = getAllTriggers();
-    // Map to include icon components
     return triggers.map(trigger => ({
       id: trigger.id,
       label: trigger.label,
@@ -152,16 +179,21 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   useEffect(() => {
     return () => {
       if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
+      if (orbitIntervalRef.current) clearInterval(orbitIntervalRef.current);
+      if (coldIntervalRef.current) clearInterval(coldIntervalRef.current);
     };
   }, []);
 
-  // Handle intensity selection
+  // ============================================================
+  // INTENSITY & PROTOCOL SELECTION
+  // ============================================================
+  
   const handleUrgeIntensity = (intensity) => {
     setUrgeIntensity(intensity);
     
     if (!sessionStartTime) setSessionStartTime(new Date());
     
-    // Smart protocol suggestion
+    // Smart protocol suggestion based on intensity and level
     if (intensity >= 8) {
       setActiveProtocol('breathing');
       setAdvancedBreathing(experienceLevel !== 'beginner');
@@ -173,10 +205,13 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
       setActiveProtocol('mental');
     }
     
-    setTimeout(() => setCurrentStep('protocol'), 400);
+    setTimeout(() => setCurrentStep('protocol'), 500);
   };
 
-  // Timer functions
+  // ============================================================
+  // TIMER FUNCTIONS
+  // ============================================================
+  
   const startActiveTimer = () => {
     if (!isTimerActive) {
       setProtocolStartTime(new Date());
@@ -192,7 +227,10 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  // Breathing functions
+  // ============================================================
+  // BREATHING FUNCTIONS
+  // ============================================================
+  
   const completeBreathingSession = (message) => {
     setBreathingPhase('complete');
     setBreathingActive(false);
@@ -200,7 +238,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     stopActiveTimer();
     setShowBreathingModal(false);
     toast.success(message);
-    setTimeout(() => setCurrentStep('summary'), 1000);
+    setTimeout(() => setCurrentStep('tools'), 800);
   };
 
   const startBreathing = () => {
@@ -285,44 +323,208 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     setBreathingActive(false);
     if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
     stopActiveTimer();
-    toast.success('Session paused - you can continue anytime');
     setShowBreathingModal(false);
+    setCurrentStep('tools');
   };
 
-  // Get phase-based tools
-  const getPhaseTools = () => {
-    if (experienceLevel === 'beginner') {
-      if (urgeIntensity >= 8) {
-        return [
-          { id: 'cold-shower', name: 'Cold Shower', action: () => {} },
-          { id: 'leave-room', name: 'Leave the Room', action: () => {} },
-          { id: 'call-friend', name: 'Call a Friend', action: () => {} }
-        ];
-      } else {
-        return [
-          { id: 'creative', name: 'Creative Expression', action: () => {} },
-          { id: 'learning', name: 'Mental Challenge', action: () => {} },
-          { id: 'visualization', name: 'Future Self', action: () => {} }
-        ];
+  // ============================================================
+  // MICROCOSMIC ORBIT FUNCTIONS
+  // ============================================================
+  
+  const startOrbit = () => {
+    setOrbitActive(true);
+    setOrbitPointIndex(0);
+    setOrbitCycleCount(0);
+    setOrbitTimer(4);
+    startActiveTimer();
+    
+    orbitIntervalRef.current = setInterval(() => {
+      setOrbitTimer(prev => {
+        if (prev <= 1) {
+          setTimeout(() => advanceOrbit(), 0);
+          return 4;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const advanceOrbit = () => {
+    setOrbitPointIndex(prev => {
+      const nextIndex = prev + 1;
+      if (nextIndex >= ORBIT_POINTS.length) {
+        // Completed one full cycle
+        setOrbitCycleCount(cycles => {
+          const newCycles = cycles + 1;
+          if (newCycles >= orbitTargetCycles) {
+            completeOrbit();
+            return newCycles;
+          }
+          return newCycles;
+        });
+        return 0; // Reset to first point
       }
+      return nextIndex;
+    });
+  };
+
+  const completeOrbit = () => {
+    setOrbitActive(false);
+    if (orbitIntervalRef.current) clearInterval(orbitIntervalRef.current);
+    stopActiveTimer();
+    setShowOrbitModal(false);
+    toast.success(`${orbitTargetCycles} cycles complete - energy circulated`);
+    setCurrentStep('summary');
+  };
+
+  const stopOrbit = () => {
+    setOrbitActive(false);
+    if (orbitIntervalRef.current) clearInterval(orbitIntervalRef.current);
+    stopActiveTimer();
+    setShowOrbitModal(false);
+  };
+
+  // ============================================================
+  // GROUNDING (5-4-3-2-1) FUNCTIONS
+  // ============================================================
+  
+  const GROUNDING_STEPS = [
+    { sense: 'see', count: 5, label: 'things you can SEE' },
+    { sense: 'hear', count: 4, label: 'things you can HEAR' },
+    { sense: 'touch', count: 3, label: 'things you can TOUCH' },
+    { sense: 'smell', count: 2, label: 'things you can SMELL' },
+    { sense: 'taste', count: 1, label: 'thing you can TASTE' }
+  ];
+
+  const advanceGrounding = () => {
+    if (groundingStep < GROUNDING_STEPS.length - 1) {
+      setGroundingStep(prev => prev + 1);
+    } else {
+      completeGrounding();
+    }
+  };
+
+  const completeGrounding = () => {
+    stopActiveTimer();
+    setShowGroundingModal(false);
+    toast.success('Grounding complete - you are present');
+    setGroundingStep(0);
+    setGroundingItems({ see: [], hear: [], touch: [], smell: [], taste: [] });
+  };
+
+  // ============================================================
+  // COLD TIMER FUNCTIONS
+  // ============================================================
+  
+  const startCold = () => {
+    setColdActive(true);
+    setColdTimer(0);
+    startActiveTimer();
+    
+    coldIntervalRef.current = setInterval(() => {
+      setColdTimer(prev => {
+        if (prev >= coldTarget) {
+          completeCold();
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 1000);
+  };
+
+  const completeCold = () => {
+    setColdActive(false);
+    if (coldIntervalRef.current) clearInterval(coldIntervalRef.current);
+    stopActiveTimer();
+    setShowColdModal(false);
+    toast.success(`${Math.floor(coldTimer / 60)}:${String(coldTimer % 60).padStart(2, '0')} of cold exposure - warrior mindset activated`);
+  };
+
+  const stopCold = () => {
+    setColdActive(false);
+    if (coldIntervalRef.current) clearInterval(coldIntervalRef.current);
+    stopActiveTimer();
+    if (coldTimer > 10) {
+      toast.success(`${coldTimer}s logged - every second counts`);
+    }
+    setShowColdModal(false);
+  };
+
+  // ============================================================
+  // TOOLS CONFIGURATION
+  // ============================================================
+  
+  const getInteractiveTools = () => {
+    const tools = [];
+    
+    // Microcosmic Orbit - Intermediate+
+    if (experienceLevel !== 'beginner') {
+      tools.push({
+        id: 'orbit',
+        name: 'Microcosmic Orbit',
+        desc: 'Guided energy circulation',
+        action: () => {
+          setOrbitTargetCycles(experienceLevel === 'advanced' ? 18 : 9);
+          setShowOrbitModal(true);
+          startActiveTimer();
+        }
+      });
+    }
+    
+    // 5-4-3-2-1 Grounding - All levels
+    tools.push({
+      id: 'grounding',
+      name: '5-4-3-2-1 Grounding',
+      desc: 'Sensory awareness technique',
+      action: () => {
+        setShowGroundingModal(true);
+        startActiveTimer();
+      }
+    });
+    
+    // Cold Exposure Timer - All levels
+    tools.push({
+      id: 'cold',
+      name: 'Cold Exposure',
+      desc: experienceLevel === 'beginner' ? '2 min timer' : '5 min timer',
+      action: () => {
+        setColdTarget(experienceLevel === 'beginner' ? 120 : 300);
+        setShowColdModal(true);
+      }
+    });
+    
+    return tools;
+  };
+
+  const getQuickActions = () => {
+    if (experienceLevel === 'beginner') {
+      return [
+        'Leave your current environment',
+        'Call or text a friend',
+        'Do 20 push-ups or jumping jacks',
+        'Splash cold water on your face'
+      ];
     } else if (experienceLevel === 'intermediate') {
       return [
-        { id: 'energy-circulation', name: 'Microcosmic Orbit', action: () => {} },
-        { id: 'cold-therapy', name: 'Extended Cold Therapy', action: () => {} },
-        { id: 'service', name: 'Channel Into Service', action: () => {} },
-        { id: 'creative-project', name: 'Creative Project', action: () => {} }
+        'Channel energy into creative work',
+        'Practice service to others',
+        'Go for a run or intense workout',
+        'Journal your thoughts and feelings'
       ];
     } else {
       return [
-        { id: 'energy-mastery', name: 'Advanced Energy Work', action: () => {} },
-        { id: 'teaching', name: 'Teach Others', action: () => {} },
-        { id: 'spiritual', name: 'Spiritual Practice', action: () => {} },
-        { id: 'world-service', name: 'Global Service', action: () => {} }
+        'Teach or mentor someone',
+        'Work on your mission/purpose',
+        'Extended meditation practice',
+        'Connect with your community'
       ];
     }
   };
 
-  // Log trigger
+  // ============================================================
+  // DATA LOGGING
+  // ============================================================
+  
   const logTrigger = () => {
     if (selectedTrigger && updateUserData) {
       const urgeLog = {
@@ -332,14 +534,18 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         protocol: activeProtocol,
         phase: currentPhase.name,
         day: currentDay,
-        experienceLevel
+        experienceLevel,
+        sessionDuration: totalActiveTime
       };
       updateUserData({ urgeLog: [...(userData.urgeLog || []), urgeLog] });
-      toast.success('Session logged');
+      toast.success('Session logged - stay strong');
     }
   };
 
-  // Reset session
+  // ============================================================
+  // RESET
+  // ============================================================
+  
   const resetSession = () => {
     stopActiveTimer();
     setCurrentStep('assessment');
@@ -353,26 +559,21 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     setBreathingCount(0);
     setBreathingTimer(0);
     setAdvancedBreathing(false);
+    setOrbitActive(false);
+    setOrbitPointIndex(0);
+    setOrbitCycleCount(0);
+    setColdActive(false);
+    setColdTimer(0);
+    setGroundingStep(0);
     if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
+    if (orbitIntervalRef.current) clearInterval(orbitIntervalRef.current);
+    if (coldIntervalRef.current) clearInterval(coldIntervalRef.current);
   };
 
-  // Steps navigation
-  const steps = [
-    { id: 'assessment', label: 'Assess' },
-    { id: 'protocol', label: 'Protocol' },
-    { id: 'tools', label: 'Tools' },
-    { id: 'summary', label: 'Complete' }
-  ];
-
-  const stepOrder = ['assessment', 'protocol', 'tools', 'summary'];
-  const currentStepIndex = stepOrder.indexOf(currentStep);
-
-  const canNavigateTo = (stepId) => {
-    const targetIndex = stepOrder.indexOf(stepId);
-    return targetIndex <= currentStepIndex;
-  };
-
-  // Protocol step content
+  // ============================================================
+  // PROTOCOL STEPS
+  // ============================================================
+  
   const getProtocolSteps = () => {
     if (activeProtocol === 'mental') {
       return experienceLevel === 'advanced' ? [
@@ -409,6 +610,26 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     return [];
   };
 
+  // Navigation
+  const steps = [
+    { id: 'assessment', label: 'Assess' },
+    { id: 'protocol', label: 'Protocol' },
+    { id: 'tools', label: 'Tools' },
+    { id: 'summary', label: 'Complete' }
+  ];
+
+  const stepOrder = ['assessment', 'protocol', 'tools', 'summary'];
+  const currentStepIndex = stepOrder.indexOf(currentStep);
+
+  const canNavigateTo = (stepId) => {
+    const targetIndex = stepOrder.indexOf(stepId);
+    return targetIndex <= currentStepIndex;
+  };
+
+  // ============================================================
+  // RENDER
+  // ============================================================
+
   return (
     <div className="urge-toolkit">
       {/* Phase Indicator */}
@@ -439,67 +660,94 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
       {/* Content */}
       <div className="ut-content">
         
-        {/* Assessment Step */}
+        {/* ================================================================
+            ASSESSMENT STEP
+            ================================================================ */}
         {currentStep === 'assessment' && (
           <>
             <div className="ut-section-header">
               <h2 className="ut-section-title">How intense is this urge?</h2>
-              <p className="ut-section-desc">Rate what you're experiencing right now</p>
+              <p className="ut-section-desc">
+                {urgeIntensity > 0 ? INTENSITY_LABELS[urgeIntensity] : 'Select your current level'}
+              </p>
             </div>
             
             <div className="ut-intensity">
-              <div className="ut-intensity-grid">
+              <div className="ut-intensity-scale">
                 {[1,2,3,4,5,6,7,8,9,10].map(level => (
                   <button
                     key={level}
-                    className={`ut-intensity-btn ${urgeIntensity === level ? 'selected' : ''}`}
+                    className={`ut-intensity-btn ${urgeIntensity === level ? 'selected' : ''} ${level <= 3 ? 'low' : level <= 6 ? 'medium' : 'high'}`}
                     onClick={() => handleUrgeIntensity(level)}
                   >
-                    {level}
+                    <span className="ut-intensity-num">{level}</span>
                   </button>
                 ))}
               </div>
               <div className="ut-intensity-labels">
                 <span>Mild</span>
-                <span>Moderate</span>
                 <span>Severe</span>
               </div>
             </div>
           </>
         )}
 
-        {/* Protocol Step */}
+        {/* ================================================================
+            PROTOCOL STEP
+            ================================================================ */}
         {currentStep === 'protocol' && (
           <>
             <div className="ut-section-header">
-              <h2 className="ut-section-title">{protocols[activeProtocol]?.name}</h2>
-              <p className="ut-section-desc">{protocols[activeProtocol]?.description}</p>
+              <h2 className="ut-section-title">Select Protocol</h2>
+              <p className="ut-section-desc">Choose your intervention strategy</p>
+            </div>
+            
+            <div className="ut-protocols">
+              {Object.entries(protocols).map(([key, protocol], index, arr) => (
+                <React.Fragment key={key}>
+                  <button
+                    className={`ut-protocol ${activeProtocol === key ? 'active' : ''}`}
+                    onClick={() => setActiveProtocol(key)}
+                  >
+                    <div className="ut-protocol-main">
+                      <span className="ut-protocol-name">{protocol.name}</span>
+                      <div className="ut-protocol-meta">
+                        {activeProtocol === key && <span className="ut-protocol-rec">Selected</span>}
+                        <span className="ut-protocol-duration">{protocol.duration}</span>
+                      </div>
+                    </div>
+                    <p className="ut-protocol-desc">{protocol.description}</p>
+                  </button>
+                  {index < arr.length - 1 && <div className="ut-protocol-divider" />}
+                </React.Fragment>
+              ))}
             </div>
 
             {/* Breathing Protocol */}
             {activeProtocol === 'breathing' && (
-              <div className="ut-breathing-setup">
-                <div className="ut-breathing-info">
-                  <div className="ut-breathing-info-item">
-                    <span className="ut-breathing-info-label">Duration</span>
-                    <span className="ut-breathing-info-value">{protocols.breathing.duration}</span>
-                  </div>
-                  <div className="ut-breathing-info-item">
-                    <span className="ut-breathing-info-label">Best For</span>
-                    <span className="ut-breathing-info-value">{protocols.breathing.bestFor}</span>
-                  </div>
+              <div className="ut-breathing-trigger">
+                <div className="ut-breathing-info-card">
+                  <span className="ut-breathing-title">
+                    {advancedBreathing && experienceLevel !== 'beginner' ? 'Advanced Breathing' : 'Box Breathing'}
+                  </span>
+                  <span className="ut-breathing-desc">
+                    {advancedBreathing && experienceLevel !== 'beginner' 
+                      ? 'Bhastrika + retention for energy transmutation' 
+                      : '4-4-4-4 pattern for calm and focus'}
+                  </span>
                 </div>
                 
                 {experienceLevel !== 'beginner' && (
-                  <div className="ut-breathing-toggle">
-                    <button 
-                      className={`ut-toggle-btn ${!advancedBreathing ? 'active' : ''}`}
+                  <div className="ut-breathing-modes">
+                    <button
+                      className={`ut-mode-btn ${!advancedBreathing ? 'active' : ''}`}
                       onClick={() => setAdvancedBreathing(false)}
                     >
                       Standard
                     </button>
-                    <button 
-                      className={`ut-toggle-btn ${advancedBreathing ? 'active' : ''}`}
+                    <span className="ut-mode-divider" />
+                    <button
+                      className={`ut-mode-btn ${advancedBreathing ? 'active' : ''}`}
                       onClick={() => setAdvancedBreathing(true)}
                     >
                       Advanced
@@ -544,30 +792,44 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
           </>
         )}
 
-        {/* Tools Step */}
+        {/* ================================================================
+            TOOLS STEP
+            ================================================================ */}
         {currentStep === 'tools' && (
           <>
             <div className="ut-section-header">
-              <h2 className="ut-section-title">
-                {experienceLevel === 'advanced' ? 'Master Tools' : 
-                 experienceLevel === 'intermediate' ? 'Intermediate Tools' : 
-                 'Phase Tools'}
-              </h2>
-              <p className="ut-section-desc">Additional techniques for your level</p>
+              <h2 className="ut-section-title">Additional Tools</h2>
+              <p className="ut-section-desc">Interactive techniques to reinforce your progress</p>
             </div>
             
-            <div className="ut-tools">
-              {getPhaseTools().map((tool, index, arr) => (
+            {/* Interactive Tools */}
+            <div className="ut-interactive-tools">
+              <div className="ut-tools-label">Guided Practices</div>
+              {getInteractiveTools().map((tool, index, arr) => (
                 <React.Fragment key={tool.id}>
-                  <div className="ut-tool">
-                    <span className="ut-tool-name">{tool.name}</span>
-                    <button className="ut-tool-btn" onClick={tool.action}>
-                      Use
-                    </button>
-                  </div>
+                  <button className="ut-interactive-tool" onClick={tool.action}>
+                    <div className="ut-tool-info">
+                      <span className="ut-tool-name">{tool.name}</span>
+                      <span className="ut-tool-desc">{tool.desc}</span>
+                    </div>
+                    <span className="ut-tool-arrow">→</span>
+                  </button>
                   {index < arr.length - 1 && <div className="ut-tool-divider" />}
                 </React.Fragment>
               ))}
+            </div>
+            
+            {/* Quick Actions */}
+            <div className="ut-quick-actions">
+              <div className="ut-tools-label">Quick Actions</div>
+              <div className="ut-quick-list">
+                {getQuickActions().map((action, index) => (
+                  <div key={index} className="ut-quick-item">
+                    <span className="ut-quick-bullet">•</span>
+                    <span className="ut-quick-text">{action}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             
             <div className="ut-actions">
@@ -584,7 +846,9 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
           </>
         )}
 
-        {/* Summary Step */}
+        {/* ================================================================
+            SUMMARY STEP
+            ================================================================ */}
         {currentStep === 'summary' && (
           <>
             <div className="ut-section-header">
@@ -617,13 +881,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               </div>
               <div className="ut-stat">
                 <span className="ut-stat-label">Protocol</span>
-                <span className="ut-stat-value">{protocols[activeProtocol]?.name}</span>
-              </div>
-              <div className="ut-stat">
-                <span className="ut-stat-label">Session Time</span>
-                <span className="ut-stat-value">
-                  {sessionStartTime ? Math.round((new Date() - sessionStartTime) / 60000) : 0} min
-                </span>
+                <span className="ut-stat-value">{protocols[activeProtocol]?.name || 'None'}</span>
               </div>
               <div className="ut-stat">
                 <span className="ut-stat-label">Active Time</span>
@@ -654,20 +912,24 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         )}
       </div>
 
-      {/* BREATHING MODAL */}
+      {/* ================================================================
+          BREATHING MODAL
+          ================================================================ */}
       {showBreathingModal && (
-        <div className="ut-breathing-overlay">
-          <div className="ut-breathing-modal">
-            <div className="ut-breathing-modal-header">
-              <span className="ut-breathing-modal-title">
+        <div className="ut-modal-overlay">
+          <div className="ut-modal">
+            <div className="ut-modal-header">
+              <span className="ut-modal-title">
                 {advancedBreathing && experienceLevel !== 'beginner' ? 'Advanced Breathing' : 'Box Breathing'}
               </span>
-              <span className="ut-breathing-modal-subtitle">
-                {advancedBreathing && experienceLevel !== 'beginner' ? '30s rapid · 15s hold · 15s exhale' : '4s inhale · 4s exhale'}
+              <span className="ut-modal-subtitle">
+                {advancedBreathing && experienceLevel !== 'beginner' 
+                  ? '30s rapid · 15s hold · 15s exhale' 
+                  : '4s inhale · 4s exhale'}
               </span>
             </div>
 
-            <div className="ut-breathing-modal-body">
+            <div className="ut-modal-body">
               <div className="ut-breathing-circle">
                 <div 
                   className={`ut-breathing-orb ${
@@ -680,24 +942,24 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 />
               </div>
 
-              <div className="ut-breathing-modal-info">
+              <div className="ut-modal-info">
                 {breathingActive ? (
                   <>
-                    <span className="ut-breathing-phase-text">
+                    <span className="ut-modal-phase">
                       {breathingPhase === 'bhastrika' ? 'RAPID BREATH' : breathingPhase.toUpperCase()}
                     </span>
-                    <span className="ut-breathing-cycle-text">
+                    <span className="ut-modal-cycle">
                       Cycle {breathingCount + 1} of {advancedBreathing ? '3' : '10'}
                     </span>
-                    <span className="ut-breathing-timer-text">{breathingTimer}</span>
+                    <span className="ut-modal-timer">{breathingTimer}</span>
                   </>
                 ) : (
-                  <span className="ut-breathing-phase-text">READY</span>
+                  <span className="ut-modal-phase">READY</span>
                 )}
               </div>
             </div>
 
-            <div className="ut-breathing-modal-footer">
+            <div className="ut-modal-footer">
               {!breathingActive ? (
                 <>
                   <button className="ut-btn-ghost" onClick={() => setShowBreathingModal(false)}>
@@ -709,7 +971,194 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 </>
               ) : (
                 <button className="ut-btn-stop" onClick={stopBreathing}>
-                  Stop Session
+                  End Session
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================
+          MICROCOSMIC ORBIT MODAL
+          ================================================================ */}
+      {showOrbitModal && (
+        <div className="ut-modal-overlay">
+          <div className="ut-modal ut-orbit-modal">
+            <div className="ut-modal-header">
+              <span className="ut-modal-title">Microcosmic Orbit</span>
+              <span className="ut-modal-subtitle">
+                {orbitTargetCycles} cycles · Tongue on roof of mouth
+              </span>
+            </div>
+
+            <div className="ut-modal-body">
+              {/* Energy Path Visualization */}
+              <div className="ut-orbit-visual">
+                <div className="ut-orbit-body">
+                  {ORBIT_POINTS.map((point, index) => (
+                    <div 
+                      key={point.id}
+                      className={`ut-orbit-point ${index === orbitPointIndex && orbitActive ? 'active' : ''} ${index < orbitPointIndex || orbitCycleCount > 0 ? 'passed' : ''}`}
+                      style={{ '--point-index': index }}
+                    />
+                  ))}
+                  {orbitActive && (
+                    <div 
+                      className="ut-orbit-energy"
+                      style={{ '--point-index': orbitPointIndex }}
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div className="ut-modal-info">
+                {orbitActive ? (
+                  <>
+                    <span className="ut-modal-phase">{ORBIT_POINTS[orbitPointIndex].location}</span>
+                    <span className="ut-orbit-instruction">{ORBIT_POINTS[orbitPointIndex].instruction}</span>
+                    <span className="ut-modal-cycle">
+                      Cycle {orbitCycleCount + 1} of {orbitTargetCycles}
+                    </span>
+                    <span className="ut-modal-timer">{orbitTimer}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="ut-modal-phase">READY</span>
+                    <span className="ut-orbit-instruction">Sit with spine straight, tongue touching roof of mouth</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="ut-modal-footer">
+              {!orbitActive ? (
+                <>
+                  <button className="ut-btn-ghost" onClick={() => setShowOrbitModal(false)}>
+                    Cancel
+                  </button>
+                  <button className="ut-btn-primary" onClick={startOrbit}>
+                    Begin
+                  </button>
+                </>
+              ) : (
+                <button className="ut-btn-stop" onClick={stopOrbit}>
+                  End Session
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================
+          GROUNDING MODAL
+          ================================================================ */}
+      {showGroundingModal && (
+        <div className="ut-modal-overlay">
+          <div className="ut-modal">
+            <div className="ut-modal-header">
+              <span className="ut-modal-title">5-4-3-2-1 Grounding</span>
+              <span className="ut-modal-subtitle">Anchor yourself in the present moment</span>
+            </div>
+
+            <div className="ut-modal-body">
+              <div className="ut-grounding-progress">
+                {GROUNDING_STEPS.map((step, index) => (
+                  <div 
+                    key={step.sense}
+                    className={`ut-grounding-dot ${index < groundingStep ? 'complete' : ''} ${index === groundingStep ? 'active' : ''}`}
+                  >
+                    {step.count}
+                  </div>
+                ))}
+              </div>
+
+              <div className="ut-modal-info">
+                <span className="ut-modal-phase">
+                  Name {GROUNDING_STEPS[groundingStep].count}
+                </span>
+                <span className="ut-grounding-label">
+                  {GROUNDING_STEPS[groundingStep].label}
+                </span>
+              </div>
+            </div>
+
+            <div className="ut-modal-footer">
+              <button className="ut-btn-ghost" onClick={() => {
+                setShowGroundingModal(false);
+                setGroundingStep(0);
+              }}>
+                Cancel
+              </button>
+              <button className="ut-btn-primary" onClick={advanceGrounding}>
+                {groundingStep < GROUNDING_STEPS.length - 1 ? 'Next' : 'Complete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================
+          COLD EXPOSURE MODAL
+          ================================================================ */}
+      {showColdModal && (
+        <div className="ut-modal-overlay">
+          <div className="ut-modal">
+            <div className="ut-modal-header">
+              <span className="ut-modal-title">Cold Exposure</span>
+              <span className="ut-modal-subtitle">
+                Target: {Math.floor(coldTarget / 60)}:{String(coldTarget % 60).padStart(2, '0')}
+              </span>
+            </div>
+
+            <div className="ut-modal-body">
+              <div className="ut-cold-ring">
+                <svg className="ut-cold-progress" viewBox="0 0 100 100">
+                  <circle 
+                    className="ut-cold-track" 
+                    cx="50" cy="50" r="45"
+                  />
+                  <circle 
+                    className="ut-cold-fill" 
+                    cx="50" cy="50" r="45"
+                    style={{ 
+                      strokeDashoffset: 283 - (283 * Math.min(coldTimer / coldTarget, 1))
+                    }}
+                  />
+                </svg>
+                <div className="ut-cold-time">
+                  {Math.floor(coldTimer / 60)}:{String(coldTimer % 60).padStart(2, '0')}
+                </div>
+              </div>
+
+              <div className="ut-modal-info">
+                {coldActive ? (
+                  <span className="ut-cold-message">
+                    {coldTimer < 30 ? 'Embrace the cold' : 
+                     coldTimer < 60 ? 'Stay with it' :
+                     coldTimer < 90 ? 'You are in control' :
+                     'Warrior mindset'}
+                  </span>
+                ) : (
+                  <span className="ut-cold-message">Start when you're under cold water</span>
+                )}
+              </div>
+            </div>
+
+            <div className="ut-modal-footer">
+              {!coldActive ? (
+                <>
+                  <button className="ut-btn-ghost" onClick={() => setShowColdModal(false)}>
+                    Cancel
+                  </button>
+                  <button className="ut-btn-primary" onClick={startCold}>
+                    Start Timer
+                  </button>
+                </>
+              ) : (
+                <button className="ut-btn-stop" onClick={stopCold}>
+                  End Exposure
                 </button>
               )}
             </div>
