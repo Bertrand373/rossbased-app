@@ -4,6 +4,9 @@
 
 import mlPredictionService from './MLPredictionService';
 
+// UNIFIED TRIGGER SYSTEM - for human-readable trigger labels
+import { getTriggerLabel, normalizeTrigger } from '../constants/triggerConstants';
+
 class PatternLearningService {
   constructor() {
     this.cachedInsights = null;
@@ -324,19 +327,24 @@ class PatternLearningService {
 
   /**
    * Analyze trigger patterns
+   * UPDATED: Uses unified trigger system for human-readable labels
    */
   analyzeTriggers(relapses) {
     const triggerCounts = {};
 
     relapses.forEach(relapse => {
-      const trigger = relapse.trigger || 'unknown';
-      triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
+      // Normalize trigger ID for backward compatibility with old data
+      const rawTrigger = relapse.trigger || 'unknown';
+      const normalizedTrigger = normalizeTrigger(rawTrigger);
+      triggerCounts[normalizedTrigger] = (triggerCounts[normalizedTrigger] || 0) + 1;
     });
 
     const sorted = Object.entries(triggerCounts)
       .sort(([,a], [,b]) => b - a)
-      .map(([trigger, count]) => ({
-        trigger,
+      .map(([triggerId, count]) => ({
+        trigger: triggerId,
+        // Use unified trigger system for human-readable label
+        triggerLabel: getTriggerLabel(triggerId),
         count,
         percentage: Math.round((count / relapses.length) * 100)
       }));

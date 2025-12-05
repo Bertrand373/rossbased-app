@@ -4,13 +4,35 @@ import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import './UrgeToolkit.css';
 
-// Minimal icons for triggers
+// Icons for triggers and UI
 import { FaBrain, FaExclamationTriangle, FaClock, FaMeh, FaHeart, 
-  FaFire, FaBatteryEmpty, FaUsers, FaBolt,
+  FaFire, FaBatteryEmpty, FaUsers, FaBolt, FaMobile, FaUserFriends,
+  FaHome, FaWineGlass, FaBed,
   FaPlay, FaPause, FaStop } from 'react-icons/fa';
 
 // Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+
+// UNIFIED TRIGGER SYSTEM
+import { getTriggersByLevel } from '../../constants/triggerConstants';
+
+// Icon mapping for triggers
+const TRIGGER_ICONS = {
+  FaBrain,
+  FaExclamationTriangle,
+  FaClock,
+  FaMeh,
+  FaHeart,
+  FaFire,
+  FaBatteryEmpty,
+  FaUsers,
+  FaBolt,
+  FaMobile,
+  FaUserFriends,
+  FaHome,
+  FaWineGlass,
+  FaBed
+};
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   // Core States
@@ -76,29 +98,15 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   const currentPhase = getCurrentPhase();
 
-  // Trigger options based on experience
+  // Get trigger options from unified constants
   const getTriggerOptions = () => {
-    const base = [
-      { id: 'thoughts', label: 'Lustful Thoughts', icon: FaBrain },
-      { id: 'content', label: 'Explicit Content', icon: FaExclamationTriangle },
-      { id: 'stress', label: 'Stress/Anxiety', icon: FaClock },
-      { id: 'boredom', label: 'Boredom', icon: FaMeh },
-      { id: 'loneliness', label: 'Loneliness', icon: FaHeart },
-    ];
-    
-    if (experienceLevel !== 'beginner') {
-      base.push(
-        { id: 'energy-overflow', label: 'Energy Overflow', icon: FaFire },
-        { id: 'flatline', label: 'Flatline', icon: FaBatteryEmpty }
-      );
-    }
-    
-    if (experienceLevel === 'advanced') {
-      base.push({ id: 'social-pressure', label: 'Social Pressure', icon: FaUsers });
-    }
-    
-    base.push({ id: 'other', label: 'Other', icon: FaBolt });
-    return base;
+    const triggers = getTriggersByLevel(experienceLevel);
+    // Map to include icon components
+    return triggers.map(trigger => ({
+      id: trigger.id,
+      label: trigger.label,
+      icon: TRIGGER_ICONS[trigger.icon] || FaBolt
+    }));
   };
 
   // Protocol definitions
@@ -227,78 +235,68 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }, 1000);
   };
 
-  const handleAdvancedBreathing = () => {
-    setBreathingPhase(phase => {
-      if (phase === 'bhastrika') {
-        setBreathingTimer(15);
-        setBreathingDuration(15);
-        return 'hold';
-      } else if (phase === 'hold') {
-        setBreathingTimer(15);
-        setBreathingDuration(15);
-        return 'exhale';
-      } else if (phase === 'exhale') {
-        setBreathingCount(prev => {
-          if (prev + 1 >= 3) {
-            completeBreathingSession('Advanced breathing complete!');
-            return prev + 1;
-          }
-          setBreathingTimer(30);
-          setBreathingDuration(30);
-          return prev + 1;
-        });
-        return 'bhastrika';
-      }
-      return phase;
-    });
-  };
-
   const handleStandardBreathing = () => {
-    setBreathingPhase(phase => {
-      if (phase === 'inhale') {
+    setBreathingPhase(prev => {
+      if (prev === 'inhale') {
         setBreathingTimer(4);
         setBreathingDuration(4);
         return 'exhale';
-      } else if (phase === 'exhale') {
-        setBreathingCount(prev => {
-          if (prev + 1 >= 10) {
-            completeBreathingSession('Breathing complete!');
-            return prev + 1;
+      } else {
+        setBreathingCount(c => {
+          if (c >= 9) {
+            completeBreathingSession('Breathing session complete!');
+            return c;
           }
-          setBreathingTimer(4);
-          setBreathingDuration(4);
-          return prev + 1;
+          return c + 1;
         });
+        setBreathingTimer(4);
+        setBreathingDuration(4);
         return 'inhale';
       }
-      return phase;
+    });
+  };
+
+  const handleAdvancedBreathing = () => {
+    setBreathingPhase(prev => {
+      if (prev === 'bhastrika') {
+        setBreathingTimer(15);
+        setBreathingDuration(15);
+        return 'hold';
+      } else if (prev === 'hold') {
+        setBreathingTimer(15);
+        setBreathingDuration(15);
+        return 'exhale';
+      } else {
+        setBreathingCount(c => {
+          if (c >= 2) {
+            completeBreathingSession('Advanced breathing complete!');
+            return c;
+          }
+          return c + 1;
+        });
+        setBreathingTimer(30);
+        setBreathingDuration(30);
+        return 'bhastrika';
+      }
     });
   };
 
   const stopBreathing = () => {
     setBreathingActive(false);
-    setBreathingPhase('ready');
     if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
     stopActiveTimer();
+    toast.success('Session paused - you can continue anytime');
     setShowBreathingModal(false);
-    setCurrentStep('summary');
   };
 
-  // Get phase-specific tools - UPDATED: Removed toast notifications
-  // Button click is acknowledgment enough; no toast needed for instructions
+  // Get phase-based tools
   const getPhaseTools = () => {
     if (experienceLevel === 'beginner') {
-      if (currentDay <= 14) {
+      if (urgeIntensity >= 8) {
         return [
           { id: 'cold-shower', name: 'Cold Shower', action: () => {} },
-          { id: 'exercise', name: 'Physical Exercise', action: () => {} },
-          { id: 'environment', name: 'Change Environment', action: () => {} }
-        ];
-      } else if (currentDay <= 45) {
-        return [
-          { id: 'journaling', name: 'Emotional Processing', action: () => {} },
-          { id: 'meditation', name: 'Mindfulness Practice', action: () => {} },
-          { id: 'support', name: 'Reach Out', action: () => {} }
+          { id: 'leave-room', name: 'Leave the Room', action: () => {} },
+          { id: 'call-friend', name: 'Call a Friend', action: () => {} }
         ];
       } else {
         return [
@@ -454,7 +452,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 {[1,2,3,4,5,6,7,8,9,10].map(level => (
                   <button
                     key={level}
-                    className={`ut-intensity-btn ${urgeIntensity === level ? 'active' : ''}`}
+                    className={`ut-intensity-btn ${urgeIntensity === level ? 'selected' : ''}`}
                     onClick={() => handleUrgeIntensity(level)}
                   >
                     {level}
@@ -463,7 +461,8 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
               </div>
               <div className="ut-intensity-labels">
                 <span>Mild</span>
-                <span>Overwhelming</span>
+                <span>Moderate</span>
+                <span>Severe</span>
               </div>
             </div>
           </>
@@ -473,56 +472,34 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         {currentStep === 'protocol' && (
           <>
             <div className="ut-section-header">
-              <h2 className="ut-section-title">Select Protocol</h2>
-              <p className="ut-section-desc">Choose your intervention strategy</p>
-            </div>
-            
-            <div className="ut-protocols">
-              {Object.entries(protocols).map(([key, protocol], index, arr) => (
-                <React.Fragment key={key}>
-                  <button
-                    className={`ut-protocol ${activeProtocol === key ? 'active' : ''}`}
-                    onClick={() => setActiveProtocol(key)}
-                  >
-                    <div className="ut-protocol-main">
-                      <span className="ut-protocol-name">{protocol.name}</span>
-                      <span className="ut-protocol-meta">
-                        {activeProtocol === key && <span className="ut-protocol-rec">Recommended</span>}
-                        <span className="ut-protocol-duration">{protocol.duration}</span>
-                      </span>
-                    </div>
-                    <p className="ut-protocol-desc">{protocol.description}</p>
-                  </button>
-                  {index < arr.length - 1 && <div className="ut-protocol-divider" />}
-                </React.Fragment>
-              ))}
+              <h2 className="ut-section-title">{protocols[activeProtocol]?.name}</h2>
+              <p className="ut-section-desc">{protocols[activeProtocol]?.description}</p>
             </div>
 
-            {/* Breathing Interface - Opens Modal */}
+            {/* Breathing Protocol */}
             {activeProtocol === 'breathing' && (
-              <div className="ut-breathing-trigger">
-                <div className="ut-breathing-info-card">
-                  <span className="ut-breathing-title">
-                    {advancedBreathing && experienceLevel !== 'beginner' ? 'Advanced Breathing' : 'Box Breathing'}
-                  </span>
-                  <span className="ut-breathing-desc">
-                    {advancedBreathing && experienceLevel !== 'beginner' 
-                      ? 'Bhastrika + retention for energy transmutation' 
-                      : '4-4-4-4 pattern for calm and focus'}
-                  </span>
+              <div className="ut-breathing-setup">
+                <div className="ut-breathing-info">
+                  <div className="ut-breathing-info-item">
+                    <span className="ut-breathing-info-label">Duration</span>
+                    <span className="ut-breathing-info-value">{protocols.breathing.duration}</span>
+                  </div>
+                  <div className="ut-breathing-info-item">
+                    <span className="ut-breathing-info-label">Best For</span>
+                    <span className="ut-breathing-info-value">{protocols.breathing.bestFor}</span>
+                  </div>
                 </div>
                 
                 {experienceLevel !== 'beginner' && (
-                  <div className="ut-breathing-modes">
-                    <button
-                      className={`ut-mode-btn ${!advancedBreathing ? 'active' : ''}`}
+                  <div className="ut-breathing-toggle">
+                    <button 
+                      className={`ut-toggle-btn ${!advancedBreathing ? 'active' : ''}`}
                       onClick={() => setAdvancedBreathing(false)}
                     >
                       Standard
                     </button>
-                    <span className="ut-mode-divider" />
-                    <button
-                      className={`ut-mode-btn ${advancedBreathing ? 'active' : ''}`}
+                    <button 
+                      className={`ut-toggle-btn ${advancedBreathing ? 'active' : ''}`}
                       onClick={() => setAdvancedBreathing(true)}
                     >
                       Advanced

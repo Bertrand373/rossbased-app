@@ -16,6 +16,9 @@ import interventionService from '../../services/InterventionService';
 // Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
+// UNIFIED TRIGGER SYSTEM
+import { getAllTriggers, getTriggerLabel } from '../../constants/triggerConstants';
+
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -53,24 +56,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     };
   }, [viewMode]);
 
-  const triggerOptions = [
-    { id: 'lustful_thoughts', label: 'Lustful Thoughts' },
-    { id: 'stress', label: 'Stress' },
-    { id: 'boredom', label: 'Boredom' },
-    { id: 'social_media', label: 'Social Media' },
-    { id: 'loneliness', label: 'Loneliness' },
-    { id: 'relationship', label: 'Relationship' },
-    { id: 'home_alone', label: 'Home Alone' },
-    { id: 'explicit_content', label: 'Explicit Content' },
-    { id: 'alcohol_substances', label: 'Substances' },
-    { id: 'sleep_deprivation', label: 'Sleep Deprived' }
-  ];
-
-  // Helper to get trigger label from ID
-  const getTriggerLabel = (triggerId) => {
-    const trigger = triggerOptions.find(t => t.id === triggerId);
-    return trigger ? trigger.label : triggerId;
-  };
+  // Get trigger options from unified constants (Calendar shows ALL triggers)
+  const triggerOptions = getAllTriggers().map(t => ({
+    id: t.id,
+    label: t.label
+  }));
 
   // Navigation
   const prevPeriod = () => {
@@ -209,21 +199,17 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
   const closeDayInfo = () => {
     setDayInfoModal(false);
+    setSelectedDate(null);
     setIsEditingNote(false);
+    setNoteText('');
   };
 
   const showEditFromInfo = () => {
-    // Don't allow editing future days
-    if (isFutureDay(selectedDate)) {
-      toast.error("Can't edit future days");
-      return;
-    }
-    
     setDayInfoModal(false);
     setEditDayModal(true);
+    setSelectedTrigger('');
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
-    setSelectedTrigger('');
   };
 
   const closeEditModal = () => {
@@ -237,23 +223,13 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     setEditDayModal(false);
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
+    setSelectedTrigger('');
     setDayInfoModal(true);
   };
 
   // Journal handlers
-  const startEditingNote = () => setIsEditingNote(true);
-
-  const saveNote = () => {
-    if (!selectedDate || !updateUserData) return;
-    const dayStr = format(selectedDate, 'yyyy-MM-dd');
-    const updatedNotes = { ...userData.notes };
-    if (noteText.trim()) {
-      updatedNotes[dayStr] = noteText.trim();
-    } else {
-      delete updatedNotes[dayStr];
-    }
-    updateUserData({ notes: updatedNotes });
-    setIsEditingNote(false);
+  const startEditingNote = () => {
+    setIsEditingNote(true);
   };
 
   const cancelEditingNote = () => {
@@ -263,7 +239,17 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     setIsEditingNote(false);
   };
 
-  // Render helper for status badge (used in both sticky and non-sticky layouts)
+  const saveNote = () => {
+    if (!selectedDate || !updateUserData) return;
+    
+    const dayStr = format(selectedDate, 'yyyy-MM-dd');
+    const updatedNotes = { ...(userData.notes || {}), [dayStr]: noteText };
+    updateUserData({ notes: updatedNotes });
+    setIsEditingNote(false);
+    toast.success('Note saved');
+  };
+
+  // Render status badge for day info modal
   const renderStatusBadge = () => {
     const dayStatus = getDayStatus(selectedDate);
     const dayCount = getDayCount(selectedDate);
@@ -273,8 +259,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return (
         <div className="calendar-status-badge current-streak">
           <span className="status-dot"></span>
-          <span>Current Streak</span>
-          {dayCount && <span className="day-count">Day {dayCount.dayNumber}</span>}
+          <span>Day {dayCount?.dayNumber || 0}</span>
         </div>
       );
     }
@@ -282,8 +267,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       return (
         <div className="calendar-status-badge former-streak">
           <span className="status-dot"></span>
-          <span>Former Streak</span>
-          {dayCount && <span className="day-count">Day {dayCount.dayNumber}{dayCount.totalDays ? `/${dayCount.totalDays}` : ''}</span>}
+          {dayCount && <span>Day {dayCount.dayNumber}{dayCount.totalDays ? `/${dayCount.totalDays}` : ''}</span>}
         </div>
       );
     }
@@ -701,45 +685,31 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         dayStatus?.type || '',
         wetDream ? 'wet-dream' : ''
       ].filter(Boolean).join(' ');
-      
+
       days.push(
         <div key={i} className={cellClasses} onClick={() => openDayInfo(day)}>
           <div className="week-day-header">
             <span className="week-day-name">{format(day, 'EEE')}</span>
-            <span className={`week-day-number ${isToday ? 'today' : ''}`}>{format(day, 'd')}</span>
+            <span className="week-day-number">{format(day, 'd')}</span>
           </div>
           
-          {dayBenefits && isPremium ? (
-            <div className="week-benefits-prominent">
-              <div className="week-benefit-item">
-                <span className="week-benefit-label-top">Energy</span>
-                <div className="week-benefit-bar">
-                  <div className="week-benefit-fill" style={{ width: `${dayBenefits.energy * 10}%` }} />
-                </div>
+          <div className="week-day-content">
+            {/* Quick benefit preview */}
+            {dayBenefits && (
+              <div className="week-benefits-mini">
+                {['energy', 'focus', 'confidence'].map(metric => (
+                  <div key={metric} className="week-benefit-dot">
+                    <span className="week-benefit-value">{dayBenefits[metric] || '-'}</span>
+                  </div>
+                ))}
               </div>
-              <div className="week-benefit-item">
-                <span className="week-benefit-label-top">Focus</span>
-                <div className="week-benefit-bar">
-                  <div className="week-benefit-fill" style={{ width: `${dayBenefits.focus * 10}%` }} />
-                </div>
+            )}
+            
+            {/* Journal indicator */}
+            {dayTracking.hasJournal && (
+              <div className="week-journal-indicator">
+                <span>📝</span>
               </div>
-              <div className="week-benefit-item">
-                <span className="week-benefit-label-top">Confidence</span>
-                <div className="week-benefit-bar">
-                  <div className="week-benefit-fill" style={{ width: `${dayBenefits.confidence * 10}%` }} />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="week-benefits-prominent">
-              <span className="week-no-data">No data</span>
-            </div>
-          )}
-          
-          <div className="week-day-indicators">
-            {/* Single gold dot if has data */}
-            {(dayBenefits || dayTracking.hasJournal) && (
-              <span className="week-has-data-dot"></span>
             )}
             {/* Status indicator on right */}
             <div className="week-status-indicator">
