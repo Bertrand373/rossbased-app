@@ -250,17 +250,16 @@
 /* =============================================================================
    BENEFIT TRACKER - Toggle Pattern (matches Calendar/EmotionalTimeline)
    UPDATED: Single row on desktop, wraps to 2 rows on mobile
-   FIX: Added width: 100% to ensure proper centering
+   FIX: Using width: fit-content + margin: auto for reliable centering
    ============================================================================= */
 
 /* Toggle Row - Text-only buttons with vertical dividers */
 .toggle-row {
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 0;
-  margin-bottom: 12px;
-  width: 100%;
+  width: fit-content;
+  margin: 0 auto 12px auto;
 }
 
 /* Benefits row - single row on desktop, wraps on mobile */
