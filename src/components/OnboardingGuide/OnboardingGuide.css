@@ -59,9 +59,9 @@
   position: fixed;
   z-index: 10002; /* Above blocker for visual, but pointer-events: none */
   
-  /* Dark surround */
+  /* Dark surround - 0.92 for maximum focus */
   box-shadow: 
-    0 0 0 9999px rgba(0, 0, 0, 0.88),
+    0 0 0 9999px rgba(0, 0, 0, 0.92),
     /* Inner vignette - draws eye to center */
     inset 0 0 30px 10px rgba(0, 0, 0, 0.3);
   
@@ -160,17 +160,15 @@
   position: fixed;
   width: calc(100% - 48px);
   max-width: 300px;
-  padding: 20px 24px;
+  padding: 0;
   z-index: 10005; /* Above blocker (10001) */
   text-align: center;
   pointer-events: auto;
   
-  /* Subtle dark backdrop for text readability */
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  /* Pure floating text - no container */
+  background: transparent;
+  border: none;
+  border-radius: 0;
   
   /* Fade transition */
   transition: opacity 250ms ease, transform 250ms ease;
