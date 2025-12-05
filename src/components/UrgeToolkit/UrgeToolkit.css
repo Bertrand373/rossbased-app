@@ -162,22 +162,22 @@
 .ut-intensity-scale {
   display: flex;
   justify-content: space-between;
-  gap: 6px;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 8px 0;
 }
 
 .ut-intensity-btn {
   flex: 1;
-  aspect-ratio: 1;
-  max-width: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.875rem;
+  background: transparent;
+  border: none;
+  padding: 12px 0;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -186,28 +186,18 @@
 }
 
 .ut-intensity-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.7);
-  transform: translateY(-2px);
+  transform: scale(1.2);
 }
 
 .ut-intensity-btn:active {
-  transform: translateY(0) scale(0.95);
+  transform: scale(1.1);
 }
 
 .ut-intensity-btn.selected {
-  background: #ffffff;
-  border-color: #ffffff;
-  color: #000000;
-  transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-.ut-intensity-btn.selected.high {
-  background: #ff6b6b;
-  border-color: #ff6b6b;
-  box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+  color: #ffffff;
+  transform: scale(1.4);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
 .ut-intensity-num {
@@ -897,7 +887,7 @@
 }
 
 /* =============================================================================
-   MICROCOSMIC ORBIT MODAL
+   MICROCOSMIC ORBIT MODAL - SVG Human Figure
    ============================================================================= */
 
 .ut-orbit-modal {
@@ -913,60 +903,31 @@
   justify-content: center;
 }
 
-.ut-orbit-body {
-  width: 60px;
-  height: 240px;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 30px;
+.ut-orbit-figure {
+  width: 100%;
+  height: 100%;
 }
 
-/* Energy points along the body */
-.ut-orbit-point {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  left: 50%;
-  transform: translateX(-50%);
+.ut-orbit-body-path {
+  transition: stroke 300ms ease;
+}
+
+.ut-orbit-point-svg {
+  fill: rgba(255, 255, 255, 0.15);
+  stroke: rgba(255, 255, 255, 0.25);
+  stroke-width: 1;
   transition: all 300ms ease;
 }
 
-/* Position each point */
-.ut-orbit-point:nth-child(1) { bottom: 0; left: 50%; } /* Perineum */
-.ut-orbit-point:nth-child(2) { bottom: 30px; left: -10px; } /* Sacrum */
-.ut-orbit-point:nth-child(3) { bottom: 80px; left: -15px; } /* Mid spine */
-.ut-orbit-point:nth-child(4) { bottom: 140px; left: -10px; } /* Neck */
-.ut-orbit-point:nth-child(5) { top: 0; left: 50%; } /* Crown */
-.ut-orbit-point:nth-child(6) { top: 30px; right: -10px; left: auto; } /* Third eye */
-.ut-orbit-point:nth-child(7) { top: 60px; right: -15px; left: auto; } /* Throat */
-.ut-orbit-point:nth-child(8) { top: 100px; right: -15px; left: auto; } /* Heart */
-.ut-orbit-point:nth-child(9) { top: 140px; right: -10px; left: auto; } /* Solar */
-.ut-orbit-point:nth-child(10) { bottom: 60px; left: 50%; } /* Dan tian */
-
-.ut-orbit-point.active {
-  background: #ffffff;
-  border-color: #ffffff;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-  transform: translateX(-50%) scale(1.3);
+.ut-orbit-point-svg.passed {
+  fill: rgba(255, 255, 255, 0.35);
+  stroke: rgba(255, 255, 255, 0.5);
 }
 
-.ut-orbit-point.passed {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.ut-orbit-energy {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
-  pointer-events: none;
-  transition: all 400ms ease;
+.ut-orbit-point-svg.active {
+  fill: #ffffff;
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
 }
 
 .ut-orbit-instruction {
@@ -1048,7 +1009,7 @@
 
 .ut-cold-fill {
   fill: none;
-  stroke: #60a5fa;
+  stroke: #ffffff;
   stroke-width: 3;
   stroke-linecap: round;
   stroke-dasharray: 283;

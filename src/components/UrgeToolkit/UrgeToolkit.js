@@ -677,7 +677,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 {[1,2,3,4,5,6,7,8,9,10].map(level => (
                   <button
                     key={level}
-                    className={`ut-intensity-btn ${urgeIntensity === level ? 'selected' : ''} ${level <= 3 ? 'low' : level <= 6 ? 'medium' : 'high'}`}
+                    className={`ut-intensity-btn ${urgeIntensity === level ? 'selected' : ''}`}
                     onClick={() => handleUrgeIntensity(level)}
                   >
                     <span className="ut-intensity-num">{level}</span>
@@ -712,7 +712,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                     <div className="ut-protocol-main">
                       <span className="ut-protocol-name">{protocol.name}</span>
                       <div className="ut-protocol-meta">
-                        {activeProtocol === key && <span className="ut-protocol-rec">Selected</span>}
+                        {activeProtocol === key && <span className="ut-protocol-rec">Recommended</span>}
                         <span className="ut-protocol-duration">{protocol.duration}</span>
                       </div>
                     </div>
@@ -993,23 +993,57 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
 
             <div className="ut-modal-body">
-              {/* Energy Path Visualization */}
+              {/* Seated Human Figure with Energy Points */}
               <div className="ut-orbit-visual">
-                <div className="ut-orbit-body">
-                  {ORBIT_POINTS.map((point, index) => (
-                    <div 
-                      key={point.id}
-                      className={`ut-orbit-point ${index === orbitPointIndex && orbitActive ? 'active' : ''} ${index < orbitPointIndex || orbitCycleCount > 0 ? 'passed' : ''}`}
-                      style={{ '--point-index': index }}
-                    />
-                  ))}
-                  {orbitActive && (
-                    <div 
-                      className="ut-orbit-energy"
-                      style={{ '--point-index': orbitPointIndex }}
-                    />
-                  )}
-                </div>
+                <svg className="ut-orbit-figure" viewBox="0 0 200 280" fill="none">
+                  {/* Seated meditation figure - single stroke outline */}
+                  <path 
+                    className="ut-orbit-body-path"
+                    d="M100 45 
+                       C115 45 125 35 125 20 C125 5 115 0 100 0 C85 0 75 5 75 20 C75 35 85 45 100 45
+                       M100 45 L100 90
+                       M70 70 Q85 75 100 75 Q115 75 130 70
+                       M100 90 L100 160
+                       M100 160 Q70 165 50 200 Q40 220 45 250
+                       M100 160 Q130 165 150 200 Q160 220 155 250
+                       M45 250 Q30 255 25 270
+                       M155 250 Q170 255 175 270"
+                    stroke="rgba(255,255,255,0.15)"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                  
+                  {/* Energy points */}
+                  {ORBIT_POINTS.map((point, index) => {
+                    // Position each point on the figure
+                    const positions = [
+                      { x: 100, y: 245 },  // Perineum
+                      { x: 75, y: 210 },   // Sacrum (back)
+                      { x: 70, y: 160 },   // Mid spine
+                      { x: 72, y: 100 },   // Neck base
+                      { x: 100, y: 8 },    // Crown
+                      { x: 100, y: 30 },   // Third eye
+                      { x: 115, y: 55 },   // Throat
+                      { x: 120, y: 90 },   // Heart
+                      { x: 125, y: 125 },  // Solar plexus
+                      { x: 115, y: 170 }   // Dan tian
+                    ];
+                    const pos = positions[index];
+                    const isActive = index === orbitPointIndex && orbitActive;
+                    const isPassed = index < orbitPointIndex || orbitCycleCount > 0;
+                    
+                    return (
+                      <circle
+                        key={point.id}
+                        cx={pos.x}
+                        cy={pos.y}
+                        r={isActive ? 10 : 6}
+                        className={`ut-orbit-point-svg ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`}
+                      />
+                    );
+                  })}
+                </svg>
               </div>
 
               <div className="ut-modal-info">
