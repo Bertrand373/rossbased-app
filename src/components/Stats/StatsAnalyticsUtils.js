@@ -295,6 +295,127 @@ export const calculateMetricAverages = (userData, days = 7) => {
 };
 
 // ============================================================
+// METRIC TRENDS - Compare current period vs previous period
+// ============================================================
+export const calculateMetricTrends = (userData, currentPeriod = 7, comparePeriod = 7) => {
+  try {
+    const safeData = validateUserData(userData);
+    const allData = safeData.benefitTracking || [];
+    
+    if (allData.length < currentPeriod + comparePeriod) {
+      return null;
+    }
+    
+    const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    const today = new Date();
+    
+    // Current period: last N days
+    const currentCutoff = subDays(today, currentPeriod);
+    const previousCutoff = subDays(today, currentPeriod + comparePeriod);
+    
+    const currentData = allData.filter(item => {
+      if (!item?.date) return false;
+      const itemDate = new Date(item.date);
+      return !isNaN(itemDate.getTime()) && itemDate >= currentCutoff;
+    });
+    
+    const previousData = allData.filter(item => {
+      if (!item?.date) return false;
+      const itemDate = new Date(item.date);
+      return !isNaN(itemDate.getTime()) && itemDate >= previousCutoff && itemDate < currentCutoff;
+    });
+    
+    if (currentData.length < 3 || previousData.length < 3) {
+      return null;
+    }
+    
+    const trends = {};
+    
+    metrics.forEach(metric => {
+      const currentValues = currentData
+        .map(d => d[metric] || null)
+        .filter(v => typeof v === 'number' && v >= 1 && v <= 10);
+        
+      const previousValues = previousData
+        .map(d => d[metric] || null)
+        .filter(v => typeof v === 'number' && v >= 1 && v <= 10);
+      
+      if (currentValues.length >= 2 && previousValues.length >= 2) {
+        const currentAvg = currentValues.reduce((sum, val) => sum + val, 0) / currentValues.length;
+        const previousAvg = previousValues.reduce((sum, val) => sum + val, 0) / previousValues.length;
+        const delta = currentAvg - previousAvg;
+        
+        let direction = 'stable';
+        if (delta >= 0.3) direction = 'up';
+        else if (delta <= -0.3) direction = 'down';
+        
+        trends[metric] = {
+          current: parseFloat(currentAvg.toFixed(1)),
+          previous: parseFloat(previousAvg.toFixed(1)),
+          delta: parseFloat(delta.toFixed(1)),
+          direction
+        };
+      }
+    });
+    
+    return Object.keys(trends).length > 0 ? trends : null;
+  } catch (error) {
+    console.error('Metric trends calculation error:', error);
+    return null;
+  }
+};
+
+// ============================================================
+// IDENTIFY STRONGEST & WEAKEST METRICS
+// ============================================================
+export const identifyMetricExtremes = (userData, days = 7) => {
+  try {
+    const averages = calculateMetricAverages(userData, days);
+    
+    if (!averages?.averages) {
+      return null;
+    }
+    
+    const validMetrics = Object.entries(averages.averages)
+      .filter(([_, data]) => data.value !== null && data.dataPoints >= 2)
+      .map(([metric, data]) => ({ metric, value: data.value }));
+    
+    if (validMetrics.length < 2) {
+      return null;
+    }
+    
+    // Sort by value
+    validMetrics.sort((a, b) => b.value - a.value);
+    
+    const strongest = validMetrics[0];
+    const weakest = validMetrics[validMetrics.length - 1];
+    
+    // Only report if there's meaningful difference
+    if (strongest.value - weakest.value < 0.5) {
+      return {
+        strongest: null,
+        growthArea: null,
+        message: 'Metrics balanced'
+      };
+    }
+    
+    return {
+      strongest: {
+        metric: strongest.metric,
+        value: strongest.value
+      },
+      growthArea: {
+        metric: weakest.metric,
+        value: weakest.value
+      }
+    };
+  } catch (error) {
+    console.error('Metric extremes calculation error:', error);
+    return null;
+  }
+};
+
+// ============================================================
 // PATTERN DETECTION - Real User Patterns from Data
 // ============================================================
 export const generatePatternInsights = (userData) => {

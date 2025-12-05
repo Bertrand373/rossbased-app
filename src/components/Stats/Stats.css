@@ -370,8 +370,11 @@
 
 @media (min-width: 768px) {
   .chart-box {
-    height: 200px;
+    height: 220px;
     padding: 24px 20px 16px 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -1106,8 +1109,8 @@
     margin-right: auto;
   }
   
-  /* Hide the divider after Confidence (3rd divider) - it's at end of row 1 */
-  .stats-page .toggle-row.benefits-row .toggle-divider:nth-of-type(3) {
+  /* Hide the divider after Aura (4th divider) - it's at end of row 1 */
+  .stats-page .toggle-row.benefits-row .toggle-divider:nth-of-type(4) {
     display: none;
   }
   
@@ -1283,6 +1286,11 @@
 
 /* Desktop enhancements */
 @media (min-width: 768px) {
+  /* Center section headers on desktop */
+  .stats-section h2 {
+    text-align: center;
+  }
+  
   /* All 6 metrics in single row on desktop */
   .stats-page .toggle-row.benefits-row {
     flex-wrap: nowrap;
@@ -1331,9 +1339,10 @@
   }
   
   .chart-box {
-    height: 220px;
+    height: 260px;
     border-radius: 20px;
     padding: 24px 24px 16px 24px;
+    max-width: 700px;
   }
   
   .modal {
