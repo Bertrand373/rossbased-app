@@ -703,3 +703,15 @@ body.modal-open {
 .ut-breathing-overlay {
   overscroll-behavior: contain !important;
 }
+
+/* ============================================================
+   STATIC VIEW - No scroll on fixed-content views
+   ============================================================ */
+
+body.static-view {
+  overflow: hidden;
+}
+
+body.static-view .app-content {
+  overflow: hidden;
+}

@@ -80,6 +80,23 @@ const HeaderNavigation = () => {
   );
 };
 
+// Static view controller - prevents scroll on fixed-content views
+const StaticViewManager = () => {
+  const location = useLocation();
+  
+  useEffect(() => {
+    const staticRoutes = ['/', '/calendar'];
+    if (staticRoutes.includes(location.pathname)) {
+      document.body.classList.add('static-view');
+    } else {
+      document.body.classList.remove('static-view');
+    }
+    return () => document.body.classList.remove('static-view');
+  }, [location.pathname]);
+  
+  return null;
+};
+
 // Scroll to top on route change
 const ScrollToTop = () => {
   const location = useLocation();
@@ -170,6 +187,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
+      <StaticViewManager />
       <ServiceWorkerListener />
       {/* RESPONSIVE TOAST: Desktop top-right, Mobile top-center below header */}
       <Toaster 
