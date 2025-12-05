@@ -33,14 +33,24 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   // Lock body scroll when any modal is open
   useBodyScrollLock(dayInfoModal || editDayModal);
 
-  // Lock scroll on Month view (fixed content), allow scroll on Week view
+  // Lock scroll on Month view mobile only (fixed content), allow scroll on Week view and desktop
   useEffect(() => {
-    if (viewMode === 'month') {
-      document.body.classList.add('static-view');
-    } else {
+    const handleScrollLock = () => {
+      const isMobile = window.innerWidth <= 1024;
+      if (viewMode === 'month' && isMobile) {
+        document.body.classList.add('static-view');
+      } else {
+        document.body.classList.remove('static-view');
+      }
+    };
+    
+    handleScrollLock();
+    window.addEventListener('resize', handleScrollLock);
+    
+    return () => {
       document.body.classList.remove('static-view');
-    }
-    return () => document.body.classList.remove('static-view');
+      window.removeEventListener('resize', handleScrollLock);
+    };
   }, [viewMode]);
 
   const triggerOptions = [
