@@ -245,6 +245,16 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
     }
   }, [userData]);
 
+  // Lock scroll on Analysis tab (fixed content)
+  useEffect(() => {
+    if (activeTab === 'analysis') {
+      document.body.classList.add('static-view');
+    } else {
+      document.body.classList.remove('static-view');
+    }
+    return () => document.body.classList.remove('static-view');
+  }, [activeTab]);
+
   // ============================================================
   // ANALYSIS - Focused trajectory calculation
   // ============================================================

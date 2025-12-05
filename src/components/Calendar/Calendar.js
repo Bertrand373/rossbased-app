@@ -1,6 +1,6 @@
 // components/Calendar/Calendar.js - TITANTRACK ELITE
 // Two CSS files: CalendarBase.css + CalendarModals.css
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, differenceInDays, isAfter,
   startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
@@ -32,6 +32,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
   // Lock body scroll when any modal is open
   useBodyScrollLock(dayInfoModal || editDayModal);
+
+  // Lock scroll on Month view (fixed content), allow scroll on Week view
+  useEffect(() => {
+    if (viewMode === 'month') {
+      document.body.classList.add('static-view');
+    } else {
+      document.body.classList.remove('static-view');
+    }
+    return () => document.body.classList.remove('static-view');
+  }, [viewMode]);
 
   const triggerOptions = [
     { id: 'lustful_thoughts', label: 'Lustful Thoughts' },

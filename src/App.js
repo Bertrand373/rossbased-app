@@ -85,7 +85,7 @@ const StaticViewManager = () => {
   const location = useLocation();
   
   useEffect(() => {
-    const staticRoutes = ['/', '/calendar'];
+    const staticRoutes = ['/'];
     if (staticRoutes.includes(location.pathname)) {
       document.body.classList.add('static-view');
     } else {
@@ -125,9 +125,24 @@ const ServiceWorkerListener = () => {
   return null;
 };
 
+// Navigate to Tracker after successful login
+const PostLoginNavigator = ({ shouldNavigate, onNavigated }) => {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (shouldNavigate) {
+      navigate('/', { replace: true });
+      onNavigated();
+    }
+  }, [shouldNavigate, navigate, onNavigated]);
+  
+  return null;
+};
+
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
+  const [shouldNavigateToTracker, setShouldNavigateToTracker] = useState(false);
   
   const [isRefreshLoading, setIsRefreshLoading] = useState(() => {
     return localStorage.getItem('isLoggedIn') === 'true';
@@ -164,10 +179,14 @@ function App() {
     }
   }, [isRefreshLoading]);
 
-  const handleLogin = async (username, password) => {
+  const handleLogin = async (username, password, isGoogleAuth = false) => {
     setLoadingMessage('Signing in...');
-    const success = await login(username, password);
-    if (success) setShowAuthModal(false);
+    const success = await login(username, password, isGoogleAuth);
+    if (success) {
+      setShowAuthModal(false);
+      setActiveTab('tracker');
+      setShouldNavigateToTracker(true);
+    }
     return success;
   };
 
@@ -189,6 +208,10 @@ function App() {
       <ScrollToTop />
       <StaticViewManager />
       <ServiceWorkerListener />
+      <PostLoginNavigator 
+        shouldNavigate={shouldNavigateToTracker} 
+        onNavigated={() => setShouldNavigateToTracker(false)} 
+      />
       {/* RESPONSIVE TOAST: Desktop top-right, Mobile top-center below header */}
       <Toaster 
         position={isMobile ? "top-center" : "top-right"}
