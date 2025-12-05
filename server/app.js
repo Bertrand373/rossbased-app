@@ -278,7 +278,7 @@ app.post('/api/notification-preferences/:username', async (req, res) => {
 });
 
 // ============================================
-// FEEDBACK TO DISCORD WEBHOOK
+// FEEDBACK TO DISCORD WEBHOOK (Robust)
 // ============================================
 app.post('/api/feedback', async (req, res) => {
   const { type, subject, message, username } = req.body;
@@ -289,6 +289,12 @@ app.post('/api/feedback', async (req, res) => {
   
   const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1446208891561054360/97_-2IRepbgkGtDruh4cWN5ep-6c5_Iw8ibP5N5cFPKigucQlO669h4bhLFlU-2DwEv-';
   
+  // Sanitize and truncate content (Discord limits: field value 1024 chars)
+  const sanitize = (str, maxLength = 1000) => {
+    if (!str) return 'N/A';
+    return String(str).slice(0, maxLength).trim() || 'N/A';
+  };
+  
   // Format type for display
   const typeLabels = {
     general: '💬 General',
@@ -298,35 +304,92 @@ app.post('/api/feedback', async (req, res) => {
     other: '📝 Other'
   };
   
-  const embed = {
+  const safeSubject = sanitize(subject, 100);
+  const safeMessage = sanitize(message, 900);
+  const safeUsername = sanitize(username, 50);
+  const safeType = typeLabels[type] || '💬 General';
+  const timestamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+  
+  // Embed format (preferred)
+  const embedPayload = {
     embeds: [{
-      title: `${typeLabels[type] || '💬 General'} Feedback`,
-      color: 0xFFD700, // Gold color to match TitanTrack
+      title: `${safeType} Feedback`,
+      color: 0xFFD700,
       fields: [
-        { name: 'Subject', value: subject, inline: false },
-        { name: 'Message', value: message, inline: false },
-        { name: 'From', value: username || 'Anonymous', inline: true },
-        { name: 'Time', value: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }), inline: true }
+        { name: 'Subject', value: safeSubject, inline: false },
+        { name: 'Message', value: safeMessage, inline: false },
+        { name: 'From', value: safeUsername, inline: true },
+        { name: 'Time', value: timestamp, inline: true }
       ],
       footer: { text: 'TitanTrack App Feedback' }
     }]
   };
   
-  try {
-    const response = await fetch(DISCORD_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(embed)
-    });
-    
-    if (!response.ok) {
-      throw new Error('Discord webhook failed');
+  // Simple fallback format (if embed fails)
+  const simplePayload = {
+    content: `**${safeType} Feedback**\n**Subject:** ${safeSubject}\n**Message:** ${safeMessage}\n**From:** ${safeUsername}\n**Time:** ${timestamp}`
+  };
+  
+  // Retry helper with delay
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  
+  const sendToDiscord = async (payload, attempt = 1) => {
+    try {
+      const response = await fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (response.ok) {
+        return { success: true };
+      }
+      
+      // Get error details
+      const errorText = await response.text();
+      console.error(`Discord attempt ${attempt} failed:`, response.status, errorText);
+      
+      // Rate limited - wait and retry
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After') || 5;
+        console.log(`Rate limited. Waiting ${retryAfter}s...`);
+        await delay(Number(retryAfter) * 1000);
+        if (attempt < 3) {
+          return sendToDiscord(payload, attempt + 1);
+        }
+      }
+      
+      // Server error - retry with backoff
+      if (response.status >= 500 && attempt < 3) {
+        await delay(1000 * attempt);
+        return sendToDiscord(payload, attempt + 1);
+      }
+      
+      return { success: false, status: response.status, error: errorText };
+    } catch (error) {
+      console.error(`Discord attempt ${attempt} error:`, error.message);
+      if (attempt < 3) {
+        await delay(1000 * attempt);
+        return sendToDiscord(payload, attempt + 1);
+      }
+      return { success: false, error: error.message };
     }
-    
-    console.log('✅ Feedback sent to Discord from:', username || 'Anonymous');
+  };
+  
+  // Try embed format first
+  let result = await sendToDiscord(embedPayload);
+  
+  // If embed failed, try simple format
+  if (!result.success) {
+    console.log('Embed failed, trying simple format...');
+    result = await sendToDiscord(simplePayload);
+  }
+  
+  if (result.success) {
+    console.log('✅ Feedback sent to Discord from:', safeUsername);
     res.json({ success: true, message: 'Feedback sent successfully' });
-  } catch (error) {
-    console.error('❌ Failed to send feedback to Discord:', error);
+  } else {
+    console.error('❌ All Discord attempts failed:', result);
     res.status(500).json({ error: 'Failed to send feedback' });
   }
 });
