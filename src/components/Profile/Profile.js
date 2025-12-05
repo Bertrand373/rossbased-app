@@ -90,6 +90,16 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   }, [notificationsEnabled, userData?.username]);
 
+  // Lock scroll on Data tab (fixed content)
+  useEffect(() => {
+    if (activeTab === 'data') {
+      document.body.classList.add('static-view');
+    } else {
+      document.body.classList.remove('static-view');
+    }
+    return () => document.body.classList.remove('static-view');
+  }, [activeTab]);
+
   const loadNotificationPreferences = async () => {
     try {
       const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`);

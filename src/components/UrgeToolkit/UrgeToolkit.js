@@ -55,6 +55,16 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   }, [currentDay]);
 
+  // Lock scroll on Assessment tab (fixed content)
+  useEffect(() => {
+    if (currentStep === 'assessment') {
+      document.body.classList.add('static-view');
+    } else {
+      document.body.classList.remove('static-view');
+    }
+    return () => document.body.classList.remove('static-view');
+  }, [currentStep]);
+
   // Get current phase
   const getCurrentPhase = () => {
     if (currentDay <= 14) return { num: "01", name: "Initial Adaptation", color: "#22c55e" };
