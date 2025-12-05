@@ -126,7 +126,6 @@
     justify-content: center;
     align-items: center;
     gap: 32px;
-    max-width: none;
   }
   
   .stat-card {
