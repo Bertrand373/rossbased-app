@@ -250,31 +250,36 @@
 /* =============================================================================
    BENEFIT TRACKER - Toggle Pattern (matches Calendar/EmotionalTimeline)
    UPDATED: Single row on desktop, wraps to 2 rows on mobile
-   FIX: Using width: fit-content + margin: auto for reliable centering
+   FIX: Scoped to .stats-page to avoid Profile.css .toggle-row conflict
    ============================================================================= */
 
 /* Toggle Row - Text-only buttons with vertical dividers */
-.toggle-row {
+/* IMPORTANT: Scoped to .stats-page to override Profile.css .toggle-row */
+.stats-page .toggle-row {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 0;
-  width: fit-content;
-  margin: 0 auto 12px auto;
+  width: 100%;
+  margin: 0 0 12px 0;
+  padding: 0;
+  border-bottom: none;
 }
 
 /* Benefits row - single row on desktop, wraps on mobile */
-.toggle-row.benefits-row {
+.stats-page .toggle-row.benefits-row {
   margin-bottom: 12px;
 }
 
 /* Time range - SAME styling as benefits, no max-width constraint */
-.toggle-row.time-range {
+.stats-page .toggle-row.time-range {
   margin-top: 0;
   margin-bottom: 12px;
 }
 
 /* Toggle buttons - MATCHES EmotionalTimeline exactly */
-.toggle-btn {
+/* Scoped to .stats-page to avoid conflicts */
+.stats-page .toggle-btn {
   background: transparent;
   border: none;
   padding: 8px 16px;
@@ -288,16 +293,16 @@
   white-space: nowrap;
 }
 
-.toggle-btn:hover:not(.active) {
+.stats-page .toggle-btn:hover:not(.active) {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.toggle-btn.active {
+.stats-page .toggle-btn.active {
   color: #ffffff;
   font-weight: 600;
 }
 
-.toggle-divider {
+.stats-page .toggle-divider {
   width: 1px;
   height: 16px;
   background-color: rgba(255, 255, 255, 0.1);
@@ -1092,7 +1097,7 @@
 
 /* Mobile: Benefits row wraps to 2 rows of 3 */
 @media (max-width: 520px) {
-  .toggle-row.benefits-row {
+  .stats-page .toggle-row.benefits-row {
     flex-wrap: wrap;
     justify-content: center;
     row-gap: 12px;
@@ -1102,12 +1107,12 @@
   }
   
   /* Hide the divider after Confidence (3rd divider) - it's at end of row 1 */
-  .toggle-row.benefits-row .toggle-divider:nth-of-type(3) {
+  .stats-page .toggle-row.benefits-row .toggle-divider:nth-of-type(3) {
     display: none;
   }
   
   /* Time range also gets slight constraint on mobile for visual balance */
-  .toggle-row.time-range {
+  .stats-page .toggle-row.time-range {
     max-width: 280px;
     margin-left: auto;
     margin-right: auto;
@@ -1158,12 +1163,12 @@
   }
   
   /* Toggle buttons - slightly tighter on small screens but proportional */
-  .toggle-btn {
+  .stats-page .toggle-btn {
     font-size: 0.8125rem;
     padding: 8px 12px;
   }
   
-  .toggle-divider {
+  .stats-page .toggle-divider {
     height: 14px;
   }
   
@@ -1258,20 +1263,20 @@
   }
   
   /* Benefits row on very small screens */
-  .toggle-row.benefits-row {
+  .stats-page .toggle-row.benefits-row {
     max-width: 280px;
   }
   
-  .toggle-row.time-range {
+  .stats-page .toggle-row.time-range {
     max-width: 240px;
   }
   
-  .toggle-btn {
+  .stats-page .toggle-btn {
     font-size: 0.75rem;
     padding: 6px 10px;
   }
   
-  .toggle-divider {
+  .stats-page .toggle-divider {
     height: 12px;
   }
 }
@@ -1279,11 +1284,11 @@
 /* Desktop enhancements */
 @media (min-width: 768px) {
   /* All 6 metrics in single row on desktop */
-  .toggle-row.benefits-row {
+  .stats-page .toggle-row.benefits-row {
     flex-wrap: nowrap;
   }
   
-  .toggle-btn {
+  .stats-page .toggle-btn {
     padding: 8px 16px;
   }
 }
@@ -1359,7 +1364,7 @@
     opacity: 1;
   }
   
-  .toggle-btn,
+  .stats-page .toggle-btn,
   .milestone-card,
   .stat-card,
   .reset-btn {
