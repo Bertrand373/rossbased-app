@@ -887,7 +887,7 @@
 }
 
 /* =============================================================================
-   MICROCOSMIC ORBIT MODAL - SVG Human Figure
+   MICROCOSMIC ORBIT MODAL - Premium Silhouette
    ============================================================================= */
 
 .ut-orbit-modal {
@@ -895,8 +895,8 @@
 }
 
 .ut-orbit-visual {
-  width: 200px;
-  height: 280px;
+  width: 160px;
+  height: 230px;
   position: relative;
   display: flex;
   align-items: center;
@@ -908,26 +908,39 @@
   height: 100%;
 }
 
-.ut-orbit-body-path {
-  transition: stroke 300ms ease;
+.ut-orbit-silhouette {
+  fill: rgba(255, 255, 255, 0.06);
+  transition: fill 300ms ease;
+}
+
+.ut-orbit-glow {
+  fill: rgba(255, 255, 255, 0.15);
+  animation: orbitPulse 2s ease-in-out infinite;
+}
+
+@keyframes orbitPulse {
+  0%, 100% { 
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
 }
 
 .ut-orbit-point-svg {
-  fill: rgba(255, 255, 255, 0.15);
-  stroke: rgba(255, 255, 255, 0.25);
-  stroke-width: 1;
+  fill: rgba(255, 255, 255, 0.25);
   transition: all 300ms ease;
 }
 
 .ut-orbit-point-svg.passed {
-  fill: rgba(255, 255, 255, 0.35);
-  stroke: rgba(255, 255, 255, 0.5);
+  fill: rgba(255, 255, 255, 0.5);
 }
 
 .ut-orbit-point-svg.active {
   fill: #ffffff;
-  stroke: #ffffff;
-  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
 }
 
 .ut-orbit-instruction {

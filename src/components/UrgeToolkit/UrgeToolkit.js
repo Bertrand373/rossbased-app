@@ -993,54 +993,112 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
 
             <div className="ut-modal-body">
-              {/* Seated Human Figure with Energy Points */}
+              {/* Premium Seated Meditation Silhouette */}
               <div className="ut-orbit-visual">
-                <svg className="ut-orbit-figure" viewBox="0 0 200 280" fill="none">
-                  {/* Seated meditation figure - single stroke outline */}
-                  <path 
-                    className="ut-orbit-body-path"
-                    d="M100 45 
-                       C115 45 125 35 125 20 C125 5 115 0 100 0 C85 0 75 5 75 20 C75 35 85 45 100 45
-                       M100 45 L100 90
-                       M70 70 Q85 75 100 75 Q115 75 130 70
-                       M100 90 L100 160
-                       M100 160 Q70 165 50 200 Q40 220 45 250
-                       M100 160 Q130 165 150 200 Q160 220 155 250
-                       M45 250 Q30 255 25 270
-                       M155 250 Q170 255 175 270"
-                    stroke="rgba(255,255,255,0.15)"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    fill="none"
+                <svg className="ut-orbit-figure" viewBox="0 0 140 200" fill="none">
+                  {/* Head */}
+                  <ellipse 
+                    cx="70" cy="22" rx="18" ry="22"
+                    className="ut-orbit-silhouette"
                   />
                   
-                  {/* Energy points */}
+                  {/* Neck */}
+                  <path 
+                    d="M62 42 L62 52 L78 52 L78 42"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* Torso */}
+                  <path 
+                    d="M45 52 
+                       C45 52 40 90 42 110
+                       C44 130 50 145 70 150
+                       C90 145 96 130 98 110
+                       C100 90 95 52 95 52
+                       L78 52 L62 52 Z"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* Left arm */}
+                  <path 
+                    d="M45 58
+                       C35 65 25 80 20 95
+                       C15 110 18 120 25 125
+                       C32 130 40 125 45 115
+                       C48 108 48 100 45 90
+                       L45 58 Z"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* Right arm */}
+                  <path 
+                    d="M95 58
+                       C105 65 115 80 120 95
+                       C125 110 122 120 115 125
+                       C108 130 100 125 95 115
+                       C92 108 92 100 95 90
+                       L95 58 Z"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* Left leg (lotus position) */}
+                  <path 
+                    d="M50 145
+                       C40 150 25 155 15 165
+                       C5 175 5 185 15 190
+                       C25 195 50 195 70 190
+                       L70 150
+                       C60 150 55 147 50 145 Z"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* Right leg (lotus position) */}
+                  <path 
+                    d="M90 145
+                       C100 150 115 155 125 165
+                       C135 175 135 185 125 190
+                       C115 195 90 195 70 190
+                       L70 150
+                       C80 150 85 147 90 145 Z"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* Energy points along the orbit path */}
                   {ORBIT_POINTS.map((point, index) => {
-                    // Position each point on the figure
+                    // Anatomically positioned along spine and front channel
                     const positions = [
-                      { x: 100, y: 245 },  // Perineum
-                      { x: 75, y: 210 },   // Sacrum (back)
-                      { x: 70, y: 160 },   // Mid spine
-                      { x: 72, y: 100 },   // Neck base
-                      { x: 100, y: 8 },    // Crown
-                      { x: 100, y: 30 },   // Third eye
-                      { x: 115, y: 55 },   // Throat
-                      { x: 120, y: 90 },   // Heart
-                      { x: 125, y: 125 },  // Solar plexus
-                      { x: 115, y: 170 }   // Dan tian
+                      { x: 70, y: 175 },  // Hui Yin - Perineum
+                      { x: 70, y: 155 },  // Ming Men - Sacrum
+                      { x: 70, y: 130 },  // Jizhong - Mid spine
+                      { x: 70, y: 105 },  // Dazhui - Upper back
+                      { x: 70, y: 75 },   // Yuzhen - Base of skull
+                      { x: 70, y: 5 },    // Baihui - Crown
+                      { x: 70, y: 25 },   // Yintang - Third eye
+                      { x: 70, y: 48 },   // Tiantu - Throat
+                      { x: 70, y: 80 },   // Shanzhong - Heart
+                      { x: 70, y: 120 }   // Qihai - Dan tian
                     ];
                     const pos = positions[index];
                     const isActive = index === orbitPointIndex && orbitActive;
                     const isPassed = index < orbitPointIndex || orbitCycleCount > 0;
                     
                     return (
-                      <circle
-                        key={point.id}
-                        cx={pos.x}
-                        cy={pos.y}
-                        r={isActive ? 10 : 6}
-                        className={`ut-orbit-point-svg ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`}
-                      />
+                      <g key={point.id}>
+                        {isActive && (
+                          <circle
+                            cx={pos.x}
+                            cy={pos.y}
+                            r="14"
+                            className="ut-orbit-glow"
+                          />
+                        )}
+                        <circle
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isActive ? 6 : 4}
+                          className={`ut-orbit-point-svg ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`}
+                        />
+                      </g>
                     );
                   })}
                 </svg>
