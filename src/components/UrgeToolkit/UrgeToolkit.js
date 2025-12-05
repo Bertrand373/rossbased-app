@@ -14,7 +14,7 @@ import { FaBrain, FaExclamationTriangle, FaClock, FaMeh, FaHeart,
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 // UNIFIED TRIGGER SYSTEM
-import { getTriggersByLevel } from '../../constants/triggerConstants';
+import { getAllTriggers } from '../../constants/triggerConstants';
 
 // Icon mapping for triggers
 const TRIGGER_ICONS = {
@@ -98,9 +98,9 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   const currentPhase = getCurrentPhase();
 
-  // Get trigger options from unified constants
+  // Get trigger options from unified constants (show ALL triggers)
   const getTriggerOptions = () => {
-    const triggers = getTriggersByLevel(experienceLevel);
+    const triggers = getAllTriggers();
     // Map to include icon components
     return triggers.map(trigger => ({
       id: trigger.id,
