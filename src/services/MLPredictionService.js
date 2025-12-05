@@ -1,7 +1,6 @@
 // src/services/MLPredictionService.js
-// Machine Learning Prediction Service for Relapse Risk Assessment
-// UPDATED: Now uses 12 features including Emotional Timeline data
-// FIXED: Properly loads seeded test data and handles emotionalTracking field names
+// TensorFlow.js-based ML prediction with 12-feature neural network
+// FIXED: Factor naming consistency for PredictionDisplay compatibility
 
 import * as tf from '@tensorflow/tfjs';
 import dataPreprocessor from '../utils/DataPreprocessor';
@@ -9,22 +8,11 @@ import dataPreprocessor from '../utils/DataPreprocessor';
 class MLPredictionService {
   constructor() {
     this.model = null;
-    this.isModelReady = false;
-    this.MODEL_SAVE_PATH = 'indexeddb://titantrack-relapse-model';
-    this.NUM_FEATURES = 12; // UPDATED from 10
-    
-    // Training history for tracking model performance
-    this.trainingHistory = {
-      accuracy: [],
-      loss: [],
-      lastTrained: null,
-      totalEpochs: 0
-    };
-    
-    // Normalization stats for consistent scaling
+    this.isInitialized = false;
     this.normalizationStats = null;
-    
-    console.log('🧠 MLPredictionService initialized (12-feature model)');
+    this.trainingHistory = null;
+    this.MODEL_KEY = 'titantrack-ml-model';
+    this.STATS_KEY = 'ml_normalization_stats';
   }
 
   // ============================================================
@@ -32,32 +20,21 @@ class MLPredictionService {
   // ============================================================
 
   async initialize() {
+    if (this.isInitialized) return true;
+
     try {
-      // Try to load existing model
-      const loaded = await this.loadModel();
-      if (loaded) {
-        this.loadTrainingHistory();
+      const savedModel = await this.loadModel();
+      if (savedModel) {
+        this.model = savedModel;
         this.loadNormalizationStats();
-        this.isModelReady = true;
-        console.log('✅ Loaded existing ML model');
+        this.isInitialized = true;
+        console.log('✅ ML model loaded from storage');
         return true;
       }
-      
-      // Create new model if none exists
+
       this.model = this.createModel();
-      
-      // IMPORTANT: Still load training history for seeded test data
-      // This allows PatternInsightCard to work with test users like 'aicard'
-      this.loadTrainingHistory();
-      this.loadNormalizationStats();
-      
-      // Check if we have seeded training data (for testing)
-      if (this.trainingHistory.lastTrained && this.normalizationStats) {
-        console.log('🧪 Found seeded ML data - enabling test mode');
-        this.isModelReady = true; // Enable predictions with seeded data
-      }
-      
-      console.log('🆕 Created new ML model (12 features)');
+      this.isInitialized = true;
+      console.log('✅ New ML model created (untrained)');
       return true;
     } catch (error) {
       console.error('❌ ML initialization error:', error);
@@ -66,146 +43,197 @@ class MLPredictionService {
   }
 
   // ============================================================
-  // MODEL ARCHITECTURE - UPDATED FOR 12 FEATURES
+  // MODEL ARCHITECTURE - 12-Feature Neural Network
   // ============================================================
 
   createModel() {
     const model = tf.sequential();
-    
-    // Input layer - NOW 12 FEATURES
+
+    // Input layer - 12 features
     model.add(tf.layers.dense({
-      inputShape: [this.NUM_FEATURES], // 12 features
+      inputShape: [12],
       units: 24,
       activation: 'relu',
       kernelInitializer: 'glorotNormal'
     }));
-    
-    // Dropout for regularization
-    model.add(tf.layers.dropout({ rate: 0.2 }));
-    
-    // Hidden layer
+
+    // Hidden layer with dropout
+    model.add(tf.layers.dropout({ rate: 0.3 }));
     model.add(tf.layers.dense({
       units: 12,
-      activation: 'relu',
-      kernelInitializer: 'glorotNormal'
+      activation: 'relu'
     }));
-    
-    // Output layer - binary classification (relapse risk)
+
+    // Output layer - single probability
     model.add(tf.layers.dense({
       units: 1,
       activation: 'sigmoid'
     }));
-    
-    // Compile model
+
     model.compile({
       optimizer: tf.train.adam(0.001),
       loss: 'binaryCrossentropy',
       metrics: ['accuracy']
     });
-    
-    console.log('📐 Model architecture: 12 → 24 → 12 → 1');
+
     return model;
   }
 
   // ============================================================
-  // TRAINING
+  // MODEL PERSISTENCE
   // ============================================================
 
-  async train(userData, options = {}) {
+  async saveModel() {
+    if (!this.model) return false;
     try {
-      if (!this.model) {
-        await this.initialize();
+      await this.model.save(`localstorage://${this.MODEL_KEY}`);
+      return true;
+    } catch (error) {
+      console.error('Error saving model:', error);
+      return false;
+    }
+  }
+
+  async loadModel() {
+    try {
+      const model = await tf.loadLayersModel(`localstorage://${this.MODEL_KEY}`);
+      model.compile({
+        optimizer: tf.train.adam(0.001),
+        loss: 'binaryCrossentropy',
+        metrics: ['accuracy']
+      });
+      return model;
+    } catch {
+      return null;
+    }
+  }
+
+  saveNormalizationStats(stats) {
+    this.normalizationStats = stats;
+    localStorage.setItem(this.STATS_KEY, JSON.stringify(stats));
+  }
+
+  loadNormalizationStats() {
+    try {
+      const saved = localStorage.getItem(this.STATS_KEY);
+      if (saved) {
+        this.normalizationStats = JSON.parse(saved);
+        return this.normalizationStats;
       }
-      
-      console.log('🏋️ Starting model training...');
-      
+    } catch (error) {
+      console.error('Error loading normalization stats:', error);
+    }
+    return null;
+  }
+
+  // ============================================================
+  // TRAINING - 12-Feature Dataset
+  // ============================================================
+
+  async train(userData, callbacks = {}) {
+    if (!this.isInitialized) await this.initialize();
+
+    const benefitTracking = userData.benefitTracking || [];
+    const streakHistory = userData.streakHistory || [];
+
+    if (benefitTracking.length < 14) {
+      return { success: false, error: 'Need at least 14 days of benefit tracking data' };
+    }
+
+    const relapses = streakHistory.filter(s => s.reason === 'relapse');
+    if (relapses.length < 2) {
+      return { success: false, error: 'Need at least 2 relapses for pattern learning' };
+    }
+
+    try {
       // Generate training data using DataPreprocessor
-      const { features, labels, count } = dataPreprocessor.generateTrainingData(userData);
-      
-      if (count < 14) {
-        console.log(`⚠️ Insufficient data: ${count}/14 minimum`);
-        return { success: false, reason: 'Insufficient training data' };
+      const trainingData = dataPreprocessor.generateTrainingData(userData);
+
+      if (trainingData.features.length < 10) {
+        return { success: false, error: 'Insufficient training samples' };
       }
-      
-      // Calculate and store normalization stats
-      this.normalizationStats = dataPreprocessor.calculateNormalizationStats(features);
-      this.saveNormalizationStats();
-      
+
+      // Calculate and save normalization stats
+      const stats = dataPreprocessor.calculateNormalizationStats(trainingData.features);
+      this.saveNormalizationStats(stats);
+
       // Normalize features
-      const normalizedFeatures = features.map(f => 
-        dataPreprocessor.normalizeFeatures(f, this.normalizationStats)
+      const normalizedFeatures = trainingData.features.map(f =>
+        dataPreprocessor.normalizeFeatures(f, stats)
       );
-      
-      // Convert to tensors
+
+      // Create tensors
       const xs = tf.tensor2d(normalizedFeatures);
-      const ys = tf.tensor2d(labels);
-      
-      // Training configuration
-      const epochs = options.epochs || 50;
-      const batchSize = Math.min(8, Math.floor(count / 4));
-      
+      const ys = tf.tensor2d(trainingData.labels.map(l => [l]));
+
       // Train
-      const history = await this.model.fit(xs, ys, {
-        epochs,
-        batchSize,
+      const result = await this.model.fit(xs, ys, {
+        epochs: 50,
+        batchSize: Math.min(32, Math.floor(normalizedFeatures.length / 2)),
         validationSplit: 0.2,
         shuffle: true,
         callbacks: {
           onEpochEnd: (epoch, logs) => {
-            if (epoch % 10 === 0) {
-              console.log(`   Epoch ${epoch}: loss=${logs.loss.toFixed(4)}, acc=${logs.acc.toFixed(4)}`);
+            if (callbacks.onProgress) {
+              callbacks.onProgress({
+                epoch: epoch + 1,
+                totalEpochs: 50,
+                loss: logs.loss,
+                accuracy: logs.acc,
+                valLoss: logs.val_loss,
+                valAccuracy: logs.val_acc
+              });
             }
           }
         }
       });
-      
-      // Cleanup tensors
+
+      // Cleanup
       xs.dispose();
       ys.dispose();
-      
-      // Update training history
-      const finalAccuracy = history.history.acc[history.history.acc.length - 1];
-      const finalLoss = history.history.loss[history.history.loss.length - 1];
-      
-      this.trainingHistory.accuracy.push(finalAccuracy);
-      this.trainingHistory.loss.push(finalLoss);
-      this.trainingHistory.lastTrained = new Date().toISOString();
-      this.trainingHistory.totalEpochs += epochs;
-      
-      // Save model and history
+
+      // Save model
       await this.saveModel();
-      this.saveTrainingHistory();
-      
-      this.isModelReady = true;
-      
-      console.log(`✅ Training complete: accuracy=${(finalAccuracy * 100).toFixed(1)}%`);
-      
+
+      // Save training history
+      const history = {
+        lastTrained: new Date().toISOString(),
+        samples: normalizedFeatures.length,
+        finalLoss: result.history.loss[result.history.loss.length - 1],
+        finalAccuracy: result.history.acc[result.history.acc.length - 1],
+        relapseCount: relapses.length
+      };
+      localStorage.setItem('ml_training_history', JSON.stringify(history));
+      this.trainingHistory = history;
+
       return {
         success: true,
-        accuracy: finalAccuracy,
-        loss: finalLoss,
-        epochs,
-        dataPoints: count
+        samples: normalizedFeatures.length,
+        epochs: 50,
+        finalLoss: history.finalLoss,
+        finalAccuracy: history.finalAccuracy
       };
-      
+
     } catch (error) {
       console.error('❌ Training error:', error);
-      return { success: false, reason: error.message };
+      return { success: false, error: error.message };
     }
   }
 
   // ============================================================
   // PREDICTION
+  // FIXED: Now generates rich pattern data for PredictionDisplay
   // ============================================================
 
   async predict(userData) {
+    if (!this.isInitialized) await this.initialize();
+
     try {
-      // Check if model is ready AND actually trained (not just seeded data)
-      // Seeded data sets trainingHistory but doesn't create real model weights
-      const hasRealTrainedModel = this.isModelReady && 
-                                   this.model && 
-                                   this.trainingHistory.lastTrained &&
-                                   this.trainingHistory.totalEpochs > 0; // Real training has epochs
+      // Check for real trained model with actual training history
+      const trainingHistory = localStorage.getItem('ml_training_history');
+      const hasRealTrainedModel = this.model && 
+                                   trainingHistory && 
+                                   JSON.parse(trainingHistory).samples > 0;
       
       if (!hasRealTrainedModel) {
         console.log('⚠️ No real trained model, using fallback prediction with rich patterns');
@@ -256,11 +284,11 @@ class MLPredictionService {
       // Calculate reliability based on data quality
       const reliability = this.calculateReliability(userData);
       
-      // Analyze contributing factors
+      // Analyze contributing factors - FIXED: Now uses correct naming
       const factors = this.analyzeFactors(rawFeatures, userData);
       
-      // Get pattern insights
-      const patterns = this.analyzeStreakPatterns(userData);
+      // Get pattern insights - FIXED: Now generates rich patterns with suggestions
+      const patterns = this.generateMLPatterns(userData, rawFeatures);
       
       // Get emotional data count (check both field names)
       const emotionalDataPoints = (userData.emotionalLog || userData.emotionalTracking || []).length;
@@ -286,7 +314,7 @@ class MLPredictionService {
   }
 
   // ============================================================
-  // FACTOR ANALYSIS - UPDATED FOR 12 FEATURES
+  // FACTOR ANALYSIS - FIXED FOR PREDICTIONDISPLAY COMPATIBILITY
   // ============================================================
 
   analyzeFactors(features, userData) {
@@ -307,8 +335,12 @@ class MLPredictionService {
     if (hourOfDay >= 20 || hourOfDay <= 4) factors.highRiskHour = { value: hourOfDay, weight: 0.10 };
     if (isWeekend) factors.weekend = { value: 1, weight: 0.08 };
     
-    // Streak context
-    if (inPurgePhase) factors.purgePhase = { value: streakDay, weight: 0.12 };
+    // FIXED: Streak context - Use correct naming for PredictionDisplay
+    if (inPurgePhase) {
+      const currentPhase = this.getCurrentPhase(streakDay);
+      factors.inPurgePhase = true; // PredictionDisplay checks for this
+      factors.emotionalProcessingPhase = { value: streakDay, weight: 0.12, phaseName: currentPhase.name };
+    }
     
     // EMOTIONAL FACTORS - HIGHEST PREDICTIVE VALUE
     if (anxiety > 7) factors.highAnxiety = { value: anxiety, weight: 0.20 };
@@ -333,7 +365,7 @@ class MLPredictionService {
       if (factors.moodVolatility) {
         return 'Emotional volatility pattern - journal and ground yourself';
       }
-      if (factors.emotionalProcessingPhase || factors.purgePhase) {
+      if (factors.emotionalProcessingPhase || factors.inPurgePhase) {
         return 'Emotional Processing phase - intense but temporary';
       }
       if (factors.energyCrash) {
@@ -356,6 +388,127 @@ class MLPredictionService {
     }
     
     return 'Low risk - your patterns indicate stability';
+  }
+
+  // ============================================================
+  // ML PATTERN GENERATION - NEW METHOD FOR RICH MODAL DATA
+  // ============================================================
+
+  generateMLPatterns(userData, features) {
+    const [
+      energy, focus, confidence, energyDrop, hourOfDay, isWeekend,
+      streakDay, inPurgePhase, anxiety, moodStability, mentalClarity, emotionalProcessing
+    ] = features;
+    
+    const relapses = (userData.streakHistory || []).filter(s => s.reason === 'relapse');
+    const patterns = {};
+    const currentPhase = this.getCurrentPhase(streakDay);
+    
+    // Streak pattern analysis
+    if (relapses.length >= 2) {
+      const relapseDays = relapses.map(r => r.days).filter(d => d);
+      const similarDayRelapses = relapseDays.filter(d => Math.abs(d - streakDay) <= 5);
+      
+      if (similarDayRelapses.length >= 1) {
+        const minDay = Math.max(1, streakDay - 5);
+        const maxDay = streakDay + 5;
+        patterns.streak = {
+          isHighRiskDay: similarDayRelapses.length >= 2,
+          currentDay: streakDay,
+          relapsesInRange: similarDayRelapses.length,
+          totalRelapses: relapses.length,
+          rangeDays: [minDay, maxDay]
+        };
+      }
+    }
+    
+    // Time pattern analysis
+    const isHighRiskHour = hourOfDay >= 20 || hourOfDay <= 4;
+    if (isHighRiskHour) {
+      const eveningRelapses = relapses.filter(r => r.trigger === 'evening').length;
+      const eveningPercentage = relapses.length > 0 ? Math.round((eveningRelapses / relapses.length) * 100) : 0;
+      
+      if (eveningPercentage >= 30) {
+        patterns.time = {
+          isHighRiskTime: true,
+          currentHour: hourOfDay,
+          eveningRelapses: eveningRelapses,
+          eveningPercentage: eveningPercentage
+        };
+      }
+    }
+    
+    // Benefit drop analysis
+    if (energyDrop >= 2) {
+      patterns.benefits = {
+        hasSignificantDrop: true,
+        drops: [{ metric: 'Energy', from: Math.round(energy + energyDrop), to: Math.round(energy) }],
+        daysCovered: 1
+      };
+    }
+    
+    // Generate suggestions based on ML-detected factors
+    patterns.suggestions = this.generateSuggestions(features, currentPhase, inPurgePhase);
+    
+    return patterns;
+  }
+
+  // ============================================================
+  // SUGGESTION GENERATION
+  // ============================================================
+
+  generateSuggestions(features, currentPhase, inPurgePhase) {
+    const [
+      energy, focus, confidence, energyDrop, hourOfDay, isWeekend,
+      streakDay, , anxiety, moodStability, mentalClarity, emotionalProcessing
+    ] = features;
+    
+    const suggestions = [];
+    
+    // Phase-specific suggestion (always included for phases 1-2)
+    if (inPurgePhase || streakDay <= 45) {
+      suggestions.push({
+        focus: currentPhase.name,
+        reason: streakDay <= 14
+          ? 'Focus on building unbreakable daily habits and channeling excess energy'
+          : 'Emotional turbulence is normal - journal and accept feelings without resistance'
+      });
+    }
+    
+    // Anxiety-based suggestion
+    if (anxiety > 6) {
+      suggestions.push({
+        focus: 'Anxiety management',
+        reason: 'Elevated anxiety detected - breathing exercises and grounding techniques help'
+      });
+    }
+    
+    // Mood-based suggestion
+    if (moodStability < 5) {
+      suggestions.push({
+        focus: 'Emotional stability',
+        reason: 'Mood fluctuations are common - maintain consistent daily practices'
+      });
+    }
+    
+    // Time-based suggestion
+    if (hourOfDay >= 20 || hourOfDay <= 4) {
+      suggestions.push({
+        focus: 'Evening protocol',
+        reason: 'Evening hours require extra vigilance - avoid screens and practice wind-down routine'
+      });
+    }
+    
+    // Energy-based suggestion
+    if (energy < 4 || energyDrop >= 2) {
+      suggestions.push({
+        focus: 'Energy restoration',
+        reason: 'Low energy increases vulnerability - prioritize sleep and recovery'
+      });
+    }
+    
+    // Limit to top 3 suggestions
+    return suggestions.slice(0, 3);
   }
 
   // ============================================================
@@ -497,239 +650,132 @@ class MLPredictionService {
     if (isHighRiskHour) {
       // Analyze relapse triggers for evening pattern
       const eveningRelapses = relapses.filter(r => r.trigger === 'evening').length;
-      const eveningPercentage = relapses.length > 0 ? Math.round((eveningRelapses / relapses.length) * 100) : 50;
+      const eveningPercentage = relapses.length > 0 ? Math.round((eveningRelapses / relapses.length) * 100) : 0;
       
-      patterns.time = {
-        isHighRiskTime: true,
-        eveningPercentage: Math.max(eveningPercentage, 40) // Minimum 40% for display
-      };
-    }
-    
-    // Benefit drop pattern
-    if (hasEnergyDrop) {
-      const benefitTracking = userData.benefitTracking || [];
-      if (benefitTracking.length >= 2) {
-        const latest = benefitTracking[benefitTracking.length - 1];
-        const previous = benefitTracking[benefitTracking.length - 2];
-        patterns.benefits = {
-          hasSignificantDrop: true,
-          drops: [{
-            metric: 'Energy',
-            from: previous.energy,
-            to: latest.energy
-          }],
-          daysCovered: Math.min(7, benefitTracking.length)
+      if (eveningPercentage >= 30) {
+        patterns.time = {
+          isHighRiskTime: true,
+          currentHour: new Date().getHours(),
+          eveningRelapses: eveningRelapses,
+          eveningPercentage: eveningPercentage
         };
       }
     }
     
-    // Suggestions based on risk factors
-    const suggestions = [];
-    if (inEmotionalProcessing) {
-      suggestions.push({
-        focus: currentPhase.name + ' phase',
-        reason: 'Days 15-45 often bring intense emotional processing as suppressed feelings surface'
-      });
-    }
-    if (isHighRiskHour) {
-      suggestions.push({
-        focus: 'Evening routine',
-        reason: 'Structure your nights to reduce vulnerability'
-      });
-    }
+    // Benefit drop analysis
     if (hasEnergyDrop) {
-      suggestions.push({
-        focus: 'Energy recovery',
-        reason: 'Low energy correlates with increased risk'
-      });
-    }
-    
-    if (suggestions.length > 0) {
-      patterns.suggestions = suggestions;
-    }
-    
-    return Object.keys(patterns).length > 0 ? patterns : null;
-  }
-
-  // ============================================================
-  // RELIABILITY CALCULATION
-  // FIXED: Now checks both emotionalLog and emotionalTracking fields
-  // ============================================================
-
-  calculateReliability(userData) {
-    let reliability = this.trainingHistory.accuracy.length > 0
-      ? this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1] * 100
-      : 50;
-    
-    // Data quantity factors
-    const benefitDays = userData.benefitTracking?.length || 0;
-    const emotionalDays = (userData.emotionalLog || userData.emotionalTracking || []).length;
-    
-    if (benefitDays < 30) {
-      reliability *= 0.7;
-    } else if (benefitDays < 50) {
-      reliability *= 0.85;
-    }
-    
-    // Emotional data coverage bonus
-    if (emotionalDays > 0) {
-      const coverage = emotionalDays / benefitDays;
-      if (coverage > 0.7) {
-        reliability *= 1.1; // 10% boost for good emotional data
-      } else if (coverage > 0.3) {
-        reliability *= 1.05;
+      const benefitTracking = userData.benefitTracking || [];
+      if (benefitTracking.length >= 2) {
+        const current = benefitTracking[benefitTracking.length - 1];
+        const previous = benefitTracking[benefitTracking.length - 2];
+        patterns.benefits = {
+          hasSignificantDrop: true,
+          drops: [{ metric: 'Energy', from: previous.energy, to: current.energy }],
+          daysCovered: 1
+        };
       }
     }
     
-    // Relapse history factors
-    const relapseCount = userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0;
-    if (relapseCount < 2) {
-      reliability *= 0.75;
-    } else if (relapseCount < 4) {
-      reliability *= 0.9;
+    // Generate suggestions based on current state
+    patterns.suggestions = [];
+    
+    // Phase-specific suggestion
+    if (inEmotionalProcessing) {
+      patterns.suggestions.push({
+        focus: currentPhase.name,
+        reason: currentStreak <= 14 
+          ? 'Focus on building unbreakable daily habits and channeling excess energy'
+          : 'Emotional turbulence is normal - journal and accept feelings without resistance'
+      });
     }
     
-    return Math.min(Math.round(reliability), 90);
+    // Time-based suggestion
+    if (isHighRiskHour) {
+      patterns.suggestions.push({
+        focus: 'Evening protocol',
+        reason: 'Evening hours require extra vigilance - avoid screens and practice wind-down routine'
+      });
+    }
+    
+    // Energy-based suggestion
+    if (hasEnergyDrop) {
+      patterns.suggestions.push({
+        focus: 'Energy restoration',
+        reason: 'Low energy increases vulnerability - prioritize sleep and recovery'
+      });
+    }
+    
+    return patterns;
   }
 
-  // ============================================================
-  // PATTERN ANALYSIS
-  // ============================================================
-
+  // Legacy method for compatibility - calls generateFallbackPatterns internally
   analyzeStreakPatterns(userData) {
-    const relapses = (userData.streakHistory || [])
-      .filter(s => s.reason === 'relapse' && s.days)
-      .map(s => s.days);
+    const streak = userData.currentStreak || 0;
+    const hour = new Date().getHours();
+    const isHighRiskHour = hour >= 20 || hour <= 4;
+    const inEmotionalProcessing = streak >= 15 && streak <= 45;
     
-    if (relapses.length < 2) {
-      return null;
+    // Check for energy drop
+    let hasEnergyDrop = false;
+    const benefitTracking = userData.benefitTracking || [];
+    if (benefitTracking.length >= 2) {
+      const current = benefitTracking[benefitTracking.length - 1];
+      const previous = benefitTracking[benefitTracking.length - 2];
+      if (previous.energy - current.energy >= 2) {
+        hasEnergyDrop = true;
+      }
     }
-
-    const currentDay = userData.currentStreak || 0;
     
-    // Find relapses within similar day range
-    const similarDayRelapses = relapses.filter(d => 
-      Math.abs(d - currentDay) <= 5
-    );
-    
-    // Analyze relapse distribution
-    const ranges = {
-      early: relapses.filter(d => d <= 14).length,
-      mid: relapses.filter(d => d > 14 && d <= 30).length,
-      late: relapses.filter(d => d > 30 && d <= 60).length,
-      veteran: relapses.filter(d => d > 60).length
-    };
-    
-    // Current range
-    let currentRange = 'early';
-    if (currentDay > 60) currentRange = 'veteran';
-    else if (currentDay > 30) currentRange = 'late';
-    else if (currentDay > 14) currentRange = 'mid';
-    
-    return {
-      totalRelapses: relapses.length,
-      averageStreakLength: Math.round(relapses.reduce((a, b) => a + b, 0) / relapses.length),
-      similarDayRelapses: similarDayRelapses.length,
-      currentRange,
-      rangeDistribution: ranges,
-      inHistoricalDangerZone: similarDayRelapses.length >= 2
-    };
+    return this.generateFallbackPatterns(userData, streak, isHighRiskHour, hasEnergyDrop, inEmotionalProcessing);
   }
 
   // ============================================================
-  // MODEL INFO - For external checks
+  // UTILITY METHODS
   // ============================================================
+
+  calculateReliability(userData) {
+    let reliability = 40;
+    
+    const benefitDays = userData.benefitTracking?.length || 0;
+    const relapseCount = userData.streakHistory?.filter(s => s.reason === 'relapse').length || 0;
+    const emotionalPoints = (userData.emotionalLog || userData.emotionalTracking || []).length;
+    
+    if (benefitDays >= 30) reliability += 20;
+    else if (benefitDays >= 14) reliability += 10;
+    
+    if (relapseCount >= 5) reliability += 20;
+    else if (relapseCount >= 3) reliability += 10;
+    
+    if (emotionalPoints >= 10) reliability += 10;
+    else if (emotionalPoints >= 5) reliability += 5;
+    
+    return Math.min(90, reliability);
+  }
 
   getModelInfo() {
+    const trainingHistory = localStorage.getItem('ml_training_history');
+    const history = trainingHistory ? JSON.parse(trainingHistory) : null;
+    
     return {
-      isReady: this.isModelReady,
-      lastTrained: this.trainingHistory.lastTrained,
-      accuracy: this.trainingHistory.accuracy.length > 0
-        ? this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1]
-        : null,
-      epochs: this.trainingHistory.totalEpochs,
-      numFeatures: this.NUM_FEATURES
+      isReady: this.model !== null && history?.samples > 0,
+      lastTrained: history?.lastTrained,
+      samples: history?.samples || 0,
+      accuracy: history?.finalAccuracy,
+      hasNormalizationStats: this.normalizationStats !== null
     };
   }
 
-  // ============================================================
-  // TRAINING STATUS
-  // ============================================================
-
-  getTrainingStatus() {
-    return {
-      isTrained: this.isModelReady && this.trainingHistory.lastTrained !== null,
-      lastTrained: this.trainingHistory.lastTrained,
-      accuracy: this.trainingHistory.accuracy.length > 0
-        ? this.trainingHistory.accuracy[this.trainingHistory.accuracy.length - 1]
-        : null,
-      epochs: this.trainingHistory.totalEpochs,
-      dataPoints: 0, // Would need to track this separately
-      numFeatures: this.NUM_FEATURES
-    };
-  }
-
-  // ============================================================
-  // PERSISTENCE
-  // ============================================================
-
-  async loadModel() {
-    try {
-      this.model = await tf.loadLayersModel(this.MODEL_SAVE_PATH);
-      this.model.compile({
-        optimizer: tf.train.adam(0.001),
-        loss: 'binaryCrossentropy',
-        metrics: ['accuracy']
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  async saveModel() {
-    if (this.model) {
-      await this.model.save(this.MODEL_SAVE_PATH);
-    }
-  }
-
-  saveTrainingHistory() {
-    localStorage.setItem('ml_training_history', JSON.stringify(this.trainingHistory));
-  }
-
-  loadTrainingHistory() {
-    const saved = localStorage.getItem('ml_training_history');
-    if (saved) {
-      this.trainingHistory = JSON.parse(saved);
-    }
-  }
-
-  saveNormalizationStats() {
-    if (this.normalizationStats) {
-      localStorage.setItem('ml_normalization_stats', JSON.stringify(this.normalizationStats));
-    }
-  }
-
-  loadNormalizationStats() {
-    const saved = localStorage.getItem('ml_normalization_stats');
-    if (saved) {
-      this.normalizationStats = JSON.parse(saved);
-    }
-  }
-
-  // ============================================================
-  // CLEANUP
-  // ============================================================
-
-  dispose() {
-    if (this.model) {
-      this.model.dispose();
-      this.model = null;
-    }
-    this.isModelReady = false;
+  resetModel() {
+    localStorage.removeItem(this.MODEL_KEY);
+    localStorage.removeItem(`${this.MODEL_KEY}_info`);
+    localStorage.removeItem(this.STATS_KEY);
+    localStorage.removeItem('ml_training_history');
+    this.model = this.createModel();
+    this.normalizationStats = null;
+    this.trainingHistory = null;
+    console.log('🔄 ML model reset');
   }
 }
 
-// Export singleton instance
 const mlPredictionService = new MLPredictionService();
 export default mlPredictionService;
