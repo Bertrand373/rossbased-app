@@ -884,7 +884,7 @@
 }
 
 /* =============================================================================
-   MICROCOSMIC ORBIT MODAL - Side Profile
+   MICROCOSMIC ORBIT MODAL - Anatomically Correct Side Profile
    ============================================================================= */
 
 .ut-orbit-modal {
@@ -892,7 +892,7 @@
 }
 
 .ut-orbit-visual {
-  width: 140px;
+  width: 180px;
   height: 250px;
   position: relative;
   display: flex;
@@ -906,29 +906,30 @@
 }
 
 .ut-orbit-silhouette {
-  fill: rgba(255, 255, 255, 0.06);
+  fill: rgba(255, 255, 255, 0.08);
 }
 
 .ut-orbit-marker {
-  fill: rgba(255, 255, 255, 0.2);
+  fill: rgba(255, 255, 255, 0.25);
 }
 
 .ut-orbit-glow {
-  fill: rgba(255, 255, 255, 0.15);
-  animation: orbitPulse 1.5s ease-in-out infinite;
+  fill: rgba(255, 255, 255, 0.12);
+  animation: orbitPulse 2s ease-in-out infinite;
 }
 
 .ut-orbit-ball {
   fill: #ffffff;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.9));
 }
 
 @keyframes orbitPulse {
   0%, 100% { 
     opacity: 0.3;
+    transform-origin: center;
   }
   50% { 
-    opacity: 0.7;
+    opacity: 0.6;
   }
 }
 

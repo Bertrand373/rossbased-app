@@ -993,77 +993,123 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
 
             <div className="ut-modal-body">
-              {/* Side Profile Meditation Silhouette */}
+              {/* Side Profile Meditation Figure - Anatomically Correct */}
               <div className="ut-orbit-visual">
-                <svg className="ut-orbit-figure" viewBox="0 0 100 180" fill="none">
-                  {/* Clean side profile silhouette */}
-                  <path 
+                <svg className="ut-orbit-figure" viewBox="0 0 200 280" fill="none">
+                  
+                  {/* === HEAD === */}
+                  {/* Back of skull curves right, forehead curves left */}
+                  <ellipse 
+                    cx="100" 
+                    cy="35" 
+                    rx="28" 
+                    ry="32"
                     className="ut-orbit-silhouette"
-                    d="M50 5
-                       C62 5 70 15 70 28
-                       C70 38 65 46 58 50
-                       C60 52 62 56 62 62
-                       L62 95
-                       C62 105 65 115 70 122
-                       L75 130
-                       C78 135 78 142 75 148
-                       C72 154 65 158 55 160
-                       L40 165
-                       C30 168 22 172 18 175
-                       L85 175
-                       C82 168 75 162 68 158
-                       C75 150 78 140 78 130
-                       L78 120
-                       C85 115 90 105 90 92
-                       C90 80 85 72 78 68
-                       C80 62 80 55 78 50
-                       C85 45 90 35 90 25
-                       C90 12 75 5 50 5
-                       Z"
                   />
                   
-                  {/* Single moving energy ball - only shows when active */}
+                  {/* === NECK === */}
+                  <path
+                    d="M88 62 L85 78 L115 78 L112 62"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* === TORSO === */}
+                  {/* Back has natural S-curve, front is straighter */}
+                  <path
+                    d="M85 78
+                       L75 90
+                       L70 120
+                       L68 150
+                       L70 175
+                       L85 190
+                       L115 190
+                       L130 175
+                       L132 150
+                       L130 120
+                       L125 90
+                       L115 78
+                       Z"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* === ARMS (resting on knees) === */}
+                  <ellipse
+                    cx="55"
+                    cy="160"
+                    rx="18"
+                    ry="12"
+                    className="ut-orbit-silhouette"
+                  />
+                  <ellipse
+                    cx="145"
+                    cy="160"
+                    rx="18"
+                    ry="12"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* === CROSSED LEGS === */}
+                  {/* Left leg (crosses in front) */}
+                  <path
+                    d="M70 190
+                       C50 195 30 210 25 230
+                       C22 245 30 260 50 265
+                       C70 268 95 265 100 260
+                       L100 200
+                       Z"
+                    className="ut-orbit-silhouette"
+                  />
+                  {/* Right leg (underneath) */}
+                  <path
+                    d="M130 190
+                       C150 195 170 210 175 230
+                       C178 245 170 260 150 265
+                       C130 268 105 265 100 260
+                       L100 200
+                       Z"
+                    className="ut-orbit-silhouette"
+                  />
+                  
+                  {/* === ENERGY BALL (only when active) === */}
                   {orbitActive && (() => {
-                    // Anatomically correct positions for side profile
-                    // Back channel goes UP: perineum → sacrum → spine → skull → crown
-                    // Front channel goes DOWN: crown → third eye → throat → heart → dan tian
+                    // Anatomically correct positions based on reference image
+                    // Back channel (right side, up): perineum → tailbone → lower back → upper back → neck base → crown
+                    // Front channel (left side, down): crown → third eye → throat → heart → solar plexus → dan tian
                     const positions = [
-                      { x: 45, y: 160 },  // Hui Yin - Perineum (base, between legs)
-                      { x: 38, y: 140 },  // Ming Men - Sacrum (lower back)
-                      { x: 35, y: 110 },  // Jizhong - Mid spine (middle back)
-                      { x: 35, y: 80 },   // Lingtai - Upper spine (upper back)
-                      { x: 40, y: 55 },   // Dazhui - Base of skull (back of neck)
-                      { x: 50, y: 10 },   // Baihui - Crown (top of head)
-                      { x: 62, y: 30 },   // Yintang - Third eye (forehead)
-                      { x: 68, y: 52 },   // Tiantu - Throat (front of neck)
-                      { x: 72, y: 78 },   // Shanzhong - Heart (chest)
-                      { x: 65, y: 120 }   // Qihai - Dan tian (lower abdomen)
+                      { x: 100, y: 255 },  // 1. Hui Yin - Perineum (bottom center)
+                      { x: 125, y: 220 },  // 2. Chang Qiang - Tailbone (back, low)
+                      { x: 130, y: 175 },  // 3. Ming Men - Lower back / Kidneys (back, mid-low)
+                      { x: 130, y: 130 },  // 4. Jizhong - Mid spine (back, middle)
+                      { x: 125, y: 85 },   // 5. Dazhui - C7 / Base of neck (back, upper)
+                      { x: 100, y: 8 },    // 6. Baihui - Crown (top of head)
+                      { x: 78, y: 25 },    // 7. Yintang - Third eye (forehead, front)
+                      { x: 72, y: 70 },    // 8. Tiantu - Throat (front of neck)
+                      { x: 68, y: 110 },   // 9. Shanzhong - Heart (front chest)
+                      { x: 70, y: 160 }    // 10. Qihai - Dan tian (lower abdomen, front)
                     ];
                     const pos = positions[orbitPointIndex];
                     
                     return (
-                      <g className="ut-orbit-energy-ball">
-                        {/* Outer glow */}
-                        <circle cx={pos.x} cy={pos.y} r="14" className="ut-orbit-glow" />
-                        {/* Inner ball */}
-                        <circle cx={pos.x} cy={pos.y} r="7" className="ut-orbit-ball" />
+                      <g className="ut-energy-group">
+                        <circle cx={pos.x} cy={pos.y} r="16" className="ut-orbit-glow" />
+                        <circle cx={pos.x} cy={pos.y} r="8" className="ut-orbit-ball" />
                       </g>
                     );
                   })()}
                   
-                  {/* Subtle static markers - show path when not active */}
+                  {/* === STATIC MARKERS (when not active) === */}
                   {!orbitActive && ORBIT_POINTS.map((point, index) => {
                     const positions = [
-                      { x: 45, y: 160 },
-                      { x: 38, y: 140 },
-                      { x: 35, y: 110 },
-                      { x: 35, y: 80 },
-                      { x: 40, y: 55 },
-                      { x: 50, y: 10 },
-                      { x: 62, y: 30 },
-                      { x: 68, y: 52 },
-                      { x: 72, y: 78 },
-                      { x: 65, y: 120 }
+                      { x: 100, y: 255 },  // Perineum
+                      { x: 125, y: 220 },  // Tailbone
+                      { x: 130, y: 175 },  // Lower back
+                      { x: 130, y: 130 },  // Mid spine
+                      { x: 125, y: 85 },   // Base of neck
+                      { x: 100, y: 8 },    // Crown
+                      { x: 78, y: 25 },    // Third eye
+                      { x: 72, y: 70 },    // Throat
+                      { x: 68, y: 110 },   // Heart
+                      { x: 70, y: 160 }    // Dan tian
                     ];
                     const pos = positions[index];
                     
@@ -1072,7 +1118,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                         key={point.id}
                         cx={pos.x}
                         cy={pos.y}
-                        r="3"
+                        r="4"
                         className="ut-orbit-marker"
                       />
                     );
