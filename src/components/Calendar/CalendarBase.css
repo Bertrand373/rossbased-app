@@ -116,27 +116,29 @@
   height: 12px;
 }
 
-/* View Toggle - Text only, landing page stat divider style */
+/* View Toggle - Text only, matches EmotionalTimeline/Profile/Stats */
 .view-toggle-minimal {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 0;
 }
 
 .toggle-option {
   background: transparent;
   border: none;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: color 200ms ease;
-  padding: 4px 0;
-  color: rgba(255, 255, 255, 0.3);
+  transition: color 150ms ease;
+  padding: 8px 16px;
+  color: rgba(255, 255, 255, 0.25);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .toggle-option.active {
   color: #ffffff;
+  font-weight: 600;
 }
 
 .toggle-option:not(.active):hover {
@@ -423,28 +425,6 @@
   transform: scale(0.98);
 }
 
-/* Week status styling */
-.week-day-cell.current-streak {
-  border-color: rgba(52, 211, 153, 0.2);
-}
-
-.week-day-cell.former-streak {
-  border-color: rgba(96, 165, 250, 0.2);
-}
-
-.week-day-cell.relapse {
-  border-color: rgba(248, 113, 113, 0.2);
-}
-
-.week-day-cell.wet-dream {
-  border-color: rgba(251, 191, 36, 0.2);
-}
-
-.week-day-cell.today-card {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
 /* Week day header */
 .week-day-header {
   display: flex;
@@ -464,8 +444,8 @@
 
 .week-day-number {
   font-size: 1.5rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
   font-feature-settings: 'tnum' 1;
   line-height: 1;
 }
@@ -479,23 +459,14 @@
   background: #ffffff;
   color: #000000;
   border-radius: 50%;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
 }
 
-.week-day-cell.current-streak .week-day-number { color: #34d399; }
-.week-day-cell.former-streak .week-day-number { color: #60a5fa; }
-.week-day-cell.relapse .week-day-number { color: #f87171; }
-.week-day-cell.wet-dream .week-day-number { color: #fbbf24; }
+/* =============================================================================
+   WEEK VIEW - Benefit Bars (Prominent)
+   ============================================================================= */
 
-.week-day-cell.current-streak .week-day-number.today,
-.week-day-cell.former-streak .week-day-number.today,
-.week-day-cell.relapse .week-day-number.today,
-.week-day-cell.wet-dream .week-day-number.today {
-  background: #ffffff;
-  color: #000000;
-}
-
-/* Week benefits */
 .week-benefits-prominent {
   flex: 1;
   display: flex;
@@ -506,20 +477,20 @@
 .week-benefit-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .week-benefit-label-top {
   font-size: 0.5625rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.25);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
 }
 
 .week-benefit-bar {
   height: 2px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 1px;
   overflow: hidden;
 }
@@ -528,22 +499,19 @@
   height: 100%;
   background: #ffffff;
   border-radius: 1px;
-  transition: width 300ms ease;
+  transition: width 400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Week empty state */
-.week-no-data {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.15);
-  text-align: center;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Color-coded benefit bars */
+.week-benefit-fill.energy { background: #34d399; }
+.week-benefit-fill.focus { background: #60a5fa; }
+.week-benefit-fill.confidence { background: #fbbf24; }
+.week-benefit-fill.aura { background: #a78bfa; }
+.week-benefit-fill.sleep { background: #818cf8; }
+.week-benefit-fill.workout { background: #f472b6; }
 
 /* =============================================================================
-   WEEK DAY INDICATORS - Dots only
+   WEEK VIEW - Bottom Indicators
    ============================================================================= */
 
 .week-day-indicators {
@@ -806,11 +774,12 @@
   }
   
   .toggle-option {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
+    padding: 8px 12px;
   }
   
   .toggle-divider {
-    height: 12px;
+    height: 14px;
   }
   
   /* Legend */
@@ -919,6 +888,17 @@
   .week-status-dot {
     width: 4px;
     height: 4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .toggle-option {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+  
+  .toggle-divider {
+    height: 12px;
   }
 }
 

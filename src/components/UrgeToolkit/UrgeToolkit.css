@@ -75,7 +75,7 @@
 }
 
 /* =============================================================================
-   STEP NAVIGATION - Text-only with dividers
+   STEP NAVIGATION - Text-only with dividers (matches Profile/Stats/EmotionalTimeline)
    ============================================================================= */
 
 .ut-steps {
@@ -93,7 +93,7 @@
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.25);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -316,7 +316,7 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* Mode Toggle - Text-only with dividers (matches other tabs) */
+/* Mode Toggle - Text-only with dividers (matches Profile/Stats/EmotionalTimeline) */
 .ut-breathing-modes {
   display: flex;
   justify-content: center;
@@ -329,7 +329,7 @@
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.25);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -408,147 +408,63 @@
   text-align: center;
 }
 
+.ut-breathing-mode-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
 .ut-breathing-modal-title {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #ffffff;
+  margin: 0;
 }
 
-.ut-breathing-modal-subtitle {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.35);
-}
+/* =============================================================================
+   BREATHING CIRCLE - Premium Animated
+   ============================================================================= */
 
-.ut-breathing-modal-body {
+.ut-breathing-circle-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 32px;
 }
 
-/* Breathing Circle - Outer ring for depth */
 .ut-breathing-circle {
+  position: relative;
   width: 180px;
   height: 180px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
-/* Subtle outer glow ring */
-.ut-breathing-circle::before {
-  content: '';
+/* Outer ring */
+.ut-breathing-ring {
   position: absolute;
-  inset: -1px;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  pointer-events: none;
 }
 
+/* Animated orb */
 .ut-breathing-orb {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
+  background: #ffffff;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, 
-    rgba(255, 255, 255, 0.95) 0%, 
-    rgba(255, 255, 255, 0.7) 50%, 
-    rgba(255, 255, 255, 0.4) 100%);
   box-shadow: 
-    0 0 20px rgba(255, 255, 255, 0.15),
-    0 0 40px rgba(255, 255, 255, 0.05);
-  filter: blur(0.5px);
+    0 0 40px rgba(255, 255, 255, 0.3),
+    0 0 80px rgba(255, 255, 255, 0.15);
+  transition: transform 0.1s ease-out;
 }
 
-/* Dynamic duration via CSS variable */
-.ut-breathing-orb.inhale {
-  animation: breatheIn var(--breath-duration, 4s) ease-in-out forwards;
-}
-
-.ut-breathing-orb.exhale {
-  animation: breatheOut var(--breath-duration, 4s) ease-in-out forwards;
-}
-
-.ut-breathing-orb.hold {
-  animation: holdPulse 2s ease-in-out infinite;
-  transform: scale(1.8);
-  box-shadow: 
-    0 0 40px rgba(255, 255, 255, 0.25),
-    0 0 80px rgba(255, 255, 255, 0.1);
-}
-
-.ut-breathing-orb.rapid {
-  animation: rapidBreath 0.3s ease-in-out infinite;
-}
-
-@keyframes breatheIn {
-  from { 
-    transform: scale(1); 
-    box-shadow: 
-      0 0 20px rgba(255, 255, 255, 0.1),
-      0 0 40px rgba(255, 255, 255, 0.03);
-    filter: blur(0.5px);
-  }
-  to { 
-    transform: scale(1.8); 
-    box-shadow: 
-      0 0 40px rgba(255, 255, 255, 0.3),
-      0 0 80px rgba(255, 255, 255, 0.15),
-      0 0 120px rgba(255, 255, 255, 0.05);
-    filter: blur(0px);
-  }
-}
-
-@keyframes breatheOut {
-  from { 
-    transform: scale(1.8); 
-    box-shadow: 
-      0 0 40px rgba(255, 255, 255, 0.3),
-      0 0 80px rgba(255, 255, 255, 0.15),
-      0 0 120px rgba(255, 255, 255, 0.05);
-    filter: blur(0px);
-  }
-  to { 
-    transform: scale(1); 
-    box-shadow: 
-      0 0 20px rgba(255, 255, 255, 0.1),
-      0 0 40px rgba(255, 255, 255, 0.03);
-    filter: blur(0.5px);
-  }
-}
-
-@keyframes holdPulse {
-  0%, 100% { 
-    box-shadow: 
-      0 0 40px rgba(255, 255, 255, 0.2),
-      0 0 80px rgba(255, 255, 255, 0.1);
-  }
-  50% { 
-    box-shadow: 
-      0 0 50px rgba(255, 255, 255, 0.35),
-      0 0 100px rgba(255, 255, 255, 0.15);
-  }
-}
-
-@keyframes rapidBreath {
-  0%, 100% { 
-    transform: scale(1); 
-    box-shadow: 
-      0 0 20px rgba(255, 255, 255, 0.15),
-      0 0 40px rgba(255, 255, 255, 0.05);
-  }
-  50% { 
-    transform: scale(1.4); 
-    box-shadow: 
-      0 0 30px rgba(255, 255, 255, 0.25),
-      0 0 60px rgba(255, 255, 255, 0.1);
-  }
-}
-
-/* Breathing Modal Info */
-.ut-breathing-modal-info {
+/* Phase/Timer display */
+.ut-breathing-display {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -556,86 +472,74 @@
 }
 
 .ut-breathing-phase-text {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 500;
   color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-}
-
-.ut-breathing-cycle-text {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.35);
+  text-transform: capitalize;
 }
 
 .ut-breathing-timer-text {
   font-size: 3rem;
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.4);
   font-feature-settings: 'tnum' 1;
-  line-height: 1;
-  margin-top: 8px;
 }
 
-/* Breathing Modal Footer */
-.ut-breathing-modal-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-
-.ut-btn-stop {
-  width: 100%;
-  padding: 16px 24px;
-  background: rgba(255, 59, 48, 0.15);
-  border: 1px solid rgba(255, 59, 48, 0.3);
-  border-radius: 12px;
-  color: #ff3b30;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.ut-btn-stop:hover {
-  background: rgba(255, 59, 48, 0.25);
-}
-
-/* Legacy classes kept for compatibility */
-.ut-breathing-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
+/* Old phase/timer styles (fallback) */
 .ut-breathing-phase {
   font-size: 1.5rem;
   font-weight: 500;
   color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.ut-breathing-count {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  text-transform: capitalize;
 }
 
 .ut-breathing-timer {
   font-size: 2rem;
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.4);
   font-feature-settings: 'tnum' 1;
 }
 
-/* Breathing Controls */
+/* =============================================================================
+   BREATHING PROGRESS
+   ============================================================================= */
+
+.ut-breathing-progress {
+  width: 100%;
+  max-width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.ut-breathing-progress-bar {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.ut-breathing-progress-fill {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 1px;
+  transition: width 300ms ease;
+}
+
+.ut-breathing-progress-text {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* =============================================================================
+   BREATHING CONTROLS
+   ============================================================================= */
+
 .ut-breathing-controls {
   display: flex;
-  gap: 12px;
+  gap: 16px;
 }
 
 .ut-control-btn {
@@ -962,7 +866,11 @@
 
   .ut-step {
     padding: 8px 12px;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
+  }
+  
+  .ut-mode-btn {
+    font-size: 0.8125rem;
   }
 
   .ut-section-title {
@@ -1022,10 +930,18 @@
 
   .ut-step {
     padding: 6px 10px;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
+  }
+  
+  .ut-mode-btn {
+    font-size: 0.75rem;
   }
 
   .ut-step-divider {
+    height: 12px;
+  }
+  
+  .ut-mode-divider {
     height: 12px;
   }
 
