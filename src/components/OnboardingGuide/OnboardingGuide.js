@@ -26,7 +26,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
       title: 'Set your start date',
       message: 'Tap the counter to set when your journey began.',
       position: 'bottom',
-      padding: 8 // Tight padding - just the counter
+      padding: 4 // Very tight - just the counter
     },
     {
       // Target the log button
@@ -34,15 +34,15 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
       title: 'Track daily benefits',
       message: 'Log how you feel each day. This powers your AI insights.',
       position: 'top',
-      padding: 6 // Tight padding - just the button
+      padding: 4 // Tight padding - just the button
     },
     {
-      // Target navigation
-      target: isMobile ? '.mobile-nav' : '.header-nav',
+      // Target just the nav links container (not full bar)
+      target: isMobile ? '.mobile-nav-inner' : '.nav-container',
       title: 'Explore when ready',
       message: 'Calendar, stats, timeline, and crisis tools await.',
       position: isMobile ? 'top' : 'bottom',
-      padding: 4 // Minimal for nav bar
+      padding: 8 // Padding for nav links
     }
   ];
 
@@ -161,24 +161,35 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
   const getSpotlightStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
-    // For nav (step 3), full width but tight height
+    // For nav (step 3) - rounded corners like other elements
     if (currentStep === 2) {
       return {
         top: `${targetRect.top - padding}px`,
-        left: '0',
-        width: '100%',
+        left: `${targetRect.left - padding}px`,
+        width: `${targetRect.width + (padding * 2)}px`,
         height: `${targetRect.height + (padding * 2)}px`,
-        borderRadius: '0'
+        borderRadius: '16px' // Rounded like other highlights
       };
     }
     
-    // For counter and button - tight spotlight
+    // For counter (step 1) - tight around just the button
+    if (currentStep === 0) {
+      return {
+        top: `${targetRect.top - padding}px`,
+        left: `${targetRect.left - padding}px`,
+        width: `${targetRect.width + (padding * 2)}px`,
+        height: `${targetRect.height + (padding * 2)}px`,
+        borderRadius: '20px'
+      };
+    }
+    
+    // For benefits button (step 2)
     return {
       top: `${targetRect.top - padding}px`,
       left: `${targetRect.left - padding}px`,
       width: `${targetRect.width + (padding * 2)}px`,
       height: `${targetRect.height + (padding * 2)}px`,
-      borderRadius: currentStep === 0 ? '20px' : '14px'
+      borderRadius: '14px'
     };
   };
 
