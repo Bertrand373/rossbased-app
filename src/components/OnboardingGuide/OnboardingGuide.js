@@ -121,17 +121,6 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     }, 300);
   };
 
-  // Handle spotlight tap
-  const handleSpotlightTap = () => {
-    if (isTransitioning) return;
-    
-    if (currentStep === 0 && onTriggerDatePicker) {
-      onTriggerDatePicker();
-    } else {
-      handleNext();
-    }
-  };
-
   if (!isVisible) return null;
 
   const step = steps[currentStep];
@@ -239,12 +228,14 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
 
   return (
     <div className="onboarding-overlay">
+      {/* Full-screen click blocker - prevents ALL interaction with app */}
+      <div className="onboarding-blocker" />
+      
       {/* Spotlight - tight focus on element */}
       {targetRect && (
         <div 
           className="onboarding-spotlight"
           style={getSpotlightStyle()}
-          onClick={handleSpotlightTap}
         />
       )}
 

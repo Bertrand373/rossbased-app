@@ -16,21 +16,34 @@
   background: transparent;
   z-index: 10000;
   animation: onboardingFadeIn 400ms ease;
-  
-  /* Block ALL clicks on background */
+}
+
+/* =============================================================================
+   CLICK BLOCKER - Prevents ALL interaction with app below
+   ============================================================================= */
+
+.onboarding-blocker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10001;
+  background: transparent;
+  pointer-events: auto;
+  cursor: default;
+}
+
+/* Only tooltip buttons are interactive - sits above blocker */
+.onboarding-tooltip {
   pointer-events: auto;
 }
 
-/* Only tooltip content is interactive */
+/* Visual elements only - no interaction */
+.onboarding-spotlight,
 .onboarding-connector,
 .onboarding-dot {
   pointer-events: none;
-}
-
-/* Spotlight blocks clicks on highlighted element */
-.onboarding-spotlight {
-  pointer-events: auto;
-  cursor: default;
 }
 
 @keyframes onboardingFadeIn {
@@ -44,7 +57,7 @@
 
 .onboarding-spotlight {
   position: fixed;
-  z-index: 10001;
+  z-index: 10002; /* Above blocker for visual, but pointer-events: none */
   
   /* Dark surround */
   box-shadow: 
@@ -83,7 +96,7 @@
     rgba(255, 255, 255, 0.4),
     rgba(255, 255, 255, 0.15)
   );
-  z-index: 10002;
+  z-index: 10003;
   pointer-events: none;
   
   /* Fade in with tooltip */
@@ -114,7 +127,7 @@
   height: 5px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
-  z-index: 10002;
+  z-index: 10004;
   pointer-events: none;
   
   /* Fade in with connector */
@@ -137,8 +150,9 @@
   background: transparent;
   border: none;
   padding: 0;
-  z-index: 10003;
+  z-index: 10005; /* Above blocker (10001) */
   text-align: center;
+  pointer-events: auto;
   
   /* Fade transition */
   transition: opacity 250ms ease, transform 250ms ease;
