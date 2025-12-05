@@ -1024,6 +1024,16 @@
     padding: 28px 12px 90px;
   }
   
+  /* Tab menu - matches Calendar/Profile/Stats/UrgeToolkit at 360px */
+  .et-tab {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+  
+  .et-tab-divider {
+    height: 12px;
+  }
+  
   .trajectory-values {
     gap: 6px;
   }

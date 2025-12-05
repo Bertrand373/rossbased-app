@@ -870,6 +870,7 @@
   }
   
   .ut-mode-btn {
+    padding: 8px 12px;
     font-size: 0.8125rem;
   }
 
@@ -934,6 +935,7 @@
   }
   
   .ut-mode-btn {
+    padding: 6px 10px;
     font-size: 0.75rem;
   }
 
