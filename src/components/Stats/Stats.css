@@ -61,6 +61,10 @@
   .stats-page > .overlay {
     max-width: none;
   }
+  
+  .stat-grid {
+    max-width: 520px;
+  }
 }
 
 /* =============================================================================
@@ -127,7 +131,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 100%;
+    max-width: 480px;
   }
   
   .stat-card {
