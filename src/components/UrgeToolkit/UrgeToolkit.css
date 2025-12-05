@@ -884,20 +884,22 @@
 }
 
 /* =============================================================================
-   MICROCOSMIC ORBIT MODAL - Anatomically Correct Side Profile
+   MICROCOSMIC ORBIT MODAL - Abstract Energy Circuit
    ============================================================================= */
 
 .ut-orbit-modal {
-  max-width: 360px;
+  max-width: 400px;
 }
 
 .ut-orbit-visual {
-  width: 180px;
-  height: 250px;
+  width: 100%;
+  max-width: 320px;
+  height: 380px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
 }
 
 .ut-orbit-figure {
@@ -905,31 +907,100 @@
   height: 100%;
 }
 
-.ut-orbit-silhouette {
-  fill: rgba(255, 255, 255, 0.08);
+/* Circuit path */
+.ut-circuit-path {
+  opacity: 0.6;
 }
 
-.ut-orbit-marker {
+/* Direction arrows */
+.ut-circuit-direction {
+  font-size: 14px;
+  fill: rgba(255, 255, 255, 0.15);
+  font-weight: 300;
+}
+
+/* Channel labels (FRONT / BACK) */
+.ut-circuit-channel {
+  font-size: 9px;
+  font-weight: 600;
   fill: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 
-.ut-orbit-glow {
-  fill: rgba(255, 255, 255, 0.12);
-  animation: orbitPulse 2s ease-in-out infinite;
+.ut-circuit-channel-sub {
+  font-size: 8px;
+  font-weight: 400;
+  fill: rgba(255, 255, 255, 0.15);
+  letter-spacing: 0.05em;
 }
 
-.ut-orbit-ball {
+/* Energy point markers */
+.ut-circuit-point {
+  fill: rgba(255, 255, 255, 0.2);
+  transition: all 400ms ease;
+}
+
+.ut-circuit-point.passed {
+  fill: rgba(255, 255, 255, 0.45);
+}
+
+.ut-circuit-point.active {
   fill: #ffffff;
-  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.9));
 }
 
-@keyframes orbitPulse {
-  0%, 100% { 
+/* Point labels */
+.ut-circuit-label {
+  font-size: 9px;
+  font-weight: 500;
+  fill: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.08em;
+  transition: all 400ms ease;
+}
+
+.ut-circuit-label.passed {
+  fill: rgba(255, 255, 255, 0.5);
+}
+
+.ut-circuit-label.active {
+  fill: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+}
+
+/* Glow effects for active point */
+.ut-circuit-glow-outer {
+  fill: rgba(255, 255, 255, 0.05);
+  animation: circuitPulseOuter 2.5s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.ut-circuit-glow-inner {
+  fill: rgba(255, 255, 255, 0.1);
+  animation: circuitPulseInner 2.5s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes circuitPulseOuter {
+  0%, 100% {
     opacity: 0.3;
-    transform-origin: center;
+    transform: scale(1);
   }
-  50% { 
+  50% {
     opacity: 0.6;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes circuitPulseInner {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
   }
 }
 

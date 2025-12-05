@@ -38,16 +38,16 @@ const INTENSITY_LABELS = {
 
 // Microcosmic Orbit energy points
 const ORBIT_POINTS = [
-  { id: 'perineum', name: 'Hui Yin', location: 'Perineum', instruction: 'Feel energy gather at the base of your spine' },
-  { id: 'sacrum', name: 'Ming Men', location: 'Lower Back', instruction: 'Energy rises to the kidney area' },
-  { id: 'spine', name: 'Ji Zhong', location: 'Mid Spine', instruction: 'Energy flows up through the spine' },
-  { id: 'neck', name: 'Da Zhui', location: 'Base of Neck', instruction: 'Energy reaches the base of skull' },
-  { id: 'crown', name: 'Bai Hui', location: 'Crown', instruction: 'Energy arrives at the top of your head' },
-  { id: 'thirdeye', name: 'Yin Tang', location: 'Third Eye', instruction: 'Energy settles between your eyebrows' },
+  { id: 'perineum', name: 'Hui Yin', location: 'Perineum', instruction: 'Feel energy gather at the base' },
+  { id: 'tailbone', name: 'Chang Qiang', location: 'Tailbone', instruction: 'Energy rises to the coccyx' },
+  { id: 'lowerback', name: 'Ming Men', location: 'Lower Back', instruction: 'Energy warms the kidney area' },
+  { id: 'upperback', name: 'Ji Zhong', location: 'Upper Back', instruction: 'Energy flows up the spine' },
+  { id: 'skull', name: 'Yu Zhen', location: 'Base of Skull', instruction: 'Energy reaches the jade pillow' },
+  { id: 'crown', name: 'Bai Hui', location: 'Crown', instruction: 'Energy arrives at the crown' },
+  { id: 'thirdeye', name: 'Yin Tang', location: 'Third Eye', instruction: 'Energy settles at the third eye' },
   { id: 'throat', name: 'Tian Tu', location: 'Throat', instruction: 'Energy descends through the throat' },
-  { id: 'heart', name: 'Shan Zhong', location: 'Heart Center', instruction: 'Energy drops to the heart' },
-  { id: 'solar', name: 'Zhong Wan', location: 'Solar Plexus', instruction: 'Energy reaches the stomach area' },
-  { id: 'dantian', name: 'Qi Hai', location: 'Dan Tian', instruction: 'Energy rests below your navel - one cycle complete' }
+  { id: 'heart', name: 'Shan Zhong', location: 'Heart', instruction: 'Energy rests at the heart center' },
+  { id: 'dantian', name: 'Qi Hai', location: 'Dan Tian', instruction: 'Energy returns below the navel' }
 ];
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
@@ -993,143 +993,106 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
 
             <div className="ut-modal-body">
-              {/* Side Profile Meditation Figure - Anatomically Correct */}
+              {/* Abstract Energy Circuit - Premium Design */}
               <div className="ut-orbit-visual">
-                <svg className="ut-orbit-figure" viewBox="0 0 200 280" fill="none">
+                <svg className="ut-orbit-figure" viewBox="0 0 320 400">
                   
-                  {/* === HEAD === */}
-                  {/* Back of skull curves right, forehead curves left */}
-                  <ellipse 
-                    cx="100" 
-                    cy="35" 
-                    rx="28" 
-                    ry="32"
-                    className="ut-orbit-silhouette"
-                  />
-                  
-                  {/* === NECK === */}
+                  {/* Circuit path - subtle connecting line */}
                   <path
-                    d="M88 62 L85 78 L115 78 L112 62"
-                    className="ut-orbit-silhouette"
+                    className="ut-circuit-path"
+                    d="M160 340
+                       C160 340 200 330 205 280
+                       C210 250 218 230 218 210
+                       C218 190 218 170 218 150
+                       C218 120 210 100 205 95
+                       C195 85 175 50 160 50
+                       C145 50 125 85 115 95
+                       C110 100 102 120 102 150
+                       C102 170 102 190 102 210
+                       C102 230 110 250 115 280
+                       C120 330 160 340 160 340"
+                    fill="none"
+                    stroke="rgba(255,255,255,0.08)"
+                    strokeWidth="1"
                   />
                   
-                  {/* === TORSO === */}
-                  {/* Back has natural S-curve, front is straighter */}
-                  <path
-                    d="M85 78
-                       L75 90
-                       L70 120
-                       L68 150
-                       L70 175
-                       L85 190
-                       L115 190
-                       L130 175
-                       L132 150
-                       L130 120
-                       L125 90
-                       L115 78
-                       Z"
-                    className="ut-orbit-silhouette"
-                  />
+                  {/* Direction indicators - subtle arrows */}
+                  <text x="225" y="195" className="ut-circuit-direction">↑</text>
+                  <text x="88" y="195" className="ut-circuit-direction">↓</text>
                   
-                  {/* === ARMS (resting on knees) === */}
-                  <ellipse
-                    cx="55"
-                    cy="160"
-                    rx="18"
-                    ry="12"
-                    className="ut-orbit-silhouette"
-                  />
-                  <ellipse
-                    cx="145"
-                    cy="160"
-                    rx="18"
-                    ry="12"
-                    className="ut-orbit-silhouette"
-                  />
-                  
-                  {/* === CROSSED LEGS === */}
-                  {/* Left leg (crosses in front) */}
-                  <path
-                    d="M70 190
-                       C50 195 30 210 25 230
-                       C22 245 30 260 50 265
-                       C70 268 95 265 100 260
-                       L100 200
-                       Z"
-                    className="ut-orbit-silhouette"
-                  />
-                  {/* Right leg (underneath) */}
-                  <path
-                    d="M130 190
-                       C150 195 170 210 175 230
-                       C178 245 170 260 150 265
-                       C130 268 105 265 100 260
-                       L100 200
-                       Z"
-                    className="ut-orbit-silhouette"
-                  />
-                  
-                  {/* === ENERGY BALL (only when active) === */}
-                  {orbitActive && (() => {
-                    // Anatomically correct positions based on reference image
-                    // Back channel (right side, up): perineum → tailbone → lower back → upper back → neck base → crown
-                    // Front channel (left side, down): crown → third eye → throat → heart → solar plexus → dan tian
-                    const positions = [
-                      { x: 100, y: 255 },  // 1. Hui Yin - Perineum (bottom center)
-                      { x: 125, y: 220 },  // 2. Chang Qiang - Tailbone (back, low)
-                      { x: 130, y: 175 },  // 3. Ming Men - Lower back / Kidneys (back, mid-low)
-                      { x: 130, y: 130 },  // 4. Jizhong - Mid spine (back, middle)
-                      { x: 125, y: 85 },   // 5. Dazhui - C7 / Base of neck (back, upper)
-                      { x: 100, y: 8 },    // 6. Baihui - Crown (top of head)
-                      { x: 78, y: 25 },    // 7. Yintang - Third eye (forehead, front)
-                      { x: 72, y: 70 },    // 8. Tiantu - Throat (front of neck)
-                      { x: 68, y: 110 },   // 9. Shanzhong - Heart (front chest)
-                      { x: 70, y: 160 }    // 10. Qihai - Dan tian (lower abdomen, front)
+                  {/* Energy points and labels */}
+                  {(() => {
+                    const points = [
+                      { x: 160, y: 340, label: 'PERINEUM', labelX: 160, labelY: 370, align: 'center' },
+                      { x: 205, y: 295, label: 'TAILBONE', labelX: 240, labelY: 300, align: 'left' },
+                      { x: 218, y: 235, label: 'LOWER BACK', labelX: 240, labelY: 240, align: 'left' },
+                      { x: 218, y: 175, label: 'UPPER BACK', labelX: 240, labelY: 180, align: 'left' },
+                      { x: 205, y: 115, label: 'BASE OF SKULL', labelX: 240, labelY: 120, align: 'left' },
+                      { x: 160, y: 50, label: 'CROWN', labelX: 160, labelY: 28, align: 'center' },
+                      { x: 115, y: 95, label: 'THIRD EYE', labelX: 80, labelY: 100, align: 'right' },
+                      { x: 102, y: 150, label: 'THROAT', labelX: 80, labelY: 155, align: 'right' },
+                      { x: 102, y: 210, label: 'HEART', labelX: 80, labelY: 215, align: 'right' },
+                      { x: 115, y: 280, label: 'DAN TIAN', labelX: 80, labelY: 285, align: 'right' }
                     ];
-                    const pos = positions[orbitPointIndex];
                     
-                    return (
-                      <g className="ut-energy-group">
-                        <circle cx={pos.x} cy={pos.y} r="16" className="ut-orbit-glow" />
-                        <circle cx={pos.x} cy={pos.y} r="8" className="ut-orbit-ball" />
-                      </g>
-                    );
+                    return points.map((point, index) => {
+                      const isActive = index === orbitPointIndex && orbitActive;
+                      const isPassed = orbitActive && (index < orbitPointIndex || orbitCycleCount > 0);
+                      
+                      return (
+                        <g key={index}>
+                          {/* Glow effect for active point */}
+                          {isActive && (
+                            <>
+                              <circle
+                                cx={point.x}
+                                cy={point.y}
+                                r="20"
+                                className="ut-circuit-glow-outer"
+                              />
+                              <circle
+                                cx={point.x}
+                                cy={point.y}
+                                r="12"
+                                className="ut-circuit-glow-inner"
+                              />
+                            </>
+                          )}
+                          
+                          {/* Point marker */}
+                          <circle
+                            cx={point.x}
+                            cy={point.y}
+                            r={isActive ? 8 : 4}
+                            className={`ut-circuit-point ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`}
+                          />
+                          
+                          {/* Label */}
+                          <text
+                            x={point.labelX}
+                            y={point.labelY}
+                            textAnchor={point.align === 'center' ? 'middle' : point.align === 'right' ? 'end' : 'start'}
+                            className={`ut-circuit-label ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`}
+                          >
+                            {point.label}
+                          </text>
+                        </g>
+                      );
+                    });
                   })()}
                   
-                  {/* === STATIC MARKERS (when not active) === */}
-                  {!orbitActive && ORBIT_POINTS.map((point, index) => {
-                    const positions = [
-                      { x: 100, y: 255 },  // Perineum
-                      { x: 125, y: 220 },  // Tailbone
-                      { x: 130, y: 175 },  // Lower back
-                      { x: 130, y: 130 },  // Mid spine
-                      { x: 125, y: 85 },   // Base of neck
-                      { x: 100, y: 8 },    // Crown
-                      { x: 78, y: 25 },    // Third eye
-                      { x: 72, y: 70 },    // Throat
-                      { x: 68, y: 110 },   // Heart
-                      { x: 70, y: 160 }    // Dan tian
-                    ];
-                    const pos = positions[index];
-                    
-                    return (
-                      <circle
-                        key={point.id}
-                        cx={pos.x}
-                        cy={pos.y}
-                        r="4"
-                        className="ut-orbit-marker"
-                      />
-                    );
-                  })}
+                  {/* Channel labels */}
+                  <text x="245" y="55" className="ut-circuit-channel">BACK</text>
+                  <text x="245" y="70" className="ut-circuit-channel-sub">(Ascending)</text>
+                  <text x="75" y="55" className="ut-circuit-channel" textAnchor="end">FRONT</text>
+                  <text x="75" y="70" className="ut-circuit-channel-sub" textAnchor="end">(Descending)</text>
                 </svg>
               </div>
 
               <div className="ut-modal-info">
                 {orbitActive ? (
                   <>
-                    <span className="ut-modal-phase">{ORBIT_POINTS[orbitPointIndex].location}</span>
+                    <span className="ut-modal-phase">{ORBIT_POINTS[orbitPointIndex].location.toUpperCase()}</span>
                     <span className="ut-orbit-instruction">{ORBIT_POINTS[orbitPointIndex].instruction}</span>
                     <span className="ut-modal-cycle">
                       Cycle {orbitCycleCount + 1} of {orbitTargetCycles}
@@ -1139,7 +1102,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 ) : (
                   <>
                     <span className="ut-modal-phase">READY</span>
-                    <span className="ut-orbit-instruction">Sit with spine straight, tongue touching roof of mouth</span>
+                    <span className="ut-orbit-instruction">Sit comfortably with spine straight, tongue on roof of mouth</span>
                   </>
                 )}
               </div>
