@@ -126,16 +126,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 32px;
-    max-width: 480px;
+    gap: 20px;
   }
   
   .stat-card {
-    padding: 16px 20px;
+    padding: 16px 12px;
   }
   
   .stat-num {
-    font-size: 2.25rem;
+    font-size: 2rem;
   }
   
   .stat-divider {
@@ -1301,12 +1300,11 @@
 
 @media (min-width: 1024px) {
   .stat-grid {
-    gap: 40px;
-    max-width: 520px;
+    gap: 24px;
   }
   
   .stat-num {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
   }
   
   .stat-divider {
