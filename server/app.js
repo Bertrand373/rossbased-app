@@ -38,9 +38,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// MongoDB connection
+// MongoDB connection with optimized pooling for scale
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/rossbased';
-mongoose.connect(mongoUri)
+mongoose.connect(mongoUri, {
+  maxPoolSize: 50,                    // Handle up to 50 concurrent connections
+  minPoolSize: 5,                     // Keep 5 connections warm
+  serverSelectionTimeoutMS: 5000,     // Fail fast if DB unreachable
+  socketTimeoutMS: 45000,             // Close idle sockets after 45s
+  retryWrites: true,                  // Auto-retry failed writes
+})
   .then(() => {
     console.log('MongoDB connected');
     // Initialize notification schedulers after DB connection
