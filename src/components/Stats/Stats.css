@@ -119,12 +119,12 @@
   white-space: nowrap;
 }
 
-/* Dividers - hidden on mobile, shown on desktop */
+/* Dividers - hidden (kept for DOM compatibility) */
 .stat-divider {
   display: none;
 }
 
-/* Desktop: inline layout with dividers */
+/* Desktop: inline layout */
 @media (min-width: 768px) {
   .stat-grid {
     display: flex;
@@ -140,13 +140,6 @@
   
   .stat-num {
     font-size: 2rem;
-  }
-  
-  .stat-divider {
-    display: block;
-    width: 1px;
-    height: 48px;
-    background-color: rgba(255, 255, 255, 0.08);
   }
 }
 
@@ -165,6 +158,7 @@
   margin: 0 0 20px 0;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  text-align: center;
 }
 
 /* =============================================================================
@@ -1306,10 +1300,6 @@
 @media (min-width: 1024px) {
   .stat-num {
     font-size: 2.25rem;
-  }
-  
-  .stat-divider {
-    height: 56px;
   }
   
   .milestone-grid {
