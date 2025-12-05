@@ -11,6 +11,9 @@ const DatePicker = ({ onSubmit, onCancel, initialDate, title }) => {
   const dayRef = useRef(null);
   const yearRef = useRef(null);
 
+  // Determine if this is an edit vs initial setup
+  const isEditing = title?.toLowerCase().includes('edit');
+
   useEffect(() => {
     monthRef.current?.focus();
   }, []);
@@ -91,7 +94,7 @@ const DatePicker = ({ onSubmit, onCancel, initialDate, title }) => {
   return (
     <div className="date-picker" onClick={e => e.stopPropagation()}>
       <h2>{title || "When did you start?"}</h2>
-      <p>Enter your streak start date</p>
+      <p>{isEditing ? "Your journey is yours. Be honest with yourself." : "Enter your streak start date"}</p>
       
       <form onSubmit={handleSubmit} className="date-form">
         <div className="date-inputs">
