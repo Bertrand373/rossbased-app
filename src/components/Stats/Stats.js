@@ -532,12 +532,28 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
               <p className="modal-date">Reached {format(new Date(selectedMilestone.date), 'MMMM d, yyyy')}</p>
             )}
             <p className="modal-text">
-              {selectedMilestone.days === 7 && "Foundation set. Energy stabilizing, clarity emerging."}
-              {selectedMilestone.days === 14 && "Two weeks in. Focus and physical energy improving."}
-              {selectedMilestone.days === 30 && "One month. Habits formed, transformation underway."}
-              {selectedMilestone.days === 90 && "Ninety days. Neurological rewiring complete."}
-              {selectedMilestone.days === 180 && "Six months. Baseline permanently elevated."}
-              {selectedMilestone.days === 365 && "One year. This is now who you are."}
+              {/* Contextual text: different message if earned but currently below milestone */}
+              {(safeUserData.currentStreak || 0) >= selectedMilestone.days ? (
+                // Currently at or past this milestone - celebratory
+                <>
+                  {selectedMilestone.days === 7 && "Foundation set. Energy stabilizing, clarity emerging."}
+                  {selectedMilestone.days === 14 && "Two weeks in. Focus and physical energy improving."}
+                  {selectedMilestone.days === 30 && "One month. Habits formed, transformation underway."}
+                  {selectedMilestone.days === 90 && "Ninety days. Neurological rewiring complete."}
+                  {selectedMilestone.days === 180 && "Six months. Baseline permanently elevated."}
+                  {selectedMilestone.days === 365 && "One year. This is now who you are."}
+                </>
+              ) : (
+                // Earned but relapsed - acknowledgment + challenge
+                <>
+                  {selectedMilestone.days === 7 && "You've built the foundation before. Build it again."}
+                  {selectedMilestone.days === 14 && "Two weeks is in your wheelhouse. Reclaim it."}
+                  {selectedMilestone.days === 30 && "You've proven you can do this. Now do it again."}
+                  {selectedMilestone.days === 90 && "You've rewired once. The path is familiar."}
+                  {selectedMilestone.days === 180 && "Six months was yours. Take it back."}
+                  {selectedMilestone.days === 365 && "A year lives in you. Rise again."}
+                </>
+              )}
             </p>
             <button className="btn-ghost" onClick={() => setShowMilestoneModal(false)}>Close</button>
           </div>
