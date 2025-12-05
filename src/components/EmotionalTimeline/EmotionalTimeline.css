@@ -90,7 +90,6 @@
 }
 
 .et-current {
-  text-align: center;
   padding: 0 0 48px 0;
   cursor: pointer;
   transition: opacity 150ms ease;
@@ -107,27 +106,41 @@
   opacity: 0.6;
 }
 
-.et-current-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 16px;
+/* Numbered header matching urge toolkit style */
+.et-current-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.et-current-num {
+  font-size: 1.5rem;
+  font-weight: 300;
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.et-current-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .et-current-name {
-  font-size: 1.375rem;
-  font-weight: 500;
+  font-size: 0.9375rem;
+  font-weight: 600;
   color: #ffffff;
-  margin: 0 0 8px 0;
-  letter-spacing: -0.02em;
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .et-current-days {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.35);
-  margin: 0 0 32px 0;
+  margin: 0;
 }
 
 /* Progress */
@@ -558,7 +571,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .et-analysis .insight-card-header span {
@@ -581,27 +594,26 @@
 }
 
 /* ============================================================
-   EMPTY STATE - Matches Stats Insights
+   EMPTY STATE - Matches Stats Insights exactly
    ============================================================ */
 
 .et-analysis .insight-empty {
-  padding: 32px 0;
+  padding: 20px 0;
   text-align: center;
 }
 
 .et-analysis .empty-message {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 8px 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 6px 0;
   font-weight: 500;
   font-feature-settings: 'tnum' 1;
 }
 
 .et-analysis .empty-context {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.2);
   margin: 0;
-  line-height: 1.5;
 }
 
 /* ============================================================
@@ -933,12 +945,17 @@
     font-size: 0.8125rem;
   }
   
-  .et-current-name {
-    font-size: 1.25rem;
+  .et-current-header {
+    gap: 10px;
+    margin-bottom: 28px;
   }
   
-  .et-current-days {
-    margin-bottom: 28px;
+  .et-current-num {
+    font-size: 1.375rem;
+  }
+  
+  .et-current-name {
+    font-size: 0.875rem;
   }
   
   .et-phase {
@@ -1056,8 +1073,12 @@
 
 /* Desktop enhancements */
 @media (min-width: 768px) {
+  .et-current-num {
+    font-size: 1.75rem;
+  }
+  
   .et-current-name {
-    font-size: 2.25rem;
+    font-size: 1rem;
   }
   
   .trajectory-row {
