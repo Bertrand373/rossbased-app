@@ -112,6 +112,7 @@
   font-weight: 400;
   color: rgba(255, 255, 255, 0.35);
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 /* Dividers - hidden on mobile, shown on desktop */
@@ -126,6 +127,7 @@
     justify-content: center;
     align-items: center;
     gap: 32px;
+    max-width: 480px;
   }
   
   .stat-card {
@@ -1300,6 +1302,7 @@
 @media (min-width: 1024px) {
   .stat-grid {
     gap: 40px;
+    max-width: 520px;
   }
   
   .stat-num {
