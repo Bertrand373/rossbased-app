@@ -124,13 +124,13 @@
 @media (min-width: 768px) {
   .stat-grid {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    width: 100%;
   }
   
   .stat-card {
-    padding: 16px 12px;
+    padding: 16px 0;
   }
   
   .stat-num {
@@ -1299,10 +1299,6 @@
 }
 
 @media (min-width: 1024px) {
-  .stat-grid {
-    gap: 24px;
-  }
-  
   .stat-num {
     font-size: 2.25rem;
   }
