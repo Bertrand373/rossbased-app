@@ -21,12 +21,12 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
   // Define the 3 onboarding steps - TIGHT targeting
   const steps = [
     {
-      // Target ONLY the streak number button
-      target: '.streak-counter',
+      // Target ONLY the streak number itself
+      target: '.streak-num',
       title: 'Set your start date',
       message: 'Tap the counter to set when your journey began.',
       position: 'bottom',
-      padding: 4 // Very tight - just the counter
+      padding: 12 // Comfortable padding around just the number
     },
     {
       // Target the log button
@@ -34,7 +34,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
       title: 'Track daily benefits',
       message: 'Log how you feel each day. This powers your AI insights.',
       position: 'top',
-      padding: 4 // Tight padding - just the button
+      padding: 6 // Tight padding - just the button
     },
     {
       // Target just the nav links container (not full bar)
@@ -42,7 +42,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
       title: 'Explore when ready',
       message: 'Calendar, stats, timeline, and crisis tools await.',
       position: isMobile ? 'top' : 'bottom',
-      padding: 8 // Padding for nav links
+      padding: 10 // Padding for nav links
     }
   ];
 

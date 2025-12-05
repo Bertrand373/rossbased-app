@@ -160,12 +160,17 @@
   position: fixed;
   width: calc(100% - 48px);
   max-width: 300px;
-  background: transparent;
-  border: none;
-  padding: 0;
+  padding: 20px 24px;
   z-index: 10005; /* Above blocker (10001) */
   text-align: center;
   pointer-events: auto;
+  
+  /* Subtle dark backdrop for text readability */
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   
   /* Fade transition */
   transition: opacity 250ms ease, transform 250ms ease;
