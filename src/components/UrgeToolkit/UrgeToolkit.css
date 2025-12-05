@@ -532,9 +532,6 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  max-height: 280px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .ut-trigger {
@@ -887,7 +884,7 @@
 }
 
 /* =============================================================================
-   MICROCOSMIC ORBIT MODAL - Premium Silhouette
+   MICROCOSMIC ORBIT MODAL - Side Profile
    ============================================================================= */
 
 .ut-orbit-modal {
@@ -895,8 +892,8 @@
 }
 
 .ut-orbit-visual {
-  width: 160px;
-  height: 230px;
+  width: 140px;
+  height: 250px;
   position: relative;
   display: flex;
   align-items: center;
@@ -910,37 +907,29 @@
 
 .ut-orbit-silhouette {
   fill: rgba(255, 255, 255, 0.06);
-  transition: fill 300ms ease;
+}
+
+.ut-orbit-marker {
+  fill: rgba(255, 255, 255, 0.2);
 }
 
 .ut-orbit-glow {
   fill: rgba(255, 255, 255, 0.15);
-  animation: orbitPulse 2s ease-in-out infinite;
+  animation: orbitPulse 1.5s ease-in-out infinite;
+}
+
+.ut-orbit-ball {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
 }
 
 @keyframes orbitPulse {
   0%, 100% { 
-    opacity: 0.4;
-    transform: scale(1);
+    opacity: 0.3;
   }
   50% { 
-    opacity: 0.8;
-    transform: scale(1.1);
+    opacity: 0.7;
   }
-}
-
-.ut-orbit-point-svg {
-  fill: rgba(255, 255, 255, 0.25);
-  transition: all 300ms ease;
-}
-
-.ut-orbit-point-svg.passed {
-  fill: rgba(255, 255, 255, 0.5);
-}
-
-.ut-orbit-point-svg.active {
-  fill: #ffffff;
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
 }
 
 .ut-orbit-instruction {
@@ -1120,25 +1109,4 @@
   .ut-modal-timer {
     font-size: 3.5rem;
   }
-}
-
-/* =============================================================================
-   SCROLLBAR STYLING
-   ============================================================================= */
-
-.ut-triggers-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.ut-triggers-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.ut-triggers-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-}
-
-.ut-triggers-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
 }
