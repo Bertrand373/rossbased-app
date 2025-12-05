@@ -287,7 +287,7 @@ app.post('/api/feedback', async (req, res) => {
     return res.status(400).json({ error: 'Subject and message are required' });
   }
   
-  const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1446208891561054360/97_-2IRepbgkGtDruh4cWN5ep-6c5_Iw8ibP5N5cFPKigucQlO669h4bhLFlU-2DwEv-';
+  const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1446375361830195322/CNNQZse3lNF3VRJtJ0BZsschJeXmMkvBcbiDLukDrxPDRRqI0iyLIYp2d7UvNh9R2Dhl';
   
   // Sanitize and truncate content (Discord limits: field value 1024 chars)
   const sanitize = (str, maxLength = 1000) => {
@@ -354,22 +354,22 @@ app.post('/api/feedback', async (req, res) => {
         const retryAfter = response.headers.get('Retry-After') || 5;
         console.log(`Rate limited. Waiting ${retryAfter}s...`);
         await delay(Number(retryAfter) * 1000);
-        if (attempt < 3) {
+        if (attempt < 2) {
           return sendToDiscord(payload, attempt + 1);
         }
       }
       
       // Server error - retry with backoff
-      if (response.status >= 500 && attempt < 3) {
-        await delay(1000 * attempt);
+      if (response.status >= 500 && attempt < 2) {
+        await delay(2000 * attempt);
         return sendToDiscord(payload, attempt + 1);
       }
       
       return { success: false, status: response.status, error: errorText };
     } catch (error) {
       console.error(`Discord attempt ${attempt} error:`, error.message);
-      if (attempt < 3) {
-        await delay(1000 * attempt);
+      if (attempt < 2) {
+        await delay(2000 * attempt);
         return sendToDiscord(payload, attempt + 1);
       }
       return { success: false, error: error.message };
