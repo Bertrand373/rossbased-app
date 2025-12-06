@@ -21,7 +21,7 @@ import comprehensiveMockData, {
 } from '../mockData';
 
 // ========== TOGGLE THIS FOR PRODUCTION ==========
-const MOCK_MODE = true; // Set to false for production with real API
+const MOCK_MODE = false; // PRODUCTION MODE - using real API
 // ================================================
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
