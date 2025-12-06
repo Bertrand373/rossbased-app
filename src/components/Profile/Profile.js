@@ -26,6 +26,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
+  // Leaderboard rank
+  const [userRank, setUserRank] = useState(null);
+  const [isLoadingRank, setIsLoadingRank] = useState(false);
+  
   // Privacy States (instant-save pattern for toggles)
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
   const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
@@ -111,6 +115,41 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       }
     };
   }, []);
+
+  // Fetch user's leaderboard rank
+  const fetchUserRank = useCallback(async () => {
+    if (!userData?.username || !userData?.showOnLeaderboard || !userData?.discordUsername) {
+      setUserRank(null);
+      return;
+    }
+    
+    setIsLoadingRank(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/leaderboard/rank/${userData.username}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.onLeaderboard) {
+          setUserRank({ rank: data.rank, total: data.total });
+        } else {
+          setUserRank(null);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch rank:', error);
+      setUserRank(null);
+    } finally {
+      setIsLoadingRank(false);
+    }
+  }, [userData?.username, userData?.showOnLeaderboard, userData?.discordUsername]);
+
+  // Fetch rank on mount and when relevant data changes
+  useEffect(() => {
+    fetchUserRank();
+  }, [fetchUserRank]);
 
   const loadNotificationPreferences = async () => {
     try {
@@ -485,6 +524,27 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </button>
             </div>
 
+            {/* Leaderboard Rank Display */}
+            {userData?.showOnLeaderboard && userData?.discordUsername && (
+              <div className="rank-display">
+                <span className="rank-label">Your Position</span>
+                {isLoadingRank ? (
+                  <span className="rank-value">...</span>
+                ) : userRank ? (
+                  <span className="rank-value">#{userRank.rank} <span className="rank-total">of {userRank.total}</span></span>
+                ) : (
+                  <span className="rank-value rank-pending">—</span>
+                )}
+              </div>
+            )}
+
+            {!userData?.showOnLeaderboard && (
+              <div className="rank-display rank-disabled">
+                <span className="rank-label">Your Position</span>
+                <span className="rank-value">Enable leaderboard to see rank</span>
+              </div>
+            )}
+
             {isEditingProfile && (
               <div className="section-actions">
                 <button className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Cancel</button>
@@ -754,14 +814,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <span className="pillar-name">Crisis Toolkit</span>
                 <span className="pillar-desc">When urges hit, you're prepared.</span>
               </div>
-            </div>
-
-            <div className="about-divider" />
-
-            {/* Tagline */}
-            <div className="about-tagline">
-              <span className="tagline-main">Hold the Flame.</span>
-              <span className="tagline-sub">Master the fire within.</span>
             </div>
 
             <div className="about-divider" />
