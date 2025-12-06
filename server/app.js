@@ -145,6 +145,7 @@ app.post('/api/login', async (req, res) => {
         urgeToolUsage: [],
         discordUsername: '',
         showOnLeaderboard: false,
+        announceDiscordMilestones: false,
         notes: {},
         notificationPreferences: {
           quietHoursEnabled: false,
@@ -212,6 +213,11 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
     }
     
     const updateData = { ...req.body };
+    
+    // Remove immutable fields that MongoDB won't allow updating
+    delete updateData._id;
+    delete updateData.__v;
+    
     const previousStreak = existingUser.currentStreak || 0;
     const newStreak = updateData.currentStreak;
     
@@ -243,13 +249,6 @@ app.delete('/api/user/:username', authenticate, async (req, res) => {
   console.log('Received delete user request for:', req.params.username);
   
   try {
-    // Security: Verify the authenticated user matches the username being deleted
-    if (req.user.username !== req.params.username) {
-      console.log('Unauthorized deletion attempt - user mismatch');
-      return res.status(403).json({ error: 'Cannot delete another user\'s account' });
-    }
-    
-    // Delete the user document
     const user = await User.findOneAndDelete({ username: req.params.username });
     
     if (!user) {
@@ -257,11 +256,7 @@ app.delete('/api/user/:username', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    // Also delete notification subscriptions for this user
-    const NotificationSubscription = require('./models/NotificationSubscription');
-    await NotificationSubscription.deleteMany({ username: req.params.username });
-    
-    console.log('✅ User account deleted:', req.params.username);
+    console.log('User deleted successfully:', req.params.username);
     res.json({ success: true, message: 'Account deleted successfully' });
   } catch (err) {
     console.error('Delete user error:', err);
