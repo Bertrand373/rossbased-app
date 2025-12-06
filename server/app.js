@@ -238,6 +238,37 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
   }
 });
 
+// Delete user account (ACTUAL DELETION from MongoDB)
+app.delete('/api/user/:username', authenticate, async (req, res) => {
+  console.log('Received delete user request for:', req.params.username);
+  
+  try {
+    // Security: Verify the authenticated user matches the username being deleted
+    if (req.user.username !== req.params.username) {
+      console.log('Unauthorized deletion attempt - user mismatch');
+      return res.status(403).json({ error: 'Cannot delete another user\'s account' });
+    }
+    
+    // Delete the user document
+    const user = await User.findOneAndDelete({ username: req.params.username });
+    
+    if (!user) {
+      console.log('User not found for deletion:', req.params.username);
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Also delete notification subscriptions for this user
+    const NotificationSubscription = require('./models/NotificationSubscription');
+    await NotificationSubscription.deleteMany({ username: req.params.username });
+    
+    console.log('✅ User account deleted:', req.params.username);
+    res.json({ success: true, message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error('Delete user error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Get all users (admin)
 app.get('/api/users', async (req, res) => {
   try {

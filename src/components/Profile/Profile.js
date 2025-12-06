@@ -24,12 +24,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [email, setEmail] = useState(userData.email || '');
   const [discordUsername, setDiscordUsername] = useState(userData.discordUsername || '');
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
-  const [announceDiscordMilestones, setAnnounceDiscordMilestones] = useState(userData.announceDiscordMilestones || false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  
-  // User rank state
-  const [userRank, setUserRank] = useState(null);
-  const [isLoadingRank, setIsLoadingRank] = useState(false);
   
   // Privacy States (instant-save pattern for toggles)
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
@@ -116,42 +111,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       }
     };
   }, []);
-
-  // Fetch user rank when leaderboard is enabled
-  useEffect(() => {
-    if (showOnLeaderboard && discordUsername && userData?.username) {
-      fetchUserRank();
-    } else {
-      setUserRank(null);
-    }
-  }, [showOnLeaderboard, discordUsername, userData?.username]);
-
-  const fetchUserRank = async () => {
-    if (!userData?.username) return;
-    
-    setIsLoadingRank(true);
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/leaderboard/rank/${userData.username}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.onLeaderboard) {
-          setUserRank({ rank: data.rank, total: data.total });
-        } else {
-          setUserRank(null);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch rank:', error);
-    } finally {
-      setIsLoadingRank(false);
-    }
-  };
 
   const loadNotificationPreferences = async () => {
     try {
@@ -332,16 +291,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       username: username.trim(),
       email: email.trim(),
       discordUsername: discordUsername.trim(),
-      showOnLeaderboard,
-      announceDiscordMilestones
+      showOnLeaderboard
     });
     setIsEditingProfile(false);
     toast.success('Profile updated', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
-    
-    // Refresh rank after save if leaderboard is enabled
-    if (showOnLeaderboard && discordUsername.trim()) {
-      setTimeout(fetchUserRank, 500);
-    }
   };
 
   const handleFeedbackSubmit = async () => {
@@ -403,9 +356,40 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     toast.success('Data exported!');
   };
 
-  const handleAccountDeletion = () => {
-    localStorage.clear();
-    onLogout('Account deleted');
+  const handleAccountDeletion = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const username = userData?.username;
+      
+      if (!token || !username) {
+        // Fallback: just clear local and logout
+        localStorage.clear();
+        onLogout('Account deleted');
+        return;
+      }
+      
+      // Call API to delete user from MongoDB
+      const response = await fetch(`${API_URL}/api/user/${username}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete account');
+      }
+      
+      // Success - clear local storage and logout
+      localStorage.clear();
+      onLogout('Account deleted');
+      
+    } catch (error) {
+      console.error('Account deletion error:', error);
+      toast.error('Failed to delete account. Please try again.');
+    }
   };
 
   const userInitial = userData?.username?.charAt(0)?.toUpperCase() || 
@@ -487,12 +471,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               <span className="form-hint">Found in Discord → Settings → username</span>
             </div>
 
-            <h3 className="group-label">Discord Integration</h3>
-
             <div className="toggle-row">
               <div className="toggle-text">
                 <span className="toggle-label">Show on Leaderboard</span>
-                <span className="toggle-desc">Appear on the Discord leaderboard</span>
+                <span className="toggle-desc">Display streak publicly</span>
               </div>
               <button 
                 className={`toggle-switch ${showOnLeaderboard ? 'active' : ''}`}
@@ -502,41 +484,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <span className="toggle-knob" />
               </button>
             </div>
-
-            <div className="toggle-row">
-              <div className="toggle-text">
-                <span className="toggle-label">Discord Milestones</span>
-                <span className="toggle-desc">Announce 30, 90, 180 & 365 days</span>
-              </div>
-              <button 
-                className={`toggle-switch ${announceDiscordMilestones ? 'active' : ''}`}
-                onClick={() => isEditingProfile && setAnnounceDiscordMilestones(!announceDiscordMilestones)}
-                disabled={!isEditingProfile}
-              >
-                <span className="toggle-knob" />
-              </button>
-            </div>
-
-            {/* Rank Display */}
-            {showOnLeaderboard && discordUsername && (
-              <div className="rank-display">
-                <span className="rank-label">Your Position</span>
-                {isLoadingRank ? (
-                  <span className="rank-value">...</span>
-                ) : userRank ? (
-                  <span className="rank-value">#{userRank.rank} of {userRank.total}</span>
-                ) : (
-                  <span className="rank-value rank-pending">Save to see rank</span>
-                )}
-              </div>
-            )}
-
-            {!showOnLeaderboard && (
-              <div className="rank-display rank-disabled">
-                <span className="rank-label">Your Position</span>
-                <span className="rank-value">Enable leaderboard to see rank</span>
-              </div>
-            )}
 
             {isEditingProfile && (
               <div className="section-actions">
@@ -642,14 +589,15 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
             )}
 
-            {notificationsEnabled && (
+            {/* Notification Preferences - Always visible when enabled */}
+            {isSupported && notificationsEnabled && (
               <>
                 <h3 className="group-label">Notification Types</h3>
-                
+
                 <div className="toggle-row">
                   <div className="toggle-text">
-                    <span className="toggle-label">Milestone Alerts</span>
-                    <span className="toggle-desc">7, 30, 90+ day achievements</span>
+                    <span className="toggle-label">Milestones</span>
+                    <span className="toggle-desc">Day 7, 30, 90...</span>
                   </div>
                   <button 
                     className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
@@ -662,7 +610,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <div className="toggle-row">
                   <div className="toggle-text">
                     <span className="toggle-label">Urge Support</span>
-                    <span className="toggle-desc">Check-ins during tough times</span>
+                    <span className="toggle-desc">Encouragement alerts</span>
                   </div>
                   <button 
                     className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
@@ -674,8 +622,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
                 <div className="toggle-row">
                   <div className="toggle-text">
-                    <span className="toggle-label">Weekly Progress</span>
-                    <span className="toggle-desc">Sunday recap of your week</span>
+                    <span className="toggle-label">Weekly Summary</span>
+                    <span className="toggle-desc">Sunday report</span>
                   </div>
                   <button 
                     className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
@@ -690,7 +638,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <div className="toggle-row">
                   <div className="toggle-text">
                     <span className="toggle-label">Daily Reminder</span>
-                    <span className="toggle-desc">Log your daily check-in</span>
+                    <span className="toggle-desc">Log benefits</span>
                   </div>
                   <button 
                     className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
@@ -702,11 +650,11 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
                 {dailyReminderEnabled && (
                   <div className="time-row single">
-                    <label>Time</label>
-                    <input
-                      type="time"
-                      value={dailyReminderTime}
-                      onChange={handleReminderTimeChange}
+                    <label>Reminder time</label>
+                    <input 
+                      type="time" 
+                      value={dailyReminderTime} 
+                      onChange={handleReminderTimeChange} 
                     />
                   </div>
                 )}
@@ -714,7 +662,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <div className="toggle-row">
                   <div className="toggle-text">
                     <span className="toggle-label">Quiet Hours</span>
-                    <span className="toggle-desc">Pause notifications</span>
+                    <span className="toggle-desc">Pause during sleep</span>
                   </div>
                   <button 
                     className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
@@ -726,23 +674,22 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
                 {quietHoursEnabled && (
                   <div className="time-row">
-                    <label>From</label>
-                    <input
-                      type="time"
-                      value={quietHoursStart}
-                      onChange={handleQuietStartChange}
+                    <input 
+                      type="time" 
+                      value={quietHoursStart} 
+                      onChange={handleQuietStartChange} 
                     />
                     <span>to</span>
-                    <input
-                      type="time"
-                      value={quietHoursEnd}
-                      onChange={handleQuietEndChange}
+                    <input 
+                      type="time" 
+                      value={quietHoursEnd} 
+                      onChange={handleQuietEndChange} 
                     />
                   </div>
                 )}
 
                 <button className="test-notif-btn" onClick={handleTestNotification}>
-                  Send Test Notification
+                  Test Notification
                 </button>
               </>
             )}
@@ -759,26 +706,21 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <div className="data-row">
               <div className="data-text">
                 <span className="data-title">Export Data</span>
-                <span className="data-desc">Download your complete history</span>
+                <span className="data-desc">Download as JSON</span>
               </div>
-              <button className="data-btn" onClick={() => setShowExportModal(true)}>
-                Export
-              </button>
+              <button className="data-btn" onClick={() => setShowExportModal(true)}>Export</button>
             </div>
 
-            <div className="data-row data-row-danger">
+            <div className="data-row danger">
               <div className="data-text">
                 <span className="data-title">Delete Account</span>
                 <span className="data-desc">Permanently remove all data</span>
               </div>
-              <button className="data-btn danger" onClick={() => setShowDeleteConfirm(true)}>
-                Delete
-              </button>
+              <button className="data-btn danger" onClick={() => setShowDeleteConfirm(true)}>Delete</button>
             </div>
           </div>
         )}
 
-        {/* ABOUT TAB */}
         {activeTab === 'about' && (
           <div className="about-section">
             {/* Brand Header */}
@@ -789,18 +731,18 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
             <div className="about-divider" />
 
-            {/* Pillars */}
+            {/* The Pillars */}
             <div className="about-pillars">
-              <span className="about-pillars-title">What We Do</span>
+              <h2 className="about-pillars-title">The Pillars</h2>
               
               <div className="about-pillar">
                 <span className="pillar-name">Streak Tracking</span>
-                <span className="pillar-desc">Simple, focused, reliable.</span>
+                <span className="pillar-desc">Your foundation. Every day counts.</span>
               </div>
               
               <div className="about-pillar">
                 <span className="pillar-name">Benefit Analytics</span>
-                <span className="pillar-desc">6 metrics. Real patterns.</span>
+                <span className="pillar-desc">Track what retention unlocks in you.</span>
               </div>
               
               <div className="about-pillar">
@@ -812,6 +754,14 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <span className="pillar-name">Crisis Toolkit</span>
                 <span className="pillar-desc">When urges hit, you're prepared.</span>
               </div>
+            </div>
+
+            <div className="about-divider" />
+
+            {/* Tagline */}
+            <div className="about-tagline">
+              <span className="tagline-main">Hold the Flame.</span>
+              <span className="tagline-sub">Master the fire within.</span>
             </div>
 
             <div className="about-divider" />
