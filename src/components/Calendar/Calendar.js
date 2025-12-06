@@ -891,7 +891,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             {renderEditContent()}
 
             <div className="calendar-actions">
-              {/* Back button - returns to Day Info modal */}
+              <button className="calendar-btn-ghost" onClick={closeEditModal}>
+                Cancel
+              </button>
               {!showTriggerSelection && getEditOptions().type !== 'future' && (
                 <button className="calendar-btn-back" onClick={backToDayInfo}>
                   Back
