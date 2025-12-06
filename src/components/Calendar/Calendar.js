@@ -690,7 +690,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         <div key={i} className={cellClasses} onClick={() => openDayInfo(day)}>
           <div className="week-day-header">
             <span className="week-day-name">{format(day, 'EEE')}</span>
-            <span className="week-day-number">{format(day, 'd')}</span>
+            <span className={`week-day-number ${isToday ? 'today' : ''} ${dayStatus?.type || ''} ${wetDream && !dayStatus ? 'wet-dream' : ''}`}>
+              {format(day, 'd')}
+            </span>
           </div>
           
           {/* Benefit bars - white progress bars matching modal style */}
@@ -700,7 +702,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 <span className="week-benefit-label-top">{metric}</span>
                 <div className="week-benefit-bar">
                   <div 
-                    className={`week-benefit-fill ${metric}`} 
+                    className="week-benefit-fill" 
                     style={{ width: `${(dayBenefits[metric] || 5) * 10}%` }} 
                   />
                 </div>

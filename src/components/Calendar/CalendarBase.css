@@ -463,6 +463,32 @@
   font-size: 0.9375rem;
 }
 
+/* Week view - Status colored day numbers (matches month view) */
+.week-day-number.current-streak {
+  color: #34d399;
+}
+
+.week-day-number.former-streak {
+  color: #60a5fa;
+}
+
+.week-day-number.relapse {
+  color: #f87171;
+}
+
+.week-day-number.wet-dream {
+  color: #fbbf24;
+}
+
+/* Preserve white circle for today even with status */
+.week-day-number.today.current-streak,
+.week-day-number.today.former-streak,
+.week-day-number.today.relapse,
+.week-day-number.today.wet-dream {
+  background: #ffffff;
+  color: #000000;
+}
+
 /* =============================================================================
    WEEK VIEW - Benefit Bars (Prominent)
    ============================================================================= */
