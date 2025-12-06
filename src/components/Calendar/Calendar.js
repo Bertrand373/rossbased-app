@@ -693,25 +693,28 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             <span className="week-day-number">{format(day, 'd')}</span>
           </div>
           
-          <div className="week-day-content">
-            {/* Quick benefit preview */}
-            {dayBenefits && (
-              <div className="week-benefits-mini">
-                {['energy', 'focus', 'confidence'].map(metric => (
-                  <div key={metric} className="week-benefit-dot">
-                    <span className="week-benefit-value">{dayBenefits[metric] || '-'}</span>
-                  </div>
-                ))}
+          {/* Benefit bars - white progress bars matching modal style */}
+          <div className="week-benefits-prominent">
+            {dayBenefits && ['energy', 'focus', 'confidence'].map(metric => (
+              <div key={metric} className="week-benefit-item">
+                <span className="week-benefit-label-top">{metric}</span>
+                <div className="week-benefit-bar">
+                  <div 
+                    className={`week-benefit-fill ${metric}`} 
+                    style={{ width: `${(dayBenefits[metric] || 5) * 10}%` }} 
+                  />
+                </div>
               </div>
+            ))}
+          </div>
+          
+          {/* Bottom indicators */}
+          <div className="week-day-indicators">
+            {/* Data dot */}
+            {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
+              <span className="week-has-data-dot"></span>
             )}
-            
-            {/* Journal indicator */}
-            {dayTracking.hasJournal && (
-              <div className="week-journal-indicator">
-                <span>📝</span>
-              </div>
-            )}
-            {/* Status indicator on right */}
+            {/* Status indicator */}
             <div className="week-status-indicator">
               {dayStatus?.type === 'current-streak' && <span className="week-status-dot current-streak"></span>}
               {dayStatus?.type === 'former-streak' && <span className="week-status-dot former-streak"></span>}
@@ -891,9 +894,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             {renderEditContent()}
 
             <div className="calendar-actions">
-              <button className="calendar-btn-ghost" onClick={closeEditModal}>
-                Cancel
-              </button>
               {!showTriggerSelection && getEditOptions().type !== 'future' && (
                 <button className="calendar-btn-back" onClick={backToDayInfo}>
                   Back
