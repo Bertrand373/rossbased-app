@@ -182,17 +182,48 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     setError('');
     
     try {
-      const [success] = await Promise.all([
-        onLogin(username.trim(), password),
-        new Promise(resolve => setTimeout(resolve, 800))
-      ]);
-      
-      if (!success) {
-        setError('Invalid credentials. Please try again.');
-        setIsLoading(false);
+      if (isLogin) {
+        // SIGN IN - use existing login flow
+        const [success] = await Promise.all([
+          onLogin(username.trim(), password),
+          new Promise(resolve => setTimeout(resolve, 800))
+        ]);
+        
+        if (!success) {
+          setError('Invalid credentials or account not found.');
+          setIsLoading(false);
+        }
+      } else {
+        // SIGN UP - call signup endpoint directly
+        const response = await fetch(`${API_URL}/api/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username.trim(),
+            password,
+            email: email.trim()
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Signup failed');
+        }
+        
+        // Store token and username
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.username);
+        
+        // Complete login flow (similar to OAuth)
+        const success = await onLogin(data.username, null, true);
+        
+        if (!success) {
+          throw new Error('Failed to complete signup');
+        }
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(err.message || 'Something went wrong. Please try again.');
       setIsLoading(false);
     }
   };

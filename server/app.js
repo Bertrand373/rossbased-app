@@ -110,59 +110,20 @@ const authenticate = (req, res, next) => {
 // AUTH ENDPOINTS
 // ============================================
 
-// Login endpoint
+// Login endpoint - ONLY authenticates existing users
 app.post('/api/login', async (req, res) => {
   console.log('Received login request:', req.body);
   const { username, password } = req.body;
   try {
-    let user = await User.findOne({ username });
+    const user = await User.findOne({ username });
+    
     if (!user) {
-      console.log('Creating new user:', username);
-      user = new User({
-        username,
-        password,
-        startDate: new Date(),
-        currentStreak: 0,
-        longestStreak: 0,
-        wetDreamCount: 0,
-        relapseCount: 0,
-        isPremium: false,
-        hasSeenOnboarding: false,
-        badges: [
-          { id: 1, name: '7-Day Warrior', earned: false, date: null },
-          { id: 2, name: '14-Day Monk', earned: false, date: null },
-          { id: 3, name: '30-Day Master', earned: false, date: null },
-          { id: 4, name: '90-Day King', earned: false, date: null }
-        ],
-        benefitTracking: [],
-        streakHistory: [{
-          id: 1,
-          start: new Date(),
-          end: null,
-          days: 0,
-          reason: null
-        }],
-        urgeToolUsage: [],
-        discordUsername: '',
-        showOnLeaderboard: false,
-        announceDiscordMilestones: false,
-        notes: {},
-        notificationPreferences: {
-          quietHoursEnabled: false,
-          quietHoursStart: '22:00',
-          quietHoursEnd: '08:00',
-          types: {
-            milestones: true,
-            urgeSupport: true,
-            weeklyProgress: true
-          },
-          dailyReminderEnabled: false,
-          dailyReminderTime: '09:00'
-        }
-      });
-      await user.save();
-      console.log('User created:', username);
-    } else if (user.password !== password) {
+      console.log('Login failed - user not found:', username);
+      return res.status(401).json({ error: 'Account not found. Please sign up.' });
+    }
+    
+    if (user.password !== password) {
+      console.log('Login failed - wrong password:', username);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
@@ -175,6 +136,88 @@ app.post('/api/login', async (req, res) => {
     res.json({ token, ...user.toObject() });
   } catch (err) {
     console.error('Login error:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+});
+
+// Signup endpoint - Creates new accounts
+app.post('/api/signup', async (req, res) => {
+  console.log('Received signup request:', req.body);
+  const { username, password, email } = req.body;
+  
+  try {
+    // Check if username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      console.log('Signup failed - username taken:', username);
+      return res.status(409).json({ error: 'Username already taken' });
+    }
+    
+    // Check if email already exists (if provided)
+    if (email) {
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail) {
+        console.log('Signup failed - email taken:', email);
+        return res.status(409).json({ error: 'Email already registered' });
+      }
+    }
+    
+    // Create new user
+    console.log('Creating new user:', username);
+    const user = new User({
+      username,
+      password,
+      email: email || '',
+      startDate: new Date(),
+      currentStreak: 0,
+      longestStreak: 0,
+      wetDreamCount: 0,
+      relapseCount: 0,
+      isPremium: false,
+      hasSeenOnboarding: false,
+      badges: [
+        { id: 1, name: '7-Day Warrior', earned: false, date: null },
+        { id: 2, name: '14-Day Monk', earned: false, date: null },
+        { id: 3, name: '30-Day Master', earned: false, date: null },
+        { id: 4, name: '90-Day King', earned: false, date: null }
+      ],
+      benefitTracking: [],
+      streakHistory: [{
+        id: 1,
+        start: new Date(),
+        end: null,
+        days: 0,
+        reason: null
+      }],
+      urgeToolUsage: [],
+      discordUsername: '',
+      showOnLeaderboard: false,
+      announceDiscordMilestones: false,
+      notes: {},
+      notificationPreferences: {
+        quietHoursEnabled: false,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00',
+        types: {
+          milestones: true,
+          urgeSupport: true,
+          weeklyProgress: true
+        },
+        dailyReminderEnabled: false,
+        dailyReminderTime: '09:00'
+      }
+    });
+    
+    await user.save();
+    console.log('User created:', username);
+    
+    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+    const token = jwt.sign({ username }, jwtSecret, { expiresIn: '7d' });
+    console.log('Signup successful, token generated for:', username);
+    
+    res.json({ token, ...user.toObject() });
+  } catch (err) {
+    console.error('Signup error:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
