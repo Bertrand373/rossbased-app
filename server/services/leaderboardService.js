@@ -56,7 +56,7 @@ async function getLeaderboardUsers() {
     
     return users;
   } catch (error) {
-    console.error('❌ Error fetching leaderboard users:', error);
+    console.error('âŒ Error fetching leaderboard users:', error);
     return [];
   }
 }
@@ -86,11 +86,11 @@ function formatLeaderboardEmbed(users) {
     const rank = String(index + 1).padStart(2, ' ');
     // Truncate long names for mobile
     const name = user.discordUsername.length > 14 
-      ? user.discordUsername.substring(0, 13) + '…' 
+      ? user.discordUsername.substring(0, 13) + 'â€¦' 
       : user.discordUsername.padEnd(14, ' ');
     const days = String(user.currentStreak || 0).padStart(3, ' ') + 'd';
     // Verified mentor gets a checkmark
-    const verified = user.verifiedMentor ? ' ✓' : '';
+    const verified = user.verifiedMentor ? ' âœ“' : '';
     
     leaderboardText += `${rank}  ${name} ${days}${verified}\n`;
   });
@@ -101,7 +101,7 @@ function formatLeaderboardEmbed(users) {
       title: 'TITANTRACK LEADERBOARD',
       description: `\`\`\`\n${leaderboardText}\`\`\``,
       footer: {
-        text: `Hold the Flame. • Updated ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+        text: `Hold the Flame. â€¢ Updated ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
       }
     }]
   };
@@ -114,7 +114,7 @@ function formatLeaderboardEmbed(users) {
  */
 async function postLeaderboardToDiscord() {
   if (!LEADERBOARD_WEBHOOK) {
-    console.log('⚠️ DISCORD_LEADERBOARD_WEBHOOK not configured - skipping leaderboard post');
+    console.log('âš ï¸ DISCORD_LEADERBOARD_WEBHOOK not configured - skipping leaderboard post');
     return false;
   }
   
@@ -135,10 +135,10 @@ async function postLeaderboardToDiscord() {
       });
       
       if (editResponse.ok) {
-        console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
+        console.log(`âœ… Leaderboard updated (edited message ${existingMessageId})`);
         return true;
       } else {
-        console.log('⚠️ Could not edit existing message, posting new one...');
+        console.log('âš ï¸ Could not edit existing message, posting new one...');
       }
     }
     
@@ -158,12 +158,12 @@ async function postLeaderboardToDiscord() {
     const data = await response.json();
     if (data.id) {
       await setSetting('leaderboard_message_id', data.id);
-      console.log(`✅ Leaderboard posted to Discord (message ID: ${data.id})`);
+      console.log(`âœ… Leaderboard posted to Discord (message ID: ${data.id})`);
     }
     
     return true;
   } catch (error) {
-    console.error('❌ Failed to post leaderboard to Discord:', error);
+    console.error('âŒ Failed to post leaderboard to Discord:', error);
     return false;
   }
 }
@@ -189,7 +189,7 @@ async function postMilestoneToDiscord(discordUsername, days) {
   const webhook = MILESTONE_WEBHOOK;
   
   if (!webhook) {
-    console.log('⚠️ No Discord webhook configured for milestones - skipping milestone post');
+    console.log('âš ï¸ No Discord webhook configured for milestones - skipping milestone post');
     return false;
   }
   
@@ -207,10 +207,10 @@ async function postMilestoneToDiscord(discordUsername, days) {
       throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
     }
     
-    console.log(`✅ Milestone announced: ${discordUsername} - ${days} days`);
+    console.log(`âœ… Milestone announced: ${discordUsername} - ${days} days`);
     return true;
   } catch (error) {
-    console.error('❌ Failed to post milestone to Discord:', error);
+    console.error('âŒ Failed to post milestone to Discord:', error);
     return false;
   }
 }
@@ -245,7 +245,7 @@ async function checkAndAnnounceMilestone(username, newStreak) {
         const updateData = { lastMilestoneAnnounced: milestone };
         if (milestone >= 180 && !user.mentorEligible) {
           updateData.mentorEligible = true;
-          console.log(`🎖️ ${username} is now mentor eligible (${milestone}+ days)`);
+          console.log(`ðŸŽ–ï¸ ${username} is now mentor eligible (${milestone}+ days)`);
         }
         
         await User.findOneAndUpdate(
@@ -259,7 +259,7 @@ async function checkAndAnnounceMilestone(username, newStreak) {
     
     return false;
   } catch (error) {
-    console.error('❌ Error checking milestone:', error);
+    console.error('âŒ Error checking milestone:', error);
     return false;
   }
 }
@@ -288,7 +288,7 @@ async function getUserRank(username) {
       streak: users[index].currentStreak
     };
   } catch (error) {
-    console.error('❌ Error getting user rank:', error);
+    console.error('âŒ Error getting user rank:', error);
     return null;
   }
 }
@@ -308,7 +308,7 @@ async function getVerifiedMentors() {
     
     return mentors;
   } catch (error) {
-    console.error('❌ Error fetching mentors:', error);
+    console.error('âŒ Error fetching mentors:', error);
     return [];
   }
 }
@@ -317,7 +317,7 @@ async function getVerifiedMentors() {
  * Manual trigger for leaderboard (for testing)
  */
 async function triggerLeaderboardPost() {
-  console.log('📊 Manual leaderboard trigger requested');
+  console.log('ðŸ“Š Manual leaderboard trigger requested');
   return await postLeaderboardToDiscord();
 }
 
@@ -326,7 +326,7 @@ async function triggerLeaderboardPost() {
  */
 async function resetLeaderboardMessage() {
   await Settings.deleteOne({ key: 'leaderboard_message_id' });
-  console.log('🔄 Leaderboard message ID reset - next post will create new message');
+  console.log('ðŸ”„ Leaderboard message ID reset - next post will create new message');
   return true;
 }
 
