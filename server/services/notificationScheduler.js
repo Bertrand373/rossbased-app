@@ -18,18 +18,24 @@ function scheduleDailyReminders() {
       const currentHour = new Date().getHours();
       const currentTime = `${String(currentHour).padStart(2, '0')}:00`;
       
-      // Find all subscriptions with reminders enabled at this hour
-      const subscriptions = await NotificationSubscription.find({
-        notificationsEnabled: true,
-        'notificationTypes.dailyReminder': true,
-        reminderTime: { $regex: `^${currentTime.substring(0, 2)}:` } // Match hour
+      // Find all users with reminders enabled at this hour
+      const users = await User.find({
+        'notificationPreferences.dailyReminderEnabled': true
       });
       
-      console.log(`📬 Found ${subscriptions.length} users for daily reminders at ${currentTime}`);
+      let sentCount = 0;
       
-      for (const subscription of subscriptions) {
-        await sendNotificationToUser(subscription.username, 'daily_reminder');
+      for (const user of users) {
+        const reminderTime = user.notificationPreferences?.dailyReminderTime || '09:00';
+        const [reminderHour] = reminderTime.split(':').map(Number);
+        
+        if (currentHour === reminderHour) {
+          await sendNotificationToUser(user.username, 'daily_reminder');
+          sentCount++;
+        }
       }
+      
+      console.log(`📬 Sent ${sentCount} daily reminders at ${currentTime}`);
       
     } catch (error) {
       console.error('❌ Error in daily reminder scheduler:', error);
@@ -47,13 +53,15 @@ function scheduleWeeklyMotivation() {
     console.log('💪 Sending weekly motivational messages...');
     
     try {
-      const subscriptions = await NotificationSubscription.find({
-        notificationsEnabled: true,
-        'notificationTypes.motivational': true
+      // Find all users with weekly progress notifications enabled
+      const users = await User.find({
+        'notificationPreferences.types.weeklyProgress': { $ne: false }
       });
       
-      const usernames = subscriptions.map(s => s.username);
+      const usernames = users.map(u => u.username);
       await sendBulkNotifications(usernames, 'motivational');
+      
+      console.log(`✅ Sent weekly motivation to ${usernames.length} users`);
       
     } catch (error) {
       console.error('❌ Error in weekly motivation scheduler:', error);
@@ -71,33 +79,23 @@ function scheduleMilestoneChecks() {
     console.log('🏆 Checking for milestone achievements...');
     
     try {
-      // Get all users with active subscriptions
-      const subscriptions = await NotificationSubscription.find({
-        notificationsEnabled: true,
-        'notificationTypes.milestones': true
+      const milestones = [7, 14, 30, 60, 90, 180, 365];
+      
+      // Find users whose current streak is a milestone
+      const users = await User.find({
+        currentStreak: { $in: milestones },
+        'notificationPreferences.types.milestones': { $ne: false }
       });
       
-      for (const subscription of subscriptions) {
-        // Get user data to check current streak
-        const user = await User.findOne({ username: subscription.username });
-        
-        if (user && user.currentStreak) {
-          const milestones = [7, 14, 30, 60, 90, 180, 365];
-          
-          // Check if current streak is a milestone
-          if (milestones.includes(user.currentStreak)) {
-            // Check if we already sent notification for this milestone today
-            const lastSent = subscription.lastNotificationSent;
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            if (!lastSent || lastSent < today) {
-              const templateKey = `milestone_${user.currentStreak}`;
-              await sendNotificationToUser(subscription.username, templateKey);
-            }
-          }
-        }
+      let sentCount = 0;
+      
+      for (const user of users) {
+        const templateKey = `milestone_${user.currentStreak}`;
+        const result = await sendNotificationToUser(user.username, templateKey);
+        if (result.success) sentCount++;
       }
+      
+      console.log(`✅ Sent ${sentCount} milestone notifications`);
       
     } catch (error) {
       console.error('❌ Error in milestone check scheduler:', error);
@@ -111,8 +109,7 @@ function scheduleMilestoneChecks() {
 // Posts the top 13 leaderboard to Discord
 function scheduleLeaderboardPost() {
   // 8 AM EST = 13:00 UTC (standard time) or 12:00 UTC (daylight saving)
-  // Using 13:00 UTC for EST. Adjust if your server uses a different timezone.
-  // Render servers typically run in UTC.
+  // Using 13:00 UTC for EST. Render servers run in UTC.
   cron.schedule('0 13 * * *', async () => {
     console.log('📊 Posting daily leaderboard to Discord...');
     

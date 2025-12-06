@@ -20,7 +20,6 @@ import MLTraining from './components/MLTraining/MLTraining';
 
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
-import DiscordCallback from './components/Auth/DiscordCallback';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
@@ -30,9 +29,6 @@ import { useUserData } from './hooks/useUserData';
 
 // AMBIENT AI HOOKS - Auto-train only (risk indicator removed, floating card handles alerts)
 import { useAutoTrain } from './hooks/useAutoTrain';
-
-// Analytics
-import { initMixpanel, identifyUser, trackAppOpen, trackLogout } from './utils/mixpanel';
 
 // Profile Button - Minimal circle
 const ProfileButton = ({ userData }) => {
@@ -184,24 +180,6 @@ function App() {
     }
   }, [isRefreshLoading]);
 
-  // Initialize Mixpanel on app load
-  useEffect(() => {
-    initMixpanel();
-    trackAppOpen();
-  }, []);
-
-  // Identify user when logged in
-  useEffect(() => {
-    if (userData && userData._id) {
-      identifyUser(userData._id, {
-        email: userData.email,
-        username: userData.username,
-        isPremium: isPremium,
-        createdAt: userData.createdAt,
-      });
-    }
-  }, [userData, isPremium]);
-
   const handleLogin = async (username, password, isGoogleAuth = false) => {
     setLoadingMessage('Signing in...');
     const success = await login(username, password, isGoogleAuth);
@@ -211,12 +189,6 @@ function App() {
       setShouldNavigateToTracker(true);
     }
     return success;
-  };
-
-  // Wrapped logout to track analytics
-  const handleLogout = () => {
-    trackLogout();
-    logout();
   };
 
   // Loading screen - icon only, no text
@@ -316,8 +288,12 @@ function App() {
               />
             )}
             
-            {/* PWA Install Prompt - TEST MODE: forceShow enabled */}
-            <InstallPrompt forceShow={true} />
+            {/* PWA Install Prompt - shows after first check-in or 3rd visit */}
+            <InstallPrompt 
+              triggerAfterCheckIns={1}
+              triggerAfterVisits={3}
+              currentCheckIns={userData?.totalCheckIns || 0}
+            />
             
             <main className="app-content">
               <div className="main-content-wrapper">
@@ -344,7 +320,7 @@ function App() {
                     <UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/profile" element={
-                    <Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={handleLogout} />
+                    <Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />
                   } />
                   <Route path="/urge-prediction" element={
                     <PredictionDisplay mode="full" userData={userData} />
@@ -357,7 +333,6 @@ function App() {
           </>
         ) : (
           <Routes>
-            <Route path="/auth/discord/callback" element={<DiscordCallback onLogin={handleLogin} />} />
             <Route path="*" element={<Landing onLogin={handleLogin} />} />
           </Routes>
         )}

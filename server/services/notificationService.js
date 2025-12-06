@@ -43,7 +43,7 @@ function initializeFirebase() {
 // Initialize on module load
 initializeFirebase();
 
-// NEW: Check if user preferences allow this notification
+// Check if user preferences allow this notification
 async function shouldSendNotification(username, notificationType) {
   try {
     // Fetch user's notification preferences from User model
@@ -69,8 +69,10 @@ async function shouldSendNotification(username, notificationType) {
       'milestone': 'milestones',
       'urge': 'urgeSupport',
       'weekly': 'weeklyProgress',
-      'encouragement': 'weeklyProgress', // Use weekly progress for general encouragement
-      'streak': 'milestones' // Streak reminders use milestone setting
+      'encouragement': 'weeklyProgress',
+      'streak': 'milestones',
+      'daily': 'dailyReminder',
+      'motivational': 'weeklyProgress'
     };
     
     const prefKey = typeMapping[typeCategory];
@@ -111,7 +113,7 @@ async function shouldSendNotification(username, notificationType) {
 
 // Check if user is in quiet hours (legacy function for NotificationSubscription model)
 function isInQuietHours(subscription) {
-  if (!subscription.quietHours.enabled) return false;
+  if (!subscription.quietHours || !subscription.quietHours.enabled) return false;
   
   const now = new Date();
   const currentHour = now.getHours();
@@ -131,67 +133,97 @@ function isInQuietHours(subscription) {
   return currentTime >= startTime && currentTime < endTime;
 }
 
-// Notification content templates
+// ============================================================================
+// NOTIFICATION TEMPLATES - Discreet, mature, non-embarrassing
+// ============================================================================
 const notificationTemplates = {
+  // DAILY REMINDER
+  daily_reminder: {
+    title: 'TitanTrack',
+    body: 'Log your day.',
+    data: { url: '/', type: 'daily_reminder' }
+  },
+  
+  // WEEKLY MOTIVATIONAL (Monday)
+  motivational: {
+    title: 'TitanTrack',
+    body: 'New week. Stay locked in.',
+    data: { url: '/', type: 'motivational' }
+  },
+  
+  // MILESTONES - Clean, confident, no emojis
   milestone_7: {
-    title: '🔥 7 Day Milestone!',
-    body: 'Incredible work! You\'ve reached 7 days. Keep going strong!',
+    title: 'Day 7',
+    body: 'First week done. Keep building.',
     data: { url: '/stats', type: 'milestone', days: '7' }
   },
   milestone_14: {
-    title: '💪 14 Day Champion!',
-    body: 'Two weeks of strength! You\'re building unstoppable momentum!',
+    title: 'Day 14',
+    body: 'Two weeks. Momentum is real.',
     data: { url: '/stats', type: 'milestone', days: '14' }
   },
   milestone_30: {
-    title: '👑 30 Day Master!',
-    body: 'One month of excellence! You\'re proving your dedication!',
+    title: 'Day 30',
+    body: 'One month. You\'re different now.',
     data: { url: '/stats', type: 'milestone', days: '30' }
   },
   milestone_60: {
-    title: '🌟 60 Day Legend!',
-    body: 'Two months of transformation! Your willpower is inspiring!',
+    title: 'Day 60',
+    body: 'Two months in. Stay the course.',
     data: { url: '/stats', type: 'milestone', days: '60' }
   },
   milestone_90: {
-    title: '🏆 90 Day King!',
-    body: 'Three months of mastery! You\'ve reached elite status!',
+    title: 'Day 90',
+    body: 'Quarter year. This is who you are now.',
     data: { url: '/stats', type: 'milestone', days: '90' }
   },
   milestone_180: {
-    title: '⚡ 180 Day Titan!',
-    body: 'Six months of unwavering discipline! You are unstoppable!',
+    title: 'Day 180',
+    body: 'Six months. Rare territory.',
     data: { url: '/stats', type: 'milestone', days: '180' }
   },
   milestone_365: {
-    title: '🎯 365 Day LEGEND!',
-    body: 'ONE YEAR! You\'ve achieved what few ever do. Legendary status!',
+    title: 'Day 365',
+    body: 'One year. Few make it here.',
     data: { url: '/stats', type: 'milestone', days: '365' }
   },
+  
+  // ENCOURAGEMENT - Subtle, respectful
   encouragement_morning: {
-    title: '☀️ New Day, New Strength',
-    body: 'Good morning, King! Today is another opportunity to prove your power!',
+    title: 'TitanTrack',
+    body: 'New day. Stay focused.',
     data: { url: '/', type: 'encouragement' }
   },
   encouragement_evening: {
-    title: '🌙 Stay Strong Tonight',
-    body: 'Evening is here. Remember your commitment. You\'ve got this!',
+    title: 'TitanTrack',
+    body: 'End of day. How\'d you hold up?',
     data: { url: '/', type: 'encouragement' }
   },
+  
+  // URGE SUPPORT - Calm, grounding
   urge_high_risk: {
-    title: '🚨 Danger Zone Detected',
-    body: 'Your patterns suggest high risk. Remember your goals. Stay strong!',
+    title: 'TitanTrack',
+    body: 'Breathe. This will pass.',
     data: { url: '/emergency', type: 'urge_warning' }
   },
   urge_medium_risk: {
-    title: '⚠️ Stay Alert',
-    body: 'Detected some risky patterns. Take a moment to refocus.',
+    title: 'TitanTrack',
+    body: 'Take a moment. Refocus.',
     data: { url: '/emergency', type: 'urge_warning' }
   },
+  
+  // STREAK REMINDER
   streak_save: {
-    title: '💎 Your Streak Matters',
-    body: 'Don\'t throw away all your progress. You\'ve worked too hard!',
+    title: 'TitanTrack',
+    body: 'You know what to do.',
     data: { url: '/stats', type: 'streak_reminder' }
+  },
+  
+  // WEEKLY PROGRESS
+  weekly_progress: {
+    title: 'TitanTrack',
+    body: 'Your weekly summary is ready.',
+    data: { url: '/stats', type: 'weekly_progress' }
   }
 };
 
@@ -246,7 +278,7 @@ async function sendNotification(fcmToken, notificationType, customData = {}) {
 // Send notification to a user (looks up their subscriptions and checks preferences)
 async function sendNotificationToUser(username, notificationType, customData = {}) {
   try {
-    // NEW: Check user preferences first
+    // Check user preferences first
     const shouldSend = await shouldSendNotification(username, notificationType);
     
     if (!shouldSend) {
@@ -276,7 +308,7 @@ async function sendNotificationToUser(username, notificationType, customData = {
 
       // Legacy check for NotificationSubscription preferences
       const notificationCategory = notificationType.split('_')[0];
-      if (!subscription.preferences[notificationCategory]) {
+      if (subscription.preferences && !subscription.preferences[notificationCategory]) {
         console.log(`User ${username} has disabled ${notificationCategory} notifications (subscription model)`);
         continue;
       }
@@ -297,26 +329,15 @@ async function sendNotificationToUser(username, notificationType, customData = {
 }
 
 // Send bulk notifications (e.g., for daily encouragement)
-async function sendBulkNotifications(notificationType, customData = {}) {
+async function sendBulkNotifications(usernames, notificationType, customData = {}) {
   try {
-    const subscriptions = await NotificationSubscription.find({ isActive: true });
-    console.log(`Sending ${notificationType} to ${subscriptions.length} active subscriptions`);
+    console.log(`Sending ${notificationType} to ${usernames.length} users`);
 
     const results = [];
     
-    for (const subscription of subscriptions) {
-      // NEW: Check user preferences
-      const shouldSend = await shouldSendNotification(subscription.username, notificationType);
-      if (!shouldSend) continue;
-      
-      // Check quiet hours and preferences (legacy)
-      if (isInQuietHours(subscription)) continue;
-      
-      const notificationCategory = notificationType.split('_')[0];
-      if (!subscription.preferences[notificationCategory]) continue;
-
-      const result = await sendNotification(subscription.fcmToken, notificationType, customData);
-      results.push({ username: subscription.username, ...result });
+    for (const username of usernames) {
+      const result = await sendNotificationToUser(username, notificationType, customData);
+      results.push({ username, ...result });
       
       // Add small delay to avoid rate limits
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -337,10 +358,27 @@ async function sendBulkNotifications(notificationType, customData = {}) {
   }
 }
 
+// Check and send milestone notification
+async function checkAndSendMilestoneNotification(username, currentStreak) {
+  const milestones = [7, 14, 30, 60, 90, 180, 365];
+  
+  if (!milestones.includes(currentStreak)) {
+    return { success: false, reason: `${currentStreak} is not a milestone day` };
+  }
+  
+  const templateKey = `milestone_${currentStreak}`;
+  if (!notificationTemplates[templateKey]) {
+    return { success: false, reason: `No template for milestone_${currentStreak}` };
+  }
+  
+  return await sendNotificationToUser(username, templateKey);
+}
+
 module.exports = {
   sendNotification,
   sendNotificationToUser,
   sendBulkNotifications,
+  checkAndSendMilestoneNotification,
   notificationTemplates,
   shouldSendNotification
 };

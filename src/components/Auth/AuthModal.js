@@ -232,8 +232,11 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     }
   };
   
-  const handleClose = () => {
-    if (!isLoading) onClose();
+  // Close modal when tapping outside (on overlay)
+  const handleOverlayClick = () => {
+    if (!isLoading && onClose) {
+      onClose();
+    }
   };
 
   // Loading state
@@ -263,7 +266,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   }
   
   return (
-    <div className="auth-overlay">
+    <div className="auth-overlay" onClick={handleOverlayClick}>
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
         
         {/* Hidden Google Sign-In Button - rendered by Google SDK */}
