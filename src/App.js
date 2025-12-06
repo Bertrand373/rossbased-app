@@ -142,13 +142,17 @@ const PostLoginNavigator = ({ shouldNavigate, onNavigated }) => {
 };
 
 // Navigate to root when logged out (fixes black screen on sign out)
+// EXCLUDES auth callback paths to allow OAuth flow to complete
 const LogoutRedirect = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
   useEffect(() => {
-    // If user is logged out and not already on root path, redirect to root
-    if (!isLoggedIn && location.pathname !== '/') {
+    // Don't redirect if on an auth callback path - let OAuth complete
+    const isAuthCallback = location.pathname.startsWith('/auth/');
+    
+    // If user is logged out and not on root or auth callback, redirect to root
+    if (!isLoggedIn && location.pathname !== '/' && !isAuthCallback) {
       navigate('/', { replace: true });
     }
   }, [isLoggedIn, location.pathname, navigate]);
@@ -165,6 +169,14 @@ function App() {
     return localStorage.getItem('isLoggedIn') === 'true';
   });
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
+  
+  // Minimum loading screen duration for smooth UX (prevents flash)
+  const [minLoadingComplete, setMinLoadingComplete] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setMinLoadingComplete(true), 600);
+    return () => clearTimeout(timer);
+  }, []);
   
   const { 
     userData, 
@@ -217,7 +229,8 @@ function App() {
   };
 
   // Loading screen - icon only, no text
-  if (isLoading || isRefreshLoading) {
+  // Shows until BOTH data is loaded AND minimum display time has passed
+  if (isLoading || isRefreshLoading || !minLoadingComplete) {
     return (
       <div className="app-loading-screen">
         <img 
