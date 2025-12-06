@@ -20,6 +20,7 @@ import MLTraining from './components/MLTraining/MLTraining';
 
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
+import DiscordCallback from './components/Auth/DiscordCallback';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
@@ -329,6 +330,7 @@ function App() {
           </>
         ) : (
           <Routes>
+            <Route path="/auth/discord/callback" element={<DiscordCallback onLogin={handleLogin} />} />
             <Route path="*" element={<Landing onLogin={handleLogin} />} />
           </Routes>
         )}
