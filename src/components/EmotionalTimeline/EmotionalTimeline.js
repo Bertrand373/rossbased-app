@@ -469,9 +469,15 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       {activeTab === 'journey' && (
         <div className="et-journey">
           <div className="et-current" onClick={() => openPhase(currentPhase)}>
-            <div className="et-current-label">Current Phase</div>
-            <h2 className="et-current-name">{currentPhase?.name}</h2>
-            <p className="et-current-days">Days {currentPhase?.days}</p>
+            <div className="et-current-header">
+              <span className="et-current-num">
+                {String(phases.findIndex(p => p.id === currentPhase?.id) + 1).padStart(2, '0')}
+              </span>
+              <div className="et-current-info">
+                <h2 className="et-current-name">{currentPhase?.name}</h2>
+                <p className="et-current-days">Days {currentPhase?.days}</p>
+              </div>
+            </div>
             
             <div className="et-progress">
               <div className="et-progress-bar">
