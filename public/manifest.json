@@ -1,7 +1,7 @@
 {
-  "name": "TitanTrack - Semen Retention Tracker",
+  "name": "TitanTrack | Retention Intelligence",
   "short_name": "TitanTrack",
-  "description": "Track your semen retention journey with comprehensive analytics and support",
+  "description": "Data-driven retention tracking with AI predictions and analytics",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
