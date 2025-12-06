@@ -141,6 +141,21 @@ const PostLoginNavigator = ({ shouldNavigate, onNavigated }) => {
   return null;
 };
 
+// Navigate to root when logged out (fixes black screen on sign out)
+const LogoutRedirect = ({ isLoggedIn }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  useEffect(() => {
+    // If user is logged out and not already on root path, redirect to root
+    if (!isLoggedIn && location.pathname !== '/') {
+      navigate('/', { replace: true });
+    }
+  }, [isLoggedIn, location.pathname, navigate]);
+  
+  return null;
+};
+
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
@@ -214,6 +229,7 @@ function App() {
         shouldNavigate={shouldNavigateToTracker} 
         onNavigated={() => setShouldNavigateToTracker(false)} 
       />
+      <LogoutRedirect isLoggedIn={isLoggedIn} />
       {/* RESPONSIVE TOAST: Desktop top-right, Mobile top-center below header */}
       <Toaster 
         position={isMobile ? "top-center" : "top-right"}
