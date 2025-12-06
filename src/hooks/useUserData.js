@@ -512,58 +512,19 @@ export const useUserData = () => {
   };
 
   const logout = (customMessage) => {
-    setUserData({
-      username: '',
-      email: '',
-      startDate: null,
-      currentStreak: 0,
-      longestStreak: 0,
-      wetDreamCount: 0,
-      relapseCount: 0,
-      isPremium: true,
-      goal: {
-        targetDays: null,
-        isActive: false,
-        targetDate: null,
-        achieved: false,
-        achievementDate: null
-      },
-      badges: [
-        { id: 1, name: '7-Day Warrior', earned: false, date: null },
-        { id: 2, name: '14-Day Monk', earned: false, date: null },
-        { id: 3, name: '30-Day Master', earned: false, date: null },
-        { id: 4, name: '90-Day King', earned: false, date: null },
-        { id: 5, name: '180-Day Emperor', earned: false, date: null },
-        { id: 6, name: '365-Day Sage', earned: false, date: null }
-      ],
-      benefitTracking: [],
-      emotionalTracking: [],
-      streakHistory: [],
-      urgeToolUsage: [],
-      urgeLog: [],
-      discordUsername: '',
-      showOnLeaderboard: false,
-      notes: {},
-      dataSharing: false,
-      analyticsOptIn: true,
-      marketingEmails: false,
-      darkMode: true,
-      notifications: true,
-      language: 'en',
-      wisdomMode: false
-    });
-    setIsLoggedIn(false);
-    setIsPremium(true);
-    setSyncStatus('idle');
-    
-    // Clear all local storage
+    // Clear all local storage FIRST
     localStorage.removeItem('userData');
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     
-    // Show custom message or default logout message
+    // Show toast before redirect
     toast.success(customMessage || 'Logged out successfully');
+    
+    // Small delay to let toast show, then force redirect to landing page
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 300);
   };
 
   // ================================================================
