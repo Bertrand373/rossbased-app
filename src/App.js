@@ -31,6 +31,9 @@ import { useUserData } from './hooks/useUserData';
 // AMBIENT AI HOOKS - Auto-train only (risk indicator removed, floating card handles alerts)
 import { useAutoTrain } from './hooks/useAutoTrain';
 
+// Analytics
+import { initMixpanel, identifyUser, trackAppOpen, trackLogout } from './utils/mixpanel';
+
 // Profile Button - Minimal circle
 const ProfileButton = ({ userData }) => {
   const navigate = useNavigate();
@@ -181,6 +184,24 @@ function App() {
     }
   }, [isRefreshLoading]);
 
+  // Initialize Mixpanel on app load
+  useEffect(() => {
+    initMixpanel();
+    trackAppOpen();
+  }, []);
+
+  // Identify user when logged in
+  useEffect(() => {
+    if (userData && userData._id) {
+      identifyUser(userData._id, {
+        email: userData.email,
+        username: userData.username,
+        isPremium: isPremium,
+        createdAt: userData.createdAt,
+      });
+    }
+  }, [userData, isPremium]);
+
   const handleLogin = async (username, password, isGoogleAuth = false) => {
     setLoadingMessage('Signing in...');
     const success = await login(username, password, isGoogleAuth);
@@ -190,6 +211,12 @@ function App() {
       setShouldNavigateToTracker(true);
     }
     return success;
+  };
+
+  // Wrapped logout to track analytics
+  const handleLogout = () => {
+    trackLogout();
+    logout();
   };
 
   // Loading screen - icon only, no text
@@ -317,7 +344,7 @@ function App() {
                     <UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/profile" element={
-                    <Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />
+                    <Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={handleLogout} />
                   } />
                   <Route path="/urge-prediction" element={
                     <PredictionDisplay mode="full" userData={userData} />

@@ -12,6 +12,7 @@
     "chart.js": "^4.4.0",
     "date-fns": "^2.30.0",
     "firebase": "^12.3.0",
+    "mixpanel-browser": "^2.72.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-datepicker": "^8.3.0",

@@ -215,11 +215,22 @@ export const useUserData = () => {
       let token = localStorage.getItem('token');
       let userDataFromAPI;
       
-      if (isGoogleAuth) {
-        // Google auth already set the token, just fetch user data
+      // Auto-detect OAuth login: if password is null AND token already exists, treat as OAuth
+      const isOAuthLogin = isGoogleAuth || (password === null && token);
+      
+      if (isOAuthLogin) {
+        // Google/Discord auth already completed - token and user data already set
+        // Just load the user data from localStorage that was set by the auth callback
         token = localStorage.getItem('token');
         const storedUsername = localStorage.getItem('username');
         
+        if (!token || !storedUsername) {
+          throw new Error('Authentication data not found');
+        }
+        
+        console.log('OAuth login detected, fetching user data for:', storedUsername);
+        
+        // Fetch fresh user data from API to ensure we have complete data
         const response = await fetch(`${API_URL}/api/user/${storedUsername}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -234,6 +245,8 @@ export const useUserData = () => {
         userDataFromAPI = await response.json();
       } else {
         // Regular username/password login
+        console.log('Regular login for:', username);
+        
         const response = await fetch(`${API_URL}/api/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
