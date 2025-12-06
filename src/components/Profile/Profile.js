@@ -1,6 +1,6 @@
 // Profile.js - TITANTRACK MINIMAL
-// Matches Landing/Stats/Calendar aesthetic
-import React, { useState, useEffect } from 'react';
+// Premium app patterns: instant-save toggles, always-visible notification prefs
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
@@ -18,15 +18,14 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   
-  // Account States
+  // Account States (Edit/Save pattern for text fields)
   const [username, setUsername] = useState(userData.username || '');
   const [email, setEmail] = useState(userData.email || '');
   const [discordUsername, setDiscordUsername] = useState(userData.discordUsername || '');
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
-  // Privacy States
-  const [isEditingPrivacy, setIsEditingPrivacy] = useState(false);
+  // Privacy States (instant-save pattern for toggles)
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
   const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
@@ -60,6 +59,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [feedbackType, setFeedbackType] = useState('general');
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
+
+  // Debounce timer ref for auto-save
+  const saveTimerRef = useRef(null);
 
   // Lock body scroll when any modal is open
   useBodyScrollLock(showFeedbackModal || showDeleteConfirm || showExportModal || showPrivacyModal);
@@ -100,6 +102,15 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     return () => document.body.classList.remove('static-view');
   }, [activeTab]);
 
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, []);
+
   const loadNotificationPreferences = async () => {
     try {
       const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`);
@@ -117,16 +128,19 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   };
 
-  const updateNotifType = (type) => {
-    if (!isEditingPrivacy) return;
-    setNotifTypes(prev => ({ ...prev, [type]: !prev[type] }));
-  };
-
-  const handleSaveNotificationPreferences = async () => {
+  // Auto-save notification preferences with debounce
+  const saveNotificationPreferences = useCallback(async (overrides = {}) => {
     const preferences = {
-      quietHoursEnabled, quietHoursStart, quietHoursEnd,
-      types: notifTypes, dailyReminderEnabled, dailyReminderTime, fcmToken
+      quietHoursEnabled,
+      quietHoursStart,
+      quietHoursEnd,
+      types: notifTypes,
+      dailyReminderEnabled,
+      dailyReminderTime,
+      fcmToken,
+      ...overrides
     };
+    
     try {
       await fetch(`${API_URL}/api/notification-preferences/${userData.username}`, {
         method: 'POST',
@@ -137,7 +151,91 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     } catch (error) {
       localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
     }
-    setIsEditingPrivacy(false);
+  }, [quietHoursEnabled, quietHoursStart, quietHoursEnd, notifTypes, dailyReminderEnabled, dailyReminderTime, fcmToken, userData.username]);
+
+  // Debounced save for time inputs
+  const debouncedSave = useCallback((overrides = {}) => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+    saveTimerRef.current = setTimeout(() => {
+      saveNotificationPreferences(overrides);
+      toast.success('Saved', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+    }, 1000);
+  }, [saveNotificationPreferences]);
+
+  // Instant-save privacy settings
+  const savePrivacySettings = useCallback(async (updates) => {
+    const newSettings = {
+      dataSharing,
+      analyticsOptIn,
+      marketingEmails,
+      ...updates
+    };
+    
+    // Update via parent
+    updateUserData(newSettings);
+    toast.success('Saved', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+  }, [dataSharing, analyticsOptIn, marketingEmails, updateUserData]);
+
+  // Toggle handlers with instant-save
+  const handleAnalyticsToggle = () => {
+    const newValue = !analyticsOptIn;
+    setAnalyticsOptIn(newValue);
+    savePrivacySettings({ analyticsOptIn: newValue });
+  };
+
+  const handleDataSharingToggle = () => {
+    const newValue = !dataSharing;
+    setDataSharing(newValue);
+    savePrivacySettings({ dataSharing: newValue });
+  };
+
+  const handleMarketingToggle = () => {
+    const newValue = !marketingEmails;
+    setMarketingEmails(newValue);
+    savePrivacySettings({ marketingEmails: newValue });
+  };
+
+  // Notification type toggles with instant-save
+  const handleNotifTypeToggle = (type) => {
+    const newTypes = { ...notifTypes, [type]: !notifTypes[type] };
+    setNotifTypes(newTypes);
+    saveNotificationPreferences({ types: newTypes });
+    toast.success('Saved', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+  };
+
+  const handleQuietHoursToggle = () => {
+    const newValue = !quietHoursEnabled;
+    setQuietHoursEnabled(newValue);
+    saveNotificationPreferences({ quietHoursEnabled: newValue });
+    toast.success('Saved', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+  };
+
+  const handleDailyReminderToggle = () => {
+    const newValue = !dailyReminderEnabled;
+    setDailyReminderEnabled(newValue);
+    saveNotificationPreferences({ dailyReminderEnabled: newValue });
+    toast.success('Saved', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+  };
+
+  // Time input handlers with debounced save
+  const handleQuietStartChange = (e) => {
+    const newValue = e.target.value;
+    setQuietHoursStart(newValue);
+    debouncedSave({ quietHoursStart: newValue });
+  };
+
+  const handleQuietEndChange = (e) => {
+    const newValue = e.target.value;
+    setQuietHoursEnd(newValue);
+    debouncedSave({ quietHoursEnd: newValue });
+  };
+
+  const handleReminderTimeChange = (e) => {
+    const newValue = e.target.value;
+    setDailyReminderTime(newValue);
+    debouncedSave({ dailyReminderTime: newValue });
   };
 
   const handleNotificationToggle = async () => {
@@ -147,6 +245,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       if (notificationsEnabled) {
         await unsubscribeFromPush();
         setNotificationsEnabled(false);
+        toast.success('Notifications disabled', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
       } else {
         if (permission !== 'granted') {
           const granted = await requestPermission();
@@ -194,6 +293,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       showOnLeaderboard
     });
     setIsEditingProfile(false);
+    toast.success('Profile updated', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
   };
 
   const handleFeedbackSubmit = async () => {
@@ -295,7 +395,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       {/* Content */}
       <div className="profile-content" key={activeTab}>
         
-        {/* ACCOUNT TAB */}
+        {/* ACCOUNT TAB - Edit/Save for text fields */}
         {activeTab === 'account' && (
           <div className="profile-section">
             <div className="section-header">
@@ -389,14 +489,11 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* PRIVACY TAB */}
+        {/* PRIVACY TAB - Instant-save toggles */}
         {activeTab === 'privacy' && (
           <div className="profile-section">
             <div className="section-header">
               <h2>Privacy & Notifications</h2>
-              <button className="edit-btn" onClick={() => setIsEditingPrivacy(!isEditingPrivacy)}>
-                {isEditingPrivacy ? 'Cancel' : 'Edit'}
-              </button>
             </div>
 
             <h3 className="group-label">Data & Analytics</h3>
@@ -408,8 +505,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
               <button 
                 className={`toggle-switch ${analyticsOptIn ? 'active' : ''}`}
-                onClick={() => isEditingPrivacy && setAnalyticsOptIn(!analyticsOptIn)}
-                disabled={!isEditingPrivacy}
+                onClick={handleAnalyticsToggle}
               >
                 <span className="toggle-knob" />
               </button>
@@ -422,8 +518,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
               <button 
                 className={`toggle-switch ${dataSharing ? 'active' : ''}`}
-                onClick={() => isEditingPrivacy && setDataSharing(!dataSharing)}
-                disabled={!isEditingPrivacy}
+                onClick={handleDataSharingToggle}
               >
                 <span className="toggle-knob" />
               </button>
@@ -438,8 +533,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
               <button 
                 className={`toggle-switch ${marketingEmails ? 'active' : ''}`}
-                onClick={() => isEditingPrivacy && setMarketingEmails(!marketingEmails)}
-                disabled={!isEditingPrivacy}
+                onClick={handleMarketingToggle}
               >
                 <span className="toggle-knob" />
               </button>
@@ -463,31 +557,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
             )}
 
-            {/* Notification Preferences */}
-            {isSupported && notificationsEnabled && isEditingPrivacy && (
+            {/* Notification Preferences - Always visible when enabled */}
+            {isSupported && notificationsEnabled && (
               <>
-                <h3 className="group-label">Notification Preferences</h3>
-
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Quiet Hours</span>
-                    <span className="toggle-desc">Pause during sleep</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
-                    onClick={() => setQuietHoursEnabled(!quietHoursEnabled)}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
-
-                {quietHoursEnabled && (
-                  <div className="time-row">
-                    <input type="time" value={quietHoursStart} onChange={(e) => setQuietHoursStart(e.target.value)} />
-                    <span>to</span>
-                    <input type="time" value={quietHoursEnd} onChange={(e) => setQuietHoursEnd(e.target.value)} />
-                  </div>
-                )}
+                <h3 className="group-label">Notification Types</h3>
 
                 <div className="toggle-row">
                   <div className="toggle-text">
@@ -496,7 +569,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   </div>
                   <button 
                     className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
-                    onClick={() => updateNotifType('milestones')}
+                    onClick={() => handleNotifTypeToggle('milestones')}
                   >
                     <span className="toggle-knob" />
                   </button>
@@ -505,11 +578,11 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <div className="toggle-row">
                   <div className="toggle-text">
                     <span className="toggle-label">Urge Support</span>
-                    <span className="toggle-desc">Encouragement</span>
+                    <span className="toggle-desc">Encouragement alerts</span>
                   </div>
                   <button 
                     className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
-                    onClick={() => updateNotifType('urgeSupport')}
+                    onClick={() => handleNotifTypeToggle('urgeSupport')}
                   >
                     <span className="toggle-knob" />
                   </button>
@@ -522,11 +595,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   </div>
                   <button 
                     className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
-                    onClick={() => updateNotifType('weeklyProgress')}
+                    onClick={() => handleNotifTypeToggle('weeklyProgress')}
                   >
                     <span className="toggle-knob" />
                   </button>
                 </div>
+
+                <h3 className="group-label">Schedule</h3>
 
                 <div className="toggle-row">
                   <div className="toggle-text">
@@ -535,7 +610,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   </div>
                   <button 
                     className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
-                    onClick={() => setDailyReminderEnabled(!dailyReminderEnabled)}
+                    onClick={handleDailyReminderToggle}
                   >
                     <span className="toggle-knob" />
                   </button>
@@ -544,7 +619,40 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 {dailyReminderEnabled && (
                   <div className="time-row single">
                     <label>Reminder time</label>
-                    <input type="time" value={dailyReminderTime} onChange={(e) => setDailyReminderTime(e.target.value)} />
+                    <input 
+                      type="time" 
+                      value={dailyReminderTime} 
+                      onChange={handleReminderTimeChange} 
+                    />
+                  </div>
+                )}
+
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Quiet Hours</span>
+                    <span className="toggle-desc">Pause during sleep</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
+                    onClick={handleQuietHoursToggle}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
+
+                {quietHoursEnabled && (
+                  <div className="time-row">
+                    <input 
+                      type="time" 
+                      value={quietHoursStart} 
+                      onChange={handleQuietStartChange} 
+                    />
+                    <span>to</span>
+                    <input 
+                      type="time" 
+                      value={quietHoursEnd} 
+                      onChange={handleQuietEndChange} 
+                    />
                   </div>
                 )}
 
@@ -552,13 +660,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                   Test Notification
                 </button>
               </>
-            )}
-
-            {isEditingPrivacy && (
-              <div className="section-actions">
-                <button className="btn-ghost" onClick={() => setIsEditingPrivacy(false)}>Cancel</button>
-                <button className="btn-primary" onClick={handleSaveNotificationPreferences}>Save Changes</button>
-              </div>
             )}
           </div>
         )}

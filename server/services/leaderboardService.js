@@ -2,6 +2,14 @@
 // Discord Leaderboard & Milestone Announcements
 
 const User = require('../models/User');
+const mongoose = require('mongoose');
+
+// Simple schema to store Discord message IDs
+const settingsSchema = new mongoose.Schema({
+  key: { type: String, unique: true },
+  value: String
+});
+const Settings = mongoose.models.Settings || mongoose.model('Settings', settingsSchema);
 
 // Webhook URLs from environment (add these to Render)
 const LEADERBOARD_WEBHOOK = process.env.DISCORD_LEADERBOARD_WEBHOOK;
@@ -9,6 +17,25 @@ const MILESTONE_WEBHOOK = process.env.DISCORD_MILESTONE_WEBHOOK || LEADERBOARD_W
 
 // Milestone thresholds for Discord announcements
 const MILESTONE_DAYS = [30, 90, 180, 365];
+
+/**
+ * Store a setting in the database
+ */
+async function setSetting(key, value) {
+  await Settings.findOneAndUpdate(
+    { key },
+    { key, value },
+    { upsert: true }
+  );
+}
+
+/**
+ * Get a setting from the database
+ */
+async function getSetting(key) {
+  const setting = await Settings.findOne({ key });
+  return setting?.value || null;
+}
 
 /**
  * Fetch top 13 users for leaderboard
@@ -83,7 +110,7 @@ function formatLeaderboardEmbed(users) {
 }
 
 /**
- * Post leaderboard to Discord
+ * Post leaderboard to Discord (or edit existing)
  */
 async function postLeaderboardToDiscord() {
   if (!LEADERBOARD_WEBHOOK) {
@@ -95,7 +122,28 @@ async function postLeaderboardToDiscord() {
     const users = await getLeaderboardUsers();
     const embed = formatLeaderboardEmbed(users);
     
-    const response = await fetch(LEADERBOARD_WEBHOOK, {
+    // Check if we have an existing message to edit
+    const existingMessageId = await getSetting('leaderboard_message_id');
+    
+    if (existingMessageId) {
+      // Try to edit existing message
+      const editUrl = `${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`;
+      const editResponse = await fetch(editUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(embed)
+      });
+      
+      if (editResponse.ok) {
+        console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
+        return true;
+      } else {
+        console.log('⚠️ Could not edit existing message, posting new one...');
+      }
+    }
+    
+    // Post new message
+    const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(embed)
@@ -106,7 +154,13 @@ async function postLeaderboardToDiscord() {
       throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
     }
     
-    console.log(`✅ Leaderboard posted to Discord (${users.length} users)`);
+    // Save message ID for future edits
+    const data = await response.json();
+    if (data.id) {
+      await setSetting('leaderboard_message_id', data.id);
+      console.log(`✅ Leaderboard posted to Discord (message ID: ${data.id})`);
+    }
+    
     return true;
   } catch (error) {
     console.error('❌ Failed to post leaderboard to Discord:', error);
@@ -267,6 +321,15 @@ async function triggerLeaderboardPost() {
   return await postLeaderboardToDiscord();
 }
 
+/**
+ * Reset leaderboard message (posts fresh instead of editing)
+ */
+async function resetLeaderboardMessage() {
+  await Settings.deleteOne({ key: 'leaderboard_message_id' });
+  console.log('🔄 Leaderboard message ID reset - next post will create new message');
+  return true;
+}
+
 module.exports = {
   getLeaderboardUsers,
   postLeaderboardToDiscord,
@@ -275,5 +338,6 @@ module.exports = {
   getUserRank,
   getVerifiedMentors,
   triggerLeaderboardPost,
+  resetLeaderboardMessage,
   MILESTONE_DAYS
 };

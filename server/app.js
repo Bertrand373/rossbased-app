@@ -289,6 +289,28 @@ app.post('/api/leaderboard/trigger', async (req, res) => {
   }
 });
 
+// Manual milestone test (for testing)
+app.post('/api/leaderboard/test-milestone', async (req, res) => {
+  try {
+    const { username, days } = req.body;
+    
+    if (!username || !days) {
+      return res.status(400).json({ error: 'Provide username and days in request body' });
+    }
+    
+    const { postMilestoneToDiscord } = require('./services/leaderboardService');
+    const result = await postMilestoneToDiscord(username, days);
+    
+    res.json({ 
+      success: result, 
+      message: result ? `Milestone posted: ${username} - ${days} days` : 'Failed to post milestone (check DISCORD_MILESTONE_WEBHOOK)' 
+    });
+  } catch (err) {
+    console.error('Test milestone error:', err);
+    res.status(500).json({ error: 'Failed to test milestone' });
+  }
+});
+
 // ============================================
 // NOTIFICATION PREFERENCES ENDPOINTS
 // ============================================
