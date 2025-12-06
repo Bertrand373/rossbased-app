@@ -519,7 +519,9 @@ export const useUserData = () => {
     localStorage.removeItem('username');
     
     // Store message for display after redirect
-    sessionStorage.setItem('logoutMessage', customMessage || 'Logged out successfully');
+    // Check if customMessage is actually a string (not an event object from onClick)
+    const message = (typeof customMessage === 'string') ? customMessage : 'Logged out successfully';
+    sessionStorage.setItem('logoutMessage', message);
     
     // Force redirect to landing page
     window.location.href = '/';
