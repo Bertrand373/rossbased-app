@@ -293,7 +293,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       </nav>
 
       {/* Content */}
-      <div className="profile-content">
+      <div className="profile-content" key={activeTab}>
         
         {/* ACCOUNT TAB */}
         {activeTab === 'account' && (
