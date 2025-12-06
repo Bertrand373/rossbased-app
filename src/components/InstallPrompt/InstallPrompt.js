@@ -81,12 +81,6 @@ const CheckIcon = () => (
   </svg>
 );
 
-const CloseIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M1 1l12 12M1 13L13 1" strokeLinecap="round"/>
-  </svg>
-);
-
 // =============================================================================
 // INSTRUCTION STEPS BY PLATFORM
 // =============================================================================
@@ -94,24 +88,24 @@ const CloseIcon = () => (
 const getInstructionSteps = (platform, browser) => {
   if (platform === 'ios') {
     return [
-      { num: '1', icon: <ShareIcon />, title: 'Tap Share', desc: 'Bottom of Safari' },
-      { num: '2', icon: <PlusIcon />, title: 'Add to Home Screen', desc: 'Scroll to find it' },
-      { num: '3', icon: <CheckIcon />, title: 'Tap Add', desc: 'Top right corner' }
+      { num: '01', icon: <ShareIcon />, title: 'Tap Share', desc: 'Bottom of Safari' },
+      { num: '02', icon: <PlusIcon />, title: 'Add to Home Screen', desc: 'Scroll to find it' },
+      { num: '03', icon: <CheckIcon />, title: 'Tap Add', desc: 'Top right corner' }
     ];
   }
   
   if (platform === 'android') {
     return [
-      { num: '1', icon: <MenuIcon />, title: 'Tap Menu', desc: 'Three dots, top right' },
-      { num: '2', icon: <PlusIcon />, title: 'Install App', desc: 'Or "Add to Home screen"' },
-      { num: '3', icon: <CheckIcon />, title: 'Confirm', desc: 'Tap Install' }
+      { num: '01', icon: <MenuIcon />, title: 'Tap Menu', desc: 'Three dots, top right' },
+      { num: '02', icon: <PlusIcon />, title: 'Install App', desc: 'Or "Add to Home screen"' },
+      { num: '03', icon: <CheckIcon />, title: 'Confirm', desc: 'Tap Install' }
     ];
   }
   
   // Desktop
   return [
-    { num: '1', icon: <PlusIcon />, title: 'Click Install', desc: 'In the address bar' },
-    { num: '2', icon: <CheckIcon />, title: 'Confirm', desc: 'Click Install' }
+    { num: '01', icon: <PlusIcon />, title: 'Click Install', desc: 'In the address bar' },
+    { num: '02', icon: <CheckIcon />, title: 'Confirm', desc: 'Click Install' }
   ];
 };
 
@@ -223,11 +217,6 @@ const InstallPrompt = ({
   return (
     <div className="install-overlay" onClick={handleClose}>
       <div className="install-modal" onClick={e => e.stopPropagation()}>
-        
-        {/* Close */}
-        <button className="install-close" onClick={handleClose} aria-label="Close">
-          <CloseIcon />
-        </button>
         
         {/* Header */}
         <div className="install-header">

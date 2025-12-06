@@ -55,33 +55,6 @@
 }
 
 /* =============================================================================
-   CLOSE BUTTON - Matches auth-close exactly
-   ============================================================================= */
-
-.install-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.install-close:hover {
-  color: rgba(255, 255, 255, 0.7);
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-/* =============================================================================
    HEADER - Typography matches app hierarchy
    ============================================================================= */
 
@@ -138,17 +111,13 @@
 }
 
 .install-step-num {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.1);
+  font-feature-settings: 'tnum' 1;
+  line-height: 1;
   flex-shrink: 0;
+  min-width: 32px;
 }
 
 .install-step-icon {
@@ -337,9 +306,8 @@
   }
   
   .install-step-num {
-    width: 20px;
-    height: 20px;
-    font-size: 0.6875rem;
+    font-size: 1.25rem;
+    min-width: 28px;
   }
   
   .install-step-icon {
@@ -365,8 +333,7 @@
   }
   
   .install-btn-primary,
-  .install-btn-ghost,
-  .install-close {
+  .install-btn-ghost {
     transition: none;
   }
 }
