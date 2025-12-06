@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema({
   // Discord Integration
   discordUsername: { type: String, default: '' },
   showOnLeaderboard: { type: Boolean, default: false },
+  announceDiscordMilestones: { type: Boolean, default: false },
   
   // Mentor System Fields
   mentorEligible: { type: Boolean, default: false },
