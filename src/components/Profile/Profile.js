@@ -15,6 +15,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('account');
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [showExportModal, setShowExportModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   
@@ -357,7 +358,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   const handleAccountDeletion = () => {
     localStorage.clear();
-    onLogout();
+    onLogout('Account deleted');
   };
 
   const userInitial = userData?.username?.charAt(0)?.toUpperCase() || 
@@ -818,12 +819,39 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       {/* DELETE MODAL */}
       {showDeleteConfirm && (
         <div className="overlay">
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+          <div className="confirm-modal delete-confirm-modal" onClick={e => e.stopPropagation()}>
             <h2>Delete Account?</h2>
             <p>This will permanently delete all your data. This cannot be undone.</p>
+            
+            <div className="delete-confirm-input">
+              <label>Type <strong>DELETE</strong> to confirm</label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
+                placeholder="DELETE"
+                autoComplete="off"
+                spellCheck="false"
+              />
+            </div>
+            
             <div className="confirm-actions">
-              <button className="btn-danger" onClick={handleAccountDeletion}>Delete</button>
-              <button className="btn-ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+              <button 
+                className="btn-danger" 
+                onClick={handleAccountDeletion}
+                disabled={deleteConfirmText !== 'DELETE'}
+              >
+                Delete Account
+              </button>
+              <button 
+                className="btn-ghost" 
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDeleteConfirmText('');
+                }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

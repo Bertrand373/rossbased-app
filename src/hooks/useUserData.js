@@ -511,7 +511,7 @@ export const useUserData = () => {
     }
   };
 
-  const logout = () => {
+  const logout = (customMessage) => {
     setUserData({
       username: '',
       email: '',
@@ -562,7 +562,8 @@ export const useUserData = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     
-    toast.success('Logged out successfully');
+    // Show custom message or default logout message
+    toast.success(customMessage || 'Logged out successfully');
   };
 
   // ================================================================

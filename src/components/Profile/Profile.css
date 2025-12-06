@@ -1179,6 +1179,65 @@
 }
 
 /* =============================================================================
+   DELETE CONFIRMATION INPUT
+   ============================================================================= */
+
+.delete-confirm-modal {
+  max-width: 380px;
+}
+
+.delete-confirm-input {
+  margin: 28px 0 8px 0;
+  text-align: left;
+}
+
+.delete-confirm-input label {
+  display: block;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 12px;
+}
+
+.delete-confirm-input label strong {
+  color: #ff4757;
+  font-weight: 600;
+}
+
+.delete-confirm-input input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 71, 87, 0.08);
+  border: 1px solid rgba(255, 71, 87, 0.2);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-align: center;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.delete-confirm-input input:focus {
+  outline: none;
+  border-color: rgba(255, 71, 87, 0.4);
+  background: rgba(255, 71, 87, 0.12);
+}
+
+.delete-confirm-input input::placeholder {
+  color: rgba(255, 255, 255, 0.15);
+  letter-spacing: 0.15em;
+}
+
+/* Disabled delete button state */
+.confirm-actions .btn-danger:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: rgba(255, 71, 87, 0.2);
+  border-color: rgba(255, 71, 87, 0.1);
+}
+
+/* =============================================================================
    REDUCED MOTION
    ============================================================================= */
 
