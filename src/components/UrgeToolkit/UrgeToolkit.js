@@ -647,7 +647,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
         <span className="ut-phase-num">{currentPhase.num}</span>
         <div className="ut-phase-info">
           <span className="ut-phase-name">{currentPhase.name}</span>
-          <span className="ut-phase-detail">Day {currentDay} · {experienceLevel}</span>
+          <span className="ut-phase-detail">Day {currentDay} · {experienceLevel.charAt(0).toUpperCase() + experienceLevel.slice(1)} Tools</span>
         </div>
       </div>
 
