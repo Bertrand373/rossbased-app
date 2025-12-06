@@ -1,5 +1,6 @@
-// src/hooks/useUserData.js - UPDATED: Google OAuth support + Mock mode toggle
-import { useState, useEffect } from 'react';
+// src/hooks/useUserData.js - FIXED: Proper MongoDB sync
+// Changes: Always fetch from DB on load, robust sync with error handling
+import { useState, useEffect, useCallback } from 'react';
 import { addDays } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -71,6 +72,7 @@ export const useUserData = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isPremium, setIsPremium] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'error' | 'success'
 
   const calculateGoalTargetDate = (startDate, targetDays) => {
     if (!startDate || !targetDays) return null;
@@ -101,38 +103,34 @@ export const useUserData = () => {
     }
   };
 
-  // Seed ML data for AI card test user so the PatternInsightCard shows
-  // UPDATED: Now 12 features including ET emotional data
-  const seedMLDataForTesting = () => {
-    const trainingHistory = {
-      accuracy: [0.72, 0.75, 0.78],
-      loss: [0.45, 0.38, 0.32],
-      lastTrained: new Date().toISOString(),
-      totalEpochs: 150
-    };
+  // Process user data from API (convert dates, set defaults)
+  const processUserData = (rawData) => {
+    const processed = { ...rawData };
     
-    // 12 features: energy, focus, confidence, energyDrop, hourOfDay, isWeekend, 
-    // streakDay, inPurgePhase, anxiety, moodStability, mentalClarity, emotionalProcessing
-    const normalizationStats = {
-      means: [6.5, 6.8, 6.5, 0.5, 14, 0.3, 20, 0.4, 5, 6, 5.5, 5],
-      stds: [1.8, 1.6, 1.7, 1.2, 6, 0.45, 15, 0.49, 2, 2, 2, 2]
-    };
-    
-    localStorage.setItem('ml_training_history', JSON.stringify(trainingHistory));
-    localStorage.setItem('ml_normalization_stats', JSON.stringify(normalizationStats));
-    
-    console.log('🧠 ML data seeded for testing - PatternInsightCard will show (12 features)');
-  };
-
-  // Helper to process user data from API
-  const processUserData = (data) => {
-    const processed = { ...data };
-    
+    // Convert date strings to Date objects
     if (processed.startDate) {
       processed.startDate = new Date(processed.startDate);
+      
+      // SYNC STREAK ON APP LOAD - ensures accuracy after days away
+      const today = new Date();
+      const daysDiff = Math.floor((today - processed.startDate) / (1000 * 60 * 60 * 24));
+      processed.currentStreak = Math.max(0, daysDiff);
+      
+      // Also update longestStreak if current exceeds it
+      if (processed.currentStreak > (processed.longestStreak || 0)) {
+        processed.longestStreak = processed.currentStreak;
+      }
     }
     
-    if (!processed.goal) {
+    // Process goal dates
+    if (processed.goal) {
+      if (processed.goal.targetDate) {
+        processed.goal.targetDate = new Date(processed.goal.targetDate);
+      }
+      if (processed.goal.achievementDate) {
+        processed.goal.achievementDate = new Date(processed.goal.achievementDate);
+      }
+    } else {
       processed.goal = {
         targetDays: null,
         isActive: false,
@@ -140,15 +138,9 @@ export const useUserData = () => {
         achieved: false,
         achievementDate: null
       };
-    } else {
-      if (processed.goal.targetDate) {
-        processed.goal.targetDate = new Date(processed.goal.targetDate);
-      }
-      if (processed.goal.achievementDate) {
-        processed.goal.achievementDate = new Date(processed.goal.achievementDate);
-      }
     }
     
+    // Process badges
     if (processed.badges) {
       processed.badges = processed.badges.map(badge => ({
         ...badge,
@@ -156,6 +148,7 @@ export const useUserData = () => {
       }));
     }
     
+    // Process benefit tracking
     if (processed.benefitTracking) {
       processed.benefitTracking = processed.benefitTracking.map(item => ({
         ...item,
@@ -164,8 +157,11 @@ export const useUserData = () => {
         sleep: item.sleep || item.attraction || 5,
         workout: item.workout || item.gymPerformance || 5
       }));
+    } else {
+      processed.benefitTracking = [];
     }
     
+    // Process emotional tracking
     if (processed.emotionalTracking) {
       processed.emotionalTracking = processed.emotionalTracking.map(item => ({
         ...item,
@@ -175,6 +171,7 @@ export const useUserData = () => {
       processed.emotionalTracking = [];
     }
     
+    // Process urge log
     if (processed.urgeLog) {
       processed.urgeLog = processed.urgeLog.map(item => ({
         ...item,
@@ -184,6 +181,7 @@ export const useUserData = () => {
       processed.urgeLog = [];
     }
     
+    // Process streak history
     if (processed.streakHistory) {
       processed.streakHistory = processed.streakHistory.map(streak => ({
         ...streak,
@@ -205,6 +203,78 @@ export const useUserData = () => {
     
     return processed;
   };
+
+  // ================================================================
+  // FETCH FRESH DATA FROM MONGODB
+  // ================================================================
+  const fetchUserDataFromAPI = useCallback(async (username, token) => {
+    try {
+      console.log('Fetching fresh data from MongoDB for:', username);
+      
+      const response = await fetch(`${API_URL}/api/user/${username}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      
+      const rawData = await response.json();
+      return processUserData(rawData);
+    } catch (err) {
+      console.error('Error fetching from API:', err);
+      return null;
+    }
+  }, []);
+
+  // ================================================================
+  // SYNC TO MONGODB - ROBUST VERSION WITH ERROR HANDLING
+  // ================================================================
+  const syncToAPI = useCallback(async (dataToSync) => {
+    if (MOCK_MODE) return true;
+    
+    const token = localStorage.getItem('token');
+    const username = dataToSync.username || localStorage.getItem('username');
+    
+    if (!token || !username) {
+      console.warn('Cannot sync: missing token or username');
+      return false;
+    }
+    
+    try {
+      setSyncStatus('syncing');
+      
+      const response = await fetch(`${API_URL}/api/user/${username}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToSync)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Sync failed with status ${response.status}`);
+      }
+      
+      setSyncStatus('success');
+      console.log('✅ Data synced to MongoDB');
+      return true;
+    } catch (err) {
+      console.error('❌ Failed to sync to MongoDB:', err);
+      setSyncStatus('error');
+      // Show error toast so user knows sync failed
+      toast.error('Data sync failed. Changes saved locally.', { 
+        duration: 3000,
+        icon: '⚠️'
+      });
+      return false;
+    }
+  }, []);
 
   // Production login via API
   const loginViaAPI = async (username, password, isGoogleAuth = false) => {
@@ -340,82 +410,43 @@ export const useUserData = () => {
         case 'aitest1':
           mockUserData = aiTestUser1;
           break;
-          
         case 'aitest2':
           mockUserData = aiTestUser2;
           break;
-          
         case 'aitest3':
           mockUserData = aiTestUser3;
           break;
-          
         case 'aitest4':
           mockUserData = aiTestUser4;
           break;
-          
         case 'aitest5':
           mockUserData = aiTestUser5;
           break;
-          
         case 'aitest6':
           mockUserData = aiTestUser6;
           break;
-          
         case 'aicard':
-        case 'cardtest':
+        case 'aicardtest':
           mockUserData = aiCardTestUser;
           break;
           
         default:
           mockUserData = comprehensiveMockData;
-          break;
       }
       
-      mockUserData.isPremium = true;
-
-      if (!mockUserData.goal) {
-        mockUserData.goal = {
-          targetDays: null,
-          isActive: false,
-          targetDate: null,
-          achieved: false,
-          achievementDate: null
-        };
-      }
-
-      if (mockUserData.goal.isActive && mockUserData.goal.targetDays && mockUserData.startDate) {
-        mockUserData.goal.targetDate = calculateGoalTargetDate(
-          mockUserData.startDate, 
-          mockUserData.goal.targetDays
-        );
-        
-        if (checkGoalAchievement(mockUserData.currentStreak, mockUserData.goal.targetDays)) {
-          if (!mockUserData.goal.achieved) {
-            mockUserData.goal.achieved = true;
-            mockUserData.goal.achievementDate = addDays(
-              new Date(mockUserData.startDate), 
-              mockUserData.goal.targetDays - 1
-            );
-          }
-        }
-      }
+      const processed = { ...mockUserData };
       
-      setUserData(mockUserData);
+      setUserData(processed);
       setIsLoggedIn(true);
       setIsPremium(true);
       
-      // Seed ML data for AI card test user
-      if (username.toLowerCase() === 'aicard' || username.toLowerCase() === 'cardtest') {
-        seedMLDataForTesting();
-      }
-      
-      localStorage.setItem('userData', JSON.stringify(mockUserData));
+      localStorage.setItem('userData', JSON.stringify(processed));
       localStorage.setItem('isLoggedIn', 'true');
       
       setIsLoading(false);
       
       const scenarioInfo = getScenarioInfo(username);
-      toast.success(`Welcome, ${username}! ${scenarioInfo} - All features unlocked!`);
+      toast.success(`${scenarioInfo} - All features unlocked!`);
       
       return true;
     } catch (err) {
@@ -471,19 +502,16 @@ export const useUserData = () => {
       case 'aitest5':
         return 'AI Test: Long streak (Day 60)';
       case 'aitest6':
-        return 'AI Test: Post-relapse recovery';
+        return 'AI Test: Recovery pattern (Day 8)';
       case 'aicard':
-      case 'cardtest':
-        return 'AI Card Test: ML model seeded';
+      case 'aicardtest':
+        return 'AI Card Test: Daily log → prediction demo';
       default:
-        return 'Loaded';
+        return 'Comprehensive mock data loaded';
     }
   };
 
-  const logout = async () => {
-    // Clear ML data on logout
-    await clearMLData();
-    
+  const logout = () => {
     setUserData({
       username: '',
       email: '',
@@ -526,7 +554,9 @@ export const useUserData = () => {
     });
     setIsLoggedIn(false);
     setIsPremium(true);
+    setSyncStatus('idle');
     
+    // Clear all local storage
     localStorage.removeItem('userData');
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('token');
@@ -535,58 +565,50 @@ export const useUserData = () => {
     toast.success('Logged out successfully');
   };
 
+  // ================================================================
+  // UPDATE USER DATA - NOW WITH PROPER SYNC
+  // ================================================================
   const updateUserData = async (newData) => {
     try {
-      const updatedData = { ...userData, ...newData, isPremium: true };
-
-      if (newData.startDate && updatedData.goal && updatedData.goal.isActive) {
-        updatedData.goal.targetDate = calculateGoalTargetDate(
-          newData.startDate, 
-          updatedData.goal.targetDays
-        );
-        
-        updatedData.goal.achieved = false;
-        updatedData.goal.achievementDate = null;
-        
-        if (updatedData.currentStreak >= updatedData.goal.targetDays) {
+      const updatedData = { ...userData, ...newData };
+      
+      // Check badges based on streak
+      if (updatedData.currentStreak && updatedData.badges) {
+        const milestones = [7, 14, 30, 90, 180, 365];
+        updatedData.badges = updatedData.badges.map((badge, index) => {
+          const milestone = milestones[index];
+          if (updatedData.currentStreak >= milestone && !badge.earned) {
+            return { ...badge, earned: true, date: new Date() };
+          }
+          return badge;
+        });
+      }
+      
+      // Update longest streak if needed
+      if (updatedData.currentStreak > updatedData.longestStreak) {
+        updatedData.longestStreak = updatedData.currentStreak;
+      }
+      
+      // Check goal achievement
+      if (updatedData.goal?.isActive && updatedData.goal?.targetDays) {
+        const isAchieved = updatedData.currentStreak >= updatedData.goal.targetDays;
+        if (isAchieved && !updatedData.goal.achieved) {
           updatedData.goal.achieved = true;
-          updatedData.goal.achievementDate = addDays(
-            new Date(newData.startDate), 
-            updatedData.goal.targetDays - 1
-          );
+          updatedData.goal.achievementDate = new Date();
+          toast.success(`🎯 Goal Complete! You reached ${updatedData.goal.targetDays} days!`);
         }
       }
 
-      if (newData.currentStreak !== undefined && updatedData.goal && updatedData.goal.isActive) {
-        if (!updatedData.goal.achieved && checkGoalAchievement(newData.currentStreak, updatedData.goal.targetDays)) {
-          updatedData.goal.achieved = true;
-          updatedData.goal.achievementDate = addDays(
-            new Date(updatedData.startDate), 
-            updatedData.goal.targetDays - 1
-          );
-          
-          toast.success(`Goal achieved! You reached ${updatedData.goal.targetDays} days!`);
-        }
-      }
-
+      // Update state immediately for responsive UI
       setUserData(updatedData);
       setIsPremium(true);
       
+      // Save to localStorage as cache/fallback
       localStorage.setItem('userData', JSON.stringify(updatedData));
       
-      // If not in mock mode, also save to API
+      // CRITICAL: Sync to MongoDB (now with proper error handling)
       if (!MOCK_MODE) {
-        const token = localStorage.getItem('token');
-        if (token && updatedData.username) {
-          fetch(`${API_URL}/api/user/${updatedData.username}`, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedData)
-          }).catch(err => console.error('Failed to sync to API:', err));
-        }
+        await syncToAPI(updatedData);
       }
       
       return true;
@@ -613,13 +635,17 @@ export const useUserData = () => {
           isActive: true,
           targetDate,
           achieved: isAchieved,
-          achievementDate: isAchieved ? addDays(new Date(userData.startDate), targetDays - 1) : null
+          achievementDate: isAchieved ? new Date() : null
         }
       };
 
+      // Also set achievementDate for already-achieved goals
+      if (isAchieved) {
+        goalData.goal.achievementDate = userData.startDate ? 
+          addDays(new Date(userData.startDate), targetDays - 1) : null;
+      }
+
       updateUserData(goalData);
-      
-      // No toast needed - modal closing is sufficient confirmation
       
       return true;
     } catch (err) {
@@ -642,7 +668,6 @@ export const useUserData = () => {
       };
 
       updateUserData(goalData);
-      // No toast needed - modal closing is sufficient confirmation
       return true;
     } catch (err) {
       console.error('Cancel goal error:', err);
@@ -651,122 +676,90 @@ export const useUserData = () => {
     }
   };
 
+  // ================================================================
+  // INITIALIZATION - NOW FETCHES FROM MONGODB
+  // ================================================================
   useEffect(() => {
-    const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
-    const storedUserData = localStorage.getItem('userData');
-    
-    if (storedIsLoggedIn === 'true' && storedUserData) {
-      try {
-        const parsedUserData = JSON.parse(storedUserData);
+    const initializeUser = async () => {
+      const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
+      const token = localStorage.getItem('token');
+      const username = localStorage.getItem('username');
+      
+      // User is logged in - try to fetch fresh data from MongoDB
+      if (storedIsLoggedIn === 'true' && token && username && !MOCK_MODE) {
+        setIsLoading(true);
         
-        if (parsedUserData.startDate) {
-          parsedUserData.startDate = new Date(parsedUserData.startDate);
+        try {
+          // Fetch fresh data from MongoDB
+          const freshData = await fetchUserDataFromAPI(username, token);
           
-          // SYNC STREAK ON APP LOAD - ensures accuracy after days away
-          const today = new Date();
-          const daysDiff = Math.floor((today - parsedUserData.startDate) / (1000 * 60 * 60 * 24));
-          parsedUserData.currentStreak = Math.max(0, daysDiff);
-          
-          // Also update longestStreak if current exceeds it
-          if (parsedUserData.currentStreak > (parsedUserData.longestStreak || 0)) {
-            parsedUserData.longestStreak = parsedUserData.currentStreak;
+          if (freshData) {
+            // Got fresh data from MongoDB - use it
+            setUserData(freshData);
+            setIsLoggedIn(true);
+            setIsPremium(true);
+            localStorage.setItem('userData', JSON.stringify(freshData));
+            console.log('✅ Loaded fresh data from MongoDB');
+          } else {
+            // API fetch failed - fall back to localStorage
+            const storedUserData = localStorage.getItem('userData');
+            if (storedUserData) {
+              const parsedUserData = processUserData(JSON.parse(storedUserData));
+              setUserData(parsedUserData);
+              setIsLoggedIn(true);
+              setIsPremium(true);
+              console.log('⚠️ Using cached localStorage data (API unavailable)');
+              toast('Using offline data', { icon: '📴', duration: 2000 });
+            }
+          }
+        } catch (err) {
+          console.error('Error initializing user:', err);
+          // Fall back to localStorage on error
+          const storedUserData = localStorage.getItem('userData');
+          if (storedUserData) {
+            const parsedUserData = processUserData(JSON.parse(storedUserData));
+            setUserData(parsedUserData);
+            setIsLoggedIn(true);
+            setIsPremium(true);
           }
         }
-
-        if (parsedUserData.goal) {
-          if (parsedUserData.goal.targetDate) {
-            parsedUserData.goal.targetDate = new Date(parsedUserData.goal.targetDate);
+        
+        setIsLoading(false);
+      } 
+      // MOCK MODE or no login - use localStorage directly
+      else if (storedIsLoggedIn === 'true') {
+        const storedUserData = localStorage.getItem('userData');
+        if (storedUserData) {
+          try {
+            const parsedUserData = processUserData(JSON.parse(storedUserData));
+            setUserData(parsedUserData);
+            setIsLoggedIn(true);
+            setIsPremium(true);
+            localStorage.setItem('userData', JSON.stringify(parsedUserData));
+          } catch (err) {
+            console.error('Error parsing stored user data:', err);
+            localStorage.removeItem('userData');
+            localStorage.removeItem('isLoggedIn');
           }
-          if (parsedUserData.goal.achievementDate) {
-            parsedUserData.goal.achievementDate = new Date(parsedUserData.goal.achievementDate);
-          }
-        } else {
-          parsedUserData.goal = {
-            targetDays: null,
-            isActive: false,
-            targetDate: null,
-            achieved: false,
-            achievementDate: null
-          };
         }
-        
-        if (parsedUserData.badges) {
-          parsedUserData.badges = parsedUserData.badges.map(badge => ({
-            ...badge,
-            date: badge.date ? new Date(badge.date) : null
-          }));
-        }
-        
-        if (parsedUserData.benefitTracking) {
-          parsedUserData.benefitTracking = parsedUserData.benefitTracking.map(item => ({
-            ...item,
-            date: new Date(item.date),
-            aura: item.aura || 5,
-            sleep: item.sleep || item.attraction || 5,
-            workout: item.workout || item.gymPerformance || 5
-          }));
-        }
-        
-        if (parsedUserData.emotionalTracking) {
-          parsedUserData.emotionalTracking = parsedUserData.emotionalTracking.map(item => ({
-            ...item,
-            date: new Date(item.date)
-          }));
-        } else {
-          parsedUserData.emotionalTracking = [];
-        }
-        
-        if (parsedUserData.urgeLog) {
-          parsedUserData.urgeLog = parsedUserData.urgeLog.map(item => ({
-            ...item,
-            date: new Date(item.date)
-          }));
-        } else {
-          parsedUserData.urgeLog = [];
-        }
-        
-        if (parsedUserData.streakHistory) {
-          parsedUserData.streakHistory = parsedUserData.streakHistory.map(streak => ({
-            ...streak,
-            start: new Date(streak.start),
-            end: streak.end ? new Date(streak.end) : null
-          }));
-        }
-        
-        parsedUserData.email = parsedUserData.email || '';
-        parsedUserData.dataSharing = parsedUserData.dataSharing || false;
-        parsedUserData.analyticsOptIn = parsedUserData.analyticsOptIn !== false;
-        parsedUserData.marketingEmails = parsedUserData.marketingEmails || false;
-        parsedUserData.darkMode = parsedUserData.darkMode !== false;
-        parsedUserData.notifications = parsedUserData.notifications !== false;
-        parsedUserData.language = parsedUserData.language || 'en';
-        parsedUserData.wisdomMode = parsedUserData.wisdomMode || false;
-        parsedUserData.isPremium = true;
-        
-        setUserData(parsedUserData);
-        setIsLoggedIn(true);
-        setIsPremium(true);
-        
-        // Save updated streak back to localStorage
-        localStorage.setItem('userData', JSON.stringify(parsedUserData));
-      } catch (err) {
-        console.error('Error parsing stored user data:', err);
-        localStorage.removeItem('userData');
-        localStorage.removeItem('isLoggedIn');
       }
-    }
-  }, []);
+    };
+
+    initializeUser();
+  }, [fetchUserDataFromAPI]);
 
   return { 
     userData, 
     isLoggedIn, 
     isPremium: true,
     isLoading,
+    syncStatus,
     login, 
     logout, 
     updateUserData,
     setGoal,
-    cancelGoal
+    cancelGoal,
+    syncToAPI // Expose for manual sync if needed
   };
 };
 
