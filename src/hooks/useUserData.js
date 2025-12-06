@@ -518,13 +518,11 @@ export const useUserData = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     
-    // Show toast before redirect
-    toast.success(customMessage || 'Logged out successfully');
+    // Store message for display after redirect
+    sessionStorage.setItem('logoutMessage', customMessage || 'Logged out successfully');
     
-    // Small delay to let toast show, then force redirect to landing page
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 300);
+    // Force redirect to landing page
+    window.location.href = '/';
   };
 
   // ================================================================

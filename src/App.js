@@ -1,7 +1,7 @@
 // App.js - TITANTRACK MODERN MINIMAL
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import './App.css';
 import trackerLogo from './assets/trackerapplogo.png';
 
@@ -195,6 +195,15 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [isRefreshLoading]);
+
+  // Show logout/account deleted message after redirect
+  useEffect(() => {
+    const logoutMessage = sessionStorage.getItem('logoutMessage');
+    if (logoutMessage) {
+      toast.success(logoutMessage);
+      sessionStorage.removeItem('logoutMessage');
+    }
+  }, []);
 
   const handleLogin = async (username, password, isGoogleAuth = false) => {
     setLoadingMessage('Signing in...');
