@@ -328,14 +328,15 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             </div>
 
             <div className="form-group">
-              <label>Discord</label>
+              <label>Discord Username</label>
               <input
                 type="text"
                 value={discordUsername}
                 onChange={(e) => setDiscordUsername(e.target.value)}
                 disabled={!isEditingProfile}
-                placeholder="For leaderboard"
+                placeholder="@username"
               />
+              <span className="form-hint">Found in Discord → Settings → username</span>
             </div>
 
             <div className="toggle-row">

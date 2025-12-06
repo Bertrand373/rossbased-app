@@ -1,15 +1,16 @@
 // server/services/notificationScheduler.js
-// Scheduled jobs for automatic notification sending
+// Scheduled jobs for automatic notification sending and Discord leaderboard
 
 const cron = require('node-cron');
 const NotificationSubscription = require('../models/NotificationSubscription');
 const { sendNotificationToUser, sendBulkNotifications } = require('./notificationService');
+const { postLeaderboardToDiscord } = require('./leaderboardService');
 const User = require('../models/User');
 
 // Daily reminder notifications
 // Runs every hour and checks which users should receive their daily reminder
 function scheduleDailyReminders() {
-  // Run every hour
+  // Run every hour at minute 0
   cron.schedule('0 * * * *', async () => {
     console.log('⏰ Running daily reminder check...');
     
@@ -63,7 +64,7 @@ function scheduleWeeklyMotivation() {
 }
 
 // Milestone check - runs multiple times per day
-// Checks user streaks and sends milestone notifications
+// Checks user streaks and sends push notifications for milestones
 function scheduleMilestoneChecks() {
   // Run every 6 hours
   cron.schedule('0 */6 * * *', async () => {
@@ -106,6 +107,30 @@ function scheduleMilestoneChecks() {
   console.log('✅ Milestone check scheduler started');
 }
 
+// Discord Leaderboard - Daily at 8 AM EST
+// Posts the top 13 leaderboard to Discord
+function scheduleLeaderboardPost() {
+  // 8 AM EST = 13:00 UTC (standard time) or 12:00 UTC (daylight saving)
+  // Using 13:00 UTC for EST. Adjust if your server uses a different timezone.
+  // Render servers typically run in UTC.
+  cron.schedule('0 13 * * *', async () => {
+    console.log('📊 Posting daily leaderboard to Discord...');
+    
+    try {
+      const success = await postLeaderboardToDiscord();
+      if (success) {
+        console.log('✅ Daily leaderboard posted successfully');
+      } else {
+        console.log('⚠️ Leaderboard post returned false');
+      }
+    } catch (error) {
+      console.error('❌ Error posting leaderboard:', error);
+    }
+  });
+  
+  console.log('✅ Discord leaderboard scheduler started (8 AM EST daily)');
+}
+
 // Initialize all schedulers
 function initializeSchedulers() {
   console.log('🚀 Initializing notification schedulers...');
@@ -113,6 +138,7 @@ function initializeSchedulers() {
   scheduleDailyReminders();
   scheduleWeeklyMotivation();
   scheduleMilestoneChecks();
+  scheduleLeaderboardPost();
   
   console.log('✅ All notification schedulers initialized successfully');
 }

@@ -1,3 +1,4 @@
+// server/app.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -16,6 +17,14 @@ const notificationRoutes = require('./routes/notifications');
 const googleAuthRoutes = require('./routes/googleAuth');
 const discordAuthRoutes = require('./routes/discordAuth');
 const { initializeSchedulers } = require('./services/notificationScheduler');
+
+// Import leaderboard service
+const { 
+  checkAndAnnounceMilestone, 
+  getLeaderboardUsers, 
+  triggerLeaderboardPost, 
+  getUserRank 
+} = require('./services/leaderboardService');
 
 const app = express();
 
@@ -41,11 +50,11 @@ app.use((err, req, res, next) => {
 // MongoDB connection with optimized pooling for scale
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/rossbased';
 mongoose.connect(mongoUri, {
-  maxPoolSize: 50,                    // Handle up to 50 concurrent connections
-  minPoolSize: 5,                     // Keep 5 connections warm
-  serverSelectionTimeoutMS: 5000,     // Fail fast if DB unreachable
-  socketTimeoutMS: 45000,             // Close idle sockets after 45s
-  retryWrites: true,                  // Auto-retry failed writes
+  maxPoolSize: 50,
+  minPoolSize: 5,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  retryWrites: true,
 })
   .then(() => {
     console.log('MongoDB connected');
@@ -97,6 +106,10 @@ const authenticate = (req, res, next) => {
   }
 };
 
+// ============================================
+// AUTH ENDPOINTS
+// ============================================
+
 // Login endpoint
 app.post('/api/login', async (req, res) => {
   console.log('Received login request:', req.body);
@@ -114,7 +127,7 @@ app.post('/api/login', async (req, res) => {
         wetDreamCount: 0,
         relapseCount: 0,
         isPremium: false,
-        hasSeenOnboarding: false,  // NEW: Track onboarding completion
+        hasSeenOnboarding: false,
         badges: [
           { id: 1, name: '7-Day Warrior', earned: false, date: null },
           { id: 2, name: '14-Day Monk', earned: false, date: null },
@@ -133,7 +146,6 @@ app.post('/api/login', async (req, res) => {
         discordUsername: '',
         showOnLeaderboard: false,
         notes: {},
-        // Initialize notification preferences for new users
         notificationPreferences: {
           quietHoursEnabled: false,
           quietHoursStart: '22:00',
@@ -166,6 +178,10 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// ============================================
+// USER DATA ENDPOINTS
+// ============================================
+
 // Get user data
 app.get('/api/user/:username', authenticate, async (req, res) => {
   console.log('Received get user request for:', req.params.username);
@@ -183,7 +199,7 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
   }
 });
 
-// Update user data
+// Update user data (with milestone detection)
 app.put('/api/user/:username', authenticate, async (req, res) => {
   console.log('Received update user request for:', req.params.username);
   console.log('Update data:', req.body);
@@ -196,6 +212,8 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
     }
     
     const updateData = { ...req.body };
+    const previousStreak = existingUser.currentStreak || 0;
+    const newStreak = updateData.currentStreak;
     
     const user = await User.findOneAndUpdate(
       { username: req.params.username },
@@ -204,6 +222,15 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
     );
     
     console.log('User updated successfully:', req.params.username);
+    
+    // Check for milestone announcements (Discord) - only if streak increased
+    if (newStreak && newStreak > previousStreak) {
+      // Run async - don't wait for it to complete
+      checkAndAnnounceMilestone(req.params.username, newStreak).catch(err => {
+        console.error('Milestone check failed:', err);
+      });
+    }
+    
     res.json(user);
   } catch (err) {
     console.error('Update user error:', err);
@@ -211,7 +238,7 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
   }
 });
 
-// Get all users
+// Get all users (admin)
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find({});
@@ -222,7 +249,51 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// NEW: Get notification preferences
+// ============================================
+// LEADERBOARD API ENDPOINTS
+// ============================================
+
+// Get leaderboard data (public)
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const users = await getLeaderboardUsers();
+    res.json({ success: true, users });
+  } catch (err) {
+    console.error('Leaderboard error:', err);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
+// Get user's rank (authenticated)
+app.get('/api/leaderboard/rank/:username', authenticate, async (req, res) => {
+  try {
+    const rank = await getUserRank(req.params.username);
+    if (!rank) {
+      return res.json({ success: true, onLeaderboard: false });
+    }
+    res.json({ success: true, onLeaderboard: true, ...rank });
+  } catch (err) {
+    console.error('Get rank error:', err);
+    res.status(500).json({ error: 'Failed to get rank' });
+  }
+});
+
+// Manual leaderboard trigger (for testing)
+app.post('/api/leaderboard/trigger', async (req, res) => {
+  try {
+    const result = await triggerLeaderboardPost();
+    res.json({ success: result, message: result ? 'Leaderboard posted to Discord' : 'Failed to post leaderboard' });
+  } catch (err) {
+    console.error('Trigger leaderboard error:', err);
+    res.status(500).json({ error: 'Failed to trigger leaderboard' });
+  }
+});
+
+// ============================================
+// NOTIFICATION PREFERENCES ENDPOINTS
+// ============================================
+
+// Get notification preferences
 app.get('/api/notification-preferences/:username', async (req, res) => {
   const { username } = req.params;
   
@@ -255,7 +326,7 @@ app.get('/api/notification-preferences/:username', async (req, res) => {
   }
 });
 
-// NEW: Save/Update notification preferences
+// Save/Update notification preferences
 app.post('/api/notification-preferences/:username', async (req, res) => {
   const { username } = req.params;
   const preferences = req.body;
@@ -400,7 +471,9 @@ app.post('/api/feedback', async (req, res) => {
   }
 });
 
-// Mount notification routes
+// ============================================
+// MOUNT ROUTES
+// ============================================
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/auth', googleAuthRoutes);
 app.use('/api/auth', discordAuthRoutes);
