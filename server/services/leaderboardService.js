@@ -43,7 +43,11 @@ function formatLeaderboardEmbed(users) {
     return {
       embeds: [{
         color: 0xFFD700,
-        description: '```\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n              TITANTRACK\n             LEADERBOARD\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n      No warriors on the board yet.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n            Hold the Flame.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n```'
+        title: 'TITANTRACK LEADERBOARD',
+        description: '```\nNo one on the board yet.\n```',
+        footer: {
+          text: 'Hold the Flame.'
+        }
       }]
     };
   }
@@ -53,23 +57,24 @@ function formatLeaderboardEmbed(users) {
   
   users.forEach((user, index) => {
     const rank = String(index + 1).padStart(2, ' ');
-    // Truncate long names, pad short ones for alignment
-    const name = user.discordUsername.length > 16 
-      ? user.discordUsername.substring(0, 15) + '…' 
-      : user.discordUsername.padEnd(16, ' ');
-    const days = String(user.currentStreak || 0).padStart(4, ' ') + 'd';
+    // Truncate long names for mobile
+    const name = user.discordUsername.length > 14 
+      ? user.discordUsername.substring(0, 13) + '…' 
+      : user.discordUsername.padEnd(14, ' ');
+    const days = String(user.currentStreak || 0).padStart(3, ' ') + 'd';
     // Verified mentor gets a checkmark
     const verified = user.verifiedMentor ? ' ✓' : '';
     
-    leaderboardText += `  ${rank}    ${name}    ${days}${verified}\n`;
+    leaderboardText += `${rank}  ${name} ${days}${verified}\n`;
   });
   
   const embed = {
     embeds: [{
       color: 0xFFD700,
-      description: `\`\`\`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n              TITANTRACK\n             LEADERBOARD\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${leaderboardText}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n            Hold the Flame.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\`\`\``,
+      title: 'TITANTRACK LEADERBOARD',
+      description: `\`\`\`\n${leaderboardText}\`\`\``,
       footer: {
-        text: `Updated ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} at 8:00 AM EST`
+        text: `Hold the Flame. • Updated ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
       }
     }]
   };
@@ -117,7 +122,7 @@ function formatMilestoneEmbed(discordUsername, days) {
   return {
     embeds: [{
       color: 0xFFD700,
-      description: `\`\`\`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  ${discordUsername} just crossed ${days} days.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\`\`\``
+      description: `**${discordUsername}** just crossed **${days} days**.`
     }]
   };
 }
