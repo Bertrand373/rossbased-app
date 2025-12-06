@@ -254,6 +254,20 @@ function App() {
       />
       
       <div className="app-container">
+        {/* Landscape Blocker - Portrait Only */}
+        <div className="landscape-blocker">
+          <div className="landscape-blocker-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="14" y="6" width="20" height="36" rx="3" stroke="currentColor" strokeWidth="2"/>
+              <line x1="14" y1="12" x2="34" y2="12" stroke="currentColor" strokeWidth="1.5" opacity="0.3"/>
+              <line x1="14" y1="36" x2="34" y2="36" stroke="currentColor" strokeWidth="1.5" opacity="0.3"/>
+              <circle cx="24" cy="40" r="2" fill="currentColor" opacity="0.4"/>
+            </svg>
+          </div>
+          <p className="landscape-blocker-text">Rotate to Portrait</p>
+          <p className="landscape-blocker-subtext">TitanTrack is optimized for vertical viewing</p>
+        </div>
+
         {isLoggedIn ? (
           <>
             <header className="app-header">

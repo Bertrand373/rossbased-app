@@ -518,101 +518,12 @@ label {
 }
 
 /* ============================================================
-   BADGES & TAGS
-   ============================================================ */
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.badge-success {
-  background-color: var(--success-muted);
-  color: var(--success);
-}
-
-.badge-warning {
-  background-color: var(--warning-muted);
-  color: var(--warning);
-}
-
-.badge-danger {
-  background-color: var(--danger-muted);
-  color: var(--danger);
-}
-
-/* ============================================================
-   SUBSCRIPTION BANNER
-   ============================================================ */
-
-.subscription-banner {
-  background-color: var(--accent);
-  padding: var(--space-4);
-  text-align: center;
-}
-
-.subscription-banner-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-  color: #000000;
-}
-
-.subscription-cta {
-  display: inline-block;
-  padding: var(--space-2) var(--space-5);
-  background-color: #000000;
-  color: var(--accent);
-  font-weight: 500;
-  text-decoration: none;
-  border-radius: var(--radius-sm);
-  font-size: 0.8125rem;
-}
-
-.subscription-cta:hover {
-  background-color: var(--bg-card);
-}
-
-/* ============================================================
-   DIVIDERS
-   ============================================================ */
-
-.divider {
-  height: 1px;
-  background-color: var(--border-subtle);
-  margin: var(--space-6) 0;
-}
-
-.divider-text {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  color: var(--text-muted);
-  font-size: 0.75rem;
-}
-
-.divider-text::before,
-.divider-text::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background-color: var(--border-subtle);
-}
-
-/* ============================================================
-   SCROLLBAR
+   SCROLLBARS - Minimal
    ============================================================ */
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -714,4 +625,91 @@ body.static-view {
 
 body.static-view .app-content {
   overflow: hidden;
+}
+
+/* ============================================================
+   LANDSCAPE BLOCKER - Portrait Only
+   Matches TitanTrack aesthetic: black, minimal, confident
+   ============================================================ */
+
+.landscape-blocker {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000;
+  z-index: 99999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px;
+  text-align: center;
+}
+
+.landscape-blocker-icon {
+  color: rgba(255, 255, 255, 0.25);
+  animation: landscapeRotate 3s ease-in-out infinite;
+}
+
+.landscape-blocker-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+@keyframes landscapeRotate {
+  0%, 100% { 
+    transform: rotate(0deg); 
+    opacity: 0.25;
+  }
+  50% { 
+    transform: rotate(-90deg); 
+    opacity: 0.6;
+  }
+}
+
+.landscape-blocker-text {
+  font-family: var(--font-base);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.landscape-blocker-subtext {
+  font-family: var(--font-base);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+}
+
+/* Show blocker ONLY on mobile/tablet devices in landscape */
+@media screen and (max-width: 1024px) and (orientation: landscape) {
+  .landscape-blocker {
+    display: flex;
+  }
+  
+  /* Hide everything else */
+  .app-container > *:not(.landscape-blocker) {
+    display: none !important;
+  }
+}
+
+/* Ensure blocker stays hidden on desktop regardless of orientation */
+@media screen and (min-width: 1025px) {
+  .landscape-blocker {
+    display: none !important;
+  }
+}
+
+/* Reduced motion - subtle fade only */
+@media (prefers-reduced-motion: reduce) {
+  .landscape-blocker-icon {
+    animation: none;
+    opacity: 0.4;
+  }
 }
