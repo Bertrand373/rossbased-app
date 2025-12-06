@@ -85,6 +85,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'general', label: 'General' }
   ];
 
+  // Check if Discord username is filled (for enabling leaderboard toggle)
+  const hasDiscordUsername = discordUsername.trim().length > 0;
+
   useEffect(() => {
     if (isSupported && userData?.username) {
       checkExistingSubscription().then((sub) => setNotificationsEnabled(!!sub));
@@ -326,12 +329,16 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     : 'Unknown';
 
   const handleProfileUpdate = () => {
+    // If Discord username was cleared, also disable leaderboard
+    const finalShowOnLeaderboard = discordUsername.trim() ? showOnLeaderboard : false;
+    
     updateUserData({
       username: username.trim(),
       email: email.trim(),
       discordUsername: discordUsername.trim(),
-      showOnLeaderboard
+      showOnLeaderboard: finalShowOnLeaderboard
     });
+    setShowOnLeaderboard(finalShowOnLeaderboard);
     setIsEditingProfile(false);
     toast.success('Profile updated', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
   };
@@ -431,6 +438,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   };
 
+  // Handle leaderboard toggle - only works if Discord username exists
+  const handleLeaderboardToggle = () => {
+    if (!isEditingProfile) return;
+    if (!hasDiscordUsername) return; // Silently ignore if no Discord username
+    setShowOnLeaderboard(!showOnLeaderboard);
+  };
+
   const userInitial = userData?.username?.charAt(0)?.toUpperCase() || 
                       userData?.email?.charAt(0)?.toUpperCase() || '?';
 
@@ -510,15 +524,22 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               <span className="form-hint">Found in Discord → Settings → username</span>
             </div>
 
-            <div className="toggle-row">
+            {/* Leaderboard Toggle - Disabled when no Discord username */}
+            <div className={`toggle-row ${!hasDiscordUsername && isEditingProfile ? 'toggle-row-disabled' : ''}`}>
               <div className="toggle-text">
                 <span className="toggle-label">Show on Leaderboard</span>
-                <span className="toggle-desc">Display streak publicly</span>
+                <span className="toggle-desc">
+                  {!hasDiscordUsername && isEditingProfile 
+                    ? 'Add Discord username above to enable' 
+                    : 'Display streak publicly'
+                  }
+                </span>
               </div>
               <button 
-                className={`toggle-switch ${showOnLeaderboard ? 'active' : ''}`}
-                onClick={() => isEditingProfile && setShowOnLeaderboard(!showOnLeaderboard)}
-                disabled={!isEditingProfile}
+                className={`toggle-switch ${showOnLeaderboard && hasDiscordUsername ? 'active' : ''}`}
+                onClick={handleLeaderboardToggle}
+                disabled={!isEditingProfile || !hasDiscordUsername}
+                aria-label={!hasDiscordUsername ? 'Add Discord username to enable leaderboard' : 'Toggle leaderboard visibility'}
               >
                 <span className="toggle-knob" />
               </button>
@@ -538,7 +559,15 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
             )}
 
-            {!userData?.showOnLeaderboard && (
+            {/* Show appropriate message based on state */}
+            {!userData?.discordUsername && (
+              <div className="rank-display rank-disabled">
+                <span className="rank-label">Your Position</span>
+                <span className="rank-value">Add Discord to join leaderboard</span>
+              </div>
+            )}
+
+            {userData?.discordUsername && !userData?.showOnLeaderboard && (
               <div className="rank-display rank-disabled">
                 <span className="rank-label">Your Position</span>
                 <span className="rank-value">Enable leaderboard to see rank</span>
@@ -605,8 +634,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
             <div className="toggle-row">
               <div className="toggle-text">
-                <span className="toggle-label">Community Insights</span>
-                <span className="toggle-desc">Share aggregated data</span>
+                <span className="toggle-label">Data Sharing</span>
+                <span className="toggle-desc">Contribute to aggregated insights</span>
               </div>
               <button 
                 className={`toggle-switch ${dataSharing ? 'active' : ''}`}
@@ -616,12 +645,10 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </button>
             </div>
 
-            <h3 className="group-label">Communications</h3>
-
             <div className="toggle-row">
               <div className="toggle-text">
                 <span className="toggle-label">Marketing Emails</span>
-                <span className="toggle-desc">Features and tips</span>
+                <span className="toggle-desc">Receive updates & tips</span>
               </div>
               <button 
                 className={`toggle-switch ${marketingEmails ? 'active' : ''}`}
@@ -631,126 +658,131 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </button>
             </div>
 
-            {isSupported && (
-              <div className="toggle-row">
-                <div className="toggle-text">
-                  <span className="toggle-label">Push Notifications</span>
-                  <span className="toggle-desc">
-                    {permission === 'denied' ? 'Blocked in browser' : 'Milestone alerts'}
-                  </span>
-                </div>
-                <button 
-                  className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
-                  onClick={handleNotificationToggle}
-                  disabled={isTogglingNotifications || permission === 'denied'}
-                >
-                  <span className="toggle-knob" />
-                </button>
+            <h3 className="group-label">Push Notifications</h3>
+
+            {!isSupported ? (
+              <div className="notification-unavailable">
+                <span className="toggle-label">Not Available</span>
+                <span className="toggle-desc">Notifications not supported on this device</span>
               </div>
-            )}
-
-            {/* Notification Preferences - Always visible when enabled */}
-            {isSupported && notificationsEnabled && (
+            ) : (
               <>
-                <h3 className="group-label">Notification Types</h3>
-
                 <div className="toggle-row">
                   <div className="toggle-text">
-                    <span className="toggle-label">Milestones</span>
-                    <span className="toggle-desc">Day 7, 30, 90...</span>
+                    <span className="toggle-label">Enable Notifications</span>
+                    <span className="toggle-desc">
+                      {permission === 'denied' ? 'Blocked in browser settings' : 'Milestones, reminders & support'}
+                    </span>
                   </div>
                   <button 
-                    className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
-                    onClick={() => handleNotifTypeToggle('milestones')}
+                    className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
+                    onClick={handleNotificationToggle}
+                    disabled={isTogglingNotifications || permission === 'denied'}
                   >
                     <span className="toggle-knob" />
                   </button>
                 </div>
 
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Urge Support</span>
-                    <span className="toggle-desc">Encouragement alerts</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
-                    onClick={() => handleNotifTypeToggle('urgeSupport')}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
+                {notificationsEnabled && (
+                  <>
+                    <div className="toggle-row">
+                      <div className="toggle-text">
+                        <span className="toggle-label">Milestone Alerts</span>
+                        <span className="toggle-desc">7, 14, 30, 90 day milestones</span>
+                      </div>
+                      <button 
+                        className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
+                        onClick={() => handleNotifTypeToggle('milestones')}
+                      >
+                        <span className="toggle-knob" />
+                      </button>
+                    </div>
 
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Weekly Summary</span>
-                    <span className="toggle-desc">Sunday report</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
-                    onClick={() => handleNotifTypeToggle('weeklyProgress')}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
+                    <div className="toggle-row">
+                      <div className="toggle-text">
+                        <span className="toggle-label">Urge Support</span>
+                        <span className="toggle-desc">Get help during tough moments</span>
+                      </div>
+                      <button 
+                        className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
+                        onClick={() => handleNotifTypeToggle('urgeSupport')}
+                      >
+                        <span className="toggle-knob" />
+                      </button>
+                    </div>
 
-                <h3 className="group-label">Schedule</h3>
+                    <div className="toggle-row">
+                      <div className="toggle-text">
+                        <span className="toggle-label">Weekly Progress</span>
+                        <span className="toggle-desc">Sunday recap of your week</span>
+                      </div>
+                      <button 
+                        className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
+                        onClick={() => handleNotifTypeToggle('weeklyProgress')}
+                      >
+                        <span className="toggle-knob" />
+                      </button>
+                    </div>
 
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Daily Reminder</span>
-                    <span className="toggle-desc">Log benefits</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
-                    onClick={handleDailyReminderToggle}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
+                    <div className="toggle-row">
+                      <div className="toggle-text">
+                        <span className="toggle-label">Daily Reminder</span>
+                        <span className="toggle-desc">Check in at a set time</span>
+                      </div>
+                      <button 
+                        className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
+                        onClick={handleDailyReminderToggle}
+                      >
+                        <span className="toggle-knob" />
+                      </button>
+                    </div>
 
-                {dailyReminderEnabled && (
-                  <div className="time-row single">
-                    <label>Reminder time</label>
-                    <input 
-                      type="time" 
-                      value={dailyReminderTime} 
-                      onChange={handleReminderTimeChange} 
-                    />
-                  </div>
+                    {dailyReminderEnabled && (
+                      <div className="time-row single">
+                        <label>Reminder time</label>
+                        <input
+                          type="time"
+                          value={dailyReminderTime}
+                          onChange={handleReminderTimeChange}
+                        />
+                      </div>
+                    )}
+
+                    <div className="toggle-row">
+                      <div className="toggle-text">
+                        <span className="toggle-label">Quiet Hours</span>
+                        <span className="toggle-desc">Pause notifications at night</span>
+                      </div>
+                      <button 
+                        className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
+                        onClick={handleQuietHoursToggle}
+                      >
+                        <span className="toggle-knob" />
+                      </button>
+                    </div>
+
+                    {quietHoursEnabled && (
+                      <div className="time-row">
+                        <label>From</label>
+                        <input
+                          type="time"
+                          value={quietHoursStart}
+                          onChange={handleQuietStartChange}
+                        />
+                        <span>to</span>
+                        <input
+                          type="time"
+                          value={quietHoursEnd}
+                          onChange={handleQuietEndChange}
+                        />
+                      </div>
+                    )}
+
+                    <button className="test-notif-btn" onClick={handleTestNotification}>
+                      Send Test Notification
+                    </button>
+                  </>
                 )}
-
-                <div className="toggle-row">
-                  <div className="toggle-text">
-                    <span className="toggle-label">Quiet Hours</span>
-                    <span className="toggle-desc">Pause during sleep</span>
-                  </div>
-                  <button 
-                    className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
-                    onClick={handleQuietHoursToggle}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
-
-                {quietHoursEnabled && (
-                  <div className="time-row">
-                    <input 
-                      type="time" 
-                      value={quietHoursStart} 
-                      onChange={handleQuietStartChange} 
-                    />
-                    <span>to</span>
-                    <input 
-                      type="time" 
-                      value={quietHoursEnd} 
-                      onChange={handleQuietEndChange} 
-                    />
-                  </div>
-                )}
-
-                <button className="test-notif-btn" onClick={handleTestNotification}>
-                  Test Notification
-                </button>
               </>
             )}
           </div>
@@ -766,34 +798,43 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <div className="data-row">
               <div className="data-text">
                 <span className="data-title">Export Data</span>
-                <span className="data-desc">Download as JSON</span>
+                <span className="data-desc">Download all your tracking data</span>
               </div>
               <button className="data-btn" onClick={() => setShowExportModal(true)}>Export</button>
             </div>
 
-            <div className="data-row danger">
+            <div className="data-row data-row-danger">
               <div className="data-text">
-                <span className="data-title">Delete Account</span>
-                <span className="data-desc">Permanently remove all data</span>
+                <span className="data-title data-title-danger">Delete Account</span>
+                <span className="data-desc">Permanently remove all your data</span>
               </div>
-              <button className="data-btn danger" onClick={() => setShowDeleteConfirm(true)}>Delete</button>
+              <button className="data-btn data-btn-danger" onClick={() => setShowDeleteConfirm(true)}>Delete</button>
             </div>
           </div>
         )}
 
+        {/* ABOUT TAB */}
         {activeTab === 'about' && (
           <div className="about-section">
-            {/* Brand Header */}
+            {/* Brand */}
             <div className="about-brand">
-              <img src="/icon-192.png" alt="TitanTrack" className="about-logo" />
-              <span className="about-version">Version 1.0.0</span>
+              <img src="/helmet.png" alt="TitanTrack" className="about-logo" />
+              <span className="about-version">v1.0.0</span>
             </div>
 
             <div className="about-divider" />
 
-            {/* The Pillars */}
+            {/* Tagline */}
+            <div className="about-tagline">
+              <span className="tagline-main">Hold the Flame</span>
+              <span className="tagline-sub">Master your energy. Own your path.</span>
+            </div>
+
+            <div className="about-divider" />
+
+            {/* Four Pillars */}
             <div className="about-pillars">
-              <h2 className="about-pillars-title">The Pillars</h2>
+              <span className="about-pillars-title">The Four Pillars</span>
               
               <div className="about-pillar">
                 <span className="pillar-name">Streak Tracking</span>
