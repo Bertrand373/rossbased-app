@@ -1,5 +1,5 @@
 // AuthModal.js - TITANTRACK MODERN MINIMAL
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './AuthModal.css';
 import trackerLogo from '../../assets/trackerapplogo.png';
 
@@ -22,6 +22,10 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
+  const [googleButtonRendered, setGoogleButtonRendered] = useState(false);
+  
+  // Ref for hidden Google button container
+  const googleButtonRef = useRef(null);
   
   // Lock body scroll when modal is open (always true since this component only renders when shown)
   useBodyScrollLock(true);
@@ -91,15 +95,29 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     };
   }, []);
 
-  // Initialize Google Sign-In when loaded
+  // Initialize Google Sign-In and render hidden button when loaded
   useEffect(() => {
-    if (googleLoaded && window.google?.accounts?.id) {
+    if (googleLoaded && window.google?.accounts?.id && googleButtonRef.current && !googleButtonRendered) {
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: handleGoogleResponse
       });
+      
+      // Render the Google button (hidden) - this is more reliable than prompt()
+      window.google.accounts.id.renderButton(
+        googleButtonRef.current,
+        { 
+          type: 'standard',
+          theme: 'filled_black',
+          size: 'large',
+          text: 'signin_with',
+          width: 280
+        }
+      );
+      
+      setGoogleButtonRendered(true);
     }
-  }, [googleLoaded, handleGoogleResponse]);
+  }, [googleLoaded, handleGoogleResponse, googleButtonRendered]);
   
   // Clear error when switching modes
   useEffect(() => {
@@ -178,12 +196,21 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     if (isLoading) return;
     
     if (provider === 'Google') {
-      if (googleLoaded && window.google?.accounts?.id) {
-        window.google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed()) {
-            window.google.accounts.id.prompt();
+      // Click the hidden Google button - much more reliable than prompt()
+      if (googleButtonRef.current) {
+        const googleBtn = googleButtonRef.current.querySelector('div[role="button"]');
+        if (googleBtn) {
+          googleBtn.click();
+        } else {
+          // Fallback: try to find any clickable element in the Google button container
+          const anyButton = googleButtonRef.current.querySelector('iframe') || 
+                           googleButtonRef.current.querySelector('div');
+          if (anyButton) {
+            anyButton.click();
+          } else {
+            setError('Google Sign-In is loading. Please try again.');
           }
-        });
+        }
       } else {
         setError('Google Sign-In is loading. Please try again.');
       }
@@ -233,6 +260,19 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   return (
     <div className="auth-overlay">
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
+        
+        {/* Hidden Google Sign-In Button - rendered by Google SDK */}
+        <div 
+          ref={googleButtonRef} 
+          style={{ 
+            position: 'absolute', 
+            opacity: 0, 
+            pointerEvents: 'none',
+            width: 0,
+            height: 0,
+            overflow: 'hidden'
+          }} 
+        />
         
         {/* Header */}
         <div className="auth-header">
