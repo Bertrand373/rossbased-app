@@ -22,6 +22,7 @@ import MLTraining from './components/MLTraining/MLTraining';
 import AuthModal from './components/Auth/AuthModal';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
+import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -286,6 +287,9 @@ function App() {
                 setActiveTab={setActiveTab}
               />
             )}
+            
+            {/* PWA Install Prompt - TEST MODE: forceShow enabled */}
+            <InstallPrompt forceShow={true} />
             
             <main className="app-content">
               <div className="main-content-wrapper">

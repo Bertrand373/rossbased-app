@@ -1,0 +1,372 @@
+/* src/components/InstallPrompt/InstallPrompt.css */
+/* TITANTRACK - PWA Install Prompt */
+/* Matches app aesthetic: transparent, minimal, typography-driven */
+
+/* =============================================================================
+   OVERLAY - Matches auth-overlay, et-overlay, calendar-overlay exactly
+   ============================================================================= */
+
+.install-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 24px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
+  animation: installOverlayIn 200ms ease;
+}
+
+@keyframes installOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* =============================================================================
+   MODAL - Transparent floating, matches confirm-modal pattern
+   ============================================================================= */
+
+.install-modal {
+  width: 100%;
+  max-width: 340px;
+  background: transparent;
+  position: relative;
+  text-align: center;
+  animation: installModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes installModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================================================
+   CLOSE BUTTON - Matches auth-close exactly
+   ============================================================================= */
+
+.install-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.install-close:hover {
+  color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* =============================================================================
+   HEADER - Typography matches app hierarchy
+   ============================================================================= */
+
+.install-header {
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.install-header h2 {
+  font-size: 1.375rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.install-header p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* =============================================================================
+   STEPS - Minimal, typography-focused
+   ============================================================================= */
+
+.install-steps {
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.install-steps-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+}
+
+.install-step {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.install-step:last-child {
+  border-bottom: none;
+}
+
+.install-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.install-step-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.install-step-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.install-step-title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.install-step-desc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* =============================================================================
+   ACTIONS - For native install (Chrome)
+   ============================================================================= */
+
+.install-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* =============================================================================
+   BUTTONS - Matches btn-primary, btn-ghost exactly
+   ============================================================================= */
+
+.install-btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 150ms ease, transform 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.install-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.install-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.install-btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.install-btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.install-btn-text {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.75rem;
+  font-weight: 400;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.install-btn-text:hover {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* =============================================================================
+   FOOTER
+   ============================================================================= */
+
+.install-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* =============================================================================
+   RESPONSIVE - Matches app breakpoints
+   ============================================================================= */
+
+@media (max-width: 480px) {
+  .install-overlay {
+    padding: 20px;
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+  
+  .install-modal {
+    max-width: 100%;
+  }
+  
+  .install-header {
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+  }
+  
+  .install-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .install-header p {
+    font-size: 0.8125rem;
+  }
+  
+  .install-step {
+    padding: 14px 0;
+    gap: 12px;
+  }
+  
+  .install-step-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+  
+  .install-step-title {
+    font-size: 0.875rem;
+  }
+  
+  .install-step-desc {
+    font-size: 0.75rem;
+  }
+  
+  .install-btn-primary,
+  .install-btn-ghost {
+    padding: 14px 20px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .install-overlay {
+    padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  
+  .install-header h2 {
+    font-size: 1.125rem;
+  }
+  
+  .install-step {
+    gap: 10px;
+  }
+  
+  .install-step-num {
+    width: 20px;
+    height: 20px;
+    font-size: 0.6875rem;
+  }
+  
+  .install-step-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .install-btn-primary,
+  .install-btn-ghost {
+    padding: 14px 16px;
+    border-radius: 10px;
+  }
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .install-overlay,
+  .install-modal {
+    animation: none;
+  }
+  
+  .install-btn-primary,
+  .install-btn-ghost,
+  .install-close {
+    transition: none;
+  }
+}
