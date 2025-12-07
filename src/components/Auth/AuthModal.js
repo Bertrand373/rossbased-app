@@ -1,544 +1,406 @@
-/* AuthModal.css - TITANTRACK ELITE */
-/* Matches Tracker modal aesthetic - floating, immersive, premium */
+// AuthModal.js - TITANTRACK MODERN MINIMAL
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import './AuthModal.css';
+import { FaSpinner } from 'react-icons/fa';
+import { FcGoogle } from 'react-icons/fc';
+import { BsDiscord } from 'react-icons/bs';
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
-/* =============================================================================
-   OVERLAY - Full screen with safe areas
-   ============================================================================= */
+const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
-.auth-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 24px;
-  padding-top: max(24px, env(safe-area-inset-top));
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
-  padding-left: max(24px, env(safe-area-inset-left));
-  padding-right: max(24px, env(safe-area-inset-right));
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  animation: overlayIn 200ms ease;
-}
+const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [googleLoaded, setGoogleLoaded] = useState(false);
+  const [googleButtonRendered, setGoogleButtonRendered] = useState(false);
+  
+  const googleButtonRef = useRef(null);
+  
+  useBodyScrollLock(true);
+  
+  const GOOGLE_CLIENT_ID = '81026306470-im14ikk81801f6l1obk0b4cu260nito1.apps.googleusercontent.com';
+  const DISCORD_CLIENT_ID = '1446165239174529132';
 
-@keyframes overlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+  const handleGoogleResponse = useCallback(async (response) => {
+    if (!response.credential) {
+      setError('Google sign-in failed');
+      return;
+    }
 
-/* =============================================================================
-   MODAL - Floating, transparent, consistent width
-   ============================================================================= */
+    setIsLoading(true);
+    setError('');
 
-.auth-modal {
-  width: 100%;
-  max-width: 340px;
-  background-color: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  position: relative;
-  flex-shrink: 0;
-  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-}
+    try {
+      const loadingStartTime = Date.now();
+      
+      const res = await fetch(`${API_URL}/api/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      });
 
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+      const data = await res.json();
 
-/* =============================================================================
-   CLOSE BUTTON - Matches Tracker
-   ============================================================================= */
+      if (!res.ok) {
+        throw new Error(data.error || 'Google authentication failed');
+      }
 
-.auth-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 150ms ease;
-  z-index: 10;
-}
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
 
-.auth-close:hover {
-  color: rgba(255, 255, 255, 0.7);
-  background-color: rgba(255, 255, 255, 0.05);
-}
+      const elapsedTime = Date.now() - loadingStartTime;
+      const remainingTime = Math.max(0, 1200 - elapsedTime);
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      const success = await onLogin(data.username, null, true);
+      
+      if (!success) {
+        throw new Error('Failed to complete login');
+      }
 
-/* =============================================================================
-   HEADER - Centered, clean typography
-   ============================================================================= */
+    } catch (err) {
+      console.error('Google auth error:', err);
+      setError(err.message || 'Google sign-in failed. Please try again.');
+      setIsLoading(false);
+    }
+  }, [onLogin]);
 
-.auth-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
+  useEffect(() => {
+    if (window.google?.accounts?.id) {
+      setGoogleLoaded(true);
+      return;
+    }
 
-.auth-header h2 {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 8px 0;
-  letter-spacing: -0.02em;
-}
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      setGoogleLoaded(true);
+    };
+    document.body.appendChild(script);
 
-.auth-header p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 400;
-  margin: 0;
-  line-height: 1.5;
-}
+    return () => {};
+  }, []);
 
-/* =============================================================================
-   SOCIAL BUTTONS - Full width, stacked
-   ============================================================================= */
+  useEffect(() => {
+    if (googleLoaded && window.google?.accounts?.id && googleButtonRef.current && !googleButtonRendered) {
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleResponse
+      });
+      
+      window.google.accounts.id.renderButton(
+        googleButtonRef.current,
+        { 
+          type: 'standard',
+          theme: 'filled_black',
+          size: 'large',
+          text: 'signin_with',
+          width: 280
+        }
+      );
+      
+      setGoogleButtonRendered(true);
+    }
+  }, [googleLoaded, handleGoogleResponse, googleButtonRendered]);
+  
+  useEffect(() => {
+    setError('');
+  }, [isLogin]);
+  
+  useEffect(() => {
+    if (error) setError('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username, email, password, confirmPassword]);
+  
+  const validateUsername = (username) => {
+    const trimmed = username.trim();
+    if (trimmed.length < 3) return 'Username must be at least 3 characters';
+    if (trimmed.length > 20) return 'Username must be 20 characters or less';
+    if (trimmed.includes('@')) return 'Username cannot contain @';
+    if (trimmed.includes(' ')) return 'Username cannot contain spaces';
+    if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) return 'Letters, numbers, underscores, hyphens only';
+    return null;
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!username.trim() || !password.trim()) {
+      setError('Please fill out all fields');
+      return;
+    }
+    
+    const usernameError = validateUsername(username);
+    if (usernameError) {
+      setError(usernameError);
+      return;
+    }
+    
+    if (password.length < 4) {
+      setError('Password must be at least 4 characters');
+      return;
+    }
+    
+    if (!isLogin) {
+      if (!email.trim()) {
+        setError('Email is required');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        setError('Please enter a valid email');
+        return;
+      }
+    }
+    
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      if (isLogin) {
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        const success = await onLogin(username.trim(), password);
+        
+        if (!success) {
+          setError('Invalid credentials or account not found.');
+          setIsLoading(false);
+        }
+      } else {
+        const response = await fetch(`${API_URL}/api/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username.trim(),
+            password,
+            email: email.trim()
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Signup failed');
+        }
+        
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.username);
+        
+        const success = await onLogin(data.username, null, true);
+        
+        if (!success) {
+          throw new Error('Failed to complete signup');
+        }
+      }
+    } catch (err) {
+      setError(err.message || 'Something went wrong. Please try again.');
+      setIsLoading(false);
+    }
+  };
+  
+  const handleSocialLogin = (provider) => {
+    if (isLoading) return;
+    
+    if (provider === 'Google') {
+      if (googleButtonRef.current) {
+        const googleBtn = googleButtonRef.current.querySelector('div[role="button"]');
+        if (googleBtn) {
+          googleBtn.click();
+        } else {
+          const anyButton = googleButtonRef.current.querySelector('iframe') || 
+                           googleButtonRef.current.querySelector('div');
+          if (anyButton) {
+            anyButton.click();
+          } else {
+            setError('Google Sign-In is loading. Please try again.');
+          }
+        }
+      } else {
+        setError('Google Sign-In is loading. Please try again.');
+      }
+    } else if (provider === 'Discord') {
+      const REDIRECT_URI = encodeURIComponent(
+        window.location.hostname === 'localhost' 
+          ? 'http://localhost:3000/auth/discord/callback'
+          : 'https://titantrack.app/auth/discord/callback'
+      );
+      const scope = encodeURIComponent('identify email');
+      
+      window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${scope}`;
+    }
+  };
+  
+  const handleOverlayClick = () => {
+    if (!isLoading && onClose) {
+      onClose();
+    }
+  };
 
-.auth-social {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 32px;
-}
-
-.auth-social-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 16px 24px;
-  background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: #ffffff;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.auth-social-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.auth-social-btn:active {
-  transform: scale(0.98);
-}
-
-.auth-social-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.auth-social-btn svg {
-  font-size: 1.125rem;
-}
-
-/* Google specific */
-.auth-social-google:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Discord specific */
-.auth-social-discord {
-  color: #5865F2;
-}
-
-.auth-social-discord:hover {
-  border-color: rgba(88, 101, 242, 0.3);
-  background-color: rgba(88, 101, 242, 0.08);
-}
-
-/* =============================================================================
-   DIVIDER
-   ============================================================================= */
-
-.auth-divider {
-  position: relative;
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.auth-divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background-color: rgba(255, 255, 255, 0.06);
-}
-
-.auth-divider span {
-  position: relative;
-  background-color: rgba(0, 0, 0, 0.95);
-  padding: 0 16px;
-  color: rgba(255, 255, 255, 0.25);
-  font-size: 0.75rem;
-  font-weight: 400;
-  text-transform: lowercase;
-}
-
-/* =============================================================================
-   ERROR MESSAGE
-   ============================================================================= */
-
-.auth-error {
-  background-color: rgba(248, 113, 113, 0.08);
-  border: 1px solid rgba(248, 113, 113, 0.15);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 24px;
-  color: #f87171;
-  font-size: 0.8125rem;
-  font-weight: 400;
-  text-align: center;
-  line-height: 1.5;
-}
-
-/* =============================================================================
-   FORM
-   ============================================================================= */
-
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.auth-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.auth-field label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.auth-field input {
-  width: 100%;
-  padding: 16px;
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  color: #ffffff;
-  font-size: 1rem;
-  font-family: inherit;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.auth-field input:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.04);
-}
-
-.auth-field input::placeholder {
-  color: rgba(255, 255, 255, 0.2);
-}
-
-/* =============================================================================
-   SUBMIT BUTTON - Matches Tracker .btn-primary exactly
-   ============================================================================= */
-
-.auth-submit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 16px 24px;
-  margin-top: 12px;
-  background-color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  color: #000000;
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.auth-submit:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-.auth-submit:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.auth-submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.auth-spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* =============================================================================
-   FOOTER - Mode switcher
-   ============================================================================= */
-
-.auth-footer {
-  text-align: center;
-  margin-top: 40px;
-}
-
-.auth-footer p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: 0;
-}
-
-.auth-switch {
-  background: none;
-  border: none;
-  color: #ffffff;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-  transition: opacity 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.auth-switch:hover {
-  opacity: 0.7;
-}
-
-.auth-switch:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* =============================================================================
-   LOADING STATE - Icon only, premium/modern approach
-   ============================================================================= */
-
-.auth-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-}
-
-.auth-loading-icon {
-  width: 64px;
-  height: 64px;
-  animation: iconPulse 2s ease-in-out infinite;
-}
-
-@keyframes iconPulse {
-  0%, 100% { 
-    opacity: 1; 
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.4; 
-    transform: scale(0.95);
-  }
-}
-
-/* =============================================================================
-   RESPONSIVE
-   ============================================================================= */
-
-@media (max-width: 480px) {
-  .auth-overlay {
-    padding: 20px;
-    padding-top: max(20px, env(safe-area-inset-top));
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  if (isLoading) {
+    return (
+      <div className="auth-overlay">
+        <div className="auth-modal" onClick={e => e.stopPropagation()}>
+          <div className="auth-loading">
+            <img 
+              src="/icon-192.png" 
+              alt="" 
+              className="auth-loading-icon"
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
   
-  .auth-modal {
-    max-width: 100%;
-  }
-  
-  .auth-header {
-    margin-bottom: 32px;
-  }
-  
-  .auth-header h2 {
-    font-size: 1.375rem;
-  }
-  
-  .auth-header p {
-    font-size: 0.8125rem;
-  }
-  
-  .auth-social {
-    margin-bottom: 28px;
-  }
-  
-  .auth-social-btn {
-    padding: 16px 20px;
-    font-size: 0.875rem;
-  }
-  
-  .auth-divider {
-    margin-bottom: 28px;
-  }
-  
-  .auth-form {
-    gap: 18px;
-  }
-  
-  .auth-field input {
-    padding: 16px;
-  }
-  
-  .auth-submit {
-    padding: 16px 20px;
-    font-size: 0.9375rem;
-  }
-  
-  .auth-footer {
-    margin-top: 32px;
-  }
-  
-  .auth-footer p {
-    font-size: 0.8125rem;
-  }
-  
-  .auth-switch {
-    font-size: 0.8125rem;
-  }
-  
-  .auth-error {
-    padding: 12px 14px;
-    font-size: 0.75rem;
-  }
-  
-  .auth-loading-icon {
-    width: 56px;
-    height: 56px;
-  }
-}
+  return (
+    <div className="auth-overlay" onClick={handleOverlayClick}>
+      <div className="auth-modal" onClick={e => e.stopPropagation()}>
+        
+        <div 
+          ref={googleButtonRef} 
+          style={{ 
+            position: 'absolute', 
+            opacity: 0, 
+            pointerEvents: 'none',
+            width: 0,
+            height: 0,
+            overflow: 'hidden'
+          }} 
+        />
+        
+        <div className="auth-header">
+          <h2>{isLogin ? 'Welcome back' : 'Create account'}</h2>
+          <p>{isLogin ? 'Sign in to continue your journey' : 'Start tracking your progress today'}</p>
+        </div>
+        
+        {error && (
+          <div className="auth-error">
+            {error}
+          </div>
+        )}
+        
+        <div className="auth-social">
+          <button
+            type="button"
+            className="auth-social-btn auth-social-google"
+            onClick={() => handleSocialLogin('Google')}
+            disabled={!googleLoaded || isLoading}
+          >
+            <FcGoogle />
+            <span>Continue with Google</span>
+          </button>
+          
+          <button
+            type="button"
+            className="auth-social-btn auth-social-discord"
+            onClick={() => handleSocialLogin('Discord')}
+            disabled={isLoading}
+          >
+            <BsDiscord />
+            <span>Continue with Discord</span>
+          </button>
+        </div>
+        
+        <div className="auth-divider">
+          <span>or</span>
+        </div>
+        
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
+              autoComplete="username"
+              autoCapitalize="off"
+              disabled={isLoading}
+            />
+          </div>
+          
+          {!isLogin && (
+            <div className="auth-field">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                autoComplete="email"
+                autoCapitalize="off"
+                disabled={isLoading}
+              />
+            </div>
+          )}
+          
+          <div className="auth-field">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              autoComplete={isLogin ? 'current-password' : 'new-password'}
+              disabled={isLoading}
+            />
+          </div>
+          
+          {!isLogin && (
+            <div className="auth-field">
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                autoComplete="new-password"
+                disabled={isLoading}
+              />
+            </div>
+          )}
+          
+          <button type="submit" className="auth-submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <FaSpinner className="auth-spinner" />
+                <span>{isLogin ? 'Signing in...' : 'Creating account...'}</span>
+              </>
+            ) : (
+              <span>{isLogin ? 'Sign in' : 'Create account'}</span>
+            )}
+          </button>
+        </form>
+        
+        <div className="auth-footer">
+          <p>
+            {isLogin ? "Don't have an account?" : 'Already have an account?'}
+            <button 
+              type="button" 
+              className="auth-switch" 
+              onClick={() => setIsLogin(!isLogin)}
+              disabled={isLoading}
+            >
+              {isLogin ? 'Sign up' : 'Sign in'}
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-@media (max-width: 360px) {
-  .auth-overlay {
-    padding: 16px;
-    padding-top: max(16px, env(safe-area-inset-top));
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
-  }
-  
-  .auth-header h2 {
-    font-size: 1.25rem;
-  }
-  
-  .auth-social-btn {
-    padding: 14px 16px;
-    border-radius: 10px;
-  }
-  
-  .auth-field input {
-    padding: 14px;
-    border-radius: 10px;
-  }
-  
-  .auth-submit {
-    padding: 14px 16px;
-    border-radius: 10px;
-  }
-  
-  .auth-error {
-    border-radius: 10px;
-  }
-}
-
-/* Landscape mobile */
-@media (max-height: 600px) and (orientation: landscape) {
-  .auth-overlay {
-    justify-content: flex-start;
-    padding-top: max(16px, env(safe-area-inset-top));
-  }
-  
-  .auth-header {
-    margin-bottom: 24px;
-  }
-  
-  .auth-social {
-    margin-bottom: 20px;
-  }
-  
-  .auth-divider {
-    margin-bottom: 20px;
-  }
-  
-  .auth-form {
-    gap: 14px;
-  }
-  
-  .auth-footer {
-    margin-top: 24px;
-  }
-}
-
-/* Desktop enhancements */
-@media (min-width: 768px) {
-  .auth-modal {
-    max-width: 360px;
-  }
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .auth-overlay,
-  .auth-modal {
-    animation: none;
-  }
-  
-  .auth-loading-icon {
-    animation: none;
-    opacity: 0.7;
-  }
-  
-  .auth-social-btn,
-  .auth-submit {
-    transition: none;
-  }
-}
+export default AuthModal;
