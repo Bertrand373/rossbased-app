@@ -1,5 +1,6 @@
 // server/services/notificationService.js
 // Service for sending push notifications via Firebase Cloud Messaging
+// FULLY FIXED VERSION - Timezone-aware, correct field names, bulletproof
 
 const admin = require('firebase-admin');
 const NotificationSubscription = require('../models/NotificationSubscription');
@@ -19,7 +20,8 @@ function initializeFirebase() {
     
     // Validate that all required environment variables are present
     if (!projectId || !privateKey || !clientEmail) {
-      throw new Error('Missing required Firebase environment variables');
+      console.warn('⚠️ Missing Firebase environment variables - notifications disabled');
+      return;
     }
     
     // Initialize Firebase Admin with environment variables
@@ -36,14 +38,52 @@ function initializeFirebase() {
     console.log('✅ Firebase Admin SDK initialized successfully');
   } catch (error) {
     console.error('❌ Failed to initialize Firebase Admin SDK:', error);
-    throw error;
   }
 }
 
 // Initialize on module load
 initializeFirebase();
 
-// Check if user preferences allow this notification
+// ============================================================================
+// TIMEZONE UTILITY
+// ============================================================================
+
+/**
+ * Get current hour and minutes in a specific timezone
+ * @param {string} timezone - IANA timezone string (e.g., 'America/New_York')
+ * @returns {{hours: number, minutes: number, totalMinutes: number}}
+ */
+function getCurrentTimeInTimezone(timezone) {
+  try {
+    const now = new Date();
+    const options = { hour: 'numeric', minute: 'numeric', hour12: false, timeZone: timezone };
+    const timeStr = new Intl.DateTimeFormat('en-US', options).format(now);
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return {
+      hours,
+      minutes,
+      totalMinutes: hours * 60 + minutes
+    };
+  } catch (error) {
+    // If timezone is invalid, fall back to UTC
+    console.warn(`⚠️ Invalid timezone "${timezone}", falling back to UTC`);
+    const now = new Date();
+    return {
+      hours: now.getUTCHours(),
+      minutes: now.getUTCMinutes(),
+      totalMinutes: now.getUTCHours() * 60 + now.getUTCMinutes()
+    };
+  }
+}
+
+// ============================================================================
+// PREFERENCE CHECKING - TIMEZONE AWARE
+// ============================================================================
+
+/**
+ * Check if user preferences allow this notification
+ * Now timezone-aware for quiet hours
+ */
 async function shouldSendNotification(username, notificationType) {
   try {
     // Fetch user's notification preferences from User model
@@ -77,18 +117,25 @@ async function shouldSendNotification(username, notificationType) {
     
     const prefKey = typeMapping[typeCategory];
     
-    if (prefKey && prefs.types && prefs.types[prefKey] === false) {
+    // Special handling for daily reminder - check if specifically enabled
+    if (typeCategory === 'daily') {
+      if (!prefs.dailyReminderEnabled) {
+        console.log(`⏸️ Daily reminders disabled for ${username}`);
+        return false;
+      }
+    } else if (prefKey && prefs.types && prefs.types[prefKey] === false) {
       console.log(`⏸️ ${notificationType} notifications disabled for ${username}`);
       return false;
     }
     
-    // Check quiet hours
+    // Check quiet hours - NOW TIMEZONE AWARE
     if (prefs.quietHoursEnabled) {
-      const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const timezone = prefs.timezone || 'America/New_York';
+      const userTime = getCurrentTimeInTimezone(timezone);
+      const currentMinutes = userTime.totalMinutes;
       
-      const [startH, startM] = prefs.quietHoursStart.split(':').map(Number);
-      const [endH, endM] = prefs.quietHoursEnd.split(':').map(Number);
+      const [startH, startM] = (prefs.quietHoursStart || '22:00').split(':').map(Number);
+      const [endH, endM] = (prefs.quietHoursEnd || '08:00').split(':').map(Number);
       
       const quietStart = startH * 60 + startM;
       const quietEnd = endH * 60 + endM;
@@ -99,7 +146,7 @@ async function shouldSendNotification(username, notificationType) {
         : (currentMinutes >= quietStart && currentMinutes < quietEnd);
       
       if (isQuietTime) {
-        console.log(`🌙 Quiet hours active for ${username} - notification postponed`);
+        console.log(`🌙 Quiet hours active for ${username} (${timezone}: ${userTime.hours}:${String(userTime.minutes).padStart(2, '0')}) - notification blocked`);
         return false;
       }
     }
@@ -109,28 +156,6 @@ async function shouldSendNotification(username, notificationType) {
     console.error('Error checking notification preferences:', error);
     return true; // Default to allowing notification on error
   }
-}
-
-// Check if user is in quiet hours (legacy function for NotificationSubscription model)
-function isInQuietHours(subscription) {
-  if (!subscription.quietHours || !subscription.quietHours.enabled) return false;
-  
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  const currentTime = currentHour * 60 + currentMinute;
-  
-  const [startHour, startMinute] = subscription.quietHours.start.split(':').map(Number);
-  const [endHour, endMinute] = subscription.quietHours.end.split(':').map(Number);
-  const startTime = startHour * 60 + startMinute;
-  const endTime = endHour * 60 + endMinute;
-  
-  // Handle cases where quiet hours span midnight
-  if (startTime > endTime) {
-    return currentTime >= startTime || currentTime < endTime;
-  }
-  
-  return currentTime >= startTime && currentTime < endTime;
 }
 
 // ============================================================================
@@ -227,17 +252,22 @@ const notificationTemplates = {
   }
 };
 
-// Send notification to a single device
+// ============================================================================
+// SEND NOTIFICATION TO SINGLE DEVICE
+// ============================================================================
+
 async function sendNotification(fcmToken, notificationType, customData = {}) {
   try {
     if (!firebaseInitialized) {
-      throw new Error('Firebase Admin SDK not initialized');
+      console.warn('⚠️ Firebase not initialized - cannot send notification');
+      return { success: false, error: 'Firebase not initialized' };
     }
 
     // Get notification template
     const template = notificationTemplates[notificationType];
     if (!template) {
-      throw new Error(`Unknown notification type: ${notificationType}`);
+      console.error(`❌ Unknown notification type: ${notificationType}`);
+      return { success: false, error: `Unknown notification type: ${notificationType}` };
     }
 
     // Prepare message
@@ -270,68 +300,81 @@ async function sendNotification(fcmToken, notificationType, customData = {}) {
     console.log('✅ Notification sent successfully:', response);
     return { success: true, messageId: response };
   } catch (error) {
-    console.error('❌ Error sending notification:', error);
+    // Handle specific Firebase errors
+    if (error.code === 'messaging/registration-token-not-registered' ||
+        error.code === 'messaging/invalid-registration-token') {
+      console.log(`⚠️ Invalid/expired FCM token - marking for cleanup`);
+      return { success: false, error: 'invalid_token', shouldRemove: true };
+    }
+    
+    console.error('❌ Error sending notification:', error.message);
     return { success: false, error: error.message };
   }
 }
 
-// Send notification to a user (looks up their subscriptions and checks preferences)
+// ============================================================================
+// SEND NOTIFICATION TO USER - FIXED VERSION
+// ============================================================================
+
 async function sendNotificationToUser(username, notificationType, customData = {}) {
   try {
     // Check user preferences first
     const shouldSend = await shouldSendNotification(username, notificationType);
     
     if (!shouldSend) {
-      console.log(`⏸️ Skipping ${notificationType} notification for ${username} (user preferences)`);
       return { success: false, reason: 'blocked_by_preferences' };
     }
     
-    // Find user's active subscriptions
-    const subscriptions = await NotificationSubscription.find({
+    // Find user's subscription - FIXED: use correct field name
+    const subscription = await NotificationSubscription.findOne({
       username: username,
-      isActive: true
+      notificationsEnabled: true  // FIXED: was 'isActive' which doesn't exist
     });
 
-    if (subscriptions.length === 0) {
-      console.log(`No active subscriptions found for user: ${username}`);
-      return { success: false, error: 'No active subscriptions' };
+    if (!subscription) {
+      console.log(`📭 No active subscription for ${username}`);
+      return { success: false, reason: 'no_subscription' };
     }
 
-    const results = [];
+    if (!subscription.fcmToken) {
+      console.log(`📭 No FCM token for ${username}`);
+      return { success: false, reason: 'no_fcm_token' };
+    }
+
+    // Send notification
+    const result = await sendNotification(subscription.fcmToken, notificationType, customData);
     
-    for (const subscription of subscriptions) {
-      // Legacy check for NotificationSubscription model quiet hours
-      if (isInQuietHours(subscription)) {
-        console.log(`User ${username} is in quiet hours (subscription model), skipping notification`);
-        continue;
-      }
-
-      // Legacy check for NotificationSubscription preferences
-      const notificationCategory = notificationType.split('_')[0];
-      if (subscription.preferences && !subscription.preferences[notificationCategory]) {
-        console.log(`User ${username} has disabled ${notificationCategory} notifications (subscription model)`);
-        continue;
-      }
-
-      // Send notification
-      const result = await sendNotification(subscription.fcmToken, notificationType, customData);
-      results.push({ subscription: subscription._id, ...result });
+    // If token is invalid, disable the subscription
+    if (result.shouldRemove) {
+      console.log(`🧹 Disabling invalid subscription for ${username}`);
+      await NotificationSubscription.updateOne(
+        { _id: subscription._id },
+        { $set: { notificationsEnabled: false, failedAttempts: (subscription.failedAttempts || 0) + 1 } }
+      );
+    }
+    
+    // Update last notification sent timestamp on success
+    if (result.success) {
+      await NotificationSubscription.updateOne(
+        { _id: subscription._id },
+        { $set: { lastNotificationSent: new Date() } }
+      );
     }
 
-    return {
-      success: results.some(r => r.success),
-      results: results
-    };
+    return result;
   } catch (error) {
-    console.error('❌ Error sending notification to user:', error);
+    console.error(`❌ Error sending notification to ${username}:`, error);
     return { success: false, error: error.message };
   }
 }
 
-// Send bulk notifications (e.g., for daily encouragement)
+// ============================================================================
+// SEND BULK NOTIFICATIONS
+// ============================================================================
+
 async function sendBulkNotifications(usernames, notificationType, customData = {}) {
   try {
-    console.log(`Sending ${notificationType} to ${usernames.length} users`);
+    console.log(`📤 Sending ${notificationType} to ${usernames.length} users`);
 
     const results = [];
     
@@ -358,7 +401,10 @@ async function sendBulkNotifications(usernames, notificationType, customData = {
   }
 }
 
-// Check and send milestone notification
+// ============================================================================
+// MILESTONE NOTIFICATION HELPER
+// ============================================================================
+
 async function checkAndSendMilestoneNotification(username, currentStreak) {
   const milestones = [7, 14, 30, 60, 90, 180, 365];
   
@@ -374,11 +420,16 @@ async function checkAndSendMilestoneNotification(username, currentStreak) {
   return await sendNotificationToUser(username, templateKey);
 }
 
+// ============================================================================
+// EXPORTS
+// ============================================================================
+
 module.exports = {
   sendNotification,
   sendNotificationToUser,
   sendBulkNotifications,
   checkAndSendMilestoneNotification,
   notificationTemplates,
-  shouldSendNotification
+  shouldSendNotification,
+  getCurrentTimeInTimezone
 };
