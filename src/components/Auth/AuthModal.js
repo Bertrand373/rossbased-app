@@ -47,6 +47,9 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     setError('');
 
     try {
+      // Track when loading started for minimum duration
+      const loadingStartTime = Date.now();
+      
       const res = await fetch(`${API_URL}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -63,8 +66,13 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
 
-      // Call onLogin with isGoogleAuth = true
-      // The login function will fetch fresh user data using the token
+      // Wait for minimum 1200ms loading duration BEFORE completing login
+      // (onLogin closes the modal, so we must wait first)
+      const elapsedTime = Date.now() - loadingStartTime;
+      const remainingTime = Math.max(0, 1200 - elapsedTime);
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      // NOW complete login (this will close the modal)
       const success = await onLogin(data.username, null, true);
       
       if (!success) {
@@ -183,11 +191,9 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     
     try {
       if (isLogin) {
-        // SIGN IN - use existing login flow
-        const [success] = await Promise.all([
-          onLogin(username.trim(), password),
-          new Promise(resolve => setTimeout(resolve, 800))
-        ]);
+        // SIGN IN - wait for minimum duration, then complete login
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        const success = await onLogin(username.trim(), password);
         
         if (!success) {
           setError('Invalid credentials or account not found.');
@@ -316,27 +322,36 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
         {/* Header */}
         <div className="auth-header">
           <h2>{isLogin ? 'Welcome back' : 'Create account'}</h2>
-          <p>{isLogin ? 'Sign in to continue your journey' : 'Start tracking your progress'}</p>
+          <p>{isLogin ? 'Sign in to continue your journey' : 'Start tracking your progress today'}</p>
         </div>
+        
+        {/* Error message */}
+        {error && (
+          <div className="auth-error">
+            {error}
+          </div>
+        )}
         
         {/* Social buttons */}
         <div className="auth-social">
-          <button 
-            className="auth-social-btn"
+          <button
+            type="button"
+            className="auth-social-btn auth-social-google"
             onClick={() => handleSocialLogin('Google')}
-            disabled={isLoading}
+            disabled={!googleLoaded || isLoading}
           >
-            <FcGoogle size={18} />
-            <span>Google</span>
+            <FcGoogle />
+            <span>Continue with Google</span>
           </button>
           
-          <button 
+          <button
+            type="button"
             className="auth-social-btn auth-social-discord"
             onClick={() => handleSocialLogin('Discord')}
             disabled={isLoading}
           >
-            <BsDiscord size={18} />
-            <span>Discord</span>
+            <BsDiscord />
+            <span>Continue with Discord</span>
           </button>
         </div>
         
@@ -345,21 +360,19 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
           <span>or</span>
         </div>
         
-        {/* Error */}
-        {error && <div className="auth-error">{error}</div>}
-        
         {/* Form */}
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
             <label htmlFor="username">Username</label>
             <input
-              type="text"
               id="username"
+              type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
+              placeholder="Enter your username"
               autoComplete="username"
-              maxLength={20}
+              autoCapitalize="off"
+              disabled={isLoading}
             />
           </div>
           
@@ -367,12 +380,14 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
             <div className="auth-field">
               <label htmlFor="email">Email</label>
               <input
-                type="email"
                 id="email"
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter email"
+                placeholder="Enter your email"
                 autoComplete="email"
+                autoCapitalize="off"
+                disabled={isLoading}
               />
             </div>
           )}
@@ -380,25 +395,27 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
           <div className="auth-field">
             <label htmlFor="password">Password</label>
             <input
-              type="password"
               id="password"
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
-              autoComplete={isLogin ? "current-password" : "new-password"}
+              placeholder="Enter your password"
+              autoComplete={isLogin ? 'current-password' : 'new-password'}
+              disabled={isLoading}
             />
           </div>
           
           {!isLogin && (
             <div className="auth-field">
-              <label htmlFor="confirmPassword">Confirm password</label>
+              <label htmlFor="confirmPassword">Confirm Password</label>
               <input
-                type="password"
                 id="confirmPassword"
+                type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm password"
+                placeholder="Confirm your password"
                 autoComplete="new-password"
+                disabled={isLoading}
               />
             </div>
           )}
@@ -407,7 +424,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
             {isLoading ? (
               <>
                 <FaSpinner className="auth-spinner" />
-                <span>{isLogin ? 'Signing in...' : 'Creating...'}</span>
+                <span>{isLogin ? 'Signing in...' : 'Creating account...'}</span>
               </>
             ) : (
               <span>{isLogin ? 'Sign in' : 'Create account'}</span>
@@ -415,20 +432,20 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
           </button>
         </form>
         
-        {/* Footer */}
+        {/* Footer - switch mode */}
         <div className="auth-footer">
           <p>
-            {isLogin ? "Don't have an account?" : "Already have an account?"}
+            {isLogin ? "Don't have an account?" : 'Already have an account?'}
             <button 
-              className="auth-switch"
-              onClick={() => !isLoading && setIsLogin(!isLogin)}
+              type="button" 
+              className="auth-switch" 
+              onClick={() => setIsLogin(!isLogin)}
               disabled={isLoading}
             >
               {isLogin ? 'Sign up' : 'Sign in'}
             </button>
           </p>
         </div>
-        
       </div>
     </div>
   );
