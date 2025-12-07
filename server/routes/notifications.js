@@ -40,28 +40,32 @@ router.post('/subscribe', async (req, res) => {
       });
     }
     
-    // Check if subscription already exists
-    let subscription = await NotificationSubscription.findOne({ username });
+    // IMPORTANT: Handle case where fcmToken exists under different username
+    // (e.g., user deleted account and re-created, or device switched users)
+    // First, remove any existing subscription with this fcmToken (different user)
+    await NotificationSubscription.deleteMany({ 
+      fcmToken: fcmToken, 
+      username: { $ne: username } 
+    });
     
-    if (subscription) {
-      // Update existing subscription
-      subscription.fcmToken = fcmToken;
-      subscription.notificationsEnabled = notificationsEnabled !== false;
-      subscription.failedAttempts = 0;
-      await subscription.save();
-      
-      console.log(`✅ Updated notification subscription for: ${username}`);
-    } else {
-      // Create new subscription
-      subscription = new NotificationSubscription({
-        username,
-        fcmToken,
-        notificationsEnabled: notificationsEnabled !== false
-      });
-      await subscription.save();
-      
-      console.log(`✅ Created new notification subscription for: ${username}`);
-    }
+    // Now upsert the subscription for this username
+    const subscription = await NotificationSubscription.findOneAndUpdate(
+      { username },
+      {
+        $set: {
+          fcmToken,
+          notificationsEnabled: notificationsEnabled !== false,
+          failedAttempts: 0,
+          updatedAt: new Date()
+        },
+        $setOnInsert: {
+          createdAt: new Date()
+        }
+      },
+      { upsert: true, new: true }
+    );
+    
+    console.log(`✅ Notification subscription saved for: ${username}`);
     
     res.json({ 
       success: true, 
