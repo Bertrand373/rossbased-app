@@ -256,7 +256,7 @@ const Tracker = ({ userData, updateUserData }) => {
       {showBenefits && (
         <div className="overlay">
           <div className="benefits-modal" onClick={e => e.stopPropagation()}>
-            <h2>How do you feel?</h2>
+            <h2>Log Benefits</h2>
             <p>Rate today's benefits</p>
             
             <div className="benefits-list">
