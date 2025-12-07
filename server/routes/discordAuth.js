@@ -43,7 +43,7 @@ router.post('/discord', async (req, res) => {
     });
 
     const discordUser = await userResponse.json();
-    console.log('Discord auth for:', discordUser.username);
+    console.log('Discord auth for:', discordUser.username, '| Display name:', discordUser.global_name);
 
     // Check if user exists by discordId or email
     let user = await User.findOne({ 
@@ -69,7 +69,8 @@ router.post('/discord', async (req, res) => {
         password: `discord_${discordUser.id}`,
         discordId: discordUser.id,
         discordUsername: discordUser.username,
-        discordAvatar: discordUser.avatar || null, // Save avatar hash
+        discordDisplayName: discordUser.global_name || discordUser.username, // Display name (what people see)
+        discordAvatar: discordUser.avatar || null,
         startDate: new Date().toISOString().split('T')[0],
         currentStreak: 0,
         longestStreak: 0,
@@ -117,10 +118,11 @@ router.post('/discord', async (req, res) => {
       await user.save();
       console.log('Created new user via Discord:', username);
     } else {
-      // Update existing user's Discord info (including avatar)
+      // Update existing user's Discord info
       user.discordId = discordUser.id;
       user.discordUsername = discordUser.username;
-      user.discordAvatar = discordUser.avatar || null; // Update avatar hash
+      user.discordDisplayName = discordUser.global_name || discordUser.username; // Update display name
+      user.discordAvatar = discordUser.avatar || null;
       await user.save();
       console.log('Updated Discord info for user:', user.username);
     }

@@ -48,7 +48,7 @@ async function getLeaderboardUsers() {
     })
     .sort({ currentStreak: -1 })
     .limit(13)
-    .select('discordUsername discordId discordAvatar currentStreak longestStreak mentorEligible verifiedMentor')
+    .select('discordUsername discordDisplayName discordId discordAvatar currentStreak longestStreak mentorEligible verifiedMentor')
     .lean();
     
     return users;
@@ -60,7 +60,7 @@ async function getLeaderboardUsers() {
 
 /**
  * Format leaderboard for Discord embed
- * Clean, minimalist text design
+ * Uses display name if available, falls back to username
  */
 function formatLeaderboardEmbed(users) {
   if (!users || users.length === 0) {
@@ -78,9 +78,11 @@ function formatLeaderboardEmbed(users) {
   
   users.forEach((user, index) => {
     const rank = String(index + 1).padStart(2, ' ');
-    const name = user.discordUsername.length > 14 
-      ? user.discordUsername.substring(0, 13) + '…' 
-      : user.discordUsername.padEnd(14, ' ');
+    // Use display name if available, otherwise fall back to username
+    const displayName = user.discordDisplayName || user.discordUsername;
+    const name = displayName.length > 14 
+      ? displayName.substring(0, 13) + '…' 
+      : displayName.padEnd(14, ' ');
     const days = String(user.currentStreak || 0).padStart(4, ' ') + 'd';
     
     leaderboardText += `${rank}  ${name} ${days}\n`;
@@ -158,12 +160,14 @@ async function postLeaderboardToDiscord() {
 
 /**
  * Format milestone announcement embed
+ * Uses display name if available
  */
-function formatMilestoneEmbed(discordUsername, days) {
+function formatMilestoneEmbed(user, days) {
+  const displayName = user.discordDisplayName || user.discordUsername;
   return {
     embeds: [{
       color: 0xFFD700,
-      description: `**${discordUsername}** just crossed **${days} days**.`
+      description: `**${displayName}** just crossed **${days} days**.`
     }]
   };
 }
@@ -171,7 +175,7 @@ function formatMilestoneEmbed(discordUsername, days) {
 /**
  * Post milestone announcement to Discord
  */
-async function postMilestoneToDiscord(discordUsername, days) {
+async function postMilestoneToDiscord(user, days) {
   const webhook = MILESTONE_WEBHOOK;
   
   if (!webhook) {
@@ -180,7 +184,7 @@ async function postMilestoneToDiscord(discordUsername, days) {
   }
   
   try {
-    const embed = formatMilestoneEmbed(discordUsername, days);
+    const embed = formatMilestoneEmbed(user, days);
     
     const response = await fetch(webhook, {
       method: 'POST',
@@ -193,7 +197,8 @@ async function postMilestoneToDiscord(discordUsername, days) {
       throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
     }
     
-    console.log(`✅ Milestone announced: ${discordUsername} - ${days} days`);
+    const displayName = user.discordDisplayName || user.discordUsername;
+    console.log(`✅ Milestone announced: ${displayName} - ${days} days`);
     return true;
   } catch (error) {
     console.error('❌ Failed to post milestone to Discord:', error);
@@ -221,7 +226,7 @@ async function checkAndAnnounceMilestone(username, newStreak) {
     
     for (const milestone of MILESTONE_DAYS) {
       if (newStreak >= milestone && lastAnnounced < milestone) {
-        await postMilestoneToDiscord(user.discordUsername, milestone);
+        await postMilestoneToDiscord(user, milestone);
         
         const updateData = { lastMilestoneAnnounced: milestone };
         if (milestone >= 180 && !user.mentorEligible) {
@@ -288,7 +293,7 @@ async function getVerifiedMentors() {
       verifiedMentor: true,
       mentorStatus: 'available'
     })
-    .select('username discordUsername currentStreak')
+    .select('username discordUsername discordDisplayName currentStreak')
     .lean();
     
     return mentors;
