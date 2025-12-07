@@ -1,7 +1,6 @@
 // AuthModal.js - TITANTRACK MODERN MINIMAL
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './AuthModal.css';
-import trackerLogo from '../../assets/trackerapplogo.png';
 
 import { FaSpinner } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
@@ -276,26 +275,17 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     }
   };
 
-  // Loading state
+  // Loading state - icon only, no text (premium/modern approach)
   if (isLoading) {
     return (
       <div className="auth-overlay">
         <div className="auth-modal" onClick={e => e.stopPropagation()}>
           <div className="auth-loading">
             <img 
-              src={trackerLogo} 
-              alt="TitanTrack" 
-              className="auth-loading-logo"
-              onError={(e) => {
-                e.target.style.display = 'none';
-              }}
+              src="/icon-192.png" 
+              alt="" 
+              className="auth-loading-icon"
             />
-            <p className="auth-loading-text">
-              {loadingMessage || (isLogin ? 'Signing in...' : 'Creating account...')}
-            </p>
-            <div className="auth-loading-dots">
-              <span /><span /><span />
-            </div>
           </div>
         </div>
       </div>

@@ -356,64 +356,30 @@
 }
 
 /* =============================================================================
-   LOADING STATE
+   LOADING STATE - Icon only, premium/modern approach
    ============================================================================= */
 
 .auth-loading {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
+  padding: 80px 20px;
 }
 
-.auth-loading-logo {
-  height: 28px;
-  width: auto;
-  margin-bottom: 32px;
-  opacity: 0.9;
-  animation: logoPulse 2s ease-in-out infinite;
+.auth-loading-icon {
+  width: 64px;
+  height: 64px;
+  animation: iconPulse 2s ease-in-out infinite;
 }
 
-@keyframes logoPulse {
-  0%, 100% { opacity: 0.9; }
-  50% { opacity: 0.4; }
-}
-
-.auth-loading-text {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 20px;
-}
-
-.auth-loading-dots {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
-.auth-loading-dots span {
-  width: 6px;
-  height: 6px;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  animation: dotBounce 1.4s ease-in-out infinite both;
-}
-
-.auth-loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-.auth-loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-.auth-loading-dots span:nth-child(3) { animation-delay: 0s; }
-
-@keyframes dotBounce {
-  0%, 80%, 100% {
-    transform: scale(0.8);
-    opacity: 0.3;
-  }
-  40% {
+@keyframes iconPulse {
+  0%, 100% { 
+    opacity: 1; 
     transform: scale(1);
-    opacity: 1;
+  }
+  50% { 
+    opacity: 0.4; 
+    transform: scale(0.95);
   }
 }
 
@@ -485,6 +451,11 @@
   .auth-error {
     padding: 12px 14px;
     font-size: 0.75rem;
+  }
+  
+  .auth-loading-icon {
+    width: 56px;
+    height: 56px;
   }
 }
 
@@ -561,14 +532,9 @@
     animation: none;
   }
   
-  .auth-loading-logo {
+  .auth-loading-icon {
     animation: none;
-    opacity: 0.9;
-  }
-  
-  .auth-loading-dots span {
-    animation: none;
-    opacity: 0.5;
+    opacity: 0.7;
   }
   
   .auth-social-btn,
