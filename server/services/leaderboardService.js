@@ -1,11 +1,8 @@
 // server/services/leaderboardService.js
 // Discord Leaderboard & Milestone Announcements
-// Clean generated image with user avatars
 
 const User = require('../models/User');
 const mongoose = require('mongoose');
-const { createCanvas, loadImage } = require('canvas');
-const FormData = require('form-data');
 
 // Simple schema to store Discord message IDs
 const settingsSchema = new mongoose.Schema({
@@ -51,7 +48,7 @@ async function getLeaderboardUsers() {
     })
     .sort({ currentStreak: -1 })
     .limit(13)
-    .select('discordUsername discordId discordAvatar currentStreak longestStreak')
+    .select('discordUsername discordId discordAvatar currentStreak longestStreak mentorEligible verifiedMentor')
     .lean();
     
     return users;
@@ -62,111 +59,46 @@ async function getLeaderboardUsers() {
 }
 
 /**
- * Get Discord avatar URL for a user
+ * Format leaderboard for Discord embed
+ * Clean, minimalist text design
  */
-function getAvatarUrl(discordId, avatarHash) {
-  if (avatarHash) {
-    const ext = avatarHash.startsWith('a_') ? 'gif' : 'png';
-    return `https://cdn.discordapp.com/avatars/${discordId}/${avatarHash}.${ext}?size=64`;
-  } else {
-    const defaultIndex = (BigInt(discordId) >> 22n) % 6n;
-    return `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
+function formatLeaderboardEmbed(users) {
+  if (!users || users.length === 0) {
+    return {
+      embeds: [{
+        color: 0x000000,
+        title: 'LEADERBOARD',
+        description: '```\nNo one on the board yet.\n```'
+      }]
+    };
   }
+  
+  // Build the leaderboard rows
+  let leaderboardText = '';
+  
+  users.forEach((user, index) => {
+    const rank = String(index + 1).padStart(2, ' ');
+    const name = user.discordUsername.length > 14 
+      ? user.discordUsername.substring(0, 13) + '…' 
+      : user.discordUsername.padEnd(14, ' ');
+    const days = String(user.currentStreak || 0).padStart(4, ' ') + 'd';
+    
+    leaderboardText += `${rank}  ${name} ${days}\n`;
+  });
+  
+  const embed = {
+    embeds: [{
+      color: 0x000000,
+      title: 'LEADERBOARD',
+      description: `\`\`\`\n${leaderboardText}\`\`\``
+    }]
+  };
+  
+  return embed;
 }
 
 /**
- * Generate leaderboard image with user avatars
- * Ultra-clean premium design
- */
-async function generateLeaderboardImage(users) {
-  const width = 380;
-  const rowHeight = 44;
-  const headerHeight = 50;
-  const bottomPadding = 16;
-  const padding = 20;
-  const avatarSize = 28;
-  
-  const height = headerHeight + (users.length * rowHeight) + bottomPadding;
-  
-  const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext('2d');
-  
-  // Background - pure black
-  ctx.fillStyle = '#000000';
-  ctx.fillRect(0, 0, width, height);
-  
-  // Header - clean white text
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = '600 16px Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('LEADERBOARD', width / 2, 32);
-  
-  // Draw each user row
-  for (let i = 0; i < users.length; i++) {
-    const user = users[i];
-    const y = headerHeight + (i * rowHeight) + 28;
-    
-    // Rank number - subtle gray
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#555555';
-    ctx.font = '14px Arial, sans-serif';
-    ctx.fillText(`${i + 1}`, padding, y);
-    
-    // Avatar
-    const avatarX = padding + 24;
-    const avatarY = y - avatarSize / 2 - 4;
-    
-    try {
-      const avatarUrl = getAvatarUrl(user.discordId, user.discordAvatar);
-      const avatar = await loadImage(avatarUrl);
-      
-      // Draw circular avatar - no border
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
-      ctx.closePath();
-      ctx.clip();
-      ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
-      ctx.restore();
-    } catch (err) {
-      // Placeholder if avatar fails
-      ctx.fillStyle = '#1a1a1a';
-      ctx.beginPath();
-      ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
-      ctx.fill();
-      
-      ctx.fillStyle = '#555555';
-      ctx.font = 'bold 12px Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(user.discordUsername[0].toUpperCase(), avatarX + avatarSize / 2, avatarY + avatarSize / 2 + 4);
-      ctx.textAlign = 'left';
-    }
-    
-    // Username - white
-    const nameX = avatarX + avatarSize + 12;
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = '14px Arial, sans-serif';
-    ctx.textAlign = 'left';
-    const displayName = user.discordUsername.length > 16 
-      ? user.discordUsername.substring(0, 15) + '…' 
-      : user.discordUsername;
-    ctx.fillText(displayName, nameX, y);
-    
-    // Streak - gold number, subtle "d"
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#FFD700';
-    ctx.font = '14px Arial, sans-serif';
-    const streakNum = `${user.currentStreak}`;
-    ctx.fillText(streakNum, width - padding - 14, y);
-    ctx.fillStyle = '#555555';
-    ctx.fillText('d', width - padding, y);
-  }
-  
-  return canvas.toBuffer('image/png');
-}
-
-/**
- * Post leaderboard to Discord with generated image
+ * Post leaderboard to Discord (or edit existing)
  */
 async function postLeaderboardToDiscord() {
   if (!LEADERBOARD_WEBHOOK) {
@@ -176,62 +108,33 @@ async function postLeaderboardToDiscord() {
   
   try {
     const users = await getLeaderboardUsers();
+    const embed = formatLeaderboardEmbed(users);
     
-    if (!users || users.length === 0) {
-      const embed = {
-        embeds: [{
-          color: 0xFFD700,
-          title: 'LEADERBOARD',
-          description: '```\nNo one on the board yet.\n```'
-        }]
-      };
-      
-      await fetch(LEADERBOARD_WEBHOOK, {
-        method: 'POST',
+    // Check if we have an existing message to edit
+    const existingMessageId = await getSetting('leaderboard_message_id');
+    
+    if (existingMessageId) {
+      // Try to edit existing message
+      const editUrl = `${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`;
+      const editResponse = await fetch(editUrl, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(embed)
       });
       
-      console.log('✅ Empty leaderboard posted');
-      return true;
-    }
-    
-    console.log('🎨 Generating leaderboard image...');
-    const imageBuffer = await generateLeaderboardImage(users);
-    
-    const form = new FormData();
-    form.append('file', imageBuffer, {
-      filename: 'leaderboard.png',
-      contentType: 'image/png'
-    });
-    
-    const payload = {
-      embeds: [{
-        color: 0x000000,
-        image: { url: 'attachment://leaderboard.png' }
-      }]
-    };
-    form.append('payload_json', JSON.stringify(payload));
-    
-    // Delete old message if exists
-    const existingMessageId = await getSetting('leaderboard_message_id');
-    
-    if (existingMessageId) {
-      try {
-        await fetch(`${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`, {
-          method: 'DELETE'
-        });
-        console.log('🗑️ Deleted old leaderboard message');
-      } catch (err) {
-        console.log('⚠️ Could not delete old message');
+      if (editResponse.ok) {
+        console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
+        return true;
+      } else {
+        console.log('⚠️ Could not edit existing message, posting new one...');
       }
     }
     
-    // Post new message with image
+    // Post new message
     const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
       method: 'POST',
-      body: form,
-      headers: form.getHeaders()
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(embed)
     });
     
     if (!response.ok) {
@@ -239,10 +142,11 @@ async function postLeaderboardToDiscord() {
       throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
     }
     
+    // Save message ID for future edits
     const data = await response.json();
     if (data.id) {
       await setSetting('leaderboard_message_id', data.id);
-      console.log(`✅ Leaderboard image posted to Discord (message ID: ${data.id})`);
+      console.log(`✅ Leaderboard posted to Discord (message ID: ${data.id})`);
     }
     
     return true;
