@@ -555,8 +555,8 @@
 }
 
 .data-row-danger {
-  margin-top: 32px;
-  padding-top: 32px;
+  margin-top: 24px;
+  padding-top: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   border-bottom: none;
 }

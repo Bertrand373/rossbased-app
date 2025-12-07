@@ -103,10 +103,32 @@ const Tracker = ({ userData, updateUserData }) => {
     const now = new Date();
     const daysDiff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
     const newStreak = Math.max(0, daysDiff);
+    
+    // Update streakHistory to include the current active streak
+    // This is required for the Calendar to properly display streak days
+    let updatedStreakHistory = [...(userData.streakHistory || [])];
+    
+    // Find and remove any existing active streak (no end date)
+    const activeStreakIndex = updatedStreakHistory.findIndex(s => !s.end);
+    if (activeStreakIndex !== -1) {
+      updatedStreakHistory.splice(activeStreakIndex, 1);
+    }
+    
+    // Add the new active streak with the selected start date
+    updatedStreakHistory.push({
+      id: updatedStreakHistory.length + 1,
+      start: date,
+      end: null,
+      days: newStreak,
+      reason: null,
+      trigger: null
+    });
+    
     updateUserData({
       startDate: date,
       currentStreak: newStreak,
-      longestStreak: Math.max(userData.longestStreak || 0, newStreak)
+      longestStreak: Math.max(userData.longestStreak || 0, newStreak),
+      streakHistory: updatedStreakHistory
     });
     setShowDatePicker(false);
   };
