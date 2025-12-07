@@ -141,7 +141,8 @@ router.get('/preferences/:username', async (req, res) => {
           weeklyProgress: true
         },
         dailyReminderEnabled: false,
-        dailyReminderTime: '09:00'
+        dailyReminderTime: '09:00',
+        timezone: 'America/New_York'
       },
       subscription: subscription || null
     });
@@ -165,7 +166,8 @@ router.put('/preferences', async (req, res) => {
       quietHoursEnd,
       types,
       dailyReminderEnabled,
-      dailyReminderTime
+      dailyReminderTime,
+      timezone
     } = req.body;
     
     if (!username) {
@@ -186,13 +188,14 @@ router.put('/preferences', async (req, res) => {
       quietHoursEnd: quietHoursEnd || '08:00',
       types: types || { milestones: true, urgeSupport: true, weeklyProgress: true },
       dailyReminderEnabled: dailyReminderEnabled || false,
-      dailyReminderTime: dailyReminderTime || '09:00'
+      dailyReminderTime: dailyReminderTime || '09:00',
+      timezone: timezone || 'America/New_York'
     };
     
     user.notificationPreferences = preferences;
     await user.save();
     
-    console.log(`✅ Updated notification preferences for: ${username}`);
+    console.log(`✅ Updated notification preferences for: ${username} (timezone: ${preferences.timezone})`);
     res.json({ 
       success: true, 
       message: 'Preferences updated successfully',
@@ -219,6 +222,7 @@ router.post('/notification-preferences/:username', async (req, res) => {
       types,
       dailyReminderEnabled,
       dailyReminderTime,
+      timezone,
       fcmToken
     } = req.body;
     
@@ -236,7 +240,8 @@ router.post('/notification-preferences/:username', async (req, res) => {
       quietHoursEnd: quietHoursEnd || '08:00',
       types: types || { milestones: true, urgeSupport: true, weeklyProgress: true },
       dailyReminderEnabled: dailyReminderEnabled || false,
-      dailyReminderTime: dailyReminderTime || '09:00'
+      dailyReminderTime: dailyReminderTime || '09:00',
+      timezone: timezone || 'America/New_York'
     };
     
     user.notificationPreferences = preferences;
@@ -251,7 +256,7 @@ router.post('/notification-preferences/:username', async (req, res) => {
       );
     }
     
-    console.log(`✅ Saved notification preferences for: ${username}`);
+    console.log(`✅ Saved notification preferences for: ${username} (timezone: ${preferences.timezone})`);
     res.json({ 
       success: true, 
       message: 'Preferences saved successfully',
@@ -451,14 +456,22 @@ router.post('/debug-test', async (req, res) => {
       quietHoursEnd: prefs.quietHoursEnd || '08:00',
       dailyReminderEnabled: prefs.dailyReminderEnabled || false,
       dailyReminderTime: prefs.dailyReminderTime || '09:00',
+      timezone: prefs.timezone || 'America/New_York',
       types: prefs.types || { milestones: true, urgeSupport: true, weeklyProgress: true }
     };
     
-    // 4. Check quiet hours
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    // 4. Check quiet hours (using user's timezone)
+    const userTimezone = prefs.timezone || 'America/New_York';
+    let userNow;
+    try {
+      userNow = new Date(new Date().toLocaleString('en-US', { timeZone: userTimezone }));
+    } catch (e) {
+      userNow = new Date();
+    }
+    const currentMinutes = userNow.getHours() * 60 + userNow.getMinutes();
+    debugInfo.checks.userTimezone = userTimezone;
+    debugInfo.checks.userLocalTime = `${String(userNow.getHours()).padStart(2, '0')}:${String(userNow.getMinutes()).padStart(2, '0')}`;
     debugInfo.checks.currentTimeMinutes = currentMinutes;
-    debugInfo.checks.currentTimeFormatted = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     
     if (prefs.quietHoursEnabled) {
       const [startH, startM] = (prefs.quietHoursStart || '22:00').split(':').map(Number);
@@ -516,16 +529,16 @@ router.post('/debug-test', async (req, res) => {
         debugInfo.wouldSend = false;
         debugInfo.blockReasons.push('Daily reminders are disabled in preferences');
       } else {
-        // Check if current hour matches reminder time
+        // Check if current hour matches reminder time (in user's timezone)
         const [reminderH] = (prefs.dailyReminderTime || '09:00').split(':').map(Number);
-        const currentHour = now.getHours();
+        const currentHour = userNow.getHours();
         debugInfo.checks.currentHour = currentHour;
         debugInfo.checks.reminderHour = reminderH;
         debugInfo.checks.hoursMatch = currentHour === reminderH;
         
         if (currentHour !== reminderH) {
           debugInfo.checks.schedulerWouldSkip = true;
-          debugInfo.checks.schedulerNote = `Scheduler runs hourly. Would fire at ${String(reminderH).padStart(2, '0')}:00, current hour is ${String(currentHour).padStart(2, '0')}:00`;
+          debugInfo.checks.schedulerNote = `Scheduler runs hourly. Would fire at ${String(reminderH).padStart(2, '0')}:00 ${userTimezone}, current local hour is ${String(currentHour).padStart(2, '0')}:00`;
         }
       }
     } else if (prefKey && prefs.types) {

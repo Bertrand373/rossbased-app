@@ -163,6 +163,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   // Auto-save notification preferences with debounce
   const saveNotificationPreferences = useCallback(async (overrides = {}) => {
+    // Auto-detect user's timezone for accurate scheduling
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York';
+    
     const preferences = {
       quietHoursEnabled,
       quietHoursStart,
@@ -170,6 +173,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       types: notifTypes,
       dailyReminderEnabled,
       dailyReminderTime,
+      timezone: userTimezone,
       fcmToken,
       ...overrides
     };
