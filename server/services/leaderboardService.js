@@ -1,8 +1,11 @@
 // server/services/leaderboardService.js
 // Discord Leaderboard & Milestone Announcements
+// Clean generated image with user avatars
 
 const User = require('../models/User');
 const mongoose = require('mongoose');
+const { createCanvas, loadImage } = require('canvas');
+const FormData = require('form-data');
 
 // Simple schema to store Discord message IDs
 const settingsSchema = new mongoose.Schema({
@@ -11,7 +14,7 @@ const settingsSchema = new mongoose.Schema({
 });
 const Settings = mongoose.models.Settings || mongoose.model('Settings', settingsSchema);
 
-// Webhook URLs from environment (add these to Render)
+// Webhook URLs from environment
 const LEADERBOARD_WEBHOOK = process.env.DISCORD_LEADERBOARD_WEBHOOK;
 const MILESTONE_WEBHOOK = process.env.DISCORD_MILESTONE_WEBHOOK || LEADERBOARD_WEBHOOK;
 
@@ -39,9 +42,6 @@ async function getSetting(key) {
 
 /**
  * Fetch top 13 users for leaderboard
- * Only includes users who:
- * - Have opted into leaderboard (showOnLeaderboard: true)
- * - Have a Discord username set
  */
 async function getLeaderboardUsers() {
   try {
@@ -51,7 +51,7 @@ async function getLeaderboardUsers() {
     })
     .sort({ currentStreak: -1 })
     .limit(13)
-    .select('discordUsername currentStreak longestStreak mentorEligible verifiedMentor')
+    .select('discordUsername discordId discordAvatar currentStreak longestStreak')
     .lean();
     
     return users;
@@ -62,55 +62,111 @@ async function getLeaderboardUsers() {
 }
 
 /**
- * Format leaderboard for Discord embed
- * Clean, minimalist design matching TitanTrack aesthetic
+ * Get Discord avatar URL for a user
  */
-function formatLeaderboardEmbed(users) {
-  if (!users || users.length === 0) {
-    return {
-      embeds: [{
-        color: 0xFFD700,
-        title: 'TITANTRACK LEADERBOARD',
-        description: '```\nNo one on the board yet.\n```',
-        footer: {
-          text: 'TitanTrack'
-        }
-      }]
-    };
+function getAvatarUrl(discordId, avatarHash) {
+  if (avatarHash) {
+    const ext = avatarHash.startsWith('a_') ? 'gif' : 'png';
+    return `https://cdn.discordapp.com/avatars/${discordId}/${avatarHash}.${ext}?size=64`;
+  } else {
+    const defaultIndex = (BigInt(discordId) >> 22n) % 6n;
+    return `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
   }
-  
-  // Build the leaderboard rows
-  let leaderboardText = '';
-  
-  users.forEach((user, index) => {
-    const rank = String(index + 1).padStart(2, ' ');
-    // Truncate long names for mobile
-    const name = user.discordUsername.length > 14 
-      ? user.discordUsername.substring(0, 13) + '…' 
-      : user.discordUsername.padEnd(14, ' ');
-    const days = String(user.currentStreak || 0).padStart(3, ' ') + 'd';
-    // Verified mentor gets a checkmark
-    const verified = user.verifiedMentor ? ' ✓' : '';
-    
-    leaderboardText += `${rank}  ${name} ${days}${verified}\n`;
-  });
-  
-  const embed = {
-    embeds: [{
-      color: 0xFFD700,
-      title: 'TITANTRACK LEADERBOARD',
-      description: `\`\`\`\n${leaderboardText}\`\`\``,
-      footer: {
-        text: `Updated ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-      }
-    }]
-  };
-  
-  return embed;
 }
 
 /**
- * Post leaderboard to Discord (or edit existing)
+ * Generate leaderboard image with user avatars
+ * Ultra-clean premium design
+ */
+async function generateLeaderboardImage(users) {
+  const width = 380;
+  const rowHeight = 44;
+  const headerHeight = 50;
+  const bottomPadding = 16;
+  const padding = 20;
+  const avatarSize = 28;
+  
+  const height = headerHeight + (users.length * rowHeight) + bottomPadding;
+  
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+  
+  // Background - pure black
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, width, height);
+  
+  // Header - clean white text
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '600 16px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('LEADERBOARD', width / 2, 32);
+  
+  // Draw each user row
+  for (let i = 0; i < users.length; i++) {
+    const user = users[i];
+    const y = headerHeight + (i * rowHeight) + 28;
+    
+    // Rank number - subtle gray
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#555555';
+    ctx.font = '14px Arial, sans-serif';
+    ctx.fillText(`${i + 1}`, padding, y);
+    
+    // Avatar
+    const avatarX = padding + 24;
+    const avatarY = y - avatarSize / 2 - 4;
+    
+    try {
+      const avatarUrl = getAvatarUrl(user.discordId, user.discordAvatar);
+      const avatar = await loadImage(avatarUrl);
+      
+      // Draw circular avatar - no border
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
+      ctx.restore();
+    } catch (err) {
+      // Placeholder if avatar fails
+      ctx.fillStyle = '#1a1a1a';
+      ctx.beginPath();
+      ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = '#555555';
+      ctx.font = 'bold 12px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(user.discordUsername[0].toUpperCase(), avatarX + avatarSize / 2, avatarY + avatarSize / 2 + 4);
+      ctx.textAlign = 'left';
+    }
+    
+    // Username - white
+    const nameX = avatarX + avatarSize + 12;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '14px Arial, sans-serif';
+    ctx.textAlign = 'left';
+    const displayName = user.discordUsername.length > 16 
+      ? user.discordUsername.substring(0, 15) + '…' 
+      : user.discordUsername;
+    ctx.fillText(displayName, nameX, y);
+    
+    // Streak - gold number, subtle "d"
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#FFD700';
+    ctx.font = '14px Arial, sans-serif';
+    const streakNum = `${user.currentStreak}`;
+    ctx.fillText(streakNum, width - padding - 14, y);
+    ctx.fillStyle = '#555555';
+    ctx.fillText('d', width - padding, y);
+  }
+  
+  return canvas.toBuffer('image/png');
+}
+
+/**
+ * Post leaderboard to Discord with generated image
  */
 async function postLeaderboardToDiscord() {
   if (!LEADERBOARD_WEBHOOK) {
@@ -120,33 +176,62 @@ async function postLeaderboardToDiscord() {
   
   try {
     const users = await getLeaderboardUsers();
-    const embed = formatLeaderboardEmbed(users);
     
-    // Check if we have an existing message to edit
-    const existingMessageId = await getSetting('leaderboard_message_id');
-    
-    if (existingMessageId) {
-      // Try to edit existing message
-      const editUrl = `${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`;
-      const editResponse = await fetch(editUrl, {
-        method: 'PATCH',
+    if (!users || users.length === 0) {
+      const embed = {
+        embeds: [{
+          color: 0xFFD700,
+          title: 'LEADERBOARD',
+          description: '```\nNo one on the board yet.\n```'
+        }]
+      };
+      
+      await fetch(LEADERBOARD_WEBHOOK, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(embed)
       });
       
-      if (editResponse.ok) {
-        console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
-        return true;
-      } else {
-        console.log('⚠️ Could not edit existing message, posting new one...');
+      console.log('✅ Empty leaderboard posted');
+      return true;
+    }
+    
+    console.log('🎨 Generating leaderboard image...');
+    const imageBuffer = await generateLeaderboardImage(users);
+    
+    const form = new FormData();
+    form.append('file', imageBuffer, {
+      filename: 'leaderboard.png',
+      contentType: 'image/png'
+    });
+    
+    const payload = {
+      embeds: [{
+        color: 0x000000,
+        image: { url: 'attachment://leaderboard.png' }
+      }]
+    };
+    form.append('payload_json', JSON.stringify(payload));
+    
+    // Delete old message if exists
+    const existingMessageId = await getSetting('leaderboard_message_id');
+    
+    if (existingMessageId) {
+      try {
+        await fetch(`${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`, {
+          method: 'DELETE'
+        });
+        console.log('🗑️ Deleted old leaderboard message');
+      } catch (err) {
+        console.log('⚠️ Could not delete old message');
       }
     }
     
-    // Post new message
+    // Post new message with image
     const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(embed)
+      body: form,
+      headers: form.getHeaders()
     });
     
     if (!response.ok) {
@@ -154,11 +239,10 @@ async function postLeaderboardToDiscord() {
       throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
     }
     
-    // Save message ID for future edits
     const data = await response.json();
     if (data.id) {
       await setSetting('leaderboard_message_id', data.id);
-      console.log(`✅ Leaderboard posted to Discord (message ID: ${data.id})`);
+      console.log(`✅ Leaderboard image posted to Discord (message ID: ${data.id})`);
     }
     
     return true;
@@ -170,7 +254,6 @@ async function postLeaderboardToDiscord() {
 
 /**
  * Format milestone announcement embed
- * Clean, simple announcement when someone crosses a milestone
  */
 function formatMilestoneEmbed(discordUsername, days) {
   return {
@@ -183,13 +266,12 @@ function formatMilestoneEmbed(discordUsername, days) {
 
 /**
  * Post milestone announcement to Discord
- * Uses DISCORD_MILESTONE_WEBHOOK if set, otherwise falls back to LEADERBOARD_WEBHOOK
  */
 async function postMilestoneToDiscord(discordUsername, days) {
   const webhook = MILESTONE_WEBHOOK;
   
   if (!webhook) {
-    console.log('⚠️ No Discord webhook configured for milestones - skipping milestone post');
+    console.log('⚠️ No Discord webhook configured for milestones');
     return false;
   }
   
@@ -217,8 +299,6 @@ async function postMilestoneToDiscord(discordUsername, days) {
 
 /**
  * Check if user crossed a milestone and announce it
- * Called when user data is updated (streak increases)
- * Now uses announceDiscordMilestones toggle (separate from leaderboard)
  */
 async function checkAndAnnounceMilestone(username, newStreak) {
   try {
@@ -229,20 +309,16 @@ async function checkAndAnnounceMilestone(username, newStreak) {
       return false;
     }
     
-    // Must have Discord milestone announcements enabled AND have Discord username
     if (!user.announceDiscordMilestones || !user.discordUsername) {
       return false;
     }
     
     const lastAnnounced = user.lastMilestoneAnnounced || 0;
     
-    // Check if any milestone was crossed
     for (const milestone of MILESTONE_DAYS) {
       if (newStreak >= milestone && lastAnnounced < milestone) {
-        // Announce this milestone
         await postMilestoneToDiscord(user.discordUsername, milestone);
         
-        // Update mentor eligibility if 180+ days
         const updateData = { lastMilestoneAnnounced: milestone };
         if (milestone >= 180 && !user.mentorEligible) {
           updateData.mentorEligible = true;
@@ -267,19 +343,15 @@ async function checkAndAnnounceMilestone(username, newStreak) {
 
 /**
  * Get user's current rank on leaderboard
- * Returns rank among opted-in users only
- * Returns null if user has not opted into leaderboard
  */
 async function getUserRank(username) {
   try {
-    // First check if this user is opted in
     const currentUser = await User.findOne({ username }).lean();
     
     if (!currentUser || !currentUser.showOnLeaderboard || !currentUser.discordUsername) {
       return null;
     }
     
-    // Get all opted-in users sorted by streak
     const users = await User.find({
       showOnLeaderboard: true,
       discordUsername: { $exists: true, $ne: '', $ne: null }
@@ -305,7 +377,6 @@ async function getUserRank(username) {
 
 /**
  * Get all verified mentors
- * For future mentor request feature
  */
 async function getVerifiedMentors() {
   try {
@@ -324,7 +395,7 @@ async function getVerifiedMentors() {
 }
 
 /**
- * Manual trigger for leaderboard (for testing)
+ * Manual trigger for leaderboard
  */
 async function triggerLeaderboardPost() {
   console.log('📊 Manual leaderboard trigger requested');
@@ -332,11 +403,11 @@ async function triggerLeaderboardPost() {
 }
 
 /**
- * Reset leaderboard message (posts fresh instead of editing)
+ * Reset leaderboard message
  */
 async function resetLeaderboardMessage() {
   await Settings.deleteOne({ key: 'leaderboard_message_id' });
-  console.log('🔄 Leaderboard message ID reset - next post will create new message');
+  console.log('🔄 Leaderboard message ID reset');
   return true;
 }
 

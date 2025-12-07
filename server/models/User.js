@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   googleId: String,
   discordId: String,
+  discordAvatar: String, // Discord avatar hash for profile pic
   startDate: Date,
   currentStreak: { type: Number, default: 0 },
   longestStreak: { type: Number, default: 0 },

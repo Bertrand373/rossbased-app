@@ -68,7 +68,8 @@ router.post('/discord', async (req, res) => {
         email: discordUser.email || '',
         password: `discord_${discordUser.id}`,
         discordId: discordUser.id,
-        discordUsername: `${discordUser.username}`,
+        discordUsername: discordUser.username,
+        discordAvatar: discordUser.avatar || null, // Save avatar hash
         startDate: new Date().toISOString().split('T')[0],
         currentStreak: 0,
         longestStreak: 0,
@@ -115,12 +116,13 @@ router.post('/discord', async (req, res) => {
 
       await user.save();
       console.log('Created new user via Discord:', username);
-    } else if (!user.discordId) {
-      // Link Discord to existing account
+    } else {
+      // Update existing user's Discord info (including avatar)
       user.discordId = discordUser.id;
       user.discordUsername = discordUser.username;
+      user.discordAvatar = discordUser.avatar || null; // Update avatar hash
       await user.save();
-      console.log('Linked Discord to existing user:', user.username);
+      console.log('Updated Discord info for user:', user.username);
     }
 
     // Generate JWT
