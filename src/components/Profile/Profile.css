@@ -545,6 +545,10 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
+.data-row:first-of-type {
+  padding-top: 0;
+}
+
 .data-row:last-of-type {
   border-bottom: none;
 }
