@@ -100,16 +100,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   }, [notificationsEnabled, userData?.username]);
 
-  // Lock scroll on Data tab (fixed content)
-  useEffect(() => {
-    if (activeTab === 'data') {
-      document.body.classList.add('static-view');
-    } else {
-      document.body.classList.remove('static-view');
-    }
-    return () => document.body.classList.remove('static-view');
-  }, [activeTab]);
-
   // Cleanup debounce timer on unmount
   useEffect(() => {
     return () => {
