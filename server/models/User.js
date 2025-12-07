@@ -86,6 +86,8 @@ const userSchema = new mongoose.Schema({
       dailyReminderTime: '09:00'
     }
   }
+}, {
+  timestamps: true
 });
 
 // Indexes for efficient queries
