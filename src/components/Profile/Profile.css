@@ -447,13 +447,8 @@
 }
 
 /* Notification unavailable state */
-.notification-unavailable {
-  padding: 20px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
 .notification-unavailable .toggle-label {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .notification-unavailable .toggle-desc {
@@ -555,9 +550,12 @@
 }
 
 .data-row-danger {
-  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 0;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
   border-bottom: none;
 }
 
@@ -574,7 +572,7 @@
 }
 
 .data-title-danger {
-  color: #ff4757;
+  color: #ffffff;
 }
 
 .data-desc {
@@ -602,13 +600,18 @@
 }
 
 .data-btn-danger {
-  border-color: rgba(255, 71, 87, 0.3);
+  width: 100%;
+  padding: 16px 24px;
+  background: rgba(255, 71, 87, 0.12);
+  border: none;
+  border-radius: 12px;
   color: #ff4757;
+  font-size: 0.9375rem;
+  font-weight: 600;
 }
 
 .data-btn-danger:hover {
-  border-color: rgba(255, 71, 87, 0.5);
-  background: rgba(255, 71, 87, 0.1);
+  background: rgba(255, 71, 87, 0.18);
 }
 
 /* =============================================================================
@@ -971,20 +974,27 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .about-logo {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
+}
+
+.about-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin-top: 4px;
 }
 
 .about-version {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.3);
   font-weight: 400;
-  margin-top: 8px;
 }
 
 /* Dividers */
@@ -1029,26 +1039,6 @@
 .pillar-desc {
   font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.4);
-  font-weight: 400;
-}
-
-/* Tagline */
-.about-tagline {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.tagline-main {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: #ffffff;
-  letter-spacing: 0.01em;
-}
-
-.tagline-sub {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.35);
   font-weight: 400;
 }
 

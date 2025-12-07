@@ -314,8 +314,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     if (!success) toast.error('Failed to send test');
   };
 
-  const memberSince = userData.startDate 
-    ? format(new Date(userData.startDate), 'MMMM yyyy') 
+  const memberSince = userData.createdAt 
+    ? format(new Date(userData.createdAt), 'MMMM yyyy') 
     : 'Unknown';
 
   const handleProfileUpdate = () => {
@@ -651,9 +651,11 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <h3 className="group-label">Push Notifications</h3>
 
             {!isSupported ? (
-              <div className="notification-unavailable">
-                <span className="toggle-label">Not Available</span>
-                <span className="toggle-desc">Notifications not supported on this device</span>
+              <div className="toggle-row notification-unavailable">
+                <div className="toggle-text">
+                  <span className="toggle-label">Not Available</span>
+                  <span className="toggle-desc">Notifications not supported on this device</span>
+                </div>
               </div>
             ) : (
               <>
@@ -793,12 +795,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               <button className="data-btn" onClick={() => setShowExportModal(true)}>Export</button>
             </div>
 
-            <div className="data-row data-row-danger">
+            <div className="data-row-danger">
               <div className="data-text">
                 <span className="data-title data-title-danger">Delete Account</span>
                 <span className="data-desc">Permanently remove all your data</span>
               </div>
-              <button className="data-btn data-btn-danger" onClick={() => setShowDeleteConfirm(true)}>Delete</button>
+              <button className="data-btn-danger" onClick={() => setShowDeleteConfirm(true)}>Delete Account</button>
             </div>
           </div>
         )}
@@ -808,16 +810,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           <div className="about-section">
             {/* Brand */}
             <div className="about-brand">
-              <img src="/helmet.png" alt="TitanTrack" className="about-logo" />
+              <img src="/icon-192.png" alt="TitanTrack" className="about-logo" />
+              <span className="about-title">TitanTrack</span>
               <span className="about-version">v1.0.0</span>
-            </div>
-
-            <div className="about-divider" />
-
-            {/* Tagline */}
-            <div className="about-tagline">
-              <span className="tagline-main">Hold the Flame</span>
-              <span className="tagline-sub">Master your energy. Own your path.</span>
             </div>
 
             <div className="about-divider" />
@@ -923,8 +918,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <h2>Export Data</h2>
             <p>Download all your tracking data including streak history, journal entries, and settings.</p>
             <div className="confirm-actions">
-              <button className="btn-primary" onClick={handleDataExport}>Download</button>
               <button className="btn-ghost" onClick={() => setShowExportModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleDataExport}>Download</button>
             </div>
           </div>
         </div>
@@ -951,13 +946,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             
             <div className="confirm-actions">
               <button 
-                className="btn-danger" 
-                onClick={handleAccountDeletion}
-                disabled={deleteConfirmText !== 'DELETE'}
-              >
-                Delete Account
-              </button>
-              <button 
                 className="btn-ghost" 
                 onClick={() => {
                   setShowDeleteConfirm(false);
@@ -965,6 +953,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 }}
               >
                 Cancel
+              </button>
+              <button 
+                className="btn-danger" 
+                onClick={handleAccountDeletion}
+                disabled={deleteConfirmText !== 'DELETE'}
+              >
+                Delete Account
               </button>
             </div>
           </div>
