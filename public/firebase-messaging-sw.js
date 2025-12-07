@@ -24,7 +24,8 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message:', payload);
 
-  const notificationTitle = payload.notification?.title || '🔥 TitanTrack';
+  // Use server-sent values, clean fallbacks without emojis
+  const notificationTitle = payload.notification?.title || 'TitanTrack';
   const notificationOptions = {
     body: payload.notification?.body || 'You have a new notification',
     icon: payload.notification?.icon || '/icon-192.png',
@@ -34,16 +35,6 @@ messaging.onBackgroundMessage((payload) => {
       url: payload.data?.url || '/',
       ...payload.data
     },
-    actions: [
-      {
-        action: 'open',
-        title: 'View'
-      },
-      {
-        action: 'close',
-        title: 'Dismiss'
-      }
-    ],
     tag: 'titantrack-notification',
     requireInteraction: false
   };
