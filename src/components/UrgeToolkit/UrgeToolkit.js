@@ -55,6 +55,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   const [currentStep, setCurrentStep] = useState('assessment');
   const [urgeIntensity, setUrgeIntensity] = useState(0);
   const [activeProtocol, setActiveProtocol] = useState(null);
+  const [recommendedProtocol, setRecommendedProtocol] = useState(null);
   const [selectedTrigger, setSelectedTrigger] = useState('');
   
   // Experience level detection
@@ -204,16 +205,20 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     if (!sessionStartTime) setSessionStartTime(new Date());
     
     // Smart protocol suggestion based on intensity and level
+    let suggested;
     if (intensity >= 8) {
-      setActiveProtocol('breathing');
+      suggested = 'breathing';
       setAdvancedBreathing(experienceLevel !== 'beginner');
     } else if (intensity >= 6) {
-      setActiveProtocol(experienceLevel !== 'beginner' ? 'energy' : 'physical');
+      suggested = experienceLevel !== 'beginner' ? 'energy' : 'physical';
     } else if (intensity >= 4) {
-      setActiveProtocol('physical');
+      suggested = 'physical';
     } else {
-      setActiveProtocol('mental');
+      suggested = 'mental';
     }
+    
+    setRecommendedProtocol(suggested);
+    setActiveProtocol(suggested);
     
     setTimeout(() => setCurrentStep('protocol'), 500);
   };
@@ -722,7 +727,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                     <div className="ut-protocol-main">
                       <span className="ut-protocol-name">{protocol.name}</span>
                       <div className="ut-protocol-meta">
-                        {activeProtocol === key && <span className="ut-protocol-rec">Recommended</span>}
+                        {recommendedProtocol === key && <span className="ut-protocol-rec">Recommended</span>}
                         <span className="ut-protocol-duration">{protocol.duration}</span>
                       </div>
                     </div>
