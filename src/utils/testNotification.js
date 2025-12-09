@@ -15,8 +15,8 @@ export const testLocalNotification = async () => {
   try {
     const registration = await navigator.serviceWorker.ready;
     
-    await registration.showNotification('🔥 Test Notification', {
-      body: 'This is a test notification from TitanTrack!',
+    await registration.showNotification('TitanTrack', {
+      body: 'Test notification received.',
       icon: '/icon-192.png',
       badge: '/icon-192.png',
       vibrate: [200, 100, 200],

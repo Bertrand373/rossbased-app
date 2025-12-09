@@ -105,9 +105,10 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   console.log('[Service Worker] Push notification received');
   
+  // Clean, premium fallbacks - no emojis
   let notificationData = {
-    title: '🔥 TitanTrack Alert',
-    body: 'Check your progress!',
+    title: 'TitanTrack',
+    body: 'You have a new update.',
     icon: '/icon-192.png',
     badge: '/icon-192.png'
   };

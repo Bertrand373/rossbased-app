@@ -144,18 +144,49 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     };
   }, [safeUserData, selectedMetric, isPremium]);
 
-  // Milestones
+  // Milestones - with fallback date calculation for legacy accounts
   const milestones = useMemo(() => {
     const maxStreak = Math.max(safeUserData.currentStreak || 0, safeUserData.longestStreak || 0);
     const badges = safeUserData.badges || [];
+    const streakHistory = safeUserData.streakHistory || [];
+    const startDate = safeUserData.startDate;
+    
+    // Helper to calculate milestone date if badge entry is missing
+    const getMilestoneDate = (badgeName, milestoneDays) => {
+      // First, try to get date from badge
+      const badge = badges.find(b => b.name === badgeName);
+      if (badge?.date) return badge.date;
+      
+      // If no badge date but milestone was earned, calculate it
+      if (maxStreak >= milestoneDays) {
+        // Check if current streak reached this milestone
+        const currentStreak = safeUserData.currentStreak || 0;
+        if (currentStreak >= milestoneDays && startDate) {
+          const milestoneDate = new Date(startDate);
+          milestoneDate.setDate(milestoneDate.getDate() + milestoneDays);
+          return milestoneDate;
+        }
+        
+        // Check streak history for the first streak that reached this milestone
+        for (const streak of streakHistory) {
+          if (streak.days >= milestoneDays && streak.start) {
+            const milestoneDate = new Date(streak.start);
+            milestoneDate.setDate(milestoneDate.getDate() + milestoneDays);
+            return milestoneDate;
+          }
+        }
+      }
+      
+      return null;
+    };
     
     return [
-      { days: 7, label: '1 week', earned: maxStreak >= 7, date: badges.find(b => b.name === '7-Day Warrior')?.date },
-      { days: 14, label: '2 weeks', earned: maxStreak >= 14, date: badges.find(b => b.name === '14-Day Monk')?.date },
-      { days: 30, label: '1 month', earned: maxStreak >= 30, date: badges.find(b => b.name === '30-Day Master')?.date },
-      { days: 90, label: '3 months', earned: maxStreak >= 90, date: badges.find(b => b.name === '90-Day King')?.date },
-      { days: 180, label: '6 months', earned: maxStreak >= 180, date: badges.find(b => b.name === '180-Day Emperor')?.date },
-      { days: 365, label: '1 year', earned: maxStreak >= 365, date: badges.find(b => b.name === '365-Day Sage')?.date }
+      { days: 7, label: '1 week', earned: maxStreak >= 7, date: getMilestoneDate('7-Day Warrior', 7) },
+      { days: 14, label: '2 weeks', earned: maxStreak >= 14, date: getMilestoneDate('14-Day Monk', 14) },
+      { days: 30, label: '1 month', earned: maxStreak >= 30, date: getMilestoneDate('30-Day Master', 30) },
+      { days: 90, label: '3 months', earned: maxStreak >= 90, date: getMilestoneDate('90-Day King', 90) },
+      { days: 180, label: '6 months', earned: maxStreak >= 180, date: getMilestoneDate('180-Day Emperor', 180) },
+      { days: 365, label: '1 year', earned: maxStreak >= 365, date: getMilestoneDate('365-Day Sage', 365) }
     ];
   }, [safeUserData]);
 
