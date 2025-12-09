@@ -355,6 +355,7 @@
   line-height: 1.6;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
+  white-space: pre-wrap;
 }
 
 .calendar-journal-editing {
@@ -632,6 +633,21 @@
 .calendar-option-wetdream:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
+}
+
+/* Remove wet dream button - subtle with amber dot */
+.calendar-option-remove-wetdream {
+  background: rgba(251, 191, 36, 0.1);
+  color: rgba(251, 191, 36, 0.8);
+}
+
+.calendar-option-remove-wetdream .option-dot {
+  background-color: #fbbf24;
+}
+
+.calendar-option-remove-wetdream:hover {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
 }
 
 /* Relapse button with red dot */

@@ -102,9 +102,9 @@ function formatLeaderboardEmbed(users) {
         color: 0x000000,
         title: 'LEADERBOARD',
         url: 'https://titantrack.app',
-        description: '```\nNo one on the board yet.\n```',
+        description: '```\nNo one on the board yet.\n```\n[Join the leaderboard →](https://titantrack.app)',
         footer: {
-          text: `Updated ${estTimestamp} EST • titantrack.app`
+          text: `Updated ${estTimestamp} EST`
         }
       }]
     };
@@ -130,9 +130,9 @@ function formatLeaderboardEmbed(users) {
       color: 0x000000,
       title: 'LEADERBOARD',
       url: 'https://titantrack.app',
-      description: `\`\`\`\n${leaderboardText}\`\`\``,
+      description: `\`\`\`\n${leaderboardText}\`\`\`\n[Join the leaderboard →](https://titantrack.app)`,
       footer: {
-        text: `Updated ${estTimestamp} EST • titantrack.app`
+        text: `Updated ${estTimestamp} EST`
       }
     }]
   };

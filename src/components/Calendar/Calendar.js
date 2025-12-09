@@ -161,19 +161,13 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   };
 
   const hasWetDream = (day) => {
-    const wetDreamDates = userData.streakHistory?.reduce((dates, streak) => {
-      if (streak.start && streak.days > 7) {
-        const wetDreamDay = new Date(streak.start);
-        wetDreamDay.setDate(wetDreamDay.getDate() + 5);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (wetDreamDay <= today && isSameDay(wetDreamDay, day)) {
-          dates.push(wetDreamDay);
-        }
-      }
-      return dates;
-    }, []) || [];
-    return wetDreamDates.length > 0;
+    // Check actual wetDreams array for this date
+    if (!userData.wetDreams || userData.wetDreams.length === 0) return false;
+    
+    return userData.wetDreams.some(wetDream => {
+      if (!wetDream.date) return false;
+      return isSameDay(new Date(wetDream.date), day);
+    });
   };
 
   const getDayBenefits = (day) => {
@@ -255,6 +249,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     const dayCount = getDayCount(selectedDate);
     const wetDream = hasWetDream(selectedDate);
     
+    // Check wet dream FIRST - wet dream days show amber badge (it's the notable event)
+    if (wetDream) {
+      return (
+        <div className="calendar-status-badge wet-dream">
+          <span className="status-dot"></span>
+          <span>Wet Dream{dayCount ? ` · Day ${dayCount.dayNumber}` : ''}</span>
+        </div>
+      );
+    }
+    
     if (dayStatus?.type === 'current-streak') {
       return (
         <div className="calendar-status-badge current-streak">
@@ -284,14 +288,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               <span className="trigger-value">{getTriggerLabel(dayStatus.trigger)}</span>
             </div>
           )}
-        </div>
-      );
-    }
-    if (wetDream) {
-      return (
-        <div className="calendar-status-badge wet-dream">
-          <span className="status-dot"></span>
-          <span>Wet Dream</span>
         </div>
       );
     }
@@ -360,13 +356,42 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     </div>
   );
 
+  // Remove wet dream from a day
+  const handleRemoveWetDream = () => {
+    if (!selectedDate || !updateUserData) return;
+    
+    // Filter out the wet dream for this date
+    const updatedWetDreams = (userData.wetDreams || []).filter(wetDream => {
+      if (!wetDream.date) return true;
+      return !isSameDay(new Date(wetDream.date), selectedDate);
+    });
+    
+    updateUserData({ 
+      wetDreams: updatedWetDreams,
+      wetDreamCount: updatedWetDreams.length  // Recalculate from array - always accurate
+    });
+    
+    toast.success('Wet dream removed');
+    closeEditModal();
+  };
+
   // Status update handlers
   const handleStatusClick = (status) => {
     if (status === 'relapse') {
       setShowTriggerSelection(true);
       setEditingExistingTrigger(false);
     } else if (status === 'wet-dream') {
-      updateUserData({ wetDreamCount: (userData.wetDreamCount || 0) + 1 });
+      // Get current streak day for this date
+      const dayCount = getDayCount(selectedDate);
+      const streakDay = dayCount?.dayNumber || userData.currentStreak || 0;
+      
+      // Store wet dream with date (like Tracker.js does)
+      const updatedWetDreams = [...(userData.wetDreams || []), { date: selectedDate, streakDay }];
+      updateUserData({ 
+        wetDreams: updatedWetDreams,
+        wetDreamCount: updatedWetDreams.length,
+        lastWetDream: selectedDate
+      });
       toast.success('Wet dream logged');
       closeEditModal();
     }
@@ -562,15 +587,27 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     }
     
     if (editOptions.type === 'current-streak') {
+      const dayHasWetDream = hasWetDream(selectedDate);
+      
       return (
         <div className="calendar-edit-options">
-          <button 
-            className="calendar-option-btn calendar-option-wetdream"
-            onClick={() => handleStatusClick('wet-dream')}
-          >
-            <span className="option-dot"></span>
-            <span>Log Wet Dream</span>
-          </button>
+          {dayHasWetDream ? (
+            <button 
+              className="calendar-option-btn calendar-option-remove-wetdream"
+              onClick={handleRemoveWetDream}
+            >
+              <span className="option-dot"></span>
+              <span>Remove Wet Dream</span>
+            </button>
+          ) : (
+            <button 
+              className="calendar-option-btn calendar-option-wetdream"
+              onClick={() => handleStatusClick('wet-dream')}
+            >
+              <span className="option-dot"></span>
+              <span>Log Wet Dream</span>
+            </button>
+          )}
           <button 
             className="calendar-option-btn calendar-option-relapse"
             onClick={() => handleStatusClick('relapse')}
