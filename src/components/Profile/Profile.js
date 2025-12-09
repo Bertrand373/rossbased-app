@@ -85,8 +85,8 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     { id: 'general', label: 'General' }
   ];
 
-  // Check if Discord username is filled (for enabling leaderboard toggle)
-  const hasDiscordUsername = discordUsername.trim().length > 0;
+  // Check if Discord username is saved (for enabling leaderboard toggle)
+  const hasSavedDiscordUsername = Boolean(userData.discordUsername?.trim());
 
   useEffect(() => {
     if (isSupported && userData?.username) {
@@ -322,19 +322,32 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     ? format(new Date(userData.createdAt), 'MMMM yyyy') 
     : 'Unknown';
 
+  // Profile save - only saves text fields (username, email, discordUsername)
   const handleProfileUpdate = () => {
-    // If Discord username was cleared, also disable leaderboard
-    const finalShowOnLeaderboard = discordUsername.trim() ? showOnLeaderboard : false;
-    
     updateUserData({
       username: username.trim(),
       email: email.trim(),
-      discordUsername: discordUsername.trim(),
-      showOnLeaderboard: finalShowOnLeaderboard
+      discordUsername: discordUsername.trim()
     });
-    setShowOnLeaderboard(finalShowOnLeaderboard);
     setIsEditingProfile(false);
     toast.success('Profile updated', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+  };
+
+  // Cancel editing - reset to saved values
+  const handleCancelEdit = () => {
+    setUsername(userData.username || '');
+    setEmail(userData.email || '');
+    setDiscordUsername(userData.discordUsername || '');
+    setIsEditingProfile(false);
+  };
+
+  // Leaderboard toggle - instant-save, independent of edit mode
+  const handleLeaderboardToggle = () => {
+    if (!hasSavedDiscordUsername) return; // Requires saved Discord username
+    const newValue = !showOnLeaderboard;
+    setShowOnLeaderboard(newValue);
+    updateUserData({ showOnLeaderboard: newValue });
+    toast.success('Saved', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
   };
 
   const handleFeedbackSubmit = async () => {
@@ -432,13 +445,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     }
   };
 
-  // Handle leaderboard toggle - only works if Discord username exists
-  const handleLeaderboardToggle = () => {
-    if (!isEditingProfile) return;
-    if (!hasDiscordUsername) return; // Silently ignore if no Discord username
-    setShowOnLeaderboard(!showOnLeaderboard);
-  };
-
   const userInitial = userData?.username?.charAt(0)?.toUpperCase() || 
                       userData?.email?.charAt(0)?.toUpperCase() || '?';
 
@@ -474,12 +480,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       {/* Content */}
       <div className="profile-content" key={activeTab}>
         
-        {/* ACCOUNT TAB - Edit/Save for text fields */}
+        {/* ACCOUNT TAB - Edit/Save for text fields, instant-save for toggle */}
         {activeTab === 'account' && (
           <div className="profile-section">
             <div className="section-header">
               <h2>Account Details</h2>
-              <button className="edit-btn" onClick={() => setIsEditingProfile(!isEditingProfile)}>
+              <button className="edit-btn" onClick={() => isEditingProfile ? handleCancelEdit() : setIsEditingProfile(true)}>
                 {isEditingProfile ? 'Cancel' : 'Edit'}
               </button>
             </div>
@@ -518,22 +524,28 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               <span className="form-hint">Found in Discord → Settings → username</span>
             </div>
 
-            {/* Leaderboard Toggle - Disabled when no Discord username */}
-            <div className={`toggle-row ${!hasDiscordUsername && isEditingProfile ? 'toggle-row-disabled' : ''}`}>
+            {/* Save/Cancel buttons - only visible when editing, stacked */}
+            <div className={`section-actions ${isEditingProfile ? 'visible' : ''}`}>
+              <button className="btn-ghost" onClick={handleCancelEdit}>Cancel</button>
+              <button className="btn-primary" onClick={handleProfileUpdate}>Save Changes</button>
+            </div>
+
+            {/* Leaderboard Toggle - Outside edit mode, instant-save */}
+            <div className={`toggle-row leaderboard-toggle ${!hasSavedDiscordUsername ? 'toggle-row-disabled' : ''}`}>
               <div className="toggle-text">
                 <span className="toggle-label">Show on Leaderboard</span>
                 <span className="toggle-desc">
-                  {!hasDiscordUsername && isEditingProfile 
-                    ? 'Add Discord username above to enable' 
+                  {!hasSavedDiscordUsername 
+                    ? 'Save Discord username to enable' 
                     : 'Display streak publicly'
                   }
                 </span>
               </div>
               <button 
-                className={`toggle-switch ${showOnLeaderboard && hasDiscordUsername ? 'active' : ''}`}
+                className={`toggle-switch ${showOnLeaderboard && hasSavedDiscordUsername ? 'active' : ''}`}
                 onClick={handleLeaderboardToggle}
-                disabled={!isEditingProfile || !hasDiscordUsername}
-                aria-label={!hasDiscordUsername ? 'Add Discord username to enable leaderboard' : 'Toggle leaderboard visibility'}
+                disabled={!hasSavedDiscordUsername}
+                aria-label={!hasSavedDiscordUsername ? 'Save Discord username to enable leaderboard' : 'Toggle leaderboard visibility'}
               >
                 <span className="toggle-knob" />
               </button>
@@ -568,13 +580,6 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </div>
             )}
 
-            {isEditingProfile && (
-              <div className="section-actions">
-                <button className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Cancel</button>
-                <button className="btn-primary" onClick={handleProfileUpdate}>Save Changes</button>
-              </div>
-            )}
-
             {/* Feedback Row */}
             <div className="feedback-row">
               <div className="feedback-text">
@@ -604,19 +609,17 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           </div>
         )}
 
-        {/* PRIVACY TAB - Instant-save toggles */}
+        {/* PRIVACY TAB - All toggles, instant-save */}
         {activeTab === 'privacy' && (
           <div className="profile-section">
             <div className="section-header">
-              <h2>Privacy & Notifications</h2>
+              <h2>Privacy Settings</h2>
             </div>
-
-            <h3 className="group-label">Data & Analytics</h3>
 
             <div className="toggle-row">
               <div className="toggle-text">
-                <span className="toggle-label">Anonymous Analytics</span>
-                <span className="toggle-desc">Help improve the app</span>
+                <span className="toggle-label">Analytics</span>
+                <span className="toggle-desc">Help improve TitanTrack</span>
               </div>
               <button 
                 className={`toggle-switch ${analyticsOptIn ? 'active' : ''}`}
@@ -629,7 +632,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <div className="toggle-row">
               <div className="toggle-text">
                 <span className="toggle-label">Data Sharing</span>
-                <span className="toggle-desc">Contribute to aggregated insights</span>
+                <span className="toggle-desc">Anonymous usage data</span>
               </div>
               <button 
                 className={`toggle-switch ${dataSharing ? 'active' : ''}`}
@@ -642,7 +645,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <div className="toggle-row">
               <div className="toggle-text">
                 <span className="toggle-label">Marketing Emails</span>
-                <span className="toggle-desc">Receive updates & tips</span>
+                <span className="toggle-desc">Product updates & tips</span>
               </div>
               <button 
                 className={`toggle-switch ${marketingEmails ? 'active' : ''}`}
@@ -652,133 +655,127 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               </button>
             </div>
 
-            <h3 className="group-label">Push Notifications</h3>
+            {/* Notifications Section */}
+            <div className="group-label">Notifications</div>
 
-            {!isSupported ? (
-              <div className="toggle-row notification-unavailable">
-                <div className="toggle-text">
-                  <span className="toggle-label">Not Available</span>
-                  <span className="toggle-desc">Notifications not supported on this device</span>
-                </div>
+            <div className={`toggle-row ${!isSupported ? 'notification-unavailable' : ''}`}>
+              <div className="toggle-text">
+                <span className="toggle-label">Push Notifications</span>
+                <span className="toggle-desc">
+                  {!isSupported 
+                    ? 'Not available in this browser' 
+                    : notificationsEnabled ? 'Enabled' : 'Disabled'
+                  }
+                </span>
               </div>
-            ) : (
+              <button 
+                className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
+                onClick={handleNotificationToggle}
+                disabled={!isSupported || isTogglingNotifications}
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
+
+            {/* Show notification preferences only when notifications are enabled */}
+            {notificationsEnabled && (
               <>
                 <div className="toggle-row">
                   <div className="toggle-text">
-                    <span className="toggle-label">Enable Notifications</span>
-                    <span className="toggle-desc">
-                      {permission === 'denied' ? 'Blocked in browser settings' : 'Milestones, reminders & support'}
-                    </span>
+                    <span className="toggle-label">Milestones</span>
+                    <span className="toggle-desc">7, 14, 30, 90 day alerts</span>
                   </div>
                   <button 
-                    className={`toggle-switch ${notificationsEnabled ? 'active' : ''}`}
-                    onClick={handleNotificationToggle}
-                    disabled={isTogglingNotifications || permission === 'denied'}
+                    className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
+                    onClick={() => handleNotifTypeToggle('milestones')}
                   >
                     <span className="toggle-knob" />
                   </button>
                 </div>
 
-                {notificationsEnabled && (
-                  <>
-                    <div className="toggle-row">
-                      <div className="toggle-text">
-                        <span className="toggle-label">Milestone Alerts</span>
-                        <span className="toggle-desc">7, 14, 30, 90 day milestones</span>
-                      </div>
-                      <button 
-                        className={`toggle-switch ${notifTypes.milestones ? 'active' : ''}`}
-                        onClick={() => handleNotifTypeToggle('milestones')}
-                      >
-                        <span className="toggle-knob" />
-                      </button>
-                    </div>
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Urge Support</span>
+                    <span className="toggle-desc">High-risk moment alerts</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
+                    onClick={() => handleNotifTypeToggle('urgeSupport')}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
 
-                    <div className="toggle-row">
-                      <div className="toggle-text">
-                        <span className="toggle-label">Urge Support</span>
-                        <span className="toggle-desc">Get help during tough moments</span>
-                      </div>
-                      <button 
-                        className={`toggle-switch ${notifTypes.urgeSupport ? 'active' : ''}`}
-                        onClick={() => handleNotifTypeToggle('urgeSupport')}
-                      >
-                        <span className="toggle-knob" />
-                      </button>
-                    </div>
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Weekly Progress</span>
+                    <span className="toggle-desc">Sunday summary</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
+                    onClick={() => handleNotifTypeToggle('weeklyProgress')}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
 
-                    <div className="toggle-row">
-                      <div className="toggle-text">
-                        <span className="toggle-label">Weekly Progress</span>
-                        <span className="toggle-desc">Sunday recap of your week</span>
-                      </div>
-                      <button 
-                        className={`toggle-switch ${notifTypes.weeklyProgress ? 'active' : ''}`}
-                        onClick={() => handleNotifTypeToggle('weeklyProgress')}
-                      >
-                        <span className="toggle-knob" />
-                      </button>
-                    </div>
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Daily Reminder</span>
+                    <span className="toggle-desc">Daily check-in prompt</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
+                    onClick={handleDailyReminderToggle}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
 
-                    <div className="toggle-row">
-                      <div className="toggle-text">
-                        <span className="toggle-label">Daily Reminder</span>
-                        <span className="toggle-desc">Check in at a set time</span>
-                      </div>
-                      <button 
-                        className={`toggle-switch ${dailyReminderEnabled ? 'active' : ''}`}
-                        onClick={handleDailyReminderToggle}
-                      >
-                        <span className="toggle-knob" />
-                      </button>
-                    </div>
-
-                    {dailyReminderEnabled && (
-                      <div className="time-row single">
-                        <label>Reminder time</label>
-                        <input
-                          type="time"
-                          value={dailyReminderTime}
-                          onChange={handleReminderTimeChange}
-                        />
-                      </div>
-                    )}
-
-                    <div className="toggle-row">
-                      <div className="toggle-text">
-                        <span className="toggle-label">Quiet Hours</span>
-                        <span className="toggle-desc">Pause notifications at night</span>
-                      </div>
-                      <button 
-                        className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
-                        onClick={handleQuietHoursToggle}
-                      >
-                        <span className="toggle-knob" />
-                      </button>
-                    </div>
-
-                    {quietHoursEnabled && (
-                      <div className="time-row">
-                        <label>From</label>
-                        <input
-                          type="time"
-                          value={quietHoursStart}
-                          onChange={handleQuietStartChange}
-                        />
-                        <span>to</span>
-                        <input
-                          type="time"
-                          value={quietHoursEnd}
-                          onChange={handleQuietEndChange}
-                        />
-                      </div>
-                    )}
-
-                    <button className="test-notif-btn" onClick={handleTestNotification}>
-                      Send Test Notification
-                    </button>
-                  </>
+                {dailyReminderEnabled && (
+                  <div className="time-row single">
+                    <label>Remind at</label>
+                    <input 
+                      type="time" 
+                      value={dailyReminderTime}
+                      onChange={handleReminderTimeChange}
+                    />
+                  </div>
                 )}
+
+                <div className="toggle-row">
+                  <div className="toggle-text">
+                    <span className="toggle-label">Quiet Hours</span>
+                    <span className="toggle-desc">Pause notifications</span>
+                  </div>
+                  <button 
+                    className={`toggle-switch ${quietHoursEnabled ? 'active' : ''}`}
+                    onClick={handleQuietHoursToggle}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
+
+                {quietHoursEnabled && (
+                  <div className="time-row">
+                    <label>From</label>
+                    <input 
+                      type="time" 
+                      value={quietHoursStart}
+                      onChange={handleQuietStartChange}
+                    />
+                    <span>to</span>
+                    <input 
+                      type="time" 
+                      value={quietHoursEnd}
+                      onChange={handleQuietEndChange}
+                    />
+                  </div>
+                )}
+
+                <button className="test-notif-btn" onClick={handleTestNotification}>
+                  Send Test Notification
+                </button>
               </>
             )}
           </div>
@@ -794,17 +791,21 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             <div className="data-row">
               <div className="data-text">
                 <span className="data-title">Export Data</span>
-                <span className="data-desc">Download all your tracking data</span>
+                <span className="data-desc">Download your tracking history</span>
               </div>
-              <button className="data-btn" onClick={() => setShowExportModal(true)}>Export</button>
+              <button className="data-btn" onClick={() => setShowExportModal(true)}>
+                Export
+              </button>
             </div>
 
             <div className="data-row-danger">
               <div className="data-text">
                 <span className="data-title data-title-danger">Delete Account</span>
-                <span className="data-desc">Permanently remove all your data</span>
+                <span className="data-desc">Permanently remove all data</span>
               </div>
-              <button className="data-btn-danger" onClick={() => setShowDeleteConfirm(true)}>Delete Account</button>
+              <button className="btn-danger" onClick={() => setShowDeleteConfirm(true)}>
+                Delete Account
+              </button>
             </div>
           </div>
         )}
@@ -814,20 +815,24 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
           <div className="about-section">
             {/* Brand */}
             <div className="about-brand">
-              <img src="/icon-192.png" alt="TitanTrack" className="about-logo" />
+              <img 
+                src="/holdtheflame_logo.png" 
+                alt="TitanTrack" 
+                className="about-logo"
+              />
               <span className="about-title">TitanTrack</span>
-              <span className="about-version">v1.0.0</span>
+              <span className="about-version">Version 1.0.0</span>
             </div>
 
             <div className="about-divider" />
 
-            {/* Four Pillars */}
+            {/* Core Pillars */}
             <div className="about-pillars">
-              <span className="about-pillars-title">The Four Pillars</span>
+              <span className="about-pillars-title">Core Pillars</span>
               
               <div className="about-pillar">
-                <span className="pillar-name">Streak Tracking</span>
-                <span className="pillar-desc">Your foundation. Every day counts.</span>
+                <span className="pillar-name">Streak Intelligence</span>
+                <span className="pillar-desc">Track your journey with precision.</span>
               </div>
               
               <div className="about-pillar">
