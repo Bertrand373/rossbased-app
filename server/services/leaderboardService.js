@@ -38,20 +38,42 @@ async function getSetting(key) {
 }
 
 /**
+ * Calculate current streak from start date
+ * This ensures accuracy even if user hasn't opened the app
+ */
+function calculateStreakFromStartDate(startDate) {
+  if (!startDate) return 0;
+  
+  const start = new Date(startDate);
+  const today = new Date();
+  const daysDiff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+  return Math.max(1, daysDiff + 1); // Day 1 = start day
+}
+
+/**
  * Fetch top 13 users for leaderboard
+ * Now calculates streak dynamically from startDate for accuracy
  */
 async function getLeaderboardUsers() {
   try {
     const users = await User.find({
       showOnLeaderboard: true,
-      discordUsername: { $exists: true, $ne: '', $ne: null }
+      discordUsername: { $exists: true, $ne: '', $ne: null },
+      startDate: { $exists: true, $ne: null } // Must have a start date
     })
-    .sort({ currentStreak: -1 })
-    .limit(13)
-    .select('discordUsername discordDisplayName discordId discordAvatar currentStreak longestStreak mentorEligible verifiedMentor')
+    .select('discordUsername discordDisplayName discordId discordAvatar startDate currentStreak longestStreak mentorEligible verifiedMentor')
     .lean();
     
-    return users;
+    // Calculate live streak for each user and sort
+    const usersWithLiveStreak = users.map(user => ({
+      ...user,
+      currentStreak: calculateStreakFromStartDate(user.startDate)
+    }));
+    
+    // Sort by calculated streak (descending) and take top 13
+    usersWithLiveStreak.sort((a, b) => b.currentStreak - a.currentStreak);
+    
+    return usersWithLiveStreak.slice(0, 13);
   } catch (error) {
     console.error('❌ Error fetching leaderboard users:', error);
     return [];
@@ -282,20 +304,28 @@ async function getUserRank(username) {
     
     const users = await User.find({
       showOnLeaderboard: true,
-      discordUsername: { $exists: true, $ne: '', $ne: null }
+      discordUsername: { $exists: true, $ne: '', $ne: null },
+      startDate: { $exists: true, $ne: null }
     })
-    .sort({ currentStreak: -1 })
-    .select('username currentStreak')
+    .select('username startDate')
     .lean();
     
-    const index = users.findIndex(u => u.username === username);
+    // Calculate live streaks and sort
+    const usersWithLiveStreak = users.map(user => ({
+      username: user.username,
+      currentStreak: calculateStreakFromStartDate(user.startDate)
+    }));
+    
+    usersWithLiveStreak.sort((a, b) => b.currentStreak - a.currentStreak);
+    
+    const index = usersWithLiveStreak.findIndex(u => u.username === username);
     
     if (index === -1) return null;
     
     return {
       rank: index + 1,
-      total: users.length,
-      streak: users[index].currentStreak
+      total: usersWithLiveStreak.length,
+      streak: usersWithLiveStreak[index].currentStreak
     };
   } catch (error) {
     console.error('❌ Error getting user rank:', error);
