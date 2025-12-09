@@ -485,7 +485,17 @@
   pointer-events: auto;
 }
 
-.section-actions .btn-ghost,
+.section-actions .btn-ghost {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-actions .btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
 .section-actions .btn-primary {
   width: 100%;
 }

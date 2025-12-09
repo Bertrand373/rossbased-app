@@ -316,13 +316,13 @@
 
 .confirm-actions {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 12px;
   margin-top: 40px;
 }
 
 .confirm-actions .btn-primary {
-  flex: 1;
+  width: 100%;
   padding: 14px 20px;
   background-color: #ffffff;
   border: none;
@@ -340,7 +340,7 @@
 }
 
 .confirm-actions .btn-ghost {
-  flex: 1;
+  width: 100%;
   padding: 14px 20px;
   background: transparent;
   border: none;
@@ -358,7 +358,7 @@
 }
 
 .confirm-actions .btn-danger {
-  flex: 1;
+  width: 100%;
   padding: 14px 20px;
   background: rgba(255, 59, 48, 0.15);
   border: none;

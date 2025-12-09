@@ -997,13 +997,13 @@
 
 .modal-buttons {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 12px;
 }
 
 .modal-buttons .btn-danger,
 .modal-buttons .btn-ghost {
-  flex: 1;
+  width: 100%;
   padding: 14px 20px;
 }
 
@@ -1204,10 +1204,6 @@
   .modal-text {
     font-size: 0.875rem;
     margin-bottom: 32px;
-  }
-  
-  .modal-buttons {
-    flex-direction: column;
   }
   
   .modal-buttons .btn-danger,
