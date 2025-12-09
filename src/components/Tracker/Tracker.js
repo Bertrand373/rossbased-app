@@ -102,7 +102,8 @@ const Tracker = ({ userData, updateUserData }) => {
   const handleDateSubmit = (date) => {
     const now = new Date();
     const daysDiff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-    const newStreak = Math.max(0, daysDiff);
+    // ONE-BASED COUNTING: Day 1 = start day (matches calendar display)
+    const newStreak = Math.max(1, daysDiff + 1);
     
     // Update streakHistory to include the current active streak
     // This is required for the Calendar to properly display streak days
@@ -142,10 +143,11 @@ const Tracker = ({ userData, updateUserData }) => {
     if (currentIdx !== -1) {
       history[currentIdx] = { ...history[currentIdx], end: now, days: streak, reason: 'relapse' };
     }
-    history.push({ start: now, end: null, days: 0 });
+    // ONE-BASED COUNTING: New streak starts at Day 1
+    history.push({ start: now, end: null, days: 1 });
 
     updateUserData({
-      currentStreak: 0,
+      currentStreak: 1,
       startDate: now,
       streakHistory: history,
       lastRelapse: now, 

@@ -63,12 +63,27 @@ async function getLeaderboardUsers() {
  * Uses display name if available, falls back to username
  */
 function formatLeaderboardEmbed(users) {
+  // Generate timestamp in EST
+  const now = new Date();
+  const estTimestamp = now.toLocaleString('en-US', { 
+    timeZone: 'America/New_York',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+  
   if (!users || users.length === 0) {
     return {
       embeds: [{
         color: 0x000000,
         title: 'LEADERBOARD',
-        description: '```\nNo one on the board yet.\n```'
+        url: 'https://titantrack.app',
+        description: '```\nNo one on the board yet.\n```',
+        footer: {
+          text: `Updated ${estTimestamp} EST • titantrack.app`
+        }
       }]
     };
   }
@@ -92,7 +107,11 @@ function formatLeaderboardEmbed(users) {
     embeds: [{
       color: 0x000000,
       title: 'LEADERBOARD',
-      description: `\`\`\`\n${leaderboardText}\`\`\``
+      url: 'https://titantrack.app',
+      description: `\`\`\`\n${leaderboardText}\`\`\``,
+      footer: {
+        text: `Updated ${estTimestamp} EST • titantrack.app`
+      }
     }]
   };
   

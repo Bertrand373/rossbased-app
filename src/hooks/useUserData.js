@@ -112,9 +112,10 @@ export const useUserData = () => {
       processed.startDate = new Date(processed.startDate);
       
       // SYNC STREAK ON APP LOAD - ensures accuracy after days away
+      // ONE-BASED COUNTING: Day 1 = start day (matches calendar display)
       const today = new Date();
       const daysDiff = Math.floor((today - processed.startDate) / (1000 * 60 * 60 * 24));
-      processed.currentStreak = Math.max(0, daysDiff);
+      processed.currentStreak = Math.max(1, daysDiff + 1);
       
       // Also update longestStreak if current exceeds it
       if (processed.currentStreak > (processed.longestStreak || 0)) {
