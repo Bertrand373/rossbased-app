@@ -559,25 +559,6 @@
   border-color: rgba(255, 71, 87, 0.5);
 }
 
-.btn-danger-filled {
-  padding: 16px 24px;
-  background: rgba(130, 35, 40, 0.9);
-  border: none;
-  border-radius: 12px;
-  color: #ff4757;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-  width: 100%;
-}
-
-.btn-danger-filled:hover {
-  background: rgba(150, 45, 50, 0.95);
-}
-
 /* =============================================================================
    DATA TAB
    ============================================================================= */
@@ -896,6 +877,28 @@
 .confirm-actions .btn-danger {
   width: 100%;
   padding: 14px 20px;
+}
+
+/* Solid maroon delete button style - used in modal */
+.confirm-actions .btn-danger {
+  background: rgba(130, 35, 40, 0.9);
+  border: none;
+}
+
+.confirm-actions .btn-danger:hover {
+  background: rgba(150, 45, 50, 0.95);
+}
+
+/* Data tab delete button - matches modal exactly */
+.data-row-danger .btn-danger {
+  width: 100%;
+  padding: 14px 20px;
+  background: rgba(130, 35, 40, 0.9);
+  border: none;
+}
+
+.data-row-danger .btn-danger:hover {
+  background: rgba(150, 45, 50, 0.95);
 }
 
 /* =============================================================================
