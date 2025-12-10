@@ -1,5 +1,6 @@
 // server/services/leaderboardService.js
 // Discord Leaderboard & Milestone Announcements
+// With htmlcsstoimage.com integration for avatar display
 
 const User = require('../models/User');
 const mongoose = require('mongoose');
@@ -14,6 +15,10 @@ const Settings = mongoose.models.Settings || mongoose.model('Settings', settings
 // Webhook URLs from environment
 const LEADERBOARD_WEBHOOK = process.env.DISCORD_LEADERBOARD_WEBHOOK;
 const MILESTONE_WEBHOOK = process.env.DISCORD_MILESTONE_WEBHOOK || LEADERBOARD_WEBHOOK;
+
+// htmlcsstoimage.com credentials
+const HCTI_USER_ID = process.env.HCTI_USER_ID;
+const HCTI_API_KEY = process.env.HCTI_API_KEY;
 
 // Milestone thresholds for Discord announcements
 const MILESTONE_DAYS = [30, 90, 180, 365];
@@ -51,6 +56,142 @@ function calculateStreakFromStartDate(startDate) {
 }
 
 /**
+ * Get Discord avatar URL for a user
+ * Falls back to default Discord avatar if no custom avatar
+ */
+function getDiscordAvatarUrl(discordId, avatarHash, size = 64) {
+  if (avatarHash && discordId) {
+    // User has a custom avatar
+    const extension = avatarHash.startsWith('a_') ? 'gif' : 'png';
+    return `https://cdn.discordapp.com/avatars/${discordId}/${avatarHash}.${extension}?size=${size}`;
+  } else if (discordId) {
+    // Default avatar based on user ID (Discord's new system)
+    const defaultIndex = (BigInt(discordId) >> 22n) % 6n;
+    return `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
+  }
+  // Fallback - generic default
+  return `https://cdn.discordapp.com/embed/avatars/0.png`;
+}
+
+/**
+ * Generate HTML for leaderboard image
+ */
+function generateLeaderboardHTML(users) {
+  const rows = users.map((user, index) => {
+    const rank = index + 1;
+    const displayName = user.discordDisplayName || user.discordUsername || 'Unknown';
+    const truncatedName = displayName.length > 16 ? displayName.substring(0, 15) + '…' : displayName;
+    const avatarUrl = getDiscordAvatarUrl(user.discordId, user.discordAvatar, 64);
+    const days = user.currentStreak || 0;
+    
+    // Highlight top 3
+    let rankStyle = 'color: rgba(255,255,255,0.5);';
+    if (rank === 1) rankStyle = 'color: #FFD700;'; // Gold
+    else if (rank === 2) rankStyle = 'color: #C0C0C0;'; // Silver
+    else if (rank === 3) rankStyle = 'color: #CD7F32;'; // Bronze
+    
+    return `
+      <div style="display: flex; align-items: center; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);">
+        <span style="width: 28px; font-size: 14px; font-weight: 600; ${rankStyle}">${rank}</span>
+        <img src="${avatarUrl}" style="width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; object-fit: cover;" />
+        <span style="flex: 1; font-size: 14px; color: #ffffff; font-weight: 500;">${truncatedName}</span>
+        <span style="font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; font-variant-numeric: tabular-nums;">${days}d</span>
+      </div>
+    `;
+  }).join('');
+
+  // Generate timestamp in EST
+  const now = new Date();
+  const estTimestamp = now.toLocaleString('en-US', { 
+    timeZone: 'America/New_York',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </head>
+    <body style="margin: 0; padding: 0; background: #000000; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+      <div style="width: 380px; background: #000000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);">
+        
+        <!-- Header -->
+        <div style="padding: 20px 16px 16px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); letter-spacing: 0.1em; margin-bottom: 4px;">TITANTRACK</div>
+          <div style="font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: -0.02em;">LEADERBOARD</div>
+        </div>
+        
+        <!-- User Rows -->
+        <div style="padding: 4px 0;">
+          ${rows}
+        </div>
+        
+        <!-- Footer -->
+        <div style="padding: 14px 16px; text-align: center; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 11px; color: rgba(255,255,255,0.3);">titantrack.app • ${estTimestamp} EST</div>
+        </div>
+        
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Generate leaderboard image using htmlcsstoimage.com
+ * Returns image URL or null if failed
+ */
+async function generateLeaderboardImage(users) {
+  if (!HCTI_USER_ID || !HCTI_API_KEY) {
+    console.log('⚠️ HCTI credentials not configured - skipping image generation');
+    return null;
+  }
+
+  if (!users || users.length === 0) {
+    return null;
+  }
+
+  try {
+    const html = generateLeaderboardHTML(users);
+    
+    const response = await fetch('https://hcti.io/v1/image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic ' + Buffer.from(`${HCTI_USER_ID}:${HCTI_API_KEY}`).toString('base64')
+      },
+      body: JSON.stringify({
+        html: html,
+        css: '', // CSS is inline
+        google_fonts: 'Inter',
+        selector: 'div', // Capture the main container
+        ms_delay: 500, // Wait for fonts to load
+        device_scale: 2 // Retina quality
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ HCTI API error:', response.status, errorText);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log('✅ Leaderboard image generated:', data.url);
+    return data.url;
+
+  } catch (error) {
+    console.error('❌ Error generating leaderboard image:', error);
+    return null;
+  }
+}
+
+/**
  * Fetch top 13 users for leaderboard
  * Now calculates streak dynamically from startDate for accuracy
  */
@@ -82,9 +223,9 @@ async function getLeaderboardUsers() {
 
 /**
  * Format leaderboard for Discord embed
- * Uses display name if available, falls back to username
+ * Uses image if available, falls back to text
  */
-function formatLeaderboardEmbed(users) {
+function formatLeaderboardEmbed(users, imageUrl = null) {
   // Generate timestamp in EST
   const now = new Date();
   const estTimestamp = now.toLocaleString('en-US', { 
@@ -110,12 +251,27 @@ function formatLeaderboardEmbed(users) {
     };
   }
   
-  // Build the leaderboard rows
+  // If we have an image, use a minimal embed with just the image
+  if (imageUrl) {
+    return {
+      embeds: [{
+        color: 0x000000,
+        url: 'https://titantrack.app',
+        image: {
+          url: imageUrl
+        },
+        footer: {
+          text: `Join at titantrack.app`
+        }
+      }]
+    };
+  }
+  
+  // Fallback: Text-only leaderboard
   let leaderboardText = '';
   
   users.forEach((user, index) => {
     const rank = String(index + 1).padStart(2, ' ');
-    // Use display name if available, otherwise fall back to username
     const displayName = user.discordDisplayName || user.discordUsername;
     const name = displayName.length > 14 
       ? displayName.substring(0, 13) + '…' 
@@ -125,7 +281,7 @@ function formatLeaderboardEmbed(users) {
     leaderboardText += `${rank}  ${name} ${days}\n`;
   });
   
-  const embed = {
+  return {
     embeds: [{
       color: 0x000000,
       title: 'LEADERBOARD',
@@ -136,8 +292,6 @@ function formatLeaderboardEmbed(users) {
       }
     }]
   };
-  
-  return embed;
 }
 
 /**
@@ -151,7 +305,11 @@ async function postLeaderboardToDiscord() {
   
   try {
     const users = await getLeaderboardUsers();
-    const embed = formatLeaderboardEmbed(users);
+    
+    // Try to generate image with avatars
+    const imageUrl = await generateLeaderboardImage(users);
+    
+    const embed = formatLeaderboardEmbed(users, imageUrl);
     
     // Check if we have an existing message to edit
     const existingMessageId = await getSetting('leaderboard_message_id');
