@@ -219,11 +219,26 @@ async function getLeaderboardUsers() {
 }
 
 /**
- * Format leaderboard for Discord
- * Uses content-only approach with image for cleaner display (no grey embed wrapper)
+ * Download image from URL and return as Buffer
  */
-function formatLeaderboardMessage(users, imageUrl = null) {
-  // Generate timestamp in EST
+async function downloadImage(imageUrl) {
+  try {
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to download image: ${response.status}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch (error) {
+    console.error('❌ Error downloading image:', error);
+    return null;
+  }
+}
+
+/**
+ * Format fallback text leaderboard (when image fails)
+ */
+function formatTextLeaderboard(users) {
   const now = new Date();
   const estTimestamp = now.toLocaleString('en-US', { 
     timeZone: 'America/New_York',
@@ -233,7 +248,7 @@ function formatLeaderboardMessage(users, imageUrl = null) {
     minute: '2-digit',
     hour12: true
   });
-  
+
   if (!users || users.length === 0) {
     return {
       embeds: [{
@@ -241,29 +256,12 @@ function formatLeaderboardMessage(users, imageUrl = null) {
         title: 'LEADERBOARD',
         url: 'https://titantrack.app',
         description: '```\nNo one on the board yet.\n```\n[Join the leaderboard →](https://titantrack.app)',
-        footer: {
-          text: `Updated ${estTimestamp} EST`
-        }
+        footer: { text: `Updated ${estTimestamp} EST` }
       }]
     };
   }
   
-  // If we have an image, use minimal embed (hides ugly URL, minimal wrapper)
-  if (imageUrl) {
-    return {
-      embeds: [{
-        color: 0x000000,
-        image: {
-          url: imageUrl
-        }
-      }],
-      content: '**[Join the leaderboard →](<https://titantrack.app>)**'
-    };
-  }
-  
-  // Fallback: Text-only leaderboard with embed
   let leaderboardText = '';
-  
   users.forEach((user, index) => {
     const rank = String(index + 1).padStart(2, ' ');
     const displayName = user.discordDisplayName || user.discordUsername;
@@ -271,7 +269,6 @@ function formatLeaderboardMessage(users, imageUrl = null) {
       ? displayName.substring(0, 13) + '…' 
       : displayName.padEnd(14, ' ');
     const days = String(user.currentStreak || 0).padStart(4, ' ') + 'd';
-    
     leaderboardText += `${rank}  ${name} ${days}\n`;
   });
   
@@ -281,15 +278,14 @@ function formatLeaderboardMessage(users, imageUrl = null) {
       title: 'LEADERBOARD',
       url: 'https://titantrack.app',
       description: `\`\`\`\n${leaderboardText}\`\`\`\n[Join the leaderboard →](https://titantrack.app)`,
-      footer: {
-        text: `Updated ${estTimestamp} EST`
-      }
+      footer: { text: `Updated ${estTimestamp} EST` }
     }]
   };
 }
 
 /**
  * Post leaderboard to Discord (or edit existing)
+ * Uses file attachment for clean image display (no embed wrapper)
  */
 async function postLeaderboardToDiscord() {
   if (!LEADERBOARD_WEBHOOK) {
@@ -303,48 +299,112 @@ async function postLeaderboardToDiscord() {
     // Try to generate image with avatars
     const imageUrl = await generateLeaderboardImage(users);
     
-    const message = formatLeaderboardMessage(users, imageUrl);
+    let messagePayload;
+    let useFormData = false;
+    let imageBuffer = null;
+    
+    if (imageUrl) {
+      // Download the image to upload as attachment
+      imageBuffer = await downloadImage(imageUrl);
+      if (imageBuffer) {
+        useFormData = true;
+      }
+    }
     
     // Check if we have an existing message to edit
     const existingMessageId = await getSetting('leaderboard_message_id');
     
-    if (existingMessageId) {
-      // Try to edit existing message
-      const editUrl = `${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`;
-      const editResponse = await fetch(editUrl, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(message)
+    if (useFormData && imageBuffer) {
+      // Create form data with image attachment
+      const FormData = (await import('form-data')).default;
+      const formData = new FormData();
+      
+      // Add the image file
+      formData.append('files[0]', imageBuffer, {
+        filename: 'leaderboard.png',
+        contentType: 'image/png'
       });
       
-      if (editResponse.ok) {
-        console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
-        return true;
-      } else {
-        console.log('⚠️ Could not edit existing message, posting new one...');
+      // Add the message content (clickable link)
+      const payload = {
+        content: '**[Join the leaderboard →](<https://titantrack.app>)**'
+      };
+      formData.append('payload_json', JSON.stringify(payload));
+      
+      if (existingMessageId) {
+        // Try to edit existing message
+        const editUrl = `${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`;
+        const editResponse = await fetch(editUrl, {
+          method: 'PATCH',
+          body: formData,
+          headers: formData.getHeaders()
+        });
+        
+        if (editResponse.ok) {
+          console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
+          return true;
+        } else {
+          console.log('⚠️ Could not edit existing message, posting new one...');
+        }
       }
+      
+      // Post new message with attachment
+      const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
+        method: 'POST',
+        body: formData,
+        headers: formData.getHeaders()
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
+      }
+      
+      const data = await response.json();
+      if (data.id) {
+        await setSetting('leaderboard_message_id', data.id);
+        console.log(`✅ Leaderboard posted to Discord with attachment (message ID: ${data.id})`);
+      }
+      
+      return true;
+      
+    } else {
+      // Fallback: Text-only leaderboard
+      messagePayload = formatTextLeaderboard(users);
+      
+      if (existingMessageId) {
+        const editUrl = `${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`;
+        const editResponse = await fetch(editUrl, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(messagePayload)
+        });
+        
+        if (editResponse.ok) {
+          console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
+          return true;
+        }
+      }
+      
+      const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(messagePayload)
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
+      }
+      
+      const data = await response.json();
+      if (data.id) {
+        await setSetting('leaderboard_message_id', data.id);
+        console.log(`✅ Leaderboard posted to Discord (message ID: ${data.id})`);
+      }
+      
+      return true;
     }
-    
-    // Post new message
-    const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(message)
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
-    }
-    
-    // Save message ID for future edits
-    const data = await response.json();
-    if (data.id) {
-      await setSetting('leaderboard_message_id', data.id);
-      console.log(`✅ Leaderboard posted to Discord (message ID: ${data.id})`);
-    }
-    
-    return true;
   } catch (error) {
     console.error('❌ Failed to post leaderboard to Discord:', error);
     return false;
