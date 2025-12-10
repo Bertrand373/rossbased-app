@@ -65,8 +65,9 @@
   padding: 0;
 }
 
-/* When benefits exist, use flex layout for sticky header/footer */
-.calendar-modal.has-benefits {
+/* When benefits exist OR scrollable content class, use flex layout for sticky header/footer */
+.calendar-modal.has-benefits,
+.calendar-modal.has-scrollable-content {
   display: flex;
   flex-direction: column;
   overflow-y: hidden;
@@ -571,34 +572,43 @@
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.4);
   line-height: 1.5;
-  margin: 0 0 32px 0;
+  margin: 0 0 40px 0;
 }
 
-/* Edit options */
+/* =============================================================================
+   EDIT OPTIONS - Action buttons for editing day
+   ============================================================================= */
+
 .calendar-edit-options {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 32px;
 }
 
 .calendar-option-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+  width: 100%;
   padding: 16px 24px;
   border-radius: 12px;
   font-size: 0.9375rem;
   font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
   transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   border: none;
-  width: 100%;
-  font-family: inherit;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
 }
 
-/* Option dot */
+.calendar-option-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* Option dots (status indicators) */
 .calendar-option-btn .option-dot {
   width: 8px;
   height: 8px;
@@ -606,94 +616,62 @@
   flex-shrink: 0;
 }
 
-/* Streak button - WHITE with green dot */
-.calendar-option-streak {
-  background: #ffffff;
-  color: #000000;
-}
-
-.calendar-option-streak .option-dot {
-  background-color: #34d399;
-}
-
-.calendar-option-streak:hover {
-  opacity: 0.9;
-}
-
-/* Wet dream button - subtle with amber dot */
-.calendar-option-wetdream {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.calendar-option-wetdream .option-dot {
-  background-color: #fbbf24;
-}
-
-.calendar-option-wetdream:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-/* Remove wet dream button - subtle with amber dot */
-.calendar-option-remove-wetdream {
-  background: rgba(251, 191, 36, 0.1);
-  color: rgba(251, 191, 36, 0.8);
-}
-
-.calendar-option-remove-wetdream .option-dot {
-  background-color: #fbbf24;
-}
-
-.calendar-option-remove-wetdream:hover {
-  background: rgba(251, 191, 36, 0.15);
-  color: #fbbf24;
-}
-
-/* Relapse button with red dot */
-.calendar-option-relapse {
-  background: rgba(255, 59, 48, 0.1);
-  color: #ff3b30;
-}
-
-.calendar-option-relapse .option-dot {
+.calendar-option-btn .option-dot.relapse {
   background-color: #f87171;
 }
 
-.calendar-option-relapse:hover {
-  background: rgba(255, 59, 48, 0.15);
+.calendar-option-btn .option-dot.wet-dream {
+  background-color: #fbbf24;
+}
+
+/* Danger variant (relapse) */
+.calendar-option-btn.calendar-option-danger {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+}
+
+.calendar-option-btn.calendar-option-danger:hover {
+  background: rgba(248, 113, 113, 0.15);
+}
+
+/* Warning variant (wet dream) */
+.calendar-option-btn.calendar-option-warning {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+}
+
+.calendar-option-btn.calendar-option-warning:hover {
+  background: rgba(251, 191, 36, 0.15);
 }
 
 /* =============================================================================
-   TRIGGER SELECTION - List style (matches Urge Toolkit)
+   TRIGGER SELECTION
    ============================================================================= */
 
 .calendar-trigger-section {
-  margin-bottom: 32px;
+  text-align: left;
 }
 
 .calendar-triggers-label {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 16px;
   text-align: center;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
 }
 
 .calendar-triggers-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
 .calendar-trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 14px 0;
+  padding: 16px 0;
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.5);
