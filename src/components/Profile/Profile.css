@@ -559,6 +559,25 @@
   border-color: rgba(255, 71, 87, 0.5);
 }
 
+.btn-danger-filled {
+  padding: 16px 24px;
+  background: rgba(130, 35, 40, 0.9);
+  border: none;
+  border-radius: 12px;
+  color: #ff4757;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+}
+
+.btn-danger-filled:hover {
+  background: rgba(150, 45, 50, 0.95);
+}
+
 /* =============================================================================
    DATA TAB
    ============================================================================= */

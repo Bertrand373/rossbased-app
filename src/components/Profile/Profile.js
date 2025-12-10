@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
 import { useNotifications } from '../../hooks/useNotifications';
+import trackerLogo from '../../assets/trackerapplogo.png';
 
 // Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
@@ -803,7 +804,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <span className="data-title data-title-danger">Delete Account</span>
                 <span className="data-desc">Permanently remove all data</span>
               </div>
-              <button className="btn-danger" onClick={() => setShowDeleteConfirm(true)}>
+              <button className="btn-danger-filled" onClick={() => setShowDeleteConfirm(true)}>
                 Delete Account
               </button>
             </div>
@@ -816,7 +817,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             {/* Brand */}
             <div className="about-brand">
               <img 
-                src="/holdtheflame_logo.png" 
+                src={trackerLogo} 
                 alt="TitanTrack" 
                 className="about-logo"
               />
