@@ -32,6 +32,34 @@
 }
 
 /* =============================================================================
+   HIDDEN GOOGLE BUTTON - Bulletproof invisibility during OAuth flow
+   ============================================================================= */
+
+.google-hidden-button {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: -9999 !important;
+}
+
+.google-hidden-button * {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* =============================================================================
    MODAL - Floating, transparent, consistent width
    ============================================================================= */
 

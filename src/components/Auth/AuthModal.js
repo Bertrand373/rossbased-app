@@ -92,7 +92,9 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     if (googleLoaded && window.google?.accounts?.id && googleButtonRef.current && !googleButtonRendered) {
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleResponse
+        callback: handleGoogleResponse,
+        cancel_on_tap_outside: false,
+        auto_select: false
       });
       
       window.google.accounts.id.renderButton(
@@ -245,9 +247,19 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     }
   };
 
+  // Hidden Google button - ALWAYS rendered to prevent layout issues during OAuth
+  const hiddenGoogleButton = (
+    <div 
+      ref={googleButtonRef} 
+      className="google-hidden-button"
+      aria-hidden="true"
+    />
+  );
+
   if (isLoading) {
     return (
       <div className="auth-overlay">
+        {hiddenGoogleButton}
         <div className="auth-modal" onClick={e => e.stopPropagation()}>
           <div className="auth-loading">
             <img 
@@ -263,19 +275,8 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   
   return (
     <div className="auth-overlay" onClick={handleOverlayClick}>
+      {hiddenGoogleButton}
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
-        
-        <div 
-          ref={googleButtonRef} 
-          style={{ 
-            position: 'absolute', 
-            opacity: 0, 
-            pointerEvents: 'none',
-            width: 0,
-            height: 0,
-            overflow: 'hidden'
-          }} 
-        />
         
         <div className="auth-header">
           <h2>{isLogin ? 'Welcome back' : 'Create account'}</h2>
