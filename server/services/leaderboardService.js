@@ -248,10 +248,16 @@ function formatLeaderboardMessage(users, imageUrl = null) {
     };
   }
   
-  // If we have an image, send it with a clickable link below
+  // If we have an image, use minimal embed (hides ugly URL, minimal wrapper)
   if (imageUrl) {
     return {
-      content: `${imageUrl}\n\n**[Join the leaderboard →](<https://titantrack.app>)**`
+      embeds: [{
+        color: 0x000000,
+        image: {
+          url: imageUrl
+        }
+      }],
+      content: '**[Join the leaderboard →](<https://titantrack.app>)**'
     };
   }
   
