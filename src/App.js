@@ -31,6 +31,9 @@ import { useUserData } from './hooks/useUserData';
 // AMBIENT AI HOOKS - Auto-train only (risk indicator removed, floating card handles alerts)
 import { useAutoTrain } from './hooks/useAutoTrain';
 
+// Mixpanel Analytics
+import { initMixpanel, identifyUser, trackAppOpen, trackPageView, trackLogout, resetMixpanel } from './utils/mixpanel';
+
 // Profile Button - Minimal circle
 const ProfileButton = ({ userData }) => {
   const navigate = useNavigate();
@@ -160,6 +163,69 @@ const LogoutRedirect = ({ isLoggedIn }) => {
   return null;
 };
 
+// Mixpanel Analytics Tracker - handles init, user ID, and page views
+const MixpanelTracker = ({ isLoggedIn, userData }) => {
+  const location = useLocation();
+  const hasInitialized = React.useRef(false);
+  const hasIdentified = React.useRef(false);
+  const previousPath = React.useRef(null);
+
+  // Initialize Mixpanel once on first render
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      initMixpanel();
+      trackAppOpen();
+      hasInitialized.current = true;
+      console.log('📊 Mixpanel initialized');
+    }
+  }, []);
+
+  // Identify user when logged in
+  useEffect(() => {
+    if (isLoggedIn && userData?.email && !hasIdentified.current) {
+      identifyUser(userData.email, {
+        email: userData.email,
+        username: userData.username,
+        isPremium: userData.isPremium || false,
+        createdAt: userData.createdAt,
+        currentStreak: userData.currentStreak || 0,
+        longestStreak: userData.longestStreak || 0,
+        totalCheckIns: userData.totalCheckIns || 0,
+        relapseCount: userData.relapseCount || 0
+      });
+      hasIdentified.current = true;
+      console.log('📊 User identified:', userData.email);
+    }
+    
+    // Reset on logout
+    if (!isLoggedIn && hasIdentified.current) {
+      hasIdentified.current = false;
+    }
+  }, [isLoggedIn, userData]);
+
+  // Track page views on route change
+  useEffect(() => {
+    if (isLoggedIn && location.pathname !== previousPath.current) {
+      const pageMap = {
+        '/': 'Tracker',
+        '/calendar': 'Calendar',
+        '/stats': 'Stats',
+        '/timeline': 'Timeline',
+        '/urge-toolkit': 'Urge Toolkit',
+        '/profile': 'Profile',
+        '/urge-prediction': 'AI Prediction',
+        '/ml-training': 'ML Training'
+      };
+      
+      const pageName = pageMap[location.pathname] || location.pathname;
+      trackPageView(pageName);
+      previousPath.current = location.pathname;
+    }
+  }, [location.pathname, isLoggedIn]);
+
+  return null;
+};
+
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
@@ -247,6 +313,7 @@ function App() {
       <ScrollToTop />
       <StaticViewManager />
       <ServiceWorkerListener />
+      <MixpanelTracker isLoggedIn={isLoggedIn} userData={userData} />
       <PostLoginNavigator 
         shouldNavigate={shouldNavigateToTracker} 
         onNavigated={() => setShouldNavigateToTracker(false)} 

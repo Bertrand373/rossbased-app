@@ -12,6 +12,9 @@ import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
 
+// Mixpanel Analytics
+import { trackDailyLog, trackStreakReset } from '../../utils/mixpanel';
+
 // Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
@@ -168,6 +171,10 @@ const Tracker = ({ userData, updateUserData }) => {
     setShowResetConfirm(false);
     setShowStreakOptions(false);
     setResetType(null);
+    
+    // Track relapse in Mixpanel
+    trackStreakReset(streak, 'relapse');
+    
     toast.success('Relapse logged');
   };
 
@@ -212,6 +219,10 @@ const Tracker = ({ userData, updateUserData }) => {
       : [...existing, entry];
 
     updateUserData({ benefitTracking: updated });
+    
+    // Track daily log in Mixpanel
+    trackDailyLog(streak, benefits);
+    
     setShowBenefits(false);
   };
 
