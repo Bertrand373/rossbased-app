@@ -75,31 +75,9 @@ function getDiscordAvatarUrl(discordId, avatarHash, size = 64) {
 
 /**
  * Generate HTML for leaderboard image
+ * Clean design with uniform styling
  */
 function generateLeaderboardHTML(users) {
-  const rows = users.map((user, index) => {
-    const rank = index + 1;
-    const displayName = user.discordDisplayName || user.discordUsername || 'Unknown';
-    const truncatedName = displayName.length > 16 ? displayName.substring(0, 15) + '…' : displayName;
-    const avatarUrl = getDiscordAvatarUrl(user.discordId, user.discordAvatar, 64);
-    const days = user.currentStreak || 0;
-    
-    // Highlight top 3
-    let rankStyle = 'color: rgba(255,255,255,0.5);';
-    if (rank === 1) rankStyle = 'color: #FFD700;'; // Gold
-    else if (rank === 2) rankStyle = 'color: #C0C0C0;'; // Silver
-    else if (rank === 3) rankStyle = 'color: #CD7F32;'; // Bronze
-    
-    return `
-      <div style="display: flex; align-items: center; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);">
-        <span style="width: 28px; font-size: 14px; font-weight: 600; ${rankStyle}">${rank}</span>
-        <img src="${avatarUrl}" style="width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; object-fit: cover;" />
-        <span style="flex: 1; font-size: 14px; color: #ffffff; font-weight: 500;">${truncatedName}</span>
-        <span style="font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; font-variant-numeric: tabular-nums;">${days}d</span>
-      </div>
-    `;
-  }).join('');
-
   // Generate timestamp in EST
   const now = new Date();
   const estTimestamp = now.toLocaleString('en-US', { 
@@ -111,6 +89,24 @@ function generateLeaderboardHTML(users) {
     hour12: true
   });
 
+  const rows = users.map((user, index) => {
+    const rank = index + 1;
+    const displayName = user.discordDisplayName || user.discordUsername || 'Unknown';
+    const truncatedName = displayName.length > 16 ? displayName.substring(0, 15) + '…' : displayName;
+    const avatarUrl = getDiscordAvatarUrl(user.discordId, user.discordAvatar, 64);
+    const days = user.currentStreak || 0;
+    
+    // All ranks same subtle color - clean and uniform
+    return `
+      <div style="display: flex; align-items: center; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);">
+        <span style="width: 28px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.4);">${rank}</span>
+        <img src="${avatarUrl}" style="width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; object-fit: cover;" />
+        <span style="flex: 1; font-size: 14px; color: #ffffff; font-weight: 500;">${truncatedName}</span>
+        <span style="font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; font-variant-numeric: tabular-nums;">${days}d</span>
+      </div>
+    `;
+  }).join('');
+
   return `
     <!DOCTYPE html>
     <html>
@@ -118,22 +114,23 @@ function generateLeaderboardHTML(users) {
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     </head>
     <body style="margin: 0; padding: 0; background: #000000; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
-      <div style="width: 380px; background: #000000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);">
+      <div style="width: 380px; background: #000000; overflow: hidden;">
         
         <!-- Header -->
-        <div style="padding: 20px 16px 16px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06);">
-          <div style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); letter-spacing: 0.1em; margin-bottom: 4px;">TITANTRACK</div>
-          <div style="font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: -0.02em;">LEADERBOARD</div>
+        <div style="padding: 24px 16px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35); letter-spacing: 0.15em; margin-bottom: 6px;">TITANTRACK</div>
+          <div style="font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.02em;">LEADERBOARD</div>
         </div>
         
         <!-- User Rows -->
-        <div style="padding: 4px 0;">
+        <div style="padding: 8px 0;">
           ${rows}
         </div>
         
-        <!-- Footer -->
-        <div style="padding: 14px 16px; text-align: center; border-top: 1px solid rgba(255,255,255,0.06);">
-          <div style="font-size: 11px; color: rgba(255,255,255,0.3);">titantrack.app • ${estTimestamp} EST</div>
+        <!-- Footer with link -->
+        <div style="padding: 16px; text-align: center; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 13px; color: #ffffff; font-weight: 600;">titantrack.app</div>
+          <div style="font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 6px;">${estTimestamp} EST</div>
         </div>
         
       </div>
@@ -167,11 +164,11 @@ async function generateLeaderboardImage(users) {
       },
       body: JSON.stringify({
         html: html,
-        css: '', // CSS is inline
+        css: '',
         google_fonts: 'Inter',
-        selector: 'div', // Capture the main container
-        ms_delay: 500, // Wait for fonts to load
-        device_scale: 2 // Retina quality
+        selector: 'div',
+        ms_delay: 500,
+        device_scale: 2
       })
     });
 
@@ -200,7 +197,7 @@ async function getLeaderboardUsers() {
     const users = await User.find({
       showOnLeaderboard: true,
       discordUsername: { $exists: true, $ne: '', $ne: null },
-      startDate: { $exists: true, $ne: null } // Must have a start date
+      startDate: { $exists: true, $ne: null }
     })
     .select('discordUsername discordDisplayName discordId discordAvatar startDate currentStreak longestStreak mentorEligible verifiedMentor')
     .lean();
@@ -222,10 +219,10 @@ async function getLeaderboardUsers() {
 }
 
 /**
- * Format leaderboard for Discord embed
- * Uses image if available, falls back to text
+ * Format leaderboard for Discord
+ * Uses content-only approach with image for cleaner display (no grey embed wrapper)
  */
-function formatLeaderboardEmbed(users, imageUrl = null) {
+function formatLeaderboardMessage(users, imageUrl = null) {
   // Generate timestamp in EST
   const now = new Date();
   const estTimestamp = now.toLocaleString('en-US', { 
@@ -251,23 +248,14 @@ function formatLeaderboardEmbed(users, imageUrl = null) {
     };
   }
   
-  // If we have an image, use a minimal embed with just the image
+  // If we have an image, send it with a clickable link below
   if (imageUrl) {
     return {
-      embeds: [{
-        color: 0x000000,
-        url: 'https://titantrack.app',
-        image: {
-          url: imageUrl
-        },
-        footer: {
-          text: `Join at titantrack.app`
-        }
-      }]
+      content: `${imageUrl}\n\n**[Join the leaderboard →](<https://titantrack.app>)**`
     };
   }
   
-  // Fallback: Text-only leaderboard
+  // Fallback: Text-only leaderboard with embed
   let leaderboardText = '';
   
   users.forEach((user, index) => {
@@ -309,7 +297,7 @@ async function postLeaderboardToDiscord() {
     // Try to generate image with avatars
     const imageUrl = await generateLeaderboardImage(users);
     
-    const embed = formatLeaderboardEmbed(users, imageUrl);
+    const message = formatLeaderboardMessage(users, imageUrl);
     
     // Check if we have an existing message to edit
     const existingMessageId = await getSetting('leaderboard_message_id');
@@ -320,7 +308,7 @@ async function postLeaderboardToDiscord() {
       const editResponse = await fetch(editUrl, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(embed)
+        body: JSON.stringify(message)
       });
       
       if (editResponse.ok) {
@@ -335,7 +323,7 @@ async function postLeaderboardToDiscord() {
     const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(embed)
+      body: JSON.stringify(message)
     });
     
     if (!response.ok) {
