@@ -102,7 +102,7 @@ const PatternInsightCard = ({ userData }) => {
 
   return (
     <div className={`pattern-insight ${isVisible ? 'visible' : ''} ${isDismissing ? 'dismissing' : ''}`}>
-      <p className="pattern-insight-label">Heads up</p>
+      <p className="pattern-insight-label">Pattern Alert</p>
       <p className="pattern-insight-message">
         Your patterns suggest today may require extra awareness.
       </p>

@@ -96,14 +96,13 @@ function PredictionDisplay({ userData }) {
     return { level: 'low', label: 'Low' };
   };
 
-  // Get current phase name based on streak day
+  // Get current phase name based on streak day - MATCHES EMOTIONAL TIMELINE EXACTLY
   const getCurrentPhaseName = (streakDay) => {
     if (streakDay <= 14) return 'Initial Adaptation';
     if (streakDay <= 45) return 'Emotional Processing';
     if (streakDay <= 90) return 'Mental Expansion';
-    if (streakDay <= 180) return 'Spiritual Awakening';
-    if (streakDay <= 365) return 'Stabilization';
-    return 'Mastery';
+    if (streakDay <= 180) return 'Spiritual Integration';
+    return 'Mastery & Purpose';
   };
 
   // Loading state
