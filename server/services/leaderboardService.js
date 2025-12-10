@@ -299,112 +299,121 @@ async function postLeaderboardToDiscord() {
     // Try to generate image with avatars
     const imageUrl = await generateLeaderboardImage(users);
     
-    let messagePayload;
-    let useFormData = false;
-    let imageBuffer = null;
-    
-    if (imageUrl) {
-      // Download the image to upload as attachment
-      imageBuffer = await downloadImage(imageUrl);
-      if (imageBuffer) {
-        useFormData = true;
-      }
-    }
-    
     // Check if we have an existing message to edit
     const existingMessageId = await getSetting('leaderboard_message_id');
     
-    if (useFormData && imageBuffer) {
-      // Create form data with image attachment
-      const FormData = (await import('form-data')).default;
-      const formData = new FormData();
+    if (imageUrl) {
+      // Download the image to upload as attachment
+      const imageBuffer = await downloadImage(imageUrl);
       
-      // Add the image file
-      formData.append('files[0]', imageBuffer, {
-        filename: 'leaderboard.png',
-        contentType: 'image/png'
-      });
-      
-      // Add the message content (clickable link)
-      const payload = {
-        content: '**[Join the leaderboard →](<https://titantrack.app>)**'
-      };
-      formData.append('payload_json', JSON.stringify(payload));
-      
-      if (existingMessageId) {
-        // Try to edit existing message
-        const editUrl = `${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`;
-        const editResponse = await fetch(editUrl, {
-          method: 'PATCH',
-          body: formData,
-          headers: formData.getHeaders()
+      if (imageBuffer) {
+        // Use form-data package for multipart upload
+        const FormData = require('form-data');
+        const formData = new FormData();
+        
+        // Add the image file
+        formData.append('files[0]', imageBuffer, {
+          filename: 'leaderboard.png',
+          contentType: 'image/png'
         });
         
-        if (editResponse.ok) {
-          console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
-          return true;
-        } else {
-          console.log('⚠️ Could not edit existing message, posting new one...');
-        }
-      }
-      
-      // Post new message with attachment
-      const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
-        method: 'POST',
-        body: formData,
-        headers: formData.getHeaders()
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
-      }
-      
-      const data = await response.json();
-      if (data.id) {
-        await setSetting('leaderboard_message_id', data.id);
-        console.log(`✅ Leaderboard posted to Discord with attachment (message ID: ${data.id})`);
-      }
-      
-      return true;
-      
-    } else {
-      // Fallback: Text-only leaderboard
-      messagePayload = formatTextLeaderboard(users);
-      
-      if (existingMessageId) {
-        const editUrl = `${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`;
-        const editResponse = await fetch(editUrl, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(messagePayload)
-        });
+        // Add the message content
+        formData.append('payload_json', JSON.stringify({
+          content: '**[Join the leaderboard →](<https://titantrack.app>)**',
+          attachments: [{
+            id: 0,
+            filename: 'leaderboard.png'
+          }]
+        }));
         
-        if (editResponse.ok) {
-          console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
-          return true;
+        // For new messages, we need to delete old and post new (can't edit attachments easily)
+        if (existingMessageId) {
+          // Try to delete old message
+          try {
+            await fetch(`${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`, {
+              method: 'DELETE'
+            });
+            console.log('🗑️ Deleted old leaderboard message');
+          } catch (e) {
+            console.log('⚠️ Could not delete old message');
+          }
         }
+        
+        // Post new message with attachment using https module for proper multipart
+        const https = require('https');
+        const url = new URL(`${LEADERBOARD_WEBHOOK}?wait=true`);
+        
+        return new Promise((resolve, reject) => {
+          const request = https.request({
+            hostname: url.hostname,
+            path: url.pathname + url.search,
+            method: 'POST',
+            headers: formData.getHeaders()
+          }, (response) => {
+            let data = '';
+            response.on('data', chunk => data += chunk);
+            response.on('end', async () => {
+              if (response.statusCode === 200) {
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.id) {
+                    await setSetting('leaderboard_message_id', parsed.id);
+                    console.log(`✅ Leaderboard posted with attachment (message ID: ${parsed.id})`);
+                  }
+                  resolve(true);
+                } catch (e) {
+                  console.log('✅ Leaderboard posted');
+                  resolve(true);
+                }
+              } else {
+                console.error('❌ Discord error:', response.statusCode, data);
+                reject(new Error(`Discord failed: ${response.statusCode}`));
+              }
+            });
+          });
+          
+          request.on('error', reject);
+          formData.pipe(request);
+        });
       }
-      
-      const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
-        method: 'POST',
+    }
+    
+    // Fallback: Text-only leaderboard
+    const messagePayload = formatTextLeaderboard(users);
+    
+    if (existingMessageId) {
+      const editUrl = `${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`;
+      const editResponse = await fetch(editUrl, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(messagePayload)
       });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
+      if (editResponse.ok) {
+        console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
+        return true;
       }
-      
-      const data = await response.json();
-      if (data.id) {
-        await setSetting('leaderboard_message_id', data.id);
-        console.log(`✅ Leaderboard posted to Discord (message ID: ${data.id})`);
-      }
-      
-      return true;
     }
+    
+    const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(messagePayload)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Discord webhook failed: ${response.status} - ${errorText}`);
+    }
+    
+    const data = await response.json();
+    if (data.id) {
+      await setSetting('leaderboard_message_id', data.id);
+      console.log(`✅ Leaderboard posted to Discord (message ID: ${data.id})`);
+    }
+    
+    return true;
+    
   } catch (error) {
     console.error('❌ Failed to post leaderboard to Discord:', error);
     return false;
