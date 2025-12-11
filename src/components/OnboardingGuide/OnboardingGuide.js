@@ -216,24 +216,22 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     };
   };
 
-  // Calculate connector line position
+  // Calculate connector line position - follows target element
   const getConnectorStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
     const lineLength = 32;
     
     if (step.position === 'bottom') {
-      // Line goes from bottom of spotlight to tooltip
       return {
-        left: '50%',
+        left: `${targetRect.centerX}px`,
         top: `${targetRect.bottom + padding + 4}px`,
         height: `${lineLength}px`,
         transform: 'translateX(-50%)'
       };
     } else {
-      // Line goes from top of spotlight up to tooltip
       return {
-        left: '50%',
+        left: `${targetRect.centerX}px`,
         bottom: `${window.innerHeight - targetRect.top + padding + 4}px`,
         height: `${lineLength}px`,
         transform: 'translateX(-50%)'
@@ -241,19 +239,19 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     }
   };
 
-  // Get dot position (at end of line, near tooltip)
+  // Get dot position (at end of line, near tooltip) - follows target element
   const getDotStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
     if (step.position === 'bottom') {
       return {
-        left: '50%',
+        left: `${targetRect.centerX}px`,
         top: `${targetRect.bottom + padding + 32}px`,
         transform: 'translateX(-50%)'
       };
     } else {
       return {
-        left: '50%',
+        left: `${targetRect.centerX}px`,
         bottom: `${window.innerHeight - targetRect.top + padding + 32}px`,
         transform: 'translateX(-50%)'
       };
