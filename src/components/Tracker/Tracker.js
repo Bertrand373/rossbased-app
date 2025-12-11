@@ -19,16 +19,15 @@ import { trackDailyLog, trackStreakReset } from '../../utils/mixpanel';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 const Tracker = ({ userData, updateUserData }) => {
-  const [showDatePicker, setShowDatePicker] = useState(!userData.startDate);
+  // FIXED: Only show date picker if user has completed onboarding but hasn't set date
+  const [showDatePicker, setShowDatePicker] = useState(!userData.startDate && userData.hasSeenOnboarding);
   const [showBenefits, setShowBenefits] = useState(false);
   const [showStreakOptions, setShowStreakOptions] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetType, setResetType] = useState(null);
   
-  // Onboarding state - show if user hasn't seen it AND has a start date
-  const [showOnboarding, setShowOnboarding] = useState(
-    !userData.hasSeenOnboarding && userData.startDate
-  );
+  // FIXED: Show onboarding for ANY new user who hasn't seen it
+  const [showOnboarding, setShowOnboarding] = useState(!userData.hasSeenOnboarding);
   
   const [benefits, setBenefits] = useState({ 
     energy: 5, focus: 5, confidence: 5, aura: 5, sleep: 5, workout: 5 
@@ -43,7 +42,7 @@ const Tracker = ({ userData, updateUserData }) => {
   useBodyScrollLock(showBenefits || showStreakOptions || showResetConfirm);
   
   // Use stored currentStreak for consistency across all tabs
-  const streak = userData.currentStreak || 0;
+  const streak = userData.currentStreak || 1;
 
   const todayLogged = userData.benefitTracking?.some(
     b => format(new Date(b.date), 'yyyy-MM-dd') === format(currentTime, 'yyyy-MM-dd')
@@ -88,10 +87,15 @@ const Tracker = ({ userData, updateUserData }) => {
 
   const milestone = getNextMilestone();
 
-  // Handle onboarding complete
+  // FIXED: Handle onboarding complete - show date picker if needed
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
     updateUserData({ hasSeenOnboarding: true });
+    
+    // If new user hasn't set date yet, show date picker after onboarding
+    if (!userData.startDate) {
+      setShowDatePicker(true);
+    }
   };
 
   // Handle onboarding trigger for date picker

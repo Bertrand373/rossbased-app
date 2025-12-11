@@ -139,7 +139,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
   const isLastStep = currentStep === steps.length - 1;
   const padding = step.padding || 8;
 
-  // Calculate tooltip position
+  // Calculate tooltip position - follows target with screen constraints
   const getTooltipStyle = () => {
     if (!targetRect) {
       return {
@@ -151,22 +151,42 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
 
     // Space for the connector line
     const tooltipOffset = 48;
+    const tooltipWidth = 300; // approximate width
+    const screenPadding = 20;
+    
+    // Calculate horizontal position - follow target but stay on screen
+    let leftPos = targetRect.centerX;
+    const minLeft = screenPadding + (tooltipWidth / 2);
+    const maxLeft = window.innerWidth - screenPadding - (tooltipWidth / 2);
+    leftPos = Math.max(minLeft, Math.min(maxLeft, leftPos));
 
     if (step.position === 'bottom') {
       return {
         top: `${targetRect.bottom + padding + tooltipOffset}px`,
-        left: '50%',
+        left: `${leftPos}px`,
         transform: 'translateX(-50%)'
       };
     } else if (step.position === 'top') {
       return {
         bottom: `${window.innerHeight - targetRect.top + padding + tooltipOffset}px`,
-        left: '50%',
+        left: `${leftPos}px`,
         transform: 'translateX(-50%)'
       };
     }
 
     return {};
+  };
+
+  // Get the constrained tooltip X position (for connector alignment)
+  const getTooltipCenterX = () => {
+    if (!targetRect) return window.innerWidth / 2;
+    
+    const tooltipWidth = 300;
+    const screenPadding = 20;
+    let leftPos = targetRect.centerX;
+    const minLeft = screenPadding + (tooltipWidth / 2);
+    const maxLeft = window.innerWidth - screenPadding - (tooltipWidth / 2);
+    return Math.max(minLeft, Math.min(maxLeft, leftPos));
   };
 
   // Get spotlight style - TIGHT, element-specific
@@ -216,43 +236,57 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     };
   };
 
-  // Calculate connector line position - follows target element
+  // Calculate connector line - draws from target to tooltip (may be angled)
   const getConnectorStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
+    const tooltipX = getTooltipCenterX();
+    const targetX = targetRect.centerX;
     const lineLength = 32;
     
+    // Calculate angle and length for angled line
+    const deltaX = tooltipX - targetX;
+    const angle = Math.atan2(deltaX, lineLength) * (180 / Math.PI);
+    const actualLength = Math.sqrt(deltaX * deltaX + lineLength * lineLength);
+    
     if (step.position === 'bottom') {
+      // Tooltip below target - line goes DOWN from target to tooltip
       return {
-        left: `${targetRect.centerX}px`,
+        left: `${targetX}px`,
         top: `${targetRect.bottom + padding + 4}px`,
-        height: `${lineLength}px`,
-        transform: 'translateX(-50%)'
+        height: `${actualLength}px`,
+        transform: `translateX(-50%) rotate(${angle}deg)`,
+        transformOrigin: 'top center'
       };
     } else {
+      // Tooltip above target - line goes UP from target to tooltip
       return {
-        left: `${targetRect.centerX}px`,
+        left: `${targetX}px`,
         bottom: `${window.innerHeight - targetRect.top + padding + 4}px`,
-        height: `${lineLength}px`,
-        transform: 'translateX(-50%)'
+        height: `${actualLength}px`,
+        transform: `translateX(-50%) rotate(${-angle}deg)`,
+        transformOrigin: 'bottom center'
       };
     }
   };
 
-  // Get dot position (at end of line, near tooltip) - follows target element
+  // Get dot position (at tooltip end of line)
   const getDotStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
+    const tooltipX = getTooltipCenterX();
+    const lineLength = 32;
+    
     if (step.position === 'bottom') {
       return {
-        left: `${targetRect.centerX}px`,
-        top: `${targetRect.bottom + padding + 32}px`,
+        left: `${tooltipX}px`,
+        top: `${targetRect.bottom + padding + lineLength + 4}px`,
         transform: 'translateX(-50%)'
       };
     } else {
       return {
-        left: `${targetRect.centerX}px`,
-        bottom: `${window.innerHeight - targetRect.top + padding + 32}px`,
+        left: `${tooltipX}px`,
+        bottom: `${window.innerHeight - targetRect.top + padding + lineLength + 4}px`,
         transform: 'translateX(-50%)'
       };
     }

@@ -5,7 +5,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './StatsInsights.css';
-import './StatsInsights.css';
 
 // ============================================================
 // SECTION 1: YOUR NUMBERS - Always visible, even Day 1
@@ -260,8 +259,8 @@ export const AIInsights = ({
   const getEmptyState = () => {
     if (daysTracked < AI_THRESHOLD) {
       return {
-        message: `${daysTracked}/${AI_THRESHOLD} days tracked`,
-        context: 'AI patterns unlock at 20 days'
+        message: 'Building your personal AI',
+        context: `Log daily to unlock predictions · ${daysTracked}/${AI_THRESHOLD} days`
       };
     }
     if (relapseCount < MIN_RELAPSES) {
