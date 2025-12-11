@@ -46,7 +46,7 @@ router.post('/google', async (req, res) => {
         email,
         password: `google_${googleId}`, // Placeholder, they'll use Google to login
         googleId,
-        startDate: new Date().toISOString().split('T')[0],
+        startDate: null, // Let user set their own start date via DatePicker
         currentStreak: 0,
         longestStreak: 0,
         isPremium: false,
