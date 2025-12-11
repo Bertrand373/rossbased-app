@@ -1,10 +1,12 @@
 // Stats.js - TITANTRACK
 // Matches Landing/Tracker minimalist aesthetic
 // UPDATED: Your Patterns now shows streak-phase proof instead of day-of-week patterns
+// UPDATED: Added Early AI Insights for Day 1 value (PMF fix)
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { FaLightbulb, FaClock, FaChartLine } from 'react-icons/fa';
 import './Stats.css';
 import toast from 'react-hot-toast';
 
@@ -46,6 +48,127 @@ import {
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+// ============================================================
+// EARLY AI INSIGHTS - Shows for users with < 20 days
+// Provides immediate value from Day 1 (PMF fix)
+// ============================================================
+const EarlyAIInsights = ({ currentStreak, daysTracked }) => {
+  // Phase-based insights based on current streak day
+  const getPhaseInsight = () => {
+    const day = currentStreak || 1;
+    
+    if (day <= 7) {
+      return {
+        phase: 'Foundation Phase',
+        days: 'Days 1-7',
+        insight: 'Dopamine receptors beginning to upregulate. Withdrawal symptoms peak around days 3-5.',
+        tip: 'Focus on sleep quality and physical activity to accelerate recovery.'
+      };
+    } else if (day <= 14) {
+      return {
+        phase: 'Adaptation Phase', 
+        days: 'Days 8-14',
+        insight: 'Brain chemistry stabilizing. Many report improved mental clarity emerging.',
+        tip: 'Channel increased energy into productive habits. Avoid isolation.'
+      };
+    } else if (day <= 30) {
+      return {
+        phase: 'Stabilization Phase',
+        days: 'Days 15-30',
+        insight: 'Neuroplasticity accelerating. New neural pathways forming around healthier behaviors.',
+        tip: 'This is when habits solidify. Consistency now pays compound dividends.'
+      };
+    } else if (day <= 60) {
+      return {
+        phase: 'Emergence Phase',
+        days: 'Days 31-60',
+        insight: 'Significant hormonal optimization occurring. Confidence and drive typically peak.',
+        tip: 'Use this momentum for challenging goals. Your capacity is elevated.'
+      };
+    } else {
+      return {
+        phase: 'Power Phase',
+        days: 'Days 60+',
+        insight: 'Deep neurological rewiring complete. Benefits become your new baseline.',
+        tip: 'Focus on maintaining rather than forcing. You\'ve built something real.'
+      };
+    }
+  };
+  
+  // Common risk windows based on research
+  const riskPatterns = [
+    { time: 'Late Night', risk: 'high', detail: '10pm - 2am' },
+    { time: 'Weekend Mornings', risk: 'medium', detail: 'Unstructured time' },
+    { time: 'After Stress', risk: 'high', detail: 'Emotional regulation' }
+  ];
+  
+  const phaseInsight = getPhaseInsight();
+  const progressPercent = Math.min(100, Math.round((daysTracked / 20) * 100));
+  
+  return (
+    <div className="insight-card early-insights">
+      <div className="insight-card-header">
+        <span>AI Insights</span>
+        <span className="header-sub">Building your profile</span>
+      </div>
+      <div className="insight-card-content">
+        
+        {/* Phase Card */}
+        <div className="early-insight-card phase-card">
+          <div className="insight-header">
+            <FaLightbulb className="insight-icon" />
+            <div className="insight-title-group">
+              <span className="insight-title">{phaseInsight.phase}</span>
+              <span className="insight-days">{phaseInsight.days}</span>
+            </div>
+          </div>
+          <p className="insight-text">{phaseInsight.insight}</p>
+          <p className="insight-tip">{phaseInsight.tip}</p>
+        </div>
+        
+        {/* Risk Patterns Card */}
+        <div className="early-insight-card patterns-card">
+          <div className="insight-header">
+            <FaClock className="insight-icon" />
+            <span className="insight-title">Common Risk Windows</span>
+          </div>
+          <div className="time-patterns">
+            {riskPatterns.map((pattern, idx) => (
+              <div key={idx} className="time-pattern-item">
+                <span className="pattern-time">{pattern.time}</span>
+                <span className="pattern-detail">{pattern.detail}</span>
+                <span className={`pattern-risk ${pattern.risk}`}>
+                  {pattern.risk === 'high' ? '●' : '○'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Progress Card */}
+        <div className="early-insight-card progress-card">
+          <div className="insight-header">
+            <FaChartLine className="insight-icon" />
+            <span className="insight-title">AI Learning Progress</span>
+          </div>
+          <div className="progress-content">
+            <div className="progress-bar-container">
+              <div 
+                className="progress-bar-fill" 
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <p className="progress-text">
+              {daysTracked}/20 days · AI unlocks personalized insights automatically
+            </p>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  );
+};
 
 const Stats = ({ userData, isPremium, updateUserData }) => {
   const [selectedMetric, setSelectedMetric] = useState('energy');
@@ -340,7 +463,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const confirmResetStreak = async () => {
     try {
       await updateUserData({
-        currentStreak: 0,
+        currentStreak: 1,
         startDate: new Date()
       });
       setShowResetStreakModal(false);
@@ -353,7 +476,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const confirmResetAll = async () => {
     try {
       await updateUserData({
-        currentStreak: 0,
+        currentStreak: 1,
         longestStreak: 0,
         wetDreamCount: 0,
         relapseCount: 0,
@@ -382,7 +505,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       {/* Stat Cards - Landing page style with dividers */}
       <div className="stat-grid">
         <button className="stat-card" onClick={() => handleStatCardClick('currentStreak')}>
-          <span className="stat-num">{safeUserData.currentStreak || 0}</span>
+          <span className="stat-num">{safeUserData.currentStreak || 1}</span>
           <span className="stat-label">Current</span>
         </button>
         <div className="stat-divider" />
@@ -483,7 +606,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           <div className="free-section">
             <div className="free-card">
               <h3>Phase Context</h3>
-              <p>Day {safeUserData.currentStreak || 0} · {memoizedInsights.phaseInfo?.name || 'Initial Adaptation'}</p>
+              <p>Day {safeUserData.currentStreak || 1} · {memoizedInsights.phaseInfo?.name || 'Initial Adaptation'}</p>
             </div>
             <div className="upgrade-card">
               <p>Unlock detailed analytics and personalized optimization</p>
@@ -496,6 +619,15 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         {isPremium && (
           <>
             <div className="analytics-stack">
+              
+              {/* NEW: Early AI Insights - Shows for < 20 days */}
+              {daysTracked < 20 && (
+                <EarlyAIInsights 
+                  currentStreak={safeUserData.currentStreak || 1}
+                  daysTracked={daysTracked}
+                />
+              )}
+              
               {/* Section 1: Your Numbers - Always visible */}
               <YourNumbers
                 metricAverages={memoizedInsights.metricAverages}
@@ -596,7 +728,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         <div className="overlay">
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h2>Reset Streak?</h2>
-            <p className="modal-text">This will reset your current streak to 0. Your history and benefits data will be kept.</p>
+            <p className="modal-text">This will reset your current streak to Day 1. Your history and benefits data will be kept.</p>
             <div className="modal-buttons">
               <button className="btn-ghost" onClick={() => setShowResetStreakModal(false)}>Cancel</button>
               <button className="btn-danger" onClick={confirmResetStreak}>Reset Streak</button>

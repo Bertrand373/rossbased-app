@@ -1363,3 +1363,208 @@
     transition: none;
   }
 }
+
+/* =============================================================================
+   EARLY AI INSIGHTS - Day 1 Value (PMF)
+   Premium cards that feel special but still TitanTrack minimal
+   ============================================================================= */
+
+.early-insights .insight-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.early-insights .header-sub {
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.2);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Individual insight cards - subtle boxes like milestone-card.earned */
+.early-insight-card {
+  background: rgba(255, 221, 0, 0.02);
+  border: 1px solid rgba(255, 221, 0, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: border-color 150ms ease;
+}
+
+.early-insight-card:last-child {
+  margin-bottom: 0;
+}
+
+.early-insight-card:hover {
+  border-color: rgba(255, 221, 0, 0.12);
+}
+
+/* Card headers */
+.early-insight-card .insight-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.early-insight-card .insight-icon {
+  font-size: 0.875rem;
+  color: rgba(255, 221, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.early-insight-card .insight-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.early-insight-card .insight-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.early-insight-card .insight-days {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Card content */
+.early-insight-card .insight-text {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+  margin: 0 0 10px 0;
+}
+
+.early-insight-card .insight-tip {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Time Patterns - Risk windows */
+.time-patterns {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.time-pattern-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.time-pattern-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pattern-time {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 100px;
+}
+
+.pattern-detail {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  flex: 1;
+  text-align: center;
+}
+
+.pattern-risk {
+  font-size: 0.6875rem;
+  width: 16px;
+  text-align: center;
+}
+
+.pattern-risk.high {
+  color: rgba(248, 113, 113, 0.8);
+}
+
+.pattern-risk.medium {
+  color: rgba(251, 191, 36, 0.7);
+}
+
+.pattern-risk.low {
+  color: rgba(52, 211, 153, 0.6);
+}
+
+/* Progress Card - AI Learning */
+.progress-card .progress-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .early-insight-card {
+    padding: 14px;
+  }
+  
+  .early-insight-card .insight-title {
+    font-size: 0.8125rem;
+  }
+  
+  .early-insight-card .insight-text {
+    font-size: 0.75rem;
+  }
+  
+  .pattern-time {
+    font-size: 0.75rem;
+    min-width: 80px;
+  }
+  
+  .pattern-detail {
+    font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .early-insight-card {
+    padding: 12px;
+  }
+  
+  .early-insight-card .insight-header {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .early-insight-card .insight-icon {
+    font-size: 0.75rem;
+  }
+}
