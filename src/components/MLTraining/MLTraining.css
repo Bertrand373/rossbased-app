@@ -1,5 +1,6 @@
 /* src/components/MLTraining/MLTraining.css */
 /* UPDATED: Standalone header, explanation in banner, compact stats like Stats tab */
+/* INCLUDES: Early Insights styles for Day 1 value */
 
 .ml-training-container {
   max-width: 100%;
@@ -301,6 +302,13 @@
   font-weight: 600;
 }
 
+.ml-training-container .requirements-list h4 {
+  color: var(--text);
+  font-size: 0.875rem;
+  margin: 0 0 var(--spacing-md) 0;
+  font-weight: 600;
+}
+
 .ml-training-container .requirement-item {
   display: flex;
   align-items: center;
@@ -325,6 +333,16 @@
 
 .ml-training-container .requirement-item .cross {
   color: var(--danger);
+}
+
+.ml-training-container .requirement-item .pending {
+  font-size: 0.875rem;
+  min-width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  opacity: 0.5;
 }
 
 .ml-training-container .recommendation {
@@ -480,6 +498,13 @@
   font-weight: 600;
 }
 
+.ml-training-container .training-complete-section h2 {
+  color: var(--text);
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
 .ml-training-container .success-message {
   color: var(--text-secondary);
   font-size: 1rem;
@@ -603,18 +628,225 @@
   transform: translateY(-1px);
 }
 
+/* ============================================================
+   EARLY INSIGHTS CARDS - Day 1 Value (Pre-20 days)
+   ============================================================ */
+
+/* Early Insight Cards - Container */
+.early-insight-card {
+  background: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  text-align: left;
+}
+
+.early-insight-card.phase-card {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.03) 0%, var(--card-background) 100%);
+  border-color: rgba(255, 221, 0, 0.15);
+}
+
+.early-insight-card.patterns-card {
+  background: var(--card-background);
+}
+
+.early-insight-card.progress-card {
+  background: linear-gradient(135deg, rgba(255, 221, 0, 0.02) 0%, var(--card-background) 100%);
+  border-color: rgba(255, 221, 0, 0.1);
+}
+
+/* Insight Header */
+.insight-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.insight-icon {
+  font-size: 1.25rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.insight-icon.gold {
+  color: var(--primary);
+}
+
+.insight-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.insight-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.insight-day {
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.insight-subtext {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+/* Insight Text */
+.insight-text {
+  font-size: 0.9375rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+/* Insight Detail (Risk Window) */
+.insight-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 193, 7, 0.05);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.detail-icon {
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.detail-icon.warning {
+  color: var(--warning);
+}
+
+.insight-detail span {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Insight Tip */
+.insight-tip {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: var(--spacing-md);
+  background: rgba(34, 197, 94, 0.05);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--success);
+}
+
+.insight-tip strong {
+  color: var(--success);
+}
+
+/* Time Patterns List */
+.time-patterns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.time-pattern-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  gap: var(--spacing-md);
+}
+
+.pattern-time {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.pattern-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+
+.pattern-risk {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.pattern-risk.high {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+.pattern-risk.medium {
+  background: rgba(255, 193, 7, 0.15);
+  color: var(--warning);
+}
+
+.pattern-risk.low {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.pattern-reason {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Model Stats (for trained model state) */
+.model-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin: var(--spacing-xl) 0;
+}
+
+.model-stats .stat-item {
+  text-align: center;
+}
+
+.model-stats .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+}
+
+.model-stats .stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .ml-training-container {
-    padding: 0; /* FIXED: Remove padding for full-width */
-    margin: 0; /* FIXED: Remove margin */
+    padding: 0;
+    margin: 0;
   }
 
   .ml-training-container .training-card {
     padding: var(--spacing-md);
     border-radius: var(--radius-lg);
-    margin: var(--spacing-md); /* FIXED: Margin on card instead of container */
-    /* All borders intact */
+    margin: var(--spacing-md);
   }
 
   .ml-training-container .standalone-header h1 {
@@ -682,6 +914,22 @@
   .ml-training-container .section-icon {
     font-size: 3rem;
   }
+  
+  .time-pattern-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+  
+  .pattern-info {
+    align-items: flex-start;
+    text-align: left;
+  }
+  
+  .model-stats {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
 }
 
 @media (max-width: 480px) {
@@ -720,5 +968,21 @@
 
   .ml-training-container .section-icon {
     font-size: 2.5rem;
+  }
+  
+  .early-insight-card {
+    padding: var(--spacing-md);
+  }
+  
+  .insight-header h3 {
+    font-size: 0.9375rem;
+  }
+  
+  .insight-text {
+    font-size: 0.875rem;
+  }
+  
+  .model-stats .stat-value {
+    font-size: 1.5rem;
   }
 }

@@ -1,5 +1,7 @@
 // OnboardingGuide.js - TITANTRACK
 // Premium onboarding with architectural line+dot connector
+// UPDATED: 4 steps - now includes Crisis Toolkit as highlighted step
+
 import React, { useState, useEffect, useCallback } from 'react';
 import './OnboardingGuide.css';
 
@@ -18,31 +20,41 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Define the 3 onboarding steps - TIGHT targeting
+  // Define the 4 onboarding steps - Crisis toolkit now highlighted
   const steps = [
     {
-      // Target ONLY the streak number itself
+      // Step 1: Target ONLY the streak number itself
       target: '.streak-num',
       title: 'Set your start date',
       message: 'Tap the counter to set when your journey began.',
       position: 'bottom',
-      padding: 12 // Comfortable padding around just the number
+      padding: 12
     },
     {
-      // Target the log button
+      // Step 2: Target the log button
       target: '.benefits-trigger',
       title: 'Track daily benefits',
       message: 'Log how you feel each day. This powers your AI insights.',
       position: 'top',
-      padding: 6 // Tight padding - just the button
+      padding: 6
     },
     {
-      // Target just the nav links container (not full bar)
+      // Step 3: NEW - Target the Urges/Crisis nav item specifically
+      target: isMobile 
+        ? '.mobile-nav-item[href="/urge-toolkit"]' 
+        : '.nav-link[href="/urge-toolkit"]',
+      title: 'Crisis toolkit ready',
+      message: 'When urges hit, breathing exercises and emergency protocols are one tap away.',
+      position: 'top',
+      padding: 8
+    },
+    {
+      // Step 4: Target just the nav links container (not full bar)
       target: isMobile ? '.mobile-nav-inner' : '.nav-container',
       title: 'Explore when ready',
-      message: 'Calendar, stats, timeline, and crisis tools await.',
+      message: 'Calendar, stats, and emotional timeline await.',
       position: isMobile ? 'top' : 'bottom',
-      padding: 10 // Padding for nav links
+      padding: 10
     }
   ];
 
@@ -161,14 +173,25 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
   const getSpotlightStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
-    // For nav (step 3) - rounded corners like other elements
+    // For full nav (step 4) - rounded corners
+    if (currentStep === 3) {
+      return {
+        top: `${targetRect.top - padding}px`,
+        left: `${targetRect.left - padding}px`,
+        width: `${targetRect.width + (padding * 2)}px`,
+        height: `${targetRect.height + (padding * 2)}px`,
+        borderRadius: '16px'
+      };
+    }
+    
+    // For crisis/urges nav item (step 3) - tighter focus
     if (currentStep === 2) {
       return {
         top: `${targetRect.top - padding}px`,
         left: `${targetRect.left - padding}px`,
         width: `${targetRect.width + (padding * 2)}px`,
         height: `${targetRect.height + (padding * 2)}px`,
-        borderRadius: '16px' // Rounded like other highlights
+        borderRadius: '12px'
       };
     }
     
