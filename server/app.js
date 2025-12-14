@@ -16,6 +16,7 @@ const User = require('./models/User');
 const notificationRoutes = require('./routes/notifications');
 const googleAuthRoutes = require('./routes/googleAuth');
 const discordAuthRoutes = require('./routes/discordAuth');
+const mlRoutes = require('./routes/mlRoutes');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 
 // Import leaderboard service
@@ -246,22 +247,13 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
 // Update user data (with milestone detection)
 app.put('/api/user/:username', authenticate, async (req, res) => {
   console.log('Received update user request for:', req.params.username);
-  console.log('Update data:', req.body);
-  
   try {
-    const existingUser = await User.findOne({ username: req.params.username });
-    if (!existingUser) {
-      console.log('User not found:', req.params.username);
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
     const updateData = { ...req.body };
-    
-    // Remove immutable fields that MongoDB won't allow updating
     delete updateData._id;
-    delete updateData.__v;
     
-    const previousStreak = existingUser.currentStreak || 0;
+    // Get current user data to check for milestone changes
+    const currentUser = await User.findOne({ username: req.params.username });
+    const oldStreak = currentUser?.currentStreak || 0;
     const newStreak = updateData.currentStreak;
     
     const user = await User.findOneAndUpdate(
@@ -270,16 +262,24 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
       { new: true }
     );
     
-    console.log('User updated successfully:', req.params.username);
-    
-    // Check for milestone announcements (Discord) - only if streak increased
-    if (newStreak && newStreak > previousStreak) {
-      // Run async - don't wait for it to complete
-      checkAndAnnounceMilestone(req.params.username, newStreak).catch(err => {
-        console.error('Milestone check failed:', err);
-      });
+    if (!user) {
+      console.log('User not found for update:', req.params.username);
+      return res.status(404).json({ error: 'User not found' });
     }
     
+    // Check for milestone announcement (only if streak increased across a milestone)
+    if (newStreak > oldStreak && user.showOnLeaderboard && user.discordUsername) {
+      const milestones = [7, 14, 30, 60, 90, 180, 365];
+      for (const milestone of milestones) {
+        if (oldStreak < milestone && newStreak >= milestone) {
+          console.log(`Milestone detected: ${user.discordUsername} reached ${milestone} days`);
+          checkAndAnnounceMilestone(user.discordUsername, milestone);
+          break;
+        }
+      }
+    }
+    
+    console.log('User updated:', req.params.username);
     res.json(user);
   } catch (err) {
     console.error('Update user error:', err);
@@ -287,11 +287,15 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
   }
 });
 
-// Delete user account (ACTUAL DELETION from MongoDB)
+// Delete user account
 app.delete('/api/user/:username', authenticate, async (req, res) => {
   console.log('Received delete user request for:', req.params.username);
-  
   try {
+    // Verify the requesting user matches the account to delete
+    if (req.user.username !== req.params.username) {
+      return res.status(403).json({ error: 'Cannot delete another user\'s account' });
+    }
+    
     const user = await User.findOneAndDelete({ username: req.params.username });
     
     if (!user) {
@@ -299,7 +303,7 @@ app.delete('/api/user/:username', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    console.log('User deleted successfully:', req.params.username);
+    console.log('User deleted:', req.params.username);
     res.json({ success: true, message: 'Account deleted successfully' });
   } catch (err) {
     console.error('Delete user error:', err);
@@ -307,33 +311,22 @@ app.delete('/api/user/:username', authenticate, async (req, res) => {
   }
 });
 
-// Get all users (admin)
-app.get('/api/users', async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.json(users);
-  } catch (err) {
-    console.error('Get users error:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
 // ============================================
-// LEADERBOARD API ENDPOINTS
+// LEADERBOARD ENDPOINTS
 // ============================================
 
-// Get leaderboard data (public)
+// Get leaderboard data
 app.get('/api/leaderboard', async (req, res) => {
   try {
     const users = await getLeaderboardUsers();
-    res.json({ success: true, users });
+    res.json(users);
   } catch (err) {
     console.error('Leaderboard error:', err);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
 });
 
-// Get user's rank (authenticated)
+// Get user's rank
 app.get('/api/leaderboard/rank/:username', authenticate, async (req, res) => {
   try {
     const rank = await getUserRank(req.params.username);
@@ -568,6 +561,7 @@ app.post('/api/feedback', async (req, res) => {
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/auth', googleAuthRoutes);
 app.use('/api/auth', discordAuthRoutes);
+app.use('/api/ml', mlRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

@@ -2,6 +2,7 @@
 // Data Preprocessing Utilities for ML Pipeline
 // Handles feature extraction, normalization, and data validation
 // UPDATED: Now integrates Emotional Timeline check-in data (emotionalLog)
+// UPDATED: Added dates tracking for feedback weighting
 
 /**
  * DataPreprocessor - Prepares raw user data for machine learning
@@ -163,9 +164,10 @@ class DataPreprocessor {
   /**
    * Generate training dataset from user's historical data
    * Creates input-output pairs for the neural network
+   * UPDATED: Now includes dates for feedback weighting
    * 
    * @param {Object} userData - User's complete historical data
-   * @returns {Object} { features: [[...]], labels: [[...]], count: number }
+   * @returns {Object} { features: [[...]], labels: [[...]], dates: [...], count: number }
    */
   generateTrainingData(userData) {
     try {
@@ -174,11 +176,12 @@ class DataPreprocessor {
       // Validate input data
       if (!userData.benefitTracking || userData.benefitTracking.length < 2) {
         console.log('⚠️  Insufficient benefit tracking data');
-        return { features: [], labels: [], count: 0 };
+        return { features: [], labels: [], dates: [], count: 0 };
       }
       
       const features = [];
       const labels = [];
+      const dates = [];  // NEW: Track dates for feedback weighting
       
       // Get relapse history (these become our labels)
       const relapses = this.getRelapseHistory(userData);
@@ -201,22 +204,24 @@ class DataPreprocessor {
         const dayFeatures = this.extractFeatures(current, previous, currentDate, userData);
         
         features.push(dayFeatures);
-        labels.push([hadRelapse ? 1 : 0]); // 1 = relapse, 0 = no relapse
+        labels.push(hadRelapse ? 1 : 0);
+        dates.push(current.date);  // NEW: Store date for this sample
       }
       
       console.log(`✅ Generated ${features.length} training examples (12 features each)`);
-      console.log(`   Positive examples (relapses): ${labels.filter(l => l[0] === 1).length}`);
-      console.log(`   Negative examples (no relapse): ${labels.filter(l => l[0] === 0).length}`);
+      console.log(`   Positive examples (relapses): ${labels.filter(l => l === 1).length}`);
+      console.log(`   Negative examples (no relapse): ${labels.filter(l => l === 0).length}`);
       
       return {
         features,
         labels,
+        dates,  // NEW: Include dates for feedback weighting
         count: features.length
       };
       
     } catch (error) {
       console.error('❌ Error generating training data:', error);
-      return { features: [], labels: [], count: 0 };
+      return { features: [], labels: [], dates: [], count: 0 };
     }
   }
 
@@ -358,6 +363,27 @@ class DataPreprocessor {
       isValid: true,
       message: `Ready for training (${dataQuality} emotional data coverage)`,
       stats: { benefitDays, emotionalDays, relapses, emotionalCoverage, dataQuality }
+    };
+  }
+
+  /**
+   * Get data quality report for ML readiness
+   * 
+   * @param {Object} userData - User data
+   * @returns {Object} Quality report
+   */
+  getDataQualityReport(userData) {
+    const benefitDays = userData.benefitTracking?.length || 0;
+    const emotionalDays = userData.emotionalLog?.length || 0;
+    const relapses = this.getRelapseHistory(userData).length;
+    
+    return {
+      benefitDays,
+      emotionalDays,
+      relapseCount: relapses,
+      hasRelapseData: relapses >= 1,
+      canTrain: benefitDays >= 20 && relapses >= 2,
+      emotionalCoverage: benefitDays > 0 ? emotionalDays / benefitDays : 0
     };
   }
 

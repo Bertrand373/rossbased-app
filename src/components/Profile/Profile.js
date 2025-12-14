@@ -34,6 +34,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
   const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
   const [marketingEmails, setMarketingEmails] = useState(userData.marketingEmails || false);
+  const [mlPatternSharing, setMlPatternSharing] = useState(userData.anonymousDataSharing || false);
   
   // Notifications
   const {
@@ -207,13 +208,14 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
       dataSharing,
       analyticsOptIn,
       marketingEmails,
+      anonymousDataSharing: mlPatternSharing,
       ...updates
     };
     
     // Update via parent
     updateUserData(newSettings);
     toast.success('Saved', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
-  }, [dataSharing, analyticsOptIn, marketingEmails, updateUserData]);
+  }, [dataSharing, analyticsOptIn, marketingEmails, mlPatternSharing, updateUserData]);
 
   // Toggle handlers with instant-save
   const handleAnalyticsToggle = () => {
@@ -232,6 +234,12 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     const newValue = !marketingEmails;
     setMarketingEmails(newValue);
     savePrivacySettings({ marketingEmails: newValue });
+  };
+
+  const handleMlPatternSharingToggle = () => {
+    const newValue = !mlPatternSharing;
+    setMlPatternSharing(newValue);
+    savePrivacySettings({ anonymousDataSharing: newValue });
   };
 
   // Notification type toggles with instant-save
@@ -654,6 +662,28 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 <span className="toggle-knob" />
               </button>
             </div>
+
+            {/* AI Improvements Section */}
+            <div className="group-label">AI Improvements</div>
+
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Help Improve TitanTrack</span>
+                <span className="toggle-desc">Share anonymized patterns to improve predictions for everyone</span>
+              </div>
+              <button 
+                className={`toggle-switch ${mlPatternSharing ? 'active' : ''}`}
+                onClick={handleMlPatternSharingToggle}
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
+
+            {mlPatternSharing && (
+              <div className="privacy-note">
+                <span>Only anonymous patterns are shared — never personal details, dates, journal entries, or any identifying information.</span>
+              </div>
+            )}
 
             {/* Notifications Section */}
             <div className="group-label">Notifications</div>
