@@ -1,267 +1,436 @@
-// src/services/NotificationService.js
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { app } from '../config/firebase';
+// server/services/notificationService.js
+// Service for sending push notifications via Firebase Cloud Messaging
+// FULLY FIXED VERSION - Timezone-aware, correct field names, bulletproof
 
-class NotificationService {
-  constructor() {
-    this.messaging = null;
-    this.permission = 'default';
-    this.notificationHistory = [];
-    this.maxNotificationsPerDay = 3;
-    this.minimumGapMinutes = 120;
+const admin = require('firebase-admin');
+const NotificationSubscription = require('../models/NotificationSubscription');
+const User = require('../models/User');
+
+// Initialize Firebase Admin SDK
+let firebaseInitialized = false;
+
+function initializeFirebase() {
+  if (firebaseInitialized) return;
+  
+  try {
+    // Get Firebase credentials from environment variables
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
     
-    // Check if notifications are supported
-    if (!('Notification' in window)) {
-      console.warn('Notifications not supported on this device');
+    // Validate that all required environment variables are present
+    if (!projectId || !privateKey || !clientEmail) {
+      console.warn('⚠️ Missing Firebase environment variables - notifications disabled');
       return;
     }
     
-    this.permission = Notification.permission;
-    
-    // Initialize messaging if supported
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      try {
-        this.messaging = getMessaging(app);
-        this.setupMessageListener();
-      } catch (error) {
-        console.error('Failed to initialize Firebase messaging:', error);
-      }
-    }
-  }
-
-  async requestPermission() {
-    try {
-      if (!('Notification' in window)) {
-        console.warn('This browser does not support notifications');
-        alert('Your browser does not support notifications. Please use a modern browser like Chrome, Firefox, or Safari.');
-        return false;
-      }
-
-      if (this.permission === 'granted') {
-        console.log('Notification permission already granted');
-        return true;
-      }
-
-      const permission = await Notification.requestPermission();
-      this.permission = permission;
-
-      if (permission === 'granted') {
-        console.log('Notification permission granted');
-        await this.registerServiceWorker();
-        await this.getFCMToken();
-        return true;
-      } else if (permission === 'denied') {
-        alert('Notifications blocked. Please enable them in your browser settings.');
-        return false;
-      } else {
-        console.log('Notification permission dismissed');
-        return false;
-      }
-    } catch (error) {
-      console.error('Error requesting notification permission:', error);
-      alert('Failed to request notification permission. Error: ' + error.message);
-      return false;
-    }
-  }
-
-  async registerServiceWorker() {
-    try {
-      const registration = await navigator.serviceWorker.register(
-        '/firebase-messaging-sw.js'
-      );
-      console.log('Service Worker registered:', registration);
-      return registration;
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
-      throw error;
-    }
-  }
-
-  async getFCMToken() {
-    try {
-      if (!this.messaging) {
-        console.warn('Firebase messaging not initialized');
-        return null;
-      }
-
-      const currentToken = await getToken(this.messaging, {
-        vapidKey: 'BFELhhVyYbO3JmmaHRHnHcSwXA2JoPyrjsP1IlcbvZbCkwHhKcbaZD_OD2ahh8Cx_syCOaA6yHaRYW7UgIT1DxQ'
-      });
-
-      if (currentToken) {
-        console.log('FCM Token obtained:', currentToken);
-        localStorage.setItem('fcm_token', currentToken);
-        return currentToken;
-      } else {
-        console.log('No FCM token available');
-        return null;
-      }
-    } catch (error) {
-      console.error('Error getting FCM token:', error);
-      return null;
-    }
-  }
-
-  setupMessageListener() {
-    if (!this.messaging) return;
-
-    onMessage(this.messaging, (payload) => {
-      console.log('Foreground message received:', payload);
-      
-      this.showNotification(
-        payload.notification.title,
-        payload.notification.body,
-        payload.data
-      );
+    // Initialize Firebase Admin with environment variables
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: projectId,
+        privateKey: privateKey.replace(/\\n/g, '\n'), // Handle escaped newlines
+        clientEmail: clientEmail
+      }),
+      projectId: projectId
     });
-  }
-
-  canSendNotification() {
-    const now = Date.now();
-    const today = new Date().toDateString();
-
-    this.notificationHistory = this.notificationHistory.filter(n => 
-      new Date(n.timestamp).toDateString() === today
-    );
-
-    if (this.notificationHistory.length >= this.maxNotificationsPerDay) {
-      console.log('Daily notification limit reached');
-      return false;
-    }
-
-    if (this.notificationHistory.length > 0) {
-      const lastNotification = this.notificationHistory[this.notificationHistory.length - 1];
-      const minutesSinceLastNotification = (now - lastNotification.timestamp) / 1000 / 60;
-      
-      if (minutesSinceLastNotification < this.minimumGapMinutes) {
-        console.log(`Too soon since last notification (${Math.round(minutesSinceLastNotification)} minutes ago)`);
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  async sendUrgePredictionNotification(riskScore, reason) {
-    try {
-      if (this.permission !== 'granted') {
-        console.log('No notification permission');
-        return false;
-      }
-
-      if (!this.canSendNotification()) {
-        console.log('Rate limit exceeded, notification suppressed');
-        return false;
-      }
-
-      if (riskScore < 70) {
-        console.log('Risk score too low for notification:', riskScore);
-        return false;
-      }
-
-      const title = '⚠ High Urge Risk Detected';
-      const body = `Risk level: ${riskScore}% - Tap for instant help`;
-      const data = {
-        type: 'urge_prediction',
-        riskScore: riskScore.toString(),
-        reason: reason,
-        timestamp: Date.now().toString()
-      };
-
-      const notificationShown = await this.showNotification(title, body, data);
-
-      if (notificationShown) {
-        this.notificationHistory.push({
-          timestamp: Date.now(),
-          riskScore: riskScore,
-          reason: reason
-        });
-
-        localStorage.setItem('notification_history', JSON.stringify(this.notificationHistory));
-      }
-
-      return notificationShown;
-    } catch (error) {
-      console.error('Error sending urge prediction notification:', error);
-      return false;
-    }
-  }
-
-  async showNotification(title, body, data = {}) {
-    try {
-      if (!('Notification' in window)) {
-        console.warn('Browser does not support notifications');
-        return false;
-      }
-
-      if (Notification.permission !== 'granted') {
-        console.warn('No permission to show notification');
-        return false;
-      }
-
-      const registration = await navigator.serviceWorker.ready;
-
-      await registration.showNotification(title, {
-        body: body,
-        icon: '/logo192.png',
-        badge: '/logo192.png',
-        tag: 'urge-prediction',
-        requireInteraction: true,
-        vibrate: [200, 100, 200],
-        data: data,
-        actions: [
-          {
-            action: 'open',
-            title: 'Get Help Now'
-          },
-          {
-            action: 'dismiss',
-            title: 'Dismiss'
-          }
-        ]
-      });
-
-      console.log('Notification shown successfully');
-      return true;
-    } catch (error) {
-      console.error('Error showing notification:', error);
-      return false;
-    }
-  }
-
-  getNotificationStats() {
-    const today = new Date().toDateString();
-    const todayNotifications = this.notificationHistory.filter(n =>
-      new Date(n.timestamp).toDateString() === today
-    );
-
-    return {
-      todayCount: todayNotifications.length,
-      remainingToday: this.maxNotificationsPerDay - todayNotifications.length,
-      lastNotification: this.notificationHistory.length > 0
-        ? this.notificationHistory[this.notificationHistory.length - 1]
-        : null
-    };
-  }
-
-  clearHistory() {
-    this.notificationHistory = [];
-    localStorage.removeItem('notification_history');
-  }
-
-  loadHistory() {
-    try {
-      const saved = localStorage.getItem('notification_history');
-      if (saved) {
-        this.notificationHistory = JSON.parse(saved);
-      }
-    } catch (error) {
-      console.error('Error loading notification history:', error);
-    }
+    
+    firebaseInitialized = true;
+    console.log('✅ Firebase Admin SDK initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to initialize Firebase Admin SDK:', error);
   }
 }
 
-const notificationService = new NotificationService();
-notificationService.loadHistory();
+// Initialize on module load
+initializeFirebase();
 
-export default notificationService;
+// ============================================================================
+// TIMEZONE UTILITY
+// ============================================================================
+
+/**
+ * Get current hour and minutes in a specific timezone
+ * @param {string} timezone - IANA timezone string (e.g., 'America/New_York')
+ * @returns {{hours: number, minutes: number, totalMinutes: number}}
+ */
+function getCurrentTimeInTimezone(timezone) {
+  try {
+    const now = new Date();
+    const options = { hour: 'numeric', minute: 'numeric', hour12: false, timeZone: timezone };
+    const timeStr = new Intl.DateTimeFormat('en-US', options).format(now);
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return {
+      hours,
+      minutes,
+      totalMinutes: hours * 60 + minutes
+    };
+  } catch (error) {
+    // If timezone is invalid, fall back to UTC
+    console.warn(`⚠️ Invalid timezone "${timezone}", falling back to UTC`);
+    const now = new Date();
+    return {
+      hours: now.getUTCHours(),
+      minutes: now.getUTCMinutes(),
+      totalMinutes: now.getUTCHours() * 60 + now.getUTCMinutes()
+    };
+  }
+}
+
+// ============================================================================
+// PREFERENCE CHECKING - TIMEZONE AWARE
+// ============================================================================
+
+/**
+ * Check if user preferences allow this notification
+ * Now timezone-aware for quiet hours
+ */
+async function shouldSendNotification(username, notificationType) {
+  try {
+    // Fetch user's notification preferences from User model
+    const user = await User.findOne({ username });
+    
+    if (!user) {
+      console.log(`❌ User not found: ${username}`);
+      return false;
+    }
+    
+    const prefs = user.notificationPreferences;
+    
+    // If no preferences set, allow all notifications (default behavior)
+    if (!prefs) {
+      return true;
+    }
+    
+    // Check if this notification type is enabled
+    const typeCategory = notificationType.split('_')[0]; // e.g., 'milestone', 'urge', 'weekly'
+    
+    // Map notification types to preference keys
+    const typeMapping = {
+      'milestone': 'milestones',
+      'urge': 'urgeSupport',
+      'weekly': 'weeklyProgress',
+      'encouragement': 'weeklyProgress',
+      'streak': 'milestones',
+      'daily': 'dailyReminder',
+      'motivational': 'weeklyProgress'
+    };
+    
+    const prefKey = typeMapping[typeCategory];
+    
+    // Special handling for daily reminder - check if specifically enabled
+    if (typeCategory === 'daily') {
+      if (!prefs.dailyReminderEnabled) {
+        console.log(`⏸️ Daily reminders disabled for ${username}`);
+        return false;
+      }
+    } else if (prefKey && prefs.types && prefs.types[prefKey] === false) {
+      console.log(`⏸️ ${notificationType} notifications disabled for ${username}`);
+      return false;
+    }
+    
+    // Check quiet hours - NOW TIMEZONE AWARE
+    if (prefs.quietHoursEnabled) {
+      const timezone = prefs.timezone || 'America/New_York';
+      const userTime = getCurrentTimeInTimezone(timezone);
+      const currentMinutes = userTime.totalMinutes;
+      
+      const [startH, startM] = (prefs.quietHoursStart || '22:00').split(':').map(Number);
+      const [endH, endM] = (prefs.quietHoursEnd || '08:00').split(':').map(Number);
+      
+      const quietStart = startH * 60 + startM;
+      const quietEnd = endH * 60 + endM;
+      
+      // Handle overnight quiet hours (e.g., 22:00 to 08:00)
+      const isQuietTime = quietStart > quietEnd
+        ? (currentMinutes >= quietStart || currentMinutes < quietEnd)
+        : (currentMinutes >= quietStart && currentMinutes < quietEnd);
+      
+      if (isQuietTime) {
+        console.log(`🌙 Quiet hours active for ${username} (${timezone}: ${userTime.hours}:${String(userTime.minutes).padStart(2, '0')}) - notification blocked`);
+        return false;
+      }
+    }
+    
+    return true; // All checks passed
+  } catch (error) {
+    console.error('Error checking notification preferences:', error);
+    return true; // Default to allowing notification on error
+  }
+}
+
+// ============================================================================
+// NOTIFICATION TEMPLATES - Discreet, mature, non-embarrassing
+// iOS shows app name as header, so titles should be descriptive not "TitanTrack"
+// ============================================================================
+const notificationTemplates = {
+  // DAILY REMINDER
+  daily_reminder: {
+    title: 'Daily Check-In',
+    body: 'Log your day.',
+    data: { url: '/', type: 'daily_reminder' }
+  },
+  
+  // WEEKLY MOTIVATIONAL (Monday)
+  motivational: {
+    title: 'New Week',
+    body: 'Stay locked in.',
+    data: { url: '/', type: 'motivational' }
+  },
+  
+  // MILESTONES - Clean, confident, no emojis
+  milestone_7: {
+    title: 'Day 7',
+    body: 'First week done. Keep building.',
+    data: { url: '/stats', type: 'milestone', days: '7' }
+  },
+  milestone_14: {
+    title: 'Day 14',
+    body: 'Two weeks. Momentum is real.',
+    data: { url: '/stats', type: 'milestone', days: '14' }
+  },
+  milestone_30: {
+    title: 'Day 30',
+    body: 'One month. You\'re different now.',
+    data: { url: '/stats', type: 'milestone', days: '30' }
+  },
+  milestone_60: {
+    title: 'Day 60',
+    body: 'Two months in. Stay the course.',
+    data: { url: '/stats', type: 'milestone', days: '60' }
+  },
+  milestone_90: {
+    title: 'Day 90',
+    body: 'Quarter year. This is who you are now.',
+    data: { url: '/stats', type: 'milestone', days: '90' }
+  },
+  milestone_180: {
+    title: 'Day 180',
+    body: 'Six months. Rare territory.',
+    data: { url: '/stats', type: 'milestone', days: '180' }
+  },
+  milestone_365: {
+    title: 'Day 365',
+    body: 'One year. Few make it here.',
+    data: { url: '/stats', type: 'milestone', days: '365' }
+  },
+  
+  // ENCOURAGEMENT - Subtle, respectful
+  encouragement_morning: {
+    title: 'Good Morning',
+    body: 'New day. Stay focused.',
+    data: { url: '/', type: 'encouragement' }
+  },
+  encouragement_evening: {
+    title: 'Evening Check',
+    body: 'How\'d you hold up today?',
+    data: { url: '/', type: 'encouragement' }
+  },
+  
+  // URGE SUPPORT - Calm, grounding
+  urge_high_risk: {
+    title: 'Stay Strong',
+    body: 'Breathe. This will pass.',
+    data: { url: '/emergency', type: 'urge_warning' }
+  },
+  urge_medium_risk: {
+    title: 'Stay Focused',
+    body: 'Take a moment. Refocus.',
+    data: { url: '/emergency', type: 'urge_warning' }
+  },
+  
+  // STREAK REMINDER
+  streak_save: {
+    title: 'Reminder',
+    body: 'You know what to do.',
+    data: { url: '/stats', type: 'streak_reminder' }
+  },
+  
+  // WEEKLY PROGRESS
+  weekly_progress: {
+    title: 'Weekly Summary',
+    body: 'Your weekly summary is ready.',
+    data: { url: '/stats', type: 'weekly_progress' }
+  }
+};
+
+// ============================================================================
+// SEND NOTIFICATION TO SINGLE DEVICE
+// ============================================================================
+
+async function sendNotification(fcmToken, notificationType, customData = {}) {
+  try {
+    if (!firebaseInitialized) {
+      console.warn('⚠️ Firebase not initialized - cannot send notification');
+      return { success: false, error: 'Firebase not initialized' };
+    }
+
+    // Get notification template
+    const template = notificationTemplates[notificationType];
+    if (!template) {
+      console.error(`❌ Unknown notification type: ${notificationType}`);
+      return { success: false, error: `Unknown notification type: ${notificationType}` };
+    }
+
+    // Prepare message
+    const message = {
+      token: fcmToken,
+      notification: {
+        title: template.title,
+        body: template.body
+      },
+      data: {
+        ...template.data,
+        ...customData,
+        timestamp: Date.now().toString()
+      },
+      webpush: {
+        fcmOptions: {
+          link: template.data.url
+        },
+        notification: {
+          icon: '/icon-192.png',
+          badge: '/icon-192.png',
+          vibrate: [200, 100, 200],
+          requireInteraction: false
+        }
+      }
+    };
+
+    // Send message
+    const response = await admin.messaging().send(message);
+    console.log('✅ Notification sent successfully:', response);
+    return { success: true, messageId: response };
+  } catch (error) {
+    // Handle specific Firebase errors
+    if (error.code === 'messaging/registration-token-not-registered' ||
+        error.code === 'messaging/invalid-registration-token') {
+      console.log(`⚠️ Invalid/expired FCM token - marking for cleanup`);
+      return { success: false, error: 'invalid_token', shouldRemove: true };
+    }
+    
+    console.error('❌ Error sending notification:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================================================
+// SEND NOTIFICATION TO USER - FIXED VERSION
+// ============================================================================
+
+async function sendNotificationToUser(username, notificationType, customData = {}) {
+  try {
+    // Check user preferences first
+    const shouldSend = await shouldSendNotification(username, notificationType);
+    
+    if (!shouldSend) {
+      return { success: false, reason: 'blocked_by_preferences' };
+    }
+    
+    // Find user's subscription - FIXED: use correct field name
+    const subscription = await NotificationSubscription.findOne({
+      username: username,
+      notificationsEnabled: true  // FIXED: was 'isActive' which doesn't exist
+    });
+
+    if (!subscription) {
+      console.log(`📭 No active subscription for ${username}`);
+      return { success: false, reason: 'no_subscription' };
+    }
+
+    if (!subscription.fcmToken) {
+      console.log(`📭 No FCM token for ${username}`);
+      return { success: false, reason: 'no_fcm_token' };
+    }
+
+    // Send notification
+    const result = await sendNotification(subscription.fcmToken, notificationType, customData);
+    
+    // If token is invalid, disable the subscription
+    if (result.shouldRemove) {
+      console.log(`🧹 Disabling invalid subscription for ${username}`);
+      await NotificationSubscription.updateOne(
+        { _id: subscription._id },
+        { $set: { notificationsEnabled: false, failedAttempts: (subscription.failedAttempts || 0) + 1 } }
+      );
+    }
+    
+    // Update last notification sent timestamp on success
+    if (result.success) {
+      await NotificationSubscription.updateOne(
+        { _id: subscription._id },
+        { $set: { lastNotificationSent: new Date() } }
+      );
+    }
+
+    return result;
+  } catch (error) {
+    console.error(`❌ Error sending notification to ${username}:`, error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================================================
+// SEND BULK NOTIFICATIONS
+// ============================================================================
+
+async function sendBulkNotifications(usernames, notificationType, customData = {}) {
+  try {
+    console.log(`📤 Sending ${notificationType} to ${usernames.length} users`);
+
+    const results = [];
+    
+    for (const username of usernames) {
+      const result = await sendNotificationToUser(username, notificationType, customData);
+      results.push({ username, ...result });
+      
+      // Add small delay to avoid rate limits
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    const successCount = results.filter(r => r.success).length;
+    console.log(`✅ Sent ${successCount}/${results.length} notifications successfully`);
+
+    return {
+      success: true,
+      totalSent: successCount,
+      totalFailed: results.length - successCount,
+      results: results
+    };
+  } catch (error) {
+    console.error('❌ Error sending bulk notifications:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================================================
+// MILESTONE NOTIFICATION HELPER
+// ============================================================================
+
+async function checkAndSendMilestoneNotification(username, currentStreak) {
+  const milestones = [7, 14, 30, 60, 90, 180, 365];
+  
+  if (!milestones.includes(currentStreak)) {
+    return { success: false, reason: `${currentStreak} is not a milestone day` };
+  }
+  
+  const templateKey = `milestone_${currentStreak}`;
+  if (!notificationTemplates[templateKey]) {
+    return { success: false, reason: `No template for milestone_${currentStreak}` };
+  }
+  
+  return await sendNotificationToUser(username, templateKey);
+}
+
+// ============================================================================
+// EXPORTS
+// ============================================================================
+
+module.exports = {
+  sendNotification,
+  sendNotificationToUser,
+  sendBulkNotifications,
+  checkAndSendMilestoneNotification,
+  notificationTemplates,
+  shouldSendNotification,
+  getCurrentTimeInTimezone
+};

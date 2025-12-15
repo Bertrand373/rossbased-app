@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 
-const CACHE_NAME = 'titantrack-v2';
+const CACHE_NAME = 'titantrack-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -101,63 +101,8 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Push notification event
-self.addEventListener('push', (event) => {
-  console.log('[Service Worker] Push notification received');
-  
-  // Clean, premium fallbacks - no emojis
-  let notificationData = {
-    title: 'TitanTrack',
-    body: 'You have a new update.',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png'
-  };
-  
-  if (event.data) {
-    try {
-      const data = event.data.json();
-      notificationData = {
-        title: data.title || notificationData.title,
-        body: data.body || notificationData.body,
-        icon: data.icon || notificationData.icon,
-        badge: data.badge || notificationData.badge,
-        data: {
-          url: data.url || '/',
-          dateOfArrival: Date.now(),
-          primaryKey: data.primaryKey || 1
-        }
-      };
-    } catch (error) {
-      console.error('[Service Worker] Error parsing push data:', error);
-    }
-  }
-  
-  const options = {
-    body: notificationData.body,
-    icon: notificationData.icon,
-    badge: notificationData.badge,
-    vibrate: [200, 100, 200],
-    data: notificationData.data,
-    actions: [
-      {
-        action: 'open',
-        title: 'View',
-        icon: '/icon-192.png'
-      },
-      {
-        action: 'close',
-        title: 'Dismiss'
-      }
-    ],
-    requireInteraction: false,
-    tag: 'titantrack-notification',
-    renotify: true
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(notificationData.title, options)
-  );
-});
+// NOTE: Push notifications are handled by firebase-messaging-sw.js
+// Do NOT add a push handler here - it causes duplicate notifications
 
 // Notification click event
 self.addEventListener('notificationclick', (event) => {
