@@ -24,7 +24,8 @@ const {
   checkAndAnnounceMilestone, 
   getLeaderboardUsers, 
   triggerLeaderboardPost, 
-  getUserRank 
+  getUserRank,
+  manualMilestoneAnnounce
 } = require('./services/leaderboardService');
 
 const app = express();
@@ -351,25 +352,20 @@ app.post('/api/leaderboard/trigger', async (req, res) => {
   }
 });
 
-// Manual milestone test (for testing)
-app.post('/api/leaderboard/test-milestone', async (req, res) => {
+// Manual milestone announcement (for catch-up announcements)
+app.post('/api/leaderboard/announce-milestone', async (req, res) => {
   try {
-    const { username, days } = req.body;
+    const { discordUsername, days } = req.body;
     
-    if (!username || !days) {
-      return res.status(400).json({ error: 'Provide username and days in request body' });
+    if (!discordUsername || !days) {
+      return res.status(400).json({ error: 'Provide discordUsername and days in request body' });
     }
     
-    const { postMilestoneToDiscord } = require('./services/leaderboardService');
-    const result = await postMilestoneToDiscord(username, days);
-    
-    res.json({ 
-      success: result, 
-      message: result ? `Milestone posted: ${username} - ${days} days` : 'Failed to post milestone (check DISCORD_MILESTONE_WEBHOOK)' 
-    });
+    const result = await manualMilestoneAnnounce(discordUsername, days);
+    res.json(result);
   } catch (err) {
-    console.error('Test milestone error:', err);
-    res.status(500).json({ error: 'Failed to test milestone' });
+    console.error('Manual milestone error:', err);
+    res.status(500).json({ error: 'Failed to announce milestone' });
   }
 });
 

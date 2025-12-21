@@ -21,7 +21,7 @@ const HCTI_USER_ID = process.env.HCTI_USER_ID;
 const HCTI_API_KEY = process.env.HCTI_API_KEY;
 
 // Milestone thresholds for Discord announcements
-const MILESTONE_DAYS = [30, 90, 180, 365];
+const MILESTONE_DAYS = [30, 60, 90, 180, 365];
 
 /**
  * Store a setting in the database
@@ -263,13 +263,14 @@ function formatTextLeaderboard(users) {
   
   let leaderboardText = '';
   users.forEach((user, index) => {
-    const rank = String(index + 1).padStart(2, ' ');
-    const displayName = user.discordDisplayName || user.discordUsername;
-    const name = displayName.length > 14 
-      ? displayName.substring(0, 13) + '…' 
-      : displayName.padEnd(14, ' ');
-    const days = String(user.currentStreak || 0).padStart(4, ' ') + 'd';
-    leaderboardText += `${rank}  ${name} ${days}\n`;
+    const rank = index + 1;
+    const displayName = user.discordDisplayName || user.discordUsername || 'Unknown';
+    const truncatedName = displayName.length > 14 ? displayName.substring(0, 13) + '…' : displayName;
+    const days = user.currentStreak || 0;
+    const paddedRank = rank.toString().padStart(2, ' ');
+    const paddedName = truncatedName.padEnd(14, ' ');
+    const paddedDays = days.toString().padStart(4, ' ');
+    leaderboardText += `${paddedRank}  ${paddedName}  ${paddedDays}d\n`;
   });
   
   return {
@@ -284,60 +285,43 @@ function formatTextLeaderboard(users) {
 }
 
 /**
- * Post leaderboard to Discord (or edit existing)
- * Uses file attachment for clean image display (no embed wrapper)
+ * Post leaderboard to Discord
+ * Tries image first, falls back to text embed
  */
 async function postLeaderboardToDiscord() {
   if (!LEADERBOARD_WEBHOOK) {
-    console.log('⚠️ DISCORD_LEADERBOARD_WEBHOOK not configured - skipping leaderboard post');
+    console.log('⚠️ No Discord webhook configured for leaderboard');
     return false;
   }
   
   try {
     const users = await getLeaderboardUsers();
-    
-    // Try to generate image with avatars
-    const imageUrl = await generateLeaderboardImage(users);
-    
-    // Check if we have an existing message to edit
     const existingMessageId = await getSetting('leaderboard_message_id');
     
+    // Try to generate image
+    const imageUrl = await generateLeaderboardImage(users);
+    
     if (imageUrl) {
-      // Download the image to upload as attachment
+      // Download the image
       const imageBuffer = await downloadImage(imageUrl);
       
       if (imageBuffer) {
-        // Use form-data package for multipart upload
-        const FormData = require('form-data');
-        const formData = new FormData();
-        
-        // Add the image file
-        formData.append('files[0]', imageBuffer, {
-          filename: 'leaderboard.png',
-          contentType: 'image/png'
-        });
-        
-        // Add the message content
-        formData.append('payload_json', JSON.stringify({
-          content: '**[Join the leaderboard →](<https://titantrack.app>)**',
-          attachments: [{
-            id: 0,
-            filename: 'leaderboard.png'
-          }]
-        }));
-        
-        // For new messages, we need to delete old and post new (can't edit attachments easily)
+        // Delete old message if exists (can't edit attachments)
         if (existingMessageId) {
-          // Try to delete old message
           try {
             await fetch(`${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`, {
               method: 'DELETE'
             });
             console.log('🗑️ Deleted old leaderboard message');
           } catch (e) {
-            console.log('⚠️ Could not delete old message');
+            // Ignore deletion errors
           }
         }
+        
+        // Post new message with attachment using FormData
+        const FormData = require('form-data');
+        const formData = new FormData();
+        formData.append('file', imageBuffer, { filename: 'leaderboard.png', contentType: 'image/png' });
         
         // Post new message with attachment using https module for proper multipart
         const https = require('https');
@@ -470,6 +454,8 @@ async function postMilestoneToDiscord(user, days) {
 
 /**
  * Check if user crossed a milestone and announce it
+ * Now uses showOnLeaderboard instead of separate announceDiscordMilestones flag
+ * If you're on the leaderboard, you get milestone announcements automatically
  */
 async function checkAndAnnounceMilestone(username, newStreak) {
   try {
@@ -480,7 +466,8 @@ async function checkAndAnnounceMilestone(username, newStreak) {
       return false;
     }
     
-    if (!user.announceDiscordMilestones || !user.discordUsername) {
+    // Auto-announce for anyone on the leaderboard with a Discord username
+    if (!user.showOnLeaderboard || !user.discordUsername) {
       return false;
     }
     
@@ -509,6 +496,39 @@ async function checkAndAnnounceMilestone(username, newStreak) {
   } catch (error) {
     console.error('❌ Error checking milestone:', error);
     return false;
+  }
+}
+
+/**
+ * Manually announce a milestone for a user (for catch-up announcements)
+ * @param {string} discordUsername - The Discord username to find the user
+ * @param {number} days - The milestone day count to announce
+ */
+async function manualMilestoneAnnounce(discordUsername, days) {
+  try {
+    const user = await User.findOne({ discordUsername });
+    
+    if (!user) {
+      console.log(`Manual milestone: User with Discord ${discordUsername} not found`);
+      return { success: false, error: 'User not found' };
+    }
+    
+    const success = await postMilestoneToDiscord(user, days);
+    
+    if (success) {
+      // Update their lastMilestoneAnnounced so we don't double-announce
+      await User.findOneAndUpdate(
+        { _id: user._id },
+        { $set: { lastMilestoneAnnounced: days } }
+      );
+      
+      return { success: true, user: user.discordDisplayName || user.discordUsername };
+    }
+    
+    return { success: false, error: 'Failed to post to Discord' };
+  } catch (error) {
+    console.error('❌ Error in manual milestone announce:', error);
+    return { success: false, error: error.message };
   }
 }
 
@@ -595,6 +615,7 @@ module.exports = {
   postLeaderboardToDiscord,
   checkAndAnnounceMilestone,
   postMilestoneToDiscord,
+  manualMilestoneAnnounce,
   getUserRank,
   getVerifiedMentors,
   triggerLeaderboardPost,
