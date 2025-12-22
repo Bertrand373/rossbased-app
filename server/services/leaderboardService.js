@@ -412,7 +412,7 @@ function formatMilestoneEmbed(user, days) {
   const displayName = user.discordDisplayName || user.discordUsername;
   return {
     embeds: [{
-      color: 0xFFD700,
+      color: 0x2f3136,
       description: `**${displayName}** just crossed **${days} days**.`
     }]
   };
