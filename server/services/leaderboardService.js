@@ -506,10 +506,14 @@ async function checkAndAnnounceMilestone(username, newStreak) {
  */
 async function manualMilestoneAnnounce(discordUsername, days) {
   try {
-    const user = await User.findOne({ discordUsername });
+    // Try Discord username first, then fall back to TitanTrack username
+    let user = await User.findOne({ discordUsername });
+    if (!user) {
+      user = await User.findOne({ username: discordUsername });
+    }
     
     if (!user) {
-      console.log(`Manual milestone: User with Discord ${discordUsername} not found`);
+      console.log(`Manual milestone: User ${discordUsername} not found`);
       return { success: false, error: 'User not found' };
     }
     
