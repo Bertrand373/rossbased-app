@@ -5,7 +5,7 @@
 const cron = require('node-cron');
 const NotificationSubscription = require('../models/NotificationSubscription');
 const { sendNotificationToUser, sendBulkNotifications } = require('./notificationService');
-const { postLeaderboardToDiscord } = require('./leaderboardService');
+const { postLeaderboardToDiscord, runScheduledMilestoneCheck } = require('./leaderboardService');
 const User = require('../models/User');
 
 // ============================================================================
@@ -154,17 +154,17 @@ function scheduleWeeklyMotivation() {
 }
 
 // ============================================================================
-// MILESTONE CHECK SCHEDULER
+// MILESTONE CHECK SCHEDULER (Push Notifications)
 // ============================================================================
 
 /**
- * Milestone notifications
+ * Milestone notifications (Push to user's device)
  * Checks user streaks every 6 hours and sends push notifications for milestones
  */
 function scheduleMilestoneChecks() {
   // Run every 6 hours
   cron.schedule('0 */6 * * *', async () => {
-    console.log('🏆 Checking for milestone achievements...');
+    console.log('🏆 Checking for milestone achievements (push notifications)...');
     
     try {
       const milestones = [7, 14, 30, 60, 90, 180, 365];
@@ -196,14 +196,14 @@ function scheduleMilestoneChecks() {
         }
       }
       
-      console.log(`✅ Sent ${sentCount} milestone notifications`);
+      console.log(`✅ Sent ${sentCount} milestone push notifications`);
       
     } catch (error) {
       console.error('❌ Error in milestone check scheduler:', error);
     }
   });
   
-  console.log('✅ Milestone check scheduler started');
+  console.log('✅ Milestone push notification scheduler started');
 }
 
 // ============================================================================
@@ -213,6 +213,7 @@ function scheduleMilestoneChecks() {
 /**
  * Discord Leaderboard - Daily at 8 AM EST
  * Posts the top 13 leaderboard to Discord
+ * Also runs scheduled Discord milestone announcements
  */
 function scheduleLeaderboardPost() {
   // 8 AM EST = 13:00 UTC (standard time) or 12:00 UTC (daylight saving)
@@ -227,6 +228,12 @@ function scheduleLeaderboardPost() {
       } else {
         console.log('⚠️ Leaderboard post returned false');
       }
+      
+      // Run scheduled milestone check right after leaderboard
+      // This catches milestones for users who haven't opened the app
+      console.log('🏆 Running scheduled Discord milestone announcements...');
+      await runScheduledMilestoneCheck();
+      
     } catch (error) {
       console.error('❌ Error posting leaderboard:', error);
     }

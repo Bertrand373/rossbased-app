@@ -500,6 +500,68 @@ async function checkAndAnnounceMilestone(username, newStreak) {
 }
 
 /**
+ * SCHEDULED DAILY MILESTONE CHECK
+ * Runs once daily to catch all milestones - even if users don't open the app
+ * Calculates streak from startDate for accuracy
+ */
+async function runScheduledMilestoneCheck() {
+  console.log('🏆 Running scheduled milestone check for all leaderboard users...');
+  
+  try {
+    // Get all users on the leaderboard with Discord usernames
+    const users = await User.find({
+      showOnLeaderboard: true,
+      discordUsername: { $exists: true, $ne: '', $ne: null },
+      startDate: { $exists: true, $ne: null }
+    }).lean();
+    
+    let announcedCount = 0;
+    
+    for (const user of users) {
+      // Calculate their actual current streak from startDate
+      const currentStreak = calculateStreakFromStartDate(user.startDate);
+      const lastAnnounced = user.lastMilestoneAnnounced || 0;
+      
+      // Check each milestone threshold
+      for (const milestone of MILESTONE_DAYS) {
+        if (currentStreak >= milestone && lastAnnounced < milestone) {
+          // They crossed this milestone - announce it!
+          await postMilestoneToDiscord(user, milestone);
+          
+          // Update their record
+          const updateData = { 
+            lastMilestoneAnnounced: milestone,
+            currentStreak: currentStreak // Also sync their streak while we're at it
+          };
+          
+          if (milestone >= 180 && !user.mentorEligible) {
+            updateData.mentorEligible = true;
+            console.log(`🎖️ ${user.username} is now mentor eligible (${milestone}+ days)`);
+          }
+          
+          await User.findOneAndUpdate(
+            { _id: user._id },
+            { $set: updateData }
+          );
+          
+          announcedCount++;
+          
+          // Only announce highest unannounced milestone per user per run
+          break;
+        }
+      }
+    }
+    
+    console.log(`✅ Scheduled milestone check complete: ${announcedCount} announcements made`);
+    return { success: true, announced: announcedCount };
+    
+  } catch (error) {
+    console.error('❌ Error in scheduled milestone check:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Manually announce a milestone for a user (for catch-up announcements)
  * @param {string} discordUsername - The Discord username to find the user
  * @param {number} days - The milestone day count to announce
@@ -620,6 +682,7 @@ module.exports = {
   checkAndAnnounceMilestone,
   postMilestoneToDiscord,
   manualMilestoneAnnounce,
+  runScheduledMilestoneCheck,  // NEW: Daily scheduled check
   getUserRank,
   getVerifiedMentors,
   triggerLeaderboardPost,
