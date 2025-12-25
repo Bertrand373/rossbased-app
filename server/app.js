@@ -25,7 +25,8 @@ const {
   getLeaderboardUsers, 
   triggerLeaderboardPost, 
   getUserRank,
-  manualMilestoneAnnounce
+  manualMilestoneAnnounce,
+  runScheduledMilestoneCheck
 } = require('./services/leaderboardService');
 
 const app = express();
@@ -366,6 +367,18 @@ app.post('/api/leaderboard/announce-milestone', async (req, res) => {
   } catch (err) {
     console.error('Manual milestone error:', err);
     res.status(500).json({ error: 'Failed to announce milestone' });
+  }
+});
+
+// Manual trigger for scheduled milestone check (scans all leaderboard users)
+app.post('/api/leaderboard/trigger-milestone-check', async (req, res) => {
+  try {
+    console.log('🏆 Manual milestone check triggered via API');
+    const result = await runScheduledMilestoneCheck();
+    res.json(result);
+  } catch (err) {
+    console.error('Trigger milestone check error:', err);
+    res.status(500).json({ error: 'Failed to run milestone check' });
   }
 });
 
