@@ -524,8 +524,12 @@ async function runScheduledMilestoneCheck() {
       
       // Check each milestone threshold
       for (const milestone of MILESTONE_DAYS) {
-        if (currentStreak >= milestone && lastAnnounced < milestone) {
-          // They crossed this milestone - announce it!
+        // Only announce if they're AT or JUST PAST the milestone (within 2 days)
+        // This prevents mass retroactive announcements for existing users
+        const justCrossedMilestone = currentStreak >= milestone && currentStreak <= milestone + 2;
+        
+        if (justCrossedMilestone && lastAnnounced < milestone) {
+          // They just crossed this milestone - announce it!
           await postMilestoneToDiscord(user, milestone);
           
           // Update their record
