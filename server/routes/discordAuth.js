@@ -17,6 +17,10 @@ router.post('/discord', async (req, res) => {
       return res.status(400).json({ error: 'No code provided' });
     }
 
+    console.log('Discord auth attempt with redirect URI:', DISCORD_REDIRECT_URI);
+    console.log('Discord Client ID configured:', !!DISCORD_CLIENT_ID);
+    console.log('Discord Client Secret configured:', !!DISCORD_CLIENT_SECRET);
+
     // Exchange code for access token
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
       method: 'POST',
@@ -30,17 +34,43 @@ router.post('/discord', async (req, res) => {
       })
     });
 
+    // Check if response is OK before parsing JSON
+    if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text();
+      console.error('Discord token exchange failed:', tokenResponse.status, errorText);
+      return res.status(401).json({ 
+        error: 'Discord authentication failed', 
+        details: `Discord returned ${tokenResponse.status}` 
+      });
+    }
+
+    // Check content type before parsing
+    const contentType = tokenResponse.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const responseText = await tokenResponse.text();
+      console.error('Discord returned non-JSON response:', contentType, responseText.substring(0, 500));
+      return res.status(401).json({ 
+        error: 'Discord authentication failed',
+        details: 'Unexpected response format from Discord'
+      });
+    }
+
     const tokenData = await tokenResponse.json();
     
     if (tokenData.error) {
       console.error('Discord token error:', tokenData);
-      return res.status(401).json({ error: 'Discord authentication failed' });
+      return res.status(401).json({ error: 'Discord authentication failed', details: tokenData.error_description || tokenData.error });
     }
 
     // Get user info from Discord
     const userResponse = await fetch('https://discord.com/api/users/@me', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` }
     });
+
+    if (!userResponse.ok) {
+      console.error('Discord user fetch failed:', userResponse.status);
+      return res.status(401).json({ error: 'Failed to fetch Discord user info' });
+    }
 
     const discordUser = await userResponse.json();
     console.log('Discord auth for:', discordUser.username, '| Display name:', discordUser.global_name);
@@ -69,7 +99,7 @@ router.post('/discord', async (req, res) => {
         password: `discord_${discordUser.id}`,
         discordId: discordUser.id,
         discordUsername: discordUser.username,
-        discordDisplayName: discordUser.global_name || discordUser.username, // Display name (what people see)
+        discordDisplayName: discordUser.global_name || discordUser.username,
         discordAvatar: discordUser.avatar || null,
         startDate: new Date().toISOString().split('T')[0],
         currentStreak: 0,
@@ -121,7 +151,7 @@ router.post('/discord', async (req, res) => {
       // Update existing user's Discord info
       user.discordId = discordUser.id;
       user.discordUsername = discordUser.username;
-      user.discordDisplayName = discordUser.global_name || discordUser.username; // Update display name
+      user.discordDisplayName = discordUser.global_name || discordUser.username;
       user.discordAvatar = discordUser.avatar || null;
       await user.save();
       console.log('Updated Discord info for user:', user.username);
