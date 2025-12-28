@@ -24,6 +24,7 @@ import DiscordCallback from './components/Auth/DiscordCallback';
 import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
+import AIChat from './components/AIChat/AIChat';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -400,6 +401,9 @@ function App() {
               triggerAfterVisits={3}
               currentCheckIns={userData?.totalCheckIns || 0}
             />
+            
+            {/* AI Chat - Floating component */}
+            <AIChat isLoggedIn={isLoggedIn} />
             
             <main className="app-content">
               <div className="main-content-wrapper">

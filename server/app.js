@@ -756,6 +756,161 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
   }
 });
 
+// AI Chat STREAMING endpoint - Server-Sent Events
+app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
+  const { message, conversationHistory = [] } = req.body;
+  const username = req.user.username;
+
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({ error: 'Message is required' });
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('❌ ANTHROPIC_API_KEY not configured');
+    return res.status(500).json({ error: 'AI service not configured' });
+  }
+
+  try {
+    // Get user data for context
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check rate limit
+    const now = new Date();
+    const userTimezone = user.notificationPreferences?.timezone || 'America/New_York';
+    const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
+      timeZone: userTimezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(now);
+    
+    if (!user.aiUsage || user.aiUsage.date !== userLocalDate) {
+      user.aiUsage = { 
+        date: userLocalDate, 
+        count: 0,
+        lifetimeCount: user.aiUsage?.lifetimeCount || 0
+      };
+    }
+
+    const launchDate = new Date('2025-02-18T00:00:00Z');
+    const isBetaPeriod = now < launchDate;
+    
+    const BETA_DAILY_LIMIT = 5;
+    const FREE_LIFETIME_LIMIT = 3;
+    const PREMIUM_DAILY_LIMIT = 15;
+
+    // Check limits
+    if (isBetaPeriod) {
+      if (user.aiUsage.count >= BETA_DAILY_LIMIT) {
+        return res.status(429).json({ 
+          error: 'Daily beta limit reached',
+          message: `You've used all ${BETA_DAILY_LIMIT} messages for today. Resets at midnight your time.`
+        });
+      }
+    } else {
+      const isPremium = user.isPremium || false;
+      if (isPremium) {
+        if (user.aiUsage.count >= PREMIUM_DAILY_LIMIT) {
+          return res.status(429).json({ 
+            error: 'Daily limit reached',
+            message: `You've used all ${PREMIUM_DAILY_LIMIT} messages for today.`
+          });
+        }
+      } else {
+        const lifetimeCount = user.aiUsage.lifetimeCount || 0;
+        if (lifetimeCount >= FREE_LIFETIME_LIMIT) {
+          return res.status(429).json({ 
+            error: 'Free limit reached',
+            message: `Upgrade to Premium for 15 messages daily!`
+          });
+        }
+      }
+    }
+
+    // Build user context
+    const userContext = buildUserContext(user);
+    const systemPrompt = AI_SYSTEM_PROMPT.replace('{{USER_CONTEXT}}', userContext);
+
+    // Build messages array
+    const messages = [];
+    const recentHistory = conversationHistory.slice(-20);
+    recentHistory.forEach(msg => {
+      messages.push({ role: msg.role, content: msg.content });
+    });
+    messages.push({ role: 'user', content: message });
+
+    console.log(`🤖 AI Stream request from ${username} (Day ${user.currentStreak || 0})`);
+
+    // Set up SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.flushHeaders();
+
+    // Stream from Claude
+    const stream = await anthropic.messages.stream({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: messages
+    });
+
+    // Forward chunks to client
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta?.text) {
+        res.write(`data: ${JSON.stringify({ type: 'content', text: event.delta.text })}\n\n`);
+      }
+    }
+
+    // Update usage counters
+    user.aiUsage.count = (user.aiUsage.count || 0) + 1;
+    user.aiUsage.lifetimeCount = (user.aiUsage.lifetimeCount || 0) + 1;
+    user.aiUsage.lastUsed = now;
+    await user.save();
+
+    // Send usage update
+    let messagesRemaining, messagesLimit;
+    if (isBetaPeriod) {
+      messagesRemaining = BETA_DAILY_LIMIT - user.aiUsage.count;
+      messagesLimit = BETA_DAILY_LIMIT;
+    } else if (user.isPremium) {
+      messagesRemaining = PREMIUM_DAILY_LIMIT - user.aiUsage.count;
+      messagesLimit = PREMIUM_DAILY_LIMIT;
+    } else {
+      messagesRemaining = FREE_LIFETIME_LIMIT - user.aiUsage.lifetimeCount;
+      messagesLimit = FREE_LIFETIME_LIMIT;
+    }
+
+    res.write(`data: ${JSON.stringify({ 
+      type: 'usage', 
+      messagesUsed: user.aiUsage.count,
+      messagesRemaining,
+      messagesLimit,
+      isBetaPeriod
+    })}\n\n`);
+
+    res.write('data: [DONE]\n\n');
+    res.end();
+
+    console.log(`✅ AI stream complete for ${username}. Messages remaining: ${messagesRemaining}`);
+
+  } catch (err) {
+    console.error('❌ AI Stream error:', err);
+    
+    // If headers already sent, send error through SSE
+    if (res.headersSent) {
+      res.write(`data: ${JSON.stringify({ type: 'error', message: 'Stream interrupted' })}\n\n`);
+      res.end();
+    } else {
+      res.status(500).json({ error: 'Failed to get AI response' });
+    }
+  }
+});
+
 // Get AI usage stats for user
 app.get('/api/ai/usage', authenticate, async (req, res) => {
   try {
