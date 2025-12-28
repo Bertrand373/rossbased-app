@@ -16,6 +16,7 @@ const AIChat = ({ isLoggedIn }) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [streamingText, setStreamingText] = useState('');
+  const [showPulse, setShowPulse] = useState(false);
   const [usage, setUsage] = useState({
     messagesUsed: 0,
     messagesLimit: 5,
@@ -27,6 +28,26 @@ const AIChat = ({ isLoggedIn }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const chatBodyRef = useRef(null);
+
+  // Check if user should see pulse animation (first 3 app opens before clicking chat)
+  useEffect(() => {
+    if (isLoggedIn) {
+      const chatOpened = localStorage.getItem('titantrack_ai_chat_opened');
+      const pulseCount = parseInt(localStorage.getItem('titantrack_ai_pulse_count') || '0', 10);
+      
+      if (!chatOpened && pulseCount < 3) {
+        setShowPulse(true);
+        localStorage.setItem('titantrack_ai_pulse_count', String(pulseCount + 1));
+      }
+    }
+  }, [isLoggedIn]);
+
+  // Mark chat as opened (stops future pulses)
+  const handleOpenChat = () => {
+    setIsOpen(true);
+    setShowPulse(false);
+    localStorage.setItem('titantrack_ai_chat_opened', 'true');
+  };
 
   // Load chat history from localStorage
   useEffect(() => {
@@ -241,8 +262,8 @@ const AIChat = ({ isLoggedIn }) => {
     <>
       {/* Floating Button */}
       <button 
-        className={`ai-chat-fab ${isOpen ? 'hidden' : ''}`}
-        onClick={() => setIsOpen(true)}
+        className={`ai-chat-fab ${isOpen ? 'hidden' : ''} ${showPulse ? 'pulse' : ''}`}
+        onClick={handleOpenChat}
         aria-label="Open AI Chat"
       >
         <img 

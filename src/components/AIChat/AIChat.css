@@ -40,9 +40,23 @@
 }
 
 .ai-chat-fab-icon {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   opacity: 0.9;
+}
+
+/* Subtle attention pulse - runs 3 times then stops */
+.ai-chat-fab.pulse {
+  animation: fabAttention 2s ease-in-out 3;
+}
+
+@keyframes fabAttention {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 8px rgba(255, 255, 255, 0.06);
+  }
 }
 
 /* Desktop positioning */
@@ -494,15 +508,15 @@
 
 @media (max-width: 480px) {
   .ai-chat-fab {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     bottom: calc(76px + env(safe-area-inset-bottom, 0));
     right: 16px;
   }
   
   .ai-chat-fab-icon {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
   }
   
   .ai-chat-panel {

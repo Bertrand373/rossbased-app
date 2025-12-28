@@ -622,7 +622,7 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
     }
 
     // Beta period: Feb 18, 2025 launch date
-    const launchDate = new Date('2025-02-18T00:00:00Z');
+    const launchDate = new Date('2026-02-18T00:00:00Z');
     const isBetaPeriod = now < launchDate;
     
     const BETA_DAILY_LIMIT = 5;      // Daily limit during soft launch
@@ -795,7 +795,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       };
     }
 
-    const launchDate = new Date('2025-02-18T00:00:00Z');
+    const launchDate = new Date('2026-02-18T00:00:00Z');
     const isBetaPeriod = now < launchDate;
     
     const BETA_DAILY_LIMIT = 5;
@@ -941,7 +941,7 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     }
 
     // Check if beta period
-    const launchDate = new Date('2025-02-18T00:00:00Z');
+    const launchDate = new Date('2026-02-18T00:00:00Z');
     const isBetaPeriod = now < launchDate;
     
     const BETA_DAILY_LIMIT = 5;
