@@ -375,11 +375,11 @@ const AIChat = ({ isLoggedIn }) => {
 
           {/* Clear Chat Confirmation Modal */}
           {showClearConfirm && (
-            <div className="ai-chat-modal-overlay" onClick={() => setShowClearConfirm(false)}>
-              <div className="ai-chat-modal" onClick={e => e.stopPropagation()}>
+            <div className="overlay" onClick={() => setShowClearConfirm(false)}>
+              <div className="modal" onClick={e => e.stopPropagation()}>
                 <h2>Clear chat history?</h2>
-                <p>This will delete all messages in this conversation.</p>
-                <div className="ai-chat-modal-buttons">
+                <p className="modal-text">This will delete all messages in this conversation.</p>
+                <div className="modal-buttons">
                   <button className="btn-ghost" onClick={() => setShowClearConfirm(false)}>Cancel</button>
                   <button className="btn-danger" onClick={handleClearChat}>Clear</button>
                 </div>
