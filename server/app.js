@@ -716,13 +716,7 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
     user.aiUsage.lastUsed = now;
     await user.save();
 
-    // Calculate remaining based on current mode
-    const launchDate = new Date('2025-02-18T00:00:00Z');
-    const isBetaPeriod = now < launchDate;
-    const BETA_DAILY_LIMIT = 5;
-    const FREE_LIFETIME_LIMIT = 3;
-    const PREMIUM_DAILY_LIMIT = 15;
-    
+    // Calculate remaining based on current mode (using variables already declared above)
     let messagesRemaining, messagesLimit;
     
     if (isBetaPeriod) {
