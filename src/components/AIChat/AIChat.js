@@ -24,6 +24,7 @@ const AIChat = ({ isLoggedIn }) => {
     isBetaPeriod: true
   });
   const [error, setError] = useState(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -255,6 +256,13 @@ const AIChat = ({ isLoggedIn }) => {
     });
   };
 
+  // Clear chat history
+  const handleClearChat = () => {
+    setMessages([]);
+    localStorage.removeItem(CHAT_HISTORY_KEY);
+    setShowClearConfirm(false);
+  };
+
   // Don't render if not logged in
   if (!isLoggedIn) return null;
 
@@ -352,8 +360,32 @@ const AIChat = ({ isLoggedIn }) => {
               </div>
             )}
 
+            {/* Clear chat link - only shows when messages exist */}
+            {messages.length > 0 && !isLoading && (
+              <button 
+                className="ai-chat-clear-btn"
+                onClick={() => setShowClearConfirm(true)}
+              >
+                Clear chat
+              </button>
+            )}
+
             <div ref={messagesEndRef} />
           </div>
+
+          {/* Clear Chat Confirmation Modal */}
+          {showClearConfirm && (
+            <div className="ai-chat-modal-overlay" onClick={() => setShowClearConfirm(false)}>
+              <div className="ai-chat-modal" onClick={e => e.stopPropagation()}>
+                <h2>Clear chat history?</h2>
+                <p>This will delete all messages in this conversation.</p>
+                <div className="ai-chat-modal-buttons">
+                  <button className="btn-ghost" onClick={() => setShowClearConfirm(false)}>Cancel</button>
+                  <button className="btn-danger" onClick={handleClearChat}>Clear</button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Input Area */}
           <div className="ai-chat-input-area">
