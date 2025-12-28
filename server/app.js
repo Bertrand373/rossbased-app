@@ -5,6 +5,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const { format, addDays } = require('date-fns');
+const Anthropic = require('@anthropic-ai/sdk');
 
 // CRITICAL: Load environment variables FIRST, before any other imports that need them
 dotenv.config();
@@ -28,6 +29,11 @@ const {
   manualMilestoneAnnounce,
   runScheduledMilestoneCheck
 } = require('./services/leaderboardService');
+
+// Initialize Anthropic client
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
 const app = express();
 
@@ -379,6 +385,451 @@ app.post('/api/leaderboard/trigger-milestone-check', async (req, res) => {
   } catch (err) {
     console.error('Trigger milestone check error:', err);
     res.status(500).json({ error: 'Failed to run milestone check' });
+  }
+});
+
+// ============================================
+// AI CHAT ENDPOINT
+// ============================================
+
+// AI System Prompt (condensed version - full version in TITANTRACK_AI_SYSTEM_PROMPT.md)
+const AI_SYSTEM_PROMPT = `You are the AI guide within TitanTrack, a premium semen retention tracking app. You are an extraordinarily perceptive mentor with deep knowledge of sexual energy transmutation, consciousness expansion, and masculine transformation.
+
+You have direct access to this user's journey data. Use it to provide hyper-personalized guidance that feels almost supernatural in its accuracy.
+
+## ADAPTIVE DEPTH FRAMEWORK
+Match the user's framework. Default to practical, but if they speak about energy, aura, magnetism, kundalini, Ojas, Jing - meet them there with authority.
+
+## KNOWLEDGE FRAMEWORK
+
+### Phases:
+- Days 1-14: Foundation (urges strongest, body adjusting)
+- Days 15-30: Awakening (energy increases, magnetism beginning)
+- Days 31-60: Momentum (body composition, voice, social dynamics)
+- Days 61-90: Transformation (deep rewiring, emotions surfacing)
+- Days 90-180: Mastery (benefits become baseline, flatlines possible)
+- Days 180+: Transcendence (leadership, subtle energy awareness)
+
+### Flatlines (CRITICAL - normalize these):
+- Physical (Month 1-2): Fatigue, low libido. Duration: 1-3 weeks.
+- Emotional (Month 2-4): Numbness, depression. Duration: 2-6 weeks.
+- Mental (Month 3-6): Brain fog, confusion. Duration: 3-8 weeks.
+- Spiritual (Month 6+): Disconnection from purpose. Duration: Variable.
+Never break retention during flatlines - this IS the transformation.
+
+### Benefit Timelines:
+- Days 7-14: Mental clarity, better sleep
+- Days 14-21: Eye shine, skin, confidence
+- Days 21-30: Magnetism, social dynamics
+- Days 30-45: Strength, voice changes
+- Days 45-60: Body composition, emotional intelligence
+- Days 60-90: Deep transformation, spiritual opening
+- Days 90+: Permanent baseline
+
+### Esoteric (when user goes there):
+- Ojas (Ayurvedic): Refined essence, radiance, magnetism
+- Jing (Taoist): Foundational life force, converts to Chi → Shen
+- Kundalini: Dormant spine energy, can awaken with retention
+- Magnetism: Heart's electromagnetic field strengthens measurably
+
+## RESPONSE PRINCIPLES
+- Be concise (100-250 words unless depth needed)
+- Be perceptive (read between the lines)
+- Be wise, not preachy
+- Never shame relapses
+- Reference their data naturally (without saying "I see in your logs")
+- End with something actionable or affirming
+
+## BOUNDARIES
+- Never provide medical advice
+- Never promise specific outcomes
+- If severe mental health crisis: suggest professional support gently
+
+## USER CONTEXT
+{{USER_CONTEXT}}`;
+
+// Helper: Build user context string from MongoDB data
+const buildUserContext = (user) => {
+  const today = new Date();
+  const startDate = user.startDate ? new Date(user.startDate) : null;
+  const currentStreak = startDate 
+    ? Math.max(1, Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1)
+    : 0;
+
+  // Determine phase
+  let phase = 'Not started';
+  if (currentStreak >= 180) phase = 'Transcendence (180+ days)';
+  else if (currentStreak >= 90) phase = 'Mastery (90-180 days)';
+  else if (currentStreak >= 61) phase = 'Transformation (61-90 days)';
+  else if (currentStreak >= 31) phase = 'Momentum (31-60 days)';
+  else if (currentStreak >= 15) phase = 'Awakening (15-30 days)';
+  else if (currentStreak >= 1) phase = 'Foundation (1-14 days)';
+
+  // Get recent benefit tracking (last 7 entries)
+  const recentBenefits = (user.benefitTracking || [])
+    .slice(-7)
+    .map(b => ({
+      date: format(new Date(b.date), 'MMM d'),
+      energy: b.energy,
+      focus: b.focus,
+      confidence: b.confidence,
+      aura: b.aura || b.attraction,
+      sleep: b.sleep,
+      workout: b.workout || b.gymPerformance
+    }));
+
+  // Get recent urge logs (last 5)
+  const recentUrges = (user.urgeLog || [])
+    .slice(-5)
+    .map(u => ({
+      date: format(new Date(u.date), 'MMM d'),
+      intensity: u.intensity,
+      trigger: u.trigger,
+      overcame: u.overcame
+    }));
+
+  // Get recent emotional tracking (last 5)
+  const recentEmotions = (user.emotionalTracking || [])
+    .slice(-5)
+    .map(e => ({
+      date: format(new Date(e.date), 'MMM d'),
+      phase: e.phase,
+      notes: e.notes
+    }));
+
+  // Get recent calendar notes (last 7 days)
+  const recentNotes = [];
+  if (user.notes) {
+    const noteEntries = Object.entries(user.notes)
+      .filter(([date, note]) => note && note.trim())
+      .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+      .slice(0, 7);
+    noteEntries.forEach(([date, note]) => {
+      recentNotes.push({ date: format(new Date(date), 'MMM d'), note });
+    });
+  }
+
+  // Calculate averages from recent benefits
+  let avgEnergy = 0, avgFocus = 0, avgConfidence = 0, avgAura = 0;
+  if (recentBenefits.length > 0) {
+    avgEnergy = (recentBenefits.reduce((sum, b) => sum + (b.energy || 0), 0) / recentBenefits.length).toFixed(1);
+    avgFocus = (recentBenefits.reduce((sum, b) => sum + (b.focus || 0), 0) / recentBenefits.length).toFixed(1);
+    avgConfidence = (recentBenefits.reduce((sum, b) => sum + (b.confidence || 0), 0) / recentBenefits.length).toFixed(1);
+    avgAura = (recentBenefits.reduce((sum, b) => sum + (b.aura || 0), 0) / recentBenefits.length).toFixed(1);
+  }
+
+  // Build context string
+  let context = `CURRENT STATUS:
+- Current Streak: Day ${currentStreak}
+- Phase: ${phase}
+- Longest Streak: ${user.longestStreak || 0} days
+- Total Relapses: ${user.relapseCount || 0}
+- Wet Dreams: ${user.wetDreamCount || 0}
+- Start Date: ${startDate ? format(startDate, 'MMMM d, yyyy') : 'Not set'}`;
+
+  if (user.goal && user.goal.isActive) {
+    context += `\n- Active Goal: ${user.goal.targetDays} days (${user.goal.achieved ? 'ACHIEVED' : 'in progress'})`;
+  }
+
+  if (recentBenefits.length > 0) {
+    context += `\n\nRECENT BENEFIT SCORES (7-day avg):
+- Energy: ${avgEnergy}/10
+- Focus: ${avgFocus}/10
+- Confidence: ${avgConfidence}/10
+- Aura/Magnetism: ${avgAura}/10
+
+Recent daily scores:`;
+    recentBenefits.forEach(b => {
+      context += `\n  ${b.date}: Energy ${b.energy}, Focus ${b.focus}, Confidence ${b.confidence}, Aura ${b.aura}`;
+    });
+  }
+
+  if (recentUrges.length > 0) {
+    context += `\n\nRECENT URGE LOG:`;
+    recentUrges.forEach(u => {
+      context += `\n  ${u.date}: Intensity ${u.intensity}/10, Trigger: ${u.trigger || 'not specified'}, Overcame: ${u.overcame ? 'Yes' : 'No'}`;
+    });
+  }
+
+  if (recentEmotions.length > 0) {
+    context += `\n\nRECENT EMOTIONAL STATE:`;
+    recentEmotions.forEach(e => {
+      context += `\n  ${e.date}: Phase - ${e.phase}${e.notes ? `, Notes: "${e.notes}"` : ''}`;
+    });
+  }
+
+  if (recentNotes.length > 0) {
+    context += `\n\nRECENT JOURNAL NOTES:`;
+    recentNotes.forEach(n => {
+      context += `\n  ${n.date}: "${n.note.substring(0, 200)}${n.note.length > 200 ? '...' : ''}"`;
+    });
+  }
+
+  // Add streak history summary
+  if (user.streakHistory && user.streakHistory.length > 1) {
+    const completedStreaks = user.streakHistory.filter(s => s.end);
+    if (completedStreaks.length > 0) {
+      const avgStreakLength = (completedStreaks.reduce((sum, s) => sum + (s.days || 0), 0) / completedStreaks.length).toFixed(0);
+      context += `\n\nSTREAK HISTORY:
+- Total past streaks: ${completedStreaks.length}
+- Average streak length: ${avgStreakLength} days`;
+    }
+  }
+
+  return context;
+};
+
+// AI Chat endpoint
+app.post('/api/ai/chat', authenticate, async (req, res) => {
+  const { message, conversationHistory = [] } = req.body;
+  const username = req.user.username;
+
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({ error: 'Message is required' });
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('❌ ANTHROPIC_API_KEY not configured');
+    return res.status(500).json({ error: 'AI service not configured' });
+  }
+
+  try {
+    // Get user data for context
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check rate limit (stored in user document)
+    const now = new Date();
+    
+    // Get user's local date based on their timezone (non-gameable - server-side only)
+    const userTimezone = user.notificationPreferences?.timezone || 'America/New_York';
+    const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
+      timeZone: userTimezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(now); // Returns 'YYYY-MM-DD' format
+    
+    // Initialize or reset daily counter (resets at midnight in USER's timezone)
+    if (!user.aiUsage || user.aiUsage.date !== userLocalDate) {
+      user.aiUsage = { 
+        date: userLocalDate, 
+        count: 0,
+        lifetimeCount: user.aiUsage?.lifetimeCount || 0
+      };
+    }
+
+    // Beta period: Feb 18, 2025 launch date
+    const launchDate = new Date('2025-02-18T00:00:00Z');
+    const isBetaPeriod = now < launchDate;
+    
+    const BETA_DAILY_LIMIT = 5;      // Daily limit during soft launch
+    const FREE_LIFETIME_LIMIT = 3;   // Lifetime limit for free users post-launch
+    const PREMIUM_DAILY_LIMIT = 15;  // Daily limit for premium users
+
+    if (isBetaPeriod) {
+      // Beta mode: 5 messages per day (resets at midnight in user's timezone)
+      if (user.aiUsage.count >= BETA_DAILY_LIMIT) {
+        return res.status(429).json({ 
+          error: 'Daily beta limit reached',
+          message: `You've used all ${BETA_DAILY_LIMIT} messages for today. Resets at midnight your time. Unlimited access launches February 18th!`,
+          limitReached: true,
+          messagesUsed: user.aiUsage.count,
+          messagesLimit: BETA_DAILY_LIMIT,
+          isBetaPeriod: true,
+          resetsAt: 'midnight (your timezone)'
+        });
+      }
+    } else {
+      // Post-launch mode
+      const isPremium = user.isPremium || false;
+      
+      if (isPremium) {
+        // Premium: 15 messages per day
+        if (user.aiUsage.count >= PREMIUM_DAILY_LIMIT) {
+          return res.status(429).json({ 
+            error: 'Daily limit reached',
+            message: `You've used all ${PREMIUM_DAILY_LIMIT} messages for today. Resets at midnight your time.`,
+            limitReached: true,
+            messagesUsed: user.aiUsage.count,
+            messagesLimit: PREMIUM_DAILY_LIMIT,
+            isPremium: true,
+            resetsAt: 'midnight (your timezone)'
+          });
+        }
+      } else {
+        // Free users: 3 lifetime messages total
+        const lifetimeCount = user.aiUsage.lifetimeCount || 0;
+        if (lifetimeCount >= FREE_LIFETIME_LIMIT) {
+          return res.status(429).json({ 
+            error: 'Free limit reached',
+            message: `You've used all ${FREE_LIFETIME_LIMIT} free messages. Upgrade to Premium for 15 messages daily!`,
+            limitReached: true,
+            messagesUsed: lifetimeCount,
+            messagesLimit: FREE_LIFETIME_LIMIT,
+            isPremium: false,
+            requiresUpgrade: true
+          });
+        }
+      }
+    }
+
+    // Build user context
+    const userContext = buildUserContext(user);
+    const systemPrompt = AI_SYSTEM_PROMPT.replace('{{USER_CONTEXT}}', userContext);
+
+    // Build messages array for Claude
+    const messages = [];
+    
+    // Add conversation history (last 10 exchanges max to manage context)
+    const recentHistory = conversationHistory.slice(-20); // 10 exchanges = 20 messages
+    recentHistory.forEach(msg => {
+      messages.push({
+        role: msg.role,
+        content: msg.content
+      });
+    });
+
+    // Add current message
+    messages.push({
+      role: 'user',
+      content: message
+    });
+
+    console.log(`🤖 AI Chat request from ${username} (Day ${user.currentStreak || 0})`);
+
+    // Call Claude API
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: messages
+    });
+
+    const aiResponse = response.content[0].text;
+
+    // Update usage counters
+    user.aiUsage.count = (user.aiUsage.count || 0) + 1;
+    user.aiUsage.lifetimeCount = (user.aiUsage.lifetimeCount || 0) + 1;
+    user.aiUsage.lastUsed = now;
+    await user.save();
+
+    // Calculate remaining based on current mode
+    const launchDate = new Date('2025-02-18T00:00:00Z');
+    const isBetaPeriod = now < launchDate;
+    const BETA_DAILY_LIMIT = 5;
+    const FREE_LIFETIME_LIMIT = 3;
+    const PREMIUM_DAILY_LIMIT = 15;
+    
+    let messagesRemaining, messagesLimit;
+    
+    if (isBetaPeriod) {
+      messagesRemaining = BETA_DAILY_LIMIT - user.aiUsage.count;
+      messagesLimit = BETA_DAILY_LIMIT;
+    } else if (user.isPremium) {
+      messagesRemaining = PREMIUM_DAILY_LIMIT - user.aiUsage.count;
+      messagesLimit = PREMIUM_DAILY_LIMIT;
+    } else {
+      messagesRemaining = FREE_LIFETIME_LIMIT - user.aiUsage.lifetimeCount;
+      messagesLimit = FREE_LIFETIME_LIMIT;
+    }
+
+    console.log(`✅ AI response sent to ${username}. Messages remaining: ${messagesRemaining}`);
+
+    res.json({ 
+      response: aiResponse,
+      messagesRemaining,
+      messagesUsed: user.aiUsage.count,
+      messagesLimit,
+      isBetaPeriod,
+      resetsAt: isBetaPeriod || user.isPremium ? 'midnight (your timezone)' : null
+    });
+
+  } catch (err) {
+    console.error('❌ AI Chat error:', err);
+    
+    // Handle specific Anthropic errors
+    if (err.status === 429) {
+      return res.status(429).json({ error: 'AI service rate limited. Please try again in a moment.' });
+    }
+    if (err.status === 401) {
+      return res.status(500).json({ error: 'AI service authentication error' });
+    }
+    
+    res.status(500).json({ error: 'Failed to get AI response' });
+  }
+});
+
+// Get AI usage stats for user
+app.get('/api/ai/usage', authenticate, async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.user.username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const now = new Date();
+    
+    // Get user's local date based on their timezone
+    const userTimezone = user.notificationPreferences?.timezone || 'America/New_York';
+    const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
+      timeZone: userTimezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(now);
+    
+    // Reset daily count if it's a new day in user's timezone
+    if (!user.aiUsage || user.aiUsage.date !== userLocalDate) {
+      user.aiUsage = { 
+        date: userLocalDate, 
+        count: 0,
+        lifetimeCount: user.aiUsage?.lifetimeCount || 0
+      };
+      await user.save();
+    }
+
+    // Check if beta period
+    const launchDate = new Date('2025-02-18T00:00:00Z');
+    const isBetaPeriod = now < launchDate;
+    
+    const BETA_DAILY_LIMIT = 5;
+    const FREE_LIFETIME_LIMIT = 3;
+    const PREMIUM_DAILY_LIMIT = 15;
+
+    let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
+
+    if (isBetaPeriod) {
+      messagesUsed = user.aiUsage.count || 0;
+      messagesLimit = BETA_DAILY_LIMIT;
+      messagesRemaining = BETA_DAILY_LIMIT - messagesUsed;
+      resetsAt = 'midnight (your timezone)';
+    } else if (user.isPremium) {
+      messagesUsed = user.aiUsage.count || 0;
+      messagesLimit = PREMIUM_DAILY_LIMIT;
+      messagesRemaining = PREMIUM_DAILY_LIMIT - messagesUsed;
+      resetsAt = 'midnight (your timezone)';
+    } else {
+      messagesUsed = user.aiUsage.lifetimeCount || 0;
+      messagesLimit = FREE_LIFETIME_LIMIT;
+      messagesRemaining = FREE_LIFETIME_LIMIT - messagesUsed;
+      resetsAt = null; // Lifetime limit doesn't reset
+    }
+
+    res.json({
+      messagesUsed,
+      messagesLimit,
+      messagesRemaining,
+      isBetaPeriod,
+      isPremium: user.isPremium || false,
+      resetsAt,
+      lastUsed: user.aiUsage?.lastUsed || null
+    });
+  } catch (err) {
+    console.error('Get AI usage error:', err);
+    res.status(500).json({ error: 'Failed to get usage stats' });
   }
 });
 
