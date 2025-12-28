@@ -27,6 +27,17 @@ const MOCK_MODE = false; // PRODUCTION MODE - using real API
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
+// Helper function to handle expired token - triggers logout with message
+const handleExpiredToken = () => {
+  console.log('🔒 Token expired - logging out user');
+  localStorage.removeItem('userData');
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('token');
+  localStorage.removeItem('username');
+  sessionStorage.setItem('logoutMessage', 'Session expired. Please log in again.');
+  window.location.href = '/';
+};
+
 // Custom hook to manage user data
 export const useUserData = () => {
   const [userData, setUserData] = useState({
@@ -219,6 +230,12 @@ export const useUserData = () => {
         }
       });
       
+      // Handle expired token (401 Unauthorized)
+      if (response.status === 401) {
+        handleExpiredToken();
+        return null;
+      }
+      
       if (!response.ok) {
         throw new Error('Failed to fetch user data');
       }
@@ -256,6 +273,12 @@ export const useUserData = () => {
         },
         body: JSON.stringify(dataToSync)
       });
+      
+      // Handle expired token (401 Unauthorized)
+      if (response.status === 401) {
+        handleExpiredToken();
+        return false;
+      }
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -664,7 +687,8 @@ export const useUserData = () => {
             localStorage.setItem('userData', JSON.stringify(freshData));
             console.log('✅ Loaded fresh data from MongoDB');
           } else {
-            // API fetch failed - fall back to localStorage
+            // API fetch failed (and wasn't a 401, which would have redirected)
+            // Fall back to localStorage only for non-auth errors (network issues, etc.)
             const storedUserData = localStorage.getItem('userData');
             if (storedUserData) {
               const parsedUserData = processUserData(JSON.parse(storedUserData));
