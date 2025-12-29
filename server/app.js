@@ -767,79 +767,64 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Check rate limit (stored in user document)
+    // Server-side date calculation (ungameable)
     const now = new Date();
-    
-    // Get user's local date based on their timezone (non-gameable - server-side only)
     const userTimezone = user.notificationPreferences?.timezone || 'America/New_York';
     const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
       timeZone: userTimezone,
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
-    }).format(now); // Returns 'YYYY-MM-DD' format
-    
-    // Reset daily count if new day (in database)
-    const isNewDay = !user.aiUsage || user.aiUsage.date !== userLocalDate;
-    if (isNewDay) {
-      await User.updateOne(
-        { username },
-        { $set: { 'aiUsage.date': userLocalDate, 'aiUsage.count': 0 } }
-      );
-      user.aiUsage = { 
-        date: userLocalDate, 
-        count: 0,
-        lifetimeCount: user.aiUsage?.lifetimeCount || 0
-      };
-    }
+    }).format(now);
 
-    // Beta period: Feb 18, 2025 launch date
     const launchDate = new Date('2026-02-18T00:00:00Z');
     const isBetaPeriod = now < launchDate;
     
-    const BETA_DAILY_LIMIT = 5;      // Daily limit during soft launch
-    const FREE_LIFETIME_LIMIT = 3;   // Lifetime limit for free users post-launch
-    const PREMIUM_DAILY_LIMIT = 15;  // Daily limit for premium users
+    const BETA_DAILY_LIMIT = 5;
+    const FREE_LIFETIME_LIMIT = 3;
+    const PREMIUM_DAILY_LIMIT = 15;
 
+    // Calculate current count (handle all edge cases)
+    const storedDate = user.aiUsage?.date || '';
+    const isNewDay = storedDate !== userLocalDate;
+    const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
+    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
+
+    // Check limits BEFORE calling Claude API
     if (isBetaPeriod) {
-      // Beta mode: 5 messages per day (resets at midnight in user's timezone)
-      if (user.aiUsage.count >= BETA_DAILY_LIMIT) {
+      if (currentCount >= BETA_DAILY_LIMIT) {
         return res.status(429).json({ 
           error: 'Daily beta limit reached',
           message: `You've used all ${BETA_DAILY_LIMIT} messages for today. Resets at midnight your time. Unlimited access launches February 18th!`,
           limitReached: true,
-          messagesUsed: user.aiUsage.count,
+          messagesUsed: currentCount,
           messagesLimit: BETA_DAILY_LIMIT,
           isBetaPeriod: true,
           resetsAt: 'midnight (your timezone)'
         });
       }
     } else {
-      // Post-launch mode
       const isPremium = user.isPremium || false;
       
       if (isPremium) {
-        // Premium: 15 messages per day
-        if (user.aiUsage.count >= PREMIUM_DAILY_LIMIT) {
+        if (currentCount >= PREMIUM_DAILY_LIMIT) {
           return res.status(429).json({ 
             error: 'Daily limit reached',
             message: `You've used all ${PREMIUM_DAILY_LIMIT} messages for today. Resets at midnight your time.`,
             limitReached: true,
-            messagesUsed: user.aiUsage.count,
+            messagesUsed: currentCount,
             messagesLimit: PREMIUM_DAILY_LIMIT,
             isPremium: true,
             resetsAt: 'midnight (your timezone)'
           });
         }
       } else {
-        // Free users: 3 lifetime messages total
-        const lifetimeCount = user.aiUsage.lifetimeCount || 0;
-        if (lifetimeCount >= FREE_LIFETIME_LIMIT) {
+        if (currentLifetime >= FREE_LIFETIME_LIMIT) {
           return res.status(429).json({ 
             error: 'Free limit reached',
             message: `You've used all ${FREE_LIFETIME_LIMIT} free messages. Upgrade to Premium for 15 messages daily!`,
             limitReached: true,
-            messagesUsed: lifetimeCount,
+            messagesUsed: currentLifetime,
             messagesLimit: FREE_LIFETIME_LIMIT,
             isPremium: false,
             requiresUpgrade: true
@@ -854,23 +839,13 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
 
     // Build messages array for Claude
     const messages = [];
-    
-    // Add conversation history (last 10 exchanges max to manage context)
-    const recentHistory = conversationHistory.slice(-20); // 10 exchanges = 20 messages
+    const recentHistory = conversationHistory.slice(-20);
     recentHistory.forEach(msg => {
-      messages.push({
-        role: msg.role,
-        content: msg.content
-      });
+      messages.push({ role: msg.role, content: msg.content });
     });
+    messages.push({ role: 'user', content: message });
 
-    // Add current message
-    messages.push({
-      role: 'user',
-      content: message
-    });
-
-    console.log(`🤖 AI Chat request from ${username} (Day ${user.currentStreak || 0})`);
+    console.log(`🤖 AI Chat request from ${username} (Day ${user.currentStreak || 0}) [${currentCount}/${isBetaPeriod ? BETA_DAILY_LIMIT : PREMIUM_DAILY_LIMIT} today]`);
 
     // Call Claude API
     const response = await anthropic.messages.create({
@@ -882,50 +857,53 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
 
     const aiResponse = response.content[0].text;
 
-    // Update usage counters atomically
-    const newCount = (user.aiUsage?.count || 0) + 1;
-    const newLifetimeCount = (user.aiUsage?.lifetimeCount || 0) + 1;
-    
-    await User.updateOne(
+    // ATOMIC UPDATE: Single operation handles all edge cases
+    const updateResult = await User.findOneAndUpdate(
       { username },
-      { 
-        $set: { 
-          'aiUsage.count': newCount,
-          'aiUsage.lifetimeCount': newLifetimeCount,
-          'aiUsage.lastUsed': now,
-          'aiUsage.date': user.aiUsage?.date || userLocalDate
+      [
+        {
+          $set: {
+            aiUsage: {
+              date: userLocalDate,
+              count: {
+                $cond: {
+                  if: { $eq: [{ $ifNull: ['$aiUsage.date', ''] }, userLocalDate] },
+                  then: { $add: [{ $ifNull: ['$aiUsage.count', 0] }, 1] },
+                  else: 1
+                }
+              },
+              lifetimeCount: { $add: [{ $ifNull: ['$aiUsage.lifetimeCount', 0] }, 1] },
+              lastUsed: now
+            }
+          }
         }
-      }
+      ],
+      { new: true }
     );
-    
-    // Update local reference
-    user.aiUsage = {
-      count: newCount,
-      lifetimeCount: newLifetimeCount,
-      lastUsed: now,
-      date: user.aiUsage?.date || userLocalDate
-    };
 
-    // Calculate remaining based on current mode (using variables already declared above)
+    // Get updated counts from the atomic operation result
+    const newCount = updateResult.aiUsage.count;
+    const newLifetime = updateResult.aiUsage.lifetimeCount;
+
+    // Calculate remaining
     let messagesRemaining, messagesLimit;
-    
     if (isBetaPeriod) {
-      messagesRemaining = BETA_DAILY_LIMIT - user.aiUsage.count;
+      messagesRemaining = BETA_DAILY_LIMIT - newCount;
       messagesLimit = BETA_DAILY_LIMIT;
     } else if (user.isPremium) {
-      messagesRemaining = PREMIUM_DAILY_LIMIT - user.aiUsage.count;
+      messagesRemaining = PREMIUM_DAILY_LIMIT - newCount;
       messagesLimit = PREMIUM_DAILY_LIMIT;
     } else {
-      messagesRemaining = FREE_LIFETIME_LIMIT - user.aiUsage.lifetimeCount;
+      messagesRemaining = FREE_LIFETIME_LIMIT - newLifetime;
       messagesLimit = FREE_LIFETIME_LIMIT;
     }
 
-    console.log(`✅ AI response sent to ${username}. Messages remaining: ${messagesRemaining}`);
+    console.log(`✅ AI response sent to ${username}. Count: ${newCount}, Remaining: ${messagesRemaining}`);
 
     res.json({ 
       response: aiResponse,
       messagesRemaining,
-      messagesUsed: user.aiUsage.count,
+      messagesUsed: newCount,
       messagesLimit,
       isBetaPeriod,
       resetsAt: isBetaPeriod || user.isPremium ? 'midnight (your timezone)' : null
@@ -967,7 +945,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Check rate limit
+    // Server-side date calculation (ungameable)
     const now = new Date();
     const userTimezone = user.notificationPreferences?.timezone || 'America/New_York';
     const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
@@ -976,20 +954,6 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       month: '2-digit',
       day: '2-digit'
     }).format(now);
-    
-    // Reset daily count if new day (in database)
-    const isNewDay = !user.aiUsage || user.aiUsage.date !== userLocalDate;
-    if (isNewDay) {
-      await User.updateOne(
-        { username },
-        { $set: { 'aiUsage.date': userLocalDate, 'aiUsage.count': 0 } }
-      );
-      user.aiUsage = { 
-        date: userLocalDate, 
-        count: 0,
-        lifetimeCount: user.aiUsage?.lifetimeCount || 0
-      };
-    }
 
     const launchDate = new Date('2026-02-18T00:00:00Z');
     const isBetaPeriod = now < launchDate;
@@ -998,9 +962,15 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     const FREE_LIFETIME_LIMIT = 3;
     const PREMIUM_DAILY_LIMIT = 15;
 
-    // Check limits
+    // Calculate current count (handle all edge cases)
+    const storedDate = user.aiUsage?.date || '';
+    const isNewDay = storedDate !== userLocalDate;
+    const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
+    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
+
+    // Check limits BEFORE calling Claude API
     if (isBetaPeriod) {
-      if (user.aiUsage.count >= BETA_DAILY_LIMIT) {
+      if (currentCount >= BETA_DAILY_LIMIT) {
         return res.status(429).json({ 
           error: 'Daily beta limit reached',
           message: `You've used all ${BETA_DAILY_LIMIT} messages for today. Resets at midnight your time.`
@@ -1009,15 +979,14 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     } else {
       const isPremium = user.isPremium || false;
       if (isPremium) {
-        if (user.aiUsage.count >= PREMIUM_DAILY_LIMIT) {
+        if (currentCount >= PREMIUM_DAILY_LIMIT) {
           return res.status(429).json({ 
             error: 'Daily limit reached',
             message: `You've used all ${PREMIUM_DAILY_LIMIT} messages for today.`
           });
         }
       } else {
-        const lifetimeCount = user.aiUsage.lifetimeCount || 0;
-        if (lifetimeCount >= FREE_LIFETIME_LIMIT) {
+        if (currentLifetime >= FREE_LIFETIME_LIMIT) {
           return res.status(429).json({ 
             error: 'Free limit reached',
             message: `Upgrade to Premium for 15 messages daily!`
@@ -1038,7 +1007,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     });
     messages.push({ role: 'user', content: message });
 
-    console.log(`🤖 AI Stream request from ${username} (Day ${user.currentStreak || 0})`);
+    console.log(`🤖 AI Stream request from ${username} (Day ${user.currentStreak || 0}) [${currentCount}/${isBetaPeriod ? BETA_DAILY_LIMIT : PREMIUM_DAILY_LIMIT} today]`);
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
@@ -1062,46 +1031,54 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       }
     }
 
-    // Update usage counters atomically
-    const newCount = (user.aiUsage?.count || 0) + 1;
-    const newLifetimeCount = (user.aiUsage?.lifetimeCount || 0) + 1;
-    
-    await User.updateOne(
+    // ATOMIC UPDATE: Single operation handles all edge cases
+    // - If aiUsage undefined: creates it
+    // - If new day: resets count to 1
+    // - If same day: increments count
+    // - Always increments lifetimeCount
+    const updateResult = await User.findOneAndUpdate(
       { username },
-      { 
-        $set: { 
-          'aiUsage.count': newCount,
-          'aiUsage.lifetimeCount': newLifetimeCount,
-          'aiUsage.lastUsed': now,
-          'aiUsage.date': user.aiUsage?.date || userLocalDate
+      [
+        {
+          $set: {
+            aiUsage: {
+              date: userLocalDate,
+              count: {
+                $cond: {
+                  if: { $eq: [{ $ifNull: ['$aiUsage.date', ''] }, userLocalDate] },
+                  then: { $add: [{ $ifNull: ['$aiUsage.count', 0] }, 1] },
+                  else: 1
+                }
+              },
+              lifetimeCount: { $add: [{ $ifNull: ['$aiUsage.lifetimeCount', 0] }, 1] },
+              lastUsed: now
+            }
+          }
         }
-      }
+      ],
+      { new: true }
     );
-    
-    // Update local reference
-    user.aiUsage = {
-      count: newCount,
-      lifetimeCount: newLifetimeCount,
-      lastUsed: now,
-      date: user.aiUsage?.date || userLocalDate
-    };
 
-    // Send usage update
+    // Get updated counts from the atomic operation result
+    const newCount = updateResult.aiUsage.count;
+    const newLifetime = updateResult.aiUsage.lifetimeCount;
+
+    // Calculate remaining
     let messagesRemaining, messagesLimit;
     if (isBetaPeriod) {
-      messagesRemaining = BETA_DAILY_LIMIT - user.aiUsage.count;
+      messagesRemaining = BETA_DAILY_LIMIT - newCount;
       messagesLimit = BETA_DAILY_LIMIT;
     } else if (user.isPremium) {
-      messagesRemaining = PREMIUM_DAILY_LIMIT - user.aiUsage.count;
+      messagesRemaining = PREMIUM_DAILY_LIMIT - newCount;
       messagesLimit = PREMIUM_DAILY_LIMIT;
     } else {
-      messagesRemaining = FREE_LIFETIME_LIMIT - user.aiUsage.lifetimeCount;
+      messagesRemaining = FREE_LIFETIME_LIMIT - newLifetime;
       messagesLimit = FREE_LIFETIME_LIMIT;
     }
 
     res.write(`data: ${JSON.stringify({ 
       type: 'usage', 
-      messagesUsed: user.aiUsage.count,
+      messagesUsed: newCount,
       messagesRemaining,
       messagesLimit,
       isBetaPeriod
@@ -1110,7 +1087,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     res.write('data: [DONE]\n\n');
     res.end();
 
-    console.log(`✅ AI stream complete for ${username}. Messages remaining: ${messagesRemaining}`);
+    console.log(`✅ AI stream complete for ${username}. Count: ${newCount}, Remaining: ${messagesRemaining}`);
 
   } catch (err) {
     console.error('❌ AI Stream error:', err);
@@ -1133,9 +1110,8 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Server-side date calculation (ungameable)
     const now = new Date();
-    
-    // Get user's local date based on their timezone
     const userTimezone = user.notificationPreferences?.timezone || 'America/New_York';
     const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
       timeZone: userTimezone,
@@ -1143,16 +1119,12 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
       month: '2-digit',
       day: '2-digit'
     }).format(now);
-    
-    // Reset daily count if it's a new day in user's timezone
-    if (!user.aiUsage || user.aiUsage.date !== userLocalDate) {
-      user.aiUsage = { 
-        date: userLocalDate, 
-        count: 0,
-        lifetimeCount: user.aiUsage?.lifetimeCount || 0
-      };
-      await user.save();
-    }
+
+    // Calculate current count (handle all edge cases - READ ONLY, no save)
+    const storedDate = user.aiUsage?.date || '';
+    const isNewDay = storedDate !== userLocalDate;
+    const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
+    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
 
     // Check if beta period
     const launchDate = new Date('2026-02-18T00:00:00Z');
@@ -1165,19 +1137,19 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
 
     if (isBetaPeriod) {
-      messagesUsed = user.aiUsage.count || 0;
+      messagesUsed = currentCount;
       messagesLimit = BETA_DAILY_LIMIT;
-      messagesRemaining = BETA_DAILY_LIMIT - messagesUsed;
+      messagesRemaining = BETA_DAILY_LIMIT - currentCount;
       resetsAt = 'midnight (your timezone)';
     } else if (user.isPremium) {
-      messagesUsed = user.aiUsage.count || 0;
+      messagesUsed = currentCount;
       messagesLimit = PREMIUM_DAILY_LIMIT;
-      messagesRemaining = PREMIUM_DAILY_LIMIT - messagesUsed;
+      messagesRemaining = PREMIUM_DAILY_LIMIT - currentCount;
       resetsAt = 'midnight (your timezone)';
     } else {
-      messagesUsed = user.aiUsage.lifetimeCount || 0;
+      messagesUsed = currentLifetime;
       messagesLimit = FREE_LIFETIME_LIMIT;
-      messagesRemaining = FREE_LIFETIME_LIMIT - messagesUsed;
+      messagesRemaining = FREE_LIFETIME_LIMIT - currentLifetime;
       resetsAt = null; // Lifetime limit doesn't reset
     }
 
