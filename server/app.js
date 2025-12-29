@@ -779,8 +779,13 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
       day: '2-digit'
     }).format(now); // Returns 'YYYY-MM-DD' format
     
-    // Initialize or reset daily counter (resets at midnight in USER's timezone)
-    if (!user.aiUsage || user.aiUsage.date !== userLocalDate) {
+    // Reset daily count if new day (in database)
+    const isNewDay = !user.aiUsage || user.aiUsage.date !== userLocalDate;
+    if (isNewDay) {
+      await User.updateOne(
+        { username },
+        { $set: { 'aiUsage.date': userLocalDate, 'aiUsage.count': 0 } }
+      );
       user.aiUsage = { 
         date: userLocalDate, 
         count: 0,
@@ -877,16 +882,29 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
 
     const aiResponse = response.content[0].text;
 
-    // Update usage counters atomically (bypasses Mongoose change detection issues)
-    const updatedUser = await User.findOneAndUpdate(
+    // Update usage counters atomically
+    const newCount = (user.aiUsage?.count || 0) + 1;
+    const newLifetimeCount = (user.aiUsage?.lifetimeCount || 0) + 1;
+    
+    await User.updateOne(
       { username },
       { 
-        $inc: { 'aiUsage.count': 1, 'aiUsage.lifetimeCount': 1 },
-        $set: { 'aiUsage.lastUsed': now }
-      },
-      { new: true }
+        $set: { 
+          'aiUsage.count': newCount,
+          'aiUsage.lifetimeCount': newLifetimeCount,
+          'aiUsage.lastUsed': now,
+          'aiUsage.date': user.aiUsage?.date || userLocalDate
+        }
+      }
     );
-    user.aiUsage = updatedUser.aiUsage;
+    
+    // Update local reference
+    user.aiUsage = {
+      count: newCount,
+      lifetimeCount: newLifetimeCount,
+      lastUsed: now,
+      date: user.aiUsage?.date || userLocalDate
+    };
 
     // Calculate remaining based on current mode (using variables already declared above)
     let messagesRemaining, messagesLimit;
@@ -959,7 +977,13 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       day: '2-digit'
     }).format(now);
     
-    if (!user.aiUsage || user.aiUsage.date !== userLocalDate) {
+    // Reset daily count if new day (in database)
+    const isNewDay = !user.aiUsage || user.aiUsage.date !== userLocalDate;
+    if (isNewDay) {
+      await User.updateOne(
+        { username },
+        { $set: { 'aiUsage.date': userLocalDate, 'aiUsage.count': 0 } }
+      );
       user.aiUsage = { 
         date: userLocalDate, 
         count: 0,
@@ -1038,16 +1062,29 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       }
     }
 
-    // Update usage counters atomically (bypasses Mongoose change detection issues)
-    const updatedUser = await User.findOneAndUpdate(
+    // Update usage counters atomically
+    const newCount = (user.aiUsage?.count || 0) + 1;
+    const newLifetimeCount = (user.aiUsage?.lifetimeCount || 0) + 1;
+    
+    await User.updateOne(
       { username },
       { 
-        $inc: { 'aiUsage.count': 1, 'aiUsage.lifetimeCount': 1 },
-        $set: { 'aiUsage.lastUsed': now }
-      },
-      { new: true }
+        $set: { 
+          'aiUsage.count': newCount,
+          'aiUsage.lifetimeCount': newLifetimeCount,
+          'aiUsage.lastUsed': now,
+          'aiUsage.date': user.aiUsage?.date || userLocalDate
+        }
+      }
     );
-    user.aiUsage = updatedUser.aiUsage;
+    
+    // Update local reference
+    user.aiUsage = {
+      count: newCount,
+      lifetimeCount: newLifetimeCount,
+      lastUsed: now,
+      date: user.aiUsage?.date || userLocalDate
+    };
 
     // Send usage update
     let messagesRemaining, messagesLimit;
