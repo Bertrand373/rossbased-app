@@ -236,9 +236,6 @@ const AIChat = ({ isLoggedIn }) => {
           timestamp: new Date().toISOString()
         };
         setMessages(prev => [...prev, assistantMessage]);
-        
-        // Always refresh usage from server to ensure accurate count
-        await fetchUsage();
       }
 
     } catch (err) {
