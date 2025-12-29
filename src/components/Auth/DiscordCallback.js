@@ -1,6 +1,7 @@
 // src/components/Auth/DiscordCallback.js
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { trackLogin, trackSignup } from '../../utils/mixpanel';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -41,6 +42,13 @@ const DiscordCallback = ({ onLogin }) => {
       // Store token and username
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
+
+      // Track signup or login in Mixpanel
+      if (data.isNewUser) {
+        trackSignup('discord');
+      } else {
+        trackLogin('discord');
+      }
 
       // Call onLogin
       await onLogin(data.username, null, true);

@@ -82,6 +82,7 @@ router.post('/discord', async (req, res) => {
         { email: discordUser.email }
       ]
     });
+    const isNewUser = !user;  // Track if this is a new user for Mixpanel
 
     if (!user) {
       // Create new user
@@ -163,6 +164,7 @@ router.post('/discord', async (req, res) => {
 
     res.json({
       token,
+      isNewUser,  // Send flag to frontend for Mixpanel tracking
       ...user.toObject()
     });
 
