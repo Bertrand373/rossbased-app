@@ -861,9 +861,11 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
     const newCount = isNewDay ? 1 : currentCount + 1;
     const newLifetime = currentLifetime + 1;
 
-    // Simple atomic update - guaranteed to work
-    await User.findOneAndUpdate(
-      { username },
+    // Use updateOne with explicit logging to debug
+    console.log(`📝 Attempting update for ${username}: count=${newCount}, lifetime=${newLifetime}, date=${userLocalDate}`);
+    
+    const updateResult = await User.updateOne(
+      { username: username },
       { 
         $set: { 
           'aiUsage.date': userLocalDate,
@@ -871,9 +873,10 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
           'aiUsage.lifetimeCount': newLifetime,
           'aiUsage.lastUsed': now
         }
-      },
-      { new: true, upsert: false }
+      }
     );
+    
+    console.log(`📝 Update result: matched=${updateResult.matchedCount}, modified=${updateResult.modifiedCount}, acknowledged=${updateResult.acknowledged}`);
 
     // Calculate remaining
     let messagesRemaining, messagesLimit;
@@ -1025,9 +1028,11 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     const newCount = isNewDay ? 1 : currentCount + 1;
     const newLifetime = currentLifetime + 1;
 
-    // Simple atomic update - guaranteed to work
-    await User.findOneAndUpdate(
-      { username },
+    // Use updateOne with explicit logging to debug
+    console.log(`📝 Attempting update for ${username}: count=${newCount}, lifetime=${newLifetime}, date=${userLocalDate}`);
+    
+    const updateResult = await User.updateOne(
+      { username: username },
       { 
         $set: { 
           'aiUsage.date': userLocalDate,
@@ -1035,9 +1040,10 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
           'aiUsage.lifetimeCount': newLifetime,
           'aiUsage.lastUsed': now
         }
-      },
-      { new: true, upsert: false }
+      }
     );
+    
+    console.log(`📝 Update result: matched=${updateResult.matchedCount}, modified=${updateResult.modifiedCount}, acknowledged=${updateResult.acknowledged}`);
 
     // Calculate remaining
     let messagesRemaining, messagesLimit;
