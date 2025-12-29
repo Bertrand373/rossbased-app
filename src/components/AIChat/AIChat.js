@@ -150,6 +150,9 @@ const AIChat = ({ isLoggedIn }) => {
         .slice(-MAX_CONTEXT_MESSAGES)
         .map(m => ({ role: m.role, content: m.content }));
 
+      // Auto-detect user's timezone
+      const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
       const response = await fetch(`${API_URL}/api/ai/chat/stream`, {
         method: 'POST',
         headers: {
@@ -158,7 +161,8 @@ const AIChat = ({ isLoggedIn }) => {
         },
         body: JSON.stringify({
           message: userMessage.content,
-          conversationHistory: recentMessages.slice(0, -1) // Exclude current message
+          conversationHistory: recentMessages.slice(0, -1), // Exclude current message
+          timezone: detectedTimezone
         })
       });
 
@@ -418,11 +422,6 @@ const AIChat = ({ isLoggedIn }) => {
                 <span className="ai-chat-limit-text">
                   Daily limit reached · Resets at midnight
                 </span>
-                {usage.isBetaPeriod && (
-                  <span className="ai-chat-limit-subtext">
-                    Unlimited access Feb 18
-                  </span>
-                )}
               </div>
             )}
           </div>

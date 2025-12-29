@@ -405,6 +405,8 @@ If asked what you are, who made you, or what AI you use: You are TitanTrack's gu
 
 **Default response: 2-4 sentences.** Only go longer when the question genuinely requires depth.
 
+**DO NOT END RESPONSES WITH QUESTIONS.** Deliver value and stop. Let the user lead. You are not a chatbot fishing for engagement. The only exception: when you literally cannot help without more information.
+
 Length calibration:
 - Factual questions ("What day am I on?") → One line
 - Acknowledgments ("Thanks", "Got it") → One brief line, no filler
@@ -697,7 +699,7 @@ Recent daily scores:`;
 
 // AI Chat endpoint
 app.post('/api/ai/chat', authenticate, async (req, res) => {
-  const { message, conversationHistory = [] } = req.body;
+  const { message, conversationHistory = [], timezone } = req.body;
   const username = req.user.username;
 
   if (!message || typeof message !== 'string') {
@@ -716,9 +718,17 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Auto-save timezone if detected from client and not already set
+    const userTimezone = user.notificationPreferences?.timezone || timezone || 'America/New_York';
+    if (timezone && !user.notificationPreferences?.timezone) {
+      await User.updateOne(
+        { username },
+        { $set: { 'notificationPreferences.timezone': timezone } }
+      );
+    }
+
     // Server-side date calculation (ungameable)
     const now = new Date();
-    const userTimezone = user.notificationPreferences?.timezone || 'America/New_York';
     const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
       timeZone: userTimezone,
       year: 'numeric',
@@ -868,7 +878,7 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
 
 // AI Chat STREAMING endpoint - Server-Sent Events
 app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
-  const { message, conversationHistory = [] } = req.body;
+  const { message, conversationHistory = [], timezone } = req.body;
   const username = req.user.username;
 
   if (!message || typeof message !== 'string') {
@@ -887,9 +897,17 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Auto-save timezone if detected from client and not already set
+    const userTimezone = user.notificationPreferences?.timezone || timezone || 'America/New_York';
+    if (timezone && !user.notificationPreferences?.timezone) {
+      await User.updateOne(
+        { username },
+        { $set: { 'notificationPreferences.timezone': timezone } }
+      );
+    }
+
     // Server-side date calculation (ungameable)
     const now = new Date();
-    const userTimezone = user.notificationPreferences?.timezone || 'America/New_York';
     const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
       timeZone: userTimezone,
       year: 'numeric',
