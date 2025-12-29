@@ -5,6 +5,7 @@ import { FaSpinner } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { BsDiscord } from 'react-icons/bs';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+import { trackLogin, trackSignup } from '../../utils/mixpanel';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -52,6 +53,13 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
+      
+      // Track signup or login in Mixpanel
+      if (data.isNewUser) {
+        trackSignup('google');
+      } else {
+        trackLogin('google');
+      }
 
       const elapsedTime = Date.now() - loadingStartTime;
       const remainingTime = Math.max(0, 1200 - elapsedTime);
@@ -173,6 +181,10 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
         await new Promise(resolve => setTimeout(resolve, 1200));
         const success = await onLogin(username.trim(), password);
         
+        if (success) {
+          trackLogin('email');
+        }
+        
         if (!success) {
           setError('Invalid credentials or account not found.');
           setIsLoading(false);
@@ -196,6 +208,9 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
         
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.username);
+        
+        // Track signup in Mixpanel
+        trackSignup('email');
         
         const success = await onLogin(data.username, null, true);
         

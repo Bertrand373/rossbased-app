@@ -136,13 +136,6 @@ const AIChat = ({ isLoggedIn }) => {
     setIsLoading(true);
     setError(null);
     setStreamingText('');
-    
-    // Optimistically decrement usage (will be corrected by server response)
-    setUsage(prev => ({
-      ...prev,
-      messagesUsed: prev.messagesUsed + 1,
-      messagesRemaining: Math.max(0, prev.messagesRemaining - 1)
-    }));
 
     const token = localStorage.getItem('token');
     if (!token) {
@@ -241,9 +234,6 @@ const AIChat = ({ isLoggedIn }) => {
     } catch (err) {
       console.error('AI Chat error:', err);
       setError(err.message || 'Something went wrong');
-      
-      // Refresh usage on error to get accurate count
-      await fetchUsage();
     } finally {
       setIsLoading(false);
       setStreamingText('');

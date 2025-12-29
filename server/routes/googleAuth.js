@@ -29,6 +29,7 @@ router.post('/google', async (req, res) => {
 
     // Check if user exists
     let user = await User.findOne({ email });
+    const isNewUser = !user;  // Track if this is a new user for Mixpanel
     
     if (!user) {
       // Create new user from Google data
@@ -77,7 +78,8 @@ router.post('/google', async (req, res) => {
     const token = jwt.sign({ username: user.username }, jwtSecret, { expiresIn: '7d' });
 
     res.json({ 
-      token, 
+      token,
+      isNewUser,  // Send flag to frontend for Mixpanel tracking
       ...user.toObject() 
     });
 

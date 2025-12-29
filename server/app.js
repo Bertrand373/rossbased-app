@@ -881,6 +881,7 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
     user.aiUsage.count = (user.aiUsage.count || 0) + 1;
     user.aiUsage.lifetimeCount = (user.aiUsage.lifetimeCount || 0) + 1;
     user.aiUsage.lastUsed = now;
+    user.markModified('aiUsage');
     await user.save();
 
     // Calculate remaining based on current mode (using variables already declared above)
@@ -1037,6 +1038,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     user.aiUsage.count = (user.aiUsage.count || 0) + 1;
     user.aiUsage.lifetimeCount = (user.aiUsage.lifetimeCount || 0) + 1;
     user.aiUsage.lastUsed = now;
+    user.markModified('aiUsage');
     await user.save();
 
     // Send usage update
