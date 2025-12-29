@@ -877,12 +877,16 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
 
     const aiResponse = response.content[0].text;
 
-    // Update usage counters
-    user.aiUsage.count = (user.aiUsage.count || 0) + 1;
-    user.aiUsage.lifetimeCount = (user.aiUsage.lifetimeCount || 0) + 1;
-    user.aiUsage.lastUsed = now;
-    user.markModified('aiUsage');
-    await user.save();
+    // Update usage counters atomically (bypasses Mongoose change detection issues)
+    const updatedUser = await User.findOneAndUpdate(
+      { username },
+      { 
+        $inc: { 'aiUsage.count': 1, 'aiUsage.lifetimeCount': 1 },
+        $set: { 'aiUsage.lastUsed': now }
+      },
+      { new: true }
+    );
+    user.aiUsage = updatedUser.aiUsage;
 
     // Calculate remaining based on current mode (using variables already declared above)
     let messagesRemaining, messagesLimit;
@@ -1034,12 +1038,16 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       }
     }
 
-    // Update usage counters
-    user.aiUsage.count = (user.aiUsage.count || 0) + 1;
-    user.aiUsage.lifetimeCount = (user.aiUsage.lifetimeCount || 0) + 1;
-    user.aiUsage.lastUsed = now;
-    user.markModified('aiUsage');
-    await user.save();
+    // Update usage counters atomically (bypasses Mongoose change detection issues)
+    const updatedUser = await User.findOneAndUpdate(
+      { username },
+      { 
+        $inc: { 'aiUsage.count': 1, 'aiUsage.lifetimeCount': 1 },
+        $set: { 'aiUsage.lastUsed': now }
+      },
+      { new: true }
+    );
+    user.aiUsage = updatedUser.aiUsage;
 
     // Send usage update
     let messagesRemaining, messagesLimit;
