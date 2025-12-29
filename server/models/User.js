@@ -85,6 +85,22 @@ const userSchema = new mongoose.Schema({
       dailyReminderEnabled: false,
       dailyReminderTime: '09:00'
     }
+  },
+  
+  // AI Chat Usage Tracking
+  aiUsage: {
+    type: {
+      date: String,
+      count: { type: Number, default: 0 },
+      lifetimeCount: { type: Number, default: 0 },
+      lastUsed: Date
+    },
+    default: {
+      date: '',
+      count: 0,
+      lifetimeCount: 0,
+      lastUsed: null
+    }
   }
 }, {
   timestamps: true
