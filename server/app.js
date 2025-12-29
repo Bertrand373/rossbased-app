@@ -857,33 +857,23 @@ app.post('/api/ai/chat', authenticate, async (req, res) => {
 
     const aiResponse = response.content[0].text;
 
-    // ATOMIC UPDATE: Single operation handles all edge cases
-    const updateResult = await User.findOneAndUpdate(
-      { username },
-      [
-        {
-          $set: {
-            aiUsage: {
-              date: userLocalDate,
-              count: {
-                $cond: {
-                  if: { $eq: [{ $ifNull: ['$aiUsage.date', ''] }, userLocalDate] },
-                  then: { $add: [{ $ifNull: ['$aiUsage.count', 0] }, 1] },
-                  else: 1
-                }
-              },
-              lifetimeCount: { $add: [{ $ifNull: ['$aiUsage.lifetimeCount', 0] }, 1] },
-              lastUsed: now
-            }
-          }
-        }
-      ],
-      { new: true }
-    );
+    // Calculate new values (we already know current state from earlier)
+    const newCount = isNewDay ? 1 : currentCount + 1;
+    const newLifetime = currentLifetime + 1;
 
-    // Get updated counts from the atomic operation result
-    const newCount = updateResult.aiUsage.count;
-    const newLifetime = updateResult.aiUsage.lifetimeCount;
+    // Simple atomic update - guaranteed to work
+    await User.findOneAndUpdate(
+      { username },
+      { 
+        $set: { 
+          'aiUsage.date': userLocalDate,
+          'aiUsage.count': newCount,
+          'aiUsage.lifetimeCount': newLifetime,
+          'aiUsage.lastUsed': now
+        }
+      },
+      { new: true, upsert: false }
+    );
 
     // Calculate remaining
     let messagesRemaining, messagesLimit;
@@ -1031,37 +1021,23 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       }
     }
 
-    // ATOMIC UPDATE: Single operation handles all edge cases
-    // - If aiUsage undefined: creates it
-    // - If new day: resets count to 1
-    // - If same day: increments count
-    // - Always increments lifetimeCount
-    const updateResult = await User.findOneAndUpdate(
-      { username },
-      [
-        {
-          $set: {
-            aiUsage: {
-              date: userLocalDate,
-              count: {
-                $cond: {
-                  if: { $eq: [{ $ifNull: ['$aiUsage.date', ''] }, userLocalDate] },
-                  then: { $add: [{ $ifNull: ['$aiUsage.count', 0] }, 1] },
-                  else: 1
-                }
-              },
-              lifetimeCount: { $add: [{ $ifNull: ['$aiUsage.lifetimeCount', 0] }, 1] },
-              lastUsed: now
-            }
-          }
-        }
-      ],
-      { new: true }
-    );
+    // Calculate new values (we already know current state from earlier)
+    const newCount = isNewDay ? 1 : currentCount + 1;
+    const newLifetime = currentLifetime + 1;
 
-    // Get updated counts from the atomic operation result
-    const newCount = updateResult.aiUsage.count;
-    const newLifetime = updateResult.aiUsage.lifetimeCount;
+    // Simple atomic update - guaranteed to work
+    await User.findOneAndUpdate(
+      { username },
+      { 
+        $set: { 
+          'aiUsage.date': userLocalDate,
+          'aiUsage.count': newCount,
+          'aiUsage.lifetimeCount': newLifetime,
+          'aiUsage.lastUsed': now
+        }
+      },
+      { new: true, upsert: false }
+    );
 
     // Calculate remaining
     let messagesRemaining, messagesLimit;
