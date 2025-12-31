@@ -100,6 +100,15 @@ export const trackNotificationEnabled = () => track('Notifications Enabled');
 export const trackNotificationDisabled = () => track('Notifications Disabled');
 export const trackFeedbackSubmitted = (rating) => track('Feedback Submitted', { rating });
 
+// AI Guide Chat
+export const trackAIChatOpened = () => track('AI Chat Opened');
+export const trackAIMessageSent = (messageLength, conversationLength) => track('AI Message Sent', {
+  messageLength,
+  conversationLength,
+});
+export const trackAIChatCleared = () => track('AI Chat Cleared');
+export const trackAILimitReached = () => track('AI Limit Reached');
+
 export default {
   initMixpanel,
   identifyUser,
@@ -124,4 +133,8 @@ export default {
   trackNotificationEnabled,
   trackNotificationDisabled,
   trackFeedbackSubmitted,
+  trackAIChatOpened,
+  trackAIMessageSent,
+  trackAIChatCleared,
+  trackAILimitReached,
 };

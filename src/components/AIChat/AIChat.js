@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './AIChat.css';
 
+// Mixpanel tracking
+import { trackAIChatOpened, trackAIMessageSent, trackAIChatCleared, trackAILimitReached } from '../../utils/mixpanel';
+
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
 // Storage keys
@@ -48,6 +51,7 @@ const AIChat = ({ isLoggedIn }) => {
     setIsOpen(true);
     setShowPulse(false);
     localStorage.setItem('titantrack_ai_chat_opened', 'true');
+    trackAIChatOpened();
   };
 
   // Load chat history from localStorage
@@ -98,6 +102,13 @@ const AIChat = ({ isLoggedIn }) => {
     return () => document.body.classList.remove('modal-open');
   }, [isOpen]);
 
+  // Track when limit is reached
+  useEffect(() => {
+    if (usage.messagesRemaining === 0 && usage.messagesLimit > 0) {
+      trackAILimitReached();
+    }
+  }, [usage.messagesRemaining, usage.messagesLimit]);
+
   // Fetch usage stats
   const fetchUsage = async () => {
     const token = localStorage.getItem('token');
@@ -129,6 +140,9 @@ const AIChat = ({ isLoggedIn }) => {
       content: inputValue.trim(),
       timestamp: new Date().toISOString()
     };
+
+    // Store input length before clearing
+    const sentMessageLength = inputValue.trim().length;
 
     // Add user message immediately
     setMessages(prev => [...prev, userMessage]);
@@ -237,6 +251,9 @@ const AIChat = ({ isLoggedIn }) => {
           timestamp: new Date().toISOString()
         };
         setMessages(prev => [...prev, assistantMessage]);
+        
+        // Track successful message exchange
+        trackAIMessageSent(sentMessageLength, messages.length + 2);
       }
 
     } catch (err) {
@@ -269,6 +286,7 @@ const AIChat = ({ isLoggedIn }) => {
     setMessages([]);
     localStorage.removeItem(CHAT_HISTORY_KEY);
     setShowClearConfirm(false);
+    trackAIChatCleared();
   };
 
   // Don't render if not logged in
