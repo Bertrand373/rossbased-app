@@ -1,6 +1,7 @@
 // ShareCard.js - TITANTRACK
 // Shareable stats card - premium minimal aesthetic
 // Pure black/white design, canvas-based image generation
+// MINIMAL VERSION: Just the number. The number is the flex.
 
 import React, { useState, useRef, useCallback } from 'react';
 import { format } from 'date-fns';
@@ -15,35 +16,12 @@ const ShareIcon = () => (
   </svg>
 );
 
-// Percentile tiers based on SR community data
-const getPercentile = (streak) => {
-  if (streak >= 365) return { percent: 1, label: 'Top 1%' };
-  if (streak >= 180) return { percent: 3, label: 'Top 3%' };
-  if (streak >= 90) return { percent: 7, label: 'Top 7%' };
-  if (streak >= 60) return { percent: 12, label: 'Top 12%' };
-  if (streak >= 30) return { percent: 25, label: 'Top 25%' };
-  if (streak >= 14) return { percent: 45, label: 'Top 45%' };
-  if (streak >= 7) return { percent: 60, label: 'Top 60%' };
-  return { percent: 75, label: 'Top 75%' };
-};
-
-// Phase names aligned with Emotional Timeline
-const getPhaseInfo = (streak) => {
-  if (streak <= 14) return { name: 'INITIAL ADAPTATION', range: '1-14' };
-  if (streak <= 45) return { name: 'EMOTIONAL PROCESSING', range: '15-45' };
-  if (streak <= 90) return { name: 'MENTAL EXPANSION', range: '46-90' };
-  if (streak <= 180) return { name: 'INTEGRATION & GROWTH', range: '91-180' };
-  return { name: 'MASTERY & PURPOSE', range: '181+' };
-};
-
 const ShareCard = ({ userData, isVisible = true }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const canvasRef = useRef(null);
 
   const streak = userData?.currentStreak || 0;
-  const percentile = getPercentile(streak);
-  const phase = getPhaseInfo(streak);
   const today = format(new Date(), 'MMM d, yyyy');
 
   // Generate the card image using Canvas API
@@ -67,36 +45,17 @@ const ShareCard = ({ userData, isVisible = true }) => {
       ctx.lineWidth = 2;
       ctx.strokeRect(40, 40, width - 80, height - 80);
 
-      // Day number - large, commanding
+      // Day number - large, commanding, centered
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = '600 280px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.font = '600 320px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(streak.toString(), width / 2, height * 0.38);
+      ctx.fillText(streak.toString(), width / 2, height * 0.45);
 
       // "DAYS" label
       ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.font = '500 32px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.letterSpacing = '0.3em';
-      ctx.fillText('DAYS', width / 2, height * 0.48);
-
-      // Divider line
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(width * 0.3, height * 0.55);
-      ctx.lineTo(width * 0.7, height * 0.55);
-      ctx.stroke();
-
-      // Phase name
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = '600 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.fillText(phase.name, width / 2, height * 0.63);
-
-      // Percentile
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.font = '400 28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.fillText(percentile.label + ' of retainers', width / 2, height * 0.70);
+      ctx.font = '500 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('DAYS', width / 2, height * 0.58);
 
       // Footer - date and branding
       ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
@@ -109,7 +68,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
 
       resolve(canvas);
     });
-  }, [streak, phase.name, percentile.label, today]);
+  }, [streak, today]);
 
   // Handle share action
   const handleShare = async () => {
@@ -188,8 +147,6 @@ const ShareCard = ({ userData, isVisible = true }) => {
           <div className="share-card-mini">
             <span className="share-mini-day">{streak}</span>
             <span className="share-mini-label">days</span>
-            <span className="share-mini-phase">{phase.name}</span>
-            <span className="share-mini-percentile">{percentile.label}</span>
           </div>
           <div className="share-card-cta">
             <ShareIcon />
@@ -205,9 +162,6 @@ const ShareCard = ({ userData, isVisible = true }) => {
             <div className="share-modal-card">
               <span className="share-modal-day">{streak}</span>
               <span className="share-modal-day-label">DAYS</span>
-              <div className="share-modal-divider"></div>
-              <span className="share-modal-phase">{phase.name}</span>
-              <span className="share-modal-percentile">{percentile.label} of retainers</span>
               <div className="share-modal-footer">
                 <span className="share-modal-date">{today}</span>
                 <span className="share-modal-brand">titantrack.app</span>

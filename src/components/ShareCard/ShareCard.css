@@ -1,5 +1,6 @@
 /* ShareCard.css - TITANTRACK */
 /* Premium minimal shareable card - pure black/white aesthetic */
+/* MINIMAL VERSION: Clean, simple, works everywhere */
 
 /* ============================================================
    SHARE SECTION - Inline with Stats flow
@@ -59,11 +60,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .share-mini-day {
-  font-size: 3.5rem;
+  font-size: 4rem;
   font-weight: 600;
   color: #ffffff;
   line-height: 1;
@@ -72,27 +73,12 @@
 }
 
 .share-mini-label {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-top: 4px;
-  margin-bottom: 16px;
-}
-
-.share-mini-phase {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #ffffff;
-  letter-spacing: 0.05em;
-  margin-bottom: 6px;
-}
-
-.share-mini-percentile {
-  font-size: 0.6875rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.2em;
+  margin-top: 8px;
 }
 
 .share-card-cta {
@@ -126,10 +112,10 @@
   justify-content: center;
   z-index: 1000;
   padding: 24px;
-  animation: fadeIn 200ms ease;
+  animation: shareModalFadeIn 200ms ease;
 }
 
-@keyframes fadeIn {
+@keyframes shareModalFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
@@ -140,10 +126,10 @@
   align-items: center;
   width: 100%;
   max-width: 320px;
-  animation: slideUp 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: shareModalSlideUp 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideUp {
+@keyframes shareModalSlideUp {
   from { 
     opacity: 0;
     transform: translateY(20px);
@@ -175,7 +161,7 @@
 }
 
 .share-modal-day {
-  font-size: 5rem;
+  font-size: 6rem;
   font-weight: 600;
   color: #ffffff;
   line-height: 1;
@@ -184,35 +170,12 @@
 }
 
 .share-modal-day-label {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.3em;
-  margin-top: 8px;
-  margin-bottom: 24px;
-}
-
-.share-modal-divider {
-  width: 80px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.15);
-  margin-bottom: 24px;
-}
-
-.share-modal-phase {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #ffffff;
-  letter-spacing: 0.05em;
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.share-modal-percentile {
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.5);
+  margin-top: 12px;
 }
 
 .share-modal-footer {
@@ -280,10 +243,10 @@
   border: 2px solid rgba(0, 0, 0, 0.2);
   border-top-color: #000000;
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  animation: shareSpinner 0.7s linear infinite;
 }
 
-@keyframes spin {
+@keyframes shareSpinner {
   to { transform: rotate(360deg); }
 }
 
@@ -305,7 +268,7 @@
 }
 
 /* ============================================================
-   RESPONSIVE - Larger screens
+   RESPONSIVE
    ============================================================ */
 
 @media (min-width: 768px) {
@@ -316,10 +279,43 @@
   }
   
   .share-modal-day {
-    font-size: 6rem;
+    font-size: 7rem;
   }
   
   .share-mini-day {
-    font-size: 4rem;
+    font-size: 5rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .share-card-preview {
+    padding: 24px 16px;
+  }
+  
+  .share-mini-day {
+    font-size: 3.5rem;
+  }
+  
+  .share-modal-day {
+    font-size: 5rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .share-modal-overlay,
+  .share-modal {
+    animation: none;
+  }
+  
+  .share-card-preview,
+  .share-modal-btn,
+  .share-modal-close {
+    transition: none;
+  }
+  
+  .share-btn-loading {
+    animation: none;
   }
 }
