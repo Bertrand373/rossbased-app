@@ -18,6 +18,9 @@ import {
   PhaseContext
 } from './StatsInsights';
 
+// Import ShareCard component
+import ShareCard from '../ShareCard/ShareCard';
+
 // Import utility functions
 import {
   getTimeRangeDisplayText,
@@ -426,6 +429,9 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           ))}
         </div>
       </section>
+
+      {/* Share Progress Card */}
+      <ShareCard userData={safeUserData} isVisible={true} />
 
       {/* Benefit Tracker */}
       <section className="stats-section">
