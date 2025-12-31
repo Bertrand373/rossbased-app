@@ -365,7 +365,7 @@
 
 .ai-chat-input-area {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 12px;
   padding: 16px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -382,7 +382,12 @@
   font-size: 0.9375rem;
   color: #ffffff;
   font-family: inherit;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease;
+  resize: none;
+  min-height: 44px;
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.4;
 }
 
 .ai-chat-input:focus {

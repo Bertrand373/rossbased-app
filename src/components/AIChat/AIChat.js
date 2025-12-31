@@ -133,6 +133,10 @@ const AIChat = ({ isLoggedIn }) => {
     // Add user message immediately
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
     setIsLoading(true);
     setError(null);
     setStreamingText('');
@@ -395,15 +399,41 @@ const AIChat = ({ isLoggedIn }) => {
           <div className="ai-chat-input-area">
             {usage.messagesRemaining > 0 ? (
               <>
-                <input
+                <textarea
                   ref={inputRef}
-                  type="text"
                   className="ai-chat-input"
                   placeholder="Ask anything..."
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    // Auto-resize textarea
+                    e.target.style.height = 'auto';
+                    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+                  }}
                   onKeyDown={handleKeyDown}
+                  onFocus={() => {
+                    // iOS Safari keyboard fix
+                    setTimeout(() => {
+                      const modal = document.querySelector('.ai-chat-modal');
+                      if (modal && window.visualViewport) {
+                        const keyboardHeight = window.innerHeight - window.visualViewport.height;
+                        if (keyboardHeight > 0) {
+                          modal.style.height = `${window.visualViewport.height}px`;
+                          modal.style.bottom = `${keyboardHeight}px`;
+                        }
+                      }
+                    }, 100);
+                  }}
+                  onBlur={() => {
+                    // Reset modal position when keyboard closes
+                    const modal = document.querySelector('.ai-chat-modal');
+                    if (modal) {
+                      modal.style.height = '';
+                      modal.style.bottom = '';
+                    }
+                  }}
                   disabled={isLoading}
+                  rows={1}
                 />
                 <button 
                   className={`ai-chat-send ${inputValue.trim() && !isLoading ? 'active' : ''}`}
