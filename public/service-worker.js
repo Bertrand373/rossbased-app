@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 
-const CACHE_NAME = 'titantrack-v3';
+const CACHE_NAME = 'titantrack-v4';
 const urlsToCache = [
   '/',
   '/index.html',
