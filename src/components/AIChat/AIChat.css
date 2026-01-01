@@ -40,9 +40,38 @@
 }
 
 .ai-chat-fab-icon {
-  width: 26px;
-  height: 26px;
-  opacity: 0.9;
+  width: 24px;
+  height: 24px;
+}
+
+.ai-chat-fab-icon .sparkle-main {
+  transform-origin: center;
+  animation: sparkleBreath 4s ease-in-out infinite;
+}
+
+.ai-chat-fab-icon .sparkle-accent {
+  transform-origin: center;
+  animation: sparkleAccent 4s ease-in-out infinite;
+}
+
+@keyframes sparkleBreath {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes sparkleAccent {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
 }
 
 /* Subtle attention pulse - runs 3 times then stops */
@@ -511,6 +540,11 @@
   
   .ai-chat-fab {
     transition: none;
+  }
+  
+  .ai-chat-fab-icon .sparkle-main,
+  .ai-chat-fab-icon .sparkle-accent {
+    animation: none;
   }
   
   .ai-chat-message {

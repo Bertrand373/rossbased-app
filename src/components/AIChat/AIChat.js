@@ -3,9 +3,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './AIChat.css';
 
-// Mixpanel tracking
-import { trackAIChatOpened, trackAIMessageSent, trackAIChatCleared, trackAILimitReached } from '../../utils/mixpanel';
-
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
 // Storage keys
@@ -51,7 +48,6 @@ const AIChat = ({ isLoggedIn }) => {
     setIsOpen(true);
     setShowPulse(false);
     localStorage.setItem('titantrack_ai_chat_opened', 'true');
-    trackAIChatOpened();
   };
 
   // Load chat history from localStorage
@@ -102,13 +98,6 @@ const AIChat = ({ isLoggedIn }) => {
     return () => document.body.classList.remove('modal-open');
   }, [isOpen]);
 
-  // Track when limit is reached
-  useEffect(() => {
-    if (usage.messagesRemaining === 0 && usage.messagesLimit > 0) {
-      trackAILimitReached();
-    }
-  }, [usage.messagesRemaining, usage.messagesLimit]);
-
   // Fetch usage stats
   const fetchUsage = async () => {
     const token = localStorage.getItem('token');
@@ -140,9 +129,6 @@ const AIChat = ({ isLoggedIn }) => {
       content: inputValue.trim(),
       timestamp: new Date().toISOString()
     };
-
-    // Store input length before clearing
-    const sentMessageLength = inputValue.trim().length;
 
     // Add user message immediately
     setMessages(prev => [...prev, userMessage]);
@@ -251,9 +237,6 @@ const AIChat = ({ isLoggedIn }) => {
           timestamp: new Date().toISOString()
         };
         setMessages(prev => [...prev, assistantMessage]);
-        
-        // Track successful message exchange
-        trackAIMessageSent(sentMessageLength, messages.length + 2);
       }
 
     } catch (err) {
@@ -286,7 +269,6 @@ const AIChat = ({ isLoggedIn }) => {
     setMessages([]);
     localStorage.removeItem(CHAT_HISTORY_KEY);
     setShowClearConfirm(false);
-    trackAIChatCleared();
   };
 
   // Don't render if not logged in
@@ -300,11 +282,27 @@ const AIChat = ({ isLoggedIn }) => {
         onClick={handleOpenChat}
         aria-label="Open AI Chat"
       >
-        <img 
-          src="/tt-icon-white.png" 
-          alt="" 
-          className="ai-chat-fab-icon"
-        />
+        <svg 
+          className="ai-chat-fab-icon" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Main 4-point sparkle */}
+          <path 
+            className="sparkle-main"
+            d="M12 1C12 1 12.5 6 14 8C15.5 10 21 10.5 21 10.5C21 10.5 15.5 11 14 13C12.5 15 12 21 12 21C12 21 11.5 15 10 13C8.5 11 3 10.5 3 10.5C3 10.5 8.5 10 10 8C11.5 6 12 1 12 1Z" 
+            fill="white"
+            fillOpacity="0.9"
+          />
+          {/* Small accent sparkle */}
+          <path 
+            className="sparkle-accent"
+            d="M19 1C19 1 19.2 3 20 3.8C20.8 4.6 23 4.8 23 4.8C23 4.8 20.8 5 20 5.8C19.2 6.6 19 9 19 9C19 9 18.8 6.6 18 5.8C17.2 5 15 4.8 15 4.8C15 4.8 17.2 4.6 18 3.8C18.8 3 19 1 19 1Z" 
+            fill="white"
+            fillOpacity="0.5"
+          />
+        </svg>
       </button>
 
       {/* Chat Panel */}
