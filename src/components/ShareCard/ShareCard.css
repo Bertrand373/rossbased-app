@@ -18,7 +18,7 @@
 .share-card-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 20px;
 }
 
@@ -216,7 +216,6 @@
   cursor: pointer;
   transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
-  margin-bottom: 12px;
 }
 
 .share-modal-btn:hover:not(:disabled) {
@@ -261,6 +260,7 @@
   cursor: pointer;
   transition: color 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  margin-bottom: 12px;
 }
 
 .share-modal-close:hover {

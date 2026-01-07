@@ -93,6 +93,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
             try {
               await navigator.share(shareData);
               setIsGenerating(false);
+              document.body.style.overflow = '';
               setShowPreview(false);
               return;
             } catch (err) {
@@ -115,6 +116,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
         URL.revokeObjectURL(url);
         
         setIsGenerating(false);
+        document.body.style.overflow = '';
         setShowPreview(false);
       }, 'image/png', 1.0);
     } catch (err) {
@@ -125,11 +127,13 @@ const ShareCard = ({ userData, isVisible = true }) => {
 
   // Open preview modal
   const openPreview = () => {
+    document.body.style.overflow = 'hidden';
     setShowPreview(true);
   };
 
   // Close preview modal
   const closePreview = () => {
+    document.body.style.overflow = '';
     setShowPreview(false);
   };
 
@@ -168,6 +172,10 @@ const ShareCard = ({ userData, isVisible = true }) => {
               </div>
             </div>
             
+            <button className="share-modal-close" onClick={closePreview}>
+              Cancel
+            </button>
+            
             <button 
               className="share-modal-btn" 
               onClick={handleShare}
@@ -181,10 +189,6 @@ const ShareCard = ({ userData, isVisible = true }) => {
                   <span>Share</span>
                 </>
               )}
-            </button>
-            
-            <button className="share-modal-close" onClick={closePreview}>
-              Cancel
             </button>
           </div>
         </div>

@@ -306,19 +306,8 @@ async function postLeaderboardToDiscord() {
       const imageBuffer = await downloadImage(imageUrl);
       
       if (imageBuffer) {
-        // Delete old message if exists (can't edit attachments)
-        if (existingMessageId) {
-          try {
-            await fetch(`${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`, {
-              method: 'DELETE'
-            });
-            console.log('🗑️ Deleted old leaderboard message');
-          } catch (e) {
-            // Ignore deletion errors
-          }
-        }
-        
         // Post new message with attachment using FormData
+        // NOTE: We delete old message AFTER successful post (not before)
         const FormData = require('form-data');
         const formData = new FormData();
         formData.append('file', imageBuffer, { filename: 'leaderboard.png', contentType: 'image/png' });
@@ -343,6 +332,18 @@ async function postLeaderboardToDiscord() {
                   if (parsed.id) {
                     await setSetting('leaderboard_message_id', parsed.id);
                     console.log(`✅ Leaderboard posted with attachment (message ID: ${parsed.id})`);
+                    
+                    // NOW delete old message (only after successful post)
+                    if (existingMessageId) {
+                      try {
+                        await fetch(`${LEADERBOARD_WEBHOOK}/messages/${existingMessageId}`, {
+                          method: 'DELETE'
+                        });
+                        console.log('🗑️ Deleted old leaderboard message');
+                      } catch (e) {
+                        console.log('⚠️ Could not delete old message (may already be gone)');
+                      }
+                    }
                   }
                   resolve(true);
                 } catch (e) {
