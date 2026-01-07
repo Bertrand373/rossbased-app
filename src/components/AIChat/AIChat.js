@@ -298,7 +298,7 @@ const AIChat = ({ isLoggedIn }) => {
       <button 
         className={`ai-chat-fab ${isOpen ? 'hidden' : ''} ${showPulse ? 'pulse' : ''}`}
         onClick={handleOpenChat}
-        aria-label="Open AI Chat"
+        aria-label="Open The Oracle"
       >
         <svg 
           className="ai-chat-fab-icon" 
@@ -332,7 +332,7 @@ const AIChat = ({ isLoggedIn }) => {
           {/* Header */}
           <header className="ai-chat-header">
             <div className="ai-chat-header-content">
-              <h2 className="ai-chat-title">AI Guide</h2>
+              <h2 className="ai-chat-title">The Oracle</h2>
               <span className="ai-chat-subtitle">
                 {usage.messagesRemaining} remaining · {usage.isBetaPeriod ? 'Beta' : 'Premium'}
               </span>
@@ -353,7 +353,7 @@ const AIChat = ({ isLoggedIn }) => {
           <div className="ai-chat-body" ref={chatBodyRef}>
             {messages.length === 0 && !isLoading && (
               <div className="ai-chat-empty">
-                <p className="ai-chat-empty-title">Your AI guide awaits.</p>
+                <p className="ai-chat-empty-title">The Oracle awaits.</p>
                 <p className="ai-chat-empty-subtitle">
                   Ask about your journey, phases, flatlines, transmutation, or anything on your mind.
                 </p>
