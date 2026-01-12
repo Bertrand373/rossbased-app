@@ -29,7 +29,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const currentDay = userData?.currentStreak || 0;
 
-  // Phase definitions
+  // Phase definitions with enhanced content
   const phases = [
     {
       id: 1,
@@ -38,9 +38,13 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       start: 1,
       end: 14,
       summary: "Body begins adapting while urges peak",
+      duration: "Typical duration: 10-14 days. Some clear it in 7, others take 21. Your starting point determines speed.",
+      whatsHappening: "Your body has been in depletion mode for years, possibly decades. Now it's recalibrating. Hormone production is adjusting. Dopamine receptors that were overloaded are resetting. You're not broken. You're rebooting.",
       description: "Your body begins adapting to retention while initial urges peak. This phase builds new neural pathways as your brain rewires dopamine pathways away from instant gratification.",
       science: "Cessation triggers hypothalamic-pituitary adjustments. Testosterone stabilizes while dopamine receptors rebalance from overstimulation.",
       expectation: "Emotional volatility is normal. Your system is recalibrating.",
+      criticalRule: "The urges in this phase are loud but shallow. They're habit, not need. Every urge you ride out weakens the pattern permanently.",
+      whatsNext: "Days 15-45 bring Emotional Processing, the hardest phase. The physical urges you're fighting now will quiet down, but suppressed emotions will surface. This is normal. It's healing. Prepare by establishing your daily practices now.",
       symptoms: [
         "Strong physical urges and restlessness",
         "Energy fluctuations between high and fatigue",
@@ -69,9 +73,19 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       start: 15,
       end: 45,
       summary: "Suppressed emotions surface for healing",
-      description: "Suppressed emotions surface for healing - this is often the most challenging phase. Your psyche is healing itself through this natural process.",
+      duration: "Typical duration: 2-6 weeks of intensity. The waves come and go, they don't stay at peak. Most men report the heaviest period around days 20-35.",
+      whatsHappening: "Sexual release was numbing emotional pain you didn't know you were carrying. Without that numbing agent, old wounds surface. This isn't retention causing depression. It's retention revealing what was always there, buried. You're not falling apart. You're finally processing.",
+      description: "Suppressed emotions surface for healing. This is often the most challenging phase. Your psyche is healing itself through this natural process.",
       science: "Without ejaculation's endorphin/prolactin release numbing pain, stored trauma surfaces. Retained energy amplifies all emotions as healing occurs.",
       expectation: "This is the hardest phase. Emotional turbulence means healing is happening.",
+      traumaTimeline: [
+        "Weeks 1-2: Recent frustrations, current life stress",
+        "Weeks 2-4: Past relationship pain, betrayals, heartbreak",
+        "Month 2+: Deeper patterns begin emerging"
+      ],
+      criticalRule: "This is where 90% of men fail. The emotional pain makes release feel like relief. It's a trap. Breaking retention here resets everything AND you'll face these same emotions again later. The flatline always ends. Hold the line.",
+      criticalRuleHighlight: true,
+      whatsNext: "Days 46-90 bring Mental Expansion. The emotional storms stabilize. Clarity, creativity, and focus emerge. Many men describe it as the fog lifting. The hardest part is almost behind you.",
       symptoms: [
         "Intense mood swings and emotional volatility",
         "Waves of anxiety, depression, sadness",
@@ -100,9 +114,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       start: 46,
       end: 90,
       summary: "Cognitive abilities enhance significantly",
+      duration: "This phase builds progressively. Most men notice significant cognitive shifts by day 60. Peak mental clarity often hits between days 75-90.",
+      whatsHappening: "Your brain is no longer spending resources on constant reproductive signaling. That energy is redirecting upward. Neural pathways are strengthening. The mental fog from the emotional phase clears. Many men describe this as thinking in HD for the first time.",
       description: "Cognitive abilities enhance as emotional turbulence stabilizes. Your brain operates at higher efficiency with optimized neurotransmitter balance.",
       science: "Retained nutrients rebuild nerve sheaths. Brain tissue becomes more densely connected as resources redirect from reproduction to cognition.",
       expectation: "Emotional stability returns. Clarity and calm become the norm.",
+      socialShift: "Around day 60, something shifts externally. People treat you differently. Eye contact changes. Women notice you. Men either respect you or seem uncomfortable around you. This isn't imagination. Your energy has tangibly shifted. How you handle this attention is the next test.",
+      criticalRule: "The temptation here is different. You feel powerful. Your brain will rationalize: I've got the benefits, I can release once. Don't believe it. You're accessing the surface of what's possible. The real transformation is still ahead.",
+      whatsNext: "Days 91-180 bring Integration. Your new capacities become baseline. The discipline that felt like effort becomes effortless. Your sense of purpose clarifies. You stop doing retention and start being retained.",
       symptoms: [
         "Dramatically improved focus",
         "Enhanced creativity and problem-solving",
@@ -130,9 +149,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       start: 91,
       end: 180,
       summary: "Benefits become deeply integrated",
+      duration: "This phase spans roughly 90 days, but integration continues indefinitely. Most men report feeling fundamentally different by day 120-150.",
+      whatsHappening: "The practices that required willpower are becoming automatic. Your energy signature has permanently shifted. You're not fighting urges anymore. They've lost their power. Your body and mind have accepted retention as the new normal.",
       description: "Profound inner transformation as benefits become deeply integrated. Complete endocrine rebalancing creates stable high-performance states.",
       science: "The entire nervous system optimizes for retention, creating self-sustaining high-performance states with permanent neuroplastic changes.",
       expectation: "Deep inner peace. Emotions serve you rather than control you.",
+      relationshipShift: "Relationships change during this phase. Some friendships fade naturally because you've outgrown them. New connections appear. People seek your advice without knowing why. Old flames may resurface. Not everyone will understand your transformation. That's okay.",
+      criticalRule: "The danger here is complacency. You feel stable. You forget how hard the early days were. A single release might seem harmless. It's not. Protect what you've built. The cost of rebuilding is higher than the cost of maintaining.",
+      whatsNext: "Day 181+ marks Mastery. The question shifts from what can I gain to what can I contribute. Most men at this stage describe retention choosing them, rather than the other way around.",
       symptoms: [
         "Deep sense of life purpose",
         "Natural charisma and presence",
@@ -160,9 +184,14 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       start: 181,
       end: 999999,
       summary: "Complete integration and transcendence",
+      duration: "There is no end point. Mastery deepens indefinitely. Men who've practiced for years report benefits continuing to compound.",
+      whatsHappening: "You've crossed a threshold most men never reach. The energy you've cultivated is substantial. Personal optimization feels less interesting now. Service and legacy feel more relevant. The question is no longer whether you can retain. It's what you'll build with what you've accumulated.",
       description: "You've transcended the need for external validation. Sexual energy is permanently redirected, creating sustained states of expanded awareness.",
       science: "Permanent neuroplastic changes create self-sustaining states. Enhanced connectivity between regions associated with self-control and higher cognition.",
       expectation: "Emotional mastery. You choose your state rather than react.",
+      responsibilityShift: "Others sense something different about you. Some will ask questions. Be discerning about who you teach. Not everyone is ready, and your energy is valuable. The right people will find you. Focus on what you're here to contribute.",
+      criticalRule: "Mastery isn't invincibility. The ego can inflate here. Stay humble. Stay grounded. The practice that brought you here is the same practice that keeps you here. Don't abandon the fundamentals because you feel beyond them.",
+      whatsNext: "The journey continues. Deeper states. Greater clarity. Expanded capacity. Men who've retained for years speak of dimensions that can't be described to those who haven't experienced them. You're at the beginning of mastery, not the end.",
       symptoms: [
         "Effortless self-control",
         "Natural influence and presence",
@@ -615,7 +644,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Phase Modal */}
+      {/* Phase Modal - Enhanced with new content sections */}
       {showModal && selectedPhase && (
         <div className="et-overlay">
           <div className="et-modal" onClick={e => e.stopPropagation()}>
@@ -631,16 +660,64 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
             <div className="et-modal-scroll">
               <div className="et-modal-body">
-                <div className="et-modal-section">
-                  <h4>Overview</h4>
-                  <p>{selectedPhase.description}</p>
-                </div>
+                {/* Duration estimate */}
+                {selectedPhase.duration && (
+                  <div className="et-modal-section et-duration">
+                    <p>{selectedPhase.duration}</p>
+                  </div>
+                )}
 
-                <div className="et-modal-section">
-                  <h4>The Science</h4>
-                  <p>{selectedPhase.science}</p>
-                </div>
+                {/* What's Happening - plain language */}
+                {selectedPhase.whatsHappening && (
+                  <div className="et-modal-section">
+                    <h4>What's Happening</h4>
+                    <p>{selectedPhase.whatsHappening}</p>
+                  </div>
+                )}
 
+                {/* Trauma Timeline - Phase 2 only */}
+                {selectedPhase.traumaTimeline && (
+                  <div className="et-modal-section">
+                    <h4>What Surfaces When</h4>
+                    <ul>
+                      {selectedPhase.traumaTimeline.map((item, i) => <li key={i}>{item}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Social Shift - Phase 3 only */}
+                {selectedPhase.socialShift && (
+                  <div className="et-modal-section">
+                    <h4>What Others Will Notice</h4>
+                    <p>{selectedPhase.socialShift}</p>
+                  </div>
+                )}
+
+                {/* Relationship Shift - Phase 4 only */}
+                {selectedPhase.relationshipShift && (
+                  <div className="et-modal-section">
+                    <h4>What Shifts</h4>
+                    <p>{selectedPhase.relationshipShift}</p>
+                  </div>
+                )}
+
+                {/* Responsibility Shift - Phase 5 only */}
+                {selectedPhase.responsibilityShift && (
+                  <div className="et-modal-section">
+                    <h4>What Shifts</h4>
+                    <p>{selectedPhase.responsibilityShift}</p>
+                  </div>
+                )}
+
+                {/* Critical Rule - highlighted for Phase 2 */}
+                {selectedPhase.criticalRule && (
+                  <div className={`et-modal-section ${selectedPhase.criticalRuleHighlight ? 'et-critical' : 'et-rule'}`}>
+                    <h4>{selectedPhase.criticalRuleHighlight ? '⚠️ Critical' : 'Remember'}</h4>
+                    <p>{selectedPhase.criticalRule}</p>
+                  </div>
+                )}
+
+                {/* What to Expect */}
                 <div className="et-modal-section">
                   <h4>What to Expect</h4>
                   <ul>
@@ -648,6 +725,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   </ul>
                 </div>
 
+                {/* Warning Signs */}
                 <div className="et-modal-section et-warning">
                   <h4><FaExclamationTriangle /> Warning Signs</h4>
                   <ul>
@@ -655,12 +733,21 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                   </ul>
                 </div>
 
+                {/* Techniques */}
                 <div className="et-modal-section">
                   <h4>Techniques</h4>
                   <ul>
                     {selectedPhase.techniques.map((t, i) => <li key={i}>{t}</li>)}
                   </ul>
                 </div>
+
+                {/* What's Next */}
+                {selectedPhase.whatsNext && (
+                  <div className="et-modal-section et-next">
+                    <h4>What's Next</h4>
+                    <p>{selectedPhase.whatsNext}</p>
+                  </div>
+                )}
               </div>
             </div>
             
