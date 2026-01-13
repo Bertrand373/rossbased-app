@@ -900,21 +900,18 @@
   font-style: italic;
 }
 
-/* Critical rule - Phase 2 highlight */
+/* Critical rule - Phase 2 (no special box, words do the work) */
 .et-critical {
-  background: rgba(248, 113, 113, 0.06);
-  border: 1px solid rgba(248, 113, 113, 0.15);
-  border-radius: 12px;
-  padding: 20px !important;
-  margin: 8px 0;
+  padding-top: 24px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .et-critical h4 {
-  color: rgba(248, 113, 113, 0.8) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .et-critical p {
-  color: rgba(255, 255, 255, 0.65) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* Regular rule - other phases */
@@ -1094,10 +1091,6 @@
   /* New sections responsive */
   .et-duration p {
     font-size: 0.8125rem !important;
-  }
-  
-  .et-critical {
-    padding: 16px !important;
   }
   
   .et-critical p,

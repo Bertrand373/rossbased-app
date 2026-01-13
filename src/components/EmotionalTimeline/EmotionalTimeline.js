@@ -712,7 +712,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 {/* Critical Rule - highlighted for Phase 2 */}
                 {selectedPhase.criticalRule && (
                   <div className={`et-modal-section ${selectedPhase.criticalRuleHighlight ? 'et-critical' : 'et-rule'}`}>
-                    <h4>{selectedPhase.criticalRuleHighlight ? '⚠️ Critical' : 'Remember'}</h4>
+                    <h4>{selectedPhase.criticalRuleHighlight ? 'Critical' : 'Remember'}</h4>
                     <p>{selectedPhase.criticalRule}</p>
                   </div>
                 )}
