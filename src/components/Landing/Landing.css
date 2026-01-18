@@ -2,12 +2,16 @@
 
 .landing {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background-color: #000000;
   color: #ffffff;
   position: relative;
   overflow-x: hidden;
+  /* PWA safe areas */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Subtle background gradient */
