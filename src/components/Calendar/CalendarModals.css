@@ -22,13 +22,13 @@
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  /* Safe area padding for iOS PWA */
-  padding: 24px;
-  padding-top: max(24px, env(safe-area-inset-top, 24px));
-  padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
-  padding-left: max(24px, env(safe-area-inset-left, 24px));
-  padding-right: max(24px, env(safe-area-inset-right, 24px));
-  overflow: hidden; /* Overlay doesn't scroll - modal content does */
+  /* Minimal padding - just safe areas for notch/home indicator */
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top, 16px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: max(16px, env(safe-area-inset-left, 16px));
+  padding-right: max(16px, env(safe-area-inset-right, 16px));
+  overflow: hidden;
   animation: calendarOverlayIn 200ms ease;
 }
 
@@ -44,8 +44,8 @@
 .calendar-modal {
   width: 100%;
   max-width: 360px;
-  /* Use dvh and account for overlay padding (48px total) + safe areas */
-  max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 48px);
+  /* Fill available space - subtract only safe areas and minimal padding */
+  max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 32px);
   position: relative;
   animation: calendarModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
@@ -105,19 +105,6 @@
   display: none;
 }
 
-/* Fade hint at bottom when content is scrollable */
-.calendar-modal-content::after {
-  content: '';
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 24px;
-  background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
-  pointer-events: none;
-  flex-shrink: 0;
-}
-
 /* =============================================================================
    STICKY FOOTER - Action buttons
    ============================================================================= */
@@ -128,6 +115,7 @@
   flex-direction: column;
   gap: 12px;
   padding-top: 24px;
+  padding-bottom: 16px; /* Breathing room above home indicator */
 }
 
 @keyframes calendarModalIn {
@@ -850,7 +838,7 @@
 
 @media (max-width: 768px) {
   .calendar-modal {
-    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 40px);
+    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px);
   }
   
   .calendar-modal-header h3,
