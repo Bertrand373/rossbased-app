@@ -630,21 +630,16 @@ body.modal-open {
 
 /* ============================================================
    STATIC VIEW - No scroll on fixed-content views
-   iOS PWA requires position:fixed + touch-action:none to actually lock
-   Use inset:0 instead of height:100% to fill entire viewport including safe areas
+   Note: iOS PWA may not fully respect this, but position:fixed breaks layout
    ============================================================ */
 
 body.static-view {
-  overflow: hidden !important;
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100% !important;
-  touch-action: none !important;
-  overscroll-behavior: none !important;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body.static-view .app-content {
-  overflow: hidden !important;
+  overflow: hidden;
 }
 
 /* ============================================================
