@@ -8,7 +8,8 @@
   min-height: 100vh;
   min-height: 100dvh;
   background-color: #000000;
-  padding: 48px 16px 120px;
+  /* 64px nav + safe area for home indicator */
+  padding: 48px 16px calc(64px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -588,7 +589,7 @@
 @media (max-width: 768px) {
   .calendar-container {
     padding: 16px 12px;
-    padding-bottom: 100px;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   }
   
   .integrated-calendar-header {
@@ -769,7 +770,7 @@
 
 @media (max-width: 480px) {
   .calendar-container {
-    padding: 32px 8px 90px;
+    padding: 32px 8px calc(64px + env(safe-area-inset-bottom, 0px));
   }
   
   /* Minimal header adjustments */

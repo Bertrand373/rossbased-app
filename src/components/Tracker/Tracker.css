@@ -2,7 +2,8 @@
 
 .tracker {
   /* Simple flexbox layout - fills available space */
-  min-height: calc(100dvh - 56px - 80px);
+  /* 56px header + 64px nav + safe area for home indicator */
+  min-height: calc(100dvh - 56px - 64px - env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
