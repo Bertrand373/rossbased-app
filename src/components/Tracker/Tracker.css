@@ -171,6 +171,11 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   animation: overlayIn 200ms ease;
+  
+  /* GPU acceleration - smoother PWA animation */
+  will-change: opacity, backdrop-filter;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 @keyframes overlayIn {
