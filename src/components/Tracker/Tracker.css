@@ -1,28 +1,30 @@
 /* Tracker.css - TITANTRACK */
 
 .tracker {
-  /* Fixed height = exact available space, no scroll */
-  height: calc(100dvh - 56px - 64px);
+  /* Fill available space from parent */
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 0 24px;
+  /* NO justify-content center - let children handle positioning */
   background-color: #000000;
-  overflow: hidden;
+  overflow: hidden; /* Prevent unnecessary scroll */
 }
 
 /* ============================================================
-   MAIN - Centers content, flexes to fill remaining space
+   MAIN - Takes remaining space, centers streak vertically
    ============================================================ */
 
 .tracker-main {
+  flex: 1; /* Fill remaining space (minus AI card if present, minus footer) */
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center; /* Center the streak counter in available space */
   text-align: center;
+  padding: 0 24px;
+  min-height: 0; /* Allow proper flex shrinking */
   width: 100%;
-  max-width: 360px;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;
 }
@@ -93,16 +95,17 @@
 }
 
 /* ============================================================
-   FOOTER - Button area
+   FOOTER - Pinned at bottom, doesn't affect center calculation
    ============================================================ */
 
-/* ============================================================
-   CTA BUTTON - Inside main for unified centering
-   ============================================================ */
-
-.tracker-cta {
-  margin-top: 32px;
+.tracker-footer {
+  flex-shrink: 0; /* Never shrink */
+  padding: 24px 24px;
+  padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 16px));
+  max-width: 360px;
   width: 100%;
+  animation: fadeInUp 500ms ease 100ms forwards;
+  opacity: 0;
 }
 
 .btn-primary {
@@ -400,34 +403,31 @@
   letter-spacing: 0.1em;
   text-align: center;
   margin: 0 0 40px 0;
-  flex-shrink: 0;
 }
 
-/* Hide subtitle for cleaner minimal look */
-.benefits-modal > p {
+.benefits-modal p {
   display: none;
 }
 
-/* Benefits list - matches ET sliders section */
+/* Scrollable benefits area */
 .benefits-list {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  flex: 1;
+  gap: 36px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  text-align: left;
+  flex: 1;
+  min-height: 0;
   margin-bottom: 48px;
+  padding-right: 4px;
 }
 
-/* Each benefit row - matches ET slider-group */
 .benefit-row {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
-/* Label and value row - matches ET slider-header */
 .benefit-info {
   display: flex;
   justify-content: space-between;
@@ -442,117 +442,77 @@
 
 .benefit-num {
   font-size: 0.9375rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
   font-feature-settings: 'tnum' 1;
 }
 
-/* Description below slider - matches ET style */
 .benefit-desc {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.25);
-  margin-top: 8px;
-  text-align: left;
+  display: none;
 }
 
-/* Slider wrapper - matches ET slider-wrap exactly */
+/* Slider styling - Premium minimal */
 .benefit-slider {
   position: relative;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
+  height: 4px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.08);
   overflow: visible;
 }
 
-/* Track background - matches ET */
-.benefit-slider::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: rgba(255, 255, 255, 0.12);
-  border-radius: 1px;
-  pointer-events: none;
-}
-
-/* Fill bar - matches ET */
 .benefit-fill {
   position: absolute;
+  top: 0;
   left: 0;
-  height: 2px;
+  height: 100%;
   background-color: #ffffff;
-  border-radius: 1px;
-  transition: width 50ms ease-out;
+  border-radius: 2px;
   pointer-events: none;
+  transition: width 50ms ease;
 }
 
-/* Range input - matches ET exactly */
 .benefit-slider input[type="range"] {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
   width: 100%;
-  height: 20px;
+  height: 24px;
   margin: 0;
   padding: 0;
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  border-radius: 0;
-  outline: none !important;
-  box-shadow: none !important;
+  background: transparent;
   cursor: pointer;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-/* Track - invisible (we use .benefit-fill instead) */
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 2px;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0;
-  box-shadow: none;
-  cursor: pointer;
+  height: 4px;
+  background: transparent;
+  border-radius: 2px;
 }
 
 .benefit-slider input[type="range"]::-moz-range-track {
-  width: 100%;
-  height: 2px;
+  height: 4px;
   background: transparent;
+  border-radius: 2px;
   border: none;
-  border-radius: 0;
-  box-shadow: none;
-  cursor: pointer;
 }
 
 .benefit-slider input[type="range"]::-ms-track {
-  width: 100%;
-  height: 2px;
+  height: 4px;
   background: transparent;
-  border: none;
+  border-color: transparent;
   color: transparent;
 }
 
-.benefit-slider input[type="range"]::-ms-fill-lower,
-.benefit-slider input[type="range"]::-ms-fill-upper {
-  background: transparent;
-  border: none;
-}
-
-/* Thumb - clean white circle (matches ET exactly) */
 .benefit-slider input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  appearance: none !important;
+  -webkit-appearance: none;
+  appearance: none;
   width: 18px;
   height: 18px;
   background: #ffffff;
-  border: none !important;
+  border: none;
   border-radius: 50%;
   cursor: pointer;
   margin-top: -8px;
@@ -782,8 +742,9 @@
     margin-top: 16px;
   }
   
-  .tracker-cta {
-    margin-top: 40px;
+  .tracker-footer {
+    padding: 32px 32px;
+    padding-bottom: max(32px, calc(env(safe-area-inset-bottom) + 16px));
   }
 }
 
@@ -802,8 +763,9 @@
     font-size: 0.75rem;
   }
   
-  .tracker-cta {
-    margin-top: 24px;
+  .tracker-footer {
+    padding: 20px 20px;
+    padding-bottom: max(20px, calc(env(safe-area-inset-bottom) + 12px));
   }
   
   .btn-primary,
@@ -866,8 +828,8 @@
     margin-top: 8px;
   }
   
-  .tracker-cta {
-    margin-top: 20px;
+  .tracker-footer {
+    padding-top: 16px;
   }
 }
 
@@ -887,8 +849,8 @@
     font-size: 0.6875rem;
   }
   
-  .tracker-cta {
-    margin-top: 16px;
+  .tracker-footer {
+    padding-top: 12px;
   }
   
   .btn-primary,
@@ -902,14 +864,22 @@
   .tracker {
     flex-direction: row;
     gap: 32px;
+    overflow: visible;
+  }
+  
+  .tracker-main {
+    flex: 1;
+    padding: 0 24px;
   }
   
   .streak-num {
     font-size: 4rem;
   }
   
-  .tracker-cta {
-    margin-top: 16px;
+  .tracker-footer {
+    flex-shrink: 0;
+    padding: 24px;
+    max-width: 200px;
   }
 }
 
@@ -934,6 +904,7 @@
   .sheet,
   .overlay,
   .tracker-main,
+  .tracker-footer,
   .benefits-modal,
   .confirm-modal {
     animation: none;
