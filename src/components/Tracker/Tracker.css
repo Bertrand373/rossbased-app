@@ -1,36 +1,24 @@
 /* Tracker.css - TITANTRACK */
 
-/* ============================================================
-   TRACKER CONTAINER
-   Parent (.main-content-wrapper) handles sizing via :has()
-   ============================================================ */
-
 .tracker {
-  width: 100%;
-  height: 100%;
-  
-  /* Center the content */
+  /* No min-height calc - parent .app-content handles layout */
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 0 24px;
   background-color: #000000;
-  
-  /* Ensure no scroll */
-  overflow: hidden;
-  overscroll-behavior: none;
 }
 
-/* Desktop and Tablet - same as mobile now */
-@media (min-width: 481px) {
+@media (min-width: 1025px) {
   .tracker {
-    /* Parent handles height */
+    /* Desktop: flex: 1 fills available space */
   }
 }
 
 /* ============================================================
-   MAIN - Content block, no flex-grow (sizes to content)
+   MAIN
    ============================================================ */
 
 .tracker-main {
@@ -108,13 +96,13 @@
 }
 
 /* ============================================================
-   FOOTER - Follows content with fixed spacing
+   FOOTER - Button area
    ============================================================ */
 
 .tracker-footer {
-  margin-top: 32px;
-  width: 100%;
+  padding: 32px 24px 0 24px;
   max-width: 360px;
+  width: 100%;
   animation: fadeInUp 500ms ease 100ms forwards;
   opacity: 0;
 }
@@ -161,7 +149,7 @@
 }
 
 /* ============================================================
-   OVERLAY
+   OVERLAY - Matches app-wide standard (Calendar, Auth, Urge, etc.)
    ============================================================ */
 
 .overlay {
@@ -191,7 +179,7 @@
 }
 
 /* ============================================================
-   MODAL
+   MODAL - Clean, minimal, no box feeling
    ============================================================ */
 
 .modal {
@@ -238,6 +226,7 @@
   margin-top: 48px;
 }
 
+/* Button styles - work inside modals */
 .modal .btn-primary,
 .modal-actions .btn-primary {
   width: 100%;
@@ -299,7 +288,7 @@
 }
 
 /* ============================================================
-   CONFIRM MODAL
+   CONFIRM MODAL - Floating minimal aesthetic
    ============================================================ */
 
 .confirm-modal {
@@ -387,7 +376,7 @@
 }
 
 /* ============================================================
-   BENEFITS MODAL
+   BENEFITS MODAL - Floating minimal (matches ET check-in exactly)
    ============================================================ */
 
 .benefits-modal {
@@ -398,11 +387,13 @@
   flex-direction: column;
   flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* Floating text - NO background, NO border-radius, NO padding */
   background: transparent;
   border-radius: 0;
   padding: 0;
 }
 
+/* Header - uppercase muted style like ET */
 .benefits-modal h2 {
   font-size: 0.6875rem;
   font-weight: 600;
@@ -411,30 +402,34 @@
   letter-spacing: 0.1em;
   text-align: center;
   margin: 0 0 40px 0;
+  flex-shrink: 0;
 }
 
-.benefits-modal p {
+/* Hide subtitle for cleaner minimal look */
+.benefits-modal > p {
   display: none;
 }
 
+/* Benefits list - matches ET sliders section */
 .benefits-list {
   display: flex;
   flex-direction: column;
-  gap: 36px;
+  gap: 32px;
+  flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  flex: 1;
-  min-height: 0;
+  text-align: left;
   margin-bottom: 48px;
-  padding-right: 4px;
 }
 
+/* Each benefit row - matches ET slider-group */
 .benefit-row {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
+/* Label and value row - matches ET slider-header */
 .benefit-info {
   display: flex;
   justify-content: space-between;
@@ -449,81 +444,122 @@
 
 .benefit-num {
   font-size: 0.9375rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
   font-feature-settings: 'tnum' 1;
 }
 
+/* Description below slider - matches ET style */
 .benefit-desc {
-  display: none;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 8px;
+  text-align: left;
 }
 
+/* Slider wrapper - matches ET slider-wrap exactly */
 .benefit-slider {
   position: relative;
-  height: 4px;
-  border-radius: 2px;
-  background-color: rgba(255, 255, 255, 0.08);
+  height: 20px;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
   overflow: visible;
 }
 
+/* Track background - matches ET */
+.benefit-slider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+/* Fill bar - matches ET */
 .benefit-fill {
   position: absolute;
-  top: 0;
   left: 0;
-  height: 100%;
+  height: 2px;
   background-color: #ffffff;
-  border-radius: 2px;
+  border-radius: 1px;
+  transition: width 50ms ease-out;
   pointer-events: none;
-  transition: width 50ms ease;
 }
 
+/* Range input - matches ET exactly */
 .benefit-slider input[type="range"] {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
+  position: relative;
   width: 100%;
-  height: 24px;
+  height: 20px;
   margin: 0;
   padding: 0;
-  background: transparent;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0;
+  outline: none !important;
+  box-shadow: none !important;
   cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* Track - invisible (we use .benefit-fill instead) */
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {
-  height: 4px;
-  background: transparent;
-  border-radius: 2px;
+  width: 100%;
+  height: 2px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
 }
 
 .benefit-slider input[type="range"]::-moz-range-track {
-  height: 4px;
+  width: 100%;
+  height: 2px;
   background: transparent;
-  border-radius: 2px;
   border: none;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
 }
 
 .benefit-slider input[type="range"]::-ms-track {
-  height: 4px;
+  width: 100%;
+  height: 2px;
   background: transparent;
-  border-color: transparent;
+  border: none;
   color: transparent;
 }
 
+.benefit-slider input[type="range"]::-ms-fill-lower,
+.benefit-slider input[type="range"]::-ms-fill-upper {
+  background: transparent;
+  border: none;
+}
+
+/* Thumb - clean white circle (matches ET exactly) */
 .benefit-slider input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
+  -webkit-appearance: none !important;
+  appearance: none !important;
   width: 18px;
   height: 18px;
   background: #ffffff;
-  border: none;
+  border: none !important;
   border-radius: 50%;
   cursor: pointer;
   margin-top: -8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
 }
 
 .benefit-slider input[type="range"]::-moz-range-thumb {
@@ -534,7 +570,7 @@
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
 }
 
 .benefit-slider input[type="range"]::-ms-thumb {
@@ -547,6 +583,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
+/* Hover/active states */
 .benefit-slider input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.15);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -565,6 +602,7 @@
   transform: scale(1.1);
 }
 
+/* Remove any focus outlines/boxes */
 .benefit-slider input[type="range"]:focus {
   outline: none !important;
   border: none !important;
@@ -579,6 +617,7 @@
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
+/* Benefits actions - matches ET save button area */
 .benefits-actions {
   display: flex;
   flex-direction: column;
@@ -623,7 +662,7 @@
 }
 
 /* ============================================================
-   SHEET (Action sheet)
+   SHEET (Action sheet) - Floating, minimal
    ============================================================ */
 
 .sheet {
@@ -744,6 +783,10 @@
   .milestone {
     margin-top: 16px;
   }
+  
+  .tracker-footer {
+    padding: 40px 32px 0 32px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -762,7 +805,7 @@
   }
   
   .tracker-footer {
-    margin-top: 28px;
+    padding: 24px 20px 0 20px;
   }
   
   .btn-primary,
@@ -770,6 +813,7 @@
     padding: 14px 24px;
   }
   
+  /* Benefits modal responsive */
   .benefits-modal h2 {
     margin-bottom: 32px;
   }
@@ -825,7 +869,7 @@
   }
   
   .tracker-footer {
-    margin-top: 24px;
+    padding-top: 20px;
   }
 }
 
@@ -846,7 +890,7 @@
   }
   
   .tracker-footer {
-    margin-top: 20px;
+    padding-top: 16px;
   }
   
   .btn-primary,
@@ -867,7 +911,7 @@
   }
   
   .tracker-footer {
-    margin-top: 0;
+    padding: 0;
     max-width: 200px;
   }
 }
@@ -901,7 +945,7 @@
   }
 }
 
-/* Scrollbar for benefits */
+/* Scrollbar for benefits - barely visible */
 .benefits-list::-webkit-scrollbar {
   width: 2px;
 }
