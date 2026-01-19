@@ -1,8 +1,8 @@
 /* Tracker.css - TITANTRACK */
 
 .tracker {
-  /* Fill available space from parent */
-  flex: 1;
+  /* Explicit height - bypasses flex chain issues from React Router wrappers */
+  min-height: calc(100dvh - 56px - 64px);
   display: flex;
   flex-direction: column;
   align-items: center;
