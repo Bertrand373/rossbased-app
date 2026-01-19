@@ -1,14 +1,15 @@
 /* Tracker.css - TITANTRACK */
 
 .tracker {
-  /* Explicit height - bypasses flex chain issues from React Router wrappers */
-  min-height: calc(100dvh - 56px - 64px);
+  /* Fixed height = exact available space, no scroll */
+  height: calc(100dvh - 56px - 64px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 0 24px;
   background-color: #000000;
+  overflow: hidden;
 }
 
 /* ============================================================
