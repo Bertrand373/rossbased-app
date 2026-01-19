@@ -1,32 +1,27 @@
 /* Tracker.css - TITANTRACK */
 
 .tracker {
-  /* flex: 1 + min-height ensures centering while allowing AI card to push content */
+  /* Fill available space from parent */
   flex: 1;
-  min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 0 24px;
   background-color: #000000;
 }
 
-@media (min-width: 1025px) {
-  .tracker {
-    /* Desktop: flex: 1 fills available space */
-  }
-}
-
 /* ============================================================
-   MAIN
+   MAIN - Centers content, flexes to fill remaining space
    ============================================================ */
 
 .tracker-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
+  width: 100%;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;
 }
@@ -101,7 +96,7 @@
    ============================================================ */
 
 .tracker-footer {
-  padding: 32px 24px 0 24px;
+  padding: 32px 24px 16px 24px;
   max-width: 360px;
   width: 100%;
   animation: fadeInUp 500ms ease 100ms forwards;
@@ -786,7 +781,7 @@
   }
   
   .tracker-footer {
-    padding: 40px 32px 0 32px;
+    padding: 40px 32px 16px 32px;
   }
 }
 
@@ -806,7 +801,7 @@
   }
   
   .tracker-footer {
-    padding: 24px 20px 0 20px;
+    padding: 24px 20px 16px 20px;
   }
   
   .btn-primary,
