@@ -14,9 +14,8 @@ import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
-// Import UNIFIED PredictionDisplay
+// AI Prediction Display (PatternInsightCard handles floating alerts, this handles full view)
 import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay';
-import MLTraining from './components/MLTraining/MLTraining';
 
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
@@ -214,8 +213,7 @@ const MixpanelTracker = ({ isLoggedIn, userData }) => {
         '/timeline': 'Timeline',
         '/urge-toolkit': 'Urge Toolkit',
         '/profile': 'Profile',
-        '/urge-prediction': 'AI Prediction',
-        '/ml-training': 'ML Training'
+        '/urge-prediction': 'AI Prediction'
       };
       
       const pageName = pageMap[location.pathname] || location.pathname;
@@ -435,7 +433,6 @@ function App() {
                   <Route path="/urge-prediction" element={
                     <PredictionDisplay mode="full" userData={userData} />
                   } />
-                  <Route path="/ml-training" element={<MLTraining />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>
