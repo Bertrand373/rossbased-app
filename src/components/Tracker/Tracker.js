@@ -15,9 +15,6 @@ import interventionService from '../../services/InterventionService';
 // Mixpanel Analytics
 import { trackDailyLog, trackStreakReset } from '../../utils/mixpanel';
 
-// Body scroll lock for modals
-import useBodyScrollLock from '../../hooks/useBodyScrollLock';
-
 const Tracker = ({ userData, updateUserData }) => {
   // FIXED: Only show date picker if user has completed onboarding but hasn't set date
   const [showDatePicker, setShowDatePicker] = useState(!userData.startDate && userData.hasSeenOnboarding);
@@ -38,8 +35,7 @@ const Tracker = ({ userData, updateUserData }) => {
   
   const fillRefs = useRef({});
   
-  // Lock body scroll when any modal is open
-  useBodyScrollLock(showBenefits || showStreakOptions || showResetConfirm);
+  // Body scroll lock removed - parent containers now have overflow:hidden
   
   // Use stored currentStreak for consistency across all tabs
   const streak = userData.currentStreak || 1;
