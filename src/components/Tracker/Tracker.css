@@ -1,7 +1,8 @@
 /* Tracker.css - TITANTRACK */
 
 .tracker {
-  /* No min-height calc - parent .app-content handles layout */
+  /* Fill parent height (set by App.css :has() rules) */
+  height: 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
