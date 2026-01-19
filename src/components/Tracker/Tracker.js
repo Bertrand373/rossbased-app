@@ -362,7 +362,7 @@ const Tracker = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Main */}
+      {/* Main - All content centered as one unit */}
       <main className="tracker-main">
         <p className="date">
           {format(currentTime, 'EEEE, MMMM d')}
@@ -381,18 +381,15 @@ const Tracker = ({ userData, updateUserData }) => {
         )}
         
         <DailyQuote />
-      </main>
-
-      {/* Footer */}
-      <footer className="tracker-footer">
-        {/* ONBOARDING TARGET: benefits-trigger */}
+        
+        {/* ONBOARDING TARGET: benefits-trigger - Now inside main for unified centering */}
         <button 
-          className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
+          className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger tracker-cta`}
           onClick={() => setShowBenefits(true)}
         >
           {todayLogged ? 'Logged Today ✓' : 'Log Today'}
         </button>
-      </footer>
+      </main>
       
     </div>
   );

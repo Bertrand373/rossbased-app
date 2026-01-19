@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 0 24px;
   background-color: #000000;
 }
@@ -15,13 +16,12 @@
    ============================================================ */
 
 .tracker-main {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
   width: 100%;
+  max-width: 360px;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;
 }
@@ -95,12 +95,13 @@
    FOOTER - Button area
    ============================================================ */
 
-.tracker-footer {
-  padding: 32px 24px 16px 24px;
-  max-width: 360px;
+/* ============================================================
+   CTA BUTTON - Inside main for unified centering
+   ============================================================ */
+
+.tracker-cta {
+  margin-top: 32px;
   width: 100%;
-  animation: fadeInUp 500ms ease 100ms forwards;
-  opacity: 0;
 }
 
 .btn-primary {
@@ -780,8 +781,8 @@
     margin-top: 16px;
   }
   
-  .tracker-footer {
-    padding: 40px 32px 16px 32px;
+  .tracker-cta {
+    margin-top: 40px;
   }
 }
 
@@ -800,8 +801,8 @@
     font-size: 0.75rem;
   }
   
-  .tracker-footer {
-    padding: 24px 20px 16px 20px;
+  .tracker-cta {
+    margin-top: 24px;
   }
   
   .btn-primary,
@@ -864,8 +865,8 @@
     margin-top: 8px;
   }
   
-  .tracker-footer {
-    padding-top: 20px;
+  .tracker-cta {
+    margin-top: 20px;
   }
 }
 
@@ -885,8 +886,8 @@
     font-size: 0.6875rem;
   }
   
-  .tracker-footer {
-    padding-top: 16px;
+  .tracker-cta {
+    margin-top: 16px;
   }
   
   .btn-primary,
@@ -906,9 +907,8 @@
     font-size: 4rem;
   }
   
-  .tracker-footer {
-    padding: 0;
-    max-width: 200px;
+  .tracker-cta {
+    margin-top: 16px;
   }
 }
 
@@ -933,7 +933,6 @@
   .sheet,
   .overlay,
   .tracker-main,
-  .tracker-footer,
   .benefits-modal,
   .confirm-modal {
     animation: none;
