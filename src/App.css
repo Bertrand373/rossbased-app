@@ -643,6 +643,30 @@ body.static-view .app-content {
 }
 
 /* ============================================================
+   TRACKER VIEW - Kill scroll when Tracker is showing
+   Uses :has() to target parent when .tracker is present
+   ============================================================ */
+
+.main-content-wrapper:has(.tracker) {
+  padding: 0;
+  overflow: hidden;
+  height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile));
+  max-height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile));
+}
+
+.app-content:has(.tracker) {
+  overflow: hidden;
+  padding-bottom: 0 !important;
+}
+
+@media (min-width: 1025px) {
+  .main-content-wrapper:has(.tracker) {
+    height: calc(100dvh - var(--header-height));
+    max-height: calc(100dvh - var(--header-height));
+  }
+}
+
+/* ============================================================
    LANDSCAPE BLOCKER - Portrait Only
    Matches TitanTrack aesthetic: black, minimal, confident
    ============================================================ */
