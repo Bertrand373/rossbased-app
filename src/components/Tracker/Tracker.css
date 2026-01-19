@@ -1,30 +1,59 @@
 /* Tracker.css - TITANTRACK */
 
+/* ============================================================
+   TRACKER CONTAINER
+   Escapes wrapper padding, fills exact screen height
+   ============================================================ */
+
 .tracker {
-  /* Fill available space from parent */
+  /* Escape the wrapper padding (--space-4 = 16px on mobile) */
+  margin: -16px;
+  width: calc(100% + 32px);
+  
+  /* Fill exact viewport minus header (56px) and bottom nav (64px) */
+  height: calc(100dvh - 56px - 64px);
+  min-height: calc(100dvh - 56px - 64px);
+  max-height: calc(100dvh - 56px - 64px);
+  
+  /* Flexbox - main grows to fill, footer stays at bottom */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #000000;
+}
+
+/* Desktop: no bottom nav, taller header */
+@media (min-width: 1025px) {
+  .tracker {
+    margin: -32px;
+    width: calc(100% + 64px);
+    height: calc(100dvh - 64px);
+    min-height: calc(100dvh - 64px);
+    max-height: calc(100dvh - 64px);
+  }
+}
+
+/* Tablet */
+@media (min-width: 481px) and (max-width: 1024px) {
+  .tracker {
+    margin: -24px;
+    width: calc(100% + 48px);
+  }
+}
+
+/* ============================================================
+   MAIN - Fills space, centers streak counter
+   ============================================================ */
+
+.tracker-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* NO justify-content center - let children handle positioning */
-  background-color: #000000;
-  overflow: hidden; /* Prevent unnecessary scroll */
-}
-
-/* ============================================================
-   MAIN - Takes remaining space, centers streak vertically
-   ============================================================ */
-
-.tracker-main {
-  flex: 1; /* Fill remaining space (minus AI card if present, minus footer) */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; /* Center the streak counter in available space */
+  justify-content: center;
   text-align: center;
   padding: 0 24px;
-  min-height: 0; /* Allow proper flex shrinking */
-  width: 100%;
+  min-height: 0;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;
 }
@@ -95,17 +124,23 @@
 }
 
 /* ============================================================
-   FOOTER - Pinned at bottom, doesn't affect center calculation
+   FOOTER - Fixed at bottom
    ============================================================ */
 
 .tracker-footer {
-  flex-shrink: 0; /* Never shrink */
-  padding: 24px 24px;
-  padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 16px));
-  max-width: 360px;
-  width: 100%;
+  flex-shrink: 0;
+  padding: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
   animation: fadeInUp 500ms ease 100ms forwards;
   opacity: 0;
+}
+
+.tracker-footer .btn-primary,
+.tracker-footer .btn-logged {
+  max-width: 360px;
+  width: 100%;
 }
 
 .btn-primary {
@@ -150,7 +185,7 @@
 }
 
 /* ============================================================
-   OVERLAY - Matches app-wide standard (Calendar, Auth, Urge, etc.)
+   OVERLAY
    ============================================================ */
 
 .overlay {
@@ -180,7 +215,7 @@
 }
 
 /* ============================================================
-   MODAL - Clean, minimal, no box feeling
+   MODAL
    ============================================================ */
 
 .modal {
@@ -227,7 +262,6 @@
   margin-top: 48px;
 }
 
-/* Button styles - work inside modals */
 .modal .btn-primary,
 .modal-actions .btn-primary {
   width: 100%;
@@ -289,7 +323,7 @@
 }
 
 /* ============================================================
-   CONFIRM MODAL - Floating minimal aesthetic
+   CONFIRM MODAL
    ============================================================ */
 
 .confirm-modal {
@@ -377,7 +411,7 @@
 }
 
 /* ============================================================
-   BENEFITS MODAL - Floating minimal (matches ET check-in exactly)
+   BENEFITS MODAL
    ============================================================ */
 
 .benefits-modal {
@@ -388,13 +422,11 @@
   flex-direction: column;
   flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  /* Floating text - NO background, NO border-radius, NO padding */
   background: transparent;
   border-radius: 0;
   padding: 0;
 }
 
-/* Header - uppercase muted style like ET */
 .benefits-modal h2 {
   font-size: 0.6875rem;
   font-weight: 600;
@@ -409,7 +441,6 @@
   display: none;
 }
 
-/* Scrollable benefits area */
 .benefits-list {
   display: flex;
   flex-direction: column;
@@ -451,7 +482,6 @@
   display: none;
 }
 
-/* Slider styling - Premium minimal */
 .benefit-slider {
   position: relative;
   height: 4px;
@@ -517,7 +547,7 @@
   cursor: pointer;
   margin-top: -8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
 .benefit-slider input[type="range"]::-moz-range-thumb {
@@ -528,7 +558,7 @@
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
 .benefit-slider input[type="range"]::-ms-thumb {
@@ -541,7 +571,6 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Hover/active states */
 .benefit-slider input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.15);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -560,7 +589,6 @@
   transform: scale(1.1);
 }
 
-/* Remove any focus outlines/boxes */
 .benefit-slider input[type="range"]:focus {
   outline: none !important;
   border: none !important;
@@ -575,7 +603,6 @@
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Benefits actions - matches ET save button area */
 .benefits-actions {
   display: flex;
   flex-direction: column;
@@ -620,7 +647,7 @@
 }
 
 /* ============================================================
-   SHEET (Action sheet) - Floating, minimal
+   SHEET (Action sheet)
    ============================================================ */
 
 .sheet {
@@ -741,11 +768,6 @@
   .milestone {
     margin-top: 16px;
   }
-  
-  .tracker-footer {
-    padding: 32px 32px;
-    padding-bottom: max(32px, calc(env(safe-area-inset-bottom) + 16px));
-  }
 }
 
 @media (max-width: 480px) {
@@ -764,8 +786,8 @@
   }
   
   .tracker-footer {
-    padding: 20px 20px;
-    padding-bottom: max(20px, calc(env(safe-area-inset-bottom) + 12px));
+    padding: 20px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
   }
   
   .btn-primary,
@@ -773,7 +795,6 @@
     padding: 14px 24px;
   }
   
-  /* Benefits modal responsive */
   .benefits-modal h2 {
     margin-bottom: 32px;
   }
@@ -864,12 +885,10 @@
   .tracker {
     flex-direction: row;
     gap: 32px;
-    overflow: visible;
   }
   
   .tracker-main {
     flex: 1;
-    padding: 0 24px;
   }
   
   .streak-num {
@@ -880,6 +899,7 @@
     flex-shrink: 0;
     padding: 24px;
     max-width: 200px;
+    align-items: center;
   }
 }
 
@@ -912,7 +932,7 @@
   }
 }
 
-/* Scrollbar for benefits - barely visible */
+/* Scrollbar for benefits */
 .benefits-list::-webkit-scrollbar {
   width: 2px;
 }
