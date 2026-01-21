@@ -24,11 +24,21 @@
   z-index: 10000;
   padding: 16px;
   padding-top: max(16px, env(safe-area-inset-top, 16px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
   padding-left: max(16px, env(safe-area-inset-left, 16px));
   padding-right: max(16px, env(safe-area-inset-right, 16px));
+  /* FIXED: No scroll on overlay - content inside scrolls */
   overflow: hidden;
   animation: calendarOverlayIn 200ms ease;
+  
+  /* Prevent touch scroll on overlay itself */
+  overscroll-behavior: contain;
+  touch-action: none;
+}
+
+/* Allow touch on modal children */
+.calendar-overlay > * {
+  touch-action: auto;
 }
 
 @keyframes calendarOverlayIn {
@@ -71,7 +81,25 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Fill available space */
   height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 32px);
+  max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 32px);
+}
+
+/* Fixed header elements in trigger selection mode */
+.calendar-modal.calendar-edit-day.has-trigger-selection > h3 {
+  flex-shrink: 0;
+}
+
+.calendar-modal.calendar-edit-day.has-trigger-selection > p {
+  flex-shrink: 0;
+}
+
+/* Actions fixed at absolute bottom in trigger mode */
+.calendar-modal.calendar-edit-day.has-trigger-selection > .calendar-actions {
+  flex-shrink: 0;
+  margin-top: auto; /* Push to bottom */
+  padding-bottom: 8px;
 }
 
 /* =============================================================================
@@ -653,6 +681,7 @@
   flex: 1;
   min-height: 0; /* Critical for flex overflow */
   text-align: left;
+  overflow: hidden; /* Contain scroll to list only */
 }
 
 /* Fixed header area */
@@ -669,7 +698,7 @@
   text-align: center;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin: 0;
+  margin: 0 0 24px 0;
   flex-shrink: 0;
 }
 
