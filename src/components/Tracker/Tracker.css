@@ -382,13 +382,15 @@
 }
 
 /* ============================================================
-   BENEFITS MODAL - Floating minimal (matches ET check-in exactly)
+   BENEFITS MODAL - Fixed header/footer, scrollable content
    ============================================================ */
 
 .benefits-modal {
   width: 100%;
   max-width: 360px;
-  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  /* Use full available height */
+  height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: 700px; /* Cap on larger screens */
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -399,7 +401,7 @@
   padding: 0;
 }
 
-/* Header - uppercase muted style like ET */
+/* Header - FIXED at top */
 .benefits-modal h2 {
   font-size: 0.6875rem;
   font-weight: 600;
@@ -407,8 +409,9 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   text-align: center;
-  margin: 0 0 40px 0;
-  flex-shrink: 0;
+  margin: 0;
+  padding-bottom: 32px;
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 /* Hide subtitle for cleaner minimal look */
@@ -416,16 +419,32 @@
   display: none;
 }
 
-/* Benefits list - matches ET sliders section */
+/* Benefits list - SCROLLABLE middle section */
 .benefits-list {
   display: flex;
   flex-direction: column;
   gap: 32px;
-  flex: 1;
+  flex: 1; /* Take remaining space */
+  min-height: 0; /* Critical for flex overflow */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   text-align: left;
-  margin-bottom: 48px;
+  padding: 8px 0; /* Small padding for scroll content */
+  /* Fade edges to indicate scrollability */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 16px,
+    black calc(100% - 16px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 16px,
+    black calc(100% - 16px),
+    transparent 100%
+  );
 }
 
 /* Each benefit row - matches ET slider-group */
@@ -623,12 +642,13 @@
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Benefits actions - matches ET save button area */
+/* Benefits actions - FIXED at bottom */
 .benefits-actions {
   display: flex;
   flex-direction: column;
   gap: 0;
-  flex-shrink: 0;
+  flex-shrink: 0; /* Prevent shrinking */
+  padding-top: 24px; /* Space above buttons */
 }
 
 .benefits-actions .btn-primary {
@@ -821,17 +841,20 @@
   
   /* Benefits modal responsive */
   .benefits-modal h2 {
-    margin-bottom: 32px;
+    padding-bottom: 24px;
   }
   
   .benefits-list {
     gap: 28px;
-    margin-bottom: 40px;
   }
   
   .benefit-info span:first-child,
   .benefit-num {
     font-size: 0.875rem;
+  }
+  
+  .benefits-actions {
+    padding-top: 20px;
   }
   
   .benefits-actions .btn-primary,
@@ -877,6 +900,15 @@
   .tracker-footer {
     padding-top: 20px;
   }
+  
+  /* Benefits modal on short screens */
+  .benefits-modal {
+    max-height: none; /* Allow full height */
+  }
+  
+  .benefits-list {
+    gap: 24px;
+  }
 }
 
 /* Very short screens */
@@ -902,6 +934,19 @@
   .btn-primary,
   .btn-logged {
     padding: 12px 20px;
+  }
+  
+  /* Benefits modal on very short screens */
+  .benefits-modal h2 {
+    padding-bottom: 16px;
+  }
+  
+  .benefits-list {
+    gap: 20px;
+  }
+  
+  .benefits-actions {
+    padding-top: 16px;
   }
 }
 
