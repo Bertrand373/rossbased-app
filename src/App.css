@@ -165,6 +165,10 @@ h4 { font-size: 0.875rem; }
   align-items: center;
   z-index: 9999;
   animation: loaderFadeIn 0.15s ease-out;
+  
+  /* PWA safe area compensation - centers within visible area */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @keyframes loaderFadeIn {
