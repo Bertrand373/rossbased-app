@@ -66,6 +66,14 @@
   overflow: hidden;
 }
 
+/* Edit day modal with trigger selection needs flex layout */
+.calendar-modal.calendar-edit-day.has-trigger-selection {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 32px);
+}
+
 /* =============================================================================
    STICKY HEADER - Date title and status badge
    ============================================================================= */
@@ -636,11 +644,22 @@
 }
 
 /* =============================================================================
-   TRIGGER SELECTION
+   TRIGGER SELECTION - Fixed header/footer, scrollable list
    ============================================================================= */
 
 .calendar-trigger-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* Critical for flex overflow */
   text-align: left;
+}
+
+/* Fixed header area */
+.calendar-trigger-header {
+  flex-shrink: 0;
+  text-align: center;
+  padding-bottom: 16px;
 }
 
 .calendar-triggers-label {
@@ -650,12 +669,48 @@
   text-align: center;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin-bottom: 24px;
+  margin: 0;
+  flex-shrink: 0;
 }
 
+/* Scrollable trigger list */
 .calendar-triggers-list {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0; /* Critical for flex overflow */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 0;
+  /* Subtle fade edges */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 8px,
+    black calc(100% - 8px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 8px,
+    black calc(100% - 8px),
+    transparent 100%
+  );
+}
+
+/* Hide scrollbar but keep functionality */
+.calendar-triggers-list::-webkit-scrollbar {
+  width: 2px;
+}
+
+.calendar-triggers-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.calendar-triggers-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
 }
 
 .calendar-trigger {
@@ -692,12 +747,16 @@
 .calendar-trigger-divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
 }
 
+/* Fixed footer with confirm button */
 .calendar-trigger-actions {
   display: flex;
-  justify-content: center;
-  margin-top: 24px;
+  flex-direction: column;
+  gap: 0;
+  flex-shrink: 0;
+  padding-top: 24px;
 }
 
 .calendar-trigger-confirm {
@@ -840,6 +899,10 @@
     max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px);
   }
   
+  .calendar-modal.calendar-edit-day.has-trigger-selection {
+    height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px);
+  }
+  
   .calendar-modal-header h3,
   .calendar-day-info h3,
   .calendar-edit-day h3 {
@@ -951,6 +1014,19 @@
     font-size: 0.75rem;
   }
   
+  .calendar-triggers-label {
+    font-size: 0.6875rem;
+  }
+  
+  .calendar-trigger-actions {
+    padding-top: 20px;
+  }
+  
+  .calendar-trigger-confirm {
+    padding: 14px 20px;
+    font-size: 0.875rem;
+  }
+  
   .calendar-journal-textarea {
     min-height: 80px;
     padding: 14px;
@@ -979,6 +1055,11 @@
 @media (min-width: 1024px) {
   .calendar-modal {
     max-width: 360px;
+  }
+  
+  .calendar-modal.calendar-edit-day.has-trigger-selection {
+    max-height: 700px;
+    height: auto;
   }
   
   .calendar-modal-header h3,

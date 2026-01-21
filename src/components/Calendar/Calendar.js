@@ -1011,7 +1011,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           ================================================================ */}
       {editDayModal && selectedDate && (
         <div className="calendar-overlay">
-          <div className="calendar-modal calendar-edit-day" onClick={e => e.stopPropagation()}>
+          <div className={`calendar-modal calendar-edit-day ${showTriggerSelection ? 'has-trigger-selection' : ''}`} onClick={e => e.stopPropagation()}>
             
             <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
             {getEditSubtitle() && <p>{getEditSubtitle()}</p>}
