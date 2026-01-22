@@ -7,10 +7,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* CHANGED: flex-start to match other tabs (Calendar, Stats, Timeline, etc.) */
-  justify-content: flex-start;
+  /* CHANGED: flex-start to match other tabs, but with space-between for footer */
+  justify-content: space-between;
   padding: 0 24px;
-  padding-top: 24px; /* Match other tabs top spacing */
+  padding-top: 32px; /* Match other tabs top spacing */
+  padding-bottom: 24px; /* Space for footer above nav */
   background-color: #000000;
 }
 
@@ -103,14 +104,12 @@
    ============================================================ */
 
 .tracker-footer {
-  padding: 32px 24px 0 24px;
+  padding: 0 24px;
   max-width: 360px;
   width: 100%;
   animation: fadeInUp 500ms ease 100ms forwards;
   opacity: 0;
-  /* Push to bottom with margin-top auto */
-  margin-top: auto;
-  padding-bottom: 24px;
+  flex-shrink: 0;
 }
 
 .btn-primary {
@@ -767,14 +766,15 @@
     margin-top: 16px;
   }
   
-  .tracker-footer {
-    padding: 40px 32px 0 32px;
+  .tracker {
+    padding-top: 40px;
   }
 }
 
 @media (max-width: 480px) {
   .tracker {
-    padding-top: 20px;
+    padding-top: 28px;
+    padding-bottom: 20px;
   }
   
   .streak-num {
@@ -789,11 +789,6 @@
   .milestone {
     margin-top: 10px;
     font-size: 0.75rem;
-  }
-  
-  .tracker-footer {
-    padding: 24px 20px 0 20px;
-    padding-bottom: 20px;
   }
   
   .btn-primary,
@@ -848,7 +843,8 @@
 /* Short screens */
 @media (max-height: 700px) {
   .tracker {
-    padding-top: 16px;
+    padding-top: 20px;
+    padding-bottom: 16px;
   }
   
   .streak-num {
@@ -861,11 +857,6 @@
   
   .milestone {
     margin-top: 8px;
-  }
-  
-  .tracker-footer {
-    padding-top: 20px;
-    padding-bottom: 16px;
   }
   
   /* Benefits modal on short screens */
@@ -882,6 +873,7 @@
 @media (max-height: 600px) {
   .tracker {
     padding-top: 12px;
+    padding-bottom: 12px;
   }
   
   .streak-num {
@@ -896,11 +888,6 @@
   .milestone {
     margin-top: 6px;
     font-size: 0.6875rem;
-  }
-  
-  .tracker-footer {
-    padding-top: 16px;
-    padding-bottom: 12px;
   }
   
   .btn-primary,
@@ -926,6 +913,7 @@
 @media (max-height: 500px) and (orientation: landscape) {
   .tracker {
     flex-direction: row;
+    justify-content: center;
     gap: 32px;
     padding-top: 16px;
   }
@@ -937,7 +925,6 @@
   .tracker-footer {
     padding: 0;
     max-width: 200px;
-    margin-top: 0;
   }
 }
 
