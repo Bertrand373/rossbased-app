@@ -12,8 +12,8 @@
   padding: 0 24px;
   /* Top padding to match other tabs + breathing room from header */
   padding-top: 48px;
-  /* Bottom padding: clear mobile nav (~60px) + AI chat button (~70px) + safe area */
-  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+  /* Bottom padding: clear mobile nav + AI chat button */
+  padding-bottom: 120px;
   background-color: #000000;
 }
 
@@ -822,7 +822,7 @@
 @media (min-width: 768px) {
   .tracker {
     padding-top: 48px;
-    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: 100px;
   }
   
   .streak-num {
@@ -841,7 +841,7 @@
 @media (max-width: 480px) {
   .tracker {
     padding-top: 44px;
-    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: 115px;
   }
   
   .streak-num {
@@ -911,7 +911,7 @@
 @media (max-height: 700px) {
   .tracker {
     padding-top: 32px;
-    padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: 105px;
   }
   
   .streak-num {
@@ -940,7 +940,7 @@
 @media (max-height: 600px) {
   .tracker {
     padding-top: 24px;
-    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: 95px;
   }
   
   .streak-num {
