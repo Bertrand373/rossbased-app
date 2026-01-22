@@ -35,6 +35,8 @@
   /* flex: 1 takes remaining space, centers content vertically */
   flex: 1;
   justify-content: center;
+  /* Spacing above (matches gap between header and transmission) */
+  padding-top: 24px;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;
 }
@@ -110,6 +112,8 @@
 
 .tracker-footer {
   padding: 0;
+  /* Spacing above (matches gap between header and transmission) */
+  padding-top: 24px;
   max-width: 360px;
   width: 100%;
   animation: fadeInUp 500ms ease 100ms forwards;
