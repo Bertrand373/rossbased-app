@@ -68,17 +68,29 @@
 }
 
 /* =============================================================================
-   STAT CARDS - 2x2 grid on mobile, inline with dividers on desktop
+   STAT CARDS - Visual hierarchy: primary (hero) and secondary (subdued)
    ============================================================================= */
 
 .stat-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
   margin-bottom: 48px;
-  max-width: 320px;
-  margin-left: auto;
-  margin-right: auto;
+}
+
+.stat-row-primary {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+}
+
+.stat-row-secondary {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .stat-card {
@@ -88,7 +100,7 @@
   gap: 6px;
   background: transparent;
   border: none;
-  padding: 20px 12px;
+  padding: 12px;
   cursor: pointer;
   transition: opacity 150ms ease;
   -webkit-tap-highlight-color: transparent;
@@ -102,8 +114,9 @@
   opacity: 0.5;
 }
 
-.stat-num {
-  font-size: 2.5rem;
+/* Primary stats - large, prominent */
+.stat-card-primary .stat-num {
+  font-size: 3.5rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1;
@@ -111,12 +124,28 @@
   font-feature-settings: 'tnum' 1;
 }
 
-.stat-label {
+.stat-card-primary .stat-label {
   font-size: 0.6875rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   letter-spacing: 0.02em;
-  white-space: nowrap;
+}
+
+/* Secondary stats - smaller, muted */
+.stat-card-secondary .stat-num {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-feature-settings: 'tnum' 1;
+}
+
+.stat-card-secondary .stat-label {
+  font-size: 0.625rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.02em;
 }
 
 /* Dividers - hidden (kept for DOM compatibility) */
@@ -124,22 +153,22 @@
   display: none;
 }
 
-/* Desktop: inline layout */
+/* Desktop: larger primary stats */
 @media (min-width: 768px) {
-  .stat-grid {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 480px;
+  .stat-row-primary {
+    gap: 64px;
   }
   
-  .stat-card {
-    padding: 16px 0;
+  .stat-row-secondary {
+    gap: 56px;
   }
   
-  .stat-num {
-    font-size: 2rem;
+  .stat-card-primary .stat-num {
+    font-size: 4rem;
+  }
+  
+  .stat-card-secondary .stat-num {
+    font-size: 1.75rem;
   }
 }
 
@@ -1123,21 +1152,20 @@
     padding: 32px 16px 100px;
   }
   
-  .stat-grid {
-    gap: 4px 12px;
-    max-width: 280px;
+  .stat-row-primary {
+    gap: 40px;
   }
   
-  .stat-card {
-    padding: 16px 8px;
+  .stat-row-secondary {
+    gap: 32px;
   }
   
-  .stat-num {
-    font-size: 2rem;
+  .stat-card-primary .stat-num {
+    font-size: 3rem;
   }
   
-  .stat-label {
-    font-size: 0.625rem;
+  .stat-card-secondary .stat-num {
+    font-size: 1.25rem;
   }
   
   .stats-section h2 {
@@ -1232,17 +1260,20 @@
     padding: 28px 12px 90px;
   }
   
-  .stat-grid {
-    gap: 2px 8px;
-    max-width: 260px;
+  .stat-row-primary {
+    gap: 32px;
   }
   
-  .stat-card {
-    padding: 14px 6px;
+  .stat-row-secondary {
+    gap: 24px;
   }
   
-  .stat-num {
-    font-size: 1.75rem;
+  .stat-card-primary .stat-num {
+    font-size: 2.5rem;
+  }
+  
+  .stat-card-secondary .stat-num {
+    font-size: 1.125rem;
   }
   
   .milestone-card {
@@ -1294,8 +1325,12 @@
 }
 
 @media (min-width: 1024px) {
-  .stat-num {
-    font-size: 2.25rem;
+  .stat-card-primary .stat-num {
+    font-size: 4.5rem;
+  }
+  
+  .stat-card-secondary .stat-num {
+    font-size: 2rem;
   }
   
   .milestone-grid {

@@ -208,7 +208,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           stepSize: 5, 
           color: 'rgba(255,255,255,0.12)', 
           font: { size: 10, weight: '400' },
-          padding: 8
+          padding: 8,
+          callback: (value) => value <= 10 ? value : ''
         },
         grid: { 
           color: 'rgba(255,255,255,0.03)', 
@@ -317,12 +318,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         borderWidth: 2.5,
         backgroundColor: gradient,
         fill: true,
-        pointBackgroundColor: 'rgba(255, 221, 0, 0.5)',
+        pointBackgroundColor: '#ffffff',
         pointBorderColor: '#000000',
         pointBorderWidth: 2,
         pointRadius: pointRadii,
         pointHoverRadius: 6,
-        pointHoverBackgroundColor: 'rgba(255, 221, 0, 0.6)',
+        pointHoverBackgroundColor: '#ffffff',
         pointHoverBorderColor: '#000000',
       }]
     };
@@ -382,27 +383,28 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="stats-page">
-      {/* Stat Cards - Landing page style with dividers */}
+      {/* Stat Cards - Hero primary stats, subdued secondary stats */}
       <div className="stat-grid">
-        <button className="stat-card" onClick={() => handleStatCardClick('currentStreak')}>
-          <span className="stat-num">{safeUserData.currentStreak || 0}</span>
-          <span className="stat-label">Current</span>
-        </button>
-        <div className="stat-divider" />
-        <button className="stat-card" onClick={() => handleStatCardClick('longestStreak')}>
-          <span className="stat-num">{safeUserData.longestStreak || 0}</span>
-          <span className="stat-label">Longest</span>
-        </button>
-        <div className="stat-divider" />
-        <button className="stat-card" onClick={() => handleStatCardClick('wetDreams')}>
-          <span className="stat-num">{safeUserData.wetDreamCount || 0}</span>
-          <span className="stat-label">Wet Dreams</span>
-        </button>
-        <div className="stat-divider" />
-        <button className="stat-card" onClick={() => handleStatCardClick('relapses')}>
-          <span className="stat-num">{safeUserData.relapseCount || 0}</span>
-          <span className="stat-label">Relapses</span>
-        </button>
+        <div className="stat-row-primary">
+          <button className="stat-card stat-card-primary" onClick={() => handleStatCardClick('currentStreak')}>
+            <span className="stat-num">{safeUserData.currentStreak || 0}</span>
+            <span className="stat-label">Current</span>
+          </button>
+          <button className="stat-card stat-card-primary" onClick={() => handleStatCardClick('longestStreak')}>
+            <span className="stat-num">{safeUserData.longestStreak || 0}</span>
+            <span className="stat-label">Longest</span>
+          </button>
+        </div>
+        <div className="stat-row-secondary">
+          <button className="stat-card stat-card-secondary" onClick={() => handleStatCardClick('wetDreams')}>
+            <span className="stat-num">{safeUserData.wetDreamCount || 0}</span>
+            <span className="stat-label">Wet Dreams</span>
+          </button>
+          <button className="stat-card stat-card-secondary" onClick={() => handleStatCardClick('relapses')}>
+            <span className="stat-num">{safeUserData.relapseCount || 0}</span>
+            <span className="stat-label">Relapses</span>
+          </button>
+        </div>
       </div>
 
       <StatCardModal
