@@ -10,10 +10,10 @@
   /* flex-start positions transmission at top */
   justify-content: flex-start;
   padding: 0 24px;
-  /* Top padding to match other tabs */
-  padding-top: 40px;
+  /* Top padding to match other tabs + breathing room from header */
+  padding-top: 48px;
   /* Bottom padding: clear mobile nav (~60px) + AI chat button (~70px) + safe area */
-  padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
   background-color: #000000;
 }
 
@@ -836,8 +836,8 @@
 
 @media (max-width: 480px) {
   .tracker {
-    padding-top: 36px;
-    padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+    padding-top: 44px;
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
   }
   
   .streak-num {
@@ -906,8 +906,8 @@
 /* Short screens */
 @media (max-height: 700px) {
   .tracker {
-    padding-top: 28px;
-    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+    padding-top: 32px;
+    padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
   }
   
   .streak-num {
@@ -935,8 +935,8 @@
 /* Very short screens */
 @media (max-height: 600px) {
   .tracker {
-    padding-top: 20px;
-    padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+    padding-top: 24px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
   }
   
   .streak-num {
