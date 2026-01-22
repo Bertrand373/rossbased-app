@@ -7,11 +7,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* CHANGED: flex-start to match other tabs, but with space-between for footer */
+  /* Space between pushes main content up, footer down */
   justify-content: space-between;
   padding: 0 24px;
-  padding-top: 32px; /* Match other tabs top spacing */
-  padding-bottom: 24px; /* Space for footer above nav */
+  padding-top: 40px; /* More top space to match other tabs */
+  /* Bottom padding must clear the mobile nav (~70px) + safe area */
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
   background-color: #000000;
 }
 
@@ -773,8 +774,8 @@
 
 @media (max-width: 480px) {
   .tracker {
-    padding-top: 28px;
-    padding-bottom: 20px;
+    padding-top: 36px;
+    padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px));
   }
   
   .streak-num {
@@ -843,8 +844,8 @@
 /* Short screens */
 @media (max-height: 700px) {
   .tracker {
-    padding-top: 20px;
-    padding-bottom: 16px;
+    padding-top: 28px;
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
   }
   
   .streak-num {
@@ -872,8 +873,8 @@
 /* Very short screens */
 @media (max-height: 600px) {
   .tracker {
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 20px;
+    padding-bottom: calc(65px + env(safe-area-inset-bottom, 0px));
   }
   
   .streak-num {
