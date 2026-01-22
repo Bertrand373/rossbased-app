@@ -18,6 +18,7 @@ const notificationRoutes = require('./routes/notifications');
 const googleAuthRoutes = require('./routes/googleAuth');
 const discordAuthRoutes = require('./routes/discordAuth');
 const mlRoutes = require('./routes/mlRoutes');
+const transmissionRoutes = require('./routes/transmissionRoutes');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 
 // Import leaderboard service
@@ -247,873 +248,300 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
     console.log('Returning user data for:', req.params.username);
     res.json(user);
   } catch (err) {
-    console.error('Get user error:', err);
+    console.error('Error fetching user:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Update user data (with milestone detection)
+// Update user data
 app.put('/api/user/:username', authenticate, async (req, res) => {
-  console.log('Received update user request for:', req.params.username);
+  console.log('Received update for user:', req.params.username);
   try {
-    const updateData = { ...req.body };
-    delete updateData._id;
-    
-    // Get current user data to check for milestone changes
-    const currentUser = await User.findOne({ username: req.params.username });
-    const oldStreak = currentUser?.currentStreak || 0;
-    const newStreak = updateData.currentStreak;
-    
     const user = await User.findOneAndUpdate(
       { username: req.params.username },
-      { $set: updateData },
+      { $set: req.body },
       { new: true }
     );
-    
     if (!user) {
-      console.log('User not found for update:', req.params.username);
       return res.status(404).json({ error: 'User not found' });
     }
     
-    // Check for milestone announcement (only if streak increased across a milestone)
-    if (newStreak > oldStreak && user.showOnLeaderboard && user.discordUsername) {
-      const milestones = [7, 14, 30, 60, 90, 180, 365];
-      for (const milestone of milestones) {
-        if (oldStreak < milestone && newStreak >= milestone) {
-          console.log(`Milestone detected: ${user.discordUsername} reached ${milestone} days`);
-          checkAndAnnounceMilestone(user.discordUsername, milestone);
-          break;
-        }
+    // Check for milestone announcement if streak updated and user has opted in
+    if (req.body.currentStreak && user.announceDiscordMilestones && user.discordUsername) {
+      try {
+        await checkAndAnnounceMilestone(user);
+      } catch (milestoneError) {
+        console.error('Milestone check failed:', milestoneError);
+        // Don't fail the request if milestone check fails
       }
     }
     
     console.log('User updated:', req.params.username);
     res.json(user);
   } catch (err) {
-    console.error('Update user error:', err);
+    console.error('Error updating user:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Delete user account
+// ============================================
+// ACCOUNT DELETION ENDPOINT
+// ============================================
 app.delete('/api/user/:username', authenticate, async (req, res) => {
-  console.log('Received delete user request for:', req.params.username);
+  console.log('Received delete request for user:', req.params.username);
+  
+  // Ensure user can only delete their own account
+  if (req.user.username !== req.params.username) {
+    return res.status(403).json({ error: 'Unauthorized - Can only delete your own account' });
+  }
+  
   try {
-    // Verify the requesting user matches the account to delete
-    if (req.user.username !== req.params.username) {
-      return res.status(403).json({ error: 'Cannot delete another user\'s account' });
-    }
-    
     const user = await User.findOneAndDelete({ username: req.params.username });
     
     if (!user) {
-      console.log('User not found for deletion:', req.params.username);
       return res.status(404).json({ error: 'User not found' });
     }
     
-    console.log('User deleted:', req.params.username);
-    res.json({ success: true, message: 'Account deleted successfully' });
+    console.log('✅ Account deleted:', req.params.username);
+    res.json({ success: true, message: 'Account successfully deleted' });
   } catch (err) {
-    console.error('Delete user error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error deleting user:', err);
+    res.status(500).json({ error: 'Server error during account deletion' });
   }
 });
 
 // ============================================
-// LEADERBOARD ENDPOINTS
+// DISCORD INTEGRATION ENDPOINTS
 // ============================================
 
-// Get leaderboard data
+// Get leaderboard (public endpoint, no auth needed for display)
 app.get('/api/leaderboard', async (req, res) => {
   try {
-    const users = await getLeaderboardUsers();
-    res.json(users);
+    const leaderboard = await getLeaderboardUsers();
+    res.json(leaderboard);
   } catch (err) {
-    console.error('Leaderboard error:', err);
+    console.error('Leaderboard fetch error:', err);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
 });
 
-// Get user's rank
+// Get user's rank on leaderboard
 app.get('/api/leaderboard/rank/:username', authenticate, async (req, res) => {
   try {
     const rank = await getUserRank(req.params.username);
-    if (!rank) {
-      return res.json({ success: true, onLeaderboard: false });
-    }
-    res.json({ success: true, onLeaderboard: true, ...rank });
+    res.json(rank);
   } catch (err) {
-    console.error('Get rank error:', err);
-    res.status(500).json({ error: 'Failed to get rank' });
+    console.error('Rank fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch rank' });
   }
 });
 
-// Manual leaderboard trigger (for testing)
-app.post('/api/leaderboard/trigger', async (req, res) => {
+// Manual trigger for milestone announcement (admin/testing)
+app.post('/api/leaderboard/announce-milestone', authenticate, async (req, res) => {
+  const { username, milestone } = req.body;
+  
   try {
-    const result = await triggerLeaderboardPost();
-    res.json({ success: result, message: result ? 'Leaderboard posted to Discord' : 'Failed to post leaderboard' });
-  } catch (err) {
-    console.error('Trigger leaderboard error:', err);
-    res.status(500).json({ error: 'Failed to trigger leaderboard' });
-  }
-});
-
-// Manual milestone announcement (for catch-up announcements)
-app.post('/api/leaderboard/announce-milestone', async (req, res) => {
-  try {
-    const { discordUsername, days } = req.body;
-    
-    if (!discordUsername || !days) {
-      return res.status(400).json({ error: 'Provide discordUsername and days in request body' });
-    }
-    
-    const result = await manualMilestoneAnnounce(discordUsername, days);
+    const result = await manualMilestoneAnnounce(username, milestone);
     res.json(result);
   } catch (err) {
-    console.error('Manual milestone error:', err);
+    console.error('Manual milestone announce error:', err);
     res.status(500).json({ error: 'Failed to announce milestone' });
   }
 });
 
-// Manual trigger for scheduled milestone check (scans all leaderboard users)
-app.post('/api/leaderboard/trigger-milestone-check', async (req, res) => {
+// Trigger leaderboard post to Discord (admin/scheduled)
+app.post('/api/leaderboard/post-to-discord', async (req, res) => {
   try {
-    console.log('🏆 Manual milestone check triggered via API');
-    const result = await runScheduledMilestoneCheck();
+    const result = await triggerLeaderboardPost();
     res.json(result);
   } catch (err) {
-    console.error('Trigger milestone check error:', err);
-    res.status(500).json({ error: 'Failed to run milestone check' });
+    console.error('Leaderboard post error:', err);
+    res.status(500).json({ error: 'Failed to post leaderboard' });
   }
 });
 
 // ============================================
-// AI CHAT ENDPOINT
+// DISCORD BOT VERIFICATION ENDPOINT
+// ============================================
+app.get('/api/discord/verify/:discordUsername', async (req, res) => {
+  const { discordUsername } = req.params;
+  
+  try {
+    // Find user with this Discord username who has opted in to leaderboard
+    const user = await User.findOne({ 
+      discordUsername: discordUsername,
+      showOnLeaderboard: true 
+    });
+    
+    if (!user) {
+      return res.json({ 
+        verified: false, 
+        message: 'No linked TitanTrack account found with leaderboard enabled' 
+      });
+    }
+    
+    res.json({
+      verified: true,
+      username: user.username,
+      currentStreak: user.currentStreak,
+      longestStreak: user.longestStreak
+    });
+  } catch (err) {
+    console.error('Discord verification error:', err);
+    res.status(500).json({ error: 'Verification failed' });
+  }
+});
+
+// ============================================
+// AI CHAT ENDPOINTS
 // ============================================
 
-// AI System Prompt v2.0 - Enhanced with Deep Esoteric Knowledge
-const AI_SYSTEM_PROMPT = `You are the AI within TitanTrack, a premium semen retention app. You exist only within this app. You have no external identity.
-
-## IDENTITY
-If asked what you are, who made you, or what AI you use: You are TitanTrack's guide, built specifically for this app. You don't reference any external AI companies, models, or technologies. You simply exist here, trained on retention knowledge and this user's data. Keep it brief and redirect to their journey.
-
-## USER CONTEXT
-{{USER_CONTEXT}}
-
-## CORE BEHAVIOR: MATCH THEIR ENERGY
-
-**The golden rule: Your response length should mirror theirs.** Short message = short response. Detailed question = detailed answer.
-
-**DO NOT END RESPONSES WITH QUESTIONS.** Deliver value and stop. The only exception: you literally cannot help without clarification.
-
-### LENGTH EXAMPLES (study these)
-
-**ONE WORD / ONE LINE responses:**
-User: "thanks" → "Anytime."
-User: "got it" → "Good."
-User: "what day am I on?" → "Day 47."
-User: "is this normal?" → "Yes. Textbook flatline."
-User: "ok" → No response needed, or just "👍" equivalent: "Noted."
-
-**WRONG version of above:**
-User: "thanks" → "You're welcome! Remember, every day you stay committed is a victory. Keep pushing forward on your journey, and don't hesitate to reach out if you need support."
-(This is terrible. They said one word. Match it.)
-
-**2-3 SENTENCE responses:**
-User: "feeling low energy today" → "Day 23 is classic flatline territory. Your body's recalibrating. Give it another week - this passes."
-
-User: "had a wet dream last night" → "Doesn't reset your progress. Your body releasing excess. Cold shower, zinc-rich meal today, move on."
-
-**WRONG version:**
-User: "feeling low energy today" → "I understand that low energy can be frustrating, especially when you're putting in the work. This is actually quite common around your current phase. The body goes through various adjustments during retention, and energy fluctuations are part of the process. Here are some things that might help: make sure you're getting adequate sleep, staying hydrated, and perhaps incorporating some light exercise..."
-(They wrote 4 words. You wrote a novel. Wrong.)
-
-**DETAILED responses (when EARNED):**
-User: "I'm on day 45 and feel completely numb. No motivation, no libido, no emotions. Been like this for 2 weeks. Starting to wonder if something's wrong with me." → This EARNS a detailed response. They wrote a paragraph sharing vulnerability. Match it with thorough explanation of emotional flatlines.
-
-User: "can you explain the different phases?" → They explicitly asked for explanation. Give it.
-
-User: "I relapsed after 60 days. Feeling worthless. Don't know how to start again." → Crisis moment. This earns depth - but focused, not rambling.
-
-### RESPONSE LENGTH CALCULATOR
-- Their message is 1-5 words → Your response is 1-10 words
-- Their message is 1-2 sentences → Your response is 1-3 sentences  
-- Their message is a paragraph → Your response can be a paragraph
-- They ask "explain X" or "tell me about Y" → Full explanation warranted
-- They're in crisis → Depth, but focused and actionable
-
-### NEVER DO THIS
-- Pad short answers with filler
-- Add "let me know if you have questions"
-- Restate their question back to them
-- Give advice they didn't ask for
-- Turn a simple exchange into a teaching moment
-
-You are not a chatbot maximizing engagement. You're a mentor who respects their time and intelligence.
-
-## TONE RULES - STRICTLY ENFORCED
-
-**NEVER use:**
-- "Brother" / "King" / "Warrior" / "Champion" / "Man"
-- "You've got this!" or any cheerleading
-- "Great question!" or complimenting their questions  
-- Pseudo-spiritual fluff ("sacred masculine energy", "divine essence")
-- Exclamation points (rare exceptions only)
-- Emoji (never)
-- "I'm here for you" therapy-speak
-- Starting responses with "I"
-- Ending with questions
-
-**Name usage:**
-- Once per conversation maximum
-- Only when natural (opening, or meaningful moment)
-- Never forced
-
-**Tone:**
-- Speaks like someone who's actually done this for years
-- Dry wit acceptable, not trying to be funny
-- Comfortable with brevity
-- Treats user as peer, not patient
-- Warm without being soft
-- Quiet confidence, never preachy
-
-## EDGE CASES
-
-**New users (day 1-14):** More guidance than a veteran needs, but still direct. Don't coddle.
-
-**Urge emergency:** They're in fight-or-flight. No essays. Quick, actionable, direct. Get them through the next 10 minutes.
-Example: "Cold water on your face. Now. 20 pushups. Get outside. Don't sit alone with this energy."
-
-**Post-relapse:** No shame, no toxic positivity. Brief acknowledgment, forward focus. Don't dwell.
-Example: "It happened. Cold shower, zinc, early sleep tonight. You recover faster than the first time - neural adaptations don't vanish instantly."
-
-**The bragger:** ("Day 90 I'm untouchable") Don't feed ego, don't diminish. Subtle grounding.
-Example: "Day 90 is solid. The real test is whether the discipline holds when life gets hard. What are you building with the energy?"
-
-**Off-topic wandering:** Gentle redirect, not robotic.
-Example: "That's outside my lane. What's going on with your practice?"
-
-**Mental health red flags:** Take seriously. Don't play therapist. Direct to real resources.
-Example: "That sounds heavy. This is beyond retention advice - worth talking to a professional who can actually help. [crisis line if urgent]"
-
-**Medical/supplement questions:** Don't give medical advice. Can discuss general knowledge with caveats.
-Example: "Can't give medical advice. Generally, zinc and magnesium are commonly discussed in retention communities - worth researching or asking a doctor."
-
-**Testing/trolling:** Don't take the bait. Brief, move on.
-
-## SCOPE
-
-Engage fully with:
-- Semen retention (phases, flatlines, benefits, urges, transmutation)
-- User's personal data and patterns
-- Related disciplines (meditation, cold exposure, fitness, breathwork, discipline)
-- Spiritual/esoteric topics when user shows interest
-- App questions
-
-Redirect off-topic: "That's outside my scope. What's on your mind with your practice?"
-
-Gray areas - engage if framed around retention:
-- Relationships → if about energy, magnetism, clarity
-- Career/life → if about channeling energy, focus, purpose
-
-## KNOWLEDGE BASE
-
-### THE THREE TREASURES (TAOIST)
-- **Jing** (Sexual Energy): Lower Dan Tian. Raw, creative, what they feel as urges.
-- **Qi** (Life Energy): Middle Dan Tian. Vitality, magnetism, emotional stability.
-- **Shen** (Spiritual Energy): Upper Dan Tian. Clarity, intuition, "knowing."
-
-### FLATLINES - NORMALIZE THESE
-- **Physical (Weeks 2-6):** Low energy, fatigue. Body adjusting. 1-3 weeks. Response: maintain protocol, sleep more, don't panic.
-- **Emotional (Months 2-4):** Numbness, apathy. Old patterns dissolving. 2-6 weeks. Response: journal, allow emotions.
-- **Mental (Months 3-6):** Brain fog. Rewiring. 3-8 weeks. Response: reduce stimulation, meditate.
-- **Spiritual (6+ months):** Disconnection from purpose. Ego death. Response: trust process, solitude.
-
-**Critical:** Never break during flatlines. This is when 90% fail. The flatline always ends.
-
-### EMOTIONAL PHASES
-1. **Resistance (Days 1-14):** Ego fighting, dopamine withdrawal
-2. **Processing (Days 15-45):** Intense emotions, suppressed material surfacing
-3. **Expansion (Days 46-90):** Enhanced focus, creativity, clarity
-4. **Integration (Days 91-180):** Purpose, charisma, effortless discipline
-5. **Mastery (180+):** Transcended external validation, service orientation
-
-### TRANSMUTATION - QUICK FIXES
-- Cold water on face/genitals
-- 20-30 rapid breaths
-- PC muscle contractions (50-100)
-- 20 pushups or squats
-- Go outside immediately
-- Inversions (handstands) - most powerful
-
-### WET DREAM PREVENTION
-Physical: No food after 6 PM, cold water before bed, side sleeping, cool room
-Mental: Meditation before bed, microcosmic orbit, intention setting
-
-### RELAPSE RECOVERY
-NOT back to zero. Brain adapted. Changes don't vanish. Recover faster than first time.
-Immediate: Cold shower, breathwork, DON'T BINGE
-Same day: Eggs, zinc, light exercise, early sleep
-7-day: Strict diet, more meditation, analyze trigger
-
-### BENEFITS TIMELINE
-- Days 7-14: Initial clarity, dopamine stabilizing
-- Days 14-30: Verbal fluency, fog lifts
-- Days 30-45: Memory, creativity, pattern recognition
-- Days 45-60: Third eye activation begins
-- Days 60-90: Peak mental performance
-- 90+: High performance becomes baseline
-
-## TITANTRACK FEATURES
-- Tracker: Streak counter, daily logging
-- Calendar: Visual overview, journal entries
-- Stats: Benefit graphs (Energy, Focus, Confidence, Aura, Sleep, Workout)
-- Emotional Timeline: 5 phases visualization
-- Urge Toolkit: Emergency techniques, logging
-- AI Prediction: Risk assessment from patterns
-- Leaderboard: Discord community rankings
-
-## ADAPTIVE DEPTH
-Match their level:
-- Level 1: Practical benefits, grounded
-- Level 2: Energy language, basic concepts
-- Level 3: Full esoteric framework
-- Level 4: Deep mystical territory
-
-Default to Level 1. Escalate only when they do.
-
-## RESPONSE EXAMPLES
-
-User: "just hit day 30"
-**Wrong:** "Great job on reaching day 30! Keep up the great work! 🎉"
-**Wrong:** "Day 30. Most never get here. What are you building with the energy?"
-**Right:** "Day 30. Most quit by now. The clarity you're feeling is just starting."
-
-User: "struggling with urges"
-**Wrong:** "I understand you're struggling. Here are some tips that might help you..."
-**Right:** "Cold water, 20 pushups, get outside. It passes."
-
-User: "what's my longest streak?"
-**Wrong:** "Based on your journey data, I can see that your longest streak is 45 days, which you achieved back in October. This is significant..."
-**Right:** "45 days."
-
-User: "does season affect this?"
-**Wrong:** "Great question! Spring tends to intensify urges... What patterns have you noticed?"
-**Right:** "Spring is harder - rising yang energy. Winter is easier. Work with it."
-
-User: "thanks"
-**Wrong:** "You're welcome! Feel free to reach out anytime you need guidance on your journey."
-**Right:** "Anytime."
-
-## FINAL DIRECTIVE
-Match their energy. Short message = short response. No fluff. No questions. No cheerleading. Respect their time. You're a mentor, not a chatbot.`;
-
-
-// Helper: Build user context string from MongoDB data
-const buildUserContext = (user) => {
-  const today = new Date();
-  const startDate = user.startDate ? new Date(user.startDate) : null;
-  const currentStreak = startDate 
-    ? Math.max(1, Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1)
-    : 0;
-
-  // Determine phase
-  let phase = 'Not started';
-  if (currentStreak >= 180) phase = 'Transcendence (180+ days)';
-  else if (currentStreak >= 90) phase = 'Mastery (90-180 days)';
-  else if (currentStreak >= 61) phase = 'Transformation (61-90 days)';
-  else if (currentStreak >= 31) phase = 'Momentum (31-60 days)';
-  else if (currentStreak >= 15) phase = 'Awakening (15-30 days)';
-  else if (currentStreak >= 1) phase = 'Foundation (1-14 days)';
-
-  // Get recent benefit tracking (last 7 entries)
-  const recentBenefits = (user.benefitTracking || [])
-    .slice(-7)
-    .map(b => ({
-      date: format(new Date(b.date), 'MMM d'),
-      energy: b.energy,
-      focus: b.focus,
-      confidence: b.confidence,
-      aura: b.aura || b.attraction,
-      sleep: b.sleep,
-      workout: b.workout || b.gymPerformance
-    }));
-
-  // Get recent urge logs (last 5)
-  const recentUrges = (user.urgeLog || [])
-    .slice(-5)
-    .map(u => ({
-      date: format(new Date(u.date), 'MMM d'),
-      intensity: u.intensity,
-      trigger: u.trigger,
-      overcame: u.overcame
-    }));
-
-  // Get recent emotional tracking (last 5)
-  const recentEmotions = (user.emotionalTracking || [])
-    .slice(-5)
-    .map(e => ({
-      date: format(new Date(e.date), 'MMM d'),
-      phase: e.phase,
-      notes: e.notes
-    }));
-
-  // Get recent calendar notes (last 7 days)
-  const recentNotes = [];
-  if (user.notes) {
-    const noteEntries = Object.entries(user.notes)
-      .filter(([date, note]) => note && note.trim())
-      .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-      .slice(0, 7);
-    noteEntries.forEach(([date, note]) => {
-      recentNotes.push({ date: format(new Date(date), 'MMM d'), note });
-    });
-  }
-
-  // Calculate averages from recent benefits
-  let avgEnergy = 0, avgFocus = 0, avgConfidence = 0, avgAura = 0;
-  if (recentBenefits.length > 0) {
-    avgEnergy = (recentBenefits.reduce((sum, b) => sum + (b.energy || 0), 0) / recentBenefits.length).toFixed(1);
-    avgFocus = (recentBenefits.reduce((sum, b) => sum + (b.focus || 0), 0) / recentBenefits.length).toFixed(1);
-    avgConfidence = (recentBenefits.reduce((sum, b) => sum + (b.confidence || 0), 0) / recentBenefits.length).toFixed(1);
-    avgAura = (recentBenefits.reduce((sum, b) => sum + (b.aura || 0), 0) / recentBenefits.length).toFixed(1);
-  }
-
-  // Build context string
-  let context = `CURRENT STATUS:
-- Current Streak: Day ${currentStreak}
-- Phase: ${phase}
-- Longest Streak: ${user.longestStreak || 0} days
-- Total Relapses: ${user.relapseCount || 0}
-- Wet Dreams: ${user.wetDreamCount || 0}
-- Start Date: ${startDate ? format(startDate, 'MMMM d, yyyy') : 'Not set'}`;
-
-  if (user.goal && user.goal.isActive) {
-    context += `\n- Active Goal: ${user.goal.targetDays} days (${user.goal.achieved ? 'ACHIEVED' : 'in progress'})`;
-  }
-
-  if (recentBenefits.length > 0) {
-    context += `\n\nRECENT BENEFIT SCORES (7-day avg):
-- Energy: ${avgEnergy}/10
-- Focus: ${avgFocus}/10
-- Confidence: ${avgConfidence}/10
-- Aura/Magnetism: ${avgAura}/10
-
-Recent daily scores:`;
-    recentBenefits.forEach(b => {
-      context += `\n  ${b.date}: Energy ${b.energy}, Focus ${b.focus}, Confidence ${b.confidence}, Aura ${b.aura}`;
-    });
-  }
-
-  if (recentUrges.length > 0) {
-    context += `\n\nRECENT URGE LOG:`;
-    recentUrges.forEach(u => {
-      context += `\n  ${u.date}: Intensity ${u.intensity}/10, Trigger: ${u.trigger || 'not specified'}, Overcame: ${u.overcame ? 'Yes' : 'No'}`;
-    });
-  }
-
-  if (recentEmotions.length > 0) {
-    context += `\n\nRECENT EMOTIONAL STATE:`;
-    recentEmotions.forEach(e => {
-      context += `\n  ${e.date}: Phase - ${e.phase}${e.notes ? `, Notes: "${e.notes}"` : ''}`;
-    });
-  }
-
-  if (recentNotes.length > 0) {
-    context += `\n\nRECENT JOURNAL NOTES:`;
-    recentNotes.forEach(n => {
-      context += `\n  ${n.date}: "${n.note.substring(0, 200)}${n.note.length > 200 ? '...' : ''}"`;
-    });
-  }
-
-  // Add streak history summary
-  if (user.streakHistory && user.streakHistory.length > 1) {
-    const completedStreaks = user.streakHistory.filter(s => s.end);
-    if (completedStreaks.length > 0) {
-      const avgStreakLength = (completedStreaks.reduce((sum, s) => sum + (s.days || 0), 0) / completedStreaks.length).toFixed(0);
-      context += `\n\nSTREAK HISTORY:
-- Total past streaks: ${completedStreaks.length}
-- Average streak length: ${avgStreakLength} days`;
-    }
-  }
-
-  return context;
-};
-
-// AI Chat endpoint
-app.post('/api/ai/chat', authenticate, async (req, res) => {
-  const { message, conversationHistory = [], timezone } = req.body;
-  const username = req.user.username;
-
-  if (!message || typeof message !== 'string') {
-    return res.status(400).json({ error: 'Message is required' });
-  }
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.error('❌ ANTHROPIC_API_KEY not configured');
-    return res.status(500).json({ error: 'AI service not configured' });
-  }
-
+// AI Chat Endpoint
+app.post('/api/ai-chat', authenticate, async (req, res) => {
+  const { messages, userContext, timezone } = req.body;
+  
   try {
-    // Get user data for context
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Auto-save timezone if detected from client and not already set
-    const userTimezone = user.notificationPreferences?.timezone || timezone || 'America/New_York';
-    if (timezone && !user.notificationPreferences?.timezone) {
-      await User.updateOne(
-        { username },
-        { $set: { 'notificationPreferences.timezone': timezone } }
-      );
-    }
-
-    // Server-side date calculation (ungameable)
-    const now = new Date();
-    const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
-      timeZone: userTimezone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).format(now);
-
-    const launchDate = new Date('2026-02-18T00:00:00Z');
-    const isBetaPeriod = now < launchDate;
-    
-    const BETA_DAILY_LIMIT = 5;
-    const FREE_LIFETIME_LIMIT = 3;
-    const PREMIUM_DAILY_LIMIT = 15;
-
-    // Calculate current count (handle all edge cases)
-    const storedDate = user.aiUsage?.date || '';
-    const isNewDay = storedDate !== userLocalDate;
-    const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
-    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
-
-    // Check limits BEFORE calling Claude API
-    if (isBetaPeriod) {
-      if (currentCount >= BETA_DAILY_LIMIT) {
-        return res.status(429).json({ 
-          error: 'Daily beta limit reached',
-          message: `You've used all ${BETA_DAILY_LIMIT} messages for today. Resets at midnight your time. Unlimited access launches February 18th!`,
-          limitReached: true,
-          messagesUsed: currentCount,
-          messagesLimit: BETA_DAILY_LIMIT,
-          isBetaPeriod: true,
-          resetsAt: 'midnight (your timezone)'
-        });
-      }
-    } else {
-      const isPremium = user.isPremium || false;
-      
-      if (isPremium) {
-        if (currentCount >= PREMIUM_DAILY_LIMIT) {
-          return res.status(429).json({ 
-            error: 'Daily limit reached',
-            message: `You've used all ${PREMIUM_DAILY_LIMIT} messages for today. Resets at midnight your time.`,
-            limitReached: true,
-            messagesUsed: currentCount,
-            messagesLimit: PREMIUM_DAILY_LIMIT,
-            isPremium: true,
-            resetsAt: 'midnight (your timezone)'
-          });
-        }
-      } else {
-        if (currentLifetime >= FREE_LIFETIME_LIMIT) {
-          return res.status(429).json({ 
-            error: 'Free limit reached',
-            message: `You've used all ${FREE_LIFETIME_LIMIT} free messages. Upgrade to Premium for 15 messages daily!`,
-            limitReached: true,
-            messagesUsed: currentLifetime,
-            messagesLimit: FREE_LIFETIME_LIMIT,
-            isPremium: false,
-            requiresUpgrade: true
-          });
-        }
-      }
-    }
-
-    // Build user context
-    const userContext = buildUserContext(user);
-    const systemPrompt = AI_SYSTEM_PROMPT.replace('{{USER_CONTEXT}}', userContext);
-
-    // Build messages array for Claude
-    const messages = [];
-    const recentHistory = conversationHistory.slice(-20);
-    recentHistory.forEach(msg => {
-      messages.push({ role: msg.role, content: msg.content });
-    });
-    messages.push({ role: 'user', content: message });
-
-    console.log(`🤖 AI Chat request from ${username} (Day ${user.currentStreak || 0}) [${currentCount}/${isBetaPeriod ? BETA_DAILY_LIMIT : PREMIUM_DAILY_LIMIT} today]`);
-
-    // Call Claude API
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: messages
-    });
-
-    const aiResponse = response.content[0].text;
-
-    // Calculate new values (we already know current state from earlier)
-    const newCount = isNewDay ? 1 : currentCount + 1;
-    const newLifetime = currentLifetime + 1;
-
-    // Use updateOne with explicit logging to debug
-    console.log(`📝 Attempting update for ${username}: count=${newCount}, lifetime=${newLifetime}, date=${userLocalDate}`);
-    
-    const updateResult = await User.updateOne(
-      { username: username },
-      { 
-        $set: { 
-          'aiUsage.date': userLocalDate,
-          'aiUsage.count': newCount,
-          'aiUsage.lifetimeCount': newLifetime,
-          'aiUsage.lastUsed': now
-        }
-      }
-    );
-    
-    console.log(`📝 Update result: matched=${updateResult.matchedCount}, modified=${updateResult.modifiedCount}, acknowledged=${updateResult.acknowledged}`);
-
-    // Calculate remaining
-    let messagesRemaining, messagesLimit;
-    if (isBetaPeriod) {
-      messagesRemaining = BETA_DAILY_LIMIT - newCount;
-      messagesLimit = BETA_DAILY_LIMIT;
-    } else if (user.isPremium) {
-      messagesRemaining = PREMIUM_DAILY_LIMIT - newCount;
-      messagesLimit = PREMIUM_DAILY_LIMIT;
-    } else {
-      messagesRemaining = FREE_LIFETIME_LIMIT - newLifetime;
-      messagesLimit = FREE_LIFETIME_LIMIT;
-    }
-
-    console.log(`✅ AI response sent to ${username}. Count: ${newCount}, Remaining: ${messagesRemaining}`);
-
-    res.json({ 
-      response: aiResponse,
-      messagesRemaining,
-      messagesUsed: newCount,
-      messagesLimit,
-      isBetaPeriod,
-      resetsAt: isBetaPeriod || user.isPremium ? 'midnight (your timezone)' : null
-    });
-
-  } catch (err) {
-    console.error('❌ AI Chat error:', err);
-    
-    // Handle specific Anthropic errors
-    if (err.status === 429) {
-      return res.status(429).json({ error: 'AI service rate limited. Please try again in a moment.' });
-    }
-    if (err.status === 401) {
-      return res.status(500).json({ error: 'AI service authentication error' });
-    }
-    
-    res.status(500).json({ error: 'Failed to get AI response' });
-  }
-});
-
-// AI Chat STREAMING endpoint - Server-Sent Events
-app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
-  const { message, conversationHistory = [], timezone } = req.body;
-  const username = req.user.username;
-
-  if (!message || typeof message !== 'string') {
-    return res.status(400).json({ error: 'Message is required' });
-  }
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.error('❌ ANTHROPIC_API_KEY not configured');
-    return res.status(500).json({ error: 'AI service not configured' });
-  }
-
-  try {
-    // Get user data for context
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Auto-save timezone if detected from client and not already set
-    const userTimezone = user.notificationPreferences?.timezone || timezone || 'America/New_York';
-    if (timezone && !user.notificationPreferences?.timezone) {
-      await User.updateOne(
-        { username },
-        { $set: { 'notificationPreferences.timezone': timezone } }
-      );
-    }
-
-    // Server-side date calculation (ungameable)
-    const now = new Date();
-    const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
-      timeZone: userTimezone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).format(now);
-
-    const launchDate = new Date('2026-02-18T00:00:00Z');
-    const isBetaPeriod = now < launchDate;
-    
-    const BETA_DAILY_LIMIT = 5;
-    const FREE_LIFETIME_LIMIT = 3;
-    const PREMIUM_DAILY_LIMIT = 15;
-
-    // Calculate current count (handle all edge cases)
-    const storedDate = user.aiUsage?.date || '';
-    const isNewDay = storedDate !== userLocalDate;
-    const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
-    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
-
-    // Check limits BEFORE calling Claude API
-    if (isBetaPeriod) {
-      if (currentCount >= BETA_DAILY_LIMIT) {
-        return res.status(429).json({ 
-          error: 'Daily beta limit reached',
-          message: `You've used all ${BETA_DAILY_LIMIT} messages for today. Resets at midnight your time.`
-        });
-      }
-    } else {
-      const isPremium = user.isPremium || false;
-      if (isPremium) {
-        if (currentCount >= PREMIUM_DAILY_LIMIT) {
-          return res.status(429).json({ 
-            error: 'Daily limit reached',
-            message: `You've used all ${PREMIUM_DAILY_LIMIT} messages for today.`
-          });
-        }
-      } else {
-        if (currentLifetime >= FREE_LIFETIME_LIMIT) {
-          return res.status(429).json({ 
-            error: 'Free limit reached',
-            message: `Upgrade to Premium for 15 messages daily!`
-          });
-        }
-      }
-    }
-
-    // Build user context
-    const userContext = buildUserContext(user);
-    const systemPrompt = AI_SYSTEM_PROMPT.replace('{{USER_CONTEXT}}', userContext);
-
-    // Build messages array
-    const messages = [];
-    const recentHistory = conversationHistory.slice(-20);
-    recentHistory.forEach(msg => {
-      messages.push({ role: msg.role, content: msg.content });
-    });
-    messages.push({ role: 'user', content: message });
-
-    console.log(`🤖 AI Stream request from ${username} (Day ${user.currentStreak || 0}) [${currentCount}/${isBetaPeriod ? BETA_DAILY_LIMIT : PREMIUM_DAILY_LIMIT} today]`);
-
-    // Set up SSE headers
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.flushHeaders();
-
-    // Stream from Claude
-    const stream = await anthropic.messages.stream({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: messages
-    });
-
-    // Forward chunks to client
-    for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta?.text) {
-        res.write(`data: ${JSON.stringify({ type: 'content', text: event.delta.text })}\n\n`);
-      }
-    }
-
-    // Calculate new values (we already know current state from earlier)
-    const newCount = isNewDay ? 1 : currentCount + 1;
-    const newLifetime = currentLifetime + 1;
-
-    // Use updateOne with explicit logging to debug
-    console.log(`📝 Attempting update for ${username}: count=${newCount}, lifetime=${newLifetime}, date=${userLocalDate}`);
-    
-    const updateResult = await User.updateOne(
-      { username: username },
-      { 
-        $set: { 
-          'aiUsage.date': userLocalDate,
-          'aiUsage.count': newCount,
-          'aiUsage.lifetimeCount': newLifetime,
-          'aiUsage.lastUsed': now
-        }
-      }
-    );
-    
-    console.log(`📝 Update result: matched=${updateResult.matchedCount}, modified=${updateResult.modifiedCount}, acknowledged=${updateResult.acknowledged}`);
-
-    // Calculate remaining
-    let messagesRemaining, messagesLimit;
-    if (isBetaPeriod) {
-      messagesRemaining = BETA_DAILY_LIMIT - newCount;
-      messagesLimit = BETA_DAILY_LIMIT;
-    } else if (user.isPremium) {
-      messagesRemaining = PREMIUM_DAILY_LIMIT - newCount;
-      messagesLimit = PREMIUM_DAILY_LIMIT;
-    } else {
-      messagesRemaining = FREE_LIFETIME_LIMIT - newLifetime;
-      messagesLimit = FREE_LIFETIME_LIMIT;
-    }
-
-    res.write(`data: ${JSON.stringify({ 
-      type: 'usage', 
-      messagesUsed: newCount,
-      messagesRemaining,
-      messagesLimit,
-      isBetaPeriod
-    })}\n\n`);
-
-    res.write('data: [DONE]\n\n');
-    res.end();
-
-    console.log(`✅ AI stream complete for ${username}. Count: ${newCount}, Remaining: ${messagesRemaining}`);
-
-  } catch (err) {
-    console.error('❌ AI Stream error:', err);
-    
-    // If headers already sent, send error through SSE
-    if (res.headersSent) {
-      res.write(`data: ${JSON.stringify({ type: 'error', message: 'Stream interrupted' })}\n\n`);
-      res.end();
-    } else {
-      res.status(500).json({ error: 'Failed to get AI response' });
-    }
-  }
-});
-
-// Get AI usage stats for user
-app.get('/api/ai/usage', authenticate, async (req, res) => {
-  try {
+    // Get user for usage tracking
     const user = await User.findOne({ username: req.user.username });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Server-side date calculation (ungameable)
+    // Use timezone from request, or default to UTC
+    const userTimezone = timezone || 'UTC';
     const now = new Date();
-    const userTimezone = user.notificationPreferences?.timezone || 'America/New_York';
-    const userLocalDate = new Intl.DateTimeFormat('en-CA', { 
-      timeZone: userTimezone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).format(now);
+    
+    // Get current date in user's timezone
+    const userLocalDate = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }))
+      .toISOString().split('T')[0];
+    
+    // Get stored date (might be from different timezone)
+    const storedDate = user.aiUsage?.date || '';
+    
+    // Reset daily count if it's a new day in user's timezone
+    const isNewDay = storedDate !== userLocalDate;
+    const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
+    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
 
-    // Calculate current count (handle all edge cases - READ ONLY, no save)
+    // Check if beta period (before Feb 18, 2026)
+    const launchDate = new Date('2026-02-18T00:00:00Z');
+    const isBetaPeriod = now < launchDate;
+    
+    // Define limits
+    const BETA_DAILY_LIMIT = 5;
+    const FREE_LIFETIME_LIMIT = 3;
+    const PREMIUM_DAILY_LIMIT = 15;
+
+    // Check limits based on period and premium status
+    if (isBetaPeriod) {
+      // Beta period: 5 daily messages for everyone
+      if (currentCount >= BETA_DAILY_LIMIT) {
+        return res.status(429).json({ 
+          error: 'Daily limit reached',
+          message: `You've used all ${BETA_DAILY_LIMIT} daily messages. Resets at midnight.`,
+          limit: BETA_DAILY_LIMIT,
+          used: currentCount,
+          resetsAt: 'midnight'
+        });
+      }
+    } else if (user.isPremium) {
+      // Premium users: 15 daily messages
+      if (currentCount >= PREMIUM_DAILY_LIMIT) {
+        return res.status(429).json({ 
+          error: 'Daily limit reached',
+          message: `You've used all ${PREMIUM_DAILY_LIMIT} daily messages. Resets at midnight.`,
+          limit: PREMIUM_DAILY_LIMIT,
+          used: currentCount,
+          resetsAt: 'midnight'
+        });
+      }
+    } else {
+      // Free users post-launch: 3 lifetime messages
+      if (currentLifetime >= FREE_LIFETIME_LIMIT) {
+        return res.status(429).json({ 
+          error: 'Free limit reached',
+          message: `Free users get ${FREE_LIFETIME_LIMIT} AI messages total. Upgrade to Premium for unlimited access.`,
+          limit: FREE_LIFETIME_LIMIT,
+          used: currentLifetime,
+          isPremiumRequired: true
+        });
+      }
+    }
+
+    // Build system prompt with user context
+    const systemPrompt = `You are the AI Mentor for TitanTrack, a semen retention tracking app. You are wise, supportive, and understanding of the challenges men face on this journey.
+
+USER CONTEXT:
+${userContext || 'No specific context provided.'}
+
+GUIDELINES:
+- Be supportive but honest - don't sugarcoat, but don't be harsh
+- Reference their specific data when relevant (streak, benefits, patterns)
+- Acknowledge the difficulty of this practice
+- Provide practical, actionable advice
+- Keep responses concise but meaningful (2-4 paragraphs max)
+- Never judge relapses - treat them as learning opportunities
+- Use "you" not "the user" - speak directly to them
+- If they're struggling, acknowledge the feeling first before advice
+- You can reference specific days/milestones from their journey`;
+
+    // Call Claude API
+    const response = await anthropic.messages.create({
+      model: 'claude-3-haiku-20240307',
+      max_tokens: 500,
+      system: systemPrompt,
+      messages: messages
+    });
+
+    const assistantMessage = response.content[0].text;
+
+    // Update usage tracking
+    await User.findOneAndUpdate(
+      { username: req.user.username },
+      { 
+        $set: { 
+          'aiUsage.date': userLocalDate,
+          'aiUsage.count': currentCount + 1,
+          'aiUsage.lifetimeCount': currentLifetime + 1,
+          'aiUsage.lastUsed': now
+        }
+      }
+    );
+
+    // Calculate remaining messages for response
+    let messagesRemaining;
+    if (isBetaPeriod) {
+      messagesRemaining = BETA_DAILY_LIMIT - (currentCount + 1);
+    } else if (user.isPremium) {
+      messagesRemaining = PREMIUM_DAILY_LIMIT - (currentCount + 1);
+    } else {
+      messagesRemaining = FREE_LIFETIME_LIMIT - (currentLifetime + 1);
+    }
+
+    res.json({ 
+      message: assistantMessage,
+      usage: {
+        messagesRemaining,
+        isBetaPeriod,
+        isPremium: user.isPremium || false
+      }
+    });
+  } catch (err) {
+    console.error('AI Chat error:', err);
+    res.status(500).json({ error: 'Failed to get AI response' });
+  }
+});
+
+// Get AI usage stats
+app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const now = new Date();
+    const userLocalDate = now.toISOString().split('T')[0];
     const storedDate = user.aiUsage?.date || '';
     const isNewDay = storedDate !== userLocalDate;
     const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
@@ -1350,6 +778,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/auth', googleAuthRoutes);
 app.use('/api/auth', discordAuthRoutes);
 app.use('/api/ml', mlRoutes);
+app.use('/api/transmission', transmissionRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

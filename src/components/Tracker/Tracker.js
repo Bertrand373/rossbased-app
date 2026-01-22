@@ -1,4 +1,6 @@
 // Tracker.js - TITANTRACK
+// UPDATED: Replaced DailyQuote with DailyTransmission
+// UPDATED: Added mutual exclusion between PatternInsightCard and DailyTransmission
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -6,7 +8,7 @@ import toast from 'react-hot-toast';
 import './Tracker.css';
 import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
-import DailyQuote from '../DailyQuote/DailyQuote';
+import DailyTransmission from '../DailyTransmission/DailyTransmission';
 import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 
 // NEW: Import InterventionService for ML feedback loop
@@ -25,6 +27,9 @@ const Tracker = ({ userData, updateUserData }) => {
   
   // FIXED: Show onboarding for ANY new user who hasn't seen it
   const [showOnboarding, setShowOnboarding] = useState(!userData.hasSeenOnboarding);
+  
+  // NEW: Track if PatternInsightCard is showing (for mutual exclusion with DailyTransmission)
+  const [isPatternAlertShowing, setIsPatternAlertShowing] = useState(false);
   
   const [benefits, setBenefits] = useState({ 
     energy: 5, focus: 5, confidence: 5, aura: 5, sleep: 5, workout: 5 
@@ -165,77 +170,81 @@ const Tracker = ({ userData, updateUserData }) => {
         console.log(`📊 Marked ${markedCount} pending interventions as relapse`);
       }
     } catch (error) {
-      console.warn('InterventionService notification error:', error);
+      console.warn('InterventionService error:', error);
     }
 
     setShowResetConfirm(false);
     setShowStreakOptions(false);
-    setResetType(null);
+    toast('Streak reset. New journey begins.', { icon: '🔄' });
     
-    // Track relapse in Mixpanel
-    trackStreakReset(streak, 'relapse');
-    
-    toast.success('Relapse logged');
+    // Track with Mixpanel
+    trackStreakReset(streak);
   };
 
-  // Log wet dream - no toast, modal closing is confirmation
+  // Wet dream - no streak reset, just log
   const handleLogWetDream = () => {
-    updateUserData({
-      wetDreams: [...(userData.wetDreams || []), { date: new Date(), streakDay: streak }],
-      lastWetDream: new Date()
-    });
-
+    const wetDreams = userData.wetDreams || [];
+    wetDreams.push({ date: new Date(), streakDay: streak });
+    updateUserData({ wetDreams });
     setShowResetConfirm(false);
     setShowStreakOptions(false);
-    setResetType(null);
+    toast('Wet dream logged.', { icon: '📝' });
   };
 
-  // Benefits
-  const updateFill = useCallback((key, val) => {
+  // Benefits list for modal
+  const benefitsList = [
+    { key: 'energy', label: 'Energy', desc: 'Physical vitality throughout the day' },
+    { key: 'focus', label: 'Focus', desc: 'Mental clarity and concentration' },
+    { key: 'confidence', label: 'Confidence', desc: 'Self-assurance in interactions' },
+    { key: 'aura', label: 'Aura', desc: 'Presence and magnetism others notice' },
+    { key: 'sleep', label: 'Sleep', desc: 'Quality and restfulness of sleep' },
+    { key: 'workout', label: 'Workout', desc: 'Physical performance and recovery' }
+  ];
+
+  // Handle benefit change
+  const handleBenefitChange = useCallback((key, value) => {
+    const newValue = parseInt(value);
+    setBenefits(prev => ({ ...prev, [key]: newValue }));
+    
+    // Update fill bar visually
     if (fillRefs.current[key]) {
-      fillRefs.current[key].style.width = `${((val - 1) / 9) * 100}%`;
+      fillRefs.current[key].style.width = `${(newValue / 10) * 100}%`;
     }
   }, []);
 
-  useEffect(() => {
-    Object.entries(benefits).forEach(([k, v]) => updateFill(k, v));
-  }, [benefits, updateFill]);
-
-  const handleBenefitChange = (key, val) => {
-    const num = parseInt(val, 10);
-    setBenefits(prev => ({ ...prev, [key]: num }));
-    updateFill(key, num);
-  };
-
-  // Save benefits - no toast, modal closing is confirmation
+  // Save benefits
   const saveBenefits = () => {
-    const todayStr = format(currentTime, 'yyyy-MM-dd');
+    const today = format(currentTime, 'yyyy-MM-dd');
     const existing = userData.benefitTracking || [];
-    const idx = existing.findIndex(b => format(new Date(b.date), 'yyyy-MM-dd') === todayStr);
+    const existingIdx = existing.findIndex(b => 
+      format(new Date(b.date), 'yyyy-MM-dd') === today
+    );
     
-    const entry = { date: new Date(), day: streak, ...benefits };
-    const updated = idx !== -1 
-      ? existing.map((b, i) => i === idx ? entry : b)
-      : [...existing, entry];
-
-    updateUserData({ benefitTracking: updated });
+    const entry = { 
+      date: new Date(), 
+      ...benefits,
+      streakDay: streak 
+    };
     
-    // Track daily log in Mixpanel
-    trackDailyLog(streak, benefits);
+    if (existingIdx >= 0) {
+      existing[existingIdx] = entry;
+    } else {
+      existing.push(entry);
+    }
     
+    updateUserData({ benefitTracking: existing });
     setShowBenefits(false);
+    
+    // Track with Mixpanel
+    trackDailyLog(benefits, streak);
   };
 
-  const benefitsList = [
-    { key: 'energy', label: 'Energy', desc: '1 = drained, 10 = energized' },
-    { key: 'focus', label: 'Focus', desc: '1 = scattered, 10 = laser' },
-    { key: 'confidence', label: 'Confidence', desc: '1 = low, 10 = high' },
-    { key: 'aura', label: 'Aura', desc: '1 = dim, 10 = radiant' },
-    { key: 'sleep', label: 'Sleep', desc: '1 = poor, 10 = excellent' },
-    { key: 'workout', label: 'Workout', desc: '1 = weak, 10 = strong' }
-  ];
+  // NEW: Callback for PatternInsightCard visibility changes
+  const handlePatternAlertVisibilityChange = useCallback((isShowing) => {
+    setIsPatternAlertShowing(isShowing);
+  }, []);
 
-  // Date picker screen
+  // Show date picker if no start date set
   if (showDatePicker) {
     return (
       <div className="tracker">
@@ -263,7 +272,18 @@ const Tracker = ({ userData, updateUserData }) => {
       )}
       
       {/* AI Pattern Insight - ambient, non-intrusive */}
-      <PatternInsightCard userData={userData} />
+      {/* NEW: Passes visibility change callback for mutual exclusion */}
+      <PatternInsightCard 
+        userData={userData} 
+        onVisibilityChange={handlePatternAlertVisibilityChange}
+      />
+      
+      {/* NEW: Daily Transmission - AI-powered wisdom (replaces DailyQuote) */}
+      {/* Only shows when PatternInsightCard is NOT showing */}
+      <DailyTransmission 
+        userData={userData}
+        isPatternAlertShowing={isPatternAlertShowing}
+      />
       
       {/* Benefits Modal */}
       {showBenefits && (
@@ -376,7 +396,7 @@ const Tracker = ({ userData, updateUserData }) => {
           <p className="milestone">{milestone}</p>
         )}
         
-        <DailyQuote />
+        {/* REMOVED: DailyQuote - replaced by DailyTransmission above */}
       </main>
 
       {/* Footer */}

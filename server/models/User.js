@@ -101,7 +101,17 @@ const userSchema = new mongoose.Schema({
       lifetimeCount: 0,
       lastUsed: null
     }
+  },
+  
+  // Daily Transmission Cache
+  // Stores the AI-generated transmission for the current day
+  dailyTransmission: {
+    text: { type: String, default: '' },
+    generatedAt: { type: Date },
+    forStreak: { type: Number, default: 0 },
+    phase: { type: String, default: '' }
   }
+  
 }, {
   timestamps: true
 });

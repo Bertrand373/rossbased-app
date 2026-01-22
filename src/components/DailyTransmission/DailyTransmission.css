@@ -1,0 +1,198 @@
+/* src/components/DailyTransmission/DailyTransmission.css */
+/* Daily Transmission - AI-powered wisdom card */
+/* Position: Above counter in tracker-main */
+/* Mutually exclusive with PatternInsightCard */
+
+.daily-transmission {
+  width: 100%;
+  max-width: 340px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 221, 0, 0.1);
+  border-radius: 14px;
+  text-align: left;
+  margin-bottom: 28px;
+  
+  /* Animation - fade in */
+  animation: transmissionFadeIn 500ms ease forwards;
+}
+
+@keyframes transmissionFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header row */
+.transmission-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.transmission-icon {
+  font-size: 0.625rem;
+  color: #ffdd00;
+  opacity: 0.8;
+}
+
+.transmission-label {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: rgba(255, 221, 0, 0.6);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Main text */
+.transmission-text {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.65;
+  margin: 0;
+  min-height: 3.3em; /* Reserve space for ~2-3 lines */
+}
+
+.transmission-text strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+/* Streaming cursor */
+.transmission-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: rgba(255, 221, 0, 0.6);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: cursorBlink 0.8s infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Hide cursor when not streaming */
+.daily-transmission:not(.streaming) .transmission-cursor {
+  display: none;
+}
+
+/* ============================================================
+   LOADING SKELETON
+   ============================================================ */
+
+.transmission-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-line {
+  height: 14px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 25%,
+    rgba(255, 255, 255, 0.04) 50%,
+    rgba(255, 255, 255, 0.02) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-line:nth-child(1) { width: 95%; }
+.skeleton-line:nth-child(2) { width: 100%; }
+.skeleton-line:nth-child(3) { width: 60%; }
+.skeleton-line.short { width: 40%; }
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .daily-transmission {
+    max-width: 320px;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+  }
+  
+  .transmission-text {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+  
+  .transmission-label {
+    font-size: 0.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .daily-transmission {
+    max-width: 300px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+  }
+  
+  .transmission-text {
+    font-size: 0.75rem;
+  }
+}
+
+/* Short screens - reduce margin */
+@media (max-height: 700px) {
+  .daily-transmission {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+  }
+}
+
+@media (max-height: 600px) {
+  .daily-transmission {
+    margin-bottom: 16px;
+    padding: 10px 14px;
+  }
+  
+  .transmission-text {
+    font-size: 0.75rem;
+    line-height: 1.55;
+    min-height: auto;
+  }
+  
+  .transmission-header {
+    margin-bottom: 8px;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .daily-transmission {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .transmission-cursor {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .skeleton-line {
+    animation: none;
+    background: rgba(255, 255, 255, 0.03);
+  }
+}

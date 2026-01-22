@@ -1,6 +1,7 @@
 // src/components/PatternInsight/PatternInsightCard.js
 // Ambient AI pattern awareness - floating minimal design
 // Integrated with InterventionService for outcome tracking
+// UPDATED: Added onVisibilityChange callback for mutual exclusion with DailyTransmission
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +9,7 @@ import './PatternInsightCard.css';
 import mlPredictionService from '../../services/MLPredictionService';
 import interventionService from '../../services/InterventionService';
 
-const PatternInsightCard = ({ userData }) => {
+const PatternInsightCard = ({ userData, onVisibilityChange }) => {
   const navigate = useNavigate();
   const [insight, setInsight] = useState(null);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -19,6 +20,15 @@ const PatternInsightCard = ({ userData }) => {
   useEffect(() => {
     checkForInsight();
   }, [userData]);
+
+  // Notify parent of visibility changes
+  useEffect(() => {
+    if (onVisibilityChange) {
+      // Card is "showing" if it has insight, is visible, and not dismissed
+      const isShowing = insight && isVisible && !isDismissed;
+      onVisibilityChange(isShowing);
+    }
+  }, [insight, isVisible, isDismissed, onVisibilityChange]);
 
   const checkForInsight = async () => {
     // Don't show if already dismissed this session
