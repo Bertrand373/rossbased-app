@@ -7,8 +7,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Space-between: content at top, footer at bottom */
-  justify-content: space-between;
+  /* flex-start positions transmission at top */
+  justify-content: flex-start;
   padding: 0 24px;
   /* Top padding to match other tabs */
   padding-top: 40px;
@@ -24,7 +24,7 @@
 }
 
 /* ============================================================
-   MAIN
+   MAIN - Centers in available space between transmission and footer
    ============================================================ */
 
 .tracker-main {
@@ -32,6 +32,9 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  /* flex: 1 takes remaining space, centers content vertically */
+  flex: 1;
+  justify-content: center;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;
 }
@@ -975,7 +978,12 @@
     flex-direction: row;
     justify-content: center;
     gap: 32px;
+    padding-top: 16px;
     padding-bottom: 24px;
+  }
+  
+  .tracker-main {
+    flex: none;
   }
   
   .streak-num {

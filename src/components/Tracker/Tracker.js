@@ -372,15 +372,15 @@ const Tracker = ({ userData, updateUserData }) => {
       )}
 
       {/* Main */}
+      {/* Daily Transmission - Fixed at top */}
+      {/* Only shows when PatternInsightCard is NOT showing */}
+      <DailyTransmission 
+        userData={userData}
+        isPatternAlertShowing={isPatternAlertShowing}
+      />
+      
+      {/* Main - Centers in remaining space */}
       <main className="tracker-main">
-        
-        {/* Daily Transmission - AI-powered wisdom (replaces DailyQuote) */}
-        {/* Only shows when PatternInsightCard is NOT showing */}
-        <DailyTransmission 
-          userData={userData}
-          isPatternAlertShowing={isPatternAlertShowing}
-        />
-        
         <p className="date">
           {format(currentTime, 'EEEE, MMMM d')}
           <span className="time-separator">·</span>
