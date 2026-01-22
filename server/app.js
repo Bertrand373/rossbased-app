@@ -328,8 +328,21 @@ app.get('/api/leaderboard', async (req, res) => {
 // Get user's rank on leaderboard
 app.get('/api/leaderboard/rank/:username', authenticate, async (req, res) => {
   try {
-    const rank = await getUserRank(req.params.username);
-    res.json(rank);
+    const rankData = await getUserRank(req.params.username);
+    
+    if (rankData) {
+      res.json({
+        success: true,
+        onLeaderboard: true,
+        rank: rankData.rank,
+        total: rankData.total
+      });
+    } else {
+      res.json({
+        success: true,
+        onLeaderboard: false
+      });
+    }
   } catch (err) {
     console.error('Rank fetch error:', err);
     res.status(500).json({ error: 'Failed to fetch rank' });
@@ -532,7 +545,189 @@ GUIDELINES:
   }
 });
 
-// Get AI usage stats
+// AI Chat Streaming Endpoint
+app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
+  const { message, conversationHistory, timezone } = req.body;
+  
+  try {
+    const user = await User.findOne({ username: req.user.username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userTimezone = timezone || 'UTC';
+    const now = new Date();
+    const userLocalDate = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }))
+      .toISOString().split('T')[0];
+    
+    const storedDate = user.aiUsage?.date || '';
+    const isNewDay = storedDate !== userLocalDate;
+    const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
+    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
+
+    const launchDate = new Date('2026-02-18T00:00:00Z');
+    const isBetaPeriod = now < launchDate;
+    
+    const BETA_DAILY_LIMIT = 5;
+    const FREE_LIFETIME_LIMIT = 3;
+    const PREMIUM_DAILY_LIMIT = 15;
+
+    // Check limits
+    if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
+      return res.status(429).json({ 
+        error: 'Daily limit reached',
+        message: `You've used all ${BETA_DAILY_LIMIT} daily messages. Resets at midnight.`
+      });
+    } else if (!isBetaPeriod && user.isPremium && currentCount >= PREMIUM_DAILY_LIMIT) {
+      return res.status(429).json({ 
+        error: 'Daily limit reached',
+        message: `You've used all ${PREMIUM_DAILY_LIMIT} daily messages. Resets at midnight.`
+      });
+    } else if (!isBetaPeriod && !user.isPremium && currentLifetime >= FREE_LIFETIME_LIMIT) {
+      return res.status(429).json({ 
+        error: 'Free limit reached',
+        message: `Free users get ${FREE_LIFETIME_LIMIT} AI messages total. Upgrade to Premium.`
+      });
+    }
+
+    // Build user context from their data
+    const streakDays = user.currentStreak || 0;
+    const userContext = `Current streak: ${streakDays} days. Longest streak: ${user.longestStreak || 0} days. Total relapses: ${user.relapseCount || 0}.`;
+
+    const systemPrompt = `You are The Oracle, the AI guide for TitanTrack, a semen retention tracking app. You are wise, grounded, and supportive.
+
+USER CONTEXT:
+${userContext}
+
+GUIDELINES:
+- Be supportive but honest - don't sugarcoat, but don't be harsh
+- Reference their specific data when relevant
+- Keep responses concise (2-3 paragraphs max)
+- Never judge relapses - treat them as learning opportunities
+- Speak directly to them using "you"`;
+
+    // Build messages array
+    const messages = [
+      ...(conversationHistory || []),
+      { role: 'user', content: message }
+    ];
+
+    // Set up SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    // Stream from Claude
+    const stream = await anthropic.messages.stream({
+      model: 'claude-3-haiku-20240307',
+      max_tokens: 500,
+      system: systemPrompt,
+      messages: messages
+    });
+
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta?.text) {
+        res.write(`data: ${JSON.stringify({ type: 'content', text: event.delta.text })}\n\n`);
+      }
+    }
+
+    // Update usage after successful stream
+    await User.findOneAndUpdate(
+      { username: req.user.username },
+      { 
+        $set: { 
+          'aiUsage.date': userLocalDate,
+          'aiUsage.count': currentCount + 1,
+          'aiUsage.lifetimeCount': currentLifetime + 1,
+          'aiUsage.lastUsed': now
+        }
+      }
+    );
+
+    // Calculate remaining
+    let messagesRemaining;
+    if (isBetaPeriod) {
+      messagesRemaining = BETA_DAILY_LIMIT - (currentCount + 1);
+    } else if (user.isPremium) {
+      messagesRemaining = PREMIUM_DAILY_LIMIT - (currentCount + 1);
+    } else {
+      messagesRemaining = FREE_LIFETIME_LIMIT - (currentLifetime + 1);
+    }
+
+    // Send usage update and done signal
+    res.write(`data: ${JSON.stringify({ 
+      type: 'usage', 
+      messagesUsed: currentCount + 1,
+      messagesLimit: isBetaPeriod ? BETA_DAILY_LIMIT : (user.isPremium ? PREMIUM_DAILY_LIMIT : FREE_LIFETIME_LIMIT),
+      messagesRemaining,
+      isBetaPeriod
+    })}\n\n`);
+    res.write('data: [DONE]\n\n');
+    res.end();
+
+  } catch (err) {
+    console.error('AI Chat Stream error:', err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Failed to get AI response' });
+    } else {
+      res.write(`data: ${JSON.stringify({ type: 'error', message: 'Stream interrupted' })}\n\n`);
+      res.end();
+    }
+  }
+});
+
+// Get AI usage stats (for frontend)
+app.get('/api/ai/usage', authenticate, async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.user.username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const now = new Date();
+    const userLocalDate = now.toISOString().split('T')[0];
+    const storedDate = user.aiUsage?.date || '';
+    const isNewDay = storedDate !== userLocalDate;
+    const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
+    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
+
+    const launchDate = new Date('2026-02-18T00:00:00Z');
+    const isBetaPeriod = now < launchDate;
+    
+    const BETA_DAILY_LIMIT = 5;
+    const FREE_LIFETIME_LIMIT = 3;
+    const PREMIUM_DAILY_LIMIT = 15;
+
+    let messagesUsed, messagesLimit, messagesRemaining;
+
+    if (isBetaPeriod) {
+      messagesUsed = currentCount;
+      messagesLimit = BETA_DAILY_LIMIT;
+      messagesRemaining = BETA_DAILY_LIMIT - currentCount;
+    } else if (user.isPremium) {
+      messagesUsed = currentCount;
+      messagesLimit = PREMIUM_DAILY_LIMIT;
+      messagesRemaining = PREMIUM_DAILY_LIMIT - currentCount;
+    } else {
+      messagesUsed = currentLifetime;
+      messagesLimit = FREE_LIFETIME_LIMIT;
+      messagesRemaining = FREE_LIFETIME_LIMIT - currentLifetime;
+    }
+
+    res.json({
+      messagesUsed,
+      messagesLimit,
+      messagesRemaining,
+      isBetaPeriod,
+      isPremium: user.isPremium || false
+    });
+  } catch (err) {
+    console.error('Get AI usage error:', err);
+    res.status(500).json({ error: 'Failed to get usage stats' });
+  }
+});
+
+// Get AI usage stats (legacy path)
 app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
