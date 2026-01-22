@@ -203,7 +203,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     scales: {
       y: {
         min: 0,
-        max: 10,
+        max: 10.5,
         ticks: { 
           stepSize: 5, 
           color: 'rgba(255,255,255,0.12)', 
@@ -317,12 +317,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         borderWidth: 2.5,
         backgroundColor: gradient,
         fill: true,
-        pointBackgroundColor: '#e5c200',
+        pointBackgroundColor: 'rgba(255, 221, 0, 0.5)',
         pointBorderColor: '#000000',
         pointBorderWidth: 2,
         pointRadius: pointRadii,
         pointHoverRadius: 6,
-        pointHoverBackgroundColor: '#e5c200',
+        pointHoverBackgroundColor: 'rgba(255, 221, 0, 0.6)',
         pointHoverBorderColor: '#000000',
       }]
     };
