@@ -34,7 +34,7 @@
   text-align: center;
   /* Spacing above (matches gap between header and transmission) */
   margin-top: 24px;
-  animation: fadeInUp 500ms ease forwards;
+  animation: fadeInUp 400ms ease 150ms forwards;
   opacity: 0;
 }
 
@@ -113,7 +113,7 @@
   padding: 0;
   max-width: 360px;
   width: 100%;
-  animation: fadeInUp 500ms ease 100ms forwards;
+  animation: fadeInUp 400ms ease 300ms forwards;
   opacity: 0;
   flex-shrink: 0;
 }

@@ -19,7 +19,7 @@
   position: relative;
   
   /* Animation - fade in */
-  animation: transmissionFadeIn 500ms ease forwards;
+  animation: transmissionFadeIn 400ms ease forwards;
 }
 
 /* Fade out effect for overflow content */
@@ -48,7 +48,7 @@
 @keyframes transmissionFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
