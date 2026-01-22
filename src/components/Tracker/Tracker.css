@@ -7,8 +7,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* CHANGED: flex-start to match other tabs (Calendar, Stats, Timeline, etc.) */
+  justify-content: flex-start;
   padding: 0 24px;
+  padding-top: 24px; /* Match other tabs top spacing */
   background-color: #000000;
 }
 
@@ -106,6 +108,9 @@
   width: 100%;
   animation: fadeInUp 500ms ease 100ms forwards;
   opacity: 0;
+  /* Push to bottom with margin-top auto */
+  margin-top: auto;
+  padding-bottom: 24px;
 }
 
 .btn-primary {
@@ -405,65 +410,59 @@
   flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
   /* Floating text - NO background, NO border-radius, NO padding */
-  background: transparent;
-  border-radius: 0;
-  padding: 0;
 }
 
-/* Header - FIXED at top */
 .benefits-modal h2 {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #ffffff;
   margin: 0;
+  text-align: center;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
   padding-bottom: 32px;
-  flex-shrink: 0; /* Prevent shrinking */
 }
 
-/* Hide subtitle for cleaner minimal look */
 .benefits-modal > p {
-  display: none;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 32px 0;
+  text-align: center;
+  line-height: 1.5;
+  flex-shrink: 0;
 }
 
-/* Benefits list - SCROLLABLE middle section */
+/* Benefits list - scrollable */
 .benefits-list {
+  flex: 1;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 32px;
-  flex: 1; /* Take remaining space */
-  min-height: 0; /* Critical for flex overflow */
-  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  text-align: left;
-  padding: 8px 0; /* Small padding for scroll content */
-  /* Fade edges to indicate scrollability */
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 16px,
-    black calc(100% - 16px),
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 16px,
-    black calc(100% - 16px),
-    transparent 100%
-  );
+  overscroll-behavior: contain;
+  /* Minimal padding for scroll area */
+  padding-right: 4px;
 }
 
-/* Each benefit row - matches ET slider-group */
+/* Hide scrollbar on mobile, show on desktop */
+@media (max-width: 768px) {
+  .benefits-list::-webkit-scrollbar {
+    display: none;
+  }
+  .benefits-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
 .benefit-row {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-/* Label and value row - matches ET slider-header */
 .benefit-info {
   display: flex;
   justify-content: space-between;
@@ -471,145 +470,94 @@
 }
 
 .benefit-info span:first-child {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 500;
   color: #ffffff;
 }
 
 .benefit-num {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
   font-feature-settings: 'tnum' 1;
 }
 
-/* Description below slider - matches ET style */
 .benefit-desc {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.25);
-  margin-top: 8px;
-  text-align: left;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 2px;
 }
 
-/* Slider wrapper - matches ET slider-wrap exactly */
+/* Slider track styling */
 .benefit-slider {
   position: relative;
-  height: 20px;
+  height: 32px;
   display: flex;
   align-items: center;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
-  overflow: visible;
 }
 
-/* Track background - matches ET */
-.benefit-slider::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: rgba(255, 255, 255, 0.12);
-  border-radius: 1px;
-  pointer-events: none;
-}
-
-/* Fill bar - matches ET */
 .benefit-fill {
   position: absolute;
   left: 0;
-  height: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
   background-color: #ffffff;
-  border-radius: 1px;
-  transition: width 50ms ease-out;
+  border-radius: 2px;
   pointer-events: none;
+  z-index: 1;
+  /* Width is set dynamically via JS */
 }
 
-/* Range input - matches ET exactly */
 .benefit-slider input[type="range"] {
-  position: relative;
   width: 100%;
-  height: 20px;
-  margin: 0;
-  padding: 0;
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  border-radius: 0;
-  outline: none !important;
-  box-shadow: none !important;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  outline: none;
   cursor: pointer;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 2;
 }
 
-/* Track - invisible (we use .benefit-fill instead) */
+/* Track - WebKit */
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {
   width: 100%;
-  height: 2px;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0;
-  box-shadow: none;
-  cursor: pointer;
+  height: 4px;
+  background: transparent;
+  border-radius: 2px;
 }
 
+/* Track - Firefox */
 .benefit-slider input[type="range"]::-moz-range-track {
   width: 100%;
-  height: 2px;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  cursor: pointer;
-}
-
-.benefit-slider input[type="range"]::-ms-track {
-  width: 100%;
-  height: 2px;
-  background: transparent;
-  border: none;
-  color: transparent;
-}
-
-.benefit-slider input[type="range"]::-ms-fill-lower,
-.benefit-slider input[type="range"]::-ms-fill-upper {
-  background: transparent;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
   border: none;
 }
 
-/* Thumb - clean white circle (matches ET exactly) */
+/* Thumb - WebKit (Safari, Chrome, Edge) */
 .benefit-slider input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 18px;
-  height: 18px;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
   background: #ffffff;
-  border: none !important;
+  border: none;
   border-radius: 50%;
   cursor: pointer;
   margin-top: -8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
+/* Thumb - Firefox */
 .benefit-slider input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: #ffffff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
-}
-
-.benefit-slider input[type="range"]::-ms-thumb {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   background: #ffffff;
   border: none;
   border-radius: 50%;
@@ -825,6 +773,10 @@
 }
 
 @media (max-width: 480px) {
+  .tracker {
+    padding-top: 20px;
+  }
+  
   .streak-num {
     font-size: 7rem;
   }
@@ -841,6 +793,7 @@
   
   .tracker-footer {
     padding: 24px 20px 0 20px;
+    padding-bottom: 20px;
   }
   
   .btn-primary,
@@ -894,6 +847,10 @@
 
 /* Short screens */
 @media (max-height: 700px) {
+  .tracker {
+    padding-top: 16px;
+  }
+  
   .streak-num {
     font-size: 6rem;
   }
@@ -908,6 +865,7 @@
   
   .tracker-footer {
     padding-top: 20px;
+    padding-bottom: 16px;
   }
   
   /* Benefits modal on short screens */
@@ -922,6 +880,10 @@
 
 /* Very short screens */
 @media (max-height: 600px) {
+  .tracker {
+    padding-top: 12px;
+  }
+  
   .streak-num {
     font-size: 5rem;
   }
@@ -938,6 +900,7 @@
   
   .tracker-footer {
     padding-top: 16px;
+    padding-bottom: 12px;
   }
   
   .btn-primary,
@@ -964,6 +927,7 @@
   .tracker {
     flex-direction: row;
     gap: 32px;
+    padding-top: 16px;
   }
   
   .streak-num {
@@ -973,6 +937,7 @@
   .tracker-footer {
     padding: 0;
     max-width: 200px;
+    margin-top: 0;
   }
 }
 
