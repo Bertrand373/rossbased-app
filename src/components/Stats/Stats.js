@@ -317,12 +317,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         borderWidth: 2.5,
         backgroundColor: gradient,
         fill: true,
-        pointBackgroundColor: '#ffdd00',
+        pointBackgroundColor: '#e5c200',
         pointBorderColor: '#000000',
         pointBorderWidth: 2,
         pointRadius: pointRadii,
         pointHoverRadius: 6,
-        pointHoverBackgroundColor: '#ffdd00',
+        pointHoverBackgroundColor: '#e5c200',
         pointHoverBorderColor: '#000000',
       }]
     };
