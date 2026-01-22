@@ -108,8 +108,8 @@
    ============================================================ */
 
 .tracker-footer {
-  /* Spacing above (matches gap between header and transmission) */
-  margin-top: 24px;
+  /* Spacing above - positions button between content and AI chat icon */
+  margin-top: 40px;
   padding: 0;
   max-width: 360px;
   width: 100%;
