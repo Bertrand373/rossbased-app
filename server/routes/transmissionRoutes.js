@@ -119,12 +119,12 @@ USER CONTEXT:
   userContext += `
 
 GENERATE ONE TRANSMISSION:
-- Start with "Day ${streak}." in bold (or the appropriate opening for their level)
-- 2-3 sentences maximum
-- Draw from the phase-specific wisdom provided
-- Make it feel written specifically for this person on this day
-- Never generic - always specific to their exact day and phase
-- Tone: Direct, confident, like transmission from a master who knows the path`;
+- Start with "**Day ${streak}.**" (use markdown bold)
+- CRITICAL LENGTH LIMIT: Exactly 2 sentences. Maximum 40-50 words total. Do not exceed this.
+- First sentence: Bold day number + immediate insight
+- Second sentence: Continuation or call to awareness
+- NO third sentence. NO questions. NO fluff.
+- Example: "**Day 45.** The flatline tests your resolve while your body repairs in silence. Trust the process - emergence approaches."`;
 
   return { systemPrompt, userContext };
 };
@@ -203,7 +203,7 @@ router.get('/', async (req, res) => {
 
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
-      max_tokens: 200,
+      max_tokens: 100,
       system: systemPrompt,
       messages: [
         { role: 'user', content: userContext }
@@ -285,7 +285,7 @@ router.post('/regenerate', async (req, res) => {
 
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
-      max_tokens: 200,
+      max_tokens: 100,
       system: systemPrompt,
       messages: [
         { role: 'user', content: userContext }

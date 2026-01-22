@@ -278,13 +278,6 @@ const Tracker = ({ userData, updateUserData }) => {
         onVisibilityChange={handlePatternAlertVisibilityChange}
       />
       
-      {/* NEW: Daily Transmission - AI-powered wisdom (replaces DailyQuote) */}
-      {/* Only shows when PatternInsightCard is NOT showing */}
-      <DailyTransmission 
-        userData={userData}
-        isPatternAlertShowing={isPatternAlertShowing}
-      />
-      
       {/* Benefits Modal */}
       {showBenefits && (
         <div className="overlay">
@@ -380,6 +373,14 @@ const Tracker = ({ userData, updateUserData }) => {
 
       {/* Main */}
       <main className="tracker-main">
+        
+        {/* Daily Transmission - AI-powered wisdom (replaces DailyQuote) */}
+        {/* Only shows when PatternInsightCard is NOT showing */}
+        <DailyTransmission 
+          userData={userData}
+          isPatternAlertShowing={isPatternAlertShowing}
+        />
+        
         <p className="date">
           {format(currentTime, 'EEEE, MMMM d')}
           <span className="time-separator">·</span>
@@ -396,7 +397,6 @@ const Tracker = ({ userData, updateUserData }) => {
           <p className="milestone">{milestone}</p>
         )}
         
-        {/* REMOVED: DailyQuote - replaced by DailyTransmission above */}
       </main>
 
       {/* Footer */}
