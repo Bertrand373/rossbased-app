@@ -198,7 +198,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     responsive: true,
     maintainAspectRatio: false,
     layout: {
-      padding: { top: 8, right: 8, bottom: 0, left: 0 }
+      padding: { top: 20, right: 8, bottom: 0, left: 0 }
     },
     scales: {
       y: {
@@ -317,12 +317,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         borderWidth: 2.5,
         backgroundColor: gradient,
         fill: true,
-        pointBackgroundColor: '#ffffff',
+        pointBackgroundColor: '#ffdd00',
         pointBorderColor: '#000000',
         pointBorderWidth: 2,
         pointRadius: pointRadii,
         pointHoverRadius: 6,
-        pointHoverBackgroundColor: '#ffffff',
+        pointHoverBackgroundColor: '#ffdd00',
         pointHoverBorderColor: '#000000',
       }]
     };
