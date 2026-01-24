@@ -64,8 +64,17 @@ const buildTransmissionPrompt = (userData) => {
     });
   }
 
-  // Build the system prompt
-  let systemPrompt = `You are generating a daily transmission for a semen retention practitioner using TitanTrack.
+  // Build the system prompt - LENGTH CONSTRAINTS FIRST (most important)
+  let systemPrompt = `OUTPUT FORMAT (STRICTLY ENFORCED):
+- EXACTLY 2 sentences total
+- Maximum 120 characters (including "**Day X.**")
+- Start with "**Day ${streak}.**" then one insight sentence, then one closing sentence
+- STOP after 2 sentences. Do not write a third sentence.
+
+GOOD: "**Day 45.** The flatline tests your resolve while your body repairs. Trust the process."
+BAD: Writing 3+ sentences or exceeding 120 characters.
+
+You are generating a daily transmission for a semen retention practitioner.
 
 ${CORE_WISDOM}
 
@@ -87,44 +96,29 @@ ${PHASE_WISDOM[phase]}
     systemPrompt += `\n${BENEFIT_TREND_CONTEXT}\n`;
   }
 
-  // Build user context message
-  let userContext = `
-USER CONTEXT:
-- Current streak: Day ${streak}
-- Phase: ${phaseName} (${phase})
-- Today's date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`;
+  // Build user context message - keep simple, constraints are in system prompt
+  let userContext = `Generate transmission for Day ${streak} (${phaseName}).`;
 
   if (streakBreakdown) {
-    userContext += `\n- Streak breakdown: ${streakBreakdown}`;
+    userContext += ` ${streakBreakdown}.`;
   }
 
   if (longestStreak && longestStreak > streak) {
-    userContext += `\n- Previous longest: ${longestStreak} days`;
+    userContext += ` Previous best: ${longestStreak} days.`;
   }
 
-  if (relapseCount > 0) {
-    userContext += `\n- Total relapses: ${relapseCount}`;
-    if (isPostRelapse) {
-      userContext += ` (currently recovering from recent relapse)`;
-    }
+  if (isPostRelapse) {
+    userContext += ` Recently relapsed, now recovering.`;
   }
 
   if (benefitTrends && Object.keys(benefitTrends).length > 0) {
-    const trendSummary = Object.entries(benefitTrends)
-      .map(([metric, trend]) => `${metric}: ${trend}`)
-      .join(', ');
-    userContext += `\n- Recent benefit trends: ${trendSummary}`;
+    const rising = Object.entries(benefitTrends)
+      .filter(([_, trend]) => trend === 'rising')
+      .map(([metric]) => metric);
+    if (rising.length > 0) {
+      userContext += ` Rising: ${rising.join(', ')}.`;
+    }
   }
-
-  userContext += `
-
-GENERATE ONE TRANSMISSION:
-- Start with "**Day ${streak}.**" (use markdown bold)
-- CRITICAL LENGTH LIMIT: Exactly 2 sentences. Maximum 40-50 words total. Do not exceed this.
-- First sentence: Bold day number + immediate insight
-- Second sentence: Continuation or call to awareness
-- NO third sentence. NO questions. NO fluff.
-- Example: "**Day 45.** The flatline tests your resolve while your body repairs in silence. Trust the process - emergence approaches."`;
 
   return { systemPrompt, userContext };
 };
@@ -203,7 +197,7 @@ router.get('/', async (req, res) => {
 
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
-      max_tokens: 100,
+      max_tokens: 60,  // Reduced from 100 to enforce brevity
       system: systemPrompt,
       messages: [
         { role: 'user', content: userContext }
@@ -238,7 +232,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ 
       error: 'Failed to generate transmission',
       fallback: true,
-      transmission: "Your journey continues. Every day of retention builds upon the last. Stay the course."
+      transmission: "Your journey continues. Every day builds upon the last."
     });
   }
 });
@@ -285,7 +279,7 @@ router.post('/regenerate', async (req, res) => {
 
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
-      max_tokens: 100,
+      max_tokens: 60,  // Reduced from 100 to enforce brevity
       system: systemPrompt,
       messages: [
         { role: 'user', content: userContext }
