@@ -1,100 +1,6 @@
 /* src/components/AIChat/AIChat.css */
 /* Premium AI Chat - Matches TitanTrack aesthetic */
-
-/* ============================================================
-   FLOATING ACTION BUTTON
-   ============================================================ */
-
-.ai-chat-fab {
-  position: fixed;
-  bottom: calc(80px + env(safe-area-inset-bottom, 0));
-  right: 20px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-  z-index: 95;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 200ms ease;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-.ai-chat-fab:hover {
-  transform: scale(1.05);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.ai-chat-fab:active {
-  transform: scale(0.95);
-}
-
-.ai-chat-fab.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.8);
-}
-
-.ai-chat-fab-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.ai-chat-fab-icon .sparkle-main {
-  transform-origin: center;
-  animation: sparkleBreath 4s ease-in-out infinite;
-}
-
-.ai-chat-fab-icon .sparkle-accent {
-  transform-origin: center;
-  animation: sparkleAccent 4s ease-in-out infinite;
-}
-
-@keyframes sparkleBreath {
-  0%, 100% {
-    opacity: 0.9;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-@keyframes sparkleAccent {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.3;
-    transform: scale(0.8);
-  }
-}
-
-/* Subtle attention pulse - runs 3 times then stops */
-.ai-chat-fab.pulse {
-  animation: fabAttention 2s ease-in-out 3;
-}
-
-@keyframes fabAttention {
-  0%, 100% {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  }
-  50% {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 8px rgba(255, 255, 255, 0.06);
-  }
-}
-
-/* Desktop positioning */
-@media (min-width: 1025px) {
-  .ai-chat-fab {
-    bottom: 24px;
-    right: 24px;
-  }
-}
+/* Floating button removed - now triggered from header */
 
 /* ============================================================
    OVERLAY
@@ -538,15 +444,6 @@
     transition: none;
   }
   
-  .ai-chat-fab {
-    transition: none;
-  }
-  
-  .ai-chat-fab-icon .sparkle-main,
-  .ai-chat-fab-icon .sparkle-accent {
-    animation: none;
-  }
-  
   .ai-chat-message {
     animation: none;
   }
@@ -567,18 +464,6 @@
    ============================================================ */
 
 @media (max-width: 480px) {
-  .ai-chat-fab {
-    width: 46px;
-    height: 46px;
-    bottom: calc(76px + env(safe-area-inset-bottom, 0));
-    right: 16px;
-  }
-  
-  .ai-chat-fab-icon {
-    width: 24px;
-    height: 24px;
-  }
-  
   .ai-chat-panel {
     height: 90vh;
     border-radius: 12px 12px 0 0;

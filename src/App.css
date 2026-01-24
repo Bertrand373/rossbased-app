@@ -230,6 +230,43 @@ h4 { font-size: 0.875rem; }
   opacity: 0.9;
 }
 
+/* Header actions container - AI button + Profile */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* AI Chat Header Button - Matches profile circle style */
+.ai-chat-header-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ai-chat-header-btn:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.ai-chat-header-btn:active {
+  transform: scale(0.95);
+}
+
+.ai-chat-header-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
 /* Profile circle - minimal */
 .profile-circle {
   width: 30px;
@@ -323,9 +360,19 @@ h4 { font-size: 0.875rem; }
     display: none;
   }
   
+  .header-actions {
+    gap: 10px;
+  }
+  
+  .ai-chat-header-btn,
   .profile-circle {
     width: 32px;
     height: 32px;
+  }
+  
+  .ai-chat-header-btn svg {
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -340,9 +387,22 @@ h4 { font-size: 0.875rem; }
     opacity: 0.9;
   }
   
+  .header-actions {
+    gap: 8px;
+  }
+  
+  .ai-chat-header-btn,
   .profile-circle {
     width: 30px;
     height: 30px;
+  }
+  
+  .ai-chat-header-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+  
+  .profile-circle {
     font-size: 0.6875rem;
   }
 }
@@ -355,35 +415,30 @@ h4 { font-size: 0.875rem; }
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-base);
 }
 
 .main-content-wrapper {
   flex: 1;
+  padding: var(--space-6);
+  max-width: 1200px;
   width: 100%;
-  max-width: 1000px;
   margin: 0 auto;
-  padding: var(--space-8);
 }
 
-@media (max-width: 1024px) {
-  .app-content {
-    padding-bottom: calc(var(--nav-height-mobile) + var(--space-4));
-  }
-  
-  .main-content-wrapper {
-    padding: var(--space-6);
-  }
-}
-
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .main-content-wrapper {
     padding: var(--space-4);
   }
 }
 
+@media (max-width: 480px) {
+  .main-content-wrapper {
+    padding: var(--space-4) var(--space-3);
+  }
+}
+
 /* ============================================================
-   BUTTONS - Refined system
+   BUTTONS - Refined, minimal
    ============================================================ */
 
 .btn {
@@ -393,8 +448,9 @@ h4 { font-size: 0.875rem; }
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
   font-family: var(--font-base);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
+  line-height: 1;
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;

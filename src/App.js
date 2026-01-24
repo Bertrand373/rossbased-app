@@ -34,6 +34,21 @@ import { useAutoTrain } from './hooks/useAutoTrain';
 // Mixpanel Analytics
 import { initMixpanel, identifyUser, trackAppOpen, trackPageView, trackLogout, resetMixpanel } from './utils/mixpanel';
 
+// AI Chat Header Button - Minimal, matches profile circle style
+const AIChatButton = ({ onClick }) => {
+  return (
+    <button 
+      className="ai-chat-header-btn"
+      onClick={onClick}
+      aria-label="AI Mentor"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L14.09 8.26L20 9.27L15.55 13.97L16.91 20L12 16.9L7.09 20L8.45 13.97L4 9.27L9.91 8.26L12 2Z" fill="currentColor"/>
+      </svg>
+    </button>
+  );
+};
+
 // Profile Button - Minimal circle
 const ProfileButton = ({ userData }) => {
   const navigate = useNavigate();
@@ -229,6 +244,7 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
   const [shouldNavigateToTracker, setShouldNavigateToTracker] = useState(false);
+  const [showAIChat, setShowAIChat] = useState(false);
   
   const [isRefreshLoading, setIsRefreshLoading] = useState(() => {
     return localStorage.getItem('isLoggedIn') === 'true';
@@ -383,7 +399,10 @@ function App() {
               
               {!isMobile && <HeaderNavigation />}
               
-              <ProfileButton userData={userData} />
+              <div className="header-actions">
+                <AIChatButton onClick={() => setShowAIChat(true)} />
+                <ProfileButton userData={userData} />
+              </div>
             </header>
             
             {isMobile && (
@@ -400,8 +419,12 @@ function App() {
               currentCheckIns={userData?.totalCheckIns || 0}
             />
             
-            {/* AI Chat - Floating component */}
-            <AIChat isLoggedIn={isLoggedIn} />
+            {/* AI Chat - Now controlled by header button */}
+            <AIChat 
+              isLoggedIn={isLoggedIn} 
+              isOpen={showAIChat}
+              onClose={() => setShowAIChat(false)}
+            />
             
             <main className="app-content">
               <div className="main-content-wrapper">

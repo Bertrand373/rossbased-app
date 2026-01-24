@@ -1,5 +1,6 @@
 // src/components/AIChat/AIChat.js
 // Premium AI Chat with streaming responses
+// Now controlled by header button instead of floating FAB
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './AIChat.css';
 
@@ -13,13 +14,11 @@ const CHAT_HISTORY_KEY = 'titantrack_ai_chat_history';
 const MAX_STORED_MESSAGES = 50;
 const MAX_CONTEXT_MESSAGES = 10; // Send last 10 to Claude
 
-const AIChat = ({ isLoggedIn }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [streamingText, setStreamingText] = useState('');
-  const [showPulse, setShowPulse] = useState(false);
   const [usage, setUsage] = useState({
     messagesUsed: 0,
     messagesLimit: 5,
@@ -32,27 +31,18 @@ const AIChat = ({ isLoggedIn }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const chatBodyRef = useRef(null);
+  const hasTrackedOpen = useRef(false);
 
-  // Check if user should see pulse animation (first 3 app opens before clicking chat)
+  // Track chat opened (once per open)
   useEffect(() => {
-    if (isLoggedIn) {
-      const chatOpened = localStorage.getItem('titantrack_ai_chat_opened');
-      const pulseCount = parseInt(localStorage.getItem('titantrack_ai_pulse_count') || '0', 10);
-      
-      if (!chatOpened && pulseCount < 3) {
-        setShowPulse(true);
-        localStorage.setItem('titantrack_ai_pulse_count', String(pulseCount + 1));
-      }
+    if (isOpen && !hasTrackedOpen.current) {
+      trackAIChatOpened();
+      hasTrackedOpen.current = true;
     }
-  }, [isLoggedIn]);
-
-  // Mark chat as opened (stops future pulses)
-  const handleOpenChat = () => {
-    setIsOpen(true);
-    setShowPulse(false);
-    localStorage.setItem('titantrack_ai_chat_opened', 'true');
-    trackAIChatOpened();
-  };
+    if (!isOpen) {
+      hasTrackedOpen.current = false;
+    }
+  }, [isOpen]);
 
   // Load chat history from localStorage
   useEffect(() => {
@@ -233,32 +223,28 @@ const AIChat = ({ isLoggedIn }) => {
               } else if (parsed.type === 'error') {
                 throw new Error(parsed.message);
               }
-            } catch (e) {
-              // Skip malformed JSON chunks
-              if (data && data !== '[DONE]') {
-                console.warn('Failed to parse SSE data:', data);
-              }
+            } catch (parseErr) {
+              // Ignore parse errors for incomplete chunks
             }
           }
         }
       }
 
-      // Add complete assistant message
+      // Add assistant message to history
       if (fullResponse) {
-        const assistantMessage = {
+        setMessages(prev => [...prev, {
           role: 'assistant',
           content: fullResponse,
           timestamp: new Date().toISOString()
-        };
-        setMessages(prev => [...prev, assistantMessage]);
+        }]);
         
-        // Track successful message exchange
-        trackAIMessageSent(sentMessageLength, messages.length + 2);
+        // Track message sent
+        trackAIMessageSent(sentMessageLength, fullResponse.length);
       }
 
     } catch (err) {
       console.error('AI Chat error:', err);
-      setError(err.message || 'Something went wrong');
+      setError(err.message || 'Failed to get response. Please try again.');
     } finally {
       setIsLoading(false);
       setStreamingText('');
@@ -294,37 +280,8 @@ const AIChat = ({ isLoggedIn }) => {
 
   return (
     <>
-      {/* Floating Button */}
-      <button 
-        className={`ai-chat-fab ${isOpen ? 'hidden' : ''} ${showPulse ? 'pulse' : ''}`}
-        onClick={handleOpenChat}
-        aria-label="Open The Oracle"
-      >
-        <svg 
-          className="ai-chat-fab-icon" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Main 4-point sparkle */}
-          <path 
-            className="sparkle-main"
-            d="M12 1C12 1 12.5 6 14 8C15.5 10 21 10.5 21 10.5C21 10.5 15.5 11 14 13C12.5 15 12 21 12 21C12 21 11.5 15 10 13C8.5 11 3 10.5 3 10.5C3 10.5 8.5 10 10 8C11.5 6 12 1 12 1Z" 
-            fill="white"
-            fillOpacity="0.9"
-          />
-          {/* Small accent sparkle */}
-          <path 
-            className="sparkle-accent"
-            d="M19 1C19 1 19.2 3 20 3.8C20.8 4.6 23 4.8 23 4.8C23 4.8 20.8 5 20 5.8C19.2 6.6 19 9 19 9C19 9 18.8 6.6 18 5.8C17.2 5 15 4.8 15 4.8C15 4.8 17.2 4.6 18 3.8C18.8 3 19 1 19 1Z" 
-            fill="white"
-            fillOpacity="0.5"
-          />
-        </svg>
-      </button>
-
       {/* Chat Panel */}
-      <div className={`ai-chat-overlay ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(false)}>
+      <div className={`ai-chat-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
         <div 
           className={`ai-chat-panel ${isOpen ? 'open' : ''}`}
           onClick={(e) => e.stopPropagation()}
@@ -339,7 +296,7 @@ const AIChat = ({ isLoggedIn }) => {
             </div>
             <button 
               className="ai-chat-close"
-              onClick={() => setIsOpen(false)}
+              onClick={onClose}
               aria-label="Close chat"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
