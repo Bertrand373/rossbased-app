@@ -34,7 +34,7 @@ import { useAutoTrain } from './hooks/useAutoTrain';
 // Mixpanel Analytics
 import { initMixpanel, identifyUser, trackAppOpen, trackPageView, trackLogout, resetMixpanel } from './utils/mixpanel';
 
-// AI Chat Header Button - Minimal, matches profile circle style
+// AI Chat Header Button - Gold sparkle with breathing animation
 const AIChatButton = ({ onClick }) => {
   return (
     <button 
@@ -42,8 +42,27 @@ const AIChatButton = ({ onClick }) => {
       onClick={onClick}
       aria-label="AI Mentor"
     >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L14.09 8.26L20 9.27L15.55 13.97L16.91 20L12 16.9L7.09 20L8.45 13.97L4 9.27L9.91 8.26L12 2Z" fill="currentColor"/>
+      <svg 
+        className="ai-header-sparkle" 
+        width="18" 
+        height="18" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* Main 4-point sparkle */}
+        <path 
+          className="sparkle-main"
+          d="M12 1C12 1 12.5 6 14 8C15.5 10 21 10.5 21 10.5C21 10.5 15.5 11 14 13C12.5 15 12 21 12 21C12 21 11.5 15 10 13C8.5 11 3 10.5 3 10.5C3 10.5 8.5 10 10 8C11.5 6 12 1 12 1Z" 
+          fill="#ffdd00"
+        />
+        {/* Small accent sparkle */}
+        <path 
+          className="sparkle-accent"
+          d="M19 2C19 2 19.15 3.5 19.75 4.1C20.35 4.7 22 4.85 22 4.85C22 4.85 20.35 5 19.75 5.6C19.15 6.2 19 8 19 8C19 8 18.85 6.2 18.25 5.6C17.65 5 16 4.85 16 4.85C16 4.85 17.65 4.7 18.25 4.1C18.85 3.5 19 2 19 2Z" 
+          fill="#ffdd00"
+          fillOpacity="0.6"
+        />
       </svg>
     </button>
   );

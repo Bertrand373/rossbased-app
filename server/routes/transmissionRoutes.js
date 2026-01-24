@@ -124,6 +124,28 @@ ${PHASE_WISDOM[phase]}
 };
 
 // ============================================================
+// HELPER: Calculate current streak from startDate
+// This ensures transmission always shows correct day
+// ============================================================
+
+const calculateStreakFromStartDate = (startDate) => {
+  if (!startDate) return 1;
+  
+  const start = new Date(startDate);
+  const now = new Date();
+  
+  // Reset time portions for accurate day calculation
+  start.setHours(0, 0, 0, 0);
+  now.setHours(0, 0, 0, 0);
+  
+  const diffTime = now.getTime() - start.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  // Return at least 1 (day 1 is the start day)
+  return Math.max(1, diffDays + 1);
+};
+
+// ============================================================
 // HELPER: Check if transmission should be regenerated
 // ============================================================
 
@@ -170,7 +192,11 @@ router.get('/', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const currentStreak = user.currentStreak || 1;
+    // Calculate current streak dynamically from startDate
+    // This ensures transmission always shows correct day even if DB is stale
+    const currentStreak = user.startDate 
+      ? calculateStreakFromStartDate(user.startDate)
+      : (user.currentStreak || 1);
 
     // Check if we have a valid cached transmission
     if (!shouldRegenerateTransmission(user.dailyTransmission, currentStreak)) {
@@ -188,7 +214,7 @@ router.get('/', async (req, res) => {
     console.log(`✨ Generating new transmission for ${user.username} (Day ${currentStreak})`);
     
     const { systemPrompt, userContext } = buildTransmissionPrompt({
-      currentStreak: user.currentStreak,
+      currentStreak: currentStreak,
       relapseCount: user.relapseCount,
       longestStreak: user.longestStreak,
       benefitTracking: user.benefitTracking,
@@ -265,12 +291,15 @@ router.post('/regenerate', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const currentStreak = user.currentStreak || 1;
+    // Calculate current streak dynamically from startDate
+    const currentStreak = user.startDate 
+      ? calculateStreakFromStartDate(user.startDate)
+      : (user.currentStreak || 1);
     
     console.log(`🔄 Force regenerating transmission for ${user.username} (Day ${currentStreak})`);
     
     const { systemPrompt, userContext } = buildTransmissionPrompt({
-      currentStreak: user.currentStreak,
+      currentStreak: currentStreak,
       relapseCount: user.relapseCount,
       longestStreak: user.longestStreak,
       benefitTracking: user.benefitTracking,
