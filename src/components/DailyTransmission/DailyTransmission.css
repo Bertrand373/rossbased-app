@@ -162,6 +162,30 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
+/* Close button for expanded state */
+.transmission-close-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.25rem;
+  font-weight: 300;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1;
+}
+
+.transmission-close-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+}
+
 /* Main text - the transmission itself */
 .transmission-text {
   font-size: 0.875rem;

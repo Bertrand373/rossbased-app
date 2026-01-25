@@ -147,9 +147,9 @@ const calculateStreakFromStartDate = (startDate, timezone = 'UTC') => {
 
 // ============================================================
 // HELPER: Post-process transmission to ensure quality
-// - Ensures 2-3 complete sentences
 // - Ensures proper punctuation
 // - Ensures "Day X." format at start
+// - Lets Haiku complete its thought (no arbitrary sentence cap)
 // ============================================================
 
 const postProcessTransmission = (text, streak) => {
@@ -161,32 +161,17 @@ const postProcessTransmission = (text, streak) => {
   const dayPattern = /^\*?\*?Day\s*\d[\d,]*\.?\*?\*?\.?\s*/i;
   cleaned = cleaned.replace(dayPattern, '');
   
-  // Split into sentences (handle ., !, ?)
-  const sentences = cleaned
-    .split(/(?<=[.!?])\s+/)
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
+  // Ensure text ends with punctuation
+  if (cleaned && !/[.!?]$/.test(cleaned)) {
+    cleaned += '.';
+  }
   
-  // Take up to 3 complete sentences
-  let finalSentences = sentences.slice(0, 3);
-  
-  // Ensure each ends with punctuation
-  finalSentences = finalSentences.map(s => {
-    if (!/[.!?]$/.test(s)) {
-      return s + '.';
-    }
-    return s;
-  });
-  
-  // If no valid sentences, use fallback
-  if (finalSentences.length === 0) {
+  // If no content, use fallback
+  if (!cleaned) {
     return `**Day ${streak}.** Your energy builds with each passing day. Trust the process.`;
   }
   
-  // Combine with proper Day prefix
-  const body = finalSentences.join(' ');
-  
-  return `**Day ${streak}.** ${body}`;
+  return `**Day ${streak}.** ${cleaned}`;
 };
 
 // ============================================================

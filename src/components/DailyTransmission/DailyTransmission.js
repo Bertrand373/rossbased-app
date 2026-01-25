@@ -238,11 +238,17 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
       {isExpanded && (
         <>
           <div className="transmission-overlay" onClick={() => setIsExpanded(false)} />
-          <div className="daily-transmission expanded" onClick={() => setIsExpanded(false)}>
+          <div className="daily-transmission expanded" onClick={(e) => e.stopPropagation()}>
             <div className="transmission-header">
               <span className="transmission-icon">✦</span>
               <span className="transmission-label">Daily Transmission</span>
-              <span className="transmission-expand-hint">−</span>
+              <button 
+                className="transmission-close-btn" 
+                onClick={() => setIsExpanded(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
             </div>
             <p 
               className="transmission-text"
