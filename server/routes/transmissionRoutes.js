@@ -64,17 +64,12 @@ const buildTransmissionPrompt = (userData) => {
     });
   }
 
-  // Build the system prompt - LENGTH CONSTRAINTS FIRST (most important)
-  let systemPrompt = `OUTPUT FORMAT (STRICTLY ENFORCED):
-- EXACTLY 2 sentences total
-- Maximum 120 characters (including "**Day X.**")
-- Start with "**Day ${streak}.**" then one insight sentence, then one closing sentence
-- STOP after 2 sentences. Do not write a third sentence.
+  // Build the system prompt - guidance not hard constraints
+  let systemPrompt = `You are generating a daily transmission for a semen retention practitioner.
 
-GOOD: "**Day 45.** The flatline tests your resolve while your body repairs. Trust the process."
-BAD: Writing 3+ sentences or exceeding 120 characters.
+Write 2-3 sentences of wisdom for Day ${streak}. Start with "**Day ${streak}.**" followed by your insight.
 
-You are generating a daily transmission for a semen retention practitioner.
+Keep it grounded and practical. Reference their specific phase and benefits when relevant. No fluff.
 
 ${CORE_WISDOM}
 
@@ -148,6 +143,50 @@ const calculateStreakFromStartDate = (startDate, timezone = 'UTC') => {
   
   // Return at least 1 (day 1 is the start day)
   return Math.max(1, diffDays + 1);
+};
+
+// ============================================================
+// HELPER: Post-process transmission to ensure quality
+// - Ensures 2-3 complete sentences
+// - Ensures proper punctuation
+// - Ensures "Day X." format at start
+// ============================================================
+
+const postProcessTransmission = (text, streak) => {
+  if (!text) return `**Day ${streak}.** Your journey continues. Trust the process.`;
+  
+  let cleaned = text.trim();
+  
+  // Ensure it starts with **Day X.** format - strip any existing
+  const dayPattern = /^\*?\*?Day\s*\d[\d,]*\.?\*?\*?\.?\s*/i;
+  cleaned = cleaned.replace(dayPattern, '');
+  
+  // Split into sentences (handle ., !, ?)
+  const sentences = cleaned
+    .split(/(?<=[.!?])\s+/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+  
+  // Take up to 3 complete sentences
+  let finalSentences = sentences.slice(0, 3);
+  
+  // Ensure each ends with punctuation
+  finalSentences = finalSentences.map(s => {
+    if (!/[.!?]$/.test(s)) {
+      return s + '.';
+    }
+    return s;
+  });
+  
+  // If no valid sentences, use fallback
+  if (finalSentences.length === 0) {
+    return `**Day ${streak}.** Your energy builds with each passing day. Trust the process.`;
+  }
+  
+  // Combine with proper Day prefix
+  const body = finalSentences.join(' ');
+  
+  return `**Day ${streak}.** ${body}`;
 };
 
 // ============================================================
@@ -233,14 +272,15 @@ router.get('/', async (req, res) => {
 
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
-      max_tokens: 60,  // Reduced from 100 to enforce brevity
+      max_tokens: 200,  // Let Haiku write complete thoughts
       system: systemPrompt,
       messages: [
         { role: 'user', content: userContext }
       ]
     });
 
-    const transmissionText = response.content[0].text.trim();
+    const rawText = response.content[0].text.trim();
+    const transmissionText = postProcessTransmission(rawText, currentStreak);
 
     // Cache the transmission
     user.dailyTransmission = {
@@ -318,14 +358,15 @@ router.post('/regenerate', async (req, res) => {
 
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
-      max_tokens: 60,  // Reduced from 100 to enforce brevity
+      max_tokens: 200,  // Let Haiku write complete thoughts
       system: systemPrompt,
       messages: [
         { role: 'user', content: userContext }
       ]
     });
 
-    const transmissionText = response.content[0].text.trim();
+    const rawText = response.content[0].text.trim();
+    const transmissionText = postProcessTransmission(rawText, currentStreak);
 
     // Update cache
     user.dailyTransmission = {

@@ -1,6 +1,6 @@
 // src/components/DailyTransmission/DailyTransmission.js
 // AI-powered daily wisdom transmission - replaces DailyQuote
-// Streams on first view of the day, shows instantly on subsequent views
+// Expandable card: shows preview, tap to expand as overlay
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './DailyTransmission.css';
@@ -14,15 +14,27 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [hasSeenToday, setHasSeenToday] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [needsExpansion, setNeedsExpansion] = useState(false);
   
   const streamIntervalRef = useRef(null);
   const hasStreamedRef = useRef(false);
+  const textRef = useRef(null);
 
   // Check if user has seen today's transmission
   const getTodayKey = useCallback(() => {
     const today = new Date().toDateString();
     return `transmission_seen_${today}`;
   }, []);
+
+  // Check if text overflows (needs expansion)
+  useEffect(() => {
+    if (textRef.current && displayedText && !isStreaming) {
+      const element = textRef.current;
+      // Check if content exceeds 3 lines (approx 4.8em at 1.6 line-height)
+      setNeedsExpansion(element.scrollHeight > element.clientHeight + 2);
+    }
+  }, [displayedText, isStreaming]);
 
   // Fetch transmission from server
   const fetchTransmission = useCallback(async () => {
@@ -134,6 +146,20 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     };
   }, [transmission, isLoading, hasSeenToday, getTodayKey]);
 
+  // Close expanded view when clicking outside
+  useEffect(() => {
+    if (!isExpanded) return;
+    
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.daily-transmission')) {
+        setIsExpanded(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isExpanded]);
+
   // Don't render if pattern alert is showing (they're mutually exclusive)
   if (isPatternAlertShowing) {
     return null;
@@ -180,18 +206,38 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     return formatted;
   };
 
+  const handleCardClick = () => {
+    if (needsExpansion && !isStreaming) {
+      setIsExpanded(!isExpanded);
+    }
+  };
+
   return (
-    <div className={`daily-transmission ${isStreaming ? 'streaming' : ''}`}>
-      <div className="transmission-header">
-        <span className="transmission-icon">✦</span>
-        <span className="transmission-label">Daily Transmission</span>
+    <>
+      {/* Overlay backdrop when expanded */}
+      {isExpanded && <div className="transmission-overlay" onClick={() => setIsExpanded(false)} />}
+      
+      <div 
+        className={`daily-transmission ${isStreaming ? 'streaming' : ''} ${isExpanded ? 'expanded' : ''} ${needsExpansion ? 'expandable' : ''}`}
+        onClick={handleCardClick}
+      >
+        <div className="transmission-header">
+          <span className="transmission-icon">✦</span>
+          <span className="transmission-label">Daily Transmission</span>
+          {needsExpansion && !isStreaming && (
+            <span className="transmission-expand-hint">
+              {isExpanded ? '−' : '+'}
+            </span>
+          )}
+        </div>
+        <p 
+          ref={textRef}
+          className="transmission-text"
+          dangerouslySetInnerHTML={{ __html: formatText(displayedText) }}
+        />
+        {isStreaming && <span className="transmission-cursor"></span>}
       </div>
-      <p 
-        className="transmission-text"
-        dangerouslySetInnerHTML={{ __html: formatText(displayedText) }}
-      />
-      {isStreaming && <span className="transmission-cursor"></span>}
-    </div>
+    </>
   );
 };
 

@@ -1,7 +1,6 @@
 /* src/components/DailyTransmission/DailyTransmission.css */
 /* Daily Transmission - AI-powered wisdom card */
-/* Position: Above counter in tracker-main */
-/* Mutually exclusive with PatternInsightCard */
+/* Expandable: shows preview, tap to expand as overlay */
 
 .daily-transmission {
   width: 100%;
@@ -12,8 +11,11 @@
   border-radius: 12px;
   text-align: left;
   margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+  transition: transform 200ms ease, box-shadow 200ms ease, z-index 0ms;
   
-  /* Animation - fade in (matches app-wide pattern) */
+  /* Animation - fade in */
   animation: transmissionFadeIn 500ms ease forwards;
   opacity: 0;
 }
@@ -27,6 +29,92 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Expandable state - show tap hint */
+.daily-transmission.expandable {
+  cursor: pointer;
+}
+
+.daily-transmission.expandable:active {
+  transform: scale(0.98);
+}
+
+/* Collapsed state - limit height and fade */
+.daily-transmission:not(.expanded) .transmission-text {
+  max-height: 4.8em; /* ~3 lines at 1.6 line-height */
+  overflow: hidden;
+  position: relative;
+}
+
+/* Fade effect for truncated text */
+.daily-transmission.expandable:not(.expanded) .transmission-text::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2em;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.95) 100%
+  );
+  pointer-events: none;
+}
+
+/* Overlay backdrop */
+.transmission-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  animation: overlayFadeIn 200ms ease;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Expanded state - overlay mode */
+.daily-transmission.expanded {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  max-width: min(380px, calc(100vw - 40px));
+  width: calc(100vw - 40px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  background: #0a0a0a;
+  border-color: rgba(255, 221, 0, 0.15);
+  animation: expandIn 200ms ease;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.daily-transmission.expanded .transmission-text {
+  max-height: none;
+  overflow: visible;
+}
+
+.daily-transmission.expanded .transmission-text::after {
+  display: none;
 }
 
 /* Header row */
@@ -49,6 +137,24 @@
   color: rgba(255, 221, 0, 0.5);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  flex: 1;
+}
+
+/* Expand/collapse hint */
+.transmission-expand-hint {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 300;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 150ms ease;
+}
+
+.daily-transmission.expandable:hover .transmission-expand-hint {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* Main text - the transmission itself */
@@ -127,6 +233,12 @@
     margin-bottom: 16px;
   }
   
+  .daily-transmission.expanded {
+    max-width: calc(100vw - 32px);
+    width: calc(100vw - 32px);
+    padding: 18px 20px;
+  }
+  
   .transmission-text {
     font-size: 0.8125rem;
     line-height: 1.55;
@@ -158,6 +270,10 @@
   .daily-transmission {
     margin-bottom: 14px;
     padding: 12px 16px;
+  }
+  
+  .daily-transmission:not(.expanded) .transmission-text {
+    max-height: 3.2em; /* ~2 lines on short screens */
   }
   
   .transmission-text {
@@ -198,6 +314,14 @@
   .daily-transmission {
     animation: none;
     opacity: 1;
+  }
+  
+  .daily-transmission.expanded {
+    animation: none;
+  }
+  
+  .transmission-overlay {
+    animation: none;
   }
   
   .transmission-cursor {
