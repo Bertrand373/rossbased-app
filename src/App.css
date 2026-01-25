@@ -237,65 +237,34 @@ h4 { font-size: 0.875rem; }
   gap: 12px;
 }
 
-/* AI Chat Header Button - Gold sparkle with breathing animation */
+/* AI Chat Header Button - Matches profile circle style */
 .ai-chat-header-btn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.08);
   border: none;
   border-radius: 50%;
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   transition: all var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
 }
 
 .ai-chat-header-btn:hover {
-  background-color: rgba(255, 221, 0, 0.08);
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
 }
 
 .ai-chat-header-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.95);
 }
 
-/* Sparkle icon with breathing animation */
 .ai-header-sparkle {
-  width: 18px;
-  height: 18px;
-}
-
-.ai-header-sparkle .sparkle-main {
-  transform-origin: center;
-  animation: sparkleBreath 3s ease-in-out infinite;
-}
-
-.ai-header-sparkle .sparkle-accent {
-  transform-origin: center;
-  animation: sparkleAccent 3s ease-in-out infinite;
-}
-
-@keyframes sparkleBreath {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(0.92);
-  }
-}
-
-@keyframes sparkleAccent {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.3;
-    transform: scale(0.85);
-  }
+  width: 14px;
+  height: 14px;
 }
 
 /* Profile circle - minimal */
@@ -395,19 +364,15 @@ h4 { font-size: 0.875rem; }
     gap: 10px;
   }
   
-  .ai-chat-header-btn {
+  .ai-chat-header-btn,
+  .profile-circle {
     width: 32px;
     height: 32px;
   }
   
   .ai-header-sparkle {
-    width: 18px;
-    height: 18px;
-  }
-  
-  .profile-circle {
-    width: 32px;
-    height: 32px;
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -426,19 +391,18 @@ h4 { font-size: 0.875rem; }
     gap: 8px;
   }
   
-  .ai-chat-header-btn {
+  .ai-chat-header-btn,
+  .profile-circle {
     width: 30px;
     height: 30px;
   }
   
   .ai-header-sparkle {
-    width: 16px;
-    height: 16px;
+    width: 13px;
+    height: 13px;
   }
   
   .profile-circle {
-    width: 30px;
-    height: 30px;
     font-size: 0.6875rem;
   }
 }

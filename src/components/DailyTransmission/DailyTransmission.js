@@ -36,7 +36,10 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
         return;
       }
 
-      const response = await fetch(`${API_URL}/api/transmission`, {
+      // Get user's timezone for accurate day calculation
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      const response = await fetch(`${API_URL}/api/transmission?timezone=${encodeURIComponent(timezone)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -152,7 +155,6 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
         <div className="transmission-skeleton">
           <div className="skeleton-line"></div>
           <div className="skeleton-line"></div>
-          <div className="skeleton-line short"></div>
         </div>
       </div>
     );

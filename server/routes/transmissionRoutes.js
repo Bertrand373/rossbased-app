@@ -124,21 +124,26 @@ ${PHASE_WISDOM[phase]}
 };
 
 // ============================================================
-// HELPER: Calculate current streak from startDate
-// This ensures transmission always shows correct day
+// HELPER: Calculate current streak from startDate (timezone-aware)
+// This ensures transmission always shows correct day in user's timezone
 // ============================================================
 
-const calculateStreakFromStartDate = (startDate) => {
+const calculateStreakFromStartDate = (startDate, timezone = 'UTC') => {
   if (!startDate) return 1;
   
-  const start = new Date(startDate);
+  // Get current date in user's timezone
   const now = new Date();
+  const userNow = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  
+  // Get start date in user's timezone
+  const start = new Date(startDate);
+  const userStart = new Date(start.toLocaleString('en-US', { timeZone: timezone }));
   
   // Reset time portions for accurate day calculation
-  start.setHours(0, 0, 0, 0);
-  now.setHours(0, 0, 0, 0);
+  userStart.setHours(0, 0, 0, 0);
+  userNow.setHours(0, 0, 0, 0);
   
-  const diffTime = now.getTime() - start.getTime();
+  const diffTime = userNow.getTime() - userStart.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   
   // Return at least 1 (day 1 is the start day)
@@ -149,7 +154,7 @@ const calculateStreakFromStartDate = (startDate) => {
 // HELPER: Check if transmission should be regenerated
 // ============================================================
 
-const shouldRegenerateTransmission = (cachedTransmission, currentStreak) => {
+const shouldRegenerateTransmission = (cachedTransmission, currentStreak, timezone = 'UTC') => {
   if (!cachedTransmission) return true;
   
   const { generatedAt, forStreak } = cachedTransmission;
@@ -157,11 +162,13 @@ const shouldRegenerateTransmission = (cachedTransmission, currentStreak) => {
   // Regenerate if streak changed (relapse or date picker change)
   if (forStreak !== currentStreak) return true;
   
-  // Regenerate if it's a new day
-  const generatedDate = new Date(generatedAt).toDateString();
-  const today = new Date().toDateString();
+  // Regenerate if it's a new day in user's timezone
+  const now = new Date();
+  const userNow = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  const generatedDate = new Date(generatedAt);
+  const userGenerated = new Date(generatedDate.toLocaleString('en-US', { timeZone: timezone }));
   
-  return generatedDate !== today;
+  return userNow.toDateString() !== userGenerated.toDateString();
 };
 
 // ============================================================
@@ -192,14 +199,17 @@ router.get('/', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Calculate current streak dynamically from startDate
-    // This ensures transmission always shows correct day even if DB is stale
+    // Get timezone from query param (sent by frontend)
+    const timezone = req.query.timezone || 'America/New_York';
+
+    // Calculate current streak dynamically from startDate in user's timezone
+    // This ensures transmission always shows correct day
     const currentStreak = user.startDate 
-      ? calculateStreakFromStartDate(user.startDate)
+      ? calculateStreakFromStartDate(user.startDate, timezone)
       : (user.currentStreak || 1);
 
     // Check if we have a valid cached transmission
-    if (!shouldRegenerateTransmission(user.dailyTransmission, currentStreak)) {
+    if (!shouldRegenerateTransmission(user.dailyTransmission, currentStreak, timezone)) {
       console.log(`📦 Returning cached transmission for ${user.username}`);
       return res.json({
         transmission: user.dailyTransmission.text,
