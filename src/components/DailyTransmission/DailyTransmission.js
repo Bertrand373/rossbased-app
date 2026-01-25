@@ -212,22 +212,33 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     }
   };
 
+  // Format text - convert **bold** to <strong>
+  const formatText = (text) => {
+    if (!text) return '';
+    
+    // Convert **text** to <strong>text</strong>
+    let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Also handle Day X. at start to make it bold if not already
+    if (!formatted.startsWith('<strong>')) {
+      formatted = formatted.replace(/^(Day \d[\d,]*\.?)/, '<strong>$1</strong>');
+    }
+    
+    return formatted;
+  };
+
   return (
     <>
-      {/* Overlay backdrop when expanded */}
-      {isExpanded && <div className="transmission-overlay" onClick={() => setIsExpanded(false)} />}
-      
+      {/* Collapsed card - always in normal flow */}
       <div 
-        className={`daily-transmission ${isStreaming ? 'streaming' : ''} ${isExpanded ? 'expanded' : ''} ${needsExpansion ? 'expandable' : ''}`}
+        className={`daily-transmission ${isStreaming ? 'streaming' : ''} ${needsExpansion ? 'expandable' : ''} ${isExpanded ? 'hidden-for-expand' : ''}`}
         onClick={handleCardClick}
       >
         <div className="transmission-header">
           <span className="transmission-icon">✦</span>
           <span className="transmission-label">Daily Transmission</span>
           {needsExpansion && !isStreaming && (
-            <span className="transmission-expand-hint">
-              {isExpanded ? '−' : '+'}
-            </span>
+            <span className="transmission-expand-hint">+</span>
           )}
         </div>
         <p 
@@ -237,6 +248,24 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
         />
         {isStreaming && <span className="transmission-cursor"></span>}
       </div>
+
+      {/* Expanded overlay - rendered separately */}
+      {isExpanded && (
+        <>
+          <div className="transmission-overlay" onClick={() => setIsExpanded(false)} />
+          <div className="daily-transmission expanded" onClick={() => setIsExpanded(false)}>
+            <div className="transmission-header">
+              <span className="transmission-icon">✦</span>
+              <span className="transmission-label">Daily Transmission</span>
+              <span className="transmission-expand-hint">−</span>
+            </div>
+            <p 
+              className="transmission-text"
+              dangerouslySetInnerHTML={{ __html: formatText(displayedText) }}
+            />
+          </div>
+        </>
+      )}
     </>
   );
 };

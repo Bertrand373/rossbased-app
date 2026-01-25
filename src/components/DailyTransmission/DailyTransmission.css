@@ -40,6 +40,11 @@
   transform: scale(0.98);
 }
 
+/* Hide original card when expanded version is showing */
+.daily-transmission.hidden-for-expand {
+  visibility: hidden;
+}
+
 /* Collapsed state - limit height and fade */
 .daily-transmission:not(.expanded) .transmission-text {
   max-height: 4.8em; /* ~3 lines at 1.6 line-height */
@@ -48,7 +53,7 @@
 }
 
 /* Fade effect for truncated text */
-.daily-transmission.expandable:not(.expanded) .transmission-text::after {
+.daily-transmission.expandable:not(.expanded):not(.hidden-for-expand) .transmission-text::after {
   content: '';
   position: absolute;
   bottom: 0;
