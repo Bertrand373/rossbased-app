@@ -212,21 +212,6 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     }
   };
 
-  // Format text - convert **bold** to <strong>
-  const formatText = (text) => {
-    if (!text) return '';
-    
-    // Convert **text** to <strong>text</strong>
-    let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    
-    // Also handle Day X. at start to make it bold if not already
-    if (!formatted.startsWith('<strong>')) {
-      formatted = formatted.replace(/^(Day \d[\d,]*\.?)/, '<strong>$1</strong>');
-    }
-    
-    return formatted;
-  };
-
   return (
     <>
       {/* Collapsed card - always in normal flow */}
