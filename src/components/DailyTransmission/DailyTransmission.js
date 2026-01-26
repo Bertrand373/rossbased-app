@@ -1,11 +1,70 @@
 // src/components/DailyTransmission/DailyTransmission.js
-// AI-powered daily wisdom transmission - replaces DailyQuote
-// Expandable card: shows preview, tap to expand as overlay
+// AI-powered daily wisdom transmission
+// Uses React Portal for overlay
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import './DailyTransmission.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
+// Global state outside React to survive re-renders
+let globalExpanded = false;
+let globalSetExpanded = null;
+
+// Overlay rendered via Portal
+const TransmissionOverlay = ({ content }) => {
+  const [isOpen, setIsOpen] = useState(globalExpanded);
+  
+  // Register the setter globally
+  useEffect(() => {
+    globalSetExpanded = setIsOpen;
+    setIsOpen(globalExpanded);
+    return () => { globalSetExpanded = null; };
+  }, []);
+  
+  // Sync with global state
+  useEffect(() => {
+    globalExpanded = isOpen;
+  }, [isOpen]);
+
+  const handleClose = () => {
+    globalExpanded = false;
+    setIsOpen(false);
+  };
+
+  if (!isOpen) return null;
+  
+  return ReactDOM.createPortal(
+    <div className="transmission-portal">
+      <div 
+        className="transmission-overlay" 
+        onClick={handleClose}
+      />
+      <div 
+        className="daily-transmission expanded"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="transmission-header">
+          <span className="transmission-icon">✦</span>
+          <span className="transmission-label">Daily Transmission</span>
+          <button 
+            className="transmission-close-btn" 
+            onClick={handleClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <p 
+          className="transmission-text"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      </div>
+    </div>,
+    document.body
+  );
+};
 
 const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
   const [transmission, setTransmission] = useState(null);
@@ -14,29 +73,24 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [hasSeenToday, setHasSeenToday] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [needsExpansion, setNeedsExpansion] = useState(false);
   
   const streamIntervalRef = useRef(null);
   const hasStreamedRef = useRef(false);
   const textRef = useRef(null);
 
-  // Check if user has seen today's transmission
   const getTodayKey = useCallback(() => {
     const today = new Date().toDateString();
     return `transmission_seen_${today}`;
   }, []);
 
-  // Check if text overflows (needs expansion)
   useEffect(() => {
     if (textRef.current && displayedText && !isStreaming) {
       const element = textRef.current;
-      // Check if content exceeds 3 lines (approx 4.8em at 1.6 line-height)
       setNeedsExpansion(element.scrollHeight > element.clientHeight + 2);
     }
   }, [displayedText, isStreaming]);
 
-  // Fetch transmission from server
   const fetchTransmission = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -48,7 +102,6 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
         return;
       }
 
-      // Get user's timezone for accurate day calculation
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
       const response = await fetch(`${API_URL}/api/transmission?timezone=${encodeURIComponent(timezone)}`, {
@@ -65,11 +118,9 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
       const data = await response.json();
       setTransmission(data);
 
-      // Check if already seen today
       const seenToday = localStorage.getItem(getTodayKey());
       setHasSeenToday(!!seenToday);
 
-      // If seen today, show full text immediately
       if (seenToday || hasStreamedRef.current) {
         setDisplayedText(data.transmission);
       }
@@ -77,7 +128,6 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     } catch (err) {
       console.error('Transmission fetch error:', err);
       setError(err.message);
-      // Set fallback
       setTransmission({
         transmission: "Your journey continues. Every day of retention builds upon the last.",
         fallback: true
@@ -88,11 +138,9 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     }
   }, [getTodayKey]);
 
-  // Initial fetch
   useEffect(() => {
     fetchTransmission();
     
-    // Cleanup streaming on unmount
     return () => {
       if (streamIntervalRef.current) {
         clearInterval(streamIntervalRef.current);
@@ -100,13 +148,11 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     };
   }, [fetchTransmission]);
 
-  // Stream effect for first view of the day
   useEffect(() => {
     if (!transmission || isLoading || hasSeenToday || hasStreamedRef.current) {
       return;
     }
 
-    // Start streaming
     setIsStreaming(true);
     const fullText = transmission.transmission;
     let currentIndex = 0;
@@ -118,8 +164,6 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
         setIsStreaming(false);
         setDisplayedText(fullText);
         hasStreamedRef.current = true;
-        
-        // Mark as seen today
         localStorage.setItem(getTodayKey(), 'true');
         setHasSeenToday(true);
         return;
@@ -127,9 +171,7 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
 
       const char = fullText[currentIndex];
 
-      // Handle HTML tags (for bold text like **Day 23.**)
       if (char === '*' && fullText[currentIndex + 1] === '*') {
-        // Skip markdown bold markers, we'll handle styling in CSS
         currentIndex += 2;
         return;
       }
@@ -137,7 +179,7 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
       currentDisplay += char;
       setDisplayedText(currentDisplay);
       currentIndex++;
-    }, 20); // ~50 chars per second
+    }, 20);
 
     return () => {
       if (streamIntervalRef.current) {
@@ -146,17 +188,14 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     };
   }, [transmission, isLoading, hasSeenToday, getTodayKey]);
 
-  // Don't render if pattern alert is showing (they're mutually exclusive)
   if (isPatternAlertShowing) {
     return null;
   }
 
-  // Don't render if no start date (onboarding not complete)
   if (!userData?.startDate) {
     return null;
   }
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="daily-transmission">
@@ -172,46 +211,35 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     );
   }
 
-  // Error state - show fallback
   if (error && !transmission) {
     return null;
   }
 
-  // Format text - convert **bold** to <strong>
   const formatText = (text) => {
     if (!text) return '';
-    
-    // Convert **text** to <strong>text</strong>
     let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    
-    // Also handle Day X. at start to make it bold if not already
     if (!formatted.startsWith('<strong>')) {
       formatted = formatted.replace(/^(Day \d[\d,]*\.?)/, '<strong>$1</strong>');
     }
-    
     return formatted;
   };
 
-  const handleCardClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (needsExpansion && !isStreaming) {
-      setIsExpanded(true);
-    }
-  };
+  const formattedContent = formatText(displayedText);
 
-  const handleClose = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsExpanded(false);
+  const handleExpand = () => {
+    if (needsExpansion && !isStreaming) {
+      globalExpanded = true;
+      if (globalSetExpanded) {
+        globalSetExpanded(true);
+      }
+    }
   };
 
   return (
     <>
-      {/* Collapsed card - always in normal flow */}
       <div 
-        className={`daily-transmission ${isStreaming ? 'streaming' : ''} ${needsExpansion ? 'expandable' : ''} ${isExpanded ? 'hidden-for-expand' : ''}`}
-        onClick={handleCardClick}
+        className={`daily-transmission ${isStreaming ? 'streaming' : ''} ${needsExpansion ? 'expandable' : ''}`}
+        onClick={handleExpand}
       >
         <div className="transmission-header">
           <span className="transmission-icon">✦</span>
@@ -223,34 +251,12 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
         <p 
           ref={textRef}
           className="transmission-text"
-          dangerouslySetInnerHTML={{ __html: formatText(displayedText) }}
+          dangerouslySetInnerHTML={{ __html: formattedContent }}
         />
         {isStreaming && <span className="transmission-cursor"></span>}
       </div>
 
-      {/* Expanded overlay - rendered separately */}
-      {isExpanded && (
-        <>
-          <div className="transmission-overlay" onClick={handleClose} />
-          <div className="daily-transmission expanded" onClick={(e) => e.stopPropagation()}>
-            <div className="transmission-header">
-              <span className="transmission-icon">✦</span>
-              <span className="transmission-label">Daily Transmission</span>
-              <button 
-                className="transmission-close-btn" 
-                onClick={handleClose}
-                aria-label="Close"
-              >
-                ×
-              </button>
-            </div>
-            <p 
-              className="transmission-text"
-              dangerouslySetInnerHTML={{ __html: formatText(displayedText) }}
-            />
-          </div>
-        </>
-      )}
+      <TransmissionOverlay content={formattedContent} />
     </>
   );
 };
