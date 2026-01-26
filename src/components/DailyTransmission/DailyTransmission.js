@@ -192,10 +192,18 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     return formatted;
   };
 
-  const handleCardClick = () => {
+  const handleCardClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (needsExpansion && !isStreaming) {
-      setIsExpanded(!isExpanded);
+      setIsExpanded(true);
     }
+  };
+
+  const handleClose = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsExpanded(false);
   };
 
   return (
@@ -223,14 +231,14 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
       {/* Expanded overlay - rendered separately */}
       {isExpanded && (
         <>
-          <div className="transmission-overlay" onClick={() => setIsExpanded(false)} />
+          <div className="transmission-overlay" onClick={handleClose} />
           <div className="daily-transmission expanded" onClick={(e) => e.stopPropagation()}>
             <div className="transmission-header">
               <span className="transmission-icon">✦</span>
               <span className="transmission-label">Daily Transmission</span>
               <button 
                 className="transmission-close-btn" 
-                onClick={() => setIsExpanded(false)}
+                onClick={handleClose}
                 aria-label="Close"
               >
                 ×
