@@ -146,20 +146,6 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     };
   }, [transmission, isLoading, hasSeenToday, getTodayKey]);
 
-  // Close expanded view when clicking outside
-  useEffect(() => {
-    if (!isExpanded) return;
-    
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('.daily-transmission')) {
-        setIsExpanded(false);
-      }
-    };
-    
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [isExpanded]);
-
   // Don't render if pattern alert is showing (they're mutually exclusive)
   if (isPatternAlertShowing) {
     return null;
