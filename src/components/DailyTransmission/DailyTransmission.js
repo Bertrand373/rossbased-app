@@ -1,69 +1,49 @@
 // src/components/DailyTransmission/DailyTransmission.js
 // AI-powered daily wisdom transmission
-// Uses React Portal for overlay
+// Uses pure DOM for overlay to avoid React re-render issues
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import ReactDOM from 'react-dom';
 import './DailyTransmission.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-// Global state outside React to survive re-renders
-let globalExpanded = false;
-let globalSetExpanded = null;
-
-// Overlay rendered via Portal
-const TransmissionOverlay = ({ content }) => {
-  const [isOpen, setIsOpen] = useState(globalExpanded);
+// Pure DOM overlay - completely outside React
+const showOverlay = (content) => {
+  // Remove any existing overlay first
+  const existing = document.getElementById('transmission-overlay-root');
+  if (existing) existing.remove();
   
-  // Register the setter globally
-  useEffect(() => {
-    globalSetExpanded = setIsOpen;
-    setIsOpen(globalExpanded);
-    return () => { globalSetExpanded = null; };
-  }, []);
-  
-  // Sync with global state
-  useEffect(() => {
-    globalExpanded = isOpen;
-  }, [isOpen]);
-
-  const handleClose = () => {
-    globalExpanded = false;
-    setIsOpen(false);
-  };
-
-  if (!isOpen) return null;
-  
-  return ReactDOM.createPortal(
-    <div className="transmission-portal">
-      <div 
-        className="transmission-overlay" 
-        onClick={handleClose}
-      />
-      <div 
-        className="daily-transmission expanded"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="transmission-header">
-          <span className="transmission-icon">✦</span>
-          <span className="transmission-label">Daily Transmission</span>
-          <button 
-            className="transmission-close-btn" 
-            onClick={handleClose}
-            aria-label="Close"
-          >
-            ×
-          </button>
+  // Create overlay container
+  const root = document.createElement('div');
+  root.id = 'transmission-overlay-root';
+  root.innerHTML = `
+    <div class="transmission-portal">
+      <div class="transmission-overlay"></div>
+      <div class="daily-transmission expanded">
+        <div class="transmission-header">
+          <span class="transmission-icon">✦</span>
+          <span class="transmission-label">Daily Transmission</span>
+          <button class="transmission-close-btn" aria-label="Close">×</button>
         </div>
-        <p 
-          className="transmission-text"
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
+        <p class="transmission-text">${content}</p>
       </div>
-    </div>,
-    document.body
-  );
+    </div>
+  `;
+  
+  document.body.appendChild(root);
+  document.body.style.overflow = 'hidden';
+  
+  // Close handlers
+  const closeOverlay = () => {
+    root.remove();
+    document.body.style.overflow = '';
+  };
+  
+  root.querySelector('.transmission-overlay').addEventListener('click', closeOverlay);
+  root.querySelector('.transmission-close-btn').addEventListener('click', closeOverlay);
+  root.querySelector('.daily-transmission.expanded').addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
 };
 
 const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
@@ -78,6 +58,7 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
   const streamIntervalRef = useRef(null);
   const hasStreamedRef = useRef(false);
   const textRef = useRef(null);
+  const formattedContentRef = useRef('');
 
   const getTodayKey = useCallback(() => {
     const today = new Date().toDateString();
@@ -188,6 +169,15 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
     };
   }, [transmission, isLoading, hasSeenToday, getTodayKey]);
 
+  // Cleanup overlay on unmount
+  useEffect(() => {
+    return () => {
+      const existing = document.getElementById('transmission-overlay-root');
+      if (existing) existing.remove();
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   if (isPatternAlertShowing) {
     return null;
   }
@@ -225,39 +215,33 @@ const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
   };
 
   const formattedContent = formatText(displayedText);
+  formattedContentRef.current = formattedContent;
 
   const handleExpand = () => {
     if (needsExpansion && !isStreaming) {
-      globalExpanded = true;
-      if (globalSetExpanded) {
-        globalSetExpanded(true);
-      }
+      showOverlay(formattedContentRef.current);
     }
   };
 
   return (
-    <>
-      <div 
-        className={`daily-transmission ${isStreaming ? 'streaming' : ''} ${needsExpansion ? 'expandable' : ''}`}
-        onClick={handleExpand}
-      >
-        <div className="transmission-header">
-          <span className="transmission-icon">✦</span>
-          <span className="transmission-label">Daily Transmission</span>
-          {needsExpansion && !isStreaming && (
-            <span className="transmission-expand-hint">+</span>
-          )}
-        </div>
-        <p 
-          ref={textRef}
-          className="transmission-text"
-          dangerouslySetInnerHTML={{ __html: formattedContent }}
-        />
-        {isStreaming && <span className="transmission-cursor"></span>}
+    <div 
+      className={`daily-transmission ${isStreaming ? 'streaming' : ''} ${needsExpansion ? 'expandable' : ''}`}
+      onClick={handleExpand}
+    >
+      <div className="transmission-header">
+        <span className="transmission-icon">✦</span>
+        <span className="transmission-label">Daily Transmission</span>
+        {needsExpansion && !isStreaming && (
+          <span className="transmission-expand-hint">+</span>
+        )}
       </div>
-
-      <TransmissionOverlay content={formattedContent} />
-    </>
+      <p 
+        ref={textRef}
+        className="transmission-text"
+        dangerouslySetInnerHTML={{ __html: formattedContent }}
+      />
+      {isStreaming && <span className="transmission-cursor"></span>}
+    </div>
   );
 };
 
