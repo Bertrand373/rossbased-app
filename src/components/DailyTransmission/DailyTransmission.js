@@ -9,9 +9,14 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 // Pure DOM overlay - completely outside React
 const showOverlay = (content) => {
+  console.log('🟢 showOverlay called');
+  
   // Remove any existing overlay first
   const existing = document.getElementById('transmission-overlay-root');
-  if (existing) existing.remove();
+  if (existing) {
+    console.log('🟡 Removing existing overlay');
+    existing.remove();
+  }
   
   // Create overlay container
   const root = document.createElement('div');
@@ -30,12 +35,28 @@ const showOverlay = (content) => {
   `;
   
   document.body.appendChild(root);
+  console.log('🟢 Overlay appended to body');
   document.body.style.overflow = 'hidden';
+  
+  // Monitor for removal
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.removedNodes.forEach((node) => {
+        if (node.id === 'transmission-overlay-root') {
+          console.log('🔴 OVERLAY WAS REMOVED! Stack trace:');
+          console.trace();
+        }
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true });
   
   // Close handlers
   const closeOverlay = (e) => {
+    console.log('🟡 closeOverlay called by:', e.target);
     e.preventDefault();
     e.stopPropagation();
+    observer.disconnect();
     root.remove();
     document.body.style.overflow = '';
   };
@@ -47,6 +68,7 @@ const showOverlay = (content) => {
     
     if (backdrop) backdrop.addEventListener('click', closeOverlay);
     if (closeBtn) closeBtn.addEventListener('click', closeOverlay);
+    console.log('🟢 Event listeners attached');
   }, 0);
 };
 
