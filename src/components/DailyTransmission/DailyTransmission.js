@@ -16,17 +16,16 @@ const showOverlay = (content) => {
   // Create overlay container
   const root = document.createElement('div');
   root.id = 'transmission-overlay-root';
+  root.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;';
   root.innerHTML = `
-    <div class="transmission-portal">
-      <div class="transmission-overlay"></div>
-      <div class="daily-transmission expanded">
-        <div class="transmission-header">
-          <span class="transmission-icon">✦</span>
-          <span class="transmission-label">Daily Transmission</span>
-          <button class="transmission-close-btn" aria-label="Close">×</button>
-        </div>
-        <p class="transmission-text">${content}</p>
+    <div class="trans-modal-backdrop" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;"></div>
+    <div class="trans-modal-card" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100vw - 40px);max-width:400px;background:#0a0a0a;border:1px solid rgba(255,221,0,0.15);border-radius:16px;padding:20px;z-index:100000;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
+        <span style="font-size:0.625rem;color:#ffdd00;opacity:0.7;">✦</span>
+        <span style="font-size:0.5625rem;font-weight:600;color:rgba(255,221,0,0.5);letter-spacing:0.1em;text-transform:uppercase;flex:1;">Daily Transmission</span>
+        <button id="trans-close-btn" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.5rem;cursor:pointer;padding:0;line-height:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
+      <p style="font-size:0.9375rem;color:rgba(255,255,255,0.65);line-height:1.65;margin:0;">${content}</p>
     </div>
   `;
   
@@ -34,16 +33,21 @@ const showOverlay = (content) => {
   document.body.style.overflow = 'hidden';
   
   // Close handlers
-  const closeOverlay = () => {
+  const closeOverlay = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     root.remove();
     document.body.style.overflow = '';
   };
   
-  root.querySelector('.transmission-overlay').addEventListener('click', closeOverlay);
-  root.querySelector('.transmission-close-btn').addEventListener('click', closeOverlay);
-  root.querySelector('.daily-transmission.expanded').addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
+  // Use setTimeout to ensure elements exist before attaching listeners
+  setTimeout(() => {
+    const backdrop = root.querySelector('.trans-modal-backdrop');
+    const closeBtn = root.querySelector('#trans-close-btn');
+    
+    if (backdrop) backdrop.addEventListener('click', closeOverlay);
+    if (closeBtn) closeBtn.addEventListener('click', closeOverlay);
+  }, 0);
 };
 
 const DailyTransmission = ({ userData, isPatternAlertShowing }) => {
