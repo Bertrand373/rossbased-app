@@ -9,14 +9,9 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 // Pure DOM overlay - completely outside React
 const showOverlay = (content) => {
-  console.log('🟢 showOverlay called');
-  
   // Remove any existing overlay first
   const existing = document.getElementById('transmission-overlay-root');
-  if (existing) {
-    console.log('🟡 Removing existing overlay');
-    existing.remove();
-  }
+  if (existing) existing.remove();
   
   // Create overlay container
   const root = document.createElement('div');
@@ -35,40 +30,24 @@ const showOverlay = (content) => {
   `;
   
   document.body.appendChild(root);
-  console.log('🟢 Overlay appended to body');
   document.body.style.overflow = 'hidden';
   
-  // Monitor for removal
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.removedNodes.forEach((node) => {
-        if (node.id === 'transmission-overlay-root') {
-          console.log('🔴 OVERLAY WAS REMOVED! Stack trace:');
-          console.trace();
-        }
-      });
-    });
-  });
-  observer.observe(document.body, { childList: true });
-  
-  // Close handlers
+  // Close handler - only runs on valid click events
   const closeOverlay = (e) => {
-    console.log('🟡 closeOverlay called by:', e.target);
+    if (!e || !e.target) return; // Guard against invalid calls
     e.preventDefault();
     e.stopPropagation();
-    observer.disconnect();
     root.remove();
     document.body.style.overflow = '';
   };
   
-  // Use setTimeout to ensure elements exist before attaching listeners
+  // Attach listeners after DOM is ready
   setTimeout(() => {
     const backdrop = root.querySelector('.trans-modal-backdrop');
     const closeBtn = root.querySelector('#trans-close-btn');
     
     if (backdrop) backdrop.addEventListener('click', closeOverlay);
     if (closeBtn) closeBtn.addEventListener('click', closeOverlay);
-    console.log('🟢 Event listeners attached');
   }, 0);
 };
 
