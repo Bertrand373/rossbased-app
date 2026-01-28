@@ -57,8 +57,8 @@
   --transition-normal: 200ms ease;
   
   /* Theme-specific: Logo and icon paths (for JS to read) */
-  --logo-src: url('/trackerapplogo-white.png');
-  --icon-src: '/icon-192.png';
+
+
 }
 
 /* =============================================================================
@@ -88,8 +88,8 @@
   /* Status colors stay the same for accessibility */
   
   /* Theme-specific paths */
-  --logo-src: url('/trackerapplogo-black.png');
-  --icon-src: '/icon-192-black.png';
+
+
 }
 
 /* =============================================================================
