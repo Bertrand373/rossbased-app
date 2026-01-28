@@ -1,9 +1,12 @@
 // App.js - TITANTRACK MODERN MINIMAL
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import './App.css';
-import trackerLogo from './assets/trackerapplogo.png';
+
+// Theme-aware logo imports
+import trackerLogoWhite from './assets/trackerapplogo-white.png';
+import trackerLogoBlack from './assets/trackerapplogo-black.png';
 
 // Tabs
 import Tracker from './components/Tracker/Tracker';
@@ -34,7 +37,58 @@ import { useAutoTrain } from './hooks/useAutoTrain';
 // Mixpanel Analytics
 import { initMixpanel, identifyUser, trackAppOpen, trackPageView, trackLogout, resetMixpanel } from './utils/mixpanel';
 
+// =============================================================================
+// THEME CONTEXT - Manages light/dark theme across the app
+// =============================================================================
+const ThemeContext = createContext();
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};
+
+const ThemeProvider = ({ children }) => {
+  // Initialize from localStorage (matches index.html initialization)
+  const [theme, setThemeState] = useState(() => {
+    return localStorage.getItem('titantrack-theme') || 'dark';
+  });
+
+  // Apply theme to document and update localStorage
+  const setTheme = (newTheme) => {
+    setThemeState(newTheme);
+    localStorage.setItem('titantrack-theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    
+    // Update theme-color meta tag for browser chrome
+    const themeColorMeta = document.getElementById('theme-color-meta');
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute('content', newTheme === 'light' ? '#ffffff' : '#000000');
+    }
+  };
+
+  // Toggle between themes
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  // Sync with document on mount (in case localStorage changed externally)
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, []);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+// =============================================================================
 // AI Chat Header Button - White sparkle in circle (matches profile button)
+// =============================================================================
 const AIChatButton = ({ onClick }) => {
   return (
     <button 
@@ -231,22 +285,12 @@ const MixpanelTracker = ({ isLoggedIn, userData }) => {
 
   // Track page views on route change
   useEffect(() => {
-    if (isLoggedIn && location.pathname !== previousPath.current) {
-      const pageMap = {
-        '/': 'Tracker',
-        '/calendar': 'Calendar',
-        '/stats': 'Stats',
-        '/timeline': 'Timeline',
-        '/urge-toolkit': 'Urge Toolkit',
-        '/profile': 'Profile',
-        '/urge-prediction': 'AI Prediction'
-      };
-      
-      const pageName = pageMap[location.pathname] || location.pathname;
-      trackPageView(pageName);
+    // Only track if path actually changed
+    if (previousPath.current !== location.pathname) {
+      trackPageView(location.pathname);
       previousPath.current = location.pathname;
     }
-  }, [location.pathname, isLoggedIn]);
+  }, [location.pathname]);
 
   return null;
 };
@@ -320,19 +364,69 @@ function App() {
     return success;
   };
 
+  // Get current theme for loading screen icon
+  const currentTheme = localStorage.getItem('titantrack-theme') || 'dark';
+  const loadingIcon = currentTheme === 'light' ? '/icon-192-black.png' : '/icon-192.png';
+
   // Loading screen - icon only, no text
   // Shows until BOTH data is loaded AND minimum display time has passed
   if (isLoading || isRefreshLoading || !minLoadingComplete) {
     return (
       <div className="app-loading-screen">
         <img 
-          src="/icon-192.png" 
+          src={loadingIcon}
           alt="" 
           className="app-loading-icon"
         />
       </div>
     );
   }
+
+  return (
+    <ThemeProvider>
+      <AppContent 
+        isLoggedIn={isLoggedIn}
+        userData={userData}
+        isPremium={isPremium}
+        updateUserData={updateUserData}
+        setGoal={setGoal}
+        cancelGoal={cancelGoal}
+        logout={logout}
+        handleLogin={handleLogin}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        shouldNavigateToTracker={shouldNavigateToTracker}
+        setShouldNavigateToTracker={setShouldNavigateToTracker}
+        showAIChat={showAIChat}
+        setShowAIChat={setShowAIChat}
+        isMobile={isMobile}
+      />
+    </ThemeProvider>
+  );
+}
+
+// Separated to use theme context
+function AppContent({ 
+  isLoggedIn, 
+  userData, 
+  isPremium, 
+  updateUserData, 
+  setGoal, 
+  cancelGoal, 
+  logout, 
+  handleLogin,
+  activeTab,
+  setActiveTab,
+  shouldNavigateToTracker,
+  setShouldNavigateToTracker,
+  showAIChat,
+  setShowAIChat,
+  isMobile
+}) {
+  const { theme } = useTheme();
+  
+  // Theme-aware logo
+  const trackerLogo = theme === 'light' ? trackerLogoBlack : trackerLogoWhite;
 
   return (
     <Router>

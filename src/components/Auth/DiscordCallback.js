@@ -11,6 +11,10 @@ const DiscordCallback = ({ onLogin }) => {
   const [error, setError] = useState('');
   const hasProcessed = useRef(false);
 
+  // Get current theme
+  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const isLight = theme === 'light';
+
   useEffect(() => {
     // Prevent double processing in React StrictMode
     if (hasProcessed.current) return;
@@ -61,13 +65,77 @@ const DiscordCallback = ({ onLogin }) => {
     }
   };
 
+  // Theme-aware styles
+  const styles = {
+    container: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: isLight ? '#ffffff' : '#000000',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999,
+      transition: 'background-color 0.2s ease'
+    },
+    icon: {
+      width: '64px',
+      height: '64px',
+      animation: 'icon-pulse 2s ease-in-out infinite'
+    },
+    errorCard: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      textAlign: 'center',
+      padding: '40px 20px'
+    },
+    errorIcon: {
+      width: '64px',
+      height: '64px',
+      opacity: 0.4,
+      marginBottom: '24px'
+    },
+    errorTitle: {
+      color: isLight ? '#000000' : '#fff',
+      fontSize: '1.125rem',
+      fontWeight: '600',
+      margin: '0 0 12px 0',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+    },
+    errorText: {
+      color: isLight ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+      fontSize: '0.875rem',
+      margin: '0 0 24px 0',
+      lineHeight: '1.5',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+    },
+    button: {
+      padding: '14px 32px',
+      backgroundColor: isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
+      border: `1px solid ${isLight ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.15)'}`,
+      borderRadius: '8px',
+      color: isLight ? '#000000' : '#fff',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      cursor: 'pointer',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+      transition: 'all 0.15s ease'
+    }
+  };
+
+  // Theme-aware icon
+  const iconSrc = isLight ? '/icon-192-black.png' : '/icon-192.png';
+
   // Error state
   if (error) {
     return (
       <div style={styles.container}>
         <div style={styles.errorCard}>
           <img 
-            src="/icon-192.png" 
+            src={iconSrc} 
             alt="" 
             style={styles.errorIcon}
           />
@@ -80,6 +148,7 @@ const DiscordCallback = ({ onLogin }) => {
             Go Back
           </button>
         </div>
+        <style>{keyframes}</style>
       </div>
     );
   }
@@ -88,7 +157,7 @@ const DiscordCallback = ({ onLogin }) => {
   return (
     <div style={styles.container}>
       <img 
-        src="/icon-192.png" 
+        src={iconSrc} 
         alt="" 
         style={styles.icon}
       />
@@ -110,65 +179,5 @@ const keyframes = `
     }
   }
 `;
-
-// Styles matching app-loading-screen exactly
-const styles = {
-  container: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#000000',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999
-  },
-  icon: {
-    width: '64px',
-    height: '64px',
-    animation: 'icon-pulse 2s ease-in-out infinite'
-  },
-  errorCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-    padding: '40px 20px'
-  },
-  errorIcon: {
-    width: '64px',
-    height: '64px',
-    opacity: 0.4,
-    marginBottom: '24px'
-  },
-  errorTitle: {
-    color: '#fff',
-    fontSize: '1.125rem',
-    fontWeight: '600',
-    margin: '0 0 12px 0',
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif"
-  },
-  errorText: {
-    color: 'rgba(255, 255, 255, 0.5)',
-    fontSize: '0.875rem',
-    margin: '0 0 24px 0',
-    lineHeight: '1.5',
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif"
-  },
-  button: {
-    padding: '14px 32px',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-    borderRadius: '8px',
-    color: '#fff',
-    fontSize: '0.875rem',
-    fontWeight: '500',
-    cursor: 'pointer',
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
-    transition: 'all 0.15s ease'
-  }
-};
 
 export default DiscordCallback;

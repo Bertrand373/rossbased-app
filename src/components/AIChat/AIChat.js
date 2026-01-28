@@ -275,6 +275,12 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
     trackAIChatCleared();
   };
 
+  // Get theme-aware loading icon
+  const getLoadingIcon = () => {
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    return theme === 'light' ? '/tt-icon-black.png' : '/tt-icon-white.png';
+  };
+
   // Don't render if not logged in
   if (!isLoggedIn) return null;
 
@@ -341,11 +347,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
               </div>
             )}
 
-            {/* Loading indicator */}
+            {/* Loading indicator - Theme aware */}
             {isLoading && !streamingText && (
               <div className="ai-chat-loading">
                 <img 
-                  src="/tt-icon-white.png" 
+                  src={getLoadingIcon()} 
                   alt="" 
                   className="ai-chat-loading-icon"
                 />

@@ -1,11 +1,12 @@
-/* SpartanLoader.css - Minimal pulsing icon */
+/* SpartanLoader.css - Minimal pulsing icon, theme-aware */
 
 .spartan-loader-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #000000;
+  background-color: var(--background, #000000);
+  transition: background-color 0.2s ease;
 }
 
 .spartan-loader-icon {

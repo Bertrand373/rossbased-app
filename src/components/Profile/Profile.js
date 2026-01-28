@@ -5,6 +5,8 @@ import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
 import { useNotifications } from '../../hooks/useNotifications';
+// Theme context
+import { useTheme } from '../../App';
 
 // Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
@@ -68,6 +70,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   // Debounce timer ref for auto-save
   const saveTimerRef = useRef(null);
+
+  // Theme
+  const { theme, toggleTheme } = useTheme();
 
   // Lock body scroll when any modal is open
   useBodyScrollLock(showFeedbackModal || showDeleteConfirm || showExportModal || showPrivacyModal);
@@ -614,6 +619,24 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 Join
               </a>
             </div>
+
+            {/* Appearance Divider */}
+            <div className="section-divider" />
+
+            {/* Theme Toggle */}
+            <div className="toggle-row">
+              <div className="toggle-text">
+                <span className="toggle-label">Appearance</span>
+                <span className="toggle-desc">{theme === 'dark' ? 'Dark mode' : 'Light mode'}</span>
+              </div>
+              <button 
+                className={`toggle-switch ${theme === 'light' ? 'active' : ''}`}
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+              >
+                <span className="toggle-knob" />
+              </button>
+            </div>
           </div>
         )}
 
@@ -846,7 +869,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
             {/* Brand */}
             <div className="about-brand">
               <img 
-                src="/icon-192.png" 
+                src={theme === 'light' ? '/icon-192-black.png' : '/icon-192.png'} 
                 alt="TitanTrack" 
                 className="about-logo"
               />

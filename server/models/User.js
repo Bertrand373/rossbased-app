@@ -70,6 +70,9 @@ const userSchema = new mongoose.Schema({
   // General
   notes: { type: Object, default: {} },
   
+  // Theme preference
+  theme: { type: String, enum: ['dark', 'light'], default: 'dark' },
+  
   // Notification preferences
   notificationPreferences: {
     type: Object,
