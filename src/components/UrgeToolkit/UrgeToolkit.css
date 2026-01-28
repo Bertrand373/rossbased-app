@@ -1,6 +1,5 @@
 /* UrgeToolkit.css - TITANTRACK ELITE
-   Complete urge management system styling
-   Matches Landing/Stats/Calendar aesthetic */
+   Theme-aware version - uses CSS variables from index.css */
 
 /* =============================================================================
    CONTAINER
@@ -12,7 +11,7 @@
   flex-direction: column;
   align-items: center;
   padding: 48px 24px 120px;
-  background-color: #000000;
+  background-color: var(--background);
   width: 100%;
 }
 
@@ -28,7 +27,6 @@
   max-width: 400px;
 }
 
-/* Modals break out of max-width */
 .urge-toolkit > .ut-modal-overlay {
   max-width: none;
   width: 100%;
@@ -44,7 +42,7 @@
   justify-content: center;
   gap: 12px;
   padding-bottom: 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border-subtle);
   margin-bottom: 40px;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;
@@ -55,7 +53,7 @@
   font-weight: 300;
   font-feature-settings: 'tnum' 1;
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 .ut-phase-info {
@@ -67,12 +65,12 @@
 .ut-phase-name {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .ut-phase-detail {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
 }
 
 /* =============================================================================
@@ -93,7 +91,7 @@
   padding: 8px 16px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
@@ -103,11 +101,11 @@
 }
 
 .ut-step:hover:not(.active):not(:disabled) {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
 }
 
 .ut-step.active {
-  color: #ffffff;
+  color: var(--text);
 }
 
 .ut-step:disabled {
@@ -118,7 +116,7 @@
 .ut-step-divider {
   width: 1px;
   height: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-prominent);
 }
 
 /* =============================================================================
@@ -138,14 +136,14 @@
 .ut-section-title {
   font-size: 1.5rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   margin: 0 0 8px 0;
   letter-spacing: -0.02em;
 }
 
 .ut-section-desc {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   margin: 0;
   min-height: 1.4em;
   transition: all 200ms ease;
@@ -176,7 +174,7 @@
   background: transparent;
   border: none;
   padding: 12px 0;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
@@ -186,7 +184,7 @@
 }
 
 .ut-intensity-btn:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   transform: scale(1.2);
 }
 
@@ -195,9 +193,8 @@
 }
 
 .ut-intensity-btn.selected {
-  color: #ffffff;
+  color: var(--text);
   transform: scale(1.4);
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
 .ut-intensity-num {
@@ -208,7 +205,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   padding: 0 4px;
@@ -233,17 +230,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ut-protocol:hover {
-  opacity: 0.8;
-}
+.ut-protocol:hover { opacity: 0.8; }
 
-.ut-protocol.active .ut-protocol-name {
-  color: #ffffff;
-}
-
-.ut-protocol.active .ut-protocol-desc {
-  color: rgba(255, 255, 255, 0.5);
-}
+.ut-protocol.active .ut-protocol-name { color: var(--text); }
+.ut-protocol.active .ut-protocol-desc { color: var(--text-secondary); }
 
 .ut-protocol-main {
   display: flex;
@@ -255,7 +245,7 @@
 .ut-protocol-name {
   font-size: 1rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   transition: color 150ms ease;
 }
 
@@ -268,8 +258,8 @@
 .ut-protocol-rec {
   font-size: 0.625rem;
   font-weight: 600;
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  background: var(--surface-overlay);
   padding: 4px 8px;
   border-radius: 4px;
   text-transform: uppercase;
@@ -278,12 +268,12 @@
 
 .ut-protocol-duration {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
 }
 
 .ut-protocol-desc {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.4;
   transition: color 150ms ease;
@@ -291,7 +281,7 @@
 
 .ut-protocol-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--border-subtle);
 }
 
 /* =============================================================================
@@ -309,20 +299,20 @@
   flex-direction: column;
   gap: 6px;
   padding: 24px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
   text-align: center;
 }
 
 .ut-breathing-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .ut-breathing-desc {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 .ut-breathing-modes {
@@ -336,7 +326,7 @@
   padding: 8px 20px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
@@ -345,18 +335,13 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ut-mode-btn:hover {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.ut-mode-btn.active {
-  color: #ffffff;
-}
+.ut-mode-btn:hover { color: var(--text-secondary); }
+.ut-mode-btn.active { color: var(--text); }
 
 .ut-mode-divider {
   width: 1px;
   height: 14px;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--border-prominent);
 }
 
 /* =============================================================================
@@ -370,7 +355,7 @@
 .ut-steps-header {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 20px;
@@ -388,17 +373,15 @@
   align-items: flex-start;
   gap: 16px;
   padding: 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.ut-step-item:last-child {
-  border-bottom: none;
-}
+.ut-step-item:last-child { border-bottom: none; }
 
 .ut-step-num {
   font-size: 0.75rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   font-feature-settings: 'tnum' 1;
   flex-shrink: 0;
   width: 20px;
@@ -406,7 +389,7 @@
 
 .ut-step-text {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
@@ -421,7 +404,7 @@
 .ut-tools-label {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 16px;
@@ -440,13 +423,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ut-interactive-tool:hover {
-  opacity: 0.7;
-}
-
-.ut-interactive-tool:hover .ut-tool-arrow {
-  transform: translateX(4px);
-}
+.ut-interactive-tool:hover { opacity: 0.7; }
+.ut-interactive-tool:hover .ut-tool-arrow { transform: translateX(4px); }
 
 .ut-tool-info {
   display: flex;
@@ -458,23 +436,23 @@
 .ut-tool-name {
   font-size: 1rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .ut-tool-desc {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 .ut-tool-arrow {
   font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   transition: transform 150ms ease;
 }
 
 .ut-tool-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--border-subtle);
 }
 
 /* =============================================================================
@@ -484,7 +462,7 @@
 .ut-quick-actions {
   margin-bottom: 40px;
   padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .ut-quick-list {
@@ -500,14 +478,14 @@
 }
 
 .ut-quick-bullet {
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   font-size: 0.75rem;
   line-height: 1.6;
 }
 
 .ut-quick-text {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
@@ -522,7 +500,7 @@
 .ut-triggers-label {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 16px;
@@ -542,7 +520,7 @@
   padding: 14px 0;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
@@ -552,22 +530,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ut-trigger:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.ut-trigger.selected {
-  color: #ffffff;
-}
+.ut-trigger:hover { color: var(--text); }
+.ut-trigger.selected { color: var(--text); }
 
 .ut-trigger-check {
   font-size: 0.875rem;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .ut-trigger-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--border-subtle);
 }
 
 /* =============================================================================
@@ -580,8 +553,8 @@
   gap: 0;
   margin-bottom: 32px;
   padding: 20px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .ut-stat {
@@ -592,18 +565,18 @@
 }
 
 .ut-stat:not(:last-child) {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .ut-stat-label {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
 }
 
 .ut-stat-value {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
   font-feature-settings: 'tnum' 1;
 }
 
@@ -620,10 +593,10 @@
 .ut-btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background: #ffffff;
+  background: var(--text);
   border: none;
   border-radius: 12px;
-  color: #000000;
+  color: var(--background);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -632,13 +605,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ut-btn-primary:hover {
-  opacity: 0.9;
-}
-
-.ut-btn-primary:active {
-  transform: scale(0.98);
-}
+.ut-btn-primary:hover { opacity: 0.9; }
+.ut-btn-primary:active { transform: scale(0.98); }
 
 .ut-btn-ghost {
   width: 100%;
@@ -646,7 +614,7 @@
   background: transparent;
   border: none;
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
@@ -655,9 +623,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ut-btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
+.ut-btn-ghost:hover { color: var(--text); }
 
 .ut-btn-stop {
   width: 100%;
@@ -674,12 +640,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ut-btn-stop:hover {
-  background: rgba(255, 59, 48, 0.25);
-}
+.ut-btn-stop:hover { background: rgba(255, 59, 48, 0.25); }
 
 /* =============================================================================
-   MODAL OVERLAY - Shared for all modals
+   MODAL OVERLAY
    ============================================================================= */
 
 .ut-modal-overlay {
@@ -688,7 +652,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: var(--overlay-bg);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
@@ -701,9 +665,7 @@
 }
 
 @media (min-width: 768px) {
-  .ut-modal-overlay {
-    padding: 48px;
-  }
+  .ut-modal-overlay { padding: 48px; }
 }
 
 @keyframes modalOverlayIn {
@@ -723,35 +685,25 @@
 }
 
 @media (min-width: 768px) {
-  .ut-modal {
-    max-height: calc(100vh - 96px);
-  }
+  .ut-modal { max-height: calc(100vh - 96px); }
 }
 
 @keyframes modalSlideIn {
-  from { 
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* =============================================================================
    MODAL HEADER
    ============================================================================= */
 
-.ut-modal-header {
-  text-align: center;
-}
+.ut-modal-header { text-align: center; }
 
 .ut-modal-title {
   display: block;
   font-size: 1.375rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   margin-bottom: 8px;
   letter-spacing: -0.02em;
 }
@@ -759,7 +711,7 @@
 .ut-modal-subtitle {
   display: block;
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 /* =============================================================================
@@ -784,26 +736,26 @@
 .ut-modal-phase {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
 
 .ut-modal-cycle {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 .ut-modal-timer {
   font-size: 3rem;
   font-weight: 300;
-  color: #ffffff;
+  color: var(--text);
   font-feature-settings: 'tnum' 1;
   line-height: 1;
 }
 
 /* =============================================================================
-   MODAL FOOTER - Stacked buttons (ghost top, primary bottom)
+   MODAL FOOTER
    ============================================================================= */
 
 .ut-modal-footer {
@@ -830,7 +782,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
 }
 
 .ut-breathing-circle::before {
@@ -838,17 +790,15 @@
   position: absolute;
   inset: -1px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.02) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--surface-overlay) 0%, transparent 70%);
 }
 
 .ut-breathing-orb {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6));
-  box-shadow: 
-    0 0 30px rgba(255, 255, 255, 0.3),
-    0 0 60px rgba(255, 255, 255, 0.1);
+  background: radial-gradient(circle at 30% 30%, var(--text), var(--text-secondary));
+  box-shadow: 0 0 30px var(--surface-overlay), 0 0 60px var(--border);
   transition: transform 0.3s ease;
 }
 
@@ -880,178 +830,13 @@
 }
 
 @keyframes holdPulse {
-  0%, 100% { 
-    transform: scale(1.8);
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(255, 255, 255, 0.1);
-  }
-  50% { 
-    transform: scale(1.85);
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.4), 0 0 80px rgba(255, 255, 255, 0.15);
-  }
+  0%, 100% { transform: scale(1.8); }
+  50% { transform: scale(1.85); }
 }
 
 @keyframes rapidBreath {
   0%, 100% { transform: scale(1.3); }
   50% { transform: scale(1.5); }
-}
-
-/* =============================================================================
-   MICROCOSMIC ORBIT MODAL - Abstract Energy Circuit
-   ============================================================================= */
-
-.ut-orbit-modal {
-  max-width: 400px;
-}
-
-.ut-orbit-modal .ut-modal-body {
-  gap: 24px;
-}
-
-.ut-orbit-visual {
-  width: 100%;
-  max-width: 320px;
-  height: 320px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-}
-
-.ut-orbit-figure {
-  width: 100%;
-  height: 100%;
-}
-
-/* Circuit path */
-.ut-circuit-path {
-  opacity: 0.6;
-}
-
-/* Direction arrows */
-.ut-circuit-direction {
-  font-size: 14px;
-  fill: rgba(255, 255, 255, 0.15);
-  font-weight: 300;
-}
-
-/* Channel labels (FRONT / BACK) */
-.ut-circuit-channel {
-  font-size: 9px;
-  font-weight: 600;
-  fill: rgba(255, 255, 255, 0.25);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.ut-circuit-channel-sub {
-  font-size: 8px;
-  font-weight: 400;
-  fill: rgba(255, 255, 255, 0.15);
-  letter-spacing: 0.05em;
-}
-
-/* Energy point markers */
-.ut-circuit-point {
-  fill: rgba(255, 255, 255, 0.2);
-  transition: all 400ms ease;
-}
-
-.ut-circuit-point.passed {
-  fill: rgba(255, 255, 255, 0.45);
-}
-
-.ut-circuit-point.active {
-  fill: #ffffff;
-}
-
-/* Point labels */
-.ut-circuit-label {
-  font-size: 9px;
-  font-weight: 500;
-  fill: rgba(255, 255, 255, 0.25);
-  letter-spacing: 0.08em;
-  transition: all 400ms ease;
-}
-
-.ut-circuit-label.passed {
-  fill: rgba(255, 255, 255, 0.5);
-}
-
-.ut-circuit-label.active {
-  fill: rgba(255, 255, 255, 0.95);
-  font-weight: 600;
-}
-
-/* Glow effects for active point */
-.ut-circuit-glow-outer {
-  fill: rgba(255, 255, 255, 0.05);
-  animation: circuitPulseOuter 2.5s ease-in-out infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-
-.ut-circuit-glow-inner {
-  fill: rgba(255, 255, 255, 0.1);
-  animation: circuitPulseInner 2.5s ease-in-out infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-
-@keyframes circuitPulseOuter {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.15);
-  }
-}
-
-@keyframes circuitPulseInner {
-  0%, 100% {
-    opacity: 0.5;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.1);
-  }
-}
-
-.ut-orbit-instruction {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
-  max-width: 280px;
-  line-height: 1.5;
-}
-
-/* Mobile adjustments */
-@media (max-width: 480px) {
-  .ut-orbit-modal {
-    gap: 32px;
-  }
-  
-  .ut-orbit-modal .ut-modal-body {
-    gap: 20px;
-  }
-  
-  .ut-orbit-visual {
-    height: 300px;
-  }
-  
-  .ut-circuit-label {
-    font-size: 8px;
-  }
-  
-  .ut-circuit-channel {
-    font-size: 8px;
-  }
-  
-  .ut-circuit-channel-sub {
-    font-size: 7px;
-  }
 }
 
 /* =============================================================================
@@ -1073,18 +858,17 @@
   justify-content: center;
   font-size: 1rem;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.3);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
   transition: all 300ms ease;
 }
 
 .ut-grounding-dot.active {
-  background: #ffffff;
-  border-color: #ffffff;
-  color: #000000;
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--background);
   transform: scale(1.15);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 .ut-grounding-dot.complete {
@@ -1095,7 +879,7 @@
 
 .ut-grounding-label {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
 }
 
 /* =============================================================================
@@ -1120,13 +904,13 @@
 
 .ut-cold-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
+  stroke: var(--border);
   stroke-width: 3;
 }
 
 .ut-cold-fill {
   fill: none;
-  stroke: #ffffff;
+  stroke: var(--text);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-dasharray: 283;
@@ -1137,13 +921,13 @@
 .ut-cold-time {
   font-size: 2.5rem;
   font-weight: 300;
-  color: #ffffff;
+  color: var(--text);
   font-feature-settings: 'tnum' 1;
 }
 
 .ut-cold-message {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
 }
 
 /* =============================================================================
@@ -1151,14 +935,8 @@
    ============================================================================= */
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* =============================================================================
@@ -1166,62 +944,20 @@
    ============================================================================= */
 
 @media (max-width: 480px) {
-  .urge-toolkit {
-    padding: 32px 20px 120px;
-  }
-  
-  .ut-phase {
-    padding-bottom: 24px;
-    margin-bottom: 32px;
-  }
-  
-  .ut-steps {
-    margin-bottom: 36px;
-  }
-  
-  .ut-step {
-    padding: 8px 12px;
-    font-size: 0.8125rem;
-  }
-  
-  .ut-section-title {
-    font-size: 1.375rem;
-  }
-  
-  .ut-intensity-btn {
-    max-width: 32px;
-    font-size: 0.8125rem;
-  }
-  
-  .ut-modal {
-    gap: 40px;
-  }
-  
-  .ut-modal-title {
-    font-size: 1.25rem;
-  }
-  
-  .ut-breathing-circle {
-    width: 160px;
-    height: 160px;
-  }
-  
-  .ut-breathing-orb {
-    width: 44px;
-    height: 44px;
-  }
+  .urge-toolkit { padding: 32px 20px 120px; }
+  .ut-phase { padding-bottom: 24px; margin-bottom: 32px; }
+  .ut-steps { margin-bottom: 36px; }
+  .ut-step { padding: 8px 12px; font-size: 0.8125rem; }
+  .ut-section-title { font-size: 1.375rem; }
+  .ut-intensity-btn { max-width: 32px; font-size: 0.8125rem; }
+  .ut-modal { gap: 40px; }
+  .ut-modal-title { font-size: 1.25rem; }
+  .ut-breathing-circle { width: 160px; height: 160px; }
+  .ut-breathing-orb { width: 44px; height: 44px; }
 }
 
 @media (min-width: 1024px) {
-  .ut-section-title {
-    font-size: 1.625rem;
-  }
-  
-  .ut-modal-title {
-    font-size: 1.5rem;
-  }
-  
-  .ut-modal-timer {
-    font-size: 3.5rem;
-  }
+  .ut-section-title { font-size: 1.625rem; }
+  .ut-modal-title { font-size: 1.5rem; }
+  .ut-modal-timer { font-size: 3.5rem; }
 }

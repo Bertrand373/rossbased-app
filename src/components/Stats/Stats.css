@@ -1,7 +1,6 @@
 /* =============================================================================
    STATS.CSS - TITANTRACK
-   Matches Landing page minimalism + Tracker confident aesthetic
-   Pure black, white accents, no boxes, floating content
+   Theme-aware version - uses CSS variables from index.css
    ============================================================================= */
 
 /* =============================================================================
@@ -15,12 +14,11 @@
   flex-direction: column;
   align-items: center;
   padding: 48px 24px 120px;
-  background-color: #000000;
+  background-color: var(--background);
   position: relative;
   overflow-x: hidden;
 }
 
-/* Subtle radial gradient - matches Landing page */
 .stats-page::before {
   content: '';
   position: absolute;
@@ -30,8 +28,8 @@
   left: 50%;
   transform: translateX(-50%);
   background: 
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255, 255, 255, 0.015) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--surface-overlay) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, var(--surface-overlay) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -42,7 +40,6 @@
   z-index: 1;
 }
 
-/* Overlay must break out of max-width constraint */
 .stats-page > .overlay {
   max-width: none;
   width: 100%;
@@ -50,25 +47,14 @@
 }
 
 @media (min-width: 1025px) {
-  .stats-page {
-    padding: 56px 24px 80px;
-  }
-  
-  .stats-page > * {
-    max-width: 520px;
-  }
-  
-  .stats-page > .overlay {
-    max-width: none;
-  }
-  
-  .stat-grid {
-    max-width: 520px;
-  }
+  .stats-page { padding: 56px 24px 80px; }
+  .stats-page > * { max-width: 520px; }
+  .stats-page > .overlay { max-width: none; }
+  .stat-grid { max-width: 520px; }
 }
 
 /* =============================================================================
-   STAT CARDS - Visual hierarchy: primary (hero) and secondary (subdued)
+   STAT CARDS
    ============================================================================= */
 
 .stat-grid {
@@ -90,7 +76,7 @@
   justify-content: center;
   gap: 40px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .stat-card {
@@ -106,19 +92,13 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.stat-card:hover {
-  opacity: 0.7;
-}
+.stat-card:hover { opacity: 0.7; }
+.stat-card:active { opacity: 0.5; }
 
-.stat-card:active {
-  opacity: 0.5;
-}
-
-/* Primary stats - large, prominent */
 .stat-card-primary .stat-num {
   font-size: 3.5rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   line-height: 1;
   letter-spacing: -0.03em;
   font-feature-settings: 'tnum' 1;
@@ -127,15 +107,14 @@
 .stat-card-primary .stat-label {
   font-size: 0.6875rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   letter-spacing: 0.02em;
 }
 
-/* Secondary stats - smaller, muted */
 .stat-card-secondary .stat-num {
   font-size: 1.5rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   line-height: 1;
   letter-spacing: -0.02em;
   font-feature-settings: 'tnum' 1;
@@ -144,46 +123,29 @@
 .stat-card-secondary .stat-label {
   font-size: 0.625rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   letter-spacing: 0.02em;
 }
 
-/* Dividers - hidden (kept for DOM compatibility) */
-.stat-divider {
-  display: none;
-}
+.stat-divider { display: none; }
 
-/* Desktop: larger primary stats */
 @media (min-width: 768px) {
-  .stat-row-primary {
-    gap: 64px;
-  }
-  
-  .stat-row-secondary {
-    gap: 56px;
-  }
-  
-  .stat-card-primary .stat-num {
-    font-size: 4rem;
-  }
-  
-  .stat-card-secondary .stat-num {
-    font-size: 1.75rem;
-  }
+  .stat-row-primary { gap: 64px; }
+  .stat-row-secondary { gap: 56px; }
+  .stat-card-primary .stat-num { font-size: 4rem; }
+  .stat-card-secondary .stat-num { font-size: 1.75rem; }
 }
 
 /* =============================================================================
-   SECTIONS - Minimal headers
+   SECTIONS
    ============================================================================= */
 
-.stats-section {
-  margin-bottom: 48px;
-}
+.stats-section { margin-bottom: 48px; }
 
 .stats-section h2 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   margin: 0 0 20px 0;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -191,7 +153,7 @@
 }
 
 /* =============================================================================
-   MILESTONES - Minimal grid
+   MILESTONES
    ============================================================================= */
 
 .milestone-grid {
@@ -202,7 +164,7 @@
 
 .milestone-card {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   padding: 20px 8px;
   text-align: center;
@@ -218,15 +180,14 @@
 }
 
 .milestone-card:not(:disabled):hover {
-  background-color: rgba(255, 255, 255, 0.02);
-  border-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--surface-overlay);
+  border-color: var(--border);
 }
 
 .milestone-card:not(:disabled):active {
   transform: scale(0.98);
 }
 
-/* Earned milestone */
 .milestone-card.earned {
   background: rgba(255, 221, 0, 0.02);
   border-color: rgba(255, 221, 0, 0.1);
@@ -237,7 +198,6 @@
   border-color: rgba(255, 221, 0, 0.15);
 }
 
-/* Checkmark for earned */
 .milestone-card.earned::after {
   content: '✓';
   position: absolute;
@@ -252,19 +212,17 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   line-height: 1;
   font-feature-settings: 'tnum' 1;
 }
 
-.milestone-card.earned .milestone-num {
-  color: #ffffff;
-}
+.milestone-card.earned .milestone-num { color: var(--text); }
 
 .milestone-label {
   display: block;
   font-size: 0.5625rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   margin-top: 8px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -276,13 +234,9 @@
 }
 
 /* =============================================================================
-   BENEFIT TRACKER - Toggle Pattern (matches Calendar/EmotionalTimeline)
-   UPDATED: Single row on desktop, wraps to 2 rows on mobile
-   FIX: Scoped to .stats-page to avoid Profile.css .toggle-row conflict
+   BENEFIT TRACKER - Toggle Pattern
    ============================================================================= */
 
-/* Toggle Row - Text-only buttons with vertical dividers */
-/* IMPORTANT: Scoped to .stats-page to override Profile.css .toggle-row */
 .stats-page .toggle-row {
   display: flex;
   justify-content: center;
@@ -294,19 +248,9 @@
   border-bottom: none;
 }
 
-/* Benefits row - single row on desktop, wraps on mobile */
-.stats-page .toggle-row.benefits-row {
-  margin-bottom: 12px;
-}
+.stats-page .toggle-row.benefits-row { margin-bottom: 12px; }
+.stats-page .toggle-row.time-range { margin-top: 0; margin-bottom: 12px; }
 
-/* Time range - SAME styling as benefits, no max-width constraint */
-.stats-page .toggle-row.time-range {
-  margin-top: 0;
-  margin-bottom: 12px;
-}
-
-/* Toggle buttons - MATCHES EmotionalTimeline exactly */
-/* Scoped to .stats-page to avoid conflicts */
 .stats-page .toggle-btn {
   background: transparent;
   border: none;
@@ -316,28 +260,22 @@
   font-family: inherit;
   cursor: pointer;
   transition: color 150ms ease;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 }
 
-.stats-page .toggle-btn:hover:not(.active) {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.stats-page .toggle-btn.active {
-  color: #ffffff;
-  font-weight: 600;
-}
+.stats-page .toggle-btn:hover:not(.active) { color: var(--text-secondary); }
+.stats-page .toggle-btn.active { color: var(--text); font-weight: 600; }
 
 .stats-page .toggle-divider {
   width: 1px;
   height: 16px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--border-prominent);
   flex-shrink: 0;
 }
 
-/* Average Display - Hero number like Tracker */
+/* Average Display */
 .average-block {
   text-align: center;
   margin: 32px 0 8px 0;
@@ -347,34 +285,34 @@
 .average-num {
   font-size: 6rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   letter-spacing: -0.04em;
   font-feature-settings: 'tnum' 1;
 }
 
 .average-suffix {
   font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   font-weight: 400;
   margin-left: 2px;
 }
 
 .average-label {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   margin: 8px 0 32px 0;
   text-align: center;
   letter-spacing: 0.02em;
 }
 
 /* =============================================================================
-   CHART - Clean, minimal
+   CHART
    ============================================================================= */
 
 .chart-box {
   position: relative;
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
   border-radius: 16px;
   padding: 28px 12px 12px 8px;
   margin-bottom: 32px;
@@ -392,25 +330,22 @@
   justify-content: center;
   height: 100%;
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   margin: 0;
 }
 
 @media (min-width: 768px) {
-  .chart-box {
-    height: 240px;
-    padding: 24px 20px 16px 20px;
-  }
+  .chart-box { height: 240px; padding: 24px 20px 16px 20px; }
 }
 
 /* =============================================================================
-   FREE USER SECTION - Minimal, flowing
+   FREE USER SECTION
    ============================================================================= */
 
 .free-section {
   margin-top: 40px;
   padding-top: 40px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .free-card {
@@ -421,7 +356,7 @@
 .free-card h3 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0 0 16px 0;
@@ -429,7 +364,7 @@
 
 .free-card p {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-secondary);
   line-height: 1.7;
   margin: 0;
 }
@@ -440,19 +375,19 @@
   border: none;
   border-radius: 0;
   background: transparent;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
   margin-top: 32px;
 }
 
 .upgrade-card p {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   margin: 0 0 28px 0;
   line-height: 1.6;
 }
 
 /* =============================================================================
-   ANALYTICS STACK (Premium) - Flowing content with dividers
+   ANALYTICS STACK (Premium)
    ============================================================================= */
 
 .analytics-stack {
@@ -461,11 +396,11 @@
   gap: 0;
   margin-top: 40px;
   padding-top: 40px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
 }
 
 /* =============================================================================
-   INSIGHT SECTIONS - No containers, Landing page style
+   INSIGHT SECTIONS
    ============================================================================= */
 
 .insight-card {
@@ -474,7 +409,7 @@
   border-radius: 0;
   padding-bottom: 32px;
   margin-bottom: 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .insight-card:last-child {
@@ -492,14 +427,12 @@
 .insight-card-header span {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
-.insight-card-content {
-  padding: 0;
-}
+.insight-card-content { padding: 0; }
 
 /* Loading spinner */
 .insight-loading {
@@ -511,8 +444,8 @@
 .insight-loading-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.06);
-  border-top-color: rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--border-subtle);
+  border-top-color: var(--text-muted);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -529,19 +462,19 @@
 
 .insight-empty-title {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   margin: 0 0 8px 0;
   font-weight: 500;
 }
 
 .insight-empty-text {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.6;
 }
 
-/* Mini info banner - subtle inline */
+/* Mini info banner */
 .mini-info-banner {
   background: transparent;
   border-radius: 0;
@@ -551,14 +484,14 @@
 
 .mini-info-banner p {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
   text-align: center;
 }
 
 /* =============================================================================
-   PROGRESS TRENDS - Minimal, flowing
+   PROGRESS TRENDS
    ============================================================================= */
 
 .progress-trends-display {
@@ -569,7 +502,7 @@
 
 .trend-item {
   padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .trend-item:last-child {
@@ -586,20 +519,20 @@
 .trend-label {
   font-size: 0.625rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .trend-text {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-secondary);
   line-height: 1.7;
   margin: 0;
 }
 
 .trend-text strong {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -622,25 +555,25 @@
 
 .relapse-stat-label {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 .relapse-stat-value {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
   text-transform: capitalize;
 }
 
 .relapse-insight {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-secondary);
   line-height: 1.7;
   margin: 0;
 }
 
 .relapse-insight strong {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -653,7 +586,7 @@
 .victory-days {
   font-size: 4rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   line-height: 1;
   margin-bottom: 8px;
   font-feature-settings: 'tnum' 1;
@@ -661,7 +594,7 @@
 
 .victory-label {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 24px;
@@ -669,13 +602,13 @@
 
 .victory-message {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   line-height: 1.7;
   margin: 0;
 }
 
 /* =============================================================================
-   PATTERN RECOGNITION - Minimal bullets
+   PATTERN RECOGNITION
    ============================================================================= */
 
 .patterns-display {
@@ -686,19 +619,17 @@
 
 .pattern-item {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-secondary);
   line-height: 1.7;
   padding-left: 0;
   position: relative;
   margin: 0;
 }
 
-.pattern-item::before {
-  display: none;
-}
+.pattern-item::before { display: none; }
 
 .pattern-item strong {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -716,13 +647,13 @@
   background: transparent;
   border-radius: 0;
   padding: 0 0 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .optimization-criteria-title {
   font-size: 0.625rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 10px;
@@ -730,7 +661,7 @@
 
 .optimization-criteria-text {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
 }
@@ -743,24 +674,22 @@
 
 .optimization-item {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-secondary);
   line-height: 1.7;
   padding-left: 0;
   position: relative;
   margin: 0;
 }
 
-.optimization-item::before {
-  display: none;
-}
+.optimization-item::before { display: none; }
 
 .optimization-item strong {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text);
   font-weight: 500;
 }
 
 /* =============================================================================
-   PHASE EVOLUTION - Minimal grid
+   PHASE EVOLUTION
    ============================================================================= */
 
 .phase-evolution-grid {
@@ -778,49 +707,45 @@
   text-align: center;
 }
 
-.phase-evolution-card.current .phase-value {
-  color: #ffffff;
-}
+.phase-evolution-card.current .phase-value { color: var(--text); }
 
 .phase-name {
   font-size: 0.5625rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 8px;
 }
 
-.phase-evolution-card.current .phase-name {
-  color: rgba(255, 255, 255, 0.5);
-}
+.phase-evolution-card.current .phase-name { color: var(--text-secondary); }
 
 .phase-value {
   font-size: 1.5rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
 .phase-range {
   font-size: 0.5625rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
 }
 
 .phase-evolution-insight {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-secondary);
   line-height: 1.7;
   margin: 0;
 }
 
 .phase-evolution-insight strong {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text);
   font-weight: 500;
 }
 
 /* =============================================================================
-   RESET MENU - Text-only with dividers (matches toggle pattern)
+   RESET MENU
    ============================================================================= */
 
 .reset-menu {
@@ -830,12 +755,12 @@
   gap: 0;
   margin-top: 56px;
   padding-top: 40px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .reset-label {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   margin-right: 4px;
 }
 
@@ -848,36 +773,31 @@
   font-family: inherit;
   cursor: pointer;
   transition: color 150ms ease;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   -webkit-tap-highlight-color: transparent;
 }
 
-.reset-btn:hover {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.reset-btn.danger:hover {
-  color: #ff3b30;
-}
+.reset-btn:hover { color: var(--text-secondary); }
+.reset-btn.danger:hover { color: #ff3b30; }
 
 .reset-divider {
   width: 1px;
   height: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--border-prominent);
   flex-shrink: 0;
 }
 
 /* =============================================================================
-   BUTTONS - Match Tracker exactly
+   BUTTONS
    ============================================================================= */
 
-.btn-primary {
+.stats-page .btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background-color: #ffffff;
+  background-color: var(--text);
   border: none;
   border-radius: 12px;
-  color: #000000;
+  color: var(--background);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -885,21 +805,16 @@
   transition: opacity 150ms ease, transform 150ms ease;
 }
 
-.btn-primary:hover {
-  opacity: 0.9;
-}
+.stats-page .btn-primary:hover { opacity: 0.9; }
+.stats-page .btn-primary:active { transform: scale(0.98); }
 
-.btn-primary:active {
-  transform: scale(0.98);
-}
-
-.btn-ghost {
+.stats-page .btn-ghost {
   width: 100%;
   padding: 16px 24px;
   background: transparent;
   border: none;
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -907,11 +822,9 @@
   transition: color 150ms ease;
 }
 
-.btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
+.stats-page .btn-ghost:hover { color: var(--text); }
 
-.btn-danger {
+.stats-page .btn-danger {
   width: 100%;
   padding: 16px 24px;
   background: rgba(255, 59, 48, 0.15) !important;
@@ -926,25 +839,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-danger:hover {
-  background: rgba(255, 59, 48, 0.25) !important;
-}
-
-.btn-danger:active {
-  transform: scale(0.98);
-}
+.stats-page .btn-danger:hover { background: rgba(255, 59, 48, 0.25) !important; }
+.stats-page .btn-danger:active { transform: scale(0.98); }
 
 /* =============================================================================
-   OVERLAY & MODAL - Transparent floating like Tracker
+   OVERLAY & MODAL
    ============================================================================= */
 
-.overlay {
+.stats-page .overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: var(--overlay-bg);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
@@ -957,9 +865,8 @@
   animation: overlayIn 200ms ease;
 }
 
-/* Spacers push content to center */
-.overlay::before,
-.overlay::after {
+.stats-page .overlay::before,
+.stats-page .overlay::after {
   content: '';
   flex: 1;
   min-height: 40px;
@@ -970,8 +877,7 @@
   to { opacity: 1; }
 }
 
-/* Modal - Transparent floating content like Tracker */
-.modal {
+.stats-page .modal {
   width: 100%;
   max-width: 340px;
   background: transparent;
@@ -982,44 +888,38 @@
 }
 
 @keyframes modalIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(16px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .modal-num {
   display: block;
   font-size: 5rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   line-height: 1;
   letter-spacing: -0.03em;
   margin-bottom: 8px;
   font-feature-settings: 'tnum' 1;
 }
 
-.modal h2 {
+.stats-page .modal h2 {
   font-size: 1.5rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   margin: 0 0 8px 0;
   letter-spacing: -0.02em;
 }
 
 .modal-date {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   margin: 0 0 24px 0;
 }
 
 .modal-text {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0 0 40px 0;
 }
@@ -1045,8 +945,8 @@
 .stat-detail-breakdown {
   margin: 32px 0;
   padding: 20px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .stat-breakdown-item {
@@ -1057,34 +957,26 @@
 
 .stat-breakdown-label {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 .stat-breakdown-value {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   font-feature-settings: 'tnum' 1;
 }
 
 /* =============================================================================
-   ANIMATIONS - Entrance effects matching Landing
+   ANIMATIONS
    ============================================================================= */
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.stat-grid {
-  animation: fadeInUp 500ms ease forwards;
-}
+.stat-grid { animation: fadeInUp 500ms ease forwards; }
 
 .stats-section:nth-of-type(1) {
   animation: fadeInUp 500ms ease 50ms forwards;
@@ -1106,24 +998,12 @@
    ============================================================================= */
 
 @media (max-width: 768px) {
-  .stats-page {
-    padding: 40px 20px 120px;
-  }
-  
-  .average-num {
-    font-size: 5rem;
-  }
-  
-  .modal-num {
-    font-size: 4rem;
-  }
-  
-  .modal h2 {
-    font-size: 1.375rem;
-  }
+  .stats-page { padding: 40px 20px 120px; }
+  .average-num { font-size: 5rem; }
+  .modal-num { font-size: 4rem; }
+  .stats-page .modal h2 { font-size: 1.375rem; }
 }
 
-/* Mobile: Benefits row wraps to 2 rows of 3 */
 @media (max-width: 520px) {
   .stats-page .toggle-row.benefits-row {
     flex-wrap: wrap;
@@ -1134,12 +1014,8 @@
     margin-right: auto;
   }
   
-  /* Hide the divider after Aura (4th divider) - it's at end of row 1 */
-  .stats-page .toggle-row.benefits-row .toggle-divider:nth-of-type(4) {
-    display: none;
-  }
+  .stats-page .toggle-row.benefits-row .toggle-divider:nth-of-type(4) { display: none; }
   
-  /* Time range also gets slight constraint on mobile for visual balance */
   .stats-page .toggle-row.time-range {
     max-width: 280px;
     margin-left: auto;
@@ -1148,232 +1024,64 @@
 }
 
 @media (max-width: 480px) {
-  .stats-page {
-    padding: 32px 16px 100px;
-  }
-  
-  .stat-row-primary {
-    gap: 40px;
-  }
-  
-  .stat-row-secondary {
-    gap: 32px;
-  }
-  
-  .stat-card-primary .stat-num {
-    font-size: 3rem;
-  }
-  
-  .stat-card-secondary .stat-num {
-    font-size: 1.25rem;
-  }
-  
-  .stats-section h2 {
-    font-size: 0.625rem;
-  }
-  
-  .milestone-grid {
-    gap: 6px;
-  }
-  
-  .milestone-card {
-    padding: 16px 6px;
-    border-radius: 10px;
-  }
-  
-  .milestone-num {
-    font-size: 1.25rem;
-  }
-  
-  .milestone-label {
-    font-size: 0.5rem;
-  }
-  
-  /* Toggle buttons - slightly tighter on small screens but proportional */
-  .stats-page .toggle-btn {
-    font-size: 0.8125rem;
-    padding: 8px 12px;
-  }
-  
-  .stats-page .toggle-divider {
-    height: 14px;
-  }
-  
-  .average-num {
-    font-size: 4rem;
-  }
-  
-  .average-suffix {
-    font-size: 1rem;
-  }
-  
-  .average-label {
-    font-size: 0.6875rem;
-  }
-  
-  .chart-box {
-    height: 150px;
-    padding: 16px 8px 8px 4px;
-    border-radius: 12px;
-  }
-  
-  .modal {
-    max-width: 300px;
-  }
-  
-  .modal-num {
-    font-size: 3.5rem;
-  }
-  
-  .modal h2 {
-    font-size: 1.25rem;
-  }
-  
-  .modal-text {
-    font-size: 0.875rem;
-    margin-bottom: 32px;
-  }
-  
-  .modal-buttons .btn-danger,
-  .modal-buttons .btn-ghost {
-    padding: 14px 20px;
-    font-size: 0.875rem;
-  }
-  
-  .btn-primary,
-  .btn-ghost,
-  .btn-danger {
-    padding: 14px 20px;
-    font-size: 0.875rem;
-    border-radius: 10px;
-  }
-  
-  .btn-danger {
-    background: rgba(255, 59, 48, 0.15) !important;
-    color: #ff3b30 !important;
-  }
+  .stats-page { padding: 32px 16px 100px; }
+  .stat-row-primary { gap: 40px; }
+  .stat-row-secondary { gap: 32px; }
+  .stat-card-primary .stat-num { font-size: 3rem; }
+  .stat-card-secondary .stat-num { font-size: 1.25rem; }
+  .stats-section h2 { font-size: 0.625rem; }
+  .milestone-grid { gap: 6px; }
+  .milestone-card { padding: 16px 6px; border-radius: 10px; }
+  .milestone-num { font-size: 1.25rem; }
+  .milestone-label { font-size: 0.5rem; }
+  .stats-page .toggle-btn { font-size: 0.8125rem; padding: 8px 12px; }
+  .stats-page .toggle-divider { height: 14px; }
+  .average-num { font-size: 4rem; }
+  .average-suffix { font-size: 1rem; }
+  .average-label { font-size: 0.6875rem; }
+  .chart-box { height: 150px; padding: 16px 8px 8px 4px; border-radius: 12px; }
+  .stats-page .modal { max-width: 300px; }
+  .modal-num { font-size: 3.5rem; }
+  .stats-page .modal h2 { font-size: 1.25rem; }
+  .modal-text { font-size: 0.875rem; margin-bottom: 32px; }
+  .modal-buttons .btn-danger, .modal-buttons .btn-ghost { padding: 14px 20px; font-size: 0.875rem; }
+  .stats-page .btn-primary, .stats-page .btn-ghost, .stats-page .btn-danger { padding: 14px 20px; font-size: 0.875rem; border-radius: 10px; }
 }
 
-/* Very small screens */
 @media (max-width: 360px) {
-  .stats-page {
-    padding: 28px 12px 90px;
-  }
-  
-  .stat-row-primary {
-    gap: 32px;
-  }
-  
-  .stat-row-secondary {
-    gap: 24px;
-  }
-  
-  .stat-card-primary .stat-num {
-    font-size: 2.5rem;
-  }
-  
-  .stat-card-secondary .stat-num {
-    font-size: 1.125rem;
-  }
-  
-  .milestone-card {
-    padding: 14px 4px;
-  }
-  
-  .milestone-num {
-    font-size: 1.125rem;
-  }
-  
-  .average-num {
-    font-size: 3.5rem;
-  }
-  
-  /* Benefits row on very small screens */
-  .stats-page .toggle-row.benefits-row {
-    max-width: 280px;
-  }
-  
-  .stats-page .toggle-row.time-range {
-    max-width: 240px;
-  }
-  
-  .stats-page .toggle-btn {
-    font-size: 0.75rem;
-    padding: 6px 10px;
-  }
-  
-  .stats-page .toggle-divider {
-    height: 12px;
-  }
+  .stats-page { padding: 28px 12px 90px; }
+  .stat-row-primary { gap: 32px; }
+  .stat-row-secondary { gap: 24px; }
+  .stat-card-primary .stat-num { font-size: 2.5rem; }
+  .stat-card-secondary .stat-num { font-size: 1.125rem; }
+  .milestone-card { padding: 14px 4px; }
+  .milestone-num { font-size: 1.125rem; }
+  .average-num { font-size: 3.5rem; }
+  .stats-page .toggle-row.benefits-row { max-width: 280px; }
+  .stats-page .toggle-row.time-range { max-width: 240px; }
+  .stats-page .toggle-btn { font-size: 0.75rem; padding: 6px 10px; }
+  .stats-page .toggle-divider { height: 12px; }
 }
 
-/* Desktop enhancements */
 @media (min-width: 768px) {
-  /* Center section headers on desktop */
-  .stats-section h2 {
-    text-align: center;
-  }
-  
-  /* All 6 metrics in single row on desktop */
-  .stats-page .toggle-row.benefits-row {
-    flex-wrap: nowrap;
-  }
-  
-  .stats-page .toggle-btn {
-    padding: 8px 16px;
-  }
+  .stats-section h2 { text-align: center; }
+  .stats-page .toggle-row.benefits-row { flex-wrap: nowrap; }
+  .stats-page .toggle-btn { padding: 8px 16px; }
 }
 
 @media (min-width: 1024px) {
-  .stat-card-primary .stat-num {
-    font-size: 4.5rem;
-  }
-  
-  .stat-card-secondary .stat-num {
-    font-size: 2rem;
-  }
-  
-  .milestone-grid {
-    gap: 12px;
-  }
-  
-  .milestone-card {
-    padding: 24px 12px;
-  }
-  
-  .milestone-num {
-    font-size: 1.75rem;
-  }
-  
-  .milestone-label {
-    font-size: 0.625rem;
-  }
-  
-  .average-num {
-    font-size: 7rem;
-  }
-  
-  .average-suffix {
-    font-size: 1.5rem;
-  }
-  
-  .chart-box {
-    height: 280px;
-    border-radius: 20px;
-    padding: 24px 24px 16px 24px;
-  }
-  
-  .modal {
-    max-width: 360px;
-  }
-  
-  .modal-num {
-    font-size: 6rem;
-  }
-  
-  .modal h2 {
-    font-size: 1.625rem;
-  }
+  .stat-card-primary .stat-num { font-size: 4.5rem; }
+  .stat-card-secondary .stat-num { font-size: 2rem; }
+  .milestone-grid { gap: 12px; }
+  .milestone-card { padding: 24px 12px; }
+  .milestone-num { font-size: 1.75rem; }
+  .milestone-label { font-size: 0.625rem; }
+  .average-num { font-size: 7rem; }
+  .average-suffix { font-size: 1.5rem; }
+  .chart-box { height: 280px; border-radius: 20px; padding: 24px 24px 16px 24px; }
+  .stats-page .modal { max-width: 360px; }
+  .modal-num { font-size: 6rem; }
+  .stats-page .modal h2 { font-size: 1.625rem; }
 }
 
 /* =============================================================================
@@ -1381,20 +1089,12 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .stat-grid,
-  .stats-section,
-  .reset-menu,
-  .overlay,
-  .modal,
-  .insight-loading-spinner {
+  .stat-grid, .stats-section, .reset-menu, .stats-page .overlay, .stats-page .modal, .insight-loading-spinner {
     animation: none;
     opacity: 1;
   }
   
-  .stats-page .toggle-btn,
-  .milestone-card,
-  .stat-card,
-  .reset-btn {
+  .stats-page .toggle-btn, .milestone-card, .stat-card, .reset-btn {
     transition: none;
   }
 }

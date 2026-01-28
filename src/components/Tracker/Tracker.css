@@ -1,26 +1,17 @@
 /* Tracker.css - TITANTRACK */
+/* Theme-aware version - uses CSS variables from index.css */
 
 .tracker {
-  /* Fill parent height (set by App.css :has() rules) */
   height: 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* flex-start positions transmission at top */
   justify-content: flex-start;
   padding: 0 24px;
-  /* Top padding to match other tabs + breathing room from header */
   padding-top: 48px;
-  /* Bottom padding: clear mobile nav + AI chat button */
   padding-bottom: 120px;
-  background-color: #000000;
-}
-
-@media (min-width: 1025px) {
-  .tracker {
-    /* Desktop: flex: 1 fills available space */
-  }
+  background-color: var(--background);
 }
 
 /* ============================================================
@@ -32,7 +23,6 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  /* Spacing above (matches gap between header and transmission) */
   margin-top: 24px;
   animation: fadeInUp 500ms ease 50ms forwards;
   opacity: 0;
@@ -41,7 +31,7 @@
 .date {
   font-size: 0.8125rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   margin: 0 0 12px 0;
 }
 
@@ -71,17 +61,17 @@
 }
 
 .streak:hover {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--surface-overlay);
 }
 
 .streak:active {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: var(--border);
 }
 
 .streak-num {
   font-size: 8rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   line-height: 1;
   letter-spacing: -0.04em;
   font-feature-settings: 'tnum' 1;
@@ -90,7 +80,7 @@
 .streak-unit {
   font-size: 0.875rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   margin-top: 4px;
   letter-spacing: 0.15em;
   text-transform: lowercase;
@@ -99,7 +89,7 @@
 .milestone {
   font-size: 0.8125rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   margin: 12px 0 0 0;
 }
 
@@ -108,7 +98,6 @@
    ============================================================ */
 
 .tracker-footer {
-  /* Spacing above - positions button between content and AI chat icon */
   margin-top: 40px;
   padding: 0;
   max-width: 360px;
@@ -118,13 +107,13 @@
   flex-shrink: 0;
 }
 
-.btn-primary {
+.tracker .btn-primary {
   width: 100%;
   padding: 16px 32px;
-  background-color: #ffffff;
+  background-color: var(--text);
   border: none;
   border-radius: 12px;
-  color: #000000;
+  color: var(--background);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -132,21 +121,21 @@
   transition: opacity 150ms ease, transform 150ms ease;
 }
 
-.btn-primary:hover {
+.tracker .btn-primary:hover {
   opacity: 0.9;
 }
 
-.btn-primary:active {
+.tracker .btn-primary:active {
   transform: scale(0.98);
 }
 
 .btn-logged {
   width: 100%;
   padding: 16px 32px;
-  background-color: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: var(--surface-overlay);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
@@ -155,18 +144,18 @@
 }
 
 .btn-logged:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
+  background-color: var(--border);
+  color: var(--text);
 }
 
 /* ============================================================
-   OVERLAY - Matches app-wide standard (Calendar, Auth, Urge, etc.)
+   OVERLAY - Matches app-wide standard
    ============================================================ */
 
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: var(--overlay-bg);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
@@ -179,21 +168,15 @@
   padding-bottom: max(24px, env(safe-area-inset-bottom));
   padding-left: max(24px, env(safe-area-inset-left));
   padding-right: max(24px, env(safe-area-inset-right));
-  /* FIXED: No scroll on overlay - content inside scrolls */
   overflow: hidden;
   animation: overlayIn 200ms ease;
-  
-  /* GPU acceleration - smoother PWA animation */
   will-change: opacity, backdrop-filter;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
-  
-  /* Prevent touch scroll on overlay itself */
   overscroll-behavior: contain;
   touch-action: none;
 }
 
-/* Allow touch on modal children */
 .overlay > * {
   touch-action: auto;
 }
@@ -217,20 +200,14 @@
 }
 
 @keyframes modalIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(16px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .modal h2 {
   font-size: 1.5rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   margin: 0 0 8px 0;
   text-align: center;
   letter-spacing: -0.02em;
@@ -238,7 +215,7 @@
 
 .modal p {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   margin: 0 0 40px 0;
   text-align: center;
   line-height: 1.5;
@@ -251,15 +228,14 @@
   margin-top: 48px;
 }
 
-/* Button styles - work inside modals */
 .modal .btn-primary,
 .modal-actions .btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background-color: #ffffff;
+  background-color: var(--text);
   border: none;
   border-radius: 12px;
-  color: #000000;
+  color: var(--background);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -279,7 +255,7 @@
   background: transparent;
   border: none;
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -289,17 +265,17 @@
 
 .modal .btn-ghost:hover,
 .modal-actions .btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text);
 }
 
 .modal .btn-danger,
 .modal-actions .btn-danger {
   width: 100%;
   padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--surface-overlay);
   border: none;
   border-radius: 12px;
-  color: #ffffff;
+  color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -309,7 +285,7 @@
 
 .modal .btn-danger:hover,
 .modal-actions .btn-danger:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--border);
 }
 
 /* ============================================================
@@ -327,14 +303,14 @@
 .confirm-modal h2 {
   font-size: 1.375rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
   margin: 0 0 12px 0;
   letter-spacing: -0.02em;
 }
 
 .confirm-modal p {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
 }
@@ -349,10 +325,10 @@
 .confirm-actions .btn-primary {
   width: 100%;
   padding: 14px 20px;
-  background-color: #ffffff;
+  background-color: var(--text);
   border: none;
   border-radius: 12px;
-  color: #000000;
+  color: var(--background);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -370,7 +346,7 @@
   background: transparent;
   border: none;
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
@@ -379,7 +355,7 @@
 }
 
 .confirm-actions .btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text);
 }
 
 .confirm-actions .btn-danger {
@@ -407,73 +383,53 @@
 .benefits-modal {
   width: 100%;
   max-width: 360px;
-  /* Use full available height */
   height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  max-height: 700px; /* Cap on larger screens */
+  max-height: 700px;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  /* Floating text - NO background, NO border-radius, NO padding */
   background: transparent;
   border-radius: 0;
   padding: 0;
 }
 
-/* Header - FIXED at top */
 .benefits-modal h2 {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   text-align: center;
   margin: 0;
   padding-bottom: 32px;
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
 }
 
-/* Hide subtitle for cleaner minimal look */
 .benefits-modal > p {
   display: none;
 }
 
-/* Benefits list - SCROLLABLE middle section */
 .benefits-list {
   display: flex;
   flex-direction: column;
   gap: 32px;
-  flex: 1; /* Take remaining space */
-  min-height: 0; /* Critical for flex overflow */
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   text-align: left;
-  padding: 8px 0; /* Small padding for scroll content */
-  /* Fade edges to indicate scrollability */
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 16px,
-    black calc(100% - 16px),
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 16px,
-    black calc(100% - 16px),
-    transparent 100%
-  );
+  padding: 8px 0;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
 }
 
-/* Each benefit row - matches ET slider-group */
 .benefit-row {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* Label and value row - matches ET slider-header */
 .benefit-info {
   display: flex;
   justify-content: space-between;
@@ -483,25 +439,23 @@
 .benefit-info span:first-child {
   font-size: 0.9375rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .benefit-num {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   font-feature-settings: 'tnum' 1;
 }
 
-/* Description below slider - matches ET style */
 .benefit-desc {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   margin-top: 8px;
   text-align: left;
 }
 
-/* Slider wrapper - matches ET slider-wrap exactly */
 .benefit-slider {
   position: relative;
   height: 20px;
@@ -514,30 +468,27 @@
   overflow: visible;
 }
 
-/* Track background - matches ET */
 .benefit-slider::before {
   content: '';
   position: absolute;
   left: 0;
   right: 0;
   height: 2px;
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: var(--border-prominent);
   border-radius: 1px;
   pointer-events: none;
 }
 
-/* Fill bar - matches ET */
 .benefit-fill {
   position: absolute;
   left: 0;
   height: 2px;
-  background-color: #ffffff;
+  background-color: var(--text);
   border-radius: 1px;
   transition: width 50ms ease-out;
   pointer-events: none;
 }
 
-/* Range input - matches ET exactly */
 .benefit-slider input[type="range"] {
   position: relative;
   width: 100%;
@@ -556,7 +507,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Track - invisible (we use .benefit-fill instead) */
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {
   width: 100%;
   height: 2px;
@@ -577,57 +527,31 @@
   cursor: pointer;
 }
 
-.benefit-slider input[type="range"]::-ms-track {
-  width: 100%;
-  height: 2px;
-  background: transparent;
-  border: none;
-  color: transparent;
-}
-
-.benefit-slider input[type="range"]::-ms-fill-lower,
-.benefit-slider input[type="range"]::-ms-fill-upper {
-  background: transparent;
-  border: none;
-}
-
-/* Thumb - clean white circle (matches ET exactly) */
 .benefit-slider input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none !important;
   appearance: none !important;
   width: 18px;
   height: 18px;
-  background: #ffffff;
+  background: var(--text);
   border: none !important;
   border-radius: 50%;
   cursor: pointer;
   margin-top: -8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
 .benefit-slider input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  background: #ffffff;
+  background: var(--text);
   border: none;
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
-.benefit-slider input[type="range"]::-ms-thumb {
-  width: 18px;
-  height: 18px;
-  background: #ffffff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-/* Hover/active states */
 .benefit-slider input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.15);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -638,45 +562,27 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-.benefit-slider input[type="range"]:active::-webkit-slider-thumb {
-  transform: scale(1.1);
-}
-
-.benefit-slider input[type="range"]:active::-moz-range-thumb {
-  transform: scale(1.1);
-}
-
-/* Remove any focus outlines/boxes */
 .benefit-slider input[type="range"]:focus {
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-.benefit-slider input[type="range"]:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-.benefit-slider input[type="range"]:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-/* Benefits actions - FIXED at bottom */
 .benefits-actions {
   display: flex;
   flex-direction: column;
   gap: 0;
-  flex-shrink: 0; /* Prevent shrinking */
-  padding-top: 24px; /* Space above buttons */
+  flex-shrink: 0;
+  padding-top: 24px;
 }
 
 .benefits-actions .btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background-color: #ffffff;
+  background-color: var(--text);
   border: none;
   border-radius: 12px;
-  color: #000000;
+  color: var(--background);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -694,7 +600,7 @@
   background: transparent;
   border: none;
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
@@ -703,7 +609,7 @@
 }
 
 .benefits-actions .btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text);
 }
 
 /* ============================================================
@@ -722,18 +628,12 @@
 }
 
 @keyframes sheetIn {
-  from { 
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to { 
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 .sheet-content {
-  background-color: rgba(28, 28, 30, 0.98);
+  background-color: var(--surface-raised);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: 16px;
@@ -748,7 +648,7 @@
   background: transparent;
   border: none;
   border-radius: 10px;
-  color: #ffffff;
+  color: var(--text);
   font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
@@ -759,11 +659,11 @@
 }
 
 .sheet button:hover {
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: var(--surface-overlay);
 }
 
 .sheet button:active {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--border);
 }
 
 .sheet button.danger {
@@ -772,25 +672,24 @@
 
 .sheet-divider {
   height: 1px;
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--border);
   margin: 4px 12px;
 }
 
 .sheet button.cancel {
-  background-color: rgba(28, 28, 30, 0.98);
+  background-color: var(--surface-raised);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
 .sheet button.cancel:hover {
-  background-color: rgba(40, 40, 42, 0.98);
-  color: #ffffff;
+  background-color: var(--surface-overlay);
+  color: var(--text);
 }
 
-/* Desktop: sheet becomes centered modal */
 @media (min-width: 768px) {
   .sheet {
     position: relative;
@@ -822,17 +721,9 @@
     padding-bottom: 100px;
   }
   
-  .streak-num {
-    font-size: 10rem;
-  }
-  
-  .date {
-    margin-bottom: 16px;
-  }
-  
-  .milestone {
-    margin-top: 16px;
-  }
+  .streak-num { font-size: 10rem; }
+  .date { margin-bottom: 16px; }
+  .milestone { margin-top: 16px; }
 }
 
 @media (max-width: 480px) {
@@ -841,139 +732,60 @@
     padding-bottom: 115px;
   }
   
-  .streak-num {
-    font-size: 7rem;
-  }
-  
-  .date {
-    margin-bottom: 10px;
-    font-size: 0.75rem;
-  }
-  
-  .milestone {
-    margin-top: 10px;
-    font-size: 0.75rem;
-  }
+  .streak-num { font-size: 7rem; }
+  .date { margin-bottom: 10px; font-size: 0.75rem; }
+  .milestone { margin-top: 10px; font-size: 0.75rem; }
   
   .btn-primary,
-  .btn-logged {
-    padding: 14px 24px;
-  }
+  .btn-logged { padding: 14px 24px; }
   
-  /* Benefits modal responsive */
-  .benefits-modal h2 {
-    padding-bottom: 24px;
-  }
-  
-  .benefits-list {
-    gap: 28px;
-  }
-  
+  .benefits-modal h2 { padding-bottom: 24px; }
+  .benefits-list { gap: 28px; }
   .benefit-info span:first-child,
-  .benefit-num {
-    font-size: 0.875rem;
-  }
-  
-  .benefits-actions {
-    padding-top: 20px;
-  }
-  
+  .benefit-num { font-size: 0.875rem; }
+  .benefits-actions { padding-top: 20px; }
   .benefits-actions .btn-primary,
-  .benefits-actions .btn-ghost {
-    padding: 16px 20px;
-    font-size: 0.9375rem;
-  }
+  .benefits-actions .btn-ghost { padding: 16px 20px; font-size: 0.9375rem; }
   
-  .confirm-modal h2 {
-    font-size: 1.25rem;
-  }
-  
-  .confirm-modal p {
-    font-size: 0.8125rem;
-  }
-  
-  .confirm-actions {
-    margin-top: 32px;
-  }
-  
+  .confirm-modal h2 { font-size: 1.25rem; }
+  .confirm-modal p { font-size: 0.8125rem; }
+  .confirm-actions { margin-top: 32px; }
   .confirm-actions .btn-primary,
   .confirm-actions .btn-ghost,
-  .confirm-actions .btn-danger {
-    padding: 12px 16px;
-    font-size: 0.875rem;
-  }
+  .confirm-actions .btn-danger { padding: 12px 16px; font-size: 0.875rem; }
 }
 
-/* Short screens */
 @media (max-height: 700px) {
   .tracker {
     padding-top: 32px;
     padding-bottom: 105px;
   }
   
-  .streak-num {
-    font-size: 6rem;
-  }
-  
-  .date {
-    margin-bottom: 8px;
-  }
-  
-  .milestone {
-    margin-top: 8px;
-  }
-  
-  /* Benefits modal on short screens */
-  .benefits-modal {
-    max-height: none; /* Allow full height */
-  }
-  
-  .benefits-list {
-    gap: 24px;
-  }
+  .streak-num { font-size: 6rem; }
+  .date { margin-bottom: 8px; }
+  .milestone { margin-top: 8px; }
+  .benefits-modal { max-height: none; }
+  .benefits-list { gap: 24px; }
 }
 
-/* Very short screens */
 @media (max-height: 600px) {
   .tracker {
     padding-top: 24px;
     padding-bottom: 95px;
   }
   
-  .streak-num {
-    font-size: 5rem;
-  }
-  
-  .date {
-    font-size: 0.6875rem;
-    margin-bottom: 6px;
-  }
-  
-  .milestone {
-    margin-top: 6px;
-    font-size: 0.6875rem;
-  }
+  .streak-num { font-size: 5rem; }
+  .date { font-size: 0.6875rem; margin-bottom: 6px; }
+  .milestone { margin-top: 6px; font-size: 0.6875rem; }
   
   .btn-primary,
-  .btn-logged {
-    padding: 12px 20px;
-  }
+  .btn-logged { padding: 12px 20px; }
   
-  /* Benefits modal on very short screens */
-  .benefits-modal h2 {
-    padding-bottom: 16px;
-  }
-  
-  .benefits-list {
-    gap: 20px;
-  }
-  
-  .benefits-actions {
-    padding-top: 16px;
-  }
+  .benefits-modal h2 { padding-bottom: 16px; }
+  .benefits-list { gap: 20px; }
+  .benefits-actions { padding-top: 16px; }
 }
 
-/* Landscape */
 @media (max-height: 500px) and (orientation: landscape) {
   .tracker {
     flex-direction: row;
@@ -983,13 +795,8 @@
     padding-bottom: 24px;
   }
   
-  .tracker-main {
-    flex: none;
-  }
-  
-  .streak-num {
-    font-size: 4rem;
-  }
+  .tracker-main { flex: none; }
+  .streak-num { font-size: 4rem; }
   
   .tracker-footer {
     padding: 0;
@@ -1002,17 +809,10 @@
    ============================================================ */
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .modal,
   .sheet,
@@ -1026,16 +826,9 @@
   }
 }
 
-/* Scrollbar for benefits - barely visible */
-.benefits-list::-webkit-scrollbar {
-  width: 2px;
-}
-
-.benefits-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+.benefits-list::-webkit-scrollbar { width: 2px; }
+.benefits-list::-webkit-scrollbar-track { background: transparent; }
 .benefits-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border);
   border-radius: 1px;
 }

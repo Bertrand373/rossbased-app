@@ -1,5 +1,5 @@
 /* MobileNavigation.css - TITANTRACK */
-/* Text-only navigation with dividers */
+/* Theme-aware version - uses CSS variables from index.css */
 
 .mobile-nav {
   position: fixed;
@@ -12,10 +12,10 @@
   padding: 16px 20px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
   
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: var(--nav-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .mobile-nav-inner {
@@ -41,7 +41,7 @@
 .mobile-nav-label {
   font-size: 0.6875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   letter-spacing: 0.01em;
   transition: color 150ms ease;
   white-space: nowrap;
@@ -49,14 +49,14 @@
 
 /* Active state */
 .mobile-nav-item.active .mobile-nav-label {
-  color: #ffffff;
+  color: var(--text);
   font-weight: 600;
 }
 
 /* Hover - only on devices that support it */
 @media (hover: hover) {
   .mobile-nav-item:hover .mobile-nav-label {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
   }
 }
 
@@ -67,7 +67,7 @@
 .mobile-nav-divider {
   width: 1px;
   height: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-prominent);
   flex-shrink: 0;
 }
 
