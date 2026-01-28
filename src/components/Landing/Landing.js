@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './Landing.css';
 import AuthModal from '../Auth/AuthModal';
-import trackerLogo from '../../assets/trackerapplogo.png';
+import trackerLogo from '../../assets/trackerapplogo-white.png';
 
 const Landing = ({ onLogin }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
