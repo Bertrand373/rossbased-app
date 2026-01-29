@@ -1,6 +1,6 @@
 /* ShareCard.css - TITANTRACK */
-/* Premium minimal shareable card - pure black/white aesthetic */
-/* MINIMAL VERSION: Clean, simple, works everywhere */
+/* Premium minimal shareable card - theme-aware */
+/* Uses CSS variables from index.css */
 
 /* ============================================================
    SHARE SECTION - Inline with Stats flow
@@ -12,7 +12,7 @@
   border-radius: 0;
   padding-bottom: 32px;
   margin-bottom: 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border);
 }
 
 .share-card-header {
@@ -25,7 +25,7 @@
 .share-card-header span {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -39,8 +39,8 @@
   flex-direction: column;
   align-items: center;
   padding: 32px 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
   border-radius: 16px;
   cursor: pointer;
   transition: all 150ms ease;
@@ -48,8 +48,8 @@
 }
 
 .share-card-preview:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--surface-raised);
+  border-color: var(--border-prominent);
 }
 
 .share-card-preview:active {
@@ -66,7 +66,7 @@
 .share-mini-day {
   font-size: 4rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
   line-height: 1;
   letter-spacing: -0.02em;
   font-feature-settings: 'tnum' 1;
@@ -75,7 +75,7 @@
 .share-mini-label {
   font-size: 0.75rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.2em;
   margin-top: 8px;
@@ -85,7 +85,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-size: 0.8125rem;
   font-weight: 500;
 }
@@ -96,7 +96,7 @@
 }
 
 /* ============================================================
-   MODAL OVERLAY
+   MODAL OVERLAY - Theme-aware
    ============================================================ */
 
 .share-modal-overlay {
@@ -105,7 +105,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: var(--overlay-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -142,6 +142,7 @@
 
 /* ============================================================
    MODAL CARD - Full preview of shareable image
+   Note: The actual share image is always dark for brand consistency
    ============================================================ */
 
 .share-modal-card {
@@ -153,7 +154,7 @@
   aspect-ratio: 1080 / 1350;
   max-height: 60vh;
   background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-prominent);
   border-radius: 12px;
   padding: 32px 24px;
   position: relative;
@@ -196,7 +197,7 @@
 }
 
 /* ============================================================
-   MODAL BUTTONS
+   MODAL BUTTONS - Theme-aware
    ============================================================ */
 
 .share-modal-btn {
@@ -206,10 +207,10 @@
   gap: 10px;
   width: 100%;
   padding: 16px 24px;
-  background: #ffffff;
+  background: var(--text);
   border: none;
   border-radius: 12px;
-  color: #000000;
+  color: var(--background);
   font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
@@ -239,8 +240,8 @@
 .share-btn-loading {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  border-top-color: #000000;
+  border: 2px solid var(--border);
+  border-top-color: var(--background);
   border-radius: 50%;
   animation: shareSpinner 0.7s linear infinite;
 }
@@ -253,7 +254,7 @@
   background: transparent;
   border: none;
   padding: 12px 24px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
@@ -264,7 +265,7 @@
 }
 
 .share-modal-close:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text);
 }
 
 /* ============================================================

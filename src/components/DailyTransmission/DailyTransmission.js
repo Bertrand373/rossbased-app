@@ -1,6 +1,7 @@
 // src/components/DailyTransmission/DailyTransmission.js
 // AI-powered daily wisdom transmission
 // Uses pure DOM for overlay to avoid React re-render issues
+// THEME-AWARE: Reads current theme and applies appropriate colors
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './DailyTransmission.css';
@@ -8,26 +9,64 @@ import './DailyTransmission.css';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 // Pure DOM overlay - completely outside React
+// Now theme-aware: reads data-theme attribute
 const showOverlay = (content) => {
   // Remove any existing overlay first
   const existing = document.getElementById('transmission-overlay-root');
   if (existing) existing.remove();
+  
+  // Get current theme
+  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const isLight = theme === 'light';
+  
+  // Theme-aware colors
+  const colors = isLight ? {
+    backdrop: 'rgba(255,255,255,0.95)',
+    cardBg: '#f8f8f8',
+    cardBorder: 'rgba(184,134,11,0.2)',
+    cardShadow: '0 20px 60px rgba(0,0,0,0.15)',
+    accent: '#b8860b',
+    accentMuted: 'rgba(184,134,11,0.5)',
+    text: 'rgba(0,0,0,0.65)',
+    textStrong: '#000000',
+    closeBtn: 'rgba(0,0,0,0.4)'
+  } : {
+    backdrop: 'rgba(0,0,0,0.85)',
+    cardBg: '#0a0a0a',
+    cardBorder: 'rgba(255,221,0,0.15)',
+    cardShadow: '0 20px 60px rgba(0,0,0,0.6)',
+    accent: '#ffdd00',
+    accentMuted: 'rgba(255,221,0,0.5)',
+    text: 'rgba(255,255,255,0.65)',
+    textStrong: '#ffffff',
+    closeBtn: 'rgba(255,255,255,0.4)'
+  };
   
   // Create overlay container
   const root = document.createElement('div');
   root.id = 'transmission-overlay-root';
   root.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;';
   root.innerHTML = `
-    <div class="trans-modal-backdrop" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;"></div>
-    <div class="trans-modal-card" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100vw - 40px);max-width:400px;background:#0a0a0a;border:1px solid rgba(255,221,0,0.15);border-radius:16px;padding:20px;z-index:100000;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div class="trans-modal-backdrop" style="position:fixed;top:0;left:0;right:0;bottom:0;background:${colors.backdrop};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;"></div>
+    <div class="trans-modal-card" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100vw - 40px);max-width:400px;background:${colors.cardBg};border:1px solid ${colors.cardBorder};border-radius:16px;padding:20px;z-index:100000;box-shadow:${colors.cardShadow};">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
-        <span style="font-size:0.625rem;color:#ffdd00;opacity:0.7;">✦</span>
-        <span style="font-size:0.5625rem;font-weight:600;color:rgba(255,221,0,0.5);letter-spacing:0.1em;text-transform:uppercase;flex:1;">Daily Transmission</span>
-        <button id="trans-close-btn" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.5rem;cursor:pointer;padding:0;line-height:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">×</button>
+        <span style="font-size:0.625rem;color:${colors.accent};opacity:0.7;">✦</span>
+        <span style="font-size:0.5625rem;font-weight:600;color:${colors.accentMuted};letter-spacing:0.1em;text-transform:uppercase;flex:1;">Daily Transmission</span>
+        <button id="trans-close-btn" style="background:none;border:none;color:${colors.closeBtn};font-size:1.5rem;cursor:pointer;padding:0;line-height:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
-      <p style="font-size:0.9375rem;color:rgba(255,255,255,0.65);line-height:1.65;margin:0;">${content}</p>
+      <p style="font-size:0.9375rem;color:${colors.text};line-height:1.65;margin:0;">${content}</p>
     </div>
   `;
+  
+  // Style the strong tags in the content
+  const paragraph = root.querySelector('p');
+  if (paragraph) {
+    const strongs = paragraph.querySelectorAll('strong');
+    strongs.forEach(strong => {
+      strong.style.color = colors.textStrong;
+      strong.style.fontWeight = '600';
+    });
+  }
   
   document.body.appendChild(root);
   document.body.style.overflow = 'hidden';

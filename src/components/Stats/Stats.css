@@ -778,7 +778,7 @@
 }
 
 .reset-btn:hover { color: var(--text-secondary); }
-.reset-btn.danger:hover { color: #ff3b30; }
+.reset-btn.danger:hover { color: var(--status-relapse); }
 
 .reset-divider {
   width: 1px;
@@ -827,10 +827,10 @@
 .stats-page .btn-danger {
   width: 100%;
   padding: 16px 24px;
-  background: rgba(255, 59, 48, 0.15) !important;
+  background: var(--status-relapse-bg);
   border: none;
   border-radius: 12px;
-  color: #ff3b30 !important;
+  color: var(--status-relapse);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -839,7 +839,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.stats-page .btn-danger:hover { background: rgba(255, 59, 48, 0.25) !important; }
+.stats-page .btn-danger:hover { background: var(--status-relapse-bg-hover); }
 .stats-page .btn-danger:active { transform: scale(0.98); }
 
 /* =============================================================================
@@ -937,8 +937,8 @@
 }
 
 .modal-buttons .btn-danger {
-  background: rgba(255, 59, 48, 0.15) !important;
-  color: #ff3b30 !important;
+  background: var(--status-relapse-bg);
+  color: var(--status-relapse);
 }
 
 /* Stat detail breakdown */
