@@ -53,10 +53,34 @@
   --text-muted: rgba(255, 255, 255, 0.4);
   --text-tertiary: rgba(255, 255, 255, 0.25);
   
-  /* Status colors */
+  /* Status colors - semantic */
   --success: #22c55e;
   --danger: #ff3b30;
   --warning: #f59e0b;
+  
+  /* Calendar/Status accent colors - DARK THEME */
+  --status-current: #34d399;
+  --status-current-bg: rgba(52, 211, 153, 0.1);
+  --status-former: #60a5fa;
+  --status-former-bg: rgba(96, 165, 250, 0.1);
+  --status-relapse: #f87171;
+  --status-relapse-bg: rgba(248, 113, 113, 0.1);
+  --status-relapse-bg-hover: rgba(248, 113, 113, 0.15);
+  --status-wetdream: #fbbf24;
+  --status-wetdream-bg: rgba(251, 191, 36, 0.1);
+  --status-wetdream-bg-hover: rgba(251, 191, 36, 0.15);
+  
+  /* Gold accent for achievements/milestones */
+  --accent-gold: #ffdd00;
+  --accent-gold-bg: rgba(255, 221, 0, 0.02);
+  --accent-gold-bg-hover: rgba(255, 221, 0, 0.04);
+  --accent-gold-border: rgba(255, 221, 0, 0.1);
+  --accent-gold-border-hover: rgba(255, 221, 0, 0.15);
+  --accent-gold-text: rgba(255, 221, 0, 0.5);
+  
+  /* Trajectory/trend colors */
+  --trend-up: rgba(52, 211, 153, 0.9);
+  --trend-down: rgba(248, 113, 113, 0.8);
   
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -96,8 +120,29 @@
   --text-muted: rgba(0, 0, 0, 0.4);
   --text-tertiary: rgba(0, 0, 0, 0.25);
   
-  /* Gold accent stays the same for brand consistency */
-  /* Status colors stay the same for accessibility */
+  /* Calendar/Status accent colors - LIGHT THEME (darker for contrast) */
+  --status-current: #059669;
+  --status-current-bg: rgba(5, 150, 105, 0.12);
+  --status-former: #2563eb;
+  --status-former-bg: rgba(37, 99, 235, 0.1);
+  --status-relapse: #dc2626;
+  --status-relapse-bg: rgba(220, 38, 38, 0.1);
+  --status-relapse-bg-hover: rgba(220, 38, 38, 0.15);
+  --status-wetdream: #d97706;
+  --status-wetdream-bg: rgba(217, 119, 6, 0.1);
+  --status-wetdream-bg-hover: rgba(217, 119, 6, 0.15);
+  
+  /* Gold accent for achievements - darker goldenrod */
+  --accent-gold: #b8860b;
+  --accent-gold-bg: rgba(184, 134, 11, 0.06);
+  --accent-gold-bg-hover: rgba(184, 134, 11, 0.1);
+  --accent-gold-border: rgba(184, 134, 11, 0.2);
+  --accent-gold-border-hover: rgba(184, 134, 11, 0.3);
+  --accent-gold-text: rgba(184, 134, 11, 0.7);
+  
+  /* Trajectory/trend colors - darker for light bg */
+  --trend-up: rgba(5, 150, 105, 0.9);
+  --trend-down: rgba(220, 38, 38, 0.85);
   
   /* Theme-specific paths */
 

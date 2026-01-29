@@ -182,10 +182,10 @@
   flex-shrink: 0;
 }
 
-.calendar-status-badge.current-streak .status-dot { background-color: #34d399; }
-.calendar-status-badge.former-streak .status-dot { background-color: #60a5fa; }
-.calendar-status-badge.relapse .status-dot { background-color: #f87171; }
-.calendar-status-badge.wet-dream .status-dot { background-color: #fbbf24; }
+.calendar-status-badge.current-streak .status-dot { background-color: var(--status-current); }
+.calendar-status-badge.former-streak .status-dot { background-color: var(--status-former); }
+.calendar-status-badge.relapse .status-dot { background-color: var(--status-relapse); }
+.calendar-status-badge.wet-dream .status-dot { background-color: var(--status-wetdream); }
 
 .calendar-status-badge .day-count {
   color: var(--text-muted);
@@ -194,23 +194,23 @@
 }
 
 .calendar-status-badge.current-streak {
-  background: rgba(52, 211, 153, 0.1);
-  color: #34d399;
+  background: var(--status-current-bg);
+  color: var(--status-current);
 }
 
 .calendar-status-badge.former-streak {
-  background: rgba(96, 165, 250, 0.1);
-  color: #60a5fa;
+  background: var(--status-former-bg);
+  color: var(--status-former);
 }
 
 .calendar-status-badge.relapse {
-  background: rgba(248, 113, 113, 0.1);
-  color: #f87171;
+  background: var(--status-relapse-bg);
+  color: var(--status-relapse);
 }
 
 .calendar-status-badge.wet-dream {
-  background: rgba(251, 191, 36, 0.1);
-  color: #fbbf24;
+  background: var(--status-wetdream-bg);
+  color: var(--status-wetdream);
 }
 
 .calendar-status-badge.future {
@@ -577,25 +577,25 @@
   flex-shrink: 0;
 }
 
-.calendar-option-btn .option-dot.relapse { background-color: #f87171; }
-.calendar-option-btn .option-dot.wet-dream { background-color: #fbbf24; }
+.calendar-option-btn .option-dot.relapse { background-color: var(--status-relapse); }
+.calendar-option-btn .option-dot.wet-dream { background-color: var(--status-wetdream); }
 
 .calendar-option-btn.calendar-option-danger {
-  background: rgba(248, 113, 113, 0.1);
-  color: #f87171;
+  background: var(--status-relapse-bg);
+  color: var(--status-relapse);
 }
 
 .calendar-option-btn.calendar-option-danger:hover {
-  background: rgba(248, 113, 113, 0.15);
+  background: var(--status-relapse-bg-hover);
 }
 
 .calendar-option-btn.calendar-option-warning {
-  background: rgba(251, 191, 36, 0.1);
-  color: #fbbf24;
+  background: var(--status-wetdream-bg);
+  color: var(--status-wetdream);
 }
 
 .calendar-option-btn.calendar-option-warning:hover {
-  background: rgba(251, 191, 36, 0.15);
+  background: var(--status-wetdream-bg-hover);
 }
 
 .calendar-option-edit {

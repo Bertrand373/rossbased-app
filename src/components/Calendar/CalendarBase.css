@@ -184,10 +184,10 @@
   opacity: 0.7;
 }
 
-.calendar-legend-minimal .legend-dot.current-streak { background-color: #34d399; }
-.calendar-legend-minimal .legend-dot.former-streak { background-color: #60a5fa; }
-.calendar-legend-minimal .legend-dot.relapse { background-color: #f87171; }
-.calendar-legend-minimal .legend-dot.wet-dream { background-color: #fbbf24; }
+.calendar-legend-minimal .legend-dot.current-streak { background-color: var(--status-current); }
+.calendar-legend-minimal .legend-dot.former-streak { background-color: var(--status-former); }
+.calendar-legend-minimal .legend-dot.relapse { background-color: var(--status-relapse); }
+.calendar-legend-minimal .legend-dot.wet-dream { background-color: var(--status-wetdream); }
 .calendar-legend-minimal .legend-dot.tracked { background-color: #ffffff; }
 
 /* =============================================================================
@@ -315,12 +315,12 @@
   transform: translateX(-50%);
   width: 14px;
   height: 3px;
-  background: #34d399;
+  background: var(--status-current);
   border-radius: 2px;
 }
 
 .day-cell.current-streak .day-number {
-  color: #34d399;
+  color: var(--status-current);
 }
 
 .day-cell.former-streak::after {
@@ -331,12 +331,12 @@
   transform: translateX(-50%);
   width: 14px;
   height: 3px;
-  background: #60a5fa;
+  background: var(--status-former);
   border-radius: 2px;
 }
 
 .day-cell.former-streak .day-number {
-  color: #60a5fa;
+  color: var(--status-former);
 }
 
 .day-cell.relapse::after {
@@ -347,12 +347,12 @@
   transform: translateX(-50%);
   width: 14px;
   height: 3px;
-  background: #f87171;
+  background: var(--status-relapse);
   border-radius: 2px;
 }
 
 .day-cell.relapse .day-number {
-  color: #f87171;
+  color: var(--status-relapse);
 }
 
 .day-cell.wet-dream::after {
@@ -363,12 +363,12 @@
   transform: translateX(-50%);
   width: 14px;
   height: 3px;
-  background: #fbbf24;
+  background: var(--status-wetdream);
   border-radius: 2px;
 }
 
 .day-cell.wet-dream .day-number {
-  color: #fbbf24;
+  color: var(--status-wetdream);
 }
 
 /* =============================================================================
@@ -529,10 +529,10 @@
   border-radius: 50%;
 }
 
-.week-status-dot.current-streak { background-color: #34d399; }
-.week-status-dot.former-streak { background-color: #60a5fa; }
-.week-status-dot.relapse { background-color: #f87171; }
-.week-status-dot.wet-dream { background-color: #fbbf24; }
+.week-status-dot.current-streak { background-color: var(--status-current); }
+.week-status-dot.former-streak { background-color: var(--status-former); }
+.week-status-dot.relapse { background-color: var(--status-relapse); }
+.week-status-dot.wet-dream { background-color: var(--status-wetdream); }
 
 /* =============================================================================
    RESPONSIVE - Tablet

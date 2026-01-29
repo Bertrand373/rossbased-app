@@ -872,9 +872,9 @@
 }
 
 .ut-grounding-dot.complete {
-  background: rgba(52, 211, 153, 0.2);
-  border-color: rgba(52, 211, 153, 0.4);
-  color: #34d399;
+  background: var(--status-current-bg);
+  border-color: var(--status-current);
+  color: var(--status-current);
 }
 
 .ut-grounding-label {

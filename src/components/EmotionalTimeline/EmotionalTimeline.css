@@ -559,8 +559,8 @@
   text-align: right;
 }
 
-.trajectory-delta.improved { color: rgba(52, 211, 153, 0.9); }
-.trajectory-delta.declined { color: rgba(248, 113, 113, 0.8); }
+.trajectory-delta.improved { color: var(--trend-up); }
+.trajectory-delta.declined { color: var(--trend-down); }
 .trajectory-delta.stable { color: var(--text-muted); }
 
 /* Phase Context */

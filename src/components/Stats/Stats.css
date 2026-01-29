@@ -189,13 +189,13 @@
 }
 
 .milestone-card.earned {
-  background: rgba(255, 221, 0, 0.02);
-  border-color: rgba(255, 221, 0, 0.1);
+  background: var(--accent-gold-bg);
+  border-color: var(--accent-gold-border);
 }
 
 .milestone-card.earned:hover {
-  background: rgba(255, 221, 0, 0.04);
-  border-color: rgba(255, 221, 0, 0.15);
+  background: var(--accent-gold-bg-hover);
+  border-color: var(--accent-gold-border-hover);
 }
 
 .milestone-card.earned::after {
@@ -204,7 +204,7 @@
   top: 6px;
   right: 8px;
   font-size: 0.5rem;
-  color: rgba(255, 221, 0, 0.5);
+  color: var(--accent-gold-text);
   font-weight: 600;
 }
 
@@ -230,7 +230,7 @@
 }
 
 .milestone-card.earned .milestone-label {
-  color: rgba(255, 221, 0, 0.5);
+  color: var(--accent-gold-text);
 }
 
 /* =============================================================================
