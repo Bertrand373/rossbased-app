@@ -361,10 +361,10 @@
 .confirm-actions .btn-danger {
   width: 100%;
   padding: 14px 20px;
-  background: rgba(255, 59, 48, 0.15);
+  background: var(--status-relapse-bg);
   border: none;
   border-radius: 12px;
-  color: #ff3b30;
+  color: var(--status-relapse);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -373,7 +373,7 @@
 }
 
 .confirm-actions .btn-danger:hover {
-  background: rgba(255, 59, 48, 0.25);
+  background: var(--status-relapse-bg-hover);
 }
 
 /* ============================================================
@@ -667,7 +667,7 @@
 }
 
 .sheet button.danger {
-  color: #ff453a;
+  color: var(--status-relapse);
 }
 
 .sheet-divider {

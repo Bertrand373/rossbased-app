@@ -1,4 +1,5 @@
 /* TrackerButtons.css - TITANTRACK MODERN MINIMAL */
+/* Theme-aware version - uses CSS variables from index.css */
 
 /* ============================================================
    STREAK ACTION BUTTONS
@@ -34,54 +35,53 @@
   transform: scale(0.98);
 }
 
-/* Primary - Log Benefits (white) */
+/* Primary - Log Benefits (inverted colors) */
 .action-primary {
-  background-color: #ffffff;
-  border-color: #ffffff;
-  color: #000000;
+  background-color: var(--text);
+  border-color: var(--text);
+  color: var(--background);
 }
 
 .action-primary:hover {
-  background-color: rgba(255, 255, 255, 0.9);
+  opacity: 0.9;
 }
 
-/* Default - Fighting Urges (outlined white) */
+/* Default - Fighting Urges (outlined) */
 .action-default {
   background-color: transparent;
-  border-color: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
+  border-color: var(--border-prominent);
+  color: var(--text-secondary);
 }
 
 .action-default:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  background-color: var(--surface-overlay);
+  border-color: var(--border);
+  color: var(--text);
 }
 
-/* Muted - Log Relapse (subtle gray) */
+/* Muted - Log Relapse (subtle) */
 .action-muted {
-  background-color: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.4);
+  background-color: var(--surface-overlay);
+  border-color: var(--border);
+  color: var(--text-muted);
 }
 
 .action-muted:hover {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.6);
+  background-color: var(--border);
+  border-color: var(--border-prominent);
+  color: var(--text-secondary);
 }
 
 /* Warning - Wet Dream (amber tint) */
 .action-warning {
-  background-color: rgba(251, 191, 36, 0.08);
-  border-color: rgba(251, 191, 36, 0.15);
-  color: rgba(251, 191, 36, 0.8);
+  background-color: var(--status-wetdream-bg);
+  border-color: var(--status-wetdream-bg-hover);
+  color: var(--status-wetdream);
 }
 
 .action-warning:hover {
-  background-color: rgba(251, 191, 36, 0.12);
-  border-color: rgba(251, 191, 36, 0.25);
-  color: #fbbf24;
+  background-color: var(--status-wetdream-bg-hover);
+  border-color: var(--status-wetdream);
 }
 
 /* ============================================================

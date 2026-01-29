@@ -1,13 +1,13 @@
 /* src/components/DailyTransmission/DailyTransmission.css */
 /* Daily Transmission - AI-powered wisdom card */
-/* Expandable: shows preview, tap to expand as overlay */
+/* Theme-aware version - uses CSS variables from index.css */
 
 .daily-transmission {
   width: 100%;
   max-width: 340px;
   padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 221, 0, 0.08);
+  background: var(--accent-gold-bg);
+  border: 1px solid var(--accent-gold-border);
   border-radius: 12px;
   text-align: left;
   margin-bottom: 20px;
@@ -56,7 +56,7 @@
   position: relative;
 }
 
-/* Fade effect for truncated text */
+/* Fade effect for truncated text - uses background color */
 .daily-transmission.expandable:not(.expanded):not(.hidden-for-expand) .transmission-text::after {
   content: '';
   position: absolute;
@@ -66,8 +66,8 @@
   height: 2em;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.95) 100%
+    transparent 0%,
+    var(--background) 100%
   );
   pointer-events: none;
 }
@@ -79,7 +79,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--overlay-bg);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 100;
@@ -102,12 +102,17 @@
   z-index: 101;
   max-width: min(380px, calc(100vw - 40px));
   width: calc(100vw - 40px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
-  background: #0a0a0a;
-  border-color: rgba(255, 221, 0, 0.15);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  background: var(--surface);
+  border-color: var(--accent-gold-border-hover);
   animation: expandIn 200ms ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+/* Light theme: stronger shadow for expanded card */
+[data-theme="light"] .daily-transmission.expanded {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
 }
 
 @keyframes expandIn {
@@ -140,14 +145,14 @@
 
 .transmission-icon {
   font-size: 0.625rem;
-  color: #ffdd00;
+  color: var(--accent-gold);
   opacity: 0.7;
 }
 
 .transmission-label {
   font-size: 0.5625rem;
   font-weight: 600;
-  color: rgba(255, 221, 0, 0.5);
+  color: var(--accent-gold-text);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   flex: 1;
@@ -156,7 +161,7 @@
 /* Expand/collapse hint */
 .transmission-expand-hint {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   font-weight: 300;
   width: 20px;
   height: 20px;
@@ -167,14 +172,14 @@
 }
 
 .daily-transmission.expandable:hover .transmission-expand-hint {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
 }
 
 /* Close button for expanded state */
 .transmission-close-btn {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   font-size: 1.25rem;
   font-weight: 300;
   width: 28px;
@@ -190,20 +195,20 @@
 }
 
 .transmission-close-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
+  background: var(--surface-overlay);
+  color: var(--text-secondary);
 }
 
 /* Main text - the transmission itself */
 .transmission-text {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
 }
 
 .transmission-text strong {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -212,7 +217,7 @@
   display: inline-block;
   width: 2px;
   height: 1em;
-  background: rgba(255, 221, 0, 0.6);
+  background: var(--accent-gold);
   margin-left: 2px;
   vertical-align: text-bottom;
   animation: cursorBlink 0.8s infinite;
@@ -242,9 +247,9 @@
   height: 14px;
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.02) 25%,
-    rgba(255, 255, 255, 0.04) 50%,
-    rgba(255, 255, 255, 0.02) 75%
+    var(--surface-overlay) 25%,
+    var(--border) 50%,
+    var(--surface-overlay) 75%
   );
   background-size: 200% 100%;
   animation: skeletonShimmer 1.5s infinite;
@@ -368,6 +373,6 @@
   
   .skeleton-line {
     animation: none;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-overlay);
   }
 }
