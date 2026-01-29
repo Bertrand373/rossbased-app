@@ -60,12 +60,16 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.streak:hover {
-  background-color: var(--surface-overlay);
+/* Desktop only hover effect */
+@media (hover: hover) {
+  .streak:hover {
+    background-color: var(--surface-overlay);
+  }
 }
 
+/* Active/pressed state - very subtle */
 .streak:active {
-  background-color: var(--border);
+  background-color: var(--surface-overlay);
 }
 
 .streak-num {
