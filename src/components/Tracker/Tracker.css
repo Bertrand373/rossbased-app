@@ -45,31 +45,27 @@
   letter-spacing: 0.01em;
 }
 
-/* Streak - tappable */
+/* Streak - tappable, no visible hover/active states */
 .streak {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: none;
+  background: transparent;
   border: none;
   padding: 12px 32px;
   margin: -12px -32px;
   cursor: pointer;
   border-radius: 16px;
-  transition: background-color 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
-/* Desktop only hover effect */
-@media (hover: hover) {
-  .streak:hover {
-    background-color: var(--surface-overlay);
-  }
-}
-
-/* Active/pressed state - very subtle */
-.streak:active {
-  background-color: var(--surface-overlay);
+/* No visible hover or active states */
+.streak:hover,
+.streak:active,
+.streak:focus {
+  background: transparent;
+  outline: none;
 }
 
 .streak-num {
@@ -578,6 +574,16 @@
   gap: 0;
   flex-shrink: 0;
   padding-top: 24px;
+  /* Solid background to prevent sliders showing through */
+  position: relative;
+  z-index: 10;
+  background: var(--background);
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-bottom: -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
 }
 
 .benefits-actions .btn-primary {
