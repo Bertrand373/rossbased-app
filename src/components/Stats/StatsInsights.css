@@ -12,7 +12,7 @@
   border-radius: 0;
   padding-bottom: 32px;
   margin-bottom: 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .insight-card:last-child {
@@ -31,14 +31,14 @@
 .insight-card-header span {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
 .insight-card-header .header-sub {
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   text-transform: none;
   letter-spacing: 0;
 }
@@ -46,8 +46,8 @@
 .insight-card-header .header-badge {
   font-size: 0.5625rem;
   font-weight: 600;
-  color: rgba(255, 221, 0, 0.6);
-  background: rgba(255, 221, 0, 0.1);
+  color: var(--accent-gold-text);
+  background: var(--accent-gold-bg);
   padding: 3px 8px;
   border-radius: 4px;
   letter-spacing: 0.05em;
@@ -70,8 +70,8 @@
 .insight-loading-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.06);
-  border-top-color: rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--border-subtle);
+  border-top-color: var(--text-muted);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -87,14 +87,14 @@
 
 .empty-message {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   margin: 0 0 6px 0;
   font-weight: 500;
 }
 
 .empty-context {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   margin: 0;
 }
 
@@ -119,14 +119,14 @@
 .number-label {
   font-size: 0.6875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   text-transform: capitalize;
 }
 
 .number-value {
   font-size: 1.5rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text);
   line-height: 1;
   font-feature-settings: 'tnum' 1;
 }
@@ -134,20 +134,20 @@
 .number-delta {
   font-size: 0.6875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   font-feature-settings: 'tnum' 1;
 }
 
 .number-delta.positive {
-  color: rgba(52, 211, 153, 0.8);
+  color: var(--trend-up);
 }
 
 .number-delta.negative {
-  color: rgba(248, 113, 113, 0.7);
+  color: var(--trend-down);
 }
 
 .number-delta.neutral {
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
 }
 
 /* Strongest & Growth Area Row */
@@ -158,7 +158,7 @@
   gap: 24px;
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .extreme-item {
@@ -171,7 +171,7 @@
 .extreme-label {
   font-size: 0.625rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -179,20 +179,20 @@
 .extreme-value {
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   text-transform: capitalize;
 }
 
 .extreme-divider {
   width: 1px;
   height: 28px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border);
 }
 
 /* Tracking prompt */
 .tracking-prompt {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   text-align: center;
   margin: 20px 0 0 0;
 }
@@ -215,7 +215,7 @@
 .streak-phase-label {
   font-size: 0.75rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   margin-bottom: 12px;
   text-transform: capitalize;
 }
@@ -234,15 +234,15 @@
   align-items: center;
   text-align: center;
   padding: 16px 8px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-overlay);
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
 }
 
 .streak-phase-item .phase-value {
   font-size: 1.5rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text);
   line-height: 1;
   font-feature-settings: 'tnum' 1;
 }
@@ -250,7 +250,7 @@
 .streak-phase-item .phase-label {
   font-size: 0.625rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   margin-top: 8px;
   letter-spacing: 0.02em;
 }
@@ -266,7 +266,7 @@
 
 /* Highlight improvement visually */
 .streak-phase-item:last-child .phase-value {
-  color: rgba(52, 211, 153, 0.9);
+  color: var(--trend-up);
 }
 
 /* Pattern rows (correlations, growth) */
@@ -279,13 +279,13 @@
 
 .pattern-text {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
 .pattern-detail {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   font-feature-settings: 'tnum' 1;
   flex-shrink: 0;
   margin-left: 12px;
@@ -313,19 +313,19 @@
   flex-direction: column;
   gap: 4px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-overlay);
   border-radius: 8px;
 }
 
 .ai-condition {
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-secondary);
 }
 
 .ai-outcome {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
 }
 
 /* ============================================================
@@ -346,13 +346,13 @@
 
 .relapse-stat-label {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 .relapse-stat-value {
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
   font-feature-settings: 'tnum' 1;
 }
 
@@ -368,7 +368,7 @@
 .conquered-days {
   font-size: 3rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text);
   line-height: 1;
   font-feature-settings: 'tnum' 1;
   letter-spacing: -0.02em;
@@ -376,7 +376,7 @@
 
 .conquered-label {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   margin-top: 8px;
 }
 
@@ -387,7 +387,7 @@
 .phase-context-section {
   padding: 24px 0 0 0;
   margin-top: 32px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .phase-context-header {
@@ -397,7 +397,7 @@
 .phase-context-header span {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -416,7 +416,7 @@
 }
 
 .phase-context-row:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-overlay);
 }
 
 .phase-context-row:active {
@@ -426,7 +426,7 @@
 .phase-context-num {
   font-size: 0.75rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   font-feature-settings: 'tnum' 1;
   flex-shrink: 0;
   padding-top: 2px;
@@ -440,7 +440,7 @@
 .phase-context-name {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text);
   margin: 0 0 4px 0;
   letter-spacing: -0.01em;
 }
@@ -448,14 +448,14 @@
 .phase-context-days {
   font-size: 0.75rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   margin: 0;
   font-feature-settings: 'tnum' 1;
 }
 
 .phase-context-arrow {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-tertiary);
   flex-shrink: 0;
   padding-top: 2px;
 }
@@ -470,7 +470,7 @@
   gap: 0;
   margin-top: 40px;
   padding-top: 40px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
 }
 
 /* ============================================================

@@ -60,6 +60,11 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   
+  // Theme detection for chart colors
+  const [isDarkTheme, setIsDarkTheme] = useState(() => {
+    return document.documentElement.getAttribute('data-theme') !== 'light';
+  });
+  
   // ML pattern state
   const [mlPatterns, setMLPatterns] = useState(null);
   const [mlOptimization, setMLOptimization] = useState(null);
@@ -76,6 +81,25 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   
   // Lock body scroll when any modal is open
   useBodyScrollLock(showMilestoneModal || showResetStreakModal || showResetAllModal || showStatModal);
+  
+  // Detect theme changes for chart colors
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDarkTheme(document.documentElement.getAttribute('data-theme') !== 'light');
+    };
+    
+    // Check on mount
+    checkTheme();
+    
+    // Watch for theme changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['data-theme'] 
+    });
+    
+    return () => observer.disconnect();
+  }, []);
   
   // Get days tracked for unlock logic
   const daysTracked = useMemo(() => {
@@ -194,7 +218,16 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
   }, [safeUserData]);
 
   // Chart configuration - Clean trend line, endpoints only
-  const chartOptions = useMemo(() => ({
+  // Theme-aware colors for light/dark mode
+  const chartOptions = useMemo(() => {
+    const tickColor = isDarkTheme ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)';
+    const gridColor = isDarkTheme ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
+    const tooltipBg = isDarkTheme ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.95)';
+    const tooltipTitleColor = isDarkTheme ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.5)';
+    const tooltipBodyColor = isDarkTheme ? '#ffffff' : '#000000';
+    const tooltipBorderColor = isDarkTheme ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.1)';
+    
+    return {
     responsive: true,
     maintainAspectRatio: false,
     layout: {
@@ -206,20 +239,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         max: 10.5,
         ticks: { 
           stepSize: 5, 
-          color: 'rgba(255,255,255,0.12)', 
+          color: tickColor, 
           font: { size: 10, weight: '400' },
           padding: 8,
           callback: (value) => value <= 10 ? value : ''
         },
         grid: { 
-          color: 'rgba(255,255,255,0.03)', 
+          color: gridColor, 
           drawBorder: false
         },
         border: { display: false }
       },
       x: {
         ticks: { 
-          color: 'rgba(255,255,255,0.12)', 
+          color: tickColor, 
           font: { size: 9, weight: '400' }, 
           maxRotation: 0, 
           maxTicksLimit: timeRange === 'quarter' ? 5 : (timeRange === 'month' ? 6 : 7),
@@ -247,12 +280,12 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       legend: { display: false },
       tooltip: {
         enabled: true,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        titleColor: 'rgba(255,255,255,0.4)',
+        backgroundColor: tooltipBg,
+        titleColor: tooltipTitleColor,
         titleFont: { size: 10, weight: '400' },
-        bodyColor: '#ffffff',
+        bodyColor: tooltipBodyColor,
         bodyFont: { size: 16, weight: '600' },
-        borderColor: 'rgba(255,255,255,0.06)',
+        borderColor: tooltipBorderColor,
         borderWidth: 1,
         cornerRadius: 8,
         padding: { top: 8, right: 12, bottom: 8, left: 12 },
@@ -274,20 +307,30 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       duration: 400,
       easing: 'easeOutQuart'
     }
-  }), [timeRange]);
+  }; }, [timeRange, isDarkTheme]);
 
   // Generate chart data with gradient fill and endpoint dots
   const getChartData = useCallback(() => {
     const rawData = generateChartData(safeUserData, selectedMetric, timeRange);
     const chart = chartRef.current;
     
-    let gradient = 'rgba(255,255,255,0.04)';
+    // Theme-aware colors
+    const lineColor = isDarkTheme ? '#ffffff' : '#000000';
+    const pointBorderColor = isDarkTheme ? '#000000' : '#ffffff';
+    
+    let gradient = isDarkTheme ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
     
     if (chart?.ctx && chart?.chartArea) {
       gradient = chart.ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
-      gradient.addColorStop(0, 'rgba(255,255,255,0.1)');
-      gradient.addColorStop(0.5, 'rgba(255,255,255,0.03)');
-      gradient.addColorStop(1, 'rgba(255,255,255,0)');
+      if (isDarkTheme) {
+        gradient.addColorStop(0, 'rgba(255,255,255,0.1)');
+        gradient.addColorStop(0.5, 'rgba(255,255,255,0.03)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+      } else {
+        gradient.addColorStop(0, 'rgba(0,0,0,0.08)');
+        gradient.addColorStop(0.5, 'rgba(0,0,0,0.02)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+      }
     }
     
     // Find first and last valid data points for endpoint dots
@@ -314,20 +357,20 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
       ...rawData,
       datasets: [{
         ...rawData.datasets[0],
-        borderColor: '#ffffff',
+        borderColor: lineColor,
         borderWidth: 2.5,
         backgroundColor: gradient,
         fill: true,
-        pointBackgroundColor: '#ffffff',
-        pointBorderColor: '#000000',
+        pointBackgroundColor: lineColor,
+        pointBorderColor: pointBorderColor,
         pointBorderWidth: 2,
         pointRadius: pointRadii,
         pointHoverRadius: 6,
-        pointHoverBackgroundColor: '#ffffff',
-        pointHoverBorderColor: '#000000',
+        pointHoverBackgroundColor: lineColor,
+        pointHoverBorderColor: pointBorderColor,
       }]
     };
-  }, [safeUserData, selectedMetric, timeRange]);
+  }, [safeUserData, selectedMetric, timeRange, isDarkTheme]);
 
   const handleStatCardClick = (statType) => {
     setSelectedStatCard(statType);
