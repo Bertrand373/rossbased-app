@@ -464,12 +464,17 @@
   background: transparent;
   border: none;
   box-shadow: none;
-  border-radius: 0;
-  overflow: visible;
 }
 
 .benefit-slider::before {
-  display: none;
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--border-prominent);
+  border-radius: 1px;
+  pointer-events: none;
 }
 
 .benefit-fill {
@@ -504,18 +509,16 @@
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {
   width: 100%;
   height: 2px;
-  background: var(--border-prominent);
+  background: transparent !important;
   border: none !important;
-  border-radius: 1px;
   cursor: pointer;
 }
 
 .benefit-slider input[type="range"]::-moz-range-track {
   width: 100%;
   height: 2px;
-  background: var(--border-prominent);
+  background: transparent;
   border: none;
-  border-radius: 1px;
   cursor: pointer;
 }
 

@@ -206,9 +206,10 @@ const Tracker = ({ userData, updateUserData }) => {
     const newValue = parseInt(value);
     setBenefits(prev => ({ ...prev, [key]: newValue }));
     
-    // Update fill bar visually
+    // Update fill bar visually - use ((value - 1) / 9) to match slider thumb position
+    // Range is 1-10, so value 1 = 0% fill, value 10 = 100% fill
     if (fillRefs.current[key]) {
-      fillRefs.current[key].style.width = `${(newValue / 10) * 100}%`;
+      fillRefs.current[key].style.width = `${((newValue - 1) / 9) * 100}%`;
     }
   }, []);
 
@@ -296,6 +297,7 @@ const Tracker = ({ userData, updateUserData }) => {
                     <div 
                       className="benefit-fill" 
                       ref={el => fillRefs.current[key] = el}
+                      style={{ width: `${((benefits[key] - 1) / 9) * 100}%` }}
                     />
                     <input
                       type="range"
