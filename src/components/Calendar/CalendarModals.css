@@ -114,6 +114,8 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding: 16px 0 8px 0;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
 }
 
 .calendar-modal-content::-webkit-scrollbar { display: none; }

@@ -8,7 +8,7 @@
   /* No min-height - parent .app-content handles layout */
   flex: 1;
   background-color: var(--background);
-  padding: 48px 16px 16px;
+  padding: 48px 16px 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -624,7 +624,7 @@
 
 @media (max-width: 480px) {
   .calendar-container {
-    padding: 32px 8px 16px;
+    padding: 32px 8px 100px;
   }
   
   /* Minimal header adjustments */
