@@ -1,9 +1,9 @@
 // ShareCard.js - TITANTRACK
 // Shareable stats card - premium minimal aesthetic
-// Pure black/white design, canvas-based image generation
+// Theme-aware design, canvas-based image generation
 // MINIMAL VERSION: Just the number. The number is the flex.
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { format } from 'date-fns';
 import './ShareCard.css';
 
@@ -20,11 +20,31 @@ const ShareCard = ({ userData, isVisible = true }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const canvasRef = useRef(null);
+  
+  // Theme detection
+  const [isDarkTheme, setIsDarkTheme] = useState(() => {
+    return document.documentElement.getAttribute('data-theme') !== 'light';
+  });
+  
+  // Watch for theme changes
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDarkTheme(document.documentElement.getAttribute('data-theme') !== 'light');
+    };
+    
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['data-theme'] 
+    });
+    
+    return () => observer.disconnect();
+  }, []);
 
   const streak = userData?.currentStreak || 0;
   const today = format(new Date(), 'MMM d, yyyy');
 
-  // Generate the card image using Canvas API
+  // Generate the card image using Canvas API - theme-aware
   const generateCardImage = useCallback(() => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
@@ -35,30 +55,37 @@ const ShareCard = ({ userData, isVisible = true }) => {
       const height = 1350;
       canvas.width = width;
       canvas.height = height;
+      
+      // Theme-aware colors
+      const bgColor = isDarkTheme ? '#000000' : '#ffffff';
+      const textColor = isDarkTheme ? '#ffffff' : '#000000';
+      const borderColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+      const subtleColor = isDarkTheme ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)';
+      const mutedColor = isDarkTheme ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.25)';
 
-      // Background - pure black
-      ctx.fillStyle = '#000000';
+      // Background
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, width, height);
 
       // Subtle border
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.strokeStyle = borderColor;
       ctx.lineWidth = 2;
       ctx.strokeRect(40, 40, width - 80, height - 80);
 
       // Day number - large, commanding, centered
-      ctx.fillStyle = '#FFFFFF';
+      ctx.fillStyle = textColor;
       ctx.font = '600 320px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(streak.toString(), width / 2, height * 0.45);
 
       // "DAYS" label
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.fillStyle = subtleColor;
       ctx.font = '500 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.fillText('DAYS', width / 2, height * 0.58);
 
       // Footer - date and branding
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.fillStyle = mutedColor;
       ctx.font = '400 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(today, 80, height - 70);
@@ -68,7 +95,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
 
       resolve(canvas);
     });
-  }, [streak, today]);
+  }, [streak, today, isDarkTheme]);
 
   // Handle share action
   const handleShare = async () => {
