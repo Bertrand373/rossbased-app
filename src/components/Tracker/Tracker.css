@@ -477,7 +477,6 @@
   background-color: var(--border-prominent);
   border-radius: 1px;
   pointer-events: none;
-  z-index: 1;
 }
 
 .benefit-fill {
@@ -488,7 +487,6 @@
   border-radius: 1px;
   transition: width 50ms ease-out;
   pointer-events: none;
-  z-index: 2;
 }
 
 .benefit-slider input[type="range"] {
