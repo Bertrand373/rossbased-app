@@ -47,6 +47,9 @@
   --border-subtle: rgba(255, 255, 255, 0.04);
   --border-prominent: rgba(255, 255, 255, 0.12);
   
+  /* Gradients */
+  --gradient-subtle: rgba(255, 255, 255, 0.02);
+  
   /* Text hierarchy */
   --text: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.6);
@@ -113,6 +116,9 @@
   --border: rgba(0, 0, 0, 0.08);
   --border-subtle: rgba(0, 0, 0, 0.04);
   --border-prominent: rgba(0, 0, 0, 0.12);
+  
+  /* Gradients */
+  --gradient-subtle: rgba(0, 0, 0, 0.02);
   
   /* Text hierarchy - dark text */
   --text: #000000;
