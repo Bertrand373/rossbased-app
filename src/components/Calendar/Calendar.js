@@ -19,6 +19,92 @@ import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 // UNIFIED TRIGGER SYSTEM
 import { getAllTriggers, getTriggerLabel } from '../../constants/triggerConstants';
 
+// =============================================================================
+// LUNAR PHASE SYSTEM - Premium moon tracking
+// =============================================================================
+
+const getLunarData = (date) => {
+  const synodicMonth = 29.53058867;
+  const knownNewMoon = new Date('2000-01-06T18:14:00Z');
+  const daysSinceNew = (date.getTime() - knownNewMoon.getTime()) / (1000 * 60 * 60 * 24);
+  const lunarAge = ((daysSinceNew % synodicMonth) + synodicMonth) % synodicMonth;
+  const illumination = (1 - Math.cos((lunarAge / synodicMonth) * 2 * Math.PI)) / 2;
+  
+  let phase, isSignificant, label;
+  if (lunarAge < 1.85) {
+    phase = 'new'; isSignificant = true; label = 'New Moon';
+  } else if (lunarAge < 7.38) {
+    phase = 'waxing-crescent'; isSignificant = false; label = 'Waxing Crescent';
+  } else if (lunarAge < 9.23) {
+    phase = 'first-quarter'; isSignificant = false; label = 'First Quarter';
+  } else if (lunarAge < 13.77) {
+    phase = 'waxing-gibbous'; isSignificant = false; label = 'Waxing Gibbous';
+  } else if (lunarAge < 15.62) {
+    phase = 'full'; isSignificant = true; label = 'Full Moon';
+  } else if (lunarAge < 21.15) {
+    phase = 'waning-gibbous'; isSignificant = false; label = 'Waning Gibbous';
+  } else if (lunarAge < 23.00) {
+    phase = 'last-quarter'; isSignificant = false; label = 'Last Quarter';
+  } else if (lunarAge < 27.54) {
+    phase = 'waning-crescent'; isSignificant = false; label = 'Waning Crescent';
+  } else {
+    phase = 'new'; isSignificant = true; label = 'New Moon';
+  }
+  
+  return {
+    phase,
+    isSignificant,
+    label,
+    illumination: Math.round(illumination * 100),
+    lunarAge: Math.round(lunarAge * 10) / 10
+  };
+};
+
+// Premium Full Moon SVG Component
+const FullMoonIcon = ({ size = 11 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" className="moon-icon moon-full">
+    <defs>
+      <radialGradient id="fullMoonGrad" cx="40%" cy="40%">
+        <stop offset="0%" stopColor="#E5E1D6" />
+        <stop offset="70%" stopColor="#C9C5B8" />
+        <stop offset="100%" stopColor="#A8A498" />
+      </radialGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#fullMoonGrad)" />
+    <circle cx="8" cy="8" r="2" fill="rgba(160, 155, 140, 0.4)" />
+    <circle cx="15" cy="13" r="2.5" fill="rgba(160, 155, 140, 0.4)" />
+    <circle cx="10" cy="16" r="1.5" fill="rgba(160, 155, 140, 0.4)" />
+    <circle cx="16" cy="7" r="1" fill="rgba(160, 155, 140, 0.4)" />
+  </svg>
+);
+
+// Premium Obsidian New Moon SVG Component
+const NewMoonIcon = ({ size = 11 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" className="moon-icon moon-new">
+    <defs>
+      <radialGradient id="obsidianGrad" cx="35%" cy="35%">
+        <stop offset="0%" stopColor="#2a2a35" />
+        <stop offset="50%" stopColor="#151518" />
+        <stop offset="100%" stopColor="#0a0a0c" />
+      </radialGradient>
+      <radialGradient id="obsidianSheen" cx="30%" cy="30%">
+        <stop offset="0%" stopColor="rgba(255,255,255,0.08)" />
+        <stop offset="50%" stopColor="transparent" />
+      </radialGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#obsidianGrad)" />
+    <circle cx="12" cy="12" r="10" fill="url(#obsidianSheen)" />
+    <circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+  </svg>
+);
+
+// Moon icon renderer
+const MoonIcon = ({ phase, size = 11 }) => {
+  if (phase === 'full') return <FullMoonIcon size={size} />;
+  if (phase === 'new') return <NewMoonIcon size={size} />;
+  return null;
+};
+
 const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -29,12 +115,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [editingExistingTrigger, setEditingExistingTrigger] = useState(false);
 
+  // Moon detail modal state
+  const [moonDetailModal, setMoonDetailModal] = useState(false);
+  const [selectedMoonDate, setSelectedMoonDate] = useState(null);
+
   // Journal states
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
 
   // Lock body scroll when any modal is open
-  useBodyScrollLock(dayInfoModal || editDayModal);
+  useBodyScrollLock(dayInfoModal || editDayModal || moonDetailModal);
 
   // Lock scroll on Month view mobile only (fixed content), allow scroll on Week view and desktop
   useEffect(() => {
@@ -221,6 +311,18 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     setDayInfoModal(true);
   };
 
+  // Moon detail modal handlers
+  const openMoonDetail = (day, e) => {
+    e.stopPropagation();
+    setSelectedMoonDate(day);
+    setMoonDetailModal(true);
+  };
+
+  const closeMoonDetail = () => {
+    setMoonDetailModal(false);
+    setSelectedMoonDate(null);
+  };
+
   // Journal handlers
   const startEditingNote = () => {
     setIsEditingNote(true);
@@ -304,6 +406,22 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     return (
       <div className="calendar-status-badge">
         <span>No status recorded</span>
+      </div>
+    );
+  };
+
+  // Render moon phase info for day info modal
+  const renderMoonPhaseInfo = () => {
+    if (!selectedDate) return null;
+    const lunar = getLunarData(selectedDate);
+    
+    return (
+      <div className="calendar-moon-info">
+        <div className="calendar-moon-row">
+          <MoonIcon phase={lunar.phase} size={16} />
+          <span className="calendar-moon-label">{lunar.label}</span>
+          <span className="calendar-moon-illumination">{lunar.illumination}%</span>
+        </div>
       </div>
     );
   };
@@ -743,7 +861,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     }
   };
 
-  // Render month view - ORIGINAL STRUCTURE
+  // Render month view - ORIGINAL STRUCTURE with moon phase indicators
   const renderMonthView = () => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
@@ -776,13 +894,16 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         const dayTracking = getDayTracking(currentDay);
         const isCurrentMonth = isSameMonth(currentDay, currentDate);
         const wetDream = hasWetDream(currentDay);
+        const lunar = getLunarData(currentDay);
+        const isMoonDay = lunar.isSignificant && isCurrentMonth;
         
         const cellClasses = [
           'day-cell',
           !isCurrentMonth ? 'other-month' : '',
           isToday ? 'today' : '',
           dayStatus?.type || '',
-          wetDream ? 'wet-dream' : ''
+          wetDream ? 'wet-dream' : '',
+          isMoonDay ? `moon-day moon-${lunar.phase}` : ''
         ].filter(Boolean).join(' ');
 
         week.push(
@@ -791,6 +912,15 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             {/* Single gold dot if day has any tracked data */}
             {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
               <span className="day-has-data-dot"></span>
+            )}
+            {/* Moon phase indicator - only on significant phases */}
+            {isMoonDay && (
+              <span 
+                className="day-moon-indicator"
+                onClick={(e) => openMoonDetail(currentDay, e)}
+              >
+                <MoonIcon phase={lunar.phase} size={11} />
+              </span>
             )}
           </div>
         );
@@ -814,12 +944,15 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       const dayTracking = getDayTracking(day);
       const wetDream = hasWetDream(day);
       const isToday = isSameDay(day, new Date());
+      const lunar = getLunarData(day);
+      const isMoonDay = lunar.isSignificant;
       
       const cellClasses = [
         'week-day-cell',
         isToday ? 'today-card' : '',
         dayStatus?.type || '',
-        wetDream ? 'wet-dream' : ''
+        wetDream ? 'wet-dream' : '',
+        isMoonDay ? `moon-day moon-${lunar.phase}` : ''
       ].filter(Boolean).join(' ');
 
       days.push(
@@ -829,6 +962,15 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             <span className={`week-day-number ${isToday ? 'today' : ''} ${dayStatus?.type || ''} ${wetDream && !dayStatus ? 'wet-dream' : ''}`}>
               {format(day, 'd')}
             </span>
+            {/* Moon indicator in week view header */}
+            {isMoonDay && (
+              <span 
+                className="week-moon-indicator"
+                onClick={(e) => openMoonDetail(day, e)}
+              >
+                <MoonIcon phase={lunar.phase} size={14} />
+              </span>
+            )}
           </div>
           
           {/* Benefit bars - white progress bars matching modal style */}
@@ -966,6 +1108,9 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
                   {/* SCROLLABLE CONTENT */}
                   <div className="calendar-modal-content">
+                    {/* Moon phase info - always shown */}
+                    {renderMoonPhaseInfo()}
+                    
                     {/* Benefits section (if any) */}
                     {hasBenefits && (
                       <div className="calendar-benefits">
@@ -998,6 +1143,51 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                         Edit Day
                       </button>
                     )}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================
+          MOON DETAIL MODAL - Premium lunar information
+          ================================================================ */}
+      {moonDetailModal && selectedMoonDate && (
+        <div className="calendar-overlay" onClick={closeMoonDetail}>
+          <div className="calendar-modal moon-detail-modal" onClick={e => e.stopPropagation()}>
+            {(() => {
+              const lunar = getLunarData(selectedMoonDate);
+              return (
+                <>
+                  <div className="moon-detail-visual">
+                    <div className={`moon-detail-glow moon-${lunar.phase}`}>
+                      <MoonIcon phase={lunar.phase} size={72} />
+                    </div>
+                  </div>
+                  
+                  <div className="moon-detail-date">
+                    {format(selectedMoonDate, 'EEEE, MMMM d, yyyy')}
+                  </div>
+                  
+                  <h3 className="moon-detail-title">{lunar.label}</h3>
+                  
+                  <div className="moon-detail-illumination">
+                    {lunar.illumination}% illumination
+                  </div>
+                  
+                  <div className="moon-detail-insight">
+                    <p>
+                      {lunar.phase === 'full' 
+                        ? "The full moon often correlates with heightened energy and stronger urges. Many practitioners report peak vitality during this phase."
+                        : "The new moon marks a time of renewal and introspection. Some find this a powerful period for setting intentions and deepening practice."
+                      }
+                    </p>
+                  </div>
+                  
+                  <div className="moon-detail-hint">
+                    Tap anywhere to close
                   </div>
                 </>
               );
