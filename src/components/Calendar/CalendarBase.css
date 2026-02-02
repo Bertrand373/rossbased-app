@@ -395,6 +395,81 @@
 }
 
 /* =============================================================================
+   MOON PHASE INDICATORS - Premium lunar tracking
+   ============================================================================= */
+
+/* Moon indicator position - bottom right of day cell */
+.day-moon-indicator {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: transform 150ms ease;
+}
+
+.day-moon-indicator:hover {
+  transform: scale(1.15);
+}
+
+.day-moon-indicator:active {
+  transform: scale(1.05);
+}
+
+/* Moon icon base styles */
+.moon-icon {
+  display: block;
+  filter: drop-shadow(0 0 2px rgba(201, 197, 184, 0.2));
+}
+
+.moon-icon.moon-full {
+  filter: drop-shadow(0 0 3px rgba(201, 197, 184, 0.3));
+}
+
+.moon-icon.moon-new {
+  filter: drop-shadow(0 0 3px rgba(60, 60, 80, 0.4));
+}
+
+/* Ambient glow on moon day cells */
+.day-cell.moon-day.moon-full {
+  box-shadow: inset 0 0 12px rgba(201, 197, 184, 0.06);
+}
+
+.day-cell.moon-day.moon-new {
+  box-shadow: inset 0 0 12px rgba(60, 60, 80, 0.1);
+}
+
+/* Week view moon indicator */
+.week-moon-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: transform 150ms ease;
+}
+
+.week-moon-indicator:hover {
+  transform: scale(1.15);
+}
+
+.week-moon-indicator:active {
+  transform: scale(1.05);
+}
+
+/* Week day cell moon styling */
+.week-day-cell.moon-day.moon-full {
+  box-shadow: inset 0 0 20px rgba(201, 197, 184, 0.05);
+}
+
+.week-day-cell.moon-day.moon-new {
+  box-shadow: inset 0 0 20px rgba(60, 60, 80, 0.08);
+}
+
+/* =============================================================================
    WEEK VIEW - Premium Cards
    ============================================================================= */
 
@@ -407,7 +482,7 @@
 .week-day-cell {
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 16px 12px;
   cursor: pointer;
   transition: all 200ms ease;
@@ -425,12 +500,23 @@
   transform: scale(0.98);
 }
 
-/* Week Header - Day name + number */
+/* Status styling for week cells */
+.week-day-cell.current-streak { border-left: 3px solid var(--status-current); }
+.week-day-cell.former-streak { border-left: 3px solid var(--status-former); }
+.week-day-cell.relapse { border-left: 3px solid var(--status-relapse); }
+.week-day-cell.wet-dream { border-left: 3px solid var(--status-wetdream); }
+
+/* Today card highlight */
+.week-day-cell.today-card {
+  background: var(--surface-raised);
+  border-color: var(--border-prominent);
+}
+
+/* Week day header */
 .week-day-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  align-items: flex-start;
   margin-bottom: 16px;
 }
 
@@ -439,14 +525,14 @@
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
 }
 
 .week-day-number {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  font-feature-settings: 'tnum' 1;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
   line-height: 1;
 }
 
@@ -454,16 +540,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   background: var(--text);
   color: var(--background);
   border-radius: 50%;
-  font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.875rem;
 }
 
-/* Week Benefits - Prominent display */
+.week-day-number.current-streak { color: var(--status-current); }
+.week-day-number.former-streak { color: var(--status-former); }
+.week-day-number.relapse { color: var(--status-relapse); }
+.week-day-number.wet-dream { color: var(--status-wetdream); }
+
+/* Preserve today styling when combined with status */
+.week-day-number.today.current-streak,
+.week-day-number.today.former-streak,
+.week-day-number.today.relapse,
+.week-day-number.today.wet-dream {
+  background: var(--text);
+  color: var(--background);
+}
+
+/* Week benefits - prominent bars */
 .week-benefits-prominent {
   flex: 1;
   display: flex;
@@ -480,26 +579,26 @@
 .week-benefit-label-top {
   font-size: 0.5625rem;
   font-weight: 600;
-  color: var(--text-tertiary);
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .week-benefit-bar {
-  height: 3px;
+  height: 2px;
   background: var(--border-prominent);
-  border-radius: 2px;
+  border-radius: 1px;
   overflow: hidden;
 }
 
 .week-benefit-fill {
   height: 100%;
   background: var(--text);
-  border-radius: 2px;
+  border-radius: 1px;
   transition: width 300ms ease;
 }
 
-/* Week Status Indicators */
+/* Week day indicators */
 .week-day-indicators {
   display: flex;
   align-items: center;
@@ -541,23 +640,21 @@
 @media (max-width: 768px) {
   .week-view-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
   }
   
   .week-day-cell {
     flex-direction: row;
     align-items: center;
     min-height: auto;
-    padding: 16px 20px;
-    gap: 20px;
+    padding: 16px;
+    gap: 16px;
   }
   
   .week-day-header {
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
     margin-bottom: 0;
     min-width: 56px;
+    flex-shrink: 0;
   }
   
   .week-day-name {
@@ -565,12 +662,6 @@
   }
   
   .week-day-number {
-    font-size: 1.75rem;
-  }
-  
-  .week-day-number.today {
-    width: 44px;
-    height: 44px;
     font-size: 1rem;
   }
   
@@ -619,6 +710,12 @@
   .week-status-dot {
     width: 5px;
     height: 5px;
+  }
+  
+  /* Moon indicator in tablet week view */
+  .week-moon-indicator {
+    margin-left: 0;
+    margin-top: 4px;
   }
 }
 
@@ -726,6 +823,26 @@
     right: 2px;
   }
   
+  /* Moon indicator mobile adjustments */
+  .day-moon-indicator {
+    bottom: 2px;
+    right: 2px;
+  }
+  
+  .day-moon-indicator .moon-icon {
+    width: 9px;
+    height: 9px;
+  }
+  
+  /* Moon day ambient glow - subtler on mobile */
+  .day-cell.moon-day.moon-full {
+    box-shadow: inset 0 0 8px rgba(201, 197, 184, 0.05);
+  }
+  
+  .day-cell.moon-day.moon-new {
+    box-shadow: inset 0 0 8px rgba(60, 60, 80, 0.08);
+  }
+  
   /* Week view very small */
   .week-day-cell {
     padding: 14px 16px;
@@ -770,6 +887,11 @@
     width: 4px;
     height: 4px;
   }
+  
+  .week-moon-indicator .moon-icon {
+    width: 12px;
+    height: 12px;
+  }
 }
 
 @media (max-width: 360px) {
@@ -780,6 +902,12 @@
   
   .toggle-divider {
     height: 12px;
+  }
+  
+  /* Even smaller moon on tiny screens */
+  .day-moon-indicator .moon-icon {
+    width: 8px;
+    height: 8px;
   }
 }
 
@@ -907,6 +1035,26 @@
     right: 8px;
   }
   
+  /* Moon indicator desktop */
+  .day-moon-indicator {
+    bottom: 6px;
+    right: 6px;
+  }
+  
+  .day-moon-indicator .moon-icon {
+    width: 13px;
+    height: 13px;
+  }
+  
+  /* Moon day ambient glow - stronger on desktop */
+  .day-cell.moon-day.moon-full {
+    box-shadow: inset 0 0 16px rgba(201, 197, 184, 0.07);
+  }
+  
+  .day-cell.moon-day.moon-new {
+    box-shadow: inset 0 0 16px rgba(60, 60, 80, 0.12);
+  }
+  
   /* Week view - better spacing on desktop */
   .week-view-grid {
     gap: 12px;
@@ -958,6 +1106,11 @@
     width: 7px;
     height: 7px;
   }
+  
+  .week-moon-indicator .moon-icon {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 /* =============================================================================
@@ -976,7 +1129,9 @@
   .period-arrow,
   .day-cell,
   .week-day-cell,
-  .week-benefit-fill {
+  .week-benefit-fill,
+  .day-moon-indicator,
+  .week-moon-indicator {
     transition: none;
   }
 }

@@ -857,3 +857,202 @@
   .calendar-btn-primary, .calendar-btn-ghost, .calendar-btn-back { padding: 16px 24px; font-size: 0.9375rem; }
   .calendar-actions { margin-top: 32px; }
 }
+
+/* =============================================================================
+   MOON PHASE INFO - Day Info Modal
+   ============================================================================= */
+
+.calendar-moon-info {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.calendar-moon-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: var(--surface-overlay);
+  border-radius: 100px;
+}
+
+.calendar-moon-row .moon-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.calendar-moon-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.calendar-moon-illumination {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* =============================================================================
+   MOON DETAIL MODAL - Premium lunar information
+   ============================================================================= */
+
+.moon-detail-modal {
+  text-align: center;
+  padding: 0;
+  max-width: 320px;
+  animation: moonDetailIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes moonDetailIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+.moon-detail-visual {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.moon-detail-glow {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 300ms ease;
+}
+
+.moon-detail-glow.moon-full {
+  background: rgba(201, 197, 184, 0.05);
+  box-shadow: 
+    0 0 40px rgba(201, 197, 184, 0.12),
+    0 0 80px rgba(201, 197, 184, 0.06);
+}
+
+.moon-detail-glow.moon-new {
+  background: rgba(60, 60, 80, 0.08);
+  box-shadow: 
+    0 0 40px rgba(40, 40, 60, 0.15),
+    0 0 80px rgba(40, 40, 60, 0.08);
+}
+
+.moon-detail-glow .moon-icon {
+  width: 72px;
+  height: 72px;
+}
+
+.moon-detail-date {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.moon-detail-title {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.moon-detail-illumination {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+
+.moon-detail-insight {
+  padding: 20px;
+  background: var(--surface-overlay);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 24px;
+}
+
+.moon-detail-insight p {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.moon-detail-hint {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+}
+
+/* Moon detail modal responsive */
+@media (max-width: 480px) {
+  .moon-detail-modal {
+    max-width: 280px;
+  }
+  
+  .moon-detail-glow {
+    width: 88px;
+    height: 88px;
+  }
+  
+  .moon-detail-glow .moon-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .moon-detail-title {
+    font-size: 1.5rem;
+  }
+  
+  .moon-detail-illumination {
+    font-size: 0.875rem;
+    margin-bottom: 24px;
+  }
+  
+  .moon-detail-insight {
+    padding: 16px;
+  }
+  
+  .moon-detail-insight p {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .moon-detail-modal {
+    max-width: 340px;
+  }
+  
+  .moon-detail-glow {
+    width: 110px;
+    height: 110px;
+  }
+  
+  .moon-detail-glow .moon-icon {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .moon-detail-title {
+    font-size: 1.875rem;
+  }
+  
+  .moon-detail-insight {
+    padding: 24px;
+  }
+}
