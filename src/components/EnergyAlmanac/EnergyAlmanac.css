@@ -29,7 +29,14 @@
 
 .energy-almanac:hover { opacity: 0.8; }
 .energy-almanac:active { opacity: 0.6; }
-.energy-almanac.hidden { display: none; }
+
+/* Hidden state - use opacity/visibility instead of display:none for smoother transition */
+.energy-almanac.hidden { 
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+}
 
 [data-theme="light"] .energy-almanac {
   background: rgba(0, 0, 0, 0.03);
@@ -110,12 +117,13 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 999;
-  animation: fadeIn 200ms ease;
+  animation: fadeIn 200ms ease forwards;
+  will-change: opacity;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 .almanac-modal {
@@ -130,12 +138,19 @@
   background: var(--background);
   border-radius: 16px;
   z-index: 1000;
-  animation: modalIn 200ms ease;
+  animation: modalIn 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  0% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 /* Modal Header */
