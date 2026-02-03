@@ -30,12 +30,9 @@
 .energy-almanac:hover { opacity: 0.8; }
 .energy-almanac:active { opacity: 0.6; }
 
-/* Hidden state - use opacity/visibility instead of display:none for smoother transition */
+/* Hidden state - simple display none is fine, the issue is elsewhere */
 .energy-almanac.hidden { 
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  position: absolute;
+  display: none;
 }
 
 [data-theme="light"] .energy-almanac {
@@ -117,13 +114,12 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 999;
-  animation: fadeIn 200ms ease forwards;
-  will-change: opacity;
+  animation: overlayFadeIn 200ms ease-out forwards;
 }
 
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .almanac-modal {
@@ -138,18 +134,18 @@
   background: var(--background);
   border-radius: 16px;
   z-index: 1000;
-  animation: modalIn 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
+  animation: modalFadeIn 200ms ease-out forwards;
 }
 
-@keyframes modalIn {
-  0% { 
+/* Only animate opacity and scale, NOT the translate */
+@keyframes modalFadeIn {
+  from { 
     opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.95);
+    scale: 0.96;
   }
-  100% { 
+  to { 
     opacity: 1; 
-    transform: translate(-50%, -50%) scale(1);
+    scale: 1;
   }
 }
 
