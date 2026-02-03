@@ -461,11 +461,29 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const userInitial = userData?.username?.charAt(0)?.toUpperCase() || 
                       userData?.email?.charAt(0)?.toUpperCase() || '?';
 
+  // Build Discord avatar URL if available
+  const getDiscordAvatarUrl = () => {
+    const { discordId, discordAvatar } = userData || {};
+    if (discordAvatar && discordId) {
+      const extension = discordAvatar.startsWith('a_') ? 'gif' : 'png';
+      return `https://cdn.discordapp.com/avatars/${discordId}/${discordAvatar}.${extension}?size=128`;
+    }
+    return null;
+  };
+  
+  const avatarUrl = getDiscordAvatarUrl();
+
   return (
     <div className="profile">
       {/* User Info - Sign Out accessible here */}
       <div className="profile-user">
-        <div className="profile-avatar">{userInitial}</div>
+        <div className={`profile-avatar ${avatarUrl ? 'has-image' : ''}`}>
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="profile-avatar-img" />
+          ) : (
+            userInitial
+          )}
+        </div>
         <div className="profile-user-info">
           <span className="profile-name">{userData.username}</span>
           <span className="profile-since">Member since {memberSince}</span>

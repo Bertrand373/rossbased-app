@@ -308,9 +308,12 @@ async function postCtaToDiscord() {
       }
     }
     
-    // Post new CTA message
+    // Post new CTA message as embed (embeds support clickable links)
     const ctaPayload = {
-      content: `"Don't count the days."\n\nThen how do you know what day 30 feels like? Day 90? The flatlines?\n\nYou tracked. We all did. That's how you learned.\n\n**titantrack.app**\n\n*Free lifetime access for Discord members who joined before Feb 17*`
+      embeds: [{
+        color: 0x000000,
+        description: `"Don't count the days."\n\nThen how do you know what day 30 feels like? Day 90? The flatlines?\n\nYou tracked. We all did. That's how you learned.\n\n**[titantrack.app](https://titantrack.app)**\n\n*Free lifetime access for Discord members who joined before Feb 17*`
+      }]
     };
     
     const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {

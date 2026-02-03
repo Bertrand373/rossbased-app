@@ -70,6 +70,8 @@ export const useUserData = () => {
     urgeToolUsage: [],
     urgeLog: [],
     discordUsername: '',
+    discordId: null,
+    discordAvatar: null,
     showOnLeaderboard: false,
     notes: {},
     dataSharing: false,
@@ -202,10 +204,7 @@ export const useUserData = () => {
       }));
     }
     
-    // Set defaults
-    processed.email = processed.email || '';
-    processed.dataSharing = processed.dataSharing || false;
-    processed.analyticsOptIn = processed.analyticsOptIn !== false;
+In = processed.analyticsOptIn !== false;
     processed.marketingEmails = processed.marketingEmails || false;
     processed.darkMode = processed.darkMode !== false;
     processed.notifications = processed.notifications !== false;

@@ -114,24 +114,40 @@ const AIChatButton = ({ onClick }) => {
   );
 };
 
-// Profile Button - Minimal circle
+// Profile Button - Discord avatar with initial fallback
 const ProfileButton = ({ userData }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = location.pathname === '/profile';
   
-  // Get first initial from email or username
-  const initial = userData?.email?.charAt(0)?.toUpperCase() || 
-                  userData?.username?.charAt(0)?.toUpperCase() || 
+  // Get first initial from username or email as fallback
+  const initial = userData?.username?.charAt(0)?.toUpperCase() || 
+                  userData?.email?.charAt(0)?.toUpperCase() || 
                   '?';
+  
+  // Build Discord avatar URL if available
+  const getDiscordAvatarUrl = () => {
+    const { discordId, discordAvatar } = userData || {};
+    if (discordAvatar && discordId) {
+      const extension = discordAvatar.startsWith('a_') ? 'gif' : 'png';
+      return `https://cdn.discordapp.com/avatars/${discordId}/${discordAvatar}.${extension}?size=64`;
+    }
+    return null;
+  };
+  
+  const avatarUrl = getDiscordAvatarUrl();
   
   return (
     <button 
-      className={`profile-circle ${isActive ? 'active' : ''}`} 
+      className={`profile-circle ${isActive ? 'active' : ''} ${avatarUrl ? 'has-avatar' : ''}`} 
       onClick={() => navigate('/profile')} 
       aria-label="Profile"
     >
-      {initial}
+      {avatarUrl ? (
+        <img src={avatarUrl} alt="" className="profile-circle-img" />
+      ) : (
+        initial
+      )}
     </button>
   );
 };
