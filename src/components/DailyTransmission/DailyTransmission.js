@@ -9,7 +9,7 @@ import './DailyTransmission.css';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 // Pure DOM overlay - completely outside React
-// Now theme-aware: reads data-theme attribute
+// Theme-aware: reads data-theme attribute and matches inline card styling
 const showOverlay = (content) => {
   // Remove any existing overlay first
   const existing = document.getElementById('transmission-overlay-root');
@@ -19,25 +19,25 @@ const showOverlay = (content) => {
   const theme = document.documentElement.getAttribute('data-theme') || 'dark';
   const isLight = theme === 'light';
   
-  // Theme-aware colors
+  // Theme-aware colors - matches inline card styling (surface-overlay pattern)
   const colors = isLight ? {
     backdrop: 'rgba(255,255,255,0.95)',
-    cardBg: '#f8f8f8',
-    cardBorder: 'rgba(184,134,11,0.2)',
-    cardShadow: '0 20px 60px rgba(0,0,0,0.15)',
+    cardBg: 'rgba(0,0,0,0.03)',
+    cardBorder: 'rgba(0,0,0,0.06)',
+    cardShadow: '0 20px 60px rgba(0,0,0,0.12)',
     accent: '#b8860b',
     accentMuted: 'rgba(184,134,11,0.5)',
-    text: 'rgba(0,0,0,0.65)',
+    text: 'rgba(0,0,0,0.6)',
     textStrong: '#000000',
     closeBtn: 'rgba(0,0,0,0.4)'
   } : {
-    backdrop: 'rgba(0,0,0,0.85)',
-    cardBg: '#0a0a0a',
-    cardBorder: 'rgba(255,221,0,0.15)',
-    cardShadow: '0 20px 60px rgba(0,0,0,0.6)',
+    backdrop: 'rgba(0,0,0,0.95)',
+    cardBg: 'rgba(255,255,255,0.08)',
+    cardBorder: 'rgba(255,255,255,0.04)',
+    cardShadow: '0 20px 60px rgba(0,0,0,0.5)',
     accent: '#ffdd00',
     accentMuted: 'rgba(255,221,0,0.5)',
-    text: 'rgba(255,255,255,0.65)',
+    text: 'rgba(255,255,255,0.6)',
     textStrong: '#ffffff',
     closeBtn: 'rgba(255,255,255,0.4)'
   };
@@ -47,8 +47,8 @@ const showOverlay = (content) => {
   root.id = 'transmission-overlay-root';
   root.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;';
   root.innerHTML = `
-    <div class="trans-modal-backdrop" style="position:fixed;top:0;left:0;right:0;bottom:0;background:${colors.backdrop};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;"></div>
-    <div class="trans-modal-card" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100vw - 40px);max-width:400px;background:${colors.cardBg};border:1px solid ${colors.cardBorder};border-radius:16px;padding:20px;z-index:100000;box-shadow:${colors.cardShadow};">
+    <div class="trans-modal-backdrop" style="position:fixed;top:0;left:0;right:0;bottom:0;background:${colors.backdrop};backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);z-index:99999;"></div>
+    <div class="trans-modal-card" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100vw - 40px);max-width:400px;background:${colors.cardBg};border:1px solid ${colors.cardBorder};border-radius:12px;padding:20px;z-index:100000;box-shadow:${colors.cardShadow};">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
         <span style="font-size:0.625rem;color:${colors.accent};opacity:0.7;">✦</span>
         <span style="font-size:0.5625rem;font-weight:600;color:${colors.accentMuted};letter-spacing:0.1em;text-transform:uppercase;flex:1;">Daily Transmission</span>

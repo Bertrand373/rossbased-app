@@ -79,15 +79,26 @@
   pointer-events: none;
 }
 
-/* Light mode: Softer fade that matches card background */
+/* Light mode: Use surface-raised color for fade (matches hover state) */
 [data-theme="light"] .daily-transmission.expandable:not(.expanded):not(.hidden-for-expand) .transmission-text::after {
   height: 3em;
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(248, 248, 248, 0.5) 50%,
-    rgba(248, 248, 248, 1) 100%
+    rgba(240, 240, 240, 0.5) 50%,
+    rgba(240, 240, 240, 1) 100%
   );
+}
+
+/* Light mode: Cleaner card background without shadow artifacts */
+[data-theme="light"] .daily-transmission {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .daily-transmission.expandable:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 /* Overlay backdrop */
