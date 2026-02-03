@@ -237,6 +237,7 @@ async function downloadImage(imageUrl) {
 
 /**
  * Format fallback text leaderboard (when image fails)
+ * Now includes button component
  */
 function formatTextLeaderboard(users) {
   const now = new Date();
@@ -257,6 +258,16 @@ function formatTextLeaderboard(users) {
         url: 'https://titantrack.app',
         description: '```\nNo one on the board yet.\n```\n[Join the leaderboard →](https://titantrack.app)',
         footer: { text: `Updated ${estTimestamp} EST` }
+      }],
+      components: [{
+        type: 1, // Action Row
+        components: [{
+          type: 2, // Button
+          style: 5, // Link style
+          label: 'Open TitanTrack',
+          url: 'https://titantrack.app',
+          emoji: { name: '🔗' }
+        }]
       }]
     };
   }
@@ -280,6 +291,16 @@ function formatTextLeaderboard(users) {
       url: 'https://titantrack.app',
       description: `\`\`\`\n${leaderboardText}\`\`\`\n[Join the leaderboard →](https://titantrack.app)`,
       footer: { text: `Updated ${estTimestamp} EST` }
+    }],
+    components: [{
+      type: 1, // Action Row
+      components: [{
+        type: 2, // Button
+        style: 5, // Link style
+        label: 'Open TitanTrack',
+        url: 'https://titantrack.app',
+        emoji: { name: '🔗' }
+      }]
     }]
   };
 }
@@ -287,6 +308,7 @@ function formatTextLeaderboard(users) {
 /**
  * Post leaderboard to Discord
  * Tries image first, falls back to text embed
+ * Now includes clickable button below the leaderboard
  */
 async function postLeaderboardToDiscord() {
   if (!LEADERBOARD_WEBHOOK) {
@@ -311,6 +333,21 @@ async function postLeaderboardToDiscord() {
         const FormData = require('form-data');
         const formData = new FormData();
         formData.append('file', imageBuffer, { filename: 'leaderboard.png', contentType: 'image/png' });
+        
+        // Add payload_json with button component
+        const payloadJson = {
+          components: [{
+            type: 1, // Action Row
+            components: [{
+              type: 2, // Button
+              style: 5, // Link style (external URL)
+              label: 'Open TitanTrack',
+              url: 'https://titantrack.app',
+              emoji: { name: '🔗' }
+            }]
+          }]
+        };
+        formData.append('payload_json', JSON.stringify(payloadJson));
         
         // Post new message with attachment using https module for proper multipart
         const https = require('https');
@@ -363,7 +400,7 @@ async function postLeaderboardToDiscord() {
       }
     }
     
-    // Fallback: Text-only leaderboard
+    // Fallback: Text-only leaderboard (now includes button)
     const messagePayload = formatTextLeaderboard(users);
     
     if (existingMessageId) {
