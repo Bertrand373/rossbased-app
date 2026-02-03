@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema({
   discordAvatar: String,
   discordDisplayName: String, // What people see in Discord (global_name)
   startDate: Date,
+  
+  // NEW: Birth date for Energy Almanac calculations (numerology, Chinese zodiac)
+  birthDate: Date,
+  
   currentStreak: { type: Number, default: 0 },
   longestStreak: { type: Number, default: 0 },
   wetDreamCount: { type: Number, default: 0 },

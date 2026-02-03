@@ -1,6 +1,6 @@
 // Tracker.js - TITANTRACK
-// UPDATED: Replaced DailyQuote with DailyTransmission
-// UPDATED: Added mutual exclusion between PatternInsightCard and DailyTransmission
+// UPDATED: Replaced DailyTransmission with EnergyAlmanac
+// UPDATED: Added mutual exclusion between PatternInsightCard and EnergyAlmanac
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import './Tracker.css';
 import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
-import DailyTransmission from '../DailyTransmission/DailyTransmission';
+import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
 import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 
 // NEW: Import InterventionService for ML feedback loop
@@ -28,7 +28,7 @@ const Tracker = ({ userData, updateUserData }) => {
   // FIXED: Show onboarding for ANY new user who hasn't seen it
   const [showOnboarding, setShowOnboarding] = useState(!userData.hasSeenOnboarding);
   
-  // NEW: Track if PatternInsightCard is showing (for mutual exclusion with DailyTransmission)
+  // NEW: Track if PatternInsightCard is showing (for mutual exclusion with EnergyAlmanac)
   const [isPatternAlertShowing, setIsPatternAlertShowing] = useState(false);
   
   const [benefits, setBenefits] = useState({ 
@@ -374,9 +374,9 @@ const Tracker = ({ userData, updateUserData }) => {
       )}
 
       {/* Main */}
-      {/* Daily Transmission - Fixed at top */}
+      {/* Energy Almanac - Fixed at top */}
       {/* Only shows when PatternInsightCard is NOT showing */}
-      <DailyTransmission 
+      <EnergyAlmanac 
         userData={userData}
         isPatternAlertShowing={isPatternAlertShowing}
       />

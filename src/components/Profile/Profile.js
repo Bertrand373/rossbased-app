@@ -28,6 +28,9 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
+  // Birth date for Energy Almanac (numerology, zodiac calculations)
+  const [birthDate, setBirthDate] = useState(userData.birthDate ? format(new Date(userData.birthDate), 'yyyy-MM-dd') : '');
+  
   // Leaderboard rank
   const [userRank, setUserRank] = useState(null);
   const [isLoadingRank, setIsLoadingRank] = useState(false);
@@ -335,12 +338,13 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     ? format(new Date(userData.createdAt), 'MMMM yyyy') 
     : 'Unknown';
 
-  // Profile save - only saves text fields (username, email, discordUsername)
+  // Profile save - saves text fields including birth date
   const handleProfileUpdate = () => {
     updateUserData({
       username: username.trim(),
       email: email.trim(),
-      discordUsername: discordUsername.trim()
+      discordUsername: discordUsername.trim(),
+      birthDate: birthDate ? new Date(birthDate) : null
     });
     setIsEditingProfile(false);
     toast.success('Profile updated', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
@@ -351,6 +355,7 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     setUsername(userData.username || '');
     setEmail(userData.email || '');
     setDiscordUsername(userData.discordUsername || '');
+    setBirthDate(userData.birthDate ? format(new Date(userData.birthDate), 'yyyy-MM-dd') : '');
     setIsEditingProfile(false);
   };
 
@@ -553,6 +558,18 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
                 placeholder="@username"
               />
               <span className="form-hint">Found in Discord → Settings → username</span>
+            </div>
+
+            <div className="form-group">
+              <label>Birth Date</label>
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                disabled={!isEditingProfile}
+                max={format(new Date(), 'yyyy-MM-dd')}
+              />
+              <span className="form-hint">Enables personalized numerology & zodiac insights</span>
             </div>
 
             {/* Save/Cancel buttons - only visible when editing, stacked */}

@@ -1,0 +1,469 @@
+/* src/components/EnergyAlmanac/EnergyAlmanac.css */
+/* Energy Almanac - Cycle-based daily forecast */
+/* Matches existing app card patterns (calendar, stats cards) */
+
+/* ============================================================
+   COLLAPSED CARD
+   ============================================================ */
+
+.energy-almanac {
+  width: 100%;
+  max-width: 340px;
+  padding: 16px 20px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  text-align: left;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  
+  /* Animation - fade in */
+  animation: almanacFadeIn 500ms ease forwards;
+  opacity: 0;
+  transition: transform 200ms ease, background 200ms ease;
+}
+
+@keyframes almanacFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.energy-almanac:hover {
+  background: var(--surface-raised);
+}
+
+.energy-almanac:active {
+  transform: scale(0.98);
+}
+
+.energy-almanac.hidden-for-expand {
+  visibility: hidden;
+}
+
+/* Light mode */
+[data-theme="light"] .energy-almanac {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .energy-almanac:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.almanac-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.almanac-icon {
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  opacity: 0.8;
+}
+
+.almanac-label {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--accent-gold-text);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.almanac-expand-hint {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 300;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 150ms ease;
+}
+
+.energy-almanac:hover .almanac-expand-hint {
+  color: var(--text-secondary);
+}
+
+.almanac-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  font-weight: 300;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1;
+}
+
+.almanac-close:hover {
+  background: var(--surface-overlay);
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   QUICK STATS ROW (Collapsed)
+   ============================================================ */
+
+.almanac-quick-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.quick-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-emoji {
+  font-size: 0.875rem;
+}
+
+.stat-value {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.quick-stat-divider {
+  color: var(--text-muted);
+  opacity: 0.5;
+  font-size: 0.75rem;
+}
+
+/* ============================================================
+   FORECAST PREVIEW (Collapsed)
+   ============================================================ */
+
+.almanac-forecast-preview {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ============================================================
+   EXPANDED OVERLAY
+   ============================================================ */
+
+.almanac-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9998;
+  animation: overlayFadeIn 200ms ease;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.almanac-expanded {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100vw - 32px);
+  max-width: 400px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  z-index: 9999;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: expandIn 200ms ease;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+[data-theme="light"] .almanac-expanded {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================================
+   CYCLES DISPLAY (Expanded)
+   ============================================================ */
+
+.almanac-cycles {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.cycle-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.cycle-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  background: var(--surface-overlay);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.cycle-icon.cycle-number {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.cycle-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.cycle-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.cycle-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cycle-value {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.cycle-phase {
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  margin-bottom: 4px;
+}
+
+.cycle-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Progress Bar */
+.cycle-bar {
+  height: 4px;
+  background: var(--surface-overlay);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.cycle-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-text));
+  border-radius: 2px;
+  transition: width 300ms ease;
+}
+
+/* ============================================================
+   FULL FORECAST (Expanded)
+   ============================================================ */
+
+.almanac-forecast-full {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.forecast-label {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.forecast-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ============================================================
+   BIRTH DATE PROMPT
+   ============================================================ */
+
+.almanac-birth-prompt {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--surface-overlay);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.almanac-birth-prompt span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .energy-almanac {
+    max-width: 320px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  
+  .almanac-expanded {
+    width: calc(100vw - 24px);
+    padding: 18px;
+    max-height: calc(100vh - 60px);
+  }
+  
+  .almanac-quick-stats {
+    gap: 6px;
+  }
+  
+  .stat-value {
+    font-size: 0.75rem;
+  }
+  
+  .stat-label {
+    font-size: 0.625rem;
+  }
+  
+  .cycle-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+  }
+  
+  .cycle-name {
+    font-size: 0.75rem;
+  }
+  
+  .cycle-desc {
+    font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .energy-almanac {
+    max-width: 300px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+  }
+  
+  .almanac-forecast-preview {
+    font-size: 0.75rem;
+  }
+}
+
+/* Short screens */
+@media (max-height: 700px) {
+  .energy-almanac {
+    margin-bottom: 14px;
+    padding: 12px 16px;
+  }
+  
+  .almanac-quick-stats {
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-height: 600px) {
+  .energy-almanac {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+  }
+  
+  .almanac-header {
+    margin-bottom: 8px;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .energy-almanac {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .almanac-overlay {
+    animation: none;
+  }
+  
+  .almanac-expanded {
+    animation: none;
+  }
+  
+  .cycle-progress {
+    transition: none;
+  }
+}
