@@ -2,9 +2,35 @@
 // Personal Energy Almanac - Cycle-based daily forecast
 // Replaces DailyTransmission with pure client-side calculations
 // No API costs - all math done locally
+// UPDATED: Correct Lunar New Year dates, refined UI matching app aesthetic
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import './EnergyAlmanac.css';
+
+// ============================================================
+// LUNAR NEW YEAR DATES (for accurate Chinese Zodiac)
+// ============================================================
+
+const LUNAR_NEW_YEAR_DATES = {
+  2020: '2020-01-25', 2021: '2021-02-12', 2022: '2022-02-01',
+  2023: '2023-01-22', 2024: '2024-02-10', 2025: '2025-01-29',
+  2026: '2026-02-17', 2027: '2027-02-06', 2028: '2028-01-26',
+  2029: '2029-02-13', 2030: '2030-02-03'
+};
+
+/**
+ * Get the Chinese zodiac year for a given date
+ * Accounts for Lunar New Year (year doesn't start Jan 1)
+ */
+const getChineseYear = (date) => {
+  const year = date.getFullYear();
+  const lnyDate = LUNAR_NEW_YEAR_DATES[year];
+  
+  if (lnyDate && date < new Date(lnyDate)) {
+    return year - 1; // Before Lunar New Year = previous year's animal
+  }
+  return year;
+};
 
 // ============================================================
 // CALCULATION ENGINES
@@ -12,53 +38,41 @@ import './EnergyAlmanac.css';
 
 /**
  * Calculate moon phase (0-29.53 day cycle)
- * Returns phase name and percentage illumination
  */
 const getMoonPhase = (date = new Date()) => {
-  // Known new moon: January 6, 2000 at 18:14 UTC
   const knownNewMoon = new Date('2000-01-06T18:14:00Z');
-  const lunarCycle = 29.53058867; // days
+  const lunarCycle = 29.53058867;
   
   const daysSinceKnown = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
   const currentCycleDay = daysSinceKnown % lunarCycle;
   const normalizedDay = currentCycleDay < 0 ? currentCycleDay + lunarCycle : currentCycleDay;
   
-  // Calculate illumination (0-100%)
   const illumination = Math.round((1 - Math.cos(2 * Math.PI * normalizedDay / lunarCycle)) / 2 * 100);
   
-  // Determine phase name
   let phase, emoji, energy;
   if (normalizedDay < 1.85) {
-    phase = 'New Moon';
-    emoji = '🌑';
+    phase = 'New Moon'; emoji = '🌑';
     energy = 'New beginnings, intention setting, introspection';
   } else if (normalizedDay < 7.38) {
-    phase = 'Waxing Crescent';
-    emoji = '🌒';
+    phase = 'Waxing Crescent'; emoji = '🌒';
     energy = 'Building momentum, taking action on intentions';
   } else if (normalizedDay < 9.23) {
-    phase = 'First Quarter';
-    emoji = '🌓';
+    phase = 'First Quarter'; emoji = '🌓';
     energy = 'Challenges arise, decision points, commitment';
   } else if (normalizedDay < 14.77) {
-    phase = 'Waxing Gibbous';
-    emoji = '🌔';
+    phase = 'Waxing Gibbous'; emoji = '🌔';
     energy = 'Refinement, adjustment, patience before fruition';
   } else if (normalizedDay < 16.61) {
-    phase = 'Full Moon';
-    emoji = '🌕';
+    phase = 'Full Moon'; emoji = '🌕';
     energy = 'Peak energy, culmination, heightened emotions';
   } else if (normalizedDay < 22.15) {
-    phase = 'Waning Gibbous';
-    emoji = '🌖';
+    phase = 'Waning Gibbous'; emoji = '🌖';
     energy = 'Gratitude, sharing wisdom, integration';
   } else if (normalizedDay < 23.99) {
-    phase = 'Last Quarter';
-    emoji = '🌗';
+    phase = 'Last Quarter'; emoji = '🌗';
     energy = 'Release, forgiveness, letting go';
   } else {
-    phase = 'Waning Crescent';
-    emoji = '🌘';
+    phase = 'Waning Crescent'; emoji = '🌘';
     energy = 'Rest, reflection, preparation for renewal';
   }
   
@@ -66,8 +80,7 @@ const getMoonPhase = (date = new Date()) => {
 };
 
 /**
- * Calculate spermatogenesis cycle position
- * Full cycle: 64-74 days (we use 72 as average)
+ * Calculate spermatogenesis cycle position (72-day cycle)
  */
 const getSpermatogenesisPhase = (streakDays) => {
   const cycleLength = 72;
@@ -76,28 +89,26 @@ const getSpermatogenesisPhase = (streakDays) => {
   let phase, description;
   if (position <= 16) {
     phase = 'Mitotic Division';
-    description = 'Stem cells multiplying. Foundation building. Energy accumulating.';
+    description = 'Stem cells multiplying. Foundation building.';
   } else if (position <= 40) {
     phase = 'Meiotic Division';
-    description = 'Genetic diversity creating. Deep cellular work. Transformation underway.';
+    description = 'Deep cellular transformation underway.';
   } else if (position <= 64) {
     phase = 'Maturation';
-    description = 'Full development phase. Peak nutrient retention. Maximum reabsorption.';
+    description = 'Peak nutrient retention. Maximum reabsorption.';
   } else {
     phase = 'Complete Reabsorption';
-    description = 'Cycle complete. Body optimizing. Highest transmutation potential.';
+    description = 'Highest transmutation potential.';
   }
   
-  // Calculate cycle number
   const cycleNumber = Math.floor(streakDays / cycleLength) + 1;
   
   return { position, cycleLength, phase, description, cycleNumber };
 };
 
 /**
- * Calculate numerology Personal Day number
- * Formula: Birth Month + Birth Day + Current Month + Current Day + Current Year
- * Reduce to single digit (except master numbers 11, 22, 33)
+ * Calculate Personal Day number (numerology)
+ * Uses proper reduction method
  */
 const getPersonalDay = (birthDate, currentDate = new Date()) => {
   if (!birthDate) return null;
@@ -109,7 +120,6 @@ const getPersonalDay = (birthDate, currentDate = new Date()) => {
   const currentDay = currentDate.getDate();
   const currentYear = currentDate.getFullYear();
   
-  // Reduce each component
   const reduceToDigit = (num) => {
     while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
       num = String(num).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
@@ -117,10 +127,14 @@ const getPersonalDay = (birthDate, currentDate = new Date()) => {
     return num;
   };
   
-  const sum = birthMonth + birthDay + currentMonth + currentDay + 
-              String(currentYear).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+  // Reduce each component first, then add
+  const birthSum = reduceToDigit(birthMonth + birthDay);
+  const yearSum = reduceToDigit(
+    String(currentYear).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0)
+  );
+  const dateSum = reduceToDigit(currentMonth + currentDay);
   
-  const personalDay = reduceToDigit(sum);
+  const personalDay = reduceToDigit(birthSum + yearSum + dateSum);
   
   const meanings = {
     1: { theme: 'Initiative', guidance: 'Start new projects. Take leadership. Assert yourself.' },
@@ -141,62 +155,33 @@ const getPersonalDay = (birthDate, currentDate = new Date()) => {
 };
 
 /**
- * Calculate Life Path number from birth date
+ * Calculate Chinese Zodiac with proper Lunar New Year dates
  */
-const getLifePath = (birthDate) => {
+const getChineseZodiac = (birthDate, currentDate = new Date()) => {
   if (!birthDate) return null;
   
   const birth = new Date(birthDate);
-  const month = birth.getMonth() + 1;
-  const day = birth.getDate();
-  const year = birth.getFullYear();
-  
-  const reduceToDigit = (num) => {
-    while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
-      num = String(num).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
-    }
-    return num;
-  };
-  
-  const monthReduced = reduceToDigit(month);
-  const dayReduced = reduceToDigit(day);
-  const yearReduced = reduceToDigit(String(year).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0));
-  
-  return reduceToDigit(monthReduced + dayReduced + yearReduced);
-};
-
-/**
- * Calculate Chinese Zodiac sign and element from birth year
- */
-const getChineseZodiac = (birthDate, currentYear = new Date().getFullYear()) => {
-  if (!birthDate) return null;
-  
-  const birth = new Date(birthDate);
-  const birthYear = birth.getFullYear();
   
   const animals = ['Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake', 
                    'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig'];
   const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
   
-  const animalIndex = (birthYear - 4) % 12;
-  const elementIndex = Math.floor(((birthYear - 4) % 10) / 2);
-  const yinYang = birthYear % 2 === 0 ? 'Yang' : 'Yin';
+  // Get Chinese year (accounting for Lunar New Year)
+  const birthChineseYear = getChineseYear(birth);
+  const currentChineseYear = getChineseYear(currentDate);
+  
+  const animalIndex = (birthChineseYear - 4) % 12;
+  const elementIndex = Math.floor(((birthChineseYear - 4) % 10) / 2);
+  const yinYang = birthChineseYear % 2 === 0 ? 'Yang' : 'Yin';
   
   const animal = animals[animalIndex];
   const element = elements[elementIndex];
   
   // Current year animal
-  const currentAnimalIndex = (currentYear - 4) % 12;
+  const currentAnimalIndex = (currentChineseYear - 4) % 12;
   const currentAnimal = animals[currentAnimalIndex];
   
-  // Compatibility check
-  const compatibleGroups = [
-    ['Rat', 'Dragon', 'Monkey'],
-    ['Ox', 'Snake', 'Rooster'],
-    ['Tiger', 'Horse', 'Dog'],
-    ['Rabbit', 'Goat', 'Pig']
-  ];
-  
+  // Conflict pairs (opposite on zodiac wheel - 6 years apart)
   const conflictPairs = {
     'Rat': 'Horse', 'Horse': 'Rat',
     'Ox': 'Goat', 'Goat': 'Ox',
@@ -206,67 +191,68 @@ const getChineseZodiac = (birthDate, currentYear = new Date().getFullYear()) => 
     'Snake': 'Pig', 'Pig': 'Snake'
   };
   
-  let yearEnergy;
+  // Compatible groups (trine harmony - 4 years apart)
+  const compatibleGroups = [
+    ['Rat', 'Dragon', 'Monkey'],
+    ['Ox', 'Snake', 'Rooster'],
+    ['Tiger', 'Horse', 'Dog'],
+    ['Rabbit', 'Goat', 'Pig']
+  ];
+  
+  let yearEnergy, yearType;
   if (animal === currentAnimal) {
-    yearEnergy = 'Ben Ming Nian (Birth Year) - Take extra care, wear red for protection';
+    yearType = 'benming';
+    yearEnergy = 'Ben Ming Nian (本命年) - Your birth year returns. Wear red for protection.';
   } else if (conflictPairs[animal] === currentAnimal) {
-    yearEnergy = 'Conflict Year - Navigate challenges with patience and awareness';
+    yearType = 'conflict';
+    yearEnergy = `Conflict Year - ${animal} and ${currentAnimal} clash. Navigate with awareness.`;
   } else if (compatibleGroups.find(g => g.includes(animal) && g.includes(currentAnimal))) {
-    yearEnergy = 'Harmonious Year - Natural support and favorable conditions';
+    yearType = 'harmonious';
+    yearEnergy = `Harmonious Year - ${currentAnimal} supports your ${animal} energy.`;
   } else {
-    yearEnergy = 'Neutral Year - Standard conditions, rely on personal effort';
+    yearType = 'neutral';
+    yearEnergy = 'Neutral Year - Standard conditions. Success through personal effort.';
   }
   
-  return { animal, element, yinYang, currentAnimal, yearEnergy };
+  return { animal, element, yinYang, currentAnimal, yearEnergy, yearType };
 };
 
 /**
- * Generate synthesized forecast based on all cycles
+ * Generate synthesized forecast
  */
 const generateForecast = (moonData, spermaData, personalDay, zodiac, streakDays) => {
   const forecasts = [];
   
-  // Spermatogenesis insight (always available)
+  // Spermatogenesis insight
   if (spermaData.position <= 16) {
-    forecasts.push(`Day ${streakDays} places you in the foundation phase of cycle ${spermaData.cycleNumber}. Energy is accumulating at the cellular level.`);
+    forecasts.push(`Day ${streakDays}. Foundation phase of cycle ${spermaData.cycleNumber}. Energy accumulating.`);
   } else if (spermaData.position <= 40) {
-    forecasts.push(`Deep transformation underway in cycle ${spermaData.cycleNumber}. Your body is doing profound work beneath the surface.`);
+    forecasts.push(`Day ${streakDays}. Deep transformation in cycle ${spermaData.cycleNumber}. Profound work beneath the surface.`);
   } else if (spermaData.position <= 64) {
-    forecasts.push(`Entering peak maturation in cycle ${spermaData.cycleNumber}. Maximum nutrient retention. Channel this power consciously.`);
+    forecasts.push(`Day ${streakDays}. Peak maturation in cycle ${spermaData.cycleNumber}. Channel this power consciously.`);
   } else {
-    forecasts.push(`Full reabsorption active in cycle ${spermaData.cycleNumber}. Your body has optimized for retention. Transmutation potential is highest.`);
+    forecasts.push(`Day ${streakDays}. Full reabsorption in cycle ${spermaData.cycleNumber}. Transmutation potential highest.`);
   }
   
-  // Moon phase synergy
+  // Moon synergy
   if (moonData.phase === 'Full Moon') {
-    forecasts.push('Full moon amplifies your energy field. Others may notice your presence more today.');
+    forecasts.push('Full moon amplifies your field. Others notice your presence.');
   } else if (moonData.phase === 'New Moon') {
-    forecasts.push('New moon favors intention setting. What you focus on today plants seeds.');
+    forecasts.push('New moon favors intention setting. What you focus on plants seeds.');
   } else if (moonData.phase.includes('Waxing')) {
-    forecasts.push('Lunar energy is building. Good day for taking action and building momentum.');
+    forecasts.push('Lunar energy building. Good for action and momentum.');
   } else {
-    forecasts.push('Lunar energy in release phase. Good for reflection, integration, and letting go.');
+    forecasts.push('Lunar energy releasing. Good for reflection and letting go.');
   }
   
-  // Numerology layer (if birth date provided)
+  // Personal Day layer
   if (personalDay) {
-    if (personalDay.number === 7) {
-      forecasts.push('Personal Day 7 calls for solitude and introspection. Trust your inner knowing.');
-    } else if (personalDay.number === 1) {
-      forecasts.push('Personal Day 1 supports new initiatives. Your leadership energy is heightened.');
-    } else if (personalDay.number === 8) {
-      forecasts.push('Personal Day 8 favors business and material matters. Manifestation potential is strong.');
-    } else if ([11, 22, 33].includes(personalDay.number)) {
-      forecasts.push(`Master number ${personalDay.number} day. Heightened spiritual frequency. Pay attention to signs.`);
+    if ([11, 22, 33].includes(personalDay.number)) {
+      forecasts.push(`Master number ${personalDay.number}. Heightened spiritual frequency.`);
     }
   }
   
-  // Chinese zodiac layer (if birth date provided)
-  if (zodiac && zodiac.yearEnergy.includes('Harmonious')) {
-    forecasts.push('Year of the ' + zodiac.currentAnimal + ' supports your ' + zodiac.animal + ' energy.');
-  }
-  
-  return forecasts.slice(0, 3).join(' ');
+  return forecasts.join(' ');
 };
 
 // ============================================================
@@ -276,7 +262,6 @@ const generateForecast = (moonData, spermaData, personalDay, zodiac, streakDays)
 const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // Calculate all cycles
   const calculations = useMemo(() => {
     const today = new Date();
     const streakDays = userData?.currentStreak || 1;
@@ -285,161 +270,122 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
     const moon = getMoonPhase(today);
     const sperma = getSpermatogenesisPhase(streakDays);
     const personalDay = getPersonalDay(birthDate, today);
-    const lifePath = getLifePath(birthDate);
-    const zodiac = getChineseZodiac(birthDate);
-    
+    const zodiac = getChineseZodiac(birthDate, today);
     const forecast = generateForecast(moon, sperma, personalDay, zodiac, streakDays);
     
-    return { moon, sperma, personalDay, lifePath, zodiac, forecast, streakDays };
+    return { moon, sperma, personalDay, zodiac, forecast, streakDays };
   }, [userData?.currentStreak, userData?.birthDate]);
   
-  // Don't render if pattern alert is showing
-  if (isPatternAlertShowing) {
-    return null;
-  }
-  
-  // Don't render if no start date
-  if (!userData?.startDate) {
+  if (isPatternAlertShowing || !userData?.startDate) {
     return null;
   }
   
   const { moon, sperma, personalDay, zodiac, forecast, streakDays } = calculations;
   
-  const handleExpand = () => {
-    setIsExpanded(true);
-  };
-  
-  const handleClose = () => {
-    setIsExpanded(false);
-  };
-  
   return (
     <>
       {/* Collapsed Card */}
       <div 
-        className={`energy-almanac ${isExpanded ? 'hidden-for-expand' : ''}`}
-        onClick={handleExpand}
+        className={`energy-almanac ${isExpanded ? 'hidden' : ''}`}
+        onClick={() => setIsExpanded(true)}
       >
         <div className="almanac-header">
           <span className="almanac-icon">◈</span>
           <span className="almanac-label">Today's Alignment</span>
-          <span className="almanac-expand-hint">+</span>
+          <span className="almanac-expand">+</span>
         </div>
         
-        {/* Quick Stats Row */}
-        <div className="almanac-quick-stats">
-          <div className="quick-stat">
-            <span className="stat-emoji">{moon.emoji}</span>
-            <span className="stat-label">{moon.phase}</span>
-          </div>
-          <div className="quick-stat-divider">·</div>
-          <div className="quick-stat">
-            <span className="stat-value">Day {sperma.position}</span>
-            <span className="stat-label">of 72</span>
-          </div>
+        <div className="almanac-quick">
+          <span className="quick-item">{moon.emoji} {moon.phase}</span>
+          <span className="quick-dot">·</span>
+          <span className="quick-item">Day {sperma.position}/72</span>
           {personalDay && (
             <>
-              <div className="quick-stat-divider">·</div>
-              <div className="quick-stat">
-                <span className="stat-value">{personalDay.number}</span>
-                <span className="stat-label">{personalDay.theme}</span>
-              </div>
+              <span className="quick-dot">·</span>
+              <span className="quick-item">{personalDay.number} {personalDay.theme}</span>
             </>
           )}
         </div>
         
-        {/* Forecast Preview */}
-        <p className="almanac-forecast-preview">
-          {forecast.substring(0, 120)}{forecast.length > 120 ? '...' : ''}
-        </p>
+        <p className="almanac-preview">{forecast}</p>
       </div>
       
-      {/* Expanded Overlay */}
+      {/* Expanded Modal */}
       {isExpanded && (
         <>
-          <div className="almanac-overlay" onClick={handleClose} />
-          <div className="almanac-expanded">
-            <div className="almanac-header">
-              <span className="almanac-icon">◈</span>
-              <span className="almanac-label">Today's Alignment</span>
-              <button className="almanac-close" onClick={handleClose}>×</button>
+          <div className="almanac-overlay" onClick={() => setIsExpanded(false)} />
+          <div className="almanac-modal">
+            <div className="almanac-modal-header">
+              <div className="almanac-modal-title">
+                <span className="almanac-icon">◈</span>
+                <span>Today's Alignment</span>
+              </div>
+              <button className="almanac-close" onClick={() => setIsExpanded(false)}>
+                Done
+              </button>
             </div>
             
-            {/* Full Cycles Display */}
-            <div className="almanac-cycles">
-              
+            <div className="almanac-modal-body">
               {/* Spermatogenesis */}
-              <div className="cycle-row">
-                <div className="cycle-icon">⟳</div>
-                <div className="cycle-content">
-                  <div className="cycle-title">
-                    <span className="cycle-name">Spermatogenesis</span>
-                    <span className="cycle-value">Day {sperma.position} of {sperma.cycleLength}</span>
-                  </div>
-                  <div className="cycle-phase">{sperma.phase} · Cycle {sperma.cycleNumber}</div>
-                  <div className="cycle-bar">
-                    <div 
-                      className="cycle-progress" 
-                      style={{ width: `${(sperma.position / sperma.cycleLength) * 100}%` }}
-                    />
-                  </div>
+              <div className="almanac-row">
+                <div className="almanac-row-header">
+                  <span className="almanac-row-title">Spermatogenesis</span>
+                  <span className="almanac-row-value">Day {sperma.position} of {sperma.cycleLength}</span>
+                </div>
+                <span className="almanac-row-phase">{sperma.phase} · Cycle {sperma.cycleNumber}</span>
+                <div className="almanac-progress">
+                  <div 
+                    className="almanac-progress-fill" 
+                    style={{ width: `${(sperma.position / sperma.cycleLength) * 100}%` }}
+                  />
                 </div>
               </div>
               
               {/* Moon Phase */}
-              <div className="cycle-row">
-                <div className="cycle-icon">{moon.emoji}</div>
-                <div className="cycle-content">
-                  <div className="cycle-title">
-                    <span className="cycle-name">Lunar Phase</span>
-                    <span className="cycle-value">{moon.illumination}% illuminated</span>
-                  </div>
-                  <div className="cycle-phase">{moon.phase}</div>
-                  <div className="cycle-desc">{moon.energy}</div>
+              <div className="almanac-row">
+                <div className="almanac-row-header">
+                  <span className="almanac-row-title">{moon.emoji} Lunar Phase</span>
+                  <span className="almanac-row-value">{moon.illumination}%</span>
                 </div>
+                <span className="almanac-row-phase">{moon.phase}</span>
+                <span className="almanac-row-desc">{moon.energy}</span>
               </div>
               
-              {/* Personal Day (if birth date) */}
+              {/* Personal Day */}
               {personalDay && (
-                <div className="cycle-row">
-                  <div className="cycle-icon cycle-number">{personalDay.number}</div>
-                  <div className="cycle-content">
-                    <div className="cycle-title">
-                      <span className="cycle-name">Personal Day</span>
-                      <span className="cycle-value">{personalDay.theme}</span>
-                    </div>
-                    <div className="cycle-desc">{personalDay.guidance}</div>
+                <div className="almanac-row">
+                  <div className="almanac-row-header">
+                    <span className="almanac-row-title">Personal Day</span>
+                    <span className="almanac-row-value">{personalDay.number} · {personalDay.theme}</span>
                   </div>
+                  <span className="almanac-row-desc">{personalDay.guidance}</span>
                 </div>
               )}
               
-              {/* Chinese Zodiac (if birth date) */}
+              {/* Chinese Zodiac */}
               {zodiac && (
-                <div className="cycle-row">
-                  <div className="cycle-icon">龍</div>
-                  <div className="cycle-content">
-                    <div className="cycle-title">
-                      <span className="cycle-name">{zodiac.element} {zodiac.animal}</span>
-                      <span className="cycle-value">{zodiac.yinYang}</span>
-                    </div>
-                    <div className="cycle-desc">{zodiac.yearEnergy}</div>
+                <div className={`almanac-row almanac-zodiac ${zodiac.yearType}`}>
+                  <div className="almanac-row-header">
+                    <span className="almanac-row-title">{zodiac.element} {zodiac.animal}</span>
+                    <span className="almanac-row-value">{zodiac.yinYang}</span>
                   </div>
+                  <span className="almanac-row-desc">{zodiac.yearEnergy}</span>
+                </div>
+              )}
+              
+              {/* Synthesis */}
+              <div className="almanac-synthesis">
+                <span className="almanac-synthesis-label">Synthesis</span>
+                <p className="almanac-synthesis-text">{forecast}</p>
+              </div>
+              
+              {/* Birth Date Prompt */}
+              {!userData?.birthDate && (
+                <div className="almanac-prompt">
+                  Add birth date in Profile for numerology & zodiac insights
                 </div>
               )}
             </div>
-            
-            {/* Full Forecast */}
-            <div className="almanac-forecast-full">
-              <div className="forecast-label">Today's Synthesis</div>
-              <p className="forecast-text">{forecast}</p>
-            </div>
-            
-            {/* Birth Date Prompt (if not set) */}
-            {!userData?.birthDate && (
-              <div className="almanac-birth-prompt">
-                <span>Add your birth date in Profile for numerology and zodiac insights</span>
-              </div>
-            )}
           </div>
         </>
       )}

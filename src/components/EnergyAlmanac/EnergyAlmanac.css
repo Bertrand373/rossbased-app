@@ -1,9 +1,9 @@
 /* src/components/EnergyAlmanac/EnergyAlmanac.css */
-/* Energy Almanac - Cycle-based daily forecast */
-/* Matches existing app card patterns (calendar, stats cards) */
+/* Energy Almanac - Matches TitanTrack minimal aesthetic */
+/* Thin progress bars, clean floating modal, no icon containers */
 
 /* ============================================================
-   COLLAPSED CARD
+   COLLAPSED CARD (on Tracker)
    ============================================================ */
 
 .energy-almanac {
@@ -15,68 +15,39 @@
   border-radius: 12px;
   text-align: left;
   margin-bottom: 20px;
-  position: relative;
-  z-index: 1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-  
-  /* Animation - fade in */
   animation: almanacFadeIn 500ms ease forwards;
   opacity: 0;
-  transition: transform 200ms ease, background 200ms ease;
+  transition: opacity 150ms ease;
 }
 
 @keyframes almanacFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.energy-almanac:hover {
-  background: var(--surface-raised);
-}
+.energy-almanac:hover { opacity: 0.8; }
+.energy-almanac:active { opacity: 0.6; }
+.energy-almanac.hidden { display: none; }
 
-.energy-almanac:active {
-  transform: scale(0.98);
-}
-
-.energy-almanac.hidden-for-expand {
-  visibility: hidden;
-}
-
-/* Light mode */
 [data-theme="light"] .energy-almanac {
   background: rgba(0, 0, 0, 0.03);
   border-color: rgba(0, 0, 0, 0.06);
 }
 
-[data-theme="light"] .energy-almanac:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-/* ============================================================
-   HEADER
-   ============================================================ */
-
+/* Header */
 .almanac-header {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .almanac-icon {
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   color: var(--accent-gold);
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 .almanac-label {
@@ -88,91 +59,35 @@
   flex: 1;
 }
 
-.almanac-expand-hint {
+.almanac-expand {
   font-size: 0.875rem;
   color: var(--text-muted);
   font-weight: 300;
-  width: 20px;
-  height: 20px;
+}
+
+/* Quick Stats */
+.almanac-quick {
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: color 150ms ease;
-}
-
-.energy-almanac:hover .almanac-expand-hint {
-  color: var(--text-secondary);
-}
-
-.almanac-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.5rem;
-  font-weight: 300;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-  line-height: 1;
-}
-
-.almanac-close:hover {
-  background: var(--surface-overlay);
-  color: var(--text-secondary);
-}
-
-/* ============================================================
-   QUICK STATS ROW (Collapsed)
-   ============================================================ */
-
-.almanac-quick-stats {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
 }
 
-.quick-stat {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.stat-emoji {
-  font-size: 0.875rem;
-}
-
-.stat-value {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.stat-label {
-  font-size: 0.6875rem;
-  color: var(--text-muted);
-}
-
-.quick-stat-divider {
-  color: var(--text-muted);
-  opacity: 0.5;
+.quick-item {
   font-size: 0.75rem;
+  color: var(--text-secondary);
 }
 
-/* ============================================================
-   FORECAST PREVIEW (Collapsed)
-   ============================================================ */
+.quick-dot {
+  color: var(--text-tertiary);
+  font-size: 0.625rem;
+}
 
-.almanac-forecast-preview {
+/* Preview Text */
+.almanac-preview {
   font-size: 0.8125rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   line-height: 1.5;
   margin: 0;
   display: -webkit-box;
@@ -182,7 +97,7 @@
 }
 
 /* ============================================================
-   EXPANDED OVERLAY
+   EXPANDED MODAL
    ============================================================ */
 
 .almanac-overlay {
@@ -194,155 +109,174 @@
   background: var(--overlay-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  z-index: 9998;
-  animation: overlayFadeIn 200ms ease;
+  z-index: 999;
+  animation: fadeIn 200ms ease;
 }
 
-@keyframes overlayFadeIn {
+@keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-.almanac-expanded {
+.almanac-modal {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: calc(100vw - 32px);
-  max-width: 400px;
+  max-width: 380px;
   max-height: calc(100vh - 80px);
   overflow-y: auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--background);
   border-radius: 16px;
-  padding: 20px;
-  z-index: 9999;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  animation: expandIn 200ms ease;
+  z-index: 1000;
+  animation: modalIn 200ms ease;
 }
 
-@keyframes expandIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+@keyframes modalIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
-[data-theme="light"] .almanac-expanded {
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-}
-
-/* ============================================================
-   CYCLES DISPLAY (Expanded)
-   ============================================================ */
-
-.almanac-cycles {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.cycle-row {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.cycle-icon {
-  width: 32px;
-  height: 32px;
+/* Modal Header */
+.almanac-modal-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  background: var(--surface-overlay);
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-.cycle-icon.cycle-number {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--accent-gold);
-}
-
-.cycle-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.cycle-title {
-  display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 2px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.cycle-name {
-  font-size: 0.8125rem;
+.almanac-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
 }
 
-.cycle-value {
-  font-size: 0.6875rem;
+.almanac-modal-title .almanac-icon {
+  font-size: 0.75rem;
+  opacity: 1;
+}
+
+.almanac-close {
+  background: none;
+  border: none;
   color: var(--text-muted);
-  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.cycle-phase {
-  font-size: 0.75rem;
-  color: var(--accent-gold);
-  margin-bottom: 4px;
+.almanac-close:hover {
+  color: var(--text);
 }
 
-.cycle-desc {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-/* Progress Bar */
-.cycle-bar {
-  height: 4px;
-  background: var(--surface-overlay);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 6px;
-}
-
-.cycle-progress {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-text));
-  border-radius: 2px;
-  transition: width 300ms ease;
+/* Modal Body */
+.almanac-modal-body {
+  padding: 0 20px 20px;
 }
 
 /* ============================================================
-   FULL FORECAST (Expanded)
+   CONTENT ROWS
    ============================================================ */
 
-.almanac-forecast-full {
+.almanac-row {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.almanac-row:last-of-type {
+  border-bottom: none;
+}
+
+.almanac-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.almanac-row-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.almanac-row-value {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.almanac-row-phase {
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.almanac-row-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: block;
+}
+
+/* Progress Bar - Thin 2px like app sliders */
+.almanac-progress {
+  height: 2px;
+  background: var(--border-prominent);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.almanac-progress-fill {
+  height: 100%;
+  background: var(--text);
+  border-radius: 1px;
+  transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Zodiac Year Type Variants */
+.almanac-zodiac.conflict .almanac-row-desc {
+  color: var(--text-secondary);
+}
+
+.almanac-zodiac.benming .almanac-row-phase {
+  color: var(--accent-gold);
+}
+
+.almanac-zodiac.harmonious .almanac-row-desc {
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   SYNTHESIS
+   ============================================================ */
+
+.almanac-synthesis {
   padding-top: 16px;
+  margin-top: 8px;
   border-top: 1px solid var(--border-subtle);
 }
 
-.forecast-label {
-  font-size: 0.5625rem;
+.almanac-synthesis-label {
+  font-size: 0.6875rem;
   font-weight: 600;
   color: var(--text-muted);
-  letter-spacing: 0.08em;
   text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
   margin-bottom: 8px;
 }
 
-.forecast-text {
+.almanac-synthesis-text {
   font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.65;
@@ -353,17 +287,13 @@
    BIRTH DATE PROMPT
    ============================================================ */
 
-.almanac-birth-prompt {
+.almanac-prompt {
   margin-top: 16px;
-  padding: 12px;
-  background: var(--surface-overlay);
-  border-radius: 8px;
+  padding: 12px 0;
   text-align: center;
-}
-
-.almanac-birth-prompt span {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
+  border-top: 1px solid var(--border-subtle);
 }
 
 /* ============================================================
@@ -377,35 +307,28 @@
     margin-bottom: 16px;
   }
   
-  .almanac-expanded {
+  .almanac-modal {
     width: calc(100vw - 24px);
-    padding: 18px;
     max-height: calc(100vh - 60px);
   }
   
-  .almanac-quick-stats {
-    gap: 6px;
+  .almanac-modal-header {
+    padding: 16px 16px 14px;
   }
   
-  .stat-value {
-    font-size: 0.75rem;
+  .almanac-modal-body {
+    padding: 0 16px 16px;
   }
   
-  .stat-label {
-    font-size: 0.625rem;
+  .almanac-row {
+    padding: 14px 0;
   }
   
-  .cycle-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 0.875rem;
+  .almanac-row-title {
+    font-size: 0.8125rem;
   }
   
-  .cycle-name {
-    font-size: 0.75rem;
-  }
-  
-  .cycle-desc {
+  .almanac-row-desc {
     font-size: 0.6875rem;
   }
 }
@@ -414,34 +337,17 @@
   .energy-almanac {
     max-width: 300px;
     padding: 12px 16px;
-    margin-bottom: 14px;
   }
   
-  .almanac-forecast-preview {
+  .almanac-preview {
     font-size: 0.75rem;
   }
 }
 
-/* Short screens */
 @media (max-height: 700px) {
   .energy-almanac {
     margin-bottom: 14px;
     padding: 12px 16px;
-  }
-  
-  .almanac-quick-stats {
-    margin-bottom: 8px;
-  }
-}
-
-@media (max-height: 600px) {
-  .energy-almanac {
-    margin-bottom: 12px;
-    padding: 10px 14px;
-  }
-  
-  .almanac-header {
-    margin-bottom: 8px;
   }
 }
 
@@ -455,15 +361,12 @@
     opacity: 1;
   }
   
-  .almanac-overlay {
+  .almanac-overlay,
+  .almanac-modal {
     animation: none;
   }
   
-  .almanac-expanded {
-    animation: none;
-  }
-  
-  .cycle-progress {
+  .almanac-progress-fill {
     transition: none;
   }
 }
