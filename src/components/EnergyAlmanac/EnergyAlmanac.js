@@ -284,9 +284,9 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
   
   return (
     <>
-      {/* Collapsed Card */}
+      {/* Collapsed Card - Always visible, overlay covers it when expanded */}
       <div 
-        className={`energy-almanac ${isExpanded ? 'hidden' : ''}`}
+        className="energy-almanac"
         onClick={() => setIsExpanded(true)}
       >
         <div className="almanac-header">

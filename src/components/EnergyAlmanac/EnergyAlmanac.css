@@ -30,11 +30,6 @@
 .energy-almanac:hover { opacity: 0.8; }
 .energy-almanac:active { opacity: 0.6; }
 
-/* Hidden state - simple display none is fine, the issue is elsewhere */
-.energy-almanac.hidden { 
-  display: none;
-}
-
 [data-theme="light"] .energy-almanac {
   background: rgba(0, 0, 0, 0.03);
   border-color: rgba(0, 0, 0, 0.06);
