@@ -204,7 +204,10 @@ export const useUserData = () => {
       }));
     }
     
-In = processed.analyticsOptIn !== false;
+    // Set defaults
+    processed.email = processed.email || '';
+    processed.dataSharing = processed.dataSharing || false;
+    processed.analyticsOptIn = processed.analyticsOptIn !== false;
     processed.marketingEmails = processed.marketingEmails || false;
     processed.darkMode = processed.darkMode !== false;
     processed.notifications = processed.notifications !== false;
