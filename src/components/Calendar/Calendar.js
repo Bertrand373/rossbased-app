@@ -20,7 +20,7 @@ import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 import { getAllTriggers, getTriggerLabel } from '../../constants/triggerConstants';
 
 // =============================================================================
-// LUNAR PHASE SYSTEM - Premium moon tracking
+// LUNAR PHASE SYSTEM - Premium moon tracking with emoji icons
 // =============================================================================
 
 const getLunarData = (date) => {
@@ -30,79 +30,60 @@ const getLunarData = (date) => {
   const lunarAge = ((daysSinceNew % synodicMonth) + synodicMonth) % synodicMonth;
   const illumination = (1 - Math.cos((lunarAge / synodicMonth) * 2 * Math.PI)) / 2;
   
-  let phase, isSignificant, label;
+  let phase, isSignificant, label, emoji;
   if (lunarAge < 1.85) {
-    phase = 'new'; isSignificant = true; label = 'New Moon';
+    phase = 'new'; isSignificant = true; label = 'New Moon'; emoji = '🌑';
   } else if (lunarAge < 7.38) {
-    phase = 'waxing-crescent'; isSignificant = false; label = 'Waxing Crescent';
+    phase = 'waxing-crescent'; isSignificant = false; label = 'Waxing Crescent'; emoji = '🌒';
   } else if (lunarAge < 9.23) {
-    phase = 'first-quarter'; isSignificant = false; label = 'First Quarter';
+    phase = 'first-quarter'; isSignificant = false; label = 'First Quarter'; emoji = '🌓';
   } else if (lunarAge < 13.77) {
-    phase = 'waxing-gibbous'; isSignificant = false; label = 'Waxing Gibbous';
+    phase = 'waxing-gibbous'; isSignificant = false; label = 'Waxing Gibbous'; emoji = '🌔';
   } else if (lunarAge < 15.62) {
-    phase = 'full'; isSignificant = true; label = 'Full Moon';
+    phase = 'full'; isSignificant = true; label = 'Full Moon'; emoji = '🌕';
   } else if (lunarAge < 21.15) {
-    phase = 'waning-gibbous'; isSignificant = false; label = 'Waning Gibbous';
+    phase = 'waning-gibbous'; isSignificant = false; label = 'Waning Gibbous'; emoji = '🌖';
   } else if (lunarAge < 23.00) {
-    phase = 'last-quarter'; isSignificant = false; label = 'Last Quarter';
+    phase = 'last-quarter'; isSignificant = false; label = 'Last Quarter'; emoji = '🌗';
   } else if (lunarAge < 27.54) {
-    phase = 'waning-crescent'; isSignificant = false; label = 'Waning Crescent';
+    phase = 'waning-crescent'; isSignificant = false; label = 'Waning Crescent'; emoji = '🌘';
   } else {
-    phase = 'new'; isSignificant = true; label = 'New Moon';
+    phase = 'new'; isSignificant = true; label = 'New Moon'; emoji = '🌑';
   }
   
   return {
     phase,
     isSignificant,
     label,
+    emoji,
     illumination: Math.round(illumination * 100),
     lunarAge: Math.round(lunarAge * 10) / 10
   };
 };
 
-// Premium Full Moon SVG Component
-const FullMoonIcon = ({ size = 11 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" className="moon-icon moon-full">
-    <defs>
-      <radialGradient id="fullMoonGrad" cx="40%" cy="40%">
-        <stop offset="0%" stopColor="#E5E1D6" />
-        <stop offset="70%" stopColor="#C9C5B8" />
-        <stop offset="100%" stopColor="#A8A498" />
-      </radialGradient>
-    </defs>
-    <circle cx="12" cy="12" r="10" fill="url(#fullMoonGrad)" />
-    <circle cx="8" cy="8" r="2" fill="rgba(160, 155, 140, 0.4)" />
-    <circle cx="15" cy="13" r="2.5" fill="rgba(160, 155, 140, 0.4)" />
-    <circle cx="10" cy="16" r="1.5" fill="rgba(160, 155, 140, 0.4)" />
-    <circle cx="16" cy="7" r="1" fill="rgba(160, 155, 140, 0.4)" />
-  </svg>
-);
-
-// Premium Obsidian New Moon SVG Component
-const NewMoonIcon = ({ size = 11 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" className="moon-icon moon-new">
-    <defs>
-      <radialGradient id="obsidianGrad" cx="35%" cy="35%">
-        <stop offset="0%" stopColor="#2a2a35" />
-        <stop offset="50%" stopColor="#151518" />
-        <stop offset="100%" stopColor="#0a0a0c" />
-      </radialGradient>
-      <radialGradient id="obsidianSheen" cx="30%" cy="30%">
-        <stop offset="0%" stopColor="rgba(255,255,255,0.08)" />
-        <stop offset="50%" stopColor="transparent" />
-      </radialGradient>
-    </defs>
-    <circle cx="12" cy="12" r="10" fill="url(#obsidianGrad)" />
-    <circle cx="12" cy="12" r="10" fill="url(#obsidianSheen)" />
-    <circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-  </svg>
-);
-
-// Moon icon renderer
-const MoonIcon = ({ phase, size = 11 }) => {
-  if (phase === 'full') return <FullMoonIcon size={size} />;
-  if (phase === 'new') return <NewMoonIcon size={size} />;
-  return null;
+// Moon emoji renderer - consistent across app
+const MoonIcon = ({ phase, size = 11, emoji }) => {
+  const moonEmoji = emoji || {
+    'new': '🌑',
+    'waxing-crescent': '🌒',
+    'first-quarter': '🌓',
+    'waxing-gibbous': '🌔',
+    'full': '🌕',
+    'waning-gibbous': '🌖',
+    'last-quarter': '🌗',
+    'waning-crescent': '🌘'
+  }[phase] || '🌕';
+  
+  return (
+    <span 
+      className="moon-emoji" 
+      style={{ fontSize: `${size}px`, lineHeight: 1 }}
+      role="img" 
+      aria-label={phase}
+    >
+      {moonEmoji}
+    </span>
+  );
 };
 
 const Calendar = ({ userData, isPremium, updateUserData }) => {
@@ -919,7 +900,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 className="day-moon-indicator"
                 onClick={(e) => openMoonDetail(currentDay, e)}
               >
-                <MoonIcon phase={lunar.phase} size={11} />
+                <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={11} />
               </span>
             )}
           </div>
@@ -968,7 +949,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 className="week-moon-indicator"
                 onClick={(e) => openMoonDetail(day, e)}
               >
-                <MoonIcon phase={lunar.phase} size={14} />
+                <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={14} />
               </span>
             )}
           </div>
@@ -1163,7 +1144,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 <>
                   <div className="moon-detail-visual">
                     <div className={`moon-detail-glow moon-${lunar.phase}`}>
-                      <MoonIcon phase={lunar.phase} size={72} />
+                      <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={72} />
                     </div>
                   </div>
                   

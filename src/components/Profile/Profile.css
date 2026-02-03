@@ -258,6 +258,28 @@
   color: var(--text-tertiary);
 }
 
+/* Date input - match text input styling on iOS/Safari */
+.form-group input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: left;
+  min-height: 54px;
+}
+
+.form-group input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+  filter: invert(1);
+}
+
+[data-theme="light"] .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
 /* Discord field hint */
 .form-hint {
   display: block;
