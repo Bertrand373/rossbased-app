@@ -237,7 +237,6 @@ async function downloadImage(imageUrl) {
 
 /**
  * Format fallback text leaderboard (when image fails)
- * Now includes button component
  */
 function formatTextLeaderboard(users) {
   const now = new Date();
@@ -258,16 +257,6 @@ function formatTextLeaderboard(users) {
         url: 'https://titantrack.app',
         description: '```\nNo one on the board yet.\n```\n[Join the leaderboard →](https://titantrack.app)',
         footer: { text: `Updated ${estTimestamp} EST` }
-      }],
-      components: [{
-        type: 1, // Action Row
-        components: [{
-          type: 2, // Button
-          style: 5, // Link style
-          label: 'Open TitanTrack',
-          url: 'https://titantrack.app',
-          emoji: { name: '🔗' }
-        }]
       }]
     };
   }
@@ -291,24 +280,68 @@ function formatTextLeaderboard(users) {
       url: 'https://titantrack.app',
       description: `\`\`\`\n${leaderboardText}\`\`\`\n[Join the leaderboard →](https://titantrack.app)`,
       footer: { text: `Updated ${estTimestamp} EST` }
-    }],
-    components: [{
-      type: 1, // Action Row
-      components: [{
-        type: 2, // Button
-        style: 5, // Link style
-        label: 'Open TitanTrack',
-        url: 'https://titantrack.app',
-        emoji: { name: '🔗' }
-      }]
     }]
   };
 }
 
 /**
+ * Post CTA message below the leaderboard
+ * Deletes old CTA first, then posts new one
+ */
+async function postCtaToDiscord() {
+  if (!LEADERBOARD_WEBHOOK) {
+    return false;
+  }
+  
+  try {
+    const existingCtaId = await getSetting('leaderboard_cta_message_id');
+    
+    // Delete old CTA message first
+    if (existingCtaId) {
+      try {
+        await fetch(`${LEADERBOARD_WEBHOOK}/messages/${existingCtaId}`, {
+          method: 'DELETE'
+        });
+        console.log('🗑️ Deleted old CTA message');
+      } catch (e) {
+        console.log('⚠️ Could not delete old CTA message');
+      }
+    }
+    
+    // Post new CTA message
+    const ctaPayload = {
+      content: `"Don't count the days."\n\nThen how do you know what day 30 feels like? Day 90? The flatlines?\n\nYou tracked. We all did. That's how you learned.\n\n**titantrack.app**\n\n*Free lifetime access for Discord members who joined before Feb 17*`
+    };
+    
+    const response = await fetch(`${LEADERBOARD_WEBHOOK}?wait=true`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ctaPayload)
+    });
+    
+    if (!response.ok) {
+      console.error('❌ Failed to post CTA:', response.status);
+      return false;
+    }
+    
+    const data = await response.json();
+    if (data.id) {
+      await setSetting('leaderboard_cta_message_id', data.id);
+      console.log(`✅ CTA posted (message ID: ${data.id})`);
+    }
+    
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Failed to post CTA to Discord:', error);
+    return false;
+  }
+}
+
+/**
  * Post leaderboard to Discord
  * Tries image first, falls back to text embed
- * Now includes clickable button below the leaderboard
+ * Then posts CTA message below
  */
 async function postLeaderboardToDiscord() {
   if (!LEADERBOARD_WEBHOOK) {
@@ -333,21 +366,6 @@ async function postLeaderboardToDiscord() {
         const FormData = require('form-data');
         const formData = new FormData();
         formData.append('file', imageBuffer, { filename: 'leaderboard.png', contentType: 'image/png' });
-        
-        // Add payload_json with button component
-        const payloadJson = {
-          components: [{
-            type: 1, // Action Row
-            components: [{
-              type: 2, // Button
-              style: 5, // Link style (external URL)
-              label: 'Open TitanTrack',
-              url: 'https://titantrack.app',
-              emoji: { name: '🔗' }
-            }]
-          }]
-        };
-        formData.append('payload_json', JSON.stringify(payloadJson));
         
         // Post new message with attachment using https module for proper multipart
         const https = require('https');
@@ -381,10 +399,15 @@ async function postLeaderboardToDiscord() {
                         console.log('⚠️ Could not delete old message (may already be gone)');
                       }
                     }
+                    
+                    // Post CTA message below the leaderboard
+                    await postCtaToDiscord();
                   }
                   resolve(true);
                 } catch (e) {
                   console.log('✅ Leaderboard posted');
+                  // Still try to post CTA
+                  await postCtaToDiscord();
                   resolve(true);
                 }
               } else {
@@ -400,7 +423,7 @@ async function postLeaderboardToDiscord() {
       }
     }
     
-    // Fallback: Text-only leaderboard (now includes button)
+    // Fallback: Text-only leaderboard
     const messagePayload = formatTextLeaderboard(users);
     
     if (existingMessageId) {
@@ -413,6 +436,8 @@ async function postLeaderboardToDiscord() {
       
       if (editResponse.ok) {
         console.log(`✅ Leaderboard updated (edited message ${existingMessageId})`);
+        // Post CTA after fallback update too
+        await postCtaToDiscord();
         return true;
       }
     }
@@ -433,6 +458,9 @@ async function postLeaderboardToDiscord() {
       await setSetting('leaderboard_message_id', data.id);
       console.log(`✅ Leaderboard posted to Discord (message ID: ${data.id})`);
     }
+    
+    // Post CTA after fallback post too
+    await postCtaToDiscord();
     
     return true;
     

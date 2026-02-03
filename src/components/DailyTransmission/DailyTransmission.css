@@ -62,35 +62,25 @@
   position: relative;
 }
 
-/* Fade effect for truncated text - theme-aware */
-/* Uses surface-overlay to match new card background */
+/* Fade effect for truncated text - DARK MODE */
+/* Card bg is rgba(255,255,255,0.08) on #000 = renders as ~#141414 */
 .daily-transmission.expandable:not(.expanded):not(.hidden-for-expand) .transmission-text::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 2.5em;
+  height: 2em;
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    var(--surface-overlay) 100%
+    rgba(20, 20, 20, 0.9) 60%,
+    rgba(20, 20, 20, 1) 100%
   );
   pointer-events: none;
 }
 
-/* Light mode: Use surface-raised color for fade (matches hover state) */
-[data-theme="light"] .daily-transmission.expandable:not(.expanded):not(.hidden-for-expand) .transmission-text::after {
-  height: 3em;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(240, 240, 240, 0.5) 50%,
-    rgba(240, 240, 240, 1) 100%
-  );
-}
-
-/* Light mode: Cleaner card background without shadow artifacts */
+/* Light mode: Card background and fade */
 [data-theme="light"] .daily-transmission {
   background: rgba(0, 0, 0, 0.03);
   border-color: rgba(0, 0, 0, 0.06);
@@ -99,6 +89,16 @@
 [data-theme="light"] .daily-transmission.expandable:hover {
   background: rgba(0, 0, 0, 0.05);
   border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Light mode fade - matches light card background */
+[data-theme="light"] .daily-transmission.expandable:not(.expanded):not(.hidden-for-expand) .transmission-text::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(250, 250, 250, 0.95) 70%,
+    rgba(250, 250, 250, 1) 100%
+  );
 }
 
 /* Overlay backdrop */
