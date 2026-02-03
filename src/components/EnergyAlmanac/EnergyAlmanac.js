@@ -2,7 +2,7 @@
 // Personal Energy Almanac - Cycle-based daily forecast
 // Replaces DailyTransmission with pure client-side calculations
 // No API costs - all math done locally
-// UPDATED: Correct Lunar New Year dates, refined UI matching app aesthetic
+// UPDATED: Modal structure matches TitanTrack pattern (header/scroll/footer)
 
 import React, { useState, useMemo } from 'react';
 import './EnergyAlmanac.css';
@@ -280,11 +280,11 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
     return null;
   }
   
-  const { moon, sperma, personalDay, zodiac, forecast, streakDays } = calculations;
+  const { moon, sperma, personalDay, zodiac, forecast } = calculations;
   
   return (
     <>
-      {/* Collapsed Card - Always visible, overlay covers it when expanded */}
+      {/* Collapsed Card */}
       <div 
         className="energy-almanac"
         onClick={() => setIsExpanded(true)}
@@ -312,82 +312,99 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
       
       {/* Expanded Modal */}
       {isExpanded && (
-        <>
-          <div className="almanac-overlay" onClick={() => setIsExpanded(false)} />
-          <div className="almanac-modal">
+        <div className="almanac-overlay" onClick={() => setIsExpanded(false)}>
+          <div className="almanac-modal" onClick={e => e.stopPropagation()}>
+            
+            {/* Header */}
             <div className="almanac-modal-header">
+              <span className="almanac-modal-icon">◈</span>
               <div className="almanac-modal-title">
-                <span className="almanac-icon">◈</span>
-                <span>Today's Alignment</span>
+                <h2>Today's Alignment</h2>
               </div>
-              <button className="almanac-close" onClick={() => setIsExpanded(false)}>
+            </div>
+            
+            {/* Scrollable Content */}
+            <div className="almanac-modal-scroll">
+              <div className="almanac-modal-body">
+                
+                {/* Spermatogenesis */}
+                <div className="almanac-row">
+                  <span className="almanac-row-label">Spermatogenesis</span>
+                  <div className="almanac-row-header">
+                    <span className="almanac-row-title">{sperma.phase}</span>
+                    <span className="almanac-row-value">Day {sperma.position} of {sperma.cycleLength}</span>
+                  </div>
+                  <span className="almanac-row-phase">Cycle {sperma.cycleNumber}</span>
+                  <span className="almanac-row-desc">{sperma.description}</span>
+                  <div className="almanac-progress">
+                    <div 
+                      className="almanac-progress-fill" 
+                      style={{ width: `${(sperma.position / sperma.cycleLength) * 100}%` }}
+                    />
+                  </div>
+                </div>
+                
+                {/* Moon Phase */}
+                <div className="almanac-row">
+                  <span className="almanac-row-label">Lunar Phase</span>
+                  <div className="almanac-row-header">
+                    <span className="almanac-row-title">{moon.emoji} {moon.phase}</span>
+                    <span className="almanac-row-value">{moon.illumination}% illuminated</span>
+                  </div>
+                  <span className="almanac-row-desc">{moon.energy}</span>
+                </div>
+                
+                {/* Personal Day */}
+                {personalDay && (
+                  <div className="almanac-row">
+                    <span className="almanac-row-label">Personal Day</span>
+                    <div className="almanac-row-header">
+                      <span className="almanac-row-title">{personalDay.number} · {personalDay.theme}</span>
+                    </div>
+                    <span className="almanac-row-desc">{personalDay.guidance}</span>
+                  </div>
+                )}
+                
+                {/* Chinese Zodiac */}
+                {zodiac && (
+                  <div className={`almanac-row almanac-zodiac ${zodiac.yearType}`}>
+                    <span className="almanac-row-label">Chinese Zodiac</span>
+                    <div className="almanac-row-header">
+                      <span className="almanac-row-title">{zodiac.element} {zodiac.animal}</span>
+                      <span className="almanac-row-value">{zodiac.yinYang}</span>
+                    </div>
+                    <span className="almanac-row-desc">{zodiac.yearEnergy}</span>
+                  </div>
+                )}
+                
+                {/* Synthesis */}
+                <div className="almanac-synthesis">
+                  <span className="almanac-synthesis-label">Synthesis</span>
+                  <p className="almanac-synthesis-text">{forecast}</p>
+                </div>
+                
+                {/* Birth Date Prompt */}
+                {!userData?.birthDate && (
+                  <div className="almanac-prompt">
+                    Add birth date in Profile for numerology & zodiac insights
+                  </div>
+                )}
+                
+              </div>
+            </div>
+            
+            {/* Footer with Done button */}
+            <div className="almanac-modal-footer">
+              <button 
+                className="almanac-btn-ghost" 
+                onClick={() => setIsExpanded(false)}
+              >
                 Done
               </button>
             </div>
             
-            <div className="almanac-modal-body">
-              {/* Spermatogenesis */}
-              <div className="almanac-row">
-                <div className="almanac-row-header">
-                  <span className="almanac-row-title">Spermatogenesis</span>
-                  <span className="almanac-row-value">Day {sperma.position} of {sperma.cycleLength}</span>
-                </div>
-                <span className="almanac-row-phase">{sperma.phase} · Cycle {sperma.cycleNumber}</span>
-                <div className="almanac-progress">
-                  <div 
-                    className="almanac-progress-fill" 
-                    style={{ width: `${(sperma.position / sperma.cycleLength) * 100}%` }}
-                  />
-                </div>
-              </div>
-              
-              {/* Moon Phase */}
-              <div className="almanac-row">
-                <div className="almanac-row-header">
-                  <span className="almanac-row-title">{moon.emoji} Lunar Phase</span>
-                  <span className="almanac-row-value">{moon.illumination}%</span>
-                </div>
-                <span className="almanac-row-phase">{moon.phase}</span>
-                <span className="almanac-row-desc">{moon.energy}</span>
-              </div>
-              
-              {/* Personal Day */}
-              {personalDay && (
-                <div className="almanac-row">
-                  <div className="almanac-row-header">
-                    <span className="almanac-row-title">Personal Day</span>
-                    <span className="almanac-row-value">{personalDay.number} · {personalDay.theme}</span>
-                  </div>
-                  <span className="almanac-row-desc">{personalDay.guidance}</span>
-                </div>
-              )}
-              
-              {/* Chinese Zodiac */}
-              {zodiac && (
-                <div className={`almanac-row almanac-zodiac ${zodiac.yearType}`}>
-                  <div className="almanac-row-header">
-                    <span className="almanac-row-title">{zodiac.element} {zodiac.animal}</span>
-                    <span className="almanac-row-value">{zodiac.yinYang}</span>
-                  </div>
-                  <span className="almanac-row-desc">{zodiac.yearEnergy}</span>
-                </div>
-              )}
-              
-              {/* Synthesis */}
-              <div className="almanac-synthesis">
-                <span className="almanac-synthesis-label">Synthesis</span>
-                <p className="almanac-synthesis-text">{forecast}</p>
-              </div>
-              
-              {/* Birth Date Prompt */}
-              {!userData?.birthDate && (
-                <div className="almanac-prompt">
-                  Add birth date in Profile for numerology & zodiac insights
-                </div>
-              )}
-            </div>
           </div>
-        </>
+        </div>
       )}
     </>
   );

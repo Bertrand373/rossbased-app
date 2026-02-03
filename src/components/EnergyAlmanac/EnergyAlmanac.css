@@ -1,6 +1,6 @@
 /* src/components/EnergyAlmanac/EnergyAlmanac.css */
-/* Energy Almanac - Matches TitanTrack minimal aesthetic */
-/* Thin progress bars, clean floating modal, no icon containers */
+/* Energy Almanac - Matches TitanTrack modal aesthetic */
+/* Transparent modal, 40px blur, footer Done button, proper section headers */
 
 /* ============================================================
    COLLAPSED CARD (on Tracker)
@@ -96,140 +96,165 @@
 }
 
 /* ============================================================
-   EXPANDED MODAL
+   OVERLAY - Matches TitanTrack standard (40px blur)
    ============================================================ */
 
 .almanac-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--overlay-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 999;
-  animation: overlayFadeIn 200ms ease-out forwards;
+  inset: 0;
+  background-color: var(--overlay-bg);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 24px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  animation: almanacOverlayIn 200ms ease;
 }
 
-@keyframes overlayFadeIn {
+@keyframes almanacOverlayIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
+/* ============================================================
+   MODAL - Transparent, no border/radius (TitanTrack pattern)
+   ============================================================ */
+
 .almanac-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100vw - 32px);
-  max-width: 380px;
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
-  background: var(--background);
-  border-radius: 16px;
-  z-index: 1000;
-  animation: modalFadeIn 200ms ease-out forwards;
-}
-
-/* Only animate opacity and scale, NOT the translate */
-@keyframes modalFadeIn {
-  from { 
-    opacity: 0; 
-    scale: 0.96;
-  }
-  to { 
-    opacity: 1; 
-    scale: 1;
-  }
-}
-
-/* Modal Header */
-.almanac-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.almanac-modal-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.almanac-modal-title .almanac-icon {
-  font-size: 0.75rem;
-  opacity: 1;
-}
-
-.almanac-close {
-  background: none;
+  width: 100%;
+  max-width: 340px;
+  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  background: transparent;
   border: none;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 4px 0;
-  transition: color 150ms ease;
-  -webkit-tap-highlight-color: transparent;
+  border-radius: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  animation: almanacModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.almanac-close:hover {
-  color: var(--text);
-}
-
-/* Modal Body */
-.almanac-modal-body {
-  padding: 0 20px 20px;
+@keyframes almanacModalIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ============================================================
-   CONTENT ROWS
+   MODAL HEADER - Matches ET pattern
+   ============================================================ */
+
+.almanac-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: transparent;
+}
+
+.almanac-modal-icon {
+  font-size: 0.875rem;
+  color: var(--accent-gold);
+}
+
+.almanac-modal-title {
+  flex: 1;
+}
+
+.almanac-modal-title h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================
+   SCROLLABLE CONTENT - With fade mask
+   ============================================================ */
+
+.almanac-modal-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+  padding: 24px 0;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+}
+
+.almanac-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ============================================================
+   CONTENT ROWS - Divider-separated sections
    ============================================================ */
 
 .almanac-row {
-  padding: 16px 0;
+  padding: 20px 0;
   border-bottom: 1px solid var(--border-subtle);
+}
+
+.almanac-row:first-child {
+  padding-top: 0;
 }
 
 .almanac-row:last-of-type {
   border-bottom: none;
 }
 
+/* Section Label - TitanTrack uppercase pattern */
+.almanac-row-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* Row Header with value */
 .almanac-row-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .almanac-row-title {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--text);
 }
 
 .almanac-row-value {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--text-muted);
+  font-feature-settings: 'tnum' 1;
 }
 
+/* Phase subtitle */
 .almanac-row-phase {
   font-size: 0.75rem;
-  color: var(--accent-gold);
+  color: var(--accent-gold-text);
   display: block;
   margin-bottom: 4px;
 }
 
+/* Description text */
 .almanac-row-desc {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
   display: block;
 }
 
@@ -239,7 +264,7 @@
   background: var(--border-prominent);
   border-radius: 1px;
   overflow: hidden;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .almanac-progress-fill {
@@ -263,12 +288,11 @@
 }
 
 /* ============================================================
-   SYNTHESIS
+   SYNTHESIS - Final section
    ============================================================ */
 
 .almanac-synthesis {
-  padding-top: 16px;
-  margin-top: 8px;
+  padding-top: 20px;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -279,13 +303,13 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .almanac-synthesis-text {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--text-secondary);
-  line-height: 1.65;
+  line-height: 1.7;
   margin: 0;
 }
 
@@ -294,12 +318,42 @@
    ============================================================ */
 
 .almanac-prompt {
-  margin-top: 16px;
-  padding: 12px 0;
+  margin-top: 20px;
+  padding-top: 16px;
   text-align: center;
   font-size: 0.75rem;
   color: var(--text-tertiary);
   border-top: 1px solid var(--border-subtle);
+}
+
+/* ============================================================
+   MODAL FOOTER - Done button at bottom
+   ============================================================ */
+
+.almanac-modal-footer {
+  flex-shrink: 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+  background: transparent;
+}
+
+.almanac-btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.almanac-btn-ghost:hover {
+  color: var(--text);
 }
 
 /* ============================================================
@@ -314,28 +368,32 @@
   }
   
   .almanac-modal {
-    width: calc(100vw - 24px);
-    max-height: calc(100vh - 60px);
+    max-width: 100%;
   }
   
-  .almanac-modal-header {
-    padding: 16px 16px 14px;
-  }
-  
-  .almanac-modal-body {
-    padding: 0 16px 16px;
+  .almanac-modal-title h2 {
+    font-size: 1.125rem;
   }
   
   .almanac-row {
-    padding: 14px 0;
+    padding: 16px 0;
   }
   
   .almanac-row-title {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
   }
   
   .almanac-row-desc {
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
+  }
+  
+  .almanac-synthesis-text {
+    font-size: 0.875rem;
+  }
+  
+  .almanac-btn-ghost {
+    padding: 14px 20px;
+    font-size: 0.875rem;
   }
 }
 
@@ -348,12 +406,42 @@
   .almanac-preview {
     font-size: 0.75rem;
   }
+  
+  .almanac-row-label {
+    font-size: 0.625rem;
+  }
 }
 
 @media (max-height: 700px) {
   .energy-almanac {
     margin-bottom: 14px;
     padding: 12px 16px;
+  }
+  
+  .almanac-modal-scroll {
+    padding: 20px 0;
+  }
+  
+  .almanac-row {
+    padding: 14px 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .almanac-modal {
+    max-width: 360px;
+  }
+  
+  .almanac-modal-title h2 {
+    font-size: 1.375rem;
+  }
+  
+  .almanac-row-title {
+    font-size: 1rem;
+  }
+  
+  .almanac-row-desc {
+    font-size: 0.9375rem;
   }
 }
 
