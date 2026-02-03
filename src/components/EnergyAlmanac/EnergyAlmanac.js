@@ -38,37 +38,51 @@ const getChineseYear = (date) => {
 
 /**
  * Calculate moon phase (0-29.53 day cycle)
+ * 
+ * Uses recent verified new moon reference to minimize drift error.
+ * Reference: Jan 29, 2025 at 12:36 UTC (verified via timeanddate.com)
+ * 
+ * Thresholds adjusted to account for:
+ * - Checking at midnight vs actual peak time
+ * - ~1 day buffer for significant phases (new/full)
  */
 const getMoonPhase = (date = new Date()) => {
-  const knownNewMoon = new Date('2000-01-06T18:14:00Z');
-  const lunarCycle = 29.53058867;
+  // Recent verified new moon - minimizes accumulated error
+  // Jan 29, 2025 at 12:36 UTC (source: timeanddate.com, USNO)
+  const knownNewMoon = new Date('2025-01-29T12:36:00Z');
+  const lunarCycle = 29.53058867; // Mean synodic month
   
   const daysSinceKnown = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
-  const currentCycleDay = daysSinceKnown % lunarCycle;
-  const normalizedDay = currentCycleDay < 0 ? currentCycleDay + lunarCycle : currentCycleDay;
+  const currentCycleDay = ((daysSinceKnown % lunarCycle) + lunarCycle) % lunarCycle;
   
-  const illumination = Math.round((1 - Math.cos(2 * Math.PI * normalizedDay / lunarCycle)) / 2 * 100);
+  const illumination = Math.round((1 - Math.cos(2 * Math.PI * currentCycleDay / lunarCycle)) / 2 * 100);
   
+  // Phase thresholds (days into cycle)
+  // New Moon peaks at day 0, Full Moon peaks at day ~14.77
+  // Thresholds give ~1.5 day window for new/full to catch the day even when checking at midnight
   let phase, emoji, energy;
-  if (normalizedDay < 1.85) {
+  if (currentCycleDay < 1.5 || currentCycleDay >= 28.5) {
+    // New Moon window: last 1 day of cycle + first 1.5 days
     phase = 'New Moon'; emoji = '🌑';
     energy = 'New beginnings, intention setting, introspection';
-  } else if (normalizedDay < 7.38) {
+  } else if (currentCycleDay < 7.38) {
     phase = 'Waxing Crescent'; emoji = '🌒';
     energy = 'Building momentum, taking action on intentions';
-  } else if (normalizedDay < 9.23) {
+  } else if (currentCycleDay < 9.23) {
     phase = 'First Quarter'; emoji = '🌓';
     energy = 'Challenges arise, decision points, commitment';
-  } else if (normalizedDay < 14.77) {
+  } else if (currentCycleDay < 13.0) {
+    // Waxing Gibbous ends earlier to give Full Moon more buffer
     phase = 'Waxing Gibbous'; emoji = '🌔';
     energy = 'Refinement, adjustment, patience before fruition';
-  } else if (normalizedDay < 16.61) {
+  } else if (currentCycleDay < 16.5) {
+    // Full Moon window: ~3.5 days centered around day 14.77
     phase = 'Full Moon'; emoji = '🌕';
     energy = 'Peak energy, culmination, heightened emotions';
-  } else if (normalizedDay < 22.15) {
+  } else if (currentCycleDay < 21.15) {
     phase = 'Waning Gibbous'; emoji = '🌖';
     energy = 'Gratitude, sharing wisdom, integration';
-  } else if (normalizedDay < 23.99) {
+  } else if (currentCycleDay < 23.0) {
     phase = 'Last Quarter'; emoji = '🌗';
     energy = 'Release, forgiveness, letting go';
   } else {
@@ -76,7 +90,7 @@ const getMoonPhase = (date = new Date()) => {
     energy = 'Rest, reflection, preparation for renewal';
   }
   
-  return { phase, emoji, illumination, energy, cycleDay: Math.floor(normalizedDay) };
+  return { phase, emoji, illumination, energy, cycleDay: Math.floor(currentCycleDay) };
 };
 
 /**
@@ -317,10 +331,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
             
             {/* Header */}
             <div className="almanac-modal-header">
-              <span className="almanac-modal-icon">◈</span>
-              <div className="almanac-modal-title">
-                <h2>Today's Alignment</h2>
-              </div>
+              <h2>Today's Alignment</h2>
             </div>
             
             {/* Scrollable Content */}

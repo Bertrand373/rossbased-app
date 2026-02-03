@@ -21,34 +21,41 @@ import { getAllTriggers, getTriggerLabel } from '../../constants/triggerConstant
 
 // =============================================================================
 // LUNAR PHASE SYSTEM - Premium moon tracking with emoji icons
+// Uses recent verified new moon reference for accuracy
 // =============================================================================
 
 const getLunarData = (date) => {
   const synodicMonth = 29.53058867;
-  const knownNewMoon = new Date('2000-01-06T18:14:00Z');
+  // Recent verified new moon - minimizes accumulated error
+  // Jan 29, 2025 at 12:36 UTC (source: timeanddate.com, USNO)
+  const knownNewMoon = new Date('2025-01-29T12:36:00Z');
   const daysSinceNew = (date.getTime() - knownNewMoon.getTime()) / (1000 * 60 * 60 * 24);
   const lunarAge = ((daysSinceNew % synodicMonth) + synodicMonth) % synodicMonth;
   const illumination = (1 - Math.cos((lunarAge / synodicMonth) * 2 * Math.PI)) / 2;
   
+  // Phase thresholds adjusted:
+  // - New/Full moon get ~1.5 day windows to catch the day even when checking at midnight
+  // - This ensures the actual full moon day shows as "Full Moon" not the day after
   let phase, isSignificant, label, emoji;
-  if (lunarAge < 1.85) {
+  if (lunarAge < 1.5 || lunarAge >= 28.5) {
+    // New Moon window: last 1 day of cycle + first 1.5 days
     phase = 'new'; isSignificant = true; label = 'New Moon'; emoji = '🌑';
   } else if (lunarAge < 7.38) {
     phase = 'waxing-crescent'; isSignificant = false; label = 'Waxing Crescent'; emoji = '🌒';
   } else if (lunarAge < 9.23) {
     phase = 'first-quarter'; isSignificant = false; label = 'First Quarter'; emoji = '🌓';
-  } else if (lunarAge < 13.77) {
+  } else if (lunarAge < 13.0) {
+    // Waxing Gibbous ends earlier to give Full Moon more buffer
     phase = 'waxing-gibbous'; isSignificant = false; label = 'Waxing Gibbous'; emoji = '🌔';
-  } else if (lunarAge < 15.62) {
+  } else if (lunarAge < 16.5) {
+    // Full Moon window: ~3.5 days centered around day 14.77
     phase = 'full'; isSignificant = true; label = 'Full Moon'; emoji = '🌕';
   } else if (lunarAge < 21.15) {
     phase = 'waning-gibbous'; isSignificant = false; label = 'Waning Gibbous'; emoji = '🌖';
-  } else if (lunarAge < 23.00) {
+  } else if (lunarAge < 23.0) {
     phase = 'last-quarter'; isSignificant = false; label = 'Last Quarter'; emoji = '🌗';
-  } else if (lunarAge < 27.54) {
-    phase = 'waning-crescent'; isSignificant = false; label = 'Waning Crescent'; emoji = '🌘';
   } else {
-    phase = 'new'; isSignificant = true; label = 'New Moon'; emoji = '🌑';
+    phase = 'waning-crescent'; isSignificant = false; label = 'Waning Crescent'; emoji = '🌘';
   }
   
   return {

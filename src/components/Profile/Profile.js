@@ -29,7 +29,16 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
   // Birth date for Energy Almanac (numerology, zodiac calculations)
-  const [birthDate, setBirthDate] = useState(userData.birthDate ? format(new Date(userData.birthDate), 'yyyy-MM-dd') : '');
+  // Stored as noon UTC to avoid timezone day-shift issues
+  const [birthDate, setBirthDate] = useState(() => {
+    if (!userData.birthDate) return '';
+    const d = new Date(userData.birthDate);
+    // Extract UTC date components to avoid timezone shift
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  });
   
   // Leaderboard rank
   const [userRank, setUserRank] = useState(null);
@@ -340,11 +349,18 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
 
   // Profile save - saves text fields including birth date
   const handleProfileUpdate = () => {
+    // Parse birthDate at noon UTC to avoid timezone shifting the day
+    let parsedBirthDate = null;
+    if (birthDate) {
+      const [year, month, day] = birthDate.split('-').map(Number);
+      parsedBirthDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+    }
+    
     updateUserData({
       username: username.trim(),
       email: email.trim(),
       discordUsername: discordUsername.trim(),
-      birthDate: birthDate ? new Date(birthDate) : null
+      birthDate: parsedBirthDate
     });
     setIsEditingProfile(false);
     toast.success('Profile updated', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
@@ -355,7 +371,16 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
     setUsername(userData.username || '');
     setEmail(userData.email || '');
     setDiscordUsername(userData.discordUsername || '');
-    setBirthDate(userData.birthDate ? format(new Date(userData.birthDate), 'yyyy-MM-dd') : '');
+    // Extract UTC date to avoid timezone shift
+    if (userData.birthDate) {
+      const d = new Date(userData.birthDate);
+      const year = d.getUTCFullYear();
+      const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      setBirthDate(`${year}-${month}-${day}`);
+    } else {
+      setBirthDate('');
+    }
     setIsEditingProfile(false);
   };
 

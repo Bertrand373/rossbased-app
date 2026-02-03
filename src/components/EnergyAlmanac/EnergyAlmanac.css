@@ -149,24 +149,12 @@
 
 .almanac-modal-header {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--border-subtle);
   background: transparent;
 }
 
-.almanac-modal-icon {
-  font-size: 0.875rem;
-  color: var(--accent-gold);
-}
-
-.almanac-modal-title {
-  flex: 1;
-}
-
-.almanac-modal-title h2 {
+.almanac-modal-header h2 {
   font-size: 1.25rem;
   font-weight: 500;
   color: var(--text);
