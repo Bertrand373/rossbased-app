@@ -4,8 +4,10 @@
 // No API costs - all math done locally
 // UPDATED: Modal structure matches TitanTrack pattern (header/scroll/footer)
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './EnergyAlmanac.css';
+
+const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
 // ============================================================
 // LUNAR NEW YEAR DATES (for accurate Chinese Zodiac)
@@ -275,6 +277,7 @@ const generateForecast = (moonData, spermaData, personalDay, zodiac, streakDays)
 
 const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [aiSynthesis, setAiSynthesis] = useState(null);
   
   const calculations = useMemo(() => {
     const today = new Date();
@@ -289,6 +292,45 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
     
     return { moon, sperma, personalDay, zodiac, forecast, streakDays };
   }, [userData?.currentStreak, userData?.birthDate]);
+
+  // Fetch AI-generated synthesis
+  useEffect(() => {
+    const fetchSynthesis = async () => {
+      const token = localStorage.getItem('token');
+      if (!token || !userData?.startDate) return;
+
+      try {
+        const { moon, sperma, personalDay, zodiac, streakDays } = calculations;
+        const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        const response = await fetch(`${API_URL}/api/transmission/synthesis`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            streakDays,
+            sperma: { position: sperma.position, cycleLength: sperma.cycleLength, cycleNumber: sperma.cycleNumber, phase: sperma.phase, description: sperma.description },
+            moon: { phase: moon.phase, illumination: moon.illumination, energy: moon.energy },
+            personalDay: personalDay ? { number: personalDay.number, theme: personalDay.theme, guidance: personalDay.guidance } : null,
+            zodiac: zodiac ? { animal: zodiac.animal, element: zodiac.element, yinYang: zodiac.yinYang, currentAnimal: zodiac.currentAnimal, yearType: zodiac.yearType, yearEnergy: zodiac.yearEnergy } : null,
+            timezone: detectedTimezone
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setAiSynthesis(data.synthesis);
+        }
+      } catch (err) {
+        console.error('Synthesis fetch error:', err);
+        // Falls back to template forecast — no problem
+      }
+    };
+
+    fetchSynthesis();
+  }, [calculations, userData?.startDate]);
   
   if (isPatternAlertShowing || !userData?.startDate) {
     return null;
@@ -321,7 +363,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
           )}
         </div>
         
-        <p className="almanac-preview">{forecast}</p>
+        <p className="almanac-preview">{aiSynthesis || forecast}</p>
       </div>
       
       {/* Expanded Modal */}
@@ -391,7 +433,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
                 {/* Synthesis */}
                 <div className="almanac-synthesis">
                   <span className="almanac-synthesis-label">Synthesis</span>
-                  <p className="almanac-synthesis-text">{forecast}</p>
+                  <p className="almanac-synthesis-text">{aiSynthesis || forecast}</p>
                 </div>
                 
                 {/* Birth Date Prompt */}

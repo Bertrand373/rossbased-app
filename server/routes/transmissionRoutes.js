@@ -376,4 +376,122 @@ router.post('/regenerate', async (req, res) => {
   }
 });
 
+// ============================================================
+// POST /api/transmission/synthesis
+// AI-generated synthesis of all alignment data
+// Called by EnergyAlmanac with calculated alignment values
+// ============================================================
+
+router.post('/synthesis', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const jwt = require('jsonwebtoken');
+    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+    
+    let decoded;
+    try {
+      decoded = jwt.verify(token, jwtSecret);
+    } catch (err) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    const user = await User.findOne({ username: decoded.username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const { streakDays, sperma, moon, personalDay, zodiac } = req.body;
+
+    // Check cache — only regenerate once per day per user
+    const timezone = req.body.timezone || 'America/New_York';
+    const now = new Date();
+    const userNow = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+    
+    if (user.dailySynthesis?.generatedAt) {
+      const genDate = new Date(user.dailySynthesis.generatedAt);
+      const userGen = new Date(genDate.toLocaleString('en-US', { timeZone: timezone }));
+      if (userNow.toDateString() === userGen.toDateString() && user.dailySynthesis.forStreak === streakDays) {
+        return res.json({ synthesis: user.dailySynthesis.text, cached: true });
+      }
+    }
+
+    // Build a focused synthesis prompt with ALL alignment data
+    const synthesisPrompt = `You synthesize alignment data into one powerful, specific daily insight for a semen retention practitioner.
+
+You receive concrete data points. Your job: weave them into 2-3 sentences that feel like a personalized daily briefing. Be SPECIFIC — reference the actual numbers, phases, and alignments. No generic motivation.
+
+RULES:
+- Start with "Day ${streakDays}."
+- 2-3 sentences MAX. Tight, specific, actionable
+- Reference at least 2-3 data points naturally woven together
+- Speak as a knowing guide, not a horoscope
+- No fluff, no "channel your energy" without context
+- Connect the dots between the data — that's the whole point`;
+
+    let userData = `ALIGNMENT DATA FOR TODAY:
+
+STREAK: Day ${streakDays}
+
+SPERMATOGENESIS: Day ${sperma.position} of ${sperma.cycleLength} (Cycle ${sperma.cycleNumber})
+Phase: ${sperma.phase}
+Note: ${sperma.description}`;
+
+    userData += `
+
+LUNAR: ${moon.phase} (${moon.illumination}% illuminated)
+Energy: ${moon.energy}`;
+
+    if (personalDay) {
+      userData += `
+
+PERSONAL DAY: ${personalDay.number} — ${personalDay.theme}
+Guidance: ${personalDay.guidance}`;
+    }
+
+    if (zodiac) {
+      userData += `
+
+CHINESE ZODIAC: ${zodiac.element} ${zodiac.animal} (${zodiac.yinYang})
+Current Year: ${zodiac.currentAnimal} year
+Year Type: ${zodiac.yearType}
+Energy: ${zodiac.yearEnergy}`;
+    }
+
+    userData += `
+
+Generate the synthesis now.`;
+
+    console.log(`🔮 Generating synthesis for ${user.username} (Day ${streakDays})`);
+
+    const response = await anthropic.messages.create({
+      model: 'claude-3-haiku-20240307',
+      max_tokens: 150,
+      system: synthesisPrompt,
+      messages: [{ role: 'user', content: userData }]
+    });
+
+    const synthesisText = response.content[0].text.trim();
+
+    // Cache it
+    user.dailySynthesis = {
+      text: synthesisText,
+      generatedAt: new Date(),
+      forStreak: streakDays
+    };
+    await user.save();
+
+    console.log(`✅ Synthesis generated for ${user.username}`);
+    res.json({ synthesis: synthesisText, cached: false });
+
+  } catch (error) {
+    console.error('Synthesis generation error:', error);
+    res.status(500).json({ error: 'Failed to generate synthesis' });
+  }
+});
+
 module.exports = router;
