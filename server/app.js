@@ -1029,5 +1029,10 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Start Discord Oracle bot (only if token is configured)
+if (process.env.ORACLE_DISCORD_TOKEN) {
+  require('./discord-bot');
+}
+
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
