@@ -74,7 +74,41 @@ const MindProgram = ({ isPremium }) => {
   const progressPercent = (progress.nightsCompleted / TOTAL_NIGHTS) * 100;
 
   // ============================================================
-  // AUDIO HANDLERS
+  // MEDIA SESSION (Lock screen controls + metadata)
+  // ============================================================
+
+  const setupMediaSession = useCallback(() => {
+    if (!('mediaSession' in navigator)) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: 'Based30',
+      artist: 'TitanTrack',
+      album: 'Mind Program'
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => {
+      if (audioRef.current) {
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+      }
+    });
+
+    navigator.mediaSession.setActionHandler('pause', () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    });
+
+    navigator.mediaSession.setActionHandler('seekto', (details) => {
+      if (audioRef.current && details.seekTime != null) {
+        audioRef.current.currentTime = details.seekTime;
+        setCurrentTime(details.seekTime);
+      }
+    });
+  }, []);
+
+  // ============================================================
+  // AUDIO HANDLERS (iOS-resilient)
   // ============================================================
 
   const handlePlay = useCallback(() => {
@@ -85,14 +119,31 @@ const MindProgram = ({ isPremium }) => {
       setIsPlaying(false);
     } else {
       audioRef.current.loop = loopEnabled;
+
+      // Attempt play — if iOS killed the session, reload and retry
       audioRef.current.play()
-        .then(() => setIsPlaying(true))
+        .then(() => {
+          setIsPlaying(true);
+          setupMediaSession();
+        })
         .catch((err) => {
-          console.warn('MindProgram: Playback failed', err);
-          setIsPlaying(false);
+          console.warn('MindProgram: Play failed, attempting recovery...', err);
+
+          // iOS recovery: reload source and retry once
+          audioRef.current.load();
+          audioRef.current.loop = loopEnabled;
+          audioRef.current.play()
+            .then(() => {
+              setIsPlaying(true);
+              setupMediaSession();
+            })
+            .catch((retryErr) => {
+              console.warn('MindProgram: Recovery failed', retryErr);
+              setIsPlaying(false);
+            });
         });
     }
-  }, [isPlaying, loopEnabled, audioError]);
+  }, [isPlaying, loopEnabled, audioError, setupMediaSession]);
 
   const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) {
@@ -244,25 +295,9 @@ const MindProgram = ({ isPremium }) => {
               <div className="mp-track-info">
                 <div className="mp-track-row">
                   <span className="mp-track-name">Based30</span>
-                  <div className="mp-track-meta">
-                    <span
-                      className={`mp-loop-indicator ${loopEnabled ? 'on' : ''}`}
-                      onClick={toggleLoop}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={loopEnabled ? 'Loop on' : 'Loop off'}
-                    >
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="17 1 21 5 17 9" />
-                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                        <polyline points="7 23 3 19 7 15" />
-                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-                      </svg>
-                    </span>
-                    <span className="mp-track-time">
-                      {formatTime(currentTime)} / {formatTime(duration)}
-                    </span>
-                  </div>
+                  <span className="mp-track-time">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </span>
                 </div>
 
                 {/* Progress bar */}
@@ -274,6 +309,20 @@ const MindProgram = ({ isPremium }) => {
                 </div>
               </div>
             </div>
+
+            {/* Loop toggle — own row, clear state */}
+            <button
+              className={`mp-loop-toggle ${loopEnabled ? 'on' : ''}`}
+              onClick={toggleLoop}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="17 1 21 5 17 9" />
+                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                <polyline points="7 23 3 19 7 15" />
+                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+              </svg>
+              <span>{loopEnabled ? 'Loop on' : 'Loop off'}</span>
+            </button>
 
             {audioError && (
               <span className="mp-audio-error">Audio file not available</span>

@@ -121,36 +121,41 @@
   letter-spacing: -0.01em;
 }
 
-.mp-track-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .mp-track-time {
   font-size: 0.75rem;
   color: var(--text-muted);
   font-feature-settings: 'tnum' 1;
 }
 
-/* Loop indicator */
-.mp-loop-indicator {
+/* Loop toggle — full row, clear on/off */
+.mp-loop-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  margin-top: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-prominent);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
-  padding: 2px;
-  color: var(--text-tertiary);
-  transition: color 150ms ease;
+  transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-loop-indicator.on {
-  color: var(--text-secondary);
+.mp-loop-toggle.on {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--background);
 }
 
-.mp-loop-indicator:hover {
-  color: var(--text);
+.mp-loop-toggle:active {
+  transform: scale(0.98);
 }
 
 /* Audio progress bar */
