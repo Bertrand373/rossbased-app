@@ -1,0 +1,437 @@
+/* =============================================================================
+   MIND PROGRAM — Based30
+   Sits at top of Toolkit page, always accessible
+   ============================================================================= */
+
+.mp-section {
+  width: 100%;
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-subtle);
+  animation: fadeInUp 500ms ease forwards;
+  opacity: 0;
+}
+
+/* Section label */
+.mp-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Header */
+.mp-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.mp-title {
+  font-size: 1.375rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.mp-desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* =============================================================================
+   AUDIO PLAYER
+   ============================================================================= */
+
+.mp-player {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 28px;
+  padding: 18px 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.mp-player-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Play button */
+.mp-play-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border-prominent);
+  background: transparent;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-play-btn:hover {
+  background: var(--surface-overlay);
+}
+
+.mp-play-btn:active {
+  transform: scale(0.95);
+}
+
+.mp-play-btn.active {
+  background: var(--surface-overlay);
+  border-color: var(--border-prominent);
+}
+
+.mp-play-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Track info */
+.mp-track-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.mp-track-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mp-track-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.mp-track-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mp-track-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Loop indicator */
+.mp-loop-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 2px;
+  color: var(--text-tertiary);
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-loop-indicator.on {
+  color: var(--text-secondary);
+}
+
+.mp-loop-indicator:hover {
+  color: var(--text);
+}
+
+/* Audio progress bar */
+.mp-audio-track {
+  position: relative;
+  height: 3px;
+  background: var(--surface-overlay);
+  border-radius: 2px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-audio-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--text);
+  border-radius: 2px;
+  transition: width 100ms linear;
+}
+
+.mp-audio-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text);
+}
+
+/* Audio error */
+.mp-audio-error {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: 4px 0;
+}
+
+/* =============================================================================
+   30-NIGHT TRACKER
+   ============================================================================= */
+
+.mp-tracker {
+  margin-bottom: 8px;
+}
+
+.mp-tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.mp-tracker-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+.mp-tracker-count {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  font-feature-settings: 'tnum' 1;
+}
+
+.mp-tracker-total {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+/* Progress bar */
+.mp-progress-bar {
+  width: 100%;
+  height: 3px;
+  background: var(--surface-overlay);
+  border-radius: 2px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.mp-progress-fill {
+  height: 100%;
+  background: var(--text);
+  border-radius: 2px;
+  transition: width 400ms ease;
+}
+
+/* Confirm button — PRIMARY inverted style */
+.mp-confirm-btn {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--background);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  letter-spacing: -0.01em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-confirm-btn:hover {
+  opacity: 0.9;
+}
+
+.mp-confirm-btn:active {
+  transform: scale(0.98);
+}
+
+.mp-confirm-btn.confirmed {
+  background: var(--surface-overlay);
+  border-color: var(--surface-overlay);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.mp-confirm-btn.confirmed:hover {
+  opacity: 1;
+}
+
+.mp-confirm-btn.confirmed:active {
+  transform: none;
+}
+
+/* =============================================================================
+   COMPLETION STATE
+   ============================================================================= */
+
+.mp-complete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.mp-complete-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.mp-complete-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.mp-complete-desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.mp-restart-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border-prominent);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  letter-spacing: -0.01em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-restart-btn:hover {
+  background: var(--surface-overlay);
+  color: var(--text);
+}
+
+.mp-restart-btn:active {
+  transform: scale(0.98);
+}
+
+/* =============================================================================
+   LOCKED STATE (Non-premium)
+   ============================================================================= */
+
+.mp-locked {
+  padding: 32px 0;
+  text-align: center;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 8px;
+}
+
+.mp-locked-text {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* =============================================================================
+   INSTRUCTIONS ACCORDION
+   ============================================================================= */
+
+.mp-instructions-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-instructions-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.mp-instructions-arrow {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  transition: transform 200ms ease;
+}
+
+.mp-instructions-arrow.open {
+  transform: rotate(180deg);
+}
+
+.mp-instructions {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+
+.mp-instr-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.mp-instr-item:last-child {
+  border-bottom: none;
+}
+
+.mp-instr-num {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+  width: 20px;
+}
+
+.mp-instr-text {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* =============================================================================
+   URGE INTERVENTION LABEL (added between sections)
+   ============================================================================= */
+
+.ut-intervention-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 32px;
+  text-align: center;
+}

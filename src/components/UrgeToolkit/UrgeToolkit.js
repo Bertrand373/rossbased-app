@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import './UrgeToolkit.css';
+import MindProgram from './MindProgram';
 
 // Icons
 import { FaBrain, FaExclamationTriangle, FaClock, FaMeh, FaHeart, 
@@ -116,15 +117,6 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
     }
   }, [currentDay]);
 
-  // Lock scroll on Assessment step (fixed content)
-  useEffect(() => {
-    if (currentStep === 'assessment') {
-      document.body.classList.add('static-view');
-    } else {
-      document.body.classList.remove('static-view');
-    }
-    return () => document.body.classList.remove('static-view');
-  }, [currentStep]);
 
   // Get current phase
   const getCurrentPhase = () => {
@@ -647,6 +639,12 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
 
   return (
     <div className="urge-toolkit">
+      {/* Mind Program — Always visible at top */}
+      <MindProgram isPremium={isPremium} />
+
+      {/* Urge Intervention Section */}
+      <div className="ut-intervention-label">URGE INTERVENTION</div>
+
       {/* Phase Indicator */}
       <div className="ut-phase">
         <span className="ut-phase-num">{currentPhase.num}</span>
