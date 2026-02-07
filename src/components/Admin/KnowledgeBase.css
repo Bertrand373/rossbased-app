@@ -60,22 +60,12 @@
   to { transform: rotate(360deg); }
 }
 
-/* Messages */
-.kb-message {
+/* Auth error - only for access denied */
+.kb-auth-error {
   padding: 10px 14px;
   border-radius: 8px;
   margin-bottom: 16px;
   font-size: 13px;
-  line-height: 1.4;
-}
-
-.kb-message-success {
-  background: rgba(34, 197, 94, 0.08);
-  border: 1px solid rgba(34, 197, 94, 0.15);
-  color: #4ade80;
-}
-
-.kb-message-error {
   background: rgba(239, 68, 68, 0.06);
   border: 1px solid rgba(239, 68, 68, 0.12);
   color: rgba(248, 113, 113, 0.9);
@@ -174,7 +164,14 @@
   font-size: 14px;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+
+.kb-input:disabled,
+.kb-select:disabled,
+.kb-textarea:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .kb-input:focus,
@@ -260,11 +257,73 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+.kb-file-label.has-file {
+  border-style: solid;
+  border-color: rgba(212, 168, 67, 0.25);
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .kb-file-hidden {
   display: none;
 }
 
-/* Processing bar */
+/* ============================================================
+   INLINE STATUS BANNER — shows inside upload section
+   Always visible where the user is looking
+   ============================================================ */
+
+.kb-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: kb-fade-in 0.2s ease;
+}
+
+@keyframes kb-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.kb-status-uploading {
+  background: rgba(212, 168, 67, 0.06);
+  border: 1px solid rgba(212, 168, 67, 0.12);
+  color: rgba(212, 168, 67, 0.9);
+}
+
+.kb-status-success {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.kb-status-error {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.kb-status-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(212, 168, 67, 0.15);
+  border-top-color: rgba(212, 168, 67, 0.7);
+  border-radius: 50%;
+  animation: kb-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.kb-status-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Processing bar at bottom of upload section */
 .kb-processing {
   height: 2px;
   background: rgba(255, 255, 255, 0.03);

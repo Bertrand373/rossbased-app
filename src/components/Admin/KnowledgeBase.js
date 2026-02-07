@@ -1,8 +1,7 @@
 // src/components/Admin/KnowledgeBase.js
 // Admin-only RAG Knowledge Base Manager
-// Upload documents, URLs, and text for Oracle's knowledge
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './KnowledgeBase.css';
 
 const API = process.env.REACT_APP_API || '';
@@ -24,16 +23,21 @@ const CATEGORIES = [
 const KnowledgeBase = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('text');
-  const [message, setMessage] = useState(null);
+  const [authError, setAuthError] = useState(null);
   const token = localStorage.getItem('token');
+
+  // Upload state - tracks status per tab
+  const [uploadState, setUploadState] = useState({ status: 'idle', message: '' });
+  // status: 'idle' | 'uploading' | 'success' | 'error'
 
   // Form states
   const [textForm, setTextForm] = useState({ name: '', content: '', category: 'general' });
   const [urlForm, setUrlForm] = useState({ url: '', name: '', category: 'general' });
   const [fileForm, setFileForm] = useState({ file: null, category: 'general' });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  const docsRef = useRef(null);
 
   const headers = {
     'Authorization': `Bearer ${token}`,
@@ -45,35 +49,47 @@ const KnowledgeBase = () => {
       const res = await fetch(`${API}/api/knowledge/stats`, { headers });
       if (res.status === 403) {
         const data = await res.json();
-        setMessage({ type: 'error', text: `Access denied. Username: "${data.yourUsername}". Add to ADMIN_USERNAMES on Render.` });
+        setAuthError(`Access denied. Username: "${data.yourUsername}". Add to ADMIN_USERNAMES on Render.`);
         setLoading(false);
         return;
       }
       if (!res.ok) {
-        setMessage({ type: 'error', text: 'Failed to load knowledge base' });
+        setAuthError('Failed to load knowledge base');
         setLoading(false);
         return;
       }
       const data = await res.json();
       setStats(data);
-      setMessage(null);
+      setAuthError(null);
     } catch (err) {
-      setMessage({ type: 'error', text: 'Failed to connect to server' });
+      setAuthError('Failed to connect to server');
     }
     setLoading(false);
   }, [token]);
 
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
-  const showMessage = (type, text) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage(null), type === 'success' ? 8000 : 6000);
+  // Reset upload status after delay
+  const setUploadResult = (status, message) => {
+    setUploadState({ status, message });
+    if (status === 'success' || status === 'error') {
+      // Scroll to documents list on success
+      if (status === 'success' && docsRef.current) {
+        setTimeout(() => {
+          docsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+      }
+      // Clear status after delay
+      setTimeout(() => {
+        setUploadState({ status: 'idle', message: '' });
+      }, status === 'success' ? 10000 : 8000);
+    }
   };
 
   // --- INGEST TEXT ---
   const handleTextSubmit = async () => {
     if (!textForm.name || !textForm.content) return;
-    setUploading(true);
+    setUploadState({ status: 'uploading', message: 'Processing text...' });
     try {
       const res = await fetch(`${API}/api/knowledge/ingest/text`, {
         method: 'POST', headers,
@@ -81,22 +97,21 @@ const KnowledgeBase = () => {
       });
       const data = await res.json();
       if (data.success) {
-        showMessage('success', `✓ "${data.name}" ingested — ${data.chunks} chunks, ~${data.totalTokens.toLocaleString()} tokens`);
+        setUploadResult('success', `"${data.name}" ingested — ${data.chunks} chunks, ~${data.totalTokens.toLocaleString()} tokens`);
         setTextForm({ name: '', content: '', category: 'general' });
         fetchStats();
       } else {
-        showMessage('error', data.error);
+        setUploadResult('error', data.error || 'Failed to ingest text');
       }
     } catch (err) {
-      showMessage('error', 'Failed to ingest text');
+      setUploadResult('error', 'Failed to ingest text — check connection');
     }
-    setUploading(false);
   };
 
   // --- INGEST URL ---
   const handleUrlSubmit = async () => {
     if (!urlForm.url) return;
-    setUploading(true);
+    setUploadState({ status: 'uploading', message: 'Fetching and processing page...' });
     try {
       const res = await fetch(`${API}/api/knowledge/ingest/url`, {
         method: 'POST', headers,
@@ -104,22 +119,21 @@ const KnowledgeBase = () => {
       });
       const data = await res.json();
       if (data.success) {
-        showMessage('success', `✓ "${data.name}" ingested — ${data.chunks} chunks from URL`);
+        setUploadResult('success', `"${data.name}" ingested — ${data.chunks} chunks from URL`);
         setUrlForm({ url: '', name: '', category: 'general' });
         fetchStats();
       } else {
-        showMessage('error', data.error);
+        setUploadResult('error', data.error || 'Failed to ingest URL');
       }
     } catch (err) {
-      showMessage('error', 'Failed to ingest URL');
+      setUploadResult('error', 'Failed to ingest URL — check connection');
     }
-    setUploading(false);
   };
 
   // --- INGEST FILE ---
   const handleFileSubmit = async () => {
     if (!fileForm.file) return;
-    setUploading(true);
+    setUploadState({ status: 'uploading', message: `Uploading ${fileForm.file.name}...` });
     try {
       const formData = new FormData();
       formData.append('file', fileForm.file);
@@ -131,18 +145,17 @@ const KnowledgeBase = () => {
       });
       const data = await res.json();
       if (data.success) {
-        showMessage('success', `✓ "${data.name}" ingested — ${data.chunks} chunks, ~${data.totalTokens.toLocaleString()} tokens`);
+        setUploadResult('success', `"${data.name}" ingested — ${data.chunks} chunks, ~${data.totalTokens.toLocaleString()} tokens`);
         setFileForm({ file: null, category: 'general' });
         const fileInput = document.querySelector('.kb-file-hidden');
         if (fileInput) fileInput.value = '';
         fetchStats();
       } else {
-        showMessage('error', data.error);
+        setUploadResult('error', data.error || 'Failed to ingest file');
       }
     } catch (err) {
-      showMessage('error', 'Failed to ingest file');
+      setUploadResult('error', 'Failed to ingest file — check file size and format');
     }
-    setUploading(false);
   };
 
   // --- TOGGLE DOCUMENT ---
@@ -154,7 +167,7 @@ const KnowledgeBase = () => {
       });
       fetchStats();
     } catch (err) {
-      showMessage('error', 'Failed to toggle document');
+      setUploadResult('error', 'Failed to toggle document');
     }
   };
 
@@ -166,12 +179,12 @@ const KnowledgeBase = () => {
       });
       const data = await res.json();
       if (data.success) {
-        showMessage('success', `✓ Deleted ${data.deletedChunks} chunks`);
+        setUploadResult('success', `Deleted — ${data.deletedChunks} chunks removed`);
         setDeleteConfirm(null);
         fetchStats();
       }
     } catch (err) {
-      showMessage('error', 'Failed to delete');
+      setUploadResult('error', 'Failed to delete');
     }
   };
 
@@ -184,9 +197,11 @@ const KnowledgeBase = () => {
       });
       fetchStats();
     } catch (err) {
-      showMessage('error', 'Failed to update category');
+      setUploadResult('error', 'Failed to update category');
     }
   };
+
+  const isUploading = uploadState.status === 'uploading';
 
   if (loading) {
     return (
@@ -207,11 +222,9 @@ const KnowledgeBase = () => {
         <span className="kb-badge">RAG Engine</span>
       </div>
 
-      {/* Message */}
-      {message && (
-        <div className={`kb-message kb-message-${message.type}`}>
-          {message.text}
-        </div>
+      {/* Auth error */}
+      {authError && (
+        <div className="kb-auth-error">{authError}</div>
       )}
 
       {/* Stats */}
@@ -239,7 +252,7 @@ const KnowledgeBase = () => {
             <button
               key={tab}
               className={`kb-tab ${activeTab === tab ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => { setActiveTab(tab); setUploadState({ status: 'idle', message: '' }); }}
             >
               {tab === 'text' ? 'Paste Text' : tab === 'url' ? 'Add URL' : 'Upload File'}
             </button>
@@ -256,11 +269,13 @@ const KnowledgeBase = () => {
                 value={textForm.name}
                 onChange={e => setTextForm({ ...textForm, name: e.target.value })}
                 className="kb-input"
+                disabled={isUploading}
               />
               <select
                 value={textForm.category}
                 onChange={e => setTextForm({ ...textForm, category: e.target.value })}
                 className="kb-select"
+                disabled={isUploading}
               >
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
@@ -270,6 +285,7 @@ const KnowledgeBase = () => {
                 onChange={e => setTextForm({ ...textForm, content: e.target.value })}
                 className="kb-textarea"
                 rows={10}
+                disabled={isUploading}
               />
               <div className="kb-form-footer">
                 {textForm.content && (
@@ -277,8 +293,8 @@ const KnowledgeBase = () => {
                     {textForm.content.length.toLocaleString()} chars · ~{Math.ceil(textForm.content.length / 4).toLocaleString()} tokens
                   </span>
                 )}
-                <button onClick={handleTextSubmit} disabled={uploading || !textForm.name || !textForm.content} className="kb-submit">
-                  {uploading ? 'Processing...' : 'Ingest Text'}
+                <button onClick={handleTextSubmit} disabled={isUploading || !textForm.name || !textForm.content} className="kb-submit">
+                  {isUploading ? 'Processing...' : 'Ingest Text'}
                 </button>
               </div>
             </div>
@@ -288,16 +304,16 @@ const KnowledgeBase = () => {
           {activeTab === 'url' && (
             <div className="kb-form">
               <input type="url" placeholder="https://glorian.org/articles/..." value={urlForm.url}
-                onChange={e => setUrlForm({ ...urlForm, url: e.target.value })} className="kb-input" />
+                onChange={e => setUrlForm({ ...urlForm, url: e.target.value })} className="kb-input" disabled={isUploading} />
               <input type="text" placeholder="Name (optional — uses domain name)" value={urlForm.name}
-                onChange={e => setUrlForm({ ...urlForm, name: e.target.value })} className="kb-input" />
-              <select value={urlForm.category} onChange={e => setUrlForm({ ...urlForm, category: e.target.value })} className="kb-select">
+                onChange={e => setUrlForm({ ...urlForm, name: e.target.value })} className="kb-input" disabled={isUploading} />
+              <select value={urlForm.category} onChange={e => setUrlForm({ ...urlForm, category: e.target.value })} className="kb-select" disabled={isUploading}>
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
               <div className="kb-form-footer">
                 <span />
-                <button onClick={handleUrlSubmit} disabled={uploading || !urlForm.url} className="kb-submit">
-                  {uploading ? 'Fetching page...' : 'Ingest URL'}
+                <button onClick={handleUrlSubmit} disabled={isUploading || !urlForm.url} className="kb-submit">
+                  {isUploading ? 'Fetching page...' : 'Ingest URL'}
                 </button>
               </div>
             </div>
@@ -306,25 +322,37 @@ const KnowledgeBase = () => {
           {/* FILE */}
           {activeTab === 'file' && (
             <div className="kb-form">
-              <label className="kb-file-label">
+              <label className={`kb-file-label ${fileForm.file ? 'has-file' : ''}`}>
                 <span>{fileForm.file ? `📄 ${fileForm.file.name}` : 'Choose file (.txt, .md, .pdf, .json)'}</span>
                 <input type="file" accept=".txt,.md,.pdf,.json"
-                  onChange={e => setFileForm({ ...fileForm, file: e.target.files[0] })} className="kb-file-hidden" />
+                  onChange={e => setFileForm({ ...fileForm, file: e.target.files[0] })} className="kb-file-hidden" disabled={isUploading} />
               </label>
-              <select value={fileForm.category} onChange={e => setFileForm({ ...fileForm, category: e.target.value })} className="kb-select">
+              <select value={fileForm.category} onChange={e => setFileForm({ ...fileForm, category: e.target.value })} className="kb-select" disabled={isUploading}>
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
               <div className="kb-form-footer">
                 <span />
-                <button onClick={handleFileSubmit} disabled={uploading || !fileForm.file} className="kb-submit">
-                  {uploading ? 'Processing...' : 'Upload & Ingest'}
+                <button onClick={handleFileSubmit} disabled={isUploading || !fileForm.file} className="kb-submit">
+                  {isUploading ? 'Uploading...' : 'Upload & Ingest'}
                 </button>
               </div>
             </div>
           )}
+
+          {/* === INLINE STATUS BANNER === */}
+          {/* This is INSIDE the upload section so you always see it */}
+          {uploadState.status !== 'idle' && (
+            <div className={`kb-status kb-status-${uploadState.status}`}>
+              {uploadState.status === 'uploading' && <div className="kb-status-spinner" />}
+              {uploadState.status === 'success' && <span className="kb-status-icon">✓</span>}
+              {uploadState.status === 'error' && <span className="kb-status-icon">✕</span>}
+              <span>{uploadState.message}</span>
+            </div>
+          )}
         </div>
 
-        {uploading && (
+        {/* Processing bar at bottom of upload section */}
+        {isUploading && (
           <div className="kb-processing">
             <div className="kb-processing-bar" />
           </div>
@@ -332,7 +360,7 @@ const KnowledgeBase = () => {
       </div>
 
       {/* Documents List */}
-      <div className="kb-documents">
+      <div className="kb-documents" ref={docsRef}>
         <div className="kb-documents-header">
           <h2>Documents</h2>
           {stats?.documents?.length > 0 && (

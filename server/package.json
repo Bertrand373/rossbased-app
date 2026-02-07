@@ -27,7 +27,7 @@
     "node-cron": "^4.2.1",
     "node-fetch": "^2.7.0",
     "path-to-regexp": "6.2.1",
-    "pdf-parse": "^2.4.5",
+    "pdf-parse": "^1.1.1",
     "uuid": "^13.0.0"
   },
   "description": ""
