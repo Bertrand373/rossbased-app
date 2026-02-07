@@ -188,7 +188,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
   ],
-  partials: [Partials.Message, Partials.Channel],
+  partials: [Partials.Message, Partials.Channel, Partials.ThreadMember],
 });
 
 const anthropic = new Anthropic({
@@ -241,47 +241,125 @@ const extractKeywords = (text) => {
 
 /**
  * Fetch all messages from a Discord channel (paginated)
+ * Handles both regular text channels AND forum channels (threads)
  * @param {Channel} channel - Discord channel
  * @param {string|null} filterUser - Optional username filter (lowercase)
  * @param {number} maxMessages - Max messages to fetch
  */
 async function fetchChannelMessages(channel, filterUser = null, maxMessages = 2000) {
   const allMessages = [];
+  
+  // Check if this is a Forum channel (type 15 = GuildForum)
+  const isForum = channel.type === 15;
+  
+  if (isForum) {
+    // Forum channels: fetch all threads, then messages from each thread
+    const threads = [];
+    
+    // Get active (non-archived) threads
+    const activeThreads = await channel.threads.fetchActive();
+    threads.push(...activeThreads.threads.values());
+    
+    // Get archived threads (paginated)
+    let hasMore = true;
+    let beforeTimestamp = undefined;
+    while (hasMore) {
+      const archived = await channel.threads.fetchArchived({ limit: 100, before: beforeTimestamp });
+      threads.push(...archived.threads.values());
+      hasMore = archived.hasMore;
+      if (archived.threads.size > 0) {
+        const lastThread = [...archived.threads.values()].pop();
+        beforeTimestamp = lastThread.archiveTimestamp;
+      } else {
+        hasMore = false;
+      }
+    }
+    
+    console.log(`[Knowledge] Forum #${channel.name}: found ${threads.length} threads`);
+    
+    // Fetch messages from each thread
+    for (const thread of threads) {
+      if (allMessages.length >= maxMessages) break;
+      
+      const threadMessages = await fetchThreadMessages(thread, filterUser, maxMessages - allMessages.length);
+      allMessages.push(...threadMessages);
+      
+      // Rate limit delay between threads
+      await new Promise(r => setTimeout(r, 300));
+    }
+  } else {
+    // Regular text channel: fetch messages directly
+    let lastId = null;
+    
+    while (allMessages.length < maxMessages) {
+      const options = { limit: 100 };
+      if (lastId) options.before = lastId;
+      
+      const batch = await channel.messages.fetch(options);
+      if (batch.size === 0) break;
+      
+      for (const [, msg] of batch) {
+        if (msg.author.bot) continue;
+        if (msg.content.length < 30) continue;
+        
+        const authorName = msg.member?.displayName || msg.author.username;
+        const authorLower = msg.author.username.toLowerCase();
+        
+        if (filterUser && authorLower !== filterUser) continue;
+        
+        allMessages.push({
+          content: msg.content,
+          author: authorName,
+          authorUsername: msg.author.username,
+          timestamp: msg.createdTimestamp
+        });
+      }
+      
+      lastId = batch.last().id;
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+  
+  return allMessages;
+}
+
+/**
+ * Fetch messages from a single thread (used by forum ingestion)
+ */
+async function fetchThreadMessages(thread, filterUser = null, maxMessages = 500) {
+  const messages = [];
   let lastId = null;
   
-  while (allMessages.length < maxMessages) {
+  while (messages.length < maxMessages) {
     const options = { limit: 100 };
     if (lastId) options.before = lastId;
     
-    const batch = await channel.messages.fetch(options);
+    const batch = await thread.messages.fetch(options);
     if (batch.size === 0) break;
     
     for (const [, msg] of batch) {
-      // Skip bot messages and very short messages
       if (msg.author.bot) continue;
       if (msg.content.length < 30) continue;
       
       const authorName = msg.member?.displayName || msg.author.username;
       const authorLower = msg.author.username.toLowerCase();
       
-      // Filter by user if specified
       if (filterUser && authorLower !== filterUser) continue;
       
-      allMessages.push({
+      messages.push({
         content: msg.content,
         author: authorName,
         authorUsername: msg.author.username,
-        timestamp: msg.createdTimestamp
+        timestamp: msg.createdTimestamp,
+        threadName: thread.name
       });
     }
     
     lastId = batch.last().id;
-    
-    // Small delay to avoid rate limits
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 300));
   }
   
-  return allMessages;
+  return messages;
 }
 
 /**
@@ -492,10 +570,13 @@ client.on('messageCreate', async (message) => {
       // Find category if provided (last arg that isn't a mention)
       const category = args.find(a => !a.startsWith('<') && !a.startsWith('#')) || 'esoteric';
       
-      await message.reply(`⏳ Scraping #${channelMention.name}${userMention ? ` (filtering by ${userMention.username})` : ''}... This may take a minute.`);
+      const targetChannel = channelMention;
+      const isForum = targetChannel.type === 15;
+      
+      await message.reply(`⏳ Scraping ${isForum ? 'forum' : ''} #${targetChannel.name}${userMention ? ` (filtering by ${userMention.username})` : ''}... This may take a minute.`);
       
       const filterUser = userMention ? userMention.username.toLowerCase() : null;
-      const messages_fetched = await fetchChannelMessages(channelMention, filterUser);
+      const messages_fetched = await fetchChannelMessages(targetChannel, filterUser);
       
       if (messages_fetched.length === 0) {
         await message.channel.send('No qualifying messages found (messages must be 30+ characters, non-bot).');
@@ -543,15 +624,23 @@ client.on('messageCreate', async (message) => {
   // ============================================================
   // WISDOM CHANNEL AUTO-INGESTION
   // Auto-ingest long messages from configured wisdom channels
+  // Also catches messages in forum threads (parent channel name)
   // ============================================================
   
-  if (WISDOM_CHANNELS.length > 0 && WISDOM_CHANNELS.includes(channelName)) {
+  const parentChannelName = message.channel.parent?.name?.toLowerCase();
+  const isWisdomChannel = WISDOM_CHANNELS.length > 0 && (
+    WISDOM_CHANNELS.includes(channelName) || 
+    WISDOM_CHANNELS.includes(parentChannelName)
+  );
+  
+  if (isWisdomChannel) {
     if (message.content.length >= 200 && !message.author.bot) {
       try {
-        const result = await autoIngestMessage(message, channelName);
+        const wisdomName = parentChannelName && WISDOM_CHANNELS.includes(parentChannelName) 
+          ? parentChannelName : channelName;
+        const result = await autoIngestMessage(message, wisdomName);
         if (result) {
-          console.log(`📚 Auto-ingested: ${result.author} in #${channelName} (${result.chunks} chunks)`);
-          // React with 📚 so author knows it was captured (subtle, not a ping)
+          console.log(`📚 Auto-ingested: ${result.author} in #${wisdomName} (${result.chunks} chunks)`);
           await message.react('📚').catch(() => {});
         }
       } catch (err) {
