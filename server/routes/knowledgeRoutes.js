@@ -26,16 +26,28 @@ const upload = multer({
 // ============================================================
 // ADMIN CHECK MIDDLEWARE
 // Only Ross (or specified admins) can manage knowledge base
+// Uses env var ADMIN_USERNAMES, or defaults to matching 'ross' prefix
 // ============================================================
 
-const ADMIN_USERNAMES = (process.env.ADMIN_USERNAMES || 'Rossbased').split(',').map(u => u.trim().toLowerCase());
-
 const adminCheck = (req, res, next) => {
-  const username = req.user?.username?.toLowerCase();
-  if (!username || !ADMIN_USERNAMES.includes(username)) {
-    return res.status(403).json({ error: 'Admin access required' });
+  const username = req.user?.username || '';
+  const lower = username.toLowerCase();
+  
+  // Check env var first
+  const envAdmins = process.env.ADMIN_USERNAMES;
+  if (envAdmins) {
+    const allowed = envAdmins.split(',').map(u => u.trim().toLowerCase());
+    if (allowed.includes(lower)) return next();
   }
-  next();
+  
+  // Default: any username starting with 'ross' is admin
+  if (lower.startsWith('ross')) return next();
+  
+  console.log(`[Knowledge Admin] Access denied for: "${username}"`);
+  return res.status(403).json({ 
+    error: 'Admin access required',
+    yourUsername: username
+  });
 };
 
 // ============================================================

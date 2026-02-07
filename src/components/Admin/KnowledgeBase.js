@@ -44,14 +44,21 @@ const KnowledgeBase = () => {
     try {
       const res = await fetch(`${API}/api/knowledge/stats`, { headers });
       if (res.status === 403) {
-        setMessage({ type: 'error', text: 'Admin access required' });
+        const data = await res.json();
+        setMessage({ type: 'error', text: `Access denied. Username: "${data.yourUsername}". Add to ADMIN_USERNAMES on Render.` });
+        setLoading(false);
+        return;
+      }
+      if (!res.ok) {
+        setMessage({ type: 'error', text: 'Failed to load knowledge base' });
         setLoading(false);
         return;
       }
       const data = await res.json();
       setStats(data);
+      setMessage(null);
     } catch (err) {
-      setMessage({ type: 'error', text: 'Failed to load knowledge base' });
+      setMessage({ type: 'error', text: 'Failed to connect to server' });
     }
     setLoading(false);
   }, [token]);
@@ -60,25 +67,21 @@ const KnowledgeBase = () => {
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
-    setTimeout(() => setMessage(null), 5000);
+    setTimeout(() => setMessage(null), type === 'success' ? 8000 : 6000);
   };
 
   // --- INGEST TEXT ---
   const handleTextSubmit = async () => {
-    if (!textForm.name || !textForm.content) {
-      showMessage('error', 'Name and content are required');
-      return;
-    }
+    if (!textForm.name || !textForm.content) return;
     setUploading(true);
     try {
       const res = await fetch(`${API}/api/knowledge/ingest/text`, {
-        method: 'POST',
-        headers,
+        method: 'POST', headers,
         body: JSON.stringify(textForm)
       });
       const data = await res.json();
       if (data.success) {
-        showMessage('success', `Ingested "${data.name}" — ${data.chunks} chunks, ~${data.totalTokens} tokens`);
+        showMessage('success', `✓ "${data.name}" ingested — ${data.chunks} chunks, ~${data.totalTokens.toLocaleString()} tokens`);
         setTextForm({ name: '', content: '', category: 'general' });
         fetchStats();
       } else {
@@ -92,20 +95,16 @@ const KnowledgeBase = () => {
 
   // --- INGEST URL ---
   const handleUrlSubmit = async () => {
-    if (!urlForm.url) {
-      showMessage('error', 'URL is required');
-      return;
-    }
+    if (!urlForm.url) return;
     setUploading(true);
     try {
       const res = await fetch(`${API}/api/knowledge/ingest/url`, {
-        method: 'POST',
-        headers,
+        method: 'POST', headers,
         body: JSON.stringify(urlForm)
       });
       const data = await res.json();
       if (data.success) {
-        showMessage('success', `Ingested "${data.name}" — ${data.chunks} chunks from URL`);
+        showMessage('success', `✓ "${data.name}" ingested — ${data.chunks} chunks from URL`);
         setUrlForm({ url: '', name: '', category: 'general' });
         fetchStats();
       } else {
@@ -119,16 +118,12 @@ const KnowledgeBase = () => {
 
   // --- INGEST FILE ---
   const handleFileSubmit = async () => {
-    if (!fileForm.file) {
-      showMessage('error', 'Select a file first');
-      return;
-    }
+    if (!fileForm.file) return;
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append('file', fileForm.file);
       formData.append('category', fileForm.category);
-
       const res = await fetch(`${API}/api/knowledge/ingest/file`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -136,8 +131,10 @@ const KnowledgeBase = () => {
       });
       const data = await res.json();
       if (data.success) {
-        showMessage('success', `Ingested "${data.name}" — ${data.chunks} chunks`);
+        showMessage('success', `✓ "${data.name}" ingested — ${data.chunks} chunks, ~${data.totalTokens.toLocaleString()} tokens`);
         setFileForm({ file: null, category: 'general' });
+        const fileInput = document.querySelector('.kb-file-hidden');
+        if (fileInput) fileInput.value = '';
         fetchStats();
       } else {
         showMessage('error', data.error);
@@ -152,8 +149,7 @@ const KnowledgeBase = () => {
   const handleToggle = async (parentId, currentEnabled) => {
     try {
       await fetch(`${API}/api/knowledge/document/${parentId}/toggle`, {
-        method: 'PUT',
-        headers,
+        method: 'PUT', headers,
         body: JSON.stringify({ enabled: !currentEnabled })
       });
       fetchStats();
@@ -166,17 +162,16 @@ const KnowledgeBase = () => {
   const handleDelete = async (parentId) => {
     try {
       const res = await fetch(`${API}/api/knowledge/document/${parentId}`, {
-        method: 'DELETE',
-        headers
+        method: 'DELETE', headers
       });
       const data = await res.json();
       if (data.success) {
-        showMessage('success', `Deleted ${data.deletedChunks} chunks`);
+        showMessage('success', `✓ Deleted ${data.deletedChunks} chunks`);
         setDeleteConfirm(null);
         fetchStats();
       }
     } catch (err) {
-      showMessage('error', 'Failed to delete document');
+      showMessage('error', 'Failed to delete');
     }
   };
 
@@ -184,8 +179,7 @@ const KnowledgeBase = () => {
   const handleCategoryChange = async (parentId, category) => {
     try {
       await fetch(`${API}/api/knowledge/document/${parentId}/category`, {
-        method: 'PUT',
-        headers,
+        method: 'PUT', headers,
         body: JSON.stringify({ category })
       });
       fetchStats();
@@ -195,24 +189,32 @@ const KnowledgeBase = () => {
   };
 
   if (loading) {
-    return <div className="kb-container"><div className="kb-loading">Loading knowledge base...</div></div>;
+    return (
+      <div className="kb-container">
+        <div className="kb-loading">
+          <div className="kb-loading-spinner" />
+          <span>Loading knowledge base...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="kb-container">
+      {/* Header */}
       <div className="kb-header">
         <h1>Oracle Knowledge Base</h1>
-        <p className="kb-subtitle">RAG Engine — Upload documents, URLs, and text for The Oracle</p>
+        <span className="kb-badge">RAG Engine</span>
       </div>
 
-      {/* Message banner */}
+      {/* Message */}
       {message && (
         <div className={`kb-message kb-message-${message.type}`}>
           {message.text}
         </div>
       )}
 
-      {/* Stats bar */}
+      {/* Stats */}
       {stats && (
         <div className="kb-stats">
           <div className="kb-stat">
@@ -221,7 +223,7 @@ const KnowledgeBase = () => {
           </div>
           <div className="kb-stat">
             <span className="kb-stat-number">{stats.enabledChunks}</span>
-            <span className="kb-stat-label">Active Chunks</span>
+            <span className="kb-stat-label">Chunks</span>
           </div>
           <div className="kb-stat">
             <span className="kb-stat-number">{(stats.totalTokens / 1000).toFixed(1)}K</span>
@@ -230,36 +232,27 @@ const KnowledgeBase = () => {
         </div>
       )}
 
-      {/* Upload section */}
+      {/* Upload Section */}
       <div className="kb-upload-section">
         <div className="kb-tabs">
-          <button
-            className={`kb-tab ${activeTab === 'text' ? 'active' : ''}`}
-            onClick={() => setActiveTab('text')}
-          >
-            Paste Text
-          </button>
-          <button
-            className={`kb-tab ${activeTab === 'url' ? 'active' : ''}`}
-            onClick={() => setActiveTab('url')}
-          >
-            Add URL
-          </button>
-          <button
-            className={`kb-tab ${activeTab === 'file' ? 'active' : ''}`}
-            onClick={() => setActiveTab('file')}
-          >
-            Upload File
-          </button>
+          {['text', 'url', 'file'].map(tab => (
+            <button
+              key={tab}
+              className={`kb-tab ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === 'text' ? 'Paste Text' : tab === 'url' ? 'Add URL' : 'Upload File'}
+            </button>
+          ))}
         </div>
 
         <div className="kb-tab-content">
-          {/* TEXT TAB */}
+          {/* TEXT */}
           {activeTab === 'text' && (
             <div className="kb-form">
               <input
                 type="text"
-                placeholder="Document name (e.g. 'Chrism Oil Teachings')"
+                placeholder="Document name (e.g. Chrism Oil Teachings)"
                 value={textForm.name}
                 onChange={e => setTextForm({ ...textForm, name: e.target.value })}
                 className="kb-input"
@@ -269,159 +262,123 @@ const KnowledgeBase = () => {
                 onChange={e => setTextForm({ ...textForm, category: e.target.value })}
                 className="kb-select"
               >
-                {CATEGORIES.map(c => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
+                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
               <textarea
-                placeholder="Paste your document content here..."
+                placeholder="Paste document content here..."
                 value={textForm.content}
                 onChange={e => setTextForm({ ...textForm, content: e.target.value })}
                 className="kb-textarea"
-                rows={12}
+                rows={10}
               />
               <div className="kb-form-footer">
                 {textForm.content && (
                   <span className="kb-char-count">
-                    {textForm.content.length.toLocaleString()} chars — ~{Math.ceil(textForm.content.length / 4).toLocaleString()} tokens
+                    {textForm.content.length.toLocaleString()} chars · ~{Math.ceil(textForm.content.length / 4).toLocaleString()} tokens
                   </span>
                 )}
-                <button
-                  onClick={handleTextSubmit}
-                  disabled={uploading}
-                  className="kb-submit"
-                >
+                <button onClick={handleTextSubmit} disabled={uploading || !textForm.name || !textForm.content} className="kb-submit">
                   {uploading ? 'Processing...' : 'Ingest Text'}
                 </button>
               </div>
             </div>
           )}
 
-          {/* URL TAB */}
+          {/* URL */}
           {activeTab === 'url' && (
             <div className="kb-form">
-              <input
-                type="url"
-                placeholder="https://glorian.org/articles/..."
-                value={urlForm.url}
-                onChange={e => setUrlForm({ ...urlForm, url: e.target.value })}
-                className="kb-input"
-              />
-              <input
-                type="text"
-                placeholder="Name (optional — will use domain name)"
-                value={urlForm.name}
-                onChange={e => setUrlForm({ ...urlForm, name: e.target.value })}
-                className="kb-input"
-              />
-              <select
-                value={urlForm.category}
-                onChange={e => setUrlForm({ ...urlForm, category: e.target.value })}
-                className="kb-select"
-              >
-                {CATEGORIES.map(c => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
+              <input type="url" placeholder="https://glorian.org/articles/..." value={urlForm.url}
+                onChange={e => setUrlForm({ ...urlForm, url: e.target.value })} className="kb-input" />
+              <input type="text" placeholder="Name (optional — uses domain name)" value={urlForm.name}
+                onChange={e => setUrlForm({ ...urlForm, name: e.target.value })} className="kb-input" />
+              <select value={urlForm.category} onChange={e => setUrlForm({ ...urlForm, category: e.target.value })} className="kb-select">
+                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
               <div className="kb-form-footer">
-                <button
-                  onClick={handleUrlSubmit}
-                  disabled={uploading}
-                  className="kb-submit"
-                >
-                  {uploading ? 'Fetching...' : 'Ingest URL'}
+                <span />
+                <button onClick={handleUrlSubmit} disabled={uploading || !urlForm.url} className="kb-submit">
+                  {uploading ? 'Fetching page...' : 'Ingest URL'}
                 </button>
               </div>
             </div>
           )}
 
-          {/* FILE TAB */}
+          {/* FILE */}
           {activeTab === 'file' && (
             <div className="kb-form">
-              <div className="kb-file-input">
-                <label className="kb-file-label">
-                  {fileForm.file ? fileForm.file.name : 'Choose file (.txt, .md, .pdf, .json)'}
-                  <input
-                    type="file"
-                    accept=".txt,.md,.pdf,.json"
-                    onChange={e => setFileForm({ ...fileForm, file: e.target.files[0] })}
-                    hidden
-                  />
-                </label>
-              </div>
-              <select
-                value={fileForm.category}
-                onChange={e => setFileForm({ ...fileForm, category: e.target.value })}
-                className="kb-select"
-              >
-                {CATEGORIES.map(c => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
+              <label className="kb-file-label">
+                <span>{fileForm.file ? `📄 ${fileForm.file.name}` : 'Choose file (.txt, .md, .pdf, .json)'}</span>
+                <input type="file" accept=".txt,.md,.pdf,.json"
+                  onChange={e => setFileForm({ ...fileForm, file: e.target.files[0] })} className="kb-file-hidden" />
+              </label>
+              <select value={fileForm.category} onChange={e => setFileForm({ ...fileForm, category: e.target.value })} className="kb-select">
+                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
               <div className="kb-form-footer">
-                <button
-                  onClick={handleFileSubmit}
-                  disabled={uploading}
-                  className="kb-submit"
-                >
+                <span />
+                <button onClick={handleFileSubmit} disabled={uploading || !fileForm.file} className="kb-submit">
                   {uploading ? 'Processing...' : 'Upload & Ingest'}
                 </button>
               </div>
             </div>
           )}
         </div>
+
+        {uploading && (
+          <div className="kb-processing">
+            <div className="kb-processing-bar" />
+          </div>
+        )}
       </div>
 
-      {/* Documents list */}
+      {/* Documents List */}
       <div className="kb-documents">
-        <h2>Documents</h2>
-        {stats?.documents?.length === 0 && (
-          <p className="kb-empty">No documents yet. Add your first one above.</p>
-        )}
-        {stats?.documents?.map(doc => (
-          <div key={doc._id} className={`kb-doc ${!doc.enabled ? 'kb-doc-disabled' : ''}`}>
-            <div className="kb-doc-header">
-              <div className="kb-doc-info">
-                <span className="kb-doc-name">{doc.name}</span>
-                <div className="kb-doc-meta">
-                  <span className="kb-doc-type">{doc.type}</span>
-                  <span className="kb-doc-chunks">{doc.chunks} chunks</span>
-                  <span className="kb-doc-tokens">~{doc.totalTokens.toLocaleString()} tokens</span>
+        <div className="kb-documents-header">
+          <h2>Documents</h2>
+          {stats?.documents?.length > 0 && (
+            <span className="kb-doc-count">{stats.documents.length}</span>
+          )}
+        </div>
+
+        {(!stats?.documents || stats.documents.length === 0) ? (
+          <div className="kb-empty">
+            <p>No documents yet</p>
+            <p className="kb-empty-hint">Upload your first document above to build the Oracle's knowledge</p>
+          </div>
+        ) : (
+          <div className="kb-doc-list">
+            {stats.documents.map(doc => (
+              <div key={doc._id} className={`kb-doc ${!doc.enabled ? 'kb-doc-disabled' : ''}`}>
+                <div className="kb-doc-left">
+                  <div className={`kb-doc-dot ${doc.enabled ? 'on' : 'off'}`} />
+                  <div className="kb-doc-info">
+                    <span className="kb-doc-name">{doc.name}</span>
+                    <span className="kb-doc-meta">
+                      {doc.type} · {doc.chunks} chunks · ~{doc.totalTokens.toLocaleString()} tokens
+                    </span>
+                  </div>
+                </div>
+                <div className="kb-doc-actions">
+                  <select value={doc.category} onChange={e => handleCategoryChange(doc._id, e.target.value)} className="kb-cat-select">
+                    {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                  </select>
+                  <button className={`kb-toggle ${doc.enabled ? 'on' : 'off'}`}
+                    onClick={() => handleToggle(doc._id, doc.enabled)}>
+                    {doc.enabled ? 'ON' : 'OFF'}
+                  </button>
+                  {deleteConfirm === doc._id ? (
+                    <div className="kb-confirm-row">
+                      <button onClick={() => handleDelete(doc._id)} className="kb-confirm-yes">Delete</button>
+                      <button onClick={() => setDeleteConfirm(null)} className="kb-confirm-no">×</button>
+                    </div>
+                  ) : (
+                    <button className="kb-remove" onClick={() => setDeleteConfirm(doc._id)}>Remove</button>
+                  )}
                 </div>
               </div>
-              <div className="kb-doc-actions">
-                <select
-                  value={doc.category}
-                  onChange={e => handleCategoryChange(doc._id, e.target.value)}
-                  className="kb-select-small"
-                >
-                  {CATEGORIES.map(c => (
-                    <option key={c.value} value={c.value}>{c.label}</option>
-                  ))}
-                </select>
-                <button
-                  className={`kb-toggle ${doc.enabled ? 'active' : ''}`}
-                  onClick={() => handleToggle(doc._id, doc.enabled)}
-                >
-                  {doc.enabled ? 'ON' : 'OFF'}
-                </button>
-                {deleteConfirm === doc._id ? (
-                  <div className="kb-delete-confirm">
-                    <button onClick={() => handleDelete(doc._id)} className="kb-delete-yes">Delete</button>
-                    <button onClick={() => setDeleteConfirm(null)} className="kb-delete-no">Cancel</button>
-                  </div>
-                ) : (
-                  <button
-                    className="kb-delete"
-                    onClick={() => setDeleteConfirm(doc._id)}
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
