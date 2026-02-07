@@ -19,7 +19,9 @@ const googleAuthRoutes = require('./routes/googleAuth');
 const discordAuthRoutes = require('./routes/discordAuth');
 const mlRoutes = require('./routes/mlRoutes');
 const transmissionRoutes = require('./routes/transmissionRoutes');
+const knowledgeRoutes = require('./routes/knowledgeRoutes');
 const { initializeSchedulers } = require('./services/notificationScheduler');
+const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 
 // Import leaderboard service
 const { 
@@ -500,11 +502,16 @@ RULES:
 - Never close with generic encouragement
 - ALWAYS respond in the same language the user writes in`;
 
+    // RAG: Retrieve relevant knowledge from last user message
+    const lastUserMsg = messages[messages.length - 1]?.content || '';
+    const ragContext = await retrieveKnowledge(lastUserMsg, { limit: 5, maxTokens: 2000 });
+    const systemWithKnowledge = systemPrompt + ragContext;
+
     // Call Claude API
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
       max_tokens: 500,
-      system: systemPrompt,
+      system: systemWithKnowledge,
       messages: messages
     });
 
@@ -694,6 +701,10 @@ When in doubt, shorter. Say what needs to be said. Stop.
       { role: 'user', content: message }
     ];
 
+    // RAG: Retrieve relevant knowledge
+    const ragContext = await retrieveKnowledge(message, { limit: 5, maxTokens: 2000 });
+    const systemWithKnowledge = systemPrompt + ragContext;
+
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
@@ -703,7 +714,7 @@ When in doubt, shorter. Say what needs to be said. Stop.
     const stream = await anthropic.messages.stream({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 500,
-      system: systemPrompt,
+      system: systemWithKnowledge,
       messages: messages
     });
 
@@ -1061,6 +1072,7 @@ app.use('/api/auth', googleAuthRoutes);
 app.use('/api/auth', discordAuthRoutes);
 app.use('/api/ml', mlRoutes);
 app.use('/api/transmission', transmissionRoutes);
+app.use('/api/knowledge', authenticate, knowledgeRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

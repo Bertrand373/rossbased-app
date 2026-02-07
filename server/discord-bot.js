@@ -5,6 +5,7 @@
 
 const { Client, GatewayIntentBits, Partials } = require('discord.js');
 const Anthropic = require('@anthropic-ai/sdk');
+const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 
 // ============================================================
 // CONFIGURATION
@@ -35,11 +36,30 @@ const MAX_HISTORY = 8; // Last 8 messages for context
 
 const getMaxTokens = (messageText) => {
   const wordCount = messageText.trim().split(/\s+/).length;
+  const text = messageText.toLowerCase();
   
-  if (wordCount <= 5) return 80;       // "should i engage" → 1-2 sentences max
-  if (wordCount <= 15) return 150;     // casual statement → short paragraph
-  if (wordCount <= 30) return 250;     // moderate question → 1-2 paragraphs
-  return 400;                          // deep/complex question → full response
+  // Deep topics that always deserve full response regardless of message length
+  const deepTopics = [
+    'karma', 'polarity', 'chakra', 'kundalini', 'ojas', 'jing', 'shen',
+    'chrism', 'pineal', 'third eye', 'consciousness', 'transmut', 'energy',
+    'spiritual', 'meditation', 'breathwork', 'universe', 'god', 'divine',
+    'angel', '1111', '111', '222', '333', '444', '555', '666', '777', '888', '999',
+    'synchronicit', 'manifest', 'attract', 'vibrat', 'frequenc', 'dimension',
+    'astral', 'aura', 'electromagnetic', 'spermatogenesis', 'flatline',
+    'wet dream', 'nocturnal', 'relapse', 'edging', 'how does', 'how do',
+    'what is', 'what are', 'why do', 'why does', 'explain', 'teach me'
+  ];
+  
+  const isDeepTopic = deepTopics.some(topic => text.includes(topic));
+  
+  // If it's a deep/spiritual topic or a question, give full room
+  if (isDeepTopic) return 400;
+  
+  // Short casual messages
+  if (wordCount <= 3) return 120;      // "thanks" / "ok" / "got it" → short but not starved
+  if (wordCount <= 8) return 200;      // casual statement → decent paragraph
+  if (wordCount <= 20) return 300;     // moderate message → 1-2 paragraphs
+  return 400;                          // longer messages → full response
 };
 
 // ============================================================
@@ -312,11 +332,15 @@ client.on('messageCreate', async (message) => {
     // Dynamic token limit based on message length
     const maxTokens = getMaxTokens(content);
     
+    // RAG: Retrieve relevant knowledge
+    const ragContext = await retrieveKnowledge(content, { limit: 5, maxTokens: 2000 });
+    const systemWithKnowledge = SYSTEM_PROMPT + ragContext;
+    
     // Call Claude
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: maxTokens,
-      system: SYSTEM_PROMPT,
+      system: systemWithKnowledge,
       messages: messages,
     });
     
