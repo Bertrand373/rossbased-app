@@ -343,12 +343,21 @@ router.post('/ingest/file', adminCheck, upload.single('file'), async (req, res) 
       text = req.file.buffer.toString('utf-8');
     }
 
+    // Clean and check text content
+    text = text.replace(/\s+/g, ' ').trim();
+
     if (text.length < 50) {
-      return res.status(400).json({ error: 'Not enough text content in file' });
+      return res.status(400).json({ 
+        error: 'This file has little or no extractable text. It may be a scanned/image-based PDF. Use Paste Text instead to manually add content.' 
+      });
     }
 
     const parentId = randomUUID();
-    const chunks = chunkText(text);
+    const chunks = chunkText(text).filter(chunk => chunk && chunk.trim().length > 10);
+
+    if (chunks.length === 0) {
+      return res.status(400).json({ error: 'No usable text could be extracted from this file.' });
+    }
     const keywords = extractKeywords(text);
 
     const docs = chunks.map((chunk, index) => ({
