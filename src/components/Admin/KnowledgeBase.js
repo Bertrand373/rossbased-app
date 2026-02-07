@@ -175,13 +175,20 @@ const KnowledgeBase = () => {
   const handleDelete = async (parentId) => {
     try {
       const res = await fetch(`${API}/api/knowledge/document/${parentId}`, {
-        method: 'DELETE', headers
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       const data = await res.json();
       if (data.success) {
         setUploadResult('success', `Deleted — ${data.deletedChunks} chunks removed`);
         setDeleteConfirm(null);
-        fetchStats();
+        // Small delay then fresh fetch to ensure DB has updated
+        setTimeout(() => fetchStats(), 300);
+      } else {
+        setUploadResult('error', data.error || 'Delete failed');
       }
     } catch (err) {
       setUploadResult('error', 'Failed to delete');

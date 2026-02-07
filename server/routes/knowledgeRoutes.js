@@ -380,7 +380,13 @@ router.post('/ingest/file', adminCheck, upload.single('file'), async (req, res) 
 // --- DELETE /document/:parentId - Delete a document and all its chunks ---
 router.delete('/document/:parentId', adminCheck, async (req, res) => {
   try {
-    const result = await KnowledgeChunk.deleteMany({ parentId: req.params.parentId });
+    const parentId = req.params.parentId;
+    console.log(`[Knowledge] Deleting document with parentId: "${parentId}"`);
+    const result = await KnowledgeChunk.deleteMany({ parentId });
+    console.log(`[Knowledge] Deleted ${result.deletedCount} chunks for parentId: "${parentId}"`);
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, error: 'No chunks found for this document' });
+    }
     res.json({ success: true, deletedChunks: result.deletedCount });
   } catch (error) {
     console.error('Delete error:', error);
