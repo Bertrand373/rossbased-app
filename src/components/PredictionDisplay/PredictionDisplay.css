@@ -271,6 +271,88 @@
 }
 
 /* =============================================================================
+   LIGHT THEME OVERRIDES
+   ============================================================================= */
+
+[data-theme="light"] .prediction-overlay {
+  background-color: var(--overlay-bg);
+}
+
+[data-theme="light"] .prediction-header {
+  border-bottom-color: var(--border-subtle);
+}
+
+[data-theme="light"] .prediction-label {
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .prediction-score {
+  color: var(--text);
+}
+
+[data-theme="light"] .prediction-percent {
+  color: var(--text-tertiary);
+}
+
+[data-theme="light"] .prediction-level {
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .prediction-loading {
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .insight-section-label {
+  color: var(--text-tertiary);
+  border-bottom-color: var(--border-subtle);
+}
+
+[data-theme="light"] .insight-title {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="light"] .insight-detail {
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .historical-line {
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .historical-outcome {
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .prediction-message {
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .prediction-disclaimer {
+  color: var(--text-tertiary);
+}
+
+[data-theme="light"] .prediction-actions .btn-primary {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+[data-theme="light"] .prediction-actions .btn-primary:hover {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+[data-theme="light"] .prediction-actions .btn-ghost {
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .prediction-actions .btn-ghost:hover {
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .prediction-context {
+  color: var(--text-tertiary);
+}
+
+/* =============================================================================
    RESPONSIVE
    ============================================================================= */
 
