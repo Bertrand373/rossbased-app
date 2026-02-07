@@ -6,7 +6,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const KnowledgeChunk = require('../models/KnowledgeChunk');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 // File upload config - store in memory for processing
 const upload = multer({
@@ -203,7 +203,7 @@ router.post('/ingest/text', adminCheck, async (req, res) => {
       return res.status(400).json({ error: 'Name and content are required' });
     }
 
-    const parentId = uuidv4();
+    const parentId = randomUUID();
     const chunks = chunkText(content);
     const keywords = extractKeywords(content);
 
@@ -277,7 +277,7 @@ router.post('/ingest/url', adminCheck, async (req, res) => {
       return res.status(400).json({ error: 'Not enough text content extracted from URL' });
     }
 
-    const parentId = uuidv4();
+    const parentId = randomUUID();
     const sourceName = name || new URL(url).hostname;
     const chunks = chunkText(text);
     const keywords = extractKeywords(text);
@@ -335,7 +335,7 @@ router.post('/ingest/file', adminCheck, upload.single('file'), async (req, res) 
       return res.status(400).json({ error: 'Not enough text content in file' });
     }
 
-    const parentId = uuidv4();
+    const parentId = randomUUID();
     const chunks = chunkText(text);
     const keywords = extractKeywords(text);
 
