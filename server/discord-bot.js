@@ -6,6 +6,7 @@
 const { Client, GatewayIntentBits, Partials } = require('discord.js');
 const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
+const { logIfRelevant, generateWeeklyInsight, getPulseStats } = require('./services/oracleInsight');
 const KnowledgeChunk = require('./models/KnowledgeChunk');
 const { randomUUID } = require('crypto');
 
@@ -22,6 +23,14 @@ const ADMIN_DISCORD_USERS = (process.env.ADMIN_DISCORD_USERS || 'rossbased').spl
 // Wisdom channels: auto-ingest long messages from these channels
 // Set channel names here (lowercase). Messages over 200 chars get auto-ingested.
 const WISDOM_CHANNELS = (process.env.WISDOM_CHANNELS || '').split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
+
+// Channel where Oracle drops weekly insights (by name, lowercase)
+const INSIGHT_CHANNEL = (process.env.INSIGHT_CHANNEL || 'main-chat').toLowerCase();
+
+// Weekly insight: day and hour (server timezone, UTC on Render)
+// Default: Sunday at 6pm UTC (1pm EST / 10am PST)
+const INSIGHT_DAY = parseInt(process.env.INSIGHT_DAY || '0'); // 0=Sunday
+const INSIGHT_HOUR = parseInt(process.env.INSIGHT_HOUR || '18'); // 18 = 6pm UTC
 
 // Channel restriction - only respond in these channels (by name)
 // Set to empty array to respond everywhere the bot can see
@@ -552,6 +561,13 @@ client.on('messageCreate', async (message) => {
   const authorUsername = message.author.username?.toLowerCase();
 
   // ============================================================
+  // PASSIVE OBSERVATION (runs on every human message)
+  // Logs relevant messages for weekly pattern analysis
+  // ============================================================
+  
+  logIfRelevant(message).catch(() => {}); // Fire and forget, never block
+
+  // ============================================================
   // ADMIN COMMANDS (Ross only)
   // ============================================================
   
@@ -617,6 +633,89 @@ client.on('messageCreate', async (message) => {
       return;
     } catch (error) {
       await message.reply('Failed to fetch stats.').catch(() => {});
+      return;
+    }
+  }
+
+  // --- !oracle-insight - Force generate a weekly insight (admin only) ---
+  if (message.content.startsWith('!oracle-insight') && ADMIN_DISCORD_USERS.includes(authorUsername)) {
+    try {
+      const args = message.content.split(/\s+/);
+      const days = parseInt(args[1]) || 7;
+      
+      await message.reply(`⏳ Generating insight from the last ${days} days of observations...`);
+      
+      const insight = await generateWeeklyInsight(days);
+      
+      if (!insight) {
+        await message.channel.send('Not enough observations yet. Oracle needs at least 5 relevant messages to detect patterns.');
+        return;
+      }
+      
+      // Preview it here first
+      await message.channel.send(`**Preview:**\n\n${insight}`);
+      await message.channel.send(`Type \`!oracle-drop\` to post this to #${INSIGHT_CHANNEL}, or generate a new one with \`!oracle-insight\``);
+      
+      // Store the latest insight temporarily for the drop command
+      client._pendingInsight = insight;
+      return;
+    } catch (error) {
+      console.error('Insight generation error:', error);
+      await message.reply('Failed to generate insight.').catch(() => {});
+      return;
+    }
+  }
+
+  // --- !oracle-drop - Post the pending insight to the insight channel ---
+  if (message.content === '!oracle-drop' && ADMIN_DISCORD_USERS.includes(authorUsername)) {
+    try {
+      const insight = client._pendingInsight;
+      if (!insight) {
+        await message.reply('No pending insight. Run `!oracle-insight` first to generate one.');
+        return;
+      }
+      
+      // Find the insight channel
+      const guild = message.guild;
+      const targetChannel = guild.channels.cache.find(
+        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+      );
+      
+      if (!targetChannel) {
+        await message.reply(`Could not find channel #${INSIGHT_CHANNEL}. Set INSIGHT_CHANNEL env var.`);
+        return;
+      }
+      
+      await targetChannel.send(insight);
+      client._pendingInsight = null;
+      await message.reply(`✓ Insight posted to #${INSIGHT_CHANNEL}`);
+      console.log(`🔮 Oracle insight dropped in #${INSIGHT_CHANNEL}`);
+      return;
+    } catch (error) {
+      await message.reply('Failed to post insight.').catch(() => {});
+      return;
+    }
+  }
+
+  // --- !pulse-stats - Check observation stats (admin only) ---
+  if (message.content === '!pulse-stats' && ADMIN_DISCORD_USERS.includes(authorUsername)) {
+    try {
+      const stats = await getPulseStats();
+      
+      const topicsStr = stats.topTopics.length > 0
+        ? stats.topTopics.map(([topic, count]) => `  ${topic}: ${count}`).join('\n')
+        : '  No observations yet';
+      
+      await message.reply(
+        `🔮 Oracle Pulse:\n` +
+        `• ${stats.thisWeek} observations this week (${stats.unprocessed} unprocessed)\n` +
+        `• ${stats.uniqueAuthors} unique members observed\n` +
+        `• ${stats.total} total all-time\n\n` +
+        `Top patterns this week:\n${topicsStr}`
+      );
+      return;
+    } catch (error) {
+      await message.reply('Failed to fetch pulse stats.').catch(() => {});
       return;
     }
   }
@@ -735,9 +834,60 @@ client.once('ready', () => {
   console.log(`🔮 The Oracle is online as ${client.user.tag}`);
   console.log(`📡 Watching channels: ${ALLOWED_CHANNELS.length > 0 ? ALLOWED_CHANNELS.join(', ') : 'ALL'}`);
   console.log(`👥 Serving ${client.guilds.cache.size} server(s)`);
+  console.log(`🧠 Pulse observation: ACTIVE`);
+  console.log(`📊 Weekly insight: ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][INSIGHT_DAY]} at ${INSIGHT_HOUR}:00 UTC → #${INSIGHT_CHANNEL}`);
   
   // Set bot status
   client.user.setActivity('the frequencies', { type: 3 }); // "Watching the frequencies"
+  
+  // ============================================================
+  // WEEKLY INSIGHT SCHEDULER
+  // Check every hour if it's time to drop the weekly insight
+  // ============================================================
+  
+  let lastInsightDate = null;
+  
+  setInterval(async () => {
+    try {
+      const now = new Date();
+      const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
+      
+      // Only fire on the configured day and hour
+      if (now.getUTCDay() !== INSIGHT_DAY) return;
+      if (now.getUTCHours() !== INSIGHT_HOUR) return;
+      
+      // Only fire once per day
+      if (lastInsightDate === today) return;
+      lastInsightDate = today;
+      
+      console.log('[Insight] Weekly insight trigger firing...');
+      
+      const insight = await generateWeeklyInsight(7);
+      if (!insight) {
+        console.log('[Insight] Not enough observations for automatic insight');
+        return;
+      }
+      
+      // Find the target channel
+      const guild = client.guilds.cache.first();
+      if (!guild) return;
+      
+      const targetChannel = guild.channels.cache.find(
+        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+      );
+      
+      if (!targetChannel) {
+        console.error(`[Insight] Could not find channel #${INSIGHT_CHANNEL}`);
+        return;
+      }
+      
+      await targetChannel.send(insight);
+      console.log(`🔮 Weekly insight auto-posted to #${INSIGHT_CHANNEL}`);
+      
+    } catch (err) {
+      console.error('[Insight] Scheduler error:', err);
+    }
+  }, 60 * 60 * 1000); // Check every hour
 });
 
 // ============================================================
