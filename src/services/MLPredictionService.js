@@ -391,7 +391,7 @@ class MLPredictionService {
       // Get interpretable factors
       const factors = this.interpretPrediction(features, normalizedFeatures, riskScore);
 
-      return {
+      const result = {
         riskScore,
         confidence: this.calculateConfidence(),
         factors,
@@ -400,6 +400,8 @@ class MLPredictionService {
         usedML: true,
         timestamp: new Date().toISOString()
       };
+
+      return this.enrichPredictionWithPatterns(result, userData);
 
     } catch (error) {
       console.error('Prediction error:', error);
@@ -430,7 +432,11 @@ class MLPredictionService {
     if (hour >= 21 || hour <= 5) factors.lateNight = true;
     
     if (features[5] === 1) factors.weekend = true;
-    if (features[7] === 1) factors.purgePhase = true;
+    if (features[7] === 1) {
+      factors.purgePhase = true;
+      factors.inPurgePhase = true;
+      factors.emotionalProcessingPhase = true;
+    }
     if (features[8] > 7) factors.highAnxiety = true;
     if (features[9] < 4) factors.lowMood = true;
 
@@ -468,6 +474,165 @@ class MLPredictionService {
     }
 
     return patterns;
+  }
+
+  // ============================================================
+  // PATTERN ENRICHMENT - Builds rich data for PredictionDisplay
+  // ============================================================
+
+  enrichPredictionWithPatterns(prediction, userData) {
+    const patterns = prediction.patterns || {};
+    const streakHistory = userData.streakHistory || [];
+    const relapses = streakHistory.filter(s => s.reason === 'relapse');
+    const currentStreak = userData.currentStreak || 0;
+    const benefitTracking = userData.benefitTracking || [];
+
+    // === STREAK PATTERN ===
+    // Check if current streak day is near a past relapse day
+    if (relapses.length >= 1 && currentStreak > 0) {
+      const rangePadding = 3;
+      const rangeStart = Math.max(1, currentStreak - rangePadding);
+      const rangeEnd = currentStreak + rangePadding;
+
+      const relapsesInRange = relapses.filter(r => {
+        const days = r.days || 0;
+        return days > 0 && days >= rangeStart && days <= rangeEnd;
+      });
+
+      if (relapsesInRange.length > 0) {
+        patterns.streak = {
+          isHighRiskDay: true,
+          currentDay: currentStreak,
+          relapsesInRange: relapsesInRange.length,
+          totalRelapses: relapses.length,
+          rangeDays: [rangeStart, rangeEnd]
+        };
+      }
+    }
+
+    // === TIME PATTERN ===
+    // Calculate evening relapse percentage and check if it's evening now
+    if (relapses.length >= 1) {
+      const eveningRelapses = relapses.filter(r => {
+        if (!r.end) return false;
+        const hour = new Date(r.end).getHours();
+        return hour >= 20 || hour <= 2;
+      });
+
+      const eveningPercentage = Math.round(
+        (eveningRelapses.length / relapses.length) * 100
+      );
+
+      const currentHour = new Date().getHours();
+      const isEveningNow = currentHour >= 20 || currentHour <= 2;
+
+      if (isEveningNow && eveningPercentage > 30) {
+        patterns.time = {
+          isHighRiskTime: true,
+          eveningPercentage
+        };
+      }
+    }
+
+    // === BENEFIT DROP PATTERN ===
+    // Check last 3 days for significant drops in any metric
+    if (benefitTracking.length >= 3) {
+      const recent = benefitTracking.slice(-3);
+      const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+      const drops = [];
+
+      metrics.forEach(metric => {
+        const first = recent[0]?.[metric];
+        const last = recent[recent.length - 1]?.[metric];
+        if (first != null && last != null && (first - last) >= 3) {
+          drops.push({
+            metric: metric.charAt(0).toUpperCase() + metric.slice(1),
+            from: first,
+            to: last
+          });
+        }
+      });
+
+      if (drops.length > 0) {
+        patterns.benefits = {
+          hasSignificantDrop: true,
+          drops,
+          daysCovered: recent.length
+        };
+      }
+    }
+
+    // === HISTORICAL MATCH ===
+    // Find a past relapse at a similar streak day
+    if (relapses.length >= 1 && currentStreak > 0) {
+      const match = relapses
+        .filter(r => (r.days || 0) > 0)
+        .find(r => Math.abs(r.days - currentStreak) <= 3);
+
+      if (match) {
+        patterns.historical = {
+          matchDay: match.days,
+          daysUntilRelapse: Math.max(0, match.days - currentStreak)
+        };
+      }
+    }
+
+    // === SUGGESTIONS ===
+    // Contextual tool recommendations based on active risk factors
+    if (prediction.riskScore >= 50) {
+      const suggestions = [];
+
+      if (patterns.time?.isHighRiskTime || prediction.factors?.lateNight) {
+        suggestions.push({
+          focus: 'Breathing Exercise',
+          reason: 'Effective for evening vulnerability windows',
+          tools: ['breathing']
+        });
+      }
+
+      if (patterns.benefits?.hasSignificantDrop || prediction.factors?.lowEnergy) {
+        suggestions.push({
+          focus: 'Cold Exposure',
+          reason: 'Resets nervous system during energy drops',
+          tools: ['cold']
+        });
+      }
+
+      if (prediction.factors?.weekend) {
+        suggestions.push({
+          focus: 'Physical Activity',
+          reason: 'Adds structure during unstructured weekend hours',
+          tools: ['exercise']
+        });
+      }
+
+      if (prediction.factors?.highAnxiety || prediction.factors?.lowMood) {
+        suggestions.push({
+          focus: 'Journaling',
+          reason: 'Process emotions before they become triggers',
+          tools: ['journal']
+        });
+      }
+
+      if (suggestions.length === 0) {
+        suggestions.push({
+          focus: 'Mindful Awareness',
+          reason: 'Stay present and observe urges without acting',
+          tools: ['breathing']
+        });
+      }
+
+      patterns.suggestions = suggestions;
+    }
+
+    // === DATA CONTEXT ===
+    prediction.dataContext = {
+      trackingDays: benefitTracking.length,
+      relapseCount: relapses.length
+    };
+
+    prediction.patterns = patterns;
+    return prediction;
   }
 
   calculateConfidence() {
@@ -522,7 +687,16 @@ class MLPredictionService {
       factors.weekend = true;
     }
 
-    return {
+    // Purge / Emotional Processing phase (days 15-45)
+    const currentStreak = userData.currentStreak || 0;
+    if (currentStreak >= 15 && currentStreak <= 45) {
+      riskScore += 10;
+      factors.purgePhase = true;
+      factors.inPurgePhase = true;
+      factors.emotionalProcessingPhase = true;
+    }
+
+    const result = {
       riskScore: Math.min(riskScore, 85),
       confidence: 0.3,
       factors,
@@ -531,6 +705,8 @@ class MLPredictionService {
       usedML: false,
       timestamp: new Date().toISOString()
     };
+
+    return this.enrichPredictionWithPatterns(result, userData);
   }
 
   // ============================================================
