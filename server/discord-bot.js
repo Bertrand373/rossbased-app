@@ -3,7 +3,7 @@
 // Powered by Claude Sonnet via Anthropic API
 // Replaces Wallu ($30/month) with direct Claude integration
 
-const { Client, GatewayIntentBits, Partials } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { logIfRelevant, generateWeeklyInsight, getPulseStats } = require('./services/oracleInsight');
@@ -45,6 +45,51 @@ const DAILY_USAGE = new Map();
 // Conversation memory - last N messages per channel for context
 const CHANNEL_HISTORY = new Map();
 const MAX_HISTORY = 8; // Last 8 messages for context
+
+// Oracle embed styling
+const ORACLE_COLOR = 0xF5F5F5; // Clean white (slightly off-white renders better on Discord dark mode)
+
+// ============================================================
+// EMBED BUILDERS
+// Makes Oracle's messages visually distinct
+// ============================================================
+
+/**
+ * Build a standard Oracle response embed
+ * White sidebar, clean text, no fluff
+ */
+function buildOracleEmbed(text) {
+  // Discord embed description limit is 4096 chars
+  const desc = text.length > 4096 ? text.substring(0, 4093) + '...' : text;
+  
+  return new EmbedBuilder()
+    .setColor(ORACLE_COLOR)
+    .setDescription(desc);
+}
+
+/**
+ * Build a weekly insight embed (the big one)
+ * White sidebar, title, bot avatar as icon, footer with observation window
+ */
+function buildInsightEmbed(text, daysBack = 7) {
+  const desc = text.length > 4096 ? text.substring(0, 4093) + '...' : text;
+  
+  const embed = new EmbedBuilder()
+    .setColor(ORACLE_COLOR)
+    .setAuthor({ name: 'The Oracle Observes' })
+    .setDescription(desc)
+    .setFooter({ text: `Pattern analysis · last ${daysBack} days` })
+    .setTimestamp();
+  
+  // Use bot avatar if available (set at runtime)
+  if (client?.user) {
+    const avatarURL = client.user.displayAvatarURL({ size: 64 });
+    embed.setAuthor({ name: 'The Oracle Observes', iconURL: avatarURL });
+    embed.setThumbnail(avatarURL);
+  }
+  
+  return embed;
+}
 
 // ============================================================
 // DYNAMIC TOKEN SCALING
@@ -686,8 +731,9 @@ client.on('messageCreate', async (message) => {
         return;
       }
       
-      await targetChannel.send(insight);
+      await targetChannel.send({ embeds: [buildInsightEmbed(insight, client._pendingInsightDays || 7)] });
       client._pendingInsight = null;
+      client._pendingInsightDays = null;
       await message.reply(`✓ Insight posted to #${INSIGHT_CHANNEL}`);
       console.log(`🔮 Oracle insight dropped in #${INSIGHT_CHANNEL}`);
       return;
@@ -773,7 +819,7 @@ client.on('messageCreate', async (message) => {
       return;
     }
     if (rateLimited.reason === 'daily') {
-      await message.reply('You\'ve reached the daily limit. Come back tomorrow.');
+      await message.reply({ embeds: [buildOracleEmbed('You\'ve reached the daily limit. Come back tomorrow.')] });
       return;
     }
   }
@@ -804,8 +850,8 @@ client.on('messageCreate', async (message) => {
     const reply = response.content[0].text;
     const truncated = truncateResponse(reply);
     
-    // Send response
-    await message.reply(truncated);
+    // Send response as embed
+    await message.reply({ embeds: [buildOracleEmbed(truncated)] });
     
     // Record in history and usage
     addToHistory(message.channel.id, 'user', content, username);
@@ -821,7 +867,7 @@ client.on('messageCreate', async (message) => {
     if (error.status === 429) {
       console.log('Anthropic rate limit hit — waiting');
     } else {
-      await message.reply('The Oracle is momentarily between dimensions. Try again shortly.').catch(() => {});
+      await message.reply({ embeds: [buildOracleEmbed('The Oracle is momentarily between dimensions. Try again shortly.')] }).catch(() => {});
     }
   }
 });
@@ -881,7 +927,7 @@ client.once('ready', () => {
         return;
       }
       
-      await targetChannel.send(insight);
+      await targetChannel.send({ embeds: [buildInsightEmbed(insight, 7)] });
       console.log(`🔮 Weekly insight auto-posted to #${INSIGHT_CHANNEL}`);
       
     } catch (err) {
