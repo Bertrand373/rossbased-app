@@ -38,6 +38,7 @@ const knowledgeChunkSchema = new mongoose.Schema({
       'chrism',
       'kundalini',
       'samael-aun-weor',
+      'community',
       'general',
       'other'
     ],
@@ -72,6 +73,12 @@ const knowledgeChunkSchema = new mongoose.Schema({
   enabled: {
     type: Boolean,
     default: true
+  },
+
+  // Author attribution (for Discord channel ingestion)
+  author: {
+    type: String,
+    default: null
   }
   
 }, {

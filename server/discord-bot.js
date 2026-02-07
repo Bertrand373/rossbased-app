@@ -6,6 +6,8 @@
 const { Client, GatewayIntentBits, Partials } = require('discord.js');
 const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
+const KnowledgeChunk = require('./models/KnowledgeChunk');
+const { randomUUID } = require('crypto');
 
 // ============================================================
 // CONFIGURATION
@@ -13,6 +15,13 @@ const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 
 const DISCORD_TOKEN = process.env.ORACLE_DISCORD_TOKEN;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+
+// Admin Discord usernames (lowercase) who can run !ingest commands
+const ADMIN_DISCORD_USERS = (process.env.ADMIN_DISCORD_USERS || 'rossbased').split(',').map(u => u.trim().toLowerCase());
+
+// Wisdom channels: auto-ingest long messages from these channels
+// Set channel names here (lowercase). Messages over 200 chars get auto-ingested.
+const WISDOM_CHANNELS = (process.env.WISDOM_CHANNELS || '').split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
 
 // Channel restriction - only respond in these channels (by name)
 // Set to empty array to respond everywhere the bot can see
@@ -187,6 +196,178 @@ const anthropic = new Anthropic({
 });
 
 // ============================================================
+// CHANNEL INGESTION ENGINE
+// Scrapes Discord channels and feeds into knowledge base
+// ============================================================
+
+// Simple chunking (mirrors knowledgeRoutes chunking)
+const chunkText = (text, maxSize = 1500) => {
+  const cleaned = text.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  if (cleaned.length <= maxSize) return [cleaned];
+  
+  const chunks = [];
+  const paragraphs = cleaned.split('\n\n');
+  let current = '';
+  
+  for (const para of paragraphs) {
+    const trimmed = para.trim();
+    if (!trimmed) continue;
+    if ((current + '\n\n' + trimmed).length > maxSize) {
+      if (current) chunks.push(current.trim());
+      current = trimmed;
+    } else {
+      current += (current ? '\n\n' : '') + trimmed;
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+  return chunks;
+};
+
+const extractKeywords = (text) => {
+  const stopWords = new Set([
+    'the','a','an','is','are','was','were','be','been','being','have','has','had',
+    'do','does','did','will','would','could','should','may','might','can','to','of',
+    'in','for','on','with','at','by','from','as','into','through','that','this',
+    'these','those','it','its','they','them','their','we','our','you','your','and',
+    'or','but','not','so','just','very','than','too','then','there','here','what',
+    'which','who','how','all','each','every','some','any','no','more','most','other'
+  ]);
+  const words = text.toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/)
+    .filter(w => w.length > 3 && !stopWords.has(w));
+  const freq = {};
+  words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+  return Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([w]) => w);
+};
+
+/**
+ * Fetch all messages from a Discord channel (paginated)
+ * @param {Channel} channel - Discord channel
+ * @param {string|null} filterUser - Optional username filter (lowercase)
+ * @param {number} maxMessages - Max messages to fetch
+ */
+async function fetchChannelMessages(channel, filterUser = null, maxMessages = 2000) {
+  const allMessages = [];
+  let lastId = null;
+  
+  while (allMessages.length < maxMessages) {
+    const options = { limit: 100 };
+    if (lastId) options.before = lastId;
+    
+    const batch = await channel.messages.fetch(options);
+    if (batch.size === 0) break;
+    
+    for (const [, msg] of batch) {
+      // Skip bot messages and very short messages
+      if (msg.author.bot) continue;
+      if (msg.content.length < 30) continue;
+      
+      const authorName = msg.member?.displayName || msg.author.username;
+      const authorLower = msg.author.username.toLowerCase();
+      
+      // Filter by user if specified
+      if (filterUser && authorLower !== filterUser) continue;
+      
+      allMessages.push({
+        content: msg.content,
+        author: authorName,
+        authorUsername: msg.author.username,
+        timestamp: msg.createdTimestamp
+      });
+    }
+    
+    lastId = batch.last().id;
+    
+    // Small delay to avoid rate limits
+    await new Promise(r => setTimeout(r, 500));
+  }
+  
+  return allMessages;
+}
+
+/**
+ * Ingest messages into knowledge base
+ * Groups by author, chunks content, stores with attribution
+ */
+async function ingestMessages(messages, channelName, category = 'esoteric') {
+  // Group messages by author
+  const byAuthor = {};
+  for (const msg of messages) {
+    if (!byAuthor[msg.author]) {
+      byAuthor[msg.author] = { username: msg.authorUsername, texts: [] };
+    }
+    byAuthor[msg.author].texts.push(msg.content);
+  }
+  
+  let totalChunks = 0;
+  let totalDocs = 0;
+  
+  for (const [authorName, data] of Object.entries(byAuthor)) {
+    const combinedText = data.texts.join('\n\n');
+    if (combinedText.length < 50) continue; // Skip if too little content
+    
+    const parentId = randomUUID();
+    const chunks = chunkText(combinedText).filter(c => c && c.trim().length > 10);
+    const keywords = extractKeywords(combinedText);
+    
+    if (chunks.length === 0) continue;
+    
+    const docs = chunks.map((chunk, index) => ({
+      content: chunk,
+      source: { type: 'channel', name: `#${channelName} — ${authorName}` },
+      category,
+      chunkIndex: index,
+      parentId,
+      keywords,
+      tokenEstimate: Math.ceil(chunk.length / 4),
+      enabled: true,
+      author: authorName
+    }));
+    
+    await KnowledgeChunk.insertMany(docs);
+    totalChunks += docs.length;
+    totalDocs++;
+  }
+  
+  return { totalDocs, totalChunks, authors: Object.keys(byAuthor) };
+}
+
+/**
+ * Auto-ingest a single message (for wisdom channel listener)
+ */
+async function autoIngestMessage(msg, channelName) {
+  const authorName = msg.member?.displayName || msg.author.username;
+  const content = msg.content;
+  
+  // Check for duplicates (don't re-ingest same content)
+  const existing = await KnowledgeChunk.findOne({
+    content: { $regex: content.substring(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' },
+    author: authorName
+  });
+  if (existing) return null;
+  
+  const parentId = randomUUID();
+  const chunks = chunkText(content).filter(c => c && c.trim().length > 10);
+  if (chunks.length === 0) return null;
+  
+  const keywords = extractKeywords(content);
+  
+  const docs = chunks.map((chunk, index) => ({
+    content: chunk,
+    source: { type: 'channel', name: `#${channelName} — ${authorName}` },
+    category: 'esoteric',
+    chunkIndex: index,
+    parentId,
+    keywords,
+    tokenEstimate: Math.ceil(chunk.length / 4),
+    enabled: true,
+    author: authorName
+  }));
+  
+  await KnowledgeChunk.insertMany(docs);
+  return { chunks: docs.length, author: authorName };
+}
+
+// ============================================================
 // HELPERS
 // ============================================================
 
@@ -289,8 +470,96 @@ client.on('messageCreate', async (message) => {
   // Ignore bot messages
   if (message.author.bot) return;
   
-  // Check if message is in an allowed channel OR mentions the bot
   const channelName = message.channel.name?.toLowerCase();
+  const authorUsername = message.author.username?.toLowerCase();
+
+  // ============================================================
+  // ADMIN COMMANDS (Ross only)
+  // ============================================================
+  
+  if (message.content.startsWith('!ingest-channel') && ADMIN_DISCORD_USERS.includes(authorUsername)) {
+    try {
+      // Parse: !ingest-channel #channel [@user] [category]
+      const args = message.content.split(/\s+/).slice(1);
+      const channelMention = message.mentions.channels.first();
+      const userMention = message.mentions.users.first();
+      
+      if (!channelMention) {
+        await message.reply('Usage: `!ingest-channel #channel-name` or `!ingest-channel #channel-name @user`');
+        return;
+      }
+      
+      // Find category if provided (last arg that isn't a mention)
+      const category = args.find(a => !a.startsWith('<') && !a.startsWith('#')) || 'esoteric';
+      
+      await message.reply(`⏳ Scraping #${channelMention.name}${userMention ? ` (filtering by ${userMention.username})` : ''}... This may take a minute.`);
+      
+      const filterUser = userMention ? userMention.username.toLowerCase() : null;
+      const messages_fetched = await fetchChannelMessages(channelMention, filterUser);
+      
+      if (messages_fetched.length === 0) {
+        await message.channel.send('No qualifying messages found (messages must be 30+ characters, non-bot).');
+        return;
+      }
+      
+      const result = await ingestMessages(messages_fetched, channelMention.name, category);
+      
+      await message.channel.send(
+        `✓ Ingested #${channelMention.name}\n` +
+        `• ${messages_fetched.length} messages from ${result.authors.length} author(s)\n` +
+        `• ${result.totalChunks} chunks stored\n` +
+        `• Authors: ${result.authors.join(', ')}`
+      );
+      
+      console.log(`📚 Channel ingested: #${channelMention.name} — ${result.totalChunks} chunks from ${result.authors.join(', ')}`);
+      return;
+    } catch (error) {
+      console.error('Channel ingestion error:', error);
+      await message.reply('Failed to ingest channel. Check server logs.').catch(() => {});
+      return;
+    }
+  }
+  
+  if (message.content === '!knowledge-stats' && ADMIN_DISCORD_USERS.includes(authorUsername)) {
+    try {
+      const total = await KnowledgeChunk.countDocuments();
+      const enabled = await KnowledgeChunk.countDocuments({ enabled: true });
+      const channelDocs = await KnowledgeChunk.countDocuments({ 'source.type': 'channel' });
+      const authors = await KnowledgeChunk.distinct('author', { author: { $ne: null } });
+      
+      await message.reply(
+        `📊 Knowledge Base:\n` +
+        `• ${total} total chunks (${enabled} enabled)\n` +
+        `• ${channelDocs} from Discord channels\n` +
+        `• Community contributors: ${authors.length > 0 ? authors.join(', ') : 'None yet'}`
+      );
+      return;
+    } catch (error) {
+      await message.reply('Failed to fetch stats.').catch(() => {});
+      return;
+    }
+  }
+
+  // ============================================================
+  // WISDOM CHANNEL AUTO-INGESTION
+  // Auto-ingest long messages from configured wisdom channels
+  // ============================================================
+  
+  if (WISDOM_CHANNELS.length > 0 && WISDOM_CHANNELS.includes(channelName)) {
+    if (message.content.length >= 200 && !message.author.bot) {
+      try {
+        const result = await autoIngestMessage(message, channelName);
+        if (result) {
+          console.log(`📚 Auto-ingested: ${result.author} in #${channelName} (${result.chunks} chunks)`);
+          // React with 📚 so author knows it was captured (subtle, not a ping)
+          await message.react('📚').catch(() => {});
+        }
+      } catch (err) {
+        console.error('Auto-ingest error:', err);
+      }
+    }
+    // Don't return here — message might also be directed at Oracle
+  }
   const isMentioned = message.mentions.has(client.user);
   const isAllowedChannel = ALLOWED_CHANNELS.length === 0 || 
     ALLOWED_CHANNELS.some(ch => channelName?.includes(ch));

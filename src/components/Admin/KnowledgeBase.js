@@ -17,6 +17,7 @@ const CATEGORIES = [
   { value: 'chrism', label: 'Chrism Oil' },
   { value: 'kundalini', label: 'Kundalini' },
   { value: 'samael-aun-weor', label: 'Samael Aun Weor' },
+  { value: 'community', label: 'Community Wisdom' },
   { value: 'other', label: 'Other' }
 ];
 
@@ -389,7 +390,7 @@ const KnowledgeBase = () => {
                   <div className="kb-doc-info">
                     <span className="kb-doc-name">{doc.name}</span>
                     <span className="kb-doc-meta">
-                      {doc.type} · {doc.chunks} chunks · ~{doc.totalTokens.toLocaleString()} tokens
+                      {doc.type} · {doc.chunks} chunks · ~{doc.totalTokens.toLocaleString()} tokens{doc.author ? ` · by ${doc.author}` : ''}
                     </span>
                   </div>
                 </div>

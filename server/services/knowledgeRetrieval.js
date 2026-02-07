@@ -30,7 +30,7 @@ const retrieveKnowledge = async (query, options = {}) => {
       )
         .sort({ score: { $meta: 'textScore' } })
         .limit(limit)
-        .select('content source category score')
+        .select('content source category author score')
         .lean();
     } catch (err) {
       // Text index might not exist yet, fall through to regex
@@ -53,7 +53,7 @@ const retrieveKnowledge = async (query, options = {}) => {
           $or: orConditions
         })
           .limit(limit)
-          .select('content source category')
+          .select('content source category author')
           .lean();
       }
     }
@@ -68,13 +68,18 @@ const retrieveKnowledge = async (query, options = {}) => {
       const chunkTokens = Math.ceil(chunk.content.length / 4);
       if (totalTokens + chunkTokens > maxTokens) break;
 
-      contextParts.push(chunk.content);
+      // Add author attribution if present
+      if (chunk.author) {
+        contextParts.push(`[Community member ${chunk.author} shared this wisdom:]\n${chunk.content}`);
+      } else {
+        contextParts.push(chunk.content);
+      }
       totalTokens += chunkTokens;
     }
 
     if (contextParts.length === 0) return '';
 
-    return '\n\nRELEVANT KNOWLEDGE:\n' + contextParts.join('\n\n---\n\n');
+    return '\n\nRELEVANT KNOWLEDGE (use naturally — if a community member is credited, you may reference them by name organically when it fits, but do not force it every time):\n' + contextParts.join('\n\n---\n\n');
 
   } catch (error) {
     console.error('Knowledge retrieval error:', error);
