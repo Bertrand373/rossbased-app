@@ -293,14 +293,24 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
     return { moon, sperma, personalDay, zodiac, forecast, streakDays };
   }, [userData?.currentStreak, userData?.birthDate]);
 
-  // Fetch AI-generated synthesis
+  // Fetch AI-generated synthesis (with localStorage cache to prevent re-fetch on tab switch)
   useEffect(() => {
     const fetchSynthesis = async () => {
       const token = localStorage.getItem('token');
       if (!token || !userData?.startDate) return;
 
+      const { moon, sperma, personalDay, zodiac, streakDays } = calculations;
+
+      // Check localStorage cache first — avoid API call entirely if we have today's synthesis
+      const todayKey = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+      const cacheKey = `synthesis_${todayKey}_${streakDays}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        setAiSynthesis(cached);
+        return;
+      }
+
       try {
-        const { moon, sperma, personalDay, zodiac, streakDays } = calculations;
         const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
         const response = await fetch(`${API_URL}/api/transmission/synthesis`, {
@@ -322,6 +332,11 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
         if (response.ok) {
           const data = await response.json();
           setAiSynthesis(data.synthesis);
+          // Cache in localStorage — clean up old keys first
+          Object.keys(localStorage).forEach(k => {
+            if (k.startsWith('synthesis_') && k !== cacheKey) localStorage.removeItem(k);
+          });
+          localStorage.setItem(cacheKey, data.synthesis);
         }
       } catch (err) {
         console.error('Synthesis fetch error:', err);
