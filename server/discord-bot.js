@@ -39,7 +39,7 @@ const ALLOWED_CHANNELS = ['retention-ai-chat', 'oracle', 'ai-chat', 'ask-oracle'
 // Rate limiting per user
 const USER_COOLDOWNS = new Map();
 const COOLDOWN_MS = 10000; // 10 seconds between messages per user
-const MAX_DAILY_PER_USER = 25;
+const MAX_DAILY_PER_USER = 10;
 const DAILY_USAGE = new Map();
 
 // Conversation memory - last N messages per channel for context
@@ -852,13 +852,26 @@ client.on('messageCreate', async (message) => {
     const reply = response.content[0].text;
     const truncated = truncateResponse(reply);
     
-    // Send response as embed
-    await message.reply({ embeds: [buildOracleEmbed(truncated)] });
+    // Record usage first so we can show remaining
+    recordUsage(message.author.id);
     
-    // Record in history and usage
+    // Build embed with optional remaining count
+    const embed = buildOracleEmbed(truncated);
+    const today = new Date().toDateString();
+    const userDaily = DAILY_USAGE.get(message.author.id);
+    const used = (userDaily && userDaily.date === today) ? userDaily.count : 0;
+    const remaining = MAX_DAILY_PER_USER - used;
+    
+    if (remaining <= 5 && remaining > 0) {
+      embed.setFooter({ text: `${remaining} remaining today` });
+    }
+    
+    // Send response as embed
+    await message.reply({ embeds: [embed] });
+    
+    // Record in history
     addToHistory(message.channel.id, 'user', content, username);
     addToHistory(message.channel.id, 'assistant', truncated);
-    recordUsage(message.author.id);
     
     console.log(`🔮 Oracle responded to ${username} in #${channelName} [${maxTokens} max tokens]`);
     
