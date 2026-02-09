@@ -87,34 +87,6 @@ const ThemeProvider = ({ children }) => {
   );
 };
 
-// =============================================================================
-// AI Chat Header Button - White sparkle in circle (matches profile button)
-// =============================================================================
-const AIChatButton = ({ onClick }) => {
-  return (
-    <button 
-      className="ai-chat-header-btn"
-      onClick={onClick}
-      aria-label="AI Mentor"
-    >
-      <svg 
-        className="ai-header-sparkle" 
-        width="14" 
-        height="14" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* 4-point sparkle */}
-        <path 
-          d="M12 1C12 1 12.5 6 14 8C15.5 10 21 10.5 21 10.5C21 10.5 15.5 11 14 13C12.5 15 12 21 12 21C12 21 11.5 15 10 13C8.5 11 3 10.5 3 10.5C3 10.5 8.5 10 10 8C11.5 6 12 1 12 1Z" 
-          fill="currentColor"
-        />
-      </svg>
-    </button>
-  );
-};
-
 // Profile Button - Discord avatar with initial fallback
 const ProfileButton = ({ userData }) => {
   const navigate = useNavigate();
@@ -522,7 +494,6 @@ function AppContent({
               {!isMobile && <HeaderNavigation />}
               
               <div className="header-actions">
-                <AIChatButton onClick={() => setShowAIChat(true)} />
                 <ProfileButton userData={userData} />
               </div>
             </header>
@@ -541,7 +512,14 @@ function AppContent({
               currentCheckIns={userData?.totalCheckIns || 0}
             />
             
-            {/* AI Chat - Now controlled by header button */}
+            {/* Floating Oracle Eye - Bottom right above nav */}
+            {!showAIChat && (
+              <button className="oracle-float-btn" onClick={() => setShowAIChat(true)} aria-label="Open The Oracle">
+                <img src="/The_Oracle.png" alt="" />
+              </button>
+            )}
+            
+            {/* AI Chat - Now triggered by floating Oracle eye */}
             <AIChat 
               isLoggedIn={isLoggedIn} 
               isOpen={showAIChat}
