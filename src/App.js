@@ -31,6 +31,9 @@ import KnowledgeBase from './components/Admin/KnowledgeBase';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
+import { useSubscription } from './hooks/useSubscription';
+import PaywallScreen from './components/Subscription/PaywallScreen';
+import DiscordLinkCallback from './components/Auth/DiscordLinkCallback';
 
 // AMBIENT AI HOOKS - Auto-train only (risk indicator removed, floating card handles alerts)
 import { useAutoTrain } from './hooks/useAutoTrain';
@@ -315,6 +318,21 @@ function App() {
     cancelGoal
   } = useUserData();
 
+  // Subscription state - determines if user sees the app or the paywall
+  const {
+    isPremium: hasSubscription,
+    isGrandfathered,
+    isTrial,
+    trialDaysLeft,
+    isLoading: subLoading,
+    hasUsedTrial,
+    subscriptionStatus,
+    startTrial,
+    createCheckout,
+    openPortal,
+    fetchStatus: refreshSubscription
+  } = useSubscription(isLoggedIn);
+
   // AMBIENT AI: Auto-train only (floating card on Tracker handles risk alerts)
   useAutoTrain(isLoggedIn ? userData : null);
 
@@ -389,6 +407,17 @@ function App() {
         showAIChat={showAIChat}
         setShowAIChat={setShowAIChat}
         isMobile={isMobile}
+        hasSubscription={hasSubscription}
+        isGrandfathered={isGrandfathered}
+        isTrial={isTrial}
+        trialDaysLeft={trialDaysLeft}
+        subLoading={subLoading}
+        hasUsedTrial={hasUsedTrial}
+        subscriptionStatus={subscriptionStatus}
+        startTrial={startTrial}
+        createCheckout={createCheckout}
+        openPortal={openPortal}
+        refreshSubscription={refreshSubscription}
       />
     </ThemeProvider>
   );
@@ -410,7 +439,18 @@ function AppContent({
   setShouldNavigateToTracker,
   showAIChat,
   setShowAIChat,
-  isMobile
+  isMobile,
+  hasSubscription,
+  isGrandfathered,
+  isTrial,
+  trialDaysLeft,
+  subLoading,
+  hasUsedTrial,
+  subscriptionStatus,
+  startTrial,
+  createCheckout,
+  openPortal,
+  refreshSubscription
 }) {
   const { theme } = useTheme();
   
@@ -486,6 +526,24 @@ function AppContent({
 
         {isLoggedIn ? (
           <>
+            {/* PAYWALL: Show if user has no active subscription */}
+            {!subLoading && !hasSubscription && (
+              <PaywallScreen 
+                userData={userData}
+                subscriptionStatus={subscriptionStatus}
+                hasUsedTrial={hasUsedTrial}
+                onStartTrial={startTrial}
+                onCheckout={createCheckout}
+                onLinkDiscord={() => {
+                  const clientId = process.env.REACT_APP_DISCORD_CLIENT_ID;
+                  const redirectUri = encodeURIComponent(
+                    window.location.origin + '/auth/discord/link-callback'
+                  );
+                  window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20email`;
+                }}
+              />
+            )}
+            
             <header className="app-header">
               <div className="logo-container">
                 <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
@@ -551,7 +609,18 @@ function AppContent({
                     <UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/profile" element={
-                    <Profile userData={userData} isPremium={isPremium} updateUserData={updateUserData} onLogout={logout} />
+                    <Profile 
+                      userData={userData} 
+                      isPremium={isPremium} 
+                      updateUserData={updateUserData} 
+                      onLogout={logout}
+                      subscriptionStatus={subscriptionStatus}
+                      isGrandfathered={isGrandfathered}
+                      isTrial={isTrial}
+                      trialDaysLeft={trialDaysLeft}
+                      onManageBilling={openPortal}
+                      createCheckout={createCheckout}
+                    />
                   } />
                   <Route path="/urge-prediction" element={
                     <PredictionDisplay mode="full" userData={userData} />
@@ -567,6 +636,9 @@ function AppContent({
         ) : (
           <Routes>
             <Route path="/auth/discord/callback" element={<DiscordCallback onLogin={handleLogin} />} />
+            <Route path="/auth/discord/link-callback" element={
+              <DiscordLinkCallback onLinkComplete={() => refreshSubscription()} />
+            } />
             <Route path="*" element={<Landing onLogin={handleLogin} />} />
           </Routes>
         )}

@@ -22,6 +22,9 @@ const transmissionRoutes = require('./routes/transmissionRoutes');
 const knowledgeRoutes = require('./routes/knowledgeRoutes');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
+const stripeRoutes = require('./routes/stripeRoutes');
+const discordLinkRoutes = require('./routes/discordLink');
+const { expireStaleTrials, expireStaleCanceled } = require('./middleware/subscriptionMiddleware');
 
 // Import leaderboard service
 const { 
@@ -51,6 +54,10 @@ app.use(cors({
 // Handle CORS preflight requests
 app.options('*', cors());
 
+// STRIPE WEBHOOK: Must use raw body parser BEFORE express.json()
+// Otherwise Stripe signature verification fails
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+
 app.use(express.json({ limit: '50mb' }));
 
 // Error-handling middleware
@@ -73,6 +80,15 @@ mongoose.connect(mongoUri, {
     // Initialize notification schedulers after DB connection
     try {
       initializeSchedulers();
+      // Run subscription cleanup every hour (expire stale trials and canceled subs)
+      setInterval(async () => {
+        try {
+          await expireStaleTrials();
+          await expireStaleCanceled();
+        } catch (e) {
+          console.error('Subscription cleanup error:', e);
+        }
+      }, 60 * 60 * 1000); // Every hour
     } catch (error) {
       console.error('Failed to initialize schedulers:', error);
     }
@@ -1336,6 +1352,8 @@ app.use('/api/auth', discordAuthRoutes);
 app.use('/api/ml', mlRoutes);
 app.use('/api/transmission', transmissionRoutes);
 app.use('/api/knowledge', authenticate, knowledgeRoutes);
+app.use('/api/stripe', stripeRoutes);
+app.use('/api/discord', discordLinkRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

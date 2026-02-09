@@ -48,7 +48,7 @@ export const useUserData = () => {
     longestStreak: 0,
     wetDreamCount: 0,
     relapseCount: 0,
-    isPremium: true,
+    isPremium: false,
     goal: {
       targetDays: null,
       isActive: false,
@@ -83,7 +83,7 @@ export const useUserData = () => {
     wisdomMode: false
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isPremium, setIsPremium] = useState(true);
+  const [isPremium, setIsPremium] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'error' | 'success'
 
@@ -213,7 +213,8 @@ export const useUserData = () => {
     processed.notifications = processed.notifications !== false;
     processed.language = processed.language || 'en';
     processed.wisdomMode = processed.wisdomMode || false;
-    processed.isPremium = true;
+    // isPremium is now determined by subscription status from the server
+    // Do NOT override here - let the real subscription system handle this
     
     return processed;
   };
@@ -365,7 +366,7 @@ export const useUserData = () => {
       
       setUserData(processed);
       setIsLoggedIn(true);
-      setIsPremium(true);
+      setIsPremium(false);
       
       localStorage.setItem('userData', JSON.stringify(processed));
       localStorage.setItem('isLoggedIn', 'true');
@@ -464,7 +465,7 @@ export const useUserData = () => {
       
       setUserData(processed);
       setIsLoggedIn(true);
-      setIsPremium(true);
+      setIsPremium(false);
       
       localStorage.setItem('userData', JSON.stringify(processed));
       localStorage.setItem('isLoggedIn', 'true');
@@ -589,7 +590,7 @@ export const useUserData = () => {
 
       // Update state immediately for responsive UI
       setUserData(updatedData);
-      setIsPremium(true);
+      setIsPremium(false);
       
       // Save to localStorage as cache/fallback
       localStorage.setItem('userData', JSON.stringify(updatedData));
@@ -685,7 +686,7 @@ export const useUserData = () => {
             // Got fresh data from MongoDB - use it
             setUserData(freshData);
             setIsLoggedIn(true);
-            setIsPremium(true);
+            setIsPremium(false);
             localStorage.setItem('userData', JSON.stringify(freshData));
             console.log('✅ Loaded fresh data from MongoDB');
           } else {
@@ -696,7 +697,7 @@ export const useUserData = () => {
               const parsedUserData = processUserData(JSON.parse(storedUserData));
               setUserData(parsedUserData);
               setIsLoggedIn(true);
-              setIsPremium(true);
+              setIsPremium(false);
               console.log('⚠️ Using cached localStorage data (API unavailable)');
               toast('Using offline data', { icon: '📴', duration: 2000 });
             }
@@ -709,7 +710,7 @@ export const useUserData = () => {
             const parsedUserData = processUserData(JSON.parse(storedUserData));
             setUserData(parsedUserData);
             setIsLoggedIn(true);
-            setIsPremium(true);
+            setIsPremium(false);
           }
         }
         
@@ -723,7 +724,7 @@ export const useUserData = () => {
             const parsedUserData = processUserData(JSON.parse(storedUserData));
             setUserData(parsedUserData);
             setIsLoggedIn(true);
-            setIsPremium(true);
+            setIsPremium(false);
             localStorage.setItem('userData', JSON.stringify(parsedUserData));
           } catch (err) {
             console.error('Error parsing stored user data:', err);
@@ -740,7 +741,7 @@ export const useUserData = () => {
   return { 
     userData, 
     isLoggedIn, 
-    isPremium: true,
+    isPremium,
     isLoading,
     syncStatus,
     login, 

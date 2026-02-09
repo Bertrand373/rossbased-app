@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "snapshot-grandfather": "node scripts/snapshotGrandfatheredMembers.js"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +29,7 @@
     "node-fetch": "^2.7.0",
     "path-to-regexp": "6.2.1",
     "pdf-parse": "^1.1.1",
+    "stripe": "^17.5.0",
     "uuid": "^13.0.0"
   },
   "description": ""

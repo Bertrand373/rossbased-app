@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { checkAndApplyGrandfather } = require('../middleware/subscriptionMiddleware');
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
@@ -132,6 +133,11 @@ router.post('/discord', async (req, res) => {
           days: 0,
           reason: null
         }],
+        // Initialize with empty subscription (will check grandfather below)
+        subscription: {
+          status: 'none',
+          plan: 'none'
+        },
         notificationPreferences: {
           quietHoursEnabled: false,
           quietHoursStart: '22:00',
@@ -156,6 +162,20 @@ router.post('/discord', async (req, res) => {
       user.discordAvatar = discordUser.avatar || null;
       await user.save();
       console.log('Updated Discord info for user:', user.username);
+    }
+
+    // ============================================
+    // GRANDFATHER CHECK - Auto-grant lifetime access
+    // ============================================
+    // Check if this Discord ID is in the grandfather list
+    // Works for both new signups AND existing users linking Discord
+    if (discordUser.id && user.subscription?.status !== 'grandfathered') {
+      const wasGranted = await checkAndApplyGrandfather(user, discordUser.id);
+      if (wasGranted) {
+        // Reload user to get updated subscription data
+        user = await User.findOne({ username: user.username });
+        console.log(`🎖️ Discord OG grandfather access granted to ${user.username}`);
+      }
     }
 
     // Generate JWT

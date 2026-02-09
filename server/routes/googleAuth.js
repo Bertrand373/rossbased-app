@@ -59,6 +59,11 @@ router.post('/google', async (req, res) => {
           sleep: 5,
           workout: 5
         },
+        // Initialize with empty subscription
+        subscription: {
+          status: 'none',
+          plan: 'none'
+        },
         emotionalEntries: [],
         relapseHistory: [],
         benefitHistory: []

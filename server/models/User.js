@@ -77,6 +77,51 @@ const userSchema = new mongoose.Schema({
   // Theme preference
   theme: { type: String, enum: ['dark', 'light'], default: 'dark' },
   
+  // ============================================
+  // SUBSCRIPTION & PAYMENT SYSTEM
+  // ============================================
+  subscription: {
+    // Status determines access level
+    // 'none'          = never subscribed (default for new users)
+    // 'trial'         = 7-day free trial active
+    // 'active'        = paying subscriber
+    // 'canceled'      = canceled but still has access until period end
+    // 'expired'       = trial or subscription ended, no access
+    // 'grandfathered'  = lifetime free access (Discord OG members)
+    status: { 
+      type: String, 
+      enum: ['none', 'trial', 'active', 'canceled', 'expired', 'grandfathered'], 
+      default: 'none' 
+    },
+    
+    // Plan type
+    plan: { 
+      type: String, 
+      enum: ['none', 'monthly', 'yearly', 'lifetime'], 
+      default: 'none' 
+    },
+    
+    // Stripe identifiers
+    stripeCustomerId: { type: String, default: null },
+    stripeSubscriptionId: { type: String, default: null },
+    
+    // Trial tracking
+    trialStartDate: { type: Date, default: null },
+    trialEndDate: { type: Date, default: null },
+    
+    // Billing cycle
+    currentPeriodStart: { type: Date, default: null },
+    currentPeriodEnd: { type: Date, default: null },
+    
+    // Cancellation
+    cancelAtPeriodEnd: { type: Boolean, default: false },
+    canceledAt: { type: Date, default: null },
+    
+    // Grandfather tracking
+    grandfatheredAt: { type: Date, default: null },
+    grandfatheredReason: { type: String, default: null } // 'discord_og', 'manual', etc.
+  },
+  
   // Notification preferences
   notificationPreferences: {
     type: Object,
@@ -123,12 +168,45 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// ============================================
+// VIRTUAL: Computed premium status
+// Returns true if user has active access (trial, active, canceled-but-not-expired, or grandfathered)
+// ============================================
+userSchema.virtual('hasPremiumAccess').get(function() {
+  const sub = this.subscription;
+  if (!sub) return false;
+  
+  const now = new Date();
+  
+  switch (sub.status) {
+    case 'grandfathered':
+      return true;
+    case 'active':
+      return true;
+    case 'trial':
+      return sub.trialEndDate ? now < sub.trialEndDate : false;
+    case 'canceled':
+      // Still has access until period end
+      return sub.currentPeriodEnd ? now < sub.currentPeriodEnd : false;
+    case 'expired':
+    case 'none':
+    default:
+      return false;
+  }
+});
+
+// Ensure virtuals are included in JSON/Object output
+userSchema.set('toJSON', { virtuals: true });
+userSchema.set('toObject', { virtuals: true });
+
 // Indexes for efficient queries
 userSchema.index({ showOnLeaderboard: 1, currentStreak: -1 });
 userSchema.index({ mentorEligible: 1, verifiedMentor: 1 });
 userSchema.index({ discordId: 1 });
 userSchema.index({ googleId: 1 });
 userSchema.index({ email: 1 });
+userSchema.index({ 'subscription.status': 1 });
+userSchema.index({ 'subscription.stripeCustomerId': 1 });
 
 const User = mongoose.model('User', userSchema);
 

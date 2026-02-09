@@ -1,0 +1,344 @@
+/* src/components/Subscription/PaywallScreen.css */
+/* Premium paywall - matches TitanTrack dark minimal aesthetic */
+
+.paywall {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* Theme-aware background */
+[data-theme="dark"] .paywall {
+  background: #000000;
+}
+
+[data-theme="light"] .paywall {
+  background: #ffffff;
+}
+
+.paywall-content {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 0;
+}
+
+/* Logo */
+.paywall-logo {
+  margin-bottom: 32px;
+}
+
+.paywall-icon {
+  width: 64px;
+  height: 64px;
+  opacity: 0.9;
+}
+
+/* Headline */
+.paywall-headline {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px 0;
+  line-height: 1.1;
+}
+
+[data-theme="dark"] .paywall-headline {
+  color: #ffffff;
+}
+
+[data-theme="light"] .paywall-headline {
+  color: #000000;
+}
+
+.paywall-subheadline {
+  font-size: 1rem;
+  margin: 0 0 40px 0;
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .paywall-subheadline {
+  color: #ffffff;
+}
+
+[data-theme="light"] .paywall-subheadline {
+  color: #000000;
+}
+
+/* Features */
+.paywall-features {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+  text-align: left;
+}
+
+.paywall-feature {
+  font-size: 0.9rem;
+  padding-left: 20px;
+  position: relative;
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .paywall-feature {
+  color: #ffffff;
+}
+
+[data-theme="light"] .paywall-feature {
+  color: #000000;
+}
+
+.paywall-feature::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  opacity: 0.3;
+}
+
+[data-theme="light"] .paywall-feature::before {
+  background: #000000;
+}
+
+/* Plans */
+.paywall-plans {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.paywall-plan {
+  flex: 1;
+  padding: 20px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  position: relative;
+  border: none;
+}
+
+[data-theme="dark"] .paywall-plan {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .paywall-plan {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .paywall-plan.selected {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .paywall-plan.selected {
+  border-color: #000000;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.plan-badge {
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: #f5c518;
+  color: #000000;
+}
+
+.plan-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .plan-label {
+  color: #ffffff;
+}
+
+[data-theme="light"] .plan-label {
+  color: #000000;
+}
+
+.plan-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .plan-price {
+  color: #ffffff;
+}
+
+[data-theme="light"] .plan-price {
+  color: #000000;
+}
+
+.plan-period {
+  font-size: 0.9rem;
+  font-weight: 400;
+  opacity: 0.5;
+}
+
+.plan-monthly {
+  font-size: 0.75rem;
+  opacity: 0.4;
+}
+
+[data-theme="dark"] .plan-monthly {
+  color: #ffffff;
+}
+
+[data-theme="light"] .plan-monthly {
+  color: #000000;
+}
+
+/* CTA Button */
+.paywall-cta {
+  width: 100%;
+  padding: 16px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+}
+
+[data-theme="dark"] .paywall-cta {
+  background: #ffffff;
+  color: #000000;
+}
+
+[data-theme="light"] .paywall-cta {
+  background: #000000;
+  color: #ffffff;
+}
+
+.paywall-cta:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.paywall-cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Discord link */
+.paywall-discord {
+  margin-top: 24px;
+  padding-top: 24px;
+  width: 100%;
+  text-align: center;
+}
+
+[data-theme="dark"] .paywall-discord {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .paywall-discord {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.paywall-discord p {
+  font-size: 0.8rem;
+  opacity: 0.4;
+  margin: 0 0 8px 0;
+}
+
+[data-theme="dark"] .paywall-discord p {
+  color: #ffffff;
+}
+
+[data-theme="light"] .paywall-discord p {
+  color: #000000;
+}
+
+.paywall-discord-link {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0;
+}
+
+[data-theme="dark"] .paywall-discord-link {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="light"] .paywall-discord-link {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.paywall-discord-link:hover {
+  opacity: 1;
+}
+
+/* Legal */
+.paywall-legal {
+  font-size: 0.7rem;
+  opacity: 0.25;
+  margin: 0;
+}
+
+[data-theme="dark"] .paywall-legal {
+  color: #ffffff;
+}
+
+[data-theme="light"] .paywall-legal {
+  color: #000000;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .paywall {
+    padding: 20px 16px;
+  }
+  
+  .paywall-headline {
+    font-size: 1.75rem;
+  }
+  
+  .paywall-plans {
+    gap: 8px;
+  }
+  
+  .paywall-plan {
+    padding: 16px 12px;
+  }
+  
+  .plan-price {
+    font-size: 1.3rem;
+  }
+}
