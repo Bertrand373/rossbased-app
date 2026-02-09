@@ -13,7 +13,18 @@ import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
+const Profile = ({ 
+  userData, 
+  isPremium, 
+  updateUserData, 
+  onLogout,
+  subscriptionStatus,
+  isGrandfathered,
+  isTrial,
+  trialDaysLeft,
+  onManageBilling,
+  createCheckout
+}) => {
   const [activeTab, setActiveTab] = useState('account');
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -696,6 +707,45 @@ const Profile = ({ userData, isPremium, updateUserData, onLogout }) => {
               >
                 <span className="toggle-knob" />
               </button>
+            </div>
+
+            {/* Subscription / Billing Section */}
+            <div className="section-divider" />
+            
+            <div className="billing-section">
+              <h3 className="billing-title">Subscription</h3>
+              
+              <div className="billing-status">
+                <span className="billing-label">Status</span>
+                <span className={`billing-value ${isPremium ? 'active' : 'inactive'}`}>
+                  {isGrandfathered 
+                    ? 'Lifetime Access' 
+                    : isTrial 
+                      ? `Free Trial (${trialDaysLeft} day${trialDaysLeft !== 1 ? 's' : ''} left)`
+                      : isPremium 
+                        ? 'Premium' 
+                        : 'Inactive'
+                  }
+                </span>
+              </div>
+              
+              {isGrandfathered && (
+                <div className="billing-note">
+                  OG Discord member. Lifetime premium. No billing required.
+                </div>
+              )}
+
+              {isPremium && !isGrandfathered && (
+                <button className="billing-manage-btn" onClick={onManageBilling}>
+                  Manage Billing
+                </button>
+              )}
+
+              {!isPremium && (
+                <button className="billing-manage-btn" onClick={() => createCheckout('monthly')}>
+                  Subscribe
+                </button>
+              )}
             </div>
           </div>
         )}

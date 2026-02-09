@@ -98,10 +98,10 @@ const PaywallScreen = ({
             className={`paywall-plan ${selectedPlan === 'yearly' ? 'selected' : ''}`}
             onClick={() => setSelectedPlan('yearly')}
           >
-            <span className="plan-badge">Save 33%</span>
+            <span className="plan-badge">Save 35%</span>
             <span className="plan-label">Annual</span>
-            <span className="plan-price">$64<span className="plan-period">/yr</span></span>
-            <span className="plan-monthly">$5.33/mo</span>
+            <span className="plan-price">$62<span className="plan-period">/yr</span></span>
+            <span className="plan-monthly">$5.17/mo</span>
           </button>
         </div>
         
@@ -120,7 +120,7 @@ const PaywallScreen = ({
             onClick={handleCheckout}
             disabled={isProcessing}
           >
-            {isProcessing ? 'Processing...' : `Subscribe — $${selectedPlan === 'yearly' ? '64/yr' : '8/mo'}`}
+            {isProcessing ? 'Processing...' : `Subscribe — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`}
           </button>
         )}
         

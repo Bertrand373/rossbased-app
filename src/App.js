@@ -452,6 +452,10 @@ function AppContent({
   openPortal,
   refreshSubscription
 }) {
+  // Derive effective premium status from subscription system
+  // This is what ALL child components use to gate premium features
+  const effectivePremium = hasSubscription || isPremium;
+  
   const { theme } = useTheme();
   
   // Theme-aware logo
@@ -591,27 +595,27 @@ function AppContent({
                     <Tracker 
                       userData={userData} 
                       updateUserData={updateUserData} 
-                      isPremium={isPremium}
+                      isPremium={effectivePremium}
                       setGoal={setGoal}
                       cancelGoal={cancelGoal}
                     />
                   } />
                   <Route path="/calendar" element={
-                    <Calendar userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
+                    <Calendar userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/stats" element={
-                    <Stats userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
+                    <Stats userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/timeline" element={
-                    <EmotionalTimeline userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
+                    <EmotionalTimeline userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/urge-toolkit" element={
-                    <UrgeToolkit userData={userData} isPremium={isPremium} updateUserData={updateUserData} />
+                    <UrgeToolkit userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/profile" element={
                     <Profile 
                       userData={userData} 
-                      isPremium={isPremium} 
+                      isPremium={effectivePremium} 
                       updateUserData={updateUserData} 
                       onLogout={logout}
                       subscriptionStatus={subscriptionStatus}

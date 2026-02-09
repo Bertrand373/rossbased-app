@@ -1338,3 +1338,98 @@
     transition: none;
   }
 }
+
+/* ============================================
+   BILLING SECTION
+   ============================================ */
+
+.billing-section {
+  margin-top: 8px;
+}
+
+.billing-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 16px;
+}
+
+.billing-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.billing-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.billing-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.billing-value.active {
+  color: #22c55e;
+}
+
+.billing-value.inactive {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.billing-note {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 12px 0;
+  line-height: 1.5;
+}
+
+.billing-manage-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.billing-manage-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Light mode */
+[data-theme="light"] .billing-title {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .billing-label {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .billing-value.inactive {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] .billing-note {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .billing-manage-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+[data-theme="light"] .billing-manage-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
