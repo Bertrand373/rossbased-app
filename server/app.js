@@ -554,6 +554,270 @@ RULES:
   }
 });
 
+// ============================================
+// BUILD DEEP USER CONTEXT FOR THE ORACLE
+// This is what makes the in-app Oracle uncanny.
+// It sees patterns the user hasn't noticed yet.
+// ============================================
+function buildOracleContext(user) {
+  const lines = [];
+  const streak = user.currentStreak || 0;
+  const longest = user.longestStreak || 0;
+  const relapses = user.relapseCount || 0;
+  const wetDreams = user.wetDreamCount || 0;
+
+  // --- CORE STATS ---
+  lines.push(`Current streak: ${streak} days.`);
+  lines.push(`Longest streak: ${longest} days.`);
+  lines.push(`Total relapses: ${relapses}.`);
+  lines.push(`Wet dreams: ${wetDreams}.`);
+
+  // --- SPERMATOGENESIS CYCLE POSITION ---
+  if (streak > 0) {
+    const cycleDay = ((streak - 1) % 74) + 1;
+    let cyclePhase;
+    if (cycleDay <= 16) cyclePhase = 'Mitotic division (stem cells multiplying). Days 1-16 of cycle.';
+    else if (cycleDay <= 40) cyclePhase = 'Meiotic division (deep cellular transformation). Days 17-40 of cycle.';
+    else if (cycleDay <= 64) cyclePhase = 'Maturation phase (peak nutrient retention and reabsorption). Days 41-64 of cycle.';
+    else cyclePhase = 'Complete reabsorption (highest transmutation potential). Days 65-74 of cycle.';
+    const cycleNumber = Math.floor((streak - 1) / 74) + 1;
+    lines.push(`Spermatogenesis: Cycle ${cycleNumber}, day ${cycleDay}/74. ${cyclePhase}`);
+  }
+
+  // --- EMOTIONAL PHASE ---
+  let phaseName;
+  if (streak <= 14) phaseName = 'Initial Adaptation (days 1-14)';
+  else if (streak <= 45) phaseName = 'Emotional Processing (days 15-45)';
+  else if (streak <= 90) phaseName = 'Mental Expansion (days 46-90)';
+  else if (streak <= 180) phaseName = 'Integration & Growth (days 91-180)';
+  else phaseName = 'Mastery & Purpose (days 181+)';
+  lines.push(`Emotional phase: ${phaseName}.`);
+
+  // --- STREAK vs PERSONAL BEST ---
+  if (longest > 0 && streak > 0) {
+    const pctOfBest = Math.round((streak / longest) * 100);
+    if (streak > longest) {
+      lines.push(`Currently in uncharted territory. New personal best.`);
+    } else if (pctOfBest >= 80) {
+      lines.push(`At ${pctOfBest}% of personal best (${longest} days). Approaching previous peak.`);
+    } else if (pctOfBest >= 50) {
+      lines.push(`At ${pctOfBest}% of personal best (${longest} days).`);
+    }
+  }
+
+  // --- BENEFIT TRENDS (last 7 days vs prior 7 days) ---
+  if (user.benefitTracking && user.benefitTracking.length >= 3) {
+    const sorted = [...user.benefitTracking]
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    const recent = sorted.slice(0, 7);
+    const prior = sorted.slice(7, 14);
+    
+    const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    const trends = {};
+    const currentLevels = {};
+    
+    metrics.forEach(m => {
+      const recentVals = recent.map(e => e[m]).filter(v => v !== undefined && v !== null);
+      const priorVals = prior.map(e => e[m]).filter(v => v !== undefined && v !== null);
+      
+      if (recentVals.length > 0) {
+        const recentAvg = recentVals.reduce((a, b) => a + b, 0) / recentVals.length;
+        currentLevels[m] = Math.round(recentAvg * 10) / 10;
+        
+        if (priorVals.length > 0) {
+          const priorAvg = priorVals.reduce((a, b) => a + b, 0) / priorVals.length;
+          const diff = recentAvg - priorAvg;
+          if (diff > 0.5) trends[m] = 'rising';
+          else if (diff < -0.5) trends[m] = 'falling';
+          else trends[m] = 'stable';
+        }
+      }
+    });
+
+    // Current levels
+    const levelParts = Object.entries(currentLevels)
+      .map(([m, v]) => `${m}: ${v}/10`)
+      .join(', ');
+    if (levelParts) {
+      lines.push(`Current benefit levels (7-day avg): ${levelParts}.`);
+    }
+
+    // Trends
+    const rising = Object.entries(trends).filter(([_, t]) => t === 'rising').map(([m]) => m);
+    const falling = Object.entries(trends).filter(([_, t]) => t === 'falling').map(([m]) => m);
+    
+    if (rising.length > 0) lines.push(`Rising: ${rising.join(', ')}.`);
+    if (falling.length > 0) lines.push(`Declining: ${falling.join(', ')}.`);
+
+    // Detect if any metric is critically low
+    const lowMetrics = Object.entries(currentLevels)
+      .filter(([_, v]) => v <= 3)
+      .map(([m]) => m);
+    if (lowMetrics.length > 0) {
+      lines.push(`Warning. Low levels: ${lowMetrics.join(', ')} (at or below 3/10).`);
+    }
+  }
+
+  // --- EMOTIONAL TRACKING (most recent entry) ---
+  if (user.emotionalTracking && user.emotionalTracking.length > 0) {
+    const latest = [...user.emotionalTracking]
+      .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    
+    if (latest) {
+      const parts = [];
+      if (latest.anxiety !== undefined) parts.push(`anxiety: ${latest.anxiety}/10`);
+      if (latest.moodStability !== undefined) parts.push(`mood stability: ${latest.moodStability}/10`);
+      if (latest.mentalClarity !== undefined) parts.push(`mental clarity: ${latest.mentalClarity}/10`);
+      if (latest.emotionalProcessing !== undefined) parts.push(`emotional processing: ${latest.emotionalProcessing}/10`);
+      if (parts.length > 0) {
+        lines.push(`Latest emotional state: ${parts.join(', ')}.`);
+      }
+    }
+  }
+
+  // --- RELAPSE PATTERN ANALYSIS ---
+  if (user.streakHistory && user.streakHistory.length > 1) {
+    const relapseStreaks = user.streakHistory.filter(s => s.reason === 'relapse' && s.days);
+    
+    if (relapseStreaks.length >= 2) {
+      // Average streak before relapse
+      const avgDays = Math.round(
+        relapseStreaks.reduce((sum, s) => sum + s.days, 0) / relapseStreaks.length
+      );
+      lines.push(`Average streak before relapse: ${avgDays} days.`);
+
+      // Most common triggers
+      const triggerCounts = {};
+      relapseStreaks.forEach(s => {
+        if (s.trigger) {
+          const t = s.trigger.toLowerCase().replace(/_/g, ' ');
+          triggerCounts[t] = (triggerCounts[t] || 0) + 1;
+        }
+      });
+      const sortedTriggers = Object.entries(triggerCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+      if (sortedTriggers.length > 0) {
+        const triggerStr = sortedTriggers
+          .map(([t, c]) => `${t} (${c}x)`)
+          .join(', ');
+        lines.push(`Top relapse triggers: ${triggerStr}.`);
+      }
+
+      // Danger zone detection
+      if (avgDays > 0 && streak > 0) {
+        const dangerStart = avgDays - 3;
+        const dangerEnd = avgDays + 3;
+        if (streak >= dangerStart && streak <= dangerEnd) {
+          lines.push(`DANGER ZONE: User is near their average relapse point (day ${avgDays}). Historically vulnerable right now.`);
+        }
+      }
+
+      // Pattern: getting stronger or weaker?
+      if (relapseStreaks.length >= 3) {
+        const lastThree = relapseStreaks.slice(-3).map(s => s.days);
+        const increasing = lastThree[2] > lastThree[1] && lastThree[1] > lastThree[0];
+        const decreasing = lastThree[2] < lastThree[1] && lastThree[1] < lastThree[0];
+        if (increasing) {
+          lines.push(`Streaks are getting longer. Last three: ${lastThree.join(', ')} days. Building momentum.`);
+        } else if (decreasing) {
+          lines.push(`Streaks are getting shorter. Last three: ${lastThree.join(', ')} days. Pattern needs attention.`);
+        }
+      }
+    }
+  }
+
+  // --- RECENT URGE ACTIVITY ---
+  if (user.urgeLog && user.urgeLog.length > 0) {
+    const sorted = [...user.urgeLog]
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    const recentUrges = sorted.slice(0, 5);
+    
+    if (recentUrges.length > 0) {
+      const avgIntensity = Math.round(
+        recentUrges.reduce((sum, u) => sum + (u.intensity || 0), 0) / recentUrges.length * 10
+      ) / 10;
+      lines.push(`Recent urge intensity (avg of last ${recentUrges.length}): ${avgIntensity}/10.`);
+
+      // Most effective tools
+      const overcameUrges = sorted.filter(u => u.overcame === true);
+      if (overcameUrges.length > 0) {
+        const toolCounts = {};
+        overcameUrges.forEach(u => {
+          if (u.toolUsed) {
+            const tool = u.toolUsed.replace(/_/g, ' ');
+            toolCounts[tool] = (toolCounts[tool] || 0) + 1;
+          }
+        });
+        const topTools = Object.entries(toolCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 2)
+          .map(([t]) => t);
+        if (topTools.length > 0) {
+          lines.push(`Most effective urge tools: ${topTools.join(', ')}.`);
+        }
+      }
+
+      // Last urge timing
+      const lastUrge = recentUrges[0];
+      const daysSinceUrge = Math.floor(
+        (new Date() - new Date(lastUrge.date)) / (1000 * 60 * 60 * 24)
+      );
+      if (daysSinceUrge <= 3) {
+        lines.push(`Last logged urge: ${daysSinceUrge === 0 ? 'today' : daysSinceUrge + ' day(s) ago'}. Intensity: ${lastUrge.intensity}/10. ${lastUrge.overcame ? 'Overcame it.' : 'Did not overcome.'}`);
+      }
+    }
+  }
+
+  // --- TOOL USAGE PATTERNS ---
+  if (user.urgeToolUsage && user.urgeToolUsage.length > 0) {
+    const recent = user.urgeToolUsage.slice(-10);
+    const effectiveTools = recent.filter(t => t.effective);
+    if (effectiveTools.length > 0) {
+      const toolNames = [...new Set(effectiveTools.map(t => t.tool?.replace(/_/g, ' ')))];
+      lines.push(`Crisis tools that work for this user: ${toolNames.slice(0, 3).join(', ')}.`);
+    }
+  }
+
+  // --- BADGES / MILESTONES ---
+  if (user.badges && user.badges.length > 0) {
+    const earned = user.badges.filter(b => b.earned).map(b => b.name);
+    const nextUnearned = user.badges.find(b => !b.earned);
+    if (earned.length > 0) {
+      lines.push(`Earned badges: ${earned.join(', ')}.`);
+    }
+    if (nextUnearned) {
+      lines.push(`Next milestone: ${nextUnearned.name}.`);
+    }
+  }
+
+  // --- UPCOMING MILESTONE PROXIMITY ---
+  const milestones = [7, 14, 21, 30, 33, 40, 60, 64, 74, 90, 120, 148, 180, 365];
+  const nextMilestone = milestones.find(m => m > streak);
+  if (nextMilestone && (nextMilestone - streak) <= 5) {
+    lines.push(`${nextMilestone - streak} day(s) from Day ${nextMilestone} milestone.`);
+  }
+
+  // --- POST-RELAPSE DETECTION ---
+  if (relapses > 0 && streak <= 7) {
+    lines.push(`Recently relapsed. In recovery phase. Handle with care but don't coddle.`);
+  }
+
+  // --- JOURNEY DURATION ---
+  if (user.startDate) {
+    const totalDays = Math.floor(
+      (new Date() - new Date(user.startDate)) / (1000 * 60 * 60 * 24)
+    );
+    if (totalDays > streak + 30) {
+      lines.push(`Total journey: ${totalDays} days (across multiple streaks). Not a beginner.`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
 // AI Chat Streaming Endpoint
 app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
   const { message, conversationHistory, timezone } = req.body;
@@ -599,9 +863,8 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       });
     }
 
-    // Build user context from their data
-    const streakDays = user.currentStreak || 0;
-    const userContext = `Current streak: ${streakDays} days. Longest streak: ${user.longestStreak || 0} days. Total relapses: ${user.relapseCount || 0}.`;
+    // Build deep user context from their data
+    const userContext = buildOracleContext(user);
 
     const systemPrompt = `You are The Oracle, the AI guide within TitanTrack.
 
