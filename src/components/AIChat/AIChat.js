@@ -316,6 +316,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
           <div className="ai-chat-body" ref={chatBodyRef}>
             {messages.length === 0 && !isLoading && (
               <div className="ai-chat-empty">
+                <img src="/The_Oracle.png" alt="" className="ai-chat-empty-eye" />
                 <p className="ai-chat-empty-title">The Oracle awaits.</p>
                 <p className="ai-chat-empty-subtitle">
                   Ask about your journey, phases, flatlines, transmutation, or anything on your mind.

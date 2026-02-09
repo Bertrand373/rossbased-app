@@ -162,6 +162,25 @@
   max-width: 280px;
 }
 
+/* Oracle eye in empty state */
+.ai-chat-empty-eye {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  margin-bottom: 8px;
+  opacity: 0.5;
+  animation: emptyEyeBreath 4s ease-in-out infinite;
+}
+
+[data-theme="light"] .ai-chat-empty-eye {
+  filter: invert(1);
+}
+
+@keyframes emptyEyeBreath {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.65; }
+}
+
 /* ============================================================
    MESSAGE BUBBLES
    ============================================================ */
@@ -456,6 +475,11 @@
   .ai-chat-loading-icon {
     animation: none;
     opacity: 0.4;
+  }
+  
+  .ai-chat-empty-eye {
+    animation: none;
+    opacity: 0.45;
   }
 }
 
