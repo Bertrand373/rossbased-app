@@ -1378,6 +1378,10 @@
   color: #22c55e;
 }
 
+.billing-value.trial {
+  color: #d4a017;
+}
+
 .billing-value.inactive {
   color: rgba(255, 255, 255, 0.4);
 }

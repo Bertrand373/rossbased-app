@@ -535,8 +535,6 @@ function AppContent({
               <PaywallScreen 
                 userData={userData}
                 subscriptionStatus={subscriptionStatus}
-                hasUsedTrial={hasUsedTrial}
-                onStartTrial={startTrial}
                 onCheckout={createCheckout}
                 onLinkDiscord={() => {
                   const clientId = process.env.REACT_APP_DISCORD_CLIENT_ID;

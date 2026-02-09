@@ -372,7 +372,16 @@ export const useUserData = () => {
       localStorage.setItem('isLoggedIn', 'true');
       
       setIsLoading(false);
-      toast.success(`Welcome, ${processed.username}!`);
+      
+      // Detect new signup: account created within last 2 minutes
+      const isNewSignup = processed.createdAt && 
+        (Date.now() - new Date(processed.createdAt).getTime()) < 2 * 60 * 1000;
+      
+      if (isNewSignup) {
+        toast.success('Welcome to TitanTrack. 7 days full access.', { duration: 4000 });
+      } else {
+        toast.success(`Welcome, ${processed.username}!`);
+      }
       
       return true;
     } catch (err) {

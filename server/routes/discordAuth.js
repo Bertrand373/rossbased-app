@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { checkAndApplyGrandfather } = require('../middleware/subscriptionMiddleware');
+const { checkAndApplyGrandfather, startFreeTrial } = require('../middleware/subscriptionMiddleware');
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
@@ -176,6 +176,13 @@ router.post('/discord', async (req, res) => {
         user = await User.findOne({ username: user.username });
         console.log(`🎖️ Discord OG grandfather access granted to ${user.username}`);
       }
+    }
+
+    // Auto-start 7-day free trial for NEW users who weren't grandfathered
+    if (isNewUser && user.subscription?.status === 'none') {
+      await startFreeTrial(user);
+      user = await User.findOne({ username: user.username });
+      console.log(`🎁 Auto-started free trial for: ${user.username}`);
     }
 
     // Generate JWT

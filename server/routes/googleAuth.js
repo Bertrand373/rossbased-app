@@ -4,6 +4,7 @@ const router = express.Router();
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { startFreeTrial } = require('../middleware/subscriptionMiddleware');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -71,6 +72,11 @@ router.post('/google', async (req, res) => {
       
       await user.save();
       console.log('Created new user via Google:', finalUsername);
+      
+      // Auto-start 7-day free trial for new users
+      await startFreeTrial(user);
+      user = await User.findOne({ username: finalUsername });
+      console.log('🎁 Auto-started free trial for:', finalUsername);
     } else if (!user.googleId) {
       // Link Google to existing account
       user.googleId = googleId;

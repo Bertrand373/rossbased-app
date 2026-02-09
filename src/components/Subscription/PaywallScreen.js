@@ -8,8 +8,6 @@ import './PaywallScreen.css';
 const PaywallScreen = ({ 
   userData, 
   subscriptionStatus,
-  hasUsedTrial,
-  onStartTrial, 
   onCheckout,
   onLinkDiscord 
 }) => {
@@ -41,15 +39,6 @@ const PaywallScreen = ({
       return 'Continue your journey.';
     }
     return 'Everything you need to master retention.';
-  };
-
-  const handleStartTrial = async () => {
-    setIsProcessing(true);
-    try {
-      await onStartTrial();
-    } finally {
-      setIsProcessing(false);
-    }
   };
 
   const handleCheckout = async () => {
@@ -105,24 +94,14 @@ const PaywallScreen = ({
           </button>
         </div>
         
-        {/* CTA */}
-        {!hasUsedTrial ? (
-          <button 
-            className="paywall-cta"
-            onClick={handleStartTrial}
-            disabled={isProcessing}
-          >
-            {isProcessing ? 'Starting...' : 'Start 7-Day Free Trial'}
-          </button>
-        ) : (
-          <button 
-            className="paywall-cta"
-            onClick={handleCheckout}
-            disabled={isProcessing}
-          >
-            {isProcessing ? 'Processing...' : `Subscribe — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`}
-          </button>
-        )}
+        {/* CTA - Trial auto-starts on signup, so paywall only shows post-trial */}
+        <button 
+          className="paywall-cta"
+          onClick={handleCheckout}
+          disabled={isProcessing}
+        >
+          {isProcessing ? 'Processing...' : `Subscribe — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`}
+        </button>
         
         {/* Discord grandfather prompt */}
         {!hasDiscord && (
@@ -139,10 +118,7 @@ const PaywallScreen = ({
         
         {/* Legal */}
         <p className="paywall-legal">
-          {!hasUsedTrial 
-            ? 'No credit card required for trial. Cancel anytime.'
-            : 'Cancel anytime. Secure payment via Stripe.'
-          }
+          Cancel anytime. Secure payment via Stripe.
         </p>
       </div>
     </div>

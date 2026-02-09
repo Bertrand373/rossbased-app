@@ -717,7 +717,7 @@ const Profile = ({
               
               <div className="billing-status">
                 <span className="billing-label">Status</span>
-                <span className={`billing-value ${isPremium ? 'active' : 'inactive'}`}>
+                <span className={`billing-value ${isGrandfathered || (isPremium && !isTrial) ? 'active' : isTrial ? 'trial' : 'inactive'}`}>
                   {isGrandfathered 
                     ? 'Lifetime Access' 
                     : isTrial 
@@ -735,7 +735,7 @@ const Profile = ({
                 </div>
               )}
 
-              {isPremium && !isGrandfathered && (
+              {isPremium && !isGrandfathered && !isTrial && (
                 <button className="billing-manage-btn" onClick={onManageBilling}>
                   Manage Billing
                 </button>
