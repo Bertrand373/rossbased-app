@@ -897,10 +897,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         week.push(
           <div key={i} className={cellClasses} onClick={() => openDayInfo(currentDay)}>
             <span className="day-number">{format(currentDay, 'd')}</span>
-            {/* Single gold dot if day has any tracked data */}
-            {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
-              <span className="day-has-data-dot"></span>
-            )}
+            {/* Data indicators - top right: dash = benefits, dot = journal */}
+            <div className="day-data-indicators">
+              {dayTracking.hasBenefits && <span className="day-benefits-dash"></span>}
+              {dayTracking.hasJournal && <span className="day-journal-dot"></span>}
+            </div>
             {/* Moon phase indicator - only on significant phases */}
             {isMoonDay && (
               <span 
@@ -978,10 +979,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           
           {/* Bottom indicators */}
           <div className="week-day-indicators">
-            {/* Data dot */}
-            {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
-              <span className="week-has-data-dot"></span>
-            )}
+            {/* Data indicators: dash = benefits, dot = journal */}
+            <div className="week-data-indicators">
+              {dayTracking.hasBenefits && <span className="week-benefits-dash"></span>}
+              {dayTracking.hasJournal && <span className="week-journal-dot"></span>}
+            </div>
             {/* Status indicator */}
             <div className="week-status-indicator">
               {dayStatus?.type === 'current-streak' && <span className="week-status-dot current-streak"></span>}
@@ -1052,8 +1054,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           <span>Wet Dream</span>
         </div>
         <div className="legend-item">
-          <span className="legend-dot tracked"></span>
-          <span>Tracked</span>
+          <span className="legend-indicator benefits"></span>
+          <span>Benefits</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-indicator journal"></span>
+          <span>Journal</span>
         </div>
       </div>
 
@@ -1143,7 +1149,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           MOON DETAIL MODAL - Premium lunar information
           ================================================================ */}
       {moonDetailModal && selectedMoonDate && (
-        <div className="calendar-overlay" onClick={closeMoonDetail}>
+        <div className="calendar-overlay">
           <div className="calendar-modal moon-detail-modal" onClick={e => e.stopPropagation()}>
             {(() => {
               const lunar = getLunarData(selectedMoonDate);
@@ -1174,8 +1180,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                     </p>
                   </div>
                   
-                  <div className="moon-detail-hint">
-                    Tap anywhere to close
+                  <div className="moon-detail-footer">
+                    <button className="calendar-btn-ghost" onClick={closeMoonDetail}>
+                      Close
+                    </button>
                   </div>
                 </>
               );

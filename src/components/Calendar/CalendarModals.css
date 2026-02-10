@@ -992,11 +992,10 @@
   margin: 0;
 }
 
-.moon-detail-hint {
-  font-size: 0.6875rem;
-  font-weight: 400;
-  color: var(--text-tertiary);
-  letter-spacing: 0.02em;
+.moon-detail-footer {
+  display: flex;
+  flex-direction: column;
+  padding-top: 8px;
 }
 
 /* Moon detail modal responsive */
