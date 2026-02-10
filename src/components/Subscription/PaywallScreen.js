@@ -120,6 +120,13 @@ const PaywallScreen = ({
         <p className="paywall-legal">
           Cancel anytime. Secure payment via Stripe.
         </p>
+        
+        <button className="paywall-signout" onClick={() => {
+          localStorage.clear();
+          window.location.href = '/';
+        }}>
+          Sign Out
+        </button>
       </div>
     </div>
   );
