@@ -9,6 +9,8 @@
   color: #ffffff;
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   /* PWA safe areas */
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -26,12 +28,11 @@
 
 /* Main content area */
 .landing-main {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px 40px;
+  padding: 120px 24px 60px;
   position: relative;
   z-index: 1;
 }
@@ -250,9 +251,8 @@
 /* Mobile - flex: 0.5 reduces the expanding gap */
 @media (max-width: 768px) {
   .landing-main {
-    flex: 0.5;
+    flex: none;
     padding: 60px 20px 32px;
-    justify-content: flex-start;
     padding-top: 12vh;
   }
   
@@ -324,7 +324,7 @@
 /* Small mobile */
 @media (max-width: 480px) {
   .landing-main {
-    flex: 0.4;
+    flex: none;
     padding-top: 10vh;
   }
   
@@ -368,7 +368,7 @@
 /* Very small screens */
 @media (max-width: 360px) {
   .landing-main {
-    flex: 0.35;
+    flex: none;
     padding: 48px 16px 24px;
     padding-top: 8vh;
   }
@@ -399,7 +399,7 @@
 /* Landscape mobile - prevent awkward layout */
 @media (max-height: 600px) and (orientation: landscape) {
   .landing-main {
-    flex: 0.5;
+    flex: none;
     padding-top: 40px;
     justify-content: center;
   }

@@ -162,7 +162,7 @@ const StaticViewManager = () => {
   const location = useLocation();
   
   useEffect(() => {
-    const staticRoutes = ['/'];
+    const staticRoutes = [];
     if (staticRoutes.includes(location.pathname)) {
       document.body.classList.add('static-view');
     } else {
