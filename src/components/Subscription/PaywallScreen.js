@@ -11,32 +11,40 @@ const PaywallScreen = ({
   onCheckout,
   onLinkDiscord 
 }) => {
-  const [selectedPlan, setSelectedPlan] = useState('monthly');
+  const [selectedPlan, setSelectedPlan] = useState('yearly');
   const [isProcessing, setIsProcessing] = useState(false);
   
   const streakCount = userData?.currentStreak || 0;
+  const longestStreak = userData?.longestStreak || 0;
   const hasDiscord = !!userData?.discordId;
   const reason = subscriptionStatus?.reason || 'no_subscription';
   
   // Determine headline based on context
   const getHeadline = () => {
+    if (reason === 'trial_expired' && streakCount > 0) {
+      return `${streakCount} days built.`;
+    }
+    if (reason === 'trial_expired' && longestStreak > 0) {
+      return `${longestStreak} days on record.`;
+    }
     if (reason === 'trial_expired') {
-      return streakCount > 0 
-        ? `${streakCount} days built.` 
-        : 'Your trial has ended.';
+      return 'You felt the difference.';
     }
     if (reason === 'subscription_ended' || reason === 'expired') {
-      return 'Welcome back.';
+      return 'Your data is waiting.';
     }
     return 'Unlock TitanTrack.';
   };
   
   const getSubheadline = () => {
     if (reason === 'trial_expired' && streakCount > 0) {
-      return "Don't lose momentum.";
+      return "Your patterns don't track themselves.";
     }
     if (reason === 'trial_expired') {
-      return 'Continue your journey.';
+      return 'The tool worked. Keep it.';
+    }
+    if (reason === 'subscription_ended' || reason === 'expired') {
+      return 'Pick up where you left off.';
     }
     return 'Everything you need to master retention.';
   };
@@ -63,14 +71,13 @@ const PaywallScreen = ({
         <h1 className="paywall-headline">{getHeadline()}</h1>
         <p className="paywall-subheadline">{getSubheadline()}</p>
         
-        {/* Feature list - brief, not salesy */}
+        {/* Outcomes, not features */}
         <div className="paywall-features">
-          <div className="paywall-feature">AI-powered relapse prediction</div>
-          <div className="paywall-feature">6-metric benefit analytics</div>
-          <div className="paywall-feature">Based30 Mind Program</div>
-          <div className="paywall-feature">The Oracle AI guide</div>
-          <div className="paywall-feature">Crisis intervention toolkit</div>
-          <div className="paywall-feature">Emotional timeline tracking</div>
+          <div className="paywall-feature">Know your risk before urges hit</div>
+          <div className="paywall-feature">See what retention is actually changing in you</div>
+          <div className="paywall-feature">Rewire your mind in 30 days</div>
+          <div className="paywall-feature">AI that learns your patterns, not someone else's</div>
+          <div className="paywall-feature">Break the cycle when it matters most</div>
         </div>
         
         {/* Plan selector */}
@@ -94,13 +101,13 @@ const PaywallScreen = ({
           </button>
         </div>
         
-        {/* CTA - Trial auto-starts on signup, so paywall only shows post-trial */}
+        {/* CTA */}
         <button 
           className="paywall-cta"
           onClick={handleCheckout}
           disabled={isProcessing}
         >
-          {isProcessing ? 'Processing...' : `Subscribe — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`}
+          {isProcessing ? 'Processing...' : `Continue — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`}
         </button>
         
         {/* Discord grandfather prompt */}
