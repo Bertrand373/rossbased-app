@@ -14,7 +14,7 @@ const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https
 const EXPLAIN = {
   activation: { w: 'What % of signups actually logged their first benefit entry.', y: 'If someone signs up and never logs, the app failed. Nothing else matters if people don\'t get past this gate.', b: '40%+ solid. Below 25% = onboarding needs work.' },
   d7: { w: 'Of activated users, what % were still logging 7 days later.', y: 'A full week = habit formed. THE metric that separates apps that grow from apps that die.', b: '25%+ good. 40%+ = something special.' },
-  premium: { w: 'What % of all users are paying subscribers.', y: 'Revenue engine. This number determines if TitanTrack is a business or a hobby.', b: '5-10% typical freemium. Your niche should push higher.' },
+  premium: { w: 'What % of users have active access — grandfathered, paying, or on trial.', y: 'Right now most users are grandfathered OGs. This metric becomes critical post-launch when new users need to convert to paid.', b: 'Pre-launch: high is expected. Post-launch: 5-10% paid conversion is typical.' },
   stickiness: { w: 'Daily active ÷ monthly active. How often people come back.', y: 'A daily logging app NEEDS high stickiness. 20% = ~6 days/month. You want daily.', b: '20%+ good. 40%+ elite. Below 15% = forgotten.' },
   features: { w: 'What % of users have used each feature at least once.', y: 'Below 10% adoption = users can\'t find it, don\'t get it, or don\'t want it.' },
   distribution: { w: 'Where your users are on their current streak right now.', y: 'Most at Day 0-7 = fast churn. Spread across ranges = long-term engagement.' },
@@ -295,7 +295,7 @@ const AdminCockpit = () => {
             {[
               { id: 'activation', rank: '01', val: `${activationRate}%`, label: 'Activation', detail: `${retention?.totalWithData || 0} of ${overview.totalUsers} signed up \u2192 logged`, metric: activationRate },
               { id: 'd7', rank: '02', val: `${d7Rate}%`, label: 'D7 Retention', detail: `${retention?.retention?.d7?.count || 0} still active after 7d`, metric: d7Rate },
-              { id: 'premium', rank: '03', val: `${premiumRate}%`, label: 'Premium Rate', detail: `${overview.premiumUsers} of ${overview.totalUsers} paying`, metric: premiumRate },
+              { id: 'premium', rank: '03', val: `${premiumRate}%`, label: 'Access Rate', detail: `${overview.premiumUsers} of ${overview.totalUsers} with active access`, metric: premiumRate },
               { id: 'stickiness', rank: '04', val: stickiness > 0 ? `${stickiness}%` : '\u2014', label: 'DAU / MAU', detail: `${overview.dau} daily \u00F7 ${overview.mau} monthly`, metric: stickiness },
             ].map(c => (
               <div key={c.id} className={`ac-c4-card ac-h-${health(c.id, c.metric)}`}>
@@ -471,7 +471,7 @@ const AdminCockpit = () => {
             </div>
             <div className="ac-table-wrap">
               <table className="ac-table">
-                <thead><tr><th>User</th><th>Streak</th><th>Logs</th><th>AI</th><th>Pro</th><th>Joined</th><th>Active</th></tr></thead>
+                <thead><tr><th>User</th><th>Streak</th><th>Logs</th><th>AI</th><th>Sub</th><th>Joined</th><th>Active</th></tr></thead>
                 <tbody>
                   {users.users.map((u, i) => (
                     <tr key={i}>
@@ -479,7 +479,13 @@ const AdminCockpit = () => {
                       <td><span className="ac-streak-pill">{u.currentStreak}d</span></td>
                       <td>{u.totalLogs}</td>
                       <td>{u.aiMessages}</td>
-                      <td><span className={`ac-dot ${u.isPremium ? 'on' : ''}`} /></td>
+                      <td><span className={`ac-sub-badge ${u.subStatus}`}>{
+                        u.subStatus === 'grandfathered' ? 'OG' :
+                        u.subStatus === 'active' ? 'PRO' :
+                        u.subStatus === 'trial' ? 'TRIAL' :
+                        u.subStatus === 'canceled' ? 'END' :
+                        u.subStatus === 'expired' ? 'EXP' : '\u2014'
+                      }</span></td>
                       <td className="ac-dim">{formatDate(u.joinedAt)}</td>
                       <td className="ac-dim">{(() => {
                         const ago = timeAgo(u.lastActive);

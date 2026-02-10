@@ -235,14 +235,23 @@ router.get('/users', adminCheck, async (req, res) => {
     if (sort === 'active') sortObj = { lastSeen: -1 };
 
     const users = await User.find({},
-      'username email currentStreak longestStreak relapseCount isPremium createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
+      'username email currentStreak longestStreak relapseCount isPremium subscription.status subscription.trialEndDate subscription.currentPeriodEnd createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
     ).sort(sortObj).limit(parseInt(limit)).lean();
 
     res.json({
       users: users.map(u => ({
         username: u.username, email: u.email || '',
         currentStreak: u.currentStreak || 0, longestStreak: u.longestStreak || 0,
-        relapses: u.relapseCount || 0, isPremium: u.isPremium || false,
+        relapses: u.relapseCount || 0, 
+        isPremium: (() => {
+          const s = u.subscription;
+          if (!s) return false;
+          if (s.status === 'grandfathered' || s.status === 'active') return true;
+          if (s.status === 'trial') return s.trialEndDate ? new Date() < new Date(s.trialEndDate) : false;
+          if (s.status === 'canceled') return s.currentPeriodEnd ? new Date() < new Date(s.currentPeriodEnd) : false;
+          return false;
+        })(),
+        subStatus: u.subscription?.status || 'none',
         totalLogs: u.benefitTracking?.length || 0, totalUrges: u.urgeLog?.length || 0,
         aiMessages: u.aiUsage?.lifetimeCount || 0,
         leaderboard: u.showOnLeaderboard || false, discord: u.discordUsername || '',
