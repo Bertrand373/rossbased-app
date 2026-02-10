@@ -1055,3 +1055,21 @@
     padding: 24px;
   }
 }
+
+/* =============================================================================
+   PWA STANDALONE MODE - Tighter modal spacing without browser chrome
+   ============================================================================= */
+
+@media (display-mode: standalone) {
+  .calendar-overlay {
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+  }
+  
+  .calendar-modal-footer {
+    padding-bottom: 16px;
+  }
+  
+  .moon-detail-footer {
+    padding-bottom: 8px;
+  }
+}

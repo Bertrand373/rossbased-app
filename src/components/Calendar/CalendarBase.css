@@ -534,7 +534,7 @@
   transform: scale(0.98);
 }
 
-/* Status styling for week cells - accent dash centered on left edge */
+/* Status styling for week cells - horizontal dash at top (matches month view) */
 .week-day-cell.current-streak,
 .week-day-cell.former-streak,
 .week-day-cell.relapse,
@@ -545,49 +545,49 @@
 .week-day-cell.current-streak::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
   background: var(--status-current);
-  border-radius: 0 2px 2px 0;
+  border-radius: 2px;
 }
 
 .week-day-cell.former-streak::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
   background: var(--status-former);
-  border-radius: 0 2px 2px 0;
+  border-radius: 2px;
 }
 
 .week-day-cell.relapse::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
   background: var(--status-relapse);
-  border-radius: 0 2px 2px 0;
+  border-radius: 2px;
 }
 
 .week-day-cell.wet-dream::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
   background: var(--status-wetdream);
-  border-radius: 0 2px 2px 0;
+  border-radius: 2px;
 }
 
 /* Today card highlight */
@@ -761,11 +761,11 @@
   .week-day-cell.former-streak::after,
   .week-day-cell.relapse::after,
   .week-day-cell.wet-dream::after {
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 16px;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 3px;
   }
   
   .week-day-name {
@@ -989,11 +989,11 @@
   .week-day-cell.former-streak::after,
   .week-day-cell.relapse::after,
   .week-day-cell.wet-dream::after {
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 2px;
-    height: 14px;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 2px;
   }
   
   .week-day-header {
@@ -1244,11 +1244,11 @@
   .week-day-cell.former-streak::after,
   .week-day-cell.relapse::after,
   .week-day-cell.wet-dream::after {
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 22px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 3px;
   }
   
   .week-day-header {
