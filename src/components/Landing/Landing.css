@@ -100,10 +100,11 @@
 }
 
 .landing-stat-value {
-  font-size: 1.25rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #ffffff;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .landing-stat-label {
@@ -173,6 +174,64 @@
   font-weight: 400;
 }
 
+/* Trial note under CTA */
+.landing-trial-note {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 12px;
+  letter-spacing: 0.01em;
+}
+
+/* Pricing section */
+.landing-pricing {
+  text-align: center;
+  padding: 32px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  z-index: 1;
+}
+
+.landing-pricing-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 12px;
+}
+
+.landing-pricing-options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.landing-pricing-option {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.landing-pricing-save {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #d4a017;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.landing-pricing-divider {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.landing-pricing-cancel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 8px;
+}
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */
@@ -226,7 +285,7 @@
   }
   
   .landing-stat-value {
-    font-size: 1.125rem;
+    font-size: 0.8125rem;
   }
   
   .landing-stat-label {
@@ -399,13 +458,25 @@
   opacity: 0;
 }
 
+.landing-trial-note {
+  animation: fadeInUp 600ms ease 250ms forwards;
+  opacity: 0;
+}
+
+.landing-pricing {
+  animation: fadeInUp 600ms ease 500ms forwards;
+  opacity: 0;
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .landing-logo-container,
   .landing-tagline,
   .landing-cta,
   .landing-stats,
-  .landing-features {
+  .landing-features,
+  .landing-trial-note,
+  .landing-pricing {
     animation: none;
     opacity: 1;
   }
