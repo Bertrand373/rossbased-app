@@ -127,35 +127,54 @@
   font-feature-settings: 'tnum' 1;
 }
 
-/* Loop toggle — full row, clear on/off */
-.mp-loop-toggle {
+/* Loop toggle — toggle switch row */
+.mp-loop-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 10px 16px;
+  justify-content: space-between;
   margin-top: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border-prominent);
-  background: transparent;
-  color: var(--text-muted);
+}
+
+.mp-loop-label {
   font-size: 0.8125rem;
   font-weight: 500;
-  font-family: inherit;
+  color: var(--text-secondary);
+}
+
+/* Toggle Switch — matches Profile pattern exactly */
+.mp-toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 30px;
+  background: var(--border);
+  border: none;
+  border-radius: 15px;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background-color 200ms ease;
+  flex-shrink: 0;
+  padding: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-loop-toggle.on {
+.mp-toggle-switch.active {
   background: var(--text);
-  border-color: var(--text);
-  color: var(--background);
 }
 
-.mp-loop-toggle:active {
-  transform: scale(0.98);
+.mp-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: var(--text);
+  border-radius: 50%;
+  transition: transform 200ms ease, background-color 200ms ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.mp-toggle-switch.active .mp-toggle-knob {
+  transform: translateX(20px);
+  background: var(--background);
 }
 
 /* Audio progress bar */
@@ -363,10 +382,10 @@
 }
 
 /* =============================================================================
-   INSTRUCTIONS ACCORDION
+   ACCORDIONS (What this does / How to use)
    ============================================================================= */
 
-.mp-instructions-toggle {
+.mp-accordion-toggle {
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -374,27 +393,28 @@
   padding: 16px 0;
   background: transparent;
   border: none;
+  border-top: 1px solid var(--border-subtle);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-instructions-label {
+.mp-accordion-label {
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-muted);
 }
 
-.mp-instructions-arrow {
+.mp-accordion-arrow {
   font-size: 0.875rem;
   color: var(--text-tertiary);
   transition: transform 200ms ease;
 }
 
-.mp-instructions-arrow.open {
+.mp-accordion-arrow.open {
   transform: rotate(180deg);
 }
 
-.mp-instructions {
+.mp-accordion-content {
   display: flex;
   flex-direction: column;
   padding-bottom: 8px;

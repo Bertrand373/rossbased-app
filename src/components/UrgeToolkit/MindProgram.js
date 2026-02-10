@@ -57,6 +57,7 @@ const MindProgram = ({ isPremium }) => {
   // Progress state
   const [progress, setProgress] = useState(loadProgress);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showWhatItDoes, setShowWhatItDoes] = useState(false);
 
   // Audio state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -310,19 +311,17 @@ const MindProgram = ({ isPremium }) => {
               </div>
             </div>
 
-            {/* Loop toggle — own row, clear state */}
-            <button
-              className={`mp-loop-toggle ${loopEnabled ? 'on' : ''}`}
-              onClick={toggleLoop}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="17 1 21 5 17 9" />
-                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                <polyline points="7 23 3 19 7 15" />
-                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-              </svg>
-              <span>{loopEnabled ? 'Loop on' : 'Loop off'}</span>
-            </button>
+            {/* Loop toggle — toggle switch, matches Profile pattern */}
+            <div className="mp-loop-row">
+              <span className="mp-loop-label">Loop</span>
+              <button
+                className={`mp-toggle-switch ${loopEnabled ? 'active' : ''}`}
+                onClick={toggleLoop}
+                aria-label={loopEnabled ? 'Loop on' : 'Loop off'}
+              >
+                <span className="mp-toggle-knob" />
+              </button>
+            </div>
 
             {audioError && (
               <span className="mp-audio-error">Audio file not available</span>
@@ -375,17 +374,49 @@ const MindProgram = ({ isPremium }) => {
         </>
       )}
 
-      {/* Instructions accordion */}
+      {/* What this does accordion */}
       <button
-        className="mp-instructions-toggle"
+        className="mp-accordion-toggle"
+        onClick={() => setShowWhatItDoes(!showWhatItDoes)}
+      >
+        <span className="mp-accordion-label">What this does</span>
+        <span className={`mp-accordion-arrow ${showWhatItDoes ? 'open' : ''}`}>↓</span>
+      </button>
+
+      {showWhatItDoes && (
+        <div className="mp-accordion-content">
+          <div className="mp-instr-item">
+            <span className="mp-instr-num">01</span>
+            <span className="mp-instr-text">
+              Your subconscious beliefs determine your behavior. Years of negative sexual habits created deeply wired patterns that make retention feel impossible.
+            </span>
+          </div>
+          <div className="mp-instr-item">
+            <span className="mp-instr-num">02</span>
+            <span className="mp-instr-text">
+              This audio delivers sped-up affirmations that bypass your conscious mind. Your subconscious processes them during theta/alpha sleep states — the same brainwave frequencies where habits are formed and broken.
+            </span>
+          </div>
+          <div className="mp-instr-item">
+            <span className="mp-instr-num">03</span>
+            <span className="mp-instr-text">
+              After 30 consecutive nights, your belief system around sexual energy shifts. Retention becomes the default rather than the struggle.
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* How to use accordion */}
+      <button
+        className="mp-accordion-toggle"
         onClick={() => setShowInstructions(!showInstructions)}
       >
-        <span className="mp-instructions-label">How it works</span>
-        <span className={`mp-instructions-arrow ${showInstructions ? 'open' : ''}`}>↓</span>
+        <span className="mp-accordion-label">How to use</span>
+        <span className={`mp-accordion-arrow ${showInstructions ? 'open' : ''}`}>↓</span>
       </button>
 
       {showInstructions && (
-        <div className="mp-instructions">
+        <div className="mp-accordion-content">
           <div className="mp-instr-item">
             <span className="mp-instr-num">01</span>
             <span className="mp-instr-text">
