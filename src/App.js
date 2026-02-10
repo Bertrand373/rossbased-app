@@ -287,6 +287,25 @@ const MixpanelTracker = ({ isLoggedIn, userData }) => {
   return null;
 };
 
+// Heartbeat — pings server on load + every 5 min for real-time admin presence
+const HeartbeatTracker = ({ isLoggedIn, username }) => {
+  useEffect(() => {
+    if (!isLoggedIn || !username) return;
+    const API = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
+    const token = localStorage.getItem('token');
+    const ping = () => {
+      fetch(`${API}/api/user/${username}/heartbeat`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+      }).catch(() => {});
+    };
+    ping(); // immediate
+    const interval = setInterval(ping, 5 * 60 * 1000); // every 5 min
+    return () => clearInterval(interval);
+  }, [isLoggedIn, username]);
+  return null;
+};
+
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('tracker');
@@ -467,6 +486,7 @@ function AppContent({
       <StaticViewManager />
       <ServiceWorkerListener />
       <MixpanelTracker isLoggedIn={isLoggedIn} userData={userData} />
+      <HeartbeatTracker isLoggedIn={isLoggedIn} username={userData?.username} />
       <PostLoginNavigator 
         shouldNavigate={shouldNavigateToTracker} 
         onNavigated={() => setShouldNavigateToTracker(false)} 

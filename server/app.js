@@ -304,6 +304,22 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
 });
 
 // ============================================
+// HEARTBEAT — lightweight presence ping
+// Updates lastSeen for real-time admin tracking
+// ============================================
+app.put('/api/user/:username/heartbeat', authenticate, async (req, res) => {
+  try {
+    await User.updateOne(
+      { username: req.params.username },
+      { $set: { lastSeen: new Date() } }
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'heartbeat failed' });
+  }
+});
+
+// ============================================
 // ACCOUNT DELETION ENDPOINT
 // ============================================
 app.delete('/api/user/:username', authenticate, async (req, res) => {

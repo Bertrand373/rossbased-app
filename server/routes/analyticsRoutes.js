@@ -6,6 +6,16 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 
+// POST /api/analytics/verify — check admin password
+router.post('/verify', (req, res) => {
+  const { password } = req.body;
+  const adminPass = process.env.ADMIN_COCKPIT_PASSWORD || '35slowH?';
+  if (password === adminPass) {
+    return res.json({ verified: true });
+  }
+  return res.status(401).json({ verified: false, error: 'Wrong password' });
+});
+
 const adminCheck = (req, res, next) => {
   const username = req.user?.username || '';
   const lower = username.toLowerCase();
@@ -31,14 +41,16 @@ router.get('/overview', adminCheck, async (req, res) => {
     const prevThirtyDays = getDateRange(60);
 
     const totalUsers = await User.countDocuments();
-    const premiumUsers = await User.countDocuments({ isPremium: true });
+    const premiumUsers = await User.countDocuments({ 
+      'subscription.status': { $in: ['grandfathered', 'active', 'trial', 'canceled'] } 
+    });
     const signupsToday = await User.countDocuments({ createdAt: { $gte: today } });
     const signupsThisWeek = await User.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
     const signupsThisMonth = await User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
     const signupsPrevMonth = await User.countDocuments({ createdAt: { $gte: prevThirtyDays, $lt: thirtyDaysAgo } });
-    const dauCount = await User.countDocuments({ updatedAt: { $gte: today } });
-    const wauCount = await User.countDocuments({ updatedAt: { $gte: sevenDaysAgo } });
-    const mauCount = await User.countDocuments({ updatedAt: { $gte: thirtyDaysAgo } });
+    const dauCount = await User.countDocuments({ lastSeen: { $gte: today } });
+    const wauCount = await User.countDocuments({ lastSeen: { $gte: sevenDaysAgo } });
+    const mauCount = await User.countDocuments({ lastSeen: { $gte: thirtyDaysAgo } });
     const usersWhoLogged = await User.countDocuments({ 'benefitTracking.0': { $exists: true } });
 
     const signupTrend = await User.aggregate([
@@ -220,10 +232,10 @@ router.get('/users', adminCheck, async (req, res) => {
     const { sort = 'recent', limit = 50 } = req.query;
     let sortObj = { createdAt: -1 };
     if (sort === 'streak') sortObj = { currentStreak: -1 };
-    if (sort === 'active') sortObj = { updatedAt: -1 };
+    if (sort === 'active') sortObj = { lastSeen: -1 };
 
     const users = await User.find({},
-      'username email currentStreak longestStreak relapseCount isPremium createdAt updatedAt benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
+      'username email currentStreak longestStreak relapseCount isPremium createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
     ).sort(sortObj).limit(parseInt(limit)).lean();
 
     res.json({
@@ -234,7 +246,7 @@ router.get('/users', adminCheck, async (req, res) => {
         totalLogs: u.benefitTracking?.length || 0, totalUrges: u.urgeLog?.length || 0,
         aiMessages: u.aiUsage?.lifetimeCount || 0,
         leaderboard: u.showOnLeaderboard || false, discord: u.discordUsername || '',
-        joinedAt: u.createdAt, lastActive: u.updatedAt
+        joinedAt: u.createdAt, lastActive: u.lastSeen || u.updatedAt
       })),
       total: await User.countDocuments()
     });

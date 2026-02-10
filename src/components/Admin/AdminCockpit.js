@@ -104,6 +104,10 @@ const RetentionChart = ({ data }) => {
 // MAIN COMPONENT
 // ============================================================
 const AdminCockpit = () => {
+  const [verified, setVerified] = useState(() => sessionStorage.getItem('ac_verified') === '1');
+  const [passInput, setPassInput] = useState('');
+  const [passError, setPassError] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
   const [tab, setTab] = useState('dashboard');
@@ -118,6 +122,29 @@ const AdminCockpit = () => {
 
   const token = localStorage.getItem('token');
   const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+  const handleVerify = async (e) => {
+    if (e) e.preventDefault();
+    setVerifying(true);
+    setPassError(false);
+    try {
+      const res = await fetch(`${API}/api/analytics/verify`, {
+        method: 'POST', headers,
+        body: JSON.stringify({ password: passInput })
+      });
+      const data = await res.json();
+      if (data.verified) {
+        sessionStorage.setItem('ac_verified', '1');
+        setVerified(true);
+      } else {
+        setPassError(true);
+        setPassInput('');
+      }
+    } catch {
+      setPassError(true);
+    }
+    setVerifying(false);
+  };
 
   const fetchData = useCallback(async (endpoint) => {
     const res = await fetch(`${API}/api/analytics/${endpoint}`, { headers });
@@ -141,7 +168,14 @@ const AdminCockpit = () => {
     setLoading(false);
   }, [fetchData]);
 
-  useEffect(() => { loadAll(); }, [loadAll]);
+  useEffect(() => { if (verified) loadAll(); }, [loadAll, verified]);
+
+  // Auto-refresh every 60s for real-time feel
+  useEffect(() => {
+    if (!verified) return;
+    const interval = setInterval(() => loadAll(userSort), 60000);
+    return () => clearInterval(interval);
+  }, [verified, userSort]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (!loading && tab === 'users') fetchData(`users?sort=${userSort}&limit=50`).then(d => d && setUsers(d)); }, [userSort]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Computed
@@ -185,6 +219,35 @@ const AdminCockpit = () => {
   };
 
   if (authError) return <div className="ac-wrap"><div className="ac-error">{authError}</div></div>;
+
+  // ===== PASSWORD GATE =====
+  if (!verified) {
+    return (
+      <div className="ac-wrap">
+        <div className="ac-gate">
+          <div className="ac-gate-icon">&#9670;</div>
+          <h2 className="ac-gate-title">Command Center</h2>
+          <p className="ac-gate-sub">Admin access required</p>
+          <div className="ac-gate-form" onKeyDown={e => e.key === 'Enter' && handleVerify()}>
+            <input
+              type="password"
+              className={`ac-gate-input ${passError ? 'error' : ''}`}
+              placeholder="Enter password"
+              value={passInput}
+              onChange={e => { setPassInput(e.target.value); setPassError(false); }}
+              autoFocus
+              disabled={verifying}
+            />
+            <button className="ac-gate-btn" onClick={handleVerify} disabled={!passInput || verifying}>
+              {verifying ? 'Verifying...' : 'Enter'}
+            </button>
+          </div>
+          {passError && <p className="ac-gate-error">Wrong password</p>}
+        </div>
+      </div>
+    );
+  }
+
   if (loading) return <div className="ac-wrap"><div className="ac-loading"><div className="ac-loader" /><span>Loading command center...</span></div></div>;
 
   return (
@@ -193,7 +256,14 @@ const AdminCockpit = () => {
       <div className="ac-header">
         <div>
           <h1 className="ac-title">Command Center</h1>
-          {lastRefresh && <span className="ac-updated">Updated {lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>}
+          <div className="ac-header-meta">
+            {lastRefresh && <span className="ac-updated">{lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>}
+            {users?.users && (() => {
+              const tenMinAgo = Date.now() - 10 * 60 * 1000;
+              const online = users.users.filter(u => u.lastActive && new Date(u.lastActive).getTime() > tenMinAgo).length;
+              return online > 0 ? <span className="ac-live-badge"><span className="ac-live-dot" />{online} live</span> : null;
+            })()}
+          </div>
         </div>
         <button className="ac-refresh" onClick={() => loadAll(userSort)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -411,7 +481,11 @@ const AdminCockpit = () => {
                       <td>{u.aiMessages}</td>
                       <td><span className={`ac-dot ${u.isPremium ? 'on' : ''}`} /></td>
                       <td className="ac-dim">{formatDate(u.joinedAt)}</td>
-                      <td className="ac-dim">{timeAgo(u.lastActive)}</td>
+                      <td className="ac-dim">{(() => {
+                        const ago = timeAgo(u.lastActive);
+                        const isOnline = u.lastActive && (Date.now() - new Date(u.lastActive).getTime()) < 10 * 60 * 1000;
+                        return isOnline ? <span className="ac-online-badge">now</span> : ago;
+                      })()}</td>
                     </tr>
                   ))}
                 </tbody>
