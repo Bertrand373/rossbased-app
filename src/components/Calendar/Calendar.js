@@ -436,11 +436,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             rows="4"
           />
           <div className="calendar-journal-actions">
-            <button className="calendar-cancel-btn" onClick={cancelEditingNote}>
-              Cancel
-            </button>
             <button className="calendar-save-btn" onClick={saveNote}>
               Save
+            </button>
+            <button className="calendar-cancel-btn" onClick={cancelEditingNote}>
+              Cancel
             </button>
           </div>
         </div>
@@ -1129,14 +1129,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
 
                   {/* STICKY FOOTER */}
                   <div className="calendar-modal-footer">
-                    <button className="calendar-btn-ghost" onClick={closeDayInfo}>
-                      Close
-                    </button>
                     {!isFuture && (
                       <button className="calendar-btn-primary" onClick={showEditFromInfo}>
                         Edit Day
                       </button>
                     )}
+                    <button className="calendar-btn-ghost" onClick={closeDayInfo}>
+                      Close
+                    </button>
                   </div>
                 </>
               );

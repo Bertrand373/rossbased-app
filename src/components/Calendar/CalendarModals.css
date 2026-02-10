@@ -373,14 +373,15 @@
 
 .calendar-journal-actions {
   display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
 .calendar-save-btn {
-  flex: 1;
+  width: 100%;
   padding: 14px 24px;
-  background: var(--surface-overlay);
-  border: none;
+  background: transparent;
+  border: 1px solid var(--border);
   border-radius: 12px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
@@ -395,19 +396,19 @@
 }
 
 .calendar-save-btn:hover {
-  background: var(--border);
+  border-color: var(--border-prominent);
   color: var(--text);
 }
 
 .calendar-cancel-btn {
-  flex: 1;
+  width: 100%;
   padding: 14px 24px;
   background: transparent;
   border: none;
   border-radius: 12px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: color 150ms ease;
@@ -819,7 +820,6 @@
   .calendar-journal-header h4 { text-align: center; }
   .calendar-action-btn { align-self: center; }
   .calendar-journal-textarea { min-height: 100px; }
-  .calendar-journal-actions { flex-direction: column; }
   .calendar-actions { margin-top: 32px; }
   .calendar-btn-primary, .calendar-btn-ghost, .calendar-btn-back { padding: 14px 20px; font-size: 0.875rem; }
 }
