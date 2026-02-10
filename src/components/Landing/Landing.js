@@ -1,17 +1,11 @@
 // Landing.js - TITANTRACK MODERN MINIMAL
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Landing.css';
 import AuthModal from '../Auth/AuthModal';
 import trackerLogo from '../../assets/trackerapplogo-white.png';
 
 const Landing = ({ onLogin }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
-
-  // Lock scroll on landing page (fixed content)
-  useEffect(() => {
-    document.body.classList.add('static-view');
-    return () => document.body.classList.remove('static-view');
-  }, []);
 
   const handleLoginSuccess = async (username, password) => {
     setShowAuthModal(false);
