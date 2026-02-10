@@ -22,31 +22,34 @@ const PaywallScreen = ({
   // Determine headline based on context
   const getHeadline = () => {
     if (reason === 'trial_expired' && streakCount > 0) {
-      return `${streakCount} days built.`;
+      return `Day ${streakCount}.`;
     }
     if (reason === 'trial_expired' && longestStreak > 0) {
-      return `${longestStreak} days on record.`;
+      return 'Your patterns are still here.';
     }
     if (reason === 'trial_expired') {
-      return 'You felt the difference.';
+      return 'Seven days in.';
     }
     if (reason === 'subscription_ended' || reason === 'expired') {
-      return 'Your data is waiting.';
+      return 'Nothing was lost.';
     }
     return 'Unlock TitanTrack.';
   };
   
   const getSubheadline = () => {
     if (reason === 'trial_expired' && streakCount > 0) {
-      return "Your patterns don't track themselves.";
+      return 'Your streak is yours. Your data lives here.';
+    }
+    if (reason === 'trial_expired' && longestStreak > 0) {
+      return 'Every check-in, every pattern, every prediction. Waiting.';
     }
     if (reason === 'trial_expired') {
-      return 'The tool worked. Keep it.';
+      return 'Now you know what this is. Decide.';
     }
     if (reason === 'subscription_ended' || reason === 'expired') {
-      return 'Pick up where you left off.';
+      return 'Your history, your patterns, your progress. All here.';
     }
-    return 'Everything you need to master retention.';
+    return 'Track the work. See the change.';
   };
 
   const handleCheckout = async () => {
