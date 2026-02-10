@@ -27,7 +27,7 @@ import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import AIChat from './components/AIChat/AIChat';
-import KnowledgeBase from './components/Admin/KnowledgeBase';
+import AdminCockpit from './components/Admin/AdminCockpit';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -627,8 +627,8 @@ function AppContent({
                   <Route path="/urge-prediction" element={
                     <PredictionDisplay mode="full" userData={userData} />
                   } />
-                  <Route path="/admin/knowledge" element={
-                    <KnowledgeBase />
+                  <Route path="/admin" element={
+                    <AdminCockpit />
                   } />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>

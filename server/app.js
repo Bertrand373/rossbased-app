@@ -20,6 +20,7 @@ const discordAuthRoutes = require('./routes/discordAuth');
 const mlRoutes = require('./routes/mlRoutes');
 const transmissionRoutes = require('./routes/transmissionRoutes');
 const knowledgeRoutes = require('./routes/knowledgeRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const stripeRoutes = require('./routes/stripeRoutes');
@@ -1352,6 +1353,7 @@ app.use('/api/auth', discordAuthRoutes);
 app.use('/api/ml', mlRoutes);
 app.use('/api/transmission', transmissionRoutes);
 app.use('/api/knowledge', authenticate, knowledgeRoutes);
+app.use('/api/analytics', authenticate, analyticsRoutes);
 app.use('/api/stripe', stripeRoutes);
 app.use('/api/discord', discordLinkRoutes);
 
