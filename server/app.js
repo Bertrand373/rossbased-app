@@ -12,6 +12,7 @@ dotenv.config();
 
 // Import User model
 const User = require('./models/User');
+const PageView = require('./models/PageView');
 
 // Import notification modules (these need env vars to be loaded first!)
 const notificationRoutes = require('./routes/notifications');
@@ -316,6 +317,24 @@ app.put('/api/user/:username/heartbeat', authenticate, async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'heartbeat failed' });
+  }
+});
+
+// ============================================
+// PAGE VIEW TRACKING — records every page visit
+// Also updates lastSeen for real-time presence
+// ============================================
+app.post('/api/track', authenticate, async (req, res) => {
+  try {
+    const { page, sessionId } = req.body;
+    if (!page || !sessionId) return res.status(400).json({ error: 'missing fields' });
+    await Promise.all([
+      PageView.create({ userId: req.user.username, page, sessionId }),
+      User.updateOne({ username: req.user.username }, { $set: { lastSeen: new Date() } })
+    ]);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'track failed' });
   }
 });
 

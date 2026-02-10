@@ -392,10 +392,50 @@
   height: 100%;
 }
 
-/* ===== SVG BAR CHART ===== */
-.ac-barchart-svg {
-  width: 100%;
-  height: auto;
+/* ===== CSS HORIZONTAL BARS ===== */
+.ac-hbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ac-hbar-row {}
+
+.ac-hbar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.ac-hbar-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.3;
+}
+
+.ac-hbar-val {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.ac-hbar-track {
+  height: 6px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ac-hbar-fill {
+  height: 100%;
+  background: rgba(255,255,255,0.14);
+  border-radius: 3px;
+  min-width: 3px;
+  transition: width 0.3s ease;
 }
 
 /* ===== RETENTION CHART ===== */
@@ -794,6 +834,85 @@
   color: rgba(239,68,68,0.5);
   font-size: 13px;
   font-weight: 600;
+}
+
+/* ===== BIG NUMBER (Ghost/Real) ===== */
+.ac-big-num {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1;
+  margin: 4px 0 4px;
+}
+
+.ac-big-num.dim { color: rgba(255,255,255,0.2); }
+
+.ac-big-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.15);
+  line-height: 1.4;
+}
+
+/* ===== PAGE LEGEND ===== */
+.ac-page-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.03);
+}
+
+.ac-page-users {
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  font-weight: 500;
+}
+
+/* ===== PEAK HOURS ===== */
+.ac-hours {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 48px;
+  padding-bottom: 14px;
+  position: relative;
+}
+
+.ac-hour-block {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+}
+
+.ac-hour-bar {
+  width: 100%;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+}
+
+.ac-hour-label {
+  position: absolute;
+  bottom: -14px;
+  font-size: 8px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.15);
+}
+
+/* ===== EMPTY MESSAGE ===== */
+.ac-empty-msg {
+  font-size: 12px;
+  color: rgba(255,255,255,0.18);
+  text-align: center;
+  padding: 24px 0;
+  margin: 0;
 }
 
 /* ===== MOBILE ===== */

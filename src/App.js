@@ -287,8 +287,28 @@ const MixpanelTracker = ({ isLoggedIn, userData }) => {
   return null;
 };
 
-// Heartbeat — pings server on load + every 5 min for real-time admin presence
-const HeartbeatTracker = ({ isLoggedIn, username }) => {
+// ActivityTracker — page views + heartbeat for real-time admin analytics
+const ActivityTracker = ({ isLoggedIn, username }) => {
+  const location = useLocation();
+  useEffect(() => {
+    if (!isLoggedIn || !username) return;
+    const API = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
+    const token = localStorage.getItem('token');
+    // Session ID persists per browser tab session
+    let sid = sessionStorage.getItem('tt_sid');
+    if (!sid) { sid = Date.now().toString(36) + Math.random().toString(36).slice(2, 8); sessionStorage.setItem('tt_sid', sid); }
+    // Send page view
+    const page = location.pathname;
+    if (page && page !== '/auth/discord/callback' && page !== '/auth/discord/link-callback') {
+      fetch(`${API}/api/track`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page, sessionId: sid })
+      }).catch(() => {});
+    }
+  }, [location.pathname, isLoggedIn, username]);
+
+  // Heartbeat every 5 min for presence
   useEffect(() => {
     if (!isLoggedIn || !username) return;
     const API = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
@@ -299,10 +319,11 @@ const HeartbeatTracker = ({ isLoggedIn, username }) => {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
       }).catch(() => {});
     };
-    ping(); // immediate
-    const interval = setInterval(ping, 5 * 60 * 1000); // every 5 min
+    ping();
+    const interval = setInterval(ping, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [isLoggedIn, username]);
+
   return null;
 };
 
@@ -486,7 +507,7 @@ function AppContent({
       <StaticViewManager />
       <ServiceWorkerListener />
       <MixpanelTracker isLoggedIn={isLoggedIn} userData={userData} />
-      <HeartbeatTracker isLoggedIn={isLoggedIn} username={userData?.username} />
+      <ActivityTracker isLoggedIn={isLoggedIn} username={userData?.username} />
       <PostLoginNavigator 
         shouldNavigate={shouldNavigateToTracker} 
         onNavigated={() => setShouldNavigateToTracker(false)} 

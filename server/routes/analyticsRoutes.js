@@ -52,6 +52,17 @@ router.get('/overview', adminCheck, async (req, res) => {
     const wauCount = await User.countDocuments({ lastSeen: { $gte: sevenDaysAgo } });
     const mauCount = await User.countDocuments({ lastSeen: { $gte: thirtyDaysAgo } });
     const usersWhoLogged = await User.countDocuments({ 'benefitTracking.0': { $exists: true } });
+    
+    // Ghost users = signed up but zero engagement (no logs, no AI, no urges, no emotional tracking)
+    const engagedUsers = await User.countDocuments({
+      $or: [
+        { 'benefitTracking.0': { $exists: true } },
+        { 'urgeLog.0': { $exists: true } },
+        { 'emotionalTracking.0': { $exists: true } },
+        { 'aiUsage.lifetimeCount': { $gt: 0 } }
+      ]
+    });
+    const ghostUsers = totalUsers - engagedUsers;
 
     const signupTrend = await User.aggregate([
       { $match: { createdAt: { $gte: thirtyDaysAgo } } },
@@ -68,7 +79,7 @@ router.get('/overview', adminCheck, async (req, res) => {
       premiumRate: totalUsers > 0 ? Math.round((premiumUsers / totalUsers) * 100) : 0,
       signupsToday, signupsThisWeek, signupsThisMonth, growthRate,
       dau: dauCount, wau: wauCount, mau: mauCount,
-      usersWhoLogged,
+      usersWhoLogged, engagedUsers, ghostUsers,
       logRate: totalUsers > 0 ? Math.round((usersWhoLogged / totalUsers) * 100) : 0,
       signupTrend
     });
@@ -262,6 +273,88 @@ router.get('/users', adminCheck, async (req, res) => {
   } catch (error) {
     console.error('Analytics users error:', error);
     res.status(500).json({ error: 'Failed to load user list' });
+  }
+});
+
+// GET /api/analytics/behavior — page views, sessions, popular pages
+router.get('/behavior', adminCheck, async (req, res) => {
+  try {
+    const PageView = require('../models/PageView');
+    const now = new Date();
+    const today = startOfDay(now);
+    const sevenDaysAgo = getDateRange(7);
+    const fourteenDaysAgo = getDateRange(14);
+    const thirtyDaysAgo = getDateRange(30);
+
+    // Top pages (last 30 days)
+    const topPages = await PageView.aggregate([
+      { $match: { timestamp: { $gte: thirtyDaysAgo } } },
+      { $group: { _id: '$page', views: { $sum: 1 }, uniqueUsers: { $addToSet: '$userId' } } },
+      { $project: { page: '$_id', views: 1, users: { $size: '$uniqueUsers' }, _id: 0 } },
+      { $sort: { views: -1 } },
+      { $limit: 15 }
+    ]);
+
+    // Session stats (last 7 days) — group by sessionId, calc duration
+    const sessions = await PageView.aggregate([
+      { $match: { timestamp: { $gte: sevenDaysAgo } } },
+      { $sort: { timestamp: 1 } },
+      { $group: {
+        _id: '$sessionId',
+        userId: { $first: '$userId' },
+        start: { $min: '$timestamp' },
+        end: { $max: '$timestamp' },
+        pageCount: { $sum: 1 },
+        pages: { $push: '$page' }
+      }},
+      { $project: {
+        userId: 1,
+        durationMin: { $divide: [{ $subtract: ['$end', '$start'] }, 60000] },
+        pageCount: 1
+      }}
+    ]);
+
+    // Filter out sessions with only 1 page view (no duration data)
+    const realSessions = sessions.filter(s => s.pageCount > 1);
+    const avgDuration = realSessions.length > 0
+      ? Math.round(realSessions.reduce((sum, s) => sum + s.durationMin, 0) / realSessions.length)
+      : 0;
+    const avgPages = sessions.length > 0
+      ? Math.round((sessions.reduce((sum, s) => sum + s.pageCount, 0) / sessions.length) * 10) / 10
+      : 0;
+
+    // Counts
+    const viewsToday = await PageView.countDocuments({ timestamp: { $gte: today } });
+    const viewsThisWeek = await PageView.countDocuments({ timestamp: { $gte: sevenDaysAgo } });
+
+    // Daily trend (last 14 days)
+    const dailyTrend = await PageView.aggregate([
+      { $match: { timestamp: { $gte: fourteenDaysAgo } } },
+      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$timestamp' } }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // Active hours (what hour of day gets most views)
+    const hourlyActivity = await PageView.aggregate([
+      { $match: { timestamp: { $gte: thirtyDaysAgo } } },
+      { $group: { _id: { $hour: '$timestamp' }, count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 24 }
+    ]);
+
+    res.json({
+      topPages,
+      totalSessions: sessions.length,
+      avgDuration,
+      avgPages,
+      viewsToday,
+      viewsThisWeek,
+      dailyTrend,
+      hourlyActivity: hourlyActivity.map(h => ({ hour: h._id, views: h.count }))
+    });
+  } catch (error) {
+    console.error('Analytics behavior error:', error);
+    res.status(500).json({ error: 'Failed to load behavior data' });
   }
 });
 

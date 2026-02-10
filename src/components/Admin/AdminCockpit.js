@@ -48,27 +48,24 @@ const Sparkline = ({ data, width = 400, height = 64 }) => {
   );
 };
 
-// Horizontal bar chart — SVG
-const SVGBarChart = ({ data, labelKey, valueKey }) => {
+// Horizontal bar chart — CSS-based (no SVG label truncation)
+const HBar = ({ data, labelKey, valueKey }) => {
   if (!data?.length) return null;
   const max = Math.max(...data.map(d => d[valueKey] || 0), 1);
-  const barH = 22, gap = 6, labelW = 72, valueW = 40;
-  const totalH = data.length * (barH + gap);
   return (
-    <svg viewBox={`0 0 420 ${totalH}`} className="ac-barchart-svg">
-      {data.map((item, i) => {
-        const y = i * (barH + gap);
-        const w = Math.max((item[valueKey] / max) * (420 - labelW - valueW - 16), 3);
-        return (
-          <g key={i}>
-            <text x={labelW - 6} y={y + barH / 2 + 4} textAnchor="end" fill="rgba(255,255,255,0.35)" fontSize="11" fontWeight="600">{item[labelKey]}</text>
-            <rect x={labelW} y={y + 2} width={420 - labelW - valueW - 16} height={barH - 4} rx="4" fill="rgba(255,255,255,0.03)" />
-            <rect x={labelW} y={y + 2} width={w} height={barH - 4} rx="4" fill="rgba(255,255,255,0.12)" />
-            <text x={420 - valueW + 4} y={y + barH / 2 + 4} fill="rgba(255,255,255,0.55)" fontSize="12" fontWeight="700">{item[valueKey]}</text>
-          </g>
-        );
-      })}
-    </svg>
+    <div className="ac-hbar">
+      {data.map((item, i) => (
+        <div key={i} className="ac-hbar-row">
+          <div className="ac-hbar-top">
+            <span className="ac-hbar-label">{item[labelKey]}</span>
+            <span className="ac-hbar-val">{item[valueKey]}</span>
+          </div>
+          <div className="ac-hbar-track">
+            <div className="ac-hbar-fill" style={{ width: `${Math.max((item[valueKey] / max) * 100, 2)}%` }} />
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 
@@ -116,6 +113,7 @@ const AdminCockpit = () => {
   const [streaks, setStreaks] = useState(null);
   const [retention, setRetention] = useState(null);
   const [users, setUsers] = useState(null);
+  const [behavior, setBehavior] = useState(null);
   const [userSort, setUserSort] = useState('recent');
   const [expandedInfo, setExpandedInfo] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(null);
@@ -155,15 +153,17 @@ const AdminCockpit = () => {
 
   const loadAll = useCallback(async (sort = 'recent') => {
     setLoading(true);
-    const [o, e, s, r, u] = await Promise.all([
+    const [o, e, s, r, u, b] = await Promise.all([
       fetchData('overview'), fetchData('engagement'), fetchData('streaks'),
-      fetchData('retention'), fetchData(`users?sort=${sort}&limit=50`)
+      fetchData('retention'), fetchData(`users?sort=${sort}&limit=50`),
+      fetchData('behavior')
     ]);
     if (o) setOverview(o);
     if (e) setEngagement(e);
     if (s) setStreaks(s);
     if (r) setRetention(r);
     if (u) setUsers(u);
+    if (b) setBehavior(b);
     setLastRefresh(new Date());
     setLoading(false);
   }, [fetchData]);
@@ -275,6 +275,7 @@ const AdminCockpit = () => {
         {[
           { id: 'dashboard', icon: '\u25A0', label: 'Dashboard' },
           { id: 'intelligence', icon: '\u25C6', label: 'Intelligence' },
+          { id: 'behavior', icon: '\u25E8', label: 'Behavior' },
           { id: 'users', icon: '\u25CB', label: 'Users' },
           { id: 'oracle', icon: '\u2726', label: 'Oracle' },
         ].map(t => (
@@ -353,6 +354,20 @@ const AdminCockpit = () => {
               </div>
             </div>
           )}
+
+          {/* User Quality */}
+          <div className="ac-row-2">
+            <div className="ac-card ac-card-compact">
+              <h3 className="ac-card-title-sm">Real Users</h3>
+              <span className="ac-big-num">{overview.engagedUsers || 0}</span>
+              <span className="ac-big-sub">logged, tracked, or used AI at least once</span>
+            </div>
+            <div className="ac-card ac-card-compact">
+              <h3 className="ac-card-title-sm">Ghost Accounts</h3>
+              <span className="ac-big-num dim">{overview.ghostUsers || 0}</span>
+              <span className="ac-big-sub">signed up but zero engagement</span>
+            </div>
+          </div>
         </div>
       )}
 
@@ -415,7 +430,7 @@ const AdminCockpit = () => {
             <div className="ac-card">
               <div className="ac-card-head"><h3>Streak Distribution</h3><Info id="distribution" /></div>
               <Tip id="distribution" />
-              <SVGBarChart data={streaks.distribution} labelKey="range" valueKey="count" />
+              <HBar data={streaks.distribution} labelKey="range" valueKey="count" />
             </div>
           )}
 
@@ -424,7 +439,7 @@ const AdminCockpit = () => {
             <div className="ac-card">
               <div className="ac-card-head"><h3>Danger Zones</h3><Info id="danger" /></div>
               <Tip id="danger" />
-              <SVGBarChart data={Object.entries(streaks.failureDays).map(([r, c]) => ({ range: r, count: c }))} labelKey="range" valueKey="count" />
+              <HBar data={Object.entries(streaks.failureDays).map(([r, c]) => ({ range: r, count: c }))} labelKey="range" valueKey="count" />
             </div>
           )}
 
@@ -433,7 +448,7 @@ const AdminCockpit = () => {
             <div className="ac-card">
               <div className="ac-card-head"><h3>Top Triggers</h3><Info id="triggers" /></div>
               <Tip id="triggers" />
-              <SVGBarChart data={streaks.topTriggers} labelKey="trigger" valueKey="count" />
+              <HBar data={streaks.topTriggers} labelKey="trigger" valueKey="count" />
             </div>
           )}
 
@@ -450,6 +465,92 @@ const AdminCockpit = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ===== BEHAVIOR ===== */}
+      {tab === 'behavior' && (
+        <div className="ac-section">
+          {behavior ? (
+            <>
+              <p className="ac-intro">Where users spend time, how long they stay, and when they're active. Data starts recording from deploy.</p>
+
+              {/* Behavior Stats */}
+              <div className="ac-stat-row">
+                {[
+                  { l: 'Views Today', v: behavior.viewsToday },
+                  { l: 'Sessions (7d)', v: behavior.totalSessions },
+                  { l: 'Avg Duration', v: behavior.avgDuration > 0 ? `${behavior.avgDuration}m` : '\u2014' },
+                  { l: 'Pages / Session', v: behavior.avgPages > 0 ? behavior.avgPages : '\u2014' },
+                ].map((s, i) => (
+                  <div key={i} className="ac-mini-stat">
+                    <span className="ac-ms-val">{s.v}</span>
+                    <span className="ac-ms-label">{s.l}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Top Pages */}
+              {behavior.topPages?.length > 0 && (
+                <div className="ac-card">
+                  <div className="ac-card-head"><h3>Most Visited Pages</h3></div>
+                  <p className="ac-card-sub">Last 30 days</p>
+                  <HBar data={behavior.topPages.map(p => ({
+                    page: p.page === '/' ? 'Home / Tracker' : p.page.replace(/^\//, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                    views: p.views,
+                    users: p.users
+                  }))} labelKey="page" valueKey="views" />
+                  <div className="ac-page-legend">
+                    {behavior.topPages.slice(0, 5).map((p, i) => (
+                      <span key={i} className="ac-page-users">{p.page === '/' ? 'Tracker' : p.page.replace(/^\//, '')} \u2014 {p.users} users</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Activity Trend */}
+              {behavior.dailyTrend?.length > 1 && (
+                <div className="ac-card">
+                  <h3 className="ac-card-title-sm">Page Views \u00B7 14 Days</h3>
+                  <div className="ac-sparkline-wrap">
+                    <Sparkline data={behavior.dailyTrend} />
+                  </div>
+                </div>
+              )}
+
+              {/* Peak Hours */}
+              {behavior.hourlyActivity?.length > 0 && (
+                <div className="ac-card">
+                  <h3 className="ac-card-title-sm">Peak Activity Hours (UTC)</h3>
+                  <div className="ac-hours">
+                    {Array.from({ length: 24 }, (_, h) => {
+                      const match = behavior.hourlyActivity.find(a => a.hour === h);
+                      const views = match?.views || 0;
+                      const maxViews = Math.max(...behavior.hourlyActivity.map(a => a.views), 1);
+                      const intensity = views / maxViews;
+                      return (
+                        <div key={h} className="ac-hour-block" title={`${h}:00 — ${views} views`}
+                          style={{ opacity: 0.15 + intensity * 0.85 }}>
+                          <div className="ac-hour-bar" style={{ height: `${Math.max(intensity * 100, 4)}%` }} />
+                          {h % 6 === 0 && <span className="ac-hour-label">{h}</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {behavior.topPages?.length === 0 && behavior.totalSessions === 0 && (
+                <div className="ac-card">
+                  <p className="ac-empty-msg">No page view data yet. Data will appear once users visit the app after this update is deployed.</p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="ac-card">
+              <p className="ac-empty-msg">Loading behavior data...</p>
             </div>
           )}
         </div>
