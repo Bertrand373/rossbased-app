@@ -2,7 +2,7 @@
 // Full-screen paywall - shown when user has no active subscription
 // Premium, minimal design matching TitanTrack aesthetic
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './PaywallScreen.css';
 
 const PaywallScreen = ({ 
@@ -13,6 +13,13 @@ const PaywallScreen = ({
 }) => {
   const [selectedPlan, setSelectedPlan] = useState('yearly');
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Reset processing state if user navigates back from Stripe
+  useEffect(() => {
+    const handleFocus = () => setIsProcessing(false);
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
   
   const streakCount = userData?.currentStreak || 0;
   const longestStreak = userData?.longestStreak || 0;
@@ -67,7 +74,7 @@ const PaywallScreen = ({
         
         {/* Logo */}
         <div className="paywall-logo">
-          <img src="/icon-192.png" alt="" className="paywall-icon" />
+          <img src="/tt-icon-white.png" alt="" className="paywall-icon" />
         </div>
         
         {/* Headline */}
