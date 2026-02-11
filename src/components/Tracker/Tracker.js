@@ -313,8 +313,8 @@ const Tracker = ({ userData, updateUserData }) => {
             </div>
             
             <div className="benefits-actions">
-              <button className="btn-ghost" onClick={() => setShowBenefits(false)}>Cancel</button>
               <button className="btn-primary" onClick={saveBenefits}>Save</button>
+              <button className="btn-ghost" onClick={() => setShowBenefits(false)}>Cancel</button>
             </div>
           </div>
         </div>
@@ -361,13 +361,13 @@ const Tracker = ({ userData, updateUserData }) => {
               }
             </p>
             <div className="confirm-actions">
-              <button className="btn-ghost" onClick={() => setShowResetConfirm(false)}>Cancel</button>
               <button 
                 className={resetType === 'relapse' ? 'btn-danger' : 'btn-primary'} 
                 onClick={resetType === 'wetdream' ? handleLogWetDream : handleReset}
               >
                 {resetType === 'wetdream' ? 'Log it' : 'Reset'}
               </button>
+              <button className="btn-ghost" onClick={() => setShowResetConfirm(false)}>Cancel</button>
             </div>
           </div>
         </div>

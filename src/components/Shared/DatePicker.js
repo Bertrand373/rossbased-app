@@ -143,11 +143,11 @@ const DatePicker = ({ onSubmit, onCancel, initialDate, title }) => {
         </div>
         
         <div className="date-actions">
-          <button type="button" className="btn-ghost" onClick={onCancel || handleUseToday}>
-            {onCancel ? 'Cancel' : 'Use today'}
-          </button>
           <button type="submit" className="btn-primary">
             Set date
+          </button>
+          <button type="button" className="btn-ghost" onClick={onCancel || handleUseToday}>
+            {onCancel ? 'Cancel' : 'Use today'}
           </button>
         </div>
       </form>
