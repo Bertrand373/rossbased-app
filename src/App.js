@@ -416,7 +416,7 @@ function App() {
 
   // Loading screen - icon only, no text
   // Shows until BOTH data is loaded AND minimum display time has passed
-  if (isLoading || isRefreshLoading || !minLoadingComplete) {
+  if (isLoading || isRefreshLoading || !minLoadingComplete || (isLoggedIn && subLoading)) {
     return (
       <div className="app-loading-screen">
         <img 
