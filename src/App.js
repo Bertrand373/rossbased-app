@@ -23,7 +23,6 @@ import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay'
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
 import DiscordCallback from './components/Auth/DiscordCallback';
-import SubscriptionBanner from './components/Subscription/SubscriptionBanner';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import AIChat from './components/AIChat/AIChat';

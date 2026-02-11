@@ -1403,7 +1403,7 @@
 }
 
 .billing-value.trial {
-  color: var(--accent-gold);
+  color: var(--accent-gold-text);
 }
 
 .billing-value.inactive {

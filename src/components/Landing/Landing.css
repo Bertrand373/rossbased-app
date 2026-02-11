@@ -217,7 +217,7 @@
 .landing-pricing-save {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: #d4a017;
+  color: rgba(255, 221, 0, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }

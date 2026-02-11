@@ -167,8 +167,16 @@
   letter-spacing: 0.05em;
   padding: 3px 8px;
   border-radius: 20px;
-  background: #f5c518;
-  color: #000000;
+}
+
+[data-theme="dark"] .plan-badge {
+  color: rgba(255, 221, 0, 0.5);
+  background: rgba(255, 221, 0, 0.08);
+}
+
+[data-theme="light"] .plan-badge {
+  color: rgba(184, 134, 11, 0.7);
+  background: rgba(184, 134, 11, 0.06);
 }
 
 .plan-label {
