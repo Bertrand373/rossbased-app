@@ -839,6 +839,14 @@ client.on('messageCreate', async (message) => {
         'The Oracle has spoken enough for one day. Sit with what you\'ve been given.',
         'Ten exchanges is the boundary. Integration matters more than accumulation. Tomorrow.',
         'Enough for today. Real growth happens between the conversations, not during them.',
+        'The well refills at midnight. Until then, apply what you already know.',
+        'Silence is part of the teaching. Sit with today\'s words.',
+        'You have what you need for now. Come back when the sun does.',
+        'The Oracle rests. Not every answer comes from asking.',
+        'Today\'s thread is complete. Tomorrow brings a new one.',
+        'Ten is the number. Reflect on what was given before seeking more.',
+        'Some answers only surface after you stop asking. Tomorrow.',
+        'The signal fades when drawn from too often. Let it rebuild overnight.',
       ];
       const limitMsg = dailyLimitMessages[Math.floor(Math.random() * dailyLimitMessages.length)];
       await message.reply({ embeds: [buildOracleEmbed(limitMsg)] });

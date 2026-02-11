@@ -382,3 +382,11 @@
     animation: none;
   }
 }
+
+/* =============================================================================
+   HIDE ORACLE FAB DURING ONBOARDING
+   ============================================================================= */
+
+body:has(.onboarding-overlay) .oracle-float-btn {
+  display: none !important;
+}
